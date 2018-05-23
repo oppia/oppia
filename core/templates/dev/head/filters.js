@@ -92,7 +92,7 @@ oppia.filter('truncateAtFirstLine', [function() {
     var suffix = otherNonemptyLinesExist ? '...' : '';
     return (
       firstNonemptyLineIndex !== -1 ?
-      lines[firstNonemptyLineIndex] + suffix : '');
+        lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
 
@@ -225,13 +225,13 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '(';
           replacementText += (
             inputs[varName][0] >= 0.0 ?
-            latitude.toFixed(2) + '°N' :
-            -latitude.toFixed(2) + '°S');
+              latitude.toFixed(2) + '°N' :
+              -latitude.toFixed(2) + '°S');
           replacementText += ', ';
           replacementText += (
             inputs[varName][1] >= 0.0 ?
-            longitude.toFixed(2) + '°E' :
-            -longitude.toFixed(2) + '°W');
+              longitude.toFixed(2) + '°E' :
+              -longitude.toFixed(2) + '°W');
           replacementText += ')';
         } else if (varType === 'NormalizedString') {
           replacementText = '"' + inputs[varName] + '"';
@@ -342,31 +342,6 @@ oppia.filter('normalizeWhitespacePunctuationAndCase', [function() {
     } else {
       return input;
     }
-  };
-}]);
-
-// Note that this filter removes additional new lines or <p><br></p> tags
-// at the end of the string.
-oppia.filter('removeExtraLines', [function() {
-  return function(string) {
-    if (!angular.isString(string)) {
-      return string;
-    }
-    var BLANK_LINES_TEXT = '<p><br></p>';
-    var EMPTY_PARA_TEXT = '<p></p>';
-    while (1) {
-      var endIndex = string.length;
-      var bStr = string.substring(endIndex - BLANK_LINES_TEXT.length, endIndex);
-      var pStr = string.substring(endIndex - EMPTY_PARA_TEXT.length, endIndex);
-      if (bStr === BLANK_LINES_TEXT) {
-        string = string.substring(0, endIndex - BLANK_LINES_TEXT.length);
-      } else if (pStr === EMPTY_PARA_TEXT) {
-        string = string.substring(0, endIndex - EMPTY_PARA_TEXT.length);
-      } else {
-        break;
-      }
-    }
-    return string;
   };
 }]);
 
@@ -493,7 +468,7 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
   return function(html) {
     html = html.replace(/&nbsp;/ig, ' ');
     html = html.replace(/&quot;/ig, '');
-    //Replace all html tags other than <oppia-noninteractive-**> ones to ''
+    // Replace all html tags other than <oppia-noninteractive-**> ones to ''.
     html = html.replace(/<(?!oppia-noninteractive\s*?)[^>]+>/g, '');
     var formattedOutput = html.replace(/(<([^>]+)>)/g, function(rteTag) {
       var replaceString = $filter(

@@ -139,7 +139,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     migration works correctly, and it should never be changed otherwise.
 
     Args:
-        exploration_model: An exploration storage model.
+        exploration_model: ExplorationModel. An exploration storage model.
         run_conversion: bool. When True, updates the exploration to the latest
             states_schema_version if necessary.
 
@@ -967,11 +967,12 @@ def save_new_exploration(committer_id, exploration):
     commit_message = (
         ('New exploration created with title \'%s\'.' % exploration.title)
         if exploration.title else 'New exploration created.')
-    _create_exploration(committer_id, exploration, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': exploration.title,
-        'category': exploration.category,
-    }])
+    _create_exploration(
+        committer_id, exploration, commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': exploration.title,
+            'category': exploration.category,
+        }])
     user_services.add_created_exploration_id(committer_id, exploration.id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
     user_services.record_user_created_an_exploration(committer_id)
@@ -1241,7 +1242,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
 
     if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
         if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit
+            # Revert commit or other non-positive commit.
             contributors_summary = compute_exploration_contributors_summary(
                 exploration.id)
         else:
@@ -1500,11 +1501,12 @@ def save_new_exploration_from_yaml_and_assets(
         'New exploration created from YAML file with title \'%s\'.'
         % exploration.title)
 
-    _create_exploration(committer_id, exploration, create_commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': exploration.title,
-        'category': exploration.category,
-    }])
+    _create_exploration(
+        committer_id, exploration, create_commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': exploration.title,
+            'category': exploration.category,
+        }])
 
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
@@ -1667,9 +1669,9 @@ def get_scaled_average_rating(ratings):
     x = (average_rating - 1) / 4
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
-    a = x + (z**2)/(2*n)
-    b = z * math.sqrt((x*(1-x))/n + (z**2)/(4*n**2))
-    wilson_score_lower_bound = (a - b)/(1 + z**2/n)
+    a = x + (z**2) / (2 * n)
+    b = z * math.sqrt((x * (1 - x)) / n + (z**2) / (4 * n**2))
+    wilson_score_lower_bound = (a - b) / (1 + z**2 / n)
     return 1 + 4 * wilson_score_lower_bound
 
 
@@ -1997,7 +1999,7 @@ def _save_state_id_mapping(state_id_mapping):
         state_id_mapping.largest_state_id_used)
 
 
-def create_and_save_state_id_mapping_model(exploration, change_list):
+def generate_state_id_mapping_model(exploration, change_list):
     """Create and store state id mapping for new exploration.
 
     Args:
@@ -2008,9 +2010,6 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     if exploration.version > 1:
         # Get state id mapping for new exploration from old exploration with
         # the help of change list.
@@ -2027,7 +2026,57 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
             exp_domain.StateIdMapping.create_mapping_for_new_exploration(
                 exploration))
 
+    new_state_id_mapping.validate()
+    return new_state_id_mapping
+
+
+def create_and_save_state_id_mapping_model(exploration, change_list):
+    """Create and store state id mapping for new exploration.
+
+    Args:
+        exploration: Exploration. Exploration for which state id mapping is
+            to be stored.
+        change_list: list(dict). A list of changes made in the exploration.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    if not feconf.ENABLE_STATE_ID_MAPPING:
+        return
+
+    new_state_id_mapping = generate_state_id_mapping_model(
+        exploration, change_list)
     _save_state_id_mapping(new_state_id_mapping)
+    return new_state_id_mapping
+
+
+def generate_state_id_mapping_model_for_reverted_exploration(
+        exploration_id, current_version, revert_to_version):
+    """Generates state id mapping model for when exploration is reverted.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        current_version: str. The current version of the exploration.
+        revert_to_version: int. The version to which the given exploration
+            is to be reverted.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    old_state_id_mapping = get_state_id_mapping(
+        exploration_id, revert_to_version)
+    previous_state_id_mapping = get_state_id_mapping(
+        exploration_id, current_version)
+
+    # Note: when an exploration is reverted state id mapping should
+    # be same as reverted version of the exploration but largest
+    # state id used should be kept as it is as in old exploration.
+    new_version = current_version + 1
+    new_state_id_mapping = exp_domain.StateIdMapping(
+        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
+        previous_state_id_mapping.largest_state_id_used)
+    new_state_id_mapping.validate()
+
     return new_state_id_mapping
 
 
@@ -2047,20 +2096,9 @@ def create_and_save_state_id_mapping_model_for_reverted_exploration(
     if not feconf.ENABLE_STATE_ID_MAPPING:
         return
 
-    old_state_id_mapping = get_state_id_mapping(
-        exploration_id, revert_to_version)
-    previous_state_id_mapping = get_state_id_mapping(
-        exploration_id, current_version)
-
-    # Note: when an exploration is reverted state id mapping should
-    # be same as reverted version of the exploration but largest
-    # state id used should be kept as it is as in old exploration.
-    new_version = current_version + 1
-    new_state_id_mapping = exp_domain.StateIdMapping(
-        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
-        previous_state_id_mapping.largest_state_id_used)
-    new_state_id_mapping.validate()
-
+    new_state_id_mapping = (
+        generate_state_id_mapping_model_for_reverted_exploration(
+            exploration_id, current_version, revert_to_version))
     _save_state_id_mapping(new_state_id_mapping)
     return new_state_id_mapping
 
@@ -2079,3 +2117,35 @@ def delete_state_id_mapping_model_for_exploration(
     exp_versions = range(1, exploration_version + 1)
     exp_models.StateIdMappingModel.delete_state_id_mapping_models(
         exploration_id, exp_versions)
+
+
+def find_all_values_for_key(key, dictionary):
+    """Finds the value of the key inside all the nested dictionaries
+    in a given dictionary.
+
+    Args:
+       key: str. The key whose value is to be found.
+       dictionary: dict or list. The dictionary or list in which the
+           key is to be searched.
+
+    Returns:
+        list. The values of the key in the given dictionary.
+    """
+    if isinstance(dictionary, list):
+        for d in dictionary:
+            if isinstance(d, (dict, list)):
+                for result in find_all_values_for_key(key, d):
+                    yield result
+
+    else:
+        for k, v in dictionary.iteritems():
+            if k == key:
+                yield v
+            elif isinstance(v, dict):
+                for result in find_all_values_for_key(key, v):
+                    yield result
+            elif isinstance(v, list):
+                for d in v:
+                    if isinstance(d, (dict, list)):
+                        for result in find_all_values_for_key(key, d):
+                            yield result

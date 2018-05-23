@@ -122,23 +122,26 @@ class LibraryIndexHandler(base.BaseHandler):
             preferred_language_codes = user_settings.preferred_language_codes
 
         if top_rated_activity_summary_dicts:
-            summary_dicts_by_category.insert(0, {
-                'activity_summary_dicts': top_rated_activity_summary_dicts,
-                'categories': [],
-                'header_i18n_id': (
-                    feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
-                'has_full_results_page': True,
-                'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
-                'protractor_id': 'top-rated',
-            })
+            summary_dicts_by_category.insert(
+                0, {
+                    'activity_summary_dicts': top_rated_activity_summary_dicts,
+                    'categories': [],
+                    'header_i18n_id': (
+                        feconf.LIBRARY_CATEGORY_TOP_RATED_EXPLORATIONS),
+                    'has_full_results_page': True,
+                    'full_results_url': feconf.LIBRARY_TOP_RATED_URL,
+                    'protractor_id': 'top-rated',
+                })
         if featured_activity_summary_dicts:
-            summary_dicts_by_category.insert(0, {
-                'activity_summary_dicts': featured_activity_summary_dicts,
-                'categories': [],
-                'header_i18n_id': feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES,
-                'has_full_results_page': False,
-                'full_results_url': None,
-            })
+            summary_dicts_by_category.insert(
+                0, {
+                    'activity_summary_dicts': featured_activity_summary_dicts,
+                    'categories': [],
+                    'header_i18n_id': (
+                        feconf.LIBRARY_CATEGORY_FEATURED_ACTIVITIES),
+                    'has_full_results_page': False,
+                    'full_results_url': None,
+                })
 
         self.values.update({
             'activity_summary_dicts_by_category': (
@@ -149,7 +152,8 @@ class LibraryIndexHandler(base.BaseHandler):
 
 
 class LibraryGroupPage(base.BaseHandler):
-    """The page for displaying top rated and recently published explorations.
+    """The page for displaying top rated and recently published
+    explorations.
     """
 
     @acl_decorators.open_access
@@ -303,8 +307,7 @@ class ExplorationSummariesHandler(base.BaseHandler):
 
 
 class CollectionSummariesHandler(base.BaseHandler):
-    """Returns collection summaries corresponding to collection ids.
-    """
+    """Returns collection summaries corresponding to collection ids."""
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 

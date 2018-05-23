@@ -69,7 +69,7 @@ oppia.controller('ExplorationEditor', [
     $scope.EditabilityService = EditabilityService;
     $scope.EditorStateService = EditorStateService;
 
-    /**********************************************************
+    /** ********************************************************
      * Called on initial load of the exploration editor page.
      *********************************************************/
     $rootScope.loadingMessage = 'Loading';
@@ -83,7 +83,7 @@ oppia.controller('ExplorationEditor', [
 
     $scope.getTabStatuses = RouterService.getTabStatuses;
 
-    /********************************************
+    /** ******************************************
     * Methods affecting the graph visualization.
     ********************************************/
     $scope.areExplorationWarningsVisible = false;
@@ -195,7 +195,7 @@ oppia.controller('ExplorationEditor', [
         });
 
         if (ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName())) {
+          EditorStateService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
         }
 

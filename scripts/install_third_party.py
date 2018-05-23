@@ -190,7 +190,7 @@ def return_json(filepath):
     Args:
         filepath: the path to the json file.
     Return:
-        a parsed json objects
+        a parsed json objects.
     """
     response = get_file_contents(filepath)
     return json.loads(response)
@@ -202,13 +202,13 @@ def test_manifest_syntax(dependency_type, dependency_dict):
     Display warning message when there is an error and terminate the program.
     Args:
       dependency_type: dependency download format.
-      dependency_dict: manifest.json dependency dict
+      dependency_dict: manifest.json dependency dict.
     """
     keys = dependency_dict.keys()
     mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['mandatory_keys']
     # Optional keys requires exactly one member of the pair
-    # to be available as a key in the dependency_dict
+    # to be available as a key in the dependency_dict.
     optional_key_pairs = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['optional_key_pairs']
     for key in mandatory_keys:

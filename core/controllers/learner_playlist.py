@@ -33,17 +33,20 @@ class LearnerPlaylistHandler(base.BaseHandler):
         belongs_to_subscribed_activities = False
 
         if activity_type == constants.ACTIVITY_TYPE_EXPLORATION:
-            (belongs_to_completed_or_incomplete_list,
-             playlist_limit_exceeded,
-             belongs_to_subscribed_activities) = (
-                 learner_progress_services.add_exp_to_learner_playlist(
-                     self.user_id, activity_id, position_to_be_inserted_in))
+            (
+                belongs_to_completed_or_incomplete_list,
+                playlist_limit_exceeded,
+                belongs_to_subscribed_activities) = (
+                    learner_progress_services.add_exp_to_learner_playlist(
+                        self.user_id, activity_id, position_to_be_inserted_in))
         elif activity_type == constants.ACTIVITY_TYPE_COLLECTION:
-            (belongs_to_completed_or_incomplete_list,
-             playlist_limit_exceeded,
-             belongs_to_subscribed_activities) = (
-                 learner_progress_services.add_collection_to_learner_playlist(
-                     self.user_id, activity_id, position_to_be_inserted_in))
+            (
+                belongs_to_completed_or_incomplete_list,
+                playlist_limit_exceeded,
+                belongs_to_subscribed_activities) = (
+                    learner_progress_services.
+                    add_collection_to_learner_playlist(
+                        self.user_id, activity_id, position_to_be_inserted_in))
 
         self.values.update({
             'belongs_to_completed_or_incomplete_list': (

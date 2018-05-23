@@ -28,7 +28,7 @@ describe('SubtitledHtml object factory', function() {
   describe('SubtitledHtmlObjectFactory', function() {
     var scope, shof, lus, subtitledHtml;
 
-    beforeEach(inject(function($rootScope, $injector) {
+    beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       shof = $injector.get('SubtitledHtmlObjectFactory');
 

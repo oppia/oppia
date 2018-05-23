@@ -46,12 +46,12 @@ describe('Solution Verification Service', function() {
       autosaveChangeList: function() {}
     };
     module(function($provide) {
-      $provide.value('ExplorationDataService', mockExplorationData);
+      $provide.value('ExplorationDataService', [mockExplorationData][0]);
     });
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     ess = $injector.get('ExplorationStatesService');
     siis = $injector.get('stateInteractionIdService');
     scas = $injector.get('stateCustomizationArgsService');

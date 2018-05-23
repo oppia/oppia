@@ -31,15 +31,15 @@ describe('Exploration data service', function() {
     beforeEach(function() {
       module(function($provide) {
         $provide.value(
-          'LocalStorageService', mockLocalStorageService);
+          'LocalStorageService', [mockLocalStorageService][0]);
       });
       module(function($provide) {
         $provide.value(
-          'EditableExplorationBackendApiService', mockBackendApiService);
+          'EditableExplorationBackendApiService', [mockBackendApiService][0]);
       });
       module(function($provide) {
         $provide.value(
-          'UrlService', mockUrlService);
+          'UrlService', [mockUrlService][0]);
       });
     });
 

@@ -48,9 +48,14 @@ CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
+CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
 EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if not DEV_MODE else '')
+ACTIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
+ISSUES_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
@@ -152,13 +157,13 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 18
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 19
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 5
+CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of the question schema.
 CURRENT_QUESTION_SCHEMA_VERSION = 1
@@ -504,7 +509,7 @@ DISABLED_EXPLORATION_IDS = ['5']
 EMBEDDED_GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/embed/?place=forum/oppia')
 
-# External URL for the Foundation site
+# External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
 # Whether to allow YAML file uploads.
@@ -569,6 +574,8 @@ NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_DATA_URL = '/questionhandler'
+QUESTION_MANAGER_URL = '/questionmanagerhandler'
+QUESTION_CREATION_URL = '/questioncreationhandler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -623,7 +630,7 @@ EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 ACTIVITY_STATUS_PRIVATE = 'private'
 ACTIVITY_STATUS_PUBLIC = 'public'
 
-# Play type constants
+# Play type constants.
 PLAY_TYPE_PLAYTEST = 'playtest'
 PLAY_TYPE_NORMAL = 'normal'
 
@@ -632,6 +639,32 @@ COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 
+# Whether learner playthroughs visualization framework should be enabled.
+ENABLE_PLAYTHROUGHS = False
+# Threshold for early quit playthrough.
+EARLY_QUIT_THRESHOLD_IN_SECS = 45
+# Threshold for multiple incorrect answers playthrough.
+NUM_INCORRECT_ANSWERS_THRESHOLD = 5
+# Threshold for repeated cyclic state transitions playthrough.
+NUM_REPEATED_CYCLES_THRESHOLD = 3
+# Max number of playthroughs for an issue.
+MAX_PLAYTHROUGHS_FOR_ISSUE = 5
+# Probability of recording a playthrough.
+RECORD_PLAYTHROUGH_PROBABILITY = 0.2
+# IDs of allowed types of issues.
+ALLOWED_ISSUE_IDS = [
+    'EarlyQuit',
+    'MultipleIncorrectSubmissions',
+    'CyclicStateTransitions'
+]
+# IDs of allowed learner actions.
+ALLOWED_ACTION_IDS = [
+    'ExplorationStart',
+    'AnswerSubmit',
+    'ExplorationQuit'
+]
+
+
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 # Number of unresolved answers to be displayed in the dashboard for each
@@ -639,7 +672,7 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with app.js
+# NOTE TO DEVELOPERS: This should be synchronized with app.js.
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
@@ -664,7 +697,7 @@ UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
 # Possible values for user query status.
 # Valid status transitions are: processing --> completed --> archived
-# Or processing --> failed.
+# or processing --> failed.
 USER_QUERY_STATUS_PROCESSING = 'processing'
 USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'
@@ -724,7 +757,7 @@ LIBRARY_PAGE_MODE_INDEX = 'index'
 # Page mode for the search results page.
 LIBRARY_PAGE_MODE_SEARCH = 'search'
 
-# Defaults for topic similarities
+# Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
@@ -792,6 +825,7 @@ ROLE_ID_GUEST = 'GUEST'
 ROLE_ID_BANNED_USER = 'BANNED_USER'
 ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
 

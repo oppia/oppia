@@ -35,12 +35,12 @@ oppia.directive('feedbackPopup', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/feedback_popup_directive.html'),
       controller: [
-        '$scope', '$element', '$http', '$timeout', '$filter',
+        '$scope', '$element', '$http', '$log', '$timeout', '$filter',
         'FocusManagerService', 'AlertsService', 'BackgroundMaskService',
         'PlayerPositionService', 'WindowDimensionsService',
         'FEEDBACK_SUBJECT_MAX_CHAR_LIMIT',
         function(
-            $scope, $element, $http, $timeout, $filter,
+            $scope, $element, $http, $log, $timeout, $filter,
             FocusManagerService, AlertsService, BackgroundMaskService,
             PlayerPositionService, WindowDimensionsService,
             FEEDBACK_SUBJECT_MAX_CHAR_LIMIT) {
@@ -79,7 +79,7 @@ oppia.directive('feedbackPopup', [
             for (var i = 0; i < 10; i++) {
               elt = elt.parent();
               if (!angular.isUndefined(
-                    elt.attr('uib-popover-template-popup'))) {
+                elt.attr('uib-popover-template-popup'))) {
                 popoverChildElt = elt;
                 break;
               }

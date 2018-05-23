@@ -35,7 +35,7 @@ describe('Interaction validator', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector, $rootScope) {
     scope = $rootScope.$new();
     filter = $injector.get('$filter');
     bivs = $injector.get('baseInteractionValidationService');

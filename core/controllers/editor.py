@@ -345,7 +345,7 @@ class ExplorationRightsHandler(EditorHandler):
         version = self.payload.get('version')
         _require_valid_version(version, exploration.version)
 
-        make_community_owned = self.payload.get('is_community_owned')
+        make_community_owned = self.payload.get('make_community_owned')
         new_member_username = self.payload.get('new_member_username')
         new_member_role = self.payload.get('new_member_role')
         viewable_if_private = self.payload.get('viewable_if_private')
@@ -563,13 +563,10 @@ class UntrainedAnswersHandler(EditorHandler):
 
                 trained_answers = set()
                 for answer_group in interaction.answer_groups:
-                    for rule_spec in answer_group.rule_specs:
-                        if (rule_spec.rule_type ==
-                                exp_domain.RULE_TYPE_CLASSIFIER):
-                            trained_answers.update(
-                                interaction_instance.normalize_answer(trained)
-                                for trained
-                                in rule_spec.inputs['training_data'])
+                    trained_answers.update(
+                        interaction_instance.normalize_answer(trained)
+                        for trained
+                        in answer_group['training_data'])
 
                 # Include all the answers which have been confirmed to be
                 # associated with the default outcome.
@@ -611,7 +608,7 @@ class ExplorationDownloadHandler(EditorHandler):
         output_format = self.request.get('output_format', default_value='zip')
         width = int(self.request.get('width', default_value=80))
 
-        # If the title of the exploration has changed, we use the new title
+        # If the title of the exploration has changed, we use the new title.
         filename = 'oppia-%s-v%s' % (
             utils.to_ascii(exploration.title.replace(' ', '')), version)
 

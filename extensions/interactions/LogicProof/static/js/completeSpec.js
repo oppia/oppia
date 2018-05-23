@@ -83,15 +83,15 @@ describe('Full system', function() {
         '  from A(d)∧B(d) we have B(d)',
         'd was arbitrary so ∀x.B(x)',
         'from ∀x.A(x) and ∀x.B(x) have (∀x.A(x))∧(∀x.B(x))'].join('\n'))
-      ).toBeUndefined();
+    ).toBeUndefined();
   });
 
   it('should reject proofs with any error', function() {
     expect(function() {
       completeCheck('p', 'p', 'we knew p');
     }).toThrow(
-        sharedErrorWrapper(
-          'The phrase starting \'we\' could not be identified; please ' +
+      sharedErrorWrapper(
+        'The phrase starting \'we\' could not be identified; please ' +
           'make sure you are only using phrases from the given list of ' +
           'vocabulary.', 0, 'unidentified_phrase_starting_at', 'formattting')
     );

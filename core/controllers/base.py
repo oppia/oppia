@@ -127,7 +127,7 @@ class BaseHandler(webapp2.RequestHandler):
     # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
 
-    # What format the get method returns when exception raised, json or html
+    # What format the get method returns when exception raised, json or html.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
 
     @webapp2.cached_property
@@ -455,8 +455,9 @@ class BaseHandler(webapp2.RequestHandler):
         if isinstance(exception, self.PageNotFoundException):
             logging.error('Invalid URL requested: %s', self.request.uri)
             self.error(404)
-            self._render_exception(404, {
-                'error': 'Could not find the page %s.' % self.request.uri})
+            self._render_exception(
+                404, {
+                    'error': 'Could not find the page %s.' % self.request.uri})
             return
 
         if isinstance(exception, self.UnauthorizedUserException):

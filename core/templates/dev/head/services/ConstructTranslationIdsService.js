@@ -16,14 +16,16 @@
  * @fileoverview Service to dynamically construct translation ids for i18n.
  */
 
-oppia.factory('ConstructTranslationIdsService', function() {
-  return {
-    // Construct a translation id for library from name and a prefix.
-    // Ex: 'categories', 'art' -> 'I18N_LIBRARY_CATEGORIES_ART'
-    getLibraryId: function(prefix, name) {
-      return (
-        'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
-        name.toUpperCase().split(' ').join('_'));
-    }
-  };
-});
+oppia.factory('ConstructTranslationIdsService', [
+  function() {
+    return {
+      // Construct a translation id for library from name and a prefix.
+      // Ex: 'categories', 'art' -> 'I18N_LIBRARY_CATEGORIES_ART'
+      getLibraryId: function(prefix, name) {
+        return (
+          'I18N_LIBRARY_' + prefix.toUpperCase() + '_' +
+            name.toUpperCase().split(' ').join('_'));
+      }
+    };
+  }]
+);

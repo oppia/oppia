@@ -99,6 +99,7 @@ oppia.controller('LearnerDashboard', [
     $scope.Math = window.Math;
     $scope.profilePictureDataUrl = GLOBALS.profilePictureDataUrl;
     $scope.username = GLOBALS.username;
+    $scope.loadingFeedbacks = false;
     var threadIndex = null;
 
     $scope.newMessage = {
@@ -134,6 +135,13 @@ oppia.controller('LearnerDashboard', [
 
     $scope.checkMobileView = function() {
       return ($window.innerWidth < 500);
+    };
+
+    $scope.getVisibleExplorationList = function(startCompletedExpIndex) {
+      return $scope.completedExplorationsList.slice(
+        startCompletedExpIndex, Math.min(
+          startCompletedExpIndex + $scope.PAGE_SIZE,
+          $scope.completedExplorationsList.length));
     };
 
     $scope.showUsernamePopover = function(subscriberUsername) {
@@ -186,7 +194,7 @@ oppia.controller('LearnerDashboard', [
       } else if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
         if (subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
           if ($scope.startCompletedExpIndex +
-            $scope.PAGE_SIZE <= $scope.startCompletedExpIndex.length) {
+            $scope.PAGE_SIZE <= $scope.completedExplorationsList.length) {
             $scope.startCompletedExpIndex += $scope.PAGE_SIZE;
           }
         } else if (
@@ -294,6 +302,7 @@ oppia.controller('LearnerDashboard', [
 
     $scope.onClickThread = function(
         threadStatus, explorationId, threadId, explorationTitle) {
+      $scope.loadingFeedbacks = true;
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
         '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
           explorationId: explorationId,
@@ -325,6 +334,7 @@ oppia.controller('LearnerDashboard', [
             FeedbackMessageSummaryObjectFactory.createFromBackendDict(
               messageSummaryDicts[index]));
         }
+        $scope.loadingFeedbacks = false;
       });
     };
 
@@ -562,10 +572,10 @@ oppia.controller('LearnerDashboard', [
         $scope.feedbackThreadActive = false;
 
         $scope.noExplorationActivity = (
-            ($scope.completedExplorationsList.length === 0) &&
+          ($scope.completedExplorationsList.length === 0) &&
             ($scope.incompleteExplorationsList.length === 0));
         $scope.noCollectionActivity = (
-            ($scope.completedCollectionsList.length === 0) &&
+          ($scope.completedCollectionsList.length === 0) &&
             ($scope.incompleteCollectionsList.length === 0));
         $scope.noActivity = (
           ($scope.noExplorationActivity) && ($scope.noCollectionActivity) &&

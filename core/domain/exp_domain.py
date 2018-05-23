@@ -90,13 +90,8 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 # rather than belonging to a specific answer group.
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
-# This represents the stringified version of a rule which uses statistical
-# classification for evaluation. Answers which are matched to rules with this
-# rulespec will be stored with the STATISTICAL_CLASSIFICATION category.
-RULE_TYPE_CLASSIFIER = 'FuzzyMatches'
 
-
-def _get_full_customization_args(customization_args, ca_specs):
+def get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
     if any of the expected customization_args are missing.
 
@@ -125,7 +120,7 @@ def _get_full_customization_args(customization_args, ca_specs):
     return customization_args
 
 
-def _validate_customization_args_and_values(
+def validate_customization_args_and_values(
         item_name, item_type, customization_args,
         ca_specs_to_validate_against):
     """Validates the given `customization_args` dict against the specs set out
@@ -164,7 +159,7 @@ def _validate_customization_args_and_values(
     # Validate and clean up the customization args.
 
     # Populate missing keys with the default values.
-    customization_args = _get_full_customization_args(
+    customization_args = get_full_customization_args(
         customization_args, ca_specs_to_validate_against)
 
     # Remove extra keys.
@@ -190,8 +185,8 @@ def _validate_customization_args_and_values(
                     ca_spec.schema))
         except Exception:
             # TODO(sll): Raise an actual exception here if parameters are not
-            # involved. (If they are, can we get sample values for the state
-            # context parameters?)
+            # involved (If they are, can we get sample values for the state
+            # context parameters?).
             pass
 
 
@@ -403,7 +398,7 @@ class AudioTranslation(object):
         self.needs_update = needs_update
 
     def validate(self):
-        """Validates properties of the Content.
+        """Validates properties of the AudioTranslation.
 
         Raises:
             ValidationError: One or more attributes of the AudioTranslation are
@@ -421,8 +416,8 @@ class AudioTranslation(object):
         if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
             raise utils.ValidationError(
                 'Invalid audio filename: it should have one of '
-                'the following extensions: %s. Received: %s',
-                (feconf.ACCEPTED_AUDIO_EXTENSIONS.keys(), self.filename))
+                'the following extensions: %s. Received: %s'
+                % (feconf.ACCEPTED_AUDIO_EXTENSIONS.keys(), self.filename))
 
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
@@ -528,11 +523,13 @@ class SubtitledHtml(object):
         Returns:
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
-        return cls(subtitled_html_dict['html'], {
-            language_code: AudioTranslation.from_dict(audio_translation_dict)
-            for language_code, audio_translation_dict in
-            subtitled_html_dict['audio_translations'].iteritems()
-        })
+        return cls(
+            subtitled_html_dict['html'], {
+                language_code: AudioTranslation.from_dict(
+                    audio_translation_dict)
+                for language_code, audio_translation_dict in
+                subtitled_html_dict['audio_translations'].iteritems()
+            })
 
     def validate(self):
         """Validates properties of the SubtitledHtml.
@@ -710,6 +707,7 @@ class Outcome(object):
     consists of a destination state, feedback to show the user, and any
     parameter changes.
     """
+
     def to_dict(self):
         """Returns a dict representing this Outcome domain object.
 
@@ -822,6 +820,7 @@ class AnswerGroup(object):
     that involve soft matching of answers to a set of training data and/or
     example answers dictated by the creator.
     """
+
     def to_dict(self):
         """Returns a dict representing this AnswerGroup domain object.
 
@@ -832,6 +831,7 @@ class AnswerGroup(object):
             'rule_specs': [rule_spec.to_dict()
                            for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
+            'training_data': self.training_data
         }
 
     @classmethod
@@ -848,20 +848,24 @@ class AnswerGroup(object):
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
+            answer_group_dict['training_data']
         )
 
-    def __init__(self, outcome, rule_specs):
+    def __init__(self, outcome, rule_specs, training_data):
         """Initializes a AnswerGroup domain object.
 
         Args:
             outcome: Outcome. The outcome corresponding to the answer group.
             rule_specs: list(RuleSpec). List of rule specifications.
+            training_data: list(*). List of answers belonging to training
+                data of this answer group.
         """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
         ) for rule_spec in rule_specs]
 
         self.outcome = outcome
+        self.training_data = training_data
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -882,39 +886,22 @@ class AnswerGroup(object):
             raise utils.ValidationError(
                 'Expected answer group rules to be a list, received %s'
                 % self.rule_specs)
-        if len(self.rule_specs) < 1:
-            raise utils.ValidationError(
-                'There must be at least one rule for each answer group.')
 
-        seen_classifier_rule = False
+        if len(self.rule_specs) == 0 and len(self.training_data) == 0:
+            raise utils.ValidationError(
+                'There must be at least one rule or training data for each'
+                ' answer group.')
+
         for rule_spec in self.rule_specs:
             if rule_spec.rule_type not in interaction.rules_dict:
                 raise utils.ValidationError(
                     'Unrecognized rule type: %s' % rule_spec.rule_type)
-
-            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
-                if seen_classifier_rule:
-                    raise utils.ValidationError(
-                        'AnswerGroups can only have one classifier rule.')
-                seen_classifier_rule = True
 
             rule_spec.validate(
                 interaction.get_rule_param_list(rule_spec.rule_type),
                 exp_param_specs_dict)
 
         self.outcome.validate()
-
-    def get_classifier_rule_index(self):
-        """Gets the index of the classifier in the answer groups.
-
-        Returns:
-            int or None. The index of the classifier in the answer
-            groups, or None if it doesn't exist.
-        """
-        for (rule_spec_index, rule_spec) in enumerate(self.rule_specs):
-            if rule_spec.rule_type == RULE_TYPE_CLASSIFIER:
-                return rule_spec_index
-        return None
 
 
 class Hint(object):
@@ -965,8 +952,10 @@ class Solution(object):
     to progress to the next card and explanation is an HTML string containing
     an explanation for the solution.
     """
-    def __init__(self, interaction_id, answer_is_exclusive,
-                 correct_answer, explanation):
+
+    def __init__(
+            self, interaction_id, answer_is_exclusive,
+            correct_answer, explanation):
         """Constructs a Solution domain object.
 
         Args:
@@ -1050,7 +1039,7 @@ class InteractionInstance(object):
             'id': self.id,
             'customization_args': (
                 {} if self.id is None else
-                _get_full_customization_args(
+                get_full_customization_args(
                     self.customization_args,
                     interaction_registry.Registry.get_interaction_by_id(
                         self.id).customization_arg_specs)),
@@ -1178,7 +1167,7 @@ class InteractionInstance(object):
         except KeyError:
             raise utils.ValidationError('Invalid interaction id: %s' % self.id)
 
-        _validate_customization_args_and_values(
+        validate_customization_args_and_values(
             'interaction', self.id, self.customization_args,
             interaction.customization_arg_specs)
 
@@ -1257,13 +1246,14 @@ class State(object):
         'solution': None,
     }
 
-    def __init__(self, content, param_changes, interaction,
-                 classifier_model_id=None):
+    def __init__(
+            self, content, param_changes, interaction,
+            classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
-            content: list(Content). The contents displayed to the reader in
-                this state. This list must have only one element.
+            content: SubtitledHtml. The contents displayed to the reader in this
+                state.
             param_changes: list(ParamChange). Parameter changes associated with
                 this state.
             interaction: InteractionInstance. The interaction instance
@@ -1295,7 +1285,7 @@ class State(object):
                 are ParamSpec value objects with an object type
                 property(obj_type). It is None if the state belongs to a
                 question.
-            allow_null_interaction. bool. Whether this state's interaction is
+            allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
 
         Raises:
@@ -1318,21 +1308,16 @@ class State(object):
 
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
-        training_data = []
+        state_training_data_by_answer_group = []
         for (answer_group_index, answer_group) in enumerate(
                 self.interaction.answer_groups):
-            classifier_rule_spec_index = (
-                answer_group.get_classifier_rule_index())
-            if classifier_rule_spec_index is not None:
-                classifier_rule_spec = answer_group.rule_specs[
-                    classifier_rule_spec_index]
-                answers = copy.deepcopy(classifier_rule_spec.inputs[
-                    'training_data'])
-                training_data.append({
+            if answer_group.training_data:
+                answers = copy.deepcopy(answer_group.training_data)
+                state_training_data_by_answer_group.append({
                     'answer_group_index': answer_group_index,
                     'answers': answers
                 })
-        return training_data
+        return state_training_data_by_answer_group
 
     def can_undergo_classification(self):
         """Checks whether the answers for this state satisfy the preconditions
@@ -1346,24 +1331,18 @@ class State(object):
         training_examples_count += len(
             self.interaction.confirmed_unclassified_answers)
         for answer_group in self.interaction.answer_groups:
-            classifier_rule_spec_index = (
-                answer_group.get_classifier_rule_index())
-            if classifier_rule_spec_index is not None:
-                classifier_rule_spec = answer_group.rule_specs[
-                    classifier_rule_spec_index]
-                training_examples_count += len(
-                    classifier_rule_spec.inputs['training_data'])
-                labels_count += 1
+            training_examples_count += len(answer_group.training_data)
+            labels_count += 1
         if ((training_examples_count >= feconf.MIN_TOTAL_TRAINING_EXAMPLES) and
                 (labels_count >= feconf.MIN_ASSIGNED_LABELS)):
             return True
         return False
 
     def update_content(self, content_dict):
-        """Update the list of Content of this state.
+        """Update the content of this state.
 
         Args:
-            content_dict. dict. The dict representation of SubtitledHtml
+            content_dict: dict. The dict representation of SubtitledHtml
                 object.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
@@ -1373,7 +1352,7 @@ class State(object):
         """Update the param_changes dict attribute.
 
         Args:
-            param_change_dicts. list(dict). List of param_change dicts that
+            param_change_dicts: list(dict). List of param_change dicts that
                 represent ParamChange domain object.
         """
         self.param_changes = [
@@ -1384,7 +1363,7 @@ class State(object):
         """Update the interaction id attribute.
 
         Args:
-            interaction_id. str. The new interaction id to set.
+            interaction_id: str. The new interaction id to set.
         """
         self.interaction.id = interaction_id
         # TODO(sll): This should also clear interaction.answer_groups (except
@@ -1396,7 +1375,7 @@ class State(object):
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
-            customization_args. dict. The new customization_args to set.
+            customization_args: dict. The new customization_args to set.
         """
         self.interaction.customization_args = customization_args
 
@@ -1404,7 +1383,7 @@ class State(object):
         """Update the list of AnswerGroup in IteractioInstancen domain object.
 
         Args:
-            answer_groups_list. list(dict). List of dicts that represent
+            answer_groups_list: list(dict). List of dicts that represent
                 AnswerGroup domain object.
         """
         if not isinstance(answer_groups_list, list):
@@ -1424,7 +1403,8 @@ class State(object):
                     'received %s' % rule_specs_list)
 
             answer_group = AnswerGroup(
-                Outcome.from_dict(answer_group_dict['outcome']), [])
+                Outcome.from_dict(answer_group_dict['outcome']), [],
+                answer_group_dict['training_data'])
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
@@ -1443,7 +1423,7 @@ class State(object):
                     if (isinstance(value, basestring) and
                             '{{' in value and '}}' in value):
                         # TODO(jacobdavis11): Create checks that all parameters
-                        # referred to exist and have the correct types
+                        # referred to exist and have the correct types.
                         normalized_param = value
                     else:
                         try:
@@ -1462,7 +1442,7 @@ class State(object):
         """Update the default_outcome of InteractionInstance domain object.
 
         Args:
-            default_outcome_dict. dict. Dict that represents Outcome domain
+            default_outcome_dict: dict. Dict that represents Outcome domain
                 object.
         """
         if default_outcome_dict:
@@ -1482,7 +1462,7 @@ class State(object):
         domain object.
 
         Args:
-            confirmed_unclassified_answers. list(AnswerGroup). The new list of
+            confirmed_unclassified_answers: list(AnswerGroup). The new list of
                 answers which have been confirmed to be associated with the
                 default outcome.
 
@@ -1674,12 +1654,13 @@ class ExplorationVersionsDiff(object):
 class Exploration(object):
     """Domain object for an Oppia exploration."""
 
-    def __init__(self, exploration_id, title, category, objective,
-                 language_code, tags, blurb, author_notes,
-                 states_schema_version, init_state_name, states_dict,
-                 param_specs_dict, param_changes_list, version,
-                 auto_tts_enabled, correctness_feedback_enabled,
-                 created_on=None, last_updated=None):
+    def __init__(
+            self, exploration_id, title, category, objective,
+            language_code, tags, blurb, author_notes,
+            states_schema_version, init_state_name, states_dict,
+            param_specs_dict, param_changes_list, version,
+            auto_tts_enabled, correctness_feedback_enabled,
+            created_on=None, last_updated=None):
         """Initializes an Exploration domain object.
 
         Args:
@@ -2241,7 +2222,7 @@ class Exploration(object):
                 'It is impossible to complete the exploration from the '
                 'following states: %s' % ', '.join(dead_end_states))
 
-    # Derived attributes of an exploration,
+    # Derived attributes of an exploration.
     @property
     def init_state(self):
         """The state which forms the start of this exploration.
@@ -2565,7 +2546,7 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        # ensure widgets are renamed to be interactions
+        # ensure widgets are renamed to be interactions.
         for _, state_defn in states_dict.iteritems():
             if 'widget' not in state_defn:
                 continue
@@ -2606,7 +2587,7 @@ class Exploration(object):
         # to an 'END' state before, then they would only be receiving warnings
         # about not being able to complete the exploration. The introduction of
         # a real END state would produce additional warnings (state cannot be
-        # reached from other states, etc.)
+        # reached from other states, etc.).
         targets_end_state = False
         has_end_state = False
         for (state_name, sdict) in states_dict.iteritems():
@@ -2621,7 +2602,7 @@ class Exploration(object):
                             break
 
         # Ensure any explorations pointing to an END state has a valid END
-        # state to end with (in case it expects an END state)
+        # state to end with (in case it expects an END state).
         if targets_end_state and not has_end_state:
             states_dict[old_end_dest] = {
                 'content': [{
@@ -3130,6 +3111,53 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v18_dict_to_v19_dict(cls, states_dict):
+        """Converts from version 18 to 19. Version 19 adds training_data
+        parameter to each answer group to store training data of that
+        answer group.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            answer_group_indexes_to_preserve = []
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group_index, answer_group in enumerate(answer_groups):
+                if answer_group['rule_specs']:
+                    training_data = []
+                    classifier_rule_index = None
+                    rule_specs = answer_group['rule_specs']
+
+                    for rule_index, rule in enumerate(rule_specs):
+                        if rule['rule_type'] == 'FuzzyMatches':
+                            training_data = rule['inputs']['training_data']
+                            classifier_rule_index = rule_index
+                            break
+
+                    if classifier_rule_index is not None:
+                        answer_group['rule_specs'].pop(classifier_rule_index)
+
+                    answer_group['training_data'] = training_data
+
+                    if training_data or answer_group['rule_specs']:
+                        answer_group_indexes_to_preserve.append(
+                            answer_group_index)
+
+            preserved_answer_groups = []
+            for answer_group_index in answer_group_indexes_to_preserve:
+                preserved_answer_groups.append(
+                    answer_groups[answer_group_index])
+
+            state_dict['interaction']['answer_groups'] = preserved_answer_groups
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3160,7 +3188,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 23
+    CURRENT_EXP_SCHEMA_VERSION = 24
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3606,6 +3634,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v23_dict_to_v24_dict(cls, exploration_dict):
+        """ Converts a v23 exploration dict into a v24 exploration dict.
+
+        Adds training_data parameter to each answer group to store training
+        data of corresponding answer group.
+        """
+        exploration_dict['schema_version'] = 24
+
+        exploration_dict['states'] = cls._convert_states_v18_dict_to_v19_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 19
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3751,6 +3794,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v22_dict_to_v23_dict(
                 exploration_dict)
             exploration_schema_version = 23
+
+        if exploration_schema_version == 23:
+            exploration_dict = cls._convert_v23_dict_to_v24_dict(
+                exploration_dict)
+            exploration_schema_version = 24
 
         return (exploration_dict, initial_schema_version)
 
@@ -3904,13 +3952,14 @@ class Exploration(object):
 class ExplorationSummary(object):
     """Domain object for an Oppia exploration summary."""
 
-    def __init__(self, exploration_id, title, category, objective,
-                 language_code, tags, ratings, scaled_average_rating, status,
-                 community_owned, owner_ids, editor_ids,
-                 viewer_ids, contributor_ids, contributors_summary, version,
-                 exploration_model_created_on,
-                 exploration_model_last_updated,
-                 first_published_msec):
+    def __init__(
+            self, exploration_id, title, category, objective,
+            language_code, tags, ratings, scaled_average_rating, status,
+            community_owned, owner_ids, editor_ids,
+            viewer_ids, contributor_ids, contributors_summary, version,
+            exploration_model_created_on,
+            exploration_model_last_updated,
+            first_published_msec):
         """Initializes a ExplorationSummary domain object.
 
         Args:
@@ -4050,7 +4099,25 @@ class StateIdMapping(object):
         # Analyse each command in change list one by one to create state id
         # mapping for new exploration.
         for change_dict in change_list:
-            if change_dict['cmd'] == CMD_ADD_STATE:
+            # During v1 -> v2 migration of states, all pseudo END states were
+            # replaced by an explicit END state through this migration.
+            # We account for that change in the state id mapping too.
+            if change_dict['cmd'] == 'migrate_states_schema_to_latest_version':
+                pseudo_end_state_name = 'END'
+                if int(change_dict['from_version']) < 2 <= int(
+                        change_dict['to_version']):
+                    # The explicit end state is created only if there is some
+                    # state that used to refer to an implicit 'END' state.
+                    # This is confirmed by checking that there is a state
+                    # called 'END' in the immediate version of the exploration
+                    # after migration and no state called 'END' is present
+                    # in previous version of exploration.
+                    if (pseudo_end_state_name in (
+                            new_exploration.states) and (
+                                pseudo_end_state_name not in (
+                                    self.state_names_to_ids))):
+                        new_state_names.append(pseudo_end_state_name)
+            elif change_dict['cmd'] == CMD_ADD_STATE:
                 new_state_names.append(change_dict['state_name'])
                 assert change_dict['state_name'] not in (
                     state_ids_to_names.values())

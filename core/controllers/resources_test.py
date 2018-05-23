@@ -310,7 +310,7 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        # Upload empty audio
+        # Upload empty audio.
         response_dict = self.post_json(
             '%s/0' % self.AUDIO_UPLOAD_URL_PREFIX,
             {'filename': 'test.mp3'},
@@ -364,10 +364,11 @@ class AudioHandlerTest(test_utils.GenericTestBase):
         )
         self.logout()
         self.assertEqual(response_dict['status_code'], 400)
-        self.assertEqual(response_dict['error'],
-                         'No filename extension: it should have '
-                         'one of the following extensions: '
-                         '%s' % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
+        self.assertEqual(
+            response_dict['error'],
+            'No filename extension: it should have '
+            'one of the following extensions: '
+            '%s' % feconf.ACCEPTED_AUDIO_EXTENSIONS.keys())
 
     def test_exceed_max_length_detected(self):
         """Test that audio file is less than max playback length."""

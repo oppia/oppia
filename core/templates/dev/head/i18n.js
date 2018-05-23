@@ -62,16 +62,6 @@ oppia.controller('I18nFooter', [
         $http.put(siteLanguageUrl, {
           site_language_code: $scope.currentLanguageCode
         });
-      } else {
-        // $translate.use() sets a cookie for the translation language, but does
-        // so using the page's base URL as the cookie path. However, the base
-        // URL is modified in pages like /library, thus causing the cookie path
-        // to change; in such cases, the user's preferences are not picked up by
-        // other pages. To avoid this, we manually set the cookie using the '/'
-        // path each time a non-logged-in user changes their site language.
-        $cookies.put(
-          'NG_TRANSLATE_LANG_KEY',
-          '"' + $scope.currentLanguageCode + '"', {path: '/'});
       }
     };
   }

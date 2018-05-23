@@ -33,7 +33,7 @@ md-checkbox.item-selection-input-checkbox .md-label {
   width: 100%;
 }
 .item-selection-input-container {
-  margin-bottom: 5px;
+  padding-bottom: 5px;
 }
 
 .item-selection-input-container md-input-group.md-default-theme label {

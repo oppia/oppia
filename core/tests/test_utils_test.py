@@ -14,13 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for test_utils, mainly for the FunctionWrapper. """
+"""Tests for test_utils, mainly for the FunctionWrapper."""
 
 from core.tests import test_utils
 
 
 class FunctionWrapperTests(test_utils.GenericTestBase):
-    """Test for testing test_utils.FunctionWrapper"""
+    """Test for testing test_utils.FunctionWrapper."""
 
     def test_wrapper_calls_subclass_methods(self):
         """Tests the basic functionality of FunctionWrapper."""
@@ -54,7 +54,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         self.assertEqual(order, ['before', 'call', 'after'])
 
     def test_wrapper_calls_passed_method(self):
-        """Tests that FunctionWrapper also works for methods"""
+        """Tests that FunctionWrapper also works for methods."""
         data = {}
 
         class Klass(object):
@@ -73,7 +73,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
             self.assertEqual(data.get('value'), 'foobar')
 
     def test_wrapper_calls_passed_class_method(self):
-        """Tests that FunctionWrapper also works for class methods"""
+        """Tests that FunctionWrapper also works for class methods."""
         data = {}
 
         class Klass(object):
@@ -91,7 +91,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
             self.assertEqual(data.get('value'), 'foobar')
 
     def test_wrapper_calls_passed_static_method(self):
-        """Tests that FunctionWrapper also works for static methods"""
+        """Tests that FunctionWrapper also works for static methods."""
         data = {}
 
         class Klass(object):
@@ -113,7 +113,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
             data['value'] = num
             return num
 
-        l = lambda x: side_effect(x)*2
+        l = lambda x: side_effect(x) * 2
 
         wrapped = test_utils.FunctionWrapper(l)
         self.assertEqual(wrapped('foobar'), 'foobarfoobar')

@@ -23,7 +23,7 @@ import utils
 NAMES = utils.create_enum(
     'activity', 'audit', 'base_model', 'classifier', 'collection', 'config',
     'email', 'exploration', 'feedback', 'file', 'job', 'question',
-    'recommendations', 'statistics', 'user')
+    'recommendations', 'statistics', 'suggestion', 'topic', 'user')
 
 
 class _Platform(object):
@@ -42,7 +42,8 @@ class _Platform(object):
 
 
 class _Gae(_Platform):
-    """Provides platform-specific imports related to GAE (Google App Engine).
+    """Provides platform-specific imports related to
+    GAE (Google App Engine).
     """
 
     @classmethod
@@ -102,6 +103,12 @@ class _Gae(_Platform):
             elif name == NAMES.statistics:
                 from core.storage.statistics import gae_models as statistics_models # pylint: disable=line-too-long
                 returned_models.append(statistics_models)
+            elif name == NAMES.suggestion:
+                from core.storage.suggestion import gae_models as suggestion_models # pylint: disable=line-too-long
+                returned_models.append(suggestion_models)
+            elif name == NAMES.topic:
+                from core.storage.topic import gae_models as topic_models
+                returned_models.append(topic_models)
             elif name == NAMES.user:
                 from core.storage.user import gae_models as user_models
                 returned_models.append(user_models)
@@ -208,7 +215,8 @@ class _Gae(_Platform):
 
 
 class Registry(object):
-    """Platform-agnostic interface for retrieving platform-specific modules.
+    """Platform-agnostic interface for retrieving platform-specific
+    modules.
     """
 
     # Maps platform names to the corresponding module registry classes.

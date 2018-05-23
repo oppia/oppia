@@ -27,20 +27,15 @@ oppia.directive('ruleTypeSelector', [function() {
     controller: [
       '$scope', '$element', '$rootScope', '$filter',
       'stateInteractionIdService', 'INTERACTION_SPECS',
-      'RULE_TYPE_CLASSIFIER',
       function(
           $scope, $element, $rootScope, $filter,
-          stateInteractionIdService, INTERACTION_SPECS,
-          RULE_TYPE_CLASSIFIER) {
+          stateInteractionIdService, INTERACTION_SPECS) {
         var choices = [];
         var numberOfRuleTypes = 0;
 
         var ruleTypesToDescriptions = INTERACTION_SPECS[
           stateInteractionIdService.savedMemento].rule_descriptions;
         for (var ruleType in ruleTypesToDescriptions) {
-          if (ruleType === RULE_TYPE_CLASSIFIER) {
-            continue;
-          }
           numberOfRuleTypes++;
           choices.push({
             id: ruleType,

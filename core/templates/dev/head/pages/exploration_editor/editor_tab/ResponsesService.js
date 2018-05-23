@@ -114,6 +114,9 @@ oppia.factory('ResponsesService', [
       if (updates.hasOwnProperty('labelledAsCorrect')) {
         answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
       }
+      if (updates.hasOwnProperty('trainingData')) {
+        answerGroup.trainingData = updates.trainingData;
+      }
       _saveAnswerGroups(_answerGroups);
     };
 
@@ -136,7 +139,7 @@ oppia.factory('ResponsesService', [
       var oldConfirmedUnclassifiedAnswers = (
         _confirmedUnclassifiedAnswersMemento);
       if (!angular.equals(
-          newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)) {
+        newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)) {
         _confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
         ExplorationStatesService.saveConfirmedUnclassifiedAnswers(

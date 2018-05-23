@@ -42,7 +42,7 @@ search_services = models.Registry.import_search_services()
 transaction_services = models.Registry.import_transaction_services()
 
 # TODO(msl): test ExpSummaryModel changes if explorations are updated,
-# reverted, deleted, created, rights changed
+# reverted, deleted, created, rights changed.
 
 
 def _count_at_least_editable_exploration_summaries(user_id):
@@ -80,6 +80,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
+
     def test_get_exploration_titles_and_categories(self):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories([]), {})
@@ -310,6 +311,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     """Test creation and deletion methods."""
+
     def test_retrieval_of_explorations(self):
         """Test the get_exploration_by_id() method."""
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
@@ -442,7 +444,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 include_deleted=True)]
         )
 
-        # The exploration summary is deleted however
+        # The exploration summary is deleted however.
         self.assertNotIn(
             self.EXP_ID,
             [exp.id for exp in exp_models.ExpSummaryModel.get_all(
@@ -474,7 +476,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_summaries_of_hard_deleted_explorations(self):
         """Test that summaries of hard deleted explorations are
-        correctly deleted."""
+        correctly deleted.
+        """
         self.save_new_default_exploration(self.EXP_ID, self.owner_id)
 
         exp_services.delete_exploration(
@@ -851,6 +854,7 @@ title: Title
 # pylint: disable=protected-access
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
+
     SAMPLE_YAML_CONTENT = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -1076,13 +1080,13 @@ title: A title
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 3)
 
-        # Download version 2
+        # Download version 2.
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID, 2)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
-        # Download version 3
+        # Download version 3.
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID, 3)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
         self.assertEqual(
@@ -1092,7 +1096,8 @@ title: A title
 class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as a dict whose keys
     are state names and whose values are YAML strings representing the state's
-    contents."""
+    contents.
+    """
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
   audio_translations: {}
@@ -1231,12 +1236,12 @@ param_changes: []
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.version, 3)
 
-        # Download version 2
+        # Download version 2.
         dict_output = exp_services.export_states_to_yaml(
             self.EXP_ID, version=2, width=50)
         self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
-        # Download version 3
+        # Download version 3.
         dict_output = exp_services.export_states_to_yaml(
             self.EXP_ID, version=3, width=50)
         self.assertEqual(dict_output, self.UPDATED_SAMPLE_DICT)
@@ -1254,6 +1259,7 @@ def _get_change_list(state_name, property_name, new_value):
 
 class UpdateStateTests(ExplorationServicesUnitTests):
     """Test updating a single state."""
+
     def setUp(self):
         super(UpdateStateTests, self).setUp()
         exploration = self.save_new_valid_exploration(
@@ -1284,6 +1290,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'param_changes': [],
                 'refresher_exploration_id': None,
             },
+            'training_data': []
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
@@ -1303,25 +1310,27 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
         self.assertNotIn('new state', exploration.states)
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'new state',
-        }], 'Add state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn('new state', exploration.states)
 
     def test_rename_state_cmd(self):
-        """Test updating of state name"""
+        """Test updating of state name."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_RENAME_STATE,
-            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_state_name': 'state',
-        }], 'Change state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': 'state',
+            }], 'Change state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn('state', exploration.states)
@@ -1334,11 +1343,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertNotIn(u'¡Hola! αβγ', exploration.states)
         self.assertIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_RENAME_STATE,
-            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
-            'new_state_name': u'¡Hola! αβγ',
-        }], 'Change state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
+                'new_state_name': u'¡Hola! αβγ',
+            }], 'Change state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn(u'¡Hola! αβγ', exploration.states)
@@ -1348,18 +1358,20 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Test deleting a state name."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_ADD_STATE,
-            'state_name': 'new state',
-        }], 'Add state name')
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_ADD_STATE,
+                'state_name': 'new state',
+            }], 'Add state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
 
         self.assertIn('new state', exploration.states)
 
-        exp_services.update_exploration(self.owner_id, self.EXP_ID, [{
-            'cmd': exp_domain.CMD_DELETE_STATE,
-            'state_name': 'new state',
+        exp_services.update_exploration(
+            self.owner_id, self.EXP_ID, [{
+                'cmd': exp_domain.CMD_DELETE_STATE,
+                'state_name': 'new state',
             }], 'delete state')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -1467,7 +1479,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_interaction_answer_groups(self):
         """Test updating of interaction_answer_groups."""
-        # We create a second state to use as a rule destination
+        # We create a second state to use as a rule destination.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exploration.add_states(['State 2'])
         exploration.states['State 2'].update_interaction_id('TextInput')
@@ -1593,6 +1605,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
 class CommitMessageHandlingTests(ExplorationServicesUnitTests):
     """Test the handling of commit messages."""
+
     def setUp(self):
         super(CommitMessageHandlingTests, self).setUp()
         exploration = self.save_new_valid_exploration(
@@ -1615,7 +1628,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
             'A message')
 
     def test_demand_commit_message(self):
-        """Check published explorations demand commit messages"""
+        """Check published explorations demand commit messages."""
         rights_manager.publish_exploration(self.owner, self.EXP_ID)
 
         with self.assertRaisesRegexp(
@@ -1629,7 +1642,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
                     exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False), '')
 
     def test_unpublished_explorations_can_accept_commit_message(self):
-        """Test unpublished explorations can accept optional commit messages"""
+        """Test unpublished explorations can accept optional commit messages."""
         exp_services.update_exploration(
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name,
@@ -2139,9 +2152,10 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(search_services,
-                                  'add_documents_to_index',
-                                  add_docs_counter)
+        add_docs_swap = self.swap(
+            search_services,
+            'add_documents_to_index',
+            add_docs_counter)
 
         for i in xrange(5):
             self.save_new_valid_exploration(
@@ -2305,43 +2319,43 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
         self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
-        # Have Albert create a new exploration. Version 1
+        # Have Albert create a new exploration. Version 1.
         self.save_new_valid_exploration(self.EXP_ID_1, albert_id)
         self._check_contributors_summary(self.EXP_ID_1, {albert_id: 1})
 
-         # Have Bob update that exploration. Version 2
+        # Have Bob update that exploration. Version 2.
         exp_services.update_exploration(
             bob_id, self.EXP_ID_1, [{
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
-        self._check_contributors_summary(self.EXP_ID_1,
-                                         {albert_id: 1, bob_id: 1})
-        # Have Bob update that exploration. Version 3
+        self._check_contributors_summary(
+            self.EXP_ID_1, {albert_id: 1, bob_id: 1})
+        # Have Bob update that exploration. Version 3.
         exp_services.update_exploration(
             bob_id, self.EXP_ID_1, [{
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
-        self._check_contributors_summary(self.EXP_ID_1,
-                                         {albert_id: 1, bob_id: 2})
+        self._check_contributors_summary(
+            self.EXP_ID_1, {albert_id: 1, bob_id: 2})
 
-        # Have Albert update that exploration. Version 4
+        # Have Albert update that exploration. Version 4.
         exp_services.update_exploration(
             albert_id, self.EXP_ID_1, [{
                 'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
             }], 'Changed title.')
-        self._check_contributors_summary(self.EXP_ID_1,
-                                         {albert_id: 2, bob_id: 2})
+        self._check_contributors_summary(
+            self.EXP_ID_1, {albert_id: 2, bob_id: 2})
 
-        # Have Albert revert to version 3. Version 5
+        # Have Albert revert to version 3. Version 5.
         exp_services.revert_exploration(albert_id, self.EXP_ID_1, 4, 3)
-        self._check_contributors_summary(self.EXP_ID_1,
-                                         {albert_id: 1, bob_id: 2})
+        self._check_contributors_summary(
+            self.EXP_ID_1, {albert_id: 1, bob_id: 2})
 
 
 class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
@@ -2370,9 +2384,9 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         - (6) Bob reverts Albert's last edit to EXP_ID_1.
         - Bob tries to publish EXP_ID_2, and is denied access.
         - (7) Albert publishes EXP_ID_2.
-        - (8) Albert creates EXP_ID_3
-        - (9) Albert publishes EXP_ID_3
-        - (10) Albert deletes EXP_ID_3
+        - (8) Albert creates EXP_ID_3.
+        - (9) Albert publishes EXP_ID_3.
+        - (10) Albert deletes EXP_ID_3.
         """
         super(ExplorationSummaryGetTests, self).setUp()
 
@@ -2439,7 +2453,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 actual_summaries[self.EXP_ID_2].first_published_msec
                 )}
 
-        # check actual summaries equal expected summaries
+        # check actual summaries equal expected summaries.
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
@@ -2483,7 +2497,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             )
         }
 
-        # check actual summaries equal expected summaries
+        # check actual summaries equal expected summaries.
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
@@ -2834,8 +2848,9 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             self.EXP_ID1, self.editor_id)
         self.save_new_valid_exploration(self.EXP_ID2, self.editor_id)
         self.initial_state_name = exploration.init_state_name
-        with self.swap(feedback_models.FeedbackThreadModel,
-                       'generate_new_thread_id', self._generate_thread_id):
+        with self.swap(
+            feedback_models.FeedbackThreadModel,
+            'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
                 self.EXP_ID1, self.user_id, 3, self.initial_state_name,
                 'description', 'new text')
@@ -2844,10 +2859,12 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                 'description', 'new text')
 
     def test_accept_suggestion_valid_suggestion(self):
-        with self.swap(exp_services, '_is_suggestion_valid',
-                       self._return_true):
-            with self.swap(exp_services, 'update_exploration',
-                           self._check_commit_message):
+        with self.swap(
+            exp_services, '_is_suggestion_valid',
+            self._return_true):
+            with self.swap(
+                exp_services, 'update_exploration',
+                self._check_commit_message):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID1,
                     self.COMMIT_MESSAGE, False)
@@ -2861,8 +2878,9 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(last_message.text, 'Suggestion accepted.')
 
     def test_accept_suggestion_invalid_suggestion(self):
-        with self.swap(exp_services, '_is_suggestion_valid',
-                       self._return_false):
+        with self.swap(
+            exp_services, '_is_suggestion_valid',
+            self._return_false):
             with self.assertRaisesRegexp(
                 Exception,
                 'Invalid suggestion: The state for which it was made '
@@ -2877,8 +2895,8 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
 
     def test_accept_suggestion_empty_commit_message(self):
-        with self.assertRaisesRegexp(Exception,
-                                     'Commit message cannot be empty.'):
+        with self.assertRaisesRegexp(
+            Exception, 'Commit message cannot be empty.'):
             exp_services.accept_suggestion(
                 self.editor_id, self.THREAD_ID1, self.EXP_ID2,
                 self.EMPTY_COMMIT_MESSAGE, False)
@@ -2889,8 +2907,9 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
 
     def test_accept_suggestion_that_has_already_been_handled(self):
         exception_message = 'Suggestion has already been accepted/rejected'
-        with self.swap(exp_services, '_is_suggestion_handled',
-                       self._return_true):
+        with self.swap(
+            exp_services, '_is_suggestion_handled',
+            self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID2,
@@ -2902,13 +2921,15 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         thread = feedback_models.FeedbackThreadModel.get(
             feedback_models.FeedbackThreadModel.generate_full_thread_id(
                 self.EXP_ID2, self.THREAD_ID1))
-        self.assertEqual(thread.status,
-                         feedback_models.STATUS_CHOICES_IGNORED)
+        self.assertEqual(
+            thread.status,
+            feedback_models.STATUS_CHOICES_IGNORED)
 
     def test_reject_suggestion_that_has_already_been_handled(self):
         exception_message = 'Suggestion has already been accepted/rejected'
-        with self.swap(exp_services, '_is_suggestion_handled',
-                       self._return_true):
+        with self.swap(
+            exp_services, '_is_suggestion_handled',
+            self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.reject_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID2)
@@ -3006,8 +3027,8 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_user_data.exploration_id, self.EXP_ID1)
         self.assertEqual(
             exp_user_data.draft_change_list, self.NEW_CHANGELIST)
-        self.assertEqual(exp_user_data.draft_change_list_last_updated,
-                         self.NEWER_DATETIME)
+        self.assertEqual(
+            exp_user_data.draft_change_list_last_updated, self.NEWER_DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
         self.assertEqual(exp_user_data.draft_change_list_id, 3)
 
@@ -3034,8 +3055,8 @@ class EditorAutoSavingUnitTests(test_utils.GenericTestBase):
         self.assertEqual(exp_user_data.exploration_id, self.EXP_ID3)
         self.assertEqual(
             exp_user_data.draft_change_list, self.NEW_CHANGELIST)
-        self.assertEqual(exp_user_data.draft_change_list_last_updated,
-                         self.NEWER_DATETIME)
+        self.assertEqual(
+            exp_user_data.draft_change_list_last_updated, self.NEWER_DATETIME)
         self.assertEqual(exp_user_data.draft_change_list_exp_version, 5)
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
 
@@ -3096,7 +3117,8 @@ class GetExplorationAndExplorationRightsTest(ExplorationServicesUnitTests):
 
 class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
     """Tests for functions associated with creating and updating state id
-    mapping."""
+    mapping.
+    """
 
     EXP_ID = 'eid'
 
@@ -3108,7 +3130,8 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_correct_state_id_mapping_model_is_stored(self):
         """Test that correct mapping model is stored for new and edited
-        exploration."""
+        exploration.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exploration = self.save_new_valid_exploration(
                 self.EXP_ID, self.owner_id)
@@ -3177,7 +3200,8 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
 
     def test_that_mapping_is_correct_when_exploration_is_reverted(self):
         """Test that state id mapping is correct when exploration is reverted
-        to old version."""
+        to old version.
+        """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exploration = self.save_new_valid_exploration(
                 self.EXP_ID, self.owner_id)

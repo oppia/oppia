@@ -126,18 +126,18 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         """Test giving feedback handler."""
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
-        # Load demo exploration
+        # Load demo exploration.
         exp_id = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        # Viewer opens exploration
+        # Viewer opens exploration.
         self.login(self.VIEWER_EMAIL)
         exploration_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
         state_name_1 = exploration_dict['exploration']['init_state_name']
 
-        # Viewer gives 1st feedback
+        # Viewer gives 1st feedback.
         self.post_json(
             '/explorehandler/give_feedback/%s' % exp_id,
             {
@@ -194,8 +194,9 @@ class ExplorationStateClassifierMappingTests(test_utils.GenericTestBase):
         retrieved_state_classifier_mapping = exploration_dict[
             'state_classifier_mapping']
 
-        self.assertEqual(expected_state_classifier_mapping,
-                         retrieved_state_classifier_mapping)
+        self.assertEqual(
+            expected_state_classifier_mapping,
+            retrieved_state_classifier_mapping)
 
 
 class ExplorationParametersUnitTests(test_utils.GenericTestBase):
@@ -272,14 +273,14 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/explore/%s' % self.EXP_ID))
 
-        # User checks rating
+        # User checks rating.
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], None)
         self.assertEqual(
             ratings['overall_ratings'],
             {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
 
-        # User rates and checks rating
+        # User rates and checks rating.
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 2
@@ -291,7 +292,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
             ratings['overall_ratings'],
             {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0})
 
-        # User re-rates and checks rating
+        # User re-rates and checks rating.
         self.login('user@example.com')
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
@@ -526,10 +527,10 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         self._complete_exploration_in_collection(self.EXP_ID_20)
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_20, collection_id=self.COL_ID)
-        # The first & next explorations should be recommended, since the first
-        # is the next to complete with current progress, and the last
-        # exploration is unlocked by completing this exploration.
-        self.assertEqual(recommendation_ids, [self.EXP_ID_19, self.EXP_ID_21])
+        # The first exploration that the user has not yet visited is
+        # recommended. Since, the collection is linear, in this method, finally,
+        # the user would visit every node in the collection.
+        self.assertEqual(recommendation_ids, [self.EXP_ID_19])
 
     def test_logged_in_no_sysexps_no_authexps_all_exps_in_col_has_no_exps(self):
         """Check there are not recommended explorations when a user is logged in
@@ -572,10 +573,10 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
         recommendation_ids = self._get_recommendation_ids(
             self.EXP_ID_20, collection_id=self.COL_ID,
             include_system_recommendations=True)
-        # The first & next explorations should be recommended, since the first
-        # is the next to complete with current progress, and the last
-        # exploration is unlocked by completing this exploration.
-        self.assertEqual(recommendation_ids, [self.EXP_ID_19, self.EXP_ID_21])
+        # The first exploration that the user has not yet visited is
+        # recommended. Since, the collection is linear, in this method, finally,
+        # the user would visit every node in the collection.
+        self.assertEqual(recommendation_ids, [self.EXP_ID_19])
 
     def test_logged_in_sysexps_no_authexps_all_exps_in_col_has_no_exps(self):
         """Check there are not recommended explorations when a user is logged in
@@ -1132,9 +1133,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove one exploration.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-             constants.ACTIVITY_TYPE_EXPLORATION,
-             self.EXP_ID_0)))
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_0)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_1])
@@ -1142,9 +1144,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove another exploration.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-             constants.ACTIVITY_TYPE_EXPLORATION,
-             self.EXP_ID_1)))
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_EXPLORATION,
+                self.EXP_ID_1)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [])
@@ -1166,9 +1169,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove one collection.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-             constants.ACTIVITY_TYPE_COLLECTION,
-             self.COL_ID_0)))
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_COLLECTION,
+                self.COL_ID_0)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
@@ -1176,9 +1180,10 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Remove another collection.
         self.testapp.delete(str(
             '%s/%s/%s' %
-            (feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
-             constants.ACTIVITY_TYPE_COLLECTION,
-             self.COL_ID_1)))
+            (
+                feconf.LEARNER_INCOMPLETE_ACTIVITY_DATA_URL,
+                constants.ACTIVITY_TYPE_COLLECTION,
+                self.COL_ID_1)))
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])

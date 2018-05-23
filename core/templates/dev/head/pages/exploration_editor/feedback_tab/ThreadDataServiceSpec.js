@@ -30,7 +30,7 @@ describe('retrieving threads service', function() {
   });
 
   var ThreadDataService, httpBackend;
-  beforeEach(inject(function(_ThreadDataService_, $httpBackend) {
+  beforeEach(inject(function($httpBackend, _ThreadDataService_) {
     ThreadDataService = _ThreadDataService_;
     httpBackend = $httpBackend;
   }));
@@ -83,10 +83,10 @@ describe('retrieving threads service', function() {
     });
 
     httpBackend.whenGET(
-       '/suggestionlisthandler/' + expId + '?has_suggestion=true&list_type=all'
-     ).respond({
-       threads: mockOpenSuggestionThreads
-     });
+      '/suggestionlisthandler/' + expId + '?has_suggestion=true&list_type=all'
+    ).respond({
+      threads: mockOpenSuggestionThreads
+    });
 
     ThreadDataService.fetchThreads();
     httpBackend.flush();

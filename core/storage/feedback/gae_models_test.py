@@ -140,7 +140,8 @@ class SuggestionModelTest(test_utils.GenericTestBase):
 
     def _get_suggestion_models_for_test(self, suggestions_list):
         """Removes fields that are set to default values in the base model and
-        are thus not explicitly verified in tests."""
+        are thus not explicitly verified in tests.
+        """
 
         updated_suggestions_list = []
         for suggestion in suggestions_list:
@@ -164,10 +165,11 @@ class SuggestionModelTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion.exploration_version, 1)
         self.assertEqual(suggestion.state_name, 'state_name')
         self.assertEqual(suggestion.description, 'description')
-        self.assertEqual(suggestion.state_content, {
-            'type': 'text',
-            'value': 'suggestion_text',
-        })
+        self.assertEqual(
+            suggestion.state_content, {
+                'type': 'text',
+                'value': 'suggestion_text',
+            })
 
     def test_create_suggestion_fails_if_thread_already_has_suggestion(self):
         with self.assertRaisesRegexp(Exception, 'There is already a feedback '
@@ -215,7 +217,7 @@ class SuggestionModelTest(test_utils.GenericTestBase):
 
 
 class UnsentFeedbackEmailModelTest(test_utils.GenericTestBase):
-    """Tests for FeedbackMessageEmailDataModel class"""
+    """Tests for FeedbackMessageEmailDataModel class."""
 
     def test_new_instances_stores_correct_data(self):
         user_id = 'A'

@@ -15,68 +15,32 @@
 /**
  * @fileoverview Service to maintain the state of a single collection shared
  * throughout the collection editor. This service provides functionality for
- * retrieving the collection, saving it, and listening for changes. The service
- * also maintains a list of all skills stored within the collection.
+ * retrieving the collection, saving it, and listening for changes.
  */
 
 oppia.factory('CollectionLinearizerService', [
   'CollectionUpdateService',
   function(CollectionUpdateService) {
-    var _getNextExplorationIds = function(collection, completedExpIds) {
-      var userAcquiredSkillIds = completedExpIds.reduce(
-        function(skillIdsList, explorationId) {
-          var collectionNode = collection.getCollectionNodeByExplorationId(
-            explorationId);
-          collectionNode.getAcquiredSkillIds().forEach(function(skillId) {
-            if (skillIdsList.indexOf(skillId) === -1) {
-              skillIdsList.push(skillId);
-            }
-          });
-          return skillIdsList;
-        }, []);
+    var _getNextExplorationId = function(collection, completedExpIds) {
+      var explorationIds = collection.getExplorationIds();
 
-      // Pick all collection nodes whose prerequisite skills are satisified by
-      // the currently acquired skills and which have not yet been completed.
-      return collection.getExplorationIds().filter(function(explorationId) {
-        if (completedExpIds.indexOf(explorationId) !== -1) {
-          return false;
+      for (var i = 0; i < explorationIds.length; i++) {
+        if (completedExpIds.indexOf(explorationIds[i]) === -1) {
+          return explorationIds[i];
         }
-
-        var collectionNode = collection.getCollectionNodeByExplorationId(
-          explorationId);
-        return collectionNode.getPrerequisiteSkillIds().every(
-          function(skillId) {
-            return userAcquiredSkillIds.indexOf(skillId) !== -1;
-          });
-      });
+      }
+      return null;
     };
 
     // Given a non linear collection input, the function will linearize it by
     // picking the first node it encounters on the branch and ignore the others.
     var _getCollectionNodesInPlayableOrder = function(collection) {
-      var nodeList = collection.getStartingCollectionNodes();
-      var completedExpIds = nodeList.map(function(collectionNode) {
-        return collectionNode.getExplorationId();
-      });
-
-      var nextExpIds = _getNextExplorationIds(collection, completedExpIds);
-      while (nextExpIds.length > 0) {
-        completedExpIds = completedExpIds.concat(nextExpIds);
-        nodeList.push(collection.getCollectionNodeByExplorationId(
-            nextExpIds[0]));
-        nextExpIds = _getNextExplorationIds(collection, completedExpIds);
-      }
-      return nodeList;
+      return collection.getCollectionNodes();
     };
 
     var addAfter = function(collection, curExplorationId, newExplorationId) {
-      // In order for the new node to succeed the current node, the new node
-      // must require the acquired skills of the current node.
       var curCollectionNode = collection.getCollectionNodeByExplorationId(
         curExplorationId);
-      var curAcquiredSkillIds = curCollectionNode.getAcquiredSkillIds();
-      CollectionUpdateService.setPrerequisiteSkillIds(
-        collection, newExplorationId, curAcquiredSkillIds);
     };
 
     var findNodeIndex = function(linearNodeList, explorationId) {
@@ -90,53 +54,17 @@ oppia.factory('CollectionLinearizerService', [
       return index;
     };
 
-    var getNodeLeftOf = function(linearNodeList, nodeIndex) {
-      return nodeIndex > 0 ? linearNodeList[nodeIndex - 1] : null;
-    };
-
-    var getNodeRightOf = function(linearNodeList, nodeIndex) {
-      var lastIndex = linearNodeList.length - 1;
-      return nodeIndex < lastIndex ? linearNodeList[nodeIndex + 1] : null;
-    };
-
     // Swap the node at the specified index with the node immediately to the
     // left of it.
     var swapLeft = function(collection, linearNodeList, nodeIndex) {
-      // There are three cases when swapping a node left:
-      //   1. There is a node right of it but not left
-      //   2. There is a node left of it but not right
-      //   3. There are nodes both to the left and right of it
-
       var node = linearNodeList[nodeIndex];
-      var leftNode = getNodeLeftOf(linearNodeList, nodeIndex);
-      var rightNode = getNodeRightOf(linearNodeList, nodeIndex);
-      if (!leftNode) {
-        // Case 1 is a no-op: there's nothing to swap with.
+      var leftNodeIndex = nodeIndex > 0 ? nodeIndex - 1 : null;
+
+      if (leftNodeIndex === null) {
         return;
       }
 
-      // Case 2 involves two shifts. Take for instance: a->b
-      // First, b needs to have the same prerequisites as a: a, b
-      var leftPrereqSkillIds = leftNode.getPrerequisiteSkillIds();
-      CollectionUpdateService.setPrerequisiteSkillIds(
-        collection, node.getExplorationId(), leftPrereqSkillIds);
-
-      // Second, a needs to prerequire b's acquired skills: b->a
-      var centerAcquiredSkillIds = node.getAcquiredSkillIds();
-      CollectionUpdateService.setPrerequisiteSkillIds(
-        collection, leftNode.getExplorationId(), centerAcquiredSkillIds);
-
-      if (rightNode) {
-        // Case 3 has a third shift beyond case two. With example: a->b->c
-        // Step 1: a, b->c
-        // Step 2: b->c
-        //          \
-        //           -a
-        // Step 3 involves updating c to prerequire a's acquired skills: b->a->c
-        var leftAcquiredSkillIds = leftNode.getAcquiredSkillIds();
-        CollectionUpdateService.setPrerequisiteSkillIds(
-          collection, rightNode.getExplorationId(), leftAcquiredSkillIds);
-      }
+      CollectionUpdateService.swapNodes(collection, leftNodeIndex, nodeIndex);
     };
     var swapRight = function(collection, linearNodeList, nodeIndex) {
       // Swapping right is the same as swapping the node one to the right
@@ -167,8 +95,8 @@ oppia.factory('CollectionLinearizerService', [
        * collection is immediately playable by the user. NOTE: This function
        * does not assume that the collection is linear.
        */
-      getNextExplorationIds: function(collection, completedExpIds) {
-        return _getNextExplorationIds(collection, completedExpIds);
+      getNextExplorationId: function(collection, completedExpIds) {
+        return _getNextExplorationId(collection, completedExpIds);
       },
 
       /**
@@ -182,22 +110,13 @@ oppia.factory('CollectionLinearizerService', [
       /**
        * Inserts a new collection node at the end of the collection's playable
        * list of explorations, based on the specified exploration ID and
-       * exploration summary backend object. This will use the exploration's
-       * title as its implicit skill that is acquired when it is completed as
-       * part of the collection. This skill will not be updated if the title of
-       * the exploration changes in the future.
+       * exploration summary backend object.
        */
       appendCollectionNode: function(
           collection, explorationId, summaryBackendObject) {
         var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
         CollectionUpdateService.addCollectionNode(
           collection, explorationId, summaryBackendObject);
-        var skillName = summaryBackendObject.title;
-        CollectionUpdateService.addCollectionSkill(collection, skillName);
-        var skillId = collection.getSkillIdFromName(skillName);
-        CollectionUpdateService.setAcquiredSkillIds(
-          collection, explorationId, [skillId]);
-
         if (linearNodeList.length > 0) {
           var lastNode = linearNodeList[linearNodeList.length - 1];
           addAfter(collection, lastNode.getExplorationId(), explorationId);
@@ -215,39 +134,6 @@ oppia.factory('CollectionLinearizerService', [
         if (!collection.containsCollectionNode(explorationId)) {
           return false;
         }
-
-        var linearNodeList = _getCollectionNodesInPlayableOrder(collection);
-        var nodeIndex = findNodeIndex(linearNodeList, explorationId);
-        var collectionNode = linearNodeList[nodeIndex];
-        var acquiredSkillIds = collectionNode.getAcquiredSkillIds();
-        if (acquiredSkillIds.length !== 1) {
-          throw Error(
-            'Expected collection node to have exactly one acquired skill, ' +
-            'found: ' + acquiredSkillIds.length);
-        }
-        var acquiredSkillId = collectionNode.getAcquiredSkillIds()[0];
-
-        // Relinking is only needed if more than just the specified node is in
-        // the collection.
-        if (collection.getCollectionNodeCount() > 1) {
-          // Ensure any present left/right nodes are appropriately linked after
-          // the node is removed.
-          var leftNode = getNodeLeftOf(linearNodeList, nodeIndex);
-          var rightNode = getNodeRightOf(linearNodeList, nodeIndex);
-          var newPrerequisiteSkillIds = [];
-          if (leftNode) {
-            newPrerequisiteSkillIds = leftNode.getAcquiredSkillIds();
-          }
-          if (rightNode) {
-            CollectionUpdateService.setPrerequisiteSkillIds(
-              collection, rightNode.getExplorationId(),
-              newPrerequisiteSkillIds);
-          }
-        }
-
-        // Delete the skill
-        CollectionUpdateService.deleteCollectionSkill(
-          collection, acquiredSkillId);
 
         // Delete the node
         CollectionUpdateService.deleteCollectionNode(collection, explorationId);

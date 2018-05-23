@@ -81,7 +81,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS):
 
-            # setup example exploration
+            # setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
             first_state_name = exp.init_state_name
@@ -112,7 +112,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 exp_id, exp_version, first_state_name, 'session2')
             self.process_and_flush_pending_tasks()
 
-            # add some answers
+            # add some answers.
             event_services.AnswerSubmissionEventHandler.record(
                 exp_id, exp_version, first_state_name, 'MultipleChoiceInput', 0,
                 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session1', time_spent,
@@ -130,7 +130,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 0, 0, exp_domain.EXPLICIT_CLASSIFICATION, 'session2',
                 time_spent, params, 'answer3')
 
-            # Run job on exploration with answers
+            # Run job on exploration with answers.
             ModifiedInteractionAnswerSummariesAggregator.start_computation()
             self.assertEqual(
                 self.count_jobs_in_taskqueue(
@@ -142,7 +142,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             calc_id = 'AnswerFrequencies'
 
-            # get job output of first state and check it
+            # get job output of first state and check it.
             calc_output_model = self._get_calc_output_model(
                 exp_id, first_state_name, calc_id,
                 exploration_version=exp_version)
@@ -161,7 +161,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
 
             self.assertEqual(calculation_output, expected_calculation_output)
 
-            # get job output of second state and check it
+            # get job output of second state and check it.
             calc_output_model = self._get_calc_output_model(
                 exp_id, second_state_name, calc_id,
                 exploration_version=exp_version)
@@ -183,7 +183,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS):
 
-            # setup example exploration
+            # setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
             first_state_name = exp.init_state_name
@@ -703,7 +703,7 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
             self.ALL_CC_MANAGERS_FOR_TESTS):
 
-            # setup example exploration
+            # setup example exploration.
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
             first_state_name = exp.init_state_name
@@ -763,14 +763,16 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calculation_output_second = (
                 common_elements_calc_output_model.calculation_output)
 
-            self.assertEqual(calculation_output_first, [{
-                'answer': ['answer1', 'answer2'],
-                'frequency': 1
-            }])
-            self.assertEqual(calculation_output_second, [{
-                'answer': 'answer1',
-                'frequency': 1
-            }, {
-                'answer': 'answer2',
-                'frequency': 1
-            }])
+            self.assertEqual(
+                calculation_output_first, [{
+                    'answer': ['answer1', 'answer2'],
+                    'frequency': 1
+                }])
+            self.assertEqual(
+                calculation_output_second, [{
+                    'answer': 'answer1',
+                    'frequency': 1
+                }, {
+                    'answer': 'answer2',
+                    'frequency': 1
+                }])

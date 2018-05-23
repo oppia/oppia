@@ -16,15 +16,15 @@ inbound_services:
 
 handlers:
 - url: /favicon.ico
-  static_files: assets/common/favicon.ico
-  upload: assets/common/favicon.ico
+  static_files: assets/favicon.ico
+  upload: assets/favicon.ico
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
 - url: /robots.txt
-  static_files: assets/common/robots.txt
-  upload: assets/common/robots.txt
+  static_files: assets/robots.txt
+  upload: assets/robots.txt
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'
@@ -35,13 +35,6 @@ handlers:
   expiration: 30d
   http_headers:
     Cache-Control: 'public, max-age=2592000'
-- url: /assets/common
-  static_dir: assets/common
-  secure: always
-  http_headers:
-    # WARNING TO DEVELOPERS: Files in this folder may be stale for
-    # up to 10 mins after a code release.
-    Cache-Control: 'public, max-age=600'
 - url: /assets
   static_dir: assets
   secure: always
@@ -131,8 +124,6 @@ handlers:
 libraries:
 - name: jinja2
   version: '2.6'
-- name: numpy
-  version: '1.6.1'
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
   version: '2.7.11'

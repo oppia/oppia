@@ -7,7 +7,7 @@
             ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
-    <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()"></div>
+    <div class="rte-viewer conversation-skin-help-card-content" angular-html-bind="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()"></div>
     <br>
     <continue-button ng-if="helpCardHasContinueButton"
                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"

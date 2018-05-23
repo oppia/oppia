@@ -734,9 +734,10 @@ class StartExplorationMRJobManager(
     def map(item):
         current_class = StartExplorationMRJobManager
         if current_class._entity_created_before_job_queued(item):  # pylint: disable=protected-access
-            yield (item.exploration_id, {
-                'event_type': item.event_type,
-            })
+            yield (
+                item.exploration_id, {
+                    'event_type': item.event_type,
+                })
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -770,7 +771,8 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
     @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         """Override this method so that it does not immediately start a
-        new MapReduce job. Non-test subclasses should not do this."""
+        new MapReduce job. Non-test subclasses should not do this.
+        """
         pass
 
     @classmethod
@@ -907,7 +909,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
 
-            # Enqueue the batch computation. (It is running on 0 events.)
+            # Enqueue the batch computation. (It is running on 0 events).
             StartExplorationEventCounter._kickoff_batch_job()  # pylint: disable=protected-access
             # Record an event while this job is in the queue. Simulate
             # this by directly calling on_incoming_event(), because using

@@ -88,8 +88,8 @@ class AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         # Create 12 answers with different frequencies.
         answers = (
             ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
-            ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
+            ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 +
+            ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L'])
         answer_dicts_list = [self._create_answer_dict(a) for a in answers]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
@@ -146,8 +146,8 @@ class Top5AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         # Create 12 answers with different frequencies.
         answers = (
             ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
-            ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
+            ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 +
+            ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L'])
         answer_dicts_list = [self._create_answer_dict(a) for a in answers]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
@@ -190,8 +190,8 @@ class Top10AnswerFrequenciesUnitTestCase(CalculationUnitTestBase):
         # Create 12 answers with different frequencies.
         answers = (
             ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
-            ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
+            ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 +
+            ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L'])
         answer_dicts_list = [self._create_answer_dict(a) for a in answers]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
@@ -260,14 +260,14 @@ class FrequencyCommonlySubmittedElementsUnitTestCase(CalculationUnitTestBase):
     def test_many_shared_answers(self):
         answers = (
             ['A'] * 12 + ['B'] * 11 + ['C'] * 10 + ['D'] * 9 +
-            ['E'] *  8 + ['F'] *  7 + ['G'] *  6 + ['H'] * 5 +
-            ['I'] *  4 + ['J'] *  3 + ['K'] *  2 + ['L'])
+            ['E'] * 8 + ['F'] * 7 + ['G'] * 6 + ['H'] * 5 +
+            ['I'] * 4 + ['J'] * 3 + ['K'] * 2 + ['L'])
         split_len = len(answers) // 4
         answer_dicts_list = [
-            self._create_answer_dict(answers[           :split_len*1]),
-            self._create_answer_dict(answers[split_len*1:split_len*2]),
-            self._create_answer_dict(answers[split_len*2:split_len*3]),
-            self._create_answer_dict(answers[split_len*3:           ]),
+            self._create_answer_dict(answers[:split_len * 1]),
+            self._create_answer_dict(answers[split_len * 1:split_len * 2]),
+            self._create_answer_dict(answers[split_len * 2:split_len * 3]),
+            self._create_answer_dict(answers[split_len * 3:]),
         ]
         state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
 
@@ -312,7 +312,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
 
     def test_many_categories(self):
         answer_dicts_list = [
-            # EXPLICIT
+            # EXPLICIT.
             self._create_answer_dict(
                 'Explicit A',
                 classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
@@ -322,7 +322,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
             self._create_answer_dict(
                 'Explicit A',
                 classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
-            # TRAINING DATA
+            # TRAINING DATA.
             self._create_answer_dict(
                 'Trained data A',
                 classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
@@ -332,7 +332,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
             self._create_answer_dict(
                 'Trained data B',
                 classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
-            # STATS CLASSIFIER
+            # STATS CLASSIFIER.
             self._create_answer_dict(
                 'Stats B',
                 classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
@@ -345,7 +345,7 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
             self._create_answer_dict(
                 'Trained data B',
                 classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
-            # DEFAULT OUTCOMES
+            # DEFAULT OUTCOMES.
             self._create_answer_dict(
                 'Default C',
                 classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),

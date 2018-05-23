@@ -34,6 +34,40 @@ import feconf
 ])
 
 
+class ExplorationIssuesModelCreatorOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """A one-off job for creating a default ExplorationIsssues model instance
+    for all the explorations in the datastore. If an ExplorationIssues model
+    already exists for an exploration, it is refreshed to a default instance.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exploration_model):
+        if not exploration_model.deleted:
+            exp_issues_model = stats_models.ExplorationIssuesModel.get(
+                exploration_model.id, strict=False)
+            if not exp_issues_model:
+                exp_issues_default = (
+                    stats_domain.ExplorationIssues.create_default(
+                        exploration_model.id))
+                stats_models.ExplorationIssuesModel.create(
+                    exp_issues_default.id, exp_issues_default.unresolved_issues)
+            else:
+                exp_issues_model.unresolved_issues = []
+                exp_issues_model.put()
+            yield(
+                exploration_model.id,
+                'ExplorationIssuesModel created')
+
+    @staticmethod
+    def reduce(exp_id, values):
+        yield "%s: %s" % (exp_id, values)
+
+
 class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """A one-off job for recomputing creator statistics from the events
     in the datastore. Should only be run in events of data corruption.
@@ -54,69 +88,75 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.event_schema_version != 2:
             return
         if isinstance(item, stats_models.StateCompleteEventLogEntryModel):
-            yield (item.exp_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
-                       'version': item.exp_version,
-                       'state_name': item.state_name
-                   })
+            yield (
+                item.exp_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_STATE_COMPLETED,
+                    'version': item.exp_version,
+                    'state_name': item.state_name
+                })
         elif isinstance(
                 item, stats_models.AnswerSubmittedEventLogEntryModel):
-            yield (item.exp_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
-                       'version': item.exp_version,
-                       'state_name': item.state_name,
-                       'is_feedback_useful': item.is_feedback_useful
-                   })
+            yield (
+                item.exp_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_ANSWER_SUBMITTED,
+                    'version': item.exp_version,
+                    'state_name': item.state_name,
+                    'is_feedback_useful': item.is_feedback_useful
+                })
         elif isinstance(item, stats_models.StateHitEventLogEntryModel):
-            yield (item.exploration_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_STATE_HIT,
-                       'version': item.exploration_version,
-                       'state_name': item.state_name,
-                       'session_id': item.session_id
-                   })
+            yield (
+                item.exploration_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_STATE_HIT,
+                    'version': item.exploration_version,
+                    'state_name': item.state_name,
+                    'session_id': item.session_id
+                })
         elif isinstance(item, stats_models.SolutionHitEventLogEntryModel):
-            yield (item.exp_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
-                       'version': item.exp_version,
-                       'state_name': item.state_name,
-                       'session_id': item.session_id
-                   })
+            yield (
+                item.exp_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_SOLUTION_HIT,
+                    'version': item.exp_version,
+                    'state_name': item.state_name,
+                    'session_id': item.session_id
+                })
         elif isinstance(
                 item, stats_models.ExplorationActualStartEventLogEntryModel):
-            yield (item.exp_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
-                       'version': item.exp_version,
-                       'state_name': item.state_name
-                   })
+            yield (
+                item.exp_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_ACTUAL_START_EXPLORATION,
+                    'version': item.exp_version,
+                    'state_name': item.state_name
+                })
         elif isinstance(
                 item, stats_models.CompleteExplorationEventLogEntryModel):
-            yield (item.exploration_id,
-                   {
-                       'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
-                       'version': item.exploration_version,
-                       'state_name': item.state_name
-                   })
+            yield (
+                item.exploration_id,
+                {
+                    'event_type': feconf.EVENT_TYPE_COMPLETE_EXPLORATION,
+                    'version': item.exploration_version,
+                    'state_name': item.state_name
+                })
 
     @staticmethod
     def reduce(exp_id, values):
         values = map(ast.literal_eval, values)
         sorted_events_dicts = sorted(values, key=lambda x: x['version'])
 
-        # Find the latest version number
+        # Find the latest version number.
         exploration = exp_services.get_exploration_by_id(exp_id)
         latest_exp_version = exploration.version
         versions = range(1, latest_exp_version + 1)
 
         # Get a copy of the corrupted statistics models to copy uncorrupted
-        # v1 fields
+        # v1 fields.
         old_stats = stats_services.get_multiple_exploration_stats_by_version(
             exp_id, versions)
-        # Get list of snapshot models for each version of the exploration
+        # Get list of snapshot models for each version of the exploration.
         snapshots_by_version = (
             exp_models.ExplorationModel.get_snapshots_metadata(
                 exp_id, versions))
@@ -125,9 +165,9 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         event_dict_idx = 0
         event_dict = sorted_events_dicts[event_dict_idx]
         for version in versions:
-            datastore_stats_for_version = old_stats[version-1]
+            datastore_stats_for_version = old_stats[version - 1]
             if version == 1:
-                # Reset the possibly corrupted stats
+                # Reset the possibly corrupted stats.
                 datastore_stats_for_version.num_starts_v2 = 0
                 datastore_stats_for_version.num_completions_v2 = 0
                 datastore_stats_for_version.num_actual_starts_v2 = 0
@@ -142,12 +182,12 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 exp_stats_dict = datastore_stats_for_version.to_dict()
             else:
                 change_list = snapshots_by_version[version - 1]['commit_cmds']
-                # Copy recomputed v2 events from previous version
+                # Copy recomputed v2 events from previous version.
                 prev_stats_dict = copy.deepcopy(exp_stats_dicts[-1])
                 prev_stats_dict = (
                     RecomputeStatisticsOneOffJob._apply_state_name_changes(
                         prev_stats_dict, change_list))
-                # Copy uncorrupt v1 stats
+                # Copy uncorrupt v1 stats.
                 prev_stats_dict['num_starts_v1'] = (
                     datastore_stats_for_version.num_starts_v1)
                 prev_stats_dict['num_completions_v1'] = (
@@ -173,7 +213,7 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         .num_completions_v1)
                 exp_stats_dict = copy.deepcopy(prev_stats_dict)
 
-            # Compute the statistics for events corresponding to this version
+            # Compute the statistics for events corresponding to this version.
             state_hit_session_ids, solution_hit_session_ids = set(), set()
             while event_dict['version'] == version:
                 state_stats = (exp_stats_dict['state_stats_mapping'][
@@ -265,6 +305,42 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
     @classmethod
     def require_non_negative(
             cls, exp_id, exp_version, property_name, value, state_name=None):
+        """Ensures that all the statistical data is non-negative.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: str. Version of the exploration.
+            property_name: str. The name used as the property's key in the
+                value dict.
+            value: dict. Its structure is as follows:
+                {
+                    'num_starts_v1': int. # of times exploration was
+                        started.
+                    'num_completions_v1': int. # of times exploration was
+                        completed.
+                    'num_actual_starts_v1': int. # of times exploration was
+                        actually started.
+                    'state_stats_mapping': A dict containing the values of
+                        stats for the states of the exploration. It is
+                        formatted as follows:
+                        {
+                            state_name: {
+                                'total_answers_count_v1',
+                                'useful_feedback_count_v1',
+                                'total_hit_count_v1',
+                                'first_hit_count_v1',
+                                'num_completions_v1'
+                            }
+                        }
+                }
+            state_name: str|None. The name of the state whose statistics should
+                be checked.
+
+        Yield:
+            str. "Negative count: exp_id:? version:? state:? ?:?",
+                where ? is the placeholder for exp_id, exp_version,
+                property_name, state_name and value.
+        """
         state_name = state_name if state_name else ''
         if value[property_name] < 0:
             yield (
@@ -318,13 +394,14 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
             } for state_name in item.state_stats_mapping
         }
 
-        yield (item.exp_id, {
-            'exp_version': item.exp_version,
-            'num_starts_v1': item.num_starts_v1,
-            'num_completions_v1': item.num_completions_v1,
-            'num_actual_starts_v1': item.num_actual_starts_v1,
-            'state_stats_mapping': reduced_state_stats_mapping
-        })
+        yield (
+            item.exp_id, {
+                'exp_version': item.exp_version,
+                'num_starts_v1': item.num_starts_v1,
+                'num_completions_v1': item.num_completions_v1,
+                'num_actual_starts_v1': item.num_actual_starts_v1,
+                'state_stats_mapping': reduced_state_stats_mapping
+            })
 
     @staticmethod
     def reduce(exp_id, stringified_values):
@@ -451,14 +528,14 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                 (_STATE_COUNTER_ERROR_KEY, error message).
             tuple. For ExplorationAnnotationModel, a 2-tuple in the form
                 ('exploration_id', value).
-                'exploration_id': str. the id of the exploration.
-                'value': a dict, whose structure is as follows:
+                'exploration_id': str. The id of the exploration.
+                'value': dict. Its structure is as follows:
                     {
-                        'version': str. version of the exploration.
+                        'version': str. Version of the exploration.
                         'starts': int. # of times exploration was started.
                         'completions': int. # of times exploration was
                             completed.
-                        'state_hit': a dict containing the hit counts for the
+                        'state_hit': dict. It contains the hit counts for the
                             states in the exploration. It is formatted as
                             follows:
                             {
@@ -479,16 +556,17 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                     StatisticsAudit._STATE_COUNTER_ERROR_KEY,
                     'Less than 0: %s %d' % (item.key, item.first_entry_count))
             return
-        # Older versions of ExplorationAnnotations didn't store exp_id
-        # This is short hand for making sure we get ones updated most recently
+        # Older versions of ExplorationAnnotations didn't store exp_id.
+        # This is short hand for making sure we get ones updated most recently.
         else:
             if item.exploration_id is not None:
-                yield (item.exploration_id, {
-                    'version': item.version,
-                    'starts': item.num_starts,
-                    'completions': item.num_completions,
-                    'state_hit': item.state_hit_counts
-                })
+                yield (
+                    item.exploration_id, {
+                        'version': item.version,
+                        'starts': item.num_starts,
+                        'completions': item.num_completions,
+                        'state_hit': item.state_hit_counts
+                    })
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -500,11 +578,11 @@ class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
                 associated with the given key. An element of stringified_values
                 would be of the form:
                     {
-                        'version': str. version of the exploration.
+                        'version': str. Version of the exploration.
                         'starts': int. # of times exploration was started.
                         'completions': int. # of times exploration was
                             completed.
-                        'state_hit': dict. a dict containing the hit counts
+                        'state_hit': dict. A dict containing the hit counts
                             for the states in the exploration. It is formatted
                             as follows:
                             {

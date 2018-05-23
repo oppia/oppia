@@ -22,7 +22,7 @@ describe('AudioTranslation object factory', function() {
   describe('AudioTranslationObjectFactory', function() {
     var scope, atof, audioTranslation;
 
-    beforeEach(inject(function($rootScope, $injector) {
+    beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       atof = $injector.get('AudioTranslationObjectFactory');
       audioTranslation = atof.createFromBackendDict({

@@ -46,9 +46,10 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.filepath = imageAndRegions.imagePath;
           $scope.imageUrl = (
             $scope.filepath ?
-            $sce.trustAsResourceUrl(
-              '/imagehandler/' + ExplorationContextService.getExplorationId() +
-              '/' + encodeURIComponent($scope.filepath)) : null);
+              $sce.trustAsResourceUrl(
+                '/imagehandler/' +
+                ExplorationContextService.getExplorationId() +
+                '/' + encodeURIComponent($scope.filepath)) : null);
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
@@ -71,7 +72,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             }
           };
           if (!$scope.interactionIsActive) {
-            /*The following lines highlight the learner's last answer for this
+            /* The following lines highlight the learner's last answer for this
               card. This need only be done at the beginning as if he submits
               an answer, based on EVENT_NEW_CARD_AVAILABLE, the image is made
               inactive, so his last selection would be higlighted.*/
@@ -172,7 +173,7 @@ oppia.directive('oppiaResponseImageClickInput', [
 
           $scope.clickRegionLabel = '(Clicks on ' + (
             _answer.clickedRegions.length > 0 ?
-            '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
+              '\'' + _answer.clickedRegions[0] + '\'' : 'image') + ')';
         }
       ]
     };

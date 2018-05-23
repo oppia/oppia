@@ -69,7 +69,8 @@ class Registry(object):
 
     @classmethod
     def get_all_visualization_ids(cls):
-        """Gets a visualization class by its id (which is also its class name).
+        """Gets a visualization class by its id
+        (which is also its class name).
         """
         if not cls.visualizations_dict:
             cls._refresh_registry()

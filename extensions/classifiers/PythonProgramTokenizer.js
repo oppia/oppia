@@ -146,7 +146,7 @@ oppia.factory('PythonProgramTokenizer', [
     var singleQuoted = [
       "'", '"', "r'", 'r"', "R'", 'R"', "u'", 'u"', "U'", 'U"', "ur'",
       'ur"', "Ur'", 'Ur"', "uR'", 'uR"', "UR'", 'UR"', "b'", 'b"', "B'", 'B"',
-      "br'", 'br"', "Br'", 'Br"', "bR'", 'bR"', "BR'", 'BR"' ];
+      "br'", 'br"', "Br'", 'Br"', "bR'", 'bR"', "BR'", 'BR"'];
 
     var tabsize = 8;
 
@@ -304,7 +304,7 @@ oppia.factory('PythonProgramTokenizer', [
                   break;
                 }
               } else if (
-                  singleQuoted.indexOf(initial) !== -1 ||
+                singleQuoted.indexOf(initial) !== -1 ||
                   singleQuoted.indexOf(token.slice(0, 2)) !== -1 ||
                   singleQuoted.indexOf(token.slice(0, 3)) !== -1) {
                 // Continued string.
