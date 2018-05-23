@@ -88,6 +88,9 @@ class FeedbackThreadModel(base_models.BaseModel):
         Args:
             update_last_updated_time: bool. Whether to update the
                 last_updated_field of the thread.
+
+        Returns:
+            list.
         """
         if update_last_updated_time:
             self.last_updated = datetime.datetime.utcnow()
@@ -192,7 +195,7 @@ class FeedbackThreadModel(base_models.BaseModel):
             thread_id: str. ID of the thread.
 
         Returns:
-            FeedbackThreadModel, or None if the thread is not found or is
+            FeedbackThreadModel. or None if the thread is not found or is
                 already deleted.
         """
         return cls.get_by_id(cls.generate_full_thread_id(

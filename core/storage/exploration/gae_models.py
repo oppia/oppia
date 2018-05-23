@@ -315,6 +315,10 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
         Args:
             exp_id: str. The exploration id whose states are mapped.
             exp_version: int. The version of the exploration.
+
+        Returns:
+            str. A string containing exploration ID and
+            exploration version.
         """
         return 'exploration-%s-%s' % (exp_id, exp_version)
 
@@ -603,6 +607,10 @@ class StateIdMappingModel(base_models.BaseModel):
         Args:
             exp_id: str. The exploration id whose states are mapped.
             exp_version: int. The version of the exploration.
+
+        Returns:
+            str. A string containing exploration ID and
+            exploration version.
         """
         return '%s.%d' % (exp_id, exp_version)
 
@@ -645,8 +653,7 @@ class StateIdMappingModel(base_models.BaseModel):
         Args:
             exp_id: str. The exploration id.
             exp_version: int. The exploration version.
-            strict: bool. Whether to raise an error if no StateIdMappingModel
-                entry is found for the given exploration id and version.
+
 
         Returns:
             StateIdMappingModel. The model retrieved from the datastore.
@@ -660,7 +667,7 @@ class StateIdMappingModel(base_models.BaseModel):
         """Removes state id mapping models present in state_id_mapping_models.
 
         Args:
-            exp_id: The id of the exploration.
+            exp_id: str. The id of the exploration.
             exp_versions: list(int). A list of exploration versions for which
                 the state id mapping model is to be deleted.
         """

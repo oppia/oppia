@@ -290,6 +290,9 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
         Args:
             job_exploration_mappings: list(TrainingJobExplorationMapping). The
                 list of TrainingJobExplorationMapping Domain objects.
+
+        Returns:
+            list(int). The list of mapping IDs.
         """
         mapping_models = []
         mapping_ids = []

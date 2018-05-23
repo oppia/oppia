@@ -279,6 +279,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
                 name to value.
             play_type: str. Type of play-through.
             unused_version: int. Default is 1.
+
+        Returns:
+            str. The ID of the entity.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due tg an error.
@@ -496,6 +499,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             play_type: str. Type of play-through.
             client_time_spent_in_secs: float. Time since start of this
                 state before this event occurred.
+
+        Returns:
+            str. The ID of the entity.
         """
         entity_id = cls.get_new_event_entity_id(exp_id, session_id)
         complete_event_entity = cls(
@@ -647,6 +653,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             params: dict. Current parameter values, map of parameter name
                 to value.
             play_type: str. Type of play-through.
+
+        Returns:
+            str. The ID of the entity.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
@@ -1070,7 +1079,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         """Gets entity_id for a batch model based on given exploration state.
 
         Args:
-            exp_id: str. ID of the exploration currently being played.
+            exploration_id: str. ID of the exploration currently being played.
             exploration_version: int. Version of the exploration currently
                 being played.
 
@@ -1110,7 +1119,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         ExplorationAnnotationsModel for a specific exploration_id.
 
         Args:
-            exp_id: str. ID of the exploration currently being played.
+            exploration_id: str. ID of the exploration currently being played.
 
         Returns:
             list(int). List of versions corresponding to annotation models

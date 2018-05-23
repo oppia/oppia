@@ -105,6 +105,8 @@ class FileMetadataModel(base_models.VersionedModel):
         Args:
             exploration_id: str. The id of the exploration.
             filepath: str. The path to the relevant file within the exploration.
+            strict: bool. Whether to fail noisily if no exploration with the given
+                id exists in the datastore. 
 
         Returns:
             FileMetadataModel. An instance of this class, uniquely
@@ -247,6 +249,8 @@ class FileModel(base_models.VersionedModel):
         Args:
             exploration_id: str. The id of the exploration.
             filepath: str. The path to the relevant file within the exploration.
+            strict: bool. Whether to fail noisily if no exploration with the given
+                id exists in the datastore.
 
         Returns:
             FileModel. An instance of this class, uniquely
