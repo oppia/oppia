@@ -2138,6 +2138,9 @@ def find_all_values_for_key(key, dictionary):
 
     Returns:
         list. The values of the key in the given dictionary.
+
+    Yields:
+        str. The value of the given key.
     """
     if isinstance(dictionary, list):
         for d in dictionary:

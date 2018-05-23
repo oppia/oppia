@@ -203,7 +203,7 @@ class SuggestionModel(base_models.BaseModel):
         """Gets all suggestions that have been reviewed by the given user.
 
         Args:
-            reviewer_id: str. The ID of the reviewer of the suggestion.
+            final_reviewer_id: str. The ID of the reviewer of the suggestion.
 
         Returns:
             list(SuggestionModel). A list of suggestions reviewed by the given
