@@ -166,7 +166,7 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 19
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
 # The current version of story schema.
-CURRENT_STORY_SCHEMA_VERSION = 1
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
 
 # The current version of the question schema.
 CURRENT_QUESTION_SCHEMA_VERSION = 1
@@ -593,14 +593,11 @@ SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
-SKILL_EDITOR_URL_PREFIX = '/skill_editor/create'
 SPLASH_URL = '/splash'
-STORY_EDITOR_URL_PREFIX = '/story_editor/create'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
-TOPIC_EDITOR_URL_PREFIX = '/topic_editor/create'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'

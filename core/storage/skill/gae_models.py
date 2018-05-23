@@ -43,13 +43,13 @@ class SkillModel(base_models.VersionedModel):
 
     # The description of the skill.
     description = ndb.StringProperty(required=True, indexed=True)
-    # The schema version for the misconceptions dict.
+    # The schema version for each of the misconceptions dict.
     misconceptions_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
     # A list of misconceptions associated with the skill, in which each
     # element is a dict.
     misconceptions = ndb.JsonProperty(repeated=True, indexed=False)
-    # The ISO 639-1 code for the language this question is written in.
+    # The ISO 639-1 code for the language this skill is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The schema version for the skill_contents.
     skill_contents_schema_version = ndb.IntegerProperty(
@@ -69,7 +69,6 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
     # The id of the skill being edited.
     skill_id = ndb.StringProperty(indexed=True, required=True)
-
 
     @classmethod
     def get_commit(cls, skill_id, version):
@@ -101,9 +100,8 @@ class SkillSummaryModel(base_models.BaseModel):
 
     # The description of the skill.
     description = ndb.StringProperty(required=True, indexed=True)
-    # The ISO 639-1 code for the language this collection is written in.
+    # The ISO 639-1 code for the language this skill is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
-
     # Time when the skill model was last updated (not to be
     # confused with last_updated, which is the time when the
     # skill *summary* model was last updated).

@@ -44,7 +44,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'description': feconf.DEFAULT_STORY_DESCRIPTION,
             'notes': feconf.DEFAULT_STORY_NOTES,
             'story_nodes': [story_node.to_dict()],
-            'schema_version': feconf.CURRENT_STORY_SCHEMA_VERSION,
+            'schema_version': feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
@@ -59,7 +59,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Outline', self.EXP_ID)
         story = story_domain.Story(
             self.STORY_ID, 'Title', 'Description', 'Notes', [story_node],
-            feconf.CURRENT_STORY_SCHEMA_VERSION, 'en', 0)
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION, 'en', 0)
         story_dict = story.to_dict()
         story_from_dict = story_domain.Story.from_dict(story_dict)
         self.assertEqual(story_from_dict.to_dict(), story_dict)

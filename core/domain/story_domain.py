@@ -15,11 +15,7 @@
 """Domain objects relating to stories."""
 
 from constants import constants
-from core.platform import models
 import feconf
-
-(story_models,) = models.Registry.import_models([models.NAMES.story])
-
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -43,6 +39,9 @@ CMD_UPDATE_STORY_NODE_PROPERTY = 'update_story_node_property'
 # These take node_id as parameter.
 CMD_ADD_STORY_NODE = 'add_story_node'
 CMD_DELETE_STORY_NODE = 'delete_story_node'
+
+# This takes additional 'title' parameters.
+CMD_CREATE_NEW = 'create_new'
 
 
 class StoryChange(object):
@@ -88,13 +87,13 @@ class StoryChange(object):
             self.node_id = change_dict['node_id']
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
+            self.old_value = change_dict['old_value']
         elif self.cmd == CMD_UPDATE_STORY_PROPERTY:
             if change_dict['property_name'] not in self.STORY_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
-            self.old_value = change_dict.get('old_value')
+            self.old_value = change_dict['old_value']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 
@@ -124,7 +123,7 @@ class StoryNode(object):
             exploration_id: str or None. The valid exploration id that fits the
                 story node. It can be None initially, when the story creator
                 has just created a story with the basic storyline (by providing
-                notes) without linking an exploration to any node.
+                outlines) without linking an exploration to any node.
         """
         self.id = node_id
         self.destination_node_ids = destination_node_ids
@@ -177,7 +176,7 @@ class StoryNode(object):
             StoryNode. The StoryNode domain object with default
             value.
         """
-        return cls(node_id, [], [], [], '', '')
+        return cls(node_id, [], [], [], '', None)
 
 
 class Story(object):
@@ -237,60 +236,27 @@ class Story(object):
         }
 
     @classmethod
-    def from_dict(
-            cls, story_dict,
-            story_created_on=None, story_last_updated=None):
-        """Return a Story domain object from a dict.
-
-        Args:
-            story_dict: dict. The dictionary representation of the
-                story.
-            story_created_on: datetime.datetime. Date and time when the
-                story is created.
-            story_last_updated: datetime.datetime. Date and time when
-                the story was last updated.
-
-        Returns:
-            Story. The corresponding Story domain object.
-        """
-        story = cls(
-            story_dict['id'], story_dict['title'],
-            story_dict['description'], story_dict['notes'],
-            [
-                StoryNode.from_dict(node_dict)
-                for node_dict in story_dict['story_nodes']
-            ], story_dict['schema_version'], story_dict['language_code'],
-            story_dict['version'], story_created_on, story_last_updated)
-
-        return story
-
-    @classmethod
-    def create_default_story(
-            cls, story_id, title=feconf.DEFAULT_STORY_TITLE,
-            description=feconf.DEFAULT_STORY_DESCRIPTION,
-            notes=feconf.DEFAULT_STORY_NOTES,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
-        """Returns a story domain object with default values.
+    def create_default_story(cls, story_id):
+        """Returns a story domain object with default values. This is for the
+        the frontend where a default blank story would be shown to the user
+        when the story is created for the first time.
 
         Args:
             story_id: str. The unique id of the story.
-            title: str. The title of the story.
-            category: str. The category of the story.
-            objective: str. The objective of the story.
-            language_code: str. The language code of the story (like 'en'
-                for English).
 
         Returns:
             Story. The Story domain object with the default values.
         """
         return cls(
-            story_id, title, description, notes, [],
-            feconf.CURRENT_STORY_SCHEMA_VERSION, language_code, 0)
+            story_id, feconf.DEFAULT_STORY_TITLE,
+            feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES, [],
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+            constants.DEFAULT_LANGUAGE_CODE, 0)
 
     @classmethod
     def update_story_contents_from_model(
             cls, versioned_story_contents, current_version):
-        """Converts the states blob contained in the given
+        """Converts the story_contents blob contained in the given
         versioned_story_contents dict from current_version to
         current_version + 1. Note that the versioned_story_contents being
         passed in is modified in-place.
@@ -308,11 +274,11 @@ class Story(object):
             versioned_story_contents is not valid.
         """
         if (versioned_story_contents['schema_version'] + 1 >
-                feconf.CURRENT_STORY_SCHEMA_VERSION):
-            raise Exception('story is version %d but current story'
-                            ' schema version is %d' % (
+                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
+            raise Exception('story_contents is version %d but current '
+                            'story_contents schema version is %d' % (
                                 versioned_story_contents['schema_version'],
-                                feconf.CURRENT_STORY_SCHEMA_VERSION))
+                                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION))
 
         versioned_story_contents['schema_version'] = (
             current_version + 1)

@@ -36,7 +36,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_get_story_by_id(self):
         expected_story = story_domain.Story(
             self.STORY_ID, 'Title', 'Description', 'Notes', [],
-            feconf.CURRENT_STORY_SCHEMA_VERSION,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 1
         ).to_dict()
         story = story_services.get_story_by_id(self.STORY_ID)

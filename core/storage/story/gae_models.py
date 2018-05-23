@@ -16,7 +16,7 @@
 
 from core.platform import models
 
-from google.appengine.ext import ndb  # pylint: disable=relative-import
+from google.appengine.ext import ndb
 
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
@@ -48,7 +48,7 @@ class StoryModel(base_models.VersionedModel):
     description = ndb.StringProperty(indexed=False)
     # A set of notes, that describe the characters, main storyline, and setting.
     notes = ndb.TextProperty(indexed=False)
-    # The ISO 639-1 code for the language this question is written in.
+    # The ISO 639-1 code for the language this story is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The schema version for the story_contents.
     schema_version = (
@@ -137,7 +137,7 @@ class StorySummaryModel(base_models.BaseModel):
 
     # The title of the story.
     title = ndb.StringProperty(required=True, indexed=True)
-    # The ISO 639-1 code for the language this question is written in.
+    # The ISO 639-1 code for the language this story is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # Time when the story model was last updated (not to be
     # confused with last_updated, which is the time when the

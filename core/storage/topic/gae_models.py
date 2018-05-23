@@ -43,18 +43,17 @@ class TopicModel(base_models.VersionedModel):
 
     # The name of the topic.
     name = ndb.StringProperty(required=True, indexed=True)
-    # This includes additional metadata like the description of the topic and
-    # some content paragraphs.
-    description = ndb.StringProperty(indexed=False)
+    # The description of the topic.
+    description = ndb.TextProperty(indexed=False)
     # This consists of the list of canonical story ids that are part of
     # this topic.
-    canonical_story_ids = ndb.StringProperty(repeated=True, indexed=False)
+    canonical_story_ids = ndb.StringProperty(repeated=True, indexed=True)
     # This consists of the list of additional (non-canonical) story ids that
     # are part of this topic.
-    additional_story_ids = ndb.StringProperty(repeated=True, indexed=False)
+    additional_story_ids = ndb.StringProperty(repeated=True, indexed=True)
     # This consists of the full list of skill ids that are part of this topic.
-    skill_ids = ndb.StringProperty(repeated=True, indexed=False)
-    # The ISO 639-1 code for the language this question is written in.
+    skill_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
 
@@ -100,7 +99,7 @@ class TopicSummaryModel(base_models.BaseModel):
 
     # The name of the topic.
     name = ndb.StringProperty(required=True, indexed=True)
-    # The ISO 639-1 code for the language this collection is written in.
+    # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
     # Time when the topic model was last updated (not to be
@@ -111,9 +110,10 @@ class TopicSummaryModel(base_models.BaseModel):
     # with created_on, which is the time when the topic *summary*
     # model was created).
     topic_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
-    # The number of stories (both canonical and additional) that are part
-    # of this topic.
-    story_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The number of canonical stories that are part of this topic.
+    canonical_story_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The number of additional stories that are part of this topic.
+    additional_story_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of skills that are part of this topic.
     skill_count = ndb.IntegerProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
