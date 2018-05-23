@@ -111,92 +111,30 @@ class FeedbackThreadModel(base_models.BaseModel):
         """
         for _ in range(_MAX_RETRIES):
             thread_id = (
+                exploration_id + '.' +
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +
                 utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
-            if not cls.get_by_exp_and_thread_id(exploration_id, thread_id):
+            if not cls.get_by_id(thread_id):
                 return thread_id
         raise Exception(
             'New thread id generator is producing too many collisions.')
 
     @classmethod
-    def generate_full_thread_id(cls, exploration_id, thread_id):
-        """Generates a full thread ID, given the exploration ID and
-        the thread ID.
-
-        Args:
-            exploration_id: str. The exploration ID the thread belongs to.
-            thread_id: str. The thread ID.
-
-        Returns:
-            str. Full thread ID.
-        """
-        return '.'.join([exploration_id, thread_id])
-
-    @classmethod
-    def get_exploration_and_thread_ids(cls, full_thread_ids):
-        """Gives back the exploration ids and thread ids corresponding to the
-        full thread ids.
-
-        Args:
-            full_thread_ids: str. The list of full thread ids.
-
-        Returns:
-            list(str). The list of exploration ids to which the threads belong.
-            list(str). The ids of the threads corresponding to the full thread
-                ids.
-        """
-        exploration_and_thread_ids = (
-            [thread_id.split('.') for thread_id in full_thread_ids])
-
-        return zip(*exploration_and_thread_ids)
-
-    @property
-    def thread_id(self):
-        """Returns the thread_id (not including the exploration_id) for this
-        model instance.
-
-        Returns:
-            str. thread_id for this FeedbackThreadModel instance.
-        """
-        return self.id.split('.')[1]
-
-    @classmethod
-    def create(cls, exploration_id, thread_id):
+    def create(cls, thread_id):
         """Creates a new FeedbackThreadModel entry.
 
         Args:
-            exploration_id: str. The ID of the exploration the thread
-                belongs to.
             thread_id: str. Thread ID of the newly-created thread.
 
         Returns:
-            str. The full thread ID for the newly-created FeedbackThreadModel
-                instance. (This ID includes the exploration ID as a
-                prefix.)
+            FeedbackThreadModel. The newly created FeedbackThreadModel instance.
 
         Raises:
-            Exception: A thread with the given exploration ID
-                and thread ID combination exists already.
+            Exception: A thread with the given thread ID exists already.
         """
-        instance_id = cls.generate_full_thread_id(exploration_id, thread_id)
-        if cls.get_by_id(instance_id):
+        if cls.get_by_id(thread_id):
             raise Exception('Feedback thread ID conflict on create.')
-        return cls(id=instance_id)
-
-    @classmethod
-    def get_by_exp_and_thread_id(cls, exploration_id, thread_id):
-        """Gets the FeedbackThreadModel entry for the given ID.
-
-        Args:
-            exploration_id: str. ID of the exploration.
-            thread_id: str. ID of the thread.
-
-        Returns:
-            FeedbackThreadModel, or None if the thread is not found or is
-                already deleted.
-        """
-        return cls.get_by_id(cls.generate_full_thread_id(
-            exploration_id, thread_id))
+        return cls(id=thread_id)
 
     @classmethod
     def get_threads(cls, exploration_id, limit=feconf.DEFAULT_QUERY_LIMIT):
@@ -247,13 +185,10 @@ class FeedbackMessageModel(base_models.BaseModel):
     received_via_email = ndb.BooleanProperty(default=False, indexed=True)
 
     @classmethod
-    def _generate_id(cls, exploration_id, thread_id, message_id):
-        """Generates full message ID given the exploration ID, thread
-        ID and message ID.
+    def _generate_id(cls, thread_id, message_id):
+        """Generates full message ID given the thread ID and message ID.
 
         Args:
-            exploration_id: str. ID of the exploration to which the message
-                belongs.
             thread_id: str. Thread ID of the thread to which the message
                 belongs.
             message_id: int. Message ID of the message.
@@ -261,7 +196,7 @@ class FeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. Full message ID.
         """
-        return '.'.join([exploration_id, thread_id, str(message_id)])
+        return '.'.join([thread_id, str(message_id)])
 
     @property
     def exploration_id(self):
@@ -282,12 +217,10 @@ class FeedbackMessageModel(base_models.BaseModel):
         return FeedbackThreadModel.get_by_id(self.thread_id).subject
 
     @classmethod
-    def create(cls, exploration_id, thread_id, message_id):
+    def create(cls, thread_id, message_id):
         """Creates a new FeedbackMessageModel entry.
 
         Args:
-            exploration_id: str. ID of the exploration to which
-                the message belongs.
             thread_id: str. ID of the thread.
             message_id: int. ID of the message.
 
@@ -299,20 +232,18 @@ class FeedbackMessageModel(base_models.BaseModel):
             Exception: A message with the same ID already exists
                 in the given thread.
         """
-        instance_id = cls._generate_id(
-            exploration_id, thread_id, message_id)
+        instance_id = cls._generate_id(thread_id, message_id)
         if cls.get_by_id(instance_id):
             raise Exception('Feedback message ID conflict on create.')
         return cls(id=instance_id)
 
     @classmethod
-    def get(cls, exploration_id, thread_id, message_id, strict=True):
+    def get(cls, thread_id, message_id, strict=True):
         """Gets the FeedbackMessageModel entry for the given ID. Raises an
         error if no undeleted message with the given ID is found and
         strict == True.
 
         Args:
-            exploration_id: str. ID of the exploration.
             thread_id: str. ID of the thread.
             message_id: int. ID of the message.
             strict: bool. Whether to raise an error if no FeedbackMessageModel
@@ -329,17 +260,15 @@ class FeedbackMessageModel(base_models.BaseModel):
                 or message is marked as deleted. No error will be raised if
                 strict == False.
         """
-        instance_id = cls._generate_id(exploration_id, thread_id, message_id)
+        instance_id = cls._generate_id(thread_id, message_id)
         return super(FeedbackMessageModel, cls).get(instance_id, strict=strict)
 
     @classmethod
-    def get_messages(cls, exploration_id, thread_id):
+    def get_messages(cls, thread_id):
         """Returns a list of messages in the given thread. The number of
         messages returned is capped by feconf.DEFAULT_QUERY_LIMIT.
 
         Args:
-            exploration_id: str. ID of the exploration the thread
-                belongs to.
             thread_id: str. ID of the thread.
 
         Returns:
@@ -348,59 +277,45 @@ class FeedbackMessageModel(base_models.BaseModel):
             messages.
 
         """
-        full_thread_id = (
-            FeedbackThreadModel.generate_full_thread_id(
-                exploration_id, thread_id))
 
         return cls.get_all().filter(
-            cls.thread_id == full_thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+            cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_most_recent_message(cls, exploration_id, thread_id):
+    def get_most_recent_message(cls, thread_id):
         """Returns the last message in the thread.
 
         Args:
-            exploration_id: str. ID of the exploration that the thread
-                belongs to.
             thread_id: str. ID of the thread.
 
         Returns:
             FeedbackMessageModel. Last message in the thread.
         """
-        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
-            exploration_id, thread_id)
-        thread = FeedbackThreadModel.get_by_exp_and_thread_id(
-            exploration_id, thread_id)
+        thread = FeedbackThreadModel.get_by_id(thread_id)
         if thread.message_count:
-            most_recent_message = cls.get(
-                exploration_id, thread_id, thread.message_count - 1)
+            most_recent_message = cls.get(thread_id, thread.message_count - 1)
             return most_recent_message
         else:
             return cls.get_all().filter(
-                cls.thread_id == full_thread_id).order(-cls.last_updated).get()
+                cls.thread_id == thread_id).order(-cls.last_updated).get()
 
     @classmethod
-    def get_message_count(cls, exploration_id, thread_id):
+    def get_message_count(cls, thread_id):
         """Returns the number of messages in the thread. Includes the
         deleted entries.
 
         Args:
-            exploration_id: str. ID of the exploration that the thread
-                belongs to.
             thread_id: str. ID of the thread.
 
         Returns:
             int. Number of messages in the thread.
         """
-        full_thread_id = FeedbackThreadModel.generate_full_thread_id(
-            exploration_id, thread_id)
-        thread = FeedbackThreadModel.get_by_exp_and_thread_id(
-            exploration_id, thread_id)
+        thread = FeedbackThreadModel.get_by_id(thread_id)
         if thread.message_count:
             return thread.message_count
         else:
             return cls.get_all(include_deleted=True).filter(
-                cls.thread_id == full_thread_id).count()
+                cls.thread_id == thread_id).count()
 
     @classmethod
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
@@ -437,70 +352,60 @@ class FeedbackThreadUserModel(base_models.BaseModel):
     message_ids_read_by_user = ndb.IntegerProperty(repeated=True, indexed=True)
 
     @classmethod
-    def generate_full_id(cls, user_id, exploration_id, thread_id):
+    def generate_full_id(cls, user_id, thread_id):
         """Generates the full message id of the format:
             <user_id.exploration_id.thread_id>.
 
          Args:
             user_id: str. The user id.
-            exploration_id: str. The exploration id.
             thread_id: str. The thread id.
 
         Returns:
             str. The full message id.
         """
-        full_thread_id = (
-            FeedbackThreadModel.generate_full_thread_id(
-                exploration_id, thread_id))
-        return '%s.%s' % (user_id, full_thread_id)
+        return '%s.%s' % (user_id, thread_id)
 
     @classmethod
-    def get(cls, user_id, exploration_id, thread_id):
+    def get(cls, user_id, thread_id):
         """Gets the FeedbackThreadUserModel corresponding to the given user and
         the thread given by the exploration id and thread id.
 
         Args:
             user_id: str. The id of the user.
-            exploration_id: str. The id of the exploration to which the thread
-                belongs.
             thread_id: str. The id of the thread.
 
         Returns:
             FeedbackThreadUserModel. The FeedbackThreadUserModel instance which
-                matches with the given user_id, exploration_id and thread id.
+                matches with the given user_id, and thread id.
         """
-        instance_id = cls.generate_full_id(user_id, exploration_id, thread_id)
+        instance_id = cls.generate_full_id(user_id, thread_id)
         return super(FeedbackThreadUserModel, cls).get(
             instance_id, strict=False)
 
     @classmethod
-    def create(cls, user_id, exploration_id, thread_id):
+    def create(cls, user_id, thread_id):
         """Creates a new FeedbackThreadUserModel instance and returns it.
 
         Args:
             user_id: str. The id of the user.
-            exploration_id: str. The id of the exploration to which the thread
-                belongs.
             thread_id: str. The id of the thread.
 
         Returns:
             FeedbackThreadUserModel. The newly created FeedbackThreadUserModel
                 instance.
         """
-        instance_id = cls.generate_full_id(user_id, exploration_id, thread_id)
+        instance_id = cls.generate_full_id(user_id, thread_id)
         new_instance = cls(id=instance_id)
         new_instance.put()
         return new_instance
 
     @classmethod
-    def get_multi(cls, user_id, exploration_ids, thread_ids):
+    def get_multi(cls, user_id, thread_ids):
         """Gets the ExplorationUserDataModel corresponding to the given user and
         the exploration and thread ids.
 
         Args:
             user_id: str. The id of the user.
-            exploration_ids: list(str). The ids of the explorations to which
-                the threads belong.
             thread_ids: list(str). The ids of the threads.
 
         Returns:
@@ -509,8 +414,8 @@ class FeedbackThreadUserModel(base_models.BaseModel):
                 ids.
         """
         instance_ids = [
-            cls.generate_full_id(user_id, exploration_id, thread_id)
-            for exploration_id, thread_id in zip(exploration_ids, thread_ids)]
+            cls.generate_full_id(user_id, thread_id)
+            for thread_id in thread_ids]
 
         return super(FeedbackThreadUserModel, cls).get_multi(instance_ids)
 
@@ -587,22 +492,6 @@ class SuggestionModel(base_models.BaseModel):
         }
 
     @classmethod
-    def _get_instance_id(cls, exploration_id, thread_id):
-        """Returns the full thread ID corresponding to the
-        given exploration ID and thread ID.
-
-         Args:
-             exploration_id: str. ID of the exploration the thread
-                belongs to.
-             thread_id: str. ID of the thread.
-
-         Returns:
-             str. Returns the full thread ID corresponding to
-                the given exploration ID and thread ID.
-        """
-        return '.'.join([exploration_id, thread_id])
-
-    @classmethod
     def create(
             cls, exploration_id, thread_id, author_id, exploration_version,
             state_name, description, suggestion_html):
@@ -622,7 +511,7 @@ class SuggestionModel(base_models.BaseModel):
             Exception: There is already a feedback thread with the same
                 exploration_id and thread_id.
         """
-        instance_id = cls._get_instance_id(exploration_id, thread_id)
+        instance_id = thread_id
         if cls.get_by_id(instance_id):
             raise Exception('There is already a feedback thread with the given '
                             'thread id: %s' % instance_id)
@@ -644,7 +533,7 @@ class SuggestionModel(base_models.BaseModel):
         return self.state_content['value']
 
     @classmethod
-    def get_by_exploration_and_thread_id(cls, exploration_id, thread_id):
+    def get_by_thread_id(cls, thread_id):
         """Gets a suggestion by the corresponding exploration and thread IDs.
 
         Args:
@@ -657,7 +546,7 @@ class SuggestionModel(base_models.BaseModel):
                 exploration and thread IDs, or None if no such SuggestionModel
                 exists.
         """
-        return cls.get_by_id(cls._get_instance_id(exploration_id, thread_id))
+        return cls.get_by_id(thread_id)
 
 
 class UnsentFeedbackEmailModel(base_models.BaseModel):
