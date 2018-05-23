@@ -90,7 +90,7 @@ class FeedbackThreadModel(base_models.BaseModel):
                 last_updated_field of the thread.
 
         Returns:
-            list.
+            thread. The thread entity.
         """
         if update_last_updated_time:
             self.last_updated = datetime.datetime.utcnow()
