@@ -201,8 +201,8 @@ def test_manifest_syntax(dependency_type, dependency_dict):
 
     Display warning message when there is an error and terminate the program.
     Args:
-      dependency_type: dependency download format.
-      dependency_dict: manifest.json dependency dict.
+      dependency_type: dependency_download_format.
+      dependency_dict: dict. manifest.json dependency dict.
     """
     keys = dependency_dict.keys()
     mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
