@@ -175,7 +175,7 @@ class ActivityRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is an activity owners.
+            bool. Whether user is an activity owner.
         """
         return bool(user_id in self.owner_ids)
 
@@ -186,7 +186,7 @@ class ActivityRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is an activity editors.
+            bool. Whether user is an activity editor.
         """
         return bool(user_id in self.editor_ids)
 

@@ -683,8 +683,10 @@ class SendModeratorEmailsTest(test_utils.GenericTestBase):
 class TranslateExplorationTest(test_utils.GenericTestBase):
     """Tests for can_translate_exploration decorator."""
     role = rights_manager.ROLE_TRANSLATOR
-    username = 'banneduser'
+    username = 'user'
     user_email = 'user@example.com'
+    banned_username = 'banneduser'
+    banned_user_email = 'banneduser@example.com'
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
 
@@ -702,12 +704,13 @@ class TranslateExplorationTest(test_utils.GenericTestBase):
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(self.user_email, self.username)
+        self.signup(self.banned_user_email, self.banned_username)
         self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
-        self.set_banned_users([self.username])
+        self.set_banned_users([self.banned_username])
         self.owner = user_services.UserActionsInfo(self.owner_id)
         self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
@@ -721,9 +724,11 @@ class TranslateExplorationTest(test_utils.GenericTestBase):
 
         rights_manager.assign_role_for_exploration(
             self.owner, self.published_exp_id, self.translator_id, self.role)
+        rights_manager.assign_role_for_exploration(
+            self.owner, self.private_exp_id, self.translator_id, self.role)
 
     def test_banned_user_cannot_translate_exploration(self):
-        self.login(self.user_email)
+        self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.private_exp_id, expect_errors=True,
@@ -759,11 +764,34 @@ class TranslateExplorationTest(test_utils.GenericTestBase):
         self.assertEqual(response['exploration_id'], self.private_exp_id)
         self.logout()
 
-    def test_translator_can_translate_assigned_exploration(self):
+    def test_translator_can_translate_assigned_public_exploration(self):
         self.login(self.TRANSLATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.published_exp_id)
         self.assertEqual(response['exploration_id'], self.published_exp_id)
+        self.logout()
+
+    def test_translator_can_translate_assigned_private_exploration(self):
+        self.login(self.TRANSLATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.private_exp_id)
+        self.assertEqual(response['exploration_id'], self.private_exp_id)
+        self.logout()
+
+    def test_user_without_translator_role_of_exploration_cannot_translate_public_exploration(self): # pylint: disable=line-too-long
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.published_exp_id, expect_errors=True,
+                expected_status_int=401)
+        self.logout()
+
+    def test_user_without_translator_role_of_exploration_cannot_translate_private_exploration(self): # pylint: disable=line-too-long
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.private_exp_id, expect_errors=True,
+                expected_status_int=401)
         self.logout()
 
 
