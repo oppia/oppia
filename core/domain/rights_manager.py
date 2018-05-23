@@ -107,6 +107,8 @@ class ActivityRights(object):
         editor_translator = set(self.editor_ids).intersection(
             set(self.translator_ids))
         editor_viewer = set(self.editor_ids).intersection(set(self.viewer_ids))
+        translator_viewer = set(self.editor_ids).intersection(
+            set(self.viewer_ids))
         if owner_editor:
             raise utils.ValidationError(
                 'A user cannot be both an owner and an editor: %s' %
@@ -127,6 +129,10 @@ class ActivityRights(object):
             raise utils.ValidationError(
                 'A user cannot be both an editor and a viewer: %s' %
                 editor_viewer)
+        if translator_viewer:
+            raise utils.ValidationError(
+                'A user cannot be both a translator and a viewer: %s' %
+                translator_viewer)
 
     def to_dict(self):
         """Returns a dict suitable for use by the frontend.
@@ -169,7 +175,7 @@ class ActivityRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is in activity owners.
+            bool. Whether user is an activity owners.
         """
         return bool(user_id in self.owner_ids)
 
@@ -180,7 +186,7 @@ class ActivityRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is in activity editors.
+            bool. Whether user is an activity editors.
         """
         return bool(user_id in self.editor_ids)
 
@@ -191,7 +197,7 @@ class ActivityRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is in activity translator.
+            bool. Whether user is an activity translator.
         """
         return bool(user_id in self.translator_ids)
 
@@ -202,7 +208,7 @@ class ActivityRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is in activity viewers of.
+            bool. Whether user is an activity viewer.
         """
         return bool(user_id in self.viewer_ids)
 
