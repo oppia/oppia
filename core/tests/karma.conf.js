@@ -2,7 +2,8 @@ var argv = require('yargs').argv;
 var isMinificationNeeded = (argv.minify === 'True');
 var generatedJs = 'third_party/generated/js/third_party.js';
 if (isMinificationNeeded) {
-  generatedJs = 'third_party/generated/js/third_party.min.js';
+  generatedJs = (
+    'backend_prod_files/third_party/generated/js/third_party.min.js');
 }
 
 module.exports = function(config) {
