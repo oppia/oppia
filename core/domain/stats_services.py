@@ -523,7 +523,7 @@ def get_top_state_answer_stats_multi(exploration_id, state_names):
             (at most) 10 answers, sorted by decreasing frequency.
     """
     return {
-        state_name: get_state_answers_stats(exploration_id, state_name)
+        state_name: get_top_state_answers_stats(exploration_id, state_name)
         for state_name in state_names
     }
 
