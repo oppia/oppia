@@ -29,6 +29,7 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous_test
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
@@ -1672,6 +1673,138 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
             '/playthroughdatahandler/%s/%s' % (
                 self.EXP_ID, self.playthrough_id1),
             expect_errors=True, expected_status_int=400)
+
+
+class ResolveIssueHandlerTest(test_utils.GenericTestBase):
+    """Test the handler for resolving issues."""
+
+    EXP_ID = 'exp_id1'
+
+    def setUp(self):
+        super(ResolveIssueHandlerTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+
+        # The editor publishes an exploration.
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id, title='My Exploration',
+            end_state_name='END')
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
+
+        self.playthrough_id1 = stats_models.PlaythroughModel.create(
+            self.EXP_ID, 1, 'EarlyQuit',
+            {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            }], is_valid=True)
+        self.playthrough_id2 = stats_models.PlaythroughModel.create(
+            self.EXP_ID, 1, 'EarlyQuit',
+            {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name2'
+                    }
+                },
+                'schema_version': 1
+            }], is_valid=True)
+
+        stats_models.ExplorationIssuesModel.create(
+            self.EXP_ID,
+            [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': [self.playthrough_id1, self.playthrough_id2],
+                'schema_version': 1
+            }]
+        )
+
+        self.exp_issue_dict = {
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            'playthrough_ids': [self.playthrough_id1, self.playthrough_id2],
+            'schema_version': 1
+        }
+
+        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        self.csrf_token = self.get_csrf_token_from_response(response)
+
+    def test_resolve_issue_handler(self):
+        """Test that resolving an issue deletes associated playthroughs."""
+        self.post_json(
+            '/resolveissuehandler/%s' % (self.EXP_ID),
+            {
+                'exp_issue_dict': self.exp_issue_dict
+            }, self.csrf_token)
+
+        exp_issues = stats_services.get_exp_issues_by_id(self.EXP_ID)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
+        playthrough_instances = stats_models.PlaythroughModel.get_multi(
+            [self.playthrough_id1, self.playthrough_id2])
+        self.assertEqual(playthrough_instances, [None, None])
+
+    def test_error_on_passing_invalid_exp_issue_dict(self):
+        """Test that error is raised on passing invalid exploration issue
+        dict.
+        """
+        del self.exp_issue_dict['issue_type']
+        self.post_json(
+            '/resolveissuehandler/%s' % (self.EXP_ID),
+            {
+                'exp_issue_dict': self.exp_issue_dict
+            }, self.csrf_token, expect_errors=True, expected_status_int=404)
+
+    def test_error_on_passing_non_matching_exp_issue_dict(self):
+        """Test that error is raised on passing an exploration issue dict that
+        doesn't match an issue in the exploration issues model.
+        """
+        self.exp_issue_dict['issue_customization_args']['state_name'][
+            'value'] = 'state_name2'
+        self.post_json(
+            '/resolveissuehandler/%s' % (self.EXP_ID),
+            {
+                'exp_issue_dict': self.exp_issue_dict
+            }, self.csrf_token, expect_errors=True, expected_status_int=404)
 
 
 class EditorAutosaveTest(BaseEditorControllerTest):

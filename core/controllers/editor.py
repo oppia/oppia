@@ -35,6 +35,7 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -810,11 +811,12 @@ class ResolveIssueHandler(EditorHandler):
             exp_issue_dict: dict. Dict representing an exploration issue.
         """
         exp_issue_properties = [
-            'issue_type', 'schema_version', 'issue_customization_args']
+            'issue_type', 'schema_version', 'issue_customization_args',
+            'playthrough_ids']
 
         for exp_issue_property in exp_issue_properties:
             if exp_issue_property not in exp_issue_dict:
-                raise self.InvalidInputException(
+                raise self.PageNotFoundException(
                     '%s not in exploration issue dict.' % (exp_issue_property))
 
         dummy_exp_issue = stats_domain.ExplorationIssue(
@@ -825,10 +827,11 @@ class ResolveIssueHandler(EditorHandler):
         try:
             dummy_exp_issue.validate()
         except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
+            raise self.PageNotFoundException(e)
 
     @acl_decorators.can_view_exploration_stats
     def post(self, exp_id):
+        """Handles POST requests."""
         exp_issue_dict = self.payload.get('exp_issue_dict')
         self._require_exp_issue_dict_is_valid(exp_issue_dict)
 
@@ -853,7 +856,7 @@ class ResolveIssueHandler(EditorHandler):
 
         # Update the exploration issues instance and delete the playthrough
         # instances.
-        stats_services.delete_multi_playthroughs(
+        stats_services.delete_playthroughs_multi(
             issue_to_remove.playthrough_ids)
         stats_services.save_exp_issues_model_transactional(exp_issues)
 

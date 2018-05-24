@@ -504,6 +504,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/playthroughdatahandler/<exploration_id>/<playthrough_id>',
         editor.FetchPlaythroughHandler),
 
+    get_redirect_route(
+        r'/resolveissuehandler/<exploration_id>', editor.ResolveIssueHandler),
+
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler),
 ]

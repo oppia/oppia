@@ -496,6 +496,15 @@ def get_exploration_stats_multi(exp_version_references):
     return exploration_stats_list
 
 
+def delete_playthroughs_multi(playthrough_ids):
+    """Deletes multiple playthrough instances.
+
+    Args:
+        playthrough_ids: list(str). List of playthrough IDs to be deleted.
+    """
+    stats_models.PlaythroughModel.delete_playthroughs_multi(playthrough_ids)
+
+
 def get_visualizations_info(exp_id, state_name, interaction_id):
     """Returns a list of visualization info. Each item in the list is a dict
     with keys 'data' and 'options'.

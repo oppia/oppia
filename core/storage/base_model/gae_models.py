@@ -130,6 +130,16 @@ class BaseModel(ndb.Model):
         """
         ndb.put_multi(entities)
 
+    @classmethod
+    def delete_multi(cls, entities):
+        """Deletes the given ndb.Model instances.
+
+        Args:
+            entities: list(ndb.Model).
+        """
+        keys = [entity.key for entity in entities]
+        ndb.delete_multi(keys)
+
     def delete(self):
         """Deletes this instance."""
         super(BaseModel, self).key.delete()

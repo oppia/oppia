@@ -1079,6 +1079,16 @@ class PlaythroughModel(base_models.BaseModel):
         playthrough_instance.put()
         return instance_id
 
+    @classmethod
+    def delete_playthroughs_multi(cls, playthrough_ids):
+        """Deltes multiple playthrough instances.
+
+        Args:
+            playthrough_ids: list(str). List of playthrough IDs to be deleted.
+        """
+        instances = cls.get_multi(playthrough_ids)
+        cls.delete_multi(instances)
+
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
