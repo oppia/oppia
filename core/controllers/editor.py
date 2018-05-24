@@ -796,6 +796,70 @@ class FetchPlaythroughHandler(EditorHandler):
         self.render_json(playthrough.to_dict())
 
 
+class ResolveIssueHandler(EditorHandler):
+    """Handler used for resolving an issue. Currently, when an issue is
+    resolved, the issue is removed from the unresolved issues list in the
+    ExplorationIssuesModel instance, and all corresponding playthrough
+    instances are deleted.
+    """
+
+    def _require_exp_issue_dict_is_valid(self, exp_issue_dict):
+        """Checks whether the exploration issue dict has the correct keys.
+
+        Args:
+            exp_issue_dict: dict. Dict representing an exploration issue.
+        """
+        exp_issue_properties = [
+            'issue_type', 'schema_version', 'issue_customization_args']
+
+        for exp_issue_property in exp_issue_properties:
+            if exp_issue_property not in exp_issue_dict:
+                raise self.InvalidInputException(
+                    '%s not in exploration issue dict.' % (exp_issue_property))
+
+        dummy_exp_issue = stats_domain.ExplorationIssue(
+            exp_issue_dict['issue_type'],
+            exp_issue_dict['issue_customization_args'], [],
+            exp_issue_dict['schema_version'])
+
+        try:
+            dummy_exp_issue.validate()
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+    @acl_decorators.can_view_exploration_stats
+    def post(self, exp_id):
+        exp_issue_dict = self.payload.get('exp_issue_dict')
+        self._require_exp_issue_dict_is_valid(exp_issue_dict)
+
+        exp_issues = stats_services.get_exp_issues_by_id(exp_id)
+        if exp_issues is None:
+            raise self.PageNotFoundException(
+                'Invalid exploration ID %s' % (exp_id))
+
+        # Check that the passed in issue actually exists in the exploration
+        # issues instance.
+        issue_to_remove = None
+        for issue in exp_issues.unresolved_issues:
+            if issue.to_dict() == exp_issue_dict:
+                issue_to_remove = issue
+                exp_issues.unresolved_issues.remove(issue_to_remove)
+                break
+
+        if not issue_to_remove:
+            raise self.PageNotFoundException(
+                'Exploration issue does not exist in the list of issues for '
+                'the exploration with ID %s' % exp_id)
+
+        # Update the exploration issues instance and delete the playthrough
+        # instances.
+        stats_services.delete_multi_playthroughs(
+            issue_to_remove.playthrough_ids)
+        stats_services.save_exp_issues_model_transactional(exp_issues)
+
+        self.render_json({})
+
+
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
