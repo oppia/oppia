@@ -678,7 +678,7 @@ tags: []
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
-    def save_new_valid_exploration_with_states(
+    def save_new_linear_exp_with_state_names_and_interactions(
             self, exploration_id, owner_id, title='A title',
             category='A category', objective='An objective',
             language_code=constants.DEFAULT_LANGUAGE_CODE,

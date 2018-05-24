@@ -1456,7 +1456,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.save_new_valid_exploration_with_states(
+        self.save_new_linear_exp_with_state_names_and_interactions(
             self.EXP_ID, self.owner_id, state_names=self.STATE_NAMES)
 
     def test_get_state_answers_stats(self):
