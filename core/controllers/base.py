@@ -211,9 +211,6 @@ class BaseHandler(webapp2.RequestHandler):
         Raises:
             Exception: The CSRF token is missing.
             UnauthorizedUserException: The CSRF token is invalid.
-
-        Returns:
-            None
         """
         # If the request is to the old demo server, redirect it permanently to
         # the new demo server.
@@ -247,7 +244,7 @@ class BaseHandler(webapp2.RequestHandler):
                     '%s: payload %s',
                     e, self.payload)
 
-                return self.handle_exception(e, self.app.debug)
+                self.handle_exception(e, self.app.debug)
 
         super(BaseHandler, self).dispatch()
 
