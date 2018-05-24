@@ -696,8 +696,7 @@ tags: []
                 sequentially in the exploration. Must be a non-empty list.
             interaction_ids: list(str). The names of the interaction ids to be
                 assigned to each state. Values will be cycled, so it doesn't
-                need to be the same size as state_names. The default interaction
-                id is TextInput.
+                need to be the same size as state_names.
 
         Returns:
             Exploration. The exploration domain object.
@@ -705,7 +704,7 @@ tags: []
         if not state_names:
             raise ValueError('must provide at least one state name')
         if not interaction_ids:
-            interaction_ids = ['TextInput']
+            raise ValueError('must provide at least one interaction type')
         interaction_ids = itertools.cycle(interaction_ids)
 
         exploration = exp_domain.Exploration.create_default_exploration(
