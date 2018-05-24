@@ -35,8 +35,8 @@ class StorySnapshotContentModel(base_models.BaseSnapshotContentModel):
 class StoryModel(base_models.VersionedModel):
     """Model for storing stories.
 
-    This class should only be imported by the story domain file, the
-    story services file, and the story model test file.
+    This class should only be imported by the story services file
+    and the story model test file.
     """
     SNAPSHOT_METADATA_CLASS = StorySnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = StorySnapshotContentModel
@@ -53,7 +53,8 @@ class StoryModel(base_models.VersionedModel):
     # The schema version for the story_contents.
     schema_version = (
         ndb.IntegerProperty(required=True, default=1, indexed=True))
-    # The story graph specifying the connection between nodes.
+    # The story contents dict specifying the list of story nodes and the
+    # connection between them. Modeled by class StoryContents.
     story_contents = ndb.JsonProperty(default={}, indexed=False)
 
     def _trusted_commit(
@@ -108,18 +109,18 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     story_id = ndb.StringProperty(indexed=True, required=True)
 
     @classmethod
-    def get_commit(cls, story_id, version):
-        """Returns the commit corresponding to the given story id and
-        version number.
+    def _get_instance_id(cls, story_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
 
         Args:
             story_id: str. The id of the story being edited.
             version: int. The version number of the story after the commit.
 
         Returns:
-            The commit with the given story id and version number.
+            The commit id with the story id and version number.
         """
-        return cls.get_by_id('story-%s-%s' % (story_id, version))
+        return 'story-%s-%s' % (story_id, version)
 
 
 class StorySummaryModel(base_models.BaseModel):

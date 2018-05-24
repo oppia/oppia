@@ -14,36 +14,76 @@
 
 """Tests the methods defined in story services."""
 
-from constants import constants
 from core.domain import story_domain
 from core.domain import story_services
+from core.platform import models
 from core.tests import test_utils
-import feconf
+
+(story_models,) = models.Registry.import_models([models.NAMES.story])
 
 
 class StoryServicesUnitTests(test_utils.GenericTestBase):
     """Test the story services module."""
 
     STORY_ID = None
+    NODE_ID = 'node_id_1'
     USER_ID = 'user'
+    story = None
 
     def setUp(self):
         super(StoryServicesUnitTests, self).setUp()
+        story_node = story_domain.StoryNode.create_default_story_node(
+            self.NODE_ID)
+        story_contents = story_domain.StoryContents([story_node])
         self.STORY_ID = story_services.get_new_story_id()
-        self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes')
+        self.story = self.save_new_story(
+            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
+            story_contents
+        )
+
+    def test_compute_summary(self):
+        story_summary = story_services.compute_summary_of_story(self.story)
+
+        self.assertEqual(story_summary.id, self.STORY_ID)
+        self.assertEqual(story_summary.title, 'Title')
+        self.assertEqual(story_summary.node_count, 1)
+
+    def test_get_new_story_id(self):
+        new_story_id = story_services.get_new_story_id()
+
+        self.assertEqual(len(new_story_id), 12)
+        self.assertEqual(story_models.StoryModel.get_by_id(new_story_id), None)
+
+    def test_get_story_from_model(self):
+        story_model = story_models.StoryModel.get(self.STORY_ID)
+        story = story_services.get_story_from_model(story_model)
+
+        self.assertEqual(story.to_dict(), self.story.to_dict())
+
+    def test_get_story_summary_from_model(self):
+        story_summary_model = story_models.StorySummaryModel.get(self.STORY_ID)
+        story_summary = story_services.get_story_summary_from_model(
+            story_summary_model)
+
+        self.assertEqual(story_summary.id, self.STORY_ID)
+        self.assertEqual(story_summary.title, 'Title')
+        self.assertEqual(story_summary.node_count, 1)
 
     def test_get_story_by_id(self):
-        expected_story = story_domain.Story(
-            self.STORY_ID, 'Title', 'Description', 'Notes', [],
-            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 1
-        ).to_dict()
+        expected_story = self.story.to_dict()
         story = story_services.get_story_by_id(self.STORY_ID)
         self.assertEqual(story.to_dict(), expected_story)
 
+    def test_commit_log_entry(self):
+        story_commit_log_entry = story_models.StoryCommitLogEntryModel.get_commit( # pylint: disable=line-too-long
+            self.STORY_ID, 1)
+        self.assertEqual(story_commit_log_entry.commit_type, 'create')
+        self.assertEqual(story_commit_log_entry.story_id, self.STORY_ID)
+        self.assertEqual(story_commit_log_entry.user_id, self.USER_ID)
+
     def test_get_story_summary_by_id(self):
         story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+
         self.assertEqual(story_summary.id, self.STORY_ID)
         self.assertEqual(story_summary.title, 'Title')
-        self.assertEqual(story_summary.node_count, 0)
+        self.assertEqual(story_summary.node_count, 1)

@@ -179,14 +179,57 @@ class StoryNode(object):
         return cls(node_id, [], [], [], '', None)
 
 
+class StoryContents(object):
+    """Domain object representing the story_contents dict."""
+
+    def __init__(self, story_nodes):
+        """Constructs a StoryContents domain object.
+
+        Args:
+            story_nodes: list(StoryNode). The list of story nodes that are part
+                of this story.
+        """
+        self.nodes = story_nodes
+
+    def to_dict(self):
+        """Returns a dict representing this StoryContents domain object.
+
+        Returns:
+            A dict, mapping all fields of StoryContents instance.
+        """
+        return {
+            'nodes': [
+                node.to_dict() for node in self.nodes
+            ]
+        }
+
+    @classmethod
+    def from_dict(cls, story_contents_dict):
+        """Return a StoryContents domain object from a dict.
+
+        Args:
+            story_contents_dict: dict. The dict representation of
+                StoryContents object.
+
+        Returns:
+            StoryContents. The corresponding StoryContents domain object.
+        """
+        story_contents = cls([
+            StoryNode.from_dict(story_node_dict)
+            for story_node_dict in story_contents_dict['nodes']
+        ])
+
+        return story_contents
+
+
 class Story(object):
     """Domain object for an Oppia Story."""
 
     def __init__(
             self, story_id, title, description, notes,
-            story_nodes, schema_version, language_code, version,
+            story_contents, schema_version, language_code, version,
             created_on=None, last_updated=None):
-        """Constructs a Question domain object.
+        """Constructs a Story domain object.
 
         Args:
             story_id: str. The unique ID of the story.
@@ -194,8 +237,8 @@ class Story(object):
             description: str. The high level desscription of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
-            story_nodes: list(StoryNode). List of the story nodes present in
-                the story.
+            story_contents: StoryContents. The dict representing the contents
+                that are part of this story.
             created_on: datetime.datetime. Date and time when the story is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -209,7 +252,7 @@ class Story(object):
         self.title = title
         self.description = description
         self.notes = notes
-        self.story_nodes = story_nodes
+        self.story_contents = story_contents
         self.schema_version = schema_version
         self.language_code = language_code
         self.created_on = created_on
@@ -230,9 +273,7 @@ class Story(object):
             'language_code': self.language_code,
             'schema_version': self.schema_version,
             'version': self.version,
-            'story_nodes': [
-                node.to_dict() for node in self.story_nodes
-            ]
+            'story_contents': self.story_contents.to_dict()
         }
 
     @classmethod
@@ -247,10 +288,11 @@ class Story(object):
         Returns:
             Story. The Story domain object with the default values.
         """
+        story_contents = StoryContents([])
         return cls(
             story_id, feconf.DEFAULT_STORY_TITLE,
-            feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES, [],
-            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+            feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
+            story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     @classmethod

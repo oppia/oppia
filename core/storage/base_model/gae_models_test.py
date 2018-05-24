@@ -111,6 +111,60 @@ class TestVersionedModel(base_models.VersionedModel):
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
 
 
+class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    @classmethod
+    def _get_instance_id(cls, instance_id, version):  # pylint: disable=unused-argument
+        """A dummy function to mimic the actual _get_instance_id. In this case,
+        the actual id itself is the argument with this function just returning
+        the same value.
+
+        Args:
+            instance_id: str. The id of the commit log entry.
+            version: int. The version of the model after the commit.
+
+        Returns:
+            instance_id.
+        """
+        return instance_id
+
+
+class CommitLogEntryModelTests(test_utils.GenericTestBase):
+    """Test methods for VersionedModel."""
+
+    def test_get_commit(self):
+        model1 = TestCommitLogEntryModel(
+            id='model_id1', user_id='user', username='username', commit_cmds={},
+            commit_type='create', commit_message='New commit created.',
+            version=1
+        )
+        model1.put()
+
+        test_model = TestCommitLogEntryModel.get_commit('model_id1', 1)
+        self.assertEqual(test_model.version, 1)
+        self.assertEqual(test_model.user_id, 'user')
+        self.assertEqual(test_model.commit_type, 'create')
+
+    def test_get_all_commits(self):
+        model1 = TestCommitLogEntryModel(
+            id='model_id1', user_id='user', username='username', commit_cmds={},
+            commit_type='create', commit_message='New commit created.',
+            version=1
+        )
+        model2 = TestCommitLogEntryModel(
+            id='model_id2', user_id='user', username='username', commit_cmds={},
+            commit_type='edit', commit_message='New commit created.',
+            version=2
+        )
+        model1.put()
+        model2.put()
+
+        test_models = TestCommitLogEntryModel.get_all_commits(2, None)
+        self.assertEqual(test_models[0][0].version, 2)
+        self.assertEqual(test_models[0][1].version, 1)
+        self.assertEqual(test_models[0][0].commit_type, 'edit')
+        self.assertEqual(test_models[0][1].commit_type, 'create')
+
+
 class VersionedModelTests(test_utils.GenericTestBase):
     """Test methods for VersionedModel."""
 

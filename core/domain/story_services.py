@@ -112,11 +112,9 @@ def get_story_from_model(story_model, run_conversion=True):
     return story_domain.Story(
         story_model.id, story_model.title,
         story_model.description, story_model.notes,
-        [
-            story_domain.StoryNode.from_dict(story_node_dict)
-            for story_node_dict in
-            versioned_story_contents['story_contents']['nodes']
-        ], versioned_story_contents['schema_version'],
+        story_domain.StoryContents.from_dict(
+            versioned_story_contents['story_contents']),
+        versioned_story_contents['schema_version'],
         story_model.language_code,
         story_model.version, story_model.created_on,
         story_model.last_updated)
@@ -220,12 +218,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         language_code=story.language_code,
         schema_version=story.schema_version,
         notes=story.notes,
-        story_contents={
-            'nodes': [
-                story_node.to_dict()
-                for story_node in story.story_nodes
-            ]
-        }
+        story_contents=story.story_contents.to_dict()
     )
     model.commit(committer_id, commit_message, commit_cmds)
     story.version += 1
@@ -258,7 +251,7 @@ def compute_summary_of_story(story):
     Returns:
         StorySummary. The computed summary for the given story.
     """
-    story_model_node_count = len(story.story_nodes)
+    story_model_node_count = len(story.story_contents.nodes)
     story_summary = story_domain.StorySummary(
         story.id, story.title, story.language_code,
         story.version, story_model_node_count,

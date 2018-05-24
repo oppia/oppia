@@ -1,0 +1,22 @@
+0 info it worked if it ends with ok
+1 verbose cli [ '/home/akshay681/opensource/oppia_tools/node-6.9.1/bin/node',
+1 verbose cli   '/home/akshay681/opensource/oppia_tools/node-6.9.1/bin/npm',
+1 verbose cli   'list' ]
+2 info using npm@3.10.8
+3 info using node@v6.9.1
+4 verbose exit [ 0, true ]
+5 verbose stack Error: write EPIPE
+5 verbose stack     at exports._errnoException (util.js:1026:11)
+5 verbose stack     at WriteWrap.afterWrite (net.js:799:14)
+6 verbose cwd /home/akshay681/opensource/oppia
+7 error Linux 4.4.0-127-generic
+8 error argv "/home/akshay681/opensource/oppia_tools/node-6.9.1/bin/node" "/home/akshay681/opensource/oppia_tools/node-6.9.1/bin/npm" "list"
+9 error node v6.9.1
+10 error npm  v3.10.8
+11 error code EPIPE
+12 error errno EPIPE
+13 error syscall write
+14 error write EPIPE
+15 error If you need help, you may report this error at:
+15 error     <https://github.com/npm/npm/issues>
+16 verbose exit [ 1, true ]

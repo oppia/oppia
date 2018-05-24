@@ -34,8 +34,8 @@ class SkillSnapshotContentModel(base_models.BaseSnapshotContentModel):
 class SkillModel(base_models.VersionedModel):
     """Model for storing Skills.
 
-    This class should only be imported by the skill domain file, the
-    skill services file, and the skill model test file.
+    This class should only be imported by the skill services file
+    and the skill model test file.
     """
     SNAPSHOT_METADATA_CLASS = SkillSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = SkillSnapshotContentModel
@@ -71,18 +71,18 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     skill_id = ndb.StringProperty(indexed=True, required=True)
 
     @classmethod
-    def get_commit(cls, skill_id, version):
-        """Returns the commit corresponding to the given skill id and
-        version number.
+    def _get_instance_id(cls, skill_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
 
         Args:
             skill_id: str. The id of the skill being edited.
             version: int. The version number of the skill after the commit.
 
         Returns:
-            The commit with the given skill id and version number.
+            The commit id with the skill id and version number.
         """
-        return cls.get_by_id('skill-%s-%s' % (skill_id, version))
+        return 'skill-%s-%s' % (skill_id, version)
 
 
 class SkillSummaryModel(base_models.BaseModel):

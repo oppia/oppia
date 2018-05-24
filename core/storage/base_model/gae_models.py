@@ -241,6 +241,21 @@ class BaseCommitLogEntryModel(BaseModel):
     version = ndb.IntegerProperty()
 
     @classmethod
+    def _get_instance_id(cls, instance_id, version):
+        """This method should be implemented in the inherited classes.
+
+        Args:
+            instance_id: str. The id of the construct(eg: exp_id, story_id etc.)
+                where this is inherited.
+            version: int. The version number of the model after the commit.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in derived
+                classes.
+        """
+        raise NotImplementedError
+
+    @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):
         """Fetches a list of all the commits sorted by their last updated
         attribute.
@@ -266,6 +281,23 @@ class BaseCommitLogEntryModel(BaseModel):
         """
         return cls._fetch_page_sorted_by_last_updated(
             cls.query(), page_size, urlsafe_start_cursor)
+
+    @classmethod
+    def get_commit(cls, instance_id, version):
+        """Returns the commit corresponding to an instance id and
+        version number.
+
+        Args:
+            instance_id: str. The id of the particular construct, from which
+                this method is called.
+            version: int. The version number of the instance
+                after the commit.
+
+        Returns:
+            The commit with the instance id and version number.
+        """
+        commit_id = cls._get_instance_id(instance_id, version)
+        return cls.get_by_id(commit_id)
 
 
 class VersionedModel(BaseModel):

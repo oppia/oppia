@@ -37,29 +37,39 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         story = story_domain.Story.create_default_story(self.STORY_ID)
         story_node = story_domain.StoryNode.create_default_story_node(
             self.NODE_ID_1)
-        story.story_nodes.append(story_node)
+        story.story_contents = story_domain.StoryContents([story_node])
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': feconf.DEFAULT_STORY_TITLE,
             'description': feconf.DEFAULT_STORY_DESCRIPTION,
             'notes': feconf.DEFAULT_STORY_NOTES,
-            'story_nodes': [story_node.to_dict()],
+            'story_contents': {
+                'nodes': [{
+                    'id': self.NODE_ID_1,
+                    'destination_node_ids': [],
+                    'acquired_skill_ids': [],
+                    'prerequisite_skill_ids': [],
+                    'outline': '',
+                    'exploration_id': None
+                }]
+            },
             'schema_version': feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'version': 0
         }
         self.assertEqual(story.to_dict(), expected_story_dict)
 
-    def test_story_export_import(self):
-        """Test that to_dict and from_dict preserve all data within a story.
+    def test_story_contents_export_import(self):
+        """Test that to_dict and from_dict preserve all data within a
+        story_contents object.
         """
         story_node = story_domain.StoryNode(
             self.NODE_ID_1, [self.NODE_ID_2],
             [self.SKILL_ID_1], [self.SKILL_ID_2],
             'Outline', self.EXP_ID)
-        story = story_domain.Story(
-            self.STORY_ID, 'Title', 'Description', 'Notes', [story_node],
-            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION, 'en', 0)
-        story_dict = story.to_dict()
-        story_from_dict = story_domain.Story.from_dict(story_dict)
-        self.assertEqual(story_from_dict.to_dict(), story_dict)
+        story_contents = story_domain.StoryContents([story_node])
+        story_contents_dict = story_contents.to_dict()
+        story_contents_from_dict = story_domain.StoryContents.from_dict(
+            story_contents_dict)
+        self.assertEqual(
+            story_contents_from_dict.to_dict(), story_contents_dict)

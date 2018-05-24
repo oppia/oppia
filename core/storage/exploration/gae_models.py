@@ -39,8 +39,8 @@ class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
 class ExplorationModel(base_models.VersionedModel):
     """Versioned storage model for an Oppia exploration.
 
-    This class should only be imported by the exploration domain file, the
-    exploration services file, and the Exploration model test file.
+    This class should only be imported by the exploration services file
+    and the exploration model test file.
     """
     SNAPSHOT_METADATA_CLASS = ExplorationSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = ExplorationSnapshotContentModel
@@ -269,7 +269,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ).put_async()
 
 
-class ExplorationCommitLogEntryModel(base_models.BaseModel):
+class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to explorations.
 
     A new instance of this model is created and saved every time a commit to
@@ -278,25 +278,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     The id for this model is of the form
     'exploration-{{EXP_ID}}-{{EXP_VERSION}}'.
     """
-    # Update superclass model to make these properties indexed.
-    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
-
-    # The id of the user.
-    user_id = ndb.StringProperty(indexed=True, required=True)
-    # The username of the user, at the time of the edit.
-    username = ndb.StringProperty(indexed=True, required=True)
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
-    # The type of the commit: 'create', 'revert', 'edit', 'delete'.
-    commit_type = ndb.StringProperty(indexed=True, required=True)
-    # The commit message.
-    commit_message = ndb.TextProperty(indexed=False)
-    # The commit_cmds dict for this commit.
-    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
-    # The version number of the exploration after this commit. Only populated
-    # for commits to an exploration (as opposed to its rights, etc.).
-    version = ndb.IntegerProperty()
 
     # The status of the exploration after the edit event ('private', 'public').
     post_commit_status = ndb.StringProperty(indexed=True, required=True)
@@ -317,33 +300,6 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
             exp_version: int. The version of the exploration.
         """
         return 'exploration-%s-%s' % (exp_id, exp_version)
-
-    @classmethod
-    def get_all_commits(cls, page_size, urlsafe_start_cursor):
-        """Fetches a list of all the commits sorted by their last updated
-        attribute.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
-
-        Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this will
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(), page_size, urlsafe_start_cursor)
 
     @classmethod
     def get_all_non_private_commits(

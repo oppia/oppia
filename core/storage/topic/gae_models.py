@@ -34,8 +34,8 @@ class TopicSnapshotContentModel(base_models.BaseSnapshotContentModel):
 class TopicModel(base_models.VersionedModel):
     """Model for storing Topics.
 
-    This class should only be imported by the topic domain file, the
-    topic services file, and the topic model test file.
+    This class should only be imported by the topic services file
+    and the topic model test file.
     """
     SNAPSHOT_METADATA_CLASS = TopicSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TopicSnapshotContentModel
@@ -70,18 +70,18 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     topic_id = ndb.StringProperty(indexed=True, required=True)
 
     @classmethod
-    def get_commit(cls, topic_id, version):
-        """Returns the commit corresponding to the given topic id and
-        version number.
+    def _get_instance_id(cls, topic_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
 
         Args:
             topic_id: str. The id of the topic being edited.
             version: int. The version number of the topic after the commit.
 
         Returns:
-            The commit with the given topic id and version number.
+            The commit id with the topic id and version number.
         """
-        return cls.get_by_id('topic-%s-%s' % (topic_id, version))
+        return 'topic-%s-%s' % (topic_id, version)
 
 
 class TopicSummaryModel(base_models.BaseModel):
