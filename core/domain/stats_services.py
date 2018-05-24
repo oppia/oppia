@@ -23,6 +23,7 @@ from core.domain import exp_domain
 from core.domain import interaction_registry
 from core.domain import stats_domain
 from core.platform import models
+import feconf
 
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
@@ -596,6 +597,45 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
     return [
         stats_domain.SubmittedAnswer.from_dict(submitted_answer_dict).answer
         for submitted_answer_dict in sample_answers]
+
+
+def get_top_state_answer_stats(exploration_id, state_name):
+    """Fetches the top (at most) 10 answers from the given state_name in the
+    corresponding exploration.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        state_name: str. The name of the state to fetch answers for.
+
+    Returns:
+        list(*). A list of the top 10 answers, sorted by decreasing frequency.
+    """
+    calculation_output = (
+        _get_calc_output(exploration_id, state_name, 'Top10AnswerFrequencies')
+        .calculation_output.to_raw_type())
+    return [
+        {'answer': output['answer'], 'frequency': output['frequency']}
+        for output in calculation_output
+        if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
+    ]
+
+
+def get_top_state_answer_stats_multi(exploration_id, state_names):
+    """Fetches the top (at most) 10 answers from each given state_name in the
+    corresponding exploration.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        state_names: list(str). The name of the state to fetch answers for.
+
+    Returns:
+        dict(str: list(*)). Dict mapping each state name to the list of its top
+            (at most) 10 answers, sorted by decreasing frequency.
+    """
+    return {
+        state_name: get_top_state_answer_stats(exploration_id, state_name)
+        for state_name in state_names
+    }
 
 
 def _get_calc_output(exploration_id, state_name, calculation_id):

@@ -19,6 +19,7 @@
 import contextlib
 import copy
 import inspect
+import itertools
 import json
 import os
 import re
@@ -673,6 +674,55 @@ tags: []
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
             init_interaction.default_outcome.dest = end_state_name
+
+        exp_services.save_new_exploration(owner_id, exploration)
+        return exploration
+
+    def save_new_linear_exp_with_state_names_and_interactions(
+            self, exploration_id, owner_id, state_names, interaction_ids,
+            title='A title', category='A category', objective='An objective',
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Saves a new strictly-validated exploration with a sequence of states.
+
+        Args:
+            exploration_id: str. The id of the new validated exploration.
+            owner_id: str. The user_id of the creator of the exploration.
+            state_names: list(str). The names of states to be linked
+                sequentially in the exploration. Must be a non-empty list.
+            interaction_ids: list(str). The names of the interaction ids to be
+                assigned to each state. Values will be cycled, so it doesn't
+                need to be the same size as state_names.
+            title: str. The title of the exploration.
+            category: str. The category this exploration belongs to.
+            objective: str. The objective of this exploration.
+            language_code: str. The language_code of this exploration.
+
+        Returns:
+            Exploration. The exploration domain object.
+        """
+        if not state_names:
+            raise ValueError('must provide at least one state name')
+        if not interaction_ids:
+            raise ValueError('must provide at least one interaction type')
+        interaction_ids = itertools.cycle(interaction_ids)
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id, title=title, category=category,
+            language_code=language_code)
+        exploration.objective = objective
+        exploration.add_states(state_names)
+
+        from_names = [exploration.init_state_name] + state_names[:-1]
+        to_names = state_names
+        for from_name, to_name in zip(from_names, to_names):
+            from_state = exploration.states[from_name]
+            from_state.update_interaction_id(next(interaction_ids))
+            from_state.interaction.default_outcome.dest = to_name
+
+        # Prepare end_state.
+        end_state = exploration.states[to_names[-1]]
+        end_state.update_interaction_id('EndExploration')
+        end_state.interaction.default_outcome = None
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
