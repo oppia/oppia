@@ -58,9 +58,9 @@ describe('Extracting Image file names in the state service', function() {
       var states = exploration.getStates();
       var stateNames = states.getStateNames();
       stateNames.forEach(function(statename) {
-        var filenamesInState = eifss.getImageFilenamesInState(states
-          .getState(statename));
-        filenamesInState.forEach(function(filename){
+        var filenamesInState = (
+          eifss.getImageFilenamesInState(states.getState(statename)));
+        filenamesInState.forEach(function(filename) {
           expect(ImageFilenamesInExploration[statename]).toContain(filename);
         });
       });

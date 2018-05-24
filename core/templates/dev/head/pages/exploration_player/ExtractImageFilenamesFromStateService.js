@@ -16,8 +16,8 @@
  * @fileoverview Service to extract image filenames in a State.
  */
 
-oppia.factory('ExtractImageFilenamesFromStateService', ['HtmlEscaperService',
-  function(HtmlEscaperService) {
+oppia.factory('ExtractImageFilenamesFromStateService', [
+  'HtmlEscaperService', function(HtmlEscaperService) {
     var INTERACTION_TYPE_MULTIPLE_CHOICE = 'MultipleChoiceInput';
     var INTERACTION_TYPE_ITEM_SELECTION = 'ItemSelectionInput';
     var INTERACTION_TYPE_IMAGE_CLICK_INPUT = 'ImageClickInput';
@@ -48,8 +48,8 @@ oppia.factory('ExtractImageFilenamesFromStateService', ['HtmlEscaperService',
       });
 
       if (state.interaction.defaultOutcome !== null) {
-        var defaultOutcomeHtml =
-          state.interaction.defaultOutcome.feedback.getHtml();
+        var defaultOutcomeHtml = (
+          state.interaction.defaultOutcome.feedback.getHtml());
         if (defaultOutcomeHtml !== '') {
           _allHtmlInTheState.push(defaultOutcomeHtml);
         }
@@ -70,8 +70,8 @@ oppia.factory('ExtractImageFilenamesFromStateService', ['HtmlEscaperService',
         strHtml) {
       var filenames = [];
       var dummyElement = document.createElement('div');
-      dummyElement.innerHTML =
-        HtmlEscaperService.escapedStrToUnescapedStr(strHtml);
+      dummyElement.innerHTML = (
+        HtmlEscaperService.escapedStrToUnescapedStr(strHtml));
 
       var imageTagList = dummyElement.getElementsByTagName(
         'oppia-noninteractive-image');
