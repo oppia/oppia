@@ -84,7 +84,8 @@ def get_topic_rights(topic_id, strict=True):
 
     Args:
         topic_id: str. ID of the topic.
-        strict: bool.
+        strict: bool. Whether to fail noisily if no topic with a given id
+            exists in the datastore.
 
     Returns:
         TopicRights. The rights object associated with the given topic.

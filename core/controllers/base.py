@@ -443,7 +443,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Overwrites the default exception handler.
 
         Args:
-            exception: exception. The exception that was thrown.
+            exception: Exception. The exception that was thrown.
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
@@ -577,7 +577,7 @@ class CsrfTokenManager(object):
             token: str. The CSRF token to validate.
 
         Returns:
-            bool.
+            bool. Whether the given CSRF token is valid.
         """
         try:
             parts = token.split('/')

@@ -77,7 +77,8 @@ def _should_index_exploration(exp_summary):
         exp_summary: ExpSummaryModel. ExplorationSummary domain object.
 
     Returns:
-        bool.
+        bool. Whether the given exploration should be indexed for future
+        search queries.
     """
     rights = rights_manager.get_exploration_rights(exp_summary.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
@@ -167,7 +168,7 @@ def _should_index_collection(collection):
         collection: CollectionSummaryModel.
 
     Returns:
-        bool.
+        bool. Whether a particular collection should be indexed.
     """
     rights = rights_manager.get_collection_rights(collection.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE

@@ -18,13 +18,21 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import _check_docs_utils as utils
+import os
+import sys
 import astroid
 
 from pylint.checkers import BaseChecker
 from pylint.checkers import utils as checker_utils
 from pylint.interfaces import IAstroidChecker
 from pylint.interfaces import IRawChecker
+
+path = os.path.join('third_party', 'python-custom-checks')
+sys.path.insert(0, path)
+
+# pylint: disable=wrong-import-position
+import _check_docs_utils as utils # isort:skip
+# pylint: enable=wrong-import-position
 
 
 class ExplicitKwargsChecker(BaseChecker):

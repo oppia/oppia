@@ -953,7 +953,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     object and return it.
 
     Args:
-        collection: Collection. The collection object.
+        collection: Collection. The domain object.
         contributor_id_to_add: str. ID of the contributor to be added to the
             collection summary.
 
@@ -1094,7 +1094,7 @@ def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
         collection_id: str. ID of the saved collection.
 
     Returns:
-        collection. The collection object.
+        Collection. The domain object.
     """
     collection = collection_domain.Collection.from_yaml(
         collection_id, yaml_content)
