@@ -1424,15 +1424,15 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
     STATE_NAMES = ['STATE A', 'STATE B', 'STATE C']
     EXP_ID = 'exp_id'
 
-    def _get_top_state_answers_stats(
+    def _get_top_state_answer_stats(
             self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
-        return stats_services.get_top_state_answers_stats(exp_id, state_name)
+        return stats_services.get_top_state_answer_stats(exp_id, state_name)
 
-    def _get_top_state_answers_stats_multi(
+    def _get_top_state_answer_stats_multi(
             self, exp_id=EXP_ID, state_names=None):
         if not state_names:
             raise ValueError('Must provide non-empty state names.')
-        return stats_services.get_top_state_answers_stats_multi(exp_id, state_names)
+        return stats_services.get_top_state_answer_stats_multi(exp_id, state_names)
 
     def _record_answer(
             self, answer, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
@@ -1460,7 +1460,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.save_new_linear_exp_with_state_names_and_interactions(
             self.EXP_ID, self.owner_id, self.STATE_NAMES, ['TextInput'])
 
-    def test_get_top_state_answers_stats(self):
+    def test_get_top_state_answer_stats(self):
         self._record_answer('A')
         self._record_answer('B')
         self._record_answer('A')
@@ -1470,7 +1470,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self._run_answer_summaries_aggregator()
 
         with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 2):
-            state_answers_stats = self._get_top_state_answers_stats()
+            state_answers_stats = self._get_top_state_answer_stats()
 
         self.assertEqual(
             state_answers_stats, [
@@ -1479,7 +1479,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
                 # C is not included because min frequency is 2.
             ])
 
-    def test_get_top_state_answers_stats_multi(self):
+    def test_get_top_state_answer_stats_multi(self):
         self._record_answer('A', state_name='STATE A')
         self._record_answer('A', state_name='STATE A')
         self._record_answer('B', state_name='STATE A')
@@ -1492,7 +1492,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self._run_answer_summaries_aggregator()
 
         with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 1):
-            state_answers_stats_multi = self._get_top_state_answers_stats_multi(
+            state_answers_stats_multi = self._get_top_state_answer_stats_multi(
                 state_names=['STATE A', 'STATE B'])
 
         self.assertEqual(sorted(state_answers_stats_multi), [
