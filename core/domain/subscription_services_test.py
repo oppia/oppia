@@ -165,26 +165,22 @@ class SubscriptionsTest(test_utils.GenericTestBase):
         thread_ids_subscribed_to = self._get_thread_ids_subscribed_to(
             self.viewer_id)
         self.assertEqual(len(thread_ids_subscribed_to), 1)
-        full_thread_id = thread_ids_subscribed_to[0]
-        thread_id = (
-            feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id(
-                full_thread_id))
+        thread_id = thread_ids_subscribed_to[0]
+
         self.assertEqual(
-            feedback_services.get_messages('exp_id', thread_id)[0].text,
+            feedback_services.get_messages(thread_id)[0].text,
             message_text)
 
         # The editor posts a follow-up message to the thread.
         new_message_text = 'new text'
         feedback_services.create_message(
-            'exp_id', thread_id, self.editor_id, '', '', new_message_text)
+            thread_id, self.editor_id, '', '', new_message_text)
 
         # The viewer and editor are now both subscribed to the thread.
         self.assertEqual(
-            self._get_thread_ids_subscribed_to(self.viewer_id),
-            [full_thread_id])
+            self._get_thread_ids_subscribed_to(self.viewer_id), [thread_id])
         self.assertEqual(
-            self._get_thread_ids_subscribed_to(self.editor_id),
-            [full_thread_id])
+            self._get_thread_ids_subscribed_to(self.editor_id), [thread_id])
 
     def test_creating_exploration_results_in_subscription(self):
         self.assertEqual(
