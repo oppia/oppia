@@ -48,6 +48,7 @@ CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
+CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
 EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if not DEV_MODE else '')
@@ -650,19 +651,6 @@ NUM_REPEATED_CYCLES_THRESHOLD = 3
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 # Probability of recording a playthrough.
 RECORD_PLAYTHROUGH_PROBABILITY = 0.2
-# IDs of allowed types of issues.
-ALLOWED_ISSUE_IDS = [
-    'EarlyQuit',
-    'MultipleIncorrectSubmissions',
-    'CyclicStateTransitions'
-]
-# IDs of allowed learner actions.
-ALLOWED_ACTION_IDS = [
-    'ExplorationStart',
-    'AnswerSubmit',
-    'ExplorationQuit'
-]
-
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False

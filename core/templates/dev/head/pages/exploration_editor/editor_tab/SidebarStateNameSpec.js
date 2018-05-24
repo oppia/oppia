@@ -37,13 +37,13 @@ describe('Sidebar state name controller', function() {
         autosaveChangeList: function() {}
       };
       module(function($provide) {
-        $provide.value('ExplorationDataService', mockExplorationData);
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(inject(function(
-        $rootScope, $filter, $controller, $injector) {
+        $controller, $filter, $injector, $rootScope) {
       scope = $rootScope.$new();
       filter = $filter;
       rootScope = $rootScope;

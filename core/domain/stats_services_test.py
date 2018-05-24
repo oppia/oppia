@@ -375,6 +375,13 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 'New state 4'].total_answers_count_v2, 0)
 
+    def test_get_exp_issues_from_model(self):
+        """Test the get_exp_issues_from_model method."""
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        exp_issues = stats_services.get_exp_issues_from_model(model)
+        self.assertEqual(exp_issues.id, self.exp_id)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
     def test_get_exploration_stats_from_model(self):
         """Test the get_exploration_stats_from_model method."""
         model = stats_models.ExplorationStatsModel.get(self.stats_model_id)
@@ -482,6 +489,31 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                     'num_completions_v2': 0
                 }
             })
+
+    def test_save_exp_issues_model_transactional(self):
+        """Test the save_exp_issues_model_transactional method."""
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        exp_issues = stats_services.get_exp_issues_from_model(model)
+        exp_issues.unresolved_issues.append(
+            stats_domain.ExplorationIssue.from_dict({
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': ['playthrough_id1'],
+                'schema_version': 1
+            }))
+        stats_services.save_exp_issues_model_transactional(exp_issues)
+
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        self.assertEqual(
+            model.unresolved_issues[0],
+            exp_issues.unresolved_issues[0].to_dict())
 
     def test_save_stats_model_transactional(self):
         """Test the save_stats_model_transactional method."""

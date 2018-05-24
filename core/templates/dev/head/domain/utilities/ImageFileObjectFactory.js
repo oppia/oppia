@@ -13,20 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Object factory for creating audio files.
+ * @fileoverview Object factory for creating image files.
  */
 
-oppia.factory('AudioFileObjectFactory', [
-  function() {
-    var AudioFile = function(filename, data) {
-      this.filename = filename;
-      this.data = data;
-    };
+oppia.factory('ImageFileObjectFactory', [function() {
+  var ImageFile = function(filename, data) {
+    this.filename = filename;
+    this.data = data;
+  };
 
-    AudioFile.createNew = function(filename, data) {
-      return new AudioFile(filename, data);
-    };
+  ImageFile.createNew = function(filename, data) {
+    return new ImageFile(filename, data);
+  };
 
-    return AudioFile;
-  }]
-);
+  return ImageFile;
+}]);
