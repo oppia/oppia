@@ -318,7 +318,7 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
 
         Returns:
             str. A string containing exploration ID and
-            exploration version.
+                exploration version.
         """
         return 'exploration-%s-%s' % (exp_id, exp_version)
 
@@ -610,7 +610,7 @@ class StateIdMappingModel(base_models.BaseModel):
 
         Returns:
             str. A string containing exploration ID and
-            exploration version.
+                exploration version.
         """
         return '%s.%d' % (exp_id, exp_version)
 

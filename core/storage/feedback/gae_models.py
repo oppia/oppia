@@ -195,7 +195,7 @@ class FeedbackThreadModel(base_models.BaseModel):
             thread_id: str. ID of the thread.
 
         Returns:
-            FeedbackThreadModel. or None if the thread is not found or is
+            FeedbackThreadModel|None. None if the thread is not found or is
                 already deleted.
         """
         return cls.get_by_id(cls.generate_full_thread_id(

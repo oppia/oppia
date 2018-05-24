@@ -576,7 +576,7 @@ class SubtitledHtml(object):
 
         Returns:
             str. The HTML string that results after stripping
-        out unrecognized tags and attributes.
+                out unrecognized tags and attributes.
         """
         if not isinstance(params, dict):
             raise Exception(
@@ -879,7 +879,7 @@ class AnswerGroup(object):
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
-            interaction: obj. The interaction object.
+            interaction: InteractionInstance. The interaction object.
 
         Raises:
             ValidationError: One or more attributes of the AnswerGroup are

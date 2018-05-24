@@ -1587,7 +1587,8 @@ def get_next_page_of_all_non_private_commits(
         urlsafe_start_cursor: str. If this is not None, then the returned
             commits start from cursor location. Otherwise they start from the
             beginning of the list of commits.
-        max_age: datetime.timedelta.
+        max_age: datetime.timedelta. The maximum age to which all non private
+            commits are fetch from the ExplorationCommitLogEntry.
 
     Returns:
         tuple. A 3-tuple consisting of:

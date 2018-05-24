@@ -1,18 +1,11 @@
 # coding: utf-8
 
-# Copyright 2018 The Oppia Authors. All Rights Reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#      http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS-IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# The following code was adapted from PyCQA for use
+# in the Oppia project. See
+# https://github.com/PyCQA/pylint/blob/master/pylint/extensions/_check_docs_utils.py 
+# for the source origin.
+# Licensed under the GPL: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+# For details: https://github.com/PyCQA/pylint/blob/master/COPYING
 
 """Utility methods for docstring checking."""
 
@@ -29,10 +22,11 @@ from pylint.checkers import utils
 def space_indentation(s):
     """The number of leading spaces in a string
 
-    :param str s: input string
+    Args:
+        s: str. The input string.
 
-    :rtype: int
-    :return: number of leading spaces
+    Returns:
+        int. The number of leading spaces.
     """
     return len(s) - len(s.lstrip(' '))
 
@@ -40,12 +34,12 @@ def space_indentation(s):
 def get_setters_property_name(node):
     """Get the name of the property that the given node is a setter for.
 
-    :param node: The node to get the property name for.
-    :type node: str
+    Args:
+        node: str. The node to get the property name for.
 
-    :rtype: str or None
-    :returns: The name of the property that the node is a setter for,
-        or None if one could not be found.
+    Returns:
+        str|None. The name of the property that the node is a setter for,
+            or None if one could not be found.
     """
     decorators = node.decorators.nodes if node.decorators else []
     for decorator in decorators:
@@ -59,12 +53,12 @@ def get_setters_property_name(node):
 def get_setters_property(node):
     """Get the property node for the given setter node.
 
-    :param node: The node to get the property for.
-    :type node: astroid.FunctionDef
+    Args:
+        node: astroid.FunctionDef. The node to get the property for.
 
-    :rtype: astroid.FunctionDef or None
-    :returns: The node relating to the property of the given setter node,
-        or None if one could not be found.
+    Returns:
+        astroid.FunctionDef|None. The node relating to the property of
+            the given setter node, or None if one could not be found.
     """
     property_ = None
 
@@ -83,12 +77,12 @@ def get_setters_property(node):
 def returns_something(return_node):
     """Check if a return node returns a value other than None.
 
-    :param return_node: The return node to check.
-    :type return_node: astroid.Return
+    Args:
+        return_node: astroid.Return. The return node to check.
 
-    :rtype: bool
-    :return: True if the return node returns a value other than None,
-        False otherwise.
+    Returns:
+        bool. True if the return node returns a value
+            other than None, False otherwise.
     """
     returns = return_node.value
 
@@ -106,11 +100,12 @@ def possible_exc_types(node):
         Caught exception types are ignored.
 
 
-    :param node: The raise node to find exception types for.
-    :type node: astroid.node_classes.NodeNG
-
-    :returns: A list of exception types possibly raised by :param:`node`.
-    :rtype: set(str)
+    Args:
+        node: astroid.node_classes.NodeNG. The raise
+            to find exception types for.
+    
+    Returns:
+        set(str). A list of exception types.
     """
     excs = []
     if isinstance(node.exc, astroid.Name):

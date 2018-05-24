@@ -37,7 +37,7 @@ def _create_new_question(committer_id, question, commit_message):
         commit_message: str. A description of changes made to the question.
 
     Returns:
-        model_id. The ID of the model.
+        str. The ID of the model.
     """
     model = question_models.QuestionModel.create(
         title=question.title,
@@ -62,7 +62,7 @@ def add_question(committer_id, question):
         question: Question. Question to be saved.
 
     Returns:
-        question_id. The ID of the question.
+        str. The ID of the question.
     """
     question.validate()
     commit_message = (

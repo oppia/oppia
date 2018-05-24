@@ -149,6 +149,8 @@ class HangingIndentChecker(BaseChecker):
                         'no-break-after-hanging-indent', line=line_num + 1)
 
 
+# This class has been derived from
+# https://github.com/PyCQA/pylint/blob/master/pylint/extensions/docparams.py#L26.
 class DocstringParameterChecker(BaseChecker):
     """Checker for Sphinx, Google, or Numpy style docstrings
 
@@ -163,14 +165,8 @@ class DocstringParameterChecker(BaseChecker):
     * Check that all explicitly raised exceptions in a function are documented
       in the function docstring. Caught exceptions are ignored.
 
-    Activate this checker by adding the line::
-
-        load-plugins=pylint.extensions.docparams
-
-    to the ``MASTER`` section of your ``.pylintrc``.
-
-    :param linter: linter object
-    :type linter: :class:`pylint.lint.PyLinter`
+    Args:
+        linter: Pylinter. The linter object.
     """
     __implements__ = IAstroidChecker
 
@@ -263,8 +259,9 @@ class DocstringParameterChecker(BaseChecker):
     def visit_functiondef(self, node):
         """Called for function and method definitions (def).
 
-        :param node: Node for a function or method definition in the AST
-        :type node: :class:`astroid.scoped_nodes.Function`
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
         """
         node_doc = utils.docstringify(node.doc)
         self.check_functiondef_params(node, node_doc)
@@ -428,20 +425,15 @@ class DocstringParameterChecker(BaseChecker):
           checker assumes that the parameters are documented in another format
           and the absence is tolerated.
 
-        :param doc: Docstring for the function, method or class.
-        :type doc: str
-
-        :param arguments_node: Arguments node for the function, method or
-            class constructor.
-        :type arguments_node: :class:`astroid.scoped_nodes.Arguments`
-
-        :param warning_node: The node to assign the warnings to
-        :type warning_node: :class:`astroid.scoped_nodes.Node`
-
-        :param accept_no_param_doc: Whether or not to allow no parameters
-            to be documented.
-            If None then this value is read from the configuration.
-        :type accept_no_param_doc: bool or None
+        Args:
+            doc: str. Docstring for the function, method or class.
+            arguments_node: astroid.scoped_nodes.Arguments. Arguments node
+                for the function, method or class constructor.
+            warning_node: astroid.scoped_nodes.Node. The node to assign
+                the warnings to.
+            accept_no_param_doc: bool|None. Whether or not to allow
+                no parameters to be documented. If None then
+                this value is read from the configuration.
         """
         # Tolerate missing param or type declarations if there is a link to
         # another method carrying the same name.
@@ -478,13 +470,11 @@ class DocstringParameterChecker(BaseChecker):
             """Compare the found argument names with the expected ones and
             generate a message if there are arguments missing.
 
-            :param set found_argument_names: argument names found in the
-                docstring
-
-            :param str message_id: pylint message id
-
-            :param not_needed_names: names that may be omitted
-            :type not_needed_names: set of str
+            Args:
+                found_argument_names: set. Argument names found in the
+                    docstring.
+                message_id: str. Pylint message id.
+                not_needed_names: set(str). Names that may be omitted.
             """
             if not tolerate_missing_params:
                 missing_argument_names = (
@@ -502,13 +492,11 @@ class DocstringParameterChecker(BaseChecker):
             """Compare the found argument names with the expected ones and
             generate a message if there are extra arguments found.
 
-            :param set found_argument_names: argument names found in the
-                docstring
-
-            :param str message_id: pylint message id
-
-            :param not_needed_names: names that may be omitted
-            :type not_needed_names: set of str
+            Args:
+                found_argument_names: set. Argument names found in the
+                    docstring.
+                message_id: str. Pylint message id.
+                not_needed_names: set(str). Names that may be omitted.
             """
             differing_argument_names = (
                 (expected_argument_names ^ found_argument_names)
@@ -547,11 +535,9 @@ class DocstringParameterChecker(BaseChecker):
     def _add_raise_message(self, missing_excs, node):
         """Adds a message on :param:`node` for the missing exception type.
 
-        :param missing_excs: A list of missing exception types.
-        :type missing_excs: list
-
-        :param node: The node show the message on.
-        :type node: astroid.node_classes.NodeNG
+        Args:
+            missing_excs: list. A list of missing exception types.
+            node: astroid.node_classes.NodeNG. The node show the message on.
         """
         if not missing_excs:
             return
