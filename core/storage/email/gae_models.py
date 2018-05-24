@@ -438,4 +438,4 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             str. The thread id.
         """
-        return self.id.split('.')[1] + '.' + self.id.split('.')[2]
+        return self.id[self.id.find('.') + 1:]
