@@ -2,7 +2,7 @@
 
 # The following code was adapted from PyCQA for use
 # in the Oppia project. See
-# https://github.com/PyCQA/pylint/blob/master/pylint/extensions/_check_docs_utils.py 
+# https://github.com/PyCQA/pylint/blob/master/pylint/extensions/_check_docs_utils.py
 # for the source origin.
 # Licensed under the GPL: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 # For details: https://github.com/PyCQA/pylint/blob/master/COPYING
@@ -103,7 +103,7 @@ def possible_exc_types(node):
     Args:
         node: astroid.node_classes.NodeNG. The raise
             to find exception types for.
-    
+
     Returns:
         set(str). A list of exception types.
     """
