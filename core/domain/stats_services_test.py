@@ -1432,7 +1432,8 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             self, exp_id=EXP_ID, state_names=None):
         if not state_names:
             raise ValueError('Must provide non-empty state names.')
-        return stats_services.get_top_state_answer_stats_multi(exp_id, state_names)
+        return stats_services.get_top_state_answer_stats_multi(
+            exp_id, state_names)
 
     def _record_answer(
             self, answer, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
