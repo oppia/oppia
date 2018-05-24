@@ -94,10 +94,7 @@ def returns_something(return_node):
 
 def possible_exc_types(node):
     """Gets all of the possible raised exception types for the given raise node.
-
-    .. note::
-
-        Caught exception types are ignored.
+    Caught exception types are ignored.
 
 
     Args:
