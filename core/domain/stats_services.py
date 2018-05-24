@@ -225,10 +225,7 @@ def get_exp_issues_by_id(exp_id):
     exp_issues_model = stats_models.ExplorationIssuesModel.get(
         exp_id, strict=False)
     if exp_issues_model is not None:
-        # TODO(pranavsid98): Convert below code to use get_from_model() method
-        # right after the StorePlaythroughController PR is merged.
-        exp_issues = stats_domain.ExplorationIssues(
-            exp_issues_model.id, exp_issues_model.unresolved_issues)
+        exp_issues = get_exp_issues_from_model(exp_issues_model)
     return exp_issues
 
 
@@ -357,11 +354,16 @@ def get_playthrough_from_model(playthrough_model):
     Returns:
         Playthrough. The domain object for a playthrough.
     """
+    playthrough_actions = []
+    for playthrough_action_dict in playthrough_model.playthrough_actions:
+        _migrate_to_latest_action_schema(playthrough_action_dict)
+        playthrough_actions.append(
+            stats_domain.LearnerAction.from_dict(playthrough_action_dict))
     return stats_domain.Playthrough(
         playthrough_model.id, playthrough_model.exp_id,
-        playthrough_model.exp_version, playthrough_model.issue_id,
-        playthrough_model.issue_customization_args,
-        playthrough_model.playthrough_actions, playthrough_model.is_valid)
+        playthrough_model.exp_version, playthrough_model.issue_type,
+        playthrough_model.issue_customization_args, playthrough_actions,
+        playthrough_model.is_valid)
 
 
 def create_stats_model(exploration_stats):

@@ -1562,12 +1562,13 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                 }
             },
             [{
-                'action_id': 'ExplorationStart',
+                'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
                     }
-                }
+                },
+                'schema_version': 1
             }], is_valid=True)
         self.playthrough_id2 = stats_models.PlaythroughModel.create(
             self.EXP_ID, 1, 'MultipleIncorrectSubmissions',
@@ -1580,17 +1581,18 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                 }
             },
             [{
-                'action_id': 'ExplorationStart',
+                'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
                     }
-                }
+                },
+                'schema_version': 1
             }], is_valid=True)
         stats_models.ExplorationIssuesModel.create(
             self.EXP_ID,
             [{
-                'issue_id': 'EarlyQuit',
+                'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -1599,9 +1601,10 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                         'value': 200
                     }
                 },
-                'playthrough_ids': [self.playthrough_id1]
+                'playthrough_ids': [self.playthrough_id1],
+                'schema_version': 1
             }, {
-                'issue_id': 'MultipleIncorrectSubmissions',
+                'issue_type': 'MultipleIncorrectSubmissions',
                 'issue_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
@@ -1610,7 +1613,8 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                         'value': 7
                     }
                 },
-                'playthrough_ids': [self.playthrough_id2]
+                'playthrough_ids': [self.playthrough_id2],
+                'schema_version': 1
             }]
         )
 
@@ -1618,9 +1622,9 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that all issues get fetched correctly."""
         response = self.get_json('/issuesdatahandler/%s' % self.EXP_ID)
         self.assertEqual(len(response), 2)
-        self.assertEqual(response[0]['issue_id'], 'EarlyQuit')
+        self.assertEqual(response[0]['issue_type'], 'EarlyQuit')
         self.assertEqual(
-            response[1]['issue_id'], 'MultipleIncorrectSubmissions')
+            response[1]['issue_type'], 'MultipleIncorrectSubmissions')
 
     def test_error_on_invalid_exp_id_for_exp_issues(self):
         """Test that error is raised if invalid exploration ID is used to
@@ -1638,7 +1642,7 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(response['id'], self.playthrough_id1)
         self.assertEqual(response['exp_id'], self.EXP_ID)
         self.assertEqual(response['exp_version'], 1)
-        self.assertEqual(response['issue_id'], 'EarlyQuit')
+        self.assertEqual(response['issue_type'], 'EarlyQuit')
         self.assertEqual(
             response['issue_customization_args'], {
                 'state_name': {
@@ -1650,17 +1654,18 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
             })
         self.assertEqual(
             response['playthrough_actions'], [{
-                'action_id': 'ExplorationStart',
+                'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
                         'value': 'state_name1'
                     }
-                }
+                },
+                'schema_version': 1
             }])
         self.assertEqual(response['is_valid'], True)
 
     def test_error_on_invalid_playthrough_id(self):
-        """Test that error is raised if invalid playthrough ID is used to
+        """Test that error is raised if invalid playthrough type is used to
         retrieve a playthrough.
         """
         self.get_json(
