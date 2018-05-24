@@ -504,9 +504,9 @@ def get_top_state_answer_stats(exploration_id, state_name):
         _get_calc_output(exploration_id, state_name, 'Top10AnswerFrequencies')
         .calculation_output.to_raw_type())
     return [
-        {'answer': calc['answer'], 'frequency': calc['frequency']}
-        for calc in calculation_output
-        if calc['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
+        {'answer': output['answer'], 'frequency': output['frequency']}
+        for output in calculation_output
+        if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
     ]
 
 
