@@ -49,10 +49,7 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         thread_model.put(update_last_updated_time=False)
 
         if next_message_id != len(message_ids):
-            exploration_and_thread_id = key.split('.')
-            exploration_id = exploration_and_thread_id[0]
-            thread_id = exploration_and_thread_id[1]
-            thread = feedback_services.get_thread(exploration_id, thread_id)
+            thread = feedback_services.get_thread(key)
             logging.error(
                 'The number of messages in the thread, given by the id %s is %s'
                 '. But the number of messages as estimated by the message ids '
@@ -63,8 +60,7 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             yield (
                 'error', {
                     'subject': thread.subject,
-                    'exploration_id': exploration_id,
-                    'thread_id': thread_id,
+                    'thread_id': key,
                     'next_message_id': next_message_id,
                     'message_count': len(message_ids)
                 })
@@ -84,8 +80,7 @@ class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.subject != FeedbackSubjectOneOffJob.DEFAULT_SUBJECT:
             return
 
-        first_message = feedback_services.get_message(
-            item.exploration_id, item.thread_id, 0)
+        first_message = feedback_services.get_message(item.id, 0)
 
         if not first_message.text:
             return
