@@ -362,18 +362,18 @@ class AccessCreatorDashboardTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
 
-class CommentOnFeedbackTest(test_utils.GenericTestBase):
-    """Tests for can_comment_on_exploration_feedback decorator."""
+class ViewFeedbackTest(test_utils.GenericTestBase):
+    """Tests for can_view_feedback_thread decorator."""
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
 
     class MockHandler(base.BaseHandler):
-        @acl_decorators.can_comment_on_feedback_thread
-        def get(self, exploration_id):
-            self.render_json({'exploration_id': exploration_id})
+        @acl_decorators.can_view_feedback_thread
+        def get(self, thread_id):
+            self.render_json({'thread_id': thread_id})
 
     def setUp(self):
-        super(CommentOnFeedbackTest, self).setUp()
+        super(ViewFeedbackTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -382,7 +382,7 @@ class CommentOnFeedbackTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
         self.testapp = webtest.TestApp(webapp2.WSGIApplication(
-            [webapp2.Route('/mock/<exploration_id>', self.MockHandler)],
+            [webapp2.Route('/mock/<thread_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
         self.save_new_valid_exploration(
@@ -392,29 +392,29 @@ class CommentOnFeedbackTest(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_guest_cannot_comment_on_feedback_threads(self):
+    def test_guest_cannot_view_feedback_threads(self):
         response = self.testapp.get(
-            '/mock/%s' % self.private_exp_id, expect_errors=True)
+            '/mock/%s.thread1' % self.private_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 302)
 
-    def test_owner_can_comment_on_feedback_for_private_exploration(self):
+    def test_owner_can_view_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.private_exp_id, expect_errors=True)
+            '/mock/%s.thread1' % self.private_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_moderator_can_comment_on_feeback_public_exploration(self):
+    def test_moderator_can_view_feeback_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.published_exp_id, expect_errors=True)
+            '/mock/%s.thread1' % self.published_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
 
-    def test_admin_can_comment_on_feeback_private_exploration(self):
+    def test_admin_can_view_feeback_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
-            '/mock/%s' % self.private_exp_id, expect_errors=True)
+            '/mock/%s.thread1' % self.private_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.logout()
 

@@ -146,7 +146,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
     """Gets all the messages in a thread."""
 
     @acl_decorators.can_access_learner_dashboard
-    def get(self, exploration_id, thread_id):
+    def get(self, thread_id):
         """Handles GET requests."""
         messages = feedback_services.get_messages(thread_id)
         author_ids = [m.author_id for m in messages]
@@ -159,6 +159,7 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
         message_summary_list = []
         suggestion = feedback_services.get_suggestion(thread_id)
 
+        exploration_id = thread_id.split('.')[0]
         if suggestion:
             exploration = exp_services.get_exploration_by_id(exploration_id)
             current_content_html = (

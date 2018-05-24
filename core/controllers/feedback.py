@@ -36,7 +36,7 @@ class ThreadListHandler(base.BaseHandler):
                 exploration_id, False)]})
         self.render_json(self.values)
 
-    @acl_decorators.can_comment_on_feedback_thread
+    @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         subject = self.payload.get('subject')
         if not subject:
@@ -62,8 +62,8 @@ class ThreadHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    @acl_decorators.can_play_exploration
-    def get(self, exploration_id, thread_id):  # pylint: disable=unused-argument
+    @acl_decorators.can_view_feedback_thread
+    def get(self, thread_id):
         suggestion = feedback_services.get_suggestion(thread_id)
         messages = [m.to_dict() for m in feedback_services.get_messages(
             thread_id)]
@@ -76,8 +76,9 @@ class ThreadHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @acl_decorators.can_comment_on_feedback_thread
-    def post(self, exploration_id, thread_id):  # pylint: disable=unused-argument
+    @acl_decorators.can_send_message_to_thread
+    def post(self, thread_id):
+        print 'post thread', thread_id
         suggestion = feedback_services.get_suggestion(thread_id)
         text = self.payload.get('text')
         updated_status = self.payload.get('updated_status')
@@ -200,7 +201,7 @@ class SuggestionListHandler(base.BaseHandler):
         else:
             return None
 
-    @acl_decorators.can_comment_on_feedback_thread
+    @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         threads = None
         list_type = self.request.get('list_type')
@@ -231,9 +232,9 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
     user.
     """
 
-    @acl_decorators.can_comment_on_feedback_thread
-    def post(self, exploration_id):
-        thread_id = self.payload.get('thread_id')
+    @acl_decorators.can_view_feedback_thread
+    def post(self, thread_id):
+        exploration_id = thread_id.split('.')[0]
         transaction_services.run_in_transaction(
             feedback_services.clear_feedback_message_references, self.user_id,
             exploration_id, thread_id)
