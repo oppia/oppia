@@ -216,9 +216,8 @@ class EditCollectionDecoratorTest(test_utils.GenericTestBase):
         rights_manager.publish_collection(self.owner, self.published_col_id)
 
     def test_guest_is_redirected_to_login_page(self):
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.mock_testapp.get(
-                '/mock/%s' % self.published_col_id, expect_errors=True)
+        response = self.mock_testapp.get(
+            '/mock/%s' % self.published_col_id, expect_errors=True)
         self.assertEqual(response.status_int, 302)
 
     def test_normal_user_cannot_edit_collection(self):
@@ -297,8 +296,7 @@ class CreateExplorationDecoratorTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_guest_user_is_redirected_to_login_page(self):
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.mock_testapp.get('/mock/create', expect_errors=True)
+        response = self.mock_testapp.get('/mock/create', expect_errors=True)
         self.assertEqual(response.status_int, 302)
 
 
@@ -328,8 +326,7 @@ class CreateCollectionDecoratorTest(test_utils.GenericTestBase):
         ))
 
     def test_guest_user_is_redirected_to_login_page(self):
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.mock_testapp.get('/mock/create', expect_errors=True)
+        response = self.mock_testapp.get('/mock/create', expect_errors=True)
         self.assertEqual(response.status_int, 302)
 
     def test_normal_user_cannot_create_collection(self):
@@ -425,9 +422,8 @@ class CommentOnFeedbackTest(test_utils.GenericTestBase):
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
     def test_guest_cannot_comment_on_feedback_threads(self):
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.mock_testapp.get(
-                '/mock/%s' % self.private_exp_id, expect_errors=True)
+        response = self.mock_testapp.get(
+            '/mock/%s' % self.private_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 302)
 
     def test_owner_can_comment_on_feedback_for_private_exploration(self):
@@ -687,8 +683,10 @@ class TranslateExplorationTest(test_utils.GenericTestBase):
     user_email = 'user@example.com'
     banned_username = 'banneduser'
     banned_user_email = 'banneduser@example.com'
-    published_exp_id = 'exp_0'
-    private_exp_id = 'exp_1'
+    published_exp_id_1 = 'exp_1'
+    published_exp_id_2 = 'exp_2'
+    private_exp_id_1 = 'exp_3'
+    private_exp_id_2 = 'exp_4'
 
     class MockHandler(base.BaseHandler):
 
@@ -717,72 +715,93 @@ class TranslateExplorationTest(test_utils.GenericTestBase):
             debug=feconf.DEBUG,
         ))
         self.save_new_valid_exploration(
-            self.published_exp_id, self.owner_id)
+            self.published_exp_id_1, self.owner_id)
         self.save_new_valid_exploration(
-            self.private_exp_id, self.owner_id)
-        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+            self.published_exp_id_2, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_1, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id_2, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_1)
+        rights_manager.publish_exploration(self.owner, self.published_exp_id_2)
 
         rights_manager.assign_role_for_exploration(
-            self.owner, self.published_exp_id, self.translator_id, self.role)
+            self.owner, self.published_exp_id_1, self.translator_id, self.role)
         rights_manager.assign_role_for_exploration(
-            self.owner, self.private_exp_id, self.translator_id, self.role)
+            self.owner, self.private_exp_id_1, self.translator_id, self.role)
 
     def test_banned_user_cannot_translate_exploration(self):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id, expect_errors=True,
+                '/mock/%s' % self.private_exp_id_1, expect_errors=True,
                 expected_status_int=401)
         self.logout()
 
     def test_owner_can_translate_exploration(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.private_exp_id)
-        self.assertEqual(response['exploration_id'], self.private_exp_id)
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
     def test_moderator_can_translate_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.published_exp_id)
-        self.assertEqual(response['exploration_id'], self.published_exp_id)
+            response = self.get_json('/mock/%s' % self.published_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.published_exp_id_1)
         self.logout()
 
     def test_moderator_cannot_translate_private_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id, expect_errors=True,
+                '/mock/%s' % self.private_exp_id_1, expect_errors=True,
                 expected_status_int=401)
         self.logout()
 
     def test_admin_can_translate_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.private_exp_id)
-        self.assertEqual(response['exploration_id'], self.private_exp_id)
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
         self.logout()
 
-    def test_translator_can_translate_assigned_public_exploration(self):
+    def test_translator_can_only_translate_assigned_public_exploration(self):
         self.login(self.TRANSLATOR_EMAIL)
+        # Checking translator can translate assigned public exploration.
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.published_exp_id)
-        self.assertEqual(response['exploration_id'], self.published_exp_id)
+            response = self.get_json('/mock/%s' % self.published_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.published_exp_id_1)
+
+        # Checking translator cannot translate public exploration which he/she
+        # is not assigned for.
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.published_exp_id_2, expect_errors=True,
+                expected_status_int=401)
         self.logout()
 
-    def test_translator_can_translate_assigned_private_exploration(self):
+    def test_translator_can_only_translate_assigned_private_exploration(self):
         self.login(self.TRANSLATOR_EMAIL)
+        # Checking translator can translate assigned private exploration.
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.private_exp_id)
-        self.assertEqual(response['exploration_id'], self.private_exp_id)
+            response = self.get_json('/mock/%s' % self.private_exp_id_1)
+        self.assertEqual(response['exploration_id'], self.private_exp_id_1)
+
+        # Checking translator cannot translate private exploration which he/she
+        # is not assigned for.
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.private_exp_id_2, expect_errors=True,
+                expected_status_int=401)
         self.logout()
 
     def test_user_without_translator_role_of_exploration_cannot_translate_public_exploration(self): # pylint: disable=line-too-long
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.published_exp_id, expect_errors=True,
+                '/mock/%s' % self.published_exp_id_1, expect_errors=True,
                 expected_status_int=401)
         self.logout()
 
@@ -790,7 +809,7 @@ class TranslateExplorationTest(test_utils.GenericTestBase):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
-                '/mock/%s' % self.private_exp_id, expect_errors=True,
+                '/mock/%s' % self.private_exp_id_1, expect_errors=True,
                 expected_status_int=401)
         self.logout()
 
@@ -1253,8 +1272,7 @@ class AccessLearnerDashboardDecoratorTest(test_utils.GenericTestBase):
 
     def test_banned_user_is_redirected(self):
         self.login(self.banned_user_email)
-        with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.mock_testapp.get('/mock/', expect_errors=True)
+        response = self.mock_testapp.get('/mock/', expect_errors=True)
         self.assertEqual(response.status_int, 302)
         self.logout()
 
