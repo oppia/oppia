@@ -784,14 +784,6 @@ class Outcome(object):
         Raises:
             ValidationError: One or more attributes of the Outcome are invalid.
         """
-        if not self.dest:
-            raise utils.ValidationError(
-                'Every outcome should have a destination.')
-        if not isinstance(self.dest, basestring):
-            raise utils.ValidationError(
-                'Expected outcome dest to be a string, received %s'
-                % self.dest)
-
         self.feedback.validate()
 
         if not isinstance(self.labelled_as_correct, bool):
@@ -1958,9 +1950,32 @@ class Exploration(object):
             raise utils.ValidationError('This exploration has no states.')
         for state_name in self.states:
             self._require_valid_state_name(state_name)
-            self.states[state_name].validate(
+            state = self.states[state_name]
+            state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict)
+            # The checks below perform validation on the Outcome domain object
+            # that is specific to answer groups in explorations, but not
+            # questions. This logic is here because the validation checks in
+            # the Outcome domain object are used by both explorations and
+            # questions.
+            for answer_group in state.interaction.answer_groups:
+                if not answer_group.outcome.dest:
+                    raise utils.ValidationError(
+                        'Every outcome should have a destination.')
+                if not isinstance(answer_group.outcome.dest, basestring):
+                    raise utils.ValidationError(
+                        'Expected outcome dest to be a string, received %s'
+                        % answer_group.outcome.dest)
+            if state.interaction.default_outcome is not None:
+                if not state.interaction.default_outcome.dest:
+                    raise utils.ValidationError(
+                        'Every outcome should have a destination.')
+                if not isinstance(
+                        state.interaction.default_outcome.dest, basestring):
+                    raise utils.ValidationError(
+                        'Expected outcome dest to be a string, received %s'
+                        % state.interaction.default_outcome.dest)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(

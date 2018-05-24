@@ -24,7 +24,6 @@ import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
-# This takes additional 'title' parameters.
 CMD_CREATE_NEW = 'create_new'
 
 
@@ -37,17 +36,12 @@ def _create_new_question(committer_id, question, commit_message):
         commit_message: str. A description of changes made to the question.
     """
     model = question_models.QuestionModel.create(
-        title=question.title,
         question_data=question.question_data,
         question_data_schema_version=question.question_data_schema_version,
         language_code=question.language_code,
     )
 
-    model.commit(
-        committer_id, commit_message, [{
-            'cmd': CMD_CREATE_NEW,
-            'title': question.title
-        }])
+    model.commit(committer_id, commit_message, [{'cmd': CMD_CREATE_NEW}])
     return model.id
 
 
@@ -59,8 +53,7 @@ def add_question(committer_id, question):
         question: Question. Question to be saved.
     """
     question.validate()
-    commit_message = (
-        'New question created with title \'%s\'.' % question.title)
+    commit_message = 'New question created'
     question_id = _create_new_question(committer_id, question, commit_message)
 
     return question_id
@@ -96,7 +89,7 @@ def get_question_from_model(question_model):
         Question. The domain object representing the question model.
     """
     return question_domain.Question(
-        question_model.id, question_model.title, question_model.question_data,
+        question_model.id, question_model.question_data,
         question_model.question_data_schema_version,
         question_model.language_code)
 
@@ -153,10 +146,7 @@ def apply_change_list(question_id, change_list):
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
                 if (change.property_name ==
-                        question_domain.QUESTION_PROPERTY_TITLE):
-                    question.update_title(change.new_value)
-                elif (change.property_name ==
-                      question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
+                        question_domain.QUESTION_PROPERTY_LANGUAGE_CODE):
                     question.update_language_code(change.new_value)
                 elif (change.cmd ==
                       question_domain.QUESTION_PROPERTY_QUESTION_DATA):
@@ -196,7 +186,6 @@ def _save_question(committer_id, question, change_list, commit_message):
     question.validate()
 
     question_model = question_models.QuestionModel.get(question.question_id)
-    question_model.title = question.title
     question_model.question_data = question.question_data
     question_model.question_data_schema_version = (
         question.question_data_schema_version)

@@ -1096,6 +1096,34 @@ class AppEngineTestBase(TestBase):
             for queue in queue_names:
                 self.taskqueue_stub.FlushQueue(queue)
 
+    def _create_valid_question_data(self, default_dest_state_name):
+        """Creates a valid question_data dict.
+
+        Args:
+            default_dest_state_name: str. The default destination state.
+
+        Returns:
+            dict. The default question_data dict.
+        """
+        state = exp_domain.State.create_default_state(default_dest_state_name)
+        solution_explanation = exp_domain.SubtitledHtml(
+            'Solution explanation', {})
+        solution = exp_domain.Solution(
+            'TextInput', False, 'Solution', solution_explanation)
+        hint_content = exp_domain.SubtitledHtml('Hint 1', {})
+        hint = exp_domain.Hint(hint_content)
+        state.interaction.id = 'TextInput'
+        state.interaction.customization_args = {
+            'placeholder': 'Enter text here',
+            'rows': 1
+        }
+        state.interaction.default_outcome.labelled_as_correct = True
+        state.interaction.default_outcome.dest = None
+        state.interaction.hints.append(hint)
+        state.interaction.solution = solution
+        state = state.to_dict()
+        return state
+
 
 if feconf.PLATFORM == 'gae':
     GenericTestBase = AppEngineTestBase
