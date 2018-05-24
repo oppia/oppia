@@ -310,20 +310,8 @@ class Story(object):
                 - story_contents: dict. The dict comprising the story
                     contents.
             current_version: int. The current schema version of story_contents.
-
-        Raises:
-            Exception: The value of the key 'schema_version' in
-            versioned_story_contents is not valid.
         """
-        if (versioned_story_contents['schema_version'] + 1 >
-                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION):
-            raise Exception('story_contents is version %d but current '
-                            'story_contents schema version is %d' % (
-                                versioned_story_contents['schema_version'],
-                                feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION))
-
-        versioned_story_contents['schema_version'] = (
-            current_version + 1)
+        versioned_story_contents['schema_version'] = current_version + 1
 
         conversion_fn = getattr(
             cls, '_convert_story_contents_v%s_dict_to_v%s_dict' % (
