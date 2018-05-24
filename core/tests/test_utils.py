@@ -679,24 +679,23 @@ tags: []
         return exploration
 
     def save_new_linear_exp_with_state_names_and_interactions(
-            self, exploration_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            state_names=None, interaction_ids=None):
+            self, exploration_id, owner_id, state_names, interaction_ids,
+            title='A title', category='A category', objective='An objective',
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new strictly-validated exploration with a sequence of states.
 
         Args:
             exploration_id: str. The id of the new validated exploration.
             owner_id: str. The user_id of the creator of the exploration.
-            title: str. The title of the exploration.
-            category: str. The category this exploration belongs to.
-            objective: str. The objective of this exploration.
-            language_code: str. The language_code of this exploration.
             state_names: list(str). The names of states to be linked
                 sequentially in the exploration. Must be a non-empty list.
             interaction_ids: list(str). The names of the interaction ids to be
                 assigned to each state. Values will be cycled, so it doesn't
                 need to be the same size as state_names.
+            title: str. The title of the exploration.
+            category: str. The category this exploration belongs to.
+            objective: str. The objective of this exploration.
+            language_code: str. The language_code of this exploration.
 
         Returns:
             Exploration. The exploration domain object.
