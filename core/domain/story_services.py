@@ -34,9 +34,9 @@ memcache_services = models.Registry.import_memcache_services()
 def _migrate_story_contents_to_latest_schema(versioned_story_contents):
     """Holds the responsibility of performing a step-by-step, sequential update
     of the story structure based on the schema version of the input
-    story dictionary. If the current story_contents schemas
-    change, a new conversion function must be added and some code appended to
-    this function to account for that new version.
+    story dictionary. If the current story_contents schema changes, a new
+    conversion function must be added and some code appended to this function
+    to account for that new version.
 
     Args:
         versioned_story_contents: A dict with two keys:

@@ -79,7 +79,7 @@ class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             version: int. The version number of the topic after the commit.
 
         Returns:
-            The commit id with the topic id and version number.
+            str. The commit id with the topic id and version number.
         """
         return 'topic-%s-%s' % (topic_id, version)
 

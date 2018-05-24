@@ -15,6 +15,7 @@
 """Base model class."""
 
 from core.platform import models
+import feconf
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -241,12 +242,67 @@ class BaseCommitLogEntryModel(BaseModel):
     version = ndb.IntegerProperty()
 
     @classmethod
-    def _get_instance_id(cls, instance_id, version):
+    def create(
+            cls, entity_id, version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds, status=None,
+            community_owned=None):
+        """This method returns an instance of the CommitLogEntryModel for a
+        construct with the common fields filled.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            committer_username: str. The username of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+            status: str. The status of the entity after the commit.
+            community_owned: bool. Whether the entity is community_owned after
+                the commit.
+
+        Returns:
+            CommitLogEntryModel. Returns the respective CommitLogEntryModel
+                instance of the construct from which this is called.
+        """
+        if status:
+            return cls(
+                id=cls._get_instance_id(entity_id, version),
+                user_id=committer_id,
+                username=committer_username,
+                commit_type=commit_type,
+                commit_message=commit_message,
+                commit_cmds=commit_cmds,
+                version=version,
+                post_commit_status=status,
+                post_commit_community_owned=community_owned,
+                post_commit_is_private=(
+                    status == feconf.ACTIVITY_STATUS_PRIVATE)
+            )
+        else:
+            return cls(
+                id=cls._get_instance_id(entity_id, version),
+                user_id=committer_id,
+                username=committer_username,
+                commit_type=commit_type,
+                commit_message=commit_message,
+                commit_cmds=commit_cmds,
+                version=version
+            )
+
+    @classmethod
+    def _get_instance_id(cls, target_entity_id, version):
         """This method should be implemented in the inherited classes.
 
         Args:
-            instance_id: str. The id of the construct(eg: exp_id, story_id etc.)
-                where this is inherited.
+            target_entity_id: str. The ID of the construct corresponding to this
+                commit log entry model (e.g. the exp_id for an exploration,
+                the story_id for a story, etc.).
             version: int. The version number of the model after the commit.
 
         Raises:
@@ -283,20 +339,21 @@ class BaseCommitLogEntryModel(BaseModel):
             cls.query(), page_size, urlsafe_start_cursor)
 
     @classmethod
-    def get_commit(cls, instance_id, version):
+    def get_commit(cls, target_entity_id, version):
         """Returns the commit corresponding to an instance id and
         version number.
 
         Args:
-            instance_id: str. The id of the particular construct, from which
-                this method is called.
+            target_entity_id: str. The id of the particular construct, from
+                which this method is called.
             version: int. The version number of the instance
                 after the commit.
 
         Returns:
-            The commit with the instance id and version number.
+            BaseCommitLogEntryModel. The commit with the target entity id and
+                version number.
         """
-        commit_id = cls._get_instance_id(instance_id, version)
+        commit_id = cls._get_instance_id(target_entity_id, version)
         return cls.get_by_id(commit_id)
 
 

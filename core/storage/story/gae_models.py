@@ -54,7 +54,8 @@ class StoryModel(base_models.VersionedModel):
     schema_version = (
         ndb.IntegerProperty(required=True, default=1, indexed=True))
     # The story contents dict specifying the list of story nodes and the
-    # connection between them. Modeled by class StoryContents.
+    # connection between them. Modelled by class StoryContents
+    # (see story_domain.py for its current schema).
     story_contents = ndb.JsonProperty(default={}, indexed=False)
 
     def _trusted_commit(
@@ -84,16 +85,12 @@ class StoryModel(base_models.VersionedModel):
             committer_user_settings_model.username
             if committer_user_settings_model else '')
 
-        StoryCommitLogEntryModel(
-            id=('story-%s-%s' % (self.id, self.version)),
-            user_id=committer_id,
-            username=committer_username,
-            story_id=self.id,
-            commit_type=commit_type,
-            commit_message=commit_message,
-            commit_cmds=commit_cmds,
-            version=self.version
-        ).put_async()
+        story_commit_log_entry = StoryCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds
+        )
+        story_commit_log_entry.story_id = self.id
+        story_commit_log_entry.put_async()
 
 
 class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -118,7 +115,7 @@ class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             version: int. The version number of the story after the commit.
 
         Returns:
-            The commit id with the story id and version number.
+            str. The commit id with the story id and version number.
         """
         return 'story-%s-%s' % (story_id, version)
 

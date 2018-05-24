@@ -237,8 +237,9 @@ class Story(object):
             description: str. The high level desscription of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
-            story_contents: StoryContents. The dict representing the contents
-                that are part of this story.
+            story_contents: StoryContents. The StoryContents instance
+                representing the contents (like nodes) that are part of the
+                story.
             created_on: datetime.datetime. Date and time when the story is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -278,7 +279,7 @@ class Story(object):
 
     @classmethod
     def create_default_story(cls, story_id):
-        """Returns a story domain object with default values. This is for the
+        """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
 

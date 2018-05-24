@@ -134,20 +134,13 @@ class ExplorationModel(base_models.VersionedModel):
         # TODO(msl): test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when explorations
         # are changed).
-        ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (self.id, self.version)),
-            user_id=committer_id,
-            username=committer_username,
-            exploration_id=self.id,
-            commit_type=commit_type,
-            commit_message=commit_message,
-            commit_cmds=commit_cmds,
-            version=self.version,
-            post_commit_status=exp_rights.status,
-            post_commit_community_owned=exp_rights.community_owned,
-            post_commit_is_private=(
-                exp_rights.status == feconf.ACTIVITY_STATUS_PRIVATE)
-        ).put_async()
+        exploration_commit_log = ExplorationCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds, exp_rights.status,
+            exp_rights.community_owned
+        )
+        exploration_commit_log.exploration_id = self.id
+        exploration_commit_log.put_async()
 
 
 class ExplorationRightsSnapshotMetadataModel(

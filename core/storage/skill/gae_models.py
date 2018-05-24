@@ -43,7 +43,7 @@ class SkillModel(base_models.VersionedModel):
 
     # The description of the skill.
     description = ndb.StringProperty(required=True, indexed=True)
-    # The schema version for each of the misconceptions dict.
+    # The schema version for each of the misconceptions dicts.
     misconceptions_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
     # A list of misconceptions associated with the skill, in which each
@@ -80,7 +80,7 @@ class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             version: int. The version number of the skill after the commit.
 
         Returns:
-            The commit id with the skill id and version number.
+            str. The commit id with the skill id and version number.
         """
         return 'skill-%s-%s' % (skill_id, version)
 

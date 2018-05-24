@@ -217,20 +217,13 @@ class CollectionRightsModel(base_models.VersionedModel):
             # TODO(msl): test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when collections
             # are changed).
-            CollectionCommitLogEntryModel(
-                id=('rights-%s-%s' % (self.id, self.version)),
-                user_id=committer_id,
-                username=committer_username,
-                collection_id=self.id,
-                commit_type=commit_type,
-                commit_message=commit_message,
-                commit_cmds=commit_cmds,
-                version=None,
-                post_commit_status=self.status,
-                post_commit_community_owned=self.community_owned,
-                post_commit_is_private=(
-                    self.status == feconf.ACTIVITY_STATUS_PRIVATE)
-            ).put_async()
+            collection_commit_log = CollectionCommitLogEntryModel.create(
+                self.id, self.version, committer_id, committer_username,
+                commit_type, commit_message, commit_cmds, self.status,
+                self.community_owned
+            )
+            collection_commit_log.collection_id = self.id
+            collection_commit_log.put_async()
 
 
 class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -265,7 +258,7 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             version: int. The version number of the collection after the commit.
 
         Returns:
-            The commit id with the collection id and version number.
+            str. The commit id with the collection id and version number.
         """
         return 'collection-%s-%s' % (collection_id, version)
 

@@ -75,8 +75,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story.to_dict(), expected_story)
 
     def test_commit_log_entry(self):
-        story_commit_log_entry = story_models.StoryCommitLogEntryModel.get_commit( # pylint: disable=line-too-long
-            self.STORY_ID, 1)
+        story_commit_log_entry = (
+            story_models.StoryCommitLogEntryModel.get_commit(self.STORY_ID, 1)
+        )
         self.assertEqual(story_commit_log_entry.commit_type, 'create')
         self.assertEqual(story_commit_log_entry.story_id, self.STORY_ID)
         self.assertEqual(story_commit_log_entry.user_id, self.USER_ID)
