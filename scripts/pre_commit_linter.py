@@ -201,6 +201,7 @@ _PATHS_TO_INSERT = [
         _PARENT_DIR, 'oppia_tools', 'google_appengine_1.9.67',
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'beautifulsoup4-4.6.0'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pyjsparser-2.5.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
@@ -218,6 +219,7 @@ for path in _PATHS_TO_INSERT:
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 
+import bs4  # isort:skip
 import isort  # isort:skip
 import pycodestyle  # isort:skip
 import pyjsparser  # isort:skip
@@ -1085,24 +1087,53 @@ def _check_directive_scope(all_files):
     return summary_messages
 
 
+def _check_html_indent(all_files):
+    """This function checks the indentation of lines in HTML files."""
+    html_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.html')]
+    for filename in html_files_to_lint:
+        with open(filename, 'r') as f:
+            soup = bs4.BeautifulSoup(f, 'html.parser')
+
+            for tag in soup.find_all():
+                pattern = re.compile(
+                    r'<(?P<tag_name>[a-zA-Z0-9-]+)(?P<attributes>[^>]*)', re.M)
+                if re.search(pattern, str(tag)):
+                    m = re.match(pattern, str(tag))
+                    print m.group('tag_name')
+                    print m.group('attributes')
+                    break
+
+
+    return []
+
 def main():
     all_files = _get_all_files()
     # TODO(apb7): Enable the _check_directive_scope function.
     directive_scope_messages = []
-    html_directive_name_messages = _check_html_directive_name(all_files)
-    import_order_messages = _check_import_order(all_files)
-    newline_messages = _check_newline_character(all_files)
-    docstring_messages = _check_docstrings(all_files)
-    comment_messages = _check_comments(all_files)
-    html_linter_messages = _lint_html_files(all_files)
-    linter_messages = _pre_commit_linter(all_files)
-    pattern_messages = _check_bad_patterns(all_files)
+    #html_directive_name_messages = _check_html_directive_name(all_files)
+    #import_order_messages = _check_import_order(all_files)
+    #newline_messages = _check_newline_character(all_files)
+    #docstring_messages = _check_docstrings(all_files)
+    #comment_messages = _check_comments(all_files)
+    html_indent_messages = _check_html_indent(all_files)
+    #html_linter_messages = _lint_html_files(all_files)
+    #linter_messages = _pre_commit_linter(all_files)
+    #pattern_messages = _check_bad_patterns(all_files)
+    html_directive_name_messages = []
+    import_order_messages = []
+    newline_messages = []
+    docstring_messages = []
+    comment_messages = []
+    html_linter_messages = []
+    linter_messages = []
+    pattern_messages = []
     all_messages = (
         directive_scope_messages + html_directive_name_messages +
         import_order_messages + newline_messages +
         docstring_messages + comment_messages +
-        html_linter_messages + linter_messages +
-        pattern_messages)
+        html_indent_messages + html_linter_messages +
+        linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
