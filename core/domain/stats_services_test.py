@@ -1457,7 +1457,8 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.save_new_linear_exp_with_state_names_and_interactions(
-            self.EXP_ID, self.owner_id, state_names=self.STATE_NAMES)
+            self.EXP_ID, self.owner_id, state_names=self.STATE_NAMES,
+            interaction_ids=['TextInput'])
 
     def test_get_state_answers_stats(self):
         self._record_answer('A')
