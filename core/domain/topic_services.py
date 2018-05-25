@@ -290,8 +290,6 @@ def create_new_topic_rights(topic_id, committer_id):
         topic_id: str. ID of the topic.
         committer_id: str. ID of the committer.
     """
-    # The initial committer (who creates the topic) will be one of the managers
-    # of the topic.
     topic_rights = topic_domain.TopicRights(topic_id, [])
     commit_cmds = [{'cmd': topic_domain.CMD_CREATE_NEW}]
 
