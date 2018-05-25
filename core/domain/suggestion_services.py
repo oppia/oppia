@@ -227,6 +227,8 @@ def get_thread_id_from_suggestion_id(suggestion_id):
     Returns:
         str. The thread ID linked to the suggestion.
     """
+
+    # Temporarily. Once feedback services are edited, will be removed
     return suggestion_id[suggestion_id.rfind('.') + 1:]
 
 
@@ -281,10 +283,6 @@ def is_suggestion_handled(suggestion):
 
 def get_commit_message_for_suggestion(author_username, commit_message):
     """Returns a modified commit message for an accepted suggestion.
-
-    NOTE TO DEVELOPERS: This should not be changed, since in the future we may
-    want to determine and credit the original authors of suggestions, and in
-    order to do so we will look for commit messages that follow this format.
 
     Args:
         author_username: str. Username of the suggestion author.
