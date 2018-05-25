@@ -341,7 +341,7 @@
         "targetDirPrefix": "math-js-",
         "files": ["math.js", "math.min.js", "math.min.map"],
         "bundle": {
-          "js": []
+          "js": ["math.js"]
         }
       },
       "midiJs": {

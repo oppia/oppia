@@ -39,8 +39,8 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 class CollectionModel(base_models.VersionedModel):
     """Versioned storage model for an Oppia collection.
 
-    This class should only be imported by the collection domain file, the
-    collection services file, and the collection model test file.
+    This class should only be imported by the collection services file
+    and the collection model test file.
     """
     SNAPSHOT_METADATA_CLASS = CollectionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = CollectionSnapshotContentModel
@@ -106,20 +106,13 @@ class CollectionModel(base_models.VersionedModel):
         # TODO(msl): test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when collections
         # are changed).
-        CollectionCommitLogEntryModel(
-            id=('collection-%s-%s' % (self.id, self.version)),
-            user_id=committer_id,
-            username=committer_username,
-            collection_id=self.id,
-            commit_type=commit_type,
-            commit_message=commit_message,
-            commit_cmds=commit_cmds,
-            version=self.version,
-            post_commit_status=collection_rights.status,
-            post_commit_community_owned=collection_rights.community_owned,
-            post_commit_is_private=(
-                collection_rights.status == feconf.ACTIVITY_STATUS_PRIVATE)
-        ).put_async()
+        collection_commit_log = CollectionCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds, collection_rights.status,
+            collection_rights.community_owned
+        )
+        collection_commit_log.collection_id = self.id
+        collection_commit_log.put_async()
 
 
 class CollectionRightsSnapshotMetadataModel(
@@ -233,7 +226,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             ).put_async()
 
 
-class CollectionCommitLogEntryModel(base_models.BaseModel):
+class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to collections.
 
     A new instance of this model is created and saved every time a commit to
@@ -242,76 +235,22 @@ class CollectionCommitLogEntryModel(base_models.BaseModel):
     The id for this model is of the form
     'collection-{{COLLECTION_ID}}-{{COLLECTION_VERSION}}'.
     """
-    # Update superclass model to make these properties indexed.
-    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
-
-    # The id of the user.
-    user_id = ndb.StringProperty(indexed=True, required=True)
-    # The username of the user, at the time of the edit.
-    username = ndb.StringProperty(indexed=True, required=True)
     # The id of the collection being edited.
     collection_id = ndb.StringProperty(indexed=True, required=True)
-    # The type of the commit: 'create', 'revert', 'edit', 'delete'.
-    commit_type = ndb.StringProperty(indexed=True, required=True)
-    # The commit message.
-    commit_message = ndb.TextProperty(indexed=False)
-    # The commit_cmds dict for this commit.
-    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
-    # The version number of the collection after this commit. Only populated
-    # for commits to an collection (as opposed to its rights, etc.).
-    version = ndb.IntegerProperty()
-
-    # The status of the collection after the edit event ('private', 'public').
-    post_commit_status = ndb.StringProperty(indexed=True, required=True)
-    # Whether the collection is community-owned after the edit event.
-    post_commit_community_owned = ndb.BooleanProperty(indexed=True)
-    # Whether the collection is private after the edit event. Having a
-    # separate field for this makes queries faster, since an equality query
-    # on this property is faster than an inequality query on
-    # post_commit_status.
-    post_commit_is_private = ndb.BooleanProperty(indexed=True)
 
     @classmethod
-    def get_commit(cls, collection_id, version):
-        """Returns the commit corresponding to the given collection id and
-        version number.
+    def _get_instance_id(cls, collection_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
 
         Args:
             collection_id: str. The id of the collection being edited.
             version: int. The version number of the collection after the commit.
 
         Returns:
-            The commit with the given collection id and version number.
+            str. The commit id with the collection id and version number.
         """
-        return cls.get_by_id('collection-%s-%s' % (collection_id, version))
-
-    @classmethod
-    def get_all_commits(cls, page_size, urlsafe_start_cursor):
-        """Fetches a list of all the commits sorted by their last updated
-        attribute.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
-
-        Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this might
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
-        """
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(), page_size, urlsafe_start_cursor)
+        return 'collection-%s-%s' % (collection_id, version)
 
     @classmethod
     def get_all_non_private_commits(

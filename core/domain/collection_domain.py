@@ -748,7 +748,7 @@ class Collection(object):
            returns None.
 
         Args:
-            completed_exploration_ids: list(str). List of completed exploration
+            completed_exp_ids: list(str). List of completed exploration
                 ids.
 
         Returns:
@@ -789,7 +789,7 @@ class Collection(object):
         Args:
             collection_id: str. The id of the collection.
 
-        Returs:
+        Returns:
             bool. True if the collection is a demo else False.
         """
         return collection_id in feconf.DEMO_COLLECTIONS

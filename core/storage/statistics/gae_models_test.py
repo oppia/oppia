@@ -235,11 +235,13 @@ class ExplorationIssuesModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_exp_issues_model(self):
         model_id = (
             stat_models.ExplorationIssuesModel.create(
-                'exp_id1', []))
+                'exp_id1', 1, []))
 
         model = stat_models.ExplorationIssuesModel.get(model_id)
 
         self.assertEqual(model.id, model_id)
+        self.assertEqual(model.exp_id, 'exp_id1')
+        self.assertEqual(model.exp_version, 1)
         self.assertEqual(model.unresolved_issues, [])
 
 
@@ -249,7 +251,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
     def test_create_and_get_playthrough_model(self):
         model_id = (
             stat_models.PlaythroughModel.create(
-                'exp_id1', 1, 'EarlyQuit', {}, [], True))
+                'exp_id1', 1, 'EarlyQuit', {}, []))
 
         model = stat_models.PlaythroughModel.get(model_id)
 
@@ -259,15 +261,14 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.issue_type, 'EarlyQuit')
         self.assertEqual(model.issue_customization_args, {})
         self.assertEqual(model.playthrough_actions, [])
-        self.assertEqual(model.is_valid, True)
 
     def test_delete_playthroughs_multi(self):
         model_id1 = (
             stat_models.PlaythroughModel.create(
-                'exp_id1', 1, 'EarlyQuit', {}, [], True))
+                'exp_id1', 1, 'EarlyQuit', {}, []))
         model_id2 = (
             stat_models.PlaythroughModel.create(
-                'exp_id1', 1, 'EarlyQuit', {}, [], True))
+                'exp_id1', 1, 'EarlyQuit', {}, []))
 
         instance_ids = [model_id1, model_id2]
         stat_models.PlaythroughModel.delete_playthroughs_multi(instance_ids)

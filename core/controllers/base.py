@@ -244,7 +244,8 @@ class BaseHandler(webapp2.RequestHandler):
                     '%s: payload %s',
                     e, self.payload)
 
-                return self.handle_exception(e, self.app.debug)
+                self.handle_exception(e, self.app.debug)
+                return
 
         super(BaseHandler, self).dispatch()
 
@@ -440,7 +441,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Overwrites the default exception handler.
 
         Args:
-            exception: The exception that was thrown.
+            exception: Exception. The exception that was thrown.
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
@@ -572,6 +573,9 @@ class CsrfTokenManager(object):
         Args:
             user_id: str. The user_id to validate the CSRF token against.
             token: str. The CSRF token to validate.
+
+        Returns:
+            bool. Whether the given CSRF token is valid.
         """
         try:
             parts = token.split('/')
