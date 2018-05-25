@@ -403,19 +403,19 @@ class SendMessageToFeedbackThread(test_utils.GenericTestBase):
     def test_owner_can_send_message_to_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s.thread1' % self.private_exp_id)
+            self.get_json('/mock/%s.thread1' % self.private_exp_id)
         self.logout()
 
     def test_moderator_can_send_message_to_feeback_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s.thread1' % self.published_exp_id)
+            self.get_json('/mock/%s.thread1' % self.published_exp_id)
         self.logout()
 
     def test_admin_can_send_message_to_feeback_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s.thread1' % self.private_exp_id)
+            self.get_json('/mock/%s.thread1' % self.private_exp_id)
         self.logout()
 
 
@@ -454,24 +454,24 @@ class ViewFeedbackThread(test_utils.GenericTestBase):
 
     def test_guest_can_view_feedback_threads_for_public_exploration(self):
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s.thread1' % self.published_exp_id)
+            self.get_json('/mock/%s.thread1' % self.published_exp_id)
 
     def test_owner_can_view_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s.thread1' % self.private_exp_id)
+            self.get_json('/mock/%s.thread1' % self.private_exp_id)
         self.logout()
 
     def test_moderator_can_view_feeback_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s.thread1' % self.published_exp_id)
+            self.get_json('/mock/%s.thread1' % self.published_exp_id)
         self.logout()
 
     def test_admin_can_view_feeback_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s.thread1' % self.private_exp_id)
+            self.get_json('/mock/%s.thread1' % self.private_exp_id)
         self.logout()
 
 
