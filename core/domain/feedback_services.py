@@ -75,7 +75,8 @@ def _create_models_for_thread_and_first_message(
     create_message(
         exploration_id, thread_id, original_author_id,
         feedback_models.STATUS_CHOICES_OPEN, subject, text)
-    return thread_id
+    return feedback_models.FeedbackThreadModel.generate_full_thread_id(
+        exploration_id, thread_id)
 
 
 def create_thread(
@@ -90,8 +91,9 @@ def create_thread(
         subject: str. The subject of this thread.
         text: str. The text of the feedback message. This may be ''.
     """
-    _create_models_for_thread_and_first_message(
+    thread_id = _create_models_for_thread_and_first_message(
         exploration_id, state_name, original_author_id, subject, text, False)
+    return thread_id
 
 
 def create_message(
