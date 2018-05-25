@@ -16,6 +16,7 @@
 
 """Services for exploration-related statistics."""
 
+import collections
 import copy
 import itertools
 
@@ -210,6 +211,68 @@ def handle_stats_creation_for_new_exp_version(
 
     # Create new statistics model.
     create_stats_model(exploration_stats)
+
+
+def create_exp_issues_for_new_exploration(exp_id):
+    """Creates the ExplorationIssuesModel instance for the exploration.
+
+    Args:
+        exp_id: str. ID of the exploration.
+    """
+    stats_models.ExplorationIssuesModel.create(exp_id, [])
+
+
+def update_exp_issues_for_new_exp_version(exploration, change_list):
+    """Retrieves the ExplorationIssuesModel for the old exp_version and makes
+    any required changes to the structure of the model.
+
+    Args:
+        exploration: Exploration. Domain object for the exploration.
+        change_list: list(dict). A list of changes introduced in this commit.
+    """
+    old_exp_version = exp_version - 1
+    new_exp_version = exp_version
+    # TODO(pranavsid98): Convert below two lines to use get_by_id() instead.
+    exp_issues_model = stats_models.ExplorationIssuesModel.get(
+        exploration.id, strict=False)
+    if exp_issues_model is None:
+        create_exp_issues_for_new_exploration(exp_id)
+        return
+    exp_issues = get_exp_issues_from_model(exp_issues_model)
+
+    # We make a mapping from state name to list of exploration issues so that
+    # handling those issues will be easier while going through the change list.
+    exp_issues_by_state_name = collections.defaultdict([])
+    for exp_issue in exp_issues:
+        keyname = feconf.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type]
+        # If keyname is 'state_names', which is a list, we add an instance of
+        # this issue to all associated states in the mapping.
+        if keyname == 'state_names':
+            state_names = exp_issue.issue_customization_args[keyname]['value']
+            for state_name in state_names:
+                exp_issues_by_state_name[state_name].append(exp_issue)
+        else:
+            state_name = exp_issue.issue_customization_args[keyname]['value']
+            exp_issues_by_state_name[state_name].append(exp_issue)
+
+    # Handling state additions, deletions and renames.
+    for change_dict in change_list:
+        if change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
+            state_name = change_dict['state_name']
+            playthrough_ids = []
+            for exp_issue in exp_issues_by_state_name[state_name]:
+                playthrough_ids.extend(exp_issue.playthrough_ids)
+            mark_playthroughs_invalid(playthrough_ids)
+        elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
+            exploration_stats.state_stats_mapping[change_dict[
+                'new_state_name']] = exploration_stats.state_stats_mapping.pop(
+                    change_dict['old_state_name'])
+
+    exploration_stats.exp_version = new_exp_version
+
+    # Create new statistics model.
+    create_stats_model(exploration_stats)
+
 
 
 def get_exploration_stats_by_id(exp_id, exp_version):

@@ -888,6 +888,10 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exploration, state_names_with_unchanged_answer_groups,
                 exp_versions_diff)
 
+    # Trigger exploration issues model updation.
+    stats_services.update_exp_issues_for_new_exp_version(
+        exploration.id, change_list)
+
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
 
@@ -951,6 +955,11 @@ def _create_exploration(
         if state_names_to_train:
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train)
+
+    # Trigger exploration issues model creation.
+    if feconf.ENABLE_PLAYTHROUGHS:
+        stats_services.create_exp_issues_for_new_exploration(
+            exploration.id)
 
     # Save state id mapping model for new exploration.
     create_and_save_state_id_mapping_model(exploration, commit_cmds)
