@@ -374,7 +374,7 @@ class SuggestionValidationUnitTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.FeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-                suggestion_services.create_suggestion(
+            suggestion_services.create_suggestion(
                 suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
@@ -483,10 +483,10 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     def test_get_by_assigned_reviewer(self):
         self.assertEqual(
             len(suggestion_services.get_suggestions_assigned_to_reviewer(
-            self.assigned_reviewer_id_1)), 3)
+                self.assigned_reviewer_id_1)), 3)
         self.assertEqual(
             len(suggestion_services.get_suggestions_assigned_to_reviewer(
-            self.assigned_reviewer_id_2)), 1)
+                self.assigned_reviewer_id_2)), 1)
 
     def test_get_by_target_id(self):
         self.assertEqual(len(suggestion_services.get_suggestions_by_target_id(

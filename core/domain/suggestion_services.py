@@ -100,6 +100,7 @@ def get_suggestion_by_id(suggestion_id):
 
     return get_suggestion_from_model(model) if model else None
 
+
 def get_suggestions_by_author(author_id):
     """Gets a list of suggestions by the given author.
 
@@ -144,7 +145,7 @@ def get_suggestions_assigned_to_reviewer(assigned_reviewer_id):
     return [
         get_suggestion_from_model(s)
         for s in suggestion_models.SuggestionModel
-            .get_suggestions_assigned_to_reviewer(assigned_reviewer_id)]
+        .get_suggestions_assigned_to_reviewer(assigned_reviewer_id)]
 
 
 def get_suggestions_by_status(status):
@@ -204,7 +205,7 @@ def update_suggestion(suggestion):
     """
 
     suggestion_model = suggestion_models.SuggestionModel.get_by_id(
-            suggestion.suggestion_id)
+        suggestion.suggestion_id)
 
     if suggestion_model.status == suggestion_models.STATUS_IN_REVIEW:
         suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
@@ -216,6 +217,7 @@ def update_suggestion(suggestion):
 
     suggestion_model.put()
 
+
 def get_thread_id_from_suggestion_id(suggestion_id):
     """Gets the thread_id from the suggestion_id.
 
@@ -225,7 +227,8 @@ def get_thread_id_from_suggestion_id(suggestion_id):
     Returns:
         str. The thread ID linked to the suggestion.
     """
-    return suggestion_id[suggestion_id.rfind('.')+1:]
+    return suggestion_id[suggestion_id.rfind('.') + 1:]
+
 
 def is_suggestion_valid(suggestion, reviewer_id):
     """Validates a suggestion. This function should be called before accepting
