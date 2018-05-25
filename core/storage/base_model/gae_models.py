@@ -269,6 +269,8 @@ class BaseCommitLogEntryModel(BaseModel):
         construct with the common fields filled.
 
         Args:
+            entity_id: str. ID of the BaseCommitLogEntryModel instance.
+            version: str. Version of the instance.
             committer_id: str. The user_id of the user who committed the
                 change.
             committer_username: str. The username of the user who committed the
