@@ -186,3 +186,5 @@ class GoogleDocstring(_check_docs_utils.GoogleDocstring):
     """.format(
         type=re_multiple_type,
     ), re.X | re.S | re.M)
+
+    re_yields_line = re_returns_line
