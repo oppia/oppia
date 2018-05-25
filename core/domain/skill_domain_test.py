@@ -29,8 +29,6 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         """Test the create_default_skill function.
         """
         skill = skill_domain.Skill.create_default_skill(self.SKILL_ID)
-        skill_contents = skill_domain.SkillContents(
-            feconf.DEFAULT_SKILL_EXPLANATION, [])
         expected_skill_dict = {
             'id': self.SKILL_ID,
             'description': feconf.DEFAULT_SKILL_DESCRIPTION,
