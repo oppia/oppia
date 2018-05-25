@@ -106,20 +106,13 @@ class CollectionModel(base_models.VersionedModel):
         # TODO(msl): test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when collections
         # are changed).
-        CollectionCommitLogEntryModel(
-            id=('collection-%s-%s' % (self.id, self.version)),
-            user_id=committer_id,
-            username=committer_username,
-            collection_id=self.id,
-            commit_type=commit_type,
-            commit_message=commit_message,
-            commit_cmds=commit_cmds,
-            version=self.version,
-            post_commit_status=collection_rights.status,
-            post_commit_community_owned=collection_rights.community_owned,
-            post_commit_is_private=(
-                collection_rights.status == feconf.ACTIVITY_STATUS_PRIVATE)
-        ).put_async()
+        collection_commit_log = CollectionCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds, collection_rights.status,
+            collection_rights.community_owned
+        )
+        collection_commit_log.collection_id = self.id
+        collection_commit_log.put_async()
 
 
 class CollectionRightsSnapshotMetadataModel(
@@ -217,13 +210,20 @@ class CollectionRightsModel(base_models.VersionedModel):
             # TODO(msl): test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when collections
             # are changed).
-            collection_commit_log = CollectionCommitLogEntryModel.create(
-                self.id, self.version, committer_id, committer_username,
-                commit_type, commit_message, commit_cmds, self.status,
-                self.community_owned
-            )
-            collection_commit_log.collection_id = self.id
-            collection_commit_log.put_async()
+            CollectionCommitLogEntryModel(
+                id=('rights-%s-%s' % (self.id, self.version)),
+                user_id=committer_id,
+                username=committer_username,
+                collection_id=self.id,
+                commit_type=commit_type,
+                commit_message=commit_message,
+                commit_cmds=commit_cmds,
+                version=None,
+                post_commit_status=self.status,
+                post_commit_community_owned=self.community_owned,
+                post_commit_is_private=(
+                    self.status == feconf.ACTIVITY_STATUS_PRIVATE)
+            ).put_async()
 
 
 class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -237,16 +237,6 @@ class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """
     # The id of the collection being edited.
     collection_id = ndb.StringProperty(indexed=True, required=True)
-
-    # The status of the collection after the edit event ('private', 'public').
-    post_commit_status = ndb.StringProperty(indexed=True, required=True)
-    # Whether the collection is community-owned after the edit event.
-    post_commit_community_owned = ndb.BooleanProperty(indexed=True)
-    # Whether the collection is private after the edit event. Having a
-    # separate field for this makes queries faster, since an equality query
-    # on this property is faster than an inequality query on
-    # post_commit_status.
-    post_commit_is_private = ndb.BooleanProperty(indexed=True)
 
     @classmethod
     def _get_instance_id(cls, collection_id, version):

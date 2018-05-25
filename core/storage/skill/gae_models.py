@@ -43,7 +43,7 @@ class SkillModel(base_models.VersionedModel):
 
     # The description of the skill.
     description = ndb.StringProperty(required=True, indexed=True)
-    # The schema version for each of the misconceptions dicts.
+    # The schema version for each of the misconception dicts.
     misconceptions_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
     # A list of misconceptions associated with the skill, in which each

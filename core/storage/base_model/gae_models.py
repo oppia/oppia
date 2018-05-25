@@ -238,14 +238,23 @@ class BaseCommitLogEntryModel(BaseModel):
     commit_message = ndb.TextProperty(indexed=False)
     # The commit_cmds dict for this commit.
     commit_cmds = ndb.JsonProperty(indexed=False, required=True)
+    # The status of the entity after the edit event ('private', 'public').
+    post_commit_status = ndb.StringProperty(indexed=True, required=True)
+    # Whether the entity is community-owned after the edit event.
+    post_commit_community_owned = ndb.BooleanProperty(indexed=True)
+    # Whether the entity is private after the edit event. Having a
+    # separate field for this makes queries faster, since an equality query
+    # on this property is faster than an inequality query on
+    # post_commit_status.
+    post_commit_is_private = ndb.BooleanProperty(indexed=True)
     # The version number of the model after this commit.
     version = ndb.IntegerProperty()
 
     @classmethod
     def create(
             cls, entity_id, version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds, status=None,
-            community_owned=None):
+            commit_type, commit_message, commit_cmds, status='public',
+            community_owned=False):
         """This method returns an instance of the CommitLogEntryModel for a
         construct with the common fields filled.
 
@@ -270,30 +279,19 @@ class BaseCommitLogEntryModel(BaseModel):
             CommitLogEntryModel. Returns the respective CommitLogEntryModel
                 instance of the construct from which this is called.
         """
-        if status:
-            return cls(
-                id=cls._get_instance_id(entity_id, version),
-                user_id=committer_id,
-                username=committer_username,
-                commit_type=commit_type,
-                commit_message=commit_message,
-                commit_cmds=commit_cmds,
-                version=version,
-                post_commit_status=status,
-                post_commit_community_owned=community_owned,
-                post_commit_is_private=(
-                    status == feconf.ACTIVITY_STATUS_PRIVATE)
-            )
-        else:
-            return cls(
-                id=cls._get_instance_id(entity_id, version),
-                user_id=committer_id,
-                username=committer_username,
-                commit_type=commit_type,
-                commit_message=commit_message,
-                commit_cmds=commit_cmds,
-                version=version
-            )
+        return cls(
+            id=cls._get_instance_id(entity_id, version),
+            user_id=committer_id,
+            username=committer_username,
+            commit_type=commit_type,
+            commit_message=commit_message,
+            commit_cmds=commit_cmds,
+            version=version,
+            post_commit_status=status,
+            post_commit_community_owned=community_owned,
+            post_commit_is_private=(
+                status == feconf.ACTIVITY_STATUS_PRIVATE)
+        )
 
     @classmethod
     def _get_instance_id(cls, target_entity_id, version):
@@ -344,8 +342,9 @@ class BaseCommitLogEntryModel(BaseModel):
         version number.
 
         Args:
-            target_entity_id: str. The id of the particular construct, from
-                which this method is called.
+            target_entity_id: str. The ID of the construct corresponding to this
+                commit log entry model (e.g. the exp_id for an exploration,
+                the story_id for a story, etc.).
             version: int. The version number of the instance
                 after the commit.
 

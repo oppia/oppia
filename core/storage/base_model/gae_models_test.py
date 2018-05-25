@@ -113,17 +113,17 @@ class TestVersionedModel(base_models.VersionedModel):
 
 class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     @classmethod
-    def _get_instance_id(cls, entity_id, version):
+    def _get_instance_id(cls, target_entity_id, version):
         """A function that returns the id of the log in BaseCommitLogEntryModel.
 
         Args:
-            entity_id: str. The id of the mock entity used.
+            target_entity_id: str. The id of the mock entity used.
             version: int. The version of the model after the commit.
 
         Returns:
-            str. The commit id with the entity id and version number.
+            str. The commit id with the target entity id and version number.
         """
-        return 'entity-%s-%s' % (entity_id, version)
+        return 'entity-%s-%s' % (target_entity_id, version)
 
 
 class CommitLogEntryModelTests(test_utils.GenericTestBase):
@@ -142,6 +142,9 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
         self.assertEqual(test_model.version, 1)
         self.assertEqual(test_model.user_id, 'user')
         self.assertEqual(test_model.commit_type, 'create')
+        self.assertEqual(test_model.post_commit_status, 'public')
+        self.assertEqual(test_model.post_commit_community_owned, False)
+        self.assertEqual(test_model.post_commit_is_private, False)
 
     def test_get_all_commits(self):
         model1 = TestCommitLogEntryModel.create(

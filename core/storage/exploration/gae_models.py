@@ -274,16 +274,6 @@ class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
 
-    # The status of the exploration after the edit event ('private', 'public').
-    post_commit_status = ndb.StringProperty(indexed=True, required=True)
-    # Whether the exploration is community-owned after the edit event.
-    post_commit_community_owned = ndb.BooleanProperty(indexed=True)
-    # Whether the exploration is private after the edit event. Having a
-    # separate field for this makes queries faster, since an equality query
-    # on this property is faster than an inequality query on
-    # post_commit_status.
-    post_commit_is_private = ndb.BooleanProperty(indexed=True)
-
     @classmethod
     def _get_instance_id(cls, exp_id, exp_version):
         """Returns ID of the exploration commit log entry model.
