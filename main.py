@@ -393,7 +393,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.StateRulesStatsHandler),
     get_redirect_route(
         r'/createhandler/state_answer_stats/<exploration_id>',
-       editor.StateAnswerStatisticsHandler),
+        editor.StateAnswerStatisticsHandler),
     get_redirect_route(
         r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler),
