@@ -24,6 +24,7 @@ from google.appengine.ext import ndb
 (base_models, user_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.user])
 
+
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
     """Storage model for the metadata for a topic snapshot."""
     pass

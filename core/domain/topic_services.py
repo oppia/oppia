@@ -27,6 +27,7 @@ from core.platform import models
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
+
 # Repository GET methods.
 def _get_topic_memcache_key(topic_id, version=None):
     """Returns a memcache key for the topic.
