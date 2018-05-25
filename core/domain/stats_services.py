@@ -255,24 +255,105 @@ def update_exp_issues_for_new_exp_version(exploration, change_list):
             state_name = exp_issue.issue_customization_args[keyname]['value']
             exp_issues_by_state_name[state_name].append(exp_issue)
 
-    # Handling state additions, deletions and renames.
-    for change_dict in change_list:
-        if change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
-            state_name = change_dict['state_name']
-            playthrough_ids = []
-            for exp_issue in exp_issues_by_state_name[state_name]:
-                playthrough_ids.extend(exp_issue.playthrough_ids)
-            mark_playthroughs_invalid(playthrough_ids)
-        elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
-            exploration_stats.state_stats_mapping[change_dict[
-                'new_state_name']] = exploration_stats.state_stats_mapping.pop(
-                    change_dict['old_state_name'])
+    exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
-    exploration_stats.exp_version = new_exp_version
+    # Handling deletions.
+    for state_name in exp_versions_diff.deleted_state_names:
+        for exp_issue in exp_issues_by_state_name[state_name]:
+            idx = exp_issues.unresolved_issues.index(exp_issue)
+            exp_issues.unresolved_issues[idx].is_valid = False
+        save_exp_issues_model_transactional(exp_issues)
 
-    # Create new statistics model.
-    create_stats_model(exploration_stats)
+    # Handling renames.
+    for old_state_name in exp_versions_diff.old_to_new_state_names:
+        new_state_name = exp_versions_diff.old_to_new_state_names[
+            old_state_name]
+        playthrough_ids = []
+        for exp_issue in exp_issues_by_state_name[old_state_name]:
+            idx = exp_issues.unresolved_issues.index(exp_issue)
+            # Modify occurences in exploration issues.
+            if feconf.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type] == (
+                    'state_names'):
+                state_names = exp_issue.issue_customization_args['state_names'][
+                    'value']
+                exp_issue.issue_customization_args['state_names']['value'] = [
+                    new_state_name
+                    if state_name == old_state_name else state_name
+                    for state_name in state_names]
+            else:
+                exp_issue.issue_customization_args['state_name']['value'] = (
+                    new_state_name)
+            playthrough_ids.extend(exp_issue.playthrough_ids)
 
+        # Modify occurences in playthroughs.
+        playthroughs = get_playthroughs_multi(playthrough_ids)
+        for idx, playthrough in enumerate(playthroughs):
+            if feconf.ISSUE_TYPE_KEYNAME_MAPPING[playthrough.issue_type] == (
+                    'state_names'):
+                state_names = playthrough.issue_customization_args[
+                    'state_names']['value']
+                playthrough.issue_customization_args['state_names']['value'] = [
+                    new_state_name
+                    if state_name == old_state_name else state_name
+                    for state_name in state_names]
+            else:
+                playthrough.issue_customization_args['state_name']['value'] = (
+                    new_state_name)
+            for idx1, action in enumerate(playthrough.playthrough_actions):
+                if action.action_customization_args['state_name']['value'] == (
+                        old_state_name):
+                    playthroughs[idx].playthrough_actions[
+                        idx1].action_customization_args['state_name'][
+                            'value'] = new_state_name
+
+        update_playthroughs_multi(playthrough_ids, playthroughs)
+
+    save_exp_issues_model_transactional(exp_issues)
+
+
+def get_playthroughs_multi(playthrough_ids):
+    """Retrieves multiple Playthrough domain objects.
+
+    Args:
+        playthrough_ids: list(str). List of playthrough IDs.
+
+    Returns:
+        list(Playthrough). List of playthrough domain objects.
+    """
+    playthrough_instances = stats_models.PlaythroughModel.get_multi(
+        playthrough_ids)
+    # TODO(pranavsid98): Replace below lines with get_from_model.
+    playthroughs = []
+    for playthrough_instance in playthrough_instances:
+        playthroughs.append(
+            stats_domain.Playthrough(
+                playthrough_instance.id,
+                playthrough_instance.exp_id,
+                playthrough_instance.exp_version,
+                playthrough_instance.issue_type,
+                playthrough_instance.issue_customization_args,
+                playthrough_instance.playthrough_actions))
+    return playthroughs
+
+
+def update_playthroughs_multi(playthrough_ids, playthroughs):
+    """Updates the playthrough instances.
+
+    Args:
+        playthrough_ids: list(str). List of playthrough IDs.
+        playthroughs: list(Playthrough). List of playthrough domain objects.
+    """
+    playthrough_instances = stats_models.PlaythroughModel.get_multi(
+        playthrough_ids)
+    updated_instances = []
+    for idx, playthrough_instance in enumerate(playthrough_instances):
+        playthrough_dict = playthroughs[idx].to_dict()
+        playthrough_instance.issue_customization_args = (
+            playthrough_dict['issue_customization_args'])
+        playthrough_instance.playthrough_actions = (
+            playthrough_dict['playthrough_actions'])
+        updated_instances.append(playthrough_instance)
+    stats_models.PlaythroughModel.put_multi(updated_instances)
 
 
 def get_exploration_stats_by_id(exp_id, exp_version):
