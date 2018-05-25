@@ -966,5 +966,5 @@ class StateAnswersStatsHandler(EditorHandler):
 
         self.render_json({
             'answers': stats_services.get_top_state_answer_stats_multi(
-                 exploration_id, current_exploration.states)
+                exploration_id, current_exploration.states)
         })
