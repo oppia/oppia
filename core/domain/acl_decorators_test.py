@@ -362,18 +362,21 @@ class AccessCreatorDashboardTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
 
-class ViewFeedbackTest(test_utils.GenericTestBase):
-    """Tests for can_view_feedback_thread decorator."""
+class SendMessageToFeedbackThread(test_utils.GenericTestBase):
+    """Tests for can_send_message_to_thread decorator."""
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
 
     class MockHandler(base.BaseHandler):
-        @acl_decorators.can_view_feedback_thread
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_send_message_to_thread
         def get(self, thread_id):
             self.render_json({'thread_id': thread_id})
 
     def setUp(self):
-        super(ViewFeedbackTest, self).setUp()
+        super(SendMessageToFeedbackThread, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -381,7 +384,7 @@ class ViewFeedbackTest(test_utils.GenericTestBase):
         self.set_moderators([self.MODERATOR_USERNAME])
         self.set_admins([self.ADMIN_USERNAME])
         self.owner = user_services.UserActionsInfo(self.owner_id)
-        self.testapp = webtest.TestApp(webapp2.WSGIApplication(
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock/<thread_id>', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
@@ -392,30 +395,83 @@ class ViewFeedbackTest(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_guest_cannot_view_feedback_threads(self):
-        response = self.testapp.get(
+    def test_guest_cannot_send_message_to_feedback_threads(self):
+        response = self.mock_testapp.get(
             '/mock/%s.thread1' % self.private_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 302)
 
+    def test_owner_can_send_message_to_feedback_for_private_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s.thread1' % self.private_exp_id)
+        self.logout()
+
+    def test_moderator_can_send_message_to_feeback_public_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s.thread1' % self.published_exp_id)
+        self.logout()
+
+    def test_admin_can_send_message_to_feeback_private_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s.thread1' % self.private_exp_id)
+        self.logout()
+
+
+class ViewFeedbackThread(test_utils.GenericTestBase):
+    """Tests for can_view_feedback_thread decorator."""
+    published_exp_id = 'exp_0'
+    private_exp_id = 'exp_1'
+
+    class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_view_feedback_thread
+        def get(self, thread_id):
+            self.render_json({'thread_id': thread_id})
+
+    def setUp(self):
+        super(ViewFeedbackThread, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<thread_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_guest_can_view_feedback_threads_for_public_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s.thread1' % self.published_exp_id)
+
     def test_owner_can_view_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
-        response = self.testapp.get(
-            '/mock/%s.thread1' % self.private_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s.thread1' % self.private_exp_id)
         self.logout()
 
     def test_moderator_can_view_feeback_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
-        response = self.testapp.get(
-            '/mock/%s.thread1' % self.published_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s.thread1' % self.published_exp_id)
         self.logout()
 
     def test_admin_can_view_feeback_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
-        response = self.testapp.get(
-            '/mock/%s.thread1' % self.private_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s.thread1' % self.private_exp_id)
         self.logout()
 
 

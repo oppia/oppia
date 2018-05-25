@@ -381,6 +381,7 @@ def can_send_message_to_thread(handler):
 
     return test_can_access
 
+
 def can_rate_exploration(handler):
     """Decorator to check whether the user can give rating to given
     exploration.

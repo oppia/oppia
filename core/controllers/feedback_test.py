@@ -623,7 +623,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         # Get a suggestion.
         thread_id = threads[0]['thread_id']
         response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX,thread_id))
+            '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id))
 
         # Suggestion description should be the same as thread subject.
         self.assertEqual(
