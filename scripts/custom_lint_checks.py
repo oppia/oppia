@@ -149,8 +149,8 @@ class HangingIndentChecker(BaseChecker):
                         'no-break-after-hanging-indent', line=line_num + 1)
 
 
-# This class has been derived from
-# https://github.com/PyCQA/pylint/blob/master/pylint/extensions/docparams.py#L26.
+# The following class was derived from
+# https://github.com/PyCQA/pylint/blob/377cc42f9e3116ff97cddd4567d53e9a3e24ebf9/pylint/extensions/docparams.py#L26
 class DocstringParameterChecker(BaseChecker):
     """Checker for Sphinx, Google, or Numpy style docstrings
 
