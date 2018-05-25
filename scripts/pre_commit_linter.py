@@ -1092,17 +1092,18 @@ def _check_html_indent(all_files):
         filename for filename in all_files if filename.endswith('.html')]
     for filename in html_files_to_lint:
         with open(filename, 'r') as f:
-            soup = bs4.BeautifulSoup(f, 'html.parser')
+            file_content = f.read()
+            pattern = r'<(?P<tag_name>[a-zA-Z0-9-]+)(?P<attributes>[^>]*)'
+            matches = re.finditer(pattern, file_content, re.MULTILINE)
 
-            for tag in soup.find_all():
-                pattern = re.compile(
-                    r'<(?P<tag_name>[a-zA-Z0-9-]+)(?P<attributes>[^>]*)', re.M)
-                if re.search(pattern, str(tag)):
-                    m = re.match(pattern, str(tag))
-                    print m.group('tag_name')
-                    print m.group('attributes')
-                    break
+            for matchNum, match in enumerate(matches):
+                matchNum = matchNum + 1
+                print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
 
+                for groupNum in range(0, len(match.groups())):
+                    groupNum = groupNum + 1
+                    print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
+        break
 
     return []
 
