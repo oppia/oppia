@@ -21,8 +21,3 @@ venv/
 # directories for dev and prod. Resource directories for prod are generated
 # via build.py and should not be committed to the repo.
 build/*
-
-# The pre_commit_linter.py script uses _check_docs_utils.py placed
-# in python-custom-checks directory under third_party directory.
-# Therefore it is not ignored.
-!third_party/python-custom-checks

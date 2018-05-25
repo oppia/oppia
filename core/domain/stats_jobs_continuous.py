@@ -105,7 +105,7 @@ class InteractionAnswerSummariesMRJobManager(
                 submitted answers.
 
         Yields:
-            Error.
+            str. One of the following strings:
                 - Expected a single version when aggregating answers for:
                     Occurs when the versions list contains multiple versions
                     instead of a specific version.

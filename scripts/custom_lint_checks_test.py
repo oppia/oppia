@@ -135,20 +135,18 @@ class DocstringParameterCheckerTest(unittest.TestCase):
             custom_lint_checks.DocstringParameterChecker)
         checker_test_object.setup_method()
         func_node = astroid.extract_node("""
-        def test(test_var_one, test_var_two, test_var_three): #@
+        def test(test_var_one, test_var_two): #@
             \"\"\"Function to test docstring parameters.
 
             Args:
                 test_var_one: int. First test variable.
                 test_var_two: str. Second test variable.
-                test_var_three: list(str). Third test variable.
 
             Returns:
-                str. The test result.
-
-           Yields:
-                list(str). The test list.
+                int. The test result.
             \"\"\"
+            result = test_var_one + test_var_two
+            return result
         """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_functiondef(func_node)
