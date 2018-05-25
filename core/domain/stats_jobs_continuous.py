@@ -113,7 +113,7 @@ class InteractionAnswerSummariesMRJobManager(
                     Occurs when there is not exactly one interaction ID
                     for each exploration and version.
                 - Expected at least one item ID for exploration:
-                    Occurs when there is not atleast one Item ID for
+                    Occurs when there is not at least one Item ID for
                     each exploration and version.
                 - Ignoring answers submitted to version:
                     Occurs when version mismatches and the new

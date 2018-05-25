@@ -285,7 +285,7 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
     @classmethod
     def create_multi(cls, job_exploration_mappings):
-        """Creates multiple new  TrainingJobExplorationMappingModel entries.
+        """Creates multiple new TrainingJobExplorationMappingModel entries.
 
         Args:
             job_exploration_mappings: list(TrainingJobExplorationMapping). The

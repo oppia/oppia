@@ -821,14 +821,8 @@ def _check_docstrings(all_files):
     summary_messages = []
     files_to_check = [
         filename for filename in all_files if not
-        (any(
-            fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS))
-        and not (filename.endswith('_check_docs_utils.py'))
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
         and filename.endswith('.py')]
-    # The file _check_docs_utils.py has to be excluded from this check
-    # as it contains a number of regular expressions which trigger this
-    # check. The only way to do this was to exclude this from
-    # files_to_check.
     missing_period_message = (
         'There should be a period at the end of the docstring.')
     multiline_docstring_message = (

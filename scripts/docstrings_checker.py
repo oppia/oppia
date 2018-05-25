@@ -129,7 +129,6 @@ def possible_exc_types(node):
         elif isinstance(target, astroid.FunctionDef):
             for ret in target.nodes_of_class(astroid.Return):
                 if ret.frame() != target:
-                    # return from inner function - ignore it.
                     continue
 
                 val = utils.safe_infer(ret.value)
@@ -168,22 +167,22 @@ def docstringify(docstring):
 class GoogleDocstring(_check_docs_utils.GoogleDocstring):
 
     re_multiple_type = _check_docs_utils.GoogleDocstring.re_multiple_type
-    re_param_line = re.compile(r"""
+    re_param_line = re.compile(r'''
         \s*  \*{{0,2}}(\w+)             # identifier potentially with asterisks
         \s*  ( [:]
             \s*
             ({type}|\S*)
             (?:,\s+optional)?
-            [.] )? \s*                # optional type declaration
+            [.] )? \s*                  # optional type declaration
         \s*  (.*)                       # beginning of optional description
-    """.format(
+    '''.format(
         type=re_multiple_type,
     ), re.X | re.S | re.M)
 
-    re_returns_line = re.compile(r"""
+    re_returns_line = re.compile(r'''
         \s* (({type}|\S*).)?              # identifier
         \s* (.*)                          # beginning of description
-    """.format(
+    '''.format(
         type=re_multiple_type,
     ), re.X | re.S | re.M)
 
