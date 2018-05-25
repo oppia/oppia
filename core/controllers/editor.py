@@ -965,6 +965,6 @@ class StateAnswersStatsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'answers': stats_services.get_state_answer_stats_multi(
+            'answers': stats_services.get_top_state_answer_stats_multi(
                  exploration_id, current_exploration.states)
         })
