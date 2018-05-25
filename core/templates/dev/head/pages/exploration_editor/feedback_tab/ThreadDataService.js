@@ -108,8 +108,7 @@ oppia.factory('ThreadDataService', [
         });
       },
       markThreadAsSeen: function(threadId) {
-        var requestUrl = (
-          _FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + _expId);
+        var requestUrl = _FEEDBACK_THREAD_VIEW_EVENT_URL + '/' + threadId;
         $http.post(requestUrl, {
           thread_id: threadId
         });
