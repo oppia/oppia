@@ -475,7 +475,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                     }
                 },
                 'playthrough_ids': ['playthrough_id1'],
-                'schema_version': 1
+                'schema_version': 1,
+                'is_valid': True
             }))
         stats_services.save_exp_issues_model_transactional(exp_issues)
 

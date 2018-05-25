@@ -1218,7 +1218,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }], is_valid=True)
+            }])
         stats_models.ExplorationIssuesModel.create(
             self.exp_id, [{
                 'issue_type': 'EarlyQuit',
@@ -1231,7 +1231,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'playthrough_ids': [playthrough_id],
-                'schema_version': 1
+                'schema_version': 1,
+                'is_valid': True
             }])
 
         self.playthrough_data = {
@@ -1254,8 +1255,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }],
-            'is_valid': True
+            }]
         }
 
         self.exp_issue_dict = {
@@ -1268,7 +1268,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': 250
                 }
             },
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         }
 
         response = self.testapp.get('/explore/%s' % self.exp_id)
@@ -1331,7 +1332,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }], is_valid=True)
+            }])
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
         model.unresolved_issues.append({
@@ -1342,7 +1343,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
             },
             'playthrough_ids': [playthrough_id],
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         })
         model.put()
 
@@ -1364,7 +1366,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             }],
-            'is_valid': True
         }
 
         self.exp_issue_dict = {
@@ -1374,7 +1375,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         }
 
         self.post_json(
@@ -1409,7 +1411,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }], is_valid=True)
+            }])
 
         model = stats_models.ExplorationIssuesModel.get(self.exp_id)
         model.unresolved_issues.append({
@@ -1420,7 +1422,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
             },
             'playthrough_ids': [playthrough_id],
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         })
         model.put()
 
@@ -1441,8 +1444,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }],
-            'is_valid': True
+            }]
         }
 
         self.exp_issue_dict = {
@@ -1452,7 +1454,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name1', 'state_name2']
                 },
             },
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         }
 
         self.post_json(
