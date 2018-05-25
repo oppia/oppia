@@ -485,7 +485,7 @@ class Playthrough(object):
 
     def __init__(
             self, playthrough_id, exp_id, exp_version, issue_type,
-            issue_customization_args, playthrough_actions, is_valid):
+            issue_customization_args, playthrough_actions):
         """Constructs a Playthrough domain object.
 
         Args:
@@ -497,7 +497,6 @@ class Playthrough(object):
                 given issue_type.
             playthrough_actions: list(LearnerAction). List of playthrough
                 learner actions.
-            is_valid: bool. Whether the playthrough is valid.
         """
         self.id = playthrough_id
         self.exp_id = exp_id
@@ -505,7 +504,6 @@ class Playthrough(object):
         self.issue_type = issue_type
         self.issue_customization_args = issue_customization_args
         self.playthrough_actions = playthrough_actions
-        self.is_valid = is_valid
 
     def to_dict(self):
         """Returns a dict representation of the Playthrough domain object.
@@ -523,7 +521,6 @@ class Playthrough(object):
             'issue_type': self.issue_type,
             'issue_customization_args': self.issue_customization_args,
             'playthrough_actions': playthrough_actions_dicts,
-            'is_valid': self.is_valid
         }
 
     @classmethod
@@ -547,8 +544,7 @@ class Playthrough(object):
             playthrough_dict['exp_version'],
             playthrough_dict['issue_type'],
             playthrough_dict['issue_customization_args'],
-            playthrough_actions,
-            playthrough_dict['is_valid'])
+            playthrough_actions)
 
     def validate(self):
         """Validates the Playthrough domain object."""
@@ -602,7 +598,7 @@ class ExplorationIssue(object):
 
     def __init__(
             self, issue_type, issue_customization_args, playthrough_ids,
-            schema_version):
+            schema_version, is_valid):
         """Constructs an ExplorationIssue domain object.
 
         Args:
@@ -613,11 +609,14 @@ class ExplorationIssue(object):
                 the customization arg.
             playthrough_ids: list(str). List of playthrough IDs.
             schema_version: int. Schema version for the exploration issue.
+            is_valid: bool. Whether the issue and the associated playthroughs
+                are valid.
         """
         self.issue_type = issue_type
         self.issue_customization_args = issue_customization_args
         self.playthrough_ids = playthrough_ids
         self.schema_version = schema_version
+        self.is_valid = is_valid
 
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssue domain object.
@@ -632,7 +631,8 @@ class ExplorationIssue(object):
                 issue_registry.Registry.get_issue_by_type(
                     self.issue_type).customization_arg_specs),
             'playthrough_ids': self.playthrough_ids,
-            'schema_version': self.schema_version
+            'schema_version': self.schema_version,
+            'is_valid': self.is_valid
         }
 
     @classmethod
@@ -650,7 +650,8 @@ class ExplorationIssue(object):
             issue_dict['issue_type'],
             issue_dict['issue_customization_args'],
             issue_dict['playthrough_ids'],
-            issue_dict['schema_version'])
+            issue_dict['schema_version'],
+            issue_dict['is_valid'])
 
     @classmethod
     def update_exp_issue_from_model(cls, issue_dict):

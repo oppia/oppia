@@ -290,7 +290,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                         }
                     },
                     'playthrough_ids': ['playthrough_id1'],
-                    'schema_version': 1})
+                    'schema_version': 1,
+                    'is_valid': True})
                 ])
 
         exp_issues_dict = exp_issues.to_dict()
@@ -308,7 +309,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     }
                 },
                 'playthrough_ids': ['playthrough_id1'],
-                'schema_version': 1
+                'schema_version': 1,
+                'is_valid': True
             }])
 
     def test_from_dict(self):
@@ -325,7 +327,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     }
                 },
                 'playthrough_ids': ['playthrough_id1'],
-                'schema_version': 1
+                'schema_version': 1,
+                'is_valid': True
             }]
         }
 
@@ -345,7 +348,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                     }
                 },
                 'playthrough_ids': ['playthrough_id1'],
-                'schema_version': 1})
+                'schema_version': 1,
+                'is_valid': True})
 
     def test_validate(self):
         exp_issues = stats_domain.ExplorationIssues(
@@ -361,7 +365,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
                         }
                     },
                     'playthrough_ids': ['playthrough_id1'],
-                    'schema_version': 1})
+                    'schema_version': 1,
+                    'is_valid': True})
                 ])
         exp_issues.validate()
 
@@ -392,7 +397,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            })], is_valid=True)
+            })])
 
         playthrough_dict = playthrough.to_dict()
 
@@ -420,7 +425,6 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     },
                     'schema_version': 1
                 }])
-        self.assertEqual(playthrough_dict['is_valid'], True)
 
     def test_from_dict(self):
         playthrough_dict = {
@@ -445,7 +449,6 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             }],
-            'is_valid': True
         }
 
         playthrough = stats_domain.Playthrough.from_dict(playthrough_dict)
@@ -474,7 +477,6 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             })
-        self.assertEqual(playthrough.is_valid, True)
 
     def test_validate(self):
         playthrough = stats_domain.Playthrough(
@@ -493,7 +495,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            })], is_valid=True)
+            })])
         playthrough.validate()
 
         # Change ID to int.
@@ -546,7 +548,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
         return issue_dict
 
     def test_to_dict(self):
-        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1)
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
         expected_customization_args = {
             'time_spent_in_exp_in_msecs': {
@@ -561,12 +563,13 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': expected_customization_args,
                 'playthrough_ids': [],
-                'schema_version': 1
+                'schema_version': 1,
+                'is_valid': True
             })
 
     def test_update_exp_issue_from_model(self):
         """Test the migration of exploration issue domain objects."""
-        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1)
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue_dict = exp_issue.to_dict()
 
         with self.swap(
@@ -581,7 +584,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
 
         # For other issue types, no changes happen during migration.
         exp_issue1 = stats_domain.ExplorationIssue(
-            'MultipleIncorrectSubmissions', {}, [], 1)
+            'MultipleIncorrectSubmissions', {}, [], 1, True)
         exp_issue_dict1 = exp_issue1.to_dict()
         with self.swap(
             stats_domain.ExplorationIssue,
@@ -593,7 +596,7 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             exp_issue_dict1['issue_type'], 'MultipleIncorrectSubmissions')
 
     def test_validate(self):
-        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1)
+        exp_issue = stats_domain.ExplorationIssue('EarlyQuit', {}, [], 1, True)
         exp_issue.validate()
 
         # Change issue_type to int.
