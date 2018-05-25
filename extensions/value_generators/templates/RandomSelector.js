@@ -22,7 +22,8 @@ oppia.directive('randomSelector', ['$compile', function($compile) {
     },
     restrict: 'E',
     scope: {
-      list_of_values: '='
+      list_of_values: '=',
+      SCHEMA: '='
     },
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope) {
