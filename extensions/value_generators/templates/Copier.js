@@ -25,8 +25,9 @@ oppia.directive('copier', ['$compile', function($compile) {
     },
     restrict: 'E',
     scope: {
-      parse_with_jinja: '=',
-      value: '='
+      initArgs: '=',
+      objType: '=',
+      customizationArgs: '='
     },
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function($scope) {
