@@ -21,7 +21,9 @@ oppia.directive('randomSelector', ['$compile', function($compile) {
       $compile(element.contents())(scope);
     },
     restrict: 'E',
-    scope: true,
+    scope: {
+      SCHEMA: '='
+    },
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope) {
       $scope.SCHEMA = {
