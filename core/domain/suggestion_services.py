@@ -228,7 +228,8 @@ def get_thread_id_from_suggestion_id(suggestion_id):
         str. The thread ID linked to the suggestion.
     """
 
-    # Temporarily. Once feedback services are edited, will be removed
+    # Temporarily. Once the feedback migration is complete, this function will
+    # be removed.
     return suggestion_id[suggestion_id.rfind('.') + 1:]
 
 
