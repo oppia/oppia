@@ -29,7 +29,7 @@ oppia.factory('ThreadDataService', [
     var _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler/' + _expId;
     var _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/' +
       _expId + '/';
-    var _THREAD_HANDLER_PREFIX = '/threadhandler/' + _expId + '/';
+    var _THREAD_HANDLER_PREFIX = '/threadhandler/';
     var _FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
     var _THREAD_STATUS_OPEN = 'open';
 

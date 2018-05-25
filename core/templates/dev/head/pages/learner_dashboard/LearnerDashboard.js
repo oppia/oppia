@@ -301,22 +301,20 @@ oppia.controller('LearnerDashboard', [
       constants.ACTIVITY_TYPE_EXPLORATION);
 
     $scope.onClickThread = function(
-        threadStatus, explorationId, threadId, explorationTitle) {
+        threadStatus, threadId, explorationTitle) {
       $scope.loadingFeedbacks = true;
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
-        '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
-          explorationId: explorationId,
+        '/learnerdashboardthreadhandler/<threadId>', {
           threadId: threadId
         });
       $scope.explorationTitle = explorationTitle;
       $scope.feedbackThreadActive = true;
       $scope.threadStatus = threadStatus;
-      $scope.explorationId = explorationId;
+      $scope.explorationId = threadId.split('.')[0];
       $scope.threadId = threadId;
 
       for (var index = 0; index < $scope.threadSummaries.length; index++) {
-        if ($scope.threadSummaries[index].explorationId === explorationId &&
-            $scope.threadSummaries[index].threadId === threadId) {
+        if ($scope.threadSummaries[index].threadId === threadId) {
           threadIndex = index;
           var threadSummary = $scope.threadSummaries[index];
           threadSummary.markTheLastTwoMessagesAsRead();
@@ -343,10 +341,9 @@ oppia.controller('LearnerDashboard', [
       threadIndex = null;
     };
 
-    $scope.addNewMessage = function(explorationId, threadId, newMessage) {
+    $scope.addNewMessage = function(threadId, newMessage) {
       var url = UrlInterpolationService.interpolateUrl(
-        '/threadhandler/<explorationId>/<threadId>', {
-          explorationId: explorationId,
+        '/threadhandler/<threadId>', {
           threadId: threadId
         });
       var payload = {
@@ -372,7 +369,7 @@ oppia.controller('LearnerDashboard', [
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/learner_dashboard/' +
+          '/pages/' +
           'learner_view_suggestion_modal_directive.html'),
         backdrop: true,
         resolve: {
