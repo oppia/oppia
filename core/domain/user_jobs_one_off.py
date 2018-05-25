@@ -31,6 +31,9 @@ import utils
         models.NAMES.feedback, models.NAMES.user]))
 
 
+_LANGUAGES_TO_RESET = ['hu', 'mk', 'sv', 'tr', 'de', 'fr', 'nl', 'pt']
+
+
 class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating and populating UserContributionsModels for
     all registered users that have contributed.
@@ -86,7 +89,7 @@ class UserLanguageAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         """Implements the map function for this job."""
-        if item.preferred_site_language_code in ['hu', 'mk', 'sv', 'tr']:
+        if item.preferred_site_language_code in _LANGUAGES_TO_RESET:
             affected_users_key = '%s.%s' % (
                 UserLanguageAuditOneOffJob._LANGUAGE_TO_RESET_KEY,
                 item.preferred_site_language_code)
@@ -125,7 +128,7 @@ class UserLanguageResetOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         """Implements the map function for this job."""
-        if item.preferred_site_language_code in ['hu', 'mk', 'sv', 'tr']:
+        if item.preferred_site_language_code in _LANGUAGES_TO_RESET:
             # Reset the preferred site language for this user to None, which in
             # turn defaults to English.
             reset_language_code = item.preferred_site_language_code
