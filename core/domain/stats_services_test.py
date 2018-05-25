@@ -46,7 +46,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.stats_model_id = (
             stats_models.ExplorationStatsModel.create(
                 'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}))
-        stats_models.ExplorationIssuesModel.create(self.exp_id, [])
+        stats_models.ExplorationIssuesModel.create(
+            self.exp_id, self.exp_version, [])
 
     def test_update_stats_method(self):
         """Test the update_stats method."""
@@ -375,9 +376,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
 
     def test_get_exp_issues_from_model(self):
         """Test the get_exp_issues_from_model method."""
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         exp_issues = stats_services.get_exp_issues_from_model(model)
-        self.assertEqual(exp_issues.id, self.exp_id)
+        self.assertEqual(exp_issues.exp_id, self.exp_id)
+        self.assertEqual(exp_issues.exp_version, 1)
         self.assertEqual(exp_issues.unresolved_issues, [])
 
     def test_get_exploration_stats_from_model(self):
@@ -461,7 +463,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
 
     def test_save_exp_issues_model_transactional(self):
         """Test the save_exp_issues_model_transactional method."""
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         exp_issues = stats_services.get_exp_issues_from_model(model)
         exp_issues.unresolved_issues.append(
             stats_domain.ExplorationIssue.from_dict({
@@ -480,7 +482,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             }))
         stats_services.save_exp_issues_model_transactional(exp_issues)
 
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(
             model.unresolved_issues[0],
             exp_issues.unresolved_issues[0].to_dict())

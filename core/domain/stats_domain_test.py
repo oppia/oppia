@@ -272,13 +272,14 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
     """Tests the ExplorationIssues domain object."""
 
     def test_create_default(self):
-        exp_issues = stats_domain.ExplorationIssues.create_default('exp_id1')
-        self.assertEqual(exp_issues.id, 'exp_id1')
+        exp_issues = stats_domain.ExplorationIssues.create_default('exp_id1', 1)
+        self.assertEqual(exp_issues.exp_id, 'exp_id1')
+        self.assertEqual(exp_issues.exp_version, 1)
         self.assertEqual(exp_issues.unresolved_issues, [])
 
     def test_to_dict(self):
         exp_issues = stats_domain.ExplorationIssues(
-            'exp_id1', [
+            'exp_id1', 1, [
                 stats_domain.ExplorationIssue.from_dict({
                     'issue_type': 'EarlyQuit',
                     'issue_customization_args': {
@@ -296,7 +297,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         exp_issues_dict = exp_issues.to_dict()
 
-        self.assertEqual(exp_issues_dict['id'], 'exp_id1')
+        self.assertEqual(exp_issues_dict['exp_id'], 'exp_id1')
+        self.assertEqual(exp_issues_dict['exp_version'], 1)
         self.assertEqual(
             exp_issues_dict['unresolved_issues'], [{
                 'issue_type': 'EarlyQuit',
@@ -315,7 +317,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
     def test_from_dict(self):
         exp_issues_dict = {
-            'id': 'exp_id1',
+            'exp_id': 'exp_id1',
+            'exp_version': 1,
             'unresolved_issues': [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
@@ -334,7 +337,8 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
         exp_issues = stats_domain.ExplorationIssues.from_dict(exp_issues_dict)
 
-        self.assertEqual(exp_issues.id, 'exp_id1')
+        self.assertEqual(exp_issues.exp_id, 'exp_id1')
+        self.assertEqual(exp_issues.exp_version, 1)
         self.assertEqual(
             exp_issues.unresolved_issues[0].to_dict(),
             {
@@ -353,7 +357,7 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
 
     def test_validate(self):
         exp_issues = stats_domain.ExplorationIssues(
-            'exp_id1', [
+            'exp_id1', 1, [
                 stats_domain.ExplorationIssue.from_dict({
                     'issue_type': 'EarlyQuit',
                     'issue_customization_args': {
@@ -371,9 +375,9 @@ class ExplorationIssuesTests(test_utils.GenericTestBase):
         exp_issues.validate()
 
         # Change ID to int.
-        exp_issues.id = 5
+        exp_issues.exp_id = 5
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected ID to be a string, received %s' % (type(5)))):
+            'Expected exp_id to be a string, received %s' % (type(5)))):
             exp_issues.validate()
 
 

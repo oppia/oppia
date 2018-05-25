@@ -410,28 +410,31 @@ class ExplorationIssues(object):
     exploration.
     """
 
-    def __init__(self, exp_id, unresolved_issues):
+    def __init__(self, exp_id, exp_version, unresolved_issues):
         """Constructs an ExplorationIssues domain object.
 
         Args:
             exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
             unresolved_issues: list(ExplorationIssue). List of exploration
                 issues.
         """
-        self.id = exp_id
+        self.exp_id = exp_id
+        self.exp_version = exp_version
         self.unresolved_issues = unresolved_issues
 
     @classmethod
-    def create_default(cls, exp_id):
+    def create_default(cls, exp_id, exp_version):
         """Creates a default ExplorationIssues domain object.
 
         Args:
             exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
 
         Returns:
             ExplorationIssues. The exploration issues domain object.
         """
-        return cls(exp_id, [])
+        return cls(exp_id, exp_version, [])
 
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssues domain object.
@@ -443,7 +446,8 @@ class ExplorationIssues(object):
             unresolved_issue.to_dict()
             for unresolved_issue in self.unresolved_issues]
         return {
-            'id': self.id,
+            'exp_id': self.exp_id,
+            'exp_version': self.exp_version,
             'unresolved_issues': unresolved_issue_dicts
         }
 
@@ -462,13 +466,21 @@ class ExplorationIssues(object):
         unresolved_issues = [
             ExplorationIssue.from_dict(unresolved_issue_dict)
             for unresolved_issue_dict in exp_issues_dict['unresolved_issues']]
-        return cls(exp_issues_dict['id'], unresolved_issues)
+        return cls(
+            exp_issues_dict['exp_id'], exp_issues_dict['exp_version'],
+            unresolved_issues)
 
     def validate(self):
         """Validates the ExplorationIssues domain object."""
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % type(self.id))
+                'Expected exp_id to be a string, received %s' % type(
+                    self.exp_id))
+
+        if not isinstance(self.exp_version, int):
+            raise utils.ValidationError(
+                'Expected exp_version to be an int, received %s' % type(
+                    self.exp_version))
 
         if not isinstance(self.unresolved_issues, list):
             raise utils.ValidationError(

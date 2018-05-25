@@ -972,18 +972,53 @@ class ExplorationIssuesModel(base_models.BaseModel):
     """Model for storing the list of playthroughs for an exploration grouped by
     issues.
     """
+    # ID of exploration.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
     # The unresolved issues for this exploration. This will be a list of dicts
     # where each dict represents an issue along with the associated
     # playthroughs.
     unresolved_issues = ndb.JsonProperty(repeated=True)
 
     @classmethod
-    def create(cls, exp_id, unresolved_issues):
+    def get_entity_id(cls, exp_id, exp_version):
+        """Generates an ID for the instance of the form
+        {{exp_id}}.{{exp_version}}.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+
+        Returns:
+            str. ID of the new ExplorationIssuesModel instance.
+        """
+        return '%s.%s' % (exp_id, exp_version)
+
+    @classmethod
+    def get_model(cls, exp_id, exp_version):
+        """Retrieves ExplorationIssuesModel given exploration ID and version.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+
+        Returns:
+            ExplorationISsuesModel. Exploration issues model instance in
+                datastore.
+        """
+        instance_id = cls.get_entity_id(exp_id, exp_version)
+        exp_issues_model = cls.get(instance_id, strict=False)
+        return exp_issues_model
+
+    @classmethod
+    def create(cls, exp_id, exp_version, unresolved_issues):
         """Creates an ExplorationIssuesModel instance and writes it to the
         datastore.
 
         Args:
             exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
             unresolved_issues: list(dict). The unresolved issues for this
                 exploration. This will be a list of dicts where each dict
                 represents an issue along with the associated playthroughs.
@@ -991,10 +1026,12 @@ class ExplorationIssuesModel(base_models.BaseModel):
         Returns:
             str. ID of the new ExplorationIssuesModel instance.
         """
+        instance_id = cls.get_entity_id(exp_id, exp_version)
         exp_issues_instance = cls(
-            id=exp_id, unresolved_issues=unresolved_issues)
+            id=instance_id, exp_id=exp_id, exp_version=exp_version,
+            unresolved_issues=unresolved_issues)
         exp_issues_instance.put()
-        return exp_id
+        return instance_id
 
 
 class PlaythroughModel(base_models.BaseModel):

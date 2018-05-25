@@ -374,8 +374,10 @@ class StorePlaythroughHandler(base.BaseHandler):
         playthrough_data = self.payload.get('playthrough_data')
         self._require_playthrough_data_is_valid(playthrough_data)
 
-        exp_issues_model = stats_models.ExplorationIssuesModel.get(
-            exploration_id)
+        exp_version = playthrough_data['exp_version']
+
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            exploration_id, exp_version)
         exp_issues = stats_services.get_exp_issues_from_model(exp_issues_model)
 
         customization_args = exp_issue_dict['issue_customization_args']
