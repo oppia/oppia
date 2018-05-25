@@ -253,8 +253,8 @@ class BaseCommitLogEntryModel(BaseModel):
     @classmethod
     def create(
             cls, entity_id, version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds, status='public',
-            community_owned=False):
+            commit_type, commit_message, commit_cmds, status,
+            community_owned):
         """This method returns an instance of the CommitLogEntryModel for a
         construct with the common fields filled.
 

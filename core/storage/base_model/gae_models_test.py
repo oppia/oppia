@@ -134,7 +134,8 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
             entity_id='id', committer_id='user',
             committer_username='username',
             commit_cmds={}, commit_type='create',
-            commit_message='New commit created.', version=1
+            commit_message='New commit created.', version=1,
+            status='public', community_owned=False
         )
         model1.put()
 
@@ -151,13 +152,15 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
             entity_id='id', committer_id='user',
             committer_username='username',
             commit_cmds={}, commit_type='create',
-            commit_message='New commit created.', version=1
+            commit_message='New commit created.', version=1,
+            status='public', community_owned=False
         )
         model2 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
             committer_username='username',
             commit_cmds={}, commit_type='edit',
-            commit_message='New commit created.', version=2
+            commit_message='New commit created.', version=2,
+            status='public', community_owned=False
         )
         model1.put()
         model2.put()
