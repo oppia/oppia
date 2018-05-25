@@ -135,7 +135,7 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
             committer_username='username',
             commit_cmds={}, commit_type='create',
             commit_message='New commit created.', version=1,
-            status='public', community_owned=False
+            status=feconf.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
         model1.put()
 
@@ -143,7 +143,8 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
         self.assertEqual(test_model.version, 1)
         self.assertEqual(test_model.user_id, 'user')
         self.assertEqual(test_model.commit_type, 'create')
-        self.assertEqual(test_model.post_commit_status, 'public')
+        self.assertEqual(
+            test_model.post_commit_status, feconf.ACTIVITY_STATUS_PUBLIC)
         self.assertEqual(test_model.post_commit_community_owned, False)
         self.assertEqual(test_model.post_commit_is_private, False)
 
@@ -153,14 +154,14 @@ class CommitLogEntryModelTests(test_utils.GenericTestBase):
             committer_username='username',
             commit_cmds={}, commit_type='create',
             commit_message='New commit created.', version=1,
-            status='public', community_owned=False
+            status=feconf.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
         model2 = TestCommitLogEntryModel.create(
             entity_id='id', committer_id='user',
             committer_username='username',
             commit_cmds={}, commit_type='edit',
             commit_message='New commit created.', version=2,
-            status='public', community_owned=False
+            status=feconf.ACTIVITY_STATUS_PUBLIC, community_owned=False
         )
         model1.put()
         model2.put()
