@@ -776,10 +776,16 @@ class FetchIssuesHandler(EditorHandler):
     @acl_decorators.can_view_exploration_stats
     def get(self, exp_id):
         """Handles GET requests."""
-        exp_issues = stats_services.get_exp_issues_by_id(exp_id)
+        exp_version = self.request.get('exp_version')
+        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
         if exp_issues is None:
             raise self.PageNotFoundException(
                 'Invalid exploration ID %s' % (exp_id))
+        unresolved_issues = []
+        for issue in exp_issues.unresolved_issues:
+            if issue.is_valid:
+                unresolved_issues.append(issue)
+        exp_issues.unresolved_issues = unresolved_issues
         exp_issues_dict = exp_issues.to_dict()
         self.render_json(exp_issues_dict['unresolved_issues'])
 
@@ -812,7 +818,7 @@ class ResolveIssueHandler(EditorHandler):
         """
         exp_issue_properties = [
             'issue_type', 'schema_version', 'issue_customization_args',
-            'playthrough_ids']
+            'playthrough_ids', 'is_valid']
 
         for exp_issue_property in exp_issue_properties:
             if exp_issue_property not in exp_issue_dict:
@@ -822,7 +828,7 @@ class ResolveIssueHandler(EditorHandler):
         dummy_exp_issue = stats_domain.ExplorationIssue(
             exp_issue_dict['issue_type'],
             exp_issue_dict['issue_customization_args'], [],
-            exp_issue_dict['schema_version'])
+            exp_issue_dict['schema_version'], exp_issue_dict['is_valid'])
 
         try:
             dummy_exp_issue.validate()
@@ -835,7 +841,9 @@ class ResolveIssueHandler(EditorHandler):
         exp_issue_dict = self.payload.get('exp_issue_dict')
         self._require_exp_issue_dict_is_valid(exp_issue_dict)
 
-        exp_issues = stats_services.get_exp_issues_by_id(exp_id)
+        exp_version = self.payload.get('exp_version')
+
+        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
         if exp_issues is None:
             raise self.PageNotFoundException(
                 'Invalid exploration ID %s' % (exp_id))

@@ -409,12 +409,12 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(playthrough.issue_type, 'EarlyQuit')
         self.assertEqual(playthrough.issue_customization_args, {})
         self.assertEqual(playthrough.playthrough_actions, [])
-        self.assertEqual(playthrough.is_valid, True)
 
     def test_get_exp_issues_by_id(self):
         """Test the get_exp_issues_by_id method."""
-        exp_issues = stats_services.get_exp_issues_by_id(self.exp_id)
-        self.assertEqual(exp_issues.id, self.exp_id)
+        exp_issues = stats_services.get_exp_issues(self.exp_id, 1)
+        self.assertEqual(exp_issues.exp_id, self.exp_id)
+        self.assertEqual(exp_issues.exp_version, 1)
         self.assertEqual(exp_issues.unresolved_issues, [])
 
     def test_get_playthrough_by_id(self):
@@ -426,7 +426,6 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(playthrough.issue_type, 'EarlyQuit')
         self.assertEqual(playthrough.issue_customization_args, {})
         self.assertEqual(playthrough.playthrough_actions, [])
-        self.assertEqual(playthrough.is_valid, True)
 
     def test_get_exploration_stats_by_id(self):
         """Test the get_exploration_stats_by_id method."""

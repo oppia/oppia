@@ -212,19 +212,20 @@ def handle_stats_creation_for_new_exp_version(
     create_stats_model(exploration_stats)
 
 
-def get_exp_issues_by_id(exp_id):
+def get_exp_issues(exp_id, exp_version):
     """Retrieves the ExplorationIssues domain object.
 
     Args:
         exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
 
     Returns:
         ExplorationIssues|None: The domain object for exploration issues or
             None if the exp_id is invalid.
     """
     exp_issues = None
-    exp_issues_model = stats_models.ExplorationIssuesModel.get(
-        exp_id, strict=False)
+    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+        exp_id, exp_version)
     if exp_issues_model is not None:
         exp_issues = get_exp_issues_from_model(exp_issues_model)
     return exp_issues
@@ -364,8 +365,7 @@ def get_playthrough_from_model(playthrough_model):
     return stats_domain.Playthrough(
         playthrough_model.id, playthrough_model.exp_id,
         playthrough_model.exp_version, playthrough_model.issue_type,
-        playthrough_model.issue_customization_args, playthrough_actions,
-        playthrough_model.is_valid)
+        playthrough_model.issue_customization_args, playthrough_actions)
 
 
 def create_stats_model(exploration_stats):

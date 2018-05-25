@@ -1570,7 +1570,7 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }], is_valid=True)
+            }])
         self.playthrough_id2 = stats_models.PlaythroughModel.create(
             self.EXP_ID, 1, 'MultipleIncorrectSubmissions',
             {
@@ -1589,9 +1589,9 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }], is_valid=True)
+            }])
         stats_models.ExplorationIssuesModel.create(
-            self.EXP_ID,
+            self.EXP_ID, 1,
             [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
@@ -1603,7 +1603,8 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'playthrough_ids': [self.playthrough_id1],
-                'schema_version': 1
+                'schema_version': 1,
+                'is_valid': True
             }, {
                 'issue_type': 'MultipleIncorrectSubmissions',
                 'issue_customization_args': {
@@ -1615,25 +1616,31 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'playthrough_ids': [self.playthrough_id2],
-                'schema_version': 1
+                'schema_version': 1,
+                'is_valid': True
             }]
         )
 
     def test_fetch_issues_handler(self):
         """Test that all issues get fetched correctly."""
-        response = self.get_json('/issuesdatahandler/%s' % self.EXP_ID)
+        response = self.get_json(
+            '/issuesdatahandler/%s' % (self.EXP_ID), {'exp_version': 1})
         self.assertEqual(len(response), 2)
         self.assertEqual(response[0]['issue_type'], 'EarlyQuit')
         self.assertEqual(
             response[1]['issue_type'], 'MultipleIncorrectSubmissions')
 
-    def test_error_on_invalid_exp_id_for_exp_issues(self):
-        """Test that error is raised if invalid exploration ID is used to
-        retrieve exploration issues.
-        """
-        self.get_json(
-            '/issuesdatahandler/%s' % (self.EXP_ID), expect_errors=True,
-            expected_status_int=400)
+    def test_invalid_issues_are_not_retrieved(self):
+        """Test that invalid issues are not retrieved."""
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            self.EXP_ID, 1)
+        exp_issues_model.unresolved_issues[1]['is_valid'] = False
+        exp_issues_model.put()
+
+        response = self.get_json(
+            '/issuesdatahandler/%s' % (self.EXP_ID), {'exp_version': 1})
+        self.assertEqual(len(response), 1)
+        self.assertEqual(response[0]['issue_type'], 'EarlyQuit')
 
     def test_fetch_playthrough_handler(self):
         """Test that the playthrough gets fetched correctly."""
@@ -1663,16 +1670,6 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             }])
-        self.assertEqual(response['is_valid'], True)
-
-    def test_error_on_invalid_playthrough_id(self):
-        """Test that error is raised if invalid playthrough type is used to
-        retrieve a playthrough.
-        """
-        self.get_json(
-            '/playthroughdatahandler/%s/%s' % (
-                self.EXP_ID, self.playthrough_id1),
-            expect_errors=True, expected_status_int=400)
 
 
 class ResolveIssueHandlerTest(test_utils.GenericTestBase):
@@ -1713,7 +1710,7 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }], is_valid=True)
+            }])
         self.playthrough_id2 = stats_models.PlaythroughModel.create(
             self.EXP_ID, 1, 'EarlyQuit',
             {
@@ -1732,10 +1729,10 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }], is_valid=True)
+            }])
 
         stats_models.ExplorationIssuesModel.create(
-            self.EXP_ID,
+            self.EXP_ID, 1,
             [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
@@ -1747,7 +1744,8 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'playthrough_ids': [self.playthrough_id1, self.playthrough_id2],
-                'schema_version': 1
+                'schema_version': 1,
+                'is_valid': True
             }]
         )
 
@@ -1762,7 +1760,8 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
                 }
             },
             'playthrough_ids': [self.playthrough_id1, self.playthrough_id2],
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         }
 
         response = self.testapp.get('/create/%s' % self.EXP_ID)
@@ -1773,10 +1772,11 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '/resolveissuehandler/%s' % (self.EXP_ID),
             {
-                'exp_issue_dict': self.exp_issue_dict
+                'exp_issue_dict': self.exp_issue_dict,
+                'exp_version': 1
             }, self.csrf_token)
 
-        exp_issues = stats_services.get_exp_issues_by_id(self.EXP_ID)
+        exp_issues = stats_services.get_exp_issues(self.EXP_ID, 1)
         self.assertEqual(exp_issues.unresolved_issues, [])
 
         playthrough_instances = stats_models.PlaythroughModel.get_multi(
@@ -1791,7 +1791,8 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '/resolveissuehandler/%s' % (self.EXP_ID),
             {
-                'exp_issue_dict': self.exp_issue_dict
+                'exp_issue_dict': self.exp_issue_dict,
+                'exp_version': 1
             }, self.csrf_token, expect_errors=True, expected_status_int=404)
 
     def test_error_on_passing_non_matching_exp_issue_dict(self):
@@ -1803,7 +1804,8 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
         self.post_json(
             '/resolveissuehandler/%s' % (self.EXP_ID),
             {
-                'exp_issue_dict': self.exp_issue_dict
+                'exp_issue_dict': self.exp_issue_dict,
+                'exp_version': 1
             }, self.csrf_token, expect_errors=True, expected_status_int=404)
 
 
