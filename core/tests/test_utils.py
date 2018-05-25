@@ -33,6 +33,8 @@ from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -903,6 +905,36 @@ tags: []
         )
         story_services.save_new_story(owner_id, story)
         return story
+
+    def save_new_topic(
+            self, topic_id, owner_id, name, description,
+            canonical_story_ids, additional_story_ids, skill_ids,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Topic and saves it.
+
+        Args:
+            topic_id: str. ID for the topic to be created.
+            owner_id: str. The user_id of the creator of the topic.
+            name: str. The name of the topic.
+            description: str. The desscription of the topic.
+            canonical_story_ids: list(str). The list of ids of canonical stories
+                that are part of the topic.
+            additional_story_ids: list(str). The list of ids of additional
+                stories that are part of the topic.
+            skill_ids: list(str). The list of ids of skills that are part of the
+                topic.
+            language_code: str. The ISO 639-1 code for the language this
+                topic is written in.
+
+        Returns:
+            Topic. A newly-created topic.
+        """
+        topic = topic_domain.Topic(
+            topic_id, name, description, canonical_story_ids,
+            additional_story_ids, skill_ids, language_code, 0
+        )
+        topic_services.save_new_topic(owner_id, topic)
+        return topic
 
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):

@@ -217,6 +217,11 @@ DEFAULT_STORY_DESCRIPTION = ''
 # Default notes for a newly-minted story.
 DEFAULT_STORY_NOTES = ''
 
+# Default name for a newly-minted topic.
+DEFAULT_TOPIC_NAME = ''
+# Default description for a newly-minted topic.
+DEFAULT_TOPIC_DESCRIPTION = ''
+
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'
 # Shared secret key for default VM.
