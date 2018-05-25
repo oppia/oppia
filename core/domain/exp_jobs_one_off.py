@@ -491,34 +491,35 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
         # invalid parent-child relations that we find.
         err_dict = {}
 
-        allowed_parent_list = feconf.ALLOWED_PARENT_LIST
-        allowed_tag_list = feconf.ALLOWED_TAG_LIST
+        allowed_parent_list = (
+            feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+            ['ALLOWED_PARENT_LIST'])
+        allowed_tag_list = (
+            feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+            ['ALLOWED_TAG_LIST'])
 
-        for state in exploration.states.itervalues():
-            # result is the list of all the html present in the state.
-            result = utils.find_all_values_for_key(
-                'html', state.to_dict())
+        html_list = exploration.get_all_html_content_strings()
 
-            for html_data in result:
-                html_data = html_data.encode('utf-8')
-                soup = bs4.BeautifulSoup(html_data, 'html.parser')
+        for html_data in html_list:
+            html_data = html_data.encode('utf-8')
+            soup = bs4.BeautifulSoup(html_data, 'html.parser')
 
-                for tag in soup.findAll():
-                    # Checking for tags not allowed in RTE.
-                    if tag.name not in allowed_tag_list:
-                        if 'invalidTags' in err_dict:
-                            err_dict['invalidTags'] += [tag.name]
-                        else:
-                            err_dict['invalidTags'] = [tag.name]
-                    # Checking for parent-child relation that are not
-                    # allowed in RTE.
-                    parent = tag.parent.name
-                    if (tag.name in allowed_tag_list and parent not in
-                            allowed_parent_list[tag.name]):
-                        if tag.name in err_dict:
-                            err_dict[tag.name] += [parent]
-                        else:
-                            err_dict[tag.name] = [parent]
+            for tag in soup.findAll():
+                # Checking for tags not allowed in RTE.
+                if tag.name not in allowed_tag_list:
+                    if 'invalidTags' in err_dict:
+                        err_dict['invalidTags'] += [tag.name]
+                    else:
+                        err_dict['invalidTags'] = [tag.name]
+                # Checking for parent-child relation that are not
+                # allowed in RTE.
+                parent = tag.parent.name
+                if (tag.name in allowed_tag_list) and (
+                        parent not in allowed_parent_list[tag.name]):
+                    if tag.name in err_dict:
+                        err_dict[tag.name] += [parent]
+                    else:
+                        err_dict[tag.name] = [parent]
 
         for key in err_dict:
             err_dict[key] = list(set(err_dict[key]))
