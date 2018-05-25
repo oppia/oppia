@@ -601,7 +601,8 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
 
 def get_top_state_answer_stats(exploration_id, state_name):
     """Fetches the top (at most) 10 answers from the given state_name in the
-    corresponding exploration.
+    corresponding exploration. Only answers that occur with frequency >=
+    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
 
     Args:
         exploration_id: str. The exploration ID.
@@ -622,7 +623,8 @@ def get_top_state_answer_stats(exploration_id, state_name):
 
 def get_top_state_answer_stats_multi(exploration_id, state_names):
     """Fetches the top (at most) 10 answers from each given state_name in the
-    corresponding exploration.
+    corresponding exploration. Only answers that occur with frequency >=
+    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
 
     Args:
         exploration_id: str. The exploration ID.
