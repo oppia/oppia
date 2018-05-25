@@ -987,8 +987,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(
                 self.testapp.get('/create/%s' % self.exploration.id))
             self.post_json(
-                '%s/%s' % (
-                    feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, self.exploration.id),
+                '%s/%s' % (feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),
                 {'thread_id': thread_id}, csrf_token)
 
             self.process_and_flush_pending_tasks()
