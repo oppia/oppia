@@ -32,6 +32,8 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import story_domain
+from core.domain import story_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -679,64 +681,49 @@ tags: []
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
-    def save_new_valid_exploration_with_states(
-            self, exploration_id, owner_id, title='A title',
-            category='A category', objective='An objective',
-            language_code=constants.DEFAULT_LANGUAGE_CODE,
-            state_names=None, interaction_ids=None):
+    def save_new_linear_exp_with_state_names_and_interactions(
+            self, exploration_id, owner_id, state_names, interaction_ids,
+            title='A title', category='A category', objective='An objective',
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Saves a new strictly-validated exploration with a sequence of states.
 
         Args:
             exploration_id: str. The id of the new validated exploration.
             owner_id: str. The user_id of the creator of the exploration.
-            title: str. The title of the exploration.
-            category: str. The category this exploration belongs to.
-            objective: str. The objective of this exploration.
-            language_code: str. The language_code of this exploration.
             state_names: list(str). The names of states to be linked
                 sequentially in the exploration. Must be a non-empty list.
             interaction_ids: list(str). The names of the interaction ids to be
                 assigned to each state. Values will be cycled, so it doesn't
-                need to be the same size as state_names. The default interaction
-                id is TextInput.
+                need to be the same size as state_names.
+            title: str. The title of the exploration.
+            category: str. The category this exploration belongs to.
+            objective: str. The objective of this exploration.
+            language_code: str. The language_code of this exploration.
 
         Returns:
             Exploration. The exploration domain object.
         """
         if not state_names:
             raise ValueError('must provide at least one state name')
+        if not interaction_ids:
+            raise ValueError('must provide at least one interaction type')
+        interaction_ids = itertools.cycle(interaction_ids)
 
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, category=category,
             language_code=language_code)
         exploration.objective = objective
+        exploration.add_states(state_names)
 
-        # Will cycle through interaction_ids to produce values for each state.
-        if not interaction_ids:
-            interaction_ids = ['TextInput']
-        interaction_ids = itertools.cycle(interaction_ids)
-
-        # Prepare the state names to link together.
-        to_state_names = state_names
-        from_state_names = [exploration.init_state_name] + to_state_names[:-1]
-
-        # Prepare init_state.
-        init_state = exploration.states[from_state_names[0]]
-        init_state.update_interaction_id(next(interaction_ids))
-
-        for from_state_name, to_state_name in (
-                zip(from_state_names, to_state_names)):
-            # NOTE: from_state_name always exists.
-            exploration.add_states([to_state_name])
-
-            from_state, to_state = operator.itemgetter(
-                from_state_name, to_state_name)(exploration.states)
-
-            to_state.update_interaction_id(next(interaction_ids))
-            from_state.interaction.default_outcome.dest = to_state_name
+        from_names = [exploration.init_state_name] + state_names[:-1]
+        to_names = state_names
+        for from_name, to_name in zip(from_names, to_names):
+            from_state = exploration.states[from_name]
+            from_state.update_interaction_id(next(interaction_ids))
+            from_state.interaction.default_outcome.dest = to_name
 
         # Prepare end_state.
-        end_state = exploration.states[to_state_names[-1]]
+        end_state = exploration.states[to_names[-1]]
         end_state.update_interaction_id('EndExploration')
         end_state.interaction.default_outcome = None
 
@@ -889,6 +876,34 @@ tags: []
         """
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_collection(committer, collection_id)
+
+    def save_new_story(
+            self, story_id, owner_id, title,
+            description, notes, story_contents,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Story and saves it.
+
+        Args:
+            story_id: str. ID for the story to be created.
+            owner_id: str. The user_id of the creator of the story.
+            title: str. The title of the story.
+            description: str. The high level desscription of the story.
+            notes: str. A set of notes, that describe the characters,
+                main storyline, and setting.
+            story_contents: StoryContents. A StoryContents object containing the
+                list of nodes.
+            language_code: str. The ISO 639-1 code for the language this
+                story is written in.
+
+        Returns:
+            Story. A newly-created story.
+        """
+        story = story_domain.Story(
+            story_id, title, description, notes, story_contents,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION, language_code, 0
+        )
+        story_services.save_new_story(owner_id, story)
+        return story
 
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):
@@ -1111,6 +1126,34 @@ class AppEngineTestBase(TestBase):
                 queue_names=queue_names)
             for queue in queue_names:
                 self.taskqueue_stub.FlushQueue(queue)
+
+    def _create_valid_question_data(self, default_dest_state_name):
+        """Creates a valid question_data dict.
+
+        Args:
+            default_dest_state_name: str. The default destination state.
+
+        Returns:
+            dict. The default question_data dict.
+        """
+        state = exp_domain.State.create_default_state(default_dest_state_name)
+        solution_explanation = exp_domain.SubtitledHtml(
+            'Solution explanation', {})
+        solution = exp_domain.Solution(
+            'TextInput', False, 'Solution', solution_explanation)
+        hint_content = exp_domain.SubtitledHtml('Hint 1', {})
+        hint = exp_domain.Hint(hint_content)
+        state.interaction.id = 'TextInput'
+        state.interaction.customization_args = {
+            'placeholder': 'Enter text here',
+            'rows': 1
+        }
+        state.interaction.default_outcome.labelled_as_correct = True
+        state.interaction.default_outcome.dest = None
+        state.interaction.hints.append(hint)
+        state.interaction.solution = solution
+        state = state.to_dict()
+        return state
 
 
 if feconf.PLATFORM == 'gae':

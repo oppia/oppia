@@ -256,7 +256,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.id, model_id)
         self.assertEqual(model.exp_id, 'exp_id1')
         self.assertEqual(model.exp_version, 1)
-        self.assertEqual(model.issue_id, 'EarlyQuit')
+        self.assertEqual(model.issue_type, 'EarlyQuit')
         self.assertEqual(model.issue_customization_args, {})
         self.assertEqual(model.playthrough_actions, [])
         self.assertEqual(model.is_valid, True)

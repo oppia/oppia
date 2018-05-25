@@ -48,6 +48,7 @@ CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
+CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
 EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if not DEV_MODE else '')
@@ -164,6 +165,9 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 19
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
+# The current version of story schema.
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
+
 # The current version of the question schema.
 CURRENT_QUESTION_SCHEMA_VERSION = 1
 
@@ -205,6 +209,13 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
+
+# Default title for a newly-minted story.
+DEFAULT_STORY_TITLE = ''
+# Default description for a newly-minted story.
+DEFAULT_STORY_DESCRIPTION = ''
+# Default notes for a newly-minted story.
+DEFAULT_STORY_NOTES = ''
 
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'
@@ -650,19 +661,6 @@ NUM_REPEATED_CYCLES_THRESHOLD = 3
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 # Probability of recording a playthrough.
 RECORD_PLAYTHROUGH_PROBABILITY = 0.2
-# IDs of allowed types of issues.
-ALLOWED_ISSUE_IDS = [
-    'EarlyQuit',
-    'MultipleIncorrectSubmissions',
-    'CyclicStateTransitions'
-]
-# IDs of allowed learner actions.
-ALLOWED_ACTION_IDS = [
-    'ExplorationStart',
-    'AnswerSubmit',
-    'ExplorationQuit'
-]
-
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False

@@ -46,6 +46,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.stats_model_id = (
             stats_models.ExplorationStatsModel.create(
                 'exp_id1', 1, 0, 0, 0, 0, 0, 0, {}))
+        stats_models.ExplorationIssuesModel.create(self.exp_id, [])
 
     def test_update_stats_method(self):
         """Test the update_stats method."""
@@ -372,6 +373,13 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             exploration_stats.state_stats_mapping[
                 'New state 4'].total_answers_count_v2, 0)
 
+    def test_get_exp_issues_from_model(self):
+        """Test the get_exp_issues_from_model method."""
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        exp_issues = stats_services.get_exp_issues_from_model(model)
+        self.assertEqual(exp_issues.id, self.exp_id)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
     def test_get_exploration_stats_from_model(self):
         """Test the get_exploration_stats_from_model method."""
         model = stats_models.ExplorationStatsModel.get(self.stats_model_id)
@@ -450,6 +458,31 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                     'num_completions_v2': 0
                 }
             })
+
+    def test_save_exp_issues_model_transactional(self):
+        """Test the save_exp_issues_model_transactional method."""
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        exp_issues = stats_services.get_exp_issues_from_model(model)
+        exp_issues.unresolved_issues.append(
+            stats_domain.ExplorationIssue.from_dict({
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': ['playthrough_id1'],
+                'schema_version': 1
+            }))
+        stats_services.save_exp_issues_model_transactional(exp_issues)
+
+        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        self.assertEqual(
+            model.unresolved_issues[0],
+            exp_issues.unresolved_issues[0].to_dict())
 
     def test_save_stats_model_transactional(self):
         """Test the save_stats_model_transactional method."""
@@ -1424,17 +1457,16 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
     STATE_NAMES = ['STATE A', 'STATE B', 'STATE C']
     EXP_ID = 'exp_id'
 
-    def _get_state_answers_stats(
-            self, exp_id=EXP_ID, state_name=STATE_NAMES[0], min_frequency=None):
-        return stats_services.get_state_answers_stats(
-            exp_id, state_name, test_only_min_frequency=min_frequency)
+    def _get_top_state_answer_stats(
+            self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
+        return stats_services.get_top_state_answer_stats(exp_id, state_name)
 
-    def _get_state_answers_stats_multi(
-            self, exp_id=EXP_ID, state_names=None, min_frequency=None):
+    def _get_top_state_answer_stats_multi(
+            self, exp_id=EXP_ID, state_names=None):
         if not state_names:
             raise ValueError('Must provide non-empty state names.')
-        return stats_services.get_state_answers_stats_multi(
-            exp_id, state_names, test_only_min_frequency=min_frequency)
+        return stats_services.get_top_state_answer_stats_multi(
+            exp_id, state_names)
 
     def _record_answer(
             self, answer, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
@@ -1459,10 +1491,10 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.save_new_valid_exploration_with_states(
-            self.EXP_ID, self.owner_id, state_names=self.STATE_NAMES)
+        self.save_new_linear_exp_with_state_names_and_interactions(
+            self.EXP_ID, self.owner_id, self.STATE_NAMES, ['TextInput'])
 
-    def test_get_state_answers_stats(self):
+    def test_get_top_state_answer_stats(self):
         self._record_answer('A')
         self._record_answer('B')
         self._record_answer('A')
@@ -1471,15 +1503,17 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self._record_answer('C')
         self._run_answer_summaries_aggregator()
 
-        state_answers_stats = self._get_state_answers_stats(min_frequency=2)
+        with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 2):
+            state_answers_stats = self._get_top_state_answer_stats()
 
-        self.assertEqual(state_answers_stats, [
-            {'answer': 'A', 'frequency': 3},
-            {'answer': 'B', 'frequency': 2},
-            # C is not included because min frequency is 2.
-        ])
+        self.assertEqual(
+            state_answers_stats, [
+                {'answer': 'A', 'frequency': 3},
+                {'answer': 'B', 'frequency': 2},
+                # C is not included because min frequency is 2.
+            ])
 
-    def test_get_state_answers_stats_multi(self):
+    def test_get_top_state_answer_stats_multi(self):
         self._record_answer('A', state_name='STATE A')
         self._record_answer('A', state_name='STATE A')
         self._record_answer('B', state_name='STATE A')
@@ -1491,8 +1525,9 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self._record_answer('Y', state_name='STATE C')
         self._run_answer_summaries_aggregator()
 
-        state_answers_stats_multi = self._get_state_answers_stats_multi(
-            min_frequency=1, state_names=['STATE A', 'STATE B'])
+        with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 1):
+            state_answers_stats_multi = self._get_top_state_answer_stats_multi(
+                state_names=['STATE A', 'STATE B'])
 
         self.assertEqual(sorted(state_answers_stats_multi), [
             'STATE A',
