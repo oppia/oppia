@@ -102,7 +102,7 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
 oppia.directive('oppiaResponseNumberWithUnits', [
   'NumberWithUnitsObjectFactory', 'HtmlEscaperService',
   'UrlInterpolationService', function(NumberWithUnitsObjectFactory,
-    HtmlEscaperService, UrlInterpolationService) {
+      HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
@@ -121,7 +121,7 @@ oppia.directive('oppiaResponseNumberWithUnits', [
 oppia.directive('oppiaShortResponseNumberWithUnits', [
   'NumberWithUnitsObjectFactory', 'HtmlEscaperService',
   'UrlInterpolationService', function(NumberWithUnitsObjectFactory,
-    HtmlEscaperService, UrlInterpolationService) {
+      HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
