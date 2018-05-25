@@ -21,7 +21,6 @@ import copy
 import inspect
 import itertools
 import json
-import operator
 import os
 import re
 import unittest
