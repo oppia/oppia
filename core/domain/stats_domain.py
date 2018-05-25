@@ -410,28 +410,31 @@ class ExplorationIssues(object):
     exploration.
     """
 
-    def __init__(self, exp_id, unresolved_issues):
+    def __init__(self, exp_id, exp_version, unresolved_issues):
         """Constructs an ExplorationIssues domain object.
 
         Args:
             exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
             unresolved_issues: list(ExplorationIssue). List of exploration
                 issues.
         """
-        self.id = exp_id
+        self.exp_id = exp_id
+        self.exp_version = exp_version
         self.unresolved_issues = unresolved_issues
 
     @classmethod
-    def create_default(cls, exp_id):
+    def create_default(cls, exp_id, exp_version):
         """Creates a default ExplorationIssues domain object.
 
         Args:
             exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
 
         Returns:
             ExplorationIssues. The exploration issues domain object.
         """
-        return cls(exp_id, [])
+        return cls(exp_id, exp_version, [])
 
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssues domain object.
@@ -443,7 +446,8 @@ class ExplorationIssues(object):
             unresolved_issue.to_dict()
             for unresolved_issue in self.unresolved_issues]
         return {
-            'id': self.id,
+            'exp_id': self.exp_id,
+            'exp_version': self.exp_version,
             'unresolved_issues': unresolved_issue_dicts
         }
 
@@ -462,13 +466,21 @@ class ExplorationIssues(object):
         unresolved_issues = [
             ExplorationIssue.from_dict(unresolved_issue_dict)
             for unresolved_issue_dict in exp_issues_dict['unresolved_issues']]
-        return cls(exp_issues_dict['id'], unresolved_issues)
+        return cls(
+            exp_issues_dict['exp_id'], exp_issues_dict['exp_version'],
+            unresolved_issues)
 
     def validate(self):
         """Validates the ExplorationIssues domain object."""
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % type(self.id))
+                'Expected exp_id to be a string, received %s' % type(
+                    self.exp_id))
+
+        if not isinstance(self.exp_version, int):
+            raise utils.ValidationError(
+                'Expected exp_version to be an int, received %s' % type(
+                    self.exp_version))
 
         if not isinstance(self.unresolved_issues, list):
             raise utils.ValidationError(
@@ -485,7 +497,7 @@ class Playthrough(object):
 
     def __init__(
             self, playthrough_id, exp_id, exp_version, issue_type,
-            issue_customization_args, playthrough_actions, is_valid):
+            issue_customization_args, playthrough_actions):
         """Constructs a Playthrough domain object.
 
         Args:
@@ -497,7 +509,6 @@ class Playthrough(object):
                 given issue_type.
             playthrough_actions: list(LearnerAction). List of playthrough
                 learner actions.
-            is_valid: bool. Whether the playthrough is valid.
         """
         self.id = playthrough_id
         self.exp_id = exp_id
@@ -505,7 +516,6 @@ class Playthrough(object):
         self.issue_type = issue_type
         self.issue_customization_args = issue_customization_args
         self.playthrough_actions = playthrough_actions
-        self.is_valid = is_valid
 
     def to_dict(self):
         """Returns a dict representation of the Playthrough domain object.
@@ -523,7 +533,6 @@ class Playthrough(object):
             'issue_type': self.issue_type,
             'issue_customization_args': self.issue_customization_args,
             'playthrough_actions': playthrough_actions_dicts,
-            'is_valid': self.is_valid
         }
 
     @classmethod
@@ -547,8 +556,7 @@ class Playthrough(object):
             playthrough_dict['exp_version'],
             playthrough_dict['issue_type'],
             playthrough_dict['issue_customization_args'],
-            playthrough_actions,
-            playthrough_dict['is_valid'])
+            playthrough_actions)
 
     def validate(self):
         """Validates the Playthrough domain object."""
@@ -602,7 +610,7 @@ class ExplorationIssue(object):
 
     def __init__(
             self, issue_type, issue_customization_args, playthrough_ids,
-            schema_version):
+            schema_version, is_valid):
         """Constructs an ExplorationIssue domain object.
 
         Args:
@@ -613,11 +621,14 @@ class ExplorationIssue(object):
                 the customization arg.
             playthrough_ids: list(str). List of playthrough IDs.
             schema_version: int. Schema version for the exploration issue.
+            is_valid: bool. Whether the issue and the associated playthroughs
+                are valid.
         """
         self.issue_type = issue_type
         self.issue_customization_args = issue_customization_args
         self.playthrough_ids = playthrough_ids
         self.schema_version = schema_version
+        self.is_valid = is_valid
 
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssue domain object.
@@ -632,7 +643,8 @@ class ExplorationIssue(object):
                 issue_registry.Registry.get_issue_by_type(
                     self.issue_type).customization_arg_specs),
             'playthrough_ids': self.playthrough_ids,
-            'schema_version': self.schema_version
+            'schema_version': self.schema_version,
+            'is_valid': self.is_valid
         }
 
     @classmethod
@@ -650,7 +662,8 @@ class ExplorationIssue(object):
             issue_dict['issue_type'],
             issue_dict['issue_customization_args'],
             issue_dict['playthrough_ids'],
-            issue_dict['schema_version'])
+            issue_dict['schema_version'],
+            issue_dict['is_valid'])
 
     @classmethod
     def update_exp_issue_from_model(cls, issue_dict):

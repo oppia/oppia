@@ -309,7 +309,8 @@ class StorePlaythroughHandler(base.BaseHandler):
             exp_issue_dict: dict. Dict representing an exploration issue.
         """
         exp_issue_properties = [
-            'issue_type', 'schema_version', 'issue_customization_args']
+            'issue_type', 'schema_version', 'issue_customization_args',
+            'is_valid']
 
         for exp_issue_property in exp_issue_properties:
             if exp_issue_property not in exp_issue_dict:
@@ -319,7 +320,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         dummy_exp_issue = stats_domain.ExplorationIssue(
             exp_issue_dict['issue_type'],
             exp_issue_dict['issue_customization_args'], [],
-            exp_issue_dict['schema_version'])
+            exp_issue_dict['schema_version'], exp_issue_dict['is_valid'])
 
         try:
             dummy_exp_issue.validate()
@@ -334,7 +335,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         """
         playthrough_properties = [
             'exp_id', 'exp_version', 'issue_type', 'issue_customization_args',
-            'playthrough_actions', 'is_valid']
+            'playthrough_actions']
 
         for playthrough_property in playthrough_properties:
             if playthrough_property not in playthrough_data:
@@ -352,8 +353,7 @@ class StorePlaythroughHandler(base.BaseHandler):
             playthrough_data['exp_version'],
             playthrough_data['issue_type'],
             playthrough_data['issue_customization_args'],
-            playthrough_actions,
-            playthrough_data['is_valid'])
+            playthrough_actions)
 
         try:
             dummy_playthrough.validate()
@@ -374,8 +374,10 @@ class StorePlaythroughHandler(base.BaseHandler):
         playthrough_data = self.payload.get('playthrough_data')
         self._require_playthrough_data_is_valid(playthrough_data)
 
-        exp_issues_model = stats_models.ExplorationIssuesModel.get(
-            exploration_id)
+        exp_version = playthrough_data['exp_version']
+
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            exploration_id, exp_version)
         exp_issues = stats_services.get_exp_issues_from_model(exp_issues_model)
 
         customization_args = exp_issue_dict['issue_customization_args']
@@ -398,8 +400,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                             playthrough_data['exp_version'],
                             playthrough_data['issue_type'],
                             playthrough_data['issue_customization_args'],
-                            playthrough_data['playthrough_actions'],
-                            playthrough_data['is_valid'])
+                            playthrough_data['playthrough_actions'])
                         exp_issues.unresolved_issues[
                             index].playthrough_ids.append(playthrough_id)
                     break
@@ -410,12 +411,12 @@ class StorePlaythroughHandler(base.BaseHandler):
                 playthrough_data['exp_version'],
                 playthrough_data['issue_type'],
                 playthrough_data['issue_customization_args'],
-                playthrough_data['playthrough_actions'],
-                playthrough_data['is_valid'])
+                playthrough_data['playthrough_actions'])
             issue = stats_domain.ExplorationIssue(
                 exp_issue_dict['issue_type'],
                 exp_issue_dict['issue_customization_args'],
-                [playthrough_id], exp_issue_dict['schema_version'])
+                [playthrough_id], exp_issue_dict['schema_version'],
+                exp_issue_dict['is_valid'])
 
             exp_issues.unresolved_issues.append(issue)
 
