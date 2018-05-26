@@ -667,6 +667,10 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
     Args:
         exploration_id: str. The id of the exploration whose states should
             be exported.
+        version: int or None. The version of the exploration to be returned.
+            If None, the latest version of the exploration is returned.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
 
     Returns:
         dict. The keys are state names, and the values are YAML strings
@@ -1592,6 +1596,8 @@ def get_next_page_of_all_non_private_commits(
         urlsafe_start_cursor: str. If this is not None, then the returned
             commits start from cursor location. Otherwise they start from the
             beginning of the list of commits.
+        max_age: datetime.timedelta. The maximum age to which all non private
+            commits are fetch from the ExplorationCommitLogEntry.
 
     Returns:
         tuple. A 3-tuple consisting of:
@@ -1947,6 +1953,9 @@ def get_exp_with_draft_applied(exp_id, user_id):
     Args:
         exp_id: str. The id of the exploration.
         user_id: str. The id of the user whose draft is to be applied.
+
+    Returns:
+        Exploration. The exploration domain object.
     """
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
@@ -1983,7 +1992,7 @@ def get_state_id_mapping(exp_id, exp_version):
         exp_id: str. The exploration id.
         exp_version: int. The exploration version.
 
-    Returnes:
+    Returns:
         StateIdMapping. Domain object for state id mapping model instance.
     """
     model = exp_models.StateIdMappingModel.get_state_id_mapping_model(
@@ -2139,6 +2148,9 @@ def find_all_values_for_key(key, dictionary):
 
     Returns:
         list. The values of the key in the given dictionary.
+
+    Yields:
+        str. The value of the given key.
     """
     if isinstance(dictionary, list):
         for d in dictionary:

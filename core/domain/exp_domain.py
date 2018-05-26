@@ -573,6 +573,10 @@ class SubtitledHtml(object):
 
         Raises:
             Exception: 'params' is not a dict.
+
+        Returns:
+            str. The HTML string that results after stripping
+                out unrecognized tags and attributes.
         """
         if not isinstance(params, dict):
             raise Exception(
@@ -784,14 +788,6 @@ class Outcome(object):
         Raises:
             ValidationError: One or more attributes of the Outcome are invalid.
         """
-        if not self.dest:
-            raise utils.ValidationError(
-                'Every outcome should have a destination.')
-        if not isinstance(self.dest, basestring):
-            raise utils.ValidationError(
-                'Expected outcome dest to be a string, received %s'
-                % self.dest)
-
         self.feedback.validate()
 
         if not isinstance(self.labelled_as_correct, bool):
@@ -875,6 +871,7 @@ class AnswerGroup(object):
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
+            interaction: InteractionInstance. The interaction object.
 
         Raises:
             ValidationError: One or more attributes of the AnswerGroup are
@@ -1480,11 +1477,11 @@ class State(object):
         """Update the list of hints.
 
         Args:
-            hint_list: list(dict). A list of dict; each dict represents a Hint
+            hints_list: list(dict). A list of dict; each dict represents a Hint
                 object.
 
         Raises:
-            Exception: 'hint_list' is not a list.
+            Exception: 'hints_list' is not a list.
         """
         if not isinstance(hints_list, list):
             raise Exception(
@@ -1958,9 +1955,32 @@ class Exploration(object):
             raise utils.ValidationError('This exploration has no states.')
         for state_name in self.states:
             self._require_valid_state_name(state_name)
-            self.states[state_name].validate(
+            state = self.states[state_name]
+            state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict)
+            # The checks below perform validation on the Outcome domain object
+            # that is specific to answer groups in explorations, but not
+            # questions. This logic is here because the validation checks in
+            # the Outcome domain object are used by both explorations and
+            # questions.
+            for answer_group in state.interaction.answer_groups:
+                if not answer_group.outcome.dest:
+                    raise utils.ValidationError(
+                        'Every outcome should have a destination.')
+                if not isinstance(answer_group.outcome.dest, basestring):
+                    raise utils.ValidationError(
+                        'Expected outcome dest to be a string, received %s'
+                        % answer_group.outcome.dest)
+            if state.interaction.default_outcome is not None:
+                if not state.interaction.default_outcome.dest:
+                    raise utils.ValidationError(
+                        'Every outcome should have a destination.')
+                if not isinstance(
+                        state.interaction.default_outcome.dest, basestring):
+                    raise utils.ValidationError(
+                        'Expected outcome dest to be a string, received %s'
+                        % state.interaction.default_outcome.dest)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -2406,8 +2426,8 @@ class Exploration(object):
         """Renames the given state.
 
         Args:
-            old_state_names: str. The old name of state to rename.
-            new_state_names: str. The new state name.
+            old_state_name: str. The old name of state to rename.
+            new_state_name: str. The new state name.
 
         Raises:
             ValueError: The old state name does not exist or the new state name
@@ -2444,7 +2464,7 @@ class Exploration(object):
         """Deletes the given state.
 
         Args:
-            state_names: str. The state name to be deleted.
+            state_name: str. The state name to be deleted.
 
         Raises:
             ValueError: The state does not exist or is the initial state of the
