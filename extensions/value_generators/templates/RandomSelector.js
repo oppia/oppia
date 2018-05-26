@@ -21,14 +21,7 @@ oppia.directive('randomSelector', ['$compile', function($compile) {
       $compile(element.contents())(scope);
     },
     restrict: 'E',
-    scope: {
-      schema: '&',
-      isDisabled: '&',
-      localValue: '=',
-      labelForFocusTarget: '&',
-      onInputBlur: '=',
-      onInputFocus: '='
-    },
+    scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope) {
       $scope.SCHEMA = {
