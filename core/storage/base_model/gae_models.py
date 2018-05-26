@@ -259,6 +259,10 @@ class BaseCommitLogEntryModel(BaseModel):
         construct with the common fields filled.
 
         Args:
+            entity_id: str. The ID of the construct corresponding to this
+                commit log entry model (e.g. the exp_id for an exploration,
+                the story_id for a story, etc.).
+            version: int. The version number of the model after the commit.
             committer_id: str. The user_id of the user who committed the
                 change.
             committer_username: str. The username of the user who committed the

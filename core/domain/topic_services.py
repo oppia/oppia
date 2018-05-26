@@ -34,7 +34,7 @@ def _get_topic_memcache_key(topic_id, version=None):
 
     Args:
         topic_id: str. ID of the topic.
-        version: str. The version of the topic.
+        version: int. The version of the topic.
 
     Returns:
         str. The memcache key of the topic.
@@ -96,7 +96,7 @@ def get_topic_by_id(topic_id, strict=True, version=None):
         topic_id: str. ID of the topic.
         strict: bool. Whether to fail noisily if no topic with the given
             id exists in the datastore.
-        version: str or None. The version number of the topic to be
+        version: int or None. The version number of the topic to be
             retrieved. If it is None, the latest version will be retrieved.
 
     Returns:
