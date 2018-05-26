@@ -51,6 +51,7 @@ Note that the root folder MUST be named 'oppia'.
 # pylint: disable=wrong-import-order
 import argparse
 import fnmatch
+import HTMLParser
 import multiprocessing
 import os
 import re
@@ -1093,17 +1094,20 @@ def _check_html_indent(all_files):
     for filename in html_files_to_lint:
         with open(filename, 'r') as f:
             file_content = f.read()
-            pattern = r'<(?P<tag_name>[a-zA-Z0-9-]+)(?P<attributes>[^>]*)'
-            matches = re.finditer(pattern, file_content, re.MULTILINE)
 
-            for matchNum, match in enumerate(matches):
-                matchNum = matchNum + 1
-                print ("Match {matchNum} was found at {start}-{end}: {match}".format(matchNum = matchNum, start = match.start(), end = match.end(), match = match.group()))
+            class CustomHTMLParser(HTMLParser.HTMLParser):
+                def handle_starttag(self, tag, attrs):
+                    print "Encountered a start tag:", tag
+                    print self.get_starttag_text()
 
-                for groupNum in range(0, len(match.groups())):
-                    groupNum = groupNum + 1
-                    print ("Group {groupNum} found at {start}-{end}: {group}".format(groupNum = groupNum, start = match.start(groupNum), end = match.end(groupNum), group = match.group(groupNum)))
-        break
+                def handle_endtag(self, tag):
+                    print "Encountered an end tag :", tag
+
+                def handle_data(self, data):
+                    print "Encountered some data  :", data
+
+            parser = CustomHTMLParser()
+            parser.feed(file_content)
 
     return []
 
