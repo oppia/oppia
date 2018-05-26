@@ -92,6 +92,8 @@ def create_thread(
     """
     thread_id = _create_models_for_thread_and_first_message(
         exploration_id, state_name, original_author_id, subject, text, False)
+
+    # Will be changed after the feedback services PR goes in.
     return feedback_models.FeedbackThreadModel.generate_full_thread_id(
         exploration_id, thread_id)
 

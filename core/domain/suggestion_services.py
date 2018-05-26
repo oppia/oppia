@@ -259,6 +259,8 @@ def is_suggestion_valid(suggestion, reviewer_id):
             suggestion.final_reviewer_id = reviewer_id
             suggestion.assigned_reviewer_id = ''
             update_suggestion(suggestion)
+
+            # Will be edited after feedback thread migration.
             thread_id = get_thread_id_from_suggestion_id(
                 suggestion.suggestion_id)
             feedback_services.create_message(
