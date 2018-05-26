@@ -205,7 +205,7 @@ def compute_summary_of_topic(topic):
     object and return it.
 
     Args:
-        topic_id: str. ID of the topic.
+        topic: Topic. The topic object for which the summary is to be computed.
 
     Returns:
         TopicSummary. The computed summary for the given topic.
