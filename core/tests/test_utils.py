@@ -31,6 +31,8 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import skill_domain
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import topic_domain
@@ -656,6 +658,8 @@ tags: []
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            end_state_name: str. The name of the end state for the exploration.
+            interaction_id: str. The id of the interaction.
 
         Returns:
             Exploration. The exploration domain object.
@@ -888,7 +892,7 @@ tags: []
             story_id: str. ID for the story to be created.
             owner_id: str. The user_id of the creator of the story.
             title: str. The title of the story.
-            description: str. The high level desscription of the story.
+            description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
             story_contents: StoryContents. A StoryContents object containing the
@@ -935,6 +939,34 @@ tags: []
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
+
+    def save_new_skill(
+            self, skill_id, owner_id,
+            description, misconceptions, skill_contents,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Skill and saves it.
+
+        Args:
+            skill_id: str. ID for the skill to be created.
+            owner_id: str. The user_id of the creator of the skill.
+            description: str. The description of the skill.
+            skill_contents: SkillContents. A SkillContents object containing the
+                explanation and examples of the skill.
+            misconceptions: list(Misconception). A list of Misconception objects
+                that contains the various misconceptions of the skill.
+            language_code: str. The ISO 639-1 code for the language this
+                skill is written in.
+
+        Returns:
+            Skill. A newly-created skill.
+        """
+        skill = skill_domain.Skill(
+            skill_id, description, misconceptions, skill_contents,
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, language_code, 0
+        )
+        skill_services.save_new_skill(owner_id, skill)
+        return skill
 
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):
@@ -1081,6 +1113,9 @@ class AppEngineTestBase(TestBase):
                 urlfetch mock. The keys of this dict are strings that represent
                 the header name and the value represents corresponding value of
                 that header.
+
+        Yields:
+            None.
         """
         if headers is None:
             response_headers = {}

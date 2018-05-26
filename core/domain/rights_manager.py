@@ -764,8 +764,6 @@ def _assign_role(
     Args:
         committer: UserActionsInfo. UserActionInfo object for the user
             who is performing the action.
-        activity_rights: ExplorationRightsModel|CollectionRightsModel. The
-            storage object for the rights of the given activity.
         assignee_id: str. ID of the user whose role is being changed.
         new_role: str. The name of the new role: One of
             ROLE_OWNER

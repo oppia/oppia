@@ -165,8 +165,14 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 19
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
-# The current version of story schema.
+# The current version of story contents dict in the story schema.
 CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
+
+# The current version of skill contents dict in the skill schema.
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
+
+# The current version of misconceptions dict in the skill schema.
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 
 # The current version of the question schema.
 CURRENT_QUESTION_SCHEMA_VERSION = 1
@@ -216,6 +222,11 @@ DEFAULT_STORY_TITLE = ''
 DEFAULT_STORY_DESCRIPTION = ''
 # Default notes for a newly-minted story.
 DEFAULT_STORY_NOTES = ''
+
+# Default description for a newly-minted skill.
+DEFAULT_SKILL_DESCRIPTION = ''
+# Default explanation for a newly-minted skill.
+DEFAULT_SKILL_EXPLANATION = ''
 
 # Default name for a newly-minted topic.
 DEFAULT_TOPIC_NAME = ''
