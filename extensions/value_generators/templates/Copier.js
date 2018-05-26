@@ -27,6 +27,7 @@ oppia.directive('copier', ['$compile', function($compile) {
     scope: {
       alwaysEditable: '@',
       initArgs: '=',
+      isEditable: '@',
       objType: '@',
       value: '='
     },
