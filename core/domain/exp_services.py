@@ -893,8 +893,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exp_versions_diff)
 
     # Trigger exploration issues model updation.
-    stats_services.update_exp_issues_for_new_exp_version(
-        exploration.id, change_list)
+    if feconf.ENABLE_PLAYTHROUGHS:
+        stats_services.update_exp_issues_for_new_exp_version(
+            exploration.id, change_list)
 
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
