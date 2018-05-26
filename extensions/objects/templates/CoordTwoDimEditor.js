@@ -101,7 +101,9 @@ oppia.directive('coordTwoDimEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        value: '='
+      },
       template: '<span ng-include="getTemplateUrl()"></span>'
     };
   }]);
