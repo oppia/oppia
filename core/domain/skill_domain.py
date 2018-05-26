@@ -113,18 +113,18 @@ class Misconception(object):
     """
 
     def __init__(
-            self, id, name, notes, feedback):
+            self, misconception_id, name, notes, feedback):
         """Initializes a Misconception domain object.
 
         Args:
-            id: str. The unique id of each misconception.
+            misconception_id: str. The unique id of each misconception.
             name: str. The name of the misconception.
             notes: str. General advice for creators about the
                 misconception (including examples) and general notes.
             feedback: str. This can auto-populate the feedback field
                 when an answer group has been tagged with a misconception.
         """
-        self.id = id
+        self.id = misconception_id
         self.name = name
         self.notes = notes
         self.feedback = feedback
