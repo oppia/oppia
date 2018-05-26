@@ -28,7 +28,9 @@ oppia.directive('filepathEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        value: '='
+      },
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', function($scope) {
         var MODE_EMPTY = 1;
