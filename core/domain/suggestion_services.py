@@ -95,7 +95,6 @@ def get_suggestion_by_id(suggestion_id):
     Returns:
         Suggestion, or None if no suggestion is found.
     """
-    print suggestion_id
     model = suggestion_models.SuggestionModel.get_by_id(suggestion_id)
 
     return get_suggestion_from_model(model) if model else None
