@@ -251,3 +251,141 @@ class UtilsTests(test_utils.GenericTestBase):
                 utils.get_hashable_value(json1_deepcopy),
                 utils.get_hashable_value(json2_deepcopy),
             })
+
+    def test_convert_to_text_angular(self):
+        html_content_1 = (
+            'Hello, <span><b>How can I help You?</b></span><br/>'
+            '<p>I am quite fluent in python can you guide me how can '
+            'I start</p>,<span>contribtuing <div>in Oppia.'
+            '</div>Ya Sure!visit,the oppia documentation, '
+            'sign the CLA</span>,<pre>and <br/>have your first PR to go.</pre>'
+        )
+
+        html_content_2 = (
+            'There are number of ways by which we can give our share to '
+            '<blockquote><div><p>the open source community. It is not just '
+            'always opening the PRs </p></div></blockquote>. <div> You can '
+            'help <br/> fellow members, <br/>open issues, <br/> <span> '
+            'review PRs </span> etc. </div>'
+        )
+
+        html_content_3 = (
+            'That is a very quick <div>sample of Oppia. For more sample '
+            'explorations check out the Library</div>. You can also '
+            'create new explorations, like this one, by clicking on the '
+            '"Create" button in the top right of the page.<br/><div>We'
+            'hope you enjoy using Oppia. If you have feedback, '
+            'please let us know at our <oppia-noninteractive-link '
+            'text-with-value="&amp;quot;discussion forum&amp;quot;" '
+            'url-with-value="&amp;quot;https://groups.google.com/forum/?'
+            'fromgroups#!forum/oppia&amp;quot;">'
+            '</oppia-noninteractive-link>!</div><p></p>'
+        )
+
+        html_content_4 = (
+            'So: <br/><br/>There is 1 way to arrange 1 ball. '
+            '<br/>There are 2 ways to arrange 2 balls.<br/>There are 6 ways '
+            'to arrange 3 balls.<br/><br/>Lets give these names. We will say '
+            'F1 = 1, F2 = 2, F3 = 6. So, if you have n balls (where n '
+            'is 1, 2, 3, ...), then Fn is the number of ways to arrange them. '
+            '<br/><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+            'patterns.png&amp;quot;"></oppia-noninteractive-image><br/><br/>'
+            'Can you see a pattern here, or a systematic way to count them? '
+            'Let us have a look at the 3-ball case.<br/><br/><br/><br/>First '
+            'you pick the ball on the left. This could be red, blue or '
+            'yellow. There are three cases to consider:<br/><br/>If the '
+            'first ball is red, then there are two balls left to arrange '
+            'in the other two slots. And there are F2 ways '
+            'to do this.<div><oppia-noninteractive-image '
+            'filepath-with-value="&amp;quot;startRed.png&amp;quot;"'
+            '></oppia-noninteractive-image><br/><span><br/></span></div> '
+            '<div><span>If the first ball is blue, then there are two balls '
+            'left to ... hey, this is the same thing, it is just F2. '
+            '</span></div><div><oppia-noninteractive-image '
+            'filepath-with-value="amp;quot;startBlue.png&amp;quot;">'
+            '</oppia-noninteractive-image><br/></div><div><br/><span>And, '
+            'if the first ball is yellow, then ... yada, yada, F2. '
+            '</span><br/><oppia-noninteractive-image filepath-with-value'
+            '="&amp;quot;startYellow.png&amp;quot;">'
+            '</oppia-noninteractive-image> <br/><br/>So the total number '
+            'of ways to arrange 3 balls, F3, is equal to 3 * F2. And all '
+            'this works out correctly, because '
+            'F2 = 2, and F3 = 3 * 2 = 6.<br/><br/><br/><br/>Now, '
+            'can you write out a similar expression for F2, in '
+            'terms of F1? Then we\'ll move on to figuring out F4, which '
+            'starts to become hard to compute manually.</div>'
+        )
+
+        expected_output_1 = (
+            '<p>Hello, <b>How can I help You?</b><br/>'
+            'I am quite fluent in python can you guide me how can '
+            'I start,contribtuing in Oppia.'
+            'Ya Sure!visit,the oppia documentation, '
+            'sign the CLA,</p><pre>and <p><br/></p>'
+            'have your first PR to go.</pre>'
+        )
+
+        expected_output_2 = (
+            '<p>There are number of ways by which we can give our share to </p>'
+            '<blockquote><p>the open source community. It is not just '
+            'always opening the PRs </p></blockquote><p>.  You can '
+            'help <br/> fellow members, <br/>open issues, <br/>  '
+            'review PRs  etc. </p>'
+        )
+
+        expected_output_3 = (
+            '<p>That is a very quick sample of Oppia. For more sample '
+            'explorations check out the Library. You can also '
+            'create new explorations, like this one, by clicking on the '
+            '"Create" button in the top right of the page.<br/>We'
+            'hope you enjoy using Oppia. If you have feedback, '
+            'please let us know at our <oppia-noninteractive-link '
+            'text-with-value="&amp;quot;discussion forum&amp;quot;" '
+            'url-with-value="&amp;quot;https://groups.google.com/forum/?'
+            'fromgroups#!forum/oppia&amp;quot;">'
+            '</oppia-noninteractive-link>!</p>'
+        )
+
+        expected_output_4 = (
+            '<p>So: <br/><br/>There is 1 way to arrange 1 ball. '
+            '<br/>There are 2 ways to arrange 2 balls.<br/>There are 6 ways '
+            'to arrange 3 balls.<br/><br/>Lets give these names. We will say '
+            'F1 = 1, F2 = 2, F3 = 6. So, if you have n balls (where n '
+            'is 1, 2, 3, ...), then Fn is the number of ways to arrange them. '
+            '<br/><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+            'patterns.png&amp;quot;"></oppia-noninteractive-image><br/><br/>'
+            'Can you see a pattern here, or a systematic way to count them? '
+            'Let us have a look at the 3-ball case.<br/><br/><br/><br/>First '
+            'you pick the ball on the left. This could be red, blue or '
+            'yellow. There are three cases to consider:<br/><br/>If the '
+            'first ball is red, then there are two balls left to arrange '
+            'in the other two slots. And there are F2 ways '
+            'to do this.<oppia-noninteractive-image '
+            'filepath-with-value="&amp;quot;startRed.png&amp;quot;"'
+            '></oppia-noninteractive-image><br/><br/> '
+            'If the first ball is blue, then there are two balls '
+            'left to ... hey, this is the same thing, it is just F2. '
+            '<oppia-noninteractive-image '
+            'filepath-with-value="amp;quot;startBlue.png&amp;quot;">'
+            '</oppia-noninteractive-image><br/><br/>And, '
+            'if the first ball is yellow, then ... yada, yada, F2. '
+            '<br/><oppia-noninteractive-image filepath-with-value'
+            '="&amp;quot;startYellow.png&amp;quot;">'
+            '</oppia-noninteractive-image> <br/><br/>So the total number '
+            'of ways to arrange 3 balls, F3, is equal to 3 * F2. And all '
+            'this works out correctly, because '
+            'F2 = 2, and F3 = 3 * 2 = 6.<br/><br/><br/><br/>Now, '
+            'can you write out a similar expression for F2, in '
+            'terms of F1? Then we\'ll move on to figuring out F4, which '
+            'starts to become hard to compute manually.</p>'
+        )
+
+        actual_output_1 = utils.convert_to_text_angular(html_content_1)
+        actual_output_2 = utils.convert_to_text_angular(html_content_2)
+        actual_output_3 = utils.convert_to_text_angular(html_content_3)
+        actual_output_4 = utils.convert_to_text_angular(html_content_4)
+
+        self.assertEqual(actual_output_1, expected_output_1)
+        self.assertEqual(actual_output_2, expected_output_2)
+        self.assertEqual(actual_output_3, expected_output_3)
+        self.assertEqual(actual_output_4, expected_output_4)

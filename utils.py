@@ -31,6 +31,7 @@ import urllib
 import urlparse
 import zipfile
 
+import bs4
 from constants import constants  # pylint: disable=relative-import
 import feconf  # pylint: disable=relative-import
 
@@ -722,6 +723,86 @@ def get_hashable_value(value):
             (k, get_hashable_value(v)) for k, v in value.iteritems()))
     else:
         return value
+
+
+def convert_to_text_angular(html_data):
+    """This fucntion converts the html to text angular supported format.
+
+    Args:
+        html_data: str. HTML string to be converted.
+
+    Returns:
+        str. The converted HTML string.
+    """
+    soup = bs4.BeautifulSoup(html_data, 'html.parser')
+
+    tags_to_remove = ['div', 'span', 'code', 'table', 'td', 'tr', 'tbody']
+
+    for tag_name in tags_to_remove:
+        for tag in soup.findAll(tag_name):
+            tag.unwrap()
+
+    for br in soup.findAll('br'):
+        if br.parent.name not in ['b', 'i', 'li', 'p']:
+            br.wrap(soup.new_tag('p'))
+
+    tag_list = soup.findAll()
+    if not len(tag_list):
+        start_tag = None
+    else:
+        start_tag = '<' + soup.findAll()[0].name + '>'
+    if not start_tag or html_data.find(start_tag) != 0:
+        html_data = '<p>' + str(soup) + '</p>'
+        soup = bs4.BeautifulSoup(html_data, 'html.parser')
+
+    oppia_tags1 = ['oppia-noninteractive-link', 'oppia-noninteractive-math']
+    oppia_tags2 = [
+        'oppia-noninteractive-image',
+        'oppia-noninteractive-video',
+        'oppia-noninteractive-collapsible',
+        'oppia-noninteractive-tabs'
+        ]
+
+    for tag_name in oppia_tags1:
+        tag_list = soup.findAll(tag_name)
+        for tag in tag_list:
+            if tag.parent.name not in ['b', 'i', 'li', 'p', 'pre']:
+                tag.wrap(soup.new_tag('p'))
+
+    for tag_name in oppia_tags2:
+        tag_list = soup.findAll(tag_name)
+        for tag in tag_list:
+            if tag.parent.name not in ['li', 'p', 'pre']:
+                tag.wrap(soup.new_tag('p'))
+
+    tag_list = soup.findAll('b')
+    for b in tag_list:
+        if b.parent.name not in ['i', 'li', 'p', 'pre']:
+            b.wrap(soup.new_tag('p'))
+
+    tag_list = soup.findAll('i')
+    for i in tag_list:
+        if i.parent.name not in ['b', 'li', 'p', 'pre']:
+            i.wrap(soup.new_tag('p'))
+
+    for tag_name in ['blockquote', 'pre']:
+        for tag in soup.findAll(tag_name):
+            prev_sib = list(tag.previous_siblings)
+            next_sib = list(tag.next_siblings)
+            if tag.parent.name == 'p':
+                tag.parent.unwrap()
+                p1 = soup.new_tag('p')
+                for sib in reversed(prev_sib):
+                    sib.wrap(p1)
+                p2 = soup.new_tag('p')
+                for sib in next_sib:
+                    sib.wrap(p2)
+
+    for p in soup.findAll('p'):
+        if p.parent.name == 'p':
+            p.unwrap()
+
+    return str(soup)
 
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):
