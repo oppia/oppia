@@ -228,6 +228,11 @@ DEFAULT_SKILL_DESCRIPTION = ''
 # Default explanation for a newly-minted skill.
 DEFAULT_SKILL_EXPLANATION = ''
 
+# Default name for a newly-minted topic.
+DEFAULT_TOPIC_NAME = ''
+# Default description for a newly-minted topic.
+DEFAULT_TOPIC_DESCRIPTION = ''
+
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'
 # Shared secret key for default VM.
