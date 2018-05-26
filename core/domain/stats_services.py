@@ -243,7 +243,7 @@ def update_exp_issues_for_new_exp_version(exploration, change_list):
     # We make a mapping from state name to list of exploration issues so that
     # handling those issues will be easier while going through the change list.
     exp_issues_by_state_name = collections.defaultdict([])
-    for exp_issue in exp_issues:
+    for exp_issue in exp_issues.unresolved_issues:
         keyname = feconf.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type]
         # If keyname is 'state_names', which is a list, we add an instance of
         # this issue to all associated states in the mapping.
@@ -310,7 +310,7 @@ def update_exp_issues_for_new_exp_version(exploration, change_list):
 
     # Handling reverts.
     if change_list[0]['cmd'] == 'AUTO_revert_version_number':
-        revert_to_version = change_dict['version_number']
+        revert_to_version = change_list[0]['version_number']
         # TODO(pranavsid98): Convert below two lines to use get_by_id() instead.
         old_exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
             exploration.id, revert_to_version)
