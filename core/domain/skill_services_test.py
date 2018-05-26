@@ -27,13 +27,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     SKILL_ID = None
     USER_ID = 'user'
+    MISCONCEPTION_ID = 'misconception_id'
 
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
         skill_contents = skill_domain.SkillContents(
             'Explanation', ['Example 1'])
         misconceptions = [skill_domain.Misconception(
-            'tag_name', 'description', 'default_feedback')]
+            self.MISCONCEPTION_ID, 'name', 'description', 'default_feedback')]
         self.SKILL_ID = skill_services.get_new_skill_id()
         self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, 'Description', misconceptions,

@@ -35,7 +35,7 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
 
     Args:
         versioned_skill_contents: A dict with two keys:
-          - schema_version: str. The schema version for the skill_contents dict.
+          - schema_version: int. The schema version for the skill_contents dict.
           - skill_contents: dict. The dict comprising the skill contents.
 
     Raises:
@@ -65,7 +65,7 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
 
     Args:
         versioned_misconceptions: A dict with two keys:
-          - schema_version: str. The schema version for the skill_contents dict.
+          - schema_version: int. The schema version for the misconceptions dict.
           - misconceptions: list(dict). The list of dicts comprising the skill
               misconceptions.
 
@@ -93,7 +93,7 @@ def _get_skill_memcache_key(skill_id, version=None):
 
     Args:
         skill_id: str. ID of the skill.
-        version: str. Schema version of the skill.
+        version: int or None. Schema version of the skill.
 
     Returns:
         str. The memcache key of the skill.
@@ -182,7 +182,7 @@ def get_skill_by_id(skill_id, strict=True, version=None):
         skill_id: str. ID of the skill.
         strict: bool. Whether to fail noisily if no skill with the given
             id exists in the datastore.
-        version: str or None. The version number of the skill to be
+        version: int or None. The version number of the skill to be
             retrieved. If it is None, the latest version will be retrieved.
 
     Returns:
@@ -282,7 +282,7 @@ def compute_summary_of_skill(skill):
     object and return it.
 
     Args:
-        skill_id: str. ID of the skill.
+        skill: Skill. The skill object, for which the summary is to be computed.
 
     Returns:
         SkillSummary. The computed summary for the given skill.

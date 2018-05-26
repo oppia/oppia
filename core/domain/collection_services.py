@@ -65,7 +65,7 @@ def _migrate_collection_contents_to_latest_schema(
 
     Args:
         versioned_collection_contents: A dict with two keys:
-          - schema_version: str. The schema version for the collection.
+          - schema_version: int. The schema version for the collection.
           - collection_contents: dict. The dict comprising the collection
               contents.
 
@@ -93,7 +93,7 @@ def _get_collection_memcache_key(collection_id, version=None):
 
     Args:
         collection_id: str. ID of the collection.
-        version: str. Schema version of the collection.
+        version: int. Schema version of the collection.
 
     Returns:
         str. The memcache key of the collection.
@@ -193,7 +193,7 @@ def get_collection_by_id(collection_id, strict=True, version=None):
         collection_id: str. ID of the collection.
         strict: bool. Whether to fail noisily if no collection with the given
             id exists in the datastore.
-        version: str or None. The version number of the collection to be
+        version: int or None. The version number of the collection to be
             retrieved. If it is None, the latest version will be retrieved.
 
     Returns:

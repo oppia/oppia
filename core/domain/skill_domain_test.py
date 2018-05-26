@@ -24,6 +24,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     """Test the skill domain object."""
 
     SKILL_ID = 'skill_id'
+    MISCONCEPTION_ID = 'misconception_id'
 
     def test_create_default_skill(self):
         """Test the create_default_skill function.
@@ -48,7 +49,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(skill.to_dict(), expected_skill_dict)
 
-    def test_export_import(self):
+    def test_conversion_to_and_from_dict(self):
         """Test that to_dict and from_dict preserve all data within a
         skill_contents and misconception object.
         """
@@ -59,7 +60,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_contents_dict)
 
         misconceptions = skill_domain.Misconception(
-            'Tag Name', 'Description', 'Feedback')
+            self.MISCONCEPTION_ID, 'Tag Name', 'Description', 'Feedback')
         misconceptions_dict = misconceptions.to_dict()
         misconceptions_from_dict = skill_domain.Misconception.from_dict(
             misconceptions_dict)
