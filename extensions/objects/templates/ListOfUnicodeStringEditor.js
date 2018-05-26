@@ -27,7 +27,9 @@ oppia.directive('listOfUnicodeStringEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        value: '='
+      },
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', function($scope) {
         $scope.SCHEMA = {

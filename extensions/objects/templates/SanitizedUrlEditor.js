@@ -27,7 +27,7 @@ oppia.directive('sanitizedUrlEditor', [
       },
       restrict: 'E',
       scope: {
-        initArgs: '=',
+        initArgs: '@',
         value: '='
       },
       template: '<span ng-include="getTemplateUrl()"></span>',

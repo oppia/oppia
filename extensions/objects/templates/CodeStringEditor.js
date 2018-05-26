@@ -28,7 +28,7 @@ oppia.directive('codeStringEditor', [
       },
       restrict: 'E',
       scope: {
-        alwaysEditable: '=?',
+        alwaysEditable: '@?',
         value: '='
       },
       template: '<span ng-include="getTemplateUrl()"></span>',
