@@ -26,7 +26,10 @@ oppia.directive('sanitizedUrlEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        initArgs: '=',
+        value: '='
+      },
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
         $scope.$watch('$parent.initArgs', function(newValue) {
