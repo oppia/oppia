@@ -130,7 +130,7 @@ oppia.directive('focusOn', [
 
 oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
   return {
-    restrict: 'A',
+    restrict: 'E',
     scope: true,
     controller: ['$scope', 'DeviceInfoService', function(
         $scope, DeviceInfoService) {
