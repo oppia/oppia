@@ -959,7 +959,7 @@ def _create_exploration(
     # Trigger exploration issues model creation.
     if feconf.ENABLE_PLAYTHROUGHS:
         stats_services.create_exp_issues_for_new_exploration(
-            exploration.id)
+            exploration.id, exploration.version)
 
     # Save state id mapping model for new exploration.
     create_and_save_state_id_mapping_model(exploration, commit_cmds)

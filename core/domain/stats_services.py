@@ -213,13 +213,14 @@ def handle_stats_creation_for_new_exp_version(
     create_stats_model(exploration_stats)
 
 
-def create_exp_issues_for_new_exploration(exp_id):
+def create_exp_issues_for_new_exploration(exp_id, exp_version):
     """Creates the ExplorationIssuesModel instance for the exploration.
 
     Args:
         exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
     """
-    stats_models.ExplorationIssuesModel.create(exp_id, [])
+    stats_models.ExplorationIssuesModel.create(exp_id, exp_version, [])
 
 
 def update_exp_issues_for_new_exp_version(exploration, change_list):
@@ -230,13 +231,12 @@ def update_exp_issues_for_new_exp_version(exploration, change_list):
         exploration: Exploration. Domain object for the exploration.
         change_list: list(dict). A list of changes introduced in this commit.
     """
-    old_exp_version = exp_version - 1
-    new_exp_version = exp_version
     # TODO(pranavsid98): Convert below two lines to use get_by_id() instead.
-    exp_issues_model = stats_models.ExplorationIssuesModel.get(
-        exploration.id, strict=False)
+    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+        exploration.id, exploration.version - 1)
     if exp_issues_model is None:
-        create_exp_issues_for_new_exploration(exp_id)
+        create_exp_issues_for_new_exploration(
+            exploration.id, exploration.version - 1)
         return
     exp_issues = get_exp_issues_from_model(exp_issues_model)
 
@@ -307,6 +307,17 @@ def update_exp_issues_for_new_exp_version(exploration, change_list):
                             'value'] = new_state_name
 
         update_playthroughs_multi(playthrough_ids, playthroughs)
+
+    # Handling reverts.
+    if change_list[0]['cmd'] == 'AUTO_revert_version_number':
+        revert_to_version = change_dict['version_number']
+        # TODO(pranavsid98): Convert below two lines to use get_by_id() instead.
+        old_exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
+            exploration.id, revert_to_version)
+        old_exp_issues = get_exp_issues_from_model(old_exp_issues_instance)
+        exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
+
+    exp_issues.exp_version += 1
 
     save_exp_issues_model_transactional(exp_issues)
 
