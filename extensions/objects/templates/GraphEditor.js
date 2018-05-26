@@ -27,7 +27,7 @@ oppia.directive('graphEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {},
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', function($scope) {
         $scope.alwaysEditable = true;
