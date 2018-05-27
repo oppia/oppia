@@ -474,6 +474,34 @@ def can_edit_exploration(handler):
     return test_can_edit
 
 
+def can_translate_exploration(handler):
+    """Decorator to check whether the user can translate given exploration."""
+
+    def test_can_translate(self, exploration_id, **kwargs):
+        """Checks if the user can translate the exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_translate_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to translate this exploration.')
+    test_can_translate.__wrapped__ = True
+
+    return test_can_translate
+
+
 def can_delete_exploration(handler):
     """Decorator to check whether user can delete exploration."""
 
