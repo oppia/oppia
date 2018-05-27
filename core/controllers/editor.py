@@ -952,7 +952,7 @@ class EditorAutosaveHandler(ExplorationHandler):
         self.render_json({})
 
 
-class StateAnswersStatsHandler(EditorHandler):
+class StateAnswerStatisticsHandler(EditorHandler):
     """Returns basic learner answer statistics for a state."""
 
     @acl_decorators.can_view_exploration_stats
