@@ -482,6 +482,10 @@ def can_translate_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: dict(str: *). Keyword arguments.
+
+        Returns:
+            Return value of decorated function.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
