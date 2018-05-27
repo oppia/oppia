@@ -549,6 +549,10 @@ def can_translate_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can translate the exploration.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
