@@ -69,7 +69,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
     def test_invalid_thread_ids_return_empty_message_list(self):
         response_dict = self.get_json(
-            '%s/%s.bad_thread_id' % (
+            '%s/%s.invalid_thread' % (
                 feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response_dict['messages'], [])
 

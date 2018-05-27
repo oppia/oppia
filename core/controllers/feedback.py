@@ -36,7 +36,7 @@ class ThreadListHandler(base.BaseHandler):
                 exploration_id, False)]})
         self.render_json(self.values)
 
-    @acl_decorators.can_play_exploration
+    @acl_decorators.can_create_feedback_thread
     def post(self, exploration_id):
         subject = self.payload.get('subject')
         if not subject:
@@ -76,7 +76,7 @@ class ThreadHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @acl_decorators.can_send_message_to_thread
+    @acl_decorators.can_comment_on_feedback_thread
     def post(self, thread_id):
         suggestion = feedback_services.get_suggestion(thread_id)
         text = self.payload.get('text')
@@ -231,7 +231,7 @@ class FeedbackThreadViewEventHandler(base.BaseHandler):
     user.
     """
 
-    @acl_decorators.can_view_feedback_thread
+    @acl_decorators.can_comment_on_feedback_thread
     def post(self, thread_id):
         exploration_id = thread_id.split('.')[0]
         transaction_services.run_in_transaction(

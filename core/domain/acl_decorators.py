@@ -343,17 +343,46 @@ def can_access_creator_dashboard(handler):
     return test_can_access
 
 
+def can_create_feedback_thread(handler):
+    """Decorator to check whether the user can create a feedback thread.
+    """
+
+    def test_can_access(self, exploration_id, **kwargs):
+        """Checks if the user can create a feedback thread.
+
+        Args:
+            exploration_id: str. The ID of the exploration where the thread will
+                be created.
+        """
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if rights_manager.check_can_access_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to create exploration feedback.')
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
 def can_view_feedback_thread(handler):
-    """Decorator to check whether the user can view feedback thread.
+    """Decorator to check whether the user can view a feedback thread.
     """
 
     def test_can_access(self, thread_id, **kwargs):
-        """Checks if the user can view the feedback thread.
+        """Checks if the user can view a feedback thread.
 
         Args:
             thread_id: str. The feedback thread id.
         """
+
         exploration_id = thread_id.split('.')[0]
+
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
 
@@ -370,12 +399,12 @@ def can_view_feedback_thread(handler):
     return test_can_access
 
 
-def can_send_message_to_thread(handler):
-    """Decorator to check whether the user can send message to feedback thread.
+def can_comment_on_feedback_thread(handler):
+    """Decorator to check whether the user can comment on feedback thread.
     """
 
     def test_can_access(self, thread_id, **kwargs):
-        """Checks if the user can send message to the feedback thread.
+        """Checks if the user can comment on the feedback thread.
 
         Args:
             thread_id: str. The feedback thread id.
@@ -396,7 +425,8 @@ def can_send_message_to_thread(handler):
             return handler(self, thread_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                'You do not have credentials to view exploration feedback.')
+                'You do not have credentials to comment on exploration'
+                ' feedback.')
     test_can_access.__wrapped__ = True
 
     return test_can_access
