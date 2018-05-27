@@ -34,18 +34,18 @@ oppia.directive('oppiaNoninteractiveImage', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
-        ImagePreloaderService.addToRecentlyRequestedImageFilenames($scope.filepath);
+        ImagePreloaderService.addToRecentlyRequestedImageFilenames(
+          $scope.filepath);
         $scope.imageUrl = '';
 
         var displayFromCache = function(filename) {
-          AssetsBackendApiService.loadImage(ExplorationContextService.getExplorationId(), filename)
-          .then(function(loadedImageFile) {
-            console.log("entered then part in display for   "+ loadedImageFile.filename);
-            var objectUrl = URL.createObjectURL(loadedImageFile.data);
-            $scope.imageUrl = objectUrl;
-            console.log( "the scope imageUrl created for the file "+ loadedImageFile.filename + "  is    " +$scope.imageUrl);
-            ImagePreloaderService.removeFromRecentlyRequestedImageFilenames(
-              filename);
+          AssetsBackendApiService.loadImage(
+            ExplorationContextService.getExplorationId(), filename)
+            .then(function(loadedImageFile) {
+              var objectUrl = URL.createObjectURL(loadedImageFile.data);
+              $scope.imageUrl = objectUrl;
+              ImagePreloaderService.removeFromRecentlyRequestedImageFilenames(
+                filename);
           });
         };
 
@@ -60,15 +60,14 @@ oppia.directive('oppiaNoninteractiveImage', [
             ImagePreloaderService.getRecentlyRequestedImageFilenames());
           if(recentlyRequestedImageFilenames.indexOf(imageFilename) !== -1) {
             displayFromCache(imageFilename);
-            console.log("Was requested earlier and got downloaded later on " + imageFilename);
           }
         };
 
         var filename = $scope.filepath;
         // This will work for the cases whose images have been requested by the
         // preloader but haven't been downloaded till now.
-        ImagePreloaderService.setImageLoadedCallback(onFinishedLoadingImage, filename);
-
+        ImagePreloaderService.setImageLoadedCallback(onFinishedLoadingImage,
+          filename);
         // If the image is preloaded, i.e already there in the cache then
         // display from the cache
         if (AssetsBackendApiService.isCached($scope.filepath)) {
