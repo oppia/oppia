@@ -46,7 +46,7 @@ oppia.directive('oppiaNoninteractiveImage', [
               $scope.imageUrl = objectUrl;
               ImagePreloaderService.removeFromRecentlyRequestedImageFilenames(
                 filename);
-          });
+            });
         };
 
         /**
@@ -58,7 +58,7 @@ oppia.directive('oppiaNoninteractiveImage', [
         var onFinishedLoadingImage = function(imageFilename) {
           var recentlyRequestedImageFilenames = (
             ImagePreloaderService.getRecentlyRequestedImageFilenames());
-          if(recentlyRequestedImageFilenames.indexOf(imageFilename) !== -1) {
+          if (recentlyRequestedImageFilenames.indexOf(imageFilename) !== -1) {
             displayFromCache(imageFilename);
           }
         };
