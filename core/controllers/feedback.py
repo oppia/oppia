@@ -78,7 +78,6 @@ class ThreadHandler(base.BaseHandler):
 
     @acl_decorators.can_send_message_to_thread
     def post(self, thread_id):
-        print 'post thread', thread_id
         suggestion = feedback_services.get_suggestion(thread_id)
         text = self.payload.get('text')
         updated_status = self.payload.get('updated_status')

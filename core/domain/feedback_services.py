@@ -357,8 +357,8 @@ def create_suggestion(
         exploration_id, state_name, author_id, description,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
     feedback_models.SuggestionModel.create(
-        exploration_id, thread_id, author_id, exploration_version, state_name,
-        description, suggestion_content)
+        thread_id, author_id, exploration_version, state_name, description,
+        suggestion_content)
 
     subscription_services.subscribe_to_thread(author_id, thread_id)
     _enqueue_suggestion_email_task(exploration_id, thread_id)

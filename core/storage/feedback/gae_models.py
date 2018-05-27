@@ -368,7 +368,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
     @classmethod
     def get(cls, user_id, thread_id):
         """Gets the FeedbackThreadUserModel corresponding to the given user and
-        the thread given by the exploration id and thread id.
+        the thread.
 
         Args:
             user_id: str. The id of the user.
@@ -402,7 +402,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
     @classmethod
     def get_multi(cls, user_id, thread_ids):
         """Gets the ExplorationUserDataModel corresponding to the given user and
-        the exploration and thread ids.
+        the thread ids.
 
         Args:
             user_id: str. The id of the user.
@@ -410,8 +410,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
 
         Returns:
             list(FeedbackThreadUserModel). The FeedbackThreadUserModels
-                corresponding to the given user and the exploration and thread
-                ids.
+                corresponding to the given user ans thread ids.
         """
         instance_ids = [
             cls.generate_full_id(user_id, thread_id)
@@ -493,12 +492,11 @@ class SuggestionModel(base_models.BaseModel):
 
     @classmethod
     def create(
-            cls, exploration_id, thread_id, author_id, exploration_version,
+            cls, thread_id, author_id, exploration_version,
             state_name, description, suggestion_html):
         """Creates a new SuggestionModel entry.
 
         Args:
-            exploration_id: str. ID of the corresponding exploration.
             thread_id: str. ID of the corresponding thread.
             author_id: str. ID of the user who submitted the suggestion.
             exploration_version: int. exploration version for which the
@@ -509,7 +507,7 @@ class SuggestionModel(base_models.BaseModel):
 
         Raises:
             Exception: There is already a feedback thread with the same
-                exploration_id and thread_id.
+                thread_id.
         """
         instance_id = thread_id
         if cls.get_by_id(instance_id):
@@ -517,6 +515,7 @@ class SuggestionModel(base_models.BaseModel):
                             'thread id: %s' % instance_id)
         state_content = cls._convert_suggestion_html_to_legacy_state_content(
             suggestion_html)
+        exploration_id = thread_id.split('.')[0]
         cls(id=instance_id, author_id=author_id,
             exploration_id=exploration_id,
             exploration_version=exploration_version,
@@ -534,17 +533,14 @@ class SuggestionModel(base_models.BaseModel):
 
     @classmethod
     def get_by_thread_id(cls, thread_id):
-        """Gets a suggestion by the corresponding exploration and thread IDs.
+        """Gets a suggestion by the corresponding thread ID.
 
         Args:
-            exploration_id: str. ID of the exploration to which the
-                suggestion belongs.
             thread_id: str. Thread ID of the suggestion thread.
 
         Returns:
-            SuggestionModel or None. Suggestion related to the given
-                exploration and thread IDs, or None if no such SuggestionModel
-                exists.
+            SuggestionModel or None. Suggestion related to the given thread ID,
+                or None if no such SuggestionModel exists.
         """
         return cls.get_by_id(thread_id)
 
