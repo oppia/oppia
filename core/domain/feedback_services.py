@@ -88,6 +88,9 @@ def create_thread(
         original_author_id: str. The author id who starts this thread.
         subject: str. The subject of this thread.
         text: str. The text of the feedback message. This may be ''.
+
+    Returns:
+        str. The ID of the newly created thread.
     """
     thread_id = _create_models_for_thread_and_first_message(
         exploration_id, state_name, original_author_id, subject, text, False)

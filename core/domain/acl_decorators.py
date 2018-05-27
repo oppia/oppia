@@ -353,6 +353,10 @@ def can_create_feedback_thread(handler):
         Args:
             exploration_id: str. The ID of the exploration where the thread will
                 be created.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can create the feedback thread.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -379,6 +383,10 @@ def can_view_feedback_thread(handler):
 
         Args:
             thread_id: str. The feedback thread id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can view the feedback thread.
         """
 
         exploration_id = thread_id.split('.')[0]
@@ -408,6 +416,10 @@ def can_comment_on_feedback_thread(handler):
 
         Args:
             thread_id: str. The feedback thread id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can comment on the feedback thread.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -442,6 +454,7 @@ def can_rate_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
