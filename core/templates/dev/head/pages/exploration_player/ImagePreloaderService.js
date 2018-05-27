@@ -71,7 +71,7 @@ oppia.factory('ImagePreloaderService', [
           _filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
           _loadImage(nextImageFilename);
         }
-        if(_imageLoadedCallback[loadedImage.filename]) {
+        if (_imageLoadedCallback[loadedImage.filename]) {
           _imageLoadedCallback.func(loadedImage.filename);
           _imageLoadedCallback.loadedImage = null;
         }
@@ -96,28 +96,27 @@ oppia.factory('ImagePreloaderService', [
     };
 
     var _onStateChange = function(stateName) {
-      console.log("entered on state change  ");
       var imageFilenamesInState = [];
       var imageFilenamesInStateCurrentlyBeingRequested = [];
       // Images that are not there in the cache and are not currently
-      //being downloaded
+      // being downloaded
       var imagesNeitherInCacheNorBeingRequested = [];
-      
+
       var state = _states.getState(stateName);
       imageFilenamesInState =
         ExtractImageFilenamesFromStateService.getImageFilenamesInState(state);
-      
+
       imageFilenamesInState.forEach(function(filename) {
-        if (! AssetsBackendApiService.isCached(filename) &&
+        if (!AssetsBackendApiService.isCached(filename) &&
           (_filenamesOfImageCurrentlyDownloading.indexOf(filename) === -1)) {
           imagesNeitherInCacheNorBeingRequested.push(filename);
-          }
-        if(_filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1) {
+        }
+        if (_filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1) {
           imageFilenamesInStateCurrentlyBeingRequested.push(filename);
         }
       });
       if (imagesNeitherInCacheNorBeingRequested.length &&
-        imageFilenamesInStateCurrentlyBeingRequested.length <=1) {
+        imageFilenamesInStateCurrentlyBeingRequested.length <= 1) {
         _cancelPreloading();
         _kickOffImagePreloader(stateName);
       }
@@ -128,7 +127,6 @@ oppia.factory('ImagePreloaderService', [
         _init(exploration);
       },
       kickOffImagePreloader: function(sourceStateName) {
-        console.log("entered ImagePreloader Kickoff");
         _kickOffImagePreloader(sourceStateName);
       },
       onStateChange: _onStateChange,
@@ -140,13 +138,13 @@ oppia.factory('ImagePreloaderService', [
       },
       removeFromRecentlyRequestedImageFilenames: function(filename) {
         var index = _recentlyRequestedImageFilenames.indexOf(filename);
-        if(index > -1) {
-          _recentlyRequestedImageFilenames.splice(index,1);
+        if (index > -1) {
+          _recentlyRequestedImageFilenames.splice(index, 1);
         }
       },
       setImageLoadedCallback: function(imageLoadedCallbackFunction, filename) {
         _imageLoadedCallback[filename] = true;
-        _imageLoadedCallback['func'] = imageLoadedCallbackFunction;
+        _imageLoadedCallback.func = imageLoadedCallbackFunction;
       },
       isLoadingImageFile: function(filename) {
         return _filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1;
