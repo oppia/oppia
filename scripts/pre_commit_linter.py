@@ -49,9 +49,9 @@ Note that the root folder MUST be named 'oppia'.
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
+import HTMLParser
 import argparse
 import fnmatch
-import HTMLParser
 import multiprocessing
 import os
 import re
@@ -219,7 +219,6 @@ for path in _PATHS_TO_INSERT:
 # pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 
-import bs4  # isort:skip
 import isort  # isort:skip
 import pycodestyle  # isort:skip
 import pyjsparser  # isort:skip
@@ -1089,49 +1088,97 @@ def _check_directive_scope(all_files):
 
 def _check_html_indent(all_files):
     """This function checks the indentation of lines in HTML files."""
+
+    print 'Starting HTML indentation check'
+    print '----------------------------------------'
+
     html_files_to_lint = [
         filename for filename in all_files if filename.endswith('.html')]
+
+    failed = False
+    summary_messages = []
+
     for filename in html_files_to_lint:
         with open(filename, 'r') as f:
             file_content = f.read()
 
             class CustomHTMLParser(HTMLParser.HTMLParser):
+                """Custom HTML parser to check indentation."""
+
+                def __init__(self, failed=False):
+                    HTMLParser.HTMLParser.__init__(self)
+                    self.failed = failed
+
                 def handle_starttag(self, tag, attrs):
-                    print "Encountered a start tag:", tag
-                    print self.get_starttag_text()
+                    line_number, column_number = self.getpos()
+                    # Check the indentation of the tag.
+                    if column_number % 2 != 0:
+                        print (
+                            'Please ensure that %s tag on line number %d '
+                            'has an indentation which is a multiple of 2 ' % (
+                                tag, line_number))
+                        self.failed = True
 
-                def handle_endtag(self, tag):
-                    print "Encountered an end tag :", tag
+                    # Check the indentation of the attributes of the tag.
+                    indentation_of_first_attribute = (
+                        column_number + len(tag) + 2)
+                    starttag_text = self.get_starttag_text()
 
-                def handle_data(self, data):
-                    print "Encountered some data  :", data
+                    for line_num, line in enumerate(
+                            str.splitlines(starttag_text)):
+                        if line_num == 0:
+                            continue
+                        leading_spaces_count = len(line) - len(line.lstrip())
+                        if (
+                                indentation_of_first_attribute != (
+                                    leading_spaces_count)):
+                            line_num_of_error = line_number + line_num
+                            print (
+                                'Please ensure that the attribute(s) on '
+                                'line number %d align with leftmost '
+                                'attribute on the first line '
+                                'of the tag' % line_num_of_error)
+                            self.failed = True
+
 
             parser = CustomHTMLParser()
             parser.feed(file_content)
 
-    return []
+            if parser.failed:
+                failed = True
+
+    if failed:
+        summary_message = '%s   HTML indentation check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s  HTML indentation check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
 
 def main():
     all_files = _get_all_files()
     # TODO(apb7): Enable the _check_directive_scope function.
     directive_scope_messages = []
-    #html_directive_name_messages = _check_html_directive_name(all_files)
-    #import_order_messages = _check_import_order(all_files)
-    #newline_messages = _check_newline_character(all_files)
-    #docstring_messages = _check_docstrings(all_files)
-    #comment_messages = _check_comments(all_files)
-    html_indent_messages = _check_html_indent(all_files)
-    #html_linter_messages = _lint_html_files(all_files)
-    #linter_messages = _pre_commit_linter(all_files)
-    #pattern_messages = _check_bad_patterns(all_files)
-    html_directive_name_messages = []
-    import_order_messages = []
-    newline_messages = []
-    docstring_messages = []
-    comment_messages = []
-    html_linter_messages = []
-    linter_messages = []
-    pattern_messages = []
+    html_directive_name_messages = _check_html_directive_name(all_files)
+    import_order_messages = _check_import_order(all_files)
+    newline_messages = _check_newline_character(all_files)
+    docstring_messages = _check_docstrings(all_files)
+    comment_messages = _check_comments(all_files)
+    # TODO(apb7): Enable the _check_html_indent function.
+    html_indent_messages = []
+    html_linter_messages = _lint_html_files(all_files)
+    linter_messages = _pre_commit_linter(all_files)
+    pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
         directive_scope_messages + html_directive_name_messages +
         import_order_messages + newline_messages +
