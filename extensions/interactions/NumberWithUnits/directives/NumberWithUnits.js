@@ -137,9 +137,40 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
   }
 ]);
 
-// Rule evaluation for number with units (will be implemented in M1.3).
+// Rule evaluation for number with units.
 oppia.factory('numberWithUnitsRulesService', [
   'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
   function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
+    var isEqualValues = function(answer, inputs) {
+      if (answer.type === 'fraction') {
+        return answer.fraction.toString() === inputs.fraction.toString();
+      } else {
+        return answer.real === inputs.real;
+      }
+    };
+
+    return {
+      IsEqualTo: function(answer, inputs) {
+        answer = NumberWithUnitsObjectFactory.fromDict(answer);
+        inputs = NumberWithUnitsObjectFactory.fromDict(inputs);
+        return answer.type === inputs.type && isEqualValues(answer, inputs) &&
+          angular.equals(answer.units.toDict(), inputs.units.toDict());
+      },
+      IsEquivalentTo: function(answer, inputs) {
+        answer = NumberWithUnitsObjectFactory.fromDict(answer);
+        inputs = NumberWithUnitsObjectFactory.fromDict(inputs);
+        if (answer.type === 'fraction') {
+          answer.type = 'real';
+          answer.real = answer.fraction.toFloat();
+        }
+        if (inputs.type === 'fraction') {
+          inputs.type = 'real';
+          inputs.real = inputs.fraction.toFloat();
+        }
+        answerString = answer.toString();
+        inputsString = inputs.toString();
+        return math.unit(answerString).equals(math.unit(inputsString));
+      }
+    };
   }
 ]);
