@@ -88,6 +88,9 @@ class FeedbackThreadModel(base_models.BaseModel):
         Args:
             update_last_updated_time: bool. Whether to update the
                 last_updated_field of the thread.
+
+        Returns:
+            thread. The thread entity.
         """
         if update_last_updated_time:
             self.last_updated = datetime.datetime.utcnow()
@@ -160,11 +163,9 @@ class FeedbackThreadModel(base_models.BaseModel):
 class FeedbackMessageModel(base_models.BaseModel):
     """Feedback messages. One or more of these messages make a thread.
 
-    The id of instances of this class has the form
-        [EXPLORATION_ID].[THREAD_ID].[MESSAGE_ID]
+    The id of instances of this class has the form [THREAD_ID].[MESSAGE_ID]
     """
-    # ID corresponding to an entry of FeedbackThreadModel in the form of
-    #   [EXPLORATION_ID].[THREAD_ID]
+    # ID corresponding to an entry of FeedbackThreadModel.
     thread_id = ndb.StringProperty(required=True, indexed=True)
     # 0-based sequential numerical ID. Sorting by this field will create the
     # thread in chronological order.
@@ -354,7 +355,7 @@ class FeedbackThreadUserModel(base_models.BaseModel):
     @classmethod
     def generate_full_id(cls, user_id, thread_id):
         """Generates the full message id of the format:
-            <user_id.exploration_id.thread_id>.
+            <user_id.thread_id>.
 
          Args:
             user_id: str. The user id.

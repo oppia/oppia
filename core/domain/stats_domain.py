@@ -410,38 +410,31 @@ class ExplorationIssues(object):
     exploration.
     """
 
-    def __init__(self, exp_id, unresolved_issues):
+    def __init__(self, exp_id, exp_version, unresolved_issues):
         """Constructs an ExplorationIssues domain object.
 
         Args:
             exp_id: str. ID of the exploration.
-            unresolved_issues: list(dict). The unresolved issues for this
-                exploration. This will be a list of dicts where each dict
-                represents an issue along with the associated playthroughs.
-                Each dict will be of the form:
-                {
-                    issue_type: str. Type of the issue.
-                    issue_customization_args: dict. The customization args dict
-                        for the given issue_type. The specs for this dict are as
-                        specified above in the different subclasses of
-                        BaseExplorationIssueSpec.
-                    playthrough_ids: list(str). List of PlaythroughModel IDs.
-                }
+            exp_version: int. Version of the exploration.
+            unresolved_issues: list(ExplorationIssue). List of exploration
+                issues.
         """
-        self.id = exp_id
+        self.exp_id = exp_id
+        self.exp_version = exp_version
         self.unresolved_issues = unresolved_issues
 
     @classmethod
-    def create_default(cls, exp_id):
+    def create_default(cls, exp_id, exp_version):
         """Creates a default ExplorationIssues domain object.
 
         Args:
             exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
 
         Returns:
             ExplorationIssues. The exploration issues domain object.
         """
-        return cls(exp_id, [])
+        return cls(exp_id, exp_version, [])
 
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssues domain object.
@@ -449,9 +442,13 @@ class ExplorationIssues(object):
         Returns:
             dict. A dict mapping of all fields of ExplorationIssues object.
         """
+        unresolved_issue_dicts = [
+            unresolved_issue.to_dict()
+            for unresolved_issue in self.unresolved_issues]
         return {
-            'id': self.id,
-            'unresolved_issues': self.unresolved_issues
+            'exp_id': self.exp_id,
+            'exp_version': self.exp_version,
+            'unresolved_issues': unresolved_issue_dicts
         }
 
     @classmethod
@@ -466,15 +463,24 @@ class ExplorationIssues(object):
             ExplorationIssues. The corresponding ExplorationIssues domain
                 object.
         """
+        unresolved_issues = [
+            ExplorationIssue.from_dict(unresolved_issue_dict)
+            for unresolved_issue_dict in exp_issues_dict['unresolved_issues']]
         return cls(
-            exp_issues_dict['id'],
-            exp_issues_dict['unresolved_issues'])
+            exp_issues_dict['exp_id'], exp_issues_dict['exp_version'],
+            unresolved_issues)
 
     def validate(self):
         """Validates the ExplorationIssues domain object."""
-        if not isinstance(self.id, basestring):
+        if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % type(self.id))
+                'Expected exp_id to be a string, received %s' % type(
+                    self.exp_id))
+
+        if not isinstance(self.exp_version, int):
+            raise utils.ValidationError(
+                'Expected exp_version to be an int, received %s' % type(
+                    self.exp_version))
 
         if not isinstance(self.unresolved_issues, list):
             raise utils.ValidationError(
@@ -482,27 +488,7 @@ class ExplorationIssues(object):
                     type(self.unresolved_issues)))
 
         for issue in self.unresolved_issues:
-            if not isinstance(issue, dict):
-                raise utils.ValidationError(
-                    'Expected each element of unresolved_issues to be a dict, '
-                    'received %s' % (type(issue)))
-
-            expected_keys = [
-                'issue_id', 'issue_customization_args', 'playthrough_ids']
-            if sorted(issue.keys()) != sorted(expected_keys):
-                raise utils.ValidationError(
-                    'KeyError in an element of unresolved_issues')
-
-            try:
-                issue_instance = issue_registry.Registry.get_issue_by_id(
-                    issue['issue_id'])
-            except KeyError:
-                raise utils.ValidationError('Invalid issue ID: %s' % (
-                    issue['issue_id']))
-
-            exp_domain.validate_customization_args_and_values(
-                'issue', issue['issue_id'], issue['issue_customization_args'],
-                issue_instance.customization_arg_specs)
+            issue.validate()
 
 
 class Playthrough(object):
@@ -510,30 +496,26 @@ class Playthrough(object):
     """
 
     def __init__(
-            self, playthrough_id, exp_id, exp_version, issue_id,
-            issue_customization_args, playthrough_actions, is_valid):
+            self, playthrough_id, exp_id, exp_version, issue_type,
+            issue_customization_args, playthrough_actions):
         """Constructs a Playthrough domain object.
 
         Args:
             playthrough_id: str. ID of the playthrough.
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
-            issue_id: str. ID of the issue.
+            issue_type: str. Type of the issue.
             issue_customization_args: dict. The customization args dict for the
-                given issue_id.
-            playthrough_actions: list(dict). The playthrough actions for this
-                playthrough. This will be a list of dicts where each dict
-                represents a single playthrough action. The list is ordered by
-                the time of occurence of the action.
-            is_valid: Bool. Whether the playthrough is valid.
+                given issue_type.
+            playthrough_actions: list(LearnerAction). List of playthrough
+                learner actions.
         """
         self.id = playthrough_id
         self.exp_id = exp_id
         self.exp_version = exp_version
-        self.issue_id = issue_id
+        self.issue_type = issue_type
         self.issue_customization_args = issue_customization_args
         self.playthrough_actions = playthrough_actions
-        self.is_valid = is_valid
 
     def to_dict(self):
         """Returns a dict representation of the Playthrough domain object.
@@ -541,14 +523,16 @@ class Playthrough(object):
         Returns:
             dict. A dict mapping of all fields of Playthrough object.
         """
+        playthrough_actions_dicts = [
+            playthrough_action.to_dict()
+            for playthrough_action in self.playthrough_actions]
         return {
             'id': self.id,
             'exp_id': self.exp_id,
             'exp_version': self.exp_version,
-            'issue_id': self.issue_id,
+            'issue_type': self.issue_type,
             'issue_customization_args': self.issue_customization_args,
-            'playthrough_actions': self.playthrough_actions,
-            'is_valid': self.is_valid
+            'playthrough_actions': playthrough_actions_dicts,
         }
 
     @classmethod
@@ -562,14 +546,17 @@ class Playthrough(object):
         Returns:
             Playthrough. The corresponding Playthrough domain object.
         """
+        playthrough_actions = [
+            LearnerAction.from_dict(playthrough_action_dict)
+            for playthrough_action_dict in playthrough_dict[
+                'playthrough_actions']]
         return cls(
             playthrough_dict['id'],
             playthrough_dict['exp_id'],
             playthrough_dict['exp_version'],
-            playthrough_dict['issue_id'],
+            playthrough_dict['issue_type'],
             playthrough_dict['issue_customization_args'],
-            playthrough_dict['playthrough_actions'],
-            playthrough_dict['is_valid'])
+            playthrough_actions)
 
     def validate(self):
         """Validates the Playthrough domain object."""
@@ -587,10 +574,10 @@ class Playthrough(object):
                 'Expected exp_version to be an int, received %s' % (
                     type(self.exp_version)))
 
-        if not isinstance(self.issue_id, basestring):
+        if not isinstance(self.issue_type, basestring):
             raise utils.ValidationError(
-                'Expected issue_id to be a string, received %s' % type(
-                    self.issue_id))
+                'Expected issue_type to be a string, received %s' % type(
+                    self.issue_type))
 
         if not isinstance(self.issue_customization_args, dict):
             raise utils.ValidationError(
@@ -599,13 +586,14 @@ class Playthrough(object):
                     type(self.issue_customization_args)))
 
         try:
-            issue = issue_registry.Registry.get_issue_by_id(
-                self.issue_id)
+            issue = issue_registry.Registry.get_issue_by_type(
+                self.issue_type)
         except KeyError:
-            raise utils.ValidationError('Invalid issue ID: %s' % self.issue_id)
+            raise utils.ValidationError('Invalid issue type: %s' % (
+                self.issue_type))
 
         exp_domain.validate_customization_args_and_values(
-            'issue', self.issue_id, self.issue_customization_args,
+            'issue', self.issue_type, self.issue_customization_args,
             issue.customization_arg_specs)
 
         if not isinstance(self.playthrough_actions, list):
@@ -614,46 +602,33 @@ class Playthrough(object):
                     type(self.playthrough_actions)))
 
         for action in self.playthrough_actions:
-            if not isinstance(action, dict):
-                raise utils.ValidationError(
-                    'Expected each element of playthrough_actions to be a '
-                    'dict, received %s' % (type(action)))
-
-            expected_keys = ['action_id', 'action_customization_args']
-            if sorted(action.keys()) != sorted(expected_keys):
-                raise utils.ValidationError(
-                    'KeyError in an element of playthrough_actions')
-
-            try:
-                action_instance = action_registry.Registry.get_action_by_id(
-                    action['action_id'])
-            except KeyError:
-                raise utils.ValidationError('Invalid action ID: %s' % (
-                    action['action_id']))
-
-            exp_domain.validate_customization_args_and_values(
-                'action', action['action_id'],
-                action['action_customization_args'],
-                action_instance.customization_arg_specs)
+            action.validate()
 
 
 class ExplorationIssue(object):
     """Domain object representing an exploration issue."""
 
-    def __init__(self, issue_id, schema_version, customization_args):
+    def __init__(
+            self, issue_type, issue_customization_args, playthrough_ids,
+            schema_version, is_valid):
         """Constructs an ExplorationIssue domain object.
 
         Args:
-            issue_id: str. ID of the issue.
-            schema_version: int. Schema version of the customization args dict.
-            customization_args: dict. The customization dict. The keys are
+            issue_type: str. Type of the issue.
+            issue_customization_args: dict. The customization dict. The keys are
                 names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+            playthrough_ids: list(str). List of playthrough IDs.
+            schema_version: int. Schema version for the exploration issue.
+            is_valid: bool. Whether the issue and the associated playthroughs
+                are valid.
         """
-        self.issue_id = issue_id
+        self.issue_type = issue_type
+        self.issue_customization_args = issue_customization_args
+        self.playthrough_ids = playthrough_ids
         self.schema_version = schema_version
-        self.customization_args = customization_args
+        self.is_valid = is_valid
 
     def to_dict(self):
         """Returns a dict representation of the ExplorationIssue domain object.
@@ -662,12 +637,14 @@ class ExplorationIssue(object):
             dict. A dict mapping of all fields of ExplorationIssue object.
         """
         return {
-            'issue_id': self.issue_id,
+            'issue_type': self.issue_type,
+            'issue_customization_args': exp_domain.get_full_customization_args(
+                self.issue_customization_args,
+                issue_registry.Registry.get_issue_by_type(
+                    self.issue_type).customization_arg_specs),
+            'playthrough_ids': self.playthrough_ids,
             'schema_version': self.schema_version,
-            'customization_args': exp_domain.get_full_customization_args(
-                self.customization_args,
-                issue_registry.Registry.get_issue_by_id(
-                    self.issue_id).customization_arg_specs)
+            'is_valid': self.is_valid
         }
 
     @classmethod
@@ -682,16 +659,42 @@ class ExplorationIssue(object):
             ExplorationIssue. The corresponding ExplorationIssue domain object.
         """
         return cls(
-            issue_dict['issue_id'],
+            issue_dict['issue_type'],
+            issue_dict['issue_customization_args'],
+            issue_dict['playthrough_ids'],
             issue_dict['schema_version'],
-            issue_dict['customization_args'])
+            issue_dict['is_valid'])
+
+    @classmethod
+    def update_exp_issue_from_model(cls, issue_dict):
+        """Converts the exploration issue blob given from
+        current issue_schema_version to current issue_schema_version + 1.
+        Note that the issue_dict being passed in is modified in-place.
+
+        Args:
+            issue_dict: dict. Dict representing the ExplorationIssue object.
+        """
+        current_issue_schema_version = issue_dict['schema_version']
+        issue_dict['schema_version'] += 1
+
+        conversion_fn = getattr(cls, '_convert_issue_v%s_dict_to_v%s_dict' % (
+            current_issue_schema_version, current_issue_schema_version + 1))
+        issue_dict = conversion_fn(issue_dict)
+
+    @classmethod
+    def _convert_issue_v1_dict_to_v2_dict(cls, issue_dict):
+        """Converts a v1 issue dict to a v2 issue dict. This function is now
+        implemented only for testing purposes and must be rewritten when an
+        actual schema migration from v1 to v2 takes place.
+        """
+        raise NotImplementedError
 
     def validate(self):
         """Validates the ExplorationIssue domain object."""
-        if not isinstance(self.issue_id, basestring):
+        if not isinstance(self.issue_type, basestring):
             raise utils.ValidationError(
-                'Expected issue_id to be a string, received %s' % (
-                    type(self.issue_id)))
+                'Expected issue_type to be a string, received %s' % (
+                    type(self.issue_type)))
 
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
@@ -699,33 +702,45 @@ class ExplorationIssue(object):
                     type(self.schema_version)))
 
         try:
-            issue = issue_registry.Registry.get_issue_by_id(
-                self.issue_id)
+            issue = issue_registry.Registry.get_issue_by_type(
+                self.issue_type)
         except KeyError:
-            raise utils.ValidationError('Invalid issue ID: %s' % self.issue_id)
+            raise utils.ValidationError('Invalid issue type: %s' % (
+                self.issue_type))
 
         exp_domain.validate_customization_args_and_values(
-            'issue', self.issue_id, self.customization_args,
+            'issue', self.issue_type, self.issue_customization_args,
             issue.customization_arg_specs)
+
+        if not isinstance(self.playthrough_ids, list):
+            raise utils.ValidationError(
+                'Expected playthrough_ids to be a list, received %s' % (
+                    type(self.playthrough_ids)))
+
+        for playthrough_id in self.playthrough_ids:
+            if not isinstance(playthrough_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each playthrough_id to be a string, received '
+                    '%s' % type(playthrough_id))
 
 
 class LearnerAction(object):
     """Domain object representing a learner action."""
 
-    def __init__(self, action_id, schema_version, customization_args):
+    def __init__(self, action_type, action_customization_args, schema_version):
         """Constructs a LearnerAction domain object.
 
         Args:
-            action_id: str. ID of the action.
-            schema_version: int. Schema version of the customization args dict.
-            customization_args: dict. The customization dict. The keys are
-                names of customization_args and the values are dicts with a
+            action_type: str. Type of the action.
+            action_customization_args: dict. The customization dict. The keys
+                are names of customization_args and the values are dicts with a
                 single key, 'value', whose corresponding value is the value of
                 the customization arg.
+            schema_version: int. Schema version for the learner action.
         """
-        self.action_id = action_id
+        self.action_type = action_type
+        self.action_customization_args = action_customization_args
         self.schema_version = schema_version
-        self.customization_args = customization_args
 
     def to_dict(self):
         """Returns a dict representation of the LearnerAction domain object.
@@ -734,12 +749,12 @@ class LearnerAction(object):
             dict. A dict mapping of all fields of LearnerAction object.
         """
         return {
-            'action_id': self.action_id,
-            'schema_version': self.schema_version,
-            'customization_args': exp_domain.get_full_customization_args(
-                self.customization_args,
-                action_registry.Registry.get_action_by_id(
-                    self.action_id).customization_arg_specs)
+            'action_type': self.action_type,
+            'action_customization_args': exp_domain.get_full_customization_args(
+                self.action_customization_args,
+                action_registry.Registry.get_action_by_type(
+                    self.action_type).customization_arg_specs),
+            'schema_version': self.schema_version
         }
 
     @classmethod
@@ -754,16 +769,40 @@ class LearnerAction(object):
             LearnerAction. The corresponding LearnerAction domain object.
         """
         return cls(
-            action_dict['action_id'],
-            action_dict['schema_version'],
-            action_dict['customization_args'])
+            action_dict['action_type'],
+            action_dict['action_customization_args'],
+            action_dict['schema_version'])
+
+    @classmethod
+    def update_learner_action_from_model(cls, action_dict):
+        """Converts the learner action blob given from
+        current action_schema_version to current action_schema_version + 1.
+        Note that the action_dict being passed in is modified in-place.
+
+        Args:
+            action_dict: dict. Dict representing the LearnerAction object.
+        """
+        current_action_schema_version = action_dict['schema_version']
+        action_dict['schema_version'] += 1
+
+        conversion_fn = getattr(cls, '_convert_action_v%s_dict_to_v%s_dict' % (
+            current_action_schema_version, current_action_schema_version + 1))
+        action_dict = conversion_fn(action_dict)
+
+    @classmethod
+    def _convert_action_v1_dict_to_v2_dict(cls, action_dict):
+        """Converts a v1 action dict to a v2 action dict. This function is now
+        implemented only for testing purposes and must be rewritten when an
+        actual schema migration from v1 to v2 takes place.
+        """
+        raise NotImplementedError
 
     def validate(self):
         """Validates the LearnerAction domain object."""
-        if not isinstance(self.action_id, basestring):
+        if not isinstance(self.action_type, basestring):
             raise utils.ValidationError(
-                'Expected action_id to be a string, received %s' % (
-                    type(self.action_id)))
+                'Expected action_type to be a string, received %s' % (
+                    type(self.action_type)))
 
         if not isinstance(self.schema_version, int):
             raise utils.ValidationError(
@@ -771,14 +810,14 @@ class LearnerAction(object):
                     type(self.schema_version)))
 
         try:
-            action = action_registry.Registry.get_action_by_id(
-                self.action_id)
+            action = action_registry.Registry.get_action_by_type(
+                self.action_type)
         except KeyError:
             raise utils.ValidationError(
-                'Invalid action ID: %s' % self.action_id)
+                'Invalid action type: %s' % self.action_type)
 
         exp_domain.validate_customization_args_and_values(
-            'action', self.action_id, self.customization_args,
+            'action', self.action_type, self.action_customization_args,
             action.customization_arg_specs)
 
 
@@ -1195,6 +1234,7 @@ class StateAnswersCalcOutput(object):
                 corresponding to the answer calculation output.
             state_name: str. The name of the exploration state to which the
                 aggregated answers were submitted.
+            interaction_id: str. The ID of the interaction.
             calculation_id: str. Which calculation was performed on the given
                 answer data.
             calculation_output: AnswerCalculationOutput. The output of an

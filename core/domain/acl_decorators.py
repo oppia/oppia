@@ -45,6 +45,10 @@ def can_play_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can play the given exploration.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise self.PageNotFoundException
@@ -70,6 +74,10 @@ def can_play_collection(handler):
 
         Args:
             collection_id: str. The collection id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can play the given collection.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
@@ -94,6 +102,10 @@ def can_download_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can download the given exploration.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -120,6 +132,10 @@ def can_view_exploration_stats(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can view the exploration stats.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -144,6 +160,10 @@ def can_edit_collection(handler):
 
         Args:
             collection_id: str. The collection id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can edit the collection.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -392,6 +412,10 @@ def can_rate_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can rate the exploration.
         """
         if (role_services.ACTION_RATE_ANY_PUBLIC_EXPLORATION in
                 self.user.actions):
@@ -412,6 +436,10 @@ def can_flag_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can flag the exploration.
         """
         if role_services.ACTION_FLAG_EXPLORATION in self.user.actions:
             return handler(self, exploration_id, **kwargs)
@@ -446,6 +474,10 @@ def can_edit_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can edit the exploration.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -466,6 +498,34 @@ def can_edit_exploration(handler):
     return test_can_edit
 
 
+def can_translate_exploration(handler):
+    """Decorator to check whether the user can translate given exploration."""
+
+    def test_can_translate(self, exploration_id, **kwargs):
+        """Checks if the user can translate the exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_translate_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to translate this exploration.')
+    test_can_translate.__wrapped__ = True
+
+    return test_can_translate
+
+
 def can_delete_exploration(handler):
     """Decorator to check whether user can delete exploration."""
 
@@ -474,6 +534,10 @@ def can_delete_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can delete the exploration.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -503,6 +567,11 @@ def can_suggest_changes_to_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can make suggestions to an
+                exploration.
         """
         if (role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in
                 self.user.actions):
@@ -524,6 +593,11 @@ def can_publish_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            *args: arguments.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can publish the exploration.
         """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -550,6 +624,10 @@ def can_publish_collection(handler):
 
         Args:
             collection_id: str. The collection id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can publish the collection.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id)
@@ -575,6 +653,10 @@ def can_unpublish_collection(handler):
 
         Args:
             collection_id: str. The collection id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can unpublish the collection.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id)
@@ -602,6 +684,11 @@ def can_modify_exploration_roles(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can modify the rights related to
+                an exploration.
         """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)

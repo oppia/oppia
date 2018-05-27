@@ -103,7 +103,7 @@ def create_message(
     Args:
         thread_id: str. The thread id the message belongs to.
         author_id: str. The author id who creates this message.
-        updated_status: str, one of STATUS_CHOICES. New thread status.
+        updated_status: str. one of STATUS_CHOICES. New thread status.
             Must be supplied if this is the first message of a thread. For the
             rest of the thread, should exist only when the status changes.
         updated_subject: str. New thread subject. Must be supplied if this is
@@ -178,9 +178,9 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
     function.
 
     Args:
-        thread_id. str. The id of the thread.
+        thread_id: str. The id of the thread.
         user_id: str. The id of the user reading the messages,
-        message_ids: list(int): The ids of the messages in the thread read by
+        message_ids: list(int). The ids of the messages in the thread read by
             the user.
     """
     feedback_thread_user_model = feedback_models.FeedbackThreadUserModel.get(
@@ -198,9 +198,9 @@ def add_message_id_to_read_by_list(thread_id, user_id, message_id):
     """Adds the message id to the list of message ids read by the user.
 
     Args:
-        thread_id. str. The id of the thread.
+        thread_id: str. The id of the thread.
         user_id: str. The id of the user reading the messages,
-        message_id: int: The id of the message.
+        message_id: int. The id of the message.
     """
     feedback_thread_user_model = feedback_models.FeedbackThreadUserModel.get(
         user_id, thread_id)
@@ -711,8 +711,8 @@ def _enqueue_feedback_thread_status_change_email_task(
     Args:
         user_id: str. The user to be notified.
         reference: FeedbackMessageReference.
-        old_status: str, one of STATUS_CHOICES.
-        new_status: str, one of STATUS_CHOICES.
+        old_status: str. one of STATUS_CHOICES.
+        new_status: str. one of STATUS_CHOICES.
     """
 
     payload = {
@@ -910,7 +910,7 @@ def _send_batch_emails(
     sent out as a batch after a short delay.
 
     Args:
-        recipient_list: list of str. A list of user_ids of all recipients
+        recipient_list: list(str). A list of user_ids of all recipients
             of the email.
         feedback_message_reference: FeedbackMessageReference.
             The reference to add to each email buffer.
@@ -936,7 +936,7 @@ def _send_instant_emails(
     sent out immediately.
 
     Args:
-        recipient_list: list of str. A list of user_ids of all
+        recipient_list: list(str). A list of user_ids of all
             recipients of the email.
         feedback_message_reference: FeedbackMessageReference.
         exploration_id: str. ID of exploration that received new message.
@@ -959,10 +959,10 @@ def _send_feedback_thread_status_change_emails(
     """Notifies the given recipients about the status change.
 
     Args:
-        recipient_list: list of str. A list of recipient ids.
-        feedback_message_reference: FeedbackMessageReference
-        old_status: str, one of STATUS_CHOICES
-        new_status: str, one of STATUS_CHOICES
+        recipient_list: list(str). A list of recipient ids.
+        feedback_message_reference: FeedbackMessageReference.
+        old_status: str. one of STATUS_CHOICES
+        new_status: str. one of STATUS_CHOICES
         exploration_id: str. ID of exploration that received new message.
         has_suggestion: bool. Whether this thread has a related
             learner suggestion.
@@ -983,7 +983,7 @@ def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
     for each user in user_ids.
 
     Args:
-        user_ids: list of str. A list of user_ids.
+        user_ids: list(str). A list of user_ids.
         thread_id: str. The id of thread used to obtain
             FeedbackEmailReplyToIdModel for given user.
     """
@@ -1013,8 +1013,8 @@ def _add_message_to_email_buffer(
         thread_id: str. ID of thread that received new message.
         message_id: int. ID of new message.
         message_length: int. Length of the feedback message to be sent.
-        old_status: str, one of STATUS_CHOICES. Value of old thread status.
-        new_status: str, one of STATUS_CHOICES. Value of new thread status.
+        old_status: str. one of STATUS_CHOICES. Value of old thread status.
+        new_status: str. one of STATUS_CHOICES. Value of new thread status.
     """
     thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
     exploration_id = thread.exploration_id

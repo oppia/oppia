@@ -19,6 +19,7 @@
 import contextlib
 import copy
 import inspect
+import itertools
 import json
 import os
 import re
@@ -30,6 +31,12 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import skill_domain
+from core.domain import skill_services
+from core.domain import story_domain
+from core.domain import story_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -136,6 +143,8 @@ class TestBase(unittest.TestCase):
     OWNER_USERNAME = 'owner'
     EDITOR_EMAIL = 'editor@example.com'
     EDITOR_USERNAME = 'editor'
+    TRANSLATOR_EMAIL = 'translator@example.com'
+    TRANSLATOR_USERNAME = 'translator'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
     NEW_USER_EMAIL = 'new.user@example.com'
@@ -651,6 +660,8 @@ tags: []
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            end_state_name: str. The name of the end state for the exploration.
+            interaction_id: str. The id of the interaction.
 
         Returns:
             Exploration. The exploration domain object.
@@ -673,6 +684,55 @@ tags: []
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
             init_interaction.default_outcome.dest = end_state_name
+
+        exp_services.save_new_exploration(owner_id, exploration)
+        return exploration
+
+    def save_new_linear_exp_with_state_names_and_interactions(
+            self, exploration_id, owner_id, state_names, interaction_ids,
+            title='A title', category='A category', objective='An objective',
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Saves a new strictly-validated exploration with a sequence of states.
+
+        Args:
+            exploration_id: str. The id of the new validated exploration.
+            owner_id: str. The user_id of the creator of the exploration.
+            state_names: list(str). The names of states to be linked
+                sequentially in the exploration. Must be a non-empty list.
+            interaction_ids: list(str). The names of the interaction ids to be
+                assigned to each state. Values will be cycled, so it doesn't
+                need to be the same size as state_names.
+            title: str. The title of the exploration.
+            category: str. The category this exploration belongs to.
+            objective: str. The objective of this exploration.
+            language_code: str. The language_code of this exploration.
+
+        Returns:
+            Exploration. The exploration domain object.
+        """
+        if not state_names:
+            raise ValueError('must provide at least one state name')
+        if not interaction_ids:
+            raise ValueError('must provide at least one interaction type')
+        interaction_ids = itertools.cycle(interaction_ids)
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id, title=title, category=category,
+            language_code=language_code)
+        exploration.objective = objective
+        exploration.add_states(state_names)
+
+        from_names = [exploration.init_state_name] + state_names[:-1]
+        to_names = state_names
+        for from_name, to_name in zip(from_names, to_names):
+            from_state = exploration.states[from_name]
+            from_state.update_interaction_id(next(interaction_ids))
+            from_state.interaction.default_outcome.dest = to_name
+
+        # Prepare end_state.
+        end_state = exploration.states[to_names[-1]]
+        end_state.update_interaction_id('EndExploration')
+        end_state.interaction.default_outcome = None
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
@@ -824,6 +884,92 @@ tags: []
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
+    def save_new_story(
+            self, story_id, owner_id, title,
+            description, notes, story_contents,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Story and saves it.
+
+        Args:
+            story_id: str. ID for the story to be created.
+            owner_id: str. The user_id of the creator of the story.
+            title: str. The title of the story.
+            description: str. The high level description of the story.
+            notes: str. A set of notes, that describe the characters,
+                main storyline, and setting.
+            story_contents: StoryContents. A StoryContents object containing the
+                list of nodes.
+            language_code: str. The ISO 639-1 code for the language this
+                story is written in.
+
+        Returns:
+            Story. A newly-created story.
+        """
+        story = story_domain.Story(
+            story_id, title, description, notes, story_contents,
+            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION, language_code, 0
+        )
+        story_services.save_new_story(owner_id, story)
+        return story
+
+    def save_new_topic(
+            self, topic_id, owner_id, name, description,
+            canonical_story_ids, additional_story_ids, skill_ids,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Topic and saves it.
+
+        Args:
+            topic_id: str. ID for the topic to be created.
+            owner_id: str. The user_id of the creator of the topic.
+            name: str. The name of the topic.
+            description: str. The desscription of the topic.
+            canonical_story_ids: list(str). The list of ids of canonical stories
+                that are part of the topic.
+            additional_story_ids: list(str). The list of ids of additional
+                stories that are part of the topic.
+            skill_ids: list(str). The list of ids of skills that are part of the
+                topic.
+            language_code: str. The ISO 639-1 code for the language this
+                topic is written in.
+
+        Returns:
+            Topic. A newly-created topic.
+        """
+        topic = topic_domain.Topic(
+            topic_id, name, description, canonical_story_ids,
+            additional_story_ids, skill_ids, language_code, 0
+        )
+        topic_services.save_new_topic(owner_id, topic)
+        return topic
+
+    def save_new_skill(
+            self, skill_id, owner_id,
+            description, misconceptions, skill_contents,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Skill and saves it.
+
+        Args:
+            skill_id: str. ID for the skill to be created.
+            owner_id: str. The user_id of the creator of the skill.
+            description: str. The description of the skill.
+            skill_contents: SkillContents. A SkillContents object containing the
+                explanation and examples of the skill.
+            misconceptions: list(Misconception). A list of Misconception objects
+                that contains the various misconceptions of the skill.
+            language_code: str. The ISO 639-1 code for the language this
+                skill is written in.
+
+        Returns:
+            Skill. A newly-created skill.
+        """
+        skill = skill_domain.Skill(
+            skill_id, description, misconceptions, skill_contents,
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, language_code, 0
+        )
+        skill_services.save_new_skill(owner_id, skill)
+        return skill
+
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):
         """Updates a param dict using the given list of param_changes.
@@ -969,6 +1115,9 @@ class AppEngineTestBase(TestBase):
                 urlfetch mock. The keys of this dict are strings that represent
                 the header name and the value represents corresponding value of
                 that header.
+
+        Yields:
+            None.
         """
         if headers is None:
             response_headers = {}
@@ -1045,6 +1194,34 @@ class AppEngineTestBase(TestBase):
                 queue_names=queue_names)
             for queue in queue_names:
                 self.taskqueue_stub.FlushQueue(queue)
+
+    def _create_valid_question_data(self, default_dest_state_name):
+        """Creates a valid question_data dict.
+
+        Args:
+            default_dest_state_name: str. The default destination state.
+
+        Returns:
+            dict. The default question_data dict.
+        """
+        state = exp_domain.State.create_default_state(default_dest_state_name)
+        solution_explanation = exp_domain.SubtitledHtml(
+            'Solution explanation', {})
+        solution = exp_domain.Solution(
+            'TextInput', False, 'Solution', solution_explanation)
+        hint_content = exp_domain.SubtitledHtml('Hint 1', {})
+        hint = exp_domain.Hint(hint_content)
+        state.interaction.id = 'TextInput'
+        state.interaction.customization_args = {
+            'placeholder': 'Enter text here',
+            'rows': 1
+        }
+        state.interaction.default_outcome.labelled_as_correct = True
+        state.interaction.default_outcome.dest = None
+        state.interaction.hints.append(hint)
+        state.interaction.solution = solution
+        state = state.to_dict()
+        return state
 
 
 if feconf.PLATFORM == 'gae':
