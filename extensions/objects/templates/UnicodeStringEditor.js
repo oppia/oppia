@@ -29,7 +29,7 @@ oppia.directive('unicodeStringEditor', [
       restrict: 'E',
       scope: {
         initArgs: '@',
-        alwaysEditable: '@?',
+        alwaysEditable: '@',
         value: '='
       },
       template: '<span ng-include="getTemplateUrl()"></span>',
