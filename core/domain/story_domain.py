@@ -30,6 +30,7 @@ STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
 STORY_NODE_PROPERTY_OUTLINE = 'outline'
 STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
+CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -94,6 +95,9 @@ class StoryChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict['old_value']
+        elif self.cmd == CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 
@@ -319,6 +323,188 @@ class Story(object):
                 current_version, current_version + 1))
         versioned_story_contents['story_contents'] = conversion_fn(
             versioned_story_contents['story_contents'])
+
+    def update_title(self, title):
+        """Updates the title of the story.
+
+        Args:
+            title: str. The new title of the story.
+        """
+        self.title = title
+
+    def update_description(self, description):
+        """Updates the description of the story.
+
+        Args:
+            description: str. The new description of the story.
+        """
+        self.description = description
+
+    def update_notes(self, notes):
+        """Updates the notes of the story.
+
+        Args:
+            notes: str. The new notes of the story.
+        """
+        self.notes = notes
+
+    def update_language_code(self, language_code):
+        """Updates the language code of the story.
+
+        Args:
+            language_code: str. The new language code of the story.
+        """
+        self.language_code = language_code
+
+    def add_node(self, node_id):
+        """Adds a new default node with the given node_id.
+
+        Args:
+            node_id: str. The id of the node.
+        """
+        self.story_contents.nodes.append(
+            StoryNode.create_default_story_node(node_id))
+
+    def _find_node(self, node_id):
+        """Returns the index of the story node with the given node
+        id, or None if the node id is not in the story contents dict.
+
+        Args:
+            node_id: str. The id of the node.
+
+        Returns:
+            int or None. The index of the corresponding node, or None if there
+            is no such node.
+        """
+        for ind, node in enumerate(self.story_contents.nodes):
+            if node.id == node_id:
+                return ind
+        return None
+
+    def _check_exploration_id_already_present(self, exploration_id):
+        """Returns whether a node with the given exploration id is already
+        present in story_contents.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            Boolean. True if a node with the given exploration id is already
+                present, else False.
+        """
+        for node in self.story_contents.nodes:
+            if node.exploration_id == exploration_id:
+                return True
+        return False
+
+    def delete_node(self, node_id):
+        """Deletes a node with the given node_id.
+
+        Args:
+            node_id: str. The id of the node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        del self.story_contents.nodes[node_index]
+
+    def update_node_outline(self, node_id, new_outline):
+        """Updates the outline field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_outline: str. The new outline of the given node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].outline = new_outline
+
+    def update_node_acquired_skill_ids(self, node_id, new_acquired_skill_ids):
+        """Updates the acquired skill ids field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_acquired_skill_ids: list(str). The updated acquired skill id
+                list.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].acquired_skill_ids = (
+            new_acquired_skill_ids)
+
+    def update_node_prerequisite_skill_ids(
+            self, node_id, new_prerequisite_skill_ids):
+        """Updates the prerequisite skill ids field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_prerequisite_skill_ids: list(str). The updated prerequisite
+                skill id list.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].prerequisite_skill_ids = (
+            new_prerequisite_skill_ids)
+
+    def update_node_destination_node_ids(
+            self, node_id, new_destination_node_ids):
+        """Updates the destination_node_ids field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_destination_node_ids: list(str). The updated destination
+                node id list.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].destination_node_ids = (
+            new_destination_node_ids)
+
+    def update_node_exploration_id(
+            self, node_id, new_exploration_id):
+        """Updates the exploration id field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_exploration_id: str. The updated exploration id for a node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story.' % node_id)
+        if _check_exploration_id_already_present(exploration_id):
+            raise ValueError(
+                'A node with exploration id %s already exists.' %
+                    new_exploration_id)
+        self.story_contents.nodes[node_index].exploration_id = (
+            new_exploration_id)
 
 
 class StorySummary(object):

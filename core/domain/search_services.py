@@ -27,6 +27,9 @@ SEARCH_INDEX_EXPLORATIONS = 'explorations'
 # Name for the collection search index.
 SEARCH_INDEX_COLLECTIONS = 'collections'
 
+# Name for the story search index.
+SEARCH_INDEX_STORIES = 'stories'
+
 # This is done to prevent the rank hitting 0 too easily. Note that
 # negative ranks are disallowed in the Search API.
 _DEFAULT_RANK = 20
@@ -125,6 +128,18 @@ def index_collection_summaries(collection_summaries):
     ], SEARCH_INDEX_COLLECTIONS)
 
 
+def index_story_summary(story_summary):
+    """Adds the story to the search index.
+
+    Args:
+        story_summary: StorySummaryModel. Story Summary domain object to be
+            indexed.
+    """
+    search_services.add_documents_to_index([
+        _story_summary_to_search_dict(story_summary)
+    ], SEARCH_INDEX_STORIES)
+
+
 def update_exploration_status_in_search(exp_id):
     """Updates the exploration status in its search doc.
 
@@ -156,6 +171,26 @@ def _collection_summary_to_search_dict(collection_summary):
         'objective': collection_summary.objective,
         'language_code': collection_summary.language_code,
         'tags': collection_summary.tags,
+        'rank': _DEFAULT_RANK,
+    }
+    return doc
+
+
+def _story_summary_to_search_dict(story_summary):
+    """Converts a story domain object to a search dict.
+
+    Args:
+        story_summary: StorySummaryModel. The story summary object to be
+            converted.
+
+    Returns:
+        dict. The search dict of the story domain object.
+    """
+    doc = {
+        'id': story_summary.id,
+        'title': story_summary.title,
+        'node_count': story_summary.node_count,
+        'language_code': story_summary.language_code,
         'rank': _DEFAULT_RANK,
     }
     return doc
