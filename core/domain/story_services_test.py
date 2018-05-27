@@ -146,3 +146,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             'Removed a story node.')
         story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_count, 1)
+
+    def test_delete_story(self):
+        story_services.delete_story(self.USER_ID, self.STORY_ID)
+        self.assertEqual(story_services.get_story_by_id(
+            self.STORY_ID, False), None)
+        self.assertEqual(
+            story_services.get_story_summary_by_id(self.STORY_ID, False), None)

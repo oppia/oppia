@@ -310,6 +310,16 @@ def delete_collections_from_search_index(collection_ids):
         collection_ids, SEARCH_INDEX_COLLECTIONS)
 
 
+def delete_story_from_search_index(story_id):
+    """Removes the given story from the search index.
+
+    Args:
+        story_id: str. ID of the story to be removed from the search index.
+    """
+    search_services.delete_documents_from_index(
+        [story_id], SEARCH_INDEX_STORIES)
+
+
 def patch_collection_search_document(collection_id, update):
     """Patches an collection's current search document, with the values
     from the 'update' dictionary.

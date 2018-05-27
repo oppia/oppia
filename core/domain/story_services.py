@@ -175,18 +175,19 @@ def get_story_by_id(story_id, strict=True, version=None):
             return None
 
 
-def get_story_summary_by_id(story_id):
+def get_story_summary_by_id(story_id, strict=True):
     """Returns a domain object representing a story summary.
 
     Args:
         story_id: str. ID of the story summary.
-
+        strict: bool. Whether to fail noisily if no story summary with the given
+            id exists in the datastore.
     Returns:
         StorySummary. The story summary domain object corresponding to
         a story with the given story_id.
     """
     story_summary_model = story_models.StorySummaryModel.get(
-        story_id)
+        story_id, strict=strict)
     if story_summary_model:
         story_summary = get_story_summary_from_model(
             story_summary_model)
@@ -421,6 +422,47 @@ def update_story(
     story = apply_change_list(story_id, change_list)
     _save_story(committer_id, story, commit_message, change_list)
     create_story_summary(story.id)
+
+
+def delete_story(committer_id, story_id, force_deletion=False):
+    """Deletes the story with the given story_id.
+
+    Args:
+        committer_id: str. ID of the committer.
+        story_id: str. ID of the story to be deleted.
+        force_deletion: bool. If true, the story and its history are fully
+            deleted and are unrecoverable. Otherwise, the story and all
+            its history are marked as deleted, but the corresponding models are
+            still retained in the datastore. This last option is the preferred
+            one.
+    """
+    story_model = story_models.StoryModel.get(story_id)
+    story_model.delete(
+        committer_id, feconf.COMMIT_MESSAGE_STORY_DELETED,
+        force_deletion=force_deletion)
+
+    # This must come after the story is retrieved. Otherwise the memcache
+    # key will be reinstated.
+    story_memcache_key = _get_story_memcache_key(story_id)
+    memcache_services.delete(story_memcache_key)
+
+    # Delete the story from search.
+    search_services.delete_story_from_search_index(story_id)
+
+    # Delete the summary of the story (regardless of whether
+    # force_deletion is True or not).
+    delete_story_summary(story_id)
+
+
+def delete_story_summary(story_id):
+    """Delete a story summary model.
+
+    Args:
+        story_id: str. ID of the story whose story summary is to
+            be deleted.
+    """
+
+    story_models.StorySummaryModel.get(story_id).delete()
 
 
 def compute_summary_of_story(story):
