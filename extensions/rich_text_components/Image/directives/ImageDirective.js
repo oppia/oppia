@@ -21,10 +21,11 @@
  */
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'HtmlEscaperService', 'ExplorationContextService',
-  'UrlInterpolationService',
-  function(
+  'UrlInterpolationService', 'ImagePreloaderService',
+  'AssetsBackendApiService', function(
       $rootScope, $sce, HtmlEscaperService, ExplorationContextService,
-      UrlInterpolationService) {
+      UrlInterpolationService, ImagePreloaderService,
+      AssetsBackendApiService) {
     return {
       restrict: 'E',
       scope: {},
@@ -33,9 +34,49 @@ oppia.directive('oppiaNoninteractiveImage', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
-        $scope.imageUrl = $sce.trustAsResourceUrl(
-          '/imagehandler/' + ExplorationContextService.getExplorationId() +
-          '/' + encodeURIComponent($scope.filepath));
+        ImagePreloaderService.addToRecentlyRequestedImageFilenames($scope.filepath);
+        $scope.imageUrl = '';
+
+        var displayFromCache = function(filename) {
+          AssetsBackendApiService.loadImage(ExplorationContextService.getExplorationId(), filename)
+          .then(function(loadedImageFile) {
+            console.log("entered then part in display for   "+ loadedImageFile.filename);
+            var objectUrl = URL.createObjectURL(loadedImageFile.data);
+            $scope.imageUrl = objectUrl;
+            console.log( "the scope imageUrl created for the file "+ loadedImageFile.filename + "  is    " +$scope.imageUrl);
+            ImagePreloaderService.removeFromRecentlyRequestedImageFilenames(
+              filename);
+          });
+        };
+
+        /**
+        * Called when an image file finishes loading.
+        * @param {string} imageFilename - Filename of the image file that
+        *                                 finished loading.
+        */
+
+        var onFinishedLoadingImage = function(imageFilename) {
+          var recentlyRequestedImageFilenames = (
+            ImagePreloaderService.getRecentlyRequestedImageFilenames());
+          if(recentlyRequestedImageFilenames.indexOf(imageFilename) !== -1) {
+            displayFromCache(imageFilename);
+            console.log("Was requested earlier and got downloaded later on " + imageFilename);
+          }
+        };
+
+        var filename = $scope.filepath;
+        // This will work for the cases whose images have been requested by the
+        // preloader but haven't been downloaded till now.
+        ImagePreloaderService.setImageLoadedCallback(onFinishedLoadingImage, filename);
+
+        // If the image is preloaded, i.e already there in the cache then
+        // display from the cache
+        if (AssetsBackendApiService.isCached($scope.filepath)) {
+          displayFromCache($scope.filepath);
+        }
+        // else [TODO] Display a loading indicator instead. For now, if the
+        // image is not there in the cache alternate text will be shown
+
         $scope.imageCaption = '';
         if ($attrs.captionWithValue) {
           $scope.imageCaption = HtmlEscaperService.escapedJsonToObj(

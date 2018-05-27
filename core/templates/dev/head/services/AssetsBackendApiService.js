@@ -37,7 +37,7 @@ oppia.factory('AssetsBackendApiService', [
        '/<exploration_id>/assets/audio/<filename>') :
         '/audiohandler/<exploration_id>/audio/<filename>');
     var IMAGE_DOWNLOAD_URL_TEMPLATE =
-      '/imagehandler/<exploration_id>/image/<filename>';
+      '/imagehandler/<exploration_id>/<filename>';
 
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
@@ -210,12 +210,14 @@ oppia.factory('AssetsBackendApiService', [
       },
       loadImage: function(explorationId, filename) {
         return $q(function(resolve, reject) {
+          console.log("filename passed as argument in loadImage of AssetsBackend is " + filename);
           if (_isCached(filename)) {
+            console.log("returned from cache "+ filename);
             resolve(ImageFileObjectFactory.createNew(
               filename, assetsCache[filename]));
           } else if (!_isAssetCurrentlyBeingRequested(filename,
             ASSET_TYPE_IMAGE)) {
-            _fetchFile(explorationId, filename, ASSET_TYPE_IMAGE,
+              _fetchFile(explorationId, filename, ASSET_TYPE_IMAGE,
               resolve, reject);
           }
         });
