@@ -499,10 +499,10 @@ class Story(object):
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story.' % node_id)
-        if _check_exploration_id_already_present(exploration_id):
+        if self._check_exploration_id_already_present(new_exploration_id):
             raise ValueError(
                 'A node with exploration id %s already exists.' %
-                    new_exploration_id)
+                new_exploration_id)
         self.story_contents.nodes[node_index].exploration_id = (
             new_exploration_id)
 

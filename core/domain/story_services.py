@@ -28,6 +28,7 @@ from core.domain import search_services
 from core.domain import story_domain
 from core.platform import models
 import feconf
+import utils
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 datastore_services = models.Registry.import_datastore_services()
@@ -274,19 +275,19 @@ def apply_change_list(story_id, change_list):
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):
                     story.update_node_outline(change.node_id, change.new_value)
                 elif (change.property_name ==
-                        story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
+                      story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
                     story.update_node_acquired_skill_ids(
                         change.node_id, change.new_value)
                 elif (change.property_name ==
-                        story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS): # pylint: disable=line-too-long
+                      story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
                     story.update_node_prerequisite_skill_ids(
                         change.node_id, change.new_value)
                 elif (change.property_name ==
-                        story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
+                      story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
                     story.update_node_destination_node_ids(
                         change.node_id, change.new_value)
                 elif (change.property_name ==
-                        story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
+                      story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
                     story.update_node_exploration_id(
                         change.node_id, change.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
