@@ -573,6 +573,10 @@ class SubtitledHtml(object):
 
         Raises:
             Exception: 'params' is not a dict.
+
+        Returns:
+            str. The HTML string that results after stripping
+                out unrecognized tags and attributes.
         """
         if not isinstance(params, dict):
             raise Exception(
@@ -867,6 +871,7 @@ class AnswerGroup(object):
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
+            interaction: InteractionInstance. The interaction object.
 
         Raises:
             ValidationError: One or more attributes of the AnswerGroup are
@@ -1472,11 +1477,11 @@ class State(object):
         """Update the list of hints.
 
         Args:
-            hint_list: list(dict). A list of dict; each dict represents a Hint
+            hints_list: list(dict). A list of dict; each dict represents a Hint
                 object.
 
         Raises:
-            Exception: 'hint_list' is not a list.
+            Exception: 'hints_list' is not a list.
         """
         if not isinstance(hints_list, list):
             raise Exception(
@@ -2421,8 +2426,8 @@ class Exploration(object):
         """Renames the given state.
 
         Args:
-            old_state_names: str. The old name of state to rename.
-            new_state_names: str. The new state name.
+            old_state_name: str. The old name of state to rename.
+            new_state_name: str. The new state name.
 
         Raises:
             ValueError: The old state name does not exist or the new state name
@@ -2459,7 +2464,7 @@ class Exploration(object):
         """Deletes the given state.
 
         Args:
-            state_names: str. The state name to be deleted.
+            state_name: str. The state name to be deleted.
 
         Raises:
             ValueError: The state does not exist or is the initial state of the
@@ -3970,7 +3975,7 @@ class ExplorationSummary(object):
     def __init__(
             self, exploration_id, title, category, objective,
             language_code, tags, ratings, scaled_average_rating, status,
-            community_owned, owner_ids, editor_ids,
+            community_owned, owner_ids, editor_ids, translator_ids,
             viewer_ids, contributor_ids, contributors_summary, version,
             exploration_model_created_on,
             exploration_model_last_updated,
@@ -3996,6 +4001,8 @@ class ExplorationSummary(object):
                 this exploration.
             editor_ids: list(str). List of the users ids who have access to
                 edit this exploration.
+            translator_ids: list(str). List of the users ids who have access to
+                translate this exploration.
             viewer_ids: list(str). List of the users ids who have access to
                 view this exploration.
             contributor_ids: list(str). List of the users ids of the user who
@@ -4023,6 +4030,7 @@ class ExplorationSummary(object):
         self.community_owned = community_owned
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
+        self.translator_ids = translator_ids
         self.viewer_ids = viewer_ids
         self.contributor_ids = contributor_ids
         self.contributors_summary = contributors_summary

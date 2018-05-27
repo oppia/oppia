@@ -234,7 +234,7 @@ class Story(object):
         Args:
             story_id: str. The unique ID of the story.
             title: str. The title of the story.
-            description: str. The high level desscription of the story.
+            description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
             story_contents: StoryContents. The StoryContents instance

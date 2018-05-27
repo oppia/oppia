@@ -634,7 +634,7 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     Args:
         filename: str. Name of the file.
         content: str. Contents of the file.
-        pattern: dict ( regexp(regex pattern) : pattern to match,
+        pattern: dict. (regexp(regex pattern) : pattern to match,
             message(str) : message to show if pattern matches,
             excluded_files(tuple(str)) : files to be excluded from matching,
             excluded_dirs(tuple(str)) : directories to be excluded from

@@ -1218,9 +1218,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }], is_valid=True)
+            }])
         stats_models.ExplorationIssuesModel.create(
-            self.exp_id, [{
+            self.exp_id, 1, [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
                     'state_name': {
@@ -1231,7 +1231,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'playthrough_ids': [playthrough_id],
-                'schema_version': 1
+                'schema_version': 1,
+                'is_valid': True
             }])
 
         self.playthrough_data = {
@@ -1254,8 +1255,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }],
-            'is_valid': True
+            }]
         }
 
         self.exp_issue_dict = {
@@ -1268,7 +1268,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': 250
                 }
             },
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         }
 
         response = self.testapp.get('/explore/%s' % self.exp_id)
@@ -1286,7 +1287,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
 
@@ -1307,7 +1308,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 2)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
@@ -1331,9 +1332,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }], is_valid=True)
+            }])
 
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues.append({
             'issue_type': 'CyclicStateTransitions',
             'issue_customization_args': {
@@ -1342,7 +1343,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
             },
             'playthrough_ids': [playthrough_id],
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         })
         model.put()
 
@@ -1364,7 +1366,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
                 'schema_version': 1
             }],
-            'is_valid': True
         }
 
         self.exp_issue_dict = {
@@ -1374,7 +1375,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         }
 
         self.post_json(
@@ -1385,7 +1387,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 2)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 2)
@@ -1409,9 +1411,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }], is_valid=True)
+            }])
 
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues.append({
             'issue_type': 'CyclicStateTransitions',
             'issue_customization_args': {
@@ -1420,7 +1422,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 },
             },
             'playthrough_ids': [playthrough_id],
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         })
         model.put()
 
@@ -1441,8 +1444,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     }
                 },
                 'schema_version': 1
-            }],
-            'is_valid': True
+            }]
         }
 
         self.exp_issue_dict = {
@@ -1452,7 +1454,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name1', 'state_name2']
                 },
             },
-            'schema_version': 1
+            'schema_version': 1,
+            'is_valid': True
         }
 
         self.post_json(
@@ -1463,7 +1466,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 3)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
@@ -1473,7 +1476,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that a playthrough is not stored when the maximum number of
         playthroughs per issue already exists.
         """
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         model.unresolved_issues[0]['playthrough_ids'] = [
             'id1', 'id2', 'id3', 'id4', 'id5']
         model.put()
@@ -1486,7 +1489,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
-        model = stats_models.ExplorationIssuesModel.get(self.exp_id)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 5)
 
