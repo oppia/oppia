@@ -16,9 +16,11 @@
 
 """Tests for topic domain objects."""
 
+from constants import constants
 from core.domain import topic_domain
 from core.domain import user_services
 from core.tests import test_utils
+import feconf
 
 
 class TopicDomainUnitTests(test_utils.GenericTestBase):
@@ -35,6 +37,22 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
         self.user_a = user_services.UserActionsInfo(self.user_id_a)
         self.user_b = user_services.UserActionsInfo(self.user_id_b)
+
+    def test_create_default_topic(self):
+        """Tests the create_default_topic() function.
+        """
+        topic = topic_domain.Topic.create_default_topic(self.topic_id)
+        expected_topic_dict = {
+            'id': self.topic_id,
+            'name': feconf.DEFAULT_TOPIC_NAME,
+            'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
+            'canonical_story_ids': [],
+            'additional_story_ids': [],
+            'skill_ids': [],
+            'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'version': 0
+        }
+        self.assertEqual(topic.to_dict(), expected_topic_dict)
 
     def test_to_dict(self):
         user_ids = [self.user_id_a, self.user_id_b]
