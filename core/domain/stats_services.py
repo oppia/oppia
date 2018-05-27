@@ -242,9 +242,9 @@ def update_exp_issues_for_new_exp_version(exploration, change_list):
 
     # We make a mapping from state name to list of exploration issues so that
     # handling those issues will be easier while going through the change list.
-    exp_issues_by_state_name = collections.defaultdict([])
+    exp_issues_by_state_name = collections.defaultdict(list)
     for exp_issue in exp_issues.unresolved_issues:
-        keyname = feconf.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type]
+        keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type]
         # If keyname is 'state_names', which is a list, we add an instance of
         # this issue to all associated states in the mapping.
         if keyname == 'state_names':
@@ -272,8 +272,8 @@ def update_exp_issues_for_new_exp_version(exploration, change_list):
         for exp_issue in exp_issues_by_state_name[old_state_name]:
             idx = exp_issues.unresolved_issues.index(exp_issue)
             # Modify occurences in exploration issues.
-            if feconf.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type] == (
-                    'state_names'):
+            if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+                    exp_issue.issue_type] == 'state_names':
                 state_names = exp_issue.issue_customization_args['state_names'][
                     'value']
                 exp_issue.issue_customization_args['state_names']['value'] = [
@@ -288,8 +288,8 @@ def update_exp_issues_for_new_exp_version(exploration, change_list):
         # Modify occurences in playthroughs.
         playthroughs = get_playthroughs_multi(playthrough_ids)
         for idx, playthrough in enumerate(playthroughs):
-            if feconf.ISSUE_TYPE_KEYNAME_MAPPING[playthrough.issue_type] == (
-                    'state_names'):
+            if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+                    playthrough.issue_type] == 'state_names':
                 state_names = playthrough.issue_customization_args[
                     'state_names']['value']
                 playthrough.issue_customization_args['state_names']['value'] = [
@@ -319,7 +319,7 @@ def update_exp_issues_for_new_exp_version(exploration, change_list):
 
     exp_issues.exp_version += 1
 
-    save_exp_issues_model_transactional(exp_issues)
+    create_exp_issues_model(exp_issues)
 
 
 def get_playthroughs_multi(playthrough_ids):
@@ -336,6 +336,10 @@ def get_playthroughs_multi(playthrough_ids):
     # TODO(pranavsid98): Replace below lines with get_from_model.
     playthroughs = []
     for playthrough_instance in playthrough_instances:
+        playthrough_actions = []
+        for action in playthrough_instance.playthrough_actions:
+            playthrough_actions.append(
+                stats_domain.LearnerAction.from_dict(action))
         playthroughs.append(
             stats_domain.Playthrough(
                 playthrough_instance.id,
@@ -343,7 +347,7 @@ def get_playthroughs_multi(playthrough_ids):
                 playthrough_instance.exp_version,
                 playthrough_instance.issue_type,
                 playthrough_instance.issue_customization_args,
-                playthrough_instance.playthrough_actions))
+                playthrough_actions))
     return playthroughs
 
 
@@ -359,6 +363,7 @@ def update_playthroughs_multi(playthrough_ids, playthroughs):
     updated_instances = []
     for idx, playthrough_instance in enumerate(playthrough_instances):
         playthrough_dict = playthroughs[idx].to_dict()
+        playthrough_instance.issue_type = playthrough_dict['issue_type']
         playthrough_instance.issue_customization_args = (
             playthrough_dict['issue_customization_args'])
         playthrough_instance.playthrough_actions = (
@@ -535,6 +540,19 @@ def save_stats_model_transactional(exploration_stats):
         _save_stats_model, exploration_stats)
 
 
+def create_exp_issues_model(exp_issues):
+    """Creates a new ExplorationIssuesModel in the datastore.
+
+    Args:
+        exp_issues: ExplorationIssues. The exploration issues domain object.
+    """
+    unresolved_issues_dicts = [
+        unresolved_issue.to_dict()
+        for unresolved_issue in exp_issues.unresolved_issues]
+    stats_models.ExplorationIssuesModel.create(
+        exp_issues.exp_id, exp_issues.exp_version, unresolved_issues_dicts)
+
+
 def _save_exp_issues_model(exp_issues):
     """Updates the ExplorationIssuesModel datastore instance with the passed
     ExplorationIssues domain object.
@@ -548,6 +566,7 @@ def _save_exp_issues_model(exp_issues):
         for unresolved_issue in exp_issues.unresolved_issues]
     exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
         exp_issues.exp_id, exp_issues.exp_version)
+    exp_issues_model.exp_version = exp_issues.exp_version
     exp_issues_model.unresolved_issues = unresolved_issues_dicts
 
     exp_issues_model.put()
