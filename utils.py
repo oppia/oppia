@@ -31,6 +31,7 @@ import urllib
 import urlparse
 import zipfile
 
+import bs4
 from constants import constants  # pylint: disable=relative-import
 import feconf  # pylint: disable=relative-import
 
@@ -722,6 +723,89 @@ def get_hashable_value(value):
             (k, get_hashable_value(v)) for k, v in value.iteritems()))
     else:
         return value
+
+
+def inject_tag(text, start, tagname):
+    """This function inserts a new tag in the string of a given tag.
+
+    Args:
+        text: unicode. String of the tag in which new tag is to be inserted.
+        start: int. The position where tag is to be inserted.
+        tagname: str. Tag which is to be inserted.
+
+    Returns:
+        unicode. The html string after insertion of new tag.
+    """
+    root = text
+    end = start + 1
+    while root.parent:
+        root = root.parent
+
+        before = root.new_string(text[:start])
+        new_tag = root.new_tag(tagname)
+        after = root.new_string(text[end:])
+
+        text.replace_with(before)
+        before.insert_after(new_tag)
+        new_tag.insert_after(after)
+    return after
+
+
+def convert_to_ckeditor(html_data):
+    """This fucntion converts the html to ckeditor supported format.
+
+    Args:
+        html_data: unicode. HTML string to be converted.
+
+    Returns:
+        unicode. The converted HTML string.
+    """
+    html_data = html_data.encode('utf-8')
+    soup = bs4.BeautifulSoup(html_data, 'html.parser')
+
+    for b in soup.findAll('b'):
+        b.name = 'strong'
+
+    for linebreak in soup.findAll('br'):
+        parent_tag = linebreak.parent
+        if parent_tag.name == 'p' and parent_tag.get_text() == '':
+            linebreak.replaceWith('&nbsp;')
+
+    for italic in soup.findAll('i'):
+        italic.name = 'em'
+
+    for tag_name in ['ol', 'ul']:
+        for tag in soup.findAll(tag_name):
+            cnt = 0
+            while True:
+                child = tag.findChildren()
+                if child:
+                    first_child = child[0]
+                if first_child.name == tag_name:
+                    cnt += 1
+                    first_child.unwrap()
+                else:
+                    if cnt >= 1:
+                        tag['style'] = 'margin-left:%d' % (40 * cnt)
+                    break
+
+    for p in soup.findAll('p'):
+        if p.parent.name == 'pre':
+            p.unwrap()
+
+    for pre in soup.findAll('pre'):
+        text = pre.string
+        start = text.find('\n')
+        while start >= 0:
+            text = inject_tag(text, start, 'br')
+            start = text.find('\n')
+
+    for pre in soup.findAll('pre'):
+        pre.name = 'div'
+        pre['style'] = (
+            'background:#eeeeee; border:1px solid #cccccc; padding:5px 10px')
+
+    return str(soup)
 
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):
