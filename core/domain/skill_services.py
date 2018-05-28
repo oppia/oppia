@@ -287,8 +287,7 @@ def apply_change_list(skill_id, change_list):
         skill_id: str. ID of the given skill.
         change_list: list(dict). A change list to be applied to the given
             skill. Each entry in change_list is a dict that represents a
-            SkillChange.
-    object.
+            SkillChange object.
 
     Returns:
       Skill. The resulting skill domain object.
