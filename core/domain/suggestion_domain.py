@@ -19,6 +19,7 @@ from core.platform import models
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
+
 class BaseSuggestion(object):
     """Domain object for a suggestion.
 
@@ -79,7 +80,8 @@ class BaseSuggestion(object):
 
     def validate(self):
         """Validates the suggestion object. Each subclass must implement
-        this function"""
+        this function
+        """
         pass
 
 
@@ -128,3 +130,12 @@ class SuggestionEditStateContent(BaseSuggestion):
         if self.change_cmd['state_name'] not in states:
             return False
         return True
+
+
+suggestion_type_domain_class_mapping = {
+    suggestion_models.SUGGESTION_EDIT_STATE_CONTENT: SuggestionEditStateContent
+}
+
+
+def get_model_corresponding_to_suggestion(suggestion):
+    return suggestion_type_domain_class_mapping[suggestion.suggestion_type]
