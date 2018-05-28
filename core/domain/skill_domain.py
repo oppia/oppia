@@ -40,6 +40,10 @@ CMD_ADD_SKILL_MISCONCEPTION = 'add_skill_misconception'
 CMD_DELETE_SKILL_MISCONCEPTION = 'delete_skill_misconception'
 
 CMD_CREATE_NEW = 'create_new'
+CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION = (
+    'migrate_contents_schema_to_latest_version')
+CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION = (
+    'migrate_misconceptions_schema_to_latest_version')
 
 
 class SkillChange(object):
@@ -332,6 +336,126 @@ class Skill(object):
             updated_misconceptions.append(conversion_fn(misconception))
 
         versioned_misconceptions['misconceptions'] = updated_misconceptions
+
+    def update_description(self, description):
+        """Updates the description of the skill.
+
+        Args:
+            description: str. The new description of the skill.
+        """
+        self.description = description
+
+    def update_language_code(self, language_code):
+        """Updates the language code of the skill.
+
+        Args:
+            language_code: str. The new language code of the skill.
+        """
+        self.language_code = language_code
+
+    def update_explanation(self, explanation):
+        """Updates the explanation of the skill.
+
+        Args:
+            explanation: str. The new explanation of the skill.
+        """
+        self.skill_contents.explanation = explanation
+
+    def update_worked_examples(self, worked_examples):
+        """Updates the worked examples list of the skill.
+
+        Args:
+            worked_examples: list(str). The new worked examples of the skill.
+        """
+        self.skill_contents.worked_examples = worked_examples
+
+    def _find_misconception_index(self, misconception_id):
+        """Returns the index of the misconception with the given misconception
+        id, or None if it is not in the misconceptions list.
+
+        Args:
+            misconception_id: str. The id of the misconception.
+
+        Returns:
+            int or None. The index of the corresponding misconception, or None
+                if there is no such misconception.
+        """
+        for ind, misconception in enumerate(self.misconceptions):
+            if misconception.id == misconception_id:
+                return ind
+        return None
+
+    def add_misconception(self, misconception_id):
+        """Adds a new misconception to the skill.
+
+        Args:
+            misconception_id: str. The id of the new misconception to be added.
+        """
+        misconception = Misconception(misconception_id, '', '', '')
+        self.misconceptions.append(misconception)
+
+    def delete_misconception(self, misconception_id):
+        """Removes a misconception with the given id.
+
+        Args:
+            misconception_id: str. The id of the misconception to be removed.
+
+        Raises:
+            ValueError: There is no misconception with the given id.
+        """
+        index = self._find_misconception_index(misconception_id)
+        if index is None:
+            raise ValueError(
+                'There is no misconception with the given id.')
+        del self.misconceptions[index]
+
+    def update_misconception_name(self, misconception_id, name):
+        """Updates the name of the misconception with the given id.
+
+        Args:
+            misconception_id: str. The id of the misconception to be edited.
+            name: str. The new name of the misconception
+
+        Raises:
+            ValueError: There is no misconception with the given id.
+        """
+        index = self._find_misconception_index(misconception_id)
+        if index is None:
+            raise ValueError(
+                'There is no misconception with the given id.')
+        self.misconceptions[index].name = name
+
+    def update_misconception_notes(self, misconception_id, notes):
+        """Updates the notes of the misconception with the given id.
+
+        Args:
+            misconception_id: str. The id of the misconception to be edited.
+            notes: str. The new notes of the misconception
+
+        Raises:
+            ValueError: There is no misconception with the given id.
+        """
+        index = self._find_misconception_index(misconception_id)
+        if index is None:
+            raise ValueError(
+                'There is no misconception with the given id.')
+        self.misconceptions[index].notes = notes
+
+    def update_misconception_feedback(self, misconception_id, feedback):
+        """Updates the feedback of the misconception with the given id.
+
+        Args:
+            misconception_id: str. The id of the misconception to be edited.
+            feedback: str. The new feedback of the misconception
+
+        Raises:
+            ValueError: There is no misconception with the given id.
+        """
+        index = self._find_misconception_index(misconception_id)
+        if index is None:
+            raise ValueError(
+                'There is no misconception with the given id.')
+        self.misconceptions[index].feedback = feedback
 
 
 class SkillSummary(object):

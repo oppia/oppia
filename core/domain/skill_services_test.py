@@ -27,14 +27,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     SKILL_ID = None
     USER_ID = 'user'
-    MISCONCEPTION_ID = 'misconception_id'
+    MISCONCEPTION_ID_1 = 'misconception_id_1'
+    MISCONCEPTION_ID_2 = 'misconception_id_2'
 
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
         skill_contents = skill_domain.SkillContents(
             'Explanation', ['Example 1'])
         misconceptions = [skill_domain.Misconception(
-            self.MISCONCEPTION_ID, 'name', 'description', 'default_feedback')]
+            self.MISCONCEPTION_ID_1, 'name', 'description', 'default_feedback')]
         self.SKILL_ID = skill_services.get_new_skill_id()
         self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, 'Description', misconceptions,
@@ -88,3 +89,35 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
+
+    def test_update_skill(self):
+        changelist = [
+            {
+                'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
+                'id': self.MISCONCEPTION_ID_2
+            },
+            {
+                'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
+                'id': self.MISCONCEPTION_ID_2,
+                'old_value': '',
+                'new_value': 'Name'
+            }
+        ]
+        skill_services.update_skill(
+            self.USER_ID, self.SKILL_ID, changelist,
+            'Updated misconception name.')
+        skill = skill_services.get_skill_by_id(self.SKILL_ID)
+        skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID)
+        self.assertEqual(skill_summary.misconception_count, 2)
+        self.assertEqual(skill_summary.version, 2)
+        self.assertEqual(skill.version, 2)
+        self.assertEqual(skill.misconceptions[1].name, 'Name')
+
+    def test_delete_skill(self):
+        skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
+        self.assertEqual(
+            skill_services.get_skill_by_id(self.SKILL_ID, False), None)
+        self.assertEqual(
+            skill_services.get_skill_summary_by_id(self.SKILL_ID, False), None)

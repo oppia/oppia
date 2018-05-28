@@ -16,6 +16,7 @@
 """
 
 import copy
+import logging
 
 from core.domain import skill_domain
 from core.platform import models
@@ -207,18 +208,20 @@ def get_skill_by_id(skill_id, strict=True, version=None):
             return None
 
 
-def get_skill_summary_by_id(skill_id):
+def get_skill_summary_by_id(skill_id, strict=True):
     """Returns a domain object representing a skill summary.
 
     Args:
         skill_id: str. ID of the skill summary.
+        strict: bool. Whether to fail noisily if no skill summary with the given
+            id exists in the datastore.
 
     Returns:
         SkillSummary. The skill summary domain object corresponding to
         a skill with the given skill_id.
     """
     skill_summary_model = skill_models.SkillSummaryModel.get(
-        skill_id)
+        skill_id, strict=strict)
     if skill_summary_model:
         skill_summary = get_skill_summary_from_model(
             skill_summary_model)
@@ -275,6 +278,191 @@ def save_new_skill(committer_id, skill):
         committer_id, skill, commit_message, [{
             'cmd': skill_domain.CMD_CREATE_NEW
         }])
+
+
+def apply_change_list(skill_id, change_list):
+    """Applies a changelist to a skill and returns the result.
+
+    Args:
+        skill_id: str. ID of the given skill.
+        change_list: list(dict). A change list to be applied to the given
+            skill. Each entry in change_list is a dict that represents a
+            SkillChange.
+    object.
+
+    Returns:
+      Skill. The resulting skill domain object.
+    """
+    skill = get_skill_by_id(skill_id)
+    try:
+        changes = [skill_domain.SkillChange(change_dict)
+                   for change_dict in change_list]
+
+        for change in changes:
+            if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:
+                if (change.property_name ==
+                        skill_domain.SKILL_PROPERTY_DESCRIPTION):
+                    skill.update_description(change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
+                    skill.update_language_code(change.new_value)
+            elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
+                if (change.property_name ==
+                        skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
+                    skill.update_explanation(change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
+                    skill.update_worked_examples(change.new_value)
+            elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
+                skill.add_misconception(change.misconception_id)
+            elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
+                skill.delete_misconception(change.misconception_id)
+            elif (change.cmd ==
+                  skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY):
+                if (change.property_name ==
+                        skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME):
+                    skill.update_misconception_name(
+                        change.misconception_id, change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NOTES):
+                    skill.update_misconception_notes(
+                        change.misconception_id, change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
+                    skill.update_misconception_feedback(
+                        change.misconception_id, change.new_value)
+            elif (change.cmd ==
+                  skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
+                  or change.cmd ==
+                  skill_domain.CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION): # pylint: disable=line-too-long
+                # Loading the skill model from the datastore into a
+                # skill domain object automatically converts it to use the
+                # latest schema version. As a result, simply resaving the
+                # skill is sufficient to apply the schema migration.
+                continue
+        return skill
+
+    except Exception as e:
+        logging.error(
+            '%s %s %s %s' % (
+                e.__class__.__name__, e, skill_id, change_list)
+        )
+        raise
+
+
+def _save_skill(committer_id, skill, commit_message, change_list):
+    """Validates a skill and commits it to persistent storage. If
+    successful, increments the version number of the incoming skill domain
+    object by 1.
+
+    Args:
+        committer_id: str. ID of the given committer.
+        skill: Skill. The skill domain object to be saved.
+        commit_message: str. The commit message.
+        change_list: list(dict). List of changes applied to a skill. Each
+            entry in change_list is a dict that represents a SkillChange.
+
+    Raises:
+        Exception: The skill model and the incoming skill domain
+            object have different version numbers.
+        Exception: Received invalid change list.
+    """
+    if not change_list:
+        raise Exception(
+            'Unexpected error: received an invalid change list when trying to '
+            'save skill %s: %s' % (skill.id, change_list))
+
+    skill_model = skill_models.SkillModel.get(
+        skill.id, strict=False)
+    if skill_model is None:
+        skill_model = skill_models.SkillModel(id=skill.id)
+    else:
+        if skill.version > skill_model.version:
+            raise Exception(
+                'Unexpected error: trying to update version %s of skill '
+                'from version %s. Please reload the page and try again.'
+                % (skill_model.version, skill.version))
+        elif skill.version < skill_model.version:
+            raise Exception(
+                'Trying to update version %s of skill from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (skill_model.version, skill.version))
+
+    skill_model.description = skill.description
+    skill_model.language_code = skill.language_code
+    skill_model.misconceptions_schema_version = (
+        skill.misconceptions_schema_version)
+    skill_model.skill_contents_schema_version = (
+        skill.skill_contents_schema_version)
+    skill_model.skill_contents = skill.skill_contents.to_dict()
+    skill_model.misconceptions = [
+        misconception.to_dict() for misconception in skill.misconceptions
+    ]
+    skill_model.commit(committer_id, commit_message, change_list)
+    memcache_services.delete(_get_skill_memcache_key(skill.id))
+    skill.version += 1
+
+
+def update_skill(committer_id, skill_id, change_list, commit_message):
+    """Updates a skill. Commits changes.
+
+    Args:
+    - committer_id: str. The id of the user who is performing the update
+        action.
+    - skill_id: str. The skill id.
+    - change_list: list of dicts, each representing a SkillChange object.
+        These changes are applied in sequence to produce the resulting
+        skill.
+    - commit_message: str or None. A description of changes made to the
+        skill. For published skills, this must be present; for
+        unpublished skills, it may be equal to None.
+    """
+    if not commit_message:
+        raise ValueError(
+            'Expected a commit message, received none.')
+
+    skill = apply_change_list(skill_id, change_list)
+
+    _save_skill(committer_id, skill, commit_message, change_list)
+    create_skill_summary(skill.id)
+
+
+def delete_skill(committer_id, skill_id, force_deletion=False):
+    """Deletes the skill with the given skill_id.
+
+    Args:
+        committer_id: str. ID of the committer.
+        skill_id: str. ID of the skill to be deleted.
+        force_deletion: bool. If true, the skill and its history are fully
+            deleted and are unrecoverable. Otherwise, the skill and all
+            its history are marked as deleted, but the corresponding models are
+            still retained in the datastore. This last option is the preferred
+            one.
+    """
+    skill_model = skill_models.SkillModel.get(skill_id)
+    skill_model.delete(
+        committer_id, feconf.COMMIT_MESSAGE_SKILL_DELETED,
+        force_deletion=force_deletion)
+
+    # This must come after the skill is retrieved. Otherwise the memcache
+    # key will be reinstated.
+    skill_memcache_key = _get_skill_memcache_key(skill_id)
+    memcache_services.delete(skill_memcache_key)
+
+    # Delete the summary of the skill (regardless of whether
+    # force_deletion is True or not).
+    delete_skill_summary(skill_id)
+
+
+def delete_skill_summary(skill_id):
+    """Delete a skill summary model.
+
+    Args:
+        skill_id: str. ID of the skill whose skill summary is to
+            be deleted.
+    """
+
+    skill_models.SkillSummaryModel.get(skill_id).delete()
 
 
 def compute_summary_of_skill(skill):
