@@ -33,7 +33,6 @@ oppia.factory('ImagePreloaderService', [
     // directive).The object contains the resolve method of the promise
     // attached with getInImageUrl method.
     var _imageLoadedCallback = {};
-    var _recentlyRequestedImageFilenames = [];
 
     var _init = function(exploration) {
       _exploration = exploration;
@@ -41,48 +40,21 @@ oppia.factory('ImagePreloaderService', [
     };
 
     /**
-     * Removes the filename from the _recentlyRequestedImagedFilenames.
-     * @param {String} filename - Filename of the image that should be removed
-     *                            from _recentlyRequestedImageFilenames.
-     */
-    var _removeFromRecentlyRequestedImageFilenames = function(filename) {
-      var index = _recentlyRequestedImageFilenames.indexOf(filename);
-      if (index > -1) {
-        _recentlyRequestedImageFilenames.splice(index, 1);
-      }
-    };
-
-    /**
      * Gets the Url for the image file.
      * @param {string} filename - Filename of the image whose Url is to be
      *                            created.
      * @param {function} onLoadCallback - Function that is called when the
-     *                                    Url of the loaded image is obtained. 
+     *                                    Url of the loaded image is obtained.
      */
     var _getUrlUsingFileInCache = function(filename, onLoadCallback) {
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), filename)
         .then(function(loadedImageFile) {
           var objectUrl = URL.createObjectURL(loadedImageFile.data);
-          _removeFromRecentlyRequestedImageFilenames(loadedImageFile.filename);
           if (onLoadCallback) {
             onLoadCallback(objectUrl);
           }
         });
-    };
-
-    /**
-    * Called when an image file finishes loading.
-    * @param {string} imageFilename - Filename of the image file that
-    *                                 finished loading.
-    * @param {function} onLoadImageResolve - Function that is called when
-    *                                        the Url of the loaded image is
-    *                                        obtained.
-    */
-    var _onFinishedLoadingImage = function(imageFilename, onLoadImageResolve) {
-      if (_recentlyRequestedImageFilenames.indexOf(imageFilename) !== -1) {
-        _getUrlUsingFileInCache(imageFilename, onLoadImageResolve);
-      }
     };
 
     /**
@@ -133,7 +105,7 @@ oppia.factory('ImagePreloaderService', [
         if (_imageLoadedCallback[loadedImage.filename]) {
           var onLoadImageResolve = (
             (_imageLoadedCallback[loadedImage.filename]).resolveMethod);
-          _onFinishedLoadingImage(loadedImage.filename, onLoadImageResolve);
+          _getUrlUsingFileInCache(loadedImage.filename, onLoadImageResolve);
           _imageLoadedCallback[loadedImage.filename] = null;
         }
       });
@@ -202,11 +174,6 @@ oppia.factory('ImagePreloaderService', [
       init: _init,
       kickOffImagePreloader: _kickOffImagePreloader,
       onStateChange: _onStateChange,
-      addToRecentlyRequestedImageFilenames: function(filename) {
-        _recentlyRequestedImageFilenames.push(filename);
-      },
-      removeFromRecentlyRequestedImageFilenames:
-        _removeFromRecentlyRequestedImageFilenames,
       isLoadingImageFile: function(filename) {
         return _filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1;
       },

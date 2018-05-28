@@ -34,8 +34,6 @@ oppia.directive('oppiaNoninteractiveImage', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
-        ImagePreloaderService.addToRecentlyRequestedImageFilenames(
-          $scope.filepath);
         $scope.imageUrl = '';
         ImagePreloaderService.getImageUrl($scope.filepath)
           .then(function(objectUrl) {
