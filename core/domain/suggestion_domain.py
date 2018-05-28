@@ -137,5 +137,13 @@ suggestion_type_domain_class_mapping = {
 }
 
 
-def get_model_corresponding_to_suggestion(suggestion):
-    return suggestion_type_domain_class_mapping[suggestion.suggestion_type]
+def get_model_corresponding_to_suggestion(suggestion_type):
+    """Gets the domain class for the given suggestion_type.
+
+    Args:
+        suggestion_type: str. The type of suggestion.
+
+    Returns:
+        The appropriate subclass of BaseSuggestion class.
+    """
+    return suggestion_type_domain_class_mapping[suggestion_type]
