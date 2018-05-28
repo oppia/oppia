@@ -1093,18 +1093,29 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
         HTMLParser.HTMLParser.__init__(self)
         self.failed = failed
         self.filename = filename
+        self.previous_tag_line_number = None
 
     def handle_starttag(self, tag, attrs):
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
-        if column_number % 2 != 0 and (
-                line_number != self.handle_endtag(tag)):
-            print (
-                '%s --> Please ensure that %s tag '
-                'in this file on line number %s '
-                'has an indentation which is a multiple of 2 ' % (
-                    self.filename, tag, line_number))
-            self.failed = True
+        if self.previous_tag_line_number is None:
+            if column_number % 2 != 0:
+                print (
+                    '%s --> Please ensure that %s tag '
+                    'in this file on line number %s '
+                    'has an indentation which is a multiple of 2 ' % (
+                        self.filename, tag, line_number))
+                self.failed = True
+        else:
+            if column_number % 2 != 0 and (
+                    line_number != self.previous_tag_line_number):
+                print (
+                    '%s --> Please ensure that %s tag '
+                    'in this file on line number %s '
+                    'has an indentation which is a multiple of 2 ' % (
+                        self.filename, tag, line_number))
+                self.failed = True
+        self.previous_tag_line_number = line_number
 
         # Check the indentation of the attributes of the tag.
         indentation_of_first_attribute = (
@@ -1136,10 +1147,6 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                     'of the tag' % (
                         self.filename, tag, line_num_of_error))
                 self.failed = True
-
-    def handle_endtag(self, tag):
-        line_number, _ = self.getpos()
-        return line_number
 
 
 def _check_html_indent(all_files):
