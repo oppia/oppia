@@ -45,7 +45,6 @@ oppia.factory('ImagePreloaderService', [
       if (index > -1) {
         _recentlyRequestedImageFilenames.splice(index, 1);
       }
-      console.log("after removeFromRecentlyRequestedFilenames"+ _recentlyRequestedImageFilenames);
     };
 
     var _getUrlUsingFileInCache = function(filename, onLoadCallback) {
@@ -54,9 +53,7 @@ oppia.factory('ImagePreloaderService', [
         .then(function(loadedImageFile) {
           var objectUrl = URL.createObjectURL(loadedImageFile.data);
           _removeFromRecentlyRequestedImageFilenames(loadedImageFile.filename);
-          console.log( "the object url created for the file "+ loadedImageFile.filename + "  is    " +objectUrl);
           if (onLoadCallback) {
-            console.log("entered onLoadCallback in the getUrlUsingFileInCache");
             onLoadCallback(objectUrl);
           }
         });
@@ -71,16 +68,15 @@ oppia.factory('ImagePreloaderService', [
     var _onFinishedLoadingImage = function(imageFilename, onLoadImageResolve) {
       if (_recentlyRequestedImageFilenames.indexOf(imageFilename) !== -1) {
         _getUrlUsingFileInCache(imageFilename, onLoadImageResolve);
-        console.log("Was requested earlier and got downloaded later on " + imageFilename)
       }
     };
 
     var _getImageFilenamesInBfsOrder = function(sourceStateName) {
-      var stateNamesInBfsOrder =
+      var stateNamesInBfsOrder = (
         ComputeGraphService.computeBfsTraversalOfStates(
           _exploration.getInitialState().name,
           _exploration.getStates(),
-          sourceStateName);
+          sourceStateName));
       var imageFilenames = [];
 
       stateNamesInBfsOrder.forEach(function(stateName) {
@@ -90,16 +86,13 @@ oppia.factory('ImagePreloaderService', [
             imageFilenames.push(filename);
           });
       });
-      console.log(" In _getImageFilesInBfsOrder -- Image Filenames are "+ imageFilenames);
       return imageFilenames;
     };
 
     var _loadImage = function(imageFilename) {
-      console.log("ImagePreloaderService  _loadImage get the images before hand " + imageFilename);
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), imageFilename
       ).then(function(loadedImage) {
-        console.log("The image has been loaded with the help of the _loadImage in ImagePreloader , the filename is " + loadedImage.filename);
         for (var i = 0;
           i < _filenamesOfImageCurrentlyDownloading.length; i++) {
           if (_filenamesOfImageCurrentlyDownloading[i] ===
@@ -113,21 +106,18 @@ oppia.factory('ImagePreloaderService', [
           _filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
           _loadImage(nextImageFilename);
         }
-        console.log("FFFor file name "+ loadedImage.filename + "  the imageLoadedCallback in the then of loadImage is "+_imageLoadedCallback[loadedImage.filename]);
         if (_imageLoadedCallback[loadedImage.filename]) {
-          console.log("EEEEEntered in imageLoadedCallback in loadImage function for file + " + loadedImage.filename);
-          var onLoadImageResolve = (_imageLoadedCallback[loadedImage.filename]).resolve;
+          var onLoadImageResolve = (
+            (_imageLoadedCallback[loadedImage.filename]).resolve);
           _onFinishedLoadingImage(loadedImage.filename, onLoadImageResolve);
-          // delete _imageLoadedCallback[loadedImage.filename];
           _imageLoadedCallback[loadedImage.filename] = null;
-          console.log(" Length of imageLoadedCallback is " + Object.keys(_imageLoadedCallback));
         }
       });
     };
 
     var _kickOffImagePreloader = function(sourceStateName) {
-      _filenamesOfImageToBeDownloaded =
-        _getImageFilenamesInBfsOrder(sourceStateName);
+      _filenamesOfImageToBeDownloaded = (
+        _getImageFilenamesInBfsOrder(sourceStateName));
       while (_filenamesOfImageCurrentlyDownloading.length <
         MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
           _filenamesOfImageToBeDownloaded.length > 0) {
@@ -145,7 +135,6 @@ oppia.factory('ImagePreloaderService', [
     var _onStateChange = function(stateName) {
       if(stateName !== _exploration.getInitialState().name) {
         _imageLoadedCallback = {};
-        console.log('IIIII have entered onStateChange function');
         var imageFilenamesInState = [];
         var imageFilenamesInStateCurrentlyBeingRequested = [];
         // Images that are not there in the cache and are not currently
@@ -153,9 +142,9 @@ oppia.factory('ImagePreloaderService', [
         var imagesNeitherInCacheNorBeingRequested = [];
 
         var state = _states.getState(stateName);
-        imageFilenamesInState =
-          ExtractImageFilenamesFromStateService.getImageFilenamesInState(state);
-
+        imageFilenamesInState = (
+          ExtractImageFilenamesFromStateService
+            .getImageFilenamesInState(state));
         imageFilenamesInState.forEach(function(filename) {
           if (!AssetsBackendApiService.isCached(filename) &&
             (_filenamesOfImageCurrentlyDownloading.indexOf(filename) === -1)) {
@@ -178,14 +167,14 @@ oppia.factory('ImagePreloaderService', [
         _init(exploration);
       },
       kickOffImagePreloader: function(sourceStateName) {
-        console.log("entered ImagePreloader Kickoff");
         _kickOffImagePreloader(sourceStateName);
       },
       onStateChange: _onStateChange,
       addToRecentlyRequestedImageFilenames: function(filename) {
         _recentlyRequestedImageFilenames.push(filename);
       },
-      removeFromRecentlyRequestedImageFilenames: _removeFromRecentlyRequestedImageFilenames,
+      removeFromRecentlyRequestedImageFilenames:
+        _removeFromRecentlyRequestedImageFilenames,
       isLoadingImageFile: function(filename) {
         return _filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1;
       },
@@ -193,16 +182,15 @@ oppia.factory('ImagePreloaderService', [
         return _filenamesOfImageCurrentlyDownloading;
       },
       getImageUrl: function(filename) {
-        console.log("entered getImageUrl for " + filename)
         return $q(function(resolve, reject){
           if (AssetsBackendApiService.isCached(filename)) {
             _getUrlUsingFileInCache(filename, resolve, reject);
           } else {
-            console.log("EEntered else defining the imageLoadedCallback Object");
             _imageLoadedCallback[filename] = {
-              'resolve': resolve, 'reject': reject };
+              'resolve': resolve,
+              'reject': reject
+            };
           }
-          console.log(" In getUrl for filename "+ filename+ " imageLoadedCallBack is  " + _imageLoadedCallback);
         });
       }
     };
