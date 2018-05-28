@@ -253,8 +253,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
             entry in change_list is a dict that represents a TopicChange.
 
     Raises:
-        ValidationError: An invalid exploration was referenced in the
-            topic.
+        Exception: Received invalid change list.
         Exception: The topic model and the incoming topic domain
             object have different version numbers.
     """
