@@ -14,8 +14,12 @@
 
 """Domain object for Oppia suggestions."""
 
+from core.domain import exp_services
+from core.platform import models
 
-class Suggestion(object):
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+
+class BaseSuggestion(object):
     """Domain object for a suggestion.
 
     Attributes:
@@ -72,3 +76,55 @@ class Suggestion(object):
             'change_cmd': self.change_cmd,
             'score_category': self.score_category
         }
+
+    def validate(self):
+        """Validates the suggestion object. Each subclass must implement
+        this function"""
+        pass
+
+
+class SuggestionEditStateContent(BaseSuggestion):
+    """Domain object for a suggestion of type SUGGESTION_EDIT_STATE_CONTENT.
+
+    Attributes:
+        suggestion_id: str. The ID of the suggestion.
+        suggestion_type: str. The type of the suggestion.
+        target_type: str. The type of target entity being edited.
+        target_id: str. The ID of the target entity being edited.
+        target_version_at_submission: int. The version number of the target
+            entity at the time of creation of the suggestion.
+        status: str. The status of the suggestion.
+        author_id: str. The ID of the user who submitted the suggestion.
+        assigned_reviewer_id: str. The ID of the user assigned to
+            review the suggestion.
+        final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
+            the suggestion.
+        change_cmd: dict. The actual content of the suggestion.
+        score_category: str. The scoring category for the suggestion.
+    """
+
+    def __init__(
+            self, suggestion_id, target_id, target_version_at_submission,
+            status, author_id, assigned_reviewer_id, final_reviewer_id,
+            change_cmd, score_category):
+        """Initializes a Suggestion object of type
+        SUGGESTION_EDIT_STATE_CONTENT.
+        """
+        super(SuggestionEditStateContent, self).__init__(
+            suggestion_id, suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
+            suggestion_models.TARGET_TYPE_EXPLORATION, target_id,
+            target_version_at_submission, status, author_id,
+            assigned_reviewer_id, final_reviewer_id, change_cmd,
+            score_category)
+
+    def validate(self):
+        """Validates a suggestion object of type SUGGESTION_EDIT_STATE_CONTENT.
+
+        Returns:
+            bool. The validity of the suggestion object.
+        """
+        super(SuggestionEditStateContent, self).validate()
+        states = exp_services.get_exploration_by_id(self.target_id).states
+        if self.change_cmd['state_name'] not in states:
+            return False
+        return True

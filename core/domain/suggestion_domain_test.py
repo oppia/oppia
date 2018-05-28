@@ -14,6 +14,7 @@
 
 """Tests for suggestion domain objects."""
 
+from core.domain import exp_services
 from core.domain import suggestion_domain
 from core.platform import models
 from core.tests import test_utils
@@ -38,9 +39,7 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
         self.signup(self.ASSIGNED_REVIEWER_EMAIL, 'assignedReviewer')
         self.assigned_reviewer_id = self.get_user_id_from_email(
             self.ASSIGNED_REVIEWER_EMAIL)
-
-    def test_to_dict(self):
-        expected_suggestion_dict = {
+        self.suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
             'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -54,7 +53,11 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'score_category': 'translation.English'
         }
 
-        observed_suggestion = suggestion_domain.Suggestion(
+    def test_to_dict_base_suggestion(self):
+
+        expected_suggestion_dict = self.suggestion_dict
+
+        observed_suggestion = suggestion_domain.BaseSuggestion(
             expected_suggestion_dict['suggestion_id'],
             expected_suggestion_dict['suggestion_type'],
             expected_suggestion_dict['target_type'],
@@ -67,3 +70,71 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
+
+    def test_create_suggestion_edit_state_content(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        observed_suggestion = suggestion_domain.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.assigned_reviewer_id, self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'])
+
+        self.assertDictEqual(
+            observed_suggestion.to_dict(), expected_suggestion_dict)
+
+
+    class MockExploration(object):
+        """Mocks an exploration. To be used only for testing."""
+        def __init__(self, exploration_id, states):
+            self.id = exploration_id
+            self.states = states
+
+    # All mock explorations created for testing.
+    explorations = [
+        MockExploration('exp1', ['state_1', 'state_2'])
+    ]
+
+    def mock_get_exploration_by_id(self, exp_id):
+        for exp in self.explorations:
+            if exp.id == exp_id:
+                return exp
+        return None
+
+    def test_validate_suggestion_edit_state_content(self):
+        expected_suggestion_dict = self.suggestion_dict
+        expected_suggestion_dict['change_cmd'] = {
+            'state_name': 'state_1'
+        }
+        suggestion = suggestion_domain.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.assigned_reviewer_id, self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'])
+
+        with self.swap(
+            exp_services, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            self.assertTrue(suggestion.validate())
+
+        expected_suggestion_dict['change_cmd'] = {
+            'state_name': 'state_unknown'
+        }
+        suggestion = suggestion_domain.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.assigned_reviewer_id, self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'])
+        with self.swap(
+            exp_services, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
+            self.assertFalse(suggestion.validate())
