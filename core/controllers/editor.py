@@ -1054,3 +1054,21 @@ class EditorAutosaveHandler(ExplorationHandler):
         """Handles POST request for discarding draft changes."""
         exp_services.discard_draft(exploration_id, self.user_id)
         self.render_json({})
+
+
+class StateAnswerStatisticsHandler(EditorHandler):
+    """Returns basic learner answer statistics for a state."""
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        try:
+            current_exploration = (
+                exp_services.get_exploration_by_id(exploration_id))
+        except:
+            raise self.PageNotFoundException
+
+        self.render_json({
+            'answers': stats_services.get_top_state_answer_stats_multi(
+                exploration_id, current_exploration.states)
+        })

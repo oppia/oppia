@@ -246,7 +246,7 @@ def compute_summary_of_story(story):
     object and return it.
 
     Args:
-        story: Story. The story domain object.
+        story: Story. The story object, for which the summary is to be computed.
 
     Returns:
         StorySummary. The computed summary for the given story.
