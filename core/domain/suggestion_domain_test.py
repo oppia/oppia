@@ -72,21 +72,9 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             observed_suggestion.to_dict(), expected_suggestion_dict)
 
     def test_get_model_corresponding_to_suggestion(self):
-        expected_suggestion_dict = self.suggestion_dict
-
-        observed_suggestion = suggestion_domain.BaseSuggestion(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['suggestion_type'],
-            expected_suggestion_dict['target_type'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.assigned_reviewer_id, self.reviewer_id,
-            expected_suggestion_dict['change_cmd'],
-            expected_suggestion_dict['score_category'])
         self.assertEqual(
             suggestion_domain.get_model_corresponding_to_suggestion(
-                observed_suggestion.suggestion_type),
+                suggestion_models.SUGGESTION_EDIT_STATE_CONTENT),
             suggestion_domain.SuggestionEditStateContent)
 
     def test_create_suggestion_edit_state_content(self):
