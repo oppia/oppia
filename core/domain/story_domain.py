@@ -389,8 +389,8 @@ class Story(object):
             exploration_id: str. The id of the exploration.
 
         Returns:
-            Boolean. True if a node with the given exploration id is already
-                present, else False.
+            bool. Whether a node with the given exploration ID is already
+                present.
         """
         for node in self.story_contents.nodes:
             if node.exploration_id == exploration_id:

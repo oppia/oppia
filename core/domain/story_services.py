@@ -24,7 +24,6 @@ import copy
 import logging
 
 from core.domain import exp_services
-from core.domain import search_services
 from core.domain import story_domain
 from core.platform import models
 import feconf
@@ -255,10 +254,9 @@ def apply_change_list(story_id, change_list):
         change_list: list(dict). A change list to be applied to the given
             story. Each entry in change_list is a dict that represents a
             StoryChange.
-    object.
 
     Returns:
-      Story. The resulting story domain object.
+        Story. The resulting story domain object.
     """
     story = get_story_by_id(story_id)
     try:
@@ -347,7 +345,8 @@ def _save_story(committer_id, story, commit_message, change_list):
     # Validate that all explorations referenced by the story exist.
     exp_ids = []
     for node in story.story_contents.nodes:
-        exp_ids.append(node.exploration_id)
+        if node.exploration_id is not None:
+            exp_ids.append(node.exploration_id)
     exp_summaries = (
         exp_services.get_exploration_summaries_matching_ids(exp_ids))
     exp_summaries_dict = {
@@ -389,18 +388,7 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.version = story.version
     story_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_story_memcache_key(story.id))
-    index_story_given_id(story.id)
     story.version += 1
-
-
-def index_story_given_id(story_id):
-    """Adds the given story to the search index.
-
-    Args:
-        story_id: str. The story id whose story is to be indexed.
-    """
-    story_summary = get_story_summary_by_id(story_id)
-    search_services.index_story_summary(story_summary)
 
 
 def update_story(
@@ -446,9 +434,6 @@ def delete_story(committer_id, story_id, force_deletion=False):
     # key will be reinstated.
     story_memcache_key = _get_story_memcache_key(story_id)
     memcache_services.delete(story_memcache_key)
-
-    # Delete the story from search.
-    search_services.delete_story_from_search_index(story_id)
 
     # Delete the summary of the story (regardless of whether
     # force_deletion is True or not).
