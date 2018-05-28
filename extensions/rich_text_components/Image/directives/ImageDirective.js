@@ -37,43 +37,11 @@ oppia.directive('oppiaNoninteractiveImage', [
         ImagePreloaderService.addToRecentlyRequestedImageFilenames(
           $scope.filepath);
         $scope.imageUrl = '';
-
-        var displayFromCache = function(filename) {
-          AssetsBackendApiService.loadImage(
-            ExplorationContextService.getExplorationId(), filename)
-            .then(function(loadedImageFile) {
-              var objectUrl = URL.createObjectURL(loadedImageFile.data);
-              $scope.imageUrl = objectUrl;
-              ImagePreloaderService.removeFromRecentlyRequestedImageFilenames(
-                filename);
-            });
-        };
-
-        /**
-        * Called when an image file finishes loading.
-        * @param {string} imageFilename - Filename of the image file that
-        *                                 finished loading.
-        */
-
-        var onFinishedLoadingImage = function(imageFilename) {
-          var recentlyRequestedImageFilenames = (
-            ImagePreloaderService.getRecentlyRequestedImageFilenames());
-          if (recentlyRequestedImageFilenames.indexOf(imageFilename) !== -1) {
-            displayFromCache(imageFilename);
-          }
-        };
-
-        var filename = $scope.filepath;
-        // This will work for the cases whose images have been requested by the
-        // preloader but haven't been downloaded till now.
-        ImagePreloaderService.setImageLoadedCallback(onFinishedLoadingImage,
-          filename);
-        // If the image is preloaded, i.e already there in the cache then
-        // display from the cache
-        if (AssetsBackendApiService.isCached($scope.filepath)) {
-          displayFromCache($scope.filepath);
-        }
-        // else [TODO] Display a loading indicator instead. For now, if the
+        ImagePreloaderService.getImageUrl($scope.filepath)
+          .then(function(objectUrl) {
+          $scope.imageUrl = objectUrl; 
+          });
+        // [TODO] Display a loading indicator instead. For now, if the
         // image is not there in the cache alternate text will be shown
 
         $scope.imageCaption = '';

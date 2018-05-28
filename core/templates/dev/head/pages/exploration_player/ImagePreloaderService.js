@@ -17,10 +17,10 @@
  */
 
 oppia.factory('ImagePreloaderService', [
-  '$uibModal', 'ExplorationContextService', 'AssetsBackendApiService',
+  '$q', '$uibModal', 'ExplorationContextService', 'AssetsBackendApiService',
   'ExplorationPlayerStateService', 'UrlInterpolationService',
   'ComputeGraphService', 'ExtractImageFilenamesFromStateService',
-  function($uibModal, ExplorationContextService, AssetsBackendApiService,
+  function($q, $uibModal, ExplorationContextService, AssetsBackendApiService,
       ExplorationPlayerStateService, UrlInterpolationService,
       ComputeGraphService, ExtractImageFilenamesFromStateService) {
     var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
@@ -28,12 +28,51 @@ oppia.factory('ImagePreloaderService', [
     var _filenamesOfImageCurrentlyDownloading = [];
     var _filenamesOfImageToBeDownloaded = [];
     var _exploration = null;
+    // imageLoadedCallback is an object of objects (identified by the filenames
+    // which are being downloaded at the time they are required by the 
+    // directive).The object contains the resolve method of the promise 
+    // attached with getInImageUrl method.
     var _imageLoadedCallback = {};
     var _recentlyRequestedImageFilenames = [];
 
     var _init = function(exploration) {
       _exploration = exploration;
       _states = exploration.states;
+    };
+
+    var _removeFromRecentlyRequestedImageFilenames = function(filename) {
+      var index = _recentlyRequestedImageFilenames.indexOf(filename);
+      if (index > -1) {
+        _recentlyRequestedImageFilenames.splice(index, 1);
+      }
+      console.log("after removeFromRecentlyRequestedFilenames"+ _recentlyRequestedImageFilenames);
+    };
+
+    var _getUrlUsingFileInCache = function(filename, onLoadCallback) {
+      AssetsBackendApiService.loadImage(
+        ExplorationContextService.getExplorationId(), filename)
+        .then(function(loadedImageFile) {
+          var objectUrl = URL.createObjectURL(loadedImageFile.data);
+          _removeFromRecentlyRequestedImageFilenames(loadedImageFile.filename);
+          console.log( "the object url created for the file "+ loadedImageFile.filename + "  is    " +objectUrl);
+          if (onLoadCallback) {
+            console.log("entered onLoadCallback in the getUrlUsingFileInCache");
+            onLoadCallback(objectUrl);
+          }
+        });
+    };
+
+    /**
+    * Called when an image file finishes loading.
+    * @param {string} imageFilename - Filename of the image file that
+    *                                 finished loading.
+    */
+
+    var _onFinishedLoadingImage = function(imageFilename, onLoadImageResolve) {
+      if (_recentlyRequestedImageFilenames.indexOf(imageFilename) !== -1) {
+        _getUrlUsingFileInCache(imageFilename, onLoadImageResolve);
+        console.log("Was requested earlier and got downloaded later on " + imageFilename)
+      }
     };
 
     var _getImageFilenamesInBfsOrder = function(sourceStateName) {
@@ -51,13 +90,16 @@ oppia.factory('ImagePreloaderService', [
             imageFilenames.push(filename);
           });
       });
+      console.log(" In _getImageFilesInBfsOrder -- Image Filenames are "+ imageFilenames);
       return imageFilenames;
     };
 
     var _loadImage = function(imageFilename) {
+      console.log("ImagePreloaderService  _loadImage get the images before hand " + imageFilename);
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), imageFilename
       ).then(function(loadedImage) {
+        console.log("The image has been loaded with the help of the _loadImage in ImagePreloader , the filename is " + loadedImage.filename);
         for (var i = 0;
           i < _filenamesOfImageCurrentlyDownloading.length; i++) {
           if (_filenamesOfImageCurrentlyDownloading[i] ===
@@ -71,9 +113,14 @@ oppia.factory('ImagePreloaderService', [
           _filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
           _loadImage(nextImageFilename);
         }
+        console.log("FFFor file name "+ loadedImage.filename + "  the imageLoadedCallback in the then of loadImage is "+_imageLoadedCallback[loadedImage.filename]);
         if (_imageLoadedCallback[loadedImage.filename]) {
-          _imageLoadedCallback.func(loadedImage.filename);
-          _imageLoadedCallback.loadedImage = null;
+          console.log("EEEEEntered in imageLoadedCallback in loadImage function for file + " + loadedImage.filename);
+          var onLoadImageResolve = (_imageLoadedCallback[loadedImage.filename]).resolve;
+          _onFinishedLoadingImage(loadedImage.filename, onLoadImageResolve);
+          // delete _imageLoadedCallback[loadedImage.filename];
+          _imageLoadedCallback[loadedImage.filename] = null;
+          console.log(" Length of imageLoadedCallback is " + Object.keys(_imageLoadedCallback));
         }
       });
     };
@@ -96,29 +143,33 @@ oppia.factory('ImagePreloaderService', [
     };
 
     var _onStateChange = function(stateName) {
-      var imageFilenamesInState = [];
-      var imageFilenamesInStateCurrentlyBeingRequested = [];
-      // Images that are not there in the cache and are not currently
-      // being downloaded
-      var imagesNeitherInCacheNorBeingRequested = [];
+      if(stateName !== _exploration.getInitialState().name) {
+        _imageLoadedCallback = {};
+        console.log('IIIII have entered onStateChange function');
+        var imageFilenamesInState = [];
+        var imageFilenamesInStateCurrentlyBeingRequested = [];
+        // Images that are not there in the cache and are not currently
+        // being downloaded
+        var imagesNeitherInCacheNorBeingRequested = [];
 
-      var state = _states.getState(stateName);
-      imageFilenamesInState =
-        ExtractImageFilenamesFromStateService.getImageFilenamesInState(state);
+        var state = _states.getState(stateName);
+        imageFilenamesInState =
+          ExtractImageFilenamesFromStateService.getImageFilenamesInState(state);
 
-      imageFilenamesInState.forEach(function(filename) {
-        if (!AssetsBackendApiService.isCached(filename) &&
-          (_filenamesOfImageCurrentlyDownloading.indexOf(filename) === -1)) {
-          imagesNeitherInCacheNorBeingRequested.push(filename);
+        imageFilenamesInState.forEach(function(filename) {
+          if (!AssetsBackendApiService.isCached(filename) &&
+            (_filenamesOfImageCurrentlyDownloading.indexOf(filename) === -1)) {
+            imagesNeitherInCacheNorBeingRequested.push(filename);
+          }
+          if (_filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1) {
+            imageFilenamesInStateCurrentlyBeingRequested.push(filename);
+          }
+        });
+        if (imagesNeitherInCacheNorBeingRequested.length &&
+          imageFilenamesInStateCurrentlyBeingRequested.length <= 1) {
+          _cancelPreloading();
+          _kickOffImagePreloader(stateName);
         }
-        if (_filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1) {
-          imageFilenamesInStateCurrentlyBeingRequested.push(filename);
-        }
-      });
-      if (imagesNeitherInCacheNorBeingRequested.length &&
-        imageFilenamesInStateCurrentlyBeingRequested.length <= 1) {
-        _cancelPreloading();
-        _kickOffImagePreloader(stateName);
       }
     };
 
@@ -127,30 +178,32 @@ oppia.factory('ImagePreloaderService', [
         _init(exploration);
       },
       kickOffImagePreloader: function(sourceStateName) {
+        console.log("entered ImagePreloader Kickoff");
         _kickOffImagePreloader(sourceStateName);
       },
       onStateChange: _onStateChange,
       addToRecentlyRequestedImageFilenames: function(filename) {
         _recentlyRequestedImageFilenames.push(filename);
       },
-      getRecentlyRequestedImageFilenames: function(filename) {
-        return _recentlyRequestedImageFilenames;
-      },
-      removeFromRecentlyRequestedImageFilenames: function(filename) {
-        var index = _recentlyRequestedImageFilenames.indexOf(filename);
-        if (index > -1) {
-          _recentlyRequestedImageFilenames.splice(index, 1);
-        }
-      },
-      setImageLoadedCallback: function(imageLoadedCallbackFunction, filename) {
-        _imageLoadedCallback[filename] = true;
-        _imageLoadedCallback.func = imageLoadedCallbackFunction;
-      },
+      removeFromRecentlyRequestedImageFilenames: _removeFromRecentlyRequestedImageFilenames,
       isLoadingImageFile: function(filename) {
         return _filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1;
       },
       getFilenamesOfImageCurrentlyDownloading: function() {
         return _filenamesOfImageCurrentlyDownloading;
+      },
+      getImageUrl: function(filename) {
+        console.log("entered getImageUrl for " + filename)
+        return $q(function(resolve, reject){
+          if (AssetsBackendApiService.isCached(filename)) {
+            _getUrlUsingFileInCache(filename, resolve, reject);
+          } else {
+            console.log("EEntered else defining the imageLoadedCallback Object");
+            _imageLoadedCallback[filename] = {
+              'resolve': resolve, 'reject': reject };
+          }
+          console.log(" In getUrl for filename "+ filename+ " imageLoadedCallBack is  " + _imageLoadedCallback);
+        });
       }
     };
   }
