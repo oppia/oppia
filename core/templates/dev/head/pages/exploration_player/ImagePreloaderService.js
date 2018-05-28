@@ -40,6 +40,11 @@ oppia.factory('ImagePreloaderService', [
       _states = exploration.states;
     };
 
+    /**
+     * Removes the filename from the _recentlyRequestedImagedFilenames.
+     * @param {String} filename - Filename of the image that should be removed
+     *                            from _recentlyRequestedImageFilenames.
+     */
     var _removeFromRecentlyRequestedImageFilenames = function(filename) {
       var index = _recentlyRequestedImageFilenames.indexOf(filename);
       if (index > -1) {
@@ -47,6 +52,13 @@ oppia.factory('ImagePreloaderService', [
       }
     };
 
+    /**
+     * Gets the Url for the image file.
+     * @param {string} filename - Filename of the image whose Url is to be
+     *                            created.
+     * @param {function} onLoadCallback - Function that is called when the
+     *                                    Url of the loaded image is obtained. 
+     */
     var _getUrlUsingFileInCache = function(filename, onLoadCallback) {
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), filename)
@@ -63,14 +75,22 @@ oppia.factory('ImagePreloaderService', [
     * Called when an image file finishes loading.
     * @param {string} imageFilename - Filename of the image file that
     *                                 finished loading.
+    * @param {function} onLoadImageResolve - Function that is called when
+    *                                        the Url of the loaded image is
+    *                                        obtained.
     */
-
     var _onFinishedLoadingImage = function(imageFilename, onLoadImageResolve) {
       if (_recentlyRequestedImageFilenames.indexOf(imageFilename) !== -1) {
         _getUrlUsingFileInCache(imageFilename, onLoadImageResolve);
       }
     };
 
+    /**
+     * Gets image files in Bfs order from the state.
+     * @param {string} sourceStateName - The name of the state starting from
+     *                                   which the filenames should be
+     *                                   obtained.
+     */
     var _getImageFilenamesInBfsOrder = function(sourceStateName) {
       var stateNamesInBfsOrder = (
         ComputeGraphService.computeBfsTraversalOfStates(
@@ -89,6 +109,10 @@ oppia.factory('ImagePreloaderService', [
       return imageFilenames;
     };
 
+    /**
+     * Handles the loading of the image file.
+     * @param {string} imageFilename - The filename of the image to be loaded.
+     */
     var _loadImage = function(imageFilename) {
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), imageFilename
@@ -115,6 +139,11 @@ oppia.factory('ImagePreloaderService', [
       });
     };
 
+    /**
+     * Initiates the image preloader beginning from the sourceStateName.
+     * @param {string} sourceStateName - The name of the state from which
+     *                                   preloader should start.
+     */
     var _kickOffImagePreloader = function(sourceStateName) {
       _filenamesOfImageToBeDownloaded = (
         _getImageFilenamesInBfsOrder(sourceStateName));
@@ -127,19 +156,26 @@ oppia.factory('ImagePreloaderService', [
       }
     };
 
+    /**
+     * Cancels the preloading of the images that are being downloaded.
+     */
     var _cancelPreloading = function() {
       AssetsBackendApiService.abortAllCurrentImageDownloads();
       _filenamesOfImageCurrentlyDownloading = [];
     };
 
+    /**
+     * Called when the state changes.
+     * @param {string} stateName - The name of the state the user shifts to.
+     */
     var _onStateChange = function(stateName) {
       if (stateName !== _exploration.getInitialState().name) {
         _imageLoadedCallback = {};
         var imageFilenamesInState = [];
-        var imageFilenamesInStateCurrentlyBeingRequested = [];
-        // Images that are not there in the cache and are not currently
+        var noOfImageFilesCurrentlyDownloading = 0;
+        // No of images that are not there in the cache and are not currently
         // being downloaded
-        var imagesNeitherInCacheNorBeingRequested = [];
+        var noOfImagesNeitherInCacheNorDownloading = 0;
 
         var state = _states.getState(stateName);
         imageFilenamesInState = (
@@ -148,14 +184,14 @@ oppia.factory('ImagePreloaderService', [
         imageFilenamesInState.forEach(function(filename) {
           if (!AssetsBackendApiService.isCached(filename) &&
             (_filenamesOfImageCurrentlyDownloading.indexOf(filename) === -1)) {
-            imagesNeitherInCacheNorBeingRequested.push(filename);
+            noOfImagesNeitherInCacheNorDownloading += 1;
           }
           if (_filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1) {
-            imageFilenamesInStateCurrentlyBeingRequested.push(filename);
+            noOfImageFilesCurrentlyDownloading += 1;
           }
         });
-        if (imagesNeitherInCacheNorBeingRequested.length &&
-          imageFilenamesInStateCurrentlyBeingRequested.length <= 1) {
+        if (noOfImagesNeitherInCacheNorDownloading &&
+          noOfImageFilesCurrentlyDownloading <= 1) {
           _cancelPreloading();
           _kickOffImagePreloader(stateName);
         }
@@ -163,12 +199,8 @@ oppia.factory('ImagePreloaderService', [
     };
 
     return {
-      init: function(exploration) {
-        _init(exploration);
-      },
-      kickOffImagePreloader: function(sourceStateName) {
-        _kickOffImagePreloader(sourceStateName);
-      },
+      init: _init,
+      kickOffImagePreloader: _kickOffImagePreloader,
       onStateChange: _onStateChange,
       addToRecentlyRequestedImageFilenames: function(filename) {
         _recentlyRequestedImageFilenames.push(filename);
@@ -186,9 +218,10 @@ oppia.factory('ImagePreloaderService', [
           if (AssetsBackendApiService.isCached(filename)) {
             _getUrlUsingFileInCache(filename, resolve, reject);
           } else {
-            _imageLoadedCallback[filename] = {};
-            _imageLoadedCallback[filename].resolveMethod = resolve;
-            _imageLoadedCallback[filename].rejectMethod = reject;
+            _imageLoadedCallback[filename] = {
+              resolveMethod: resolve,
+              rejectMethod: reject
+            };
           }
         });
       }
