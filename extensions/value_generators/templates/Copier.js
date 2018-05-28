@@ -24,7 +24,12 @@ oppia.directive('copier', ['$compile', function($compile) {
       $compile(element.contents())(scope);
     },
     restrict: 'E',
-    scope: true,
+    scope: {
+      customizationArgs: '&',
+      initArgs: '@',
+      objType: '@',
+      generatorId: '@'
+    },
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function($scope) {
       $scope.$watch('$parent.initArgs', function() {
