@@ -287,20 +287,19 @@ REPLY_TO_ID_LENGTH = 84
 
 
 class FeedbackEmailReplyToIdModel(base_models.BaseModel):
-    """This model stores unique_id for each <user, exploration, thread>
+    """This model stores unique_id for each <user, thread>
     combination.
 
     This unique_id is used in reply-to email address in outgoing feedback and
     suggestion emails. The id/key of instances of this model has form of
-    [USER_ID].[EXPLORATION_ID].[THREAD_ID]
+    [USER_ID].[THREAD_ID]
     """
     # The reply-to ID that is used in the reply-to email address.
     reply_to_id = ndb.StringProperty(indexed=True, required=True)
 
     @classmethod
     def _generate_id(cls, user_id, thread_id):
-        """Returns the unique id corresponding to the given user id, exploration
-        id and thread id.
+        """Returns the unique id corresponding to the given user and thread ids.
 
         Args:
             user_id: str. The user id.
