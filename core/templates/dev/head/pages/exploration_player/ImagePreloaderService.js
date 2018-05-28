@@ -29,8 +29,8 @@ oppia.factory('ImagePreloaderService', [
     var _filenamesOfImageToBeDownloaded = [];
     var _exploration = null;
     // imageLoadedCallback is an object of objects (identified by the filenames
-    // which are being downloaded at the time they are required by the 
-    // directive).The object contains the resolve method of the promise 
+    // which are being downloaded at the time they are required by the
+    // directive).The object contains the resolve method of the promise
     // attached with getInImageUrl method.
     var _imageLoadedCallback = {};
     var _recentlyRequestedImageFilenames = [];
@@ -108,7 +108,7 @@ oppia.factory('ImagePreloaderService', [
         }
         if (_imageLoadedCallback[loadedImage.filename]) {
           var onLoadImageResolve = (
-            (_imageLoadedCallback[loadedImage.filename]).resolve);
+            (_imageLoadedCallback[loadedImage.filename]).resolveMethod);
           _onFinishedLoadingImage(loadedImage.filename, onLoadImageResolve);
           _imageLoadedCallback[loadedImage.filename] = null;
         }
@@ -133,7 +133,7 @@ oppia.factory('ImagePreloaderService', [
     };
 
     var _onStateChange = function(stateName) {
-      if(stateName !== _exploration.getInitialState().name) {
+      if (stateName !== _exploration.getInitialState().name) {
         _imageLoadedCallback = {};
         var imageFilenamesInState = [];
         var imageFilenamesInStateCurrentlyBeingRequested = [];
@@ -187,8 +187,8 @@ oppia.factory('ImagePreloaderService', [
             _getUrlUsingFileInCache(filename, resolve, reject);
           } else {
             _imageLoadedCallback[filename] = {
-              'resolve': resolve,
-              'reject': reject
+              'resolveMethod': resolve,
+              'rejectMethod': reject
             };
           }
         });
