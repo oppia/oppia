@@ -186,9 +186,9 @@ oppia.factory('ImagePreloaderService', [
           if (AssetsBackendApiService.isCached(filename)) {
             _getUrlUsingFileInCache(filename, resolve, reject);
           } else {
-            _imageLoadedCallback[filename] = {
-              'resolveMethod': resolve,
-              'rejectMethod': reject
+            _imageLoadedCallback[filename] = {};
+            _imageLoadedCallback[filename].resolveMethod = resolve;
+            _imageLoadedCallback[filename].rejectMethod = reject;
             };
           }
         });
