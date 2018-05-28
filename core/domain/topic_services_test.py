@@ -27,7 +27,6 @@ from core.tests import test_utils
 
 class TopicServicesUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
-    topic_id = 'topic_id'
     user_id = 'user_id'
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'
@@ -110,22 +109,85 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.additional_story_count, 1)
         self.assertEqual(topic_summary.skill_count, 1)
 
+    def test_update_topic(self):
+        topic_services.assign_role(
+            self.user_admin, self.user_a, topic_domain.ROLE_MANAGER,
+            self.TOPIC_ID)
+
+        # Test whether an admin can edit a topic.
+        changelist = [{
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
+            'old_value': 'Description',
+            'new_value': 'New Description'
+        }]
+        topic_services.update_topic(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated Description.')
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.description, 'New Description')
+        self.assertEqual(topic.version, 2)
+        self.assertEqual(topic_summary.version, 2)
+
+        # Test whether a topic_manager can edit a topic.
+        changelist = [{
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_NAME,
+            'old_value': 'Name',
+            'new_value': 'New Name'
+        }]
+        topic_services.update_topic(
+            self.user_id_a, self.TOPIC_ID, changelist, 'Updated Name.')
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.name, 'New Name')
+        self.assertEqual(topic.version, 3)
+        self.assertEqual(topic_summary.name, 'New Name')
+        self.assertEqual(topic_summary.version, 3)
+
+        # Test whether a ValueError is raised when a user without rights
+        # tries to edit the topic.
+        changelist = [{
+            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
+            'property_name': topic_domain.TOPIC_PROPERTY_SKILL_IDS,
+            'old_value': ['skill'],
+            'new_value': ['skill_id_1']
+        }]
+        with self.assertRaisesRegexp(
+            ValueError,
+            'Current user does not have enough rights to edit a topic.'):
+            topic_services.update_topic(
+                self.user_id_b, self.TOPIC_ID, changelist, 'Updated skill ids.')
+
+    def test_delete_topic(self):
+        # Test whether a ValueError is raised when a user without right tries to
+        # delete a topic.
+        with self.assertRaisesRegexp(
+            ValueError,
+            'User does not have enough rights to delete a topic.'):
+            topic_services.delete_topic(self.user_id_b, self.TOPIC_ID)
+
+        # Test whether an admin can delete a topic.
+        topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
+        self.assertEqual(
+            topic_services.get_topic_by_id(self.TOPIC_ID, False), None)
+        self.assertEqual(
+            topic_services.get_topic_summary_by_id(self.TOPIC_ID, False), None)
+
+
     def test_admin_can_manage_topic(self):
-        topic_services.create_new_topic_rights(
-            self.topic_id, self.user_id_admin)
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
 
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_admin, topic_rights))
 
     def test_create_new_topic_rights(self):
-        topic_services.create_new_topic_rights(
-            self.topic_id, self.user_id_admin)
         topic_services.assign_role(
-            self.user_admin, self.user_id_a,
-            topic_domain.ROLE_MANAGER, self.topic_id)
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
 
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
@@ -133,68 +195,67 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_b, topic_rights))
 
     def test_non_admin_cannot_assign_roles(self):
-        topic_services.create_new_topic_rights(
-            self.topic_id, self.user_id_admin)
         with self.assertRaisesRegexp(
             Exception,
             'UnauthorizedUserException: Could not assign new role.'):
             topic_services.assign_role(
-                self.user_b, self.user_id_a,
-                topic_domain.ROLE_MANAGER, self.topic_id)
+                self.user_b, self.user_a,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
-    def test_manager_cannot_assign_roles(self):
-        topic_services.create_new_topic_rights(
-            self.topic_id, self.user_id_admin)
+    def test_role_cannot_be_assigned_to_non_topic_manager(self):
+        with self.assertRaisesRegexp(
+            Exception,
+            'The assignee doesn\'t have enough rights to become a manager.'):
+            topic_services.assign_role(
+                self.user_admin, self.user_b,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
+    def test_manager_cannot_assign_roles(self):
         topic_services.assign_role(
-            self.user_admin, self.user_id_a,
-            topic_domain.ROLE_MANAGER, self.topic_id)
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
         with self.assertRaisesRegexp(
             Exception,
             'UnauthorizedUserException: Could not assign new role.'):
             topic_services.assign_role(
-                self.user_a, self.user_id_b,
-                topic_domain.ROLE_MANAGER, self.topic_id)
+                self.user_a, self.user_b,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
     def test_reassigning_manager_role_to_same_user(self):
-        topic_services.create_new_topic_rights(
-            self.topic_id, self.user_id_admin)
         topic_services.assign_role(
-            self.user_admin, self.user_id_a,
-            topic_domain.ROLE_MANAGER, self.topic_id)
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
         with self.assertRaisesRegexp(
             Exception, 'This user already is a manager for this topic'):
             topic_services.assign_role(
-                self.user_admin, self.user_id_a,
-                topic_domain.ROLE_MANAGER, self.topic_id)
+                self.user_admin, self.user_a,
+                topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_b, topic_rights))
 
     def test_deassigning_manager_role(self):
-        topic_services.create_new_topic_rights(
-            self.topic_id, self.user_id_admin)
         topic_services.assign_role(
-            self.user_admin, self.user_id_a,
-            topic_domain.ROLE_MANAGER, self.topic_id)
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_MANAGER, self.TOPIC_ID)
 
-        topic_rights = topic_services.get_topic_rights(self.topic_id)
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
 
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
@@ -202,8 +263,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_b, topic_rights))
 
         topic_services.assign_role(
-            self.user_admin, self.user_id_a,
-            topic_domain.ROLE_NONE, self.topic_id)
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_NONE, self.TOPIC_ID)
 
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))
@@ -211,8 +272,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_b, topic_rights))
 
         topic_services.assign_role(
-            self.user_admin, self.user_id_a,
-            topic_domain.ROLE_NONE, self.topic_id)
+            self.user_admin, self.user_a,
+            topic_domain.ROLE_NONE, self.TOPIC_ID)
 
         self.assertFalse(topic_services.check_can_edit_topic(
             self.user_a, topic_rights))

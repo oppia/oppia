@@ -150,6 +150,56 @@ class Topic(object):
             feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [],
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
+    def update_name(self, new_name):
+        """Updates the name of a topic object.
+
+        Args:
+            new_name: str. The updated name for the topic.
+        """
+        self.name = new_name
+
+    def update_description(self, new_description):
+        """Updates the description of a topic object.
+
+        Args:
+            new_description: str. The updated description for the topic.
+        """
+        self.description = new_description
+
+    def update_language_code(self, new_language_code):
+        """Updates the language code of a topic object.
+
+        Args:
+            new_language_code: str. The updated language code for the topic.
+        """
+        self.language_code = new_language_code
+
+    def update_canonical_story_ids(self, new_canonical_story_ids):
+        """Updates the canonical story id list of a topic object.
+
+        Args:
+            new_canonical_story_ids: list(str). The updated list of canonical
+                story ids.
+        """
+        self.canonical_story_ids = new_canonical_story_ids
+
+    def update_additional_story_ids(self, new_additional_story_ids):
+        """Updates the additional story id list of a topic object.
+
+        Args:
+            new_additional_story_ids: list(str). The updated list of additional
+                story ids.
+        """
+        self.additional_story_ids = new_additional_story_ids
+
+    def update_skill_ids(self, new_skill_ids):
+        """Updates the skill id list of a topic object.
+
+        Args:
+            new_skill_ids: list(str). The updated list of skill ids.
+        """
+        self.skill_ids = new_skill_ids
+
 
 class TopicSummary(object):
     """Domain object for Topic Summary."""

@@ -22,6 +22,7 @@ from core.domain import role_services
 from core.domain import topic_domain
 from core.domain import user_services
 from core.platform import models
+import feconf
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 datastore_services = models.Registry.import_datastore_services()
@@ -120,17 +121,20 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             return None
 
 
-def get_topic_summary_by_id(topic_id):
+def get_topic_summary_by_id(topic_id, strict=True):
     """Returns a domain object representing a topic summary.
 
     Args:
         topic_id: str. ID of the topic summary.
+        strict: bool. Whether to fail noisily if no topic summary with the given
+            id exists in the datastore.
 
     Returns:
-        TopicSummary. The topic summary domain object corresponding to
-        a topic with the given topic_id.
+        TopicSummary or None. The topic summary domain object corresponding to
+        a topic with the given topic_id, if it exists, or else None.
     """
-    topic_summary_model = topic_models.TopicSummaryModel.get(topic_id)
+    topic_summary_model = topic_models.TopicSummaryModel.get(
+        topic_id, strict=strict)
     if topic_summary_model:
         topic_summary = get_topic_summary_from_model(topic_summary_model)
         return topic_summary
@@ -187,6 +191,187 @@ def save_new_topic(committer_id, topic):
             'cmd': topic_domain.CMD_CREATE_NEW,
             'name': topic.name
         }])
+
+
+def apply_change_list(topic_id, change_list):
+    """Applies a changelist to a topic and returns the result.
+
+    Args:
+        topic_id: str. ID of the given topic.
+        change_list: list(dict). A change list to be applied to the given
+            topic. Each entry in change_list is a dict that represents a
+            TopicChange object.
+    object.
+
+    Returns:
+      Topic. The resulting topic domain object.
+    """
+    topic = get_topic_by_id(topic_id)
+    try:
+        changes = [topic_domain.TopicChange(change_dict)
+                   for change_dict in change_list]
+
+        for change in changes:
+            if change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
+                if (change.property_name ==
+                        topic_domain.TOPIC_PROPERTY_NAME):
+                    topic.update_name(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_DESCRIPTION):
+                    topic.update_description(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_CANONICAL_STORY_IDS):
+                    topic.update_canonical_story_ids(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS):
+                    topic.update_additional_story_ids(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_SKILL_IDS):
+                    topic.update_skill_ids(change.new_value)
+                elif (change.property_name ==
+                      topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
+                    topic.update_language_code(change.new_value)
+        return topic
+
+    except Exception as e:
+        logging.error(
+            '%s %s %s %s' % (
+                e.__class__.__name__, e, topic_id, change_list)
+        )
+        raise
+
+
+def _save_topic(committer_id, topic, commit_message, change_list):
+    """Validates a topic and commits it to persistent storage. If
+    successful, increments the version number of the incoming topic domain
+    object by 1.
+
+    Args:
+        committer_id: str. ID of the given committer.
+        topic: Topic. The topic domain object to be saved.
+        commit_message: str. The commit message.
+        change_list: list(dict). List of changes applied to a topic. Each
+            entry in change_list is a dict that represents a TopicChange.
+
+    Raises:
+        ValidationError: An invalid exploration was referenced in the
+            topic.
+        Exception: The topic model and the incoming topic domain
+            object have different version numbers.
+    """
+    if not change_list:
+        raise Exception(
+            'Unexpected error: received an invalid change list when trying to '
+            'save topic %s: %s' % (topic.id, change_list))
+
+    topic_model = topic_models.TopicModel.get(topic.id, strict=False)
+    if topic_model is None:
+        topic_model = topic_models.TopicModel(id=topic.id)
+    else:
+        if topic.version > topic_model.version:
+            raise Exception(
+                'Unexpected error: trying to update version %s of topic '
+                'from version %s. Please reload the page and try again.'
+                % (topic_model.version, topic.version))
+        elif topic.version < topic_model.version:
+            raise Exception(
+                'Trying to update version %s of topic from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (topic_model.version, topic.version))
+
+    topic_model.description = topic.description
+    topic_model.name = topic.name
+    topic_model.canonical_story_ids = topic.canonical_story_ids
+    topic_model.additional_story_ids = topic.additional_story_ids
+    topic_model.skill_ids = topic.skill_ids
+    topic_model.language_code = topic.language_code
+    topic_model.commit(committer_id, commit_message, change_list)
+    memcache_services.delete(_get_topic_memcache_key(topic.id))
+    topic.version += 1
+
+
+def update_topic(
+        committer_id, topic_id, change_list, commit_message):
+    """Updates a topic. Commits changes.
+
+    Args:
+    - committer_id: str. The id of the user who is performing the update
+        action.
+    - topic_id: str. The topic id.
+    - change_list: list of dicts, each representing a TopicChange object.
+        These changes are applied in sequence to produce the resulting
+        topic.
+    - commit_message: str or None. A description of changes made to the
+        topic.
+
+    Raises:
+        ValueError: Current user does not have enough rights to edit a topic.
+    """
+    if not commit_message:
+        raise ValueError(
+            'Expected a commit message, received none.')
+
+    topic_rights = get_topic_rights(topic_id)
+    user_actions_info = user_services.UserActionsInfo(committer_id)
+    if check_can_edit_topic(user_actions_info, topic_rights):
+        topic = apply_change_list(topic_id, change_list)
+        _save_topic(committer_id, topic, commit_message, change_list)
+        create_topic_summary(topic.id)
+    else:
+        raise ValueError(
+            'Current user does not have enough rights to edit a topic.')
+
+
+def delete_topic(committer_id, topic_id, force_deletion=False):
+    """Deletes the topic with the given topic_id if the committer has enough
+    rights to do so.
+
+    Args:
+        committer_id: str. ID of the committer.
+        topic_id: str. ID of the topic to be deleted.
+        force_deletion: bool. If true, the topic and its history are fully
+            deleted and are unrecoverable. Otherwise, the topic and all
+            its history are marked as deleted, but the corresponding models are
+            still retained in the datastore. This last option is the preferred
+            one.
+
+    Raises:
+        ValueError: User does not have enough rights to delete a topic.
+    """
+    committer = user_services.UserActionsInfo(committer_id)
+    topic_rights = get_topic_rights(topic_id)
+    if not check_can_edit_topic(committer, topic_rights):
+        raise ValueError(
+            'User does not have enough rights to delete a topic.')
+
+    topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
+    topic_rights_model.delete(
+        committer_id, '', force_deletion=force_deletion)
+
+    topic_model = topic_models.TopicModel.get(topic_id)
+    topic_model.delete(
+        committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
+        force_deletion=force_deletion)
+
+    # This must come after the topic is retrieved. Otherwise the memcache
+    # key will be reinstated.
+    topic_memcache_key = _get_topic_memcache_key(topic_id)
+    memcache_services.delete(topic_memcache_key)
+
+    # Delete the summary of the topic (regardless of whether
+    # force_deletion is True or not).
+    delete_topic_summary(topic_id)
+
+
+def delete_topic_summary(topic_id):
+    """Delete a topic summary model.
+
+    Args:
+        topic_id: str. ID of the topic whose topic summary is to
+            be deleted.
+    """
+
+    topic_models.TopicSummaryModel.get(topic_id).delete()
 
 
 def create_topic_summary(topic_id):
@@ -334,7 +519,6 @@ def check_can_edit_topic(user, topic_rights):
     Returns:
         bool. Whether the given user can edit the given topic.
     """
-
     if topic_rights is None:
         return False
     if role_services.ACTION_EDIT_ANY_TOPIC in user.actions:
@@ -347,13 +531,14 @@ def check_can_edit_topic(user, topic_rights):
     return False
 
 
-def assign_role(committer, assignee_id, new_role, topic_id):
+def assign_role(committer, assignee, new_role, topic_id):
     """Assigns a new role to the user.
 
     Args:
         committer: UserActionsInfo. UserActionsInfo object for the user
             who is performing the action.
-        assignee_id: str. ID of the user whose role is being changed.
+        assignee: UserActionsInfo. UserActionsInfo object for the user
+            whose role is being changed.
         new_role: str. The name of the new role. Possible values are:
             ROLE_MANAGER
         topic_id: str. ID of the topic.
@@ -361,6 +546,7 @@ def assign_role(committer, assignee_id, new_role, topic_id):
     Raises:
         Exception. The committer does not have rights to modify a role.
         Exception. The assignee is already a manager for the topic.
+        Exception. The assignee doesn't have enough rights to become a manager.
         Exception. The role is invalid.
     """
     committer_id = committer.user_id
@@ -371,23 +557,26 @@ def assign_role(committer, assignee_id, new_role, topic_id):
         logging.error(
             'User %s tried to allow user %s to be a %s of topic %s '
             'but was refused permission.' % (
-                committer_id, assignee_id, new_role, topic_id))
+                committer_id, assignee.user_id, new_role, topic_id))
         raise Exception(
             'UnauthorizedUserException: Could not assign new role.')
 
-    assignee_username = user_services.get_username(assignee_id)
+    assignee_username = user_services.get_username(assignee.user_id)
+    if role_services.ACTION_EDIT_OWNED_TOPIC not in assignee.actions:
+        raise Exception(
+            'The assignee doesn\'t have enough rights to become a manager.')
 
     old_role = topic_domain.ROLE_NONE
-    if topic_rights.is_manager(assignee_id):
+    if topic_rights.is_manager(assignee.user_id):
         old_role = topic_domain.ROLE_MANAGER
 
     if new_role == topic_domain.ROLE_MANAGER:
-        if topic_rights.is_manager(assignee_id):
+        if topic_rights.is_manager(assignee.user_id):
             raise Exception('This user already is a manager for this topic')
-        topic_rights.manager_ids.append(assignee_id)
+        topic_rights.manager_ids.append(assignee.user_id)
     elif new_role == topic_domain.ROLE_NONE:
-        if topic_rights.is_manager(assignee_id):
-            topic_rights.manager_ids.remove(assignee_id)
+        if topic_rights.is_manager(assignee.user_id):
+            topic_rights.manager_ids.remove(assignee.user_id)
         else:
             old_role = topic_domain.ROLE_NONE
     else:
@@ -397,7 +586,7 @@ def assign_role(committer, assignee_id, new_role, topic_id):
         assignee_username, old_role, new_role)
     commit_cmds = [{
         'cmd': topic_domain.CMD_CHANGE_ROLE,
-        'assignee_id': assignee_id,
+        'assignee_id': assignee.user_id,
         'old_role': old_role,
         'new_role': new_role
     }]
