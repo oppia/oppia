@@ -1086,6 +1086,62 @@ def _check_directive_scope(all_files):
     return summary_messages
 
 
+class CustomHTMLParser(HTMLParser.HTMLParser):
+    """Custom HTML parser to check indentation."""
+
+    def __init__(self, filename, failed=False):
+        HTMLParser.HTMLParser.__init__(self)
+        self.failed = failed
+        self.filename = filename
+
+    def handle_starttag(self, tag, attrs):
+        line_number, column_number = self.getpos()
+        # Check the indentation of the tag.
+        if column_number % 2 != 0 and (
+                line_number != self.handle_endtag(tag)):
+            print (
+                '%s --> Please ensure that %s tag '
+                'in this file on line number %s '
+                'has an indentation which is a multiple of 2 ' % (
+                    self.filename, tag, line_number))
+            self.failed = True
+
+        # Check the indentation of the attributes of the tag.
+        indentation_of_first_attribute = (
+            column_number + len(tag) + 2)
+        starttag_text = self.get_starttag_text()
+
+        for line_num, line in enumerate(
+                str.splitlines(starttag_text)):
+            if line_num == 0:
+                continue
+
+            leading_spaces_count = len(line) - len(line.lstrip())
+            list_of_attrs = []
+
+            for attr, _ in attrs:
+                list_of_attrs.append(attr)
+
+            if not line.lstrip().startswith(tuple(list_of_attrs)):
+                continue
+            if (
+                    indentation_of_first_attribute != (
+                        leading_spaces_count)):
+                line_num_of_error = line_number + line_num
+                print (
+                    '%s --> Please ensure that the '
+                    'attribute for tag %s in this file on '
+                    'line number %s align with the '
+                    'leftmost attribute on the first line '
+                    'of the tag' % (
+                        self.filename, tag, line_num_of_error))
+                self.failed = True
+
+    def handle_endtag(self, tag):
+        line_number, _ = self.getpos()
+        return line_number
+
+
 def _check_html_indent(all_files):
     """This function checks the indentation of lines in HTML files."""
 
@@ -1102,46 +1158,7 @@ def _check_html_indent(all_files):
         with open(filename, 'r') as f:
             file_content = f.read()
 
-            class CustomHTMLParser(HTMLParser.HTMLParser):
-                """Custom HTML parser to check indentation."""
-
-                def __init__(self, failed=False):
-                    HTMLParser.HTMLParser.__init__(self)
-                    self.failed = failed
-
-                def handle_starttag(self, tag, attrs):
-                    line_number, column_number = self.getpos()
-                    # Check the indentation of the tag.
-                    if column_number % 2 != 0:
-                        print (
-                            'Please ensure that %s tag on line number %d '
-                            'has an indentation which is a multiple of 2 ' % (
-                                tag, line_number))
-                        self.failed = True
-
-                    # Check the indentation of the attributes of the tag.
-                    indentation_of_first_attribute = (
-                        column_number + len(tag) + 2)
-                    starttag_text = self.get_starttag_text()
-
-                    for line_num, line in enumerate(
-                            str.splitlines(starttag_text)):
-                        if line_num == 0:
-                            continue
-                        leading_spaces_count = len(line) - len(line.lstrip())
-                        if (
-                                indentation_of_first_attribute != (
-                                    leading_spaces_count)):
-                            line_num_of_error = line_number + line_num
-                            print (
-                                'Please ensure that the attribute(s) on '
-                                'line number %d align with leftmost '
-                                'attribute on the first line '
-                                'of the tag' % line_num_of_error)
-                            self.failed = True
-
-
-            parser = CustomHTMLParser()
+            parser = CustomHTMLParser(filename)
             parser.feed(file_content)
 
             if parser.failed:
@@ -1174,8 +1191,7 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
-    # TODO(apb7): Enable the _check_html_indent function.
-    html_indent_messages = []
+    html_indent_messages = _check_html_indent(all_files)
     html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
