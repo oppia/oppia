@@ -201,7 +201,6 @@ def apply_change_list(topic_id, change_list):
         change_list: list(dict). A change list to be applied to the given
             topic. Each entry in change_list is a dict that represents a
             TopicChange object.
-    object.
 
     Returns:
       Topic. The resulting topic domain object.
