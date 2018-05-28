@@ -189,7 +189,6 @@ oppia.factory('ImagePreloaderService', [
             _imageLoadedCallback[filename] = {};
             _imageLoadedCallback[filename].resolveMethod = resolve;
             _imageLoadedCallback[filename].rejectMethod = reject;
-            };
           }
         });
       }
