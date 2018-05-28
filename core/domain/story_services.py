@@ -253,7 +253,7 @@ def apply_change_list(story_id, change_list):
         story_id: str. ID of the given story.
         change_list: list(dict). A change list to be applied to the given
             story. Each entry in change_list is a dict that represents a
-            StoryChange.
+            StoryChange object.
 
     Returns:
         Story. The resulting story domain object.
