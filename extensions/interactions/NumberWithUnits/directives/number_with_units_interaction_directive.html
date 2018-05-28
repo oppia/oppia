@@ -1,0 +1,21 @@
+<form ng-disabled="NumberWithUnitsForm.$invalid" ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
+  <!-- This ng-form is needed for submitting answer on hitting enter. -->
+  <ng-form name="NumberWithUnitsForm" class="input">
+    <input type="text" name="answer" ng-model="answer" class="form-control">
+  </ng-form>
+
+  <div class="oppia-form-error oppia-units-input-error">
+    <[getWarningText()]>
+  </div>
+</form>
+
+<style>
+  .oppia-units-input-error {
+    margin-top: 10px;
+  }
+
+  .ng-invalid {
+    border-color: red;
+    outline-color: red;
+  }
+</style>
