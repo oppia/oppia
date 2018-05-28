@@ -41,10 +41,10 @@ oppia.directive('angularHtmlBind', ['$compile', function($compile) {
 
 oppia.directive('mathjaxBind', [function() {
   return {
-    restrict: 'A',
+    restrict: 'E',
     controller: [
       '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.$watch($attrs.mathjaxBind, function(value) {
+        $scope.$watch($attrs.mathjaxData, function(value) {
           var $script = angular.element(
             '<script type="math/tex">'
           ).html(value === undefined ? '' : value);
@@ -130,7 +130,7 @@ oppia.directive('focusOn', [
 
 oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
   return {
-    restrict: 'A',
+    restrict: 'E',
     scope: true,
     controller: ['$scope', 'DeviceInfoService', function(
         $scope, DeviceInfoService) {
