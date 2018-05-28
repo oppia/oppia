@@ -37,7 +37,7 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.imageUrl = '';
         ImagePreloaderService.getImageUrl($scope.filepath)
           .then(function(objectUrl) {
-          $scope.imageUrl = objectUrl; 
+            $scope.imageUrl = objectUrl;
           });
         // [TODO] Display a loading indicator instead. For now, if the
         // image is not there in the cache alternate text will be shown
