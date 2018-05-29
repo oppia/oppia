@@ -159,7 +159,8 @@ class LearnerDashboardFeedbackThreadHandler(base.BaseHandler):
         message_summary_list = []
         suggestion = feedback_services.get_suggestion(thread_id)
 
-        exploration_id = thread_id.split('.')[0]
+        exploration_id = (
+            feedback_domain.FeedbackThread.get_exp_id_from_thread_id(thread_id))
         if suggestion:
             exploration = exp_services.get_exploration_by_id(exploration_id)
             current_content_html = (

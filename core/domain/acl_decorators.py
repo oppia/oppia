@@ -17,6 +17,7 @@
 """Decorators to provide authorization across the site."""
 
 from core.controllers import base
+from core.domain import feedback_domain
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import topic_services
@@ -356,7 +357,7 @@ def can_create_feedback_thread(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can create the feedback thread.
+            *. The result of the decorated function.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -375,8 +376,7 @@ def can_create_feedback_thread(handler):
 
 
 def can_view_feedback_thread(handler):
-    """Decorator to check whether the user can view a feedback thread.
-    """
+    """Decorator to check whether the user can view a feedback thread."""
 
     def test_can_access(self, thread_id, **kwargs):
         """Checks if the user can view a feedback thread.
@@ -386,10 +386,11 @@ def can_view_feedback_thread(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can view the feedback thread.
+            *. The result of the decorated function.
         """
 
-        exploration_id = thread_id.split('.')[0]
+        exploration_id = (
+            feedback_domain.FeedbackThread.get_exp_id_from_thread_id(thread_id))
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -419,12 +420,13 @@ def can_comment_on_feedback_thread(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can comment on the feedback thread.
+            *. The result of the decorated function.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        exploration_id = thread_id.split('.')[0]
+        exploration_id = (
+            feedback_domain.FeedbackThread.get_exp_id_from_thread_id(thread_id))
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -454,7 +456,6 @@ def can_rate_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
-            **kwargs: *. Keyword arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:

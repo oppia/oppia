@@ -18,6 +18,7 @@
 
 import datetime
 
+from core.domain import feedback_domain
 from core.platform import models
 import feconf
 import utils
@@ -428,7 +429,8 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             str. The exploration id.
         """
-        return self.id.split('.')[1]
+        return feedback_domain.FeedbackThread.get_exp_id_from_thread_id(
+            self.thread_id)
 
     @property
     def thread_id(self):

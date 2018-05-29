@@ -24,7 +24,7 @@ import utils
 
 class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
-    THREAD_ID = EXP_ID + '.' + 'thread0'
+    THREAD_ID = 'exp0.thread0'
 
     def setUp(self):
         super(FeedbackThreadDomainUnitTests, self).setUp()
@@ -75,11 +75,17 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             last_two_message_ids, [thread_1.get_full_message_id(0), None])
 
+    def test_get_exp_id_from_thread_id(self):
+        thread_id = 'exp1.1234'
+        self.assertEqual(
+            feedback_domain.FeedbackThread.get_exp_id_from_thread_id(thread_id),
+            'exp1')
+
 
 class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
     MESSAGE_ID = 'message0'
-    THREAD_ID = EXP_ID + '.' + 'thread0'
+    THREAD_ID = 'exp0.thread0'
     FULL_MESSAGE_ID = THREAD_ID + '.' + MESSAGE_ID
 
     def setUp(self):
@@ -123,8 +129,7 @@ class FeedbackAnalyticsDomainUnitTests(test_utils.GenericTestBase):
 
 class SuggestionDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'
-    THREAD_ID = 'thread0'
-    FULL_THREAD_ID = EXP_ID + '.' + THREAD_ID
+    THREAD_ID = 'exp0.thread0'
 
     def setUp(self):
         super(SuggestionDomainUnitTests, self).setUp()
@@ -157,7 +162,7 @@ class FeedbackMessageReferenceDomainTests(test_utils.GenericTestBase):
         super(FeedbackMessageReferenceDomainTests, self).setUp()
         self.exp_id = 'exp'
         self.message_id = 'message'
-        self.thread_id = 'thread'
+        self.thread_id = 'exp.thread'
 
     def test_to_dict(self):
         expected_feedback_message_reference = {

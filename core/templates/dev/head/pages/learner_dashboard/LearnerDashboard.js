@@ -301,7 +301,7 @@ oppia.controller('LearnerDashboard', [
       constants.ACTIVITY_TYPE_EXPLORATION);
 
     $scope.onClickThread = function(
-        threadStatus, threadId, explorationTitle) {
+        threadStatus, explorationId, threadId, explorationTitle) {
       $scope.loadingFeedbacks = true;
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
         '/learnerdashboardthreadhandler/<threadId>', {
@@ -310,7 +310,7 @@ oppia.controller('LearnerDashboard', [
       $scope.explorationTitle = explorationTitle;
       $scope.feedbackThreadActive = true;
       $scope.threadStatus = threadStatus;
-      $scope.explorationId = threadId.split('.')[0];
+      $scope.explorationId = explorationId;
       $scope.threadId = threadId;
 
       for (var index = 0; index < $scope.threadSummaries.length; index++) {

@@ -153,7 +153,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
     def test_single_thread_single_exp(self):
         with self._get_swap_context():
             exp_id = 'eid'
-            thread_id = exp_id + '.tid'
+            thread_id = 'eid.tid'
             self.save_new_valid_exploration(exp_id, 'owner')
             thread = feedback_models.FeedbackThreadModel.create(thread_id)
             thread.exploration_id = exp_id
@@ -168,8 +168,8 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
     def test_multiple_threads_single_exp(self):
         with self._get_swap_context():
             exp_id = 'eid'
-            thread_id_1 = exp_id + '.tid1'
-            thread_id_2 = exp_id + '.tid2'
+            thread_id_1 = 'eid.tid1'
+            thread_id_2 = 'eid.tid2'
             self.save_new_valid_exploration(exp_id, 'owner')
             thread_1 = feedback_models.FeedbackThreadModel.create(thread_id_1)
             thread_1.exploration_id = exp_id
@@ -189,9 +189,9 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             exp_id_1 = 'eid1'
             exp_id_2 = 'eid2'
             exp_id_3 = 'eid3'
-            thread_id_1 = exp_id_1 + '.tid1'
-            thread_id_2 = exp_id_2 + '.tid2'
-            thread_id_3 = exp_id_3 + '.tid3'
+            thread_id_1 = 'eid1.tid1'
+            thread_id_2 = 'eid2.tid2'
+            thread_id_3 = 'eid3.tid3'
             self.save_new_valid_exploration(exp_id_1, 'owner')
             self.save_new_valid_exploration(exp_id_2, 'owner')
             self.save_new_valid_exploration(exp_id_3, 'owner')
@@ -260,7 +260,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             # Create test objects.
             user_id = 'uid'
             exp_id = 'eid'
-            thread_id_1 = exp_id + '.tid1'
+            thread_id_1 = 'eid.tid1'
             self.save_new_valid_exploration(exp_id, 'owner')
             thread_1 = feedback_models.FeedbackThreadModel.create(thread_id_1)
             thread_1.exploration_id = exp_id
@@ -296,7 +296,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             # Create test objects.
             user_id = 'uid'
             exp_id = 'eid'
-            thread_id_1 = exp_id + '.tid1'
+            thread_id_1 = 'eid.tid1'
             self.save_new_valid_exploration(exp_id, 'owner')
             thread_1 = feedback_models.FeedbackThreadModel.create(thread_id_1)
             thread_1.exploration_id = exp_id
@@ -350,7 +350,7 @@ class FeedbackAnalyticsAggregatorUnitTests(test_utils.GenericTestBase):
             # Create test objects.
             user_id = 'uid'
             exp_id = 'eid'
-            thread_id_1 = exp_id + '.tid1'
+            thread_id_1 = 'eid.tid1'
             self.save_new_valid_exploration(exp_id, 'owner')
             thread_1 = feedback_models.FeedbackThreadModel.create(thread_id_1)
             thread_1.exploration_id = exp_id

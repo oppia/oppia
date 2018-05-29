@@ -18,6 +18,7 @@
 
 import datetime
 
+from core.domain import feedback_domain
 from core.platform import models
 import feconf
 import utils
@@ -516,7 +517,9 @@ class SuggestionModel(base_models.BaseModel):
                             'thread id: %s' % instance_id)
         state_content = cls._convert_suggestion_html_to_legacy_state_content(
             suggestion_html)
-        exploration_id = thread_id.split('.')[0]
+        exploration_id = (
+            feedback_domain.FeedbackThread.get_exp_id_from_thread_id(
+                instance_id))
         cls(id=instance_id, author_id=author_id,
             exploration_id=exploration_id,
             exploration_version=exploration_version,

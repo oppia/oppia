@@ -339,7 +339,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         self.assertEqual(1, len(threads_exp_2))
 
         def _close_thread(thread_id):
-            thread = (feedback_models.FeedbackThreadModel.get_by_id(thread_id))
+            thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
             thread.put()
 

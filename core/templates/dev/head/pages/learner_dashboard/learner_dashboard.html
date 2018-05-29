@@ -601,7 +601,7 @@
 
             <table class="table" ng-if="!feedbackThreadActive">
               <tr ng-repeat="thread in threadSummaries | orderBy:sortFeedbackFunction:isCurrentFeedbackSortDescending"
-                  ng-click="onClickThread(thread.status, thread.threadId, thread.explorationTitle)"
+                  ng-click="onClickThread(thread.status, thread.exploration_id, thread.threadId, thread.explorationTitle)"
                   class="oppia-feedback-tab-row protractor-test-feedback-thread">
                 <td class="col-lg-1 col-md-1 col-sm-1">
                   <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
