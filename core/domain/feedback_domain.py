@@ -17,8 +17,7 @@
 from core.domain import user_services
 import utils
 
-# TODO (nithesh): Generalise feedback threads so that it is applicable to
-# entities other than explorations also.
+
 class FeedbackThread(object):
     """Domain object for a feedback thread.
 
@@ -40,6 +39,8 @@ class FeedbackThread(object):
             was last updated.
     """
 
+    # TODO (nithesh): Generalise feedback threads so that it is applicable to
+    # entities other than explorations also.
     def __init__(
             self, thread_id, exploration_id, state_name,
             original_author_id, status, subject, summary, has_suggestion,
@@ -110,16 +111,17 @@ class FeedbackThread(object):
 
     # TODO (nithesh): Once feedback threads are generalised, the below function
     # needs to be edited to get id of a general entity. For the moment, the
-    # function will return the exploration_id from a thread_id
+    # function will return the exploration_id from a thread_id.
     @classmethod
     def get_exp_id_from_thread_id(cls, thread_id):
-        """Returns the exploration_id part of the thread_id
+        """Returns the exploration_id part of the thread_id.
 
         Args:
-            thread_id: str. The id of the thread
+            thread_id: str. The id of the thread.
 
         Returns:
-            str. The exploration id part of the thread_id"""
+            str. The exploration id part of the thread_id.
+        """
         return thread_id.split('.')[0]
 
 
