@@ -2537,7 +2537,7 @@ states:
     classifier_model_id: null
     content:
       audio_translations: {}
-      html: Congratulations, you have finished!
+      html: <p>Congratulations, you have finished!</p>
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []

@@ -725,6 +725,25 @@ def get_hashable_value(value):
         return value
 
 
+def enforce_valid_parent(
+        soup, tag_name, allowed_parent_list, default_parent_name):
+    """This function validates the parent of a tag and if the parent is not
+    valid, it enforces a default parent.
+
+    Args:
+        soup: bs4.BeautifulSoup. The html soup in which tag parent is to
+            be checked.
+        tag_name: str. Tag name to be checked.
+        allowed_parent_list: list(str). List of valid parents for the tag.
+        default_parent_name: str. The parent tag name to be enforced if the
+            current parent is invalid.
+    """
+
+    for tag in soup.findAll(tag_name):
+        if tag.parent.name not in allowed_parent_list:
+            tag.wrap(soup.new_tag(default_parent_name))
+
+
 def convert_to_text_angular(html_data):
     """This fucntion converts the html to text angular supported format.
 
@@ -734,57 +753,63 @@ def convert_to_text_angular(html_data):
     Returns:
         str. The converted HTML string.
     """
+    if not len(html_data):
+        return html_data
+
     soup = bs4.BeautifulSoup(html_data, 'html.parser')
 
-    tags_to_remove = ['div', 'span', 'code', 'table', 'td', 'tr', 'tbody']
+    allowed_tag_list = (
+        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+        ['ALLOWED_TAG_LIST'])
 
-    for tag_name in tags_to_remove:
-        for tag in soup.findAll(tag_name):
+    # To remove all tags except those in allowed tag list.
+    all_tags = soup.findAll()
+    for tag in all_tags:
+        if tag.name not in allowed_tag_list:
             tag.unwrap()
 
-    for br in soup.findAll('br'):
-        if br.parent.name not in ['b', 'i', 'li', 'p']:
-            br.wrap(soup.new_tag('p'))
-
+    # Ensure that if the html content is wrapped in some tag,
+    # if not, wrap it in p tag.
     tag_list = soup.findAll()
     if not len(tag_list):
         start_tag = None
     else:
+        # This part checks if a html string is not wrapped in any tag. Since it
+        # is not possible to obtain the position of a tag using BeautifulSoup,
+        # exact tag is to be searched in the html string.
         start_tag = '<' + soup.findAll()[0].name + '>'
     if not start_tag or html_data.find(start_tag) != 0:
         html_data = '<p>' + str(soup) + '</p>'
         soup = bs4.BeautifulSoup(html_data, 'html.parser')
 
-    oppia_tags1 = ['oppia-noninteractive-link', 'oppia-noninteractive-math']
-    oppia_tags2 = [
+    oppia_inline_components = [
+        'oppia-noninteractive-link', 'oppia-noninteractive-math']
+    oppia_block_components = [
         'oppia-noninteractive-image',
         'oppia-noninteractive-video',
         'oppia-noninteractive-collapsible',
         'oppia-noninteractive-tabs'
         ]
 
-    for tag_name in oppia_tags1:
-        tag_list = soup.findAll(tag_name)
-        for tag in tag_list:
-            if tag.parent.name not in ['b', 'i', 'li', 'p', 'pre']:
-                tag.wrap(soup.new_tag('p'))
+    # Ensure that every line break is a child of <b>, <i>, <li>, or <p>.
+    enforce_valid_parent(soup, 'br', ['b', 'i', 'li', 'p'], 'p')
 
-    for tag_name in oppia_tags2:
-        tag_list = soup.findAll(tag_name)
-        for tag in tag_list:
-            if tag.parent.name not in ['li', 'p', 'pre']:
-                tag.wrap(soup.new_tag('p'))
+    # Ensure that every oppia inline component is a child of <b>, <i>,
+    # <li>, <p> or <pre>.
+    for tag_name in oppia_inline_components:
+        enforce_valid_parent(soup, tag_name, ['b', 'i', 'li', 'p', 'pre'], 'p')
 
-    tag_list = soup.findAll('b')
-    for b in tag_list:
-        if b.parent.name not in ['i', 'li', 'p', 'pre']:
-            b.wrap(soup.new_tag('p'))
+    # Ensure that every oppia block component is a child of <li>, <p>, or <pre>.
+    for tag_name in oppia_block_components:
+        enforce_valid_parent(soup, tag_name, ['li', 'p', 'pre'], 'p')
 
-    tag_list = soup.findAll('i')
-    for i in tag_list:
-        if i.parent.name not in ['b', 'li', 'p', 'pre']:
-            i.wrap(soup.new_tag('p'))
+    # Ensure that every bold tag is a child of <i>, <li>, <p> or <pre>.
+    enforce_valid_parent(soup, 'b', ['i', 'li', 'p', 'pre'], 'p')
 
+    # Ensure that every italics tag is a child of <b>, <li>, <p> or <pre>.
+    enforce_valid_parent(soup, 'i', ['b', 'li', 'p', 'pre'], 'p')
+
+    # Ensure that blockquote or pre tag is not wrapped in p tags.
     for tag_name in ['blockquote', 'pre']:
         for tag in soup.findAll(tag_name):
             prev_sib = list(tag.previous_siblings)
@@ -798,6 +823,7 @@ def convert_to_text_angular(html_data):
                 for sib in next_sib:
                     sib.wrap(p2)
 
+    # Ensure that p tag is not wrapped in p tag.
     for p in soup.findAll('p'):
         if p.parent.name == 'p':
             p.unwrap()

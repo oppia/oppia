@@ -3191,23 +3191,21 @@ class Exploration(object):
             dict. The converted states_dict.
         """
         for state_dict in states_dict.values():
-
             state_dict['content']['html'] = utils.convert_to_text_angular(
                 state_dict['content']['html'])
             if state_dict['interaction']['default_outcome']:
-                state_dict[
-                    'interaction']['default_outcome']['feedback']['html'] = (
-                        utils.convert_to_text_angular(
-                            state_dict[
-                                'interaction']['default_outcome']['feedback'][
-                                    'html']))
+                interaction_feedback_html = state_dict[
+                    'interaction']['default_outcome']['feedback']['html']
+                state_dict['interaction']['default_outcome']['feedback'][
+                    'html'] = utils.convert_to_text_angular(
+                        interaction_feedback_html)
 
             for answer_group_index, answer_group in enumerate(
                     state_dict['interaction']['answer_groups']):
+                answer_group_html = answer_group['outcome']['feedback']['html']
                 state_dict['interaction']['answer_groups'][
                     answer_group_index]['outcome']['feedback']['html'] = (
-                        utils.convert_to_text_angular(
-                            answer_group['outcome']['feedback']['html']))
+                        utils.convert_to_text_angular(answer_group_html))
                 if state_dict['interaction']['id'] == 'ItemSelectionInput':
                     for rule_spec_index, rule_spec in enumerate(
                             answer_group['rule_specs']):
@@ -3219,16 +3217,16 @@ class Exploration(object):
 
             for hint_index, hint in enumerate(
                     state_dict['interaction']['hints']):
+                hint_html = hint['hint_content']['html']
                 state_dict['interaction']['hints'][hint_index][
                     'hint_content']['html'] = (
-                        utils.convert_to_text_angular(
-                            hint['hint_content']['html']))
+                        utils.convert_to_text_angular(hint_html))
 
             if state_dict['interaction']['solution']:
+                solution_html = state_dict[
+                    'interaction']['solution']['explanation']['html']
                 state_dict['interaction']['solution']['explanation']['html'] = (
-                    utils.convert_to_text_angular(
-                        state_dict[
-                            'interaction']['solution']['explanation']['html']))
+                    utils.convert_to_text_angular(solution_html))
 
             if state_dict['interaction']['id'] in (
                     'ItemSelectionInput', 'MultipleChoiceInput'):
@@ -3734,9 +3732,10 @@ class Exploration(object):
 
     @classmethod
     def _convert_v24_dict_to_v25_dict(cls, exploration_dict):
-        """ Converts a v23 exploration dict into a v24 exploration dict.
+        """ Converts a v24 exploration dict into a v25 exploration dict.
 
-        Converts the non textangular html to the textangular html.
+        Converts all Rich Text Editor content to be compatible with the
+        textAngular format.
         """
         exploration_dict['schema_version'] = 25
 
