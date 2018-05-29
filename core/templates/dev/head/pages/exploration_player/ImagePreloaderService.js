@@ -56,8 +56,8 @@ oppia.factory('ImagePreloaderService', [
     };
 
     /**
-     * Gets image files in Bfs order from the state.
-     * @param {string} sourceStateName - The name of the state starting from
+     * Gets image files names in Bfs order from the state.
+     * @pstatearam {string} sourceStateName - The name of the starting state from
      *                                   which the filenames should be
      *                                   obtained.
      */
@@ -71,8 +71,8 @@ oppia.factory('ImagePreloaderService', [
 
       stateNamesInBfsOrder.forEach(function(stateName) {
         var state = _states.getState(stateName);
-        ExtractImageFilenamesFromStateService.getImageFilenamesInState(state).
-          forEach(function(filename) {
+        ExtractImageFilenamesFromStateService.getImageFilenamesInState(state)
+          .forEach(function(filename) {
             imageFilenames.push(filename);
           });
       });
@@ -87,14 +87,13 @@ oppia.factory('ImagePreloaderService', [
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), imageFilename
       ).then(function(loadedImage) {
-        for (var i = 0;
-          i < _filenamesOfImageCurrentlyDownloading.length; i++) {
-          if (_filenamesOfImageCurrentlyDownloading[i] ===
-              loadedImage.filename) {
-            _filenamesOfImageCurrentlyDownloading.splice(i, 1);
-            break;
-          }
-        }
+        _filenamesOfImageCurrentlyDownloading = (
+          _filenamesOfImageCurrentlyDownloading.filter(function(imageFilename) {
+            if (loadedImage.filename !== imageFilename) {
+              return true;
+            }
+          })
+        );
         if (_filenamesOfImageToBeDownloaded.length > 0) {
           var nextImageFilename = _filenamesOfImageToBeDownloaded.shift();
           _filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
@@ -118,7 +117,7 @@ oppia.factory('ImagePreloaderService', [
       _filenamesOfImageToBeDownloaded = (
         _getImageFilenamesInBfsOrder(sourceStateName));
       while (_filenamesOfImageCurrentlyDownloading.length <
-        MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
+          MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
           _filenamesOfImageToBeDownloaded.length > 0) {
         var imageFilename = _filenamesOfImageToBeDownloaded.shift();
         _filenamesOfImageCurrentlyDownloading.push(imageFilename);
@@ -135,7 +134,8 @@ oppia.factory('ImagePreloaderService', [
     };
 
     /**
-     * Called when the state changes.
+     * When the state changes, it decides whether to restart the preloader
+     * starting from the 'stateName' state or not.
      * @param {string} stateName - The name of the state the user shifts to.
      */
     var _onStateChange = function(stateName) {
@@ -143,8 +143,6 @@ oppia.factory('ImagePreloaderService', [
         _imageLoadedCallback = {};
         var imageFilenamesInState = [];
         var noOfImageFilesCurrentlyDownloading = 0;
-        // No of images that are not there in the cache and are not currently
-        // being downloaded
         var noOfImagesNeitherInCacheNorDownloading = 0;
 
         var state = _states.getState(stateName);
@@ -156,7 +154,7 @@ oppia.factory('ImagePreloaderService', [
             _filenamesOfImageCurrentlyDownloading.indexOf(filename) >= 0
           );
           if (!AssetsBackendApiService.isCached(filename) &&
-              (!isFileCurrentlyDownloading)) {
+              !isFileCurrentlyDownloading) {
             noOfImagesNeitherInCacheNorDownloading += 1;
           }
           if (isFileCurrentlyDownloading) {
