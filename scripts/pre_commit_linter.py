@@ -586,34 +586,27 @@ def _pre_commit_linter(all_files):
     css_linting_process = multiprocessing.Process(
         target=_lint_css_files, args=(stylelint_path, css_files_to_lint,
                                       css_stdout, css_result))
-    css_linting_process.daemon = True
 
     js_result = multiprocessing.Queue()
     js_stdout = multiprocessing.Queue()
     js_linting_process = multiprocessing.Process(
         target=_lint_js_files, args=(node_path, eslint_path, js_files_to_lint,
                                      js_stdout, js_result))
-    js_linting_process.daemon = True
 
     py_result = multiprocessing.Queue()
     py_linting_process = multiprocessing.Process(
         target=_lint_py_files,
         args=(config_pylint, py_files_to_lint, py_result))
-    py_linting_process.daemon = True
     print 'Starting CSS, Javascript and Python Linting'
     print '----------------------------------------'
     css_linting_process.start()
     js_linting_process.start()
     py_linting_process.start()
 
-    # Since only oppia.css is being linted presently, setting timeout parameter
-    # to 600 causes the script to wait. Therefore timeout parameter has
-    # been reduced to 50.
-    # TODO(apb7): Increase timeout parameter when linting multiple files.
-    css_linting_process.join(timeout=50)
 
     # Require timeout parameter to prevent against endless waiting for the
-    # JS and Python linting functions to return.
+    # CSS, JS and Python linting functions to return.
+    css_linting_process.join(timeout=600)
     js_linting_process.join(timeout=600)
     py_linting_process.join(timeout=600)
 
@@ -625,7 +618,7 @@ def _pre_commit_linter(all_files):
     print '\n'.join(js_messages)
     print '----------------------------------------'
     summary_messages = []
-    summary_messages.append(css_result.get())
+    # summary_messages.append(css_result.get())
     summary_messages.append(js_result.get())
     summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
