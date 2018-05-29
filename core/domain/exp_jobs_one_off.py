@@ -501,7 +501,6 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
         html_list = exploration.get_all_html_content_strings()
 
         for html_data in html_list:
-            html_data = html_data.encode('utf-8')
             soup = bs4.BeautifulSoup(html_data, 'html.parser')
 
             for tag in soup.findAll():
@@ -522,10 +521,16 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
                         err_dict[tag.name] = [parent]
 
         for key in err_dict:
-            err_dict[key] = list(set(err_dict[key]))
-
-        yield('Errors', err_dict)
+            yield(key, list(set(err_dict[key])))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        final_values = []
+        for value in values:
+            value = value[1: -1]
+            value = value.split(", ")
+            for item in value:
+                if item not in final_values:
+                    final_values = final_values + [item]
+
+        yield (key, final_values)

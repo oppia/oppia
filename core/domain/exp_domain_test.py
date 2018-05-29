@@ -3738,3 +3738,180 @@ states:
         with self.assertRaisesRegexp(
             Exception, 'Assigned state ids should be integer values'):
             state_id_mapping.validate()
+
+
+class HtmlCollectionnitTests(test_utils.GenericTestBase):
+    """Test method to obtain all html strings."""
+
+    def test_all_html_strings_are_collected(self):
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'eid', title='title', category='category')
+        exploration.add_states(['state1', 'state2', 'state3'])
+        state1 = exploration.states['state1']
+        state2 = exploration.states['state2']
+        state3 = exploration.states['state3']
+        content1_dict = {
+            'html': '<blockquote>Hello, this is state1</blockquote>',
+            'audio_translations': {}
+        }
+        content2_dict = {
+            'html': '<pre>Hello, this is state2</pre>',
+            'audio_translations': {}
+        }
+        content3_dict = {
+            'html': '<p>Hello, this is state3</p>',
+            'audio_translations': {}
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+        state3.update_content(content3_dict)
+
+        state1.update_interaction_id('TextInput')
+        state2.update_interaction_id('MultipleChoiceInput')
+        state3.update_interaction_id('ItemSelectionInput')
+
+        customization_args_dict1 = {
+            'placeholder': {'value': ''},
+            'rows': {'value': 1}
+        }
+        customization_args_dict2 = {
+            'choices': {'value': [
+                '<p>This is value1 for MultipleChoice</p>',
+                '<p>This is value2 for MultipleChoice</p>'
+            ]}
+        }
+        customization_args_dict3 = {
+            'choices': {'value': [
+                '<p>This is value1 for ItemSelection</p>',
+                '<p>This is value2 for ItemSelection</p>',
+                '<p>This is value3 for ItemSelection</p>'
+            ]}
+        }
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state3.update_interaction_customization_args(customization_args_dict3)
+
+        default_outcome_dict1 = {
+            'dest': 'state2',
+            'feedback': {
+                'html': '<p>Default outcome for state1</p>',
+                'audio_translations': {}
+            },
+            'param_changes': [],
+            'labelled_as_correct': False,
+            'refresher_exploration_id': None
+        }
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+
+        hint_list2 = [{
+            'hint_content': {
+                'html': '<p>Hello, this is html1 for state2</p>',
+                'audio_translations': {}
+            }
+        }, {
+            'hint_content': {
+                'html': '<p>Hello, this is html2 for state2</p>',
+                'audio_translations': {}
+            }
+        }]
+        state2.update_interaction_hints(hint_list2)
+
+        solution_dict1 = {
+            'interaction_id': '',
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'html': '<p>This is solution for state1</p>',
+                'audio_translations': {}
+            }
+        }
+
+        state1.update_interaction_solution(solution_dict1)
+
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': 1}
+            }],
+            'outcome': {
+                'dest': 'state1',
+                'feedback': {
+                    'html': '<p>Outcome1 for state2</p>',
+                    'audio_translations': {}
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None
+            },
+            'training_data': [],
+        }, {
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }],
+            'outcome': {
+                'dest': 'state3',
+                'feedback': {
+                    'html': '<p>Outcome2 for state2</p>',
+                    'audio_translations': {}
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None
+            },
+            'training_data': []
+        }]
+        answer_group_list3 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelectionInput</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value3 for ItemSelectionInput</p>'
+                ]}
+            }],
+            'outcome': {
+                'dest': 'state1',
+                'feedback': {
+                    'html': '<p>Outcome for state3</p>',
+                    'audio_translations': {}
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None
+            },
+            'training_data': [],
+        }]
+        state2.update_interaction_answer_groups(answer_group_list2)
+        state3.update_interaction_answer_groups(answer_group_list3)
+
+        expected_html_list = [
+            '<pre>Hello, this is state2</pre>',
+            '<p>Outcome1 for state2</p>',
+            '<p>Outcome2 for state2</p>',
+            '<p>Hello, this is html1 for state2</p>',
+            '<p>Hello, this is html2 for state2</p>',
+            '<p>This is value1 for MultipleChoice</p>',
+            '<p>This is value2 for MultipleChoice</p>',
+            '<blockquote>Hello, this is state1</blockquote>',
+            '<p>Default outcome for state1</p>',
+            '<p>This is solution for state1</p>',
+            '<p>Hello, this is state3</p>',
+            '<p>Outcome for state3</p>',
+            '<p>This is value1 for ItemSelectionInput</p>',
+            '<p>This is value3 for ItemSelectionInput</p>',
+            '<p>This is value1 for ItemSelection</p>',
+            '<p>This is value2 for ItemSelection</p>',
+            '<p>This is value3 for ItemSelection</p>'
+        ]
+
+        actual_outcome_list = exploration.get_all_html_content_strings()
+
+        self.assertEqual(actual_outcome_list, expected_html_list)

@@ -1246,20 +1246,18 @@ class InteractionInstance(object):
             default_outcome_html = self.default_outcome.feedback.html
             html_list = html_list + [default_outcome_html]
 
-
         for hint in self.hints:
             hint_html = hint.hint_content.html
             html_list = html_list + [hint_html]
-
 
         if self.solution:
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
 
         if self.id in ('ItemSelectionInput', 'MultipleChoiceInput'):
-            customization_args_html = (
+            customization_args_html_list = (
                 self.customization_args['choices']['value'])
-            html_list = html_list + customization_args_html
+            html_list = html_list + customization_args_html_list
 
         return html_list
 
@@ -4017,8 +4015,12 @@ class Exploration(object):
         html_list = []
         for state in self.states.itervalues():
             content_html = state.content.html
-            interaction_html = state.interaction.get_all_html_content_strings()
-            html_list = html_list + [content_html] + interaction_html
+            interaction_html_list = (
+                state.interaction.get_all_html_content_strings())
+            html_list = html_list + [content_html] + interaction_html_list
+
+        html_list = filter(None, html_list)
+
         return html_list
 
 
