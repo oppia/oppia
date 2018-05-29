@@ -46,8 +46,8 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         outcomesHtml = outcomesHtml.concat(answerGroupHtml);
       });
       if (state.interaction.defaultOutcome !== null) {
-        outcomesHtml = outcomesHtml.concat(state.interaction.defaultOutcome
-          .feedback.getHtml());
+        outcomesHtml = outcomesHtml.concat(
+          state.interaction.defaultOutcome.feedback.getHtml());
       }
       return outcomesHtml;
     };
@@ -161,11 +161,6 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       getImageFilenamesInHints: function(state) {
         var hintsHtml = _getHintsHtml(state);
         return _extractFilepathValueFromOppiaNonInteractiveImageTag(hintsHtml);
-      },
-      getImageFilenamesInSolutions: function(state) {
-        var solutionHtml = _getHintsHtml(state);
-        return _extractFilepathValueFromOppiaNonInteractiveImageTag(
-          solutionHtml);
       }
     };
   }]);
