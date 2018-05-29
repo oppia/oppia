@@ -100,12 +100,6 @@ oppia.factory('StatsReportingService', [
         });
     };
 
-    if (!_editorPreviewMode) {
-      $interval(function() {
-        postStatsToBackend();
-      }, 10000);
-    }
-
     var postStatsToBackend = function() {
       $http.post(getFullStatsUrl('STATS_EVENTS'), {
         aggregated_stats: aggregatedStats,
@@ -133,8 +127,6 @@ oppia.factory('StatsReportingService', [
         createDefaultStateStatsMapping(stateName);
         aggregatedStats.state_stats_mapping[stateName].total_hit_count += 1;
         aggregatedStats.state_stats_mapping[stateName].first_hit_count += 1;
-
-        postStatsToBackend();
 
         $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
           params: params,
