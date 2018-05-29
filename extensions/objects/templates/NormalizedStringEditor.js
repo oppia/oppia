@@ -26,8 +26,8 @@ oppia.directive('normalizedStringEditor', [
       },
       restrict: 'E',
       scope: {
-        initArgs: '@',
         alwaysEditable: '@',
+        initArgs: '@',
         value: '='
       },
       template: '<span ng-include="getTemplateUrl()"></span>',
