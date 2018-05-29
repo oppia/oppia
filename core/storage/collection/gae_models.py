@@ -112,7 +112,7 @@ class CollectionModel(base_models.VersionedModel):
             collection_rights.community_owned
         )
         collection_commit_log.collection_id = self.id
-        collection_commit_log.put_async()
+        collection_commit_log.put()
 
 
 class CollectionRightsSnapshotMetadataModel(

@@ -212,8 +212,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         committer_id: str. ID of the committer.
         story: Story. The story domain object.
         commit_message: str. A description of changes made to the story.
-        commit_cmds: list(dict). A list of change commands made to the given
-            story.
+        commit_cmds: list(StoryChange). A list of change commands made to the
+            given story.
     """
     story.validate()
     model = story_models.StoryModel(
@@ -225,6 +225,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         notes=story.notes,
         story_contents=story.story_contents.to_dict()
     )
+    commit_cmds = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds)
     story.version += 1
     create_story_summary(story.id)
@@ -240,10 +241,10 @@ def save_new_story(committer_id, story):
     commit_message = (
         'New story created with title \'%s\'.' % story.title)
     _create_story(
-        committer_id, story, commit_message, [{
+        committer_id, story, commit_message, [story_domain.StoryChange({
             'cmd': story_domain.CMD_CREATE_NEW,
             'title': story.title
-        }])
+        })])
 
 
 # Repository SAVE and DELETE methods.
@@ -252,19 +253,15 @@ def apply_change_list(story_id, change_list):
 
     Args:
         story_id: str. ID of the given story.
-        change_list: list(dict). A change list to be applied to the given
-            story. Each entry in change_list is a dict that represents a
-            StoryChange object.
+        change_list: list(StoryChange). A change list to be applied to the given
+            story. Each entry in change_list is a StoryChange object.
 
     Returns:
         Story. The resulting story domain object.
     """
     story = get_story_by_id(story_id)
     try:
-        changes = [story_domain.StoryChange(change_dict)
-                   for change_dict in change_list]
-
-        for change in changes:
+        for change in change_list:
             if change.cmd == story_domain.CMD_ADD_STORY_NODE:
                 story.add_node(change.node_id)
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
@@ -329,8 +326,8 @@ def _save_story(committer_id, story, commit_message, change_list):
         committer_id: str. ID of the given committer.
         story: Story. The story domain object to be saved.
         commit_message: str. The commit message.
-        change_list: list(dict). List of changes applied to a story. Each
-            entry in change_list is a dict that represents a StoryChange.
+        change_list: list(StoryChange). List of changes applied to a story. Each
+            entry in change_list is a StoryChange object.
 
     Raises:
         ValidationError: An invalid exploration was referenced in the
@@ -388,6 +385,7 @@ def _save_story(committer_id, story, commit_message, change_list):
         ]
     }
     story_model.version = story.version
+    change_list = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_story_memcache_key(story.id))
     story.version += 1
@@ -401,7 +399,7 @@ def update_story(
     - committer_id: str. The id of the user who is performing the update
         action.
     - story_id: str. The story id.
-    - change_list: list(dict). Each element in the list represents a valid
+    - change_list: list(StoryChange). Each element in the list represents a
         StoryChange object. These changes are applied in sequence to produce the
         resulting story.
     - commit_message: str or None. A description of changes made to the

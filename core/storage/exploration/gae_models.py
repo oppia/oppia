@@ -140,7 +140,7 @@ class ExplorationModel(base_models.VersionedModel):
             exp_rights.community_owned
         )
         exploration_commit_log.exploration_id = self.id
-        exploration_commit_log.put_async()
+        exploration_commit_log.put()
 
 
 class ExplorationRightsSnapshotMetadataModel(

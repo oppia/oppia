@@ -77,6 +77,9 @@ class StoryModel(base_models.VersionedModel):
                     cmd: str. Unique command.
                 and then additional arguments for that command.
         """
+        super(StoryModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+
         committer_user_settings_model = (
             user_models.UserSettingsModel.get_by_id(committer_id))
         committer_username = (
@@ -84,14 +87,12 @@ class StoryModel(base_models.VersionedModel):
             if committer_user_settings_model else '')
 
         story_commit_log_entry = StoryCommitLogEntryModel.create(
-            self.id, self.version + 1, committer_id, committer_username,
+            self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
             feconf.ACTIVITY_STATUS_PUBLIC, False
         )
         story_commit_log_entry.story_id = self.id
-        story_commit_log_entry.put_async()
-        super(StoryModel, self)._trusted_commit(
-            committer_id, commit_type, commit_message, commit_cmds)
+        story_commit_log_entry.put()
 
 
 class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

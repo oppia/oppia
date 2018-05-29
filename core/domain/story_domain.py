@@ -105,6 +105,31 @@ class StoryChange(object):
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 
+    def to_dict(self):
+        """Returns a dict representing the StoryChange domain object.
+
+        Returns:
+            A dict, mapping all fields of StoryChange instance.
+        """
+        story_change_dict = {}
+        story_change_dict['cmd'] = self.cmd
+        if hasattr(self, 'property_name'):
+            story_change_dict['property_name'] = self.property_name
+        if hasattr(self, 'new_value'):
+            story_change_dict['new_value'] = self.new_value
+        if hasattr(self, 'old_value'):
+            story_change_dict['old_value'] = self.old_value
+        if hasattr(self, 'node_id'):
+            story_change_dict['node_id'] = self.node_id
+        if hasattr(self, 'from_version'):
+            story_change_dict['from_version'] = self.from_version
+        if hasattr(self, 'to_version'):
+            story_change_dict['to_version'] = self.to_version
+        if hasattr(self, 'title'):
+            story_change_dict['title'] = self.title
+
+        return story_change_dict
+
 
 class StoryNode(object):
     """Domain object describing a node in the exploration graph of a
