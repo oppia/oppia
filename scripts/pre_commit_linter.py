@@ -1089,33 +1089,37 @@ def _check_directive_scope(all_files):
 class CustomHTMLParser(HTMLParser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
-    def __init__(self, filename, failed=False):
+    def __init__(self, filename, file_lines, failed=False):
         HTMLParser.HTMLParser.__init__(self)
         self.failed = failed
         self.filename = filename
         self.previous_tag_line_number = None
+        self.file_lines = file_lines
 
     def handle_starttag(self, tag, attrs):
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
-        if self.previous_tag_line_number is None:
-            if column_number % 2 != 0:
-                print (
-                    '%s --> Indentation level for %s '
-                    'tag on line %s should be a '
-                    'multiple of 2 ' % (
-                        self.filename, tag, line_number))
-                self.failed = True
-        else:
-            if column_number % 2 != 0 and (
-                    line_number != self.previous_tag_line_number):
-                print (
-                    '%s --> Indentation level for %s '
-                    'tag on line %s should be a '
-                    'multiple of 2 ' % (
-                        self.filename, tag, line_number))
-                self.failed = True
-        self.previous_tag_line_number = line_number
+        tag_line = self.file_lines[line_number - 1].lstrip()
+        angled_tag = '<' + tag
+        if tag_line.startswith(angled_tag):
+            if self.previous_tag_line_number is None:
+                if column_number % 2 != 0:
+                    print (
+                        '%s --> Indentation level for %s '
+                        'tag on line %s should be a '
+                        'multiple of 2 ' % (
+                            self.filename, tag, line_number))
+                    self.failed = True
+            else:
+                if column_number % 2 != 0 and (
+                        line_number != self.previous_tag_line_number):
+                    print (
+                        '%s --> Indentation level for %s '
+                        'tag on line %s should be a '
+                        'multiple of 2 ' % (
+                            self.filename, tag, line_number))
+                    self.failed = True
+            self.previous_tag_line_number = line_number
 
         # Check the indentation of the attributes of the tag.
         indentation_of_first_attribute = (
@@ -1163,8 +1167,8 @@ def _check_html_indent(all_files):
     for filename in html_files_to_lint:
         with open(filename, 'r') as f:
             file_content = f.read()
-
-            parser = CustomHTMLParser(filename)
+            file_lines = file_content.split('\n')
+            parser = CustomHTMLParser(filename, file_lines)
             parser.feed(file_content)
 
             if parser.failed:
