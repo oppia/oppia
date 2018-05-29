@@ -3640,7 +3640,6 @@ states:
         self.assertDictEqual(state_id_map.state_names_to_ids, expected_mapping)
         self.assertEqual(state_id_map.largest_state_id_used, 2)
 
-
     def test_mapping_for_exp_with_no_end_reference(self):
         """Test that correct mapping is generated when old exploration has
         END state references but new exploration does not have END
