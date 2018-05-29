@@ -57,9 +57,9 @@ oppia.factory('ImagePreloaderService', [
 
     /**
      * Gets image files names in Bfs order from the state.
-     * @pstatearam {string} sourceStateName - The name of the starting state from
-     *                                   which the filenames should be
-     *                                   obtained.
+     * @pstatearam {string} sourceStateName - The name of the starting state
+     *                                        from which the filenames should
+     *                                        be obtained.
      */
     var _getImageFilenamesInBfsOrder = function(sourceStateName) {
       var stateNamesInBfsOrder = (
