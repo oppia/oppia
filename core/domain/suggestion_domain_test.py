@@ -41,7 +41,7 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             self.ASSIGNED_REVIEWER_EMAIL)
         self.suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
+            'suggestion_type': suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT, # pylint: disable=line-too-long
             'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
             'target_id': 'exp1',
             'target_version_at_submission': 1,
@@ -53,35 +53,16 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'score_category': 'translation.English'
         }
 
-    def test_to_dict_base_suggestion(self):
+    def test_base_class_methods_raises_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseSuggestion should implement __init__.'):
+            suggestion_domain.BaseSuggestion()
 
-        expected_suggestion_dict = self.suggestion_dict
-
-        observed_suggestion = suggestion_domain.BaseSuggestion(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['suggestion_type'],
-            expected_suggestion_dict['target_type'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.assigned_reviewer_id, self.reviewer_id,
-            expected_suggestion_dict['change_cmd'],
-            expected_suggestion_dict['score_category'])
-
-        self.assertDictEqual(
-            observed_suggestion.to_dict(), expected_suggestion_dict)
-
-    def test_from_dict_base_suggestion(self):
-        observed_suggestion = suggestion_domain.BaseSuggestion.from_dict(
-            self.suggestion_dict)
-        self.assertDictEqual(
-            observed_suggestion.to_dict(), self.suggestion_dict)
-
-    def test_get_model_corresponding_to_suggestion(self):
-        self.assertEqual(
-            suggestion_domain.get_model_corresponding_to_suggestion(
-                suggestion_models.SUGGESTION_EDIT_STATE_CONTENT),
-            suggestion_domain.SuggestionEditStateContent)
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseSuggestion should implement from_dict.'):
+            suggestion_domain.BaseSuggestion.from_dict()
 
     def test_create_suggestion_edit_state_content(self):
         expected_suggestion_dict = self.suggestion_dict

@@ -40,23 +40,10 @@ class BaseSuggestion(object):
         score_category: str. The scoring category for the suggestion.
     """
 
-    def __init__(
-            self, suggestion_id, suggestion_type, target_type, target_id,
-            target_version_at_submission, status, author_id,
-            assigned_reviewer_id, final_reviewer_id, change_cmd,
-            score_category):
+    def __init__(self):
         """Initializes a Suggestion object."""
-        self.suggestion_id = suggestion_id
-        self.suggestion_type = suggestion_type
-        self.target_type = target_type
-        self.target_id = target_id
-        self.target_version_at_submission = target_version_at_submission
-        self.status = status
-        self.author_id = author_id
-        self.assigned_reviewer_id = assigned_reviewer_id
-        self.final_reviewer_id = final_reviewer_id
-        self.change_cmd = change_cmd
-        self.score_category = score_category
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement __init__.')
 
     def to_dict(self):
         """Returns a dict representation of a suggestion object.
@@ -79,63 +66,57 @@ class BaseSuggestion(object):
         }
 
     @classmethod
-    def from_dict(cls, suggestion_dict):
-        """Return a Suggestion object of type from a dict.
-
-        Args:
-            suggestion_dict: dict. The dict representation of the suggestion.
-
-        Returns:
-            BaseSuggestion. The corresponding Suggestion domain object.
-        """
-        suggestion = cls(
-            suggestion_dict['suggestion_id'],
-            suggestion_dict['suggestion_type'], suggestion_dict['target_type'],
-            suggestion_dict['target_id'],
-            suggestion_dict['target_version_at_submission'],
-            suggestion_dict['status'], suggestion_dict['author_id'],
-            suggestion_dict['assigned_reviewer_id'],
-            suggestion_dict['final_reviewer_id'], suggestion_dict['change_cmd'],
-            suggestion_dict['score_category'])
-
-        return suggestion
+    def from_dict(cls):
+        """Return a Suggestion object of type from a dict."""
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement from_dict.')
 
     def validate(self):
         """Validates the suggestion object. Each subclass must implement
         this function
         """
-        pass
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement validate.')
 
     def accept(self):
         """Accepts the suggestion. Each subclass must implement this function.
         """
-        pass
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement accept.')
 
 
 class SuggestionEditStateContent(BaseSuggestion):
-    """Domain object for a suggestion of type SUGGESTION_EDIT_STATE_CONTENT."""
+    """Domain object for a suggestion of type
+    SUGGESTION_TYPE_EDIT_STATE_CONTENT.
+    """
 
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, assigned_reviewer_id, final_reviewer_id,
             change_cmd, score_category):
         """Initializes a Suggestion object of type
-        SUGGESTION_EDIT_STATE_CONTENT.
+        SUGGESTION_TYPE_EDIT_STATE_CONTENT.
         """
-        super(SuggestionEditStateContent, self).__init__(
-            suggestion_id, suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION, target_id,
-            target_version_at_submission, status, author_id,
-            assigned_reviewer_id, final_reviewer_id, change_cmd,
-            score_category)
+        self.suggestion_id = suggestion_id
+        self.suggestion_type = (
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+        self.target_type = suggestion_models.TARGET_TYPE_EXPLORATION
+        self.target_id = target_id
+        self.target_version_at_submission = target_version_at_submission
+        self.status = status
+        self.author_id = author_id
+        self.assigned_reviewer_id = assigned_reviewer_id
+        self.final_reviewer_id = final_reviewer_id
+        self.change_cmd = change_cmd
+        self.score_category = score_category
 
     def validate(self):
-        """Validates a suggestion object of type SUGGESTION_EDIT_STATE_CONTENT.
+        """Validates a suggestion object of type
+        SUGGESTION_TYPE_EDIT_STATE_CONTENT.
 
         Returns:
             bool. The validity of the suggestion object.
         """
-        super(SuggestionEditStateContent, self).validate()
         states = exp_services.get_exploration_by_id(self.target_id).states
         if self.change_cmd['state_name'] not in states:
             return False
@@ -173,18 +154,6 @@ class SuggestionEditStateContent(BaseSuggestion):
 
         return suggestion
 
-suggestion_type_domain_class_mapping = {
-    suggestion_models.SUGGESTION_EDIT_STATE_CONTENT: SuggestionEditStateContent
+SUGGESTION_TYPE_TO_DOMAIN_CLASS = {
+    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT: SuggestionEditStateContent
 }
-
-
-def get_model_corresponding_to_suggestion(suggestion_type):
-    """Gets the domain class for the given suggestion_type.
-
-    Args:
-        suggestion_type: str. The type of suggestion.
-
-    Returns:
-        The appropriate subclass of BaseSuggestion class.
-    """
-    return suggestion_type_domain_class_mapping[suggestion_type]
