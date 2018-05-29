@@ -137,8 +137,6 @@ oppia.factory('StatsReportingService', [
         aggregatedStats.state_stats_mapping[stateName].total_hit_count += 1;
         aggregatedStats.state_stats_mapping[stateName].first_hit_count += 1;
 
-        postStatsToBackend();
-
         $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
           params: params,
           session_id: sessionId,
