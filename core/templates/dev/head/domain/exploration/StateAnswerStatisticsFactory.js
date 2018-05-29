@@ -33,7 +33,7 @@ oppia.factory('StateAnswerStatisticsFactory', [
       /** @member {string} */
       this._stateName = stateName;
       /** @member {*} */
-      this._answer = answer;
+      this._answer = angular.copy(answer);
       /** @member {number} */
       this._frequency = frequency;
       /** @member {boolean} */
@@ -57,7 +57,7 @@ oppia.factory('StateAnswerStatisticsFactory', [
 
     /** @returns {*} */
     StateAnswerStatistics.prototype.getAnswer = function() {
-      return this._answer;
+      return angular.copy(this._answer);
     };
 
     /** @returns {number} */
@@ -74,7 +74,7 @@ oppia.factory('StateAnswerStatisticsFactory', [
     StateAnswerStatistics.prototype.toBackendDict = function() {
       return {
         state_name: this._stateName,
-        answer: this._answer,
+        answer: angular.copy(this._answer),
         frequency: this._frequency,
       };
     };
