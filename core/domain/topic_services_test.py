@@ -127,12 +127,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID)
 
         # Test whether an admin can edit a topic.
-        changelist = [{
+        changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_DESCRIPTION,
             'old_value': 'Description',
             'new_value': 'New Description'
-        }]
+        })]
         topic_services.update_topic(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated Description.')
@@ -143,12 +143,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.version, 2)
 
         # Test whether a topic_manager can edit a topic.
-        changelist = [{
+        changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
             'property_name': topic_domain.TOPIC_PROPERTY_NAME,
             'old_value': 'Name',
             'new_value': 'New Name'
-        }]
+        })]
         topic_services.update_topic(
             self.user_id_a, self.TOPIC_ID, changelist, 'Updated Name.')
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)

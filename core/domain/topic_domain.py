@@ -77,8 +77,29 @@ class TopicChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict['old_value']
+        elif self.cmd == CMD_CREATE_NEW:
+            self.name = change_dict['name']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the TopicChange domain object.
+
+        Returns:
+            A dict, mapping all fields of TopicChange instance.
+        """
+        topic_change_dict = {}
+        topic_change_dict['cmd'] = self.cmd
+        if hasattr(self, 'property_name'):
+            topic_change_dict['property_name'] = self.property_name
+        if hasattr(self, 'new_value'):
+            topic_change_dict['new_value'] = self.new_value
+        if hasattr(self, 'old_value'):
+            topic_change_dict['old_value'] = self.old_value
+        if hasattr(self, 'name'):
+            topic_change_dict['name'] = self.name
+
+        return topic_change_dict
 
 
 class Topic(object):

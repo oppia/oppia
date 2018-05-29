@@ -159,8 +159,8 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         committer_id: str. ID of the committer.
         topic: Topic. topic domain object.
         commit_message: str. A description of changes made to the topic.
-        commit_cmds: list(dict). A list of change commands made to the given
-            topic.
+        commit_cmds: list(TopicChange). A list of TopicChange objects that
+            represent change commands made to the given topic.
     """
     topic.validate()
     create_new_topic_rights(topic.id, committer_id)
@@ -173,6 +173,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         additional_story_ids=topic.additional_story_ids,
         skill_ids=topic.skill_ids
     )
+    commit_cmds = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmds)
     topic.version += 1
     create_topic_summary(topic.id)
@@ -188,10 +189,10 @@ def save_new_topic(committer_id, topic):
     commit_message = (
         'New topic created with name \'%s\'.' % topic.name)
     _create_topic(
-        committer_id, topic, commit_message, [{
+        committer_id, topic, commit_message, [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_CREATE_NEW,
             'name': topic.name
-        }])
+        })])
 
 
 def apply_change_list(topic_id, change_list):
@@ -199,19 +200,15 @@ def apply_change_list(topic_id, change_list):
 
     Args:
         topic_id: str. ID of the given topic.
-        change_list: list(dict). A change list to be applied to the given
-            topic. Each entry in change_list is a dict that represents a
-            TopicChange object.
+        change_list: list(TopicChange). A change list to be applied to the given
+            topic. Each entry in change_list is a TopicChange object.
 
     Returns:
         Topic. The resulting topic domain object.
     """
     topic = get_topic_by_id(topic_id)
     try:
-        changes = [topic_domain.TopicChange(change_dict)
-                   for change_dict in change_list]
-
-        for change in changes:
+        for change in change_list:
             if change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.TOPIC_PROPERTY_NAME):
@@ -250,8 +247,8 @@ def _save_topic(committer_id, topic, commit_message, change_list):
         committer_id: str. ID of the given committer.
         topic: Topic. The topic domain object to be saved.
         commit_message: str. The commit message.
-        change_list: list(dict). List of changes applied to a topic. Each
-            entry in change_list is a dict that represents a TopicChange.
+        change_list: list(TopicChange). List of changes applied to a topic. Each
+            entry in change_list is a TopicChange object.
 
     Raises:
         Exception: Received invalid change list.
@@ -285,6 +282,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.additional_story_ids = topic.additional_story_ids
     topic_model.skill_ids = topic.skill_ids
     topic_model.language_code = topic.language_code
+    change_list = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_list)
     memcache_services.delete(_get_topic_memcache_key(topic.id))
     topic.version += 1
@@ -298,8 +296,8 @@ def update_topic(
     - committer_id: str. The id of the user who is performing the update
         action.
     - topic_id: str. The topic id.
-    - change_list: list of dicts, each representing a TopicChange object.
-        These changes are applied in sequence to produce the resulting
+    - change_list: list(TopicChange), Each element in this is a TopicChange
+        object. These changes are applied in sequence to produce the resulting
         topic.
     - commit_message: str or None. A description of changes made to the
         topic.
