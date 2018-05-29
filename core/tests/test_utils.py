@@ -491,7 +491,7 @@ tags: []
             json_response, expect_errors=expect_errors)
 
     def delete_json(self, url, params, expect_errors=False,
-                 expected_status_int=200):
+                    expected_status_int=200):
         """Get an object to the server by JSON; return the received object."""
         json_response = self.testapp.delete(
             url, params, expect_errors=expect_errors,
