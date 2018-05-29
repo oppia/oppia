@@ -30,33 +30,26 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
      *                         should be returned.
      */
     var _getStateContentHtml = function(state) {
-      var stateContentHtml = state.content.getHtml();
-      return stateContentHtml;
+      return state.content.getHtml();
     };
 
     /**
-     * Gets the html from the outcome of the answer groups of the state.
+     * Gets the html from the outcome of the answer groups and the default
+     * outcome of the state.
      * @param {object} state - The state from which the html of the outcomes of
      *                         the answer groups should be returned.
      */
-    var _getOutcomeHtml = function(state) {
-      var outcomeHtml = '';
+    var _getOutcomesHtml = function(state) {
+      var outcomesHtml = '';
       state.interaction.answerGroups.forEach(function(answerGroup) {
         var answerGroupHtml = answerGroup.outcome.feedback.getHtml();
-        outcomeHtml = outcomeHtml.concat(answerGroupHtml);
+        outcomesHtml = outcomesHtml.concat(answerGroupHtml);
       });
-      return outcomeHtml;
-    };
-
-    /**
-     * Gets the html from the default outcome.
-     * @param {object} state - The state whose default outcome's html should be
-     *                         returned.
-     */
-    var _getDefaultOutcomeHtml = function(state) {
-      var defaultOutcomeHtml = (
-        state.interaction.defaultOutcome.feedback.getHtml());
-      return defaultOutcomeHtml;
+      if (state.interaction.defaultOutcome !== null) {
+        outcomesHtml = outcomesHtml.concat(state.interaction.defaultOutcome
+          .feedback.getHtml());
+      }
+      return outcomesHtml;
     };
 
     /**
@@ -78,8 +71,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
      *                         returned.
      */
     var _getSolutionHtml = function(state) {
-      var solutionHtml = state.interaction.solution.explanation.getHtml();
-      return solutionHtml;
+      return state.interaction.solution.explanation.getHtml();
     };
 
     /**
@@ -105,14 +97,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         _allHtmlInTheState.push(customizationArgsHtml);
       }
 
-      _allHtmlInTheState.push(_getOutcomeHtml(state));
-
-      if (state.interaction.defaultOutcome !== null) {
-        var defaultOutcomeHtml = _getDefaultOutcomeHtml(state);
-        if (defaultOutcomeHtml !== '') {
-          _allHtmlInTheState.push(defaultOutcomeHtml);
-        }
-      }
+      _allHtmlInTheState.push(_getOutcomesHtml(state));
 
       _allHtmlInTheState.push(_getHintsHtml(state));
 
