@@ -23,14 +23,77 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var INTERACTION_TYPE_IMAGE_CLICK_INPUT = 'ImageClickInput';
 
     var filenamesInState = [];
+
+    /**
+     * Gets the html from the state's content.
+     * @param {object} state - The state from which the html of the content
+     *                         should be returned.
+     */
+    var _getStateContentHtml = function(state) {
+      var stateContentHtml = state.content.getHtml();
+      return stateContentHtml;
+    };
+
+    /**
+     * Gets the html from the outcome of the answer groups of the state.
+     * @param {object} state - The state from which the html of the outcomes of
+     *                         the answer groups should be returned.
+     */
+    var _getOutcomeHtml = function(state) {
+      var outcomeHtml = [];
+      state.interaction.answerGroups.forEach(function(answerGroup) {
+        var answerGroupHtml = answerGroup.outcome.feedback.getHtml();
+        outcomeHtml.push(answerGroupHtml);
+      });
+      return outcomeHtml;
+    };
+
+    /**
+     * Gets the html from the default outcome.
+     * @param {object} state - The state whose default outcome's html should be
+     *                         returned.
+     */
+    var _getDefaultOutcomeHtml = function(state) {
+      var defaultOutcomeHtml = (
+        state.interaction.defaultOutcome.feedback.getHtml());
+      return defaultOutcomeHtml;
+    };
+
+    /**
+     * Gets the html from the hints in the state.
+     * @param {object} state - The state whose hints' html should be returned.
+     */
+    var _getHintsHtml = function(state) {
+      var hintsHtml = [];
+      state.interaction.hints.forEach(function(hint) {
+        var hintHtml = hint.hintContent.getHtml();
+        hintsHtml.push(hintHtml);
+      });
+      return hintsHtml;
+    };
+
+    /**
+     * Gets the html from the solution in the state.
+     * @param {object} state - The state whose solution's html should be
+     *                         returned.
+     */
+    var _getSolutionHtml = function(state) {
+      var solutionHtml = state.interaction.solution.explanation.getHtml();
+      return solutionHtml;
+    };
+
+    /**
+     * Gets all the html in a state.
+     * @param {object} state - The state whose html is to be fetched.
+     */
     var _getAllHtmlOfState = function(state) {
       var _allHtmlInTheState = [];
       // The order of the extracted image names is same as they appear in a
       // state. The images should be preloaded in the following order ---
       // content, customizationArgs of interactions, feedback of outcomes ()
       // including feedback of default outcome if any), hints, solution if any.
-      var stateContentHtml = state.content.getHtml();
-      _allHtmlInTheState.push(stateContentHtml);
+
+      _allHtmlInTheState.push(_getStateContentHtml(state));
 
       if (state.interaction.id === INTERACTION_TYPE_MULTIPLE_CHOICE ||
           state.interaction.id === INTERACTION_TYPE_ITEM_SELECTION ) {
@@ -42,30 +105,29 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         _allHtmlInTheState.push(customizationArgsHtml);
       }
 
-      state.interaction.answerGroups.forEach(function(answerGroup) {
-        var answerGroupHtml = answerGroup.outcome.feedback.getHtml();
-        _allHtmlInTheState.push(answerGroupHtml);
-      });
+      _allHtmlInTheState = _allHtmlInTheState.concat(_getOutcomeHtml(state));
 
       if (state.interaction.defaultOutcome !== null) {
-        var defaultOutcomeHtml = (
-          state.interaction.defaultOutcome.feedback.getHtml());
+        var defaultOutcomeHtml = _getDefaultOutcomeHtml(state);
         if (defaultOutcomeHtml !== '') {
           _allHtmlInTheState.push(defaultOutcomeHtml);
         }
       }
 
-      state.interaction.hints.forEach(function(hint) {
-        var hintHtml = hint.hintContent.getHtml();
-        _allHtmlInTheState.push(hintHtml);
-      });
+      _allHtmlInTheState = _allHtmlInTheState.concat(_getHintsHtml(state));
+
       if (state.interaction.solution !== null) {
-        var solutionHtml = state.interaction.solution.explanation.getHtml();
-        _allHtmlInTheState.push(solutionHtml);
+        _allHtmlInTheState.push(_getSolutionHtml(state));
       }
       return _allHtmlInTheState;
     };
 
+    /**
+     * Extracts the filenames from the filepath-value attribute of the
+     * oppia-noninteractive-image tags in the strHtml(given string).
+     * @param {string} strHtml - The string from which the filenames of images
+     *                           should be extracted.
+     */
     var _extractFilepathValueFromOppiaNonInteractiveImageTag = function(
         strHtml) {
       var filenames = [];
@@ -87,6 +149,11 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       return filenames;
     };
 
+    /**
+     * Gets the filenames of all the images that are a part of the state.
+     * @param {object} state - The state from which the filenames of the image
+     *                         should be extracted.
+     */
     var _getImageFilenamesInState = function(state) {
       var filenamesInState = [];
       // The Image Click Input interaction has an image whose filename is
