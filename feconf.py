@@ -227,6 +227,12 @@ DEFAULT_STORY_NOTES = ''
 DEFAULT_SKILL_DESCRIPTION = ''
 # Default explanation for a newly-minted skill.
 DEFAULT_SKILL_EXPLANATION = ''
+# Default name for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_NAME = ''
+# Default notes for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_NOTES = ''
+# Default feedback for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_FEEDBACK = ''
 
 # Default name for a newly-minted topic.
 DEFAULT_TOPIC_NAME = ''

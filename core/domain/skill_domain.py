@@ -16,6 +16,7 @@
 
 from constants import constants
 import feconf
+import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -126,7 +127,8 @@ class Misconception(object):
             notes: str. General advice for creators about the
                 misconception (including examples) and general notes.
             feedback: str. This can auto-populate the feedback field
-                when an answer group has been tagged with a misconception.
+                when an answer group has been tagged with a misconception. This
+                should be an html string.
         """
         self.id = misconception_id
         self.name = name
@@ -163,6 +165,42 @@ class Misconception(object):
 
         return misconception
 
+    @classmethod
+    def create_default_misconception(cls, misconception_id):
+        """Creates a Misconception object with default values.
+
+        Args:
+            misconception_id: str. ID of the new misconception.
+
+        Returns:
+            Misconception. A misconception object with given id and default
+                values for all other fields.
+        """
+        return cls(
+            misconception_id, feconf.DEFAULT_MISCONCEPTION_NAME,
+            feconf.DEFAULT_MISCONCEPTION_NOTES,
+            feconf.DEFAULT_MISCONCEPTION_FEEDBACK)
+
+    def validate(self):
+        """Validates various properties of the Misconception object.
+
+        Raises:
+            ValidationError: One or more attributes of the misconception are
+            invalid.
+        """
+        if not isinstance(self.name, basestring):
+            raise utils.ValidationError(
+                'Expected misconception name to be a string, received %s' %
+                self.name)
+        if not isinstance(self.notes, basestring):
+            raise utils.ValidationError(
+                'Expected misconception notes to be a string, received %s' %
+                self.notes)
+        if not isinstance(self.feedback, basestring):
+            raise utils.ValidationError(
+                'Expected misconception feedback to be a string, received %s' %
+                self.feedback)
+
 
 class SkillContents(object):
     """Domain object representing the skill_contents dict."""
@@ -176,6 +214,22 @@ class SkillContents(object):
         """
         self.explanation = explanation
         self.worked_examples = worked_examples
+
+    def validate(self):
+        """Validates various properties of the SkillContents object.
+
+        Raises:
+            ValidationError: One or more attributes of skill contents are
+            invalid.
+        """
+        if not isinstance(self.explanation, basestring):
+            raise utils.ValidationError(
+                'Expected skill explanation to be a string, received %s' %
+                self.explanation)
+        if not isinstance(self.worked_examples, list):
+            raise utils.ValidationError(
+                'Expected worked examples to be a list, received %s' %
+                self.worked_examples)
 
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
@@ -246,6 +300,71 @@ class Skill(object):
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+
+    def validate(self):
+        """Validates various properties of the Skill object.
+
+        Raises:
+            ValidationError: One or more attributes of skill are invalid.
+        """
+        if not isinstance(self.description, basestring):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
+
+        if not isinstance(self.misconceptions_schema_version, int):
+            raise utils.ValidationError(
+                'Expected misconceptions schema version to be an integer, ' +
+                'received %s' % self.misconceptions_schema_version)
+        if (
+                self.misconceptions_schema_version !=
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+            raise utils.ValidationError(
+                'Expected misconceptions schema version to be %s, received %s'
+                % (
+                    feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+                    self.misconceptions_schema_version)
+            )
+
+        if not isinstance(self.skill_contents_schema_version, int):
+            raise utils.ValidationError(
+                'Expected skill contents schema version to be an integer, ' +
+                'received %s' % self.skill_contents_schema_version)
+        if (
+                self.skill_contents_schema_version !=
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
+            raise utils.ValidationError(
+                'Expected skill contents schema version to be %s, received %s'
+                % (
+                    feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+                    self.skill_contents_schema_version)
+            )
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+        if not any([self.language_code == lc['code']
+                    for lc in constants.ALL_LANGUAGE_CODES]):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.skill_contents, SkillContents):
+            raise utils.ValidationError(
+                'Expected skill_contents to be a SkillContents object, ' +
+                'received %s' % self.skill_contents)
+        if not isinstance(self.misconceptions, list):
+            raise utils.ValidationError(
+                'Expected misconceptions to be a list, ' +
+                'received %s' % self.skill_contents)
+
+        self.skill_contents.validate()
+        for misconception in self.misconceptions:
+            if not isinstance(misconception, Misconception):
+                raise utils.ValidationError(
+                    'Expected each misconception to be a Misconception ' +
+                    'object, received %s' % misconception)
+            misconception.validate()
 
     def to_dict(self):
         """Returns a dict representing this Skill domain object.
@@ -391,7 +510,8 @@ class Skill(object):
         Args:
             misconception_id: str. The id of the new misconception to be added.
         """
-        misconception = Misconception(misconception_id, '', '', '')
+        misconception = Misconception.create_default_misconception(
+            misconception_id)
         self.misconceptions.append(misconception)
 
     def delete_misconception(self, misconception_id):
@@ -414,7 +534,7 @@ class Skill(object):
 
         Args:
             misconception_id: str. The id of the misconception to be edited.
-            name: str. The new name of the misconception
+            name: str. The new name of the misconception.
 
         Raises:
             ValueError: There is no misconception with the given id.
@@ -430,7 +550,7 @@ class Skill(object):
 
         Args:
             misconception_id: str. The id of the misconception to be edited.
-            notes: str. The new notes of the misconception
+            notes: str. The new notes of the misconception.
 
         Raises:
             ValueError: There is no misconception with the given id.
@@ -446,7 +566,8 @@ class Skill(object):
 
         Args:
             misconception_id: str. The id of the misconception to be edited.
-            feedback: str. The new feedback of the misconception
+            feedback: str. The html string that corresponds to the new feedback
+                of the misconception.
 
         Raises:
             ValueError: There is no misconception with the given id.

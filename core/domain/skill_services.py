@@ -290,7 +290,7 @@ def apply_change_list(skill_id, change_list):
             SkillChange object.
 
     Returns:
-      Skill. The resulting skill domain object.
+        Skill. The resulting skill domain object.
     """
     skill = get_skill_by_id(skill_id)
     try:
@@ -409,12 +409,15 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     - committer_id: str. The id of the user who is performing the update
         action.
     - skill_id: str. The skill id.
-    - change_list: list of dicts, each representing a SkillChange object.
+    - change_list: list(dict). Each represents a SkillChange object.
         These changes are applied in sequence to produce the resulting
         skill.
     - commit_message: str or None. A description of changes made to the
         skill. For published skills, this must be present; for
         unpublished skills, it may be equal to None.
+
+    Raises:
+        ValueError: Expected commit message.
     """
     if not commit_message:
         raise ValueError(
