@@ -100,6 +100,15 @@ oppia.factory('StatsReportingService', [
         });
     };
 
+    if (!_editorPreviewMode) {
+      $interval(function() {
+        postStatsToBackend();
+      }, 600000);
+    }
+
+    // This method is called right after the exploration is started, whenever a
+    // learner tries to leave an exploration, when a learner completes an
+    // exploration and also every five minutes.
     var postStatsToBackend = function() {
       $http.post(getFullStatsUrl('STATS_EVENTS'), {
         aggregated_stats: aggregatedStats,
@@ -127,6 +136,8 @@ oppia.factory('StatsReportingService', [
         createDefaultStateStatsMapping(stateName);
         aggregatedStats.state_stats_mapping[stateName].total_hit_count += 1;
         aggregatedStats.state_stats_mapping[stateName].first_hit_count += 1;
+
+        postStatsToBackend();
 
         $http.post(getFullStatsUrl('EXPLORATION_STARTED'), {
           params: params,
