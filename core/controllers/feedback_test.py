@@ -69,7 +69,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
     def test_invalid_thread_ids_return_empty_message_list(self):
         response_dict = self.get_json(
-            '%s/invalid_thread_id' % feconf.FEEDBACK_THREAD_URL_PREFIX)
+            '%s/0.unknown_thread' % feconf.FEEDBACK_THREAD_URL_PREFIX)
         self.assertEqual(response_dict['messages'], [])
 
     def test_non_logged_in_users_can_view_threads_and_messages(self):
