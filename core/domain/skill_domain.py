@@ -109,8 +109,29 @@ class SkillChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict['old_value']
+        elif self.cmd == CMD_CREATE_NEW:
+            return
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the SkillChange domain object.
+
+        Returns:
+            A dict, mapping all fields of SkillChange instance.
+        """
+        skill_change_dict = {}
+        skill_change_dict['cmd'] = self.cmd
+        if hasattr(self, 'property_name'):
+            skill_change_dict['property_name'] = self.property_name
+        if hasattr(self, 'new_value'):
+            skill_change_dict['new_value'] = self.new_value
+        if hasattr(self, 'old_value'):
+            skill_change_dict['old_value'] = self.old_value
+        if hasattr(self, 'misconception_id'):
+            skill_change_dict['id'] = self.misconception_id
+
+        return skill_change_dict
 
 
 class Misconception(object):

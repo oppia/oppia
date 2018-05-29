@@ -92,18 +92,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_skill(self):
         changelist = [
-            {
+            skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
                 'id': self.MISCONCEPTION_ID_2
-            },
-            {
+            }),
+            skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
                 'id': self.MISCONCEPTION_ID_2,
                 'old_value': '',
                 'new_value': 'Name'
-            }
+            })
         ]
         skill_services.update_skill(
             self.USER_ID, self.SKILL_ID, changelist,
