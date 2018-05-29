@@ -103,7 +103,7 @@ oppia.factory('StatsReportingService', [
     if (!_editorPreviewMode) {
       $interval(function() {
         postStatsToBackend();
-      }, 600000);
+      }, 300000);
     }
 
     // This method is called right after the exploration is started, whenever a
