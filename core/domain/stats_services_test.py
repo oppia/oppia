@@ -496,8 +496,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'old_state_name': 'Home',
             'new_state_name': 'Renamed state'
         }]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.update_exp_issues_for_new_exp_version(
-            exploration, change_list)
+            exploration, exp_versions_diff, False)
 
         # TODO(pranavsid98): Replace below lines with get_exp_issues().
         exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
@@ -538,8 +539,9 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'cmd': 'delete_state',
             'state_name': 'End'
         }]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.update_exp_issues_for_new_exp_version(
-            exploration, change_list)
+            exploration, exp_versions_diff, False)
 
         # TODO(pranavsid98): Replace below lines with get_exp_issues().
         exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
