@@ -1101,18 +1101,18 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
         if self.previous_tag_line_number is None:
             if column_number % 2 != 0:
                 print (
-                    '%s --> Please ensure that %s tag '
-                    'in this file on line number %s '
-                    'has an indentation which is a multiple of 2 ' % (
+                    '%s --> Indentation level for %s '
+                    'tag on line %s should be a '
+                    'multiple of 2 ' % (
                         self.filename, tag, line_number))
                 self.failed = True
         else:
             if column_number % 2 != 0 and (
                     line_number != self.previous_tag_line_number):
                 print (
-                    '%s --> Please ensure that %s tag '
-                    'in this file on line number %s '
-                    'has an indentation which is a multiple of 2 ' % (
+                    '%s --> Indentation level for %s '
+                    'tag on line %s should be a '
+                    'multiple of 2 ' % (
                         self.filename, tag, line_number))
                 self.failed = True
         self.previous_tag_line_number = line_number
@@ -1140,12 +1140,11 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                         leading_spaces_count)):
                 line_num_of_error = line_number + line_num
                 print (
-                    '%s --> Please ensure that the '
-                    'attribute for tag %s in this file on '
-                    'line number %s align with the '
-                    'leftmost attribute on the first line '
-                    'of the tag' % (
-                        self.filename, tag, line_num_of_error))
+                    '%s --> Attribute for tag %s on line '
+                    '%s should align with the leftmost '
+                    'attribute on line %s ' % (
+                        self.filename, tag,
+                        line_num_of_error, line_number))
                 self.failed = True
 
 
