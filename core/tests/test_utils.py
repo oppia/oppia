@@ -490,6 +490,15 @@ tags: []
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
+    def delete_json(self, url, params, expect_errors=False,
+                 expected_status_int=200):
+        """Get an object to the server by JSON; return the received object."""
+        json_response = self.testapp.delete(
+            url, params, expect_errors=expect_errors,
+            status=expected_status_int)
+        return self._parse_json_response(
+            json_response, expect_errors=expect_errors)
+
     def get_csrf_token_from_response(self, response):
         """Retrieve the CSRF token from a GET response."""
         return re.search(CSRF_REGEX, response.body).group(1)
