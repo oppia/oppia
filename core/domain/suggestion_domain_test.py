@@ -71,6 +71,12 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
 
+    def test_from_dict_base_suggestion(self):
+        observed_suggestion = suggestion_domain.BaseSuggestion.from_dict(
+            self.suggestion_dict)
+        self.assertDictEqual(
+            observed_suggestion.to_dict(), self.suggestion_dict)
+
     def test_get_model_corresponding_to_suggestion(self):
         self.assertEqual(
             suggestion_domain.get_model_corresponding_to_suggestion(
@@ -91,6 +97,15 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
+
+    def test_from_dict_suggestion_edit_state_content(self):
+        observed_suggestion = (
+            suggestion_domain.SuggestionEditStateContent.from_dict(
+            self.suggestion_dict))
+        self.assertDictEqual(
+            observed_suggestion.to_dict(), self.suggestion_dict)
+        self.assertIsInstance(
+            observed_suggestion, suggestion_domain.SuggestionEditStateContent)
 
     class MockExploration(object):
         """Mocks an exploration. To be used only for testing."""

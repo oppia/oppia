@@ -78,32 +78,42 @@ class BaseSuggestion(object):
             'score_category': self.score_category
         }
 
+    @classmethod
+    def from_dict(cls, suggestion_dict):
+        """Return a Suggestion object of type from a dict.
+
+        Args:
+            suggestion_dict: dict. The dict representation of the suggestion.
+
+        Returns:
+            BaseSuggestion. The corresponding Suggestion domain object.
+        """
+        suggestion = cls(
+            suggestion_dict['suggestion_id'],
+            suggestion_dict['suggestion_type'], suggestion_dict['target_type'],
+            suggestion_dict['target_id'],
+            suggestion_dict['target_version_at_submission'],
+            suggestion_dict['status'], suggestion_dict['author_id'],
+            suggestion_dict['assigned_reviewer_id'],
+            suggestion_dict['final_reviewer_id'], suggestion_dict['change_cmd'],
+            suggestion_dict['score_category'])
+
+        return suggestion
+
     def validate(self):
         """Validates the suggestion object. Each subclass must implement
         this function
         """
         pass
 
+    def accept(self):
+        """Accepts the suggestion. Each subclass must implement this function.
+        """
+        pass
+
 
 class SuggestionEditStateContent(BaseSuggestion):
-    """Domain object for a suggestion of type SUGGESTION_EDIT_STATE_CONTENT.
-
-    Attributes:
-        suggestion_id: str. The ID of the suggestion.
-        suggestion_type: str. The type of the suggestion.
-        target_type: str. The type of target entity being edited.
-        target_id: str. The ID of the target entity being edited.
-        target_version_at_submission: int. The version number of the target
-            entity at the time of creation of the suggestion.
-        status: str. The status of the suggestion.
-        author_id: str. The ID of the user who submitted the suggestion.
-        assigned_reviewer_id: str. The ID of the user assigned to
-            review the suggestion.
-        final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
-            the suggestion.
-        change_cmd: dict. The actual content of the suggestion.
-        score_category: str. The scoring category for the suggestion.
-    """
+    """Domain object for a suggestion of type SUGGESTION_EDIT_STATE_CONTENT."""
 
     def __init__(
             self, suggestion_id, target_id, target_version_at_submission,
@@ -131,6 +141,37 @@ class SuggestionEditStateContent(BaseSuggestion):
             return False
         return True
 
+    def accept(self, commit_message):
+        """Accepts the suggestion.
+
+        Args:
+            commit_message: str. The commit message.
+        """
+        change_list = [self.change_cmd]
+        exp_services.update_exploration(
+            self.final_reviewer_id, self.target_type, change_list,
+            commit_message, is_suggestion=True)
+
+    @classmethod
+    def from_dict(cls, suggestion_dict):
+        """Return a Suggestion object of type from a dict.
+
+        Args:
+            suggestion_dict: dict. The dict representation of the suggestion.
+
+        Returns:
+            BaseSuggestion. The corresponding Suggestion domain object.
+        """
+        suggestion = cls(
+            suggestion_dict['suggestion_id'],
+            suggestion_dict['target_id'],
+            suggestion_dict['target_version_at_submission'],
+            suggestion_dict['status'], suggestion_dict['author_id'],
+            suggestion_dict['assigned_reviewer_id'],
+            suggestion_dict['final_reviewer_id'], suggestion_dict['change_cmd'],
+            suggestion_dict['score_category'])
+
+        return suggestion
 
 suggestion_type_domain_class_mapping = {
     suggestion_models.SUGGESTION_EDIT_STATE_CONTENT: SuggestionEditStateContent
