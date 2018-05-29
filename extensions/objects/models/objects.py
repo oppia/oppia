@@ -827,3 +827,52 @@ class Fraction(BaseObject):
             'schema': PositiveInt.SCHEMA
         }]
     }
+
+
+class Units(BaseObject):
+    """Units class."""
+    # Validation of the units is performed only in the frontend using math.js.
+    # math.js is not available in the backend.
+
+    description = 'A units dict representation.'
+    default_value = {}
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': []
+    }
+
+
+class NumberWithUnits(BaseObject):
+    """Number with units class."""
+
+    description = 'A number with units expression.'
+    edit_html_filename = 'number_with_units_editor'
+    edit_js_filename = 'NumberWithUnitsEditor'
+    default_value = {
+        'type': 'real',
+        'fraction': Fraction.default_value,
+        'real': 0.0,
+        'unit': Units.default_value
+    }
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'type',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'fraction',
+            'schema': Fraction.SCHEMA
+        }, {
+            'name': 'real',
+            'schema': {
+                'type': 'float'
+            }
+        }, {
+            'name': 'unit',
+            'schema': Units.SCHEMA
+        }]
+    }

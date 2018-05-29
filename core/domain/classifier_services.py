@@ -204,7 +204,7 @@ def _update_classifier_training_jobs_status(job_ids, status):
     """Checks for the existence of the model and then updates it.
 
     Args:
-        job_id: list(str). list of ID of the ClassifierTrainingJob domain
+        job_ids: list(str). list of ID of the ClassifierTrainingJob domain
             objects.
         status: str. The status to which the job needs to be updated.
 

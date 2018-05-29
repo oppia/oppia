@@ -27,7 +27,6 @@ import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
-QUESTION_PROPERTY_TITLE = 'title'
 QUESTION_PROPERTY_LANGUAGE_CODE = 'language_code'
 QUESTION_PROPERTY_QUESTION_DATA = 'question_data'
 
@@ -44,7 +43,7 @@ CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
 class QuestionChange(object):
     """Domain object for changes made to question object."""
     QUESTION_PROPERTIES = (
-        QUESTION_PROPERTY_TITLE, QUESTION_PROPERTY_QUESTION_DATA,
+        QUESTION_PROPERTY_QUESTION_DATA,
         QUESTION_PROPERTY_LANGUAGE_CODE)
 
     def __init__(self, change_dict):
@@ -93,7 +92,6 @@ class Question(object):
 
     Attributes:
         question_id: str. The unique ID of the question.
-        title: str. The title of the question.
         question_data: dict. A dict representing the question data.
         question_data_schema_version: int. The schema version for the data.
         language_code: str. The ISO 639-1 code for the language this
@@ -101,20 +99,18 @@ class Question(object):
     """
 
     def __init__(
-            self, question_id, title, question_data,
+            self, question_id, question_data,
             question_data_schema_version, language_code):
         """Constructs a Question domain object.
 
         Args:
             question_id: str. The unique ID of the question.
-            title: str. The title of the question.
             question_data: dict. A dict representing the question data.
             question_data_schema_version: int. The schema version for the data.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
         self.question_id = question_id
-        self.title = title
         self.question_data = question_data
         self.question_data_schema_version = question_data_schema_version
         self.language_code = language_code
@@ -127,7 +123,6 @@ class Question(object):
         """
         return {
             'question_id': self.question_id,
-            'title': self.title,
             'question_data': self.question_data,
             'question_data_schema_version': self.question_data_schema_version,
             'language_code': self.language_code
@@ -140,16 +135,45 @@ class Question(object):
             raise utils.ValidationError(
                 'Expected ID to be a string, received %s' % self.question_id)
 
-        if not isinstance(self.title, basestring):
-            raise utils.ValidationError(
-                'Expected title to be a string, received %s' % self.title)
-
         if not isinstance(self.question_data, dict):
             raise utils.ValidationError(
                 'Expected question_data to be a dict, received %s' %
                 self.question_data)
+
+        at_least_one_correct_answer = False
+        dest_is_specified = False
+        interaction = self.question_data['interaction']
+        for answer_group in interaction['answer_groups']:
+            if answer_group['labelled_as_correct']:
+                at_least_one_correct_answer = True
+            if answer_group['dest'] is not None:
+                dest_is_specified = True
+
+        if interaction['default_outcome']['labelled_as_correct']:
+            at_least_one_correct_answer = True
+
+        if interaction['default_outcome']['dest'] is not None:
+            dest_is_specified = True
+
+        if not at_least_one_correct_answer:
+            raise utils.ValidationError(
+                'Expected at least one answer group to have a correct answer.'
+            )
+
+        if dest_is_specified:
+            raise utils.ValidationError(
+                'Expected all answer groups to have destination as None.'
+            )
+
+        if (len(interaction['hints']) == 0) or (
+                interaction['solution'] is None):
+            raise utils.ValidationError(
+                'Expected the question to have at least one hint and a ' +
+                'solution.'
+            )
+
         question_data = exp_domain.State.from_dict(self.question_data)
-        question_data.validate(None, True)
+        question_data.validate({}, True)
 
         if not isinstance(self.question_data_schema_version, int):
             raise utils.ValidationError(
@@ -174,7 +198,7 @@ class Question(object):
             Question. The corresponding Question domain object.
         """
         question = cls(
-            question_dict['question_id'], question_dict['title'],
+            question_dict['question_id'],
             question_dict['question_data'],
             question_dict['question_data_schema_version'],
             question_dict['language_code'])
@@ -183,12 +207,11 @@ class Question(object):
 
     @classmethod
     def create_default_question(
-            cls, question_id, title, language_code):
+            cls, question_id, language_code):
         """Returns a Question domain object with default values.
 
         Args:
             question_id: str. The unique ID of the question.
-            title: str. The title of the question.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -196,16 +219,9 @@ class Question(object):
             Question. A Question domain object with default values.
         """
         return cls(
-            question_id, title, {},
+            question_id, exp_domain.State.create_default_state(
+                feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True),
             feconf.CURRENT_QUESTION_SCHEMA_VERSION, language_code)
-
-    def update_title(self, title):
-        """Updates the title of the question.
-
-        Args:
-            title: str. The title of the question.
-        """
-        self.title = title
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
@@ -227,21 +243,17 @@ class Question(object):
 
 class QuestionSummary(object):
     """Domain object for Question Summary.
-
-    Attributes:
-        question_id: str. The ID of the question.
-        question_title: str. The title of the question.
     """
-
-    def __init__(self, question_id, question_title):
+    def __init__(self, question_id, question_content):
         """Constructs a Question Summary domain object.
 
         Args:
             question_id: str. The ID of the question.
-            question_title: str. The title of the question.
+            question_content: str. The static HTML of the question shown to
+                the learner.
         """
         self.question_id = question_id
-        self.question_title = question_title
+        self.question_content = question_content
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -251,5 +263,5 @@ class QuestionSummary(object):
         """
         return {
             'question_id': self.question_id,
-            'question_title': self.question_title
+            'question_content': self.question_content
         }

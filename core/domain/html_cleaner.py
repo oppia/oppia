@@ -115,7 +115,7 @@ def get_rte_components(html_string):
     """Extracts the RTE components from an HTML string.
 
     Args:
-        html: str. An HTML string.
+        html_string: str. An HTML string.
 
     Returns:
         list(dict). A list of dictionaries, each representing an RTE component.

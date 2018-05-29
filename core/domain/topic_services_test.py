@@ -19,15 +19,29 @@
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
+from core.platform import models
 from core.tests import test_utils
+
+(topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
 
 class TopicServicesUnitTests(test_utils.GenericTestBase):
     """Tests for topic domain objects."""
     topic_id = 'topic_id'
+    user_id = 'user_id'
+    story_id_1 = 'story_1'
+    story_id_2 = 'story_2'
+    story_id_3 = 'story_3'
+    skill_id = 'skill'
 
     def setUp(self):
         super(TopicServicesUnitTests, self).setUp()
+        self.TOPIC_ID = topic_services.get_new_topic_id()
+        self.topic = self.save_new_topic(
+            self.TOPIC_ID, self.user_id, 'Name', 'Description',
+            [self.story_id_1, self.story_id_2], [self.story_id_3],
+            [self.skill_id]
+        )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -41,6 +55,60 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.user_a = user_services.UserActionsInfo(self.user_id_a)
         self.user_b = user_services.UserActionsInfo(self.user_id_b)
         self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
+
+    def test_compute_summary(self):
+        topic_summary = topic_services.compute_summary_of_topic(self.topic)
+
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertEqual(topic_summary.name, 'Name')
+        self.assertEqual(topic_summary.canonical_story_count, 2)
+        self.assertEqual(topic_summary.additional_story_count, 1)
+        self.assertEqual(topic_summary.skill_count, 1)
+
+    def test_get_new_topic_id(self):
+        new_topic_id = topic_services.get_new_topic_id()
+
+        self.assertEqual(len(new_topic_id), 12)
+        self.assertEqual(topic_models.TopicModel.get_by_id(new_topic_id), None)
+
+    def test_get_topic_from_model(self):
+        topic_model = topic_models.TopicModel.get(self.TOPIC_ID)
+        topic = topic_services.get_topic_from_model(topic_model)
+
+        self.assertEqual(topic.to_dict(), self.topic.to_dict())
+
+    def test_get_topic_summary_from_model(self):
+        topic_summary_model = topic_models.TopicSummaryModel.get(self.TOPIC_ID)
+        topic_summary = topic_services.get_topic_summary_from_model(
+            topic_summary_model)
+
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertEqual(topic_summary.name, 'Name')
+        self.assertEqual(topic_summary.canonical_story_count, 2)
+        self.assertEqual(topic_summary.additional_story_count, 1)
+        self.assertEqual(topic_summary.skill_count, 1)
+
+    def test_get_topic_by_id(self):
+        expected_topic = self.topic.to_dict()
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.to_dict(), expected_topic)
+
+    def test_commit_log_entry(self):
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 1)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'create')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id)
+
+    def test_get_topic_summary_by_id(self):
+        topic_summary = topic_services.get_topic_summary_by_id(self.TOPIC_ID)
+
+        self.assertEqual(topic_summary.id, self.TOPIC_ID)
+        self.assertEqual(topic_summary.name, 'Name')
+        self.assertEqual(topic_summary.canonical_story_count, 2)
+        self.assertEqual(topic_summary.additional_story_count, 1)
+        self.assertEqual(topic_summary.skill_count, 1)
 
     def test_admin_can_manage_topic(self):
         topic_services.create_new_topic_rights(

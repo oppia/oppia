@@ -48,17 +48,21 @@ class ExplorationIssuesModelCreatorOneOffJobTest(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
-        exp_issues1 = stats_models.ExplorationIssuesModel.get(self.exp_id1)
-        self.assertEqual(exp_issues1.id, self.exp_id1)
+        exp_issues1 = stats_models.ExplorationIssuesModel.get_model(
+            self.exp_id1, self.exp1.version)
+        self.assertEqual(exp_issues1.exp_id, self.exp_id1)
+        self.assertEqual(exp_issues1.exp_version, self.exp1.version)
         self.assertEqual(exp_issues1.unresolved_issues, [])
 
-        exp_issues2 = stats_models.ExplorationIssuesModel.get(self.exp_id2)
-        self.assertEqual(exp_issues2.id, self.exp_id2)
+        exp_issues2 = stats_models.ExplorationIssuesModel.get_model(
+            self.exp_id2, self.exp2.version)
+        self.assertEqual(exp_issues2.exp_id, self.exp_id2)
+        self.assertEqual(exp_issues2.exp_version, self.exp2.version)
         self.assertEqual(exp_issues2.unresolved_issues, [])
 
     def test_with_existing_exp_issues_instance(self):
         stats_models.ExplorationIssuesModel.create(
-            self.exp_id1,
+            self.exp_id1, self.exp1.version,
             [{
                 'issue_type': 'EarlyQuit',
                 'issue_customization_args': {
@@ -83,12 +87,16 @@ class ExplorationIssuesModelCreatorOneOffJobTest(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
-        exp_issues1 = stats_models.ExplorationIssuesModel.get(self.exp_id1)
-        self.assertEqual(exp_issues1.id, self.exp_id1)
+        exp_issues1 = stats_models.ExplorationIssuesModel.get_model(
+            self.exp_id1, self.exp1.version)
+        self.assertEqual(exp_issues1.exp_id, self.exp_id1)
+        self.assertEqual(exp_issues1.exp_version, self.exp1.version)
         self.assertEqual(exp_issues1.unresolved_issues, [])
 
-        exp_issues2 = stats_models.ExplorationIssuesModel.get(self.exp_id2)
-        self.assertEqual(exp_issues2.id, self.exp_id2)
+        exp_issues2 = stats_models.ExplorationIssuesModel.get_model(
+            self.exp_id2, self.exp2.version)
+        self.assertEqual(exp_issues2.exp_id, self.exp_id2)
+        self.assertEqual(exp_issues2.exp_version, self.exp2.version)
         self.assertEqual(exp_issues2.unresolved_issues, [])
 
 

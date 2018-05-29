@@ -335,6 +335,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorehandler/stats_events/<exploration_id>',
         reader.StatsEventsHandler),
     get_redirect_route(
+        r'/explorehandler/store_playthrough/<exploration_id>',
+        reader.StorePlaythroughHandler),
+    get_redirect_route(
         r'/explorehandler/rating/<exploration_id>', reader.RatingHandler),
     get_redirect_route(
         r'/explorehandler/recommendations/<exploration_id>',
@@ -388,6 +391,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
         editor.StateRulesStatsHandler),
+    get_redirect_route(
+        r'/createhandler/state_answer_stats/<exploration_id>',
+        editor.StateAnswerStatisticsHandler),
     get_redirect_route(
         r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler),
