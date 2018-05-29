@@ -51,7 +51,7 @@ oppia.factory('ImagePreloaderService', [
         ExplorationContextService.getExplorationId(), filename)
         .then(function(loadedImageFile) {
           var objectUrl = URL.createObjectURL(loadedImageFile.data);
-            onLoadCallback(objectUrl);
+          onLoadCallback(objectUrl);
         });
     };
 
@@ -152,11 +152,14 @@ oppia.factory('ImagePreloaderService', [
           ExtractImageFilenamesFromStateService
             .getImageFilenamesInState(state));
         imageFilenamesInState.forEach(function(filename) {
+          var isFileCurrentlyDownloading = (
+            _filenamesOfImageCurrentlyDownloading.indexOf(filename) >= 0
+          );
           if (!AssetsBackendApiService.isCached(filename) &&
-              (_filenamesOfImageCurrentlyDownloading.indexOf(filename) === -1)) {
+              (!isFileCurrentlyDownloading)) {
             noOfImagesNeitherInCacheNorDownloading += 1;
           }
-          if (_filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1) {
+          if (isFileCurrentlyDownloading) {
             noOfImageFilesCurrentlyDownloading += 1;
           }
         });
