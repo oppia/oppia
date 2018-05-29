@@ -20,7 +20,7 @@
 oppia.factory('ResponsesService', [
   '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
   'AnswerGroupsCacheService', 'EditorStateService', 'ChangeListService',
-  'explorationStatesService', 'GraphDataService', 'OutcomeObjectFactory',
+  'ExplorationStatesService', 'GraphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ExplorationContextService', 'ExplorationWarningsService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
@@ -28,7 +28,7 @@ oppia.factory('ResponsesService', [
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
       AnswerGroupsCacheService, EditorStateService, ChangeListService,
-      explorationStatesService, GraphDataService, OutcomeObjectFactory,
+      ExplorationStatesService, GraphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, AlertsService,
       ExplorationContextService, ExplorationWarningsService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
@@ -52,7 +52,7 @@ oppia.factory('ResponsesService', [
           !angular.equals(newAnswerGroups, oldAnswerGroups)) {
         _answerGroups = newAnswerGroups;
         $rootScope.$broadcast('answerGroupChanged');
-        explorationStatesService.saveInteractionAnswerGroups(
+        ExplorationStatesService.saveInteractionAnswerGroups(
           EditorStateService.getActiveStateName(),
           angular.copy(newAnswerGroups));
 
@@ -69,15 +69,15 @@ oppia.factory('ResponsesService', [
         if (interactionCanHaveSolution && solutionExists) {
           var currentStateName = EditorStateService.getActiveStateName();
           var solutionWasPreviouslyValid = (
-            explorationStatesService.isSolutionValid(
+            ExplorationStatesService.isSolutionValid(
               EditorStateService.getActiveStateName()));
           var solutionIsCurrentlyValid = (
             SolutionVerificationService.verifySolution(
               ExplorationContextService.getExplorationId(),
-              explorationStatesService.getState(currentStateName),
+              ExplorationStatesService.getState(currentStateName),
               stateSolutionService.savedMemento.correctAnswer));
 
-          explorationStatesService.updateSolutionValidity(
+          ExplorationStatesService.updateSolutionValidity(
             currentStateName, solutionIsCurrentlyValid);
           ExplorationWarningsService.updateWarnings();
 
@@ -114,6 +114,9 @@ oppia.factory('ResponsesService', [
       if (updates.hasOwnProperty('labelledAsCorrect')) {
         answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
       }
+      if (updates.hasOwnProperty('trainingData')) {
+        answerGroup.trainingData = updates.trainingData;
+      }
       _saveAnswerGroups(_answerGroups);
     };
 
@@ -122,7 +125,7 @@ oppia.factory('ResponsesService', [
       if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
         _defaultOutcome = newDefaultOutcome;
 
-        explorationStatesService.saveInteractionDefaultOutcome(
+        ExplorationStatesService.saveInteractionDefaultOutcome(
           EditorStateService.getActiveStateName(),
           angular.copy(newDefaultOutcome));
 
@@ -136,10 +139,10 @@ oppia.factory('ResponsesService', [
       var oldConfirmedUnclassifiedAnswers = (
         _confirmedUnclassifiedAnswersMemento);
       if (!angular.equals(
-          newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)) {
+        newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)) {
         _confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
-        explorationStatesService.saveConfirmedUnclassifiedAnswers(
+        ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
           EditorStateService.getActiveStateName(),
           angular.copy(newConfirmedUnclassifiedAnswers));
 
@@ -347,7 +350,7 @@ oppia.factory('ResponsesService', [
         return angular.copy(_confirmedUnclassifiedAnswers);
       },
       // This registers the change to the handlers in the list of changes, and
-      // also updates the states object in explorationStatesService.
+      // also updates the states object in ExplorationStatesService.
       save: function(newAnswerGroups, defaultOutcome) {
         _saveAnswerGroups(newAnswerGroups);
         _saveDefaultOutcome(defaultOutcome);

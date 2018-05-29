@@ -227,38 +227,17 @@ var constants = {
     "id": "en",
     "text": "English"
   }, {
-    "id": "de",
-    "text": "Deutsch"
-  }, {
-    "id": "fr",
-    "text": "Français"
-  }, {
-    "id": "nl",
-    "text": "Nederlands"
-  }, {
     "id": "es",
     "text": "Español"
   }, {
-    "id": "hu",
-    "text": "Magyar"
-  }, {
-    "id": "pt",
-    "text": "Português"
-  }, {
     "id": "pt-br",
     "text": "Português (Brasil)"
-  }, {
-    "id": "sv",
-    "text": "svenska"
   }, {
     "id": "ar",
     "text": "العربية"
   }, {
     "id": "kab",
     "text": "Taqbaylit"
-  }, {
-    "id": "mk",
-    "text": "македонски јазик"
   }, {
     "id": "vi",
     "text": "Tiếng Việt"
@@ -268,9 +247,6 @@ var constants = {
   }, {
     "id": "bn",
     "text": "বাংলা"
-  }, {
-    "id": "tr",
-    "text": "Türkçe"
   }, {
     "id": "zh-hans",
     "text": "中文(简体)"
@@ -463,5 +439,7 @@ var constants = {
     "LIST": "list"
   },
 
-  "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": []
+  "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
+
+  "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50
 };

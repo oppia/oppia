@@ -16,30 +16,30 @@
  * @fileoverview Unit tests for the State classifier mapping service.
  */
 
- describe('State classifier mapping service', function() {
-   beforeEach(module('oppia'));
+describe('State classifier mapping service', function() {
+  beforeEach(module('oppia'));
 
-   describe('Test correct retrieval of classifier details', function() {
-     var mappingService;
-     beforeEach(inject(function($injector) {
-       mappingService = $injector.get('StateClassifierMappingService');
+  describe('Test correct retrieval of classifier details', function() {
+    var mappingService;
+    beforeEach(inject(function($injector) {
+      mappingService = $injector.get('StateClassifierMappingService');
 
-       mappingService.init({
-         stateName1: {
-           algorithm_id: 'LDAStringClassifier',
-           classifier_data: {},
-           data_schema_version: 1
-         }
-       });
-     }));
+      mappingService.init({
+        stateName1: {
+          algorithm_id: 'TestClassifier',
+          classifier_data: {},
+          data_schema_version: 1
+        }
+      });
+    }));
 
-     it('should return correct classifier details.', function() {
-       var stateName = 'stateName1';
-       var retrievedClassifier = mappingService.getClassifier(stateName);
+    it('should return correct classifier details.', function() {
+      var stateName = 'stateName1';
+      var retrievedClassifier = mappingService.getClassifier(stateName);
 
-       expect(retrievedClassifier.algorithmId).toEqual('LDAStringClassifier');
-       expect(retrievedClassifier.classifierData).toEqual({});
-       expect(retrievedClassifier.dataSchemaVersion).toEqual(1);
-     });
-   });
- });
+      expect(retrievedClassifier.algorithmId).toEqual('TestClassifier');
+      expect(retrievedClassifier.classifierData).toEqual({});
+      expect(retrievedClassifier.dataSchemaVersion).toEqual(1);
+    });
+  });
+});

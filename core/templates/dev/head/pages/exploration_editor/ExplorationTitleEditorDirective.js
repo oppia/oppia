@@ -27,15 +27,15 @@ oppia.directive('explorationTitleEditor', [
         // Additional CSS style to define the width and font-weight.
         formStyle: '@',
         // The method to call when the input field is blured.
-        onInputFieldBlur: '&'      
+        onInputFieldBlur: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/' +
         'exploration_title_editor_directive.html'),
       controller: [
-        '$scope', 'explorationTitleService',
-        function($scope, explorationTitleService) {
-          $scope.explorationTitleService = explorationTitleService;
+        '$scope', 'ExplorationTitleService',
+        function($scope, ExplorationTitleService) {
+          $scope.explorationTitleService = ExplorationTitleService;
         }
       ]
     };

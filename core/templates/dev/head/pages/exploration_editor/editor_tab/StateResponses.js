@@ -29,6 +29,8 @@ oppia.controller('StateResponses', [
       ExplorationContextService, TrainingDataService,
       stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
+    $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
+      GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
     $scope.EditorStateService = EditorStateService;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
@@ -70,7 +72,7 @@ oppia.controller('StateResponses', [
         });
       } else if (interactionId === 'ItemSelectionInput') {
         var maxSelectionCount = (
-            customizationArgs.maxAllowableSelectionCount.value);
+          customizationArgs.maxAllowableSelectionCount.value);
         if (maxSelectionCount === 1) {
           var numChoices = $scope.getAnswerChoices().length;
           // This array contains a list of booleans, one for each answer choice.
@@ -260,20 +262,20 @@ oppia.controller('StateResponses', [
           'ExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'ExplorationContextService', 'EditorStateService',
-          'explorationStatesService', 'TrainingDataService',
+          'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
-          'angularNameService', 'RULE_TYPE_CLASSIFIER',
+          'AngularNameService', 'EXPLICIT_CLASSIFICATION',
           function(
               $scope, $injector, $uibModalInstance,
               ExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
               ExplorationContextService, EditorStateService,
-              explorationStatesService, TrainingDataService,
+              ExplorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
-              angularNameService, RULE_TYPE_CLASSIFIER) {
+              AngularNameService, EXPLICIT_CLASSIFICATION) {
             var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
-            var _state = explorationStatesService.getState(_stateName);
+            var _state = ExplorationStatesService.getState(_stateName);
 
             $scope.stateContent = _state.content.getHtml();
             $scope.inputTemplate = (
@@ -335,13 +337,14 @@ oppia.controller('StateResponses', [
               $scope.trainingDataFeedback = feedbackHtml;
               $scope.trainingDataOutcomeDest = dest;
 
-              var answerGroupIndex =
-                classificationResult.answerGroupIndex;
-              var ruleIndex = classificationResult.ruleIndex;
-              if (answerGroupIndex !==
-                _state.interaction.answerGroups.length &&
-                  _state.interaction.answerGroups[answerGroupIndex]
-                    .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
+              var classificationCategorization = (
+                classificationResult.classificationCategorization);
+
+              // If answer is classified using explicit rules then we don't show
+              // yes / no option to creator. Otherwise we ask whether the
+              // response it satisfactory and assign a different response
+              // if response is not satisfactory.
+              if (classificationCategorization === EXPLICIT_CLASSIFICATION) {
                 $scope.classification.answerGroupIndex = -1;
               } else {
                 $scope.classification.answerGroupIndex = (
@@ -376,6 +379,7 @@ oppia.controller('StateResponses', [
               EditorStateService, EditorFirstTimeEventsService,
               RuleObjectFactory, OutcomeObjectFactory) {
             $scope.feedbackEditorIsOpen = false;
+
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };
@@ -414,7 +418,7 @@ oppia.controller('StateResponses', [
       }).result.then(function(result) {
         // Create a new answer group.
         $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-          [result.tmpRule], result.tmpOutcome, false));
+          [result.tmpRule], result.tmpOutcome, []));
         ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
 
@@ -557,8 +561,8 @@ oppia.filter('summarizeAnswerGroup', [
       if (hasFeedback) {
         summary += (
           shortenRule ?
-          $filter('truncate')(outcome.feedback.getHtml(), 30) :
-          $filter('convertToPlainText')(outcome.feedback.getHtml()));
+            $filter('truncate')(outcome.feedback.getHtml(), 30) :
+            $filter('convertToPlainText')(outcome.feedback.getHtml()));
       }
       return summary;
     };

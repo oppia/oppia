@@ -49,9 +49,9 @@ oppia.factory('NumericInputValidationService', [
         var isEnclosedBy = function(ra, rb) {
           // Checks if range ra is enclosed by range rb.
           var lowerBoundConditionIsSatisfied =
-              (rb.lb < ra.lb) || (rb.lb == ra.lb && (!ra.lbi || rb.lbi));
+              (rb.lb < ra.lb) || (rb.lb === ra.lb && (!ra.lbi || rb.lbi));
           var upperBoundConditionIsSatisfied =
-              (rb.ub > ra.ub) || (rb.ub == ra.ub && (!ra.ubi || rb.ubi));
+              (rb.ub > ra.ub) || (rb.ub === ra.ub && (!ra.ubi || rb.ubi));
           return lowerBoundConditionIsSatisfied &&
               upperBoundConditionIsSatisfied;
         };

@@ -17,15 +17,15 @@
  */
 
 oppia.factory('ExplorationWarningsService', [
-  '$injector', 'GraphDataService', 'explorationStatesService',
-  'ExpressionInterpolationService', 'explorationParamChangesService',
+  '$injector', 'GraphDataService', 'ExplorationStatesService',
+  'ExpressionInterpolationService', 'ExplorationParamChangesService',
   'ParameterMetadataService', 'INTERACTION_SPECS',
-  'WARNING_TYPES', 'STATE_ERROR_MESSAGES', 'RULE_TYPE_CLASSIFIER',
+  'WARNING_TYPES', 'STATE_ERROR_MESSAGES',
   function(
-      $injector, GraphDataService, explorationStatesService,
-      ExpressionInterpolationService, explorationParamChangesService,
+      $injector, GraphDataService, ExplorationStatesService,
+      ExpressionInterpolationService, ExplorationParamChangesService,
       ParameterMetadataService, INTERACTION_SPECS,
-      WARNING_TYPES, STATE_ERROR_MESSAGES, RULE_TYPE_CLASSIFIER) {
+      WARNING_TYPES, STATE_ERROR_MESSAGES) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -33,7 +33,7 @@ oppia.factory('ExplorationWarningsService', [
     var _getStatesWithoutInteractionIds = function() {
       var statesWithoutInteractionIds = [];
 
-      var states = explorationStatesService.getStates();
+      var states = ExplorationStatesService.getStates();
 
       states.getStateNames().forEach(function(stateName) {
         if (!states.getState(stateName).interaction.id) {
@@ -47,10 +47,10 @@ oppia.factory('ExplorationWarningsService', [
     var _getStatesWithIncorrectSolution = function() {
       var statesWithIncorrectSolution = [];
 
-      var states = explorationStatesService.getStates();
+      var states = ExplorationStatesService.getStates();
       states.getStateNames().forEach(function(stateName) {
         if (states.getState(stateName).interaction.solution &&
-            !explorationStatesService.isSolutionValid(stateName)) {
+            !ExplorationStatesService.isSolutionValid(stateName)) {
           statesWithIncorrectSolution.push(stateName);
         }
       });
@@ -146,9 +146,8 @@ oppia.factory('ExplorationWarningsService', [
       var answerGroups = state.interaction.answerGroups;
       for (var i = 0; i < answerGroups.length; i++) {
         var group = answerGroups[i];
-        if (group.rules.length === 1 &&
-            group.rules[0].type === RULE_TYPE_CLASSIFIER &&
-            group.rules[0].inputs.training_data.length === 0) {
+        if (group.rules.length === 0 &&
+            group.training_data.length === 0) {
           indexes.push(i);
         }
       }
@@ -158,7 +157,7 @@ oppia.factory('ExplorationWarningsService', [
     var _getStatesAndAnswerGroupsWithEmptyClassifiers = function() {
       var results = [];
 
-      var states = explorationStatesService.getStates();
+      var states = ExplorationStatesService.getStates();
 
       states.getStateNames().forEach(function(stateName) {
         var groupIndexes = _getAnswerGroupIndexesWithEmptyClassifiers(
@@ -182,7 +181,7 @@ oppia.factory('ExplorationWarningsService', [
       GraphDataService.recompute();
       var _graphData = GraphDataService.getGraphData();
 
-      var _states = explorationStatesService.getStates();
+      var _states = ExplorationStatesService.getStates();
       _states.getStateNames().forEach(function(stateName) {
         var interaction = _states.getState(stateName).interaction;
         if (interaction.id) {

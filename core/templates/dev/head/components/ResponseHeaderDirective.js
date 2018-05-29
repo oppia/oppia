@@ -34,11 +34,11 @@ oppia.directive('responseHeader', [
         '/components/response_header_directive.html'),
       controller: [
         '$scope', 'EditabilityService', 'EditorStateService', 'RouterService',
-        'PLACEHOLDER_OUTCOME_DEST', 'explorationCorrectnessFeedbackService',
+        'PLACEHOLDER_OUTCOME_DEST', 'ExplorationCorrectnessFeedbackService',
         'stateInteractionIdService', 'INTERACTION_SPECS',
         function(
             $scope, EditabilityService, EditorStateService, RouterService,
-            PLACEHOLDER_OUTCOME_DEST, explorationCorrectnessFeedbackService,
+            PLACEHOLDER_OUTCOME_DEST, ExplorationCorrectnessFeedbackService,
             stateInteractionIdService, INTERACTION_SPECS) {
           $scope.EditabilityService = EditabilityService;
 
@@ -63,7 +63,7 @@ oppia.directive('responseHeader', [
           };
 
           $scope.isCorrectnessFeedbackEnabled = function() {
-            return explorationCorrectnessFeedbackService.isEnabled();
+            return ExplorationCorrectnessFeedbackService.isEnabled();
           };
 
           $scope.isCreatingNewState = function() {

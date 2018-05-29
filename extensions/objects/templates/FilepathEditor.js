@@ -374,7 +374,7 @@ oppia.directive('filepathEditor', [
             $scope.cropAreaXWhenLastDown = $scope.cropArea.x1;
             $scope.cropAreaYWhenLastDown = $scope.cropArea.y1;
             $scope.userIsDraggingCropArea = true;
-          } else if(position !== null) {
+          } else if (position !== null) {
             $scope.lastMouseDownEventCoordinates = {x: coords.x, y: coords.y};
             $scope.userIsResizingCropArea = true;
             $scope.cropAreaResizeDirection = position;
@@ -437,8 +437,8 @@ oppia.directive('filepathEditor', [
             var data = 'url(' + $scope.data.metadata.uploadedImageData + ')';
             styles.background = data + ' no-repeat';
 
-            var x = $scope.cropArea.x1 + 3;  // Add crop area border.
-            var y = $scope.cropArea.y1 + 3;  // Add crop area border.
+            var x = $scope.cropArea.x1 + 3; // Add crop area border.
+            var y = $scope.cropArea.y1 + 3; // Add crop area border.
             styles['background-position'] = '-' + x + 'px -' + y + 'px';
 
             var dimensions = $scope.calculateTargetImageDimensions();
@@ -470,8 +470,8 @@ oppia.directive('filepathEditor', [
 
           // Generate new image data and file.
           var newImageData = getCroppedImageData(
-              $scope.data.metadata.uploadedImageData,
-              x1, y1, width, height);
+            $scope.data.metadata.uploadedImageData,
+            x1, y1, width, height);
 
           var newImageFile = convertImageDataToImageFile(newImageData);
 

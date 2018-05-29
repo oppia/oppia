@@ -57,6 +57,15 @@ describe('Fraction Input rules service', function() {
     x: 20
   };
 
+  var FRACTIONAL_RULE_INPUT = {
+    f: {
+      isNegative: false,
+      wholeNumber: 0,
+      numerator: 2,
+      denominator: 4
+    }
+  };
+
   it('should have a correct \'equivalence\' rule', function() {
     expect(firs.IsEquivalentTo(
       createNegativeFractionDict(1, 8, 4), RULE_INPUT)).toBe(false);
@@ -163,5 +172,16 @@ describe('Fraction Input rules service', function() {
       createPositiveFractionDict(1, 0, 1))).toBe(true);
     expect(firs.HasNoFractionalPart(
       createPositiveFractionDict(1, 8, 4))).toBe(false);
+  });
+
+  it('should check if \'fractional part is exactly equal\' rule', function() {
+    expect(firs.HasFractionalPartExactlyEqualTo(
+      createPositiveFractionDict(1, 1, 2), FRACTIONAL_RULE_INPUT)).toBe(false);
+    expect(firs.HasFractionalPartExactlyEqualTo(
+      createPositiveFractionDict(1, 2, 4), FRACTIONAL_RULE_INPUT)).toBe(true);
+    expect(firs.HasFractionalPartExactlyEqualTo(
+      createPositiveFractionDict(1, 5, 6), FRACTIONAL_RULE_INPUT)).toBe(false);
+    expect(firs.HasFractionalPartExactlyEqualTo(
+      createPositiveFractionDict(6, 2, 4), FRACTIONAL_RULE_INPUT)).toBe(true);
   });
 });

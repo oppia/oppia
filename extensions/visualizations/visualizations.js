@@ -27,8 +27,9 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
     controller: [
       '$scope', '$attrs', '$element', 'HtmlEscaperService',
       function($scope, $attrs, $element, HtmlEscaperService) {
-        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
-        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
+        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+        $scope.options =
+          HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
 
         var dataArray = [['Answers', '']];
         for (var i = 0; i < $scope.data.length; i++) {
@@ -61,44 +62,50 @@ oppia.directive('oppiaVisualizationBarChart', [function() {
   };
 }]);
 
-oppia.directive('oppiaVisualizationFrequencyTable', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: 'visualizations/FrequencyTable',
-    controller: [
-      '$scope', '$attrs', 'HtmlEscaperService',
-      function($scope, $attrs, HtmlEscaperService) {
-        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
-        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-        $scope.isAddressed = HtmlEscaperService.escapedJsonToObj(
-          $attrs.isAddressed);
-      }
-    ]
-  };
-}]);
+oppia.directive('oppiaVisualizationFrequencyTable', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/visualizations/frequency_table_directive.html'),
+      controller: [
+        '$scope', '$attrs', 'HtmlEscaperService',
+        function($scope, $attrs, HtmlEscaperService) {
+          $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+          $scope.options =
+            HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
+          $scope.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
+        }
+      ]
+    };
+  }
+]);
 
-oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [function() {
-  return {
-    restrict: 'E',
-    scope: {},
-    templateUrl: 'visualizations/EnumeratedFrequencyTable',
-    controller: [
-      '$scope', '$attrs', 'HtmlEscaperService',
-      function($scope, $attrs, HtmlEscaperService) {
-        $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.data);
-        $scope.options = HtmlEscaperService.escapedJsonToObj($attrs.options);
-        $scope.isAddressed = HtmlEscaperService.escapedJsonToObj(
-          $attrs.isAddressed);
+oppia.directive('oppiaVisualizationEnumeratedFrequencyTable', [
+  'UrlInterpolationService', function(UrlInterpolationService) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/visualizations/enumerated_frequency_table_directive.html'),
+      controller: [
+        '$scope', '$attrs', 'HtmlEscaperService',
+        function($scope, $attrs, HtmlEscaperService) {
+          $scope.data = HtmlEscaperService.escapedJsonToObj($attrs.escapedData);
+          $scope.options =
+            HtmlEscaperService.escapedJsonToObj($attrs.escapedOptions);
+          $scope.addressedInfoIsSupported = $attrs.addressedInfoIsSupported;
 
-        $scope.answerVisible = $scope.data.map(function(_, i) {
-          // First element is shown while all others are hidden by default.
-          return i === 0;
-        });
-        $scope.toggleAnswerVisibility = function(i) {
-          $scope.answerVisible[i] = !$scope.answerVisible[i];
-        };
-      }
-    ]
-  };
-}]);
+          $scope.answerVisible = $scope.data.map(function(_, i) {
+            // First element is shown while all others are hidden by default.
+            return i === 0;
+          });
+          $scope.toggleAnswerVisibility = function(i) {
+            $scope.answerVisible[i] = !$scope.answerVisible[i];
+          };
+        }
+      ]
+    };
+  }
+]);

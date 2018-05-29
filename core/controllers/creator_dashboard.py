@@ -325,7 +325,8 @@ class UploadExploration(base.BaseHandler):
         new_exploration_id = exp_services.get_new_exploration_id()
         if feconf.ALLOW_YAML_FILE_UPLOAD:
             exp_services.save_new_exploration_from_yaml_and_assets(
-                self.user_id, yaml_content, new_exploration_id, [])
+                self.user_id, yaml_content, new_exploration_id, [],
+                strip_audio_translations=True)
             self.render_json({
                 EXPLORATION_ID_KEY: new_exploration_id
             })

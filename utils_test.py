@@ -221,11 +221,6 @@ class UtilsTests(test_utils.GenericTestBase):
             asset_dir_prefix = utils.get_asset_dir_prefix()
             self.assertTrue(asset_dir_prefix.startswith('/build'))
 
-        with self.swap(feconf, 'IS_MINIFIED', True):
-            utils.ASSET_DIR_PREFIX = None
-            asset_dir_prefix = utils.get_asset_dir_prefix()
-            self.assertTrue(asset_dir_prefix.startswith('/build'))
-
     def test_are_datetimes_close(self):
         initial_time = datetime.datetime(2016, 12, 1, 0, 0, 0)
         with self.swap(feconf, 'PROXIMAL_TIMEDELTA_SECS', 2):
@@ -251,7 +246,8 @@ class UtilsTests(test_utils.GenericTestBase):
         test_set = {utils.get_hashable_value(json1)}
         self.assertIn(utils.get_hashable_value(json1_deepcopy), test_set)
         test_set.add(utils.get_hashable_value(json2))
-        self.assertEqual(test_set, {
-            utils.get_hashable_value(json1_deepcopy),
-            utils.get_hashable_value(json2_deepcopy),
-        })
+        self.assertEqual(
+            test_set, {
+                utils.get_hashable_value(json1_deepcopy),
+                utils.get_hashable_value(json2_deepcopy),
+            })

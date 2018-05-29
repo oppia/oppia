@@ -36,7 +36,7 @@ describe('Change list service', function() {
         addWarning: function() {}
       };
       module(function($provide) {
-        $provide.value('AlertsService', mockWarningsData);
+        $provide.value('AlertsService', [mockWarningsData][0]);
       });
       spyOn(mockWarningsData, 'addWarning');
       mockExplorationData = {
@@ -45,7 +45,7 @@ describe('Change list service', function() {
         discardDraft: function() {}
       };
       module(function($provide) {
-        $provide.value('ExplorationDataService', mockExplorationData);
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
@@ -219,13 +219,13 @@ describe('Exploration title service', function() {
         autosaveChangeList: function() {}
       };
       module(function($provide) {
-        $provide.value('ExplorationDataService', mockExplorationData);
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(inject(function($injector) {
-      ets = $injector.get('explorationTitleService');
+      ets = $injector.get('ExplorationTitleService');
       $httpBackend = $injector.get('$httpBackend');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';

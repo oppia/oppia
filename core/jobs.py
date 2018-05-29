@@ -33,8 +33,8 @@ from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
-from mapreduce import output_writers
 from mapreduce import model as mapreduce_model
+from mapreduce import output_writers
 from mapreduce import util as mapreduce_util
 from pipeline import pipeline
 
@@ -516,6 +516,9 @@ class BaseJobManager(object):
 
 
 class BaseDeferredJobManager(BaseJobManager):
+    """Base class to run a job/method as deferred task. These tasks will be
+    pushed to the default taskqueue.
+    """
 
     @classmethod
     def _run(cls, additional_job_params):
@@ -579,6 +582,11 @@ class BaseDeferredJobManager(BaseJobManager):
 
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
+    """This class inherits from the PipelineBase class which are used to
+    connect various workflows/functional procedures together. It implements
+    a run method which is called when this job is started by using start()
+    method on the object created from this class.
+    """
 
     def run(self, job_id, job_class_str, kwargs):
         """Returns a coroutine which runs the job pipeline and stores results.
@@ -611,6 +619,7 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
 
 class StoreMapReduceResults(base_handler.PipelineBase):
+    """MapreducePipeline class to store output results."""
 
     def run(self, job_id, job_class_str, output):
         """Extracts the results of a MR job and registers its completion.
@@ -642,6 +651,11 @@ class StoreMapReduceResults(base_handler.PipelineBase):
 
 class GoogleCloudStorageConsistentJsonOutputWriter(
         output_writers.GoogleCloudStorageConsistentOutputWriter):
+    """This is an Output Writer which is used to consistently store MapReduce
+    job's results in json format. GoogleCloudStorageConsistentOutputWriter is
+    preferred as it's consistent. For more details please look here
+    https://github.com/GoogleCloudPlatform/appengine-mapreduce/wiki/3.4-Readers-and-Writers#googlecloudstorageoutputwriter
+    """
 
     def write(self, data):
         """Writes that data serialized in JSON format.
@@ -844,6 +858,10 @@ class BaseMapReduceOneOffJobManager(BaseMapReduceJobManager):
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
+    """This Input Reader is used to read values from multiple
+    classes in the datastore and pass them to mapper functions in MapReduce
+    jobs.
+    """
     _ENTITY_KINDS_PARAM = MAPPER_PARAM_KEY_ENTITY_KINDS
     _READER_LIST_PARAM = 'readers'
 
@@ -923,16 +941,24 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
         issue a warning if "input_reader" subdicationary is not present.
 
         Args:
-            mapper_spec: model.MapperSpec. The MapperSpec for this InputReader.
+            unused_mapper_spec: model.MapperSpec. The MapperSpec
+                for this InputReader.
 
         Raises:
             BadReaderParamsError: Required parameters are missing or invalid.
+
+        Returns:
+            bool. Whether mapper spec and all mapper patterns are valid.
         """
-        return True  # TODO
+        return True  # TODO.
 
 
 class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
-
+    """Continuous computation jobs, which run continuously, are used to perform
+    statistical, visualisation or other real time calculations. These jobs
+    are used to perform background calculations that take place outside the
+    usual client request/response cycle.
+    """
     @classmethod
     def _get_continuous_computation_class(cls):
         """Returns the ContinuousComputationManager class associated with this
@@ -1076,6 +1102,9 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
 
         Raises:
             Exception: The current instance has an invalid realtime layer id.
+
+        Returns:
+            realtime_layer. The realtime layer entity.
         """
         if (self.realtime_layer is None or
                 str(self.realtime_layer) != self.id[0]):
@@ -1417,8 +1446,8 @@ class BaseContinuousComputationManager(object):
                 a student starts an exploration, event of type `start` is
                 triggered. If he/she completes an exploration, event of type
                 `complete` is triggered.
-            *args: Forwarded to _handle_event() method.
-            *kwargs: Forwarded to _handle_event() method.
+            *args: list(*). Forwarded to _handle_event() method.
+            **kwargs: *. Forwarded to _handle_event() method.
         """
         realtime_layers = [0, 1]
         for layer in realtime_layers:

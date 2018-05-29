@@ -57,7 +57,7 @@ oppia.directive('collectionNodeCreator', [
                 explorationMetadataBackendDict.collection_node_metadata_list.
                   map(function(item) {
                     if (!$scope.collection.containsCollectionNode(item.id)) {
-                      options.push(item.title + ' (#' + item.id + ')');
+                      options.push(item.title + ' (' + item.id + ')');
                     }
                   });
                 return options;
@@ -72,10 +72,15 @@ oppia.directive('collectionNodeCreator', [
           };
 
           var isValidSearchQuery = function(searchQuery) {
-            if (/^[a-zA-Z0-9-_ ]*$/.test(searchQuery)) {
-              return true;
+            // Allow underscores because they are allowed in exploration IDs.
+            var INVALID_SEARCH_CHARS = GLOBALS.INVALID_NAME_CHARS.replace(
+              '_', '');
+            for (var i = 0; i < INVALID_SEARCH_CHARS.length; i++) {
+              if (searchQuery.indexOf(INVALID_SEARCH_CHARS[i]) !== -1) {
+                return false;
+              }
             }
-            return;
+            return true;
           };
 
           var addExplorationToCollection = function(newExplorationId) {
@@ -110,13 +115,12 @@ oppia.directive('collectionNodeCreator', [
                 AlertsService.addWarning(
                   'There was an error while adding an exploration to the ' +
                   'collection.');
-              }
-            );
+              });
           };
 
           var convertTypeaheadToExplorationId = function(typeaheadOption) {
-            var matchResults = typeaheadOption.match(/\(#(.*?)\)$/);
-            if (matchResults == null) {
+            var matchResults = typeaheadOption.match(/\((.*?)\)$/);
+            if (matchResults === null) {
               return typeaheadOption;
             }
             return matchResults[1];

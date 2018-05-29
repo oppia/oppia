@@ -47,6 +47,11 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def get_new_id(cls, entity_name):
+        """Base classmethod to be implemented in sub classes.
+
+        Args:
+            entity_name: str. The name of the entity.
+        """
         raise NotImplementedError
 
     @classmethod
@@ -100,6 +105,8 @@ class FileMetadataModel(base_models.VersionedModel):
         Args:
             exploration_id: str. The id of the exploration.
             filepath: str. The path to the relevant file within the exploration.
+            strict: bool. Whether to fail noisily if no exploration
+                with the given id exists in the datastore.
 
         Returns:
             FileMetadataModel. An instance of this class, uniquely
@@ -197,6 +204,11 @@ class FileModel(base_models.VersionedModel):
 
     @classmethod
     def get_new_id(cls, entity_name):
+        """Base classmethod to be implemented in sub classes.
+
+        Args:
+            entity_name: str. The name of the entity.
+        """
         raise NotImplementedError
 
     @classmethod
@@ -237,6 +249,8 @@ class FileModel(base_models.VersionedModel):
         Args:
             exploration_id: str. The id of the exploration.
             filepath: str. The path to the relevant file within the exploration.
+            strict: bool. Whether to fail noisily if no exploration
+                with the given id exists in the datastore.
 
         Returns:
             FileModel. An instance of this class, uniquely

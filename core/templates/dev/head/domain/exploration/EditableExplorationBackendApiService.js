@@ -147,7 +147,7 @@ oppia.factory('EditableExplorationBackendApiService', [
       /**
        * Deletes an exploration in the backend with the provided exploration
        * ID. If successful, the exploration will also be deleted from the
-       * ReadOnlyExplorationBackendApiService cache as well. 
+       * ReadOnlyExplorationBackendApiService cache as well.
        * Errors are passed to the error callback, if one is provided.
        */
       deleteExploration: function(explorationId) {

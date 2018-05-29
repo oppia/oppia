@@ -16,16 +16,18 @@
  * @fileoverview End-to-end tests of the full exploration editor.
  */
 
-var general = require('../protractor_utils/general.js');
+var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
+var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
-var editor = require('../protractor_utils/editor.js');
-var collectionEditor = require('../protractor_utils/collectionEditor.js');
-var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
+
+var CollectionEditorPage =
+  require('../protractor_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
@@ -37,10 +39,52 @@ describe('Full exploration editor', function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
   });
 
-  it('should redirect back to parent exploration correctly when parent id is ' +
-      'given as query parameter', function() {
+  it('should prevent going back when help card is shown', function() {
+    users.createUser('user2@editorAndPlayer.com', 'user2EditorAndPlayer');
+    users.login('user2@editorAndPlayer.com');
+    workflow.createExploration();
+
+    editor.setStateName('card 1');
+    editor.setContent(forms.toRichText('this is card 1'));
+    editor.setInteraction('Continue');
+    editor.ResponseEditor('default').setDestination('card 2', true, null);
+
+    editor.moveToState('card 2');
+    editor.setContent(forms.toRichText(
+      'this is card 2 with non-inline interaction'));
+    editor.setInteraction(
+      'LogicProof',
+      '', '', 'from p we have p');
+    editor.addResponse(
+      'LogicProof', forms.toRichText('Great'), 'final card', true, 'Correct');
+
+    // Setup a terminating state
+    editor.moveToState('final card');
+    editor.setInteraction('EndExploration');
+    editor.saveChanges();
+
+    general.moveToPlayer();
+    explorationPlayerPage.submitAnswer('Continue');
+    element.all(
+      by.css('.protractor-test-back-button')).then(function(buttons){
+      expect(buttons.length).toBe(1);
+    });
+    explorationPlayerPage.submitAnswer('LogicProof');
+    element.all(
+      by.css('.protractor-test-back-button')).then(function(buttons){
+      expect(buttons.length).toBe(0);
+    });
+
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
+    users.logout();
+  });
+
+  it('should redirect back to parent exploration correctly when parent id is' +
+      ' given as query parameter', function() {
     users.createUser('user1@editorAndPlayer.com', 'user1EditorAndPlayer');
     users.login('user1@editorAndPlayer.com');
 
@@ -70,23 +114,23 @@ describe('Full exploration editor', function() {
             parentId1 + '&parent=' + parentId2);
           browser.waitForAngular();
 
-          explorationPlayerPage.clickOnSummaryTileAtEnd();
+          explorationPlayerPage.clickOnReturnToParentButton();
 
           browser.getCurrentUrl().then(function(url) {
             var currentExplorationId = url.split('/')[4].split('?')[0];
             expect(currentExplorationId).toBe(parentId2);
-          });
 
-          explorationPlayerPage.clickOnSummaryTileAtEnd();
+            explorationPlayerPage.clickOnReturnToParentButton();
 
-          browser.getCurrentUrl().then(function(url) {
-            currentExplorationId = url.split('/')[4];
-            expect(currentExplorationId).toBe(parentId1);
+            browser.getCurrentUrl().then(function(url) {
+              currentExplorationId = url.split('/')[4];
+              expect(currentExplorationId).toBe(parentId1);
+              users.logout();
+            });
           });
         });
       });
     });
-    users.logout();
   });
 
   it('should give option for redirection when author has specified ' +
@@ -97,6 +141,7 @@ describe('Full exploration editor', function() {
     var dropdown = element(by.css('.protractor-test-profile-dropdown'));
     browser.actions().mouseMove(dropdown).perform();
     dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+    general.waitForSystem();
     browser.waitForAngular();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateExplorationButton();
@@ -115,6 +160,7 @@ describe('Full exploration editor', function() {
       dropdown = element(by.css('.protractor-test-profile-dropdown'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      general.waitForSystem();
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
@@ -144,6 +190,7 @@ describe('Full exploration editor', function() {
       dropdown = element(by.css('.protractor-test-profile-dropdown'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      general.waitForSystem();
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
@@ -173,19 +220,21 @@ describe('Full exploration editor', function() {
       dropdown = element(by.css('.protractor-test-profile-dropdown'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css('.protractor-test-dashboard-link')).click();
+      general.waitForSystem();
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateCollectionButton();
+      general.waitForSystem();
       browser.waitForAngular();
-      collectionEditor.searchForAndAddExistingExploration(
+      collectionEditorPage.searchForAndAddExistingExploration(
         'Parent Exploration in collection');
-      collectionEditor.saveDraft();
-      collectionEditor.closeSaveModal();
-      collectionEditor.publishCollection();
-      collectionEditor.setTitle('Test Collection');
-      collectionEditor.setObjective('This is a test collection.');
-      collectionEditor.setCategory('Algebra');
-      collectionEditor.saveChanges();
+      collectionEditorPage.saveDraft();
+      collectionEditorPage.closeSaveModal();
+      collectionEditorPage.publishCollection();
+      collectionEditorPage.setTitle('Test Collection');
+      collectionEditorPage.setObjective('This is a test collection.');
+      collectionEditorPage.setCategory('Algebra');
+      collectionEditorPage.saveChanges();
       browser.waitForAngular();
 
       browser.get('/search/find?q=');
@@ -193,39 +242,41 @@ describe('Full exploration editor', function() {
       explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
       general.waitForSystem();
       explorationPlayerPage.clickConfirmRedirectionButton();
+      general.waitForSystem();
       browser.waitForAngular();
       general.getExplorationIdFromPlayer().then(function(currentId) {
         expect(currentId).toEqual(refresherExplorationId);
-      });
-      general.waitForSystem();
-      explorationPlayerPage.clickOnSummaryTileAtEnd();
-      browser.waitForAngular();
-      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
-      general.waitForSystem();
-      explorationPlayerPage.clickCancelRedirectionButton();
-      browser.waitForAngular();
-      explorationPlayerPage.expectContentToMatch(
-        forms.toRichText('Parent Exploration Content'));
-      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
-      browser.waitForAngular();
+        general.waitForSystem();
+        explorationPlayerPage.clickOnReturnToParentButton();
+        browser.waitForAngular();
+        explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
+        general.waitForSystem();
+        explorationPlayerPage.clickCancelRedirectionButton();
+        browser.waitForAngular();
+        explorationPlayerPage.expectContentToMatch(
+          forms.toRichText('Parent Exploration Content'));
+        explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
+        browser.waitForAngular();
 
-      browser.get('/search/find?q=');
-      element.all(by.css(
-        '.protractor-test-collection-summary-tile-title')).first().click();
-      element.all(by.css(
-        '.protractor-test-collection-exploration')).first().click();
-      explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
-      general.waitForSystem();
-      explorationPlayerPage.clickConfirmRedirectionButton();
-      browser.waitForAngular();
-      // Check the current url to see if collection_id is present in it.
-      browser.getCurrentUrl().then(function(url) {
-        var pathname = url.split('/');
-        expect(
-          pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
+        browser.get('/search/find?q=');
+        element.all(by.css(
+          '.protractor-test-collection-summary-tile-title')).first().click();
+        element.all(by.css(
+          '.protractor-test-collection-exploration')).first().click();
+        explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Incorrect');
+        general.waitForSystem();
+        explorationPlayerPage.clickConfirmRedirectionButton();
+        general.waitForSystem();
+        browser.waitForAngular();
+        // Check the current url to see if collection_id is present in it.
+        browser.getCurrentUrl().then(function(url) {
+          var pathname = url.split('/');
+          expect(
+            pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
+          general.waitForSystem();
+          users.logout();
+        });
       });
-      general.waitForSystem();
-      users.logout();
     });
   });
 
@@ -505,6 +556,67 @@ describe('Full exploration editor', function() {
       editor.setInteraction('EndExploration');
       users.logout();
     });
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
+
+
+describe('Rating', function() {
+  var EXPLORATION_RATINGTEST = 'RatingTest';
+  var CATEGORY_BUSINESS = 'Business';
+  var LANGUAGE_ENGLISH = 'English';
+  var MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS = 1;
+  var libraryPage = null;
+  var explorationPlayerPage = null;
+
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
+
+  var addRating = function(userEmail, userName, explorationName, ratingValue) {
+    users.createUser(userEmail, userName);
+    users.login(userEmail);
+    libraryPage.get();
+    libraryPage.playExploration(EXPLORATION_RATINGTEST);
+    explorationPlayerPage.expectExplorationNameToBe(explorationName);
+    explorationPlayerPage.rateExploration(ratingValue);
+    users.logout();
+  };
+
+  it('should display ratings on exploration when minimum ratings have been ' +
+     'submitted', function() {
+    users.createUser('user1@explorationRating.com', 'user1Rating');
+    // Create an test exploration
+    users.login('user1@explorationRating.com');
+    workflow.createAndPublishExploration(
+      EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
+      'this is an objective', LANGUAGE_ENGLISH);
+    users.logout();
+
+    // Create test users, play exploration and review them after completion
+    for (var i = 0; i < MINIMUM_ACCEPTABLE_NUMBER_OF_RATINGS - 1; i++) {
+      var userEmail = 'NoDisplay' + i + '@explorationRating.com';
+      var username = 'NoDisplay' + i;
+      addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
+    }
+
+    libraryPage.get();
+    libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
+
+    var userEmail = 'Display@explorationRating.com';
+    var username = 'Display';
+    addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
+
+    libraryPage.get();
+    libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
+
+    libraryPage.playExploration(EXPLORATION_RATINGTEST);
+    explorationPlayerPage.expectExplorationRatingOnInformationCardToEqual(
+      '4.0');
   });
 
   afterEach(function() {

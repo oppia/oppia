@@ -56,17 +56,14 @@ oppia.factory('CodeReplPredictionService', [
             tokenId === PythonProgramTokenType.COMMENT ||
             tokenName.trim() === '') {
             continue;
-          }
-          else if (
+          } else if (
             tokenId === PythonProgramTokenType.NAME &&
             KW_LIST.indexOf(tokenName) === -1) {
             tokenizedProgram.push(TOKEN_NAME_VAR);
-          }
-          else {
+          } else {
             if (tokenToId.hasOwnProperty(tokenName)) {
               tokenizedProgram.push(tokenName);
-            }
-            else {
+            } else {
               tokenizedProgram.push(TOKEN_NAME_UNK);
             }
           }
@@ -89,13 +86,11 @@ oppia.factory('CodeReplPredictionService', [
             tokenId === PythonProgramTokenType.COMMENT ||
             tokenName.trim() === '') {
             continue;
-          }
-          else if (
+          } else if (
             tokenId === PythonProgramTokenType.NAME &&
             KW_LIST.indexOf(tokenName) === -1) {
             tokenizedProgram.push(TOKEN_NAME_VAR);
-          }
-          else {
+          } else {
             tokenizedProgram.push(tokenName);
           }
         }
@@ -114,10 +109,10 @@ oppia.factory('CodeReplPredictionService', [
 
         var smallSet = (
           (multisetA.length < multisetB.length) ?
-          multisetA.slice() : multisetB.slice());
+            multisetA.slice() : multisetB.slice());
         var unionSet = (
           (multisetA.length < multisetB.length) ?
-          multisetB.slice() : multisetA.slice());
+            multisetB.slice() : multisetA.slice());
         var index = 0;
         var extraElements = [];
 
@@ -127,8 +122,7 @@ oppia.factory('CodeReplPredictionService', [
           }
           if (index >= unionSet.length || elem < unionSet[index]) {
             extraElements.push(elem);
-          }
-          else if (elem === unionSet[index]) {
+          } else if (elem === unionSet[index]) {
             index += 1;
           }
         });
@@ -179,9 +173,16 @@ oppia.factory('CodeReplPredictionService', [
         var top = knnData.top;
 
         // Find program tokens using python program tokenizer.
-        var pythonProgramTokens = PythonProgramTokenizer.generateTokens(
-          program.split('\n'));
+        var programLines = program.split('\n');
 
+        // Empty lines in between program causes parser to think that program
+        // has ended which leads to generation of wrong set of tokens.
+        programLines = programLines.filter(function(line) {
+          return line.trim().length !== 0;
+        });
+
+        var pythonProgramTokens = PythonProgramTokenizer.generateTokens(
+          programLines);
         // Normalize program tokens for winnowing preprocessing. This removes
         // unnecessary tokens and normalizes variable and method name tokens.
 
@@ -196,7 +197,6 @@ oppia.factory('CodeReplPredictionService', [
         var programFingerprint = (
           WinnowingPreprocessingService.getFingerprintFromHashes(
             programHashes, T, K));
-
         // Calculte similarity of the input program with every program in
         // classifier data for k nearest neighbor classification.
         similarityList = [];
@@ -204,7 +204,7 @@ oppia.factory('CodeReplPredictionService', [
           var fingerprintA = fingerprintData[index].fingerprint;
           var similarity = predictionService.getProgramSimilarity(
             fingerprintA, programFingerprint);
-          similarityList.push([index, similarity]);
+          similarityList.push([parseInt(index), similarity]);
         });
 
         // Sort the programs according to their similairy with the
@@ -231,7 +231,7 @@ oppia.factory('CodeReplPredictionService', [
         var nearestNeighborsIndexes = (
           predictionService.findNearestNeighborsIndexes(knnData, program));
         var nearesNeighborsClasses = [];
-        
+
         // Find classes of nearest neighbor programs.
         nearestNeighborsIndexes.forEach(function(neighbor) {
           var index = neighbor[0];
@@ -247,8 +247,7 @@ oppia.factory('CodeReplPredictionService', [
           var outputClass = neighbor[0];
           if (classCount.hasOwnProperty(outputClass)) {
             classCount[outputClass] += 1;
-          }
-          else {
+          } else {
             classCount[outputClass] = 1;
           }
         });
@@ -256,7 +255,11 @@ oppia.factory('CodeReplPredictionService', [
         // Find the winning class.
         var classCountArray = [];
         Object.keys(classCount).forEach(function(k) {
-          classCountArray.push([k, classCount[k]]);
+          classCountArray.push([parseInt(k), classCount[k]]);
+        });
+
+        classCountArray.sort(function(x, y) {
+          return x[1] > y[1] ? -1 : 1;
         });
 
         var predictedClass = classCountArray[0][0];
@@ -265,23 +268,30 @@ oppia.factory('CodeReplPredictionService', [
 
         if (predictedClassOccurrence >= occurrence) {
           if (classCountArray.length > 1) {
-            if (predictedClassOccurrence != classCountArray[1][1]) {
+            if (predictedClassOccurrence !== classCountArray[1][1]) {
               // Check whether second most likely prediction does not have same
               // occurrence count. If it does, then we assume that KNN has
               // failed.
-              return predictedClass.toString();
+              return prediction;
             }
-          }
-          else {
-            return predictedClass.toString();
+          } else {
+            return prediction;
           }
         }
 
         // If KNN fails to predict then use SVM to predict the output class.
 
         // Find program tokens using python program tokenizer.
+        var programLines = program.split('\n');
+
+        // Empty lines in between program causes parser to think that program
+        // has ended which leads to generation of wrong set of tokens.
+        programLines = programLines.filter(function(line) {
+          return line.trim().length !== 0;
+        });
+
         var pythonProgramTokens = PythonProgramTokenizer.generateTokens(
-          program.split('\n'));
+          programLines);
 
         var tokenizedProgram = predictionService.getTokenizedProgramForCV(
           pythonProgramTokens);
@@ -289,7 +299,7 @@ oppia.factory('CodeReplPredictionService', [
           tokenizedProgram, cvVocabulary);
 
         prediction = SVMPredictionService.predict(svmData, programVector);
-        return prediction.toString();
+        return prediction;
       }
     };
 

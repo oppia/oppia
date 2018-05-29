@@ -37,7 +37,7 @@ oppia.factory('UrlInterpolationService', [
      * returns resource path with cache slug.
      */
     var getUrlWithSlug = function(resourcePath) {
-      if (GLOBALS.MINIFICATION || !GLOBALS.DEV_MODE) {
+      if (!GLOBALS.DEV_MODE) {
         if (hashes[resourcePath]) {
           var index = resourcePath.lastIndexOf('.');
           return (resourcePath.slice(0, index) + '.' + hashes[resourcePath] +
@@ -91,8 +91,8 @@ oppia.factory('UrlInterpolationService', [
 
         // http://stackoverflow.com/questions/4775722
         if (!(interpolationValues instanceof Object) || (
-            Object.prototype.toString.call(
-              interpolationValues) === '[object Array]')) {
+          Object.prototype.toString.call(
+            interpolationValues) === '[object Array]')) {
           AlertsService.fatalWarning(
             'Expected an object of interpolation values to be passed into ' +
             'interpolateUrl.');

@@ -21,7 +21,6 @@ from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import rating_services
 from core.domain import rights_manager
-from core.domain import stats_jobs_continuous_test
 from core.domain import subscription_services
 from core.domain import user_jobs_continuous
 from core.domain import user_jobs_continuous_test
@@ -101,6 +100,13 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         event_services.StartExplorationEventHandler.record(
             exp_id, exp_version, state, self.USER_SESSION_ID, {},
             feconf.PLAY_TYPE_NORMAL)
+        event_services.StatsEventsHandler.record(
+            exp_id, exp_version, {
+                'num_starts': 1,
+                'num_actual_starts': 0,
+                'num_completions': 0,
+                'state_stats_mapping': {}
+            })
 
     def _rate_exploration(self, exp_id, ratings):
         """Create num_ratings ratings for exploration with exp_id,
@@ -118,18 +124,6 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
     def _run_user_stats_aggregator_job(self):
         (user_jobs_continuous_test.ModifiedUserStatsAggregator.
          start_computation())
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-        self.process_and_flush_pending_tasks()
-
-    def _run_stats_aggregator_jobs(self):
-        (stats_jobs_continuous_test.ModifiedStatisticsAggregator
-         .start_computation())
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
@@ -161,7 +155,6 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         state = exploration.init_state_name
 
         self._record_start(exp_id, exp_version, state)
-        self._run_stats_aggregator_jobs()
 
         self._run_user_stats_aggregator_job()
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
@@ -206,7 +199,6 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         state = exploration.init_state_name
 
         self._record_start(exp_id, exp_version, state)
-        self._run_stats_aggregator_jobs()
 
         self._rate_exploration(exp_id, [3])
 
@@ -235,7 +227,6 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self._record_start(exp_id, exp_version, state)
         self._record_start(exp_id, exp_version, state)
         self._record_start(exp_id, exp_version, state)
-        self._run_stats_aggregator_jobs()
 
         self._rate_exploration(exp_id, [3, 4, 5])
 
@@ -264,7 +255,6 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         state_1 = exploration_1.init_state_name
 
         self._record_start(exp_id_1, exp_version, state_1)
-        self._run_stats_aggregator_jobs()
 
         self._rate_exploration(exp_id_1, [4])
 
@@ -301,7 +291,6 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self._rate_exploration(exp_id_1, [4])
         self._rate_exploration(exp_id_2, [3, 3])
 
-        self._run_stats_aggregator_jobs()
         self._run_user_stats_aggregator_job()
 
         user_model = user_models.UserStatsModel.get(self.owner_id_1)
@@ -309,7 +298,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self.assertEquals(
             user_model.impact_score, self.USER_IMPACT_SCORE_DEFAULT)
         self.assertEquals(user_model.num_ratings, 3)
-        self.assertEquals(user_model.average_ratings, 10/3.0)
+        self.assertEquals(user_model.average_ratings, 10 / 3.0)
         self.logout()
 
     def test_stats_for_single_exploration_with_multiple_owners(self):
@@ -330,7 +319,6 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
 
         self._record_start(exp_id, exp_version, state)
         self._record_start(exp_id, exp_version, state)
-        self._run_stats_aggregator_jobs()
 
         self._rate_exploration(exp_id, [3, 4, 5])
         self.logout()
@@ -389,7 +377,6 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         self._record_start(exp_id_2, exp_version, state_2)
         self._record_start(exp_id_2, exp_version, state_2)
         self._record_start(exp_id_2, exp_version, state_2)
-        self._run_stats_aggregator_jobs()
 
         self._rate_exploration(exp_id_1, [5, 3])
         self._rate_exploration(exp_id_2, [5, 5])
@@ -399,7 +386,7 @@ class CreatorDashboardStatisticsTest(test_utils.GenericTestBase):
         expected_results = {
             'total_plays': 5,
             'num_ratings': 4,
-            'average_ratings': 18/4.0
+            'average_ratings': 18 / 4.0
         }
 
         user_model_2 = user_models.UserStatsModel.get(self.owner_id_2)
@@ -649,25 +636,27 @@ class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
 
     def _get_recent_notifications_mock_by_viewer(self, unused_user_id):
         """Returns a single feedback thread by VIEWER_ID."""
-        return (100000, [{
-            'activity_id': 'exp_id',
-            'activity_title': 'exp_title',
-            'author_id': self.viewer_id,
-            'last_updated_ms': 100000,
-            'subject': 'Feedback Message Subject',
-            'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-        }])
+        return (
+            100000, [{
+                'activity_id': 'exp_id',
+                'activity_title': 'exp_title',
+                'author_id': self.viewer_id,
+                'last_updated_ms': 100000,
+                'subject': 'Feedback Message Subject',
+                'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
+            }])
 
     def _get_recent_notifications_mock_by_anonymous_user(self, unused_user_id):
         """Returns a single feedback thread by an anonymous user."""
-        return (200000, [{
-            'activity_id': 'exp_id',
-            'activity_title': 'exp_title',
-            'author_id': None,
-            'last_updated_ms': 100000,
-            'subject': 'Feedback Message Subject',
-            'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-        }])
+        return (
+            200000, [{
+                'activity_id': 'exp_id',
+                'activity_title': 'exp_title',
+                'author_id': None,
+                'last_updated_ms': 100000,
+                'subject': 'Feedback Message Subject',
+                'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
+            }])
 
     def test_author_ids_are_handled_correctly(self):
         """Test that author ids are converted into author usernames

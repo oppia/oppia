@@ -59,12 +59,12 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           // Make sure $scope.preCode ends with a newline:
           if ($scope.preCode.trim().length === 0) {
             $scope.preCode = '';
-          } else if (!$scope.preCode.slice(-1) === '\n') {
+          } else if ($scope.preCode.slice(-1) !== '\n') {
             $scope.preCode += '\n';
           }
 
           // Make sure $scope.placeholder ends with a newline.
-          if (!$scope.placeholder.slice(-1) === '\n') {
+          if ($scope.placeholder.slice(-1) !== '\n') {
             $scope.placeholder += '\n';
           }
 
@@ -189,7 +189,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             var postCodeNumLines = $scope.postCode.split('\n').length;
             var fullCodeNumLines = $scope.code.split('\n').length;
             var userCodeNumLines = (
-                fullCodeNumLines - preCodeNumLines - postCodeNumLines);
+              fullCodeNumLines - preCodeNumLines - postCodeNumLines);
 
             // Mark pre- and post- code as uneditable, and give it some styling.
             var markOptions = {
@@ -232,7 +232,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
 
               for (var i = 0; i < postCodeNumLines; i++) {
                 editor.addLineClass(preCodeNumLines + userCodeNumLines + i,
-                'text', 'code-repl-noneditable-line');
+                  'text', 'code-repl-noneditable-line');
               }
             }
           };

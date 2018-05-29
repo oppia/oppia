@@ -37,19 +37,19 @@ describe('Sidebar state name controller', function() {
         autosaveChangeList: function() {}
       };
       module(function($provide) {
-        $provide.value('ExplorationDataService', mockExplorationData);
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
     beforeEach(inject(function(
-        $rootScope, $q, $filter, $controller, $injector) {
+        $controller, $filter, $injector, $rootScope) {
       scope = $rootScope.$new();
       filter = $filter;
       rootScope = $rootScope;
       ecs = $injector.get('EditorStateService');
       fs = $injector.get('FocusManagerService');
-      ess = $injector.get('explorationStatesService');
+      ess = $injector.get('ExplorationStatesService');
       $httpBackend = $injector.get('$httpBackend');
 
       GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
@@ -123,7 +123,7 @@ describe('Sidebar state name controller', function() {
         },
         EditorStateService: ecs,
         FocusManagerService: fs,
-        explorationStatesService: ess,
+        ExplorationStatesService: ess,
         RouterService: {}
       });
     }));

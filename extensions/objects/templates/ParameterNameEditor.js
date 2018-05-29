@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// NOTE TO DEVELOPERS: This editor requires explorationParamSpecsService to be
+// NOTE TO DEVELOPERS: This editor requires ExplorationParamSpecsService to be
 // available in the context in which it is used.
 
 oppia.directive('parameterNameEditor', [
@@ -29,10 +29,10 @@ oppia.directive('parameterNameEditor', [
       scope: true,
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: [
-        '$scope', '$attrs', 'explorationParamSpecsService',
-        function($scope, $attrs, explorationParamSpecsService) {
+        '$scope', '$attrs', 'ExplorationParamSpecsService',
+        function($scope, $attrs, ExplorationParamSpecsService) {
           $scope.availableParamNames =
-            explorationParamSpecsService.savedMemento.getParamNames();
+            ExplorationParamSpecsService.savedMemento.getParamNames();
 
           if ($scope.availableParamNames.length === 0) {
             $scope.localValue = null;

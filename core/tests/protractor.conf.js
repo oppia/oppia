@@ -49,8 +49,8 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  // (Note that the hint tooltip has a 120-second timeout.)
-  allScriptsTimeout: 300000,
+  // (Note that the hint tooltip has a 60-second timeout.)
+  allScriptsTimeout: 180000,
 
   // ----- What tests to run -----
   //
@@ -61,53 +61,47 @@ exports.config = {
       'protractor/*.js'
     ],
 
-    mainEditor: [
+    // Unfortunately, adding more than one file to a test suite results in
+    // severe instability as of Chromedriver 2.38 (Chrome 66).
+    accessibility: [
+      'protractor/accessibility.js'
+    ],
+
+    collections: [
+      'protractor/collections.js'
+    ],
+
+    editorAndPlayer: [
       'protractor/editorAndPlayer.js',
+    ],
+
+    stateEditor: [
       'protractor/stateEditor.js',
-      'protractor/explorationFeedback.js'
     ],
 
     editorFeatures: [
-      'protractor/historyTab.js',
-      'protractor/parameters.js',
-      'protractor/hintsAndSolutions.js'
-    ],
-
-    extensions: [
-      'protractor/richTextComponents.js',
-      'protractor/interactions.js'
-    ],
-
-    library: [
-      'protractor/explorationRating.js',
-      'protractor/privileges.js',
-      'protractor/libraryPagesTour.js',
-      'protractor/publicationAndLibrary.js'
-    ],
-
-    learnerDashboard: [
-      'protractor/learnerDashboard.js',
-    ],
-
-    users: [
-      'protractor/userManagement.js',
-      'protractor/loginFlow.js',
-      'protractor/subscriptions.js',
-      'protractor/preferences.js'
-    ],
-
-    misc: [
-      'protractor/suggestions.js',
-      'protractor/cacheSlugs.js',
-      'protractor/staticPagesTour.js',
-      'protractor/collections.js',
-      'protractor/accessibility.js',
-      'protractor/i18n.js'
+      'protractor/editorFeatures.js'
     ],
 
     embedding: [
       'protractor/embedding.js'
-    ]
+    ],
+
+    extensions: [
+      'protractor/extensions.js'
+    ],
+
+    learnerDashboard: [
+      'protractor/learnerDashboard.js'
+    ],
+
+    library: [
+      'protractor/publicationAndLibrary.js'
+    ],
+
+    users: [
+      'protractor/userJourneys.js',
+    ],
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
@@ -119,11 +113,11 @@ exports.config = {
   capabilities: {
     browserName: 'chrome',
     chromeOptions: {
-      args: ['lang=en-EN'],
-      prefs: {
-        intl: {
-          accept_languages: 'en-EN'
-        }
+      args: ['--lang=en-EN', '--window-size=1285x1000']
+    },
+    prefs: {
+      intl: {
+        accept_languages: 'en-EN'
       }
     },
     loggingPrefs: {

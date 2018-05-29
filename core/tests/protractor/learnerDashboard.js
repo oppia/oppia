@@ -13,21 +13,26 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests for the learner dashboard page.
+ * @fileoverview End-to-end tests for the learner dashboard page and
+ * subscriptions functionality.
  */
+
+var editor = require('../protractor_utils/editor.js');
+var general = require('../protractor_utils/general.js');
+var users = require('../protractor_utils/users.js');
+var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
-var collectionEditor = require('../protractor_utils/collectionEditor.js');
-var editor = require('../protractor_utils/editor.js');
-var general = require('../protractor_utils/general.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var CollectionEditorPage =
+  require('../protractor_utils/CollectionEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
-var users = require('../protractor_utils/users.js');
 var LearnerDashboardPage =
   require('../protractor_utils/LearnerDashboardPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var SubscriptionDashboardPage =
   require('../protractor_utils/SubscriptionDashboardPage.js');
 
@@ -41,6 +46,7 @@ describe('Learner dashboard functionality', function() {
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage = (
@@ -70,14 +76,14 @@ describe('Learner dashboard functionality', function() {
     // Create new collection.
     element(by.css('.protractor-test-create-collection')).click();
     browser.waitForAngular();
-    collectionEditor.addExistingExploration('14');
-    collectionEditor.saveDraft();
-    collectionEditor.closeSaveModal();
-    collectionEditor.publishCollection();
-    collectionEditor.setTitle('Test Collection');
-    collectionEditor.setObjective('This is a test collection.');
-    collectionEditor.setCategory('Algebra');
-    collectionEditor.saveChanges();
+    collectionEditorPage.addExistingExploration('14');
+    collectionEditorPage.saveDraft();
+    collectionEditorPage.closeSaveModal();
+    collectionEditorPage.publishCollection();
+    collectionEditorPage.setTitle('Test Collection');
+    collectionEditorPage.setObjective('This is a test collection.');
+    collectionEditorPage.setCategory('Algebra');
+    collectionEditorPage.saveChanges();
     browser.waitForAngular();
     users.logout();
   });
@@ -180,15 +186,15 @@ describe('Learner dashboard functionality', function() {
     creatorDashboardPage.navigateToCollectionEditor();
     browser.waitForAngular();
     general.waitForSystem();
-    collectionEditor.addExistingExploration('0');
+    collectionEditorPage.addExistingExploration('0');
     browser.waitForAngular();
     general.waitForSystem();
-    collectionEditor.saveDraft();
+    collectionEditorPage.saveDraft();
     browser.waitForAngular();
     general.waitForSystem();
     element(by.css('.protractor-test-commit-message-input')).sendKeys('Update');
     browser.driver.sleep(300);
-    collectionEditor.closeSaveModal();
+    collectionEditorPage.closeSaveModal();
     general.waitForSystem();
     browser.driver.sleep(300);
     users.logout();
@@ -241,6 +247,87 @@ describe('Learner dashboard functionality', function() {
     learnerDashboardPage.expectFeedbackExplorationTitleToMatch('About Oppia');
     learnerDashboardPage.navigateToFeedbackThread();
     learnerDashboardPage.expectFeedbackMessageToMatch(feedback);
+    users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});
+
+
+describe('Subscriptions functionality', function() {
+  var creatorDashboardPage = null;
+  var preferencesPage = null;
+  var subscriptionDashboardPage = null;
+
+  beforeEach(function() {
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    preferencesPage = new PreferencesPage.PreferencesPage();
+    subscriptionDashboardPage = (
+      new SubscriptionDashboardPage.SubscriptionDashboardPage());
+  });
+
+  it('handle subscriptions to creators correctly', function() {
+    // Create two creators.
+    users.createUser('creator1@subscriptions.com', 'creator1subscriptions');
+    users.login('creator1@subscriptions.com');
+    workflow.createExploration();
+    general.waitForSystem();
+    general.waitForSystem();
+    users.logout();
+
+    users.createUser('creator2@subscriptions.com', 'creator2subscriptions');
+    users.login('creator2@subscriptions.com');
+    workflow.createExploration();
+    users.logout();
+
+    // Create a learner who subscribes to both the creators.
+    users.createUser('learner1@subscriptions.com', 'learner1subscriptions');
+    users.login('learner1@subscriptions.com');
+    browser.get('/profile/creator1subscriptions');
+    browser.waitForAngular();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
+    browser.get('/profile/creator2subscriptions');
+    browser.waitForAngular();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
+    preferencesPage.get();
+    preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
+    preferencesPage.expectDisplayedLastSubscriptionToBe('creator...');
+    users.logout();
+
+    // Create a learner who subscribes to one creator and unsubscribes from the
+    // other.
+    users.createUser('learner2@subscriptions.com', 'learner2subscriptions');
+    users.login('learner2@subscriptions.com');
+    browser.get('/profile/creator1subscriptions');
+    browser.waitForAngular();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
+    browser.get('/profile/creator2subscriptions');
+    browser.waitForAngular();
+    // Subscribe and then unsubscribe from the same user.
+    subscriptionDashboardPage.navigateToSubscriptionButton();
+    browser.waitForAngular();
+    subscriptionDashboardPage.navigateToSubscriptionButton();
+    preferencesPage.get();
+    preferencesPage.expectSubscriptionCountToEqual(1);
+    preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
+    users.logout();
+
+    users.login('creator1@subscriptions.com');
+    creatorDashboardPage.get();
+    browser.waitForAngular();
+    creatorDashboardPage.navigateToSubscriptionDashboard();
+    subscriptionDashboardPage.expectSubscriptionFirstNameToMatch('learner...');
+    subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');
+    users.logout();
+
+    users.login('creator2@subscriptions.com');
+    creatorDashboardPage.get();
+    browser.waitForAngular();
+    creatorDashboardPage.navigateToSubscriptionDashboard();
+    subscriptionDashboardPage.expectSubscriptionCountToEqual(1);
+    subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');
     users.logout();
   });
 

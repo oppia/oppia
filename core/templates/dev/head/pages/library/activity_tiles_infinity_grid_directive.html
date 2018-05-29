@@ -11,7 +11,7 @@
                              thumbnail-icon-url="activity.thumbnail_icon_url"
                              thumbnail-bg-color="activity.thumbnail_bg_color"
                              show-learner-dashboard-icons-if-possible="true"
-                             style="margin-right: 3px;">
+                             container-is-narrow="libraryWindowIsNarrow">
     </collection-summary-tile>
     <exploration-summary-tile ng-if="activity.activity_type === 'exploration'"
                               exploration-id="activity.id"
@@ -27,6 +27,7 @@
                               is-community-owned="activity.community_owned"
                               is-community-editable="activity.community_editable"
                               show-learner-dashboard-icons-if-possible="true"
+                              container-is-narrow="libraryWindowIsNarrow"
                               class="protractor-test-exp-summary-tile">
     </exploration-summary-tile>
   </div>

@@ -35,6 +35,24 @@
   .oppia-share-publish-modal .oppia-share-publish-header img {
     width: 40%;
   }
+
+  .oppia-share-publish-body .oppia-share-publish-link{
+    display: inline-grid;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link div {
+    background-color: #fcfcfc;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    display: inline-block;
+    padding: 10px;
+    margin-bottom: 2px;
+    cursor: pointer;
+  }
+
+  .oppia-share-publish-body .oppia-share-publish-link div:hover {
+    background-color: #f9f9f9;
+  }
 </style>
 
 <div class="oppia-share-publish-modal">
@@ -47,6 +65,10 @@
     <p>
       Now that you're a published Oppia teacher, you can share your creation.
     </p>
+    <div class="oppia-share-publish-link">
+      Here's your exploration link:
+      <div ng-click="selectText($event)"><[explorationLink]></div>
+    </div>
     <sharing-links flex="100" layout-type="row"
                    layout-align-type="center center"
                    twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR"

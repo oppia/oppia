@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** 
+/**
  * @fileoverview A service to provide state-specific cache for interaction
  * details. It stores customization args corresponding to an interaction id so
  * that they can be restored if the interaction is changed back while the user
@@ -28,6 +28,9 @@ oppia.factory('InteractionDetailsCacheService', [function() {
     },
     contains: function(interactionId) {
       return _cache.hasOwnProperty(interactionId);
+    },
+    removeDetails: function (interactionId) {
+      delete _cache[interactionId];
     },
     set: function(interactionId, interactionCustomizationArgs) {
       _cache[interactionId] = {

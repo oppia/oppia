@@ -335,7 +335,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/explorehandler/stats_events/<exploration_id>',
         reader.StatsEventsHandler),
     get_redirect_route(
-        r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler),
+        r'/explorehandler/store_playthrough/<exploration_id>',
+        reader.StorePlaythroughHandler),
     get_redirect_route(
         r'/explorehandler/rating/<exploration_id>', reader.RatingHandler),
     get_redirect_route(
@@ -385,17 +386,14 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler),
     get_redirect_route(
-        r'/createhandler/statisticsversion/<exploration_id>',
-        editor.ExplorationStatsVersionsHandler),
-    get_redirect_route(
-        r'/createhandler/statistics_old/<exploration_id>/<exploration_version>',
-        editor.OldExplorationStatisticsHandler),
-    get_redirect_route(
         r'/createhandler/statistics/<exploration_id>',
         editor.ExplorationStatisticsHandler),
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',  # pylint: disable=line-too-long
         editor.StateRulesStatsHandler),
+    get_redirect_route(
+        r'/createhandler/state_answer_stats/<exploration_id>',
+        editor.StateAnswerStatisticsHandler),
     get_redirect_route(
         r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler),
@@ -466,8 +464,11 @@ URLS = MAPREDUCE_HANDLERS + [
         collection_editor.CollectionUnpublishHandler),
 
     get_redirect_route(
-        r'%s/batch' % feconf.QUESTION_DATA_URL,
-        question.QuestionsBatchHandler),
+        r'%s' % feconf.QUESTION_CREATION_URL,
+        question.QuestionCreationHandler),
+    get_redirect_route(
+        r'%s/<question_id>' % feconf.QUESTION_DATA_URL,
+        question.QuestionsHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(

@@ -281,8 +281,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
 
 class UserSubscribersModel(base_models.BaseModel):
-    """The list of subscribers of the user.
-    """
+    """The list of subscribers of the user."""
+
     # IDs of the learners who have subscribed to this user.
     subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
 
@@ -393,10 +393,11 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # draft changes to this exploration since the draft_change_list_id property
     # was introduced.
     draft_change_list_id = ndb.IntegerProperty(default=0)
-    # The user's preference for receiving suggestion emails for this exploration
+    # The user's preference for receiving suggestion emails for this
+    # exploration.
     mute_suggestion_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
-    # The user's preference for receiving feedback emails for this exploration
+    # The user's preference for receiving feedback emails for this exploration.
     mute_feedback_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
 

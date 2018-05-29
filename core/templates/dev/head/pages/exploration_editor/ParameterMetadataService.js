@@ -17,11 +17,11 @@
  */
 
 oppia.factory('ParameterMetadataService', [
-  'explorationStatesService', 'ExpressionInterpolationService',
-  'explorationParamChangesService', 'GraphDataService',
+  'ExplorationStatesService', 'ExpressionInterpolationService',
+  'ExplorationParamChangesService', 'GraphDataService',
   function(
-      explorationStatesService, ExpressionInterpolationService,
-      explorationParamChangesService, GraphDataService) {
+      ExplorationStatesService, ExpressionInterpolationService,
+      ExplorationParamChangesService, GraphDataService) {
     var PARAM_ACTION_GET = 'get';
     var PARAM_ACTION_SET = 'set';
 
@@ -88,7 +88,7 @@ oppia.factory('ParameterMetadataService', [
 
       // Next, the content is evaluated.
       ExpressionInterpolationService.getParamsFromString(
-          state.content.getHtml()).forEach(
+        state.content.getHtml()).forEach(
         function(paramName) {
           result.push({
             action: PARAM_ACTION_GET,
@@ -109,7 +109,7 @@ oppia.factory('ParameterMetadataService', [
       state.interaction.answerGroups.forEach(function(group) {
         for (var k = 0; k < group.outcome.feedback.length; k++) {
           ExpressionInterpolationService.getParamsFromString(
-              group.outcome.feedback[k]).forEach(
+            group.outcome.feedback[k]).forEach(
             function(paramName) {
               result.push({
                 action: PARAM_ACTION_GET,
@@ -150,12 +150,12 @@ oppia.factory('ParameterMetadataService', [
       getUnsetParametersInfo: function(initNodeIds) {
         var graphData = GraphDataService.getGraphData();
 
-        var states = explorationStatesService.getStates();
+        var states = ExplorationStatesService.getStates();
 
         // Determine all parameter names that are used within this exploration.
         var allParamNames = [];
         var expParamMetadata = getMetadataFromParamChanges(
-          explorationParamChangesService.savedMemento);
+          ExplorationParamChangesService.savedMemento);
         var stateParamMetadatas = {};
 
         expParamMetadata.forEach(function(expParamMetadataItem) {

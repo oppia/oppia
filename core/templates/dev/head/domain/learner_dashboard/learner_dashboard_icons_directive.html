@@ -1,10 +1,19 @@
 <i class="oppia-learner-dashboard-icon fa fa-clock-o"
-   ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId())"
+   ng-if="isAddToPlaylistIconShown()"
+   ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId()) && !isContainerNarrow()"
    ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())"
    ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"
    aria-hidden="true"
    uib-tooltip="<['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]>"
    tooltip-placement="left"></i>
+<div ng-show="canActivityBeAddedToLearnerPlaylist(getActivityId()) && isContainerNarrow()" class="btn-group dropdown oppia-learner-dashboard-icon" uib-dropdown>
+  <ul style="left:-150px;top:0" class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="single-button">
+    <li role="menuitem" ng-click="addToLearnerPlaylist(getActivityId(), getActivityType())">
+      <a><['I18N_LIBRARY_ADD_TO_LEARNER_PLAYLIST' | translate]></a>
+    </li>
+  </ul>
+  <i class="fa fa-ellipsis-v dropdown-toggle" uib-dropdown-toggle></i>
+</div>
 <i class="oppia-learner-dashboard-icon fa fa-clock-o"
    ng-if="belongsToLearnerPlaylist()"
    ng-click="removeFromLearnerPlaylist(getActivityId(), getActivityTitle(), getActivityType())"
@@ -21,5 +30,13 @@
 <i class="oppia-learner-dashboard-icon fa fa-spinner"
    ng-if="belongsToIncompleteActivities()"
    aria-hidden="true"
+   tooltip-append-to-body="true"
+   tooltip-class="library-incomplete-activity-tooltip"
    uib-tooltip="<['I18N_LIBRARY_INCOMPLETE_ACTIVITY_ICON' | translate]>"
    tooltip-placement="left"></i>
+<style>
+  .library-incomplete-activity-tooltip .tooltip-inner {
+    max-width: none;
+    white-space: nowrap;
+  }
+</style>

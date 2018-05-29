@@ -25,17 +25,14 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
     def test_create_question(self):
         state = exp_domain.State.create_default_state('ABC')
         question_data = state.to_dict()
-        title = 'A Question'
         question_data_schema_version = 1
-        collection_id = 'col1'
         language_code = 'en'
         question_model = question_models.QuestionModel.create(
-            title, question_data, question_data_schema_version,
-            collection_id, language_code)
+            question_data, question_data_schema_version,
+            language_code)
 
-        self.assertEqual(question_model.title, title)
         self.assertEqual(question_model.question_data, question_data)
-        self.assertEqual(question_model.question_data_schema_version,
-                         question_data_schema_version)
-        self.assertEqual(question_model.collection_id, collection_id)
+        self.assertEqual(
+            question_model.question_data_schema_version,
+            question_data_schema_version)
         self.assertEqual(question_model.language_code, language_code)

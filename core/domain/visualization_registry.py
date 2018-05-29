@@ -51,9 +51,7 @@ class Registry(object):
         """Returns the HTML bodies for all visualizations."""
         js_directives = utils.get_file_contents(os.path.join(
             feconf.VISUALIZATIONS_DIR, 'visualizations.js'))
-        html_templates = utils.get_file_contents(os.path.join(
-            feconf.VISUALIZATIONS_DIR, 'visualizations.html'))
-        return '<script>%s</script>\n%s' % (js_directives, html_templates)
+        return '<script>%s</script>\n' % (js_directives)
 
     @classmethod
     def get_visualization_class(cls, visualization_id):
@@ -71,7 +69,8 @@ class Registry(object):
 
     @classmethod
     def get_all_visualization_ids(cls):
-        """Gets a visualization class by its id (which is also its class name).
+        """Gets a visualization class by its id
+        (which is also its class name).
         """
         if not cls.visualizations_dict:
             cls._refresh_registry()

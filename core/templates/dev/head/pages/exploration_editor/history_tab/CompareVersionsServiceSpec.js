@@ -31,7 +31,7 @@ describe('Compare versions service', function() {
         explorationId: '0'
       };
       module(function($provide) {
-        $provide.value('ExplorationDataService', mockExplorationData);
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
     });
 

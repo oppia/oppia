@@ -337,7 +337,7 @@ class SetOfNormalizedString(BaseObject):
 
 
 class MathLatexString(BaseObject):
-    """Math LaTeX string class"""
+    """Math LaTeX string class."""
 
     description = 'A LaTeX string.'
     edit_html_filename = 'math_latex_string_editor'
@@ -453,7 +453,7 @@ class CheckedProof(BaseObject):
 
 
 class LogicQuestion(BaseObject):
-    """A question giving a formula to prove"""
+    """A question giving a formula to prove."""
 
     description = 'A question giving a formula to prove.'
     edit_html_filename = 'logic_question_editor'
@@ -487,7 +487,7 @@ class LogicQuestion(BaseObject):
 
 
 class LogicErrorCategory(BaseObject):
-    """A string from a list of possible categories"""
+    """A string from a list of possible categories."""
 
     description = 'One of the possible error categories of a logic proof.'
     edit_html_filename = 'logic_error_category_editor'
@@ -504,7 +504,7 @@ class LogicErrorCategory(BaseObject):
 
 
 class Graph(BaseObject):
-    """A (mathematical) graph with edges and vertices"""
+    """A (mathematical) graph with edges and vertices."""
 
     description = 'A (mathematical) graph'
     edit_html_filename = 'graph_editor'
@@ -607,7 +607,7 @@ class Graph(BaseObject):
 
 
 class GraphProperty(BaseObject):
-    """A string from a list of possible graph properties"""
+    """A string from a list of possible graph properties."""
 
     description = 'One of the possible properties possessed by a graph.'
     edit_html_filename = 'graph_property_editor'
@@ -763,7 +763,7 @@ class ParameterName(BaseObject):
 
 
 class SetOfHtmlString(BaseObject):
-    """A Set of Html Strings"""
+    """A Set of Html Strings."""
 
     description = "A list of Html strings."
     edit_html_filename = 'set_of_html_string_editor'
@@ -825,5 +825,54 @@ class Fraction(BaseObject):
         }, {
             'name': 'denominator',
             'schema': PositiveInt.SCHEMA
+        }]
+    }
+
+
+class Units(BaseObject):
+    """Units class."""
+    # Validation of the units is performed only in the frontend using math.js.
+    # math.js is not available in the backend.
+
+    description = 'A units dict representation.'
+    default_value = {}
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': []
+    }
+
+
+class NumberWithUnits(BaseObject):
+    """Number with units class."""
+
+    description = 'A number with units expression.'
+    edit_html_filename = 'number_with_units_editor'
+    edit_js_filename = 'NumberWithUnitsEditor'
+    default_value = {
+        'type': 'real',
+        'fraction': Fraction.default_value,
+        'real': 0.0,
+        'unit': Units.default_value
+    }
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'type',
+            'schema': {
+                'type': 'unicode'
+            }
+        }, {
+            'name': 'fraction',
+            'schema': Fraction.SCHEMA
+        }, {
+            'name': 'real',
+            'schema': {
+                'type': 'float'
+            }
+        }, {
+            'name': 'unit',
+            'schema': Units.SCHEMA
         }]
     }

@@ -151,8 +151,9 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
             thread.put()
 
     def test_create_and_get_suggestion(self):
-        with self.swap(feedback_models.FeedbackThreadModel,
-                       'generate_new_thread_id', self._generate_thread_id):
+        with self.swap(
+            feedback_models.FeedbackThreadModel,
+            'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
                 self.EXP_ID2, self.user_id, 3, 'state_name', 'description', '')
         suggestion = feedback_services.get_suggestion(
@@ -281,24 +282,24 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         threads = feedback_services.get_threads(self.EXP_ID_1)
         self.assertEqual(1, len(threads))
-        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
-                                      threads[0].to_dict())
+        self.assertDictContainsSubset(
+            self.EXPECTED_THREAD_DICT, threads[0].to_dict())
 
     def test_get_all_threads(self):
-        # Create an anonymous feedback thread
+        # Create an anonymous feedback thread.
         feedback_services.create_thread(
             self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'], None,
             self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
         threads = feedback_services.get_all_threads(self.EXP_ID_1, False)
         self.assertEqual(1, len(threads))
-        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT,
-                                      threads[0].to_dict())
+        self.assertDictContainsSubset(
+            self.EXPECTED_THREAD_DICT, threads[0].to_dict())
 
         self.EXPECTED_THREAD_DICT_VIEWER['original_author_username'] = (
             self.VIEWER_USERNAME)
 
-        # Viewer creates feedback thread
+        # Viewer creates feedback thread.
         feedback_services.create_thread(
             self.EXP_ID_1, self.EXPECTED_THREAD_DICT_VIEWER['state_name'],
             self.viewer_id, self.EXPECTED_THREAD_DICT_VIEWER['subject'],
@@ -306,8 +307,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
         threads = feedback_services.get_all_threads(self.EXP_ID_1, False)
         self.assertEqual(2, len(threads))
-        self.assertDictContainsSubset(self.EXPECTED_THREAD_DICT_VIEWER,
-                                      threads[1].to_dict())
+        self.assertDictContainsSubset(
+            self.EXPECTED_THREAD_DICT_VIEWER, threads[1].to_dict())
 
     def test_get_total_open_threads_before_job_run(self):
         self.assertEqual(feedback_services.get_total_open_threads(

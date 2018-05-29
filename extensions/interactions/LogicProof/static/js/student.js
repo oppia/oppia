@@ -173,15 +173,15 @@ var logicProofStudent = (function() {
             evaluationParameters, cache);
           if (expression.arguments[0].arguments[0].type === 'integer') {
             var rangeEnd = (
-                expression.arguments[0].top_operator_name === 'less_than') ?
+              expression.arguments[0].top_operator_name === 'less_than') ?
               bounder :
               bounder + 1;
             for (var i = 1; i < rangeEnd; i++) {
               newInputs[expression.dummies[0].top_operator_name] = i;
               if (
-                  !evaluate(
-                    expression.arguments[1], newInputs, model,
-                    evaluationParameters, cache)) {
+                !evaluate(
+                  expression.arguments[1], newInputs, model,
+                  evaluationParameters, cache)) {
                 return false;
               }
             }
@@ -259,7 +259,7 @@ var logicProofStudent = (function() {
             evaluationParameters, cache);
           if (expression.arguments[0].arguments[0].type === 'integer') {
             var rangeEnd = (
-                expression.arguments[0].top_operator_name === 'less_than') ?
+              expression.arguments[0].top_operator_name === 'less_than') ?
               bounder :
               bounder + 1;
             for (var i = 1; i < rangeEnd; i++) {
@@ -299,7 +299,7 @@ var logicProofStudent = (function() {
             evaluationParameters, cache);
           if (expression.arguments[0].arguments[0].type === 'integer') {
             var rangeEnd = (
-                expression.arguments[0].top_operator_name === 'less_than') ?
+              expression.arguments[0].top_operator_name === 'less_than') ?
               bounder :
               bounder + 1;
             for (var i = rangeEnd - 1; i > 0; i--) {
@@ -786,7 +786,7 @@ var logicProofStudent = (function() {
         var expression = computeExpressionFromTemplate(
           template[i].content, matchings);
         if (!logicProofShared.checkExpressionsAreEqual(
-            protoLine[i].content, expression)) {
+          protoLine[i].content, expression)) {
           throw new logicProofShared.UserError('unmatched_line', {});
         }
       }
@@ -1214,7 +1214,7 @@ var logicProofStudent = (function() {
     for (var i = 0; i < questionInstance.mistake_table.length; i++) {
       for (var lineNumber = 0; lineNumber < proof.lines.length; lineNumber++) {
         for (var j = 0;
-             j < questionInstance.mistake_table[i].entries.length; j++) {
+          j < questionInstance.mistake_table[i].entries.length; j++) {
           var mistake = questionInstance.mistake_table[i].entries[j];
           // If the formula determining whether an error occurs cannot be
           // evaluated then the error is deemed not to have occurred. This is
@@ -1232,8 +1232,8 @@ var logicProofStudent = (function() {
           }
           if (check) {
             var mistakeMessages = renderMistakeMessages(
-                mistake, lineNumber, questionInstance.control_model,
-                parameters, questionInstance.language.operators);
+              mistake, lineNumber, questionInstance.control_model,
+              parameters, questionInstance.language.operators);
             // If the teacher has made a mistake and none of the messages they
             // have provided can be evaluated then we try to return to the
             // student as helpful a message as possible.

@@ -39,8 +39,8 @@ class CollectionSnapshotContentModel(base_models.BaseSnapshotContentModel):
 class CollectionModel(base_models.VersionedModel):
     """Versioned storage model for an Oppia collection.
 
-    This class should only be imported by the collection domain file, the
-    collection services file, and the collection model test file.
+    This class should only be imported by the collection services file
+    and the collection model test file.
     """
     SNAPSHOT_METADATA_CLASS = CollectionSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = CollectionSnapshotContentModel
@@ -105,21 +105,14 @@ class CollectionModel(base_models.VersionedModel):
 
         # TODO(msl): test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when collections
-        # are changed)
-        CollectionCommitLogEntryModel(
-            id=('collection-%s-%s' % (self.id, self.version)),
-            user_id=committer_id,
-            username=committer_username,
-            collection_id=self.id,
-            commit_type=commit_type,
-            commit_message=commit_message,
-            commit_cmds=commit_cmds,
-            version=self.version,
-            post_commit_status=collection_rights.status,
-            post_commit_community_owned=collection_rights.community_owned,
-            post_commit_is_private=(
-                collection_rights.status == feconf.ACTIVITY_STATUS_PRIVATE)
-        ).put_async()
+        # are changed).
+        collection_commit_log = CollectionCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds, collection_rights.status,
+            collection_rights.community_owned
+        )
+        collection_commit_log.collection_id = self.id
+        collection_commit_log.put_async()
 
 
 class CollectionRightsSnapshotMetadataModel(
@@ -147,6 +140,8 @@ class CollectionRightsModel(base_models.VersionedModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this collection.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to translate this collection.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this collection.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
@@ -216,7 +211,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 if committer_user_settings_model else '')
             # TODO(msl): test if put_async() leads to any problems (make
             # sure summary dicts get updated correctly when collections
-            # are changed)
+            # are changed).
             CollectionCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -233,7 +228,7 @@ class CollectionRightsModel(base_models.VersionedModel):
             ).put_async()
 
 
-class CollectionCommitLogEntryModel(base_models.BaseModel):
+class CollectionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to collections.
 
     A new instance of this model is created and saved every time a commit to
@@ -242,44 +237,28 @@ class CollectionCommitLogEntryModel(base_models.BaseModel):
     The id for this model is of the form
     'collection-{{COLLECTION_ID}}-{{COLLECTION_VERSION}}'.
     """
-    # Update superclass model to make these properties indexed.
-    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
-
-    # The id of the user.
-    user_id = ndb.StringProperty(indexed=True, required=True)
-    # The username of the user, at the time of the edit.
-    username = ndb.StringProperty(indexed=True, required=True)
     # The id of the collection being edited.
     collection_id = ndb.StringProperty(indexed=True, required=True)
-    # The type of the commit: 'create', 'revert', 'edit', 'delete'.
-    commit_type = ndb.StringProperty(indexed=True, required=True)
-    # The commit message.
-    commit_message = ndb.TextProperty(indexed=False)
-    # The commit_cmds dict for this commit.
-    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
-    # The version number of the collection after this commit. Only populated
-    # for commits to an collection (as opposed to its rights, etc.)
-    version = ndb.IntegerProperty()
-
-    # The status of the collection after the edit event ('private', 'public').
-    post_commit_status = ndb.StringProperty(indexed=True, required=True)
-    # Whether the collection is community-owned after the edit event.
-    post_commit_community_owned = ndb.BooleanProperty(indexed=True)
-    # Whether the collection is private after the edit event. Having a
-    # separate field for this makes queries faster, since an equality query
-    # on this property is faster than an inequality query on
-    # post_commit_status.
-    post_commit_is_private = ndb.BooleanProperty(indexed=True)
 
     @classmethod
-    def get_commit(cls, collection_id, version):
-        return cls.get_by_id('collection-%s-%s' % (collection_id, version))
+    def _get_instance_id(cls, collection_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            collection_id: str. The id of the collection being edited.
+            version: int. The version number of the collection after the commit.
+
+        Returns:
+            str. The commit id with the collection id and version number.
+        """
+        return 'collection-%s-%s' % (collection_id, version)
 
     @classmethod
-    def get_all_commits(cls, page_size, urlsafe_start_cursor):
-        """Fetches a list of all the commits sorted by their last updated
-        attribute.
+    def get_all_non_private_commits(
+            cls, page_size, urlsafe_start_cursor, max_age=None):
+        """Fetches a list of all the non-private commits sorted by their last
+        updated attribute.
 
         Args:
             page_size: int. The maximum number of entities to be returned.
@@ -287,11 +266,16 @@ class CollectionCommitLogEntryModel(base_models.BaseModel):
                 returned entities starts from this datastore cursor.
                 Otherwise, the returned entities start from the beginning
                 of the full list of entities.
+            max_age: datetime.timedelta. An instance of datetime.timedelta
+                representing the maximum age of the non-private commits to be
+                fetched.
+
+        Raises:
+            ValueError. max_age is neither an instance of datetime.timedelta nor
+                None.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
+            3-tuple of (results, cursor, more) where:
                 results: List of query results.
                 cursor: str or None. A query cursor pointing to the next
                     batch of results. If there are no more results, this might
@@ -300,12 +284,6 @@ class CollectionCommitLogEntryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(), page_size, urlsafe_start_cursor)
-
-    @classmethod
-    def get_all_non_private_commits(
-            cls, page_size, urlsafe_start_cursor, max_age=None):
         if not isinstance(max_age, datetime.timedelta) and max_age is not None:
             raise ValueError(
                 'max_age must be a datetime.timedelta instance or None.')
@@ -346,16 +324,16 @@ class CollectionSummaryModel(base_models.BaseModel):
     # Tags associated with this collection.
     tags = ndb.StringProperty(repeated=True, indexed=True)
 
-    # Aggregate user-assigned ratings of the collection
+    # Aggregate user-assigned ratings of the collection.
     ratings = ndb.JsonProperty(default=None, indexed=False)
 
     # Time when the collection model was last updated (not to be
     # confused with last_updated, which is the time when the
-    # collection *summary* model was last updated)
+    # collection *summary* model was last updated).
     collection_model_last_updated = ndb.DateTimeProperty(indexed=True)
     # Time when the collection model was created (not to be confused
     # with created_on, which is the time when the collection *summary*
-    # model was created)
+    # model was created).
     collection_model_created_on = ndb.DateTimeProperty(indexed=True)
 
     # The publication status of this collection.
@@ -377,14 +355,14 @@ class CollectionSummaryModel(base_models.BaseModel):
     # The user_ids of users who are allowed to view this collection.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
-    # positive (not just a revert) change to the collection's content)
+    # positive (not just a revert) change to the collection's content).
     contributor_ids = ndb.StringProperty(indexed=True, repeated=True)
     # A dict representing the contributors of non-trivial commits to this
     # collection. Each key of this dict is a user_id, and the corresponding
     # value is the number of non-trivial commits that the user has made.
     contributors_summary = ndb.JsonProperty(default={}, indexed=False)
     # The version number of the collection after this commit. Only populated
-    # for commits to an collection (as opposed to its rights, etc.)
+    # for commits to an collection (as opposed to its rights, etc.).
     version = ndb.IntegerProperty()
     # The number of nodes(explorations) that are within this collection.
     node_count = ndb.IntegerProperty()

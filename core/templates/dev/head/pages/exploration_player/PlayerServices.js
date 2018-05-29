@@ -222,22 +222,22 @@ oppia.factory('ExplorationPlayerService', [
         if (_editorPreviewMode) {
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
             _explorationId).then(function(data) {
-              exploration = ExplorationObjectFactory.createFromBackendDict(
-                data);
-              exploration.setInitialStateName(initStateName);
-              initParams(manualParamChanges);
-              AudioTranslationLanguageService.init(
-                exploration.getAllAudioLanguageCodes(),
-                null,
-                exploration.getLanguageCode(),
-                data.auto_tts_enabled);
-              AudioPreloaderService.init(exploration);
-              AudioPreloaderService.kickOffAudioPreloader(initStateName);
-              PlayerCorrectnessFeedbackEnabledService.init(
-                data.correctness_feedback_enabled);
-              _loadInitialState(successCallback);
-              NumberAttemptsService.reset();
-            });
+            exploration = ExplorationObjectFactory.createFromBackendDict(
+              data);
+            exploration.setInitialStateName(initStateName);
+            initParams(manualParamChanges);
+            AudioTranslationLanguageService.init(
+              exploration.getAllAudioLanguageCodes(),
+              null,
+              exploration.getLanguageCode(),
+              data.auto_tts_enabled);
+            AudioPreloaderService.init(exploration);
+            AudioPreloaderService.kickOffAudioPreloader(initStateName);
+            PlayerCorrectnessFeedbackEnabledService.init(
+              data.correctness_feedback_enabled);
+            _loadInitialState(successCallback);
+            NumberAttemptsService.reset();
+          });
         } else {
           var loadedExploration = null;
           if (version) {
@@ -431,7 +431,7 @@ oppia.factory('ExplorationPlayerService', [
             visitedStateNames.push(newStateName);
 
             if (oldStateName === exploration.initStateName && (
-                !explorationActuallyStarted)) {
+              !explorationActuallyStarted)) {
               StatsReportingService.recordExplorationActuallyStarted(
                 oldStateName);
               explorationActuallyStarted = true;

@@ -1,11 +1,15 @@
 <style>
+  admin-navbar .nav > li > a:focus {
+    background-color: #00376d;
+    color: #fff;
+  }
   admin-navbar .oppia-navbar-profile-admin > li > a:hover,
   admin-navbar .oppia-navbar-profile-admin > li > a:focus,
   admin-navbar .oppia-navbar-profile-admin .open > a,
   admin-navbar .oppia-navbar-profile-admin .open > a:hover,
   admin-navbar .oppia-navbar-profile-admin .open > a:focus,
   admin-navbar .oppia-navbar-tabs-admin > li > a:hover,
-  admin-navbar .oppia-navbar-tabs-admin > li > a:focus {
+  admin-navbar .oppia-navbar-tabs-admin > li > a.active {
     background-color: #fff;
     color: #00376d;
   }
@@ -105,11 +109,11 @@
           </ul>
         </li>
 
-        <ul class="nav oppia-navbar-tabs oppia-navbar-tabs-admin">
+        <ul class="nav oppia-navbar-tabs-admin">
           <li class="oppia-clickable-navbar-element pull-right">
             <a class="oppia-navbar-tab"
-               ng-click="showTab(ADMIN_TAB_URLS.MISC)"
                ng-href="<[::ADMIN_TAB_URLS.MISC]>"
+               ng-class="{active: isMiscTabOpen()}"
                uib-tooltip="Miscellaneous"
                tooltip-placement="bottom">
               Misc
@@ -117,8 +121,8 @@
           </li>
           <li class="oppia-clickable-navbar-element pull-right">
             <a class="oppia-navbar-tab protractor-test-admin-roles-tab"
-               ng-click="showTab(ADMIN_TAB_URLS.ROLES)"
                ng-href="<[::ADMIN_TAB_URLS.ROLES]>"
+               ng-class="{active: isRolesTabOpen()}"
                uib-tooltip="Roles"
                tooltip-placemnt="bottom">
               Roles
@@ -126,8 +130,8 @@
           </li>
           <li class="oppia-clickable-navbar-element pull-right">
             <a class="oppia-navbar-tab protractor-test-admin-config-tab"
-               ng-click="showTab(ADMIN_TAB_URLS.CONFIG)"
                ng-href="<[::ADMIN_TAB_URLS.CONFIG]>"
+               ng-class="{active: isConfigTabOpen()}"
                uib-tooltip="Config"
                tooltip-placement="bottom">
               Config
@@ -135,8 +139,8 @@
           </li>
           <li class="oppia-clickable-navbar-element pull-right">
             <a class="oppia-navbar-tab"
-               ng-click="showTab(ADMIN_TAB_URLS.JOBS)"
                ng-href="<[::ADMIN_TAB_URLS.JOBS]>"
+               ng-class="{active: isJobsTabOpen()}"
                uib-tooltip="Jobs"
                tooltip-placement="bottom">
               Jobs
@@ -144,8 +148,8 @@
           </li>
           <li class="oppia-clickable-navbar-element pull-right">
             <a class="oppia-navbar-tab"
-               ng-click="showTab(ADMIN_TAB_URLS.ACTIVITIES)"
                ng-href="<[::ADMIN_TAB_URLS.ACTIVITIES]>"
+               ng-class="{active: isActivitiesTabOpen()}"
                uib-tooltip="Activities"
                tooltip-placement="bottom">
               Activities

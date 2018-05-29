@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Domain objects for feedback models"""
+"""Domain objects for feedback models."""
 
 from core.domain import user_services
 import utils
@@ -39,9 +39,10 @@ class FeedbackThread(object):
             was last updated.
     """
 
-    def __init__(self, full_thread_id, exploration_id, state_name,
-                 original_author_id, status, subject, summary, has_suggestion,
-                 message_count, created_on, last_updated):
+    def __init__(
+            self, full_thread_id, exploration_id, state_name,
+            original_author_id, status, subject, summary, has_suggestion,
+            message_count, created_on, last_updated):
         """Initializes a FeedbackThread object."""
 
         self.id = full_thread_id
@@ -160,9 +161,10 @@ class FeedbackMessage(object):
         received_via_email: bool. Whether the feedback was received via email.
     """
 
-    def __init__(self, full_message_id, full_thread_id, message_id, author_id,
-                 updated_status, updated_subject, text, created_on,
-                 last_updated, received_via_email):
+    def __init__(
+            self, full_message_id, full_thread_id, message_id, author_id,
+            updated_status, updated_subject, text, created_on,
+            last_updated, received_via_email):
         self.id = full_message_id
         self.full_thread_id = full_thread_id
         self.message_id = message_id
@@ -250,8 +252,9 @@ class Suggestion(object):
         suggestion_html: str. The state's suggested content.
         """
 
-    def __init__(self, full_thread_id, author_id, exploration_id,
-                 exploration_version, state_name, description, suggestion_html):
+    def __init__(
+            self, full_thread_id, author_id, exploration_id,
+            exploration_version, state_name, description, suggestion_html):
         """Initializes a Suggestion object."""
         self.id = full_thread_id
         self.author_id = author_id

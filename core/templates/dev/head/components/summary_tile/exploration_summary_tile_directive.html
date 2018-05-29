@@ -2,10 +2,13 @@
                          activity-type="ACTIVITY_TYPE_EXPLORATION"
                          activity-id="getExplorationId()"
                          activity-title="getExplorationTitle()"
-                         activity-active="explorationIsCurrentlyHoveredOver">
+                         container-is-narrow="isContainerNarrow()"
+                         activity-active="explorationIsCurrentlyHoveredOver"
+                         add-to-playlist-icon-is-shown="!isOwnedByCurrentUser()">
 </learner-dashboard-icons>
+
 <md-card ng-class="[isCollectionPreviewTile ? 'oppia-activity-summary-tile-mobile' : 'oppia-activity-summary-tile', {'small-width': !isWindowLarge}, {'oppia-activity-playlist-tile': isPlaylistTile()}]"
-         style="position: relative; z-index: 5;">
+         style="position: relative; z-index: 5;" ng-if="!isRefresherExploration">
   <a ng-href="<[getExplorationLink()]>" target="<[openInNewWindow ? '_blank' : '_self']>">
     <div class="title-section" style="background-color: <[getThumbnailBgColor()]>;">
       <img class="thumbnail-image" ng-src="<[getCompleteThumbnailIconUrl()]>" alt="<[getCategory()]>" ng-style="isPlaylistTile() && {'top': '4px', 'width': '50px'}">
@@ -15,7 +18,7 @@
       </h3>
 
       <!-- Note that if this is ng-if instead, the avatar area will not detect a mouseover and the tile will behave incorrectly. -->
-      <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars" ng-show="avatarsList.length > 0">
+      <div ng-show="isWindowLarge && avatarsList.length > 0" class="exploration-summary-avatars">
         <div>
           <circular-image ng-if="avatarsList.length > 0"
                           src="avatarsList[0].image"
@@ -76,3 +79,12 @@
     </div>
   </a>
 </md-card>
+<md-button class="oppia-learner-confirm-button protractor-test-return-to-parent-button"
+           style="margin-top: 12px;"
+           ng-if="isRefresherExploration"
+           ng-click="loadParentExploration()">
+  <span translate="I18N_PLAYER_RETURN_TO_PARENT"></span>
+  <i class="fa fa-arrow-right"
+     style="font-size: 19px; padding-top: 1.5px;">
+  </i>
+</md-button>

@@ -42,8 +42,8 @@ oppia.factory('ExplorationEmbedButtonService', [
                 $uibModalInstance.dismiss('close');
               };
 
-              $scope.selectText = function($event) {
-                var codeDiv = $event.currentTarget;
+              $scope.selectText = function(evt) {
+                var codeDiv = evt.currentTarget;
                 var range = document.createRange();
                 range.setStartBefore(codeDiv.firstChild);
                 range.setEndAfter(codeDiv.lastChild);

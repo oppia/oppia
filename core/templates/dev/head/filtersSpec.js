@@ -35,7 +35,8 @@ describe('Testing filters', function() {
     'summarizeNonnegativeNumber',
     'truncateAndCapitalize',
     'capitalize',
-    'stripFormatting'
+    'stripFormatting',
+    'getAbbreviatedText'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -231,8 +232,8 @@ describe('Testing filters', function() {
       expect(filter(12389654281)).toEqual('12.4B');
       expect(filter(897978581123)).toEqual('898.0B');
       expect(filter(476678)).toEqual('476.7K');
-    }
-  ));
+    })
+  );
 
   it(
     'should capitalize first letter and truncate string at a word break',
@@ -271,8 +272,8 @@ describe('Testing filters', function() {
       // return whole objective.
       expect(filter('please do not test empty string', 100)).toEqual(
         'Please do not test empty string');
-    }
-  ));
+    })
+  );
 
   it(
     'should remove all tags except img tags with the whitelisted classes',
@@ -431,8 +432,8 @@ describe('Testing filters', function() {
         $filter('stripFormatting')(BREAKLINE_TEXT, whitelistedImgClasses)
       ).toEqual('<p>Oppia makes it easy to create interactive lessons </p>' +
       '<p><br></p><p>that educate and engage.</p>');
-    }
-  ));
+    })
+  );
 
   it('should correctly capitalize strings', inject(function($filter) {
     var filter = $filter('capitalize');
@@ -452,6 +453,31 @@ describe('Testing filters', function() {
     expect(filter('  only First lettEr is  Affected ')).toEqual(
       'Only First lettEr is  Affected');
   }));
+
+  it('should not shorten the length of text', inject(function($filter) {
+    expect($filter('getAbbreviatedText')('It will remain unchanged.', 50))
+      .toBe('It will remain unchanged.');
+    expect($filter('getAbbreviatedText')(
+      'Itisjustaverylongsinglewordfortesting',
+      50)).toBe('Itisjustaverylongsinglewordfortesting');
+  }));
+
+  it('should shorten the length of text', inject(function($filter) {
+    expect($filter('getAbbreviatedText')(
+      'It has to convert to a substring as it exceeds the character limit.',
+      50)).toBe('It has to convert to a substring as it exceeds...');
+    expect($filter('getAbbreviatedText')(
+      'ItisjustaverylongsinglewordfortestinggetAbbreviatedText',
+      50)).toBe('ItisjustaverylongsinglewordfortestinggetAbbreviate...');
+    expect($filter('getAbbreviatedText')(
+      'â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od; /⏬®;😁☕😁:☝)😁😁😍1!@#',
+      50)).toBe('â, ??î or ôu🕧� n☁i✑💴++$-💯 ♓!🇪🚑🌚‼⁉4⃣od;...');
+    expect($filter('getAbbreviatedText')(
+      'It is just a very long singlewordfortestinggetAbbreviatedText',
+      50)).toBe('It is just a very long...');
+  }));
+
+
 
   it('should get correct list of RTE components from HTML input',
     inject(function($filter) {
@@ -552,9 +578,39 @@ describe('Testing filters', function() {
 
       expect($filter('convertToPlainText')($filter('formatRtePreview')(
         $filter('parameterizeRuleDescription')(ruleMixed, interactionIdMixed,
-        choicesMixed)))
+          choicesMixed)))
       ).toEqual('is ' + 'equal to \'[Image] This is a text ' +
         'input. [Image]  [Link]\'');
-    }
-  ));
+    })
+  );
+
+  it('should correctly parameterize rule description filter',
+    inject(function($filter) {
+      var ruleMultipleChoice = {
+        type: 'Equals',
+        inputs: {
+          x: 0
+        }
+      };
+      var interactionIdMultipleChoice = 'TextInput';
+      var choicesMultipleChoice = [
+        {
+          label: '$10 should not become $$10',
+          val: 0
+        }
+      ];
+      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
+        interactionIdMultipleChoice, choicesMultipleChoice)
+      ).toEqual('is equal to \'$10 should not become $$10\'');
+
+      choicesMultipleChoice = [
+        {
+          label: '$xyz should not become $$xyz',
+          val: 0
+        }
+      ];
+      expect($filter('parameterizeRuleDescription')(ruleMultipleChoice,
+        interactionIdMultipleChoice, choicesMultipleChoice)
+      ).toEqual('is equal to \'$xyz should not become $$xyz\'');
+    }));
 });

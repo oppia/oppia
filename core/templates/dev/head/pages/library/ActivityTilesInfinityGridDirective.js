@@ -24,8 +24,8 @@ oppia.directive('activityTilesInfinityGrid', [
         '/pages/library/' +
         'activity_tiles_infinity_grid_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'SearchService',
-        function($scope, $rootScope, SearchService) {
+        '$scope', '$rootScope', 'SearchService', 'WindowDimensionsService',
+        function($scope, $rootScope, SearchService, WindowDimensionsService) {
           $scope.endOfPageIsReached = false;
           $scope.allActivitiesInOrder = [];
           // Called when the first batch of search results is retrieved from the
@@ -52,6 +52,16 @@ oppia.directive('activityTilesInfinityGrid', [
               });
             }
           };
+
+          var libraryWindowCutoffPx = 530;
+          $scope.libraryWindowIsNarrow = (
+            WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+
+          WindowDimensionsService.registerOnResizeHook(function() {
+            $scope.libraryWindowIsNarrow = (
+              WindowDimensionsService.getWidth() <= libraryWindowCutoffPx);
+            $scope.$apply();
+          });
         }
       ]
     };

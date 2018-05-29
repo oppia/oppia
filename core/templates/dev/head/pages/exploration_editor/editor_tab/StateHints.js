@@ -19,13 +19,13 @@
 oppia.controller('StateHints', [
   '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
   'AlertsService', 'INTERACTION_SPECS', 'stateHintsService',
-  'explorationStatesService', 'stateInteractionIdService',
+  'ExplorationStatesService', 'stateInteractionIdService',
   'UrlInterpolationService', 'HintObjectFactory', 'ExplorationPlayerService',
   'stateSolutionService',
   function(
       $scope, $rootScope, $uibModal, $filter, EditorStateService,
       AlertsService, INTERACTION_SPECS, stateHintsService,
-      explorationStatesService, stateInteractionIdService,
+      ExplorationStatesService, stateInteractionIdService,
       UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
       stateSolutionService) {
     $scope.EditorStateService = EditorStateService;
@@ -39,7 +39,7 @@ oppia.controller('StateHints', [
     $scope.$on('stateEditorInitialized', function(evt, stateData) {
       stateHintsService.init(
         EditorStateService.getActiveStateName(),
-          stateData.interaction.hints);
+        stateData.interaction.hints);
       $scope.activeHintIndex = null;
     });
 
@@ -62,8 +62,8 @@ oppia.controller('StateHints', [
     $scope.changeActiveHintIndex = function(newIndex) {
       var currentActiveIndex = $scope.activeHintIndex;
       if (currentActiveIndex !== null && (
-          !stateHintsService.displayed[currentActiveIndex]
-            .hintContent.getHtml())) {
+        !stateHintsService.displayed[currentActiveIndex]
+          .hintContent.getHtml())) {
         if (stateSolutionService.savedMemento &&
           stateHintsService.displayed.length === 1) {
           openDeleteLastHintModal();

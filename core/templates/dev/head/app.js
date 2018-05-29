@@ -38,13 +38,10 @@ oppia.constant(
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
-oppia.constant('RULE_TYPE_CLASSIFIER', 'FuzzyMatches');
 oppia.constant('OBJECT_EDITOR_URL_PREFIX', '/object_editor_template/');
 // Feature still in development.
 // NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
 oppia.constant('ENABLE_ML_CLASSIFIERS', false);
-// NOTE TO DEVELOPERS: This should be synchronized with the value in feconf.
-oppia.constant('ENABLE_NEW_STATS_FRAMEWORK', false);
 // Feature still in development.
 oppia.constant('INFO_MESSAGE_SOLUTION_IS_INVALID',
   'The current solution does not lead to another card.');
@@ -274,10 +271,10 @@ oppia.config(['$provide', function($provide) {
 
 oppia.config([
   '$compileProvider', '$httpProvider', '$interpolateProvider',
-  '$locationProvider',
+  '$locationProvider', '$cookiesProvider',
   function(
       $compileProvider, $httpProvider, $interpolateProvider,
-      $locationProvider) {
+      $locationProvider, $cookiesProvider) {
     // This improves performance by disabling debug data. For more details,
     // see https://code.angularjs.org/1.5.5/docs/guide/production
     $compileProvider.debugInfoEnabled(false);
@@ -292,6 +289,9 @@ oppia.config([
     if (window.location.pathname === '/search/find') {
       $locationProvider.html5Mode(true);
     }
+
+    // Prevent storing duplicate cookies for translation language.
+    $cookiesProvider.defaults.path = '/';
 
     // Set default headers for POST and PUT requests.
     $httpProvider.defaults.headers.post = {
@@ -374,7 +374,6 @@ oppia.config(['toastrConfig', function(toastrConfig) {
     messageClass: 'toast-message',
     progressBar: false,
     tapToDismiss: true,
-    timeOut: 1500,
     titleClass: 'toast-title'
   });
 }]);
@@ -590,6 +589,10 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     },
     registerFinishExploration: function() {
       _sendEventToGoogleAnalytics('PlayerFinishExploration', 'click', '');
+    },
+    registerOpenFractionsFromLandingPageEvent: function(viewerType) {
+      _sendEventToGoogleAnalytics(
+        'OpenFractionsFromLandingPage', 'click', viewerType);
     }
   };
 }]);

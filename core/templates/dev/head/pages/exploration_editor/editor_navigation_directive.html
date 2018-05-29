@@ -15,12 +15,11 @@
   }
   editor-navigation .oppia-exploration-open-threads-indicator {
     border-radius: 10%;
-    bottom: 10px;
-    height: 13px;
+    bottom: 5px;
+    height: 15px;
     position: absolute;
-    right: 5px;
+    right: 3px;
     text-align: center;
-    width: 16px;
   }
 </style>
 <ul class="nav navbar-nav oppia-navbar-nav pull-right ng-cloak" style="margin-left: 20px;">
@@ -64,7 +63,7 @@
 
   <li ng-if="isLargeScreen && userIsLoggedIn" ng-class="{'active': getTabStatuses().active === 'stats'}">
     <a href="#" uib-tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()"
-       class="oppia-editor-navbar-tab-anchor">
+       class="oppia-editor-navbar-tab-anchor protractor-test-stats-tab">
       <i class="material-icons">&#xE24B;</i>
     </a>
   </li>
@@ -84,7 +83,7 @@
     </a>
     <div ng-show="getOpenThreadsCount()" class="oppia-exploration-open-threads-indicator oppia-exploration-open-threads-color">
       <span class="oppia-exploration-open-threads-count">
-        <[getOpenThreadsCount()]>
+        <[getOpenThreadsCount()]>&nbsp;open
       </span>
     </div>
   </li>

@@ -173,11 +173,11 @@ class ExplorationDisplayableSummariesTest(
 
     def test_get_displayable_exp_summary_dicts_matching_ids(self):
         # A list of exp_id's are passed in:
-        # EXP_ID_1 -- private exploration owned by Albert
-        # EXP_ID_2 -- pubished exploration owned by Albert
-        # EXP_ID_3 -- deleted exploration
-        # EXP_ID_5 -- private exploration owned by Bob
-        # Should only return [EXP_ID_2]
+        # EXP_ID_1 -- private exploration owned by Albert.
+        # EXP_ID_2 -- pubished exploration owned by Albert.
+        # EXP_ID_3 -- deleted exploration.
+        # EXP_ID_5 -- private exploration owned by Bob.
+        # Should only return [EXP_ID_2].
 
         displayable_summaries = (
             summary_services.get_displayable_exp_summary_dicts_matching_ids(
@@ -197,8 +197,8 @@ class ExplorationDisplayableSummariesTest(
             'title': u'Exploration 2 Albert title',
         }
         self.assertIn('last_updated_msec', displayable_summaries[0])
-        self.assertDictContainsSubset(expected_summary,
-                                      displayable_summaries[0])
+        self.assertDictContainsSubset(
+            expected_summary, displayable_summaries[0])
 
     def test_get_public_and_filtered_private_summary_dicts_for_creator(self):
         # If a new exploration is created by another user (Bob) and not public,
@@ -251,10 +251,11 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'reload_exploration',
-            'exploration_id': '2'
-        }, csrf_token)
+        self.post_json(
+            '/adminhandler', {
+                'action': 'reload_exploration',
+                'exploration_id': '2'
+            }, csrf_token)
         self.logout()
 
     def test_get_library_groups(self):
@@ -273,7 +274,7 @@ class LibraryGroupsTest(exp_services_test.ExplorationServicesUnitTests):
             'ratings': feconf.get_empty_ratings(),
             'status': u'public',
             'tags': [],
-            'title':  u'The Lazy Magician',
+            'title': u'The Lazy Magician',
             'thumbnail_bg_color': '#d0982a',
             'thumbnail_icon_url': '/subjects/Algorithms.svg',
         }
@@ -605,8 +606,7 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_at_most_eight_top_rated_explorations(self):
-        """Note that at most 8 explorations should be returned.
-        """
+        """Note that at most 8 explorations should be returned."""
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_2, 5)
         rating_services.assign_rating_to_exploration(
@@ -666,8 +666,8 @@ class TopRatedExplorationDisplayableSummariesTest(
         self.assertEqual(expected_ordering, actual_ordering)
 
     def test_only_explorations_with_ratings_are_returned(self):
-        """Note that only explorations with ratings will be included
-        """
+        """Note that only explorations with ratings will be included."""
+
         rating_services.assign_rating_to_exploration(
             self.bob_id, self.EXP_ID_2, 5)
 
@@ -727,8 +727,8 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         - (7) Admin user is set up.
         """
 
-        super(RecentlyPublishedExplorationDisplayableSummariesTest,
-              self).setUp()
+        super(
+            RecentlyPublishedExplorationDisplayableSummariesTest, self).setUp()
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -753,8 +753,7 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         self.set_admins([self.ADMIN_USERNAME])
 
     def test_for_recently_published_explorations(self):
-        """ Tests for recently published explorations.
-        """
+        """Tests for recently published explorations."""
 
         recently_published_exploration_summaries = (
             summary_services.get_recently_published_exp_summary_dicts(
@@ -909,25 +908,30 @@ class CollectionNodeMetadataDictsTest(
         self.albert = user_services.UserActionsInfo(self.albert_id)
         self.bob = user_services.UserActionsInfo(self.bob_id)
 
-        self.save_new_valid_exploration(self.EXP_ID1, self.albert_id,
-                                        title='Exploration 1 Albert title',
-                                        objective='An objective 1')
+        self.save_new_valid_exploration(
+            self.EXP_ID1, self.albert_id,
+            title='Exploration 1 Albert title',
+            objective='An objective 1')
 
-        self.save_new_valid_exploration(self.EXP_ID2, self.albert_id,
-                                        title='Exploration 2 Albert title',
-                                        objective='An objective 2')
+        self.save_new_valid_exploration(
+            self.EXP_ID2, self.albert_id,
+            title='Exploration 2 Albert title',
+            objective='An objective 2')
 
-        self.save_new_valid_exploration(self.EXP_ID3, self.albert_id,
-                                        title='Exploration 3 Albert title',
-                                        objective='An objective 3')
+        self.save_new_valid_exploration(
+            self.EXP_ID3, self.albert_id,
+            title='Exploration 3 Albert title',
+            objective='An objective 3')
 
-        self.save_new_valid_exploration(self.EXP_ID4, self.bob_id,
-                                        title='Exploration 4 Bob title',
-                                        objective='An objective 4')
+        self.save_new_valid_exploration(
+            self.EXP_ID4, self.bob_id,
+            title='Exploration 4 Bob title',
+            objective='An objective 4')
 
-        self.save_new_valid_exploration(self.EXP_ID5, self.albert_id,
-                                        title='Exploration 5 Albert title',
-                                        objective='An objective 5')
+        self.save_new_valid_exploration(
+            self.EXP_ID5, self.albert_id,
+            title='Exploration 5 Albert title',
+            objective='An objective 5')
 
         rights_manager.publish_exploration(self.albert, self.EXP_ID1)
         rights_manager.publish_exploration(self.albert, self.EXP_ID2)

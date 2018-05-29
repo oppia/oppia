@@ -47,7 +47,9 @@ oppia.directive('explorationSummaryTile', [
         isPlaylistTile: '&isPlaylistTile',
         getParentExplorationIds: '&parentExplorationIds',
         showLearnerDashboardIconsIfPossible: (
-          '&showLearnerDashboardIconsIfPossible')
+          '&showLearnerDashboardIconsIfPossible'),
+        isContainerNarrow: '&containerIsNarrow',
+        isOwnedByCurrentUser: '&activityIsOwnedByCurrentUser',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
@@ -79,11 +81,11 @@ oppia.directive('explorationSummaryTile', [
         );
       },
       controller: [
-        '$scope', '$http',
+        '$scope', '$http', '$window',
         'DateTimeFormatService', 'RatingComputationService',
         'WindowDimensionsService', 'UrlService',
         function(
-            $scope, $http,
+            $scope, $http, $window,
             DateTimeFormatService, RatingComputationService,
             WindowDimensionsService, UrlService) {
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
@@ -94,12 +96,18 @@ oppia.directive('explorationSummaryTile', [
             contributorsSummary).sort(
             function(contributorUsername1, contributorUsername2) {
               var commitsOfContributor1 = contributorsSummary[
-                  contributorUsername1].num_commits;
+                contributorUsername1].num_commits;
               var commitsOfContributor2 = contributorsSummary[
-                  contributorUsername2].num_commits;
+                contributorUsername2].num_commits;
               return commitsOfContributor2 - commitsOfContributor1;
             }
           );
+
+          $scope.isRefresherExploration = false;
+          if ($scope.getParentExplorationIds()) {
+            $scope.isRefresherExploration = (
+              $scope.getParentExplorationIds().length > 0);
+          }
 
           $scope.avatarsList = [];
 
@@ -107,6 +115,10 @@ oppia.directive('explorationSummaryTile', [
 
           $scope.setHoverState = function(hoverState) {
             $scope.explorationIsCurrentlyHoveredOver = hoverState;
+          };
+
+          $scope.loadParentExploration = function() {
+            $window.location.href = $scope.getExplorationLink();
           };
 
           $scope.getAverageRating = function() {
@@ -130,20 +142,29 @@ oppia.directive('explorationSummaryTile', [
               return '#';
             } else {
               var result = '/explore/' + $scope.getExplorationId();
-              if ($scope.getCollectionId()) {
-                result = UrlService.addField(
-                  result, 'collection_id', $scope.getCollectionId());
+              var urlParams = UrlService.getUrlParams();
+              var parentExplorationIds = $scope.getParentExplorationIds();
+
+              var collectionIdToAdd = $scope.getCollectionId();
+              // Replace the collection ID with the one in the URL if it exists
+              // in urlParams.
+              if (parentExplorationIds &&
+                  urlParams.hasOwnProperty('collection_id')) {
+                collectionIdToAdd = urlParams.collection_id;
               }
-              if ($scope.getParentExplorationIds()) {
-                var parentExplorationIds = $scope.getParentExplorationIds();
-                for (var i = 0; i < parentExplorationIds.length - 1; i++ ) {
+
+              if (collectionIdToAdd) {
+                result = UrlService.addField(
+                  result, 'collection_id', collectionIdToAdd);
+              }
+              if (parentExplorationIds) {
+                for (var i = 0; i < parentExplorationIds.length - 1; i++) {
                   result = UrlService.addField(
                     result, 'parent', parentExplorationIds[i]);
                 }
-                return result;
               }
+              return result;
             }
-            return result;
           };
 
           if (!$scope.mobileCutoffPx) {

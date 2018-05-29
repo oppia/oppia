@@ -91,13 +91,13 @@ oppia.factory('RteHelperService', [
         }
         var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
         if (componentDefn.previewUrlTemplate.indexOf(
-            '/rich_text_components') === 0) {
+          '/rich_text_components') === 0) {
           var interpolatedUrl = UrlInterpolationService.getExtensionResourceUrl(
             componentPreviewUrlTemplate);
         } else {
           var interpolatedUrl = ($interpolate(
             componentPreviewUrlTemplate, false, null, true)(
-              customizationArgsDict));
+            customizationArgsDict));
         }
 
         if (!interpolatedUrl) {
@@ -180,6 +180,30 @@ oppia.factory('RteHelperService', [
             return jQueryElt.get(0);
           });
         });
+
+        var textElt = elt[0].childNodes;
+        for (var i = textElt.length; i > 0; i--) {
+          for (var j = textElt[i - 1].childNodes.length; j > 0; j--) {
+            if (textElt[i - 1].childNodes[j - 1].nodeName === 'BR' ||
+              (textElt[i - 1].childNodes[j - 1].nodeName === '#text' &&
+                textElt[i - 1].childNodes[j - 1].nodeValue.trim() === '')) {
+              textElt[i - 1].childNodes[j - 1].remove();
+            } else {
+              break;
+            }
+          }
+          if (textElt[i - 1].childNodes.length === 0) {
+            if (textElt[i - 1].nodeName === 'BR' ||
+              (textElt[i - 1].nodeName === '#text' &&
+                textElt[i - 1].nodeValue.trim() === '') ||
+                textElt[i - 1].nodeName === 'P') {
+              textElt[i - 1].remove();
+              continue;
+            }
+          } else {
+            break;
+          }
+        }
 
         return elt.html();
       },

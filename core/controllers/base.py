@@ -127,7 +127,7 @@ class BaseHandler(webapp2.RequestHandler):
     # users have agreed to the latest terms.
     REDIRECT_UNFINISHED_SIGNUPS = True
 
-    # What format the get method returns when exception raised, json or html
+    # What format the get method returns when exception raised, json or html.
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_HTML
 
     @webapp2.cached_property
@@ -244,7 +244,8 @@ class BaseHandler(webapp2.RequestHandler):
                     '%s: payload %s',
                     e, self.payload)
 
-                return self.handle_exception(e, self.app.debug)
+                self.handle_exception(e, self.app.debug)
+                return
 
         super(BaseHandler, self).dispatch()
 
@@ -316,7 +317,6 @@ class BaseHandler(webapp2.RequestHandler):
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'DEV_MODE': feconf.DEV_MODE,
-            'MINIFICATION': feconf.IS_MINIFIED,
             'DOMAIN_URL': '%s://%s' % (scheme, netloc),
             'ACTIVITY_STATUS_PRIVATE': (
                 rights_manager.ACTIVITY_STATUS_PRIVATE),
@@ -441,7 +441,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Overwrites the default exception handler.
 
         Args:
-            exception: The exception that was thrown.
+            exception: Exception. The exception that was thrown.
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
@@ -456,8 +456,9 @@ class BaseHandler(webapp2.RequestHandler):
         if isinstance(exception, self.PageNotFoundException):
             logging.error('Invalid URL requested: %s', self.request.uri)
             self.error(404)
-            self._render_exception(404, {
-                'error': 'Could not find the page %s.' % self.request.uri})
+            self._render_exception(
+                404, {
+                    'error': 'Could not find the page %s.' % self.request.uri})
             return
 
         if isinstance(exception, self.UnauthorizedUserException):
@@ -572,6 +573,9 @@ class CsrfTokenManager(object):
         Args:
             user_id: str. The user_id to validate the CSRF token against.
             token: str. The CSRF token to validate.
+
+        Returns:
+            bool. Whether the given CSRF token is valid.
         """
         try:
             parts = token.split('/')

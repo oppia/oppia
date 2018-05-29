@@ -27,14 +27,14 @@ oppia.constant('LIBRARY_PAGE_MODES', {
 });
 
 oppia.controller('Library', [
-  '$scope', '$http', '$uibModal', '$rootScope', '$window', '$timeout',
+  '$scope', '$http', '$log', '$uibModal', '$rootScope', '$window', '$timeout',
   'ConstructTranslationIdsService', 'UrlService', 'ALL_CATEGORIES',
   'SearchService', 'WindowDimensionsService', 'UrlInterpolationService',
   'LIBRARY_PAGE_MODES', 'LIBRARY_TILE_WIDTH_PX', 'AlertsService',
   'LearnerDashboardIdsBackendApiService',
   'LearnerDashboardActivityIdsObjectFactory', 'LearnerPlaylistService',
   function(
-      $scope, $http, $uibModal, $rootScope, $window, $timeout,
+      $scope, $http, $log, $uibModal, $rootScope, $window, $timeout,
       ConstructTranslationIdsService, UrlService, ALL_CATEGORIES,
       SearchService, WindowDimensionsService, UrlInterpolationService,
       LIBRARY_PAGE_MODES, LIBRARY_TILE_WIDTH_PX, AlertsService,
@@ -66,19 +66,63 @@ oppia.controller('Library', [
           group_name: $scope.groupName
         }
       }).success(
-      function(data) {
-        $scope.activityList = data.activity_list;
+        function(data) {
+          $scope.activityList = data.activity_list;
 
-        $scope.groupHeaderI18nId = data.header_i18n_id;
+          $scope.groupHeaderI18nId = data.header_i18n_id;
 
-        $rootScope.$broadcast(
-          'preferredLanguageCodesLoaded', data.preferred_language_codes);
+          $rootScope.$broadcast(
+            'preferredLanguageCodesLoaded', data.preferred_language_codes);
 
-        $rootScope.loadingMessage = '';
-      });
+          $rootScope.loadingMessage = '';
+        });
     } else {
       $http.get('/libraryindexhandler').success(function(data) {
         $scope.libraryGroups = data.activity_summary_dicts_by_category;
+
+        $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
+        $scope.activitiesOwned = {explorations: {}, collections: {}};
+        if ($scope.userIsLoggedIn) {
+          $http.get('/creatordashboardhandler/data')
+            .then(function(response) {
+              $scope.libraryGroups.forEach(function(libraryGroup) {
+                var activitySummaryDicts = libraryGroup.activity_summary_dicts;
+
+                var ACTIVITY_TYPE_EXPLORATION = 'exploration';
+                var ACTIVITY_TYPE_COLLECTION = 'collection';
+                activitySummaryDicts.forEach(function(activitySummaryDict) {
+                  if (activitySummaryDict.activity_type === (
+                    ACTIVITY_TYPE_EXPLORATION)) {
+                    $scope.activitiesOwned.explorations[
+                      activitySummaryDict.id] = false;
+                  } else if (activitySummaryDict.activity_type === (
+                    ACTIVITY_TYPE_COLLECTION)) {
+                    $scope.activitiesOwned.collections[
+                      activitySummaryDict.id] = false;
+                  } else {
+                    $log.error('INVALID ACTIVITY TYPE: Activity' +
+                    '(id: ' + activitySummaryDict.id +
+                    ', name: ' + activitySummaryDict.title +
+                    ', type: ' + activitySummaryDict.activity_type +
+                    ') has an invalid activity type, which could ' +
+                    'not be recorded as an exploration or a collection.');
+                  }
+                });
+
+                response.data.explorations_list
+                  .forEach(function(ownedExplorations) {
+                    $scope.activitiesOwned.explorations[
+                      ownedExplorations.id] = true;
+                  });
+
+                response.data.collections_list
+                  .forEach(function(ownedCollections) {
+                    $scope.activitiesOwned.collections[
+                      ownedCollections.id] = true;
+                  });
+              });
+            });
+        }
 
         $rootScope.$broadcast(
           'preferredLanguageCodesLoaded', data.preferred_language_codes);
@@ -94,7 +138,7 @@ oppia.controller('Library', [
         // If not produce an error that would be caught by e2e tests.
         $timeout(function () {
           var actualWidth = $('exploration-summary-tile').width();
-          if (actualWidth && actualWidth != LIBRARY_TILE_WIDTH_PX) {
+          if (actualWidth && actualWidth !== LIBRARY_TILE_WIDTH_PX) {
             console.error(
               'The actual width of tile is different than the expected width.' +
               ' Actual size: ' + actualWidth + ', Expected size: ' +

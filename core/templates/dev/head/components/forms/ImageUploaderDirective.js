@@ -33,7 +33,7 @@ oppia.directive('imageUploader', [
         var onDragEnd = function(e) {
           e.preventDefault();
           $('.image-uploader-drop-area').removeClass(
-              'image-uploader-is-active');
+            'image-uploader-is-active');
         };
 
         var validateUploadedFile = function(file, filename) {

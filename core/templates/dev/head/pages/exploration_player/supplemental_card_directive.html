@@ -1,13 +1,13 @@
 <div class="conversation-skin-supplemental-card">
-  <div ng-if="helpCardHtml" class="conversation-skin-help-card"
-       ng-class="{'help-card-standard': isWindowTall(), 'help-card-fixed': !isWindowTall() || !canWindowShowTwoCards()}" >
+  <div ng-if="helpCardHtml" class="conversation-skin-help-card help-card-standard"
+       ng-style="!isHelpCardTall() ? {'top': getHelpCardBottomPosition()} : {}">
     <img class="conversation-skin-oppia-avatar"
          ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>" alt="">
     <button type="button" class="conversation-skin-close-help-card-button"
             ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
-    <div class="conversation-skin-help-card-content" angular-html-bind="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()"></div>
+    <div class="rte-viewer conversation-skin-help-card-content" angular-html-bind="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()"></div>
     <br>
     <continue-button ng-if="helpCardHasContinueButton"
                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
@@ -45,13 +45,9 @@
   }
 
   .help-card-standard {
-    bottom: -50px;
+    /* Use margin-bottom to make sure the help card doesn't get hidden behind the footer. */
+    margin-bottom: 80px;
     position: absolute;
-  }
-
-  .help-card-fixed {
-    bottom: 50px;
-    position: fixed;
   }
 
   .conversation-skin-help-card .conversation-skin-oppia-avatar {

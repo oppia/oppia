@@ -39,6 +39,7 @@ class FileMetadata(object):
     Attributes:
         size: int. The size of the file, in bytes.
     """
+
     def __init__(self, metadata):
         """Constructs a FileMetadata object.
 
@@ -49,6 +50,11 @@ class FileMetadata(object):
 
     @property
     def size(self):
+        """Returns the size of the file, in bytes.
+
+        Returns:
+            int. The size of the file, in bytes.
+        """
         return self._size
 
 
@@ -85,10 +91,20 @@ class FileStreamWithMetadata(object):
 
     @property
     def metadata(self):
+        """Returns the file metadata model instance.
+
+        Returns:
+            FileMetadataModel. The file metadata model instance.
+        """
         return self._metadata
 
     @property
     def version(self):
+        """Returns the version number of the file.
+
+        Returns:
+            int. The version number of the file.
+        """
         return self._version
 
 
@@ -125,6 +141,11 @@ class ExplorationFileSystem(object):
 
     @property
     def exploration_id(self):
+        """Returns the id of the exploration.
+
+        Returns:
+            str. The exploration id.
+        """
         return self._exploration_id
 
     def _get_file_metadata(self, filepath, version):
@@ -309,7 +330,7 @@ class DiskBackedFileSystem(object):
     This implementation ignores versioning and is used only by tests.
 
     Attributes:
-        root: str. the path to append to the oppia/ directory.
+        root: str. The path to append to the oppia/ directory.
         exploration_id: str. The id of the exploration.
     """
 
@@ -317,13 +338,18 @@ class DiskBackedFileSystem(object):
         """Constructor for this class.
 
         Args:
-            root: str. the path to append to the oppia/ directory.
+            root: str. The path to append to the oppia/ directory.
         """
         self._root = os.path.join(os.getcwd(), root)
         self._exploration_id = 'test'
 
     @property
     def exploration_id(self):
+        """Returns the id of the exploration.
+
+        Returns:
+            str. The exploration id.
+        """
         return self._exploration_id
 
     def isfile(self, filepath):
@@ -355,12 +381,46 @@ class DiskBackedFileSystem(object):
         return FileStreamWithMetadata(content, None, None)
 
     def commit(self, user_id, filepath, raw_bytes, mimetype):
+        """Raises NotImplementedError if the method is not implemented in the
+        derived classes.
+
+        Args:
+            user_id: str. The id of the user.
+            filepath: str. The path to the relevant file within the exploration.
+            raw_bytes: str. The content to be stored in the file.
+            mimetype: str. The content-type of the file.
+
+        Raises:
+            NotImplementedError. The method is not implemented in the derived
+                classes.
+        """
         raise NotImplementedError
 
     def delete(self, user_id, filepath):
+        """Raises NotImplementedError if the method is not implemented in the
+        derived classes.
+
+        Args:
+            user_id: str. The id of the user.
+            filepath: str. The path to the relevant file within the exploration.
+
+        Raises:
+            NotImplementedError. The method is not implemented in the derived
+                classes.
+        """
         raise NotImplementedError
 
     def listdir(self, dir_name):
+        """Raises NotImplementedError if the method is not implemented in the
+        derived classes.
+
+        Args:
+            dir_name: str. The name of the directory.
+
+        Raises:
+            NotImplementedError. The method is not implemented in the derived
+                classes.
+        """
         raise NotImplementedError
 
 
@@ -383,12 +443,39 @@ class GcsFileSystem(object):
 
     @property
     def exploration_id(self):
+        """Returns the exploration id.
+
+        Returns:
+            str. The exploration id.
+        """
         return self._exploration_id
 
     def isfile(self, filepath):
+        """Raises NotImplementedError if the method is not implemented in the
+        derived classes.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+
+        Raises:
+            NotImplementedError. The method is not implemented in the derived
+                classes.
+        """
         raise NotImplementedError
 
     def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
+        """Raises NotImplementedError if the method is not implemented in the
+        derived classes.
+
+        Args:
+            filepath: str. The path to the relevant file within the exploration.
+            version: int or None. The version of the file.
+            mode: str. The mode in which the file is to be opened.
+
+        Raises:
+            NotImplementedError. The method is not implemented in the derived
+                classes.
+        """
         raise NotImplementedError
 
     def commit(self, unused_user_id, filepath, raw_bytes, mimetype):
@@ -411,9 +498,30 @@ class GcsFileSystem(object):
         gcs_file.close()
 
     def delete(self, user_id, filepath):
+        """Raises NotImplementedError if the method is not implemented in the
+        derived classes.
+
+        Args:
+            user_id: str. The id of the user.
+            filepath: str. The path to the relevant file within the exploration.
+
+        Raises:
+            NotImplementedError. The method is not implemented in the derived
+                classes.
+        """
         raise NotImplementedError
 
     def listdir(self, dir_name):
+        """Raises NotImplementedError if the method is not implemented in the
+        derived classes.
+
+        Args:
+            dir_name: str. The name of the directory.
+
+        Raises:
+            NotImplementedError. The method is not implemented in the derived
+                classes.
+        """
         raise NotImplementedError
 
 
@@ -426,6 +534,11 @@ class AbstractFileSystem(object):
 
     @property
     def impl(self):
+        """Returns a AbstractFileSystem object.
+
+        Returns:
+            AbstractFileSystem. The AbstractFileSystem object.
+        """
         return self._impl
 
     def _check_filepath(self, filepath):

@@ -20,10 +20,11 @@
 class LearnerProgress(object):
     """Domain object for the progress of the learner."""
 
-    def __init__(self, incomplete_exp_summaries,
-                 incomplete_collection_summaries, completed_exp_summaries,
-                 completed_collection_summaries, exploration_playlist,
-                 collection_playlist):
+    def __init__(
+            self, incomplete_exp_summaries,
+            incomplete_collection_summaries, completed_exp_summaries,
+            completed_collection_summaries, exploration_playlist,
+            collection_playlist):
         """Constructs a LearnerProgress domain object.
 
         Args:
@@ -51,7 +52,8 @@ class LearnerProgress(object):
 
 class ActivityIdsInLearnerDashboard(object):
     """Domain object for ids of the activities completed, currently being
-    completed or in the playlist of the user."""
+    completed or in the playlist of the user.
+    """
 
     def __init__(
             self, completed_exploration_ids, completed_collection_ids,

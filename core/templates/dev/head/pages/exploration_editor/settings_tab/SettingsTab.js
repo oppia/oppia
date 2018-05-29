@@ -19,31 +19,31 @@
 oppia.controller('SettingsTab', [
   '$scope', '$http', '$window', '$uibModal',
   '$rootScope', 'ExplorationDataService',
-  'explorationTitleService', 'explorationCategoryService',
-  'explorationObjectiveService', 'explorationLanguageCodeService',
-  'explorationTagsService', 'ExplorationRightsService',
-  'explorationInitStateNameService', 'explorationParamSpecsService',
-  'ChangeListService', 'AlertsService', 'explorationStatesService',
-  'explorationParamChangesService', 'ExplorationWarningsService',
+  'ExplorationTitleService', 'ExplorationCategoryService',
+  'ExplorationObjectiveService', 'ExplorationLanguageCodeService',
+  'ExplorationTagsService', 'ExplorationRightsService',
+  'ExplorationInitStateNameService', 'ExplorationParamSpecsService',
+  'ChangeListService', 'AlertsService', 'ExplorationStatesService',
+  'ExplorationParamChangesService', 'ExplorationWarningsService',
   'ExplorationAdvancedFeaturesService', 'ALL_CATEGORIES',
   'EXPLORATION_TITLE_INPUT_FOCUS_LABEL', 'UserEmailPreferencesService',
   'EditableExplorationBackendApiService', 'UrlInterpolationService',
-  'explorationAutomaticTextToSpeechService',
-  'explorationCorrectnessFeedbackService',
+  'ExplorationAutomaticTextToSpeechService',
+  'ExplorationCorrectnessFeedbackService',
   function(
       $scope, $http, $window, $uibModal,
       $rootScope, ExplorationDataService,
-      explorationTitleService, explorationCategoryService,
-      explorationObjectiveService, explorationLanguageCodeService,
-      explorationTagsService, ExplorationRightsService,
-      explorationInitStateNameService, explorationParamSpecsService,
-      ChangeListService, AlertsService, explorationStatesService,
-      explorationParamChangesService, ExplorationWarningsService,
+      ExplorationTitleService, ExplorationCategoryService,
+      ExplorationObjectiveService, ExplorationLanguageCodeService,
+      ExplorationTagsService, ExplorationRightsService,
+      ExplorationInitStateNameService, ExplorationParamSpecsService,
+      ChangeListService, AlertsService, ExplorationStatesService,
+      ExplorationParamChangesService, ExplorationWarningsService,
       ExplorationAdvancedFeaturesService, ALL_CATEGORIES,
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL, UserEmailPreferencesService,
       EditableExplorationBackendApiService, UrlInterpolationService,
-      explorationAutomaticTextToSpeechService,
-      explorationCorrectnessFeedbackService) {
+      ExplorationAutomaticTextToSpeechService,
+      ExplorationCorrectnessFeedbackService) {
     $scope.EXPLORATION_TITLE_INPUT_FOCUS_LABEL = (
       EXPLORATION_TITLE_INPUT_FOCUS_LABEL);
 
@@ -73,15 +73,15 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.initSettingsTab = function() {
-      $scope.explorationTitleService = explorationTitleService;
-      $scope.explorationCategoryService = explorationCategoryService;
-      $scope.explorationObjectiveService = explorationObjectiveService;
-      $scope.explorationLanguageCodeService = explorationLanguageCodeService;
-      $scope.explorationTagsService = explorationTagsService;
+      $scope.explorationTitleService = ExplorationTitleService;
+      $scope.explorationCategoryService = ExplorationCategoryService;
+      $scope.explorationObjectiveService = ExplorationObjectiveService;
+      $scope.explorationLanguageCodeService = ExplorationLanguageCodeService;
+      $scope.explorationTagsService = ExplorationTagsService;
       $scope.ExplorationRightsService = ExplorationRightsService;
-      $scope.explorationInitStateNameService = explorationInitStateNameService;
-      $scope.explorationParamSpecsService = explorationParamSpecsService;
-      $scope.explorationParamChangesService = explorationParamChangesService;
+      $scope.explorationInitStateNameService = ExplorationInitStateNameService;
+      $scope.explorationParamSpecsService = ExplorationParamSpecsService;
+      $scope.explorationParamChangesService = ExplorationParamChangesService;
       $scope.UserEmailPreferencesService = UserEmailPreferencesService;
 
       ExplorationDataService.getData().then(function() {
@@ -91,28 +91,28 @@ oppia.controller('SettingsTab', [
     };
 
     $scope.refreshSettingsTab = function() {
-      // Ensure that explorationStatesService has been initialized before
+      // Ensure that ExplorationStatesService has been initialized before
       // getting the state names from it. (Otherwise, navigating to the
       // settings tab directly (by entering a URL that ends with /settings)
       // results in a console error.
-      if (explorationStatesService.isInitialized()) {
+      if (ExplorationStatesService.isInitialized()) {
         var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2.some(
           function(categoryItem) {
-            return categoryItem.id === explorationCategoryService.savedMemento;
+            return categoryItem.id === ExplorationCategoryService.savedMemento;
           }
         );
 
         // If the current category is not in the dropdown, add it
         // as the first option.
         if (!categoryIsInSelect2 &&
-            explorationCategoryService.savedMemento) {
+            ExplorationCategoryService.savedMemento) {
           $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
-            id: explorationCategoryService.savedMemento,
-            text: explorationCategoryService.savedMemento
+            id: ExplorationCategoryService.savedMemento,
+            text: ExplorationCategoryService.savedMemento
           });
         }
 
-        $scope.stateNames = explorationStatesService.getStateNames();
+        $scope.stateNames = ExplorationStatesService.getStateNames();
       }
     };
 
@@ -132,36 +132,36 @@ oppia.controller('SettingsTab', [
     }];
 
     $scope.saveExplorationTitle = function() {
-      explorationTitleService.saveDisplayedValue();
+      ExplorationTitleService.saveDisplayedValue();
     };
 
     $scope.saveExplorationCategory = function() {
-      explorationCategoryService.saveDisplayedValue();
+      ExplorationCategoryService.saveDisplayedValue();
     };
 
     $scope.saveExplorationObjective = function() {
-      explorationObjectiveService.saveDisplayedValue();
+      ExplorationObjectiveService.saveDisplayedValue();
     };
 
     $scope.saveExplorationLanguageCode = function() {
-      explorationLanguageCodeService.saveDisplayedValue();
+      ExplorationLanguageCodeService.saveDisplayedValue();
     };
 
     $scope.saveExplorationTags = function() {
-      explorationTagsService.saveDisplayedValue();
+      ExplorationTagsService.saveDisplayedValue();
     };
 
     $scope.saveExplorationInitStateName = function() {
-      var newInitStateName = explorationInitStateNameService.displayed;
+      var newInitStateName = ExplorationInitStateNameService.displayed;
 
-      if (!explorationStatesService.getState(newInitStateName)) {
+      if (!ExplorationStatesService.getState(newInitStateName)) {
         AlertsService.addWarning(
           'Invalid initial state name: ' + newInitStateName);
-        explorationInitStateNameService.restoreFromMemento();
+        ExplorationInitStateNameService.restoreFromMemento();
         return;
       }
 
-      explorationInitStateNameService.saveDisplayedValue();
+      ExplorationInitStateNameService.saveDisplayedValue();
 
       $rootScope.$broadcast('refreshGraph');
     };
@@ -170,7 +170,7 @@ oppia.controller('SettingsTab', [
       ExplorationWarningsService.updateWarnings();
     };
 
-    /********************************************
+    /** ******************************************
     * Methods for enabling advanced features.
     ********************************************/
     $scope.areParametersEnabled = (
@@ -179,16 +179,16 @@ oppia.controller('SettingsTab', [
       ExplorationAdvancedFeaturesService.enableParameters);
 
     $scope.isAutomaticTextToSpeechEnabled = (
-      explorationAutomaticTextToSpeechService.isAutomaticTextToSpeechEnabled);
+      ExplorationAutomaticTextToSpeechService.isAutomaticTextToSpeechEnabled);
     $scope.toggleAutomaticTextToSpeech = (
-      explorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech);
+      ExplorationAutomaticTextToSpeechService.toggleAutomaticTextToSpeech);
 
     $scope.isCorrectnessFeedbackEnabled = (
-      explorationCorrectnessFeedbackService.isEnabled);
+      ExplorationCorrectnessFeedbackService.isEnabled);
     $scope.toggleCorrectnessFeedback = (
-      explorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
+      ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
 
-    /********************************************
+    /** ******************************************
     * Methods for rights management.
     ********************************************/
     $scope.openEditRolesForm = function() {
@@ -214,7 +214,7 @@ oppia.controller('SettingsTab', [
         !ExplorationRightsService.viewableIfPrivate());
     };
 
-    /********************************************
+    /** ******************************************
     * Methods for notifications muting.
     ********************************************/
 
@@ -232,7 +232,7 @@ oppia.controller('SettingsTab', [
       UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
     };
 
-    /********************************************
+    /** ******************************************
     * Methods relating to control buttons.
     ********************************************/
     $scope.previewSummaryTile = function() {
@@ -245,23 +245,23 @@ oppia.controller('SettingsTab', [
         controller: [
           '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
             $scope.getExplorationTitle = function() {
-              return explorationTitleService.displayed;
+              return ExplorationTitleService.displayed;
             };
             $scope.getExplorationObjective = function() {
-              return explorationObjectiveService.displayed;
+              return ExplorationObjectiveService.displayed;
             };
             $scope.getExplorationCategory = function() {
-              return explorationCategoryService.displayed;
+              return ExplorationCategoryService.displayed;
             };
             $scope.getThumbnailIconUrl = function() {
-              var category = explorationCategoryService.displayed;
+              var category = ExplorationCategoryService.displayed;
               if (constants.ALL_CATEGORIES.indexOf(category) === -1) {
                 category = constants.DEFAULT_CATEGORY_ICON;
               }
               return '/subjects/' + category + '.svg';
             };
             $scope.getThumbnailBgColor = function() {
-              var category = explorationCategoryService.displayed;
+              var category = ExplorationCategoryService.displayed;
               if (!constants.CATEGORIES_TO_COLORS.hasOwnProperty(category)) {
                 var color = constants.DEFAULT_COLOR;
               } else {
@@ -322,8 +322,8 @@ oppia.controller('SettingsTab', [
       }).result.then(function() {
         EditableExplorationBackendApiService.deleteExploration(
           $scope.explorationId).then(function() {
-            $window.location = CREATOR_DASHBOARD_PAGE_URL;
-          });
+          $window.location = CREATOR_DASHBOARD_PAGE_URL;
+        });
       });
     };
 

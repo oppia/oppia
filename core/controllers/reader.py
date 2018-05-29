@@ -26,7 +26,6 @@ from core.domain import collection_services
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
-from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import interaction_registry
@@ -35,12 +34,17 @@ from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
 
 import jinja2
+
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -207,8 +211,12 @@ class ExplorationPage(base.BaseHandler):
             return
 
         # Note: this is an optional argument and will be None when the
-        # exploration is being played outside the context of a collection.
-        collection_id = self.request.get('collection_id')
+        # exploration is being played outside the context of a collection or if
+        # the 'parent' parameter is present.
+        if self.request.get('parent'):
+            collection_id = None
+        else:
+            collection_id = self.request.get('collection_id')
         can_edit = rights_manager.check_can_edit_activity(
             self.user, exploration_rights)
 
@@ -289,6 +297,131 @@ class ExplorationHandler(base.BaseHandler):
                 exploration.correctness_feedback_enabled),
         })
         self.render_json(self.values)
+
+
+class StorePlaythroughHandler(base.BaseHandler):
+    """Handles a useful playthrough coming in from the frontend to store it."""
+
+    def _require_exp_issue_dict_is_valid(self, exp_issue_dict):
+        """Checks whether the exploration issue dict has the correct keys.
+
+        Args:
+            exp_issue_dict: dict. Dict representing an exploration issue.
+        """
+        exp_issue_properties = [
+            'issue_type', 'schema_version', 'issue_customization_args',
+            'is_valid']
+
+        for exp_issue_property in exp_issue_properties:
+            if exp_issue_property not in exp_issue_dict:
+                raise self.InvalidInputException(
+                    '%s not in exploration issue dict.' % (exp_issue_property))
+
+        dummy_exp_issue = stats_domain.ExplorationIssue(
+            exp_issue_dict['issue_type'],
+            exp_issue_dict['issue_customization_args'], [],
+            exp_issue_dict['schema_version'], exp_issue_dict['is_valid'])
+
+        try:
+            dummy_exp_issue.validate()
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+    def _require_playthrough_data_is_valid(self, playthrough_data):
+        """Checks whether the playthrough data dict has the correct keys.
+
+        Args:
+            playthrough_data: dict. Dict representing a playthrough.
+        """
+        playthrough_properties = [
+            'exp_id', 'exp_version', 'issue_type', 'issue_customization_args',
+            'playthrough_actions']
+
+        for playthrough_property in playthrough_properties:
+            if playthrough_property not in playthrough_data:
+                raise self.InvalidInputException(
+                    '%s not in playthrough data dict.' % playthrough_property)
+
+        playthrough_actions = [
+            stats_domain.LearnerAction.from_dict(playthrough_action_dict)
+            for playthrough_action_dict in playthrough_data[
+                'playthrough_actions']]
+
+        dummy_playthrough = stats_domain.Playthrough(
+            'dummy_playthrough_id',
+            playthrough_data['exp_id'],
+            playthrough_data['exp_version'],
+            playthrough_data['issue_type'],
+            playthrough_data['issue_customization_args'],
+            playthrough_actions)
+
+        try:
+            dummy_playthrough.validate()
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests. Appends to existing list of playthroughs or
+        deletes it if already full.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        exp_issue_dict = self.payload.get('exp_issue_dict')
+        self._require_exp_issue_dict_is_valid(exp_issue_dict)
+
+        playthrough_data = self.payload.get('playthrough_data')
+        self._require_playthrough_data_is_valid(playthrough_data)
+
+        exp_version = playthrough_data['exp_version']
+
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            exploration_id, exp_version)
+        exp_issues = stats_services.get_exp_issues_from_model(exp_issues_model)
+
+        customization_args = exp_issue_dict['issue_customization_args']
+
+        issue_found = False
+        for index, issue in enumerate(exp_issues.unresolved_issues):
+            if issue.issue_type == exp_issue_dict['issue_type']:
+                issue_customization_args = issue.issue_customization_args
+                # In case issue_keyname is 'state_names', the ordering of the
+                # list is important i.e. [a,b,c] is different from [b,c,a].
+                issue_keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+                    issue.issue_type]
+                if (issue_customization_args[issue_keyname] ==
+                        customization_args[issue_keyname]):
+                    issue_found = True
+                    if (len(issue.playthrough_ids) <
+                            feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
+                        playthrough_id = stats_models.PlaythroughModel.create(
+                            playthrough_data['exp_id'],
+                            playthrough_data['exp_version'],
+                            playthrough_data['issue_type'],
+                            playthrough_data['issue_customization_args'],
+                            playthrough_data['playthrough_actions'])
+                        exp_issues.unresolved_issues[
+                            index].playthrough_ids.append(playthrough_id)
+                    break
+
+        if not issue_found:
+            playthrough_id = stats_models.PlaythroughModel.create(
+                playthrough_data['exp_id'],
+                playthrough_data['exp_version'],
+                playthrough_data['issue_type'],
+                playthrough_data['issue_customization_args'],
+                playthrough_data['playthrough_actions'])
+            issue = stats_domain.ExplorationIssue(
+                exp_issue_dict['issue_type'],
+                exp_issue_dict['issue_customization_args'],
+                [playthrough_id], exp_issue_dict['schema_version'],
+                exp_issue_dict['is_valid'])
+
+            exp_issues.unresolved_issues.append(issue)
+
+        stats_services.save_exp_issues_model_transactional(exp_issues)
+        self.render_json({})
 
 
 class StatsEventsHandler(base.BaseHandler):
@@ -429,11 +562,10 @@ class StateCompleteEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            event_services.StateCompleteEventHandler.record(
-                exploration_id, self.payload.get('exp_version'),
-                self.payload.get('state_name'), self.payload.get('session_id'),
-                self.payload.get('time_spent_in_state_secs'))
+        event_services.StateCompleteEventHandler.record(
+            exploration_id, self.payload.get('exp_version'),
+            self.payload.get('state_name'), self.payload.get('session_id'),
+            self.payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 
@@ -451,36 +583,6 @@ class LeaveForRefresherExpEventHandler(base.BaseHandler):
             self.payload.get('session_id'),
             self.payload.get('time_spent_in_state_secs'))
         self.render_json({})
-
-
-class ClassifyHandler(base.BaseHandler):
-    """Stateless handler that performs a classify() operation server-side and
-    returns the corresponding classification result, which is a dict containing
-    three keys:
-        'outcome': A dict representing the outcome of the answer group matched.
-        'answer_group_index': The index of the matched answer group.
-        'rule_spec_index': The index of the matched rule spec in the matched
-            answer group.
-    """
-
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
-
-    @acl_decorators.can_play_exploration
-    def post(self, unused_exploration_id):
-        """Handle POST requests.
-
-        Note: unused_exploration_id is needed because
-            @acl_decorators.can_play_exploration needs 2 arguments.
-        """
-        # A domain object representing the old state.
-        old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
-        # The learner's raw answer.
-        answer = self.payload.get('answer')
-        # The learner's parameter values.
-        params = self.payload.get('params')
-        params['answer'] = answer
-        result = classifier_services.classify(old_state, answer)
-        self.render_json(result)
 
 
 class ReaderFeedbackHandler(base.BaseHandler):
@@ -540,10 +642,9 @@ class ExplorationActualStartEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            event_services.ExplorationActualStartEventHandler.record(
-                exploration_id, self.payload.get('exploration_version'),
-                self.payload.get('state_name'), self.payload.get('session_id'))
+        event_services.ExplorationActualStartEventHandler.record(
+            exploration_id, self.payload.get('exploration_version'),
+            self.payload.get('state_name'), self.payload.get('session_id'))
         self.render_json({})
 
 
@@ -555,11 +656,10 @@ class SolutionHitEventHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests."""
-        if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-            event_services.SolutionHitEventHandler.record(
-                exploration_id, self.payload.get('exploration_version'),
-                self.payload.get('state_name'), self.payload.get('session_id'),
-                self.payload.get('time_spent_in_state_secs'))
+        event_services.SolutionHitEventHandler.record(
+            exploration_id, self.payload.get('exploration_version'),
+            self.payload.get('state_name'), self.payload.get('session_id'),
+            self.payload.get('time_spent_in_state_secs'))
         self.render_json({})
 
 
@@ -600,11 +700,11 @@ class ExplorationCompleteEventHandler(base.BaseHandler):
         if user_id and collection_id:
             collection_services.record_played_exploration_in_collection_context(
                 user_id, collection_id, exploration_id)
-            collections_left_to_complete = (
-                collection_services.get_next_exploration_ids_to_complete_by_user( # pylint: disable=line-too-long
+            next_exp_id_to_complete = (
+                collection_services.get_next_exploration_id_to_complete_by_user( # pylint: disable=line-too-long
                     user_id, collection_id))
 
-            if not collections_left_to_complete:
+            if not next_exp_id_to_complete:
                 learner_progress_services.mark_collection_as_completed(
                     user_id, collection_id)
             else:
@@ -735,18 +835,19 @@ class RecommendationsHandler(base.BaseHandler):
         except Exception:
             raise self.PageNotFoundException
 
-        auto_recommended_exp_ids = []
+        system_recommended_exp_ids = []
+        next_exp_id = None
 
         if collection_id:
             if self.user_id:
-                auto_recommended_exp_ids = (
-                    collection_services.get_next_exploration_ids_to_complete_by_user(  # pylint: disable=line-too-long
+                next_exp_id = (
+                    collection_services.get_next_exploration_id_to_complete_by_user(  # pylint: disable=line-too-long
                         self.user_id, collection_id))
             else:
                 collection = collection_services.get_collection_by_id(
                     collection_id)
-                auto_recommended_exp_ids = (
-                    collection.get_next_exploration_ids_in_sequence(
+                next_exp_id = (
+                    collection.get_next_exploration_id_in_sequence(
                         exploration_id))
         elif include_system_recommendations:
             system_chosen_exp_ids = (
@@ -754,12 +855,15 @@ class RecommendationsHandler(base.BaseHandler):
                     exploration_id))
             filtered_exp_ids = list(
                 set(system_chosen_exp_ids) - set(author_recommended_exp_ids))
-            auto_recommended_exp_ids = random.sample(
+            system_recommended_exp_ids = random.sample(
                 filtered_exp_ids,
                 min(MAX_SYSTEM_RECOMMENDATIONS, len(filtered_exp_ids)))
 
         recommended_exp_ids = set(
-            author_recommended_exp_ids + auto_recommended_exp_ids)
+            author_recommended_exp_ids + system_recommended_exp_ids)
+        if next_exp_id is not None:
+            recommended_exp_ids.add(next_exp_id)
+
         self.values.update({
             'summaries': (
                 summary_services.get_displayable_exp_summary_dicts_matching_ids(

@@ -16,15 +16,15 @@ inbound_services:
 
 handlers:
 - url: /favicon.ico
-  static_files: assets/common/favicon.ico
-  upload: assets/common/favicon.ico
+  static_files: assets/favicon.ico
+  upload: assets/favicon.ico
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
 - url: /robots.txt
-  static_files: assets/common/robots.txt
-  upload: assets/common/robots.txt
+  static_files: assets/robots.txt
+  upload: assets/robots.txt
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'
@@ -35,13 +35,6 @@ handlers:
   expiration: 30d
   http_headers:
     Cache-Control: 'public, max-age=2592000'
-- url: /assets/common
-  static_dir: assets/common
-  secure: always
-  http_headers:
-    # WARNING TO DEVELOPERS: Files in this folder may be stale for
-    # up to 10 mins after a code release.
-    Cache-Control: 'public, max-age=600'
 - url: /assets
   static_dir: assets
   secure: always
@@ -95,6 +88,12 @@ handlers:
   static_files: extensions/\1/\2
   upload: extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js|png))$
   secure: always
+- url: /extensions/visualizations/(.*\.html)
+  static_files: extensions/visualizations/\1
+  upload: extensions/visualizations/(.*\.html)
+  secure: always
+  http_headers:
+    Cache-Control: 'no-cache'
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
   secure: always
@@ -125,18 +124,13 @@ handlers:
 libraries:
 - name: jinja2
   version: '2.6'
-- name: numpy
-  version: '1.6.1'
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
   version: '2.7.11'
 - name: webapp2
   version: '2.5.2'
-# This environmental variable is for serving minified resources
-# when set to true. It allows minified resources to be used when
-# running the server in the dev environment.
+
 env_variables:
-  MINIFICATION: false
   PYTHONHTTPSVERIFY: 1
 
 
@@ -161,7 +155,7 @@ skip_files:
 - third_party/static/angular-audio-1.7.4
 - third_party/static/angular-scroll-1.0.0
 - third_party/static/angular-toastr-1.7.0
-- third_party/static/font-awesome-4.4.0
+- third_party/static/font-awesome-4.7.0
 - third_party/static/messageformat-0.3.1
 - third_party/static/ng-img-crop-0.3.2
 - third_party/static/nginfinitescroll-1.0.0

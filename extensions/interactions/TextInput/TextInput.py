@@ -24,7 +24,7 @@ class TextInput(base.BaseInteraction):
     description = 'Allows learners to enter arbitrary text strings.'
     display_mode = base.DISPLAY_MODE_INLINE
     is_trainable = True
-    _dependency_ids = []
+    _dependency_ids = ['text_input_prediction']
     answer_type = 'NormalizedString'
     instructions = None
     narrow_instructions = None
@@ -70,5 +70,5 @@ class TextInput(base.BaseInteraction):
             'title': 'Top answers',
         },
         'calculation_id': 'Top10AnswerFrequencies',
-        'show_addressed_info': True,
+        'addressed_info_is_supported': True,
     }]

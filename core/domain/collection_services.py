@@ -65,7 +65,7 @@ def _migrate_collection_contents_to_latest_schema(
 
     Args:
         versioned_collection_contents: A dict with two keys:
-          - schema_version: str. The schema version for the collection.
+          - schema_version: int. The schema version for the collection.
           - collection_contents: dict. The dict comprising the collection
               contents.
 
@@ -93,7 +93,7 @@ def _get_collection_memcache_key(collection_id, version=None):
 
     Args:
         collection_id: str. ID of the collection.
-        version: str. Schema version of the collection.
+        version: int. Schema version of the collection.
 
     Returns:
         str. The memcache key of the collection.
@@ -133,7 +133,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
             copy.deepcopy(collection_model.collection_contents)
     }
 
-    # If collection is in version 2, copy nodes data to collection contents
+    # If collection is in version 2, copy nodes data to collection contents.
     if collection_model.schema_version == 2:
         versioned_collection_contents['collection_contents'] = {
             'nodes': copy.deepcopy(collection_model.nodes)
@@ -153,15 +153,7 @@ def get_collection_from_model(collection_model, run_conversion=True):
             collection_domain.CollectionNode.from_dict(collection_node_dict)
             for collection_node_dict in
             versioned_collection_contents['collection_contents']['nodes']
-        ], {
-            skill_id: collection_domain.CollectionSkill.from_dict(
-                skill_id, skill_dict)
-            for skill_id, skill_dict in
-            versioned_collection_contents[
-                'collection_contents']['skills'].iteritems()
-        },
-        versioned_collection_contents[
-            'collection_contents']['next_skill_index'],
+        ],
         collection_model.version, collection_model.created_on,
         collection_model.last_updated)
 
@@ -201,7 +193,7 @@ def get_collection_by_id(collection_id, strict=True, version=None):
         collection_id: str. ID of the collection.
         strict: bool. Whether to fail noisily if no collection with the given
             id exists in the datastore.
-        version: str or None. The version number of the collection to be
+        version: int or None. The version number of the collection to be
             retrieved. If it is None, the latest version will be retrieved.
 
     Returns:
@@ -458,29 +450,29 @@ def get_valid_completed_exploration_ids(user_id, collection):
     ]
 
 
-def get_next_exploration_ids_to_complete_by_user(user_id, collection_id):
-    """Returns a list of exploration IDs in the specified collection that the
-    given user has not yet attempted and has the prerequisite skills to play.
+def get_next_exploration_id_to_complete_by_user(user_id, collection_id):
+    """Returns the first exploration ID in the specified collection that the
+    given user has not yet attempted.
 
     Args:
         user_id: str. ID of the user.
         collection_id: str. ID of the collection.
 
     Returns:
-        list(str). A list of exploration IDs in the specified collection that
-        the given user has not completed and has the prerequisite skills to
-        play. Returns the collection's initial explorations if the user has yet
-        to complete any explorations within the collection.
+        str. The first exploration ID in the specified collection that
+        the given user has not completed. Returns the collection's initial
+        exploration if the user has yet to complete any explorations
+        within the collection.
     """
     completed_exploration_ids = get_completed_exploration_ids(
         user_id, collection_id)
 
     collection = get_collection_by_id(collection_id)
     if completed_exploration_ids:
-        return collection.get_next_exploration_ids(completed_exploration_ids)
+        return collection.get_next_exploration_id(completed_exploration_ids)
     else:
         # The user has yet to complete any explorations inside the collection.
-        return collection.init_exploration_ids
+        return collection.first_exploration_id
 
 
 def record_played_exploration_in_collection_context(
@@ -605,7 +597,7 @@ def apply_change_list(collection_id, change_list):
     Args:
         collection_id: str. ID of the given collection.
         change_list: list(dict). A change list to be applied to the given
-            collection. Each entry in change_list is a dict that represents an
+            collection. Each entry in change_list is a dict that represents a
             CollectionChange.
     object.
 
@@ -622,17 +614,8 @@ def apply_change_list(collection_id, change_list):
                 collection.add_node(change.exploration_id)
             elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_NODE:
                 collection.delete_node(change.exploration_id)
-            elif (
-                    change.cmd ==
-                    collection_domain.CMD_EDIT_COLLECTION_NODE_PROPERTY):
-                collection_node = collection.get_node(change.exploration_id)
-                if (change.property_name ==
-                        collection_domain.COLLECTION_NODE_PROPERTY_PREREQUISITE_SKILL_IDS): # pylint: disable=line-too-long
-                    collection_node.update_prerequisite_skill_ids(
-                        change.new_value)
-                elif (change.property_name ==
-                      collection_domain.COLLECTION_NODE_PROPERTY_ACQUIRED_SKILL_IDS): # pylint: disable=line-too-long
-                    collection_node.update_acquired_skill_ids(change.new_value)
+            elif change.cmd == collection_domain.CMD_SWAP_COLLECTION_NODES:
+                collection.swap_nodes(change.first_index, change.second_index)
             elif change.cmd == collection_domain.CMD_EDIT_COLLECTION_PROPERTY:
                 if (change.property_name ==
                         collection_domain.COLLECTION_PROPERTY_TITLE):
@@ -657,17 +640,6 @@ def apply_change_list(collection_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # collection is sufficient to apply the schema migration.
                 continue
-            elif change.cmd == collection_domain.CMD_ADD_COLLECTION_SKILL:
-                collection.add_skill(change.name)
-            elif change.cmd == collection_domain.CMD_ADD_QUESTION_ID_TO_SKILL:
-                collection.add_question_id_to_skill(
-                    change.skill_id, change.question_id)
-            elif (change.cmd ==
-                  collection_domain.CMD_REMOVE_QUESTION_ID_FROM_SKILL):
-                collection.remove_question_id_from_skill(
-                    change.skill_id, change.question_id)
-            elif change.cmd == collection_domain.CMD_DELETE_COLLECTION_SKILL:
-                collection.delete_skill(change.skill_id)
         return collection
 
     except Exception as e:
@@ -772,12 +744,7 @@ def _save_collection(committer_id, collection, commit_message, change_list):
     collection_model.collection_contents = {
         'nodes': [
             collection_node.to_dict() for collection_node in collection.nodes
-        ],
-        'skills': {
-            skill_id: skill.to_dict()
-            for skill_id, skill in collection.skills.iteritems()
-        },
-        'next_skill_index': collection.next_skill_index
+        ]
     }
     collection_model.node_count = len(collection_model.nodes)
     collection_model.commit(committer_id, commit_message, change_list)
@@ -815,12 +782,7 @@ def _create_collection(committer_id, collection, commit_message, commit_cmds):
             'nodes': [
                 collection_node.to_dict()
                 for collection_node in collection.nodes
-            ],
-            'skills': {
-                skill_id: skill.to_dict()
-                for skill_id, skill in collection.skills.iteritems()
-            },
-            'next_skill_index': collection.next_skill_index
+            ]
         },
     )
     model.commit(committer_id, commit_message, commit_cmds)
@@ -837,11 +799,12 @@ def save_new_collection(committer_id, collection):
     """
     commit_message = (
         'New collection created with title \'%s\'.' % collection.title)
-    _create_collection(committer_id, collection, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': collection.title,
-        'category': collection.category,
-    }])
+    _create_collection(
+        committer_id, collection, commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': collection.title,
+            'category': collection.category,
+        }])
 
 
 def delete_collection(committer_id, collection_id, force_deletion=False):
@@ -990,7 +953,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
     object and return it.
 
     Args:
-        collection_id: str. ID of the collection.
+        collection: Collection. The domain object.
         contributor_id_to_add: str. ID of the contributor to be added to the
             collection summary.
 
@@ -1019,7 +982,7 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
 
     if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
         if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit
+            # Revert commit or other non-positive commit.
             contributors_summary = compute_collection_contributors_summary(
                 collection.id)
         else:
@@ -1129,6 +1092,9 @@ def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
         committer_id: str. ID of the committer.
         yaml_content: str. The yaml content string specifying a collection.
         collection_id: str. ID of the saved collection.
+
+    Returns:
+        Collection. The domain object.
     """
     collection = collection_domain.Collection.from_yaml(
         collection_id, yaml_content)
@@ -1136,11 +1102,12 @@ def save_new_collection_from_yaml(committer_id, yaml_content, collection_id):
         'New collection created from YAML file with title \'%s\'.'
         % collection.title)
 
-    _create_collection(committer_id, collection, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': collection.title,
-        'category': collection.category,
-    }])
+    _create_collection(
+        committer_id, collection, commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': collection.title,
+            'category': collection.category,
+        }])
 
     return collection
 
@@ -1167,7 +1134,7 @@ def load_demo(collection_id):
     """Loads a demo collection.
 
     The resulting collection will have version 2 (one for its initial
-    creation and one for its subsequent modification.)
+    creation and one for its subsequent modification).
 
     Args:
         collection_id: str. ID of the collection to be loaded.
@@ -1215,26 +1182,3 @@ def index_collections_given_ids(collection_ids):
     search_services.index_collection_summaries([
         collection_summary for collection_summary in collection_summaries
         if collection_summary is not None])
-
-
-def get_acquired_skill_ids_of_user(user_id, collection_id):
-    """Returns the acquired skills of the user identified by user_id
-    for a given collection.
-
-    Args:
-        user_id: str. The id of the user.
-        collection_id: str. The id of the collection.
-
-    Returns:
-        list(str). A list of skill ids acquired by the user.
-
-    Raises:
-        Exception: Collection with given ID does not exist.
-    """
-    completed_exploration_ids = get_completed_exploration_ids(
-        user_id, collection_id)
-    collection = get_collection_by_id(collection_id)
-    acquired_skill_ids = (
-        collection.get_acquired_skill_ids_from_exploration_ids(
-            completed_exploration_ids))
-    return acquired_skill_ids

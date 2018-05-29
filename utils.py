@@ -55,7 +55,7 @@ class ExplorationConversionError(Exception):
 
 
 def create_enum(*sequential, **names):
-    """Creates a enumerated constant
+    """Creates a enumerated constant.
 
     Args:
         sequential: *. Sequence List to generate the enumerations.
@@ -510,7 +510,7 @@ def vfs_construct_path(base_path, *path_components):
 
 def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc."""
-    # Preserve unicode (if path is unicode)
+    # Preserve unicode (if path is unicode).
     slash, dot = (u'/', u'.') if isinstance(path, unicode) else ('/', '.')
     if path == '':
         return dot
@@ -631,6 +631,9 @@ def _get_short_language_description(full_language_description):
 
     Args:
         full_language_description: str. Short description of the language.
+
+    Returns:
+        str. Short description of the language.
     """
     if ' (' not in full_language_description:
         return full_language_description
@@ -663,7 +666,7 @@ def get_asset_dir_prefix():
     It is used as a prefix in urls for images, css and script files.
     """
     asset_dir_prefix = ''
-    if feconf.IS_MINIFIED or not feconf.DEV_MODE:
+    if not feconf.DEV_MODE:
         asset_dir_prefix = '/build'
 
     return asset_dir_prefix
@@ -674,8 +677,8 @@ def get_template_dir_prefix():
     It is used as a prefix in urls for js script files under the templates
     directory.
     """
-    template_path = ('/templates/head' if feconf.IS_MINIFIED
-                     or not feconf.DEV_MODE else '/templates/dev/head')
+    template_path = (
+        '/templates/head' if not feconf.DEV_MODE else '/templates/dev/head')
     return '%s%s' % (get_asset_dir_prefix(), template_path)
 
 

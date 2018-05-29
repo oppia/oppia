@@ -48,10 +48,10 @@ oppia.factory('ReadOnlyExplorationBackendApiService', [
     var _getExplorationUrl = function(explorationId, version) {
       if (version) {
         return UrlInterpolationService.interpolateUrl(
-        EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
-          exploration_id: explorationId,
-          version: String(version)
-        });
+          EXPLORATION_VERSION_DATA_URL_TEMPLATE, {
+            exploration_id: explorationId,
+            version: String(version)
+          });
       }
       return UrlInterpolationService.interpolateUrl(
         EXPLORATION_DATA_URL_TEMPLATE, {

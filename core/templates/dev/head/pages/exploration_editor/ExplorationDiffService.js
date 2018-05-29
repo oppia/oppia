@@ -69,8 +69,8 @@ oppia.factory('ExplorationDiffService', [
       // Delete states not present in both v1 and v2
       for (var stateId in stateData) {
         if (!v1States.hasOwnProperty(
-              stateData[stateId].originalStateName) &&
-            !v2States.hasOwnProperty(stateData[stateId].newestStateName)) {
+          stateData[stateId].originalStateName) &&
+          !v2States.hasOwnProperty(stateData[stateId].newestStateName)) {
           delete stateData[stateId];
         }
       }
@@ -145,7 +145,7 @@ oppia.factory('ExplorationDiffService', [
             }
             var currentStateId = stateIds[change.state_name];
             if (stateData.hasOwnProperty(currentStateId) &&
-                stateData[currentStateId].stateProperty ==
+                stateData[currentStateId].stateProperty ===
                   STATE_PROPERTY_DELETED) {
               stateData[currentStateId].stateProperty = STATE_PROPERTY_CHANGED;
               stateData[currentStateId].newestStateName = change.state_name;
@@ -158,7 +158,7 @@ oppia.factory('ExplorationDiffService', [
             }
           } else if ((directionForwards && change.cmd === 'delete_state') ||
               (!directionForwards && change.cmd === 'add_state')) {
-            if (stateData[stateIds[change.state_name]].stateProperty ==
+            if (stateData[stateIds[change.state_name]].stateProperty ===
                 STATE_PROPERTY_ADDED) {
               stateData[stateIds[change.state_name]].stateProperty = (
                 STATE_PROPERTY_CHANGED);
@@ -180,15 +180,15 @@ oppia.factory('ExplorationDiffService', [
             delete stateIds[oldStateName];
             stateData[stateIds[newStateName]].newestStateName = newStateName;
           } else if (change.cmd === 'edit_state_property') {
-            if (stateData[stateIds[change.state_name]].stateProperty ==
+            if (stateData[stateIds[change.state_name]].stateProperty ===
                 STATE_PROPERTY_UNCHANGED) {
               stateData[stateIds[change.state_name]].stateProperty = (
                 STATE_PROPERTY_CHANGED);
             }
           } else if (
-              change.cmd !== 'migrate_states_schema_to_latest_version' &&
-              change.cmd !== 'AUTO_revert_version_number' &&
-              change.cmd !== 'edit_exploration_property') {
+            change.cmd !== 'migrate_states_schema_to_latest_version' &&
+            change.cmd !== 'AUTO_revert_version_number' &&
+            change.cmd !== 'edit_exploration_property') {
             throw new Error('Invalid change command: ' + change.cmd);
           }
         });

@@ -20,11 +20,12 @@
 var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
-var ExplorationPlayerPage =
-  require('../protractor_utils/ExplorationPlayerPage.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+
+var ExplorationPlayerPage =
+  require('../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Library index page', function() {
   var libraryPage = null;
@@ -184,5 +185,42 @@ describe('Library index page', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
+  });
+});
+
+
+describe('Permissions for private explorations', function() {
+  it('should be correct for collaborators', function() {
+    users.createUser('alice@privileges.com', 'alicePrivileges');
+    users.createUser('bob@privileges.com', 'bobPrivileges');
+    users.createUser('eve@privileges.com', 'evePrivileges');
+
+    users.login('alice@privileges.com');
+    workflow.createExploration();
+    workflow.addExplorationCollaborator('bobPrivileges');
+    expect(workflow.getExplorationManagers()).toEqual(['alicePrivileges']);
+    expect(workflow.getExplorationCollaborators()).toEqual(['bobPrivileges']);
+    expect(workflow.getExplorationPlaytesters()).toEqual([]);
+    general.getExplorationIdFromEditor().then(function(explorationId) {
+      users.logout();
+
+      users.login('bob@privileges.com');
+      general.openEditor(explorationId);
+      editor.setContent(forms.toRichText('I love you'));
+      editor.setInteraction('TextInput');
+      editor.saveChanges();
+      users.logout();
+
+      users.login('eve@privileges.com');
+      general.openEditor(explorationId);
+      general.expect404Error();
+      users.logout();
+    });
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([
+      'Failed to load resource: the server responded with a status of 404'
+    ]);
   });
 });

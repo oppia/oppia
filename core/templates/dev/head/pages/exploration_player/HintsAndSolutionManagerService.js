@@ -50,6 +50,9 @@ oppia.factory('HintsAndSolutionManagerService', [
 
     $rootScope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
       correctAnswerSubmitted = true;
+      // This prevents tooltip to hide the Continue button of the help card in
+      // mobile view.
+      tooltipIsOpen = false;
     });
 
     // This replaces any timeouts that are already queued.
@@ -181,7 +184,7 @@ oppia.factory('HintsAndSolutionManagerService', [
               wrongAnswersSinceLastHintConsumed >= 2) {
             accelerateHintRelease();
           } else if (
-              numHintsReleased > 0 && wrongAnswersSinceLastHintConsumed >= 1) {
+            numHintsReleased > 0 && wrongAnswersSinceLastHintConsumed >= 1) {
             accelerateHintRelease();
           }
         }

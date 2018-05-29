@@ -18,23 +18,23 @@
 
 oppia.factory('ExplorationSaveService', [
   '$uibModal', '$timeout', '$rootScope', '$log', '$q',
-  'AlertsService', 'ExplorationDataService', 'explorationStatesService',
-  'explorationTagsService', 'explorationTitleService',
-  'explorationObjectiveService', 'explorationCategoryService',
-  'explorationLanguageCodeService', 'ExplorationRightsService',
+  'AlertsService', 'ExplorationDataService', 'ExplorationStatesService',
+  'ExplorationTagsService', 'ExplorationTitleService',
+  'ExplorationObjectiveService', 'ExplorationCategoryService',
+  'ExplorationLanguageCodeService', 'ExplorationRightsService',
   'ExplorationWarningsService', 'ExplorationDiffService',
-  'explorationInitStateNameService', 'RouterService',
+  'ExplorationInitStateNameService', 'RouterService',
   'FocusManagerService', 'ChangeListService', 'siteAnalyticsService',
   'StatesObjectFactory', 'UrlInterpolationService',
   'AutosaveInfoModalsService',
   function(
       $uibModal, $timeout, $rootScope, $log, $q,
-      AlertsService, ExplorationDataService, explorationStatesService,
-      explorationTagsService, explorationTitleService,
-      explorationObjectiveService, explorationCategoryService,
-      explorationLanguageCodeService, ExplorationRightsService,
+      AlertsService, ExplorationDataService, ExplorationStatesService,
+      ExplorationTagsService, ExplorationTitleService,
+      ExplorationObjectiveService, ExplorationCategoryService,
+      ExplorationLanguageCodeService, ExplorationRightsService,
       ExplorationWarningsService, ExplorationDiffService,
-      explorationInitStateNameService, RouterService,
+      ExplorationInitStateNameService, RouterService,
       FocusManagerService, ChangeListService, siteAnalyticsService,
       StatesObjectFactory, UrlInterpolationService,
       AutosaveInfoModalsService) {
@@ -50,24 +50,24 @@ oppia.factory('ExplorationSaveService', [
 
     var isAdditionalMetadataNeeded = function() {
       return (
-        !explorationTitleService.savedMemento ||
-        !explorationObjectiveService.savedMemento ||
-        !explorationCategoryService.savedMemento ||
-        explorationLanguageCodeService.savedMemento ===
+        !ExplorationTitleService.savedMemento ||
+        !ExplorationObjectiveService.savedMemento ||
+        !ExplorationCategoryService.savedMemento ||
+        ExplorationLanguageCodeService.savedMemento ===
           constants.DEFAULT_LANGUAGE_CODE ||
-        explorationTagsService.savedMemento.length === 0);
+        ExplorationTagsService.savedMemento.length === 0);
     };
 
     var areRequiredFieldsFilled = function() {
-      if (!explorationTitleService.displayed) {
+      if (!ExplorationTitleService.displayed) {
         AlertsService.addWarning('Please specify a title');
         return false;
       }
-      if (!explorationObjectiveService.displayed) {
+      if (!ExplorationObjectiveService.displayed) {
         AlertsService.addWarning('Please specify an objective');
         return false;
       }
-      if (!explorationCategoryService.displayed) {
+      if (!ExplorationCategoryService.displayed) {
         AlertsService.addWarning('Please specify a category');
         return false;
       }
@@ -82,8 +82,11 @@ oppia.factory('ExplorationSaveService', [
           'post_publish_modal_directive.html'),
         backdrop: true,
         controller: [
-          '$scope', '$uibModalInstance', 'ExplorationContextService',
-          function($scope, $uibModalInstance, ExplorationContextService) {
+          '$scope', '$window', '$uibModalInstance',
+          'ExplorationContextService',
+          function(
+              $scope, $window, $uibModalInstance,
+              ExplorationContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
@@ -93,6 +96,18 @@ oppia.factory('ExplorationSaveService', [
             };
             $scope.explorationId = (
               ExplorationContextService.getExplorationId());
+            $scope.explorationLink = (
+              $window.location.protocol + '//' +
+              $window.location.host + '/explore/' + $scope.explorationId);
+            $scope.selectText = function(evt) {
+              var codeDiv = evt.currentTarget;
+              var range = document.createRange();
+              range.setStartBefore(codeDiv.firstChild);
+              range.setEndAfter(codeDiv.lastChild);
+              var selection = window.getSelection();
+              selection.removeAllRanges();
+              selection.addRange(range);
+            };
           }
         ]
       });
@@ -230,7 +245,7 @@ oppia.factory('ExplorationSaveService', [
             backdrop: 'static',
             keyboard: false,
             controller: [
-              '$scope', '$uibModalInstance', 
+              '$scope', '$uibModalInstance',
               function($scope, $uibModalInstance) {
                 $timeout(function() {
                   $uibModalInstance.dismiss('cancel');
@@ -270,37 +285,37 @@ oppia.factory('ExplorationSaveService', [
               'exploration_metadata_modal_directive.html'),
             backdrop: 'static',
             controller: [
-              '$scope', '$uibModalInstance', 'explorationObjectiveService',
-              'explorationTitleService', 'explorationCategoryService',
-              'explorationStatesService', 'ALL_CATEGORIES',
-              'explorationLanguageCodeService', 'explorationTagsService',
-              function($scope, $uibModalInstance, explorationObjectiveService,
-                  explorationTitleService, explorationCategoryService,
-                  explorationStatesService, ALL_CATEGORIES,
-                  explorationLanguageCodeService, explorationTagsService) {
-                $scope.explorationTitleService = explorationTitleService;
+              '$scope', '$uibModalInstance', 'ExplorationObjectiveService',
+              'ExplorationTitleService', 'ExplorationCategoryService',
+              'ExplorationStatesService', 'ALL_CATEGORIES',
+              'ExplorationLanguageCodeService', 'ExplorationTagsService',
+              function($scope, $uibModalInstance, ExplorationObjectiveService,
+                  ExplorationTitleService, ExplorationCategoryService,
+                  ExplorationStatesService, ALL_CATEGORIES,
+                  ExplorationLanguageCodeService, ExplorationTagsService) {
+                $scope.explorationTitleService = ExplorationTitleService;
                 $scope.explorationObjectiveService =
-                  explorationObjectiveService;
+                  ExplorationObjectiveService;
                 $scope.explorationCategoryService =
-                  explorationCategoryService;
+                  ExplorationCategoryService;
                 $scope.explorationLanguageCodeService = (
-                  explorationLanguageCodeService);
-                $scope.explorationTagsService = explorationTagsService;
+                  ExplorationLanguageCodeService);
+                $scope.explorationTagsService = ExplorationTagsService;
 
                 $scope.objectiveHasBeenPreviouslyEdited = (
-                  explorationObjectiveService.savedMemento.length > 0);
+                  ExplorationObjectiveService.savedMemento.length > 0);
 
                 $scope.requireTitleToBeSpecified = (
-                  !explorationTitleService.savedMemento);
+                  !ExplorationTitleService.savedMemento);
                 $scope.requireObjectiveToBeSpecified = (
-                  explorationObjectiveService.savedMemento.length < 15);
+                  ExplorationObjectiveService.savedMemento.length < 15);
                 $scope.requireCategoryToBeSpecified = (
-                  !explorationCategoryService.savedMemento);
+                  !ExplorationCategoryService.savedMemento);
                 $scope.askForLanguageCheck = (
-                  explorationLanguageCodeService.savedMemento ===
+                  ExplorationLanguageCodeService.savedMemento ===
                   constants.DEFAULT_LANGUAGE_CODE);
                 $scope.askForTags = (
-                  explorationTagsService.savedMemento.length === 0);
+                  ExplorationTagsService.savedMemento.length === 0);
 
                 $scope.TAG_REGEX = GLOBALS.TAG_REGEX;
 
@@ -313,33 +328,33 @@ oppia.factory('ExplorationSaveService', [
                   });
                 }
 
-                if (explorationStatesService.isInitialized()) {
+                if (ExplorationStatesService.isInitialized()) {
                   var categoryIsInSelect2 = $scope.CATEGORY_LIST_FOR_SELECT2
-                  .some(
-                    function(categoryItem) {
-                      return categoryItem.id ===
-                      explorationCategoryService.savedMemento;
-                    }
-                  );
+                    .some(
+                      function(categoryItem) {
+                        return categoryItem.id ===
+                      ExplorationCategoryService.savedMemento;
+                      }
+                    );
 
                   // If the current category is not in the dropdown, add it
                   // as the first option.
                   if (!categoryIsInSelect2 &&
-                      explorationCategoryService.savedMemento) {
+                      ExplorationCategoryService.savedMemento) {
                     $scope.CATEGORY_LIST_FOR_SELECT2.unshift({
-                      id: explorationCategoryService.savedMemento,
-                      text: explorationCategoryService.savedMemento
+                      id: ExplorationCategoryService.savedMemento,
+                      text: ExplorationCategoryService.savedMemento
                     });
                   }
                 }
 
                 $scope.isSavingAllowed = function() {
                   return Boolean(
-                    explorationTitleService.displayed &&
-                    explorationObjectiveService.displayed &&
-                    explorationObjectiveService.displayed.length >= 15 &&
-                    explorationCategoryService.displayed &&
-                    explorationLanguageCodeService.displayed);
+                    ExplorationTitleService.displayed &&
+                    ExplorationObjectiveService.displayed &&
+                    ExplorationObjectiveService.displayed.length >= 15 &&
+                    ExplorationCategoryService.displayed &&
+                    ExplorationLanguageCodeService.displayed);
                 };
 
                 $scope.save = function() {
@@ -349,28 +364,28 @@ oppia.factory('ExplorationSaveService', [
 
                   // Record any fields that have changed.
                   var metadataList = [];
-                  if (explorationTitleService.hasChanged()) {
+                  if (ExplorationTitleService.hasChanged()) {
                     metadataList.push('title');
                   }
-                  if (explorationObjectiveService.hasChanged()) {
+                  if (ExplorationObjectiveService.hasChanged()) {
                     metadataList.push('objective');
                   }
-                  if (explorationCategoryService.hasChanged()) {
+                  if (ExplorationCategoryService.hasChanged()) {
                     metadataList.push('category');
                   }
-                  if (explorationLanguageCodeService.hasChanged()) {
+                  if (ExplorationLanguageCodeService.hasChanged()) {
                     metadataList.push('language');
                   }
-                  if (explorationTagsService.hasChanged()) {
+                  if (ExplorationTagsService.hasChanged()) {
                     metadataList.push('tags');
                   }
 
                   // Save all the displayed values.
-                  explorationTitleService.saveDisplayedValue();
-                  explorationObjectiveService.saveDisplayedValue();
-                  explorationCategoryService.saveDisplayedValue();
-                  explorationLanguageCodeService.saveDisplayedValue();
-                  explorationTagsService.saveDisplayedValue();
+                  ExplorationTitleService.saveDisplayedValue();
+                  ExplorationObjectiveService.saveDisplayedValue();
+                  ExplorationCategoryService.saveDisplayedValue();
+                  ExplorationLanguageCodeService.saveDisplayedValue();
+                  ExplorationTagsService.saveDisplayedValue();
 
                   // TODO(sll): Get rid of the $timeout here.
                   // It's currently used because there is a race condition: the
@@ -385,11 +400,11 @@ oppia.factory('ExplorationSaveService', [
 
                 $scope.cancel = function() {
                   whenModalsClosed.resolve();
-                  explorationTitleService.restoreFromMemento();
-                  explorationObjectiveService.restoreFromMemento();
-                  explorationCategoryService.restoreFromMemento();
-                  explorationLanguageCodeService.restoreFromMemento();
-                  explorationTagsService.restoreFromMemento();
+                  ExplorationTitleService.restoreFromMemento();
+                  ExplorationObjectiveService.restoreFromMemento();
+                  ExplorationCategoryService.restoreFromMemento();
+                  ExplorationLanguageCodeService.restoreFromMemento();
+                  ExplorationTagsService.restoreFromMemento();
 
                   $uibModalInstance.dismiss('cancel');
                   AlertsService.clearWarnings();
@@ -419,14 +434,14 @@ oppia.factory('ExplorationSaveService', [
                   onEndLoadingCallback();
                 }
                 openPublishExplorationModal(
-                    onStartLoadingCallback, onEndLoadingCallback)
+                  onStartLoadingCallback, onEndLoadingCallback)
                   .then(function() {
                     whenModalsClosed.resolve();
                   });
               });
             } else {
               openPublishExplorationModal(
-                  onStartLoadingCallback, onEndLoadingCallback)
+                onStartLoadingCallback, onEndLoadingCallback)
                 .then(function() {
                   whenModalsClosed.resolve();
                 });
@@ -435,7 +450,7 @@ oppia.factory('ExplorationSaveService', [
         } else {
           // No further metadata is needed. Open the publish modal immediately.
           openPublishExplorationModal(
-              onStartLoadingCallback, onEndLoadingCallback)
+            onStartLoadingCallback, onEndLoadingCallback)
             .then(function() {
               whenModalsClosed.resolve();
             });
@@ -461,7 +476,7 @@ oppia.factory('ExplorationSaveService', [
         ExplorationDataService.getLastSavedData().then(function(data) {
           var oldStates = StatesObjectFactory.createFromBackendDict(
             data.states).getStateObjects();
-          var newStates = explorationStatesService.getStates()
+          var newStates = ExplorationStatesService.getStates()
             .getStateObjects();
           var diffGraphData = ExplorationDiffService.getDiffGraphData(
             oldStates, newStates, [{
@@ -474,7 +489,7 @@ oppia.factory('ExplorationSaveService', [
             finalStateIds: diffGraphData.finalStateIds,
             v1InitStateId: diffGraphData.originalStateIds[data.init_state_name],
             v2InitStateId: diffGraphData.stateIds[
-              explorationInitStateNameService.displayed],
+              ExplorationInitStateNameService.displayed],
             v1States: oldStates,
             v2States: newStates
           };

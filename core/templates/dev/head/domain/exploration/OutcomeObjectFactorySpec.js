@@ -23,7 +23,8 @@ describe('Outcome object factory', function() {
     oof = $injector.get('OutcomeObjectFactory');
   }));
 
-  it('should correctly determine if an outcome is confusing given a ' +
+  it(
+    'should correctly determine if an outcome is confusing given a ' +
     'source state',
     function() {
       var currentState = 'A';
@@ -46,7 +47,7 @@ describe('Outcome object factory', function() {
       var testOutcome2 = oof.createNew('A', '', []);
       var testOutcome3 = oof.createNew('A', '   ', []);
       expect(testOutcome1.hasNonemptyFeedback()).toBe(true);
-      expect(testOutcome2.hasNonemptyFeedback()).toBe(false); 
+      expect(testOutcome2.hasNonemptyFeedback()).toBe(false);
       expect(testOutcome3.hasNonemptyFeedback()).toBe(false);
     }
   );

@@ -168,7 +168,7 @@ oppia.controller('HistoryTab', [
         ' (' + versionMetadata.createdOnStr +
         ')' + (
           versionMetadata.commitMessage ?
-          ': ' + versionMetadata.commitMessage : ''));
+            ': ' + versionMetadata.commitMessage : ''));
     };
 
     // Function to set compared version metadata, download YAML and generate
@@ -187,7 +187,7 @@ oppia.controller('HistoryTab', [
         $scope.explorationVersionMetadata[laterComparedVersion];
 
       CompareVersionsService.getDiffGraphData(earlierComparedVersion,
-          laterComparedVersion).then(
+        laterComparedVersion).then(
         function(response) {
           $log.info('Retrieved version comparison data');
           $log.info(response);

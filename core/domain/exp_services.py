@@ -139,7 +139,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     migration works correctly, and it should never be changed otherwise.
 
     Args:
-        exploration_model: An exploration storage model.
+        exploration_model: ExplorationModel. An exploration storage model.
         run_conversion: bool. When True, updates the exploration to the latest
             states_schema_version if necessary.
 
@@ -194,7 +194,7 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.scaled_average_rating,
         exp_summary_model.status, exp_summary_model.community_owned,
         exp_summary_model.owner_ids, exp_summary_model.editor_ids,
-        exp_summary_model.viewer_ids,
+        exp_summary_model.translator_ids, exp_summary_model.viewer_ids,
         exp_summary_model.contributor_ids,
         exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
@@ -667,6 +667,10 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
     Args:
         exploration_id: str. The id of the exploration whose states should
             be exported.
+        version: int or None. The version of the exploration to be returned.
+            If None, the latest version of the exploration is returned.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
 
     Returns:
         dict. The keys are state names, and the values are YAML strings
@@ -868,16 +872,14 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration.version += 1
 
     # Trigger statistics model update.
-    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-        stats_services.handle_stats_creation_for_new_exp_version(
-            exploration.id, exploration.version, exploration.states,
-            change_list)
+    stats_services.handle_stats_creation_for_new_exp_version(
+        exploration.id, exploration.version, exploration.states,
+        change_list)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
-        new_to_old_state_names = exploration.get_state_names_mapping(
-            change_list)
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         trainable_states_dict = exploration.get_trainable_states_dict(
-            old_states, new_to_old_state_names)
+            old_states, exp_versions_diff)
         state_names_with_changed_answer_groups = trainable_states_dict[
             'state_names_with_changed_answer_groups']
         state_names_with_unchanged_answer_groups = trainable_states_dict[
@@ -888,7 +890,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
         if state_names_with_unchanged_answer_groups:
             classifier_services.handle_non_retrainable_states(
                 exploration, state_names_with_unchanged_answer_groups,
-                new_to_old_state_names)
+                exp_versions_diff)
 
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
@@ -939,9 +941,8 @@ def _create_exploration(
     exploration.version += 1
 
     # Trigger statistics model creation.
-    if feconf.ENABLE_NEW_STATS_FRAMEWORK:
-        stats_services.handle_stats_creation_for_new_exploration(
-            exploration.id, exploration.version, exploration.states)
+    stats_services.handle_stats_creation_for_new_exploration(
+        exploration.id, exploration.version, exploration.states)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         # Find out all states that need a classifier to be trained.
@@ -970,11 +971,12 @@ def save_new_exploration(committer_id, exploration):
     commit_message = (
         ('New exploration created with title \'%s\'.' % exploration.title)
         if exploration.title else 'New exploration created.')
-    _create_exploration(committer_id, exploration, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': exploration.title,
-        'category': exploration.category,
-    }])
+    _create_exploration(
+        committer_id, exploration, commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': exploration.title,
+            'category': exploration.category,
+        }])
     user_services.add_created_exploration_id(committer_id, exploration.id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
     user_services.record_user_created_an_exploration(committer_id)
@@ -1244,7 +1246,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
 
     if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
         if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit
+            # Revert commit or other non-positive commit.
             contributors_summary = compute_exploration_contributors_summary(
                 exploration.id)
         else:
@@ -1262,8 +1264,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exploration.objective, exploration.language_code,
         exploration.tags, ratings, scaled_average_rating, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
-        contributors_summary, exploration.version,
+        exp_rights.editor_ids, exp_rights.translator_ids, exp_rights.viewer_ids,
+        contributor_ids, contributors_summary, exploration.version,
         exploration_model_created_on, exploration_model_last_updated,
         first_published_msec)
 
@@ -1324,6 +1326,7 @@ def save_exploration_summary(exp_summary):
         community_owned=exp_summary.community_owned,
         owner_ids=exp_summary.owner_ids,
         editor_ids=exp_summary.editor_ids,
+        translator_ids=exp_summary.translator_ids,
         viewer_ids=exp_summary.viewer_ids,
         contributor_ids=exp_summary.contributor_ids,
         contributors_summary=exp_summary.contributors_summary,
@@ -1434,7 +1437,8 @@ def get_demo_exploration_components(demo_path):
 
 
 def save_new_exploration_from_yaml_and_assets(
-        committer_id, yaml_content, exploration_id, assets_list):
+        committer_id, yaml_content, exploration_id, assets_list,
+        strip_audio_translations=False):
     """Note that the default title and category will be used if the YAML
     schema version is less than
     exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION,
@@ -1447,6 +1451,8 @@ def save_new_exploration_from_yaml_and_assets(
         exploration_id: str. The id of the exploration.
         assets_list: list(list(str)). A list of lists of assets, which contains
             asset's filename and content.
+        strip_audio_translations: bool. Whether to strip away all audio
+            translations from the imported exploration.
 
     Raises:
         Exception: The yaml file is invalid due to a missing schema version.
@@ -1470,15 +1476,42 @@ def save_new_exploration_from_yaml_and_assets(
         exploration = exp_domain.Exploration.from_yaml(
             exploration_id, yaml_content)
 
-    commit_message = (
+    # Check whether audio translations should be stripped.
+    if strip_audio_translations:
+        for state in exploration.states.values():
+            # Strip away audio translations from the state content.
+            content = state.content
+            content.audio_translations = {}
+
+            if state.interaction is not None:
+                # Strip away audio translations from solutions.
+                solution = state.interaction.solution
+                if solution:
+                    solution.explanation.audio_translations = {}
+
+                # Strip away audio translations from hints.
+                for hint in state.interaction.hints:
+                    hint.hint_content.audio_translations = {}
+
+                # Strip away audio translations from answer groups (feedback).
+                for answer_group in state.interaction.answer_groups:
+                    answer_group.outcome.feedback.audio_translations = {}
+
+                # Strip away audio translations from the default outcome.
+                default_outcome = state.interaction.default_outcome
+                if default_outcome:
+                    default_outcome.feedback.audio_translations = {}
+
+    create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
         % exploration.title)
 
-    _create_exploration(committer_id, exploration, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': exploration.title,
-        'category': exploration.category,
-    }])
+    _create_exploration(
+        committer_id, exploration, create_commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': exploration.title,
+            'category': exploration.category,
+        }])
 
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
@@ -1555,6 +1588,8 @@ def get_next_page_of_all_non_private_commits(
         urlsafe_start_cursor: str. If this is not None, then the returned
             commits start from cursor location. Otherwise they start from the
             beginning of the list of commits.
+        max_age: datetime.timedelta. The maximum age to which all non private
+            commits are fetch from the ExplorationCommitLogEntry.
 
     Returns:
         tuple. A 3-tuple consisting of:
@@ -1641,9 +1676,9 @@ def get_scaled_average_rating(ratings):
     x = (average_rating - 1) / 4
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
-    a = x + (z**2)/(2*n)
-    b = z * math.sqrt((x*(1-x))/n + (z**2)/(4*n**2))
-    wilson_score_lower_bound = (a - b)/(1 + z**2/n)
+    a = x + (z**2) / (2 * n)
+    b = z * math.sqrt((x * (1 - x)) / n + (z**2) / (4 * n**2))
+    wilson_score_lower_bound = (a - b) / (1 + z**2 / n)
     return 1 + 4 * wilson_score_lower_bound
 
 
@@ -1910,6 +1945,9 @@ def get_exp_with_draft_applied(exp_id, user_id):
     Args:
         exp_id: str. The id of the exploration.
         user_id: str. The id of the user whose draft is to be applied.
+
+    Returns:
+        Exploration. The exploration domain object.
     """
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
@@ -1946,7 +1984,7 @@ def get_state_id_mapping(exp_id, exp_version):
         exp_id: str. The exploration id.
         exp_version: int. The exploration version.
 
-    Returnes:
+    Returns:
         StateIdMapping. Domain object for state id mapping model instance.
     """
     model = exp_models.StateIdMappingModel.get_state_id_mapping_model(
@@ -1971,7 +2009,7 @@ def _save_state_id_mapping(state_id_mapping):
         state_id_mapping.largest_state_id_used)
 
 
-def create_and_save_state_id_mapping_model(exploration, change_list):
+def generate_state_id_mapping_model(exploration, change_list):
     """Create and store state id mapping for new exploration.
 
     Args:
@@ -1982,9 +2020,6 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     if exploration.version > 1:
         # Get state id mapping for new exploration from old exploration with
         # the help of change list.
@@ -2001,7 +2036,57 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
             exp_domain.StateIdMapping.create_mapping_for_new_exploration(
                 exploration))
 
+    new_state_id_mapping.validate()
+    return new_state_id_mapping
+
+
+def create_and_save_state_id_mapping_model(exploration, change_list):
+    """Create and store state id mapping for new exploration.
+
+    Args:
+        exploration: Exploration. Exploration for which state id mapping is
+            to be stored.
+        change_list: list(dict). A list of changes made in the exploration.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    if not feconf.ENABLE_STATE_ID_MAPPING:
+        return
+
+    new_state_id_mapping = generate_state_id_mapping_model(
+        exploration, change_list)
     _save_state_id_mapping(new_state_id_mapping)
+    return new_state_id_mapping
+
+
+def generate_state_id_mapping_model_for_reverted_exploration(
+        exploration_id, current_version, revert_to_version):
+    """Generates state id mapping model for when exploration is reverted.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        current_version: str. The current version of the exploration.
+        revert_to_version: int. The version to which the given exploration
+            is to be reverted.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    old_state_id_mapping = get_state_id_mapping(
+        exploration_id, revert_to_version)
+    previous_state_id_mapping = get_state_id_mapping(
+        exploration_id, current_version)
+
+    # Note: when an exploration is reverted state id mapping should
+    # be same as reverted version of the exploration but largest
+    # state id used should be kept as it is as in old exploration.
+    new_version = current_version + 1
+    new_state_id_mapping = exp_domain.StateIdMapping(
+        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
+        previous_state_id_mapping.largest_state_id_used)
+    new_state_id_mapping.validate()
+
     return new_state_id_mapping
 
 
@@ -2021,20 +2106,9 @@ def create_and_save_state_id_mapping_model_for_reverted_exploration(
     if not feconf.ENABLE_STATE_ID_MAPPING:
         return
 
-    old_state_id_mapping = get_state_id_mapping(
-        exploration_id, revert_to_version)
-    previous_state_id_mapping = get_state_id_mapping(
-        exploration_id, current_version)
-
-    # Note: when an exploration is reverted state id mapping should
-    # be same as reverted version of the exploration but largest
-    # state id used should be kept as it is as in old exploration.
-    new_version = current_version + 1
-    new_state_id_mapping = exp_domain.StateIdMapping(
-        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
-        previous_state_id_mapping.largest_state_id_used)
-    new_state_id_mapping.validate()
-
+    new_state_id_mapping = (
+        generate_state_id_mapping_model_for_reverted_exploration(
+            exploration_id, current_version, revert_to_version))
     _save_state_id_mapping(new_state_id_mapping)
     return new_state_id_mapping
 
@@ -2053,3 +2127,38 @@ def delete_state_id_mapping_model_for_exploration(
     exp_versions = range(1, exploration_version + 1)
     exp_models.StateIdMappingModel.delete_state_id_mapping_models(
         exploration_id, exp_versions)
+
+
+def find_all_values_for_key(key, dictionary):
+    """Finds the value of the key inside all the nested dictionaries
+    in a given dictionary.
+
+    Args:
+       key: str. The key whose value is to be found.
+       dictionary: dict or list. The dictionary or list in which the
+           key is to be searched.
+
+    Returns:
+        list. The values of the key in the given dictionary.
+
+    Yields:
+        str. The value of the given key.
+    """
+    if isinstance(dictionary, list):
+        for d in dictionary:
+            if isinstance(d, (dict, list)):
+                for result in find_all_values_for_key(key, d):
+                    yield result
+
+    else:
+        for k, v in dictionary.iteritems():
+            if k == key:
+                yield v
+            elif isinstance(v, dict):
+                for result in find_all_values_for_key(key, v):
+                    yield result
+            elif isinstance(v, list):
+                for d in v:
+                    if isinstance(d, (dict, list)):
+                        for result in find_all_values_for_key(key, d):
+                            yield result

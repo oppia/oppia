@@ -46,16 +46,16 @@ describe('State Interaction controller', function() {
         autosaveChangeList: function() {}
       };
       module(function($provide) {
-        $provide.value('ExplorationDataService', mockExplorationData);
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function($rootScope, $controller, $injector) {
+    beforeEach(inject(function($controller, $injector, $rootScope) {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
       cls = $injector.get('ChangeListService');
-      ess = $injector.get('explorationStatesService');
+      ess = $injector.get('ExplorationStatesService');
       siis = $injector.get('stateInteractionIdService');
       scas = $injector.get('stateCustomizationArgsService');
       idc = $injector.get('InteractionDetailsCacheService');
@@ -140,7 +140,7 @@ describe('State Interaction controller', function() {
         $scope: scope,
         EditorStateService: ecs,
         ChangeListService: cls,
-        explorationStatesService: ess,
+        ExplorationStatesService: ess,
         EditabilityService: {
           isEditable: function() {
             return true;
@@ -153,7 +153,7 @@ describe('State Interaction controller', function() {
         $scope: scope,
         EditorStateService: ecs,
         ChangeListService: cls,
-        explorationStatesService: ess,
+        ExplorationStatesService: ess,
         EditabilityService: {
           isEditable: function() {
             return true;

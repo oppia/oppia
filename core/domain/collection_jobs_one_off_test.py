@@ -146,7 +146,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         # This running without errors indicates the collection is migrated.
         self.process_and_flush_pending_tasks()
 
-        # Check the version number of the new model
+        # Check the version number of the new model.
         new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
         self.assertEqual(
             new_model.schema_version, feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
@@ -192,7 +192,7 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
             model, self.albert_id)
         collection_services.save_collection_summary(collection_summary)
 
-        # Check that collection_contents is empty
+        # Check that collection_contents is empty.
         self.assertEqual(model.collection_contents, {})
 
         # Run the job. This should populate collection_contents.
@@ -204,7 +204,5 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         new_model = collection_models.CollectionModel.get(self.COLLECTION_ID)
         self.assertEqual(
             new_model.collection_contents, {
-                'nodes': [node.to_dict()],
-                'skills': {},
-                'next_skill_index': 0
+                'nodes': [node.to_dict()]
             })

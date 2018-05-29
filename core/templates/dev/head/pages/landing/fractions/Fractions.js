@@ -17,8 +17,29 @@
  */
 
 oppia.controller('Fractions', [
-  '$scope', 'UrlInterpolationService',
-  function($scope, UrlInterpolationService) {
+  '$scope', '$timeout', '$window',
+  'siteAnalyticsService', 'UrlInterpolationService',
+  function($scope, $timeout, $window,
+      siteAnalyticsService, UrlInterpolationService) {
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
+
+    $scope.getStaticSubjectImageUrl = function(subjectName) {
+      return UrlInterpolationService.getStaticImageUrl('/subjects/' +
+        subjectName + '.svg');
+    };
+
+    $scope.onClickGetStartedButton = function(viewerType) {
+      siteAnalyticsService.registerOpenFractionsFromLandingPageEvent(
+        viewerType);
+      $timeout(function() {
+        $window.location = '/collection/4UgTQUc1tala';
+      }, 150);
+    };
+
+    $scope.onClickLearnMoreButton = function() {
+      $timeout(function() {
+        $window.location = '/splash';
+      }, 150);
+    };
   }
 ]);
