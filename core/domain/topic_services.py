@@ -315,8 +315,7 @@ def update_topic(
 
 
 def delete_topic(committer_id, topic_id, force_deletion=False):
-    """Deletes the topic with the given topic_id if the committer has enough
-    rights to do so.
+    """Deletes the topic with the given topic_id.
 
     Args:
         committer_id: str. ID of the committer.
