@@ -95,6 +95,7 @@ class TopicModel(base_models.VersionedModel):
         topic_commit_log_entry.topic_id = self.id
         topic_commit_log_entry.put()
 
+
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to topics.
 
