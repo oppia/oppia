@@ -596,7 +596,7 @@ def _pre_commit_linter(all_files):
     py_result = multiprocessing.Queue()
     py_linting_process = multiprocessing.Process(
         target=_lint_py_files,
-        args=(config_pylint, py_files_to_lint, py_result))
+        args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result))
     print 'Starting CSS, Javascript and Python Linting'
     print '----------------------------------------'
     css_linting_process.start()
