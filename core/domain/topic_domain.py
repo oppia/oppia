@@ -17,9 +17,12 @@
 """Domain objects for topics, and related models."""
 
 from constants import constants
+from core.domain import skill_services
+from core.domain import story_services
 from core.domain import user_services
 from core.platform import models
 import feconf
+import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
 
@@ -132,6 +135,57 @@ class Topic(object):
             'skill_ids': self.skill_ids,
             'version': self.version
         }
+
+    def validate(self):
+        """Validates all properties of this topic and its constituents.
+
+        Raises:
+            ValidationError: One or more attributes of the Topic are not
+            valid.
+        """
+        if not isinstance(self.name, basestring):
+            raise utils.ValidationError(
+                'Expected name to be a string, received %s' % self.name)
+        if not isinstance(self.description, basestring):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+        if not any([self.language_code == lc['code']
+                    for lc in constants.ALL_LANGUAGE_CODES]):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.canonical_story_ids, list):
+            raise utils.ValidationError(
+                'Expected canonical story ids to be a list, received %s'
+                % self.canonical_story_ids)
+        for story_id in self.canonical_story_ids:
+            if story_services.get_story_by_id(story_id, False) is None:
+                raise utils.ValidationError(
+                    'The story with id %s doesn\'t exist' % story_id)
+
+        if not isinstance(self.additional_story_ids, list):
+            raise utils.ValidationError(
+                'Expected additional story ids to be a list, received %s'
+                % self.additional_story_ids)
+        for story_id in self.additional_story_ids:
+            if story_services.get_story_by_id(story_id, False) is None:
+                raise utils.ValidationError(
+                    'The story with id %s doesn\'t exist' % story_id)
+
+        if not isinstance(self.skill_ids, list):
+            raise utils.ValidationError(
+                'Expected skill ids to be a list, received %s'
+                % self.skill_ids)
+        for skill_id in self.skill_ids:
+            if skill_services.get_skill_by_id(skill_id, False) is None:
+                raise utils.ValidationError(
+                    'The skill with id %s doesn\'t exist' % skill_id)
 
     @classmethod
     def create_default_topic(cls, topic_id):

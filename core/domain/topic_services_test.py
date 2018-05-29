@@ -146,28 +146,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.name, 'New Name')
         self.assertEqual(topic_summary.version, 3)
 
-        # Test whether a ValueError is raised when a user without rights
-        # tries to edit the topic.
-        changelist = [{
-            'cmd': topic_domain.CMD_UPDATE_TOPIC_PROPERTY,
-            'property_name': topic_domain.TOPIC_PROPERTY_SKILL_IDS,
-            'old_value': ['skill'],
-            'new_value': ['skill_id_1']
-        }]
-        with self.assertRaisesRegexp(
-            ValueError,
-            'Current user does not have enough rights to edit a topic.'):
-            topic_services.update_topic(
-                self.user_id_b, self.TOPIC_ID, changelist, 'Updated skill ids.')
 
     def test_delete_topic(self):
-        # Test whether a ValueError is raised when a user without right tries to
-        # delete a topic.
-        with self.assertRaisesRegexp(
-            ValueError,
-            'User does not have enough rights to delete a topic.'):
-            topic_services.delete_topic(self.user_id_b, self.TOPIC_ID)
-
         # Test whether an admin can delete a topic.
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
         self.assertEqual(

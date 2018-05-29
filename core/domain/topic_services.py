@@ -162,6 +162,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         commit_cmds: list(dict). A list of change commands made to the given
             topic.
     """
+    topic.validate()
     create_new_topic_rights(topic.id, committer_id)
     model = topic_models.TopicModel(
         id=topic.id,
@@ -203,7 +204,7 @@ def apply_change_list(topic_id, change_list):
             TopicChange object.
 
     Returns:
-      Topic. The resulting topic domain object.
+        Topic. The resulting topic domain object.
     """
     topic = get_topic_by_id(topic_id)
     try:
@@ -261,6 +262,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
             'save topic %s: %s' % (topic.id, change_list))
+    topic.validate()
 
     topic_model = topic_models.TopicModel.get(topic.id, strict=False)
     if topic_model is None:
@@ -309,15 +311,9 @@ def update_topic(
         raise ValueError(
             'Expected a commit message, received none.')
 
-    topic_rights = get_topic_rights(topic_id)
-    user_actions_info = user_services.UserActionsInfo(committer_id)
-    if check_can_edit_topic(user_actions_info, topic_rights):
-        topic = apply_change_list(topic_id, change_list)
-        _save_topic(committer_id, topic, commit_message, change_list)
-        create_topic_summary(topic.id)
-    else:
-        raise ValueError(
-            'Current user does not have enough rights to edit a topic.')
+    topic = apply_change_list(topic_id, change_list)
+    _save_topic(committer_id, topic, commit_message, change_list)
+    create_topic_summary(topic.id)
 
 
 def delete_topic(committer_id, topic_id, force_deletion=False):
@@ -336,15 +332,10 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     Raises:
         ValueError: User does not have enough rights to delete a topic.
     """
-    committer = user_services.UserActionsInfo(committer_id)
-    topic_rights = get_topic_rights(topic_id)
-    if not check_can_edit_topic(committer, topic_rights):
-        raise ValueError(
-            'User does not have enough rights to delete a topic.')
-
     topic_rights_model = topic_models.TopicRightsModel.get(topic_id)
     topic_rights_model.delete(
-        committer_id, '', force_deletion=force_deletion)
+        committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
+        force_deletion=force_deletion)
 
     topic_model = topic_models.TopicModel.get(topic_id)
     topic_model.delete(
