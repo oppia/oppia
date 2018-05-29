@@ -40,10 +40,10 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
      *                         the answer groups should be returned.
      */
     var _getOutcomeHtml = function(state) {
-      var outcomeHtml = [];
+      var outcomeHtml = '';
       state.interaction.answerGroups.forEach(function(answerGroup) {
         var answerGroupHtml = answerGroup.outcome.feedback.getHtml();
-        outcomeHtml.push(answerGroupHtml);
+        outcomeHtml = outcomeHtml.concat(answerGroupHtml);
       });
       return outcomeHtml;
     };
@@ -64,10 +64,10 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
      * @param {object} state - The state whose hints' html should be returned.
      */
     var _getHintsHtml = function(state) {
-      var hintsHtml = [];
+      var hintsHtml = '';
       state.interaction.hints.forEach(function(hint) {
         var hintHtml = hint.hintContent.getHtml();
-        hintsHtml.push(hintHtml);
+        hintsHtml = hintsHtml.concat(hintHtml);
       });
       return hintsHtml;
     };
@@ -105,7 +105,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         _allHtmlInTheState.push(customizationArgsHtml);
       }
 
-      _allHtmlInTheState = _allHtmlInTheState.concat(_getOutcomeHtml(state));
+      _allHtmlInTheState.push(_getOutcomeHtml(state));
 
       if (state.interaction.defaultOutcome !== null) {
         var defaultOutcomeHtml = _getDefaultOutcomeHtml(state);
@@ -114,7 +114,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         }
       }
 
-      _allHtmlInTheState = _allHtmlInTheState.concat(_getHintsHtml(state));
+      _allHtmlInTheState.push(_getHintsHtml(state));
 
       if (state.interaction.solution !== null) {
         _allHtmlInTheState.push(_getSolutionHtml(state));
@@ -172,6 +172,15 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     };
 
     return {
-      getImageFilenamesInState: _getImageFilenamesInState
+      getImageFilenamesInState: _getImageFilenamesInState,
+      getImageFilenamesInHints: function(state) {
+        var hintsHtml = _getHintsHtml(state);
+        return _extractFilepathValueFromOppiaNonInteractiveImageTag(hintsHtml);
+      },
+      getImageFilenamesInSolutions: function(state) {
+        var solutionHtml = _getHintsHtml(state);
+        return _extractFilepathValueFromOppiaNonInteractiveImageTag(
+          solutionHtml);
+      }
     };
   }]);
