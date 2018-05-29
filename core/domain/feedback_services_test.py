@@ -75,11 +75,12 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
 class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion query functions in feedback_services."""
 
-    THREAD_ID1 = '1111'
-    THREAD_ID2 = '2222'
-    THREAD_ID3 = '3333'
-    THREAD_ID4 = '4444'
-    THREAD_ID5 = '5555'
+    THREAD_ID1 = 'exp_id1.1111'
+    THREAD_ID2 = 'exp_id1.2222'
+    THREAD_ID3 = 'exp_id1.3333'
+    THREAD_ID4 = 'exp_id1.4444'
+    THREAD_ID5 = 'exp_id1.5555'
+    THREAD_ID6 = 'exp_id2.1111'
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
     USER_EMAIL = 'abc@xyz.com'
@@ -87,7 +88,7 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
     CURRENT_TIME_IN_MSEC = 12345678
 
     def _generate_thread_id(self, unused_exp_id):
-        return self.EXP_ID2 + '.' + self.THREAD_ID1
+        return self.THREAD_ID6
 
     def setUp(self):
         super(SuggestionQueriesUnitTests, self).setUp()
@@ -97,45 +98,31 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         self.signup(self.USER_EMAIL, self.USERNAME)
         # Open thread with suggestion.
         thread1 = feedback_models.FeedbackThreadModel(
-            id=self.EXP_ID1 + '.' + self.THREAD_ID1,
-            exploration_id=self.EXP_ID1,
-            state_name='state_name',
-            original_author_id=self.user_id,
-            subject='SUGGESTION',
-            has_suggestion=True)
+            id=self.THREAD_ID1, exploration_id=self.EXP_ID1,
+            state_name='state_name', original_author_id=self.user_id,
+            subject='SUGGESTION', has_suggestion=True)
         # Closed threads with suggestion.
         thread2 = feedback_models.FeedbackThreadModel(
-            id=self.EXP_ID1 + '.' + self.THREAD_ID2,
-            exploration_id=self.EXP_ID1,
-            state_name='state_name',
-            original_author_id=self.user_id,
-            subject='SUGGESTION',
-            status=feedback_models.STATUS_CHOICES_FIXED,
+            id=self.THREAD_ID2, exploration_id=self.EXP_ID1,
+            state_name='state_name', original_author_id=self.user_id,
+            subject='SUGGESTION', status=feedback_models.STATUS_CHOICES_FIXED,
             has_suggestion=True)
         thread3 = feedback_models.FeedbackThreadModel(
-            id=self.EXP_ID1 + '.' + self.THREAD_ID3,
-            exploration_id=self.EXP_ID1,
-            state_name='state_name',
-            original_author_id=self.user_id,
-            subject='SUGGESTION',
-            status=feedback_models.STATUS_CHOICES_IGNORED,
+            id=self.THREAD_ID3, exploration_id=self.EXP_ID1,
+            state_name='state_name', original_author_id=self.user_id,
+            subject='SUGGESTION', status=feedback_models.STATUS_CHOICES_IGNORED,
             has_suggestion=True)
         # Closed thread without suggestion.
         thread4 = feedback_models.FeedbackThreadModel(
-            id=self.EXP_ID1 + '.' + self.THREAD_ID4,
-            exploration_id=self.EXP_ID1,
-            state_name='state_name',
-            original_author_id=self.user_id,
+            id=self.THREAD_ID4, exploration_id=self.EXP_ID1,
+            state_name='state_name', original_author_id=self.user_id,
             subject='NO SUGGESTION',
             status=feedback_models.STATUS_CHOICES_IGNORED)
         # Open thread without suggestion.
         thread5 = feedback_models.FeedbackThreadModel(
-            id=self.EXP_ID1 + '.' + self.THREAD_ID5,
-            exploration_id=self.EXP_ID1,
-            state_name='state_name',
-            original_author_id=self.user_id,
-            subject='NO SUGGESTION',
-            status=feedback_models.STATUS_CHOICES_OPEN)
+            id=self.THREAD_ID5, exploration_id=self.EXP_ID1,
+            state_name='state_name', original_author_id=self.user_id,
+            subject='NO SUGGESTION', status=feedback_models.STATUS_CHOICES_OPEN)
 
         for thread in [thread1, thread2, thread3, thread4, thread5]:
             thread.put()
@@ -146,10 +133,8 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
             'generate_new_thread_id', self._generate_thread_id):
             feedback_services.create_suggestion(
                 self.EXP_ID2, self.user_id, 3, 'state_name', 'description', '')
-        suggestion = feedback_services.get_suggestion(
-            self.EXP_ID2 + '.' + self.THREAD_ID1)
-        thread = feedback_models.FeedbackThreadModel.get(
-            self.EXP_ID2 + '.' + self.THREAD_ID1)
+        suggestion = feedback_services.get_suggestion(self.THREAD_ID6)
+        thread = feedback_models.FeedbackThreadModel.get(self.THREAD_ID6)
         expected_suggestion_dict = {
             'exploration_id': self.EXP_ID2,
             'author_name': 'user123',
@@ -164,36 +149,36 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
     def test_get_open_threads_with_suggestions(self):
         threads = feedback_services.get_open_threads(self.EXP_ID1, True)
         self.assertEqual(len(threads), 1)
-        self.assertEqual(threads[0].id, self.EXP_ID1 + '.' + self.THREAD_ID1)
+        self.assertEqual(threads[0].id, self.THREAD_ID1)
 
     def test_get_open_threads_without_suggestions(self):
         threads = feedback_services.get_open_threads(self.EXP_ID1, False)
         self.assertEqual(len(threads), 1)
-        self.assertEqual(threads[0].id, self.EXP_ID1 + '.' + self.THREAD_ID5)
+        self.assertEqual(threads[0].id, self.THREAD_ID5)
 
     def test_get_closed_threads_with_suggestions(self):
         threads = feedback_services.get_closed_threads(self.EXP_ID1, True)
         self.assertEqual(len(threads), 2)
-        self.assertEqual(threads[0].id, self.EXP_ID1 + '.' + self.THREAD_ID2)
-        self.assertEqual(threads[1].id, self.EXP_ID1 + '.' + self.THREAD_ID3)
+        self.assertEqual(threads[0].id, self.THREAD_ID2)
+        self.assertEqual(threads[1].id, self.THREAD_ID3)
 
     def test_get_closed_threads_without_suggestions(self):
         threads = feedback_services.get_closed_threads(self.EXP_ID1, False)
         self.assertEqual(len(threads), 1)
-        self.assertEqual(threads[0].id, self.EXP_ID1 + '.' + self.THREAD_ID4)
+        self.assertEqual(threads[0].id, self.THREAD_ID4)
 
     def test_get_all_threads_with_suggestion(self):
         threads = feedback_services.get_all_threads(self.EXP_ID1, True)
         self.assertEqual(len(threads), 3)
-        self.assertEqual(threads[0].id, self.EXP_ID1 + '.' + self.THREAD_ID1)
-        self.assertEqual(threads[1].id, self.EXP_ID1 + '.' + self.THREAD_ID2)
-        self.assertEqual(threads[2].id, self.EXP_ID1 + '.' + self.THREAD_ID3)
+        self.assertEqual(threads[0].id, self.THREAD_ID1)
+        self.assertEqual(threads[1].id, self.THREAD_ID2)
+        self.assertEqual(threads[2].id, self.THREAD_ID3)
 
     def test_get_all_threads_without_suggestion(self):
         threads = feedback_services.get_all_threads(self.EXP_ID1, False)
         self.assertEqual(len(threads), 2)
-        self.assertEqual(threads[0].id, self.EXP_ID1 + '.' + self.THREAD_ID4)
-        self.assertEqual(threads[1].id, self.EXP_ID1 + '.' + self.THREAD_ID5)
+        self.assertEqual(threads[0].id, self.THREAD_ID4)
+        self.assertEqual(threads[1].id, self.THREAD_ID5)
 
 
 class FeedbackThreadUnitTests(test_utils.GenericTestBase):
