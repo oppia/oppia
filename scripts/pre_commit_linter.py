@@ -584,14 +584,16 @@ def _pre_commit_linter(all_files):
     css_result = multiprocessing.Queue()
     css_stdout = multiprocessing.Queue()
     css_linting_process = multiprocessing.Process(
-        target=_lint_css_files, args=(stylelint_path, css_files_to_lint,
-                                      css_stdout, css_result))
+        target=_lint_css_files, args=(
+            stylelint_path, css_files_to_lint,
+            css_stdout, css_result))
 
     js_result = multiprocessing.Queue()
     js_stdout = multiprocessing.Queue()
     js_linting_process = multiprocessing.Process(
-        target=_lint_js_files, args=(node_path, eslint_path, js_files_to_lint,
-                                     js_stdout, js_result))
+        target=_lint_js_files, args=(
+            node_path, eslint_path, js_files_to_lint,
+            js_stdout, js_result))
 
     py_result = multiprocessing.Queue()
     py_linting_process = multiprocessing.Process(
