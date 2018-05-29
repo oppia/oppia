@@ -82,8 +82,8 @@ class BaseSuggestion(object):
                 are invalid.
         """
         if (
-            self.suggestion_type not in
-            suggestion_models.SUGGESTION_TYPE_CHOICES):
+                self.suggestion_type not in
+                suggestion_models.SUGGESTION_TYPE_CHOICES):
             raise utils.ValidationError(
                 'Expected suggestion_type to be among allowed choices, '
                 'recieved %s' % self.suggestion_type)
@@ -134,8 +134,8 @@ class BaseSuggestion(object):
                     self.score_category))
 
         if (
-            not suggestion_models.SCORE_CATEGORY_DELIMITER in
-            self.score_category):
+                not suggestion_models.SCORE_CATEGORY_DELIMITER in
+                self.score_category):
             raise utils.ValidationError(
                 'Expected score_category to be of the form'
                 ' score_type%sscore_sub_type, recieved %s' %
@@ -143,9 +143,9 @@ class BaseSuggestion(object):
                     self.score_category))
 
         if (
-            self.score_category.split(
-                suggestion_models.SCORE_CATEGORY_DELIMITER)[0] not in
-            suggestion_models.SCORE_TYPE_CHOICES):
+                self.score_category.split(
+                    suggestion_models.SCORE_CATEGORY_DELIMITER)[0] not in
+                suggestion_models.SCORE_TYPE_CHOICES):
             raise utils.ValidationError(
                 'Expected the first part of score_category to be among allowed'
                 ' choices, recieved %s' % self.score_category.split(
@@ -163,7 +163,7 @@ class SuggestionEditStateContent(BaseSuggestion):
     SUGGESTION_TYPE_EDIT_STATE_CONTENT.
     """
 
-    def __init__(
+    def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, assigned_reviewer_id, final_reviewer_id,
             change_cmd, score_category):
@@ -206,8 +206,8 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected change_cmd to contain a property_name key')
 
         if (
-            self.change_cmd['property_name'] !=
-            exp_domain.STATE_PROPERTY_CONTENT):
+                self.change_cmd['property_name'] !=
+                exp_domain.STATE_PROPERTY_CONTENT):
             raise utils.ValidationError(
                 'Expected property_name to be %s, recieved %s' % (
                     exp_domain.STATE_PROPERTY_CONTENT,
@@ -255,6 +255,7 @@ class SuggestionEditStateContent(BaseSuggestion):
 
         return suggestion
 
+
 SUGGESTION_TYPE_TO_DOMAIN_CLASS = {
-    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT: SuggestionEditStateContent
+    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT: SuggestionEditStateContent # pylint: disable=line-too-long
 }

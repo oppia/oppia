@@ -84,7 +84,7 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
     def test_from_dict_suggestion_edit_state_content(self):
         observed_suggestion = (
             suggestion_domain.SuggestionEditStateContent.from_dict(
-            self.suggestion_dict))
+                self.suggestion_dict))
         self.assertDictEqual(
             observed_suggestion.to_dict(), self.suggestion_dict)
         self.assertIsInstance(
