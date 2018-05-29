@@ -14,8 +14,10 @@
 
 """Domain object for Oppia suggestions."""
 
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
+import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -72,11 +74,82 @@ class BaseSuggestion(object):
             'Subclasses of BaseSuggestion should implement from_dict.')
 
     def validate(self):
-        """Validates the suggestion object. Each subclass must implement
+        """Validates the BaseSuggestion object. Each subclass must implement
         this function
+
+        Raises:
+            ValidationError: One or more attributes of the BaseSuggestion object
+                are invalid.
         """
-        raise NotImplementedError(
-            'Subclasses of BaseSuggestion should implement validate.')
+        if (
+            self.suggestion_type not in
+            suggestion_models.SUGGESTION_TYPE_CHOICES):
+            raise utils.ValidationError(
+                'Expected suggestion_type to be among allowed choices, '
+                'recieved %s' % self.suggestion_type)
+
+        if self.target_type not in suggestion_models.TARGET_TYPE_CHOICES:
+            raise utils.ValidationError(
+                'Expected target_type to be among allowed choices, '
+                'recieved %s' % self.target_type)
+
+        if not isinstance(self.target_id, basestring):
+            raise utils.ValidationError(
+                'Expected target_id to be a string, recieved %s' % type(
+                    self.target_id))
+
+        if not isinstance(self.target_version_at_submission, int):
+            raise utils.ValidationError(
+                'Expected target_version_at_submission to be an int, '
+                'recieved %s' % type(self.target_version_at_submission))
+
+        if self.status not in suggestion_models.STATUS_CHOICES:
+            raise utils.ValidationError(
+                'Expected status to be among allowed choices, '
+                'recieved %s' % self.status)
+
+        if not isinstance(self.author_id, basestring):
+            raise utils.ValidationError(
+                'Expected author_id to be a string, recieved %s' % type(
+                    self.author_id))
+
+        if not isinstance(self.assigned_reviewer_id, basestring):
+            raise utils.ValidationError(
+                'Expected assigned_reviewer_id to be a string,'
+                ' recieved %s' % type(self.assigned_reviewer_id))
+
+        if not isinstance(self.final_reviewer_id, basestring):
+            raise utils.ValidationError(
+                'Expected final_reviewer_id to be a string, recieved %s' % type(
+                    self.final_reviewer_id))
+
+        if not isinstance(self.change_cmd, dict):
+            raise utils.ValidationError(
+                'Expected change_cmd to be a dict, recieved %s' % type(
+                    self.change_cmd))
+
+        if not isinstance(self.score_category, basestring):
+            raise utils.ValidationError(
+                'Expected score_category to be a string, recieved %s' % type(
+                    self.score_category))
+
+        if (
+            not suggestion_models.SCORE_CATEGORY_DELIMITER in
+            self.score_category):
+            raise utils.ValidationError(
+                'Expected score_category to be of the form'
+                ' score_type%sscore_sub_type, recieved %s' %
+                suggestion_models.SCORE_CATEGORY_DELIMITER, type(
+                    self.score_category))
+
+        if (
+            self.score_category.split(
+                suggestion_models.SCORE_CATEGORY_DELIMITER)[0] not in
+            suggestion_models.SCORE_TYPE_CHOICES):
+            raise utils.ValidationError(
+                'Expected the first part of score_category to be among allowed'
+                ' choices, recieved %s' % self.score_category.split(
+                    suggestion_models.SCORE_CATEGORY_DELIMITER)[0])
 
     def accept(self):
         """Accepts the suggestion. Each subclass must implement this function.
@@ -117,10 +190,38 @@ class SuggestionEditStateContent(BaseSuggestion):
         Returns:
             bool. The validity of the suggestion object.
         """
+        super(SuggestionEditStateContent, self).validate()
+
+        if 'cmd' not in self.change_cmd:
+            raise utils.ValidationError(
+                'Expected change_cmd to contain a cmd key')
+
+        if self.change_cmd['cmd'] != exp_domain.CMD_EDIT_STATE_PROPERTY:
+            raise utils.ValidationError(
+                'Expected cmd to be %s, recieved %s' % (
+                    exp_domain.CMD_EDIT_STATE_PROPERTY, self.change_cmd['cmd']))
+
+        if 'property_name' not in self.change_cmd:
+            raise utils.ValidationError(
+                'Expected change_cmd to contain a property_name key')
+
+        if (
+            self.change_cmd['property_name'] !=
+            exp_domain.STATE_PROPERTY_CONTENT):
+            raise utils.ValidationError(
+                'Expected property_name to be %s, recieved %s' % (
+                    exp_domain.STATE_PROPERTY_CONTENT,
+                    self.change_cmd['property_name']))
+
+        if 'state_name' not in self.change_cmd:
+            raise utils.ValidationError(
+                'Expected change_cmd to contain a state_name key')
+
         states = exp_services.get_exploration_by_id(self.target_id).states
         if self.change_cmd['state_name'] not in states:
-            return False
-        return True
+            raise utils.ValidationError(
+                'Expected %s to be a valid state name' %
+                self.change_cmd['state_name'])
 
     def accept(self, commit_message):
         """Accepts the suggestion.

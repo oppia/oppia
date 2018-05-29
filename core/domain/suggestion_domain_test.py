@@ -14,10 +14,12 @@
 
 """Tests for suggestion domain objects."""
 
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import suggestion_domain
 from core.platform import models
 from core.tests import test_utils
+import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -108,6 +110,8 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
     def test_validate_suggestion_edit_state_content(self):
         expected_suggestion_dict = self.suggestion_dict
         expected_suggestion_dict['change_cmd'] = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state_1'
         }
         suggestion = suggestion_domain.SuggestionEditStateContent(
@@ -122,9 +126,11 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
         with self.swap(
             exp_services, 'get_exploration_by_id',
             self.mock_get_exploration_by_id):
-            self.assertTrue(suggestion.validate())
+            suggestion.validate()
 
         expected_suggestion_dict['change_cmd'] = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state_unknown'
         }
         suggestion = suggestion_domain.SuggestionEditStateContent(
@@ -138,4 +144,7 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
         with self.swap(
             exp_services, 'get_exploration_by_id',
             self.mock_get_exploration_by_id):
-            self.assertFalse(suggestion.validate())
+            with self.assertRaisesRegexp(
+                utils.ValidationError, 'Expected state_unknown to be a valid '
+                                       'state name'):
+                suggestion.validate()
