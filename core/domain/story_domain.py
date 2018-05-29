@@ -15,7 +15,9 @@
 """Domain objects relating to stories."""
 
 from constants import constants
+from core.domain import skill_services
 import feconf
+import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -98,6 +100,8 @@ class StoryChange(object):
         elif self.cmd == CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
             self.from_version = change_dict['from_version']
             self.to_version = change_dict['to_version']
+        elif self.cmd == CMD_CREATE_NEW:
+            self.title = change_dict['title']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 
@@ -182,6 +186,70 @@ class StoryNode(object):
         """
         return cls(node_id, [], [], [], '', None)
 
+    def validate(self):
+        """Validates various properties of the story node.
+
+        Raises:
+            ValidationError: One or more attributes of the story node are
+            invalid.
+        """
+        if self.exploration_id:
+            if not isinstance(self.exploration_id, basestring):
+                raise utils.ValidationError(
+                    'Expected exploration ID to be a string, received %s' %
+                    self.exploration_id)
+
+        if not isinstance(self.outline, basestring):
+            raise utils.ValidationError(
+                'Expected outline to be a string, received %s' %
+                self.outline)
+
+        if not isinstance(self.id, basestring):
+            raise utils.ValidationError(
+                'Expected node ID to be a string, received %s' %
+                self.id)
+
+        if not isinstance(self.prerequisite_skill_ids, list):
+            raise utils.ValidationError(
+                'Expected prerequisite skill ids to be a list, received %s' %
+                self.prerequisite_skill_ids)
+
+        for skill_id in self.prerequisite_skill_ids:
+            if not isinstance(skill_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each prerequisite skill id to be a string, ' +
+                    'received %s' % skill_id)
+            if skill_services.get_skill_by_id(skill_id, False) is None:
+                raise utils.ValidationError(
+                    'The prerequisite skill with id %s doesn\'t exist.'
+                    % skill_id)
+
+        if not isinstance(self.acquired_skill_ids, list):
+            raise utils.ValidationError(
+                'Expected acquired skill ids to be a list, received %s' %
+                self.acquired_skill_ids)
+
+        for skill_id in self.acquired_skill_ids:
+            if not isinstance(skill_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each acquired skill id to be a string, ' +
+                    'received %s' % skill_id)
+            if skill_services.get_skill_by_id(skill_id, False) is None:
+                raise utils.ValidationError(
+                    'The acquired skill with id %s doesn\'t exist.'
+                    % skill_id)
+
+        if not isinstance(self.destination_node_ids, list):
+            raise utils.ValidationError(
+                'Expected destination node ids to be a list, received %s' %
+                self.destination_node_ids)
+
+        for node_id in self.destination_node_ids:
+            if not isinstance(node_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each node id to be a string, ' +
+                    'received %s' % node_id)
+
 
 class StoryContents(object):
     """Domain object representing the story_contents dict."""
@@ -194,6 +262,30 @@ class StoryContents(object):
                 of this story.
         """
         self.nodes = story_nodes
+
+    def validate(self):
+        """Validates various properties of the story contents object.
+
+        Raises:
+            ValidationError: One or more attributes of the story contents are
+            invalid.
+        """
+        if not isinstance(self.nodes, list):
+            raise utils.ValidationError(
+                'Expected nodes field to be a list, received %s' % self.nodes)
+
+        for node in self.nodes:
+            if not isinstance(node, StoryNode):
+                raise utils.ValidationError(
+                    'Expected each node to be a StoryNode object, received %s' %
+                    node)
+            for destination_node_id in node.destination_node_ids:
+                if next(
+                        (node for node in self.nodes
+                         if node.id == destination_node_id), None) is None:
+                    raise utils.ValidationError(
+                        'Expected all destination nodes to exist')
+            node.validate()
 
     def to_dict(self):
         """Returns a dict representing this StoryContents domain object.
@@ -263,6 +355,49 @@ class Story(object):
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+
+    def validate(self):
+        """Validates various properties of the story object.
+
+        Raises:
+            ValidationError: One or more attributes of story are invalid.
+        """
+        if not isinstance(self.title, basestring):
+            raise utils.ValidationError(
+                'Expected title to be a string, received %s' % self.title)
+
+        if not isinstance(self.description, basestring):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
+
+        if not isinstance(self.notes, basestring):
+            raise utils.ValidationError(
+                'Expected notes to be a string, received %s' % self.notes)
+
+        if not isinstance(self.schema_version, int):
+            raise utils.ValidationError(
+                'Expected schema version to be an integer, received %s' %
+                self.schema_version)
+
+        if self.schema_version != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
+            raise utils.ValidationError(
+                'Expected schema version to be %s, received %s' % (
+                    feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+                    self.schema_version))
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+
+        if not any([self.language_code == lc['code']
+                    for lc in constants.ALL_LANGUAGE_CODES]):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+        self.story_contents.validate()
+
 
     def to_dict(self):
         """Returns a dict representing this Story domain object.

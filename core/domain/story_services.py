@@ -215,6 +215,7 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         commit_cmds: list(dict). A list of change commands made to the given
             story.
     """
+    story.validate()
     model = story_models.StoryModel(
         id=story.id,
         description=story.description,
@@ -342,6 +343,7 @@ def _save_story(committer_id, story, commit_message, change_list):
             'Unexpected error: received an invalid change list when trying to '
             'save story %s: %s' % (story.id, change_list))
 
+    story.validate()
     # Validate that all explorations referenced by the story exist.
     exp_ids = []
     for node in story.story_contents.nodes:
