@@ -26,13 +26,11 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'FocusManagerService',
-        'NumberWithUnitsObjectFactory', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
-        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        '$scope', '$attrs', 'NumberWithUnitsObjectFactory',
+        'NUMBER_WITH_UNITS_PARSING_ERRORS', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
-            $scope, $attrs, FocusManagerService,
-            NumberWithUnitsObjectFactory, NUMBER_WITH_UNITS_PARSING_ERRORS,
-            WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            $scope, $attrs, NumberWithUnitsObjectFactory,
+            NUMBER_WITH_UNITS_PARSING_ERRORS, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 

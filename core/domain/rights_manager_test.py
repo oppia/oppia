@@ -34,6 +34,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.signup('c@example.com', 'C')
         self.signup('d@example.com', 'D')
         self.signup('e@example.com', 'E')
+        self.signup('f@example.com', 'F')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
         self.signup(self.MODERATOR_EMAIL, username=self.MODERATOR_USERNAME)
 
@@ -42,6 +43,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_id_c = self.get_user_id_from_email('c@example.com')
         self.user_id_d = self.get_user_id_from_email('d@example.com')
         self.user_id_e = self.get_user_id_from_email('e@example.com')
+        self.user_id_f = self.get_user_id_from_email('f@example.com')
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.user_id_moderator = self.get_user_id_from_email(
             self.MODERATOR_EMAIL)
@@ -53,6 +55,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.user_c = user_services.UserActionsInfo(self.user_id_c)
         self.user_d = user_services.UserActionsInfo(self.user_id_d)
         self.user_e = user_services.UserActionsInfo(self.user_id_e)
+        self.user_f = user_services.UserActionsInfo(self.user_id_f)
         self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
         self.user_moderator = user_services.UserActionsInfo(
             self.user_id_moderator)
@@ -81,6 +84,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_a, exp_rights))
+        self.assertTrue(rights_manager.check_can_translate_activity(
+            self.user_a, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_a, exp_rights))
 
@@ -88,12 +93,16 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_admin, exp_rights))
+        self.assertTrue(rights_manager.check_can_translate_activity(
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_admin, exp_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
+            self.user_moderator, exp_rights))
+        self.assertTrue(rights_manager.check_can_translate_activity(
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_moderator, exp_rights))
@@ -110,6 +119,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_a, exp_rights))
+        self.assertTrue(rights_manager.check_can_translate_activity(
+            self.user_a, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_a, exp_rights))
 
@@ -117,12 +128,16 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_admin, exp_rights))
+        self.assertTrue(rights_manager.check_can_translate_activity(
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_admin, exp_rights))
 
         self.assertTrue(rights_manager.check_can_access_activity(
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
+            self.user_moderator, exp_rights))
+        self.assertTrue(rights_manager.check_can_translate_activity(
             self.user_moderator, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_moderator, exp_rights))
@@ -149,6 +164,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_a, exp_rights))
+        self.assertTrue(rights_manager.check_can_translate_activity(
+            self.user_a, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_a, exp_rights))
 
@@ -156,6 +173,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
             self.user_admin, exp_rights))
+        self.assertTrue(rights_manager.check_can_translate_activity(
+            self.user_admin, exp_rights))
         self.assertTrue(rights_manager.check_can_delete_activity(
             self.user_admin, exp_rights))
 
@@ -163,12 +182,16 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_moderator, exp_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
             self.user_moderator, exp_rights))
+        self.assertFalse(rights_manager.check_can_translate_activity(
+            self.user_moderator, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_moderator, exp_rights))
 
         self.assertFalse(rights_manager.check_can_access_activity(
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
+            self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_translate_activity(
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
@@ -182,6 +205,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
             self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_translate_activity(
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
 
@@ -193,6 +218,36 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.check_can_access_activity(
             self.user_b, exp_rights))
         self.assertTrue(rights_manager.check_can_edit_activity(
+            self.user_b, exp_rights))
+        self.assertTrue(rights_manager.check_can_translate_activity(
+            self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_delete_activity(
+            self.user_b, exp_rights))
+
+    def test_inviting_translator_to_exploration(self):
+        exp = exp_domain.Exploration.create_default_exploration(self.EXP_ID)
+        exp_services.save_new_exploration(self.user_id_a, exp)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
+        self.assertFalse(rights_manager.check_can_access_activity(
+            self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_edit_activity(
+            self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_translate_activity(
+            self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_delete_activity(
+            self.user_b, exp_rights))
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b,
+            rights_manager.ROLE_TRANSLATOR)
+        exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
+
+        self.assertTrue(rights_manager.check_can_access_activity(
+            self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_edit_activity(
+            self.user_b, exp_rights))
+        self.assertTrue(rights_manager.check_can_translate_activity(
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
@@ -206,6 +261,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
             self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_translate_activity(
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
 
@@ -218,6 +275,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_edit_activity(
             self.user_b, exp_rights))
+        self.assertFalse(rights_manager.check_can_translate_activity(
+            self.user_b, exp_rights))
         self.assertFalse(rights_manager.check_can_delete_activity(
             self.user_b, exp_rights))
 
@@ -228,6 +287,15 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.user_a, self.EXP_ID, self.user_id_b,
             rights_manager.ROLE_VIEWER)
+
+        with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
+            rights_manager.assign_role_for_exploration(
+                self.user_b, self.EXP_ID, self.user_id_c,
+                rights_manager.ROLE_VIEWER)
+
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_b,
+            rights_manager.ROLE_TRANSLATOR)
 
         with self.assertRaisesRegexp(Exception, 'Could not assign new role.'):
             rights_manager.assign_role_for_exploration(
@@ -255,6 +323,9 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
         rights_manager.assign_role_for_exploration(
             self.user_b, self.EXP_ID, self.user_id_e,
+            rights_manager.ROLE_TRANSLATOR)
+        rights_manager.assign_role_for_exploration(
+            self.user_b, self.EXP_ID, self.user_id_f,
             rights_manager.ROLE_VIEWER)
 
     def test_publishing_and_unpublishing_exploration(self):
@@ -347,6 +418,10 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_a, self.EXP_ID, self.user_id_c,
             rights_manager.ROLE_EDITOR)
 
+        rights_manager.assign_role_for_exploration(
+            self.user_a, self.EXP_ID, self.user_id_d,
+            rights_manager.ROLE_TRANSLATOR)
+
         exp_rights = rights_manager.get_exploration_rights(self.EXP_ID)
 
         self.assertTrue(exp_rights.is_owner(self.user_id_a))
@@ -355,6 +430,9 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(exp_rights.is_viewer(self.user_id_a))
         self.assertFalse(exp_rights.is_owner(self.user_id_b))
         self.assertFalse(exp_rights.is_editor(self.user_id_b))
+        self.assertTrue(exp_rights.is_translator(self.user_id_d))
+        self.assertFalse(exp_rights.is_translator(self.user_id_b))
+
 
     def test_get_multiple_exploration_rights(self):
         exp_ids = ['exp1', 'exp2', 'exp3', 'exp4']
