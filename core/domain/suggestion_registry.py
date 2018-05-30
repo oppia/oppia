@@ -16,23 +16,13 @@
 subclasses for each type of suggestion
 """
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
 import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
-
-ALL_CATEGORIES = ['Algebra', 'Algorithms', 'Architecture', 'Arithmetic',
-                  'Art', 'Astronomy', 'Biology', 'Business', 'Calculus',
-                  'Chemistry', 'Combinatorics', 'Computing', 'Economics',
-                  'Education', 'Engineering', 'English', 'Environment',
-                  'Gaulish', 'Geography', 'Geometry', 'Government',
-                  'Graph Theory', 'History', 'Languages', 'Latin', 'Law',
-                  'Logic', 'Mathematics', 'Medicine', 'Music', 'Philosophy',
-                  'Physics', 'Poetry', 'Probability', 'Programming', 'Puzzles',
-                  'Reading', 'Spanish', 'Sport', 'Statistics', 'Trigonometry',
-                  'Welcome']
 
 
 class BaseSuggestion(object):
@@ -85,6 +75,25 @@ class BaseSuggestion(object):
         """Return a Suggestion object of type from a dict."""
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement from_dict.')
+
+    def get_score_type(self):
+        """Returns the first part of the score category.
+
+        Returns:
+            str. The first part of the score category.
+        """
+        return self.score_category.split(
+            suggestion_models.SCORE_CATEGORY_DELIMITER)[0]
+
+    def get_score_sub_type(self):
+        """Returns the second part of the score category.
+
+        Returns:
+            str. The second part of the score category.
+        """
+        return self.score_category.split(
+            suggestion_models.SCORE_CATEGORY_DELIMITER)[1]
+
 
     def validate(self):
         """Validates the BaseSuggestion object. Each subclass must implement
@@ -167,14 +176,10 @@ class BaseSuggestion(object):
                     self.score_category))
 
 
-        if (
-                self.score_category.split(
-                    suggestion_models.SCORE_CATEGORY_DELIMITER)[0] not in
-                suggestion_models.SCORE_TYPE_CHOICES):
+        if self.get_score_type() not in suggestion_models.SCORE_TYPE_CHOICES:
             raise utils.ValidationError(
                 'Expected the first part of score_category to be among allowed'
-                ' choices, received %s' % self.score_category.split(
-                    suggestion_models.SCORE_CATEGORY_DELIMITER)[0])
+                ' choices, received %s' % self.get_score_type())
 
     def accept(self):
         """Accepts the suggestion. Each subclass must implement this function.
@@ -218,24 +223,17 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         super(SuggestionEditStateContent, self).validate()
 
-        if (
-                self.score_category.split(
-                    suggestion_models.SCORE_CATEGORY_DELIMITER)[0] !=
-                suggestion_models.SCORE_TYPE_CONTENT):
+        if self.get_score_type() != suggestion_models.SCORE_TYPE_CONTENT:
             raise utils.ValidationError(
                 'Expected the first part of score_category to be %s '
                 ', received %s' % (
                     suggestion_models.SCORE_TYPE_CONTENT,
-                    self.score_category.split(
-                        suggestion_models.SCORE_CATEGORY_DELIMITER)[0]))
-        if (
-                self.score_category.split(
-                    suggestion_models.SCORE_CATEGORY_DELIMITER)[1] not in
-                ALL_CATEGORIES):
+                    self.get_score_type()))
+
+        if self.get_score_sub_type() not in constants.ALL_CATEGORIES:
             raise utils.ValidationError(
                 'Expected the second part of score_category to be a valid'
-                ' category, received %s' % self.score_category.split(
-                    suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
+                ' category, received %s' % self.get_score_sub_type())
 
         if 'cmd' not in self.change_cmd:
             raise utils.ValidationError(

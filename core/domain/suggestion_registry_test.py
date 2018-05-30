@@ -82,6 +82,22 @@ class SuggestionRegistryUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
 
+    def test_get_score_part_helper_methods(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.assigned_reviewer_id, self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'])
+
+        self.assertEqual(suggestion.get_score_type(), 'content')
+        self.assertEqual(suggestion.get_score_sub_type(), 'Algebra')
+
+
     def test_from_dict_suggestion_edit_state_content(self):
         observed_suggestion = (
             suggestion_registry.SuggestionEditStateContent.from_dict(
