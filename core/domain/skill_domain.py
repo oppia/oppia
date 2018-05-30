@@ -378,3 +378,31 @@ class SkillSummary(object):
             'skill_model_created_on': self.skill_model_created_on,
             'skill_model_last_updated': self.skill_model_last_updated
         }
+
+
+class SkillsMastery(object):
+    """Domain object for an Oppia Skills Mastery."""
+
+    def __init__(self, user_id, skill_id, degree_of_mastery):
+        """Constructs a SkillMastery domain object.
+
+        Args:
+            skill_id: str. The unique id of the skill.
+            user_id: str. The user id of the logged in user.
+            degree_of_mastery: float. The language code of the skill.
+        """
+        self.id = skill_id
+        self.user_id = user_id
+        self.degree_of_mastery = degree_of_mastery
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this SkillMastery object.
+        """
+        return {
+            'user_id': self.user_id,
+            'skill_id': self.skill_id,
+            'degree_of_mastery': self.degree_of_mastery
+        }

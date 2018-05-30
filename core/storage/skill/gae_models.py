@@ -150,3 +150,14 @@ class SkillSummaryModel(base_models.BaseModel):
     # model was created).
     skill_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
+
+
+class SkillsMasteryModel(base_models.BaseModel):
+    """Mastery model of a user for Oppia Skill.
+
+    This model stores progress of each skill for a given user
+    and returns skill id.
+    """
+
+    # The degree of mastery of the user in a skill.
+    degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)

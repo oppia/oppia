@@ -329,3 +329,71 @@ def save_skill_summary(skill_summary):
     )
 
     skill_summary_model.put()
+
+
+def create_skill_mastery(user_id, skill_id, degree_of_mastery):
+    """Creates and stores skill mastery of a user.
+
+    Args:
+        skill_id: str. The unique id of the skill.
+        user_id: str. The user id of the logged in user.
+        degree_of_mastery: float. The language code of the skill.
+    """
+    skill_mastery_model = skill_models.SkillMasteryModel(
+        user_id=user_id,
+        skill_id=skill_id,
+        degree_of_mastery=degree_of_mastery
+    )
+
+    skill_mastery_model.put()
+
+
+def get_skill_mastery(user_id, skill_id):
+    """Fetches the mastery of user in a particular skill.
+
+    Args:
+        user_id: str. User Id of the user currently logged in.
+        skill_id: str. Unique id of the skill for which mastery degree is
+            requested.
+
+    Returns:
+        skill_mastery: float. Mastery degree of the user for the requested
+            skill.
+    """
+    skill_mastery = skill_models.SkillMasteryModel.get(user_id, skill_id)
+
+    return skill_mastery
+
+
+def get_multi_skill_mastery(user_id, skill_ids):
+    """Fetches the mastery of user in a particular skill.
+
+    Args:
+        user_id: str. User Id of the user currently logged in.
+        skill_ids: list(str). Skill Ids of the skill for which mastery degree is
+        requested.
+
+    Returns:
+        degree_of_mastery: list(float). Mastery degree of the user for the
+            requested skill.
+    """
+    degree_of_mastery = []
+    for i in skill_ids:
+        degree_of_mastery[i] = get_skill_mastery(user_id, i)
+
+    return degree_of_mastery
+
+
+def get_all_skill_mastery(user_id):
+    """Fetches the mastery of user in a particular skill.
+
+    Args:
+        user_id: str. User Id of the user currently logged in.
+
+    Returns:
+        skill_mastery: float. Mastery degree of the user for the
+            requested skill.
+    """
+    skill_mastery = skill_models.SkillMasteryModel.get(user_id)
+
+    return skill_mastery
