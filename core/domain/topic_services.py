@@ -201,7 +201,7 @@ def apply_change_list(topic_id, change_list):
     Args:
         topic_id: str. ID of the given topic.
         change_list: list(TopicChange). A change list to be applied to the given
-            topic. Each entry in change_list is a TopicChange object.
+            topic.
 
     Returns:
         Topic. The resulting topic domain object.
@@ -247,8 +247,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
         committer_id: str. ID of the given committer.
         topic: Topic. The topic domain object to be saved.
         commit_message: str. The commit message.
-        change_list: list(TopicChange). List of changes applied to a topic. Each
-            entry in change_list is a TopicChange object.
+        change_list: list(TopicChange). List of changes applied to a topic.
 
     Raises:
         Exception: Received invalid change list.
@@ -296,9 +295,8 @@ def update_topic(
     - committer_id: str. The id of the user who is performing the update
         action.
     - topic_id: str. The topic id.
-    - change_list: list(TopicChange), Each element in this is a TopicChange
-        object. These changes are applied in sequence to produce the resulting
-        topic.
+    - change_list: list(TopicChange). These changes are applied in sequence to
+        produce the resulting topic.
     - commit_message: str or None. A description of changes made to the
         topic.
 
