@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Registry for Oppia suggestions. Contains a BaseSuggestion class and
-subclasses for each type of suggestion
+subclasses for each type of suggestion.
 """
 
 from constants import constants
