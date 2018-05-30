@@ -34,6 +34,7 @@ ALL_CATEGORIES = ['Algebra', 'Algorithms', 'Architecture', 'Arithmetic',
                   'Reading', 'Spanish', 'Sport', 'Statistics', 'Trigonometry',
                   'Welcome']
 
+
 class BaseSuggestion(object):
     """Base class for a suggestion.
 
