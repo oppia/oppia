@@ -18,7 +18,6 @@
 
 import datetime
 
-from core.domain import feedback_domain
 from core.platform import models
 import feconf
 import utils
