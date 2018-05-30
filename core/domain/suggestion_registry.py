@@ -215,7 +215,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         super(SuggestionEditStateContent, self).validate()
 
-         if (
+        if (
                 self.score_category.split(
                     suggestion_models.SCORE_CATEGORY_DELIMITER)[0] !=
                 suggestion_models.SCORE_TYPE_CONTENT):
