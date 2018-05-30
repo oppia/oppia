@@ -847,8 +847,9 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
             exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
 
         expected_output = [
-            u'[u\'br\', [u"u\'[document]\'"]]',
-            u'[u\'invalidTags\', [u"u\'span\'"]]',
-            u'[u\'oppia-noninteractive-link\', [u"u\'[document]\'"]]']
+            u"[u'br', [u'[document]']]",
+            u"[u'invalidTags', [u'span']]",
+            u"[u'oppia-noninteractive-link', [u'[document]']]"
+        ]
 
         self.assertEqual(actual_output, expected_output)

@@ -3893,9 +3893,12 @@ class HtmlCollectionnitTests(test_utils.GenericTestBase):
         state3.update_interaction_answer_groups(answer_group_list3)
 
         expected_html_list = [
+            '',
+            '',
             '<pre>Hello, this is state2</pre>',
             '<p>Outcome1 for state2</p>',
             '<p>Outcome2 for state2</p>',
+            '',
             '<p>Hello, this is html1 for state2</p>',
             '<p>Hello, this is html2 for state2</p>',
             '<p>This is value1 for MultipleChoice</p>',
@@ -3907,6 +3910,7 @@ class HtmlCollectionnitTests(test_utils.GenericTestBase):
             '<p>Outcome for state3</p>',
             '<p>This is value1 for ItemSelectionInput</p>',
             '<p>This is value3 for ItemSelectionInput</p>',
+            '',
             '<p>This is value1 for ItemSelection</p>',
             '<p>This is value2 for ItemSelection</p>',
             '<p>This is value3 for ItemSelection</p>'

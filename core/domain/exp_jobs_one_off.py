@@ -527,10 +527,9 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
     def reduce(key, values):
         final_values = []
         for value in values:
-            value = value[1: -1]
-            value = value.split(", ")
-            for item in value:
-                if item not in final_values:
-                    final_values = final_values + [item]
+            item = ast.literal_eval(value)
+            for sub_item in item:
+                if sub_item not in final_values:
+                    final_values = final_values + [sub_item]
 
         yield (key, final_values)

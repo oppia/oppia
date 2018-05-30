@@ -1236,6 +1236,8 @@ class InteractionInstance(object):
             outcome_html = answer_group.outcome.feedback.html
             html_list = html_list + [outcome_html]
 
+        # Note that ItemSelectionInput replicates the customization arg HTML
+        # in its answer groups.
         if self.id == 'ItemSelectionInput':
             for answer_group in self.answer_groups:
                 for rule_spec in answer_group.rule_specs:
@@ -4018,8 +4020,6 @@ class Exploration(object):
             interaction_html_list = (
                 state.interaction.get_all_html_content_strings())
             html_list = html_list + [content_html] + interaction_html_list
-
-        html_list = filter(None, html_list)
 
         return html_list
 
