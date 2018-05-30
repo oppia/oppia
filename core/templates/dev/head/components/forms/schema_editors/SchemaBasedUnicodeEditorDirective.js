@@ -33,8 +33,12 @@ oppia.directive('schemaBasedUnicodeEditor', [
         'schema_based_unicode_editor_directive.html'),
       restrict: 'E',
       controller: [
-        '$scope', '$filter', '$sce', '$translate', 'DeviceInfoService',
-        function($scope, $filter, $sce, $translate, DeviceInfoService) {
+        '$scope', '$filter', '$sce', '$window', '$translate',
+        'DeviceInfoService', 'ReadOnlyExplorationBackendApiService',
+        'ExplorationContextService',
+        function($scope, $filter, $sce, $window, $translate,
+            DeviceInfoService, ReadOnlyExplorationBackendApiService,
+            ExplorationContextService) {
           if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
             // Flag that is flipped each time the codemirror view is
             // shown. (The codemirror instance needs to be refreshed
@@ -120,6 +124,78 @@ oppia.directive('schemaBasedUnicodeEditor', [
           $scope.getDisplayedValue = function() {
             return $sce.trustAsHtml(
               $filter('convertUnicodeWithParamsToHtml')($scope.localValue));
+          };
+
+          var version = GLOBALS.explorationVersion;
+          var explorationId = ExplorationContextService.getExplorationId();
+          var explorationLanguageCode = null;
+          var recognition = null;
+          loadedExploration = (
+            ReadOnlyExplorationBackendApiService.loadExploration(
+              explorationId, version));
+
+          loadedExploration.then(function(data) {
+            explorationLanguageCode = data.exploration.language_code;
+          })['finally'](function() {
+            var isSpeechRecognitionLanguageSupported = (
+              constants.SUPPORTED_SPEECH_RECOGNITION_LANGUAGES.some(
+                function(languageCodeDict) {
+                  return languageCodeDict.code === explorationLanguageCode;
+                }));
+
+            $scope.allowSpeechRecognition = (
+              $scope.uiConfig() &&
+              !!$window.webkitSpeechRecognition &&
+              isSpeechRecognitionLanguageSupported);
+
+            if ($scope.allowSpeechRecognition) {
+              recognition = new webkitSpeechRecognition();
+            }
+          });
+
+          $scope.isCurrentlyRecording = false;
+
+          $scope.microphoneUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/microphone.png');
+
+          $scope.microphoneOpenUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/microphone-open.png');
+
+          $scope.toggleSpeechRecognition = function() {
+            if ($scope.isCurrentlyRecording) {
+              recognition.stop();
+              $scope.isCurrentlyRecording = false;
+              return;
+            }
+
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = false;
+            recognition.interimResults = true;
+            recognition.lang = explorationLanguageCode;
+
+            $scope.isCurrentlyRecording = true;
+            recognition.start();
+
+            recognition.onerror = function(evt) {
+              recognition.abort();
+              $scope.isCurrentlyRecording = false;
+            };
+
+            recognition.onresult = function(evt) {
+              for (var i = 0; i < evt.results.length; i++) {
+                if (evt.results[i].isFinal) {
+                  if ($scope.localValue && evt.results[i][0].transcript &&
+                      $scope.localValue[$scope.localValue.length - 1] !== ' ') {
+                    $scope.localValue += ' ';
+                  }
+                  $scope.localValue += evt.results[i][0].transcript;
+                  recognition.abort();
+                  $scope.isCurrentlyRecording = false;
+                  $scope.$apply();
+                  break;
+                }
+              }
+            };
           };
         }
       ]

@@ -441,5 +441,200 @@ var constants = {
 
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
-  "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50
+  "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
+
+  "SUPPORTED_SPEECH_RECOGNITION_LANGUAGES": [{
+      "code": "en",
+      "description": "English"
+    }, {
+      "code": "af",
+      "description": "Afrikaans"
+    }, {
+      "code": "am",
+      "description": "Amharic"
+    }, {
+      "code": "ar",
+      "description": "العربية (Arabic)"
+    }, {
+      "code": "az",
+      "description": "Azerbaijani"
+    }, {
+      "code": "bn",
+      "description": "Bengali"
+    }, {
+      "code": "bg",
+      "description": "български (Bulgarian)"
+    }, {
+      "code": "ca",
+      "description": "català (Catalan)"
+    }, {
+      "code": "cs",
+      "description": "čeština (Czech)"
+    }, {
+      "code": "da",
+      "description": "dansk (Danish)"
+    }, {
+      "code": "de",
+      "description": "Deutsch (German)"
+    }, {
+      "code": "el",
+      "description": "Greek"
+    }, {
+      "code": "es",
+      "description": "español (Spanish)"
+    }, {
+      "code": "fa",
+      "description": "Persian"
+    }, {
+      "code": "fi",
+      "description": "suomi (Finnish)"
+    }, {
+      "code": "fil",
+      "description": "Filipino (Pilipinas)"
+    }, {
+      "code": "fr",
+      "description": "français (French)"
+    }, {
+      "code": "gl",
+      "description": "Galego (España)"
+    }, {
+      "code": "gu",
+      "description": "Gujarati"
+    }, {
+      "code": "he",
+      "description": "עברית (Hebrew)"
+    }, {
+      "code": "hi",
+      "description": "हिन्दी (Hindi)"
+    }, {
+      "code": "hr",
+      "description": "hrvatski (Croatian)"
+    }, {
+      "code": "hu",
+      "description": "magyar (Hungarian)"
+    }, {
+      "code": "hy",
+      "description": "Armenian"
+    }, {
+      "code": "id",
+      "description": "Bahasa Indonesia (Indonesian)"
+    }, {
+      "code": "is",
+      "description": "Icelandic"
+    }, {
+      "code": "it",
+      "description": "italiano (Italian)"
+    }, {
+      "code": "ja",
+      "description": "Japanese"
+    }, {
+      "code": "ka",
+      "description": "Georgian (Georgia)"
+    }, {
+      "code": "kab",
+      "description": "Taqbaylit (Kabyle)"
+    }, {
+      "code": "km",
+      "description": "Khmer"
+    }, {
+      "code": "kn",
+      "description": "Kannada"
+    }, {
+      "code": "ko",
+      "description": "Korean"
+    }, {
+      "code": "lo",
+      "description": "Lao"
+    }, {
+      "code": "lt",
+      "description": "lietuvių (Lithuanian)"
+    }, {
+      "code": "lv",
+      "description": "latviešu (Latvian)"
+    }, {
+      "code": "ml",
+      "description": "Malayalam"
+    }, {
+      "code": "mr",
+      "description": "Marathi"
+    }, {
+      "code": "ms",
+      "description": "Bahasa Melayu"
+    }, {
+      "code": "nb",
+      "description": "Norwegian Bokmål"
+    }, {
+      "code": "ne",
+      "description": "Nepali"
+    }, {
+      "code": "nl",
+      "description": "Nederlands"
+    }, {
+      "code": "no",
+      "description": "Norsk (Norwegian)"
+    }, {
+      "code": "pl",
+      "description": "polski (Polish)"
+    }, {
+      "code": "pt",
+      "description": "português (Portuguese)"
+    }, {
+      "code": "ro",
+      "description": "română (Romanian)"
+    }, {
+      "code": "ru",
+      "description": "русский (Russian)"
+    }, {
+      "code": "si",
+      "description": "Sinhala"
+    }, {
+      "code": "sk",
+      "description": "slovenčina (Slovak)"
+    }, {
+      "code": "sl",
+      "description": "Slovenian"
+    }, {
+      "code": "sr",
+      "description": "српски (Serbian)"
+    }, {
+      "code": "su",
+      "description": "Sundanese"
+    }, {
+      "code": "sv",
+      "description": "Svnska"
+    }, {
+      "code": "sw",
+      "description": "Swahili"
+    }, {
+      "code": "ta",
+      "description": "Tamil"
+    }, {
+      "code": "te",
+      "description": "Telugu"
+    }, {
+      "code": "th",
+      "description": "ภาษาไทย (Thai)"
+    }, {
+      "code": "tl",
+      "description": "Filipino (Filipino)"
+    }, {
+      "code": "tr",
+      "description": "Türkçe (Turkish)"
+    }, {
+      "code": "uk",
+      "description": "українська (Ukrainian)"
+    }, {
+      "code": "ur",
+      "description": "Urdu"
+    }, {
+      "code": "vi",
+      "description": "Tiếng Việt (Vietnamese)"
+    }, {
+      "code": "zh",
+      "description": "中文 (Chinese)"
+    }, {
+      "code": "zu",
+      "description": "Zulu"
+    }]
+
 };
