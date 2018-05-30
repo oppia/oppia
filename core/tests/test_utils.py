@@ -415,6 +415,8 @@ tags: []
         json_response = self.testapp.get(
             url, params, expect_errors=expect_errors,
             status=expected_status_int)
+
+        self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
