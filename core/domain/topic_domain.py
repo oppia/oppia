@@ -17,8 +17,6 @@
 """Domain objects for topics, and related models."""
 
 from constants import constants
-from core.domain import skill_services
-from core.domain import story_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -44,6 +42,7 @@ TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
+OPTIONAL_ATTRIBUTE_NAMES = ['property_name', 'new_value', 'old_value', 'name']
 
 
 class TopicChange(object):
@@ -90,14 +89,10 @@ class TopicChange(object):
         """
         topic_change_dict = {}
         topic_change_dict['cmd'] = self.cmd
-        if hasattr(self, 'property_name'):
-            topic_change_dict['property_name'] = self.property_name
-        if hasattr(self, 'new_value'):
-            topic_change_dict['new_value'] = self.new_value
-        if hasattr(self, 'old_value'):
-            topic_change_dict['old_value'] = self.old_value
-        if hasattr(self, 'name'):
-            topic_change_dict['name'] = self.name
+        for attribute_name in OPTIONAL_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                topic_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
 
         return topic_change_dict
 
@@ -162,7 +157,7 @@ class Topic(object):
 
         Raises:
             ValidationError: One or more attributes of the Topic are not
-            valid.
+                valid.
         """
         if not isinstance(self.name, basestring):
             raise utils.ValidationError(
@@ -185,28 +180,23 @@ class Topic(object):
             raise utils.ValidationError(
                 'Expected canonical story ids to be a list, received %s'
                 % self.canonical_story_ids)
-        for story_id in self.canonical_story_ids:
-            if story_services.get_story_by_id(story_id, False) is None:
-                raise utils.ValidationError(
-                    'The story with id %s doesn\'t exist' % story_id)
 
         if not isinstance(self.additional_story_ids, list):
             raise utils.ValidationError(
                 'Expected additional story ids to be a list, received %s'
                 % self.additional_story_ids)
+
         for story_id in self.additional_story_ids:
-            if story_services.get_story_by_id(story_id, False) is None:
+            if story_id in self.canonical_story_ids:
                 raise utils.ValidationError(
-                    'The story with id %s doesn\'t exist' % story_id)
+                    'Expected additional story ids list and canonical story ' +
+                    ' ids list to be mutually exclusive. The story_id %s is ' +
+                    'present in both lists' % story_id)
 
         if not isinstance(self.skill_ids, list):
             raise utils.ValidationError(
                 'Expected skill ids to be a list, received %s'
                 % self.skill_ids)
-        for skill_id in self.skill_ids:
-            if skill_services.get_skill_by_id(skill_id, False) is None:
-                raise utils.ValidationError(
-                    'The skill with id %s doesn\'t exist' % skill_id)
 
     @classmethod
     def create_default_topic(cls, topic_id):

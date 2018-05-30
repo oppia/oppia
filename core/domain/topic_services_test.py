@@ -16,10 +16,6 @@
 
 """Tests for topic domain objects."""
 
-from core.domain import skill_domain
-from core.domain import skill_services
-from core.domain import story_domain
-from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -39,14 +35,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(TopicServicesUnitTests, self).setUp()
-        story_1 = story_domain.Story.create_default_story(self.story_id_1)
-        story_2 = story_domain.Story.create_default_story(self.story_id_2)
-        story_3 = story_domain.Story.create_default_story(self.story_id_3)
-        skill = skill_domain.Skill.create_default_skill(self.skill_id)
-        story_services.save_new_story(self.user_id, story_1)
-        story_services.save_new_story(self.user_id, story_2)
-        story_services.save_new_story(self.user_id, story_3)
-        skill_services.save_new_skill(self.user_id, skill)
         self.TOPIC_ID = topic_services.get_new_topic_id()
         self.topic = self.save_new_topic(
             self.TOPIC_ID, self.user_id, 'Name', 'Description',
@@ -163,9 +151,10 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         # Test whether an admin can delete a topic.
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
         self.assertEqual(
-            topic_services.get_topic_by_id(self.TOPIC_ID, False), None)
+            topic_services.get_topic_by_id(self.TOPIC_ID, strict=False), None)
         self.assertEqual(
-            topic_services.get_topic_summary_by_id(self.TOPIC_ID, False), None)
+            topic_services.get_topic_summary_by_id(
+                self.TOPIC_ID, strict=False), None)
 
 
     def test_admin_can_manage_topic(self):

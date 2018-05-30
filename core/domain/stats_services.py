@@ -182,7 +182,8 @@ def handle_stats_creation_for_new_exp_version(
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
         state_names: list(str). State names of the exploration.
-        change_list: list(dict). A list of changes introduced in this commit.
+        change_list: list(ExplorationChange). A list of changes introduced in
+            this commit.
     """
     old_exp_version = exp_version - 1
     new_exp_version = exp_version
@@ -194,17 +195,17 @@ def handle_stats_creation_for_new_exp_version(
         return
 
     # Handling state additions, deletions and renames.
-    for change_dict in change_list:
-        if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
-            exploration_stats.state_stats_mapping[change_dict[
-                'state_name']] = stats_domain.StateStats.create_default()
-        elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
-            exploration_stats.state_stats_mapping.pop(change_dict[
-                'state_name'])
-        elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
-            exploration_stats.state_stats_mapping[change_dict[
-                'new_state_name']] = exploration_stats.state_stats_mapping.pop(
-                    change_dict['old_state_name'])
+    for change in change_list:
+        if change.cmd == exp_domain.CMD_ADD_STATE:
+            exploration_stats.state_stats_mapping[
+                change.state_name
+            ] = stats_domain.StateStats.create_default()
+        elif change.cmd == exp_domain.CMD_DELETE_STATE:
+            exploration_stats.state_stats_mapping.pop(change.state_name)
+        elif change.cmd == exp_domain.CMD_RENAME_STATE:
+            exploration_stats.state_stats_mapping[
+                change.new_state_name
+            ] = exploration_stats.state_stats_mapping.pop(change.old_state_name)
 
     exploration_stats.exp_version = new_exp_version
 

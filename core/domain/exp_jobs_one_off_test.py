@@ -322,11 +322,11 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Have one user make two commits.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id, title='Original Title')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'title',
             'new_value': 'New title'
-        }]
+        })]
         exp_services.update_exploration(
             user_a_id, self.EXP_ID, change_list, 'Changed title.')
 
@@ -412,18 +412,18 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID, user_a_id, title='Exploration Title')
 
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
-            }], 'Changed title.')
+            })], 'Changed title.')
 
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
-            }], 'Changed Objective.')
+            })], 'Changed Objective.')
 
         # Run the job to compute contributors summary.
         job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
@@ -449,17 +449,17 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID, user_a_id, title='Exploration Title 1')
 
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
-            }], 'Changed title.')
+            })], 'Changed title.')
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
-            }], 'Changed Objective.')
+            })], 'Changed Objective.')
 
         # Let the second user revert version 3 to version 2.
         exp_services.revert_exploration(user_b_id, self.EXP_ID, 3, 2)
@@ -493,17 +493,17 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id, title='Exploration Title')
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
-            }], 'Changed title.')
+            })], 'Changed title.')
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
-            }], 'Changed Objective.')
+            })], 'Changed Objective.')
 
         # Let USER A revert version 3 to version 2.
         exp_services.revert_exploration(user_a_id, self.EXP_ID, 3, 2)
@@ -528,11 +528,11 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         # Create commits with all the system user ids.
         for system_id in feconf.SYSTEM_USER_IDS:
             exp_services.update_exploration(
-                system_id, self.EXP_ID, [{
+                system_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': 'edit_exploration_property',
                     'property_name': 'title',
                     'new_value': 'Title changed by %s' % system_id
-                }], 'Changed title.')
+                })], 'Changed title.')
 
         # Run the job to compute the contributor summary.
         job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
@@ -694,19 +694,19 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
                 self.EXP_ID, self.owner_id)
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }], 'Add state name')
+                })], 'Add state name')
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state 2',
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'new state'
-                }], 'Modify states')
+                })], 'Modify states')
 
             exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
 

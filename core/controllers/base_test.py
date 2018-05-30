@@ -24,6 +24,7 @@ import types
 
 from constants import constants
 from core.controllers import base
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
@@ -179,15 +180,15 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         self.logout()
         self.login(self.TEST_EDITOR_EMAIL)
         exp_services.update_exploration(
-            editor_user_id, exploration_id, [{
+            editor_user_id, exploration_id, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'edited title'
-            }, {
+            }), exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'category',
                 'new_value': 'edited category'
-            }], 'Change title and category')
+            })], 'Change title and category')
 
         # Since user has edited one exploration created by another user,
         # going to '/' should redirect to the dashboard page.

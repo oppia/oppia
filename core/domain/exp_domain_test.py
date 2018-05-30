@@ -48,11 +48,11 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
     def test_correct_creation_of_version_diffs(self):
         # Rename a state.
         self.exploration.rename_state('Home', 'Renamed state')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Home',
             'new_state_name': 'Renamed state'
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -68,10 +68,10 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.exploration.add_states(['New state'])
         self.exploration.states['New state'] = copy.deepcopy(
             self.exploration.states['Renamed state'])
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -82,10 +82,10 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         # Delete state.
         self.exploration.delete_state('New state')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'New state'
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -100,18 +100,18 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
             self.exploration.states['Renamed state'])
         self.exploration.rename_state('New state', 'New state2')
         self.exploration.rename_state('New state2', 'New state3')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state',
             'new_state_name': 'New state2'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state2',
             'new_state_name': 'New state3'
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -124,17 +124,17 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.exploration.add_states(['New state 2'])
         self.exploration.rename_state('New state 2', 'Renamed state 2')
         self.exploration.delete_state('Renamed state 2')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state 2'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state 2',
             'new_state_name': 'Renamed state 2'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'Renamed state 2'
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -147,18 +147,18 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.exploration.rename_state('New state3', 'Renamed state 3')
         self.exploration.rename_state('Renamed state 3', 'Renamed state 4')
         self.exploration.delete_state('Renamed state 4')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state3',
             'new_state_name': 'Renamed state 3'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Renamed state 3',
             'new_state_name': 'Renamed state 4'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'Renamed state 4'
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -731,11 +731,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Rename a state to add it in unchanged answer group.
         exploration.rename_state('Home', 'Renamed state')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Home',
             'new_state_name': 'Renamed state'
-        }]
+        })]
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [],
@@ -753,12 +753,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_groups = []
         for answer_group in state.interaction.answer_groups:
             answer_groups.append(answer_group.to_dict())
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'state_name': 'Renamed state',
             'property_name': 'answer_groups',
             'new_value': answer_groups
-        }]
+        })]
 
         expected_dict = {
             'state_names_with_changed_answer_groups': ['Renamed state'],
@@ -773,10 +773,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['New state'])
         exploration.states['New state'] = copy.deepcopy(
             exploration.states['Renamed state'])
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
-        }]
+        })]
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [
@@ -790,10 +790,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Delete state.
         exploration.delete_state('New state')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'New state'
-        }]
+        })]
 
         expected_dict = {
             'state_names_with_changed_answer_groups': ['Renamed state'],
@@ -810,18 +810,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.states['Renamed state'])
         exploration.rename_state('New state', 'New state2')
         exploration.rename_state('New state2', 'New state3')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state',
             'new_state_name': 'New state2'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state2',
             'new_state_name': 'New state3'
-        }]
+        })]
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [
@@ -3303,11 +3303,11 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': 'edit_exploration_property',
                     'property_name': 'title',
                     'new_value': 'New title'
-                }], 'Changes.')
+                })], 'Changes.')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3327,10 +3327,10 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }], 'Add state name')
+                })], 'Add state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3351,16 +3351,16 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }], 'Add state name')
+                })], 'Add state name')
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'new state',
-                }], 'delete state')
+                })], 'delete state')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3380,17 +3380,17 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }], 'Add state name')
+                })], 'Add state name')
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
                     'old_state_name': 'new state',
                     'new_state_name': 'state',
-                }], 'Change state name')
+                })], 'Change state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3411,12 +3411,12 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': self.exploration.init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput'
-                }], 'Update interaction.')
+                })], 'Update interaction.')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3437,35 +3437,35 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
                     'old_state_name': 'new state',
                     'new_state_name': 'state'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'extra state'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'state',
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'extra state',
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'TextInput'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'new state',
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'TextInput'
-                }], 'Heavy changes')
+                })], 'Heavy changes')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3484,31 +3484,31 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'state',
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
                     'old_state_name': 'extra state',
                     'new_state_name': 'state'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'state',
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'extra state'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'extra state',
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'TextInput'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
                     'old_state_name': 'new state',
                     'new_state_name': 'other state'
-                }], 'Heavy changes 2')
+                })], 'Heavy changes 2')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(

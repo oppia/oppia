@@ -18,6 +18,7 @@ import json
 import os
 
 from constants import constants
+from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import rating_services
@@ -93,15 +94,15 @@ class LibraryPageTest(test_utils.GenericTestBase):
 
         # change title and category.
         exp_services.update_exploration(
-            self.editor_id, '0', [{
+            self.editor_id, '0', [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'A new title!'
-            }, {
+            }), exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'category',
                 'new_value': 'A new category'
-            }],
+            })],
             'Change title and category')
 
         # Load the search results with an empty query.

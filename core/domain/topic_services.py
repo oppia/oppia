@@ -173,8 +173,8 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         additional_story_ids=topic.additional_story_ids,
         skill_ids=topic.skill_ids
     )
-    commit_cmds = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    model.commit(committer_id, commit_message, commit_cmds)
+    commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmds_dict)
     topic.version += 1
     create_topic_summary(topic.id)
 
@@ -282,8 +282,8 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.additional_story_ids = topic.additional_story_ids
     topic_model.skill_ids = topic.skill_ids
     topic_model.language_code = topic.language_code
-    change_list = [change.to_dict() for change in change_list]
-    topic_model.commit(committer_id, commit_message, change_list)
+    change_list_dict = [change.to_dict() for change in change_list]
+    topic_model.commit(committer_id, commit_message, change_list_dict)
     memcache_services.delete(_get_topic_memcache_key(topic.id))
     topic.version += 1
 

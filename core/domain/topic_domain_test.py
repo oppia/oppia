@@ -81,24 +81,15 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.canonical_story_ids = 'story_id'
         self._assert_validation_error(
             'Expected canonical story ids to be a list')
-        self.topic.canonical_story_ids = ['story_id']
-        self._assert_validation_error(
-            'The story with id story_id doesn\'t exist')
 
     def test_additional_story_ids_validation(self):
         self.topic.additional_story_ids = 'story_id'
         self._assert_validation_error(
             'Expected additional story ids to be a list')
-        self.topic.additional_story_ids = ['story_id']
-        self._assert_validation_error(
-            'The story with id story_id doesn\'t exist')
 
     def test_skill_ids_validation(self):
         self.topic.skill_ids = 'skill_id'
         self._assert_validation_error('Expected skill ids to be a list')
-        self.topic.skill_ids = ['skill_id']
-        self._assert_validation_error(
-            'The skill with id skill_id doesn\'t exist')
 
     def test_to_dict(self):
         user_ids = [self.user_id_a, self.user_id_b]
