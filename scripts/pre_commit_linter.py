@@ -1100,8 +1100,8 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
         tag_line = self.file_lines[line_number - 1].lstrip()
-        angled_tag = '<' + tag
-        if tag_line.startswith(angled_tag):
+        opening_tag = '<' + tag
+        if tag_line.startswith(opening_tag):
             if self.previous_tag_line_number is None:
                 if column_number % 2 != 0:
                     print (
