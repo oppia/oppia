@@ -12,11 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for suggestion domain objects."""
+"""Tests for suggestion registry classes."""
 
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import suggestion_domain
+from core.domain import suggestion_registry
 from core.platform import models
 from core.tests import test_utils
 import utils
@@ -24,7 +24,7 @@ import utils
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-class SuggestionDomainUnitTests(test_utils.GenericTestBase):
+class SuggestionRegistryUnitTests(test_utils.GenericTestBase):
     """Tests for the suggestion class."""
 
     AUTHOR_EMAIL = 'author@example.com'
@@ -32,7 +32,7 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
     ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
 
     def setUp(self):
-        super(SuggestionDomainUnitTests, self).setUp()
+        super(SuggestionRegistryUnitTests, self).setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
@@ -43,7 +43,8 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             self.ASSIGNED_REVIEWER_EMAIL)
         self.suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread1',
-            'suggestion_type': suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT, # pylint: disable=line-too-long
+            'suggestion_type': (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
             'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
             'target_id': 'exp1',
             'target_version_at_submission': 1,
@@ -52,24 +53,24 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'final_reviewer_id': self.reviewer_id,
             'assigned_reviewer_id': self.assigned_reviewer_id,
             'change_cmd': {},
-            'score_category': 'translation.English'
+            'score_category': 'content.Algebra'
         }
 
     def test_base_class_methods_raises_error(self):
         with self.assertRaisesRegexp(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement __init__.'):
-            suggestion_domain.BaseSuggestion()
+            suggestion_registry.BaseSuggestion()
 
         with self.assertRaisesRegexp(
             NotImplementedError,
             'Subclasses of BaseSuggestion should implement from_dict.'):
-            suggestion_domain.BaseSuggestion.from_dict()
+            suggestion_registry.BaseSuggestion.from_dict()
 
     def test_create_suggestion_edit_state_content(self):
         expected_suggestion_dict = self.suggestion_dict
 
-        observed_suggestion = suggestion_domain.SuggestionEditStateContent(
+        observed_suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
@@ -83,12 +84,12 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
 
     def test_from_dict_suggestion_edit_state_content(self):
         observed_suggestion = (
-            suggestion_domain.SuggestionEditStateContent.from_dict(
+            suggestion_registry.SuggestionEditStateContent.from_dict(
                 self.suggestion_dict))
         self.assertDictEqual(
             observed_suggestion.to_dict(), self.suggestion_dict)
         self.assertIsInstance(
-            observed_suggestion, suggestion_domain.SuggestionEditStateContent)
+            observed_suggestion, suggestion_registry.SuggestionEditStateContent)
 
     class MockExploration(object):
         """Mocks an exploration. To be used only for testing."""
@@ -114,7 +115,7 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state_1'
         }
-        suggestion = suggestion_domain.SuggestionEditStateContent(
+        suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
@@ -133,7 +134,7 @@ class SuggestionDomainUnitTests(test_utils.GenericTestBase):
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': 'state_unknown'
         }
-        suggestion = suggestion_domain.SuggestionEditStateContent(
+        suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
