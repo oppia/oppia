@@ -163,8 +163,8 @@ class BaseSuggestion(object):
             raise utils.ValidationError(
                 'Expected score_category to be of the form'
                 ' score_type%sscore_sub_type, received %s' % (
-                suggestion_models.SCORE_CATEGORY_DELIMITER,
-                self.score_category))
+                    suggestion_models.SCORE_CATEGORY_DELIMITER,
+                    self.score_category))
 
         if (
                 len(self.score_category.split(
@@ -172,8 +172,8 @@ class BaseSuggestion(object):
             raise utils.ValidationError(
                 'Expected score_category to be of the form'
                 ' score_type%sscore_sub_type, received %s' % (
-                suggestion_models.SCORE_CATEGORY_DELIMITER,
-                self.score_category))
+                    suggestion_models.SCORE_CATEGORY_DELIMITER,
+                    self.score_category))
 
 
         if self.get_score_type() not in suggestion_models.SCORE_TYPE_CHOICES:
