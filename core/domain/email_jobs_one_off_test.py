@@ -53,8 +53,9 @@ class EmailHashRegenerationOneOffJobTests(test_utils.GenericTestBase):
 
         generate_constant_hash_ctx = self.swap(
             email_models.SentEmailModel, '_generate_hash',
-            types.MethodType(_generate_hash_for_tests,
-                             email_models.SentEmailModel))
+            types.MethodType(
+                _generate_hash_for_tests,
+                email_models.SentEmailModel))
 
         with generate_constant_hash_ctx:
             email_models.SentEmailModel.create(

@@ -275,16 +275,17 @@ class RecentUpdatesMRJobManager(
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
                     exp_id, thread_id))
 
-            yield (reducer_key, {
-                'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-                'activity_id': last_message.exploration_id,
-                'activity_title': exp_models.ExplorationModel.get_by_id(
-                    last_message.exploration_id).title,
-                'author_id': last_message.author_id,
-                'last_updated_ms': utils.get_time_in_millisecs(
-                    last_message.created_on),
-                'subject': last_message.get_thread_subject(),
-            })
+            yield (
+                reducer_key, {
+                    'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
+                    'activity_id': last_message.exploration_id,
+                    'activity_title': exp_models.ExplorationModel.get_by_id(
+                        last_message.exploration_id).title,
+                    'author_id': last_message.author_id,
+                    'last_updated_ms': utils.get_time_in_millisecs(
+                        last_message.created_on),
+                    'subject': last_message.get_thread_subject(),
+                })
 
     @staticmethod
     def reduce(key, stringified_values):

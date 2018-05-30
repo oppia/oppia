@@ -1152,34 +1152,37 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
     def _rename_state(
             self, new_state_name, exp_id=TEXT_INPUT_EXP_ID,
             state_name=INIT_STATE_NAME):
-        exp_services.update_exploration(self.owner_id, exp_id, [{
-            'cmd': exp_domain.CMD_RENAME_STATE,
-            'old_state_name': state_name,
-            'new_state_name': new_state_name
-        }], 'Update state name')
+        exp_services.update_exploration(
+            self.owner_id, exp_id, [{
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': state_name,
+                'new_state_name': new_state_name
+            }], 'Update state name')
 
     def _change_state_interaction_id(
             self, interaction_id, exp_id=TEXT_INPUT_EXP_ID,
             state_name=INIT_STATE_NAME):
-        exp_services.update_exploration(self.owner_id, exp_id, [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-            'new_value': interaction_id
-        }], 'Update state interaction ID')
+        exp_services.update_exploration(
+            self.owner_id, exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'new_value': interaction_id
+            }], 'Update state interaction ID')
 
     def _change_state_content(
             self, new_content, exp_id=TEXT_INPUT_EXP_ID,
             state_name=INIT_STATE_NAME):
-        exp_services.update_exploration(self.owner_id, exp_id, [{
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'state_name': state_name,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'new_value': {
-                'html': new_content,
-                'audio_translations': {},
-            }
-        }], 'Change content description')
+        exp_services.update_exploration(
+            self.owner_id, exp_id, [{
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'state_name': state_name,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'new_value': {
+                    'html': new_content,
+                    'audio_translations': {},
+                }
+            }], 'Change content description')
 
     def setUp(self):
         super(AnswerVisualizationsTests, self).setUp()
@@ -1237,10 +1240,11 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             self.assertEqual(visualization['id'], 'FrequencyTable')
-            self.assertEqual(visualization['data'], [{
-                'answer': 'Answer A',
-                'frequency': 1
-            }])
+            self.assertEqual(
+                visualization['data'], [{
+                    'answer': 'Answer A',
+                    'frequency': 1
+                }])
 
     def test_has_vis_info_for_exp_with_many_answers_for_one_calculation(self):
         with self._get_swap_context():
@@ -1256,16 +1260,17 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             visualization = visualizations[0]
             self.assertEqual(visualization['id'], 'FrequencyTable')
             # Ties will appear in same order they are submitted in.
-            self.assertEqual(visualization['data'], [{
-                'answer': 'Answer A',
-                'frequency': 3
-            }, {
-                'answer': 'Answer C',
-                'frequency': 1
-            }, {
-                'answer': 'Answer B',
-                'frequency': 1
-            }])
+            self.assertEqual(
+                visualization['data'], [{
+                    'answer': 'Answer A',
+                    'frequency': 3
+                }, {
+                    'answer': 'Answer C',
+                    'frequency': 1
+                }, {
+                    'answer': 'Answer B',
+                    'frequency': 1
+                }])
 
     def test_has_vis_info_for_each_calculation_for_multi_calc_exp(self):
         with self._get_swap_context():
@@ -1288,16 +1293,17 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self.assertEqual(
                 top_answers_visualization['options']['column_headers'],
                 ['Answer', 'Count'])
-            self.assertEqual(top_answers_visualization['data'], [{
-                'answer': ['A', 'B'],
-                'frequency': 3
-            }, {
-                'answer': ['A'],
-                'frequency': 2
-            }, {
-                'answer': ['C', 'A'],
-                'frequency': 1
-            }])
+            self.assertEqual(
+                top_answers_visualization['data'], [{
+                    'answer': ['A', 'B'],
+                    'frequency': 3
+                }, {
+                    'answer': ['A'],
+                    'frequency': 2
+                }, {
+                    'answer': ['C', 'A'],
+                    'frequency': 1
+                }])
 
             common_elements_visualization = visualizations[1]
             self.assertEqual(
@@ -1308,16 +1314,17 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             common_visualization_data = (
                 common_elements_visualization['data'])
-            self.assertEqual(common_visualization_data, [{
-                'answer': 'A',
-                'frequency': 6
-            }, {
-                'answer': 'B',
-                'frequency': 3
-            }, {
-                'answer': 'C',
-                'frequency': 1
-            }])
+            self.assertEqual(
+                common_visualization_data, [{
+                    'answer': 'A',
+                    'frequency': 6
+                }, {
+                    'answer': 'B',
+                    'frequency': 3
+                }, {
+                    'answer': 'C',
+                    'frequency': 1
+                }])
 
     def test_retrieves_latest_vis_info_with_rounds_of_calculations(self):
         with self._get_swap_context():
@@ -1333,13 +1340,14 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             # The latest data should include all submitted answers.
-            self.assertEqual(visualization['data'], [{
-                'answer': 'Answer A',
-                'frequency': 2
-            }, {
-                'answer': 'Answer C',
-                'frequency': 1
-            }])
+            self.assertEqual(
+                visualization['data'], [{
+                    'answer': 'Answer A',
+                    'frequency': 2
+                }, {
+                    'answer': 'Answer C',
+                    'frequency': 1
+                }])
 
     def test_retrieves_vis_info_across_multiple_exploration_versions(self):
         with self._get_swap_context():
@@ -1356,13 +1364,14 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             visualization = visualizations[0]
             # The latest data should include all submitted answers.
-            self.assertEqual(visualization['data'], [{
-                'answer': 'Answer A',
-                'frequency': 2
-            }, {
-                'answer': 'Answer B',
-                'frequency': 1
-            }])
+            self.assertEqual(
+                visualization['data'], [{
+                    'answer': 'Answer A',
+                    'frequency': 2
+                }, {
+                    'answer': 'Answer B',
+                    'frequency': 1
+                }])
 
     def test_no_vis_info_for_exp_with_new_state_name_before_calculations(self):
         with self._get_swap_context():

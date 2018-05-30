@@ -353,11 +353,12 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
     def test_can_get_public_exploration_summaries(self):
         self.login(self.VIEWER_EMAIL)
 
-        response_dict = self.get_json(feconf.EXPLORATION_SUMMARIES_DATA_URL, {
-            'stringified_exp_ids': json.dumps([
-                self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
-                self.PRIVATE_EXP_ID_VIEWER])
-        })
+        response_dict = self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL, {
+                'stringified_exp_ids': json.dumps([
+                    self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
+                    self.PRIVATE_EXP_ID_VIEWER])
+            })
         self.assertIn('summaries', response_dict)
 
         summaries = response_dict['summaries']
@@ -371,12 +372,13 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
     def test_can_get_editable_private_exploration_summaries(self):
         self.login(self.VIEWER_EMAIL)
 
-        response_dict = self.get_json(feconf.EXPLORATION_SUMMARIES_DATA_URL, {
-            'stringified_exp_ids': json.dumps([
-                self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
-                self.PRIVATE_EXP_ID_VIEWER]),
-            'include_private_explorations': True
-        })
+        response_dict = self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL, {
+                'stringified_exp_ids': json.dumps([
+                    self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
+                    self.PRIVATE_EXP_ID_VIEWER]),
+                'include_private_explorations': True
+            })
         self.assertIn('summaries', response_dict)
 
         summaries = response_dict['summaries']
@@ -393,12 +395,13 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
             self.editor, self.PRIVATE_EXP_ID_EDITOR, self.viewer_id,
             rights_manager.ROLE_EDITOR)
 
-        response_dict = self.get_json(feconf.EXPLORATION_SUMMARIES_DATA_URL, {
-            'stringified_exp_ids': json.dumps([
-                self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
-                self.PRIVATE_EXP_ID_VIEWER]),
-            'include_private_explorations': True
-        })
+        response_dict = self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL, {
+                'stringified_exp_ids': json.dumps([
+                    self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
+                    self.PRIVATE_EXP_ID_VIEWER]),
+                'include_private_explorations': True
+            })
         self.assertIn('summaries', response_dict)
 
         summaries = response_dict['summaries']
@@ -414,12 +417,13 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_cannot_get_private_exploration_summaries_when_logged_out(self):
-        response_dict = self.get_json(feconf.EXPLORATION_SUMMARIES_DATA_URL, {
-            'stringified_exp_ids': json.dumps([
-                self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
-                self.PRIVATE_EXP_ID_VIEWER]),
-            'include_private_explorations': True
-        })
+        response_dict = self.get_json(
+            feconf.EXPLORATION_SUMMARIES_DATA_URL, {
+                'stringified_exp_ids': json.dumps([
+                    self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
+                    self.PRIVATE_EXP_ID_VIEWER]),
+                'include_private_explorations': True
+            })
         self.assertIn('summaries', response_dict)
 
         summaries = response_dict['summaries']

@@ -126,8 +126,8 @@ class LearnerProgressTests(test_utils.GenericTestBase):
             'version': incomplete_exploration_user_model.last_played_exp_version
         }
 
-    def _check_if_exp_details_match(self, actual_details,
-                                    details_fetched_from_model):
+    def _check_if_exp_details_match(
+            self, actual_details, details_fetched_from_model):
         self.assertEqual(
             actual_details['state_name'],
             details_fetched_from_model['state_name'])

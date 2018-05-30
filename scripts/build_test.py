@@ -37,15 +37,17 @@ class BuildTests(test_utils.GenericTestBase):
         # pylint: enable=protected-access
 
     def test_is_file_hash_provided_to_frontend(self):
-        with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
-                       ('path/to/file.js', 'path/to/file.html', 'file.js')):
+        with self.swap(
+            build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
+            ('path/to/file.js', 'path/to/file.html', 'file.js')):
             self.assertTrue(
                 build.is_file_hash_provided_to_frontend('path/to/file.js'))
             self.assertTrue(
                 build.is_file_hash_provided_to_frontend('path/to/file.html'))
             self.assertTrue(build.is_file_hash_provided_to_frontend('file.js'))
-        with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
-                       ('path/to/*', '*.js', '*_end.html')):
+        with self.swap(
+            build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
+            ('path/to/*', '*.js', '*_end.html')):
             self.assertTrue(
                 build.is_file_hash_provided_to_frontend('path/to/file.js'))
             self.assertTrue(
@@ -64,13 +66,16 @@ class BuildTests(test_utils.GenericTestBase):
             hashes = {'path/to/file.js': '123456',
                       'path/file.min.js': '123456'}
             filtered_hashes = build.filter_hashes(hashes)
-            self.assertEquals(filtered_hashes['/path/to/file.js'],
-                              hashes['path/to/file.js'])
-            self.assertEquals(filtered_hashes['/path/file.min.js'],
-                              hashes['path/file.min.js'])
+            self.assertEquals(
+                filtered_hashes['/path/to/file.js'],
+                hashes['path/to/file.js'])
+            self.assertEquals(
+                filtered_hashes['/path/file.min.js'],
+                hashes['path/file.min.js'])
 
-        with self.swap(build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
-                       ('test_path/*', 'path/to/file.js')):
+        with self.swap(
+            build, 'FILEPATHS_PROVIDED_TO_FRONTEND',
+            ('test_path/*', 'path/to/file.js')):
             hashes = {'path/to/file.js': '123456',
                       'test_path/to/file.html': '123456',
                       'test_path/to/file.js': 'abcdef',

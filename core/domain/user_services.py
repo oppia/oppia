@@ -1344,8 +1344,8 @@ def create_user_contributions(
     return user_contributions
 
 
-def update_user_contributions(user_id, created_exploration_ids,
-                              edited_exploration_ids):
+def update_user_contributions(
+        user_id, created_exploration_ids, edited_exploration_ids):
     """Updates an existing UserContributionsModel with new calculated
     contributions.
 

@@ -264,7 +264,7 @@ oppia.controller('StateResponses', [
           'ExplorationContextService', 'EditorStateService',
           'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
-          'AngularNameService', 'RULE_TYPE_CLASSIFIER',
+          'AngularNameService', 'EXPLICIT_CLASSIFICATION',
           function(
               $scope, $injector, $uibModalInstance,
               ExplorationHtmlFormatterService,
@@ -272,7 +272,7 @@ oppia.controller('StateResponses', [
               ExplorationContextService, EditorStateService,
               ExplorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
-              AngularNameService, RULE_TYPE_CLASSIFIER) {
+              AngularNameService, EXPLICIT_CLASSIFICATION) {
             var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
             var _state = ExplorationStatesService.getState(_stateName);
@@ -337,13 +337,14 @@ oppia.controller('StateResponses', [
               $scope.trainingDataFeedback = feedbackHtml;
               $scope.trainingDataOutcomeDest = dest;
 
-              var answerGroupIndex =
-                classificationResult.answerGroupIndex;
-              var ruleIndex = classificationResult.ruleIndex;
-              if (answerGroupIndex !==
-                _state.interaction.answerGroups.length &&
-                  _state.interaction.answerGroups[answerGroupIndex]
-                    .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
+              var classificationCategorization = (
+                classificationResult.classificationCategorization);
+
+              // If answer is classified using explicit rules then we don't show
+              // yes / no option to creator. Otherwise we ask whether the
+              // response it satisfactory and assign a different response
+              // if response is not satisfactory.
+              if (classificationCategorization === EXPLICIT_CLASSIFICATION) {
                 $scope.classification.answerGroupIndex = -1;
               } else {
                 $scope.classification.answerGroupIndex = (
@@ -417,7 +418,7 @@ oppia.controller('StateResponses', [
       }).result.then(function(result) {
         // Create a new answer group.
         $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-          [result.tmpRule], result.tmpOutcome, false));
+          [result.tmpRule], result.tmpOutcome, []));
         ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
 

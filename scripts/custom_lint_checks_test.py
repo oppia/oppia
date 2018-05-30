@@ -19,6 +19,7 @@
 
 import os
 import sys
+import tempfile
 import unittest
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
@@ -77,3 +78,50 @@ class ExplicitKwargsCheckerTest(unittest.TestCase):
         ):
             checker_test_object.checker.visit_call(
                 func_call_node_three)
+
+
+class HangingIndentCheckerTest(unittest.TestCase):
+
+    def test_finds_hanging_indent(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            custom_lint_checks.HangingIndentChecker)
+        checker_test_object.setup_method()
+        node1 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with open(filename, 'w') as tmp:
+            tmp.write(
+                """self.post_json('/ml/trainedclassifierhandler', self.payload,
+                expect_errors=True, expected_status_int=401)
+                """)
+        node1.file = filename
+        node1.path = filename
+
+        checker_test_object.checker.process_module(node1)
+
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='no-break-after-hanging-indent',
+                line=1
+            ),
+        ):
+            temp_file.close()
+
+        node2 = astroid.scoped_nodes.Module(name='test', doc='Custom test')
+
+        temp_file = tempfile.NamedTemporaryFile()
+        filename = temp_file.name
+        with open(filename, 'w') as tmp:
+            tmp.write(
+                """master_translation_dict = json.loads(
+                utils.get_file_contents(os.path.join(
+                os.getcwd(), 'assets', 'i18n', 'en.json')))
+                """)
+        node2.file = filename
+        node2.path = filename
+
+        checker_test_object.checker.process_module(node2)
+
+        with checker_test_object.assertNoMessages():
+            temp_file.close()

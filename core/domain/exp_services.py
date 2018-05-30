@@ -139,7 +139,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     migration works correctly, and it should never be changed otherwise.
 
     Args:
-        exploration_model: An exploration storage model.
+        exploration_model: ExplorationModel. An exploration storage model.
         run_conversion: bool. When True, updates the exploration to the latest
             states_schema_version if necessary.
 
@@ -967,11 +967,12 @@ def save_new_exploration(committer_id, exploration):
     commit_message = (
         ('New exploration created with title \'%s\'.' % exploration.title)
         if exploration.title else 'New exploration created.')
-    _create_exploration(committer_id, exploration, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': exploration.title,
-        'category': exploration.category,
-    }])
+    _create_exploration(
+        committer_id, exploration, commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': exploration.title,
+            'category': exploration.category,
+        }])
     user_services.add_created_exploration_id(committer_id, exploration.id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
     user_services.record_user_created_an_exploration(committer_id)
@@ -1500,11 +1501,12 @@ def save_new_exploration_from_yaml_and_assets(
         'New exploration created from YAML file with title \'%s\'.'
         % exploration.title)
 
-    _create_exploration(committer_id, exploration, create_commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': exploration.title,
-        'category': exploration.category,
-    }])
+    _create_exploration(
+        committer_id, exploration, create_commit_message, [{
+            'cmd': CMD_CREATE_NEW,
+            'title': exploration.title,
+            'category': exploration.category,
+        }])
 
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
