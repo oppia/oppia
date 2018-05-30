@@ -57,7 +57,7 @@ oppia.factory('ImagePreloaderService', [
 
     /**
      * Gets image files names in Bfs order from the state.
-     * @pstatearam {string} sourceStateName - The name of the starting state
+     * @param {string} sourceStateName - The name of the starting state
      *                                        from which the filenames should
      *                                        be obtained.
      */
@@ -89,9 +89,7 @@ oppia.factory('ImagePreloaderService', [
       ).then(function(loadedImage) {
         _filenamesOfImageCurrentlyDownloading = (
           _filenamesOfImageCurrentlyDownloading.filter(function(imageFilename) {
-            if (loadedImage.filename !== imageFilename) {
-              return true;
-            }
+            return loadedImage.filename !== imageFilename;
           })
         );
         if (_filenamesOfImageToBeDownloaded.length > 0) {
@@ -175,6 +173,10 @@ oppia.factory('ImagePreloaderService', [
       onStateChange: _onStateChange,
       isLoadingImageFile: function(filename) {
         return _filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1;
+      },
+      restartImagePreloader: function(sourceStateName) {
+        _cancelPreloading();
+        _kickOffImagePreloader(sourceStateName);
       },
       getFilenamesOfImageCurrentlyDownloading: function() {
         return _filenamesOfImageCurrentlyDownloading;

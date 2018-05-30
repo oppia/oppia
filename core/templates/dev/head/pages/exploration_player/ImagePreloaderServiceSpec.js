@@ -1,174 +1,356 @@
 // Copyright 2017 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the 'License');
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
 //      http://www.apache.org/licenses/LICENSE-2.0
 //
 // Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS-IS" BASIS,
+// distributed under the License is distributed on an 'AS-IS' BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
 /**
- * @fileoverview Service to preload image into AssetsBackendApiService's cache.
+ * @fileoverview Unit tests for the image preloader service.
  */
 
-oppia.factory('ImagePreloaderService', [
-  '$uibModal', 'ExplorationContextService', 'AssetsBackendApiService',
-  'ExplorationPlayerStateService', 'UrlInterpolationService',
-  'ComputeGraphService', 'ExtractImageFilenamesFromStateService',
-  function($uibModal, ExplorationContextService, AssetsBackendApiService,
-      ExplorationPlayerStateService, UrlInterpolationService,
-      ComputeGraphService, ExtractImageFilenamesFromStateService) {
-    var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
-
-    var _filenamesOfImageCurrentlyDownloading = [];
-    var _filenamesOfImageToBeDownloaded = [];
-    var _exploration = null;
-    var _imageLoadedCallback = null;
-    var _recentlyRequestedImageFilenames = [];
-
-    var _immediatelyLoadImage = null;
-    var _init = function(exploration) {
-      _exploration = exploration;
-      _states = exploration.states;
-    };
-
-    var _getImageFilenamesInBfsOrder = function(sourceStateName) {
-      console.log("entered GetImageFilenamesInBfsOrder");
-      var stateNamesInBfsOrder =
-        ComputeGraphService.computeBfsTraversalOfStates(
-          _exploration.getInitialState().name,
-          _exploration.getStates(),
-          sourceStateName);
-      var imageFilenames = [];
-  
-      stateNamesInBfsOrder.forEach(function(stateName) {
-        var state = _states.getState(stateName);
-        ExtractImageFilenamesFromStateService.getImageFilenamesInState(state).
-          forEach(function(filename) {
-            imageFilenames.push(filename);
-          });
+describe('Image preloader service', function() {
+  beforeEach(function() {
+    module('oppia');
+    // Set a global value for INTERACTION_SPECS that will be used by all the
+    // descendant dependencies.
+    module(function($provide) {
+      $provide.constant('INTERACTION_SPECS', {
+        TextInput: {
+          is_terminal: false
+        },
+        ItemSelectionInput: {
+          is_terminal: false
+        },
+        MultipleChoiceInput: {
+          is_terminal: false
+        },
+        Continue: {
+          is_terminal: false
+        },
+        EndExploration: {
+          is_terminal: true
+        }
       });
-      console.log(" In _getImageFilesInBfsOrder -- Image Filenames are "+ imageFilenames);
-      return imageFilenames;
-    };
+    });
+  });
 
-    var _loadImage = function(imageFilename) {
-      console.log("ImagePreloaderService  _loadImage get the images before hand " + imageFilename);
-      AssetsBackendApiService.loadImage(
-        ExplorationContextService.getExplorationId(), imageFilename
-      ).then(function(loadedImage) {
-        console.log("The image has been loaded with the help of the _loadImage in ImagePreloader , the filename is " + loadedImage.filename);
-        for (var i = 0;
-          i < _filenamesOfImageCurrentlyDownloading.length; i++) {
-          if (_filenamesOfImageCurrentlyDownloading[i] ===
-              loadedImage.filename) {
-            _filenamesOfImageCurrentlyDownloading.splice(i, 1);
-            break;
+  var abas, ips, eof, ecs;
+  var $httpBackend = null;
+  var $rootScope = null;
+  var explorationDict;
+  var requestUrl1, requestUrl2, requestUrl3, requestUrl4, requestUrl5;
+  beforeEach(inject(function($injector) {
+    $httpBackend = $injector.get('$httpBackend');
+    ips = $injector.get('ImagePreloaderService');
+    eof = $injector.get('ExplorationObjectFactory');
+    ecs = $injector.get('ExplorationContextService');
+    abas = $injector.get('AssetsBackendApiService');
+    spyOn(ecs, 'getExplorationId').and.returnValue('1');
+    $rootScope = $injector.get('$rootScope');
+    explorationDict = {
+      id: 1,
+      title: 'My Title',
+      category: 'Art',
+      objective: 'Your objective',
+      tags: [],
+      blurb: '',
+      author_notes: '',
+      states_schema_version: 15,
+      init_state_name: 'Introduction',
+      states: {
+        'State 1': {
+          param_changes: [],
+          content: {
+            html: '',
+            audio_translations: {}
+          },
+          interaction: {
+            id: 'Continue',
+            default_outcome: {
+              feedback: [],
+              dest: 'State 3',
+              param_changes: []
+            },
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              buttonText: {
+                value: 'Continue'
+              }
+            },
+            solution: null,
+            answer_groups: [],
+            hints: []
+          },
+          classifier_model_id: null
+        },
+        'State 3': {
+          param_changes: [],
+          content: {
+            html: 'Congratulations, you have finished!',
+            audio_translations: {}
+          },
+          interaction: {
+            id: 'EndExploration',
+            default_outcome: null,
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              recommendedExplorationIds: {
+                value: []
+              }
+            },
+            solution: null,
+            answer_groups: [],
+            hints: []
+          },
+          classifier_model_id: null
+        },
+        Introduction: {
+          classifier_model_id: null,
+          param_changes: [],
+          content: {
+            html: 'Multiple Choice',
+            audio_translations: {}
+          },
+          interaction: {
+            id: 'MultipleChoiceInput',
+            default_outcome: {
+              dest: 'Introduction',
+              feedback: {
+                audio_translation: {},
+                html: 'Try Again!'
+              }
+            },
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              choices: {
+                value: [
+                  '<p> Go to ItemSelection <oppia-noninteractive-image' +
+                  ' filepath-with-value="&amp;quot;sIMChoice1.png&amp;' +
+                  'quot;"></oppia-noninteractive-image></p>',
+                  '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
+                  ' filepath-with-value="&amp;quot;sIMChoice2.png&amp;' +
+                  'quot;"></oppia-noninteractive-image></p>'
+                ]
+              }
+            },
+            answer_groups: [
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: 'State 6',
+                  feedback: {
+                    audio_translations: {},
+                    html: '<p>We are going to ItemSelection' +
+                          '<oppia-noninteractive-image filepath-with-value=' +
+                          '"&amp;quot;sIOFeedback.png&amp;quot;">' +
+                          '</oppia-noninteractive-image></p>'
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [
+                  {
+                    inputs: {
+                      x: 0
+                    },
+                    rule_type: 'Equals'
+                  }
+                ]
+              },
+              {
+                labelled_as_correct: false,
+                outcome: {
+                  dest: 'State 1',
+                  feedback: {
+                    audio_translations: {},
+                    html: "Let's go to state 1 ImageAndRegion"
+                  },
+                  param_changes: [],
+                  refresher_exploration_id: null
+                },
+                rule_specs: [
+                  {
+                    inputs: {
+                      x: 1
+                    },
+                    rule_type: 'Equals'
+                  }
+                ]
+              }
+            ],
+            hints: [],
+            solution: null
           }
+        },
+        'State 6': {
+          param_changes: [],
+          content: {
+            html: '<p>Text Input Content</p>',
+            audio_translations: {}
+          },
+          interaction: {
+            id: 'TextInput',
+            default_outcome: {
+              dest: 'State 6',
+              feedback: [
+                '<p>Try again.</p>'
+              ],
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null
+            },
+            confirmed_unclassified_answers: [],
+            customization_args: {
+              rows: {
+                value: 1
+              },
+              placeholder: {
+                value: ''
+              }
+            },
+            answer_groups: [{
+              rule_specs: [{
+                inputs: {
+                  x: '1'
+                },
+                rule_type: 'Contains'
+              }],
+              outcome: {
+                dest: 'State 1',
+                feedback: [
+                  "<p>Let's go to State 1</p>"
+                ],
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
+            }, {
+              rule_specs: [{
+                inputs: {
+                  x: '2'
+                },
+                rule_type: 'Contains'
+              }],
+              outcome: {
+                dest: 'State 1',
+                feedback: [
+                  "<p>Let's go to State 1</p>"
+                ],
+                labelled_as_correct: false,
+                param_changes: [],
+                refresher_exploration_id: null
+              }
+            }],
+            hints: [{
+              hint_content: {
+                html: '<p><oppia-noninteractive-image filepath-with-value="' +
+                      '&amp;quot;s6Hint1.png&amp;quot;">' +
+                      '</oppia-noninteractive-image></p>',
+                audio_translations: {}
+              }
+            }],
+            solution: null,
+          },
+          classifier_model_id: null
         }
-        if (_filenamesOfImageToBeDownloaded.length > 0) {
-          var nextImageFilename = _filenamesOfImageToBeDownloaded.shift();
-          _filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
-          _loadImage(nextImageFilename);
-        }
-        if(_immediatelyLoadImage) {
-          _cancelPreloading();
-          _kickOffImagePreloader(_immediatelyLoadImage.sourceStateName);
-        }
-        if(_imageLoadedCallback) {
-          _imageLoadedCallback(loadedImage.filename);
-        }
+      },
+      param_specs: {},
+      param_changes: [],
+      version: 1
+    };
+
+    requestUrl1 = UrlInterpolationService.interpolateUrl(
+      '/imagehandler/<exploration_id>/<filename>', {
+        exploration_id: '1',
+        filename: 'sIMChoice1.png'
       });
-    };
-
-    var _kickOffImagePreloader = function(sourceStateName) {
-      _filenamesOfImageToBeDownloaded =
-        _getImageFilenamesInBfsOrder(sourceStateName);
-      while (_filenamesOfImageCurrentlyDownloading.length <
-        MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
-          _filenamesOfImageToBeDownloaded.length > 0) {
-        var imageFilename = _filenamesOfImageToBeDownloaded.shift();
-        _filenamesOfImageCurrentlyDownloading.push(imageFilename);
-        _loadImage(imageFilename);
-      }
-    };
-
-    var _cancelPreloading = function() {
-      AssetsBackendApiService.abortAllCurrentImageDownloads();
-      _filenamesOfImageCurrentlyDownloading = [];
-    };
-
-    var _onStateChange = function(stateName) {
-      console.log("entered on state change  ");
-      var imageFilenamesInState = [];
-      var imageFilenamesInStateCurrentlyBeingRequested = [];
-      // Images that are not there in the cache and are not currently being downloaded
-      var imagesNeitherInCacheNorBeingRequested = [];
-      
-      var state = _states.getState(stateName);
-      imageFilenamesInState = ExtractImageFilenamesFromStateService.getImageFilenamesInState(state);
-      
-      imageFilenamesInState.forEach(function(filename) {
-        if (! AssetsBackendApiService.isCached(filename) &&
-          (_filenamesOfImageCurrentlyDownloading.indexOf(filename) === -1)) {
-          imagesNeitherInCacheNorBeingRequested.push(filename);
-          }
-        if(_filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1) {
-          imageFilenamesInStateCurrentlyBeingRequested.push(filename);
-        }
+    requestUrl2 = UrlInterpolationService.interpolateUrl(
+      '/imagehandler/<exploration_id>/<filename>', {
+        exploration_id: '1',
+        filename: 'sIMChoice2.png'
       });
-      if (imagesNeitherInCacheNorBeingRequested.length &&
-        imageFilenamesInStateCurrentlyBeingRequested.length <=1) {
-        _cancelPreloading();
-        _kickOffImagePreloader(stateName);
-      }
-    };
+    requestUrl3 = UrlInterpolationService.interpolateUrl(
+      '/imagehandler/<exploration_id>/<filename>', {
+        exploration_id: '1',
+        filename: 'sIOFeedback.png'
+      });
+    requestUrl4 = UrlInterpolationService.interpolateUrl(
+      '/imagehandler/<exploration_id>/<filename>', {
+        exploration_id: '1',
+        filename: 's6Hint1.png'
+      });
+  }));
 
-    return {
-      init: function(exploration) {
-        _init(exploration);
-      },
-      kickOffImagePreloader: function(sourceStateName) {
-        console.log("entered ImagePreloader Kickoff");
-        _kickOffImagePreloader(sourceStateName);
-      },
-      onStateChange: _onStateChange,
-      addToRecentlyRequestedImageFilenames: function(filename) {
-        _recentlyRequestedImageFilenames.push(filename);
-      },
-      getRecentlyRequestedImageFilenames: function(filename) {
-        return _recentlyRequestedImageFilenames;
-      },
-      removeFromRecentlyRequestedImageFilenames: function(filename) {
-        var index = _recentlyRequestedImageFilenames.indexOf(filename);
-        if(index > -1) {
-          _recentlyRequestedImageFilenames.splice(index,1);
-        }
-      },
-      setImageLoadedCallback: function(imageLoadedCallback) {
-        _imageLoadedCallback = imageLoadedCallback;
-      },
-      immediatelyLoadImage: function(sourceStateName, filenames) {
-        _immediatelyLoadImage = {
-          'sourceStateName': sourceStateName
-        };
-        _cancelPreloading();
-        // In this case we request for all the files whose filename was received.
-        filenames.forEach(function(filename) {
-          _loadImage(filename);
-        });
-      },
-      isLoadingImageFile: function(filename) {
-        return _filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1;
-      },
-      getFilenamesOfImageCurrentlyDownloading: function() {
-        return _filenamesOfImageCurrentlyDownloading;
-      }
-    };
-  }
-]);
+  it('should maintain the correct number of download requests in queue',
+    function() {
+      $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
+      $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
+      $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
+      $httpBackend.expect('GET', requestUrl4).respond(201, 'image data 4');
+      var exploration = eof.createFromBackendDict(explorationDict);
+      ips.init(exploration);
+      ips.kickOffImagePreloader(exploration.getInitialState().name);
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+      expect(ips.isLoadingImageFile('sIMChoice1.png')).toBe(true);
+      expect(ips.isLoadingImageFile('sIMChoice2.png')).toBe(true);
+      expect(ips.isLoadingImageFile('sIOFeedback.png')).toBe(true);
+      expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(false);
+      $httpBackend.flush(1);
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+      $httpBackend.flush(1);
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(2);
+      $httpBackend.flush(1);
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
+      $httpBackend.flush(1);
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(0);
+      expect(ips.isLoadingImageFile('sIMChoice1.png')).toBe(false);
+      expect(ips.isLoadingImageFile('sIMChoice2.png')).toBe(false);
+      expect(ips.isLoadingImageFile('sIOFeedback.png')).toBe(false);
+      expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(false);
+    });
+
+  it('should properly restart pre-loading from a new state', function() {
+    var exploration = eof.createFromBackendDict(explorationDict);
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+    ips.restartImagePreloader('State 6');
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
+    expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(true);
+  });
+
+  it('should verify that preloader starts when state changes', function() {
+    var exploration = eof.createFromBackendDict(explorationDict);
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+    expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(false);
+    ips.onStateChange('State 6');
+    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
+    expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(true);
+  });
+
+  it('should check that there is sync between AssetsBackendApi Service and' +
+    'ImagePreloader Service', function() {
+    var exploration = eof.createFromBackendDict(explorationDict);
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
+    var filenamesOfImageCUrrentlyDownloading = (
+      ips.getFilenamesOfImageCurrentlyDownloading());
+    var imageFilesCurrentlyBeingRequested = (
+      abas.getAssetsFilesCurrentlyBeingRequested().image
+    );
+    for (x in filenamesOfImageCUrrentlyDownloading) {
+      expect(filenamesOfImageCUrrentlyDownloading[x]).toBe(
+        imageFilesCurrentlyBeingRequested[x].filename);
+    }
+  });
+});
