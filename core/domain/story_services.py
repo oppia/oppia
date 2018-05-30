@@ -225,8 +225,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         notes=story.notes,
         story_contents=story.story_contents.to_dict()
     )
-    commit_cmds = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    model.commit(committer_id, commit_message, commit_cmds)
+    commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmds_dict)
     story.version += 1
     create_story_summary(story.id)
 
@@ -385,8 +385,8 @@ def _save_story(committer_id, story, commit_message, change_list):
         ]
     }
     story_model.version = story.version
-    change_list = [change.to_dict() for change in change_list]
-    story_model.commit(committer_id, commit_message, change_list)
+    change_list_dict = [change.to_dict() for change in change_list]
+    story_model.commit(committer_id, commit_message, change_list_dict)
     memcache_services.delete(_get_story_memcache_key(story.id))
     story.version += 1
 

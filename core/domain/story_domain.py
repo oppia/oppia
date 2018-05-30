@@ -15,7 +15,7 @@
 """Domain objects relating to stories."""
 
 from constants import constants
-from core.domain import skill_services
+from core.domain import html_cleaner
 import feconf
 import utils
 
@@ -45,6 +45,11 @@ CMD_DELETE_STORY_NODE = 'delete_story_node'
 
 # This takes additional 'title' parameters.
 CMD_CREATE_NEW = 'create_new'
+
+OPTIONAL_ATTRIBUTE_NAMES = [
+    'property_name', 'new_value', 'old_value', 'node_id', 'from_version',
+    'to_version', 'title'
+]
 
 
 class StoryChange(object):
@@ -113,20 +118,10 @@ class StoryChange(object):
         """
         story_change_dict = {}
         story_change_dict['cmd'] = self.cmd
-        if hasattr(self, 'property_name'):
-            story_change_dict['property_name'] = self.property_name
-        if hasattr(self, 'new_value'):
-            story_change_dict['new_value'] = self.new_value
-        if hasattr(self, 'old_value'):
-            story_change_dict['old_value'] = self.old_value
-        if hasattr(self, 'node_id'):
-            story_change_dict['node_id'] = self.node_id
-        if hasattr(self, 'from_version'):
-            story_change_dict['from_version'] = self.from_version
-        if hasattr(self, 'to_version'):
-            story_change_dict['to_version'] = self.to_version
-        if hasattr(self, 'title'):
-            story_change_dict['title'] = self.title
+        for attribute_name in OPTIONAL_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                story_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
 
         return story_change_dict
 
@@ -152,7 +147,8 @@ class StoryNode(object):
                 before starting a node.
             outline: str. Free-form annotations that a lesson implementer
                 can use to construct the exploration. It describes the basic
-                theme or template of the story.
+                theme or template of the story and is to be provided in html
+                form.
             exploration_id: str or None. The valid exploration id that fits the
                 story node. It can be None initially, when the story creator
                 has just created a story with the basic storyline (by providing
@@ -162,7 +158,7 @@ class StoryNode(object):
         self.destination_node_ids = destination_node_ids
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
-        self.outline = outline
+        self.outline = html_cleaner.clean(outline)
         self.exploration_id = exploration_id
 
     def to_dict(self):
@@ -238,30 +234,27 @@ class StoryNode(object):
             raise utils.ValidationError(
                 'Expected prerequisite skill ids to be a list, received %s' %
                 self.prerequisite_skill_ids)
-
         for skill_id in self.prerequisite_skill_ids:
             if not isinstance(skill_id, basestring):
                 raise utils.ValidationError(
                     'Expected each prerequisite skill id to be a string, ' +
                     'received %s' % skill_id)
-            if skill_services.get_skill_by_id(skill_id, False) is None:
-                raise utils.ValidationError(
-                    'The prerequisite skill with id %s doesn\'t exist.'
-                    % skill_id)
 
         if not isinstance(self.acquired_skill_ids, list):
             raise utils.ValidationError(
                 'Expected acquired skill ids to be a list, received %s' %
                 self.acquired_skill_ids)
-
         for skill_id in self.acquired_skill_ids:
             if not isinstance(skill_id, basestring):
                 raise utils.ValidationError(
                     'Expected each acquired skill id to be a string, ' +
                     'received %s' % skill_id)
-            if skill_services.get_skill_by_id(skill_id, False) is None:
+
+        for skill_id in self.prerequisite_skill_ids:
+            if skill_id in self.acquired_skill_ids:
                 raise utils.ValidationError(
-                    'The acquired skill with id %s doesn\'t exist.'
+                    'Expected prerequisite skill ids and acquired skill ids ' +
+                    'to be mutually exclusive. The skill_id %s intersects '
                     % skill_id)
 
         if not isinstance(self.destination_node_ids, list):
@@ -274,6 +267,10 @@ class StoryNode(object):
                 raise utils.ValidationError(
                     'Expected each node id to be a string, ' +
                     'received %s' % node_id)
+            if node_id == self.id:
+                raise utils.ValidationError(
+                    'Expected destination node id list of a node to not have ' +
+                    'that same node as one of its elements. ')
 
 
 class StoryContents(object):
@@ -357,7 +354,7 @@ class Story(object):
             title: str. The title of the story.
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
-                main storyline, and setting.
+                main storyline, and setting. To be provided in html form.
             story_contents: StoryContents. The StoryContents instance
                 representing the contents (like nodes) that are part of the
                 story.
@@ -373,7 +370,7 @@ class Story(object):
         self.id = story_id
         self.title = title
         self.description = description
-        self.notes = notes
+        self.notes = html_cleaner.clean(notes)
         self.story_contents = story_contents
         self.schema_version = schema_version
         self.language_code = language_code
