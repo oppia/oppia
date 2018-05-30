@@ -78,25 +78,25 @@ install:
 - source scripts/setup_gae.sh || exit 1
 
 script:
-- if [ $RUN_LINT == 'false' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
+- if [ $RUN_LINT == 'true' ]; then bash scripts/install_third_party.sh; python scripts/pre_commit_linter.py --path=.; fi
 # Travis aborts test run if nothing is printed back to STDOUT for some time.
 # -x is used to avoid that.
-- if [ $RUN_FRONTEND_TESTS == 'false' ]; then travis_retry bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
-- if [ $RUN_BACKEND_TESTS == 'false' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ] && [ $EXCLUDE_LOAD_TESTS == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests; fi
-- if [ $RUN_BACKEND_TESTS == 'false' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ] && [ $EXCLUDE_LOAD_TESTS == 'true' ]; then bash scripts/run_backend_tests.sh --exclude_load_tests; fi
-- if [ $RUN_BACKEND_TESTS == 'false' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ] && [ $EXCLUDE_LOAD_TESTS == 'false' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
-- if [ $RUN_BACKEND_TESTS == 'false' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ] && [ $EXCLUDE_LOAD_TESTS == 'false' ]; then bash scripts/run_backend_tests.sh; fi
+- if [ $RUN_FRONTEND_TESTS == 'true' ]; then travis_retry bash -x scripts/run_frontend_tests.sh --run-minified-tests=true; fi
+- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ] && [ $EXCLUDE_LOAD_TESTS == 'true' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report --exclude_load_tests; fi
+- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ] && [ $EXCLUDE_LOAD_TESTS == 'true' ]; then bash scripts/run_backend_tests.sh --exclude_load_tests; fi
+- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'true' ] && [ $EXCLUDE_LOAD_TESTS == 'false' ]; then bash scripts/run_backend_tests.sh --generate_coverage_report; fi
+- if [ $RUN_BACKEND_TESTS == 'true' ] && [ $REPORT_BACKEND_COVERAGE == 'false' ] && [ $EXCLUDE_LOAD_TESTS == 'false' ]; then bash scripts/run_backend_tests.sh; fi
 # Run e2e tests in production mode.
 - if [ $RUN_E2E_TESTS_ACCESSIBILITY == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="accessibility" --prod_env; fi
-- if [ $RUN_E2E_TESTS_COLLECTIONS == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="collections" --prod_env; fi
-- if [ $RUN_E2E_TESTS_EDITOR_AND_PLAYER == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="editorAndPlayer" --prod_env; fi
-- if [ $RUN_E2E_TESTS_STATE_EDITOR == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="stateEditor" --prod_env; fi
-- if [ $RUN_E2E_TESTS_EDITOR_FEATURES == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="editorFeatures" --prod_env; fi
-- if [ $RUN_E2E_TESTS_EMBEDDING == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env; fi
-- if [ $RUN_E2E_TESTS_EXTENSIONS == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env; fi
-- if [ $RUN_E2E_TESTS_LEARNER_DASHBOARD == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="learnerDashboard" --prod_env; fi
-- if [ $RUN_E2E_TESTS_LIBRARY == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="library" --prod_env; fi
-- if [ $RUN_E2E_TESTS_USERS == 'false' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
+- if [ $RUN_E2E_TESTS_COLLECTIONS == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="collections" --prod_env; fi
+- if [ $RUN_E2E_TESTS_EDITOR_AND_PLAYER == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="editorAndPlayer" --prod_env; fi
+- if [ $RUN_E2E_TESTS_STATE_EDITOR == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="stateEditor" --prod_env; fi
+- if [ $RUN_E2E_TESTS_EDITOR_FEATURES == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="editorFeatures" --prod_env; fi
+- if [ $RUN_E2E_TESTS_EMBEDDING == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="embedding" --prod_env; fi
+- if [ $RUN_E2E_TESTS_EXTENSIONS == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="extensions" --prod_env; fi
+- if [ $RUN_E2E_TESTS_LEARNER_DASHBOARD == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="learnerDashboard" --prod_env; fi
+- if [ $RUN_E2E_TESTS_LIBRARY == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="library" --prod_env; fi
+- if [ $RUN_E2E_TESTS_USERS == 'true' ]; then travis_retry bash scripts/run_e2e_tests.sh --suite="users" --prod_env; fi
 
 
 after_success:
