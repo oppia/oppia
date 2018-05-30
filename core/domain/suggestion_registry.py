@@ -24,13 +24,15 @@ import utils
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 ALL_CATEGORIES = ['Algebra', 'Algorithms', 'Architecture', 'Arithmetic',
-    'Art', 'Astronomy', 'Biology', 'Business', 'Calculus', 'Chemistry',
-    'Combinatorics', 'Computing', 'Economics', 'Education', 'Engineering',
-    'English', 'Environment', 'Gaulish', 'Geography', 'Geometry', 'Government',
-    'Graph Theory', 'History', 'Languages', 'Latin', 'Law', 'Logic',
-    'Mathematics', 'Medicine', 'Music', 'Philosophy', 'Physics', 'Poetry',
-    'Probability', 'Programming', 'Puzzles', 'Reading', 'Spanish', 'Sport',
-    'Statistics', 'Trigonometry', 'Welcome']
+                  'Art', 'Astronomy', 'Biology', 'Business', 'Calculus',
+                  'Chemistry', 'Combinatorics', 'Computing', 'Economics',
+                  'Education', 'Engineering', 'English', 'Environment',
+                  'Gaulish', 'Geography', 'Geometry', 'Government',
+                  'Graph Theory', 'History', 'Languages', 'Latin', 'Law',
+                  'Logic', 'Mathematics', 'Medicine', 'Music', 'Philosophy',
+                  'Physics', 'Poetry', 'Probability', 'Programming', 'Puzzles',
+                  'Reading', 'Spanish', 'Sport', 'Statistics', 'Trigonometry',
+                  'Welcome']
 
 class BaseSuggestion(object):
     """Base class for a suggestion.
@@ -224,15 +226,14 @@ class SuggestionEditStateContent(BaseSuggestion):
                 ', received %s' % (
                     suggestion_models.SCORE_TYPE_CONTENT,
                     self.score_category.split(
-                    suggestion_models.SCORE_CATEGORY_DELIMITER)[0]))
+                        suggestion_models.SCORE_CATEGORY_DELIMITER)[0]))
         if (
                 self.score_category.split(
                     suggestion_models.SCORE_CATEGORY_DELIMITER)[1] not in
                 ALL_CATEGORIES):
             raise utils.ValidationError(
                 'Expected the second part of score_category to be a valid'
-                ' category, received %s' %
-                    self.score_category.split(
+                ' category, received %s' % self.score_category.split(
                     suggestion_models.SCORE_CATEGORY_DELIMITER)[1])
 
         if 'cmd' not in self.change_cmd:
