@@ -904,9 +904,7 @@ def _create_exploration(
         commit_message: str. The commit description message.
         commit_cmds: list(ExplorationChange). A list of commands, describing
             changes made in this model, which should give sufficient information
-            to reconstruct the commit. Each object always contains:
-                cmd: str. Unique command.
-                and additional arguments for that command.
+            to reconstruct the commit.
     """
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
@@ -1115,8 +1113,7 @@ def update_exploration(
             action.
         exploration_id: str. The id of the exploration to be updated.
         change_list: list(ExplorationChange). A change list to be applied to the
-            given exploration. Each entry in change_list is an ExplorationChange
-            object.
+            given exploration.
         commit_message: str or None. A description of changes made to the state.
             For published explorations, this must be present; for unpublished
             explorations, it should be equal to None. For suggestions that are

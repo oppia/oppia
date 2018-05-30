@@ -78,14 +78,27 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Invalid language code')
 
     def test_canonical_story_ids_validation(self):
+        self.topic.canonical_story_ids = ['story_id', 'story_id', 'story_id_1']
+        self._assert_validation_error(
+            'Expected all canonical stories to be distinct.')
         self.topic.canonical_story_ids = 'story_id'
         self._assert_validation_error(
             'Expected canonical story ids to be a list')
 
     def test_additional_story_ids_validation(self):
+        self.topic.additional_story_ids = ['story_id', 'story_id', 'story_id_1']
+        self._assert_validation_error(
+            'Expected all additional stories to be distinct.')
         self.topic.additional_story_ids = 'story_id'
         self._assert_validation_error(
             'Expected additional story ids to be a list')
+
+    def test_additional_canonical_story_intersection_validation(self):
+        self.topic.additional_story_ids = ['story_id', 'story_id_1']
+        self.topic.canonical_story_ids = ['story_id', 'story_id_2']
+        self._assert_validation_error(
+            'Expected additional story ids list and canonical story '
+            'ids list to be mutually exclusive.')
 
     def test_skill_ids_validation(self):
         self.topic.skill_ids = 'skill_id'

@@ -42,7 +42,6 @@ TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
-OPTIONAL_ATTRIBUTE_NAMES = ['property_name', 'new_value', 'old_value', 'name']
 
 
 class TopicChange(object):
@@ -51,6 +50,10 @@ class TopicChange(object):
         TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_DESCRIPTION,
         TOPIC_PROPERTY_CANONICAL_STORY_IDS, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
         TOPIC_PROPERTY_SKILL_IDS, TOPIC_PROPERTY_LANGUAGE_CODE)
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'property_name', 'new_value', 'old_value', 'name'
+    ]
 
     def __init__(self, change_dict):
         """Initialize a TopicChange object from a dict.
@@ -89,7 +92,7 @@ class TopicChange(object):
         """
         topic_change_dict = {}
         topic_change_dict['cmd'] = self.cmd
-        for attribute_name in OPTIONAL_ATTRIBUTE_NAMES:
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
             if hasattr(self, attribute_name):
                 topic_change_dict[attribute_name] = getattr(
                     self, attribute_name)
@@ -180,17 +183,23 @@ class Topic(object):
             raise utils.ValidationError(
                 'Expected canonical story ids to be a list, received %s'
                 % self.canonical_story_ids)
+        if len(self.canonical_story_ids) > len(set(self.canonical_story_ids)):
+            raise utils.ValidationError(
+                'Expected all canonical stories to be distinct.')
 
         if not isinstance(self.additional_story_ids, list):
             raise utils.ValidationError(
                 'Expected additional story ids to be a list, received %s'
                 % self.additional_story_ids)
+        if len(self.additional_story_ids) > len(set(self.additional_story_ids)):
+            raise utils.ValidationError(
+                'Expected all additional stories to be distinct.')
 
         for story_id in self.additional_story_ids:
             if story_id in self.canonical_story_ids:
                 raise utils.ValidationError(
-                    'Expected additional story ids list and canonical story ' +
-                    ' ids list to be mutually exclusive. The story_id %s is ' +
+                    'Expected additional story ids list and canonical story '
+                    'ids list to be mutually exclusive. The story_id %s is '
                     'present in both lists' % story_id)
 
         if not isinstance(self.skill_ids, list):

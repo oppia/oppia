@@ -91,12 +91,6 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 # Represents answers which led to the 'default outcome' of an interaction,
 # rather than belonging to a specific answer group.
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
-# The fields in ExplorationChange object.
-OPTIONAL_ATTRIBUTE_NAMES = [
-    'state_name', 'old_state_name', 'new_state_name',
-    'property_name', 'new_value', 'old_value', 'name', 'from_version',
-    'to_version', 'title', 'category'
-]
 
 
 def get_full_customization_args(customization_args, ca_specs):
@@ -231,6 +225,12 @@ class ExplorationChange(object):
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
 
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'state_name', 'old_state_name', 'new_state_name',
+        'property_name', 'new_value', 'old_value', 'name', 'from_version',
+        'to_version', 'title', 'category'
+    ]
+
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
 
@@ -296,7 +296,7 @@ class ExplorationChange(object):
         """
         exploration_change_dict = {}
         exploration_change_dict['cmd'] = self.cmd
-        for attribute_name in OPTIONAL_ATTRIBUTE_NAMES:
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
             if hasattr(self, attribute_name):
                 exploration_change_dict[attribute_name] = getattr(
                     self, attribute_name)
