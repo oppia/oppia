@@ -15,6 +15,7 @@
 """Domain objects relating to skills."""
 
 from constants import constants
+from core.domain import html_cleaner
 import feconf
 import utils
 
@@ -146,15 +147,16 @@ class Misconception(object):
             misconception_id: str. The unique id of each misconception.
             name: str. The name of the misconception.
             notes: str. General advice for creators about the
-                misconception (including examples) and general notes.
+                misconception (including examples) and general notes. This
+                should be an html string.
             feedback: str. This can auto-populate the feedback field
                 when an answer group has been tagged with a misconception. This
                 should be an html string.
         """
         self.id = misconception_id
         self.name = name
-        self.notes = notes
-        self.feedback = feedback
+        self.notes = html_cleaner.clean(notes)
+        self.feedback = html_cleaner.clean(feedback)
 
     def to_dict(self):
         """Returns a dict representing this Misconception domain object.
@@ -232,9 +234,11 @@ class SkillContents(object):
         Args:
             explanation: str. An explanation on how to apply the skill.
             worked_examples: list(str). A list of worked examples for the skill.
+                Each element should be an html string.
         """
         self.explanation = explanation
-        self.worked_examples = worked_examples
+        self.worked_examples = [
+            html_cleaner.clean(example) for example in worked_examples]
 
     def validate(self):
         """Validates various properties of the SkillContents object.
@@ -251,6 +255,11 @@ class SkillContents(object):
             raise utils.ValidationError(
                 'Expected worked examples to be a list, received %s' %
                 self.worked_examples)
+        for example in self.worked_examples:
+            if not isinstance(example, basestring):
+                raise utils.ValidationError(
+                    'Expected each worked example to be a string, received %s' %
+                    example)
 
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
@@ -335,7 +344,7 @@ class Skill(object):
 
         if not isinstance(self.misconceptions_schema_version, int):
             raise utils.ValidationError(
-                'Expected misconceptions schema version to be an integer, ' +
+                'Expected misconceptions schema version to be an integer, '
                 'received %s' % self.misconceptions_schema_version)
         if (
                 self.misconceptions_schema_version !=
@@ -349,7 +358,7 @@ class Skill(object):
 
         if not isinstance(self.skill_contents_schema_version, int):
             raise utils.ValidationError(
-                'Expected skill contents schema version to be an integer, ' +
+                'Expected skill contents schema version to be an integer, '
                 'received %s' % self.skill_contents_schema_version)
         if (
                 self.skill_contents_schema_version !=
@@ -372,18 +381,18 @@ class Skill(object):
 
         if not isinstance(self.skill_contents, SkillContents):
             raise utils.ValidationError(
-                'Expected skill_contents to be a SkillContents object, ' +
+                'Expected skill_contents to be a SkillContents object, '
                 'received %s' % self.skill_contents)
+        self.skill_contents.validate()
+
         if not isinstance(self.misconceptions, list):
             raise utils.ValidationError(
-                'Expected misconceptions to be a list, ' +
+                'Expected misconceptions to be a list, '
                 'received %s' % self.skill_contents)
-
-        self.skill_contents.validate()
         for misconception in self.misconceptions:
             if not isinstance(misconception, Misconception):
                 raise utils.ValidationError(
-                    'Expected each misconception to be a Misconception ' +
+                    'Expected each misconception to be a Misconception '
                     'object, received %s' % misconception)
             misconception.validate()
 

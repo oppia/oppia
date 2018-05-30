@@ -261,8 +261,8 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         misconceptions_schema_version=skill.misconceptions_schema_version,
         skill_contents_schema_version=skill.skill_contents_schema_version
     )
-    commit_cmds = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    model.commit(committer_id, commit_message, commit_cmds)
+    commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmds_dict)
     skill.version += 1
     create_skill_summary(skill.id)
 
@@ -394,8 +394,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.misconceptions = [
         misconception.to_dict() for misconception in skill.misconceptions
     ]
-    change_list = [change.to_dict() for change in change_list]
-    skill_model.commit(committer_id, commit_message, change_list)
+    change_list_dict = [change.to_dict() for change in change_list]
+    skill_model.commit(committer_id, commit_message, change_list_dict)
     memcache_services.delete(_get_skill_memcache_key(skill.id))
     skill.version += 1
 
@@ -415,7 +415,7 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
         unpublished skills, it may be equal to None.
 
     Raises:
-        ValueError: Expected commit message.
+        ValueError: No commit message was provided.
     """
     if not commit_message:
         raise ValueError(
