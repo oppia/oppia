@@ -138,6 +138,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         # exist' error for the remaining tests.
         self.story.story_contents.nodes.append(
             story_domain.StoryNode.create_default_story_node(self.NODE_ID_2))
+        self.story.story_contents.nodes[0].acquired_skill_ids = [
+            'skill_id', 'skill_id', 'skill_id_1']
+        self._assert_validation_error(
+            'Expected all acquired skills to be distinct.')
         self.story.story_contents.nodes[0].acquired_skill_ids = [1]
         self._assert_validation_error(
             'Expected each acquired skill id to be a string, received 1')
@@ -146,6 +150,10 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected acquired skill ids to be a list, received 1')
 
+        self.story.story_contents.nodes[0].prerequisite_skill_ids = [
+            'skill_id', 'skill_id', 'skill_id_1']
+        self._assert_validation_error(
+            'Expected all prerequisite skills to be distinct.')
         self.story.story_contents.nodes[0].prerequisite_skill_ids = [1]
         self._assert_validation_error(
             'Expected each prerequisite skill id to be a string, received 1')
@@ -153,6 +161,15 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self.story.story_contents.nodes[0].prerequisite_skill_ids = 1
         self._assert_validation_error(
             'Expected prerequisite skill ids to be a list, received 1')
+
+    def test_acquired_prerequisite_skill_intersection_validation(self):
+        self.story.story_contents.nodes[0].prerequisite_skill_ids = [
+            'skill_id', 'skill_id_1']
+        self.story.story_contents.nodes[0].acquired_skill_ids = [
+            'skill_id', 'skill_id_2']
+        self._assert_validation_error(
+            'Expected prerequisite skill ids and acquired skill ids '
+            'to be mutually exclusive.')
 
     def test_story_contents_export_import(self):
         """Test that to_dict and from_dict preserve all data within a

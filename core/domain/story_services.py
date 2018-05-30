@@ -225,8 +225,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         notes=story.notes,
         story_contents=story.story_contents.to_dict()
     )
-    commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    model.commit(committer_id, commit_message, commit_cmds_dict)
+    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmd_dicts)
     story.version += 1
     create_story_summary(story.id)
 
@@ -254,7 +254,7 @@ def apply_change_list(story_id, change_list):
     Args:
         story_id: str. ID of the given story.
         change_list: list(StoryChange). A change list to be applied to the given
-            story. Each entry in change_list is a StoryChange object.
+            story.
 
     Returns:
         Story. The resulting story domain object.
@@ -326,8 +326,7 @@ def _save_story(committer_id, story, commit_message, change_list):
         committer_id: str. ID of the given committer.
         story: Story. The story domain object to be saved.
         commit_message: str. The commit message.
-        change_list: list(StoryChange). List of changes applied to a story. Each
-            entry in change_list is a StoryChange object.
+        change_list: list(StoryChange). List of changes applied to a story.
 
     Raises:
         ValidationError: An invalid exploration was referenced in the
@@ -385,8 +384,8 @@ def _save_story(committer_id, story, commit_message, change_list):
         ]
     }
     story_model.version = story.version
-    change_list_dict = [change.to_dict() for change in change_list]
-    story_model.commit(committer_id, commit_message, change_list_dict)
+    change_dicts = [change.to_dict() for change in change_list]
+    story_model.commit(committer_id, commit_message, change_dicts)
     memcache_services.delete(_get_story_memcache_key(story.id))
     story.version += 1
 
@@ -399,9 +398,8 @@ def update_story(
     - committer_id: str. The id of the user who is performing the update
         action.
     - story_id: str. The story id.
-    - change_list: list(StoryChange). Each element in the list represents a
-        StoryChange object. These changes are applied in sequence to produce the
-        resulting story.
+    - change_list: list(StoryChange).These changes are applied in sequence to
+        produce the resulting story.
     - commit_message: str or None. A description of changes made to the
         story.
     """

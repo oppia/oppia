@@ -46,11 +46,6 @@ CMD_DELETE_STORY_NODE = 'delete_story_node'
 # This takes additional 'title' parameters.
 CMD_CREATE_NEW = 'create_new'
 
-OPTIONAL_ATTRIBUTE_NAMES = [
-    'property_name', 'new_value', 'old_value', 'node_id', 'from_version',
-    'to_version', 'title'
-]
-
 
 class StoryChange(object):
     """Domain object for changes made to story object."""
@@ -63,6 +58,11 @@ class StoryChange(object):
         STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
         STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, STORY_NODE_PROPERTY_OUTLINE,
         STORY_NODE_PROPERTY_EXPLORATION_ID)
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'property_name', 'new_value', 'old_value', 'node_id', 'from_version',
+        'to_version', 'title'
+    ]
 
     def __init__(self, change_dict):
         """Initialize a StoryChange object from a dict.
@@ -118,7 +118,7 @@ class StoryChange(object):
         """
         story_change_dict = {}
         story_change_dict['cmd'] = self.cmd
-        for attribute_name in OPTIONAL_ATTRIBUTE_NAMES:
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
             if hasattr(self, attribute_name):
                 story_change_dict[attribute_name] = getattr(
                     self, attribute_name)
@@ -237,8 +237,13 @@ class StoryNode(object):
         for skill_id in self.prerequisite_skill_ids:
             if not isinstance(skill_id, basestring):
                 raise utils.ValidationError(
-                    'Expected each prerequisite skill id to be a string, ' +
+                    'Expected each prerequisite skill id to be a string, '
                     'received %s' % skill_id)
+        if (
+                len(self.prerequisite_skill_ids) >
+                len(set(self.prerequisite_skill_ids))):
+            raise utils.ValidationError(
+                'Expected all prerequisite skills to be distinct.')
 
         if not isinstance(self.acquired_skill_ids, list):
             raise utils.ValidationError(
@@ -247,13 +252,18 @@ class StoryNode(object):
         for skill_id in self.acquired_skill_ids:
             if not isinstance(skill_id, basestring):
                 raise utils.ValidationError(
-                    'Expected each acquired skill id to be a string, ' +
+                    'Expected each acquired skill id to be a string, '
                     'received %s' % skill_id)
+        if (
+                len(self.acquired_skill_ids) >
+                len(set(self.acquired_skill_ids))):
+            raise utils.ValidationError(
+                'Expected all acquired skills to be distinct.')
 
         for skill_id in self.prerequisite_skill_ids:
             if skill_id in self.acquired_skill_ids:
                 raise utils.ValidationError(
-                    'Expected prerequisite skill ids and acquired skill ids ' +
+                    'Expected prerequisite skill ids and acquired skill ids '
                     'to be mutually exclusive. The skill_id %s intersects '
                     % skill_id)
 
@@ -265,11 +275,11 @@ class StoryNode(object):
         for node_id in self.destination_node_ids:
             if not isinstance(node_id, basestring):
                 raise utils.ValidationError(
-                    'Expected each node id to be a string, ' +
+                    'Expected each node id to be a string, '
                     'received %s' % node_id)
             if node_id == self.id:
                 raise utils.ValidationError(
-                    'Expected destination node id list of a node to not have ' +
+                    'Expected destination node id list of a node to not have '
                     'that same node as one of its elements. ')
 
 
