@@ -75,12 +75,6 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             last_two_message_ids, [thread_1.get_full_message_id(0), None])
 
-    def test_get_exp_id_from_thread_id(self):
-        thread_id = 'exp1.1234'
-        self.assertEqual(
-            feedback_domain.FeedbackThread.get_exp_id_from_thread_id(thread_id),
-            'exp1')
-
 
 class FeedbackMessageDomainUnitTests(test_utils.GenericTestBase):
     EXP_ID = 'exp0'

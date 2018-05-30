@@ -429,8 +429,7 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
         Returns:
             str. The exploration id.
         """
-        return feedback_domain.FeedbackThread.get_exp_id_from_thread_id(
-            self.thread_id)
+        return self.id.split('.')[1]
 
     @property
     def thread_id(self):

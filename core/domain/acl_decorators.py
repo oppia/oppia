@@ -17,7 +17,7 @@
 """Decorators to provide authorization across the site."""
 
 from core.controllers import base
-from core.domain import feedback_domain
+from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import topic_services
@@ -357,7 +357,7 @@ def can_create_feedback_thread(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            *. The result of the decorated function.
+            *. The return value of the decorated function.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -386,11 +386,12 @@ def can_view_feedback_thread(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            *. The result of the decorated function.
+            *. The return value of the decorated function.
         """
+        if '.' not in thread_id:
+            raise self.InvalidInputException('Thread ID must contain a .')
 
-        exploration_id = (
-            feedback_domain.FeedbackThread.get_exp_id_from_thread_id(thread_id))
+        exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -420,13 +421,15 @@ def can_comment_on_feedback_thread(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            *. The result of the decorated function.
+            *. The return value of the decorated function.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        exploration_id = (
-            feedback_domain.FeedbackThread.get_exp_id_from_thread_id(thread_id))
+        if '.' not in thread_id:
+            raise self.InvalidInputException('Thread ID must contain a .')
+
+        exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException

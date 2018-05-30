@@ -113,13 +113,13 @@ class SuggestionModelTest(test_utils.GenericTestBase):
     def setUp(self):
         super(SuggestionModelTest, self).setUp()
         feedback_models.SuggestionModel.create(
-            'exp_id1.thread_id1', 'author_id', 1, 'state_name',
+            'exp_id1', 'exp_id1.thread_id1', 'author_id', 1, 'state_name',
             'description', 'suggestion_text')
         feedback_models.SuggestionModel.create(
-            'exp_id1.thread_id2', 'author_id', 1, 'state_name',
+            'exp_id1', 'exp_id1.thread_id2', 'author_id', 1, 'state_name',
             'description', 'suggestion_text')
         feedback_models.SuggestionModel.create(
-            'exp_id2.thread_id2', 'author_id', 1, 'state_name',
+            'exp_id2', 'exp_id2.thread_id2', 'author_id', 1, 'state_name',
             'description', 'suggestion_text')
 
     def _get_suggestion_models_for_test(self, suggestions_list):
@@ -138,7 +138,7 @@ class SuggestionModelTest(test_utils.GenericTestBase):
 
     def test_create_new_object_runs_successfully(self):
         feedback_models.SuggestionModel.create(
-            'exp_id3.thread_id2', 'author_id', 1, 'state_name',
+            'exp_id3', 'exp_id3.thread_id2', 'author_id', 1, 'state_name',
             'description', 'suggestion_text')
         suggestion = (
             feedback_models.SuggestionModel.get_by_id('exp_id3.thread_id2'))
@@ -159,7 +159,7 @@ class SuggestionModelTest(test_utils.GenericTestBase):
                                      'thread with the given thread id: '
                                      'exp_id1.thread_id1'):
             feedback_models.SuggestionModel.create(
-                'exp_id1.thread_id1', 'author_id', 1, 'state_name',
+                'exp_id1', 'exp_id1.thread_id1', 'author_id', 1, 'state_name',
                 'description', 'suggestion_text')
 
     def test_get_by_exploration_and_thread_id_suggestion_present(self):

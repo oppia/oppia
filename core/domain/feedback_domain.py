@@ -109,21 +109,6 @@ class FeedbackThread(object):
             message_ids.append(None)
         return message_ids
 
-    # TODO (nithesh): Once feedback threads are generalised, the below function
-    # needs to be edited to get id of a general entity. For the moment, the
-    # function will return the exploration_id from a thread_id.
-    @classmethod
-    def get_exp_id_from_thread_id(cls, thread_id):
-        """Returns the exploration_id part of the thread_id.
-
-        Args:
-            thread_id: str. The id of the thread.
-
-        Returns:
-            str. The exploration id part of the thread_id.
-        """
-        return thread_id.split('.')[0]
-
 
 class FeedbackMessage(object):
     """Domain object for a feedback message.

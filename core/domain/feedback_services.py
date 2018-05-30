@@ -38,6 +38,21 @@ DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
+# TODO (nithesh): Once feedback threads are generalised, the below function
+# needs to be edited to get id of a general entity. For the moment, the
+# function will return the exploration_id from a thread_id.
+def get_exp_id_from_thread_id(thread_id):
+    """Returns the exploration_id part of the thread_id.
+
+    Args:
+        thread_id: str. The id of the thread.
+
+    Returns:
+        str. The exploration id part of the thread_id.
+    """
+    return thread_id.split('.')[0]
+
+
 def _create_models_for_thread_and_first_message(
         exploration_id, state_name, original_author_id, subject, text,
         has_suggestion):
@@ -360,8 +375,8 @@ def create_suggestion(
         exploration_id, state_name, author_id, description,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
     feedback_models.SuggestionModel.create(
-        thread_id, author_id, exploration_version, state_name, description,
-        suggestion_content)
+        exploration_id, thread_id, author_id, exploration_version, state_name,
+        description, suggestion_content)
 
     subscription_services.subscribe_to_thread(author_id, thread_id)
     _enqueue_suggestion_email_task(exploration_id, thread_id)

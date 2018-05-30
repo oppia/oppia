@@ -71,6 +71,11 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
         thread_status = threadlist[0].status
         self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)
 
+    def test_get_exp_id_from_thread_id(self):
+        thread_id = 'exp1.1234'
+        self.assertEqual(
+            feedback_services.get_exp_id_from_thread_id(thread_id), 'exp1')
+
 
 class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion query functions in feedback_services."""
