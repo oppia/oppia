@@ -3231,13 +3231,15 @@ class Exploration(object):
         """
         for state_dict in states_dict.values():
             content_ids_to_audio_translations = {}
-            new_content_id = get_content_id()
+            new_content_id = utils.generate_content_id(list(
+                content_ids_to_audio_translations.keys()))
             content_ids_to_audio_translations[content_id] = state_dict[
                 'content'].pop('audio_translations')
             state_dict['content']['content_id'] = content_id
 
             for answer_group in state_dict['interaction']['answer_groups']:
-                new_content_id = get_content_id()
+                new_content_id = utils.generate_content_id(list(
+                    content_ids_to_audio_translations.keys()))
                 content_ids_to_audio_translations[new_content_id] = (
                     answer_group['outcome']['feedback'].pop(
                     'audio_translations'))
@@ -3245,13 +3247,15 @@ class Exploration(object):
                     new_content_id)
 
             for hint in state_dict['interaction']['hints']:
-                new_content_id = get_content_id()
+                new_content_id = utils.generate_content_id(list(
+                    content_ids_to_audio_translations.keys()))
                 content_ids_to_audio_translations[new_content_id] = hint.pop(
                     'audio_translations')
                 hint['content_id'] = new_content_id
 
             if (state_dict['interaction']['solution']):
-                new_content_id = get_content_id()
+                new_content_id = utils.generate_content_id(list(
+                  content_ids_to_audio_translations.keys()))
                 content_ids_to_audio_translations[new_content_id] = state_dict[
                     'interaction']['solution'].pop('audio_translations')
                 state_dict['interaction']['solution']['content_id'] = (

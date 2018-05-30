@@ -753,6 +753,12 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     state.update_interaction_solution(change.new_value)
+
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS): # pylint: disable=line-too-long
+                    state.update_content_ids_to_audio_translations(
+                        change.new_value)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -1474,28 +1480,8 @@ def save_new_exploration_from_yaml_and_assets(
     # Check whether audio translations should be stripped.
     if strip_audio_translations:
         for state in exploration.states.values():
-            # Strip away audio translations from the state content.
-            content = state.content
-            content.audio_translations = {}
-
-            if state.interaction is not None:
-                # Strip away audio translations from solutions.
-                solution = state.interaction.solution
-                if solution:
-                    solution.explanation.audio_translations = {}
-
-                # Strip away audio translations from hints.
-                for hint in state.interaction.hints:
-                    hint.hint_content.audio_translations = {}
-
-                # Strip away audio translations from answer groups (feedback).
-                for answer_group in state.interaction.answer_groups:
-                    answer_group.outcome.feedback.audio_translations = {}
-
-                # Strip away audio translations from the default outcome.
-                default_outcome = state.interaction.default_outcome
-                if default_outcome:
-                    default_outcome.feedback.audio_translations = {}
+            for content_id in state.content_ids_to_audio_translations:
+                state.content_ids_to_audio_translations[content_id] = {}
 
     create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
@@ -1743,13 +1729,15 @@ def _is_suggestion_handled(thread_id, exploration_id):
 
 
 def _create_change_list_from_suggestion(
-        suggestion, old_content, audio_update_required):
+        suggestion, old_content, content_ids_to_audio_translations,
+        audio_update_required):
     """Creates a change list from a suggestion object.
 
     Args:
         suggestion: Suggestion. The given Suggestion domain object.
         old_content: SubtitledHtml. A SubtitledHtml domain object representing
             the content of the old state.
+        content_ids_to_audio_translations:
         audio_update_required: bool. Whether the audio for the state content
             should be marked as needing an update.
 
@@ -1765,23 +1753,27 @@ def _create_change_list_from_suggestion(
             new_value: list(str). List of the state content of the suggestion
                 object.
     """
-    audio_translations = old_content.audio_translations
-    if audio_update_required:
-        for _, translation in audio_translations.iteritems():
-            translation.needs_update = True
-
-    return [{
+    change_list = [{
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'state_name': suggestion.state_name,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'new_value': {
             'html': suggestion.suggestion_html,
-            'audio_translations': {
-                language_code: translation.to_dict()
-                for language_code, translation in audio_translations.iteritems()
-            }
+            'content_id': old_content.content_id
         }
     }]
+    if audio_update_required:
+        for _, translation in content_ids_to_audio_translations[
+            old_content.content_id].iteritems():
+            translation.needs_update = True
+        change_list.append({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': suggestion.state_name,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS, # pylint: disable=line-too-long
+            'new_value': content_ids_to_audio_translations
+        })
+
+    return change_list
 
 
 def _get_commit_message_for_suggestion(
@@ -1840,8 +1832,11 @@ def accept_suggestion(
         suggestion_author_username = suggestion.get_author_name()
         exploration = get_exploration_by_id(exploration_id)
         old_content = exploration.states[suggestion.state_name].content
+        old_content_ids_to_audio_translations = exploration.states[
+            suggestion.state_name].content_ids_to_audio_translations
         change_list = _create_change_list_from_suggestion(
-            suggestion, old_content, audio_update_required)
+            suggestion, old_content, old_content_ids_to_audio_translations,
+            audio_update_required)
         update_exploration(
             editor_id, exploration_id, change_list,
             _get_commit_message_for_suggestion(
