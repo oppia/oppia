@@ -287,6 +287,10 @@ describe('Image preloader service', function() {
         exploration_id: '1',
         filename: 's6Hint1.png'
       });
+
+    var exploration = eof.createFromBackendDict(explorationDict);
+    ips.init(exploration);
+    ips.kickOffImagePreloader(exploration.getInitialState().name);
   }));
 
   it('should maintain the correct number of download requests in queue',
@@ -295,9 +299,6 @@ describe('Image preloader service', function() {
       $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
       $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
       $httpBackend.expect('GET', requestUrl4).respond(201, 'image data 4');
-      var exploration = eof.createFromBackendDict(explorationDict);
-      ips.init(exploration);
-      ips.kickOffImagePreloader(exploration.getInitialState().name);
       expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
       expect(ips.isLoadingImageFile('sIMChoice1.png')).toBe(true);
       expect(ips.isLoadingImageFile('sIMChoice2.png')).toBe(true);
@@ -318,9 +319,6 @@ describe('Image preloader service', function() {
     });
 
   it('should properly restart pre-loading from a new state', function() {
-    var exploration = eof.createFromBackendDict(explorationDict);
-    ips.init(exploration);
-    ips.kickOffImagePreloader(exploration.getInitialState().name);
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
     ips.restartImagePreloader('State 6');
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
@@ -328,9 +326,6 @@ describe('Image preloader service', function() {
   });
 
   it('should verify that preloader starts when state changes', function() {
-    var exploration = eof.createFromBackendDict(explorationDict);
-    ips.init(exploration);
-    ips.kickOffImagePreloader(exploration.getInitialState().name);
     expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
     expect(ips.isLoadingImageFile('s6Hint1.png')).toBe(false);
     ips.onStateChange('State 6');
@@ -340,16 +335,14 @@ describe('Image preloader service', function() {
 
   it('should check that there is sync between AssetsBackendApi Service and' +
     'ImagePreloader Service', function() {
-    var exploration = eof.createFromBackendDict(explorationDict);
-    ips.init(exploration);
-    ips.kickOffImagePreloader(exploration.getInitialState().name);
-    var filenamesOfImageCUrrentlyDownloading = (
+    var filenamesOfImageCurrentlyDownloading = (
       ips.getFilenamesOfImageCurrentlyDownloading());
     var imageFilesCurrentlyBeingRequested = (
       abas.getAssetsFilesCurrentlyBeingRequested().image
     );
-    for (x in filenamesOfImageCUrrentlyDownloading) {
-      expect(filenamesOfImageCUrrentlyDownloading[x]).toBe(
+    $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
+    for (x in filenamesOfImageCurrentlyDownloading) {
+      expect(filenamesOfImageCurrentlyDownloading[x]).toBe(
         imageFilesCurrentlyBeingRequested[x].filename);
     }
   });
