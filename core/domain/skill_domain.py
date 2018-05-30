@@ -63,6 +63,10 @@ class SkillChange(object):
         SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK
     )
 
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'property_name', 'new_value', 'old_value', 'misconception_id'
+    ]
+
     def __init__(self, change_dict):
         """Initialize a SkillChange object from a dict.
 
@@ -123,14 +127,10 @@ class SkillChange(object):
         """
         skill_change_dict = {}
         skill_change_dict['cmd'] = self.cmd
-        if hasattr(self, 'property_name'):
-            skill_change_dict['property_name'] = self.property_name
-        if hasattr(self, 'new_value'):
-            skill_change_dict['new_value'] = self.new_value
-        if hasattr(self, 'old_value'):
-            skill_change_dict['old_value'] = self.old_value
-        if hasattr(self, 'misconception_id'):
-            skill_change_dict['id'] = self.misconception_id
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                skill_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
 
         return skill_change_dict
 

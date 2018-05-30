@@ -99,6 +99,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill.skill_contents.worked_examples = ''
         self._assert_validation_error('Expected worked examples to be a list')
 
+        self.skill.skill_contents.worked_examples = [1]
+        self._assert_validation_error(
+            'Expected each worked example to be a string')
+
         self.skill.skill_contents.explanation = 0
         self._assert_validation_error(
             'Expected skill explanation to be a string')

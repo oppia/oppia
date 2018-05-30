@@ -246,8 +246,8 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         committer_id: str. ID of the committer.
         skill: Skill. The skill domain object.
         commit_message: str. A description of changes made to the skill.
-        commit_cmds: list(SkillChange). A list of change commands (as
-            SkillChange objects) made to the given skill.
+        commit_cmds: list(SkillChange). A list of change commands made to the
+            given skill.
     """
     model = skill_models.SkillModel(
         id=skill.id,
@@ -261,8 +261,8 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         misconceptions_schema_version=skill.misconceptions_schema_version,
         skill_contents_schema_version=skill.skill_contents_schema_version
     )
-    commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    model.commit(committer_id, commit_message, commit_cmds_dict)
+    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmd_dicts)
     skill.version += 1
     create_skill_summary(skill.id)
 
@@ -287,7 +287,7 @@ def apply_change_list(skill_id, change_list):
     Args:
         skill_id: str. ID of the given skill.
         change_list: list(SkillChange). A change list to be applied to the given
-            skill. Each entry in change_list is a SkillChange object.
+            skill.
 
     Returns:
         Skill. The resulting skill domain object.
@@ -355,8 +355,7 @@ def _save_skill(committer_id, skill, commit_message, change_list):
         committer_id: str. ID of the given committer.
         skill: Skill. The skill domain object to be saved.
         commit_message: str. The commit message.
-        change_list: list(SkillChange). List of changes applied to a skill. Each
-            entry in change_list is a SkillChange object.
+        change_list: list(SkillChange). List of changes applied to a skill.
 
     Raises:
         Exception: The skill model and the incoming skill domain
@@ -394,8 +393,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
     skill_model.misconceptions = [
         misconception.to_dict() for misconception in skill.misconceptions
     ]
-    change_list_dict = [change.to_dict() for change in change_list]
-    skill_model.commit(committer_id, commit_message, change_list_dict)
+    change_dicts = [change.to_dict() for change in change_list]
+    skill_model.commit(committer_id, commit_message, change_dicts)
     memcache_services.delete(_get_skill_memcache_key(skill.id))
     skill.version += 1
 
@@ -407,9 +406,8 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     - committer_id: str. The id of the user who is performing the update
         action.
     - skill_id: str. The skill id.
-    - change_list: list(SkillChange). Each element is a SkillChange object.
-        These changes are applied in sequence to produce the resulting
-        skill.
+    - change_list: list(SkillChange). These changes are applied in sequence to
+        produce the resulting skill.
     - commit_message: str or None. A description of changes made to the
         skill. For published skills, this must be present; for
         unpublished skills, it may be equal to None.
