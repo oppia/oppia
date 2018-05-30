@@ -1,5 +1,41 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.6.4 (24 May 2018)
+--------------------
+Creator View:
+* Fix part of #3446: Add frontend validators to End Exploration. (#4828)
+
+Library & Learner Dashboard:
+* Fix #3977: Added tooltip for Collections in Learner Dashboard (#4850)
+* Fixes #4323: Fixed creator's option to add to playlist (#4863)
+* Fix #4924: Fixed exploration count error. (#4960)
+
+UI (General):
+* Partial Fix #3025: A keyboard user should be able to expand dropdown menus. (#4844)
+* Fix #4756: Duplicate cookies issue fix. (#4903)
+
+Linting:
+* Add check for parens (#4849)
+* Setup htmllint (#4900)
+* Enable lint checks for pre-commit script (#4869)
+
+Docstrings:
+* Fix part of #4374: Add docstrings to python files. (#4856)
+* Fix part of #4374: update docstrings for jobs (#4851)
+
+Skills project:
+* Fix #4846: Remove "Collection Skills" (#4862)
+
+Infrastructure and Refactoring:
+* Fix part of #4057: Add spec file of AutoplayedVideosService (#4805)
+* Fix nit comments in ExplorationStateIdMappingJob (#4860)
+
+ML:
+* Fix #3287: Enable training data classification in answer classification service (#4824)
+* Exploration states dict migration: Migrate training data to answer group and remove it from rule specs. (#4890)
+* Print stack trace of exceptions in ExplorationStateIdMappingJob (#4861)
+
+
 v2.6.3 (23 Apr 2018)
 --------------------
 Creator View:

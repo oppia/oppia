@@ -15,6 +15,7 @@
 """Base model class."""
 
 from core.platform import models
+import feconf
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -218,6 +219,145 @@ class BaseModel(ndb.Model):
             result[0],
             (result[1].urlsafe() if result[1] else None),
             result[2])
+
+
+class BaseCommitLogEntryModel(BaseModel):
+    """Base Model for the models that store the log of commits to a construct.
+    """
+    # Update superclass model to make these properties indexed.
+    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
+    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
+
+    # The id of the user.
+    user_id = ndb.StringProperty(indexed=True, required=True)
+    # The username of the user, at the time of the edit.
+    username = ndb.StringProperty(indexed=True, required=True)
+    # The type of the commit: 'create', 'revert', 'edit', 'delete'.
+    commit_type = ndb.StringProperty(indexed=True, required=True)
+    # The commit message.
+    commit_message = ndb.TextProperty(indexed=False)
+    # The commit_cmds dict for this commit.
+    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
+    # The status of the entity after the edit event ('private', 'public').
+    post_commit_status = ndb.StringProperty(indexed=True, required=True)
+    # Whether the entity is community-owned after the edit event.
+    post_commit_community_owned = ndb.BooleanProperty(indexed=True)
+    # Whether the entity is private after the edit event. Having a
+    # separate field for this makes queries faster, since an equality query
+    # on this property is faster than an inequality query on
+    # post_commit_status.
+    post_commit_is_private = ndb.BooleanProperty(indexed=True)
+    # The version number of the model after this commit.
+    version = ndb.IntegerProperty()
+
+    @classmethod
+    def create(
+            cls, entity_id, version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds, status,
+            community_owned):
+        """This method returns an instance of the CommitLogEntryModel for a
+        construct with the common fields filled.
+
+        Args:
+            entity_id: str. The ID of the construct corresponding to this
+                commit log entry model (e.g. the exp_id for an exploration,
+                the story_id for a story, etc.).
+            version: int. The version number of the model after the commit.
+            committer_id: str. The user_id of the user who committed the
+                change.
+            committer_username: str. The username of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+            status: str. The status of the entity after the commit.
+            community_owned: bool. Whether the entity is community_owned after
+                the commit.
+
+        Returns:
+            CommitLogEntryModel. Returns the respective CommitLogEntryModel
+                instance of the construct from which this is called.
+        """
+        return cls(
+            id=cls._get_instance_id(entity_id, version),
+            user_id=committer_id,
+            username=committer_username,
+            commit_type=commit_type,
+            commit_message=commit_message,
+            commit_cmds=commit_cmds,
+            version=version,
+            post_commit_status=status,
+            post_commit_community_owned=community_owned,
+            post_commit_is_private=(
+                status == feconf.ACTIVITY_STATUS_PRIVATE)
+        )
+
+    @classmethod
+    def _get_instance_id(cls, target_entity_id, version):
+        """This method should be implemented in the inherited classes.
+
+        Args:
+            target_entity_id: str. The ID of the construct corresponding to this
+                commit log entry model (e.g. the exp_id for an exploration,
+                the story_id for a story, etc.).
+            version: int. The version number of the model after the commit.
+
+        Raises:
+            NotImplementedError: The method is not overwritten in derived
+                classes.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def get_all_commits(cls, page_size, urlsafe_start_cursor):
+        """Fetches a list of all the commits sorted by their last updated
+        attribute.
+
+        Args:
+            page_size: int. The maximum number of entities to be returned.
+            urlsafe_start_cursor: str or None. If provided, the list of
+                returned entities starts from this datastore cursor.
+                Otherwise, the returned entities start from the beginning
+                of the full list of entities.
+
+        Returns:
+            3-tuple of (results, cursor, more) as described in fetch_page() at:
+            https://developers.google.com/appengine/docs/python/ndb/queryclass,
+            where:
+                results: List of query results.
+                cursor: str or None. A query cursor pointing to the next
+                    batch of results. If there are no more results, this might
+                    be None.
+                more: bool. If True, there are (probably) more results after
+                    this batch. If False, there are no further results after
+                    this batch.
+        """
+        return cls._fetch_page_sorted_by_last_updated(
+            cls.query(), page_size, urlsafe_start_cursor)
+
+    @classmethod
+    def get_commit(cls, target_entity_id, version):
+        """Returns the commit corresponding to an instance id and
+        version number.
+
+        Args:
+            target_entity_id: str. The ID of the construct corresponding to this
+                commit log entry model (e.g. the exp_id for an exploration,
+                the story_id for a story, etc.).
+            version: int. The version number of the instance
+                after the commit.
+
+        Returns:
+            BaseCommitLogEntryModel. The commit with the target entity id and
+                version number.
+        """
+        commit_id = cls._get_instance_id(target_entity_id, version)
+        return cls.get_by_id(commit_id)
 
 
 class VersionedModel(BaseModel):

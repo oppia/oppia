@@ -63,9 +63,9 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             active_realtime_layer: int. The currently active realtime
                 datastore layer.
             event_type: str. The event triggered by the student.
-            *args: Variable length argument list. The first element of *args
-                corresponds to the id of the exploration currently being
-                played.
+            *args: list(*). Variable length argument list. The
+                first element of *args corresponds to the id
+                of the exploration currently being played.
         """
         exp_id = args[0]
 
