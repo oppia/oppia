@@ -70,7 +70,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
     def test_invalid_thread_ids_return_400_response(self):
         self.get_json(
             '%s/invalid_thread_id' % feconf.FEEDBACK_THREAD_URL_PREFIX,
-            expect_errors=True, expected_status_int=404)
+            expect_errors=True, expected_status_int=400)
 
     def test_non_logged_in_users_can_view_threads_and_messages(self):
         # Non-logged-in users can see the thread list.
