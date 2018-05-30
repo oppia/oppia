@@ -335,11 +335,13 @@ def create_skill_mastery(user_id, skill_id, degree_of_mastery):
     """Creates and stores skill mastery of a user.
 
     Args:
-        skill_id: str. The unique id of the skill.
         user_id: str. The user id of the logged in user.
+        skill_id: str. The unique id of the skill.
         degree_of_mastery: float. The language code of the skill.
     """
-    skill_mastery_model = skill_models.SkillMasteryModel(
+    model_id = user_id + '-' + skill_id
+    skill_mastery_model = skill_models.SkillsMasteryModel(
+        id=model_id,
         user_id=user_id,
         skill_id=skill_id,
         degree_of_mastery=degree_of_mastery
@@ -357,15 +359,16 @@ def get_skill_mastery(user_id, skill_id):
             requested.
 
     Returns:
-        skill_mastery: float. Mastery degree of the user for the requested
+        degree_of_mastery: float. Mastery degree of the user for the requested
             skill.
     """
-    skill_mastery = skill_models.SkillMasteryModel.get(user_id, skill_id)
+    model_id = user_id + '-' + skill_id
+    degree_of_mastery = skill_models.SkillsMasteryModel.get(model_id)
 
-    return skill_mastery
+    return degree_of_mastery
 
 
-def get_multi_skill_mastery(user_id, skill_ids):
+def get_multi_skill_mastery(user_id, *skill_ids):
     """Fetches the mastery of user in a particular skill.
 
     Args:
@@ -394,6 +397,6 @@ def get_all_skill_mastery(user_id):
         skill_mastery: float. Mastery degree of the user for the
             requested skill.
     """
-    skill_mastery = skill_models.SkillMasteryModel.get(user_id)
+    degree_of_mastery = skill_models.SkillsMasteryModel.get(user_id)
 
-    return skill_mastery
+    return degree_of_mastery

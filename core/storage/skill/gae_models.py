@@ -159,5 +159,11 @@ class SkillsMasteryModel(base_models.BaseModel):
     and returns skill id.
     """
 
+    # The model id which contains both user id and skill_id.
+    model_id = ndb.StringProperty(required=True, indexed=True)
+    # The user id of the currently logged in user.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The skill id for which degree of mastery is stored.
+    skill_id = ndb.StringProperty(required=True, indexed=True)
     # The degree of mastery of the user in a skill.
     degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)

@@ -387,12 +387,16 @@ class SkillsMastery(object):
         """Constructs a SkillMastery domain object.
 
         Args:
-            skill_id: str. The unique id of the skill.
             user_id: str. The user id of the logged in user.
-            degree_of_mastery: float. The language code of the skill.
+            skill_id: str. The id of the skill.
+            degree_of_mastery: float. The progress of user for the
+                corresponding skill.
         """
-        self.id = skill_id
+        model_id = user_id + '-' + skill_id
+
+        self.id = model_id
         self.user_id = user_id
+        self.skill_id = skill_id
         self.degree_of_mastery = degree_of_mastery
 
     def to_dict(self):
@@ -402,6 +406,7 @@ class SkillsMastery(object):
             dict. A dict representing this SkillMastery object.
         """
         return {
+            'model_id': self.id,
             'user_id': self.user_id,
             'skill_id': self.skill_id,
             'degree_of_mastery': self.degree_of_mastery

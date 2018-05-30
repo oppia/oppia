@@ -28,6 +28,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     SKILL_ID = None
     USER_ID = 'user'
     MISCONCEPTION_ID = 'misconception_id'
+    DEGREE_OF_MASTERY = 0.0
 
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
@@ -40,6 +41,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.SKILL_ID, self.USER_ID, 'Description', misconceptions,
             skill_contents
         )
+        skill_services.create_skill_mastery(self.SKILL_ID, self.USER_ID, self.DEGREE_OF_MASTERY)
 
     def test_compute_summary(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
@@ -88,3 +90,19 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
+
+    def test_get_skill_mastery(self):
+        skill_mastery = skill_services.get_skill_mastery(self.USER_ID, self.SKILL_ID)
+
+        self.assertEqual(skill_mastery.degree_of_mastery, 0.0)
+
+    def test_get_multi_skill_mastery(self):
+        skill_mastery = skill_services.get_multi_skill_mastery(self.USER_ID, *self.SKILL_ID)
+
+        self.assertEqual(skill_mastery.degree_of_mastery, 0.0)
+
+    
+    def test_get_all_skill_mastery(self):
+        skill_mastery = skill_services.get_all_skill_mastery(self.USER_ID)
+
+        self.assertEqual(skill_mastery.degree_of_mastery, 0.0)
