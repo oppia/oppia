@@ -113,19 +113,21 @@ describe('NumberWithUnitsValidationService', function() {
     }]);
   });
 
-  it('should not catch equals followed by equals with unequal values', function() {
-    answerGroups[0].rules = [equalsTwoRule, equalsTwoByThreeRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
-  });
+  it('should not catch equals followed by equals with unequal values',
+    function() {
+      answerGroups[0].rules = [equalsTwoRule, equalsTwoByThreeRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([]);
+    });
 
-  it('should not catch equals followed by equivalent with unequal values', function() {
-    answerGroups[0].rules = [equalsTwoRule, equivalentToTwoThousandRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([]);
-  });
+  it('should not catch equals followed by equivalent with unequal values',
+    function() {
+      answerGroups[0].rules = [equalsTwoRule, equivalentToTwoThousandRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([]);
+    });
 
   it('should catch equals followed by equivalent with same value', function() {
     answerGroups[0].rules = [equalsTwoRule, equivalentToTwoRule];
@@ -138,41 +140,45 @@ describe('NumberWithUnitsValidationService', function() {
     }]);
   });
 
-  it('should catch equivalent followed by equals with equivalent values', function() {
-    answerGroups[0].rules = [equivalentToTwoThousandRule, equalsTwoRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
-    }]);
-  });
+  it('should catch equivalent followed by equals with equivalent values',
+    function() {
+      answerGroups[0].rules = [equivalentToTwoThousandRule, equalsTwoRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Rule 2 from answer group 1 will never be matched ' +
+          'because it is made redundant by rule 1 from answer group 1.'
+      }]);
+    });
 
-  it('should not catch equivalent followed by equals with non-equivalent values', function() {
+  it('should not catch equivalent followed by equals with non-equivalent' +
+    ' values', function() {
     answerGroups[0].rules = [equivalentToTwoThousandRule, equalsTwoByThreeRule];
     var warnings = validatorService.getAllWarnings(
       currentState, {}, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([]);
   });
 
-  it('should catch equivalent followed by equivalent with equivalent values', function() {
-    answerGroups[0].rules = [equivalentToTwoThousandRule, equivalentToTwoRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
-    }]);
-  });
+  it('should catch equivalent followed by equivalent with equivalent values',
+    function() {
+      answerGroups[0].rules = [equivalentToTwoThousandRule,
+        equivalentToTwoRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Rule 2 from answer group 1 will never be matched ' +
+          'because it is made redundant by rule 1 from answer group 1.'
+      }]);
+    });
 
   it('should not catch equivalent followed by equivalent with non-equivalent' +
     ' values', function() {
-      answerGroups[0].rules = [equivalentToTwoByThreeRule,
-        equivalentToTwoThousandRule];
-      var warnings = validatorService.getAllWarnings(
-        currentState, {}, answerGroups, goodDefaultOutcome);
-      expect(warnings).toEqual([]);
+    answerGroups[0].rules = [equivalentToTwoByThreeRule,
+      equivalentToTwoThousandRule];
+    var warnings = validatorService.getAllWarnings(
+      currentState, {}, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([]);
   });
 });

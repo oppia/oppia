@@ -37,16 +37,16 @@ oppia.factory('NumberWithUnitsValidationService', [
             earlierRule.inputs.f);
           laterInput = NumberWithUnitsObjectFactory.fromDict(
             laterRule.inputs.f);
-          //console.log(earlierInput);
-          //console.log(laterInput);
 
           if (earlierInput.type === laterInput.type) {
             if (earlierInput.type === 'fraction') {
-              if (earlierInput.fraction.tofloat() !== laterInput.fraction.toFloat()) {
+              if (earlierInput.fraction.tofloat() !== laterInput.fraction.
+                toFloat()) {
                 return false;
               }
 
-              if (!angular.equals(earlierInput.units.toDict(), laterInput.units.toDict())) {
+              if (!angular.equals(earlierInput.units.toDict(), laterInput.units.
+                toDict())) {
                 return false;
               }
               return true;
@@ -89,7 +89,8 @@ oppia.factory('NumberWithUnitsValidationService', [
             };
 
             for (var k = 0; k < ranges.length; k++) {
-              var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].rules[ranges[k].ruleIndex - 1];
+              var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
+                rules[ranges[k].ruleIndex - 1];
               if (earlierRule.rule_type === 'IsEqualTo') {
                 if (checkEquality(earlierRule, rule)) {
                   warningsList.push({

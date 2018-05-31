@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Number with Units rules.
  */
 
-fdescribe('Number with Units rules service', function() {
+describe('Number with Units rules service', function() {
   beforeEach(module('oppia'));
 
   var nurs = null;
@@ -52,7 +52,7 @@ fdescribe('Number with Units rules service', function() {
     }
   };
 
-  fit('should have a correct \'equal to\' rule', function() {
+  it('should have a correct \'equal to\' rule', function() {
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
       'real', 2.5, '', 'kg / m^2'), REAL_RULE_INPUT)).toBe(false);
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
@@ -73,7 +73,7 @@ fdescribe('Number with Units rules service', function() {
       'fraction', 0, '2/3', 'kg / m^-2'), FRACTION_RULE_INPUT)).toBe(false);
   });
 
-  fit('should have a correct \'equivalent to\' rule', function() {
+  it('should have a correct \'equivalent to\' rule', function() {
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
       'real', 2, '', 'kg / m^-2'), REAL_RULE_INPUT)).toBe(false);
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(

@@ -30,7 +30,7 @@ var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-ddescribe('Full exploration editor', function() {
+describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
   var creatorDashboardPage = null;
   var libraryPage = null;
