@@ -252,17 +252,16 @@
                  ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                  uib-tooltip="Remove"
                  tooltip-placement="top"></i>
-              <exploration-summary-tile
-                                      exploration-id="tile.id"
-                                      exploration-title="tile.title"
-                                      last-updated-msec="tile.last_updated_msec"
-                                      objective="tile.objective"
-                                      category="tile.category"
-                                      ratings="tile.ratings"
-                                      num-views="tile.num_views"
-                                      thumbnail-icon-url="tile.thumbnail_icon_url"
-                                      thumbnail-bg-color="tile.thumbnail_bg_color"
-                                      class="protractor-test-exp-summary-tile">
+              <exploration-summary-tile exploration-id="tile.id"
+                                        exploration-title="tile.title"
+                                        last-updated-msec="tile.last_updated_msec"
+                                        objective="tile.objective"
+                                        category="tile.category"
+                                        ratings="tile.ratings"
+                                        num-views="tile.num_views"
+                                        thumbnail-icon-url="tile.thumbnail_icon_url"
+                                        thumbnail-bg-color="tile.thumbnail_bg_color"
+                                        class="protractor-test-exp-summary-tile">
               </exploration-summary-tile>
             </div>
 
@@ -300,17 +299,16 @@
 
             <div ng-repeat="tile in getVisibleExplorationList(startCompletedExpIndex) | orderBy:getValueOfExplorationSortKey:isCurrentExpSortDescending track by tile.id"
                  style="display: inline-block; margin-left: 1px;">
-              <exploration-summary-tile
-                                      exploration-id="tile.id"
-                                      exploration-title="tile.title"
-                                      last-updated-msec="tile.last_updated_msec"
-                                      objective="tile.objective"
-                                      category="tile.category"
-                                      ratings="tile.ratings"
-                                      num-views="tile.num_views"
-                                      thumbnail-icon-url="tile.thumbnail_icon_url"
-                                      thumbnail-bg-color="tile.thumbnail_bg_color"
-                                      class="protractor-test-exp-summary-tile">
+              <exploration-summary-tile exploration-id="tile.id"
+                                        exploration-title="tile.title"
+                                        last-updated-msec="tile.last_updated_msec"
+                                        objective="tile.objective"
+                                        category="tile.category"
+                                        ratings="tile.ratings"
+                                        num-views="tile.num_views"
+                                        thumbnail-icon-url="tile.thumbnail_icon_url"
+                                        thumbnail-bg-color="tile.thumbnail_bg_color"
+                                        class="protractor-test-exp-summary-tile">
               </exploration-summary-tile>
             </div>
 

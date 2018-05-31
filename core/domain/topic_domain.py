@@ -185,7 +185,7 @@ class Topic(object):
                 % self.canonical_story_ids)
         if len(self.canonical_story_ids) > len(set(self.canonical_story_ids)):
             raise utils.ValidationError(
-                'Expected all canonical stories to be distinct.')
+                'Expected all canonical story ids to be distinct.')
 
         if not isinstance(self.additional_story_ids, list):
             raise utils.ValidationError(
@@ -193,7 +193,7 @@ class Topic(object):
                 % self.additional_story_ids)
         if len(self.additional_story_ids) > len(set(self.additional_story_ids)):
             raise utils.ValidationError(
-                'Expected all additional stories to be distinct.')
+                'Expected all additional story ids to be distinct.')
 
         for story_id in self.additional_story_ids:
             if story_id in self.canonical_story_ids:
