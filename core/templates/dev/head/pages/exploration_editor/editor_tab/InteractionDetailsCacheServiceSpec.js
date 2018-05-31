@@ -23,17 +23,17 @@ describe('Interaction Details Cache Service', function() {
     });
 
     var interactionCustomizationArgs = {
-      choices : {
+      choices: {
         value: 'SampleChoice'
       }
     };
 
     var interaction = {
-      customization : interactionCustomizationArgs
+      customization: interactionCustomizationArgs
     };
 
     var scope = null, idcs = null;
-    beforeEach(inject(function($rootScope, $injector) {
+    beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       idcs = $injector.get('InteractionDetailsCacheService');
     }));
