@@ -578,8 +578,8 @@ def _pre_commit_linter(all_files):
         filename for filename in all_files if filename.endswith('.js')]
     py_files_to_lint = [
         filename for filename in all_files if filename.endswith('.py')]
-    css_files_to_lint = [
-        filename for filename in all_files if filename.endswith('oppia.css')]
+    # TODO(apb7): Enable CSS lint.
+    css_files_to_lint = []
 
     css_result = multiprocessing.Queue()
     css_stdout = multiprocessing.Queue()
