@@ -193,6 +193,10 @@ COMMIT_LIST_PAGE_SIZE = 50
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
 
+# The number of top unresolved answers which should be aggragated from all of
+# the submitted answers.
+TOP_UNRESOLVED_ANSWERS_LIMIT = 20
+
 # Default title for a newly-minted exploration.
 DEFAULT_EXPLORATION_TITLE = ''
 # Default category for a newly-minted exploration.

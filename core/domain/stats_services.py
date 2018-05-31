@@ -623,6 +623,29 @@ def get_top_state_answer_stats(exploration_id, state_name):
     ]
 
 
+def get_top_state_unresolved_answers(exploration_id, state_name):
+    """Fetches the top unresolved answers for the given state_name in the
+    corresponding exploration. Only answers that occur with frequency >=
+    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        state_name: str. The name of the state to fetch answers for.
+
+    Returns:
+        list(*). A list of the top 10 answers, sorted by decreasing frequency.
+    """
+    calculation_output = (
+        _get_calc_output(
+            exploration_id, state_name, 'TopNUnresolvedAnswersByFrequency')
+        .calculation_output.to_raw_type())
+    return [
+        {'answer': output['answer'], 'frequency': output['frequency']}
+        for output in calculation_output
+        if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
+    ]
+
+
 def get_top_state_answer_stats_multi(exploration_id, state_names):
     """Fetches the top (at most) 10 answers from each given state_name in the
     corresponding exploration. Only answers that occur with frequency >=

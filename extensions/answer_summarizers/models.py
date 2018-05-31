@@ -43,11 +43,17 @@ import operator
 
 from core.domain import exp_domain
 from core.domain import stats_domain
+import feconf
 import utils
 
 CLASSIFICATION_CATEGORIES = frozenset([
     exp_domain.EXPLICIT_CLASSIFICATION,
     exp_domain.TRAINING_DATA_CLASSIFICATION,
+    exp_domain.STATISTICAL_CLASSIFICATION,
+    exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
+])
+
+UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES = frozenset([
     exp_domain.STATISTICAL_CLASSIFICATION,
     exp_domain.DEFAULT_OUTCOME_CLASSIFICATION,
 ])
@@ -87,6 +93,52 @@ def _get_top_answers_by_frequency(answers, limit=None):
     return stats_domain.AnswerFrequencyList([
         stats_domain.AnswerOccurrence(hashable_answer.answer, frequency)
         for hashable_answer, frequency in answer_counter.most_common(limit)
+    ])
+
+
+def _get_top_unresolved_answers_by_frequency(
+        answers_with_classification, limit=None):
+    hashable_answers_with_classification = [{
+        'hashable_answer': _HashableAnswer(ans['answer']),
+        'classification_categorization': ans['classification_categorization']
+    } for ans in answers_with_classification]
+
+    classification_results_dict = {}
+    for ans in hashable_answers_with_classification:
+        frequency = 0
+        if ans['hashable_answer'] in classification_results_dict:
+            frequency = classification_results_dict[ans['hashable_answer']][
+                'frequency']
+        classification_results_dict[ans['hashable_answer']] = {
+            'classification_categorization': (
+                ans['classification_categorization']),
+            'frequency': frequency + 1
+        }
+
+    answers_with_most_recent_classification = [{
+        'answer': ans.answer,
+        'classification_categorization': val['classification_categorization'],
+        'frequency': val['frequency']
+    } for ans, val in classification_results_dict.iteritems()]
+
+    grouped_hashable_answers = itertools.groupby(
+        answers_with_most_recent_classification,
+        operator.itemgetter('classification_categorization'))
+
+    unresolved_answers_with_frequency_list = []
+    for category, answers in grouped_hashable_answers:
+        if category in UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES:
+            unresolved_answers_with_frequency_list.extend({
+                'answer': ans['answer'],
+                'frequency': ans['frequency']
+            } for ans in answers)
+
+    unresolved_answers_with_frequency_list.sort(
+        key=lambda x: x['frequency'], reverse=True)
+
+    return stats_domain.AnswerFrequencyList([
+        stats_domain.AnswerOccurrence(item['answer'], item['frequency'])
+        for item in unresolved_answers_with_frequency_list[:limit]
     ])
 
 
@@ -239,3 +291,42 @@ class TopAnswersByCategorization(BaseCalculation):
             state_answers_dict['interaction_id'],
             self.id,
             categorized_answer_frequency_lists)
+
+
+class TopNUnresolvedAnswersByFrequency(BaseCalculation):
+    """Calculation for the top unresolved answers by frequency
+    The output from this calculation is a ranked list of unresolved answers, by
+    frequency.
+    """
+
+    def calculate_from_state_answers_dict(self, state_answers_dict):
+        """Filters unresolved answers and then computes the number of
+        occurrences of each unresolved answers.
+
+        This method is run within the context of MapReduce job.
+
+        Args:
+            state_answers_dict: dict. A dict containing state answers and
+                exploration information.
+
+        Returns:
+            stats_domain.StateAnswersCalcOutput. A calculation output
+                domain object.
+        """
+        answers_with_classification = [{
+            'answer': ans['answer'],
+            'classification_categorization': (
+                ans['classification_categorization'])
+        } for ans in state_answers_dict['submitted_answer_list']]
+
+        unresolved_answers = _get_top_unresolved_answers_by_frequency(
+            answers_with_classification,
+            limit=feconf.TOP_UNRESOLVED_ANSWERS_LIMIT)
+
+        return stats_domain.StateAnswersCalcOutput(
+            state_answers_dict['exploration_id'],
+            state_answers_dict['exploration_version'],
+            state_answers_dict['state_name'],
+            state_answers_dict['interaction_id'],
+            self.id,
+            unresolved_answers)

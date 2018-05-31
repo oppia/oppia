@@ -400,6 +400,8 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),
+    get_redirect_route(
+        r'/gettopunresolvedanswers', editor.TopUnresolvedAnswersHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
