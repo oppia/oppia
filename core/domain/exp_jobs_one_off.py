@@ -525,11 +525,7 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def reduce(key, values):
-        final_values = []
-        for value in values:
-            item = ast.literal_eval(value)
-            for sub_item in item:
-                if sub_item not in final_values:
-                    final_values = final_values + [sub_item]
-
-        yield (key, final_values)
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))
