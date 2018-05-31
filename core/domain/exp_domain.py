@@ -480,7 +480,7 @@ class SubtitledHtml(object):
     """Value object representing subtitled HTML."""
 
     DEFAULT_SUBTITLED_HTML_DICT = {
-        'content_id': None,
+        'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
         'html': ''
     }
 
@@ -1190,7 +1190,8 @@ class InteractionInstance(object):
         """
         default_outcome = Outcome(
             default_dest_state_name,
-            SubtitledHtml.create_default_subtitled_html(), False, {}, None)
+            SubtitledHtml.create_default_subtitled_html(
+                feconf.DEFAULT_OUTCOME_CONTENT_ID), False, {}, None)
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
@@ -1285,13 +1286,13 @@ class State(object):
                 self.content_ids_to_audio_translations):
 
             if not isinstance(content_id, basestring):
-                    raise utils.ValidationError(
-                        'Expected content id to be a string, received: %s' %
-                        content_id)
+                raise utils.ValidationError(
+                    'Expected content id to be a string, received: %s' %
+                    content_id)
             if not isinstance(audio_translations, dict):
-            raise utils.ValidationError(
-                'Expected audio_translations to be a dict, received %s'
-                % self.audio_translations)
+                raise utils.ValidationError(
+                    'Expected audio_translations to be a dict, received %s'
+                    % self.audio_translations)
 
             allowed_audio_language_codes = [
                 language['id'] for language in (
@@ -1517,8 +1518,12 @@ class State(object):
             self.interaction.solution = None
 
     def update_content_ids_to_audio_translations(
-        self, content_ids_to_audio_translations_dict):
-        """
+            self, content_ids_to_audio_translations_dict):
+        """Update the content_ids_to_audio_translations of a state.
+
+        Args:
+            content_ids_to_audio_translations: dict. The dict representation of
+                content_ids_to_audio_translations
         """
         self.content_ids_to_audio_translations = {
             content_id: {
@@ -1527,7 +1532,7 @@ class State(object):
                 for language_code, audio_translation_dict in
                 audio_translations.iteritems()
             } for content_id, audio_translations in (
-          content_ids_to_audio_translations_dict.iteritems())
+                content_ids_to_audio_translations_dict.iteritems())
         }
 
     def add_hint(self, hint_content):
@@ -1590,13 +1595,13 @@ class State(object):
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
             state_dict['classifier_model_id'], {
-            content_id: {
-                language_code: AudioTranslation.from_dict(
-                    audio_translation_dict)
-                for language_code, audio_translation_dict in
-                audio_translations.iteritems()
-            } for content_id, audio_translations in (
-            state_dict['content_ids_to_audio_translations'].iteritems())
+                content_id: {
+                    language_code: AudioTranslation.from_dict(
+                        audio_translation_dict)
+                    for language_code, audio_translation_dict in
+                    audio_translations.iteritems()
+                } for content_id, audio_translations in (
+                    state_dict['content_ids_to_audio_translations'].iteritems())
             })
 
     @classmethod
@@ -1614,11 +1619,13 @@ class State(object):
         """
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
+        content_id = feconf.DEFAULT_NEW_STATE_CONTENT_ID
         return cls(
-            SubtitledHtml(None, content_html),
+            SubtitledHtml(content_id, content_html),
             [],
             InteractionInstance.create_default_interaction(
-                default_dest_state_name), {})
+                default_dest_state_name),
+            feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
 
 
 class ExplorationVersionsDiff(object):
@@ -1880,7 +1887,7 @@ class Exploration(object):
                     for language_code, audio_translation_dict in
                     audio_translations.iteritems()
                 } for content_id, audio_translations in (
-              sdict['content_ids_to_audio_translations'].iteritems())
+                    sdict['content_ids_to_audio_translations'].iteritems())
             }
 
             exploration.states[state_name] = state
@@ -3233,34 +3240,43 @@ class Exploration(object):
             content_ids_to_audio_translations = {}
             new_content_id = utils.generate_content_id(list(
                 content_ids_to_audio_translations.keys()))
-            content_ids_to_audio_translations[content_id] = state_dict[
-                'content'].pop('audio_translations')
-            state_dict['content']['content_id'] = content_id
+            content_ids_to_audio_translations[new_content_id] = (
+                state_dict['content'].pop('audio_translations'))
+            state_dict['content']['content_id'] = new_content_id
 
             for answer_group in state_dict['interaction']['answer_groups']:
                 new_content_id = utils.generate_content_id(list(
                     content_ids_to_audio_translations.keys()))
                 content_ids_to_audio_translations[new_content_id] = (
                     answer_group['outcome']['feedback'].pop(
-                    'audio_translations'))
+                        'audio_translations'))
                 answer_group['outcome']['feedback']['content_id'] = (
                     new_content_id)
+
+            if state_dict['interaction']['default_outcome']:
+                dafault_outcome = state_dict['interaction']['default_outcome']
+                new_content_id = utils.generate_content_id(list(
+                    content_ids_to_audio_translations.keys()))
+                content_ids_to_audio_translations[new_content_id] = (
+                    dafault_outcome['feedback'].pop('audio_translations'))
+                dafault_outcome['feedback']['content_id'] = (new_content_id)
 
             for hint in state_dict['interaction']['hints']:
                 new_content_id = utils.generate_content_id(list(
                     content_ids_to_audio_translations.keys()))
-                content_ids_to_audio_translations[new_content_id] = hint.pop(
-                    'audio_translations')
-                hint['content_id'] = new_content_id
+                content_ids_to_audio_translations[new_content_id] = (
+                    hint['hint_content'].pop('audio_translations'))
+                hint['hint_content']['content_id'] = new_content_id
 
-            if (state_dict['interaction']['solution']):
+            if state_dict['interaction']['solution']:
+                solution = state_dict['interaction']['solution']
                 new_content_id = utils.generate_content_id(list(
-                  content_ids_to_audio_translations.keys()))
-                content_ids_to_audio_translations[new_content_id] = state_dict[
-                    'interaction']['solution'].pop('audio_translations')
-                state_dict['interaction']['solution']['content_id'] = (
-                    new_content_id)
-            state['content_ids_to_audio_translations'] = (
+                    content_ids_to_audio_translations.keys()))
+                content_ids_to_audio_translations[new_content_id] = (
+                    solution['explanation'].pop('audio_translations'))
+                solution['explanation']['content_id'] = (new_content_id)
+
+            state_dict['content_ids_to_audio_translations'] = (
                 content_ids_to_audio_translations)
 
         return states_dict
