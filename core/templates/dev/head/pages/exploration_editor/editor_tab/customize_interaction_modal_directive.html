@@ -12,8 +12,8 @@
   <div ng-if="!stateInteractionIdService.displayed" ng-cloak>
     <uib-tabset>
       <uib-tab ng-repeat="category in ALLOWED_INTERACTION_CATEGORIES"
-           heading="<[category.name]>" active="category.active"
-           class="protractor-test-interaction-tab-<[category.name]>">
+               heading="<[category.name]>" active="category.active"
+               class="protractor-test-interaction-tab-<[category.name]>">
         <br>
         <div ng-repeat="interactionId in category.interaction_ids"
              ng-click="onChangeInteractionId(interactionId)"

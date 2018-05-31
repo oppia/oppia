@@ -48,6 +48,7 @@ ACTIVITY_STATUS_PUBLIC = feconf.ACTIVITY_STATUS_PUBLIC
 
 ROLE_OWNER = 'owner'
 ROLE_EDITOR = 'editor'
+ROLE_TRANSLATOR = 'translator'
 ROLE_VIEWER = 'viewer'
 ROLE_NONE = 'none'
 
@@ -61,13 +62,14 @@ class ActivityRights(object):
     """
 
     def __init__(
-            self, exploration_id, owner_ids, editor_ids, viewer_ids,
-            community_owned=False, cloned_from=None,
-            status=ACTIVITY_STATUS_PRIVATE,
-            viewable_if_private=False, first_published_msec=None):
+            self, exploration_id, owner_ids, editor_ids, translator_ids,
+            viewer_ids, community_owned=False, cloned_from=None,
+            status=ACTIVITY_STATUS_PRIVATE, viewable_if_private=False,
+            first_published_msec=None):
         self.id = exploration_id
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
+        self.translator_ids = translator_ids
         self.viewer_ids = viewer_ids
         self.community_owned = community_owned
         self.cloned_from = cloned_from
@@ -79,15 +81,16 @@ class ActivityRights(object):
         """Validates an ActivityRights object.
 
         Raises:
-          utils.ValidationError: if any of the owners, editors and viewers
-          lists overlap, or if a community-owned exploration has owners,
-          editors or viewers specified.
+          utils.ValidationError: if any of the owners, editors, translators and
+          viewers lists overlap, or if a community-owned exploration has owners,
+          editors, translators or viewers specified.
         """
         if self.community_owned:
-            if self.owner_ids or self.editor_ids or self.viewer_ids:
+            if (self.owner_ids or self.editor_ids or self.translator_ids or
+                    self.viewer_ids):
                 raise utils.ValidationError(
                     'Community-owned explorations should have no owners, '
-                    'editors or viewers specified.')
+                    'editors, translators or viewers specified.')
 
         if self.community_owned and self.status == ACTIVITY_STATUS_PRIVATE:
             raise utils.ValidationError(
@@ -98,20 +101,38 @@ class ActivityRights(object):
                 'Public explorations should have no viewers specified.')
 
         owner_editor = set(self.owner_ids).intersection(set(self.editor_ids))
+        owner_translator = set(self.owner_ids).intersection(
+            set(self.translator_ids))
         owner_viewer = set(self.owner_ids).intersection(set(self.viewer_ids))
+        editor_translator = set(self.editor_ids).intersection(
+            set(self.translator_ids))
         editor_viewer = set(self.editor_ids).intersection(set(self.viewer_ids))
+        translator_viewer = set(self.editor_ids).intersection(
+            set(self.viewer_ids))
         if owner_editor:
             raise utils.ValidationError(
                 'A user cannot be both an owner and an editor: %s' %
                 owner_editor)
+        if owner_translator:
+            raise utils.ValidationError(
+                'A user cannot be both an owner and a translator: %s' %
+                owner_translator)
         if owner_viewer:
             raise utils.ValidationError(
                 'A user cannot be both an owner and a viewer: %s' %
                 owner_viewer)
+        if editor_translator:
+            raise utils.ValidationError(
+                'A user cannot be both an editor and a translator: %s' %
+                editor_translator)
         if editor_viewer:
             raise utils.ValidationError(
-                'A user cannot be both an owner and an editor: %s' %
+                'A user cannot be both an editor and a viewer: %s' %
                 editor_viewer)
+        if translator_viewer:
+            raise utils.ValidationError(
+                'A user cannot be both a translator and a viewer: %s' %
+                translator_viewer)
 
     def to_dict(self):
         """Returns a dict suitable for use by the frontend.
@@ -127,6 +148,7 @@ class ActivityRights(object):
                 'community_owned': True,
                 'owner_names': [],
                 'editor_names': [],
+                'translator_names': [],
                 'viewer_names': [],
                 'viewable_if_private': self.viewable_if_private,
             }
@@ -139,6 +161,8 @@ class ActivityRights(object):
                     self.owner_ids),
                 'editor_names': user_services.get_human_readable_user_ids(
                     self.editor_ids),
+                'translator_names': user_services.get_human_readable_user_ids(
+                    self.translator_ids),
                 'viewer_names': user_services.get_human_readable_user_ids(
                     self.viewer_ids),
                 'viewable_if_private': self.viewable_if_private,
@@ -151,7 +175,7 @@ class ActivityRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is in activity owners.
+            bool. Whether user is an activity owner.
         """
         return bool(user_id in self.owner_ids)
 
@@ -162,9 +186,20 @@ class ActivityRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is in activity editors.
+            bool. Whether user is an activity editor.
         """
         return bool(user_id in self.editor_ids)
+
+    def is_translator(self, user_id):
+        """Checks whether given user is translator of activity.
+
+        Args:
+            user_id: str or None. Id of the user.
+
+        Returns:
+            bool. Whether user is an activity translator.
+        """
+        return bool(user_id in self.translator_ids)
 
     def is_viewer(self, user_id):
         """Checks whether given user is viewer of activity.
@@ -173,7 +208,7 @@ class ActivityRights(object):
             user_id: str or None. Id of the user.
 
         Returns:
-            bool. Whether user is in activity viewers of.
+            bool. Whether user is an activity viewer.
         """
         return bool(user_id in self.viewer_ids)
 
@@ -211,6 +246,7 @@ def get_activity_rights_from_model(activity_rights_model, activity_type):
         activity_rights_model.id,
         activity_rights_model.owner_ids,
         activity_rights_model.editor_ids,
+        activity_rights_model.translator_ids,
         activity_rights_model.viewer_ids,
         community_owned=activity_rights_model.community_owned,
         cloned_from=(
@@ -250,6 +286,7 @@ def _save_activity_rights(
     model.owner_ids = activity_rights.owner_ids
     model.editor_ids = activity_rights.editor_ids
     model.viewer_ids = activity_rights.viewer_ids
+    model.translator_ids = activity_rights.translator_ids
     model.community_owned = activity_rights.community_owned
     model.status = activity_rights.status
     model.viewable_if_private = activity_rights.viewable_if_private
@@ -344,13 +381,14 @@ def create_new_exploration_rights(exploration_id, committer_id):
         committer_id: str. ID of the committer.
     """
     exploration_rights = ActivityRights(
-        exploration_id, [committer_id], [], [])
+        exploration_id, [committer_id], [], [], [])
     commit_cmds = [{'cmd': CMD_CREATE_NEW}]
 
     exp_models.ExplorationRightsModel(
         id=exploration_rights.id,
         owner_ids=exploration_rights.owner_ids,
         editor_ids=exploration_rights.editor_ids,
+        translator_ids=exploration_rights.translator_ids,
         viewer_ids=exploration_rights.viewer_ids,
         community_owned=exploration_rights.community_owned,
         status=exploration_rights.status,
@@ -457,13 +495,15 @@ def create_new_collection_rights(collection_id, committer_id):
         collection_id: str. ID of the collection.
         committer_id: str. ID of the committer.
     """
-    collection_rights = ActivityRights(collection_id, [committer_id], [], [])
+    collection_rights = ActivityRights(
+        collection_id, [committer_id], [], [], [])
     commit_cmds = [{'cmd': CMD_CREATE_NEW}]
 
     collection_models.CollectionRightsModel(
         id=collection_rights.id,
         owner_ids=collection_rights.owner_ids,
         editor_ids=collection_rights.editor_ids,
+        translator_ids=collection_rights.translator_ids,
         viewer_ids=collection_rights.viewer_ids,
         community_owned=collection_rights.community_owned,
         status=collection_rights.status,
@@ -586,6 +626,7 @@ def check_can_access_activity(user, activity_rights):
             activity_rights.is_viewer(user.user_id) or
             activity_rights.is_owner(user.user_id) or
             activity_rights.is_editor(user.user_id) or
+            activity_rights.is_translator(user.user_id) or
             activity_rights.viewable_if_private)
 
 
@@ -609,6 +650,41 @@ def check_can_edit_activity(user, activity_rights):
 
     if (activity_rights.is_owner(user.user_id) or
             activity_rights.is_editor(user.user_id)):
+        return True
+
+    if (activity_rights.community_owned or
+            (role_services.ACTION_EDIT_ANY_ACTIVITY in user.actions)):
+        return True
+
+    if (activity_rights.is_published() and
+            (role_services.ACTION_EDIT_ANY_PUBLIC_ACTIVITY in
+             user.actions)):
+        return True
+
+    return False
+
+
+def check_can_translate_activity(user, activity_rights):
+    """Checks whether the user can translate given activity.
+
+    Args:
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        activity_rights: ActivityRights or None. Rights object for the given
+            activity.
+
+    Returns:
+        bool. Whether the given user can translate this activity.
+    """
+    if activity_rights is None:
+        return False
+
+    if role_services.ACTION_EDIT_OWNED_ACTIVITY not in user.actions:
+        return False
+
+    if (activity_rights.is_owner(user.user_id) or
+            activity_rights.is_editor(user.user_id) or
+            activity_rights.is_translator(user.user_id)):
         return True
 
     if (activity_rights.community_owned or
@@ -768,6 +844,7 @@ def _assign_role(
         new_role: str. The name of the new role: One of
             ROLE_OWNER
             ROLE_EDITOR
+            ROLE_TRANSLATOR
             ROLE_VIEWER
         activity_id: str. ID of the activity.
         activity_type: str. The type of activity. Possible values:
@@ -778,7 +855,9 @@ def _assign_role(
         Exception. The committer does not have rights to modify a role.
         Exception. The user already owns the activity.
         Exception. The user can already edit the activity.
+        Exception. The user can already translate the activity.
         Exception. The activity is already publicly editable.
+        Exception. The activity is already publicly translatable.
         Exception. The user can already view the activity.
         Exception. The activity is already publicly viewable.
         Exception. The role is invalid.
@@ -809,6 +888,9 @@ def _assign_role(
         if assignee_id in activity_rights.editor_ids:
             activity_rights.editor_ids.remove(assignee_id)
             old_role = ROLE_EDITOR
+        if assignee_id in activity_rights.translator_ids:
+            activity_rights.translator_ids.remove(assignee_id)
+            old_role = ROLE_TRANSLATOR
 
     elif new_role == ROLE_EDITOR:
         if (activity_rights.is_editor(assignee_id) or
@@ -821,6 +903,27 @@ def _assign_role(
                 'Community-owned %ss can be edited by anyone.' % activity_type)
 
         activity_rights.editor_ids.append(assignee_id)
+
+        if assignee_id in activity_rights.translator_ids:
+            activity_rights.translator_ids.remove(assignee_id)
+            old_role = ROLE_TRANSLATOR
+
+        if assignee_id in activity_rights.viewer_ids:
+            activity_rights.viewer_ids.remove(assignee_id)
+            old_role = ROLE_VIEWER
+
+    elif new_role == ROLE_TRANSLATOR:
+        if (activity_rights.is_editor(assignee_id) or
+                activity_rights.is_translator(assignee_id) or
+                activity_rights.is_owner(assignee_id)):
+            raise Exception(
+                'This user already can translate this %s.' % activity_type)
+        if activity_rights.community_owned:
+            raise Exception(
+                'Community-owned %ss can be translated by anyone.' %
+                activity_type)
+
+        activity_rights.translator_ids.append(assignee_id)
 
         if assignee_id in activity_rights.viewer_ids:
             activity_rights.viewer_ids.remove(assignee_id)
@@ -1008,6 +1111,7 @@ def assign_role_for_exploration(
         new_role: str. The name of the new role: One of
             ROLE_OWNER
             ROLE_EDITOR
+            ROLE_TRANSLATOR
 
     Raises:
         Exception. This could potentially throw an exception from
@@ -1016,7 +1120,7 @@ def assign_role_for_exploration(
     _assign_role(
         committer, assignee_id, new_role, exploration_id,
         constants.ACTIVITY_TYPE_EXPLORATION)
-    if new_role in [ROLE_OWNER, ROLE_EDITOR]:
+    if new_role in [ROLE_OWNER, ROLE_EDITOR, ROLE_TRANSLATOR]:
         subscription_services.subscribe_to_exploration(
             assignee_id, exploration_id)
 

@@ -162,9 +162,9 @@
       "messageFormat": {
         "version": "0.3.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/SlexAxton/messageformat.js/archive/v0.3.1.zip",
+        "url": "https://github.com/messageformat/messageformat/archive/v0.3.1.zip",
         "targetDirPrefix": "messageformat-",
-        "rootDirPrefix": "messageformat.js-",
+        "rootDirPrefix": "messageformat-",
         "bundle": {
           "js": ["messageformat.js"]
         }
