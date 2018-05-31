@@ -26,6 +26,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     """Test the skill services module."""
 
     SKILL_ID = None
+    SKILL_IDS = []
     USER_ID = 'user'
     MISCONCEPTION_ID = 'misconception_id'
     DEGREE_OF_MASTERY = 0.0
@@ -37,11 +38,16 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID, 'name', 'description', 'default_feedback')]
         self.SKILL_ID = skill_services.get_new_skill_id()
+        self.SKILL_ID1 = skill_services.get_new_skill_id()
+        self.SKILL_IDS = [self.SKILL_ID, self.SKILL_ID1]
         self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, 'Description', misconceptions,
             skill_contents
         )
-        skill_services.create_skill_mastery(self.SKILL_ID, self.USER_ID, self.DEGREE_OF_MASTERY)
+        skill_services.create_skill_mastery(
+            self.USER_ID, self.SKILL_ID, self.DEGREE_OF_MASTERY)
+        skill_services.create_skill_mastery(
+            self.USER_ID, self.SKILL_ID1, self.DEGREE_OF_MASTERY)
 
     def test_compute_summary(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
@@ -92,17 +98,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.misconception_count, 1)
 
     def test_get_skill_mastery(self):
-        skill_mastery = skill_services.get_skill_mastery(self.USER_ID, self.SKILL_ID)
+        degree_of_mastery = skill_services.get_skill_mastery(
+            self.USER_ID, self.SKILL_ID)
 
-        self.assertEqual(skill_mastery.degree_of_mastery, 0.0)
+        self.assertEqual(degree_of_mastery, self.DEGREE_OF_MASTERY)
 
     def test_get_multi_skill_mastery(self):
-        skill_mastery = skill_services.get_multi_skill_mastery(self.USER_ID, *self.SKILL_ID)
+        degree_of_mastery = skill_services.get_multi_skill_mastery(
+            self.USER_ID, self.SKILL_IDS)
 
-        self.assertEqual(skill_mastery.degree_of_mastery, 0.0)
-
-    
-    def test_get_all_skill_mastery(self):
-        skill_mastery = skill_services.get_all_skill_mastery(self.USER_ID)
-
-        self.assertEqual(skill_mastery.degree_of_mastery, 0.0)
+        self.assertEqual(
+            degree_of_mastery, [self.DEGREE_OF_MASTERY, self.DEGREE_OF_MASTERY])
