@@ -737,7 +737,7 @@
                       </div>
                       <div>
                         <button class="btn btn-success feedback-thread-new-message-send"
-                                ng-click="addNewMessage(explorationId, threadId, newMessage.text)"
+                                ng-click="addNewMessage(threadId, newMessage.text)"
                                 ng-disabled="messageSendingInProgress || !newMessage.text">
                           <span ng-if="messageSendingInProgress" translate="I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS"></span>
                           <span class="protractor-test-feedback-send-message"
