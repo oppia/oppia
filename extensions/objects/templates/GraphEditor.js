@@ -27,10 +27,13 @@ oppia.directive('graphEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: {},
+      scope: {
+        value: '@'
+      },
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', function($scope) {
         $scope.alwaysEditable = true;
+        $scope.value = $scope.$parent.value;
       }]
     };
   }]);
