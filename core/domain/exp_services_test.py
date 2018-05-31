@@ -3201,7 +3201,6 @@ class ExplorationStateIdMappingTests(test_utils.GenericTestBase):
             exp_services.get_state_id_mapping(
                 exploration.id, exploration.version - 1)
 
-
     def test_that_mapping_is_correct_when_exploration_is_reverted(self):
         """Test that state id mapping is correct when exploration is reverted
         to old version.
