@@ -313,6 +313,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
                 name to value.
             play_type: str. Type of play-through.
             unused_version: int. Default is 1.
+
+        Returns:
+            str. The ID of the entity.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due tg an error.
@@ -530,6 +533,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             play_type: str. Type of play-through.
             client_time_spent_in_secs: float. Time since start of this
                 state before this event occurred.
+
+        Returns:
+            str. The ID of the entity.
         """
         entity_id = cls.get_new_event_entity_id(exp_id, session_id)
         complete_event_entity = cls(
@@ -681,6 +687,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             params: dict. Current parameter values, map of parameter name
                 to value.
             play_type: str. Type of play-through.
+
+        Returns:
+            str. The ID of the entity.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
@@ -972,18 +981,53 @@ class ExplorationIssuesModel(base_models.BaseModel):
     """Model for storing the list of playthroughs for an exploration grouped by
     issues.
     """
+    # ID of exploration.
+    exp_id = ndb.StringProperty(indexed=True)
+    # Version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True)
     # The unresolved issues for this exploration. This will be a list of dicts
     # where each dict represents an issue along with the associated
     # playthroughs.
     unresolved_issues = ndb.JsonProperty(repeated=True)
 
     @classmethod
-    def create(cls, exp_id, unresolved_issues):
+    def get_entity_id(cls, exp_id, exp_version):
+        """Generates an ID for the instance of the form
+        {{exp_id}}.{{exp_version}}.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+
+        Returns:
+            str. ID of the new ExplorationIssuesModel instance.
+        """
+        return '%s.%s' % (exp_id, exp_version)
+
+    @classmethod
+    def get_model(cls, exp_id, exp_version):
+        """Retrieves ExplorationIssuesModel given exploration ID and version.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+
+        Returns:
+            ExplorationISsuesModel. Exploration issues model instance in
+                datastore.
+        """
+        instance_id = cls.get_entity_id(exp_id, exp_version)
+        exp_issues_model = cls.get(instance_id, strict=False)
+        return exp_issues_model
+
+    @classmethod
+    def create(cls, exp_id, exp_version, unresolved_issues):
         """Creates an ExplorationIssuesModel instance and writes it to the
         datastore.
 
         Args:
             exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
             unresolved_issues: list(dict). The unresolved issues for this
                 exploration. This will be a list of dicts where each dict
                 represents an issue along with the associated playthroughs.
@@ -991,10 +1035,12 @@ class ExplorationIssuesModel(base_models.BaseModel):
         Returns:
             str. ID of the new ExplorationIssuesModel instance.
         """
+        instance_id = cls.get_entity_id(exp_id, exp_version)
         exp_issues_instance = cls(
-            id=exp_id, unresolved_issues=unresolved_issues)
+            id=instance_id, exp_id=exp_id, exp_version=exp_version,
+            unresolved_issues=unresolved_issues)
         exp_issues_instance.put()
-        return exp_id
+        return instance_id
 
 
 class PlaythroughModel(base_models.BaseModel):
@@ -1016,8 +1062,6 @@ class PlaythroughModel(base_models.BaseModel):
     # where each dict represents a single playthrough action. The list is
     # ordered by the time of occurence of the action.
     playthrough_actions = ndb.JsonProperty(repeated=True)
-    # Boolean for checking validity of the playthrough.
-    is_valid = ndb.BooleanProperty(indexed=True, required=True)
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -1051,7 +1095,7 @@ class PlaythroughModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, exp_id, exp_version, issue_type, issue_customization_args,
-            playthrough_actions, is_valid):
+            playthrough_actions):
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
 
@@ -1065,7 +1109,6 @@ class PlaythroughModel(base_models.BaseModel):
                 playthrough. This will be a list of dicts where each dict
                 represents a single playthrough action. The list is ordered by
                 the time of occurence of the action.
-            is_valid: bool. Whether the playthrough is valid.
 
         Returns:
             str. ID of the new PlaythroughModel instance.
@@ -1075,7 +1118,7 @@ class PlaythroughModel(base_models.BaseModel):
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             issue_type=issue_type,
             issue_customization_args=issue_customization_args,
-            playthrough_actions=playthrough_actions, is_valid=is_valid)
+            playthrough_actions=playthrough_actions)
         playthrough_instance.put()
         return instance_id
 
@@ -1105,7 +1148,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         """Gets entity_id for a batch model based on given exploration state.
 
         Args:
-            exp_id: str. ID of the exploration currently being played.
+            exploration_id: str. ID of the exploration currently being played.
             exploration_version: int. Version of the exploration currently
                 being played.
 
@@ -1145,7 +1188,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         ExplorationAnnotationsModel for a specific exploration_id.
 
         Args:
-            exp_id: str. ID of the exploration currently being played.
+            exploration_id: str. ID of the exploration currently being played.
 
         Returns:
             list(int). List of versions corresponding to annotation models

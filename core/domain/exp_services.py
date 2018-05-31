@@ -194,7 +194,7 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.scaled_average_rating,
         exp_summary_model.status, exp_summary_model.community_owned,
         exp_summary_model.owner_ids, exp_summary_model.editor_ids,
-        exp_summary_model.viewer_ids,
+        exp_summary_model.translator_ids, exp_summary_model.viewer_ids,
         exp_summary_model.contributor_ids,
         exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
@@ -667,6 +667,10 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
     Args:
         exploration_id: str. The id of the exploration whose states should
             be exported.
+        version: int or None. The version of the exploration to be returned.
+            If None, the latest version of the exploration is returned.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
 
     Returns:
         dict. The keys are state names, and the values are YAML strings
@@ -1266,8 +1270,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exploration.objective, exploration.language_code,
         exploration.tags, ratings, scaled_average_rating, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
-        contributors_summary, exploration.version,
+        exp_rights.editor_ids, exp_rights.translator_ids, exp_rights.viewer_ids,
+        contributor_ids, contributors_summary, exploration.version,
         exploration_model_created_on, exploration_model_last_updated,
         first_published_msec)
 
@@ -1328,6 +1332,7 @@ def save_exploration_summary(exp_summary):
         community_owned=exp_summary.community_owned,
         owner_ids=exp_summary.owner_ids,
         editor_ids=exp_summary.editor_ids,
+        translator_ids=exp_summary.translator_ids,
         viewer_ids=exp_summary.viewer_ids,
         contributor_ids=exp_summary.contributor_ids,
         contributors_summary=exp_summary.contributors_summary,
@@ -1569,6 +1574,8 @@ def get_next_page_of_all_non_private_commits(
         urlsafe_start_cursor: str. If this is not None, then the returned
             commits start from cursor location. Otherwise they start from the
             beginning of the list of commits.
+        max_age: datetime.timedelta. The maximum age to which all non private
+            commits are fetch from the ExplorationCommitLogEntry.
 
     Returns:
         tuple. A 3-tuple consisting of:
@@ -1933,6 +1940,9 @@ def get_exp_with_draft_applied(exp_id, user_id):
     Args:
         exp_id: str. The id of the exploration.
         user_id: str. The id of the user whose draft is to be applied.
+
+    Returns:
+        Exploration. The exploration domain object.
     """
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
@@ -1969,7 +1979,7 @@ def get_state_id_mapping(exp_id, exp_version):
         exp_id: str. The exploration id.
         exp_version: int. The exploration version.
 
-    Returnes:
+    Returns:
         StateIdMapping. Domain object for state id mapping model instance.
     """
     model = exp_models.StateIdMappingModel.get_state_id_mapping_model(
@@ -2125,6 +2135,9 @@ def find_all_values_for_key(key, dictionary):
 
     Returns:
         list. The values of the key in the given dictionary.
+
+    Yields:
+        str. The value of the given key.
     """
     if isinstance(dictionary, list):
         for d in dictionary:

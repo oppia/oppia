@@ -208,6 +208,7 @@ class Registry(object):
 
         Args:
             name: str. The name of the configuration property.
+            instance: *. The instance of the configuration property.
         """
         cls._config_registry[name] = instance
 
