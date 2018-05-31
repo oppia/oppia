@@ -422,7 +422,7 @@ tags: []
         # the status.
         # Reference URL:
         # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
@@ -443,7 +443,7 @@ tags: []
         # the status.
         # Reference URL:
         # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
 
         return self._parse_json_response(
@@ -509,7 +509,7 @@ tags: []
         # the status.
         # Reference URL:
         # https://github.com/Pylons/webtest/blob/
-        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
