@@ -24,6 +24,7 @@ from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import event_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rating_services
@@ -85,21 +86,21 @@ class UserContributionsOneOffJobTests(test_utils.GenericTestBase):
             self.EXP_ID_1, self.user_b_id, end_state_name='End')
 
         exp_services.update_exploration(
-            self.user_c_id, self.EXP_ID_1, [{
+            self.user_c_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            }], 'Test edit')
+            })], 'Test edit')
 
         self.save_new_valid_exploration(
             self.EXP_ID_2, self.user_d_id, end_state_name='End')
 
         exp_services.update_exploration(
-            self.user_d_id, self.EXP_ID_2, [{
+            self.user_d_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            }], 'Test edit')
+            })], 'Test edit')
 
     def test_null_case(self):
         """Tests the case where user has no created or edited explorations."""
@@ -999,12 +1000,12 @@ class UserFirstContributionMsecOneOffJobTests(test_utils.GenericTestBase):
         rights_manager.release_ownership_of_exploration(
             self.admin, self.EXP_ID)
         exp_services.update_exploration(
-            self.editor_id, self.EXP_ID, [{
+            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'state_name': init_state_name,
                 'property_name': 'widget_id',
                 'new_value': 'MultipleChoiceInput'
-            }], 'commit')
+            })], 'commit')
         job_id = (
             user_jobs_one_off.UserFirstContributionMsecOneOffJob.create_new())
         user_jobs_one_off.UserFirstContributionMsecOneOffJob.enqueue(job_id)
@@ -1142,11 +1143,11 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         self.logout()
         self.login(self.EDITOR_EMAIL)
         exp_services.update_exploration(
-            self.editor_id, self.exp_id, [{
+            self.editor_id, self.exp_id, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            }], 'Test edit')
+            })], 'Test edit')
         self.logout()
 
         user_settings = user_services.get_user_settings(self.editor_id)
@@ -1170,19 +1171,19 @@ class UserLastExplorationActivityOneOffJobTests(test_utils.GenericTestBase):
         self.save_new_valid_exploration(
             self.exp_id, self.owner_id, end_state_name='End')
         exp_services.update_exploration(
-            self.owner_id, self.exp_id, [{
+            self.owner_id, self.exp_id, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            }], 'Test edit')
+            })], 'Test edit')
         self.logout()
         self.login(self.EDITOR_EMAIL)
         exp_services.update_exploration(
-            self.editor_id, self.exp_id, [{
+            self.editor_id, self.exp_id, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'new objective'
-            }], 'Test edit new')
+            })], 'Test edit new')
         self.logout()
 
         user_settings = user_services.get_user_settings(self.owner_id)

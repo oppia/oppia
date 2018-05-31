@@ -60,6 +60,8 @@ STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 GADGET_PROPERTY_VISIBILITY = 'gadget_visibility'
 GADGET_PROPERTY_CUST_ARGS = 'gadget_customization_args'
 
+# This takes additional 'title' and 'category' parameters.
+CMD_CREATE_NEW = 'create_new'
 # This takes an additional 'state_name' parameter.
 CMD_ADD_STATE = 'add_state'
 # This takes additional 'old_state_name' and 'new_state_name' parameters.
@@ -223,6 +225,12 @@ class ExplorationChange(object):
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
 
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'state_name', 'old_state_name', 'new_state_name',
+        'property_name', 'new_value', 'old_value', 'name', 'from_version',
+        'to_version', 'title', 'category'
+    ]
+
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
 
@@ -274,8 +282,26 @@ class ExplorationChange(object):
         elif self.cmd == CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION:
             self.from_version = change_dict['from_version']
             self.to_version = change_dict['to_version']
+        elif self.cmd == CMD_CREATE_NEW:
+            self.title = change_dict['title']
+            self.category = change_dict['category']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the ExplorationChange domain object.
+
+        Returns:
+            A dict, mapping all fields of ExplorationChange instance.
+        """
+        exploration_change_dict = {}
+        exploration_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                exploration_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return exploration_change_dict
 
 
 class ExplorationCommitLogEntry(object):
@@ -1607,19 +1633,20 @@ class ExplorationVersionsDiff(object):
         """Constructs an ExplorationVersionsDiff domain object.
 
         Args:
-            change_list: list(dict). A list of all of the commit cmds from the
-                old version of the exploration up to the next version.
+            change_list: list(ExplorationChange). A list of all of the commit
+                cmds from the old version of the exploration up to the next
+                version.
         """
 
         added_state_names = []
         deleted_state_names = []
         new_to_old_state_names = {}
 
-        for change_dict in change_list:
-            if change_dict['cmd'] == CMD_ADD_STATE:
-                added_state_names.append(change_dict['state_name'])
-            elif change_dict['cmd'] == CMD_DELETE_STATE:
-                state_name = change_dict['state_name']
+        for change in change_list:
+            if change.cmd == CMD_ADD_STATE:
+                added_state_names.append(change.state_name)
+            elif change.cmd == CMD_DELETE_STATE:
+                state_name = change.state_name
                 if state_name in added_state_names:
                     added_state_names.remove(state_name)
                 else:
@@ -1628,9 +1655,9 @@ class ExplorationVersionsDiff(object):
                         original_state_name = new_to_old_state_names.pop(
                             original_state_name)
                     deleted_state_names.append(original_state_name)
-            elif change_dict['cmd'] == CMD_RENAME_STATE:
-                old_state_name = change_dict['old_state_name']
-                new_state_name = change_dict['new_state_name']
+            elif change.cmd == CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
                 if old_state_name in added_state_names:
                     added_state_names.remove(old_state_name)
                     added_state_names.append(new_state_name)
@@ -4104,8 +4131,8 @@ class StateIdMapping(object):
         Args:
             old_exploration: Exploration. Old version of the exploration.
             new_exploration: Exploration. New version of the exploration.
-            change_list: list(dict). List of changes between old and new
-                exploration.
+            change_list: list(ExplorationChange). List of changes between old
+                and new exploration.
 
         Returns:
             StateIdMapping. Domain object for state id mapping.
@@ -4121,14 +4148,13 @@ class StateIdMapping(object):
 
         # Analyse each command in change list one by one to create state id
         # mapping for new exploration.
-        for change_dict in change_list:
-            if change_dict['cmd'] == CMD_ADD_STATE:
-                new_state_names.append(change_dict['state_name'])
-                assert change_dict['state_name'] not in (
-                    state_ids_to_names.values())
+        for change in change_list:
+            if change.cmd == CMD_ADD_STATE:
+                new_state_names.append(change.state_name)
+                assert change.state_name not in state_ids_to_names.values()
 
-            elif change_dict['cmd'] == CMD_DELETE_STATE:
-                removed_state_name = change_dict['state_name']
+            elif change.cmd == CMD_DELETE_STATE:
+                removed_state_name = change.state_name
 
                 # Find state name in state id mapping. If it exists then
                 # remove it from mapping.
@@ -4147,9 +4173,9 @@ class StateIdMapping(object):
                     # remove it from new state names list.
                     new_state_names.remove(removed_state_name)
 
-            elif change_dict['cmd'] == CMD_RENAME_STATE:
-                old_state_name = change_dict['old_state_name']
-                new_state_name = change_dict['new_state_name']
+            elif change.cmd == CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
 
                 # Find whether old state name is present in state id mapping.
                 # If it is then replace the old state name to new state name.

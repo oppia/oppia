@@ -1318,8 +1318,7 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
         ))
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         topic_services.assign_role(
-            self.admin, self.manager_id, topic_domain.ROLE_MANAGER,
-            self.topic_id)
+            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
 
     def test_admin_can_edit_topic(self):
         self.login(self.ADMIN_EMAIL)
