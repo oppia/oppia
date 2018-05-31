@@ -14,7 +14,6 @@
 
 """Tests for the topic editor page."""
 
-from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -50,8 +49,8 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
     def setUp(self):
         super(TopicEditorTest, self).setUp()
         self.TOPIC_ID = topic_services.get_new_topic_id()
-        self.save_new_topic(self.TOPIC_ID, self.admin_id, 'Name',
-            'Description', [], [], [])
+        self.save_new_topic(
+            self.TOPIC_ID, self.admin_id, 'Name', 'Description', [], [], [])
 
     def test_assign_topic_manager_role(self):
         """Test the assign topic manager role for a topic functionality.
@@ -64,15 +63,16 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
         json_response = self.put_json(
             '%s/%s/%s' % (
                 feconf.TOPIC_MANAGER_PREFIX, self.TOPIC_ID, self.new_user_id),
-                {}, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=401)
+            {}, csrf_token=csrf_token, expect_errors=True,
+            expected_status_int=401)
         self.assertEqual(json_response['status_code'], 401)
 
         json_response = self.put_json(
             '%s/%s/%s' % (
                 feconf.TOPIC_MANAGER_PREFIX, self.TOPIC_ID,
-                self.topic_manager_id), {}, csrf_token=csrf_token,
-                expect_errors=True, expected_status_int=200)
+                self.topic_manager_id),
+            {}, csrf_token=csrf_token, expect_errors=True,
+            expected_status_int=200)
         self.assertEqual(json_response['role_updated'], True)
         self.logout()
 

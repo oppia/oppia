@@ -610,15 +610,6 @@ tags: []
         for name in collection_editor_usernames:
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
 
-    def set_topic_managers(self, topic_manager_usernames):
-        """Sets role of given users as TOPIC_MANAGER.
-
-        Args:
-            topic_manager_usernames: list(str). List of usernames.
-        """
-        for name in topic_manager_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
-
     def get_current_logged_in_user_id(self):
         """Gets the user_id of the current logged-in user.
 

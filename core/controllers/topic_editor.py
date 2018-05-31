@@ -23,6 +23,8 @@ from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 import feconf
+import utils
+
 STORY_ID_KEY = 'storyId'
 
 
@@ -139,7 +141,6 @@ class TopicManagerHandler(base.BaseHandler):
         """Assign topic manager role to a user for a particular topic, if the
         user has general topic manager rights.
         """
-        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         assignee_actions_info = user_services.UserActionsInfo(assignee_id)
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         try:

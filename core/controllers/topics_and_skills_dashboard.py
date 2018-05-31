@@ -17,11 +17,14 @@ are created.
 """
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import topic_domain
-from core.domain import topic_services
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import topic_domain
+from core.domain import topic_services
 import feconf
+
+TOPIC_ID_KEY = 'topicId'
+SKILL_ID_KEY = 'skillId'
 
 
 class NewTopic(base.BaseHandler):
@@ -40,6 +43,7 @@ class NewTopic(base.BaseHandler):
         self.render_json({
             TOPIC_ID_KEY: new_topic_id
         })
+
 
 class NewSkill(base.BaseHandler):
     """Creates a new skill."""
