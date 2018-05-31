@@ -30,7 +30,7 @@ PLATFORM = 'gae'
 # This variable is for serving minified resources
 # when set to True. It reflects we are emulating running Oppia in a production
 # environment.
-FORCE_PROD_MODE = False
+FORCE_PROD_MODE = True
 
 # Whether we should serve the development or production experience.
 # DEV_MODE should only be changed to False in the production environment,
@@ -193,6 +193,15 @@ DEFAULT_EXPLORATION_OBJECTIVE = ''
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'Introduction'
+
+DEFAULT_NEW_STATE_CONTENT_ID = 'content'
+
+DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
+
+DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
+    'content': {},
+    'default_outcome': {}
+}
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 

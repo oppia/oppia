@@ -480,7 +480,7 @@ class SubtitledHtml(object):
     """Value object representing subtitled HTML."""
 
     DEFAULT_SUBTITLED_HTML_DICT = {
-        'content_id': None,
+        'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
         'html': ''
     }
 
@@ -1190,7 +1190,8 @@ class InteractionInstance(object):
         """
         default_outcome = Outcome(
             default_dest_state_name,
-            SubtitledHtml.create_default_subtitled_html(), False, {}, None)
+            SubtitledHtml.create_default_subtitled_html(
+                feconf.DEFAULT_OUTCOME_CONTENT_ID), False, {}, None)
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
@@ -1614,11 +1615,13 @@ class State(object):
         """
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
+        content_id = feconf.DEFAULT_NEW_STATE_CONTENT_ID
         return cls(
-            SubtitledHtml(None, content_html),
+            SubtitledHtml(content_id, content_html),
             [],
             InteractionInstance.create_default_interaction(
-                default_dest_state_name), {})
+                default_dest_state_name),
+            feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
 
 
 class ExplorationVersionsDiff(object):
