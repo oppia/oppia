@@ -171,6 +171,100 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'Expected prerequisite skill ids and acquired skill ids '
             'to be mutually exclusive.')
 
+    def test_all_nodes_visited(self):
+        node_1 = {
+            'id': 'node_1',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_4'],
+            'outline': '',
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        self._assert_validation_error('Expected all nodes to be reachable.')
+
+        node_1 = {
+            'id': 'node_1',
+            'destination_node_ids': ['node_3', 'node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_3'],
+            'outline': '',
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        self.story.validate()
+
+        node_1 = {
+            'id': 'node_1',
+            'destination_node_ids': ['node_2', 'node_3'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_1'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_3'],
+            'outline': '',
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        self._assert_validation_error('Expected all nodes to be reachable.')
+
     def test_story_contents_export_import(self):
         """Test that to_dict and from_dict preserve all data within a
         story_contents object.

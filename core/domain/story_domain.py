@@ -275,12 +275,11 @@ class StoryNode(object):
         for node_id in self.destination_node_ids:
             if not isinstance(node_id, basestring):
                 raise utils.ValidationError(
-                    'Expected each node id to be a string, '
+                    'Expected each destination node id to be a string, '
                     'received %s' % node_id)
             if node_id == self.id:
                 raise utils.ValidationError(
-                    'Expected destination node id list of a node to not have '
-                    'that same node as one of its elements. ')
+                    'The story node with ID %s points to itself.' % node_id)
 
 
 class StoryContents(object):
@@ -318,6 +317,83 @@ class StoryContents(object):
                     raise utils.ValidationError(
                         'Expected all destination nodes to exist')
             node.validate()
+
+        prerequisite_skill_ids = []
+        unlocked_nodes = []
+        visited_nodes = []
+        previous_visited_nodes_length = -1
+        # The following 2 loops create the prerequisite skill id list which
+        # contains all the prerequisite skill ids of the story nodes minus
+        # its intersection with the acquired skill id list.
+        for node in self.nodes:
+            for skill_id in node.prerequisite_skill_ids:
+                prerequisite_skill_ids.append(skill_id)
+        for node in self.nodes:
+            for skill_id in node.acquired_skill_ids:
+                if skill_id in prerequisite_skill_ids:
+                    prerequisite_skill_ids.remove(skill_id)
+
+        # The following loop calculates the nodes that are unlocked initially
+        # based on the prerequisite skill ids calculated above.
+        for node in self.nodes:
+            node_unlocked = True
+            for skill_id in node.prerequisite_skill_ids:
+                if skill_id not in prerequisite_skill_ids:
+                    node_unlocked = False
+                    break
+            if node_unlocked:
+                unlocked_nodes.append(node)
+        print unlocked_nodes
+        # The while loop is there so that, is a node is unlocked, but its
+        # prerequisite skills are acquired at a later stage, then that node
+        # needs to be checked again. (The second test in
+        # test_all_nodes_visited()) checks this.
+        while len(visited_nodes) != previous_visited_nodes_length:
+            previous_visited_nodes_length = len(visited_nodes)
+            # The following loop iterates through these unlocked nodes and marks
+            # a node as visited if all its prerequisite skills are present in
+            # the list calculated above. Also, new nodes are unlocked are based
+            # on destination node ids of these visited nodes.
+            # All of the initial unlocked nodes would be visited, but for
+            # consistency, that check is also done in this loop.
+            for node in unlocked_nodes:
+                node_visited = True
+                for skill_id in node.prerequisite_skill_ids:
+                    if skill_id not in prerequisite_skill_ids:
+                        node_visited = False
+                        break
+                if node_visited:
+                    if node not in visited_nodes:
+                        visited_nodes.append(node)
+                        for skill_id in node.acquired_skill_ids:
+                            prerequisite_skill_ids.append(skill_id)
+                        for node_id in node.destination_node_ids:
+                            node = self.get_node_by_id(node_id)
+                            unlocked_nodes.append(node)
+
+            for node in visited_nodes:
+                if node in unlocked_nodes:
+                    unlocked_nodes.remove(node)
+
+        if len(visited_nodes) < len(self.nodes):
+            raise utils.ValidationError('Expected all nodes to be reachable.')
+
+
+    def get_node_by_id(self, node_id):
+        """Returns the node corresponding to the given id.
+
+        Args:
+            node_id: str. The id of the node to be found.
+
+        Returns:
+            StoryNode or None. The node corresponding to the given node_id, or
+                None, if it doesn't exist.
+        """
+        for node in self.nodes:
+            if node.id == node_id:
+                return node
+
+        return None
 
     def to_dict(self):
         """Returns a dict representing this StoryContents domain object.
