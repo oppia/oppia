@@ -92,7 +92,7 @@ class SkillModel(base_models.VersionedModel):
             feconf.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
-        skill_commit_log_entry.put_async()
+        skill_commit_log_entry.put()
 
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

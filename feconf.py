@@ -227,6 +227,12 @@ DEFAULT_STORY_NOTES = ''
 DEFAULT_SKILL_DESCRIPTION = ''
 # Default explanation for a newly-minted skill.
 DEFAULT_SKILL_EXPLANATION = ''
+# Default name for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_NAME = ''
+# Default notes for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_NOTES = ''
+# Default feedback for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_FEEDBACK = ''
 
 # Default name for a newly-minted topic.
 DEFAULT_TOPIC_NAME = ''
@@ -664,6 +670,7 @@ PLAY_TYPE_NORMAL = 'normal'
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
+COMMIT_MESSAGE_SKILL_DELETED = 'Skill deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
 ENABLE_PLAYTHROUGHS = False
