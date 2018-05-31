@@ -21,10 +21,13 @@ storage model to be changed without affecting this module and others above it.
 """
 
 import copy
+import logging
 
+from core.domain import exp_services
 from core.domain import story_domain
 from core.platform import models
 import feconf
+import utils
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 datastore_services = models.Registry.import_datastore_services()
@@ -172,18 +175,19 @@ def get_story_by_id(story_id, strict=True, version=None):
             return None
 
 
-def get_story_summary_by_id(story_id):
+def get_story_summary_by_id(story_id, strict=True):
     """Returns a domain object representing a story summary.
 
     Args:
         story_id: str. ID of the story summary.
-
+        strict: bool. Whether to fail noisily if no story summary with the given
+            id exists in the datastore.
     Returns:
         StorySummary. The story summary domain object corresponding to
         a story with the given story_id.
     """
     story_summary_model = story_models.StorySummaryModel.get(
-        story_id)
+        story_id, strict=strict)
     if story_summary_model:
         story_summary = get_story_summary_from_model(
             story_summary_model)
@@ -208,9 +212,10 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         committer_id: str. ID of the committer.
         story: Story. The story domain object.
         commit_message: str. A description of changes made to the story.
-        commit_cmds: list(dict). A list of change commands made to the given
-            story.
+        commit_cmds: list(StoryChange). A list of change commands made to the
+            given story.
     """
+    story.validate()
     model = story_models.StoryModel(
         id=story.id,
         description=story.description,
@@ -220,7 +225,8 @@ def _create_story(committer_id, story, commit_message, commit_cmds):
         notes=story.notes,
         story_contents=story.story_contents.to_dict()
     )
-    model.commit(committer_id, commit_message, commit_cmds)
+    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmd_dicts)
     story.version += 1
     create_story_summary(story.id)
 
@@ -235,10 +241,212 @@ def save_new_story(committer_id, story):
     commit_message = (
         'New story created with title \'%s\'.' % story.title)
     _create_story(
-        committer_id, story, commit_message, [{
+        committer_id, story, commit_message, [story_domain.StoryChange({
             'cmd': story_domain.CMD_CREATE_NEW,
             'title': story.title
-        }])
+        })])
+
+
+# Repository SAVE and DELETE methods.
+def apply_change_list(story_id, change_list):
+    """Applies a changelist to a story and returns the result.
+
+    Args:
+        story_id: str. ID of the given story.
+        change_list: list(StoryChange). A change list to be applied to the given
+            story.
+
+    Returns:
+        Story. The resulting story domain object.
+    """
+    story = get_story_by_id(story_id)
+    try:
+        for change in change_list:
+            if change.cmd == story_domain.CMD_ADD_STORY_NODE:
+                story.add_node(change.node_id)
+            elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
+                story.delete_node(change.node_id)
+            elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
+                if (change.property_name ==
+                        story_domain.STORY_NODE_PROPERTY_OUTLINE):
+                    story.update_node_outline(change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS):
+                    story.update_node_acquired_skill_ids(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS):
+                    story.update_node_prerequisite_skill_ids(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS):
+                    story.update_node_destination_node_ids(
+                        change.node_id, change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
+                    story.update_node_exploration_id(
+                        change.node_id, change.new_value)
+            elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
+                if (change.property_name ==
+                        story_domain.STORY_PROPERTY_TITLE):
+                    story.update_title(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_DESCRIPTION):
+                    story.update_description(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_NOTES):
+                    story.update_notes(change.new_value)
+                elif (change.property_name ==
+                      story_domain.STORY_PROPERTY_LANGUAGE_CODE):
+                    story.update_language_code(change.new_value)
+            elif (
+                    change.cmd ==
+                    story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
+                # Loading the story model from the datastore into a
+                # Story domain object automatically converts it to use the
+                # latest schema version. As a result, simply resaving the
+                # story is sufficient to apply the schema migration.
+                continue
+        return story
+
+    except Exception as e:
+        logging.error(
+            '%s %s %s %s' % (
+                e.__class__.__name__, e, story_id, change_list)
+        )
+        raise
+
+
+def _save_story(committer_id, story, commit_message, change_list):
+    """Validates a story and commits it to persistent storage. If
+    successful, increments the version number of the incoming story domain
+    object by 1.
+
+    Args:
+        committer_id: str. ID of the given committer.
+        story: Story. The story domain object to be saved.
+        commit_message: str. The commit message.
+        change_list: list(StoryChange). List of changes applied to a story.
+
+    Raises:
+        ValidationError: An invalid exploration was referenced in the
+            story.
+        Exception: The story model and the incoming story domain
+            object have different version numbers.
+    """
+    if not change_list:
+        raise Exception(
+            'Unexpected error: received an invalid change list when trying to '
+            'save story %s: %s' % (story.id, change_list))
+
+    story.validate()
+    # Validate that all explorations referenced by the story exist.
+    exp_ids = []
+    for node in story.story_contents.nodes:
+        if node.exploration_id is not None:
+            exp_ids.append(node.exploration_id)
+    exp_summaries = (
+        exp_services.get_exploration_summaries_matching_ids(exp_ids))
+    exp_summaries_dict = {
+        exp_id: exp_summaries[ind] for (ind, exp_id) in enumerate(exp_ids)
+    }
+    for node in story.story_contents.nodes:
+        if (node.exploration_id is not None) and (
+                not exp_summaries_dict[node.exploration_id]):
+            raise utils.ValidationError(
+                'Expected story to only reference valid explorations, '
+                'but found an exploration with ID: %s (was it deleted?)' %
+                node.exploration_id)
+
+    story_model = story_models.StoryModel.get(story.id, strict=False)
+    if story_model is None:
+        story_model = story_models.StoryModel(id=story.id)
+    else:
+        if story.version > story_model.version:
+            raise Exception(
+                'Unexpected error: trying to update version %s of story '
+                'from version %s. Please reload the page and try again.'
+                % (story_model.version, story.version))
+        elif story.version < story_model.version:
+            raise Exception(
+                'Trying to update version %s of story from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (story_model.version, story.version))
+
+    story_model.description = story.description
+    story_model.title = story.title
+    story_model.notes = story.notes
+    story_model.language_code = story.language_code
+    story_model.schema_version = story.schema_version
+    story_model.story_contents = {
+        'nodes': [
+            node.to_dict() for node in story.story_contents.nodes
+        ]
+    }
+    story_model.version = story.version
+    change_dicts = [change.to_dict() for change in change_list]
+    story_model.commit(committer_id, commit_message, change_dicts)
+    memcache_services.delete(_get_story_memcache_key(story.id))
+    story.version += 1
+
+
+def update_story(
+        committer_id, story_id, change_list, commit_message):
+    """Updates a story. Commits changes.
+
+    Args:
+    - committer_id: str. The id of the user who is performing the update
+        action.
+    - story_id: str. The story id.
+    - change_list: list(StoryChange).These changes are applied in sequence to
+        produce the resulting story.
+    - commit_message: str or None. A description of changes made to the
+        story.
+    """
+    if not commit_message:
+        raise ValueError('Expected a commit message but received none.')
+
+    story = apply_change_list(story_id, change_list)
+    _save_story(committer_id, story, commit_message, change_list)
+    create_story_summary(story.id)
+
+
+def delete_story(committer_id, story_id, force_deletion=False):
+    """Deletes the story with the given story_id.
+
+    Args:
+        committer_id: str. ID of the committer.
+        story_id: str. ID of the story to be deleted.
+        force_deletion: bool. If true, the story and its history are fully
+            deleted and are unrecoverable. Otherwise, the story and all
+            its history are marked as deleted, but the corresponding models are
+            still retained in the datastore. This last option is the preferred
+            one.
+    """
+    story_model = story_models.StoryModel.get(story_id)
+    story_model.delete(
+        committer_id, feconf.COMMIT_MESSAGE_STORY_DELETED,
+        force_deletion=force_deletion)
+
+    # This must come after the story is retrieved. Otherwise the memcache
+    # key will be reinstated.
+    story_memcache_key = _get_story_memcache_key(story_id)
+    memcache_services.delete(story_memcache_key)
+
+    # Delete the summary of the story (regardless of whether
+    # force_deletion is True or not).
+    delete_story_summary(story_id)
+
+
+def delete_story_summary(story_id):
+    """Delete a story summary model.
+
+    Args:
+        story_id: str. ID of the story whose story summary is to
+            be deleted.
+    """
+
+    story_models.StorySummaryModel.get(story_id).delete()
 
 
 def compute_summary_of_story(story):

@@ -15,7 +15,9 @@
 """Domain objects relating to stories."""
 
 from constants import constants
+from core.domain import html_cleaner
 import feconf
+import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -30,6 +32,7 @@ STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
 STORY_NODE_PROPERTY_OUTLINE = 'outline'
 STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
+CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
@@ -55,6 +58,11 @@ class StoryChange(object):
         STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
         STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, STORY_NODE_PROPERTY_OUTLINE,
         STORY_NODE_PROPERTY_EXPLORATION_ID)
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'property_name', 'new_value', 'old_value', 'node_id', 'from_version',
+        'to_version', 'title'
+    ]
 
     def __init__(self, change_dict):
         """Initialize a StoryChange object from a dict.
@@ -94,8 +102,28 @@ class StoryChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict['old_value']
+        elif self.cmd == CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
+            self.from_version = change_dict['from_version']
+            self.to_version = change_dict['to_version']
+        elif self.cmd == CMD_CREATE_NEW:
+            self.title = change_dict['title']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the StoryChange domain object.
+
+        Returns:
+            A dict, mapping all fields of StoryChange instance.
+        """
+        story_change_dict = {}
+        story_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                story_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return story_change_dict
 
 
 class StoryNode(object):
@@ -119,7 +147,8 @@ class StoryNode(object):
                 before starting a node.
             outline: str. Free-form annotations that a lesson implementer
                 can use to construct the exploration. It describes the basic
-                theme or template of the story.
+                theme or template of the story and is to be provided in html
+                form.
             exploration_id: str or None. The valid exploration id that fits the
                 story node. It can be None initially, when the story creator
                 has just created a story with the basic storyline (by providing
@@ -129,7 +158,7 @@ class StoryNode(object):
         self.destination_node_ids = destination_node_ids
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
-        self.outline = outline
+        self.outline = html_cleaner.clean(outline)
         self.exploration_id = exploration_id
 
     def to_dict(self):
@@ -178,6 +207,80 @@ class StoryNode(object):
         """
         return cls(node_id, [], [], [], '', None)
 
+    def validate(self):
+        """Validates various properties of the story node.
+
+        Raises:
+            ValidationError: One or more attributes of the story node are
+            invalid.
+        """
+        if self.exploration_id:
+            if not isinstance(self.exploration_id, basestring):
+                raise utils.ValidationError(
+                    'Expected exploration ID to be a string, received %s' %
+                    self.exploration_id)
+
+        if not isinstance(self.outline, basestring):
+            raise utils.ValidationError(
+                'Expected outline to be a string, received %s' %
+                self.outline)
+
+        if not isinstance(self.id, basestring):
+            raise utils.ValidationError(
+                'Expected node ID to be a string, received %s' %
+                self.id)
+
+        if not isinstance(self.prerequisite_skill_ids, list):
+            raise utils.ValidationError(
+                'Expected prerequisite skill ids to be a list, received %s' %
+                self.prerequisite_skill_ids)
+        for skill_id in self.prerequisite_skill_ids:
+            if not isinstance(skill_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each prerequisite skill id to be a string, '
+                    'received %s' % skill_id)
+        if (
+                len(self.prerequisite_skill_ids) >
+                len(set(self.prerequisite_skill_ids))):
+            raise utils.ValidationError(
+                'Expected all prerequisite skills to be distinct.')
+
+        if not isinstance(self.acquired_skill_ids, list):
+            raise utils.ValidationError(
+                'Expected acquired skill ids to be a list, received %s' %
+                self.acquired_skill_ids)
+        for skill_id in self.acquired_skill_ids:
+            if not isinstance(skill_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each acquired skill id to be a string, '
+                    'received %s' % skill_id)
+        if (
+                len(self.acquired_skill_ids) >
+                len(set(self.acquired_skill_ids))):
+            raise utils.ValidationError(
+                'Expected all acquired skills to be distinct.')
+
+        for skill_id in self.prerequisite_skill_ids:
+            if skill_id in self.acquired_skill_ids:
+                raise utils.ValidationError(
+                    'Expected prerequisite skill ids and acquired skill ids '
+                    'to be mutually exclusive. The skill_id %s intersects '
+                    % skill_id)
+
+        if not isinstance(self.destination_node_ids, list):
+            raise utils.ValidationError(
+                'Expected destination node ids to be a list, received %s' %
+                self.destination_node_ids)
+
+        for node_id in self.destination_node_ids:
+            if not isinstance(node_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each destination node id to be a string, '
+                    'received %s' % node_id)
+            if node_id == self.id:
+                raise utils.ValidationError(
+                    'The story node with ID %s points to itself.' % node_id)
+
 
 class StoryContents(object):
     """Domain object representing the story_contents dict."""
@@ -190,6 +293,107 @@ class StoryContents(object):
                 of this story.
         """
         self.nodes = story_nodes
+
+    def validate(self):
+        """Validates various properties of the story contents object.
+
+        Raises:
+            ValidationError: One or more attributes of the story contents are
+            invalid.
+        """
+        if not isinstance(self.nodes, list):
+            raise utils.ValidationError(
+                'Expected nodes field to be a list, received %s' % self.nodes)
+
+        for node in self.nodes:
+            if not isinstance(node, StoryNode):
+                raise utils.ValidationError(
+                    'Expected each node to be a StoryNode object, received %s' %
+                    node)
+            for destination_node_id in node.destination_node_ids:
+                if next(
+                        (node for node in self.nodes
+                         if node.id == destination_node_id), None) is None:
+                    raise utils.ValidationError(
+                        'Expected all destination nodes to exist')
+            node.validate()
+
+        prerequisite_skill_ids = []
+        unlocked_nodes = []
+        visited_nodes = []
+        previous_visited_nodes_length = -1
+        # The following 2 loops create the prerequisite skill id list which
+        # contains all the prerequisite skill ids of the story nodes minus
+        # its intersection with the acquired skill id list.
+        for node in self.nodes:
+            for skill_id in node.prerequisite_skill_ids:
+                prerequisite_skill_ids.append(skill_id)
+        for node in self.nodes:
+            for skill_id in node.acquired_skill_ids:
+                if skill_id in prerequisite_skill_ids:
+                    prerequisite_skill_ids.remove(skill_id)
+
+        # The following loop calculates the nodes that are unlocked initially
+        # based on the prerequisite skill ids calculated above.
+        for node in self.nodes:
+            node_unlocked = True
+            for skill_id in node.prerequisite_skill_ids:
+                if skill_id not in prerequisite_skill_ids:
+                    node_unlocked = False
+                    break
+            if node_unlocked:
+                unlocked_nodes.append(node)
+        print unlocked_nodes
+        # The while loop is there so that, is a node is unlocked, but its
+        # prerequisite skills are acquired at a later stage, then that node
+        # needs to be checked again. (The second test in
+        # test_all_nodes_visited()) checks this.
+        while len(visited_nodes) != previous_visited_nodes_length:
+            previous_visited_nodes_length = len(visited_nodes)
+            # The following loop iterates through these unlocked nodes and marks
+            # a node as visited if all its prerequisite skills are present in
+            # the list calculated above. Also, new nodes are unlocked are based
+            # on destination node ids of these visited nodes.
+            # All of the initial unlocked nodes would be visited, but for
+            # consistency, that check is also done in this loop.
+            for node in unlocked_nodes:
+                node_visited = True
+                for skill_id in node.prerequisite_skill_ids:
+                    if skill_id not in prerequisite_skill_ids:
+                        node_visited = False
+                        break
+                if node_visited:
+                    if node not in visited_nodes:
+                        visited_nodes.append(node)
+                        for skill_id in node.acquired_skill_ids:
+                            prerequisite_skill_ids.append(skill_id)
+                        for node_id in node.destination_node_ids:
+                            node = self.get_node_by_id(node_id)
+                            unlocked_nodes.append(node)
+
+            for node in visited_nodes:
+                if node in unlocked_nodes:
+                    unlocked_nodes.remove(node)
+
+        if len(visited_nodes) < len(self.nodes):
+            raise utils.ValidationError('Expected all nodes to be reachable.')
+
+
+    def get_node_by_id(self, node_id):
+        """Returns the node corresponding to the given id.
+
+        Args:
+            node_id: str. The id of the node to be found.
+
+        Returns:
+            StoryNode or None. The node corresponding to the given node_id, or
+                None, if it doesn't exist.
+        """
+        for node in self.nodes:
+            if node.id == node_id:
+                return node
+
+        return None
 
     def to_dict(self):
         """Returns a dict representing this StoryContents domain object.
@@ -236,7 +440,7 @@ class Story(object):
             title: str. The title of the story.
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
-                main storyline, and setting.
+                main storyline, and setting. To be provided in html form.
             story_contents: StoryContents. The StoryContents instance
                 representing the contents (like nodes) that are part of the
                 story.
@@ -252,13 +456,56 @@ class Story(object):
         self.id = story_id
         self.title = title
         self.description = description
-        self.notes = notes
+        self.notes = html_cleaner.clean(notes)
         self.story_contents = story_contents
         self.schema_version = schema_version
         self.language_code = language_code
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+
+    def validate(self):
+        """Validates various properties of the story object.
+
+        Raises:
+            ValidationError: One or more attributes of story are invalid.
+        """
+        if not isinstance(self.title, basestring):
+            raise utils.ValidationError(
+                'Expected title to be a string, received %s' % self.title)
+
+        if not isinstance(self.description, basestring):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
+
+        if not isinstance(self.notes, basestring):
+            raise utils.ValidationError(
+                'Expected notes to be a string, received %s' % self.notes)
+
+        if not isinstance(self.schema_version, int):
+            raise utils.ValidationError(
+                'Expected schema version to be an integer, received %s' %
+                self.schema_version)
+
+        if self.schema_version != feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION:
+            raise utils.ValidationError(
+                'Expected schema version to be %s, received %s' % (
+                    feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
+                    self.schema_version))
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+
+        if not any([self.language_code == lc['code']
+                    for lc in constants.ALL_LANGUAGE_CODES]):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+        self.story_contents.validate()
+
 
     def to_dict(self):
         """Returns a dict representing this Story domain object.
@@ -319,6 +566,188 @@ class Story(object):
                 current_version, current_version + 1))
         versioned_story_contents['story_contents'] = conversion_fn(
             versioned_story_contents['story_contents'])
+
+    def update_title(self, title):
+        """Updates the title of the story.
+
+        Args:
+            title: str. The new title of the story.
+        """
+        self.title = title
+
+    def update_description(self, description):
+        """Updates the description of the story.
+
+        Args:
+            description: str. The new description of the story.
+        """
+        self.description = description
+
+    def update_notes(self, notes):
+        """Updates the notes of the story.
+
+        Args:
+            notes: str. The new notes of the story.
+        """
+        self.notes = notes
+
+    def update_language_code(self, language_code):
+        """Updates the language code of the story.
+
+        Args:
+            language_code: str. The new language code of the story.
+        """
+        self.language_code = language_code
+
+    def add_node(self, node_id):
+        """Adds a new default node with the given node_id.
+
+        Args:
+            node_id: str. The id of the node.
+        """
+        self.story_contents.nodes.append(
+            StoryNode.create_default_story_node(node_id))
+
+    def _find_node(self, node_id):
+        """Returns the index of the story node with the given node
+        id, or None if the node id is not in the story contents dict.
+
+        Args:
+            node_id: str. The id of the node.
+
+        Returns:
+            int or None. The index of the corresponding node, or None if there
+            is no such node.
+        """
+        for ind, node in enumerate(self.story_contents.nodes):
+            if node.id == node_id:
+                return ind
+        return None
+
+    def _check_exploration_id_already_present(self, exploration_id):
+        """Returns whether a node with the given exploration id is already
+        present in story_contents.
+
+        Args:
+            exploration_id: str. The id of the exploration.
+
+        Returns:
+            bool. Whether a node with the given exploration ID is already
+                present.
+        """
+        for node in self.story_contents.nodes:
+            if node.exploration_id == exploration_id:
+                return True
+        return False
+
+    def delete_node(self, node_id):
+        """Deletes a node with the given node_id.
+
+        Args:
+            node_id: str. The id of the node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        del self.story_contents.nodes[node_index]
+
+    def update_node_outline(self, node_id, new_outline):
+        """Updates the outline field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_outline: str. The new outline of the given node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].outline = new_outline
+
+    def update_node_acquired_skill_ids(self, node_id, new_acquired_skill_ids):
+        """Updates the acquired skill ids field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_acquired_skill_ids: list(str). The updated acquired skill id
+                list.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].acquired_skill_ids = (
+            new_acquired_skill_ids)
+
+    def update_node_prerequisite_skill_ids(
+            self, node_id, new_prerequisite_skill_ids):
+        """Updates the prerequisite skill ids field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_prerequisite_skill_ids: list(str). The updated prerequisite
+                skill id list.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].prerequisite_skill_ids = (
+            new_prerequisite_skill_ids)
+
+    def update_node_destination_node_ids(
+            self, node_id, new_destination_node_ids):
+        """Updates the destination_node_ids field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_destination_node_ids: list(str). The updated destination
+                node id list.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].destination_node_ids = (
+            new_destination_node_ids)
+
+    def update_node_exploration_id(
+            self, node_id, new_exploration_id):
+        """Updates the exploration id field of a given node.
+
+        Args:
+            node_id: str. The id of the node.
+            new_exploration_id: str. The updated exploration id for a node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self._find_node(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story.' % node_id)
+        if self._check_exploration_id_already_present(new_exploration_id):
+            raise ValueError(
+                'A node with exploration id %s already exists.' %
+                new_exploration_id)
+        self.story_contents.nodes[node_index].exploration_id = (
+            new_exploration_id)
 
 
 class StorySummary(object):

@@ -26,14 +26,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     """Test the story services module."""
 
     STORY_ID = None
-    NODE_ID = 'node_id_1'
+    NODE_ID_1 = 'node_id_1'
+    NODE_ID_2 = 'node_id_2'
     USER_ID = 'user'
     story = None
 
     def setUp(self):
         super(StoryServicesUnitTests, self).setUp()
         story_node = story_domain.StoryNode.create_default_story_node(
-            self.NODE_ID)
+            self.NODE_ID_1)
         story_contents = story_domain.StoryContents([story_node])
         self.STORY_ID = story_services.get_new_story_id()
         self.story = self.save_new_story(
@@ -88,3 +89,72 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.id, self.STORY_ID)
         self.assertEqual(story_summary.title, 'Title')
         self.assertEqual(story_summary.node_count, 1)
+
+    def test_update_story_properties(self):
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': story_domain.STORY_PROPERTY_TITLE,
+                'old_value': 'Title',
+                'new_value': 'New Title'
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_PROPERTY,
+                'property_name': story_domain.STORY_PROPERTY_DESCRIPTION,
+                'old_value': 'Description',
+                'new_value': 'New Description'
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, changelist,
+            'Updated Title and Description.')
+        story = story_services.get_story_by_id(self.STORY_ID)
+        self.assertEqual(story.title, 'New Title')
+        self.assertEqual(story.description, 'New Description')
+        self.assertEqual(story.version, 2)
+
+        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        self.assertEqual(story_summary.title, 'New Title')
+        self.assertEqual(story_summary.node_count, 1)
+
+    def test_update_story_node_properties(self):
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_ADD_STORY_NODE,
+                'node_id': self.NODE_ID_2
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': story_domain.STORY_NODE_PROPERTY_OUTLINE,
+                'node_id': self.NODE_ID_2,
+                'old_value': '',
+                'new_value': 'Outline 2.'
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
+        story = story_services.get_story_by_id(self.STORY_ID)
+        self.assertEqual(story.story_contents.nodes[1].outline, 'Outline 2.')
+        self.assertEqual(story.version, 2)
+
+        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        self.assertEqual(story_summary.node_count, 2)
+
+        changelist = [
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_DELETE_STORY_NODE,
+                'node_id': self.NODE_ID_2
+            })
+        ]
+        story_services.update_story(
+            self.USER_ID, self.STORY_ID, changelist,
+            'Removed a story node.')
+        story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
+        self.assertEqual(story_summary.node_count, 1)
+
+    def test_delete_story(self):
+        story_services.delete_story(self.USER_ID, self.STORY_ID)
+        self.assertEqual(story_services.get_story_by_id(
+            self.STORY_ID, False), None)
+        self.assertEqual(
+            story_services.get_story_summary_by_id(self.STORY_ID, False), None)
