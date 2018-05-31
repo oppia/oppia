@@ -22,7 +22,7 @@ describe('HistoryTab controller', function() {
   describe('HistoryTab', function() {
     var $scope, historyTabCtrl;
 
-    beforeEach(inject(function($rootScope, $controller) {
+    beforeEach(inject(function($controller, $rootScope) {
       $scope = $rootScope.$new();
       historyTabCtrl = $controller('HistoryTab', {$scope: $scope});
     }));

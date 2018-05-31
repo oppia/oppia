@@ -16,15 +16,17 @@
  * @fileoverview Object factory for creating audio files.
  */
 
-oppia.factory('AudioFileObjectFactory', function() {
-  var AudioFile = function(filename, data) {
-    this.filename = filename;
-    this.data = data;
-  };
+oppia.factory('AudioFileObjectFactory', [
+  function() {
+    var AudioFile = function(filename, data) {
+      this.filename = filename;
+      this.data = data;
+    };
 
-  AudioFile.createNew = function(filename, data) {
-    return new AudioFile(filename, data);
-  };
+    AudioFile.createNew = function(filename, data) {
+      return new AudioFile(filename, data);
+    };
 
-  return AudioFile;
-});
+    return AudioFile;
+  }]
+);

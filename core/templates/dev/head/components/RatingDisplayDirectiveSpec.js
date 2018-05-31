@@ -21,7 +21,7 @@ describe('Rating display directive', function() {
 
   beforeEach(module('directiveTemplates'));
   beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
-  beforeEach(inject(function($rootScope, $compile, $templateCache) {
+  beforeEach(inject(function($compile, $rootScope, $templateCache) {
     var templateHtml = $templateCache.get(
       '/core/templates/dev/head/components/rating_display_directive.html');
     $compile(templateHtml)($rootScope);

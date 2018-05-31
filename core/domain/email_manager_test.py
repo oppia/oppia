@@ -1144,7 +1144,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             'You can change your email preferences via the Preferences page.')
 
         feedback_messages = {
-            self.exploration.id : {
+            self.exploration.id: {
                 'title': self.exploration.title,
                 'messages': ['Message 1.1', 'Message 1.2', 'Message 1.3']}
         }

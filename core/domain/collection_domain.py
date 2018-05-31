@@ -748,7 +748,7 @@ class Collection(object):
            returns None.
 
         Args:
-            completed_exploration_ids: list(str). List of completed exploration
+            completed_exp_ids: list(str). List of completed exploration
                 ids.
 
         Returns:
@@ -775,9 +775,9 @@ class Collection(object):
         """
         exploration_just_unlocked = None
 
-        for index in range(0, len(self.nodes)-1):
+        for index in range(0, len(self.nodes) - 1):
             if self.nodes[index].exploration_id == current_exploration_id:
-                exploration_just_unlocked = self.nodes[index+1].exploration_id
+                exploration_just_unlocked = self.nodes[index + 1].exploration_id
                 break
 
         return exploration_just_unlocked
@@ -789,7 +789,7 @@ class Collection(object):
         Args:
             collection_id: str. The id of the collection.
 
-        Returs:
+        Returns:
             bool. True if the collection is a demo else False.
         """
         return collection_id in feconf.DEMO_COLLECTIONS

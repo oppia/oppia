@@ -24,7 +24,7 @@ describe('Solution Validity Service', function() {
 
     var scope, svs;
 
-    beforeEach(inject(function($rootScope, $injector) {
+    beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       svs = $injector.get('SolutionValidityService');
 

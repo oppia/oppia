@@ -38,6 +38,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
     test hard rules, ReaderClassifyTests is only checking that the string
     classifier is actually called.
     """
+
     def setUp(self):
         super(ClassifierServicesTests, self).setUp()
         self._init_classify_inputs('16')
@@ -78,12 +79,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         answer_groups = []
         for answer_group in state.interaction.answer_groups:
             answer_groups.append(answer_group.to_dict())
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'state_name': 'Home',
             'property_name': 'answer_groups',
             'new_value': answer_groups
-        }]
+        })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
@@ -97,11 +98,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         # Make a change to the exploration without changing the answer groups
         # to trigger mapping update.
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_exploration_property',
             'property_name': 'title',
             'new_value': 'New title'
-        }]
+        })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
@@ -114,15 +115,15 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(all_mappings.count(), 3)
 
         # Check that renaming a state does not create an extra job.
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Home',
             'new_state_name': 'Home2'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Home2',
             'new_state_name': 'Home3'
-        }]
+        })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
@@ -160,11 +161,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_names = ['Home']
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Old home',
             'new_state_name': 'Home'
-        }]
+        })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
         # Test that Exception is raised if this method is called with version
@@ -189,11 +190,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         # Create job and mapping for previous version.
         job_id = classifier_models.ClassifierTrainingJobModel.create(
             feconf.INTERACTION_CLASSIFIER_MAPPING['TextInput']['algorithm_id'],
-            'TextInput', self.exp_id, exploration.version-1,
+            'TextInput', self.exp_id, exploration.version - 1,
             next_scheduled_check_time, [], 'Old home',
             feconf.TRAINING_JOB_STATUS_COMPLETE, None, 1)
         classifier_models.TrainingJobExplorationMappingModel.create(
-            self.exp_id, exploration.version-1, 'Old home', job_id)
+            self.exp_id, exploration.version - 1, 'Old home', job_id)
         classifier_services.handle_non_retrainable_states(
             exploration, state_names, exp_versions_diff)
 
@@ -264,7 +265,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         classifier_services.delete_classifier_training_job(job_id)
         with self.assertRaisesRegexp(Exception, (
             'Entity for class ClassifierTrainingJobModel '
-            'with id %s not found' %(
+            'with id %s not found' % (
                 job_id))):
             classifier_services.get_classifier_training_job_by_id(job_id)
 

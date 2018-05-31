@@ -30,7 +30,7 @@ describe('retrieving threads service', function() {
   });
 
   var ThreadDataService, httpBackend;
-  beforeEach(inject(function(_ThreadDataService_, $httpBackend) {
+  beforeEach(inject(function($httpBackend, _ThreadDataService_) {
     ThreadDataService = _ThreadDataService_;
     httpBackend = $httpBackend;
   }));

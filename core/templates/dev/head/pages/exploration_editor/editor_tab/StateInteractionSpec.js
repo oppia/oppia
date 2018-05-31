@@ -46,12 +46,12 @@ describe('State Interaction controller', function() {
         autosaveChangeList: function() {}
       };
       module(function($provide) {
-        $provide.value('ExplorationDataService', mockExplorationData);
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function($rootScope, $controller, $injector) {
+    beforeEach(inject(function($controller, $injector, $rootScope) {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
       cls = $injector.get('ChangeListService');

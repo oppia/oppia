@@ -37,10 +37,10 @@
       <div ng-repeat="responsePair in activeCard.inputResponsePairs track by $index">
         <div ng-if="!$last || !isInteractionInline">
           <input-response-pair data="responsePair"
-                                profile-picture="profilePicture"
-                                oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
-                                input-response-pair-id="getInputResponsePairId($index)"
-                                is-last-pair="false">
+                               profile-picture="profilePicture"
+                               oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
+                               input-response-pair-id="getInputResponsePairId($index)"
+                               is-last-pair="false">
           </input-response-pair>
         </div>
       </div>
@@ -49,10 +49,10 @@
     <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
     <div class="conversation-skin-tutor-card-bottom-section" ng-if="isInteractionInline && activeCard.inputResponsePairs.length > 0">
       <input-response-pair data="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1]"
-                            profile-picture="profilePicture"
-                            oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
-                            input-response-pair-id="getInputResponsePairId(activeCard.inputResponsePairs.length - 1)"
-                            is-last-pair="true">
+                           profile-picture="profilePicture"
+                           oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
+                           input-response-pair-id="getInputResponsePairId(activeCard.inputResponsePairs.length - 1)"
+                           is-last-pair="true">
       </input-response-pair>
     </div>
 
@@ -80,7 +80,7 @@
     </div>
 
     <div ng-if="!isInteractionInline"
-        class="conversation-skin-inline-interaction" style="opacity: 0.8;">
+         class="conversation-skin-inline-interaction" style="opacity: 0.8;">
       <div style="padding: 6px 12px;">
         <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
         <i ng-if="canWindowShowTwoCards()" ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
@@ -159,6 +159,7 @@
     border-radius: 2px;
     padding-top: 20px;
     text-align: left;
+    margin-left: 87px;
   }
 
   .conversation-skin-tutor-card-middle-section .conversation-skin-learner-answer-content {

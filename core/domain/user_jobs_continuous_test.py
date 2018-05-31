@@ -293,9 +293,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 EXP_1_ID, None, editor_id, FEEDBACK_THREAD_SUBJECT,
                 'text')
-            thread_id = feedback_services.get_all_threads(
-                EXP_1_ID, False)[0].get_thread_id()
-            message = feedback_services.get_messages(EXP_1_ID, thread_id)[0]
+            thread_id = feedback_services.get_all_threads(EXP_1_ID, False)[0].id
+            message = feedback_services.get_messages(thread_id)[0]
 
             # User creates another exploration.
             self.save_new_valid_exploration(
@@ -349,11 +348,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0].get_thread_id()
+            thread_id = feedback_services.get_all_threads(EXP_ID, False)[0].id
 
-            message = feedback_services.get_messages(
-                EXP_ID, thread_id)[0]
+            message = feedback_services.get_messages(thread_id)[0]
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -413,10 +410,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0].get_thread_id()
-            message = feedback_services.get_messages(
-                EXP_ID, thread_id)[0]
+            thread_id = feedback_services.get_all_threads(EXP_ID, False)[0].id
+            message = feedback_services.get_messages(thread_id)[0]
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role_for_exploration(
@@ -595,7 +590,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
     USER_B_USERNAME = 'b'
 
     MIN_NUM_COMPLETIONS = 2
-    EXPONENT = 2.0/3
+    EXPONENT = 2.0 / 3
 
     def setUp(self):
         super(UserStatsAggregatorTest, self).setUp()
@@ -886,7 +881,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         expected_results = {
             'total_plays': 2,
             'num_ratings': 6,
-            'average_ratings': 22/6.0
+            'average_ratings': 22 / 6.0
         }
 
         user_stats_1 = (
@@ -925,7 +920,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
                 self.user_a_id))
         self.assertEquals(user_stats['total_plays'], 0)
         self.assertEquals(user_stats['num_ratings'], 5)
-        self.assertEquals(user_stats['average_ratings'], 18/5.0)
+        self.assertEquals(user_stats['average_ratings'], 18 / 5.0)
 
     def test_realtime_layer_batch_job_user_rate_same_exp_multiple_times(self):
         self._create_exploration(
@@ -971,7 +966,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # _mock_get_statistics() method above.
         self.assertEqual(user_stats_model.total_plays, 14)
         self.assertEqual(user_stats_model.num_ratings, 6)
-        self.assertEqual(user_stats_model.average_ratings, 20/6.0)
+        self.assertEqual(user_stats_model.average_ratings, 20 / 6.0)
 
         # Stop the batch job. Fire up a few events and check data from realtime
         # job.
@@ -988,4 +983,4 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # two.
         self.assertEquals(user_stats['total_plays'], 16)
         self.assertEquals(user_stats['num_ratings'], 10)
-        self.assertEquals(user_stats['average_ratings'], 32/10.0)
+        self.assertEquals(user_stats['average_ratings'], 32 / 10.0)

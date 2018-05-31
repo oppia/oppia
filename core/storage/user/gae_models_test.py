@@ -135,6 +135,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
 class UserQueryModelTests(test_utils.GenericTestBase):
     """Tests for UserQueryModel."""
+
     def test_instance_stores_correct_data(self):
         submitter_id = 'submitter'
         query_id = 'qid'

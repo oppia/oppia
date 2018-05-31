@@ -560,6 +560,7 @@ describe('Suggestions on Explorations', function() {
     users.login('user1@ExplorationSuggestions.com');
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
+    general.waitForSystem();
     editor.getSuggestionThreads().then(function(threads) {
       expect(threads.length).toEqual(1);
       expect(threads[0]).toMatch(suggestionDescription);

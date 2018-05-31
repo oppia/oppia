@@ -19,7 +19,6 @@ import logging
 
 from core import jobs
 from core.domain import exp_services
-from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import stats_services
 from core.platform import models
@@ -124,10 +123,12 @@ class RecentUpdatesMRJobManager(
         as those from the Oppia migration bot).
 
         Args:
-            activity_model_cls: The storage layer object for an activity, such
-                as exp_models.ExplorationModel.
-            activity_ids_list: A list of activity IDs (such as exploration IDS)
-                for which the latest commits will be retrieved.
+            activity_model_cls: ExplorationModel|CollectionModel. The
+                storage layer object for an activity, such as
+                exp_models.ExplorationModel.
+            activity_ids_list: list(str). A list of activity IDs
+                (such as exploration IDS) for which
+                the latest commits will be retrieved.
             activity_type: str. The type of activity being referenced, such
                 as 'exploration' or 'collection'.
             commit_type: str. This represents the activity update commit
@@ -265,15 +266,9 @@ class RecentUpdatesMRJobManager(
             yield (reducer_key, recent_activity_commit_dict)
 
         for feedback_thread_id in feedback_thread_ids_list:
-            exp_id = (
-                feedback_domain.FeedbackThread.get_exp_id_from_full_thread_id(
-                    feedback_thread_id))
-            thread_id = (
-                feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id( # pylint: disable=line-too-long
-                    feedback_thread_id))
             last_message = (
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
-                    exp_id, thread_id))
+                    feedback_thread_id))
 
             yield (
                 reducer_key, {
@@ -375,7 +370,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                 triggered and the total play count is incremented. If he/she
                 rates an exploration, an event of type `rate` is triggered and
                 average rating of the realtime model is refreshed.
-            *args:
+            *args: list(*).
                 If event_type is 'start', then this is a 1-element list with
                 following entry:
                 - str. The ID of the exploration currently being played.
@@ -408,7 +403,7 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
                     if old_rating is not None:
                         sum_of_ratings -= old_rating
                         num_ratings -= 1
-                    model.average_ratings = sum_of_ratings/(num_ratings * 1.0)
+                    model.average_ratings = sum_of_ratings / (num_ratings * 1.0)
                 else:
                     model.average_ratings = rating
                 model.num_ratings = num_ratings
@@ -449,13 +444,14 @@ class UserStatsAggregator(jobs.BaseContinuousComputationManager):
         Args:
             user_id: str. The ID of the user.
 
-        Returns a dict with the following keys:
-            'total_plays': int. Number of times the user's explorations were
-                played.
-            'num_ratings': int. Number of times the explorations have been
-                rated.
-            'average_ratings': float. Average of average ratings across all
-                explorations.
+        Returns:
+            dict. This has the following keys:
+                'total_plays': int. Number of times the user's explorations were
+                    played.
+                'num_ratings': int. Number of times the explorations have been
+                    rated.
+                'average_ratings': float. Average of average ratings across all
+                    explorations.
         """
         total_plays = 0
         num_ratings = 0
@@ -542,7 +538,7 @@ class UserStatsMRJobManager(
         if item.deleted:
             return
 
-        exponent = 2.0/3
+        exponent = 2.0 / 3
 
         # This is set to False only when the exploration impact score is not
         # valid to be calculated.
@@ -655,7 +651,7 @@ class UserStatsMRJobManager(
                     all explorations owned by the user.
         """
         values = [ast.literal_eval(v) for v in stringified_values]
-        exponent = 2.0/3
+        exponent = 2.0 / 3
 
         # Find the final score and round to a whole number.
         user_impact_score = int(round(sum(

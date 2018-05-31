@@ -1,0 +1,89 @@
+allowed_parent_list : 
+  p:
+    - blockquote
+    - div
+    - pre
+    - '[document]'
+  b:
+    - i
+    - li
+    - p
+    - pre
+  br:
+    - b
+    - i
+    - li
+    - p
+  div:
+    - blockquote
+  i:
+    - b
+    - li
+    - p
+    - pre
+  li:
+    - ol
+    - ul
+  ol:
+    - blockquote
+    - li
+    - pre
+    - div
+    - '[document]'
+  ul:
+    - blockquote
+    - li
+    - pre
+    - div
+    - '[document]'
+  pre: 
+    - blockquote
+    - '[document]'
+  blockquote:
+    - blockquote
+    - '[document]'
+  oppia-noninteractive-link:
+    - b
+    - i 
+    - li
+    - p
+    - pre
+  oppia-noninteractive-math:
+    - b
+    - i 
+    - li
+    - p
+    - pre
+  oppia-noninteractive-image:
+    - li
+    - p
+    - pre
+  oppia-noninteractive-collapsible:
+    - li
+    - p
+    - pre
+  oppia-noninteractive-tabs:
+    - li
+    - p
+    - pre
+  oppia-noninteractive-video:
+    - li
+    - p
+    - pre
+allowed_tag_list:
+  - p
+  - b
+  - br
+  - div
+  - i
+  - li
+  - ol
+  - ul
+  - pre
+  - blockquote
+  - oppia-noninteractive-link
+  - oppia-noninteractive-math
+  - oppia-noninteractive-image
+  - oppia-noninteractive-collapsible
+  - oppia-noninteractive-tabs
+  - oppia-noninteractive-video

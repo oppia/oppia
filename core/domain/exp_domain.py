@@ -60,6 +60,8 @@ STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 GADGET_PROPERTY_VISIBILITY = 'gadget_visibility'
 GADGET_PROPERTY_CUST_ARGS = 'gadget_customization_args'
 
+# This takes additional 'title' and 'category' parameters.
+CMD_CREATE_NEW = 'create_new'
 # This takes an additional 'state_name' parameter.
 CMD_ADD_STATE = 'add_state'
 # This takes additional 'old_state_name' and 'new_state_name' parameters.
@@ -91,7 +93,7 @@ STATISTICAL_CLASSIFICATION = 'statistical_classifier'
 DEFAULT_OUTCOME_CLASSIFICATION = 'default_outcome'
 
 
-def _get_full_customization_args(customization_args, ca_specs):
+def get_full_customization_args(customization_args, ca_specs):
     """Populates the given customization_args dict with default values
     if any of the expected customization_args are missing.
 
@@ -120,7 +122,7 @@ def _get_full_customization_args(customization_args, ca_specs):
     return customization_args
 
 
-def _validate_customization_args_and_values(
+def validate_customization_args_and_values(
         item_name, item_type, customization_args,
         ca_specs_to_validate_against):
     """Validates the given `customization_args` dict against the specs set out
@@ -159,7 +161,7 @@ def _validate_customization_args_and_values(
     # Validate and clean up the customization args.
 
     # Populate missing keys with the default values.
-    customization_args = _get_full_customization_args(
+    customization_args = get_full_customization_args(
         customization_args, ca_specs_to_validate_against)
 
     # Remove extra keys.
@@ -223,6 +225,12 @@ class ExplorationChange(object):
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
 
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'state_name', 'old_state_name', 'new_state_name',
+        'property_name', 'new_value', 'old_value', 'name', 'from_version',
+        'to_version', 'title', 'category'
+    ]
+
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
 
@@ -274,8 +282,26 @@ class ExplorationChange(object):
         elif self.cmd == CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION:
             self.from_version = change_dict['from_version']
             self.to_version = change_dict['to_version']
+        elif self.cmd == CMD_CREATE_NEW:
+            self.title = change_dict['title']
+            self.category = change_dict['category']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the ExplorationChange domain object.
+
+        Returns:
+            A dict, mapping all fields of ExplorationChange instance.
+        """
+        exploration_change_dict = {}
+        exploration_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                exploration_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return exploration_change_dict
 
 
 class ExplorationCommitLogEntry(object):
@@ -398,7 +424,7 @@ class AudioTranslation(object):
         self.needs_update = needs_update
 
     def validate(self):
-        """Validates properties of the Content.
+        """Validates properties of the AudioTranslation.
 
         Raises:
             ValidationError: One or more attributes of the AudioTranslation are
@@ -416,8 +442,8 @@ class AudioTranslation(object):
         if extension not in feconf.ACCEPTED_AUDIO_EXTENSIONS:
             raise utils.ValidationError(
                 'Invalid audio filename: it should have one of '
-                'the following extensions: %s. Received: %s',
-                (feconf.ACCEPTED_AUDIO_EXTENSIONS.keys(), self.filename))
+                'the following extensions: %s. Received: %s'
+                % (feconf.ACCEPTED_AUDIO_EXTENSIONS.keys(), self.filename))
 
         if not isinstance(self.file_size_bytes, int):
             raise utils.ValidationError(
@@ -573,6 +599,10 @@ class SubtitledHtml(object):
 
         Raises:
             Exception: 'params' is not a dict.
+
+        Returns:
+            str. The HTML string that results after stripping
+                out unrecognized tags and attributes.
         """
         if not isinstance(params, dict):
             raise Exception(
@@ -707,6 +737,7 @@ class Outcome(object):
     consists of a destination state, feedback to show the user, and any
     parameter changes.
     """
+
     def to_dict(self):
         """Returns a dict representing this Outcome domain object.
 
@@ -783,14 +814,6 @@ class Outcome(object):
         Raises:
             ValidationError: One or more attributes of the Outcome are invalid.
         """
-        if not self.dest:
-            raise utils.ValidationError(
-                'Every outcome should have a destination.')
-        if not isinstance(self.dest, basestring):
-            raise utils.ValidationError(
-                'Expected outcome dest to be a string, received %s'
-                % self.dest)
-
         self.feedback.validate()
 
         if not isinstance(self.labelled_as_correct, bool):
@@ -819,6 +842,7 @@ class AnswerGroup(object):
     that involve soft matching of answers to a set of training data and/or
     example answers dictated by the creator.
     """
+
     def to_dict(self):
         """Returns a dict representing this AnswerGroup domain object.
 
@@ -873,6 +897,7 @@ class AnswerGroup(object):
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
+            interaction: InteractionInstance. The interaction object.
 
         Raises:
             ValidationError: One or more attributes of the AnswerGroup are
@@ -950,6 +975,7 @@ class Solution(object):
     to progress to the next card and explanation is an HTML string containing
     an explanation for the solution.
     """
+
     def __init__(
             self, interaction_id, answer_is_exclusive,
             correct_answer, explanation):
@@ -1036,7 +1062,7 @@ class InteractionInstance(object):
             'id': self.id,
             'customization_args': (
                 {} if self.id is None else
-                _get_full_customization_args(
+                get_full_customization_args(
                     self.customization_args,
                     interaction_registry.Registry.get_interaction_by_id(
                         self.id).customization_arg_specs)),
@@ -1164,7 +1190,7 @@ class InteractionInstance(object):
         except KeyError:
             raise utils.ValidationError('Invalid interaction id: %s' % self.id)
 
-        _validate_customization_args_and_values(
+        validate_customization_args_and_values(
             'interaction', self.id, self.customization_args,
             interaction.customization_arg_specs)
 
@@ -1249,8 +1275,8 @@ class State(object):
         """Initializes a State domain object.
 
         Args:
-            content: list(Content). The contents displayed to the reader in
-                this state. This list must have only one element.
+            content: SubtitledHtml. The contents displayed to the reader in this
+                state.
             param_changes: list(ParamChange). Parameter changes associated with
                 this state.
             interaction: InteractionInstance. The interaction instance
@@ -1282,7 +1308,7 @@ class State(object):
                 are ParamSpec value objects with an object type
                 property(obj_type). It is None if the state belongs to a
                 question.
-            allow_null_interaction. bool. Whether this state's interaction is
+            allow_null_interaction: bool. Whether this state's interaction is
                 allowed to be unspecified.
 
         Raises:
@@ -1336,10 +1362,10 @@ class State(object):
         return False
 
     def update_content(self, content_dict):
-        """Update the list of Content of this state.
+        """Update the content of this state.
 
         Args:
-            content_dict. dict. The dict representation of SubtitledHtml
+            content_dict: dict. The dict representation of SubtitledHtml
                 object.
         """
         # TODO(sll): Must sanitize all content in RTE component attrs.
@@ -1349,7 +1375,7 @@ class State(object):
         """Update the param_changes dict attribute.
 
         Args:
-            param_change_dicts. list(dict). List of param_change dicts that
+            param_change_dicts: list(dict). List of param_change dicts that
                 represent ParamChange domain object.
         """
         self.param_changes = [
@@ -1360,7 +1386,7 @@ class State(object):
         """Update the interaction id attribute.
 
         Args:
-            interaction_id. str. The new interaction id to set.
+            interaction_id: str. The new interaction id to set.
         """
         self.interaction.id = interaction_id
         # TODO(sll): This should also clear interaction.answer_groups (except
@@ -1372,7 +1398,7 @@ class State(object):
         """Update the customization_args of InteractionInstance domain object.
 
         Args:
-            customization_args. dict. The new customization_args to set.
+            customization_args: dict. The new customization_args to set.
         """
         self.interaction.customization_args = customization_args
 
@@ -1380,7 +1406,7 @@ class State(object):
         """Update the list of AnswerGroup in IteractioInstancen domain object.
 
         Args:
-            answer_groups_list. list(dict). List of dicts that represent
+            answer_groups_list: list(dict). List of dicts that represent
                 AnswerGroup domain object.
         """
         if not isinstance(answer_groups_list, list):
@@ -1439,7 +1465,7 @@ class State(object):
         """Update the default_outcome of InteractionInstance domain object.
 
         Args:
-            default_outcome_dict. dict. Dict that represents Outcome domain
+            default_outcome_dict: dict. Dict that represents Outcome domain
                 object.
         """
         if default_outcome_dict:
@@ -1459,7 +1485,7 @@ class State(object):
         domain object.
 
         Args:
-            confirmed_unclassified_answers. list(AnswerGroup). The new list of
+            confirmed_unclassified_answers: list(AnswerGroup). The new list of
                 answers which have been confirmed to be associated with the
                 default outcome.
 
@@ -1477,11 +1503,11 @@ class State(object):
         """Update the list of hints.
 
         Args:
-            hint_list: list(dict). A list of dict; each dict represents a Hint
+            hints_list: list(dict). A list of dict; each dict represents a Hint
                 object.
 
         Raises:
-            Exception: 'hint_list' is not a list.
+            Exception: 'hints_list' is not a list.
         """
         if not isinstance(hints_list, list):
             raise Exception(
@@ -1607,19 +1633,20 @@ class ExplorationVersionsDiff(object):
         """Constructs an ExplorationVersionsDiff domain object.
 
         Args:
-            change_list: list(dict). A list of all of the commit cmds from the
-                old version of the exploration up to the next version.
+            change_list: list(ExplorationChange). A list of all of the commit
+                cmds from the old version of the exploration up to the next
+                version.
         """
 
         added_state_names = []
         deleted_state_names = []
         new_to_old_state_names = {}
 
-        for change_dict in change_list:
-            if change_dict['cmd'] == CMD_ADD_STATE:
-                added_state_names.append(change_dict['state_name'])
-            elif change_dict['cmd'] == CMD_DELETE_STATE:
-                state_name = change_dict['state_name']
+        for change in change_list:
+            if change.cmd == CMD_ADD_STATE:
+                added_state_names.append(change.state_name)
+            elif change.cmd == CMD_DELETE_STATE:
+                state_name = change.state_name
                 if state_name in added_state_names:
                     added_state_names.remove(state_name)
                 else:
@@ -1628,9 +1655,9 @@ class ExplorationVersionsDiff(object):
                         original_state_name = new_to_old_state_names.pop(
                             original_state_name)
                     deleted_state_names.append(original_state_name)
-            elif change_dict['cmd'] == CMD_RENAME_STATE:
-                old_state_name = change_dict['old_state_name']
-                new_state_name = change_dict['new_state_name']
+            elif change.cmd == CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
                 if old_state_name in added_state_names:
                     added_state_names.remove(old_state_name)
                     added_state_names.append(new_state_name)
@@ -1955,9 +1982,32 @@ class Exploration(object):
             raise utils.ValidationError('This exploration has no states.')
         for state_name in self.states:
             self._require_valid_state_name(state_name)
-            self.states[state_name].validate(
+            state = self.states[state_name]
+            state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict)
+            # The checks below perform validation on the Outcome domain object
+            # that is specific to answer groups in explorations, but not
+            # questions. This logic is here because the validation checks in
+            # the Outcome domain object are used by both explorations and
+            # questions.
+            for answer_group in state.interaction.answer_groups:
+                if not answer_group.outcome.dest:
+                    raise utils.ValidationError(
+                        'Every outcome should have a destination.')
+                if not isinstance(answer_group.outcome.dest, basestring):
+                    raise utils.ValidationError(
+                        'Expected outcome dest to be a string, received %s'
+                        % answer_group.outcome.dest)
+            if state.interaction.default_outcome is not None:
+                if not state.interaction.default_outcome.dest:
+                    raise utils.ValidationError(
+                        'Every outcome should have a destination.')
+                if not isinstance(
+                        state.interaction.default_outcome.dest, basestring):
+                    raise utils.ValidationError(
+                        'Expected outcome dest to be a string, received %s'
+                        % state.interaction.default_outcome.dest)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -2403,8 +2453,8 @@ class Exploration(object):
         """Renames the given state.
 
         Args:
-            old_state_names: str. The old name of state to rename.
-            new_state_names: str. The new state name.
+            old_state_name: str. The old name of state to rename.
+            new_state_name: str. The new state name.
 
         Raises:
             ValueError: The old state name does not exist or the new state name
@@ -2441,7 +2491,7 @@ class Exploration(object):
         """Deletes the given state.
 
         Args:
-            state_names: str. The state name to be deleted.
+            state_name: str. The state name to be deleted.
 
         Raises:
             ValueError: The state does not exist or is the initial state of the
@@ -3952,7 +4002,7 @@ class ExplorationSummary(object):
     def __init__(
             self, exploration_id, title, category, objective,
             language_code, tags, ratings, scaled_average_rating, status,
-            community_owned, owner_ids, editor_ids,
+            community_owned, owner_ids, editor_ids, translator_ids,
             viewer_ids, contributor_ids, contributors_summary, version,
             exploration_model_created_on,
             exploration_model_last_updated,
@@ -3978,6 +4028,8 @@ class ExplorationSummary(object):
                 this exploration.
             editor_ids: list(str). List of the users ids who have access to
                 edit this exploration.
+            translator_ids: list(str). List of the users ids who have access to
+                translate this exploration.
             viewer_ids: list(str). List of the users ids who have access to
                 view this exploration.
             contributor_ids: list(str). List of the users ids of the user who
@@ -4005,6 +4057,7 @@ class ExplorationSummary(object):
         self.community_owned = community_owned
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
+        self.translator_ids = translator_ids
         self.viewer_ids = viewer_ids
         self.contributor_ids = contributor_ids
         self.contributors_summary = contributors_summary
@@ -4078,8 +4131,8 @@ class StateIdMapping(object):
         Args:
             old_exploration: Exploration. Old version of the exploration.
             new_exploration: Exploration. New version of the exploration.
-            change_list: list(dict). List of changes between old and new
-                exploration.
+            change_list: list(ExplorationChange). List of changes between old
+                and new exploration.
 
         Returns:
             StateIdMapping. Domain object for state id mapping.
@@ -4095,32 +4148,13 @@ class StateIdMapping(object):
 
         # Analyse each command in change list one by one to create state id
         # mapping for new exploration.
-        for change_dict in change_list:
-            # During v1 -> v2 migration of states, all pseudo END states were
-            # replaced by an explicit END state through this migration.
-            # We account for that change in the state id mapping too.
-            if change_dict['cmd'] == 'migrate_states_schema_to_latest_version':
-                pseudo_end_state_name = 'END'
-                if int(change_dict['from_version']) < 2 <= int(
-                        change_dict['to_version']):
-                    # The explicit end state is created only if there is some
-                    # state that used to refer to an implicit 'END' state.
-                    # This is confirmed by checking that there is a state
-                    # called 'END' in the immediate version of the exploration
-                    # after migration and no state called 'END' is present
-                    # in previous version of exploration.
-                    if (pseudo_end_state_name in (
-                            new_exploration.states) and (
-                                pseudo_end_state_name not in (
-                                    self.state_names_to_ids))):
-                        new_state_names.append(pseudo_end_state_name)
-            elif change_dict['cmd'] == CMD_ADD_STATE:
-                new_state_names.append(change_dict['state_name'])
-                assert change_dict['state_name'] not in (
-                    state_ids_to_names.values())
+        for change in change_list:
+            if change.cmd == CMD_ADD_STATE:
+                new_state_names.append(change.state_name)
+                assert change.state_name not in state_ids_to_names.values()
 
-            elif change_dict['cmd'] == CMD_DELETE_STATE:
-                removed_state_name = change_dict['state_name']
+            elif change.cmd == CMD_DELETE_STATE:
+                removed_state_name = change.state_name
 
                 # Find state name in state id mapping. If it exists then
                 # remove it from mapping.
@@ -4139,9 +4173,9 @@ class StateIdMapping(object):
                     # remove it from new state names list.
                     new_state_names.remove(removed_state_name)
 
-            elif change_dict['cmd'] == CMD_RENAME_STATE:
-                old_state_name = change_dict['old_state_name']
-                new_state_name = change_dict['new_state_name']
+            elif change.cmd == CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
 
                 # Find whether old state name is present in state id mapping.
                 # If it is then replace the old state name to new state name.
@@ -4170,6 +4204,30 @@ class StateIdMapping(object):
         # with its corresponding old state to find whether significant
         # change has happened or not.
         for (state_id, state_name) in state_ids_to_names.iteritems():
+            if state_name == 'END' and state_name not in new_exploration.states:
+                # If previous version of exploration has END state but new
+                # version does not have END state then exception will be raised
+                # below when comparing old state and corresponding new state.
+                # The exception is raised because there is no commit in change
+                # list corresponding to removal or renaming of END state.
+
+                # This problem arises when following scenario occurrs:
+                # Consider an exploration with two versions a and b (a < b).
+                # Both of these versions have their states dict schema version
+                # set to less than 2.
+                # Now version 'a' has explicit references to END
+                # state and thus when its states dict schema version will be
+                # upgraded to latest version, an 'END' state will be added.
+                # These explicit END references are not present in version 'b',
+                # however, and so no END state will be added during states dict
+                # schema migration.
+
+                # Thus we have no command of END state's removal or renaming
+                # in change_list and there is no END state present in later
+                # version of exploration.
+                new_state_names_to_ids.pop(state_name)
+                continue
+
             new_state = new_exploration.states[state_name]
             old_state = old_exploration.states[old_state_ids_to_names[state_id]]
 
@@ -4179,11 +4237,23 @@ class StateIdMapping(object):
                 new_state_names_to_ids.pop(state_name)
                 new_state_names.append(state_name)
 
+        # This may happen in exactly opposite scenario as the one written in
+        # comment above. Previous version of exploration may not have any rule
+        # having END state as its destination and hence during states schema
+        # migration END state won't be added. But next version of exploration
+        # might have END references and, hence, END state might be added
+        # to exploration during states schema migration.
+        # So we check whether such siatuation exists or not. If it exists then
+        # we consider END as a new state to which id will be assigned.
+        if 'END' in new_exploration.states and (
+                'END' not in new_state_names_to_ids and (
+                    'END' not in new_state_names)):
+            new_state_names.append('END')
+
         # Assign new ids to each state in new state names list.
         largest_state_id_used = self.largest_state_id_used
         for state_name in sorted(new_state_names):
             largest_state_id_used += 1
-
             # Check that the state name being assigned is not present in
             # mapping.
             assert state_name not in new_state_names_to_ids.keys()
@@ -4192,6 +4262,23 @@ class StateIdMapping(object):
         state_id_map = StateIdMapping(
             new_exploration.id, new_exploration.version, new_state_names_to_ids,
             largest_state_id_used)
+
+        # Do one final check that all state names in new exploration are present
+        # in generated state names to id mapping.
+        if set(new_state_names_to_ids.keys()) != set(
+                new_exploration.states.keys()):
+            unknown_state_names = ((
+                set(new_exploration.states.keys()) -
+                set(new_state_names_to_ids.keys())) + (
+                    set(new_state_names_to_ids.keys()) -
+                    set(new_exploration.states.keys())))
+            raise Exception(
+                'State names to ids mapping does not contain '
+                'state names (%s) which are present in corresponding '
+                'exploration %s, version %d' % (
+                    unknown_state_names,
+                    new_exploration.id, new_exploration.version))
+
         state_id_map.validate()
         return state_id_map
 
@@ -4226,9 +4313,15 @@ class StateIdMapping(object):
         if len(set(state_ids)) != len(state_ids):
             raise Exception('Assigned state ids should be unique.')
 
-        if not all(state_ids) <= self.largest_state_id_used:
+        if not all(x <= self.largest_state_id_used for x in state_ids):
             raise Exception(
                 'Assigned state ids should be smaller than last state id used.')
+
+        if not all(isinstance(x, int) for x in state_ids):
+            raise Exception(
+                'Assigned state ids should be integer values in '
+                'exploration %s, version %d' % (
+                    self.exploration_id, self.exploration_version))
 
     def get_state_id(self, state_name):
         """Get state id for given state name.

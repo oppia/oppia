@@ -23,7 +23,7 @@ import tempfile
 import unittest
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.7.1')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
 sys.path.insert(0, _PYLINT_PATH)
 
 # Since these module needs to be imported after adding Pylint path,
@@ -92,8 +92,8 @@ class HangingIndentCheckerTest(unittest.TestCase):
         filename = temp_file.name
         with open(filename, 'w') as tmp:
             tmp.write(
-                """self.post_json('/ml/trainedclassifierhandler', self.payload,
-                expect_errors=True, expected_status_int=401)
+                """self.post_json('/ml/trainedclassifierhandler',
+                self.payload, expect_errors=True, expected_status_int=401)
                 """)
         node1.file = filename
         node1.path = filename
@@ -125,3 +125,28 @@ class HangingIndentCheckerTest(unittest.TestCase):
 
         with checker_test_object.assertNoMessages():
             temp_file.close()
+
+
+class DocstringParameterCheckerTest(unittest.TestCase):
+
+    def test_finds_docstring_parameter(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            custom_lint_checks.DocstringParameterChecker)
+        checker_test_object.setup_method()
+        func_node = astroid.extract_node("""
+        def test(test_var_one, test_var_two): #@
+            \"\"\"Function to test docstring parameters.
+
+            Args:
+                test_var_one: int. First test variable.
+                test_var_two: str. Second test variable.
+
+            Returns:
+                int. The test result.
+            \"\"\"
+            result = test_var_one + test_var_two
+            return result
+        """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_functiondef(func_node)

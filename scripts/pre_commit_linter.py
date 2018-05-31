@@ -49,6 +49,7 @@ Note that the root folder MUST be named 'oppia'.
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
+import HTMLParser
 import argparse
 import fnmatch
 import multiprocessing
@@ -178,7 +179,7 @@ if not os.getcwd().endswith('oppia'):
     print 'ERROR    Please run this script from the oppia root directory.'
 
 _PARENT_DIR = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
-_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.7.1')
+_PYLINT_PATH = os.path.join(_PARENT_DIR, 'oppia_tools', 'pylint-1.8.4')
 if not os.path.exists(_PYLINT_PATH):
     print ''
     print 'ERROR    Please run start.sh first to install pylint '
@@ -202,6 +203,7 @@ _PATHS_TO_INSERT = [
         'google_appengine'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'webtest-1.4.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'browsermob-proxy-0.7.1'),
+    os.path.join(_PARENT_DIR, 'oppia_tools', 'pyjsparser-2.5.2'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'pycodestyle-2.3.1'),
     os.path.join(_PARENT_DIR, 'oppia_tools', 'selenium-2.53.2'),
     os.path.join('third_party', 'gae-pipeline-1.9.17.0'),
@@ -214,12 +216,15 @@ _PATHS_TO_INSERT = [
 for path in _PATHS_TO_INSERT:
     sys.path.insert(0, path)
 
+# pylint: disable=wrong-import-order
 # pylint: disable=wrong-import-position
 
 import isort  # isort:skip
 import pycodestyle  # isort:skip
+import pyjsparser  # isort:skip
 from pylint import lint  # isort:skip
 
+# pylint: enable=wrong-import-order
 # pylint: enable=wrong-import-position
 
 _MESSAGE_TYPE_SUCCESS = 'SUCCESS'
@@ -378,7 +383,7 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         current_batch_end_index = min(
             current_batch_start_index + _BATCH_SIZE, len(files_to_lint))
         current_files_to_lint = files_to_lint[
-            current_batch_start_index : current_batch_end_index]
+            current_batch_start_index: current_batch_end_index]
         print 'Linting Python files %s to %s...' % (
             current_batch_start_index + 1, current_batch_end_index)
 
@@ -407,7 +412,7 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
     print 'Python linting finished.'
 
 
-def _lint_html_files():
+def _lint_html_files(all_files):
     """This function is used to check HTML files for linting errors."""
     parent_dir = os.path.abspath(os.path.join(os.getcwd(), os.pardir))
 
@@ -420,28 +425,33 @@ def _lint_html_files():
     total_error_count = 0
     summary_messages = []
     htmllint_cmd_args = [node_path, htmllint_path, '--rc=.htmllintrc']
-    directories_to_lint = ['core', 'extensions', 'assets']
+    html_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.html')]
     print 'Starting HTML linter...'
     print '----------------------------------------'
     print ''
-    for directory in directories_to_lint:
-        proc_args = htmllint_cmd_args + ['--cwd=./' + directory]
-        print 'Linting HTML files in %s directory:' % directory
+    for filename in html_files_to_lint:
+        proc_args = htmllint_cmd_args + [filename]
+        print 'Linting %s file' % filename
         proc = subprocess.Popen(
             proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         linter_stdout, _ = proc.communicate()
-
-        if linter_stdout:
-            error_summary.append(
-                [s for s in linter_stdout.split() if s.isdigit()])
+        # This line splits the output of the linter and extracts digits from it.
+        # The digits are stored in a list. The second last digit
+        # in the list represents the number of errors in the file.
+        error_count = [int(s) for s in linter_stdout.split() if s.isdigit()][-2]
+        if error_count:
+            error_summary.append(error_count)
             print linter_stdout
 
     print '----------------------------------------'
-    for error in error_summary:
-        total_error_count += int(error[0])
-
+    for error_count in error_summary:
+        total_error_count += error_count
+    total_files_checked = len(html_files_to_lint)
     if total_error_count:
+        print '(%s files checked, %s errors found)' % (
+            total_files_checked, total_error_count)
         summary_message = '%s   HTML linting failed' % (
             _MESSAGE_TYPE_FAILED)
         summary_messages.append(summary_message)
@@ -625,7 +635,7 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     Args:
         filename: str. Name of the file.
         content: str. Contents of the file.
-        pattern: dict ( regexp(regex pattern) : pattern to match,
+        pattern: dict. (regexp(regex pattern) : pattern to match,
             message(str) : message to show if pattern matches,
             excluded_files(tuple(str)) : files to be excluded from matching,
             excluded_dirs(tuple(str)) : directories to be excluded from
@@ -947,22 +957,260 @@ def _check_html_directive_name(all_files):
     return summary_messages
 
 
+def _check_directive_scope(all_files):
+    """This function checks that all directives have an explicit
+    scope: {} and it should not be scope: true.
+    """
+    print 'Starting directive scope check'
+    print '----------------------------------------'
+    summary_messages = []
+    # Select JS files which need to be checked.
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.js')]
+    failed = False
+    summary_messages = []
+    # Use Pyjsparser to parse a JS file as a Python dictionary.
+    parser = pyjsparser.PyJsParser()
+    for filename in files_to_check:
+        with open(filename) as f:
+            content = f.read()
+        # Parse the body of the content as nodes.
+        parsed_nodes = parser.parse(content)['body']
+        for parsed_node in parsed_nodes:
+            # Check the type of the node.
+            if parsed_node['type'] != 'ExpressionStatement':
+                continue
+            # Separate the expression part of the node.
+            expression = parsed_node['expression']
+            # Check whether the expression belongs to a directive.
+            expression_type_is_not_call = (
+                expression['type'] != 'CallExpression')
+            if expression_type_is_not_call:
+                continue
+            expression_callee_type_is_not_member = (
+                expression['callee']['type'] != 'MemberExpression')
+            if expression_callee_type_is_not_member:
+                continue
+            expression_callee_property_name_is_not_directive = (
+                expression['callee']['property']['name'] != 'directive')
+            if expression_callee_property_name_is_not_directive:
+                continue
+            # Separate the arguments of the expression.
+            arguments = expression['arguments']
+            # The first argument of the expression is the
+            # name of the directive.
+            if arguments[0]['type'] == 'Literal':
+                directive_name = str(arguments[0]['value'])
+            arguments = arguments[1:]
+            for argument in arguments:
+                # Check the type of an argument.
+                if argument['type'] != 'ArrayExpression':
+                    continue
+                # Separate out the elements for the argument.
+                elements = argument['elements']
+                for element in elements:
+                    # Check the type of an element.
+                    if element['type'] != 'FunctionExpression':
+                        continue
+                    # Separate out the body of the element.
+                    body = element['body']
+                    if body['type'] != 'BlockStatement':
+                        continue
+                    # Further separate the body elements from the body.
+                    body_elements = body['body']
+                    for body_element in body_elements:
+                        # Check if the body element is a return statement.
+                        body_element_type_is_not_return = (
+                            body_element['type'] != 'ReturnStatement')
+                        body_element_argument_type_is_not_object = (
+                            body_element['argument']['type'] != (
+                                'ObjectExpression'))
+                        if (body_element_type_is_not_return or (
+                                body_element_argument_type_is_not_object)):
+                            continue
+                        # Separate the properties of the return node.
+                        return_node_properties = (
+                            body_element['argument']['properties'])
+                        # Loop over all the properties of the return node
+                        # to find out the scope key.
+                        for return_node_property in return_node_properties:
+                            # Check whether the property is scope.
+                            property_key_is_an_identifier = (
+                                return_node_property['key']['type'] == (
+                                    'Identifier'))
+                            property_key_name_is_scope = (
+                                return_node_property['key']['name'] == (
+                                    'scope'))
+                            if (
+                                    property_key_is_an_identifier and (
+                                        property_key_name_is_scope)):
+                                # Separate the scope value and
+                                # check if it is an Object Expression.
+                                # If it is not, then check for scope: true
+                                # and report the error message.
+                                scope_value = return_node_property['value']
+                                if scope_value['type'] == 'Literal' and (
+                                        scope_value['value']):
+                                    failed = True
+                                    print (
+                                        'Please ensure that %s '
+                                        'directive in %s file '
+                                        'does not have scope set to '
+                                        'true.' % (directive_name, filename))
+                                elif scope_value['type'] != 'ObjectExpression':
+                                    # Check whether the directive has scope: {}
+                                    # else report the error message.
+                                    failed = True
+                                    print (
+                                        'Please ensure that %s directive '
+                                        'in %s file has a scope: {}.' % (
+                                            directive_name, filename))
+
+    if failed:
+        summary_message = '%s   Directive scope check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s  Directive scope check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
+
+class CustomHTMLParser(HTMLParser.HTMLParser):
+    """Custom HTML parser to check indentation."""
+
+    def __init__(self, filename, file_lines, failed=False):
+        HTMLParser.HTMLParser.__init__(self)
+        self.failed = failed
+        self.filename = filename
+        self.previous_tag_line_number = None
+        self.file_lines = file_lines
+
+    def handle_starttag(self, tag, attrs):
+        line_number, column_number = self.getpos()
+        # Check the indentation of the tag.
+        tag_line = self.file_lines[line_number - 1].lstrip()
+        opening_tag = '<' + tag
+        if tag_line.startswith(opening_tag):
+            if self.previous_tag_line_number is None:
+                if column_number % 2 != 0:
+                    print (
+                        '%s --> Indentation level for %s '
+                        'tag on line %s should be a '
+                        'multiple of 2 ' % (
+                            self.filename, tag, line_number))
+                    self.failed = True
+            else:
+                if column_number % 2 != 0 and (
+                        line_number != self.previous_tag_line_number):
+                    print (
+                        '%s --> Indentation level for %s '
+                        'tag on line %s should be a '
+                        'multiple of 2 ' % (
+                            self.filename, tag, line_number))
+                    self.failed = True
+            self.previous_tag_line_number = line_number
+
+        # Check the indentation of the attributes of the tag.
+        indentation_of_first_attribute = (
+            column_number + len(tag) + 2)
+        starttag_text = self.get_starttag_text()
+
+        for line_num, line in enumerate(
+                str.splitlines(starttag_text)):
+            if line_num == 0:
+                continue
+
+            leading_spaces_count = len(line) - len(line.lstrip())
+            list_of_attrs = []
+
+            for attr, _ in attrs:
+                list_of_attrs.append(attr)
+
+            if not line.lstrip().startswith(tuple(list_of_attrs)):
+                continue
+            if (
+                    indentation_of_first_attribute != (
+                        leading_spaces_count)):
+                line_num_of_error = line_number + line_num
+                print (
+                    '%s --> Attribute for tag %s on line '
+                    '%s should align with the leftmost '
+                    'attribute on line %s ' % (
+                        self.filename, tag,
+                        line_num_of_error, line_number))
+                self.failed = True
+
+
+def _check_html_indent(all_files):
+    """This function checks the indentation of lines in HTML files."""
+
+    print 'Starting HTML indentation check'
+    print '----------------------------------------'
+
+    html_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.html')]
+
+    failed = False
+    summary_messages = []
+
+    for filename in html_files_to_lint:
+        with open(filename, 'r') as f:
+            file_content = f.read()
+            file_lines = file_content.split('\n')
+            parser = CustomHTMLParser(filename, file_lines)
+            parser.feed(file_content)
+
+            if parser.failed:
+                failed = True
+
+    if failed:
+        summary_message = '%s   HTML indentation check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s  HTML indentation check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
+    # TODO(apb7): Enable the _check_directive_scope function.
+    directive_scope_messages = []
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
-    html_linter_messages = _lint_html_files()
+    html_indent_messages = _check_html_indent(all_files)
+    html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
-        html_directive_name_messages +
+        directive_scope_messages + html_directive_name_messages +
         import_order_messages + newline_messages +
         docstring_messages + comment_messages +
-        html_linter_messages + linter_messages +
-        pattern_messages)
+        html_indent_messages + html_linter_messages +
+        linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
