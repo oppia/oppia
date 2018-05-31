@@ -535,7 +535,6 @@ def assign_role(committer, assignee, new_role, topic_id):
     """
     committer_id = committer.user_id
     topic_rights = get_topic_rights(topic_id)
-
     if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
         logging.error(

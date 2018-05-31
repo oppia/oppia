@@ -39,6 +39,8 @@ from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import subscriptions
+from core.controllers import topic_editor
+from core.controllers import topics_and_skills_dashboard
 from core.domain import acl_decorators
 from core.domain import user_services
 from core.platform import models
@@ -205,6 +207,13 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_EXPLORATION_URL, creator_dashboard.NewExploration),
     get_redirect_route(
         r'%s' % feconf.NEW_COLLECTION_URL, creator_dashboard.NewCollection),
+    get_redirect_route(
+        r'%s' % feconf.NEW_SKILL_URL,
+        topics_and_skills_dashboard.NewSkill),
+    get_redirect_route(
+        r'%s' % feconf.NEW_STORY_URL, topic_editor.NewStory),
+    get_redirect_route(
+        r'%s' % feconf.NEW_TOPIC_URL, topics_and_skills_dashboard.NewTopic),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExploration),
@@ -469,6 +478,16 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_DATA_URL,
         question.QuestionsHandler),
+
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,
+        topic_editor.TopicEditorPage),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.EDITABLE_TOPIC_DATA_URL_PREFIX,
+        topic_editor.EditableTopicDataHandler),
+    get_redirect_route(
+        r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_PREFIX,
+        topic_editor.TopicManagerHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(

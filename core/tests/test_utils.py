@@ -143,6 +143,8 @@ class TestBase(unittest.TestCase):
     OWNER_USERNAME = 'owner'
     EDITOR_EMAIL = 'editor@example.com'
     EDITOR_USERNAME = 'editor'
+    TOPIC_MANAGER_EMAIL = 'topicmanager@example.com'
+    TOPIC_MANAGER_USERNAME = 'topicmanager'
     TRANSLATOR_EMAIL = 'translator@example.com'
     TRANSLATOR_USERNAME = 'translator'
     VIEWER_EMAIL = 'viewer@example.com'
@@ -571,6 +573,15 @@ tags: []
         """
         for name in admin_usernames:
             self.set_user_role(name, feconf.ROLE_ID_ADMIN)
+
+    def set_topic_managers(self, topic_manager_usernames):
+        """Sets role of given users as TOPIC_MANAGER.
+
+        Args:
+            topic_manager_usernames: list(str). List of usernames.
+        """
+        for name in topic_manager_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
 
     def set_moderators(self, moderator_usernames):
         """Sets role of given users as MODERATOR.

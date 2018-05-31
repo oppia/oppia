@@ -525,20 +525,21 @@ class Story(object):
         }
 
     @classmethod
-    def create_default_story(cls, story_id):
+    def create_default_story(cls, story_id, title=feconf.DEFAULT_STORY_TITLE):
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
 
         Args:
             story_id: str. The unique id of the story.
+            title: str. The title for the newly created story.
 
         Returns:
             Story. The Story domain object with the default values.
         """
         story_contents = StoryContents([])
         return cls(
-            story_id, feconf.DEFAULT_STORY_TITLE,
+            story_id, title,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)

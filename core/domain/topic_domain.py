@@ -208,19 +208,20 @@ class Topic(object):
                 % self.skill_ids)
 
     @classmethod
-    def create_default_topic(cls, topic_id):
+    def create_default_topic(cls, topic_id, name=feconf.DEFAULT_TOPIC_NAME):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
 
         Args:
             topic_id: str. The unique id of the topic.
+            name: str. The initial name for the topic.
 
         Returns:
             Topic. The Topic domain object with the default values.
         """
         return cls(
-            topic_id, feconf.DEFAULT_TOPIC_NAME,
+            topic_id, name,
             feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [],
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
