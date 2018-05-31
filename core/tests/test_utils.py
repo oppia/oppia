@@ -501,6 +501,8 @@ tags: []
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
         # the status.
+        # Reference URL:
+        # https://docs.pylonsproject.org/projects/webtest/en/latest/api.html
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
