@@ -35,17 +35,21 @@ fdescribe('Number with Units rules service', function() {
   };
 
   var REAL_RULE_INPUT = {
-    type: 'real',
-    real: 2,
-    fraction: '',
-    units: 'kg / m^2'
+    f: {
+      type: 'real',
+      real: 2,
+      fraction: '',
+      units: 'kg / m^2'
+    }
   };
 
   var FRACTION_RULE_INPUT = {
-    type: 'fraction',
-    real: 0,
-    fraction: '2 / 3',
-    units: 'kg / m^2'
+    f: {
+      type: 'fraction',
+      real: 0,
+      fraction: '2 / 3',
+      units: 'kg / m^2'
+    }
   };
 
   fit('should have a correct \'equal to\' rule', function() {

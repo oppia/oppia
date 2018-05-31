@@ -27,10 +27,11 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
         'number_with_units_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'NumberWithUnitsObjectFactory',
-        'NUMBER_WITH_UNITS_PARSING_ERRORS', 'EVENT_PROGRESS_NAV_SUBMITTED',
-        function(
+        'numberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
+        'EVENT_PROGRESS_NAV_SUBMITTED', function(
             $scope, $attrs, NumberWithUnitsObjectFactory,
-            NUMBER_WITH_UNITS_PARSING_ERRORS, EVENT_PROGRESS_NAV_SUBMITTED) {
+            numberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -150,13 +151,13 @@ oppia.factory('numberWithUnitsRulesService', [
     return {
       IsEqualTo: function(answer, inputs) {
         answer = NumberWithUnitsObjectFactory.fromDict(answer);
-        inputs = NumberWithUnitsObjectFactory.fromDict(inputs);
+        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
         return answer.type === inputs.type && isEqualValues(answer, inputs) &&
           angular.equals(answer.units.toDict(), inputs.units.toDict());
       },
       IsEquivalentTo: function(answer, inputs) {
         answer = NumberWithUnitsObjectFactory.fromDict(answer);
-        inputs = NumberWithUnitsObjectFactory.fromDict(inputs);
+        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
         if (answer.type === 'fraction') {
           answer.type = 'real';
           answer.real = answer.fraction.toFloat();
