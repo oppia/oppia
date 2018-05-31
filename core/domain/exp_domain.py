@@ -1260,7 +1260,8 @@ class State(object):
                 associated with this state.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
-            content_ids_to_audio_translations:
+            content_ids_to_audio_translations: dict. A dict representing audio
+                translations for corresponding content_id.
         """
         # The content displayed to the reader in this state.
         self.content = content
@@ -1313,22 +1314,21 @@ class State(object):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to be a dict,'
                 'received %s' % self.param_changes)
-        for (content_id, audio_translations) in enumerate(
-                self.content_ids_to_audio_translations):
-
+        for (content_id, audio_translations) in (
+                self.content_ids_to_audio_translations.iteritems()):
             if not isinstance(content_id, basestring):
                 raise utils.ValidationError(
-                    'Expected content id to be a string, received: %s' %
+                    'Expected content_id to be a string, received: %s' %
                     content_id)
             if not isinstance(audio_translations, dict):
                 raise utils.ValidationError(
                     'Expected audio_translations to be a dict, received %s'
-                    % self.audio_translations)
+                    % audio_translations)
 
             allowed_audio_language_codes = [
                 language['id'] for language in (
                     constants.SUPPORTED_AUDIO_LANGUAGES)]
-            for language_code, translation in enumerate(audio_translations):
+            for language_code, translation in audio_translations.iteritems():
                 if not isinstance(language_code, basestring):
                     raise utils.ValidationError(
                         'Expected language code to be a string, received: %s' %
@@ -1553,8 +1553,8 @@ class State(object):
         """Update the content_ids_to_audio_translations of a state.
 
         Args:
-            content_ids_to_audio_translations: dict. The dict representation of
-                content_ids_to_audio_translations
+            content_ids_to_audio_translations_dict: dict. The dict
+                representation of content_ids_to_audio_translations.
         """
         self.content_ids_to_audio_translations = {
             content_id: {
@@ -1595,19 +1595,24 @@ class State(object):
         Returns:
             dict. A dict mapping all fields of State instance.
         """
+        content_ids_to_audio_translations_dict = {}
+        for content_id, audio_translations in (
+                self.content_ids_to_audio_translations.iteritems()):
+            audio_translations_dict = {}
+            for lang_code, audio_translation in audio_translations.iteritems():
+                audio_translations_dict[lang_code] = (
+                    AudioTranslation.to_dict(audio_translation))
+            content_ids_to_audio_translations_dict[content_id] = (
+                audio_translations_dict)
+
         return {
             'content': self.content.to_dict(),
             'param_changes': [param_change.to_dict()
                               for param_change in self.param_changes],
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
-            'content_ids_to_audio_translations': {
-                content_id: {
-                    lang_code: AudioTranslation.to_dict(audio)
-                    for lang_code, audio in audio_translations.iteritems()
-                } for content_id, audio_translations in (
-                    self.content_ids_to_audio_translations.iteritems())
-            }
+            'content_ids_to_audio_translations': (
+                content_ids_to_audio_translations_dict)
         }
 
     @classmethod
@@ -1620,20 +1625,23 @@ class State(object):
         Returns:
             State. The corresponding State domain object.
         """
+        content_ids_to_audio_translations = {}
+        for content_id, audio_translations_dict in (
+                state_dict['content_ids_to_audio_translations'].iteritems()):
+            audio_translations = {}
+            for lang_code, audio_translation in (
+                    audio_translations_dict.iteritems()):
+                audio_translations[lang_code] = (
+                    AudioTranslation.from_dict(audio_translation))
+            content_ids_to_audio_translations[content_id] = (
+                audio_translations)
         return cls(
             SubtitledHtml.from_dict(state_dict['content']),
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
-            state_dict['classifier_model_id'], {
-                content_id: {
-                    language_code: AudioTranslation.from_dict(
-                        audio_translation_dict)
-                    for language_code, audio_translation_dict in
-                    audio_translations.iteritems()
-                } for content_id, audio_translations in (
-                    state_dict['content_ids_to_audio_translations'].iteritems())
-            })
+            content_ids_to_audio_translations,
+            state_dict['classifier_model_id'])
 
     @classmethod
     def create_default_state(
