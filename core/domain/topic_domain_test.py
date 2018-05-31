@@ -80,7 +80,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_canonical_story_ids_validation(self):
         self.topic.canonical_story_ids = ['story_id', 'story_id', 'story_id_1']
         self._assert_validation_error(
-            'Expected all canonical stories to be distinct.')
+            'Expected all canonical story ids to be distinct.')
         self.topic.canonical_story_ids = 'story_id'
         self._assert_validation_error(
             'Expected canonical story ids to be a list')
@@ -88,7 +88,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_additional_story_ids_validation(self):
         self.topic.additional_story_ids = ['story_id', 'story_id', 'story_id_1']
         self._assert_validation_error(
-            'Expected all additional stories to be distinct.')
+            'Expected all additional story ids to be distinct.')
         self.topic.additional_story_ids = 'story_id'
         self._assert_validation_error(
             'Expected additional story ids to be a list')
