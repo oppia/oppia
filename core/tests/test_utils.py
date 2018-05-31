@@ -416,6 +416,10 @@ tags: []
             url, params, expect_errors=expect_errors,
             status=expected_status_int)
 
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
@@ -430,6 +434,11 @@ tags: []
         json_response = self._send_post_request(
             self.testapp, url, data, expect_errors, expected_status_int,
             upload_files)
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        self.assertEqual(json_response.status_int, expected_status_int)
 
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
@@ -440,7 +449,6 @@ tags: []
         json_response = app.post(
             str(url), data, expect_errors=expect_errors,
             upload_files=upload_files, headers=headers)
-        self.assertEqual(json_response.status_int, expected_status_int)
         return json_response
 
     def post_email(
@@ -488,6 +496,10 @@ tags: []
         json_response = self.testapp.put(
             str(url), data, expect_errors=expect_errors)
 
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
