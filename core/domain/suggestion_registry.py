@@ -105,6 +105,8 @@ class BaseSuggestion(object):
             ValidationError: One or more attributes of the BaseSuggestion object
                 are invalid.
         """
+        old_status = self.status
+        self.status = suggestion_models.STATUS_INVALID
         if (
                 self.suggestion_type not in
                 suggestion_models.SUGGESTION_TYPE_CHOICES):
@@ -138,14 +140,16 @@ class BaseSuggestion(object):
                     self.author_id))
 
         if not isinstance(self.assigned_reviewer_id, basestring):
-            raise utils.ValidationError(
-                'Expected assigned_reviewer_id to be a string,'
-                ' received %s' % type(self.assigned_reviewer_id))
+            if self.assigned_reviewer_id:
+                raise utils.ValidationError(
+                    'Expected assigned_reviewer_id to be a string,'
+                    ' received %s' % type(self.assigned_reviewer_id))
 
         if not isinstance(self.final_reviewer_id, basestring):
-            raise utils.ValidationError(
-                'Expected final_reviewer_id to be a string, received %s' % type(
-                    self.final_reviewer_id))
+            if self.final_reviewer_id:
+                raise utils.ValidationError(
+                    'Expected final_reviewer_id to be a string, received %s' % type(
+                        self.final_reviewer_id))
 
         if not isinstance(self.change_cmd, dict):
             raise utils.ValidationError(
@@ -181,11 +185,23 @@ class BaseSuggestion(object):
                 'Expected the first part of score_category to be among allowed'
                 ' choices, received %s' % self.get_score_type())
 
+        # Suggestion is valid, so we revert to the old status
+        self.status = old_status
+
     def accept(self):
         """Accepts the suggestion. Each subclass must implement this function.
         """
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement accept.')
+
+    def update_change_cmd_before_accept(self):
+        """Before accepting the suggestion, some parts of the change_cmd might
+        need to be updated. Each subclass must implement this function as
+        applicable.
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'update_change_cmd_before_accept.')
 
 
 class SuggestionEditStateContent(BaseSuggestion):
@@ -223,6 +239,8 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         super(SuggestionEditStateContent, self).validate()
 
+        old_status = self.status
+        self.status = suggestion_models.STATUS_INVALID
         if self.get_score_type() != suggestion_models.SCORE_TYPE_CONTENT:
             raise utils.ValidationError(
                 'Expected the first part of score_category to be %s '
@@ -266,12 +284,28 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected %s to be a valid state name' %
                 self.change_cmd['state_name'])
 
+        # Suggestion is valid, so we revert to the old status
+        self.status = old_status
+
+    def update_change_cmd_before_accept(self):
+        """Before accepting the suggestion, modifications need to be done to the
+        change_cmd.
+        """
+        exploration = exp_services.get_exploration_by_id(self.target_id)
+        old_content = exploration.states[self.change_cmd['state_name']].content
+
+        self.change_cmd['old_content'] = old_content
+
+        self.change_cmd['new_content']['audio_translations'] = (
+            old_content['audio_translations'])
+
     def accept(self, commit_message):
         """Accepts the suggestion.
 
         Args:
             commit_message: str. The commit message.
         """
+        self.update_change_cmd_before_accept()
         change_list = [self.change_cmd]
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_type, change_list,
