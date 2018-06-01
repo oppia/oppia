@@ -19,15 +19,15 @@
 oppia.controller('StateHints', [
   '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
   'AlertsService', 'INTERACTION_SPECS', 'stateHintsService',
-  'ExplorationStatesService', 'stateInteractionIdService',
-  'UrlInterpolationService', 'HintObjectFactory', 'ExplorationPlayerService',
-  'stateSolutionService',
+  'ExplorationStatesService', 'stateContentIdsToAudioTranslationsService',
+  'stateInteractionIdService', 'UrlInterpolationService', 'HintObjectFactory',
+  'ExplorationPlayerService', 'stateSolutionService',
   function(
       $scope, $rootScope, $uibModal, $filter, EditorStateService,
       AlertsService, INTERACTION_SPECS, stateHintsService,
-      ExplorationStatesService, stateInteractionIdService,
-      UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
-      stateSolutionService) {
+      ExplorationStatesService, stateContentIdsToAudioTranslationsService,
+      stateInteractionIdService, UrlInterpolationService, HintObjectFactory,
+      ExplorationPlayerService, stateSolutionService) {
     $scope.EditorStateService = EditorStateService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;

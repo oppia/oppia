@@ -55,7 +55,8 @@ oppia.factory('OutcomeObjectFactory', [
       return this.feedback.getHtml().trim() !== '';
     };
 
-    Outcome.createNew = function(dest, feedbackText, paramChanges) {
+    Outcome.createNew = function(dest, feedbackText, feedbacktextId,
+         paramChanges) {
       return new Outcome(
         dest,
         SubtitledHtmlObjectFactory.createDefault(feedbackText),
@@ -65,6 +66,7 @@ oppia.factory('OutcomeObjectFactory', [
     };
 
     Outcome.createFromBackendDict = function(outcomeDict) {
+      console.log(outcomeDict.feedback);
       return new Outcome(
         outcomeDict.dest,
         SubtitledHtmlObjectFactory.createFromBackendDict(outcomeDict.feedback),

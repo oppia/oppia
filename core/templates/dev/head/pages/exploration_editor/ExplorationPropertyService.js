@@ -334,6 +334,19 @@ oppia.factory('ExplorationStatesService', [
       content: function(content) {
         return content.toBackendDict();
       },
+      content_ids_to_audio_translations: function(
+        contentIdsToAudioTranslations) {
+        var content_ids_to_audio_translations_dict = {};
+        Object.keys(contentIdsToAudioTranslations).forEach(function(key) {
+          var audioTanslations = contentIdsToAudioTranslations[key];
+          var audioTranslationsDict = {};
+          Object.keys(audioTanslations).forEach(function(lang){
+            audioTranslationsDict[lang] = audioTanslations[lang].toBackendDict();
+          })
+          content_ids_to_audio_translations_dict[key] = audioTranslationsDict;
+        })
+        return content_ids_to_audio_translations_dict;
+      },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {
           return defaultOutcome.toBackendDict();
@@ -369,6 +382,7 @@ oppia.factory('ExplorationStatesService', [
       confirmed_unclassified_answers: [
         'interaction', 'confirmedUnclassifiedAnswers'],
       content: ['content'],
+      contenIdsToAudioTranslations: ['content_ids_to_audio_translations'],
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],
@@ -550,6 +564,16 @@ oppia.factory('ExplorationStatesService', [
       },
       saveSolution: function(stateName, newSolution) {
         saveStateProperty(stateName, 'solution', newSolution);
+      },
+      getContentIdsToAudioTranslationsMemento: function(stateName) {
+        return getStatePropertyMemento(
+          stateName, 'content_ids_to_audio_translations');
+      },
+      saveContentIdsToAudioTranslations: function(
+        stateName, newContentIdsToAudioTranslations) {
+        saveStateProperty(
+          stateName, 'content_ids_to_audio_translations',
+          newContentIdsToAudioTranslations);
       },
       isInitialized: function() {
         return _states !== null;
