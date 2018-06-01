@@ -3196,28 +3196,11 @@ div#ng-curtain {
   }
 }
 
-.oppia-about-anchor {
+.oppia-privacy-terms {
   display: block;
   position: relative;
   top: -70px;
   visibility: hidden;
-}
-
-.oppia-about-right-menu {
-  left: 50%;
-  margin-left: 360px;
-  position: fixed;
-  top: 100px;
-  width: 300px;
-}
-
-.oppia-about-right-menu p {
-  line-height: 1;
-  margin: 0.5em 0;
-}
-.oppia-about-right-menu ul {
-  list-style-type: none;
-  padding-left: 20px;
 }
 
 /* Hide the 'Skip' icon on the editor tutorial. */
@@ -4671,10 +4654,6 @@ md-card.preview-conversation-skin-supplemental-card {
   display: none;
 }
 
-.oppia-teach-tab-content{
-  padding-bottom: 7%;
-}
-
 .oppia-about-visible-content {
   display: block;
   position: relative;
@@ -4757,11 +4736,6 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-about-button:focus {
   background-color: rgba(5,190,178,1);
   color: rgba(255,255,255,1);
-}
-
-.oppia-teach-button{
-  display: block;
-  margin: 0px auto 0 auto;
 }
 
 .oppia-about-buttons-container {
