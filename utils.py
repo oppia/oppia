@@ -768,22 +768,15 @@ def convert_to_text_angular(html_data):
     # To remove all tags except those in allowed tag list.
     all_tags = soup.findAll()
     for tag in all_tags:
-        if tag.name not in allowed_tag_list:
+        if tag.name == 'td' and tag.next_sibling:
+            tag.string = tag.string + " "
+        if tag.name == 'div' or tag.name == 'tr':
+            tag.name = 'p'
+        elif tag.name not in allowed_tag_list:
             tag.unwrap()
 
-    # Ensure that if the html content is wrapped in some tag,
-    # if not, wrap it in p tag.
-    tag_list = soup.findAll()
-    if not len(tag_list):
-        start_tag = None
-    else:
-        # This part checks if a html string is not wrapped in any tag. Since it
-        # is not possible to obtain the position of a tag using BeautifulSoup,
-        # exact tag is to be searched in the html string.
-        start_tag = '<' + soup.findAll()[0].name + '>'
-    if not start_tag or html_data.find(start_tag) != 0:
-        html_data = '<p>' + str(soup) + '</p>'
-        soup = bs4.BeautifulSoup(html_data, 'html.parser')
+    # To combine parts after removal of tags.
+    soup = bs4.BeautifulSoup(str(soup), 'html.parser')
 
     oppia_inline_components = [
         'oppia-noninteractive-link', 'oppia-noninteractive-math']
@@ -792,7 +785,12 @@ def convert_to_text_angular(html_data):
         'oppia-noninteractive-video',
         'oppia-noninteractive-collapsible',
         'oppia-noninteractive-tabs'
-        ]
+    ]
+
+    # Ensure that every content in html is wrapped in a tag.
+    for content in soup.contents:
+        if not content.name:
+            content.wrap(soup.new_tag('p'))
 
     # Ensure that every line break is a child of any of its allowed parents.
     enforce_valid_parent(soup, 'br', allowed_parent_list['br'], 'p')
@@ -812,25 +810,6 @@ def convert_to_text_angular(html_data):
 
     # Ensure that every italics tag is a child of any of its allowed parents.
     enforce_valid_parent(soup, 'i', allowed_parent_list['i'], 'p')
-
-    # Ensure that blockquote or pre tag is not wrapped in p tags.
-    for tag_name in ['blockquote', 'pre']:
-        for tag in soup.findAll(tag_name):
-            prev_sib = list(tag.previous_siblings)
-            next_sib = list(tag.next_siblings)
-            if tag.parent.name == 'p':
-                tag.parent.unwrap()
-                p1 = soup.new_tag('p')
-                for sib in reversed(prev_sib):
-                    sib.wrap(p1)
-                p2 = soup.new_tag('p')
-                for sib in next_sib:
-                    sib.wrap(p2)
-
-    # Ensure that every content in html is wrapped in a tag.
-    for content in soup.contents:
-        if not content.name:
-            content.wrap(soup.new_tag('p'))
 
     # Ensure that p tag is not wrapped in p tag.
     for p in soup.findAll('p'):
