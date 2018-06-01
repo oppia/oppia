@@ -275,9 +275,6 @@ def get_thread_id_from_suggestion_id(suggestion_id):
     Returns:
         str. The thread ID linked to the suggestion.
     """
-
-    # Temporarily. Once the feedback migration is complete, this function will
-    # be removed.
     return suggestion_id[suggestion_id.find('.') + 1:]
 
 
