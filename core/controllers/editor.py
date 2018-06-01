@@ -979,9 +979,8 @@ class TopUnresolvedAnswersHandler(EditorHandler):
         try:
             exploration_id = self.payload.get('exploration_id')
             state_name = self.payload.get('state_name')
-        except utils.ValidationError as e:
-            # We leave any pre-existing draft changes in the datastore.
-            raise self.InvalidInputException(e)
+        except Exception:
+            raise self.PageNotFoundException
 
         try:
             unresolved_answers_with_frequency = (

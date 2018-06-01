@@ -1261,7 +1261,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer('Answer A')
             self._run_answer_summaries_aggregator()
             visualizations = self._get_visualizations()
-            self.assertEqual(len(visualizations), 1)
+            # There are two visualizations for TextInput. One for top answers
+            # and second is for top unresolved answers.
+            self.assertEqual(len(visualizations), 2)
 
             visualization = visualizations[0]
             self.assertEqual(
@@ -1273,7 +1275,10 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer('Answer A')
             self._run_answer_summaries_aggregator()
             visualizations = self._get_visualizations()
-            self.assertEqual(len(visualizations), 1)
+
+            # There are two visualizations for TextInput. One for top answers
+            # and second is for top unresolved answers.
+            self.assertEqual(len(visualizations), 2)
 
             visualization = visualizations[0]
             self.assertEqual(visualization['id'], 'FrequencyTable')
@@ -1292,7 +1297,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer('Answer A')
             self._run_answer_summaries_aggregator()
             visualizations = self._get_visualizations()
-            self.assertEqual(len(visualizations), 1)
+            # There are two visualizations for TextInput. One for top answers
+            # and second is for top unresolved answers.
+            self.assertEqual(len(visualizations), 2)
 
             visualization = visualizations[0]
             self.assertEqual(visualization['id'], 'FrequencyTable')
@@ -1373,7 +1380,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer('Answer A')
             self._rerun_answer_summaries_aggregator()
             visualizations = self._get_visualizations()
-            self.assertEqual(len(visualizations), 1)
+            # There are two visualizations for TextInput. One for top answers
+            # and second is for top unresolved answers.
+            self.assertEqual(len(visualizations), 2)
 
             visualization = visualizations[0]
             # The latest data should include all submitted answers.
@@ -1397,7 +1406,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             self._run_answer_summaries_aggregator()
             visualizations = self._get_visualizations()
-            self.assertEqual(len(visualizations), 1)
+            # There are two visualizations for TextInput. One for top answers
+            # and second is for top unresolved answers.
+            self.assertEqual(len(visualizations), 2)
 
             visualization = visualizations[0]
             # The latest data should include all submitted answers.
