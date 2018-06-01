@@ -351,8 +351,10 @@ class StoryContents(object):
         nodes_queue.append(self.nodes[starting_node_index].id)
 
         # The user is assumed to have all the prerequisite skills of the
-        # starting node before starting the story.
-        user_skill_ids = self.nodes[starting_node_index].prerequisite_skill_ids
+        # starting node before starting the story. Also, this list models the
+        # skill IDs acquired by a learner as they progress through the story.
+        simulated_skill_ids = self.nodes[
+            starting_node_index].prerequisite_skill_ids
 
         # The following loop employs a Breadth First Search from the given
         # starting node and makes sure that the user has acquired all the
@@ -368,7 +370,7 @@ class StoryContents(object):
             current_node = self.nodes[current_node_index]
 
             for skill_id in current_node.acquired_skill_ids:
-                user_skill_ids.append(skill_id)
+                simulated_skill_ids.append(skill_id)
 
             for node_id in current_node.destination_node_ids:
                 node_index = self.find_node_index(node_id)
@@ -376,12 +378,12 @@ class StoryContents(object):
                     raise utils.ValidationError(
                         'Loops are not allowed in stories.')
                 destination_node = self.nodes[node_index]
-                for skill_id in destination_node.prerequisite_skill_ids:
-                    if skill_id not in user_skill_ids:
-                        raise utils.ValidationError(
-                            'Expected the user to have acquired all '
-                            'prerequisite skills by the time a new node is '
-                            'visible.')
+                if not (set(destination_node.prerequisite_skill_ids).issubset(
+                        simulated_skill_ids)):
+                    raise utils.ValidationError(
+                        'Expected the user to have acquired all '
+                        'prerequisite skills by the time a new node is '
+                        'visible.')
                 nodes_queue.append(node_id)
 
         if False in is_node_visited:
