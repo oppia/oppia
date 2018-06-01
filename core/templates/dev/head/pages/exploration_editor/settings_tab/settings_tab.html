@@ -59,15 +59,14 @@
               <label for="explorationTags" class="col-lg-2 col-md-2 col-sm-2">Tags</label>
               <div class="col-lg-10 col-md-10 col-sm-10">
                 <div ng-if="hasPageLoaded">
-                  <select2-dropdown
-                    item="$parent.explorationTagsService.displayed"
-                    choices="$parent.explorationTagsService.displayed"
-                    allow-multiple-choices="true"
-                    invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
-                    new-choice-regex="<[::TAG_REGEX]>"
-                    width="100%"
-                    placeholder="Skills, concepts, topics..."
-                    on-selection-change="saveExplorationTags()">
+                  <select2-dropdown item="$parent.explorationTagsService.displayed"
+                                    choices="$parent.explorationTagsService.displayed"
+                                    allow-multiple-choices="true"
+                                    invalid-search-term-message="Add a new tag (using lowercase letters and spaces)..."
+                                    new-choice-regex="<[::TAG_REGEX]>"
+                                    width="100%"
+                                    placeholder="Skills, concepts, topics..."
+                                    on-selection-change="saveExplorationTags()">
                   </select2-dropdown>
                 </div>
                 <span class="help-block" style="font-size: smaller">
@@ -280,7 +279,7 @@
 
                 <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
                 <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
-                  ng-show="isRolesFormOpen">
+                        ng-show="isRolesFormOpen">
                   Cancel
                 </button>
               </form>

@@ -22,7 +22,7 @@ class FeedbackThread(object):
     """Domain object for a feedback thread.
 
     Attributes:
-        full_thread_id: str. The feedback thread ID.
+        thread_id: str. The feedback thread ID.
         exploration_id: str. The associated exploration's ID.
         state_name: str. The name of the state associated with
             the feedback thread.
@@ -39,13 +39,15 @@ class FeedbackThread(object):
             was last updated.
     """
 
+    # TODO (nithesh): Generalise feedback threads so that it is applicable to
+    # entities other than explorations also.
     def __init__(
-            self, full_thread_id, exploration_id, state_name,
+            self, thread_id, exploration_id, state_name,
             original_author_id, status, subject, summary, has_suggestion,
             message_count, created_on, last_updated):
         """Initializes a FeedbackThread object."""
 
-        self.id = full_thread_id
+        self.id = thread_id
         self.exploration_id = exploration_id
         self.state_name = state_name
         self.original_author_id = original_author_id
@@ -57,14 +59,6 @@ class FeedbackThread(object):
 
         self.created_on = created_on
         self.last_updated = last_updated
-
-    def get_thread_id(self):
-        """Returns the ID of the FeedbackThread instance.
-
-        Returns:
-            str. The ID of this FeedbackThread instance.
-        """
-        return FeedbackThread.get_thread_id_from_full_thread_id(self.id)
 
     def to_dict(self):
         """Returns a dict representation of this FeedbackThread object.
@@ -80,35 +74,9 @@ class FeedbackThread(object):
             'status': self.status,
             'subject': self.subject,
             'summary': self.summary,
-            'thread_id': self.get_thread_id(),
+            'thread_id': self.id,
             'message_count': self.message_count
         }
-
-    @staticmethod
-    def get_exp_id_from_full_thread_id(full_thread_id):
-        """Returns the ID of the exploration that the thread belongs to.
-
-        Args:
-            full_thread_id: str. The "full ID" of the feedback thread. (This is
-                a concatenation of the exploration ID and the thread ID.)
-
-        Returns:
-            str. The ID of the associated exploration.
-        """
-        return full_thread_id.split('.')[0]
-
-    @staticmethod
-    def get_thread_id_from_full_thread_id(full_thread_id):
-        """Returns the ID of the feedback thread.
-
-        Args:
-            full_thread_id: str. The "full ID" of the feedback thread. (This is
-                a concatenation of the exploration ID and the thread ID.)
-
-        Returns:
-            str. The ID of the feedback thread.
-        """
-        return full_thread_id.split('.')[1]
 
     def get_full_message_id(self, message_id):
         """Returns the full id of the message.
@@ -147,7 +115,7 @@ class FeedbackMessage(object):
 
     Attributes:
         full_message_id: str. The ID of the feedback message.
-        full_thread_id: str. The ID of the feedback thread containing this
+        thread_id: str. The ID of the feedback thread containing this
             message.
         message_id: str. The ID of the feedback thread message.
         author_id: str. The ID of the message's author.
@@ -162,11 +130,11 @@ class FeedbackMessage(object):
     """
 
     def __init__(
-            self, full_message_id, full_thread_id, message_id, author_id,
+            self, full_message_id, thread_id, message_id, author_id,
             updated_status, updated_subject, text, created_on,
             last_updated, received_via_email):
         self.id = full_message_id
-        self.full_thread_id = full_thread_id
+        self.thread_id = thread_id
         self.message_id = message_id
         self.author_id = author_id
         self.updated_status = updated_status
@@ -242,7 +210,7 @@ class Suggestion(object):
     """Domain object for a suggestion.
 
     Attributes:
-        full_thread_id: str. The ID of the suggestion thread.
+        thread_id: str. The ID of the suggestion thread.
         author_id: str. The ID of the message's author.
         exploration_id: str. The ID of the associated exploration.
         exploration_version: int. The version of the exploration associated
@@ -253,10 +221,10 @@ class Suggestion(object):
         """
 
     def __init__(
-            self, full_thread_id, author_id, exploration_id,
+            self, thread_id, author_id, exploration_id,
             exploration_version, state_name, description, suggestion_html):
         """Initializes a Suggestion object."""
-        self.id = full_thread_id
+        self.id = thread_id
         self.author_id = author_id
         self.exploration_id = exploration_id
         self.exploration_version = exploration_version

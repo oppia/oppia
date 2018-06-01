@@ -48,18 +48,22 @@ class ExplorationIssuesModelCreatorOneOffJob(
     @staticmethod
     def map(exploration_model):
         if not exploration_model.deleted:
-            exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
-                exploration_model.id, exploration_model.version)
-            if not exp_issues_model:
-                exp_issues_default = (
-                    stats_domain.ExplorationIssues.create_default(
-                        exploration_model.id, exploration_model.version))
-                stats_models.ExplorationIssuesModel.create(
-                    exp_issues_default.exp_id, exp_issues_default.exp_version,
-                    exp_issues_default.unresolved_issues)
-            else:
-                exp_issues_model.unresolved_issues = []
-                exp_issues_model.put()
+            current_version = exploration_model.version
+            for exp_version in xrange(1, current_version + 1):
+                exp_issues_model = (
+                    stats_models.ExplorationIssuesModel.get_model(
+                        exploration_model.id, exp_version))
+                if not exp_issues_model:
+                    exp_issues_default = (
+                        stats_domain.ExplorationIssues.create_default(
+                            exploration_model.id, exp_version))
+                    stats_models.ExplorationIssuesModel.create(
+                        exp_issues_default.exp_id,
+                        exp_issues_default.exp_version,
+                        exp_issues_default.unresolved_issues)
+                else:
+                    exp_issues_model.unresolved_issues = []
+                    exp_issues_model.put()
             yield(
                 exploration_model.id,
                 'ExplorationIssuesModel created')
@@ -256,20 +260,22 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         stats_models.ExplorationStatsModel.save_multi(exp_stats_dicts)
 
     @classmethod
-    def _apply_state_name_changes(cls, prev_stats_dict, change_list):
+    def _apply_state_name_changes(cls, prev_stats_dict, change_list_dict):
         """Update the state_stats_mapping to correspond with the changes
         in change_list.
 
         Args:
             prev_stats_dict: dict. A dict representation of an
                 ExplorationStatsModel.
-            change_list: list(dict). A list of all of the commit cmds from
+            change_list_dict: list(dict). A list of all of the commit cmds from
                 the old_stats_model up to the next version.
 
         Returns:
             dict. A dict representation of an ExplorationStatsModel
                 with updated state_stats_mapping and version.
         """
+        change_list = [
+            exp_domain.ExplorationChange(change) for change in change_list_dict]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
         # Handling state deletions, renames and additions (in that order). The
