@@ -862,3 +862,47 @@ VIEW_METHOD_USERNAME = 'username'
 QUESTION_BATCH_SIZE = 10
 
 STATE_ANSWER_STATS_MIN_FREQUENCY = 2
+
+# RTE content specifications according to the type of the editor.
+RTE_CONTENT_SPEC = {
+    'RTE_TYPE_TEXTANGULAR': {
+        # Valid parent-child relation in TextAngular.
+        'ALLOWED_PARENT_LIST': {
+            'p': ['blockquote', 'div', 'pre', '[document]'],
+            'b': ['i', 'li', 'p', 'pre'],
+            'br': ['b', 'i', 'li', 'p'],
+            'div': ['blockquote'],
+            'i': ['b', 'li', 'p', 'pre'],
+            'li': ['ol', 'ul'],
+            'ol': ['blockquote', 'li', 'pre', 'div', '[document]'],
+            'ul': ['blockquote', 'li', 'pre', 'div', '[document]'],
+            'pre': ['blockquote', '[document]'],
+            'blockquote': ['blockquote', '[document]'],
+            'oppia-noninteractive-link': ['b', 'li', 'i', 'p', 'pre'],
+            'oppia-noninteractive-math': ['b', 'li', 'i', 'p', 'pre'],
+            'oppia-noninteractive-image': ['li', 'p', 'pre'],
+            'oppia-noninteractive-collapsible': ['li', 'p', 'pre'],
+            'oppia-noninteractive-video': ['li', 'p', 'pre'],
+            'oppia-noninteractive-tabs': ['li', 'p', 'pre']
+        },
+        # Valid html tags in TextAngular.
+        'ALLOWED_TAG_LIST': [
+            'p',
+            'b',
+            'br',
+            'div',
+            'i',
+            'li',
+            'ol',
+            'ul',
+            'pre',
+            'blockquote',
+            'oppia-noninteractive-link',
+            'oppia-noninteractive-math',
+            'oppia-noninteractive-image',
+            'oppia-noninteractive-collapsible',
+            'oppia-noninteractive-video',
+            'oppia-noninteractive-tabs'
+        ]
+    }
+}
