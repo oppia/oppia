@@ -21,7 +21,6 @@ from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
     models.NAMES.suggestion, models.NAMES.feedback])
@@ -184,7 +183,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id)
 
         suggestion.status = suggestion_models.STATUS_ACCEPTED
-        suggestion_services._update_suggestion(suggestion)
+        suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
         with self.assertRaisesRegexp(
             Exception,
             'The suggestion has already been accepted/rejected.'):
@@ -196,7 +195,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.status, suggestion_models.STATUS_ACCEPTED)
         suggestion.status = suggestion_models.STATUS_REJECTED
-        suggestion_services._update_suggestion(suggestion)
+        suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(
             Exception,
@@ -223,7 +222,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         # Invalidating the suggestion.
         suggestion.score_category = 'invalid_score_category'
-        suggestion_services._update_suggestion(suggestion)
+        suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
         with self.assertRaisesRegexp(
             Exception, 'The given suggestion is not valid.'):
             suggestion_services.accept_suggestion(
@@ -291,7 +290,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id)
 
         suggestion.status = suggestion_models.STATUS_ACCEPTED
-        suggestion_services._update_suggestion(suggestion)
+        suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
         with self.assertRaisesRegexp(
             Exception,
             'The suggestion has already been accepted/rejected.'):
@@ -304,7 +303,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.status, suggestion_models.STATUS_ACCEPTED)
 
         suggestion.status = suggestion_models.STATUS_REJECTED
-        suggestion_services._update_suggestion(suggestion)
+        suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
 
         with self.assertRaisesRegexp(
             Exception,
