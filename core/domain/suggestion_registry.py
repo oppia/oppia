@@ -79,7 +79,7 @@ class BaseSuggestion(object):
     def get_score_type(self):
         """Returns the first part of the score category. The first part refers
         to the the type of scoring. The value of this part will be among
-        suggestion_models.SCORE_CATEGORY_C
+        suggestion_models.SCORE_TYPE_CHOICES.
 
         Returns:
             str. The first part of the score category.
@@ -88,14 +88,16 @@ class BaseSuggestion(object):
             suggestion_models.SCORE_CATEGORY_DELIMITER)[0]
 
     def get_score_sub_type(self):
-        """Returns the second part of the score category.
+        """Returns the second part of the score category. The second part refers
+        to the specific area where the author needs to be scored. This can be
+        the category of the exploration, the language of the suggestion, or the
+        skill linked to the question.
 
         Returns:
             str. The second part of the score category.
         """
         return self.score_category.split(
             suggestion_models.SCORE_CATEGORY_DELIMITER)[1]
-
 
     def validate(self):
         """Validates the BaseSuggestion object. Each subclass must implement
@@ -178,7 +180,6 @@ class BaseSuggestion(object):
                 ' score_type%sscore_sub_type, received %s' % (
                     suggestion_models.SCORE_CATEGORY_DELIMITER,
                     self.score_category))
-
 
         if self.get_score_type() not in suggestion_models.SCORE_TYPE_CHOICES:
             raise utils.ValidationError(
