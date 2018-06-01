@@ -15,6 +15,7 @@
 """Tests for the profile page."""
 
 from constants import constants
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -598,11 +599,11 @@ class UserContributionsTests(test_utils.GenericTestBase):
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
 
         exp_services.update_exploration(
-            user_b_id, self.EXP_ID_1, [{
+            user_b_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective'
-            }], 'Test edit')
+            })], 'Test edit')
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_B)

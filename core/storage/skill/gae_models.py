@@ -15,10 +15,12 @@
 """Models for storing the skill data models."""
 
 from core.platform import models
+import feconf
 
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.user])
 
 
 class SkillSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -56,6 +58,41 @@ class SkillModel(base_models.VersionedModel):
         required=True, indexed=True)
     # A dict representing the skill contents.
     skill_contents = ndb.JsonProperty(indexed=False)
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(SkillModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+
+        committer_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(committer_id))
+        committer_username = (
+            committer_user_settings_model.username
+            if committer_user_settings_model else '')
+
+        skill_commit_log_entry = SkillCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds,
+            feconf.ACTIVITY_STATUS_PUBLIC, False
+        )
+        skill_commit_log_entry.skill_id = self.id
+        skill_commit_log_entry.put()
 
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -100,6 +137,8 @@ class SkillSummaryModel(base_models.BaseModel):
 
     # The description of the skill.
     description = ndb.StringProperty(required=True, indexed=True)
+    # The number of misconceptions associated with the skill.
+    misconception_count = ndb.IntegerProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this skill is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # Time when the skill model was last updated (not to be

@@ -140,6 +140,8 @@ class CollectionRightsModel(base_models.VersionedModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this collection.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to translate this collection.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this collection.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 

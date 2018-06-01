@@ -36,7 +36,7 @@ oppia.factory('ExplorationPlayerService', [
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
   'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
   'PlayerCorrectnessFeedbackEnabledService',
-  'GuestCollectionProgressService',
+  'GuestCollectionProgressService', 'ImagePreloaderService',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $rootScope, $q, LearnerParamsService,
@@ -50,7 +50,7 @@ oppia.factory('ExplorationPlayerService', [
       LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
       WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
       PlayerCorrectnessFeedbackEnabledService,
-      GuestCollectionProgressService,
+      GuestCollectionProgressService, ImagePreloaderService,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
@@ -159,9 +159,11 @@ oppia.factory('ExplorationPlayerService', [
       LearnerParamsService.init(startingParams);
     };
 
-    // Ensure the transition to a terminal state properly logs the end of the
-    // exploration.
     $rootScope.$on('playerStateChange', function(evt, newStateName) {
+      // To restart the preloader for the new state if required.
+      ImagePreloaderService.onStateChange(newStateName);
+      // Ensure the transition to a terminal state properly logs the end of the
+      // exploration.
       if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
         StatsReportingService.recordExplorationCompleted(
           newStateName, LearnerParamsService.getAllParams());
@@ -233,6 +235,8 @@ oppia.factory('ExplorationPlayerService', [
               data.auto_tts_enabled);
             AudioPreloaderService.init(exploration);
             AudioPreloaderService.kickOffAudioPreloader(initStateName);
+            ImagePreloaderService.init(exploration);
+            ImagePreloaderService.kickOffImagePreloader(initStateName);
             PlayerCorrectnessFeedbackEnabledService.init(
               data.correctness_feedback_enabled);
             _loadInitialState(successCallback);
@@ -267,6 +271,9 @@ oppia.factory('ExplorationPlayerService', [
               data.auto_tts_enabled);
             AudioPreloaderService.init(exploration);
             AudioPreloaderService.kickOffAudioPreloader(
+              exploration.getInitialState().name);
+            ImagePreloaderService.init(exploration);
+            ImagePreloaderService.kickOffImagePreloader(
               exploration.getInitialState().name);
             PlayerCorrectnessFeedbackEnabledService.init(
               data.correctness_feedback_enabled);

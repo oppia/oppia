@@ -256,20 +256,22 @@ class RecomputeStatisticsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         stats_models.ExplorationStatsModel.save_multi(exp_stats_dicts)
 
     @classmethod
-    def _apply_state_name_changes(cls, prev_stats_dict, change_list):
+    def _apply_state_name_changes(cls, prev_stats_dict, change_list_dict):
         """Update the state_stats_mapping to correspond with the changes
         in change_list.
 
         Args:
             prev_stats_dict: dict. A dict representation of an
                 ExplorationStatsModel.
-            change_list: list(dict). A list of all of the commit cmds from
+            change_list_dict: list(dict). A list of all of the commit cmds from
                 the old_stats_model up to the next version.
 
         Returns:
             dict. A dict representation of an ExplorationStatsModel
                 with updated state_stats_mapping and version.
         """
+        change_list = [
+            exp_domain.ExplorationChange(change) for change in change_list_dict]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
         # Handling state deletions, renames and additions (in that order). The

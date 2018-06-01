@@ -159,7 +159,7 @@ def handle_stats_creation_for_new_exploration(exp_id, exp_version, state_names):
 
     Args:
         exp_id: str. ID of the exploration.
-        exp_version. int. Version of the exploration.
+        exp_version: int. Version of the exploration.
         state_names: list(str). State names of the exploration.
     """
     state_stats_mapping = {
@@ -182,7 +182,8 @@ def handle_stats_creation_for_new_exp_version(
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
         state_names: list(str). State names of the exploration.
-        change_list: list(dict). A list of changes introduced in this commit.
+        change_list: list(ExplorationChange). A list of changes introduced in
+            this commit.
     """
     old_exp_version = exp_version - 1
     new_exp_version = exp_version
@@ -194,17 +195,17 @@ def handle_stats_creation_for_new_exp_version(
         return
 
     # Handling state additions, deletions and renames.
-    for change_dict in change_list:
-        if change_dict['cmd'] == exp_domain.CMD_ADD_STATE:
-            exploration_stats.state_stats_mapping[change_dict[
-                'state_name']] = stats_domain.StateStats.create_default()
-        elif change_dict['cmd'] == exp_domain.CMD_DELETE_STATE:
-            exploration_stats.state_stats_mapping.pop(change_dict[
-                'state_name'])
-        elif change_dict['cmd'] == exp_domain.CMD_RENAME_STATE:
-            exploration_stats.state_stats_mapping[change_dict[
-                'new_state_name']] = exploration_stats.state_stats_mapping.pop(
-                    change_dict['old_state_name'])
+    for change in change_list:
+        if change.cmd == exp_domain.CMD_ADD_STATE:
+            exploration_stats.state_stats_mapping[
+                change.state_name
+            ] = stats_domain.StateStats.create_default()
+        elif change.cmd == exp_domain.CMD_DELETE_STATE:
+            exploration_stats.state_stats_mapping.pop(change.state_name)
+        elif change.cmd == exp_domain.CMD_RENAME_STATE:
+            exploration_stats.state_stats_mapping[
+                change.new_state_name
+            ] = exploration_stats.state_stats_mapping.pop(change.old_state_name)
 
     exploration_stats.exp_version = new_exp_version
 
@@ -603,7 +604,8 @@ def get_sample_answers(exploration_id, exploration_version, state_name):
 
 def get_top_state_answer_stats(exploration_id, state_name):
     """Fetches the top (at most) 10 answers from the given state_name in the
-    corresponding exploration.
+    corresponding exploration. Only answers that occur with frequency >=
+    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
 
     Args:
         exploration_id: str. The exploration ID.
@@ -624,7 +626,8 @@ def get_top_state_answer_stats(exploration_id, state_name):
 
 def get_top_state_answer_stats_multi(exploration_id, state_names):
     """Fetches the top (at most) 10 answers from each given state_name in the
-    corresponding exploration.
+    corresponding exploration. Only answers that occur with frequency >=
+    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
 
     Args:
         exploration_id: str. The exploration ID.

@@ -16,9 +16,13 @@
 
 """Models for topics and related constructs."""
 
-import core.storage.base_model.gae_models as base_models
+from core.platform import models
+import feconf
 
 from google.appengine.ext import ndb
+
+(base_models, user_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.user])
 
 
 class TopicSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -55,6 +59,41 @@ class TopicModel(base_models.VersionedModel):
     skill_ids = ndb.StringProperty(repeated=True, indexed=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(TopicModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+
+        committer_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(committer_id))
+        committer_username = (
+            committer_user_settings_model.username
+            if committer_user_settings_model else '')
+
+        topic_commit_log_entry = TopicCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds,
+            feconf.ACTIVITY_STATUS_PUBLIC, False
+        )
+        topic_commit_log_entry.topic_id = self.id
+        topic_commit_log_entry.put()
 
 
 class TopicCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

@@ -1234,6 +1234,7 @@ class StateAnswersCalcOutput(object):
                 corresponding to the answer calculation output.
             state_name: str. The name of the exploration state to which the
                 aggregated answers were submitted.
+            interaction_id: str. The ID of the interaction.
             calculation_id: str. Which calculation was performed on the given
                 answer data.
             calculation_output: AnswerCalculationOutput. The output of an
