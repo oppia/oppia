@@ -3740,7 +3740,7 @@ states:
             state_id_mapping.validate()
 
 
-class HtmlCollectionnitTests(test_utils.GenericTestBase):
+class HtmlCollectionTests(test_utils.GenericTestBase):
     """Test method to obtain all html strings."""
 
     def test_all_html_strings_are_collected(self):

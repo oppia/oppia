@@ -862,7 +862,7 @@ QUESTION_BATCH_SIZE = 10
 
 STATE_ANSWER_STATS_MIN_FREQUENCY = 2
 
-# RTE content specifications according to the type.
+# RTE content specifications according to the type of the editor.
 RTE_CONTENT_SPEC = {
     'RTE_TYPE_TEXTANGULAR': {
         # Valid parent-child relation in TextAngular.
