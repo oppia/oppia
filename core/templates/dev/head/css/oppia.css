@@ -2010,25 +2010,11 @@ md-card.oppia-dashboard-tile {
   margin-bottom: 30px;
 }
 
-.oppia-wide-panel-content, .oppia-forum {
+.oppia-wide-panel-content {
   font-size: large;
   margin: 5px auto;
   min-height: 400px;
   padding: 20px;
-}
-.oppia-forum {
-  margin-top: 0;
-}
-
-.oppia-warning {
-  background: #F9EDBE;
-  width: 80%;
-  max-width: 700px;
-}
-.oppia-warning-chevron {
-  font-size: 1em;
-  padding-left: 4px;
-  padding-top: 4px;
 }
 
 .oppia-placeholder {
