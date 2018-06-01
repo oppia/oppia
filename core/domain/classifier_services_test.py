@@ -79,12 +79,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         answer_groups = []
         for answer_group in state.interaction.answer_groups:
             answer_groups.append(answer_group.to_dict())
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'state_name': 'Home',
             'property_name': 'answer_groups',
             'new_value': answer_groups
-        }]
+        })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
@@ -98,11 +98,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         # Make a change to the exploration without changing the answer groups
         # to trigger mapping update.
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_exploration_property',
             'property_name': 'title',
             'new_value': 'New title'
-        }]
+        })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
@@ -115,15 +115,15 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(all_mappings.count(), 3)
 
         # Check that renaming a state does not create an extra job.
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Home',
             'new_state_name': 'Home2'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Home2',
             'new_state_name': 'Home3'
-        }]
+        })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
                 feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
@@ -161,11 +161,11 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         exploration = exp_services.get_exploration_by_id(self.exp_id)
         next_scheduled_check_time = datetime.datetime.utcnow()
         state_names = ['Home']
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Old home',
             'new_state_name': 'Home'
-        }]
+        })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
         # Test that Exception is raised if this method is called with version
