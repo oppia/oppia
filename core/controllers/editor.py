@@ -308,7 +308,9 @@ class ExplorationHandler(EditorHandler):
         _require_valid_version(version, exploration.version)
 
         commit_message = self.payload.get('commit_message')
-        change_list = self.payload.get('change_list')
+        change_list_dict = self.payload.get('change_list')
+        change_list = [
+            exp_domain.ExplorationChange(change) for change in change_list_dict]
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)
@@ -1030,7 +1032,10 @@ class EditorAutosaveHandler(ExplorationHandler):
         # Raise an Exception if the draft change list fails non-strict
         # validation.
         try:
-            change_list = self.payload.get('change_list')
+            change_list_dict = self.payload.get('change_list')
+            change_list = [
+                exp_domain.ExplorationChange(change)
+                for change in change_list_dict]
             version = self.payload.get('version')
             exp_services.create_or_update_draft(
                 exploration_id, self.user_id, change_list, version,

@@ -19,7 +19,6 @@ import logging
 
 from core import jobs
 from core.domain import exp_services
-from core.domain import feedback_domain
 from core.domain import feedback_services
 from core.domain import stats_services
 from core.platform import models
@@ -267,15 +266,9 @@ class RecentUpdatesMRJobManager(
             yield (reducer_key, recent_activity_commit_dict)
 
         for feedback_thread_id in feedback_thread_ids_list:
-            exp_id = (
-                feedback_domain.FeedbackThread.get_exp_id_from_full_thread_id(
-                    feedback_thread_id))
-            thread_id = (
-                feedback_domain.FeedbackThread.get_thread_id_from_full_thread_id( # pylint: disable=line-too-long
-                    feedback_thread_id))
             last_message = (
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
-                    exp_id, thread_id))
+                    feedback_thread_id))
 
             yield (
                 reducer_key, {

@@ -951,11 +951,11 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         # In version 2, change the objective and the initial state content.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exp_services.update_exploration(
-            self.editor_id, self.EXP_ID, [{
+            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective',
-            }, {
+            }), exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'state_name': exploration.init_state_name,
@@ -963,7 +963,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
                     'html': 'ABC',
                     'audio_translations': {},
                 },
-            }], 'Change objective and init state content')
+            })], 'Change objective and init state content')
 
     def test_reverting_to_old_exploration(self):
         """Test reverting to old exploration versions."""
@@ -1822,10 +1822,12 @@ class EditorAutosaveTest(BaseEditorControllerTest):
     DRAFT_CHANGELIST = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
+        'old_value': None,
         'new_value': 'Updated title'}]
     NEW_CHANGELIST = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
+        'old_value': None,
         'new_value': 'New title'}]
     INVALID_CHANGELIST = [{
         'cmd': 'edit_exploration_property',

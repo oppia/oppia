@@ -2,9 +2,9 @@
   <p ng-class="{'has-error': objectiveForm.$dirty && (!explorationObjectiveService.displayed || explorationObjectiveService.displayed.length < 15 || explorationObjectiveService.displayed.length > 100)}">
     <label for="explorationObjective" ng-style="<[::formStyle]>"><[::labelText]></label>
     <input id="explorationObjective" type="text"
-          class="form-control protractor-test-exploration-objective-input"
-          ng-model="explorationObjectiveService.displayed"
-          ng-blur="onInputFieldBlur()" placeholder="Learn how to..." ng-trim="false">
+           class="form-control protractor-test-exploration-objective-input"
+           ng-model="explorationObjectiveService.displayed"
+           ng-blur="onInputFieldBlur()" placeholder="Learn how to..." ng-trim="false">
     <span class="help-block" style="font-size: smaller">
       <em>In a complete sentence, tell people what they'll learn from this exploration.</em>
       <span ng-if="explorationObjectiveService.displayed.length > 0">

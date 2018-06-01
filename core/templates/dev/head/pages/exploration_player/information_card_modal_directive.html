@@ -38,14 +38,14 @@
         <i class="material-icons" uib-tooltip="<['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]>" tooltip-placement="top" style="cursor: default; margin-right: 5px;">&#xE7EF;</i>
         <span class="oppia-icon-accessibility-label"><['I18N_PLAYER_CONTRIBUTORS_TOOLTIP' | translate]></span>
         <li ng-repeat="name in contributorNames| limitTo: 2"
-          tooltip="<[name]>" tooltip-placement="top">
+            tooltip="<[name]>" tooltip-placement="top">
           <profile-link-image username="name">
           </profile-link-image>
         </li>
 
         <li ng-if="contributorNames.length > 2" class="oppia-contributors-more-circle"
-          tooltip-append-to-body="true" uib-tooltip="<[contributorNames.slice(2).join(', ')]>"
-          tooltip-placement="top">+<[contributorNames.length - 2]>
+            tooltip-append-to-body="true" uib-tooltip="<[contributorNames.slice(2).join(', ')]>"
+            tooltip-placement="top">+<[contributorNames.length - 2]>
         </li>
         <li ng-if="contributorNames.length === 0"
             tooltip="<['I18N_PLAYER_COMMUNITY_EDITABLE_TOOLTIP' | translate]>"
@@ -67,10 +67,10 @@
           </div>
           <md-chips layout-align="center center">
             <md-chip ng-if="explorationTags.tagsInTooltip.length > 0" class="oppia-info-card-tooltip-more"
-              tooltip-append-to-body="true" uib-tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
-              tooltip-placement="right"
-              translate="I18N_PLAYER_PLUS_TAGS"
-              translate-values="{additionalTagNumber: <[explorationTags.tagsInTooltip.length]>}">
+                     tooltip-append-to-body="true" uib-tooltip="<[explorationTags.tagsInTooltip.join(', ')]>"
+                     tooltip-placement="right"
+                     translate="I18N_PLAYER_PLUS_TAGS"
+                     translate-values="{additionalTagNumber: <[explorationTags.tagsInTooltip.length]>}">
             </md-chip>
             <md-chip ng-if="explorationTags.tagsToShow.length > 0">
               <[explorationTags.tagsToShow.join(", ")]>
