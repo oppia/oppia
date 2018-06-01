@@ -388,8 +388,8 @@ class AccessCreatorDashboardTest(test_utils.GenericTestBase):
         self.assertEqual(response['success'], True)
 
 
-class CommentOnFeedbackTest(test_utils.GenericTestBase):
-    """Tests for can_comment_on_exploration_feedback decorator."""
+class CommentOnFeedbackThreadTest(test_utils.GenericTestBase):
+    """Tests for can_comment_on_feedback_thread decorator."""
     published_exp_id = 'exp_0'
     private_exp_id = 'exp_1'
 
@@ -398,11 +398,71 @@ class CommentOnFeedbackTest(test_utils.GenericTestBase):
         GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
         @acl_decorators.can_comment_on_feedback_thread
+        def get(self, thread_id):
+            self.render_json({'thread_id': thread_id})
+
+    def setUp(self):
+        super(CommentOnFeedbackThreadTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<thread_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_guest_cannot_comment_on_feedback_threads(self):
+        response = self.mock_testapp.get(
+            '/mock/%s.thread1' % self.private_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 302)
+        response = self.mock_testapp.get(
+            '/mock/%s.thread1' % self.published_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 302)
+
+    def test_owner_can_comment_on_feedback_for_private_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s.thread1' % self.private_exp_id)
+        self.logout()
+
+    def test_moderator_can_comment_on_feeback_for_public_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s.thread1' % self.published_exp_id)
+        self.logout()
+
+    def test_admin_can_comment_on_feeback_for_private_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s.thread1' % self.private_exp_id)
+        self.logout()
+
+
+class CreateFeedbackThreadTest(test_utils.GenericTestBase):
+    """Tests for can_create_feedback_thread decorator."""
+    published_exp_id = 'exp_0'
+    private_exp_id = 'exp_1'
+
+    class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_create_feedback_thread
         def get(self, exploration_id):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(CommentOnFeedbackTest, self).setUp()
+        super(CreateFeedbackThreadTest, self).setUp()
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
@@ -421,30 +481,82 @@ class CommentOnFeedbackTest(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.owner, self.published_exp_id)
 
-    def test_guest_cannot_comment_on_feedback_threads(self):
-        response = self.mock_testapp.get(
-            '/mock/%s' % self.private_exp_id, expect_errors=True)
-        self.assertEqual(response.status_int, 302)
+    def test_guest_can_create_feedback_threads_for_public_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s' % self.published_exp_id)
 
-    def test_owner_can_comment_on_feedback_for_private_exploration(self):
+    def test_owner_cannot_create_feedback_for_private_exploration(self):
         self.login(self.OWNER_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.private_exp_id)
-        self.assertEqual(response['exploration_id'], self.private_exp_id)
+            self.get_json('/mock/%s' % self.private_exp_id)
         self.logout()
 
-    def test_moderator_can_comment_on_feeback_public_exploration(self):
+    def test_moderator_can_create_feeback_for_public_exploration(self):
         self.login(self.MODERATOR_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.published_exp_id)
-        self.assertEqual(response['exploration_id'], self.published_exp_id)
+            self.get_json('/mock/%s' % self.published_exp_id)
         self.logout()
 
-    def test_admin_can_comment_on_feeback_private_exploration(self):
+    def test_admin_can_create_feeback_for_private_exploration(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock/%s' % self.private_exp_id)
-        self.assertEqual(response['exploration_id'], self.private_exp_id)
+            self.get_json('/mock/%s' % self.private_exp_id)
+        self.logout()
+
+
+class ViewFeedbackThreadTest(test_utils.GenericTestBase):
+    """Tests for can_view_feedback_thread decorator."""
+    published_exp_id = 'exp_0'
+    private_exp_id = 'exp_1'
+
+    class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_view_feedback_thread
+        def get(self, thread_id):
+            self.render_json({'thread_id': thread_id})
+
+    def setUp(self):
+        super(ViewFeedbackThreadTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<thread_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(
+            self.published_exp_id, self.owner_id)
+        self.save_new_valid_exploration(
+            self.private_exp_id, self.owner_id)
+
+        rights_manager.publish_exploration(self.owner, self.published_exp_id)
+
+    def test_guest_can_view_feedback_threads_for_public_exploration(self):
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s.thread1' % self.published_exp_id)
+
+    def test_owner_cannot_view_feedback_for_private_exploration(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s.thread1' % self.private_exp_id)
+        self.logout()
+
+    def test_moderator_can_view_feeback_for_public_exploration(self):
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s.thread1' % self.published_exp_id)
+        self.logout()
+
+    def test_admin_can_view_feeback_for_private_exploration(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock/%s.thread1' % self.private_exp_id)
         self.logout()
 
 
@@ -1318,8 +1430,7 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
         ))
         topic_services.create_new_topic_rights(self.topic_id, self.admin_id)
         topic_services.assign_role(
-            self.admin, self.manager_id, topic_domain.ROLE_MANAGER,
-            self.topic_id)
+            self.admin, self.manager, topic_domain.ROLE_MANAGER, self.topic_id)
 
     def test_admin_can_edit_topic(self):
         self.login(self.ADMIN_EMAIL)

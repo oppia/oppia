@@ -21,10 +21,11 @@
  */
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'HtmlEscaperService', 'ExplorationContextService',
-  'UrlInterpolationService',
-  function(
+  'UrlInterpolationService', 'ImagePreloaderService',
+  'AssetsBackendApiService', function(
       $rootScope, $sce, HtmlEscaperService, ExplorationContextService,
-      UrlInterpolationService) {
+      UrlInterpolationService, ImagePreloaderService,
+      AssetsBackendApiService) {
     return {
       restrict: 'E',
       scope: {},
@@ -33,9 +34,14 @@ oppia.directive('oppiaNoninteractiveImage', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
-        $scope.imageUrl = $sce.trustAsResourceUrl(
-          '/imagehandler/' + ExplorationContextService.getExplorationId() +
-          '/' + encodeURIComponent($scope.filepath));
+        $scope.imageUrl = '';
+        ImagePreloaderService.getImageUrl($scope.filepath)
+          .then(function(objectUrl) {
+            $scope.imageUrl = objectUrl;
+          });
+        // [TODO] Display a loading indicator instead. For now, if the
+        // image is not there in the cache alternate text will be shown
+
         $scope.imageCaption = '';
         if ($attrs.captionWithValue) {
           $scope.imageCaption = HtmlEscaperService.escapedJsonToObj(
