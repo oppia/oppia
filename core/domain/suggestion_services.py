@@ -26,7 +26,7 @@ import utils
 (feedback_models, suggestion_models) = models.Registry.import_models([
     models.NAMES.feedback, models.NAMES.suggestion])
 
-DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a learner'
+DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 
