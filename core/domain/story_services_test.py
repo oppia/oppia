@@ -18,6 +18,7 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
@@ -26,20 +27,16 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     """Test the story services module."""
 
     STORY_ID = None
-    NODE_ID_1 = 'node_id_1'
-    NODE_ID_2 = 'node_id_2'
+    NODE_ID_1 = feconf.DEFAULT_INITIAL_NODE_ID
+    NODE_ID_2 = 'node_2'
     USER_ID = 'user'
     story = None
 
     def setUp(self):
         super(StoryServicesUnitTests, self).setUp()
-        story_node = story_domain.StoryNode.create_default_story_node(
-            self.NODE_ID_1)
-        story_contents = story_domain.StoryContents([story_node])
         self.STORY_ID = story_services.get_new_story_id()
         self.story = self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
-            story_contents
+            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes'
         )
 
     def test_compute_summary(self):
@@ -125,16 +122,27 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
-                'property_name': story_domain.STORY_NODE_PROPERTY_OUTLINE,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
                 'node_id': self.NODE_ID_2,
-                'old_value': '',
-                'new_value': 'Outline 2.'
+                'old_value': [],
+                'new_value': [self.NODE_ID_1]
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_CONTENTS_PROPERTY_STARTING_NODE_ID),
+                'old_value': self.NODE_ID_1,
+                'new_value': self.NODE_ID_2
             })
         ]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist, 'Added story node.')
         story = story_services.get_story_by_id(self.STORY_ID)
-        self.assertEqual(story.story_contents.nodes[1].outline, 'Outline 2.')
+        self.assertEqual(
+            story.story_contents.nodes[1].destination_node_ids,
+            [self.NODE_ID_1])
+        self.assertEqual(story.story_contents.starting_node_id, self.NODE_ID_2)
         self.assertEqual(story.version, 2)
 
         story_summary = story_services.get_story_summary_by_id(self.STORY_ID)
@@ -143,7 +151,15 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         changelist = [
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_DELETE_STORY_NODE,
-                'node_id': self.NODE_ID_2
+                'node_id': self.NODE_ID_1
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
+                'property_name': (
+                    story_domain.STORY_NODE_PROPERTY_DESTINATION_NODE_IDS),
+                'node_id': self.NODE_ID_2,
+                'old_value': [self.NODE_ID_1],
+                'new_value': []
             })
         ]
         story_services.update_story(
