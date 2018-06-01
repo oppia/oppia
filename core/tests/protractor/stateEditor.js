@@ -483,12 +483,6 @@ describe('State editor', function() {
 
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    // Before logging out, leave the exploration and re-enter it. Logging out
-    // from directly within an exploration and logging in again with a different
-    // user does not trigger MaybeQuit event.
-    libraryPage.get();
-    libraryPage.playExploration(EXPLORATION_TITLE);
-
     users.logout();
 
     // Creator visits the statistics tab.
