@@ -887,6 +887,15 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exploration, state_names_with_unchanged_answer_groups,
                 exp_versions_diff)
 
+    # Trigger exploration issues model updation.
+    if feconf.ENABLE_PLAYTHROUGHS:
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        revert_to_version = None
+        if change_list[0]['cmd'] == 'AUTO_revert_version_number':
+            revert_to_version = change_list[0]['version_number']
+        stats_services.update_exp_issues_for_new_exp_version(
+            exploration, exp_versions_diff, revert_to_version)
+
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
 
@@ -949,6 +958,11 @@ def _create_exploration(
         if state_names_to_train:
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train)
+
+    # Trigger exploration issues model creation.
+    if feconf.ENABLE_PLAYTHROUGHS:
+        stats_services.create_exp_issues_for_new_exploration(
+            exploration.id, exploration.version)
 
     # Save state id mapping model for new exploration.
     create_and_save_state_id_mapping_model(exploration, commit_cmds)
