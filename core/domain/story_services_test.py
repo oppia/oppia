@@ -131,7 +131,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
                 'property_name': (
-                    story_domain.STORY_CONTENTS_PROPERTY_STARTING_NODE_ID),
+                    story_domain.INITIAL_NODE_ID),
                 'old_value': self.NODE_ID_1,
                 'new_value': self.NODE_ID_2
             })

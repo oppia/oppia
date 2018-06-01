@@ -200,8 +200,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_3)
         ]
         self._assert_validation_error(
-            'Expected the user to have acquired all prerequisite skills by the '
-            'time a new node is visible.')
+            'The prerequisite skills skill_3 were not completed before '
+            'the node with id node_3 was unlocked.')
 
         # Case 2: Story with loops.
         node_1 = {
@@ -265,9 +265,43 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_2),
             story_domain.StoryNode.from_dict(node_3)
         ]
-        self._assert_validation_error('Expected all nodes to be reachable.')
+        self._assert_validation_error(
+            'The node with id node_3 is disconnected from the story graph.')
 
-        # Case 4: A valid graph.
+        # Case 4: Graph with duplicate nodes.
+        node_1 = {
+            'id': 'node_1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_3'],
+            'outline': '',
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        self._assert_validation_error(
+            'The node id node_2 is duplicated in the story.')
+
+        # Case 5: A valid graph.
         node_1 = {
             'id': 'node_1',
             'destination_node_ids': ['node_2'],

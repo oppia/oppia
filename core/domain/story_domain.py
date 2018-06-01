@@ -32,7 +32,7 @@ STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
 STORY_NODE_PROPERTY_OUTLINE = 'outline'
 STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
-STORY_CONTENTS_PROPERTY_STARTING_NODE_ID = 'starting_node_id'
+INITIAL_NODE_ID = 'starting_node_id'
 
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
@@ -62,7 +62,7 @@ class StoryChange(object):
         STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS, STORY_NODE_PROPERTY_OUTLINE,
         STORY_NODE_PROPERTY_EXPLORATION_ID)
 
-    STORY_CONTENTS_PROPERTIES = (STORY_CONTENTS_PROPERTY_STARTING_NODE_ID)
+    STORY_CONTENTS_PROPERTIES = (INITIAL_NODE_ID,)
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'property_name', 'new_value', 'old_value', 'node_id', 'from_version',
@@ -324,7 +324,9 @@ class StoryContents(object):
                 'Expected starting node id to be a string, received %s'
                 % self.starting_node_id)
 
-        starting_node_present = False
+        initial_node_is_present = False
+        node_id_list = []
+
         for node in self.nodes:
             if not isinstance(node, StoryNode):
                 raise utils.ValidationError(
@@ -338,16 +340,22 @@ class StoryContents(object):
                         'Expected all destination nodes to exist')
             node.validate()
             if node.id == self.starting_node_id:
-                starting_node_present = True
+                initial_node_is_present = True
+            node_id_list.append(node.id)
 
-        if not starting_node_present:
+        if not initial_node_is_present:
             raise utils.ValidationError('Expected starting node to exist.')
+
+        for node_id in node_id_list:
+            if node_id_list.count(node_id) > 1:
+                raise utils.ValidationError(
+                    'The node id %s is duplicated in the story.' % node_id)
 
         # nodes_queue stores the pending nodes to visit in the story that are
         # unlocked, in a 'queue' form with a First In First Out structure.
         nodes_queue = []
         is_node_visited = [False] * len(self.nodes)
-        starting_node_index = self.find_node_index(self.starting_node_id)
+        starting_node_index = self.get_node_index(self.starting_node_id)
         nodes_queue.append(self.nodes[starting_node_index].id)
 
         # The user is assumed to have all the prerequisite skills of the
@@ -362,10 +370,7 @@ class StoryContents(object):
         # visiting a particular node by the time that node is finished.
         while len(nodes_queue) > 0:
             current_node_id = nodes_queue.pop()
-            current_node_index = self.find_node_index(current_node_id)
-            # The following condition checks whether the destination node for
-            # a particular node, has already been visited, in which case the
-            # story would have loops, which are not allowed.
+            current_node_index = self.get_node_index(current_node_id)
             is_node_visited[current_node_index] = True
             current_node = self.nodes[current_node_index]
 
@@ -373,7 +378,10 @@ class StoryContents(object):
                 simulated_skill_ids.append(skill_id)
 
             for node_id in current_node.destination_node_ids:
-                node_index = self.find_node_index(node_id)
+                node_index = self.get_node_index(node_id)
+                # The following condition checks whether the destination node
+                # for a particular node, has already been visited, in which case
+                # the story would have loops, which are not allowed.
                 if is_node_visited[node_index]:
                     raise utils.ValidationError(
                         'Loops are not allowed in stories.')
@@ -381,15 +389,20 @@ class StoryContents(object):
                 if not (set(destination_node.prerequisite_skill_ids).issubset(
                         simulated_skill_ids)):
                     raise utils.ValidationError(
-                        'Expected the user to have acquired all '
-                        'prerequisite skills by the time a new node is '
-                        'visible.')
+                        'The prerequisite skills ' +
+                        ' '.join(set(destination_node.prerequisite_skill_ids) -
+                                 set(simulated_skill_ids)) +
+                        ' were not completed before the node with id %s'
+                        ' was unlocked.' % node_id)
                 nodes_queue.append(node_id)
 
-        if False in is_node_visited:
-            raise utils.ValidationError('Expected all nodes to be reachable.')
+        for index, node_visited in enumerate(is_node_visited):
+            if not node_visited:
+                raise utils.ValidationError(
+                    'The node with id %s is disconnected from the '
+                    'story graph.' % self.nodes[index].id)
 
-    def find_node_index(self, node_id):
+    def get_node_index(self, node_id):
         """Returns the index of the story node with the given node
         id, or None if the node id is not in the story contents dict.
 
@@ -649,7 +662,7 @@ class Story(object):
         Raises:
             ValueError: The node is not part of the story.
         """
-        node_index = self.story_contents.find_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
@@ -669,7 +682,7 @@ class Story(object):
         Raises:
             ValueError: The node is not part of the story.
         """
-        node_index = self.story_contents.find_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
@@ -686,7 +699,7 @@ class Story(object):
         Raises:
             ValueError: The node is not part of the story.
         """
-        node_index = self.story_contents.find_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
@@ -705,7 +718,7 @@ class Story(object):
         Raises:
             ValueError: The node is not part of the story.
         """
-        node_index = self.story_contents.find_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
@@ -724,7 +737,7 @@ class Story(object):
         Raises:
             ValueError: The node is not part of the story.
         """
-        node_index = self.story_contents.find_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
@@ -742,7 +755,7 @@ class Story(object):
         Raises:
             ValueError: The node is not part of the story.
         """
-        node_index = self.story_contents.find_node_index(node_id)
+        node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story.' % node_id)
@@ -762,7 +775,7 @@ class Story(object):
         Raises:
             ValueError: The node is not part of the story.
         """
-        node_index = self.story_contents.find_node_index(new_starting_node_id)
+        node_index = self.story_contents.get_node_index(new_starting_node_id)
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story.'
