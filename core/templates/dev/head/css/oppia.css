@@ -2589,24 +2589,6 @@ oppia-parameter {
   background: none;
 }
 
-.oppia-dashboard-row {
-  background-color: #fff;
-  cursor: pointer;
-  margin-bottom: -5px;
-  overflow: auto;
-  position: relative;
-}
-
-.oppia-dashboard-row:hover {
-  background: #eee;
-}
-.oppia-dashboard-row-recent {
-  background: #fff4ca;
-}
-.oppia-dashboard-row-recent:hover {
-  background: #ffe279;
-}
-
 .oppia-dashboard-status-green {
   color: #009688;
   font-weight: bold;
@@ -3175,27 +3157,6 @@ div#ng-curtain {
   margin-bottom: 10px;
 }
 
-.oppia-notifications-dashboard-card {
-  padding: 15px 40px;
-}
-
-.oppia-notification-content {
-  color: black;
-  display: inline-block;
-  float: left;
-}
-
-.oppia-notification-last-updated {
-  float: right;
-}
-
-@media (max-width: 500px) {
-  .oppia-notification-content,
-  .oppia-notification-last-updated {
-    display: inline;
-  }
-}
-
 .oppia-privacy-terms {
   display: block;
   position: relative;
@@ -3210,11 +3171,6 @@ div#ng-curtain {
 
 .oppia-page-heading {
   margin-bottom: 5px;
-}
-
-.oppia-page-heading-subtext {
-  font-size: smaller;
-  opacity: 0.7;
 }
 
 .oppia-rating-star-active,
