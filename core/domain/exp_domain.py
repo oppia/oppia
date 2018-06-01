@@ -3179,8 +3179,8 @@ class Exploration(object):
 
     @classmethod
     def _convert_states_v19_dict_to_v20_dict(cls, states_dict):
-        """Converts from version 19 to 20. Version 20 converts non textangular
-        html content to the textangular html content.
+        """Converts from version 19 to 20. Version 20 converts all Rich Text
+        Editor content to be compatible with the textAngular format.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,

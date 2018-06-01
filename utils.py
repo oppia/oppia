@@ -745,7 +745,7 @@ def enforce_valid_parent(
 
 
 def convert_to_text_angular(html_data):
-    """This fucntion converts the html to text angular supported format.
+    """This function converts the html to text angular supported format.
 
     Args:
         html_data: str. HTML string to be converted.
@@ -759,8 +759,11 @@ def convert_to_text_angular(html_data):
     soup = bs4.BeautifulSoup(html_data, 'html.parser')
 
     allowed_tag_list = (
-        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
-        ['ALLOWED_TAG_LIST'])
+        feconf.RTE_CONTENT_SPEC[
+            'RTE_TYPE_TEXTANGULAR']['ALLOWED_TAG_LIST'])
+    allowed_parent_list = (
+        feconf.RTE_CONTENT_SPEC[
+            'RTE_TYPE_TEXTANGULAR']['ALLOWED_PARENT_LIST'])
 
     # To remove all tags except those in allowed tag list.
     all_tags = soup.findAll()
@@ -791,23 +794,24 @@ def convert_to_text_angular(html_data):
         'oppia-noninteractive-tabs'
         ]
 
-    # Ensure that every line break is a child of <b>, <i>, <li>, or <p>.
-    enforce_valid_parent(soup, 'br', ['b', 'i', 'li', 'p'], 'p')
+    # Ensure that every line break is a child of any of its allowed parents.
+    enforce_valid_parent(soup, 'br', allowed_parent_list['br'], 'p')
 
-    # Ensure that every oppia inline component is a child of <b>, <i>,
-    # <li>, <p> or <pre>.
+    # Ensure that every oppia inline component is a child of any
+    # of its allowed parents.
     for tag_name in oppia_inline_components:
-        enforce_valid_parent(soup, tag_name, ['b', 'i', 'li', 'p', 'pre'], 'p')
+        enforce_valid_parent(soup, tag_name, allowed_parent_list[tag_name], 'p')
 
-    # Ensure that every oppia block component is a child of <li>, <p>, or <pre>.
+    # Ensure that every oppia block component is a child of any of its
+    # allowed parents.
     for tag_name in oppia_block_components:
-        enforce_valid_parent(soup, tag_name, ['li', 'p', 'pre'], 'p')
+        enforce_valid_parent(soup, tag_name, allowed_parent_list[tag_name], 'p')
 
-    # Ensure that every bold tag is a child of <i>, <li>, <p> or <pre>.
-    enforce_valid_parent(soup, 'b', ['i', 'li', 'p', 'pre'], 'p')
+    # Ensure that every bold tag is a child of any of its allowed parents.
+    enforce_valid_parent(soup, 'b', allowed_parent_list['b'], 'p')
 
-    # Ensure that every italics tag is a child of <b>, <li>, <p> or <pre>.
-    enforce_valid_parent(soup, 'i', ['b', 'li', 'p', 'pre'], 'p')
+    # Ensure that every italics tag is a child of any of its allowed parents.
+    enforce_valid_parent(soup, 'i', allowed_parent_list['i'], 'p')
 
     # Ensure that blockquote or pre tag is not wrapped in p tags.
     for tag_name in ['blockquote', 'pre']:
@@ -822,6 +826,11 @@ def convert_to_text_angular(html_data):
                 p2 = soup.new_tag('p')
                 for sib in next_sib:
                     sib.wrap(p2)
+
+    # Ensure that every content in html is wrapped in a tag.
+    for content in soup.contents:
+        if not content.name:
+            content.wrap(soup.new_tag('p'))
 
     # Ensure that p tag is not wrapped in p tag.
     for p in soup.findAll('p'):
