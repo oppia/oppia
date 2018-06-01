@@ -53,6 +53,10 @@ class TopicEditorPage(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
 
+        if not feconf.ENABLE_TOPIC_PAGE:
+            raise self.PageNotFoundException(
+                Exception('Topic Page is not accessible currently.'))
+
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         self.values.update({
             'topic_id': topic.id,
@@ -62,7 +66,7 @@ class TopicEditorPage(base.BaseHandler):
         })
 
         # Render template will be written after the frontend is done.
-        self.render_template('pages/collection_player/collection_player.html')
+        self.render_template('pages/topic_editor/topic_editor.html')
 
 
 class EditableTopicDataHandler(base.BaseHandler):
@@ -126,6 +130,7 @@ class EditableTopicDataHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
+    @acl_decorators.can_edit_topic
     def delete(self, topic_id):
         """Handles Delete requests."""
         if not topic_id:

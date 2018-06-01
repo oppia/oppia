@@ -888,7 +888,7 @@ tags: []
 
     def save_new_story(
             self, story_id, owner_id, title,
-            description, notes, story_contents,
+            description, notes,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
@@ -899,18 +899,17 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
-            story_contents: StoryContents. A StoryContents object containing the
-                list of nodes.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
 
         Returns:
             Story. A newly-created story.
         """
-        story = story_domain.Story(
-            story_id, title, description, notes, story_contents,
-            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION, language_code, 0
-        )
+        story = story_domain.Story.create_default_story(story_id)
+        story.title = title
+        story.description = description
+        story.notes = notes
+        story.language_code = language_code
         story_services.save_new_story(owner_id, story)
         return story
 

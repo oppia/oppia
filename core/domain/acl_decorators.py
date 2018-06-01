@@ -17,6 +17,7 @@
 """Decorators to provide authorization across the site."""
 
 from core.controllers import base
+from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import topic_services
@@ -343,23 +344,92 @@ def can_access_creator_dashboard(handler):
     return test_can_access
 
 
-def can_comment_on_feedback_thread(handler):
-    """Decorator to check whether the user can view feedback for a given
-    exploration.
+def can_create_feedback_thread(handler):
+    """Decorator to check whether the user can create a feedback thread.
     """
 
     def test_can_access(self, exploration_id, **kwargs):
-        """Checks if the user can view the exploration feedback.
+        """Checks if the user can create a feedback thread.
 
         Args:
-            exploration_id: str. The exploration id.
+            exploration_id: str. The ID of the exploration where the thread will
+                be created.
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can view the exploration feedback.
+            *. The return value of the decorated function.
+        """
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if rights_manager.check_can_access_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to create exploration feedback.')
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def can_view_feedback_thread(handler):
+    """Decorator to check whether the user can view a feedback thread."""
+
+    def test_can_access(self, thread_id, **kwargs):
+        """Checks if the user can view a feedback thread.
+
+        Args:
+            thread_id: str. The feedback thread id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if '.' not in thread_id:
+            raise self.InvalidInputException('Thread ID must contain a .')
+
+        exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
+
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if rights_manager.check_can_access_activity(
+                self.user, exploration_rights):
+            return handler(self, thread_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to view exploration feedback.')
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def can_comment_on_feedback_thread(handler):
+    """Decorator to check whether the user can comment on feedback thread.
+    """
+
+    def test_can_access(self, thread_id, **kwargs):
+        """Checks if the user can comment on the feedback thread.
+
+        Args:
+            thread_id: str. The feedback thread id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
+
+        if '.' not in thread_id:
+            raise self.InvalidInputException('Thread ID must contain a .')
+
+        exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -369,10 +439,11 @@ def can_comment_on_feedback_thread(handler):
 
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
-            return handler(self, exploration_id, **kwargs)
+            return handler(self, thread_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                'You do not have credentials to view exploration feedback.')
+                'You do not have credentials to comment on exploration'
+                ' feedback.')
     test_can_access.__wrapped__ = True
 
     return test_can_access
@@ -748,11 +819,10 @@ def can_edit_topic(handler):
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if topic_services.check_can_edit_topic(
-                self.user, topic_rights):
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, topic_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
+            raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this topic.')
     test_can_edit.__wrapped__ = True
 

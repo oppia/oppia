@@ -27,6 +27,25 @@ TOPIC_ID_KEY = 'topicId'
 SKILL_ID_KEY = 'skillId'
 
 
+class TopicsAndSkillsDashboardPage(base.BaseHandler):
+    """Page showing the topics and skills dashboard."""
+
+    @acl_decorators.can_access_admin_page
+    def get(self):
+
+        if not feconf.ENABLE_TOPIC_PAGE:
+            raise self.PageNotFoundException(
+                Exception(
+                    'Topics and Skills dashboard is not accessible currently.'))
+
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD
+        })
+        self.render_template(
+            'pages/topics_and_skills_dashboard/'
+            'topics_and_skills_dashboard.html', redirect_url_on_logout='/')
+
+
 class NewTopic(base.BaseHandler):
     """Creates a new topic."""
 

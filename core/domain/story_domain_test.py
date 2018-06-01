@@ -26,7 +26,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     """Test the story domain object."""
 
     STORY_ID = 'story_id'
-    NODE_ID_1 = 'node_id_1'
+    NODE_ID_1 = feconf.DEFAULT_INITIAL_NODE_ID
     NODE_ID_2 = 'node_id_2'
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
@@ -35,13 +35,9 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(StoryDomainUnitTests, self).setUp()
-        story_node = story_domain.StoryNode.create_default_story_node(
-            self.NODE_ID_1)
-        story_contents = story_domain.StoryContents([story_node])
         self.STORY_ID = story_services.get_new_story_id()
         self.story = self.save_new_story(
-            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes',
-            story_contents
+            self.STORY_ID, self.USER_ID, 'Title', 'Description', 'Notes'
         )
 
     def _assert_validation_error(self, expected_error_substring):
@@ -55,9 +51,6 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         method of class Story.
         """
         story = story_domain.Story.create_default_story(self.STORY_ID)
-        story_node = story_domain.StoryNode.create_default_story_node(
-            self.NODE_ID_1)
-        story.story_contents = story_domain.StoryContents([story_node])
         expected_story_dict = {
             'id': self.STORY_ID,
             'title': feconf.DEFAULT_STORY_TITLE,
@@ -71,7 +64,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                     'prerequisite_skill_ids': [],
                     'outline': '',
                     'exploration_id': None
-                }]
+                }],
+                'starting_node_id': self.NODE_ID_1
             },
             'schema_version': feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
@@ -115,6 +109,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         )
 
     def test_nodes_validation(self):
+        self.story.story_contents.starting_node_id = 'node'
+        self._assert_validation_error('Expected starting node to exist')
         self.story.story_contents.nodes = {}
         self._assert_validation_error(
             'Expected nodes field to be a list, received {}')
@@ -172,68 +168,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'to be mutually exclusive.')
 
     def test_all_nodes_visited(self):
-        node_1 = {
-            'id': 'node_1',
-            'destination_node_ids': ['node_3'],
-            'acquired_skill_ids': ['skill_2'],
-            'prerequisite_skill_ids': ['skill_1'],
-            'outline': '',
-            'exploration_id': None
-        }
-        node_2 = {
-            'id': 'node_2',
-            'destination_node_ids': [],
-            'acquired_skill_ids': ['skill_4'],
-            'prerequisite_skill_ids': ['skill_2'],
-            'outline': '',
-            'exploration_id': None
-        }
-        node_3 = {
-            'id': 'node_3',
-            'destination_node_ids': [],
-            'acquired_skill_ids': ['skill_3'],
-            'prerequisite_skill_ids': ['skill_4'],
-            'outline': '',
-            'exploration_id': None
-        }
-        self.story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(node_1),
-            story_domain.StoryNode.from_dict(node_2),
-            story_domain.StoryNode.from_dict(node_3)
-        ]
-        self._assert_validation_error('Expected all nodes to be reachable.')
-
-        node_1 = {
-            'id': 'node_1',
-            'destination_node_ids': ['node_3', 'node_2'],
-            'acquired_skill_ids': ['skill_2'],
-            'prerequisite_skill_ids': ['skill_1'],
-            'outline': '',
-            'exploration_id': None
-        }
-        node_2 = {
-            'id': 'node_2',
-            'destination_node_ids': [],
-            'acquired_skill_ids': ['skill_3'],
-            'prerequisite_skill_ids': ['skill_2'],
-            'outline': '',
-            'exploration_id': None
-        }
-        node_3 = {
-            'id': 'node_3',
-            'destination_node_ids': [],
-            'acquired_skill_ids': ['skill_4'],
-            'prerequisite_skill_ids': ['skill_3'],
-            'outline': '',
-            'exploration_id': None
-        }
-        self.story.story_contents.nodes = [
-            story_domain.StoryNode.from_dict(node_1),
-            story_domain.StoryNode.from_dict(node_2),
-            story_domain.StoryNode.from_dict(node_3)
-        ]
-        self.story.validate()
-
+        # Case 1: Prerequisite skills not acquired.
         node_1 = {
             'id': 'node_1',
             'destination_node_ids': ['node_2', 'node_3'],
@@ -245,7 +180,74 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         node_2 = {
             'id': 'node_2',
             'destination_node_ids': [],
-            'acquired_skill_ids': ['skill_1'],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_3'],
+            'outline': '',
+            'exploration_id': None
+        }
+        self.story.story_contents.starting_node_id = 'node_1'
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        self._assert_validation_error(
+            'Expected the user to have acquired all prerequisite skills by the '
+            'time a new node is visible.')
+
+        # Case 2: Story with loops.
+        node_1 = {
+            'id': 'node_1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'destination_node_ids': ['node_3'],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_3'],
+            'outline': '',
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        self._assert_validation_error('Loops are not allowed in stories.')
+
+        # Case 3: Disconnected graph.
+        node_1 = {
+            'id': 'node_1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
             'exploration_id': None
@@ -265,6 +267,47 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         ]
         self._assert_validation_error('Expected all nodes to be reachable.')
 
+        # Case 4: A valid graph.
+        node_1 = {
+            'id': 'node_1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1', 'skill_0'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'destination_node_ids': ['node_4', 'node_3'],
+            'acquired_skill_ids': ['skill_3', 'skill_4'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_3',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': ['skill_4'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_4 = {
+            'id': 'node_4',
+            'destination_node_ids': [],
+            'acquired_skill_ids': [],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3),
+            story_domain.StoryNode.from_dict(node_4)
+        ]
+        self.story.validate()
+
     def test_story_contents_export_import(self):
         """Test that to_dict and from_dict preserve all data within a
         story_contents object.
@@ -273,7 +316,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             self.NODE_ID_1, [self.NODE_ID_2],
             [self.SKILL_ID_1], [self.SKILL_ID_2],
             'Outline', self.EXP_ID)
-        story_contents = story_domain.StoryContents([story_node])
+        story_contents = story_domain.StoryContents(
+            [story_node], self.NODE_ID_1)
         story_contents_dict = story_contents.to_dict()
         story_contents_from_dict = story_domain.StoryContents.from_dict(
             story_contents_dict)

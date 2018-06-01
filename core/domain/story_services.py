@@ -299,6 +299,10 @@ def apply_change_list(story_id, change_list):
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_LANGUAGE_CODE):
                     story.update_language_code(change.new_value)
+            elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
+                if (change.property_name ==
+                        story_domain.STORY_CONTENTS_PROPERTY_STARTING_NODE_ID):
+                    story.update_starting_node(change.new_value)
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
@@ -378,11 +382,7 @@ def _save_story(committer_id, story, commit_message, change_list):
     story_model.notes = story.notes
     story_model.language_code = story.language_code
     story_model.schema_version = story.schema_version
-    story_model.story_contents = {
-        'nodes': [
-            node.to_dict() for node in story.story_contents.nodes
-        ]
-    }
+    story_model.story_contents = story.story_contents.to_dict()
     story_model.version = story.version
     change_dicts = [change.to_dict() for change in change_list]
     story_model.commit(committer_id, commit_message, change_dicts)

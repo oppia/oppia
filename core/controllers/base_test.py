@@ -93,9 +93,9 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
             # Some of these will 404 or 302. This is expected.
             response = self.testapp.get(url, expect_errors=True)
-            if response.status_int not in [200, 302, 401, 404]:
+            if response.status_int not in [200, 302, 400, 401, 404]:
                 print url
-            self.assertIn(response.status_int, [200, 302, 401, 404])
+            self.assertIn(response.status_int, [200, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for

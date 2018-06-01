@@ -2817,9 +2817,10 @@ title: Old Title
 
 class SuggestionActionUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion action functions in exp_services."""
-    THREAD_ID1 = '1111'
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
+    THREAD_ID1 = EXP_ID1 + '.1111'
+    THREAD_ID2 = EXP_ID2 + '.1111'
     USER_EMAIL = 'user@123.com'
     EDITOR_EMAIL = 'editor@123.com'
     USERNAME = 'user123'
@@ -2827,13 +2828,16 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
     COMMIT_MESSAGE = 'commit message'
     EMPTY_COMMIT_MESSAGE = ' '
 
-    def _generate_thread_id(self, unused_exp_id):
+    def _generate_thread_id_1(self, unused_exp_id):
         return self.THREAD_ID1
 
-    def _return_true(self, unused_thread_id, unused_exploration_id):
+    def _generate_thread_id_2(self, unused_exp_id):
+        return self.THREAD_ID2
+
+    def _return_true(self, unused_thread_id, unused_exploration_id=''):
         return True
 
-    def _return_false(self, unused_thread_id, unused_exploration_id):
+    def _return_false(self, unused_thread_id, unused_exploration_id=''):
         return False
 
     def _check_commit_message(
@@ -2858,10 +2862,13 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
         self.initial_state_name = exploration.init_state_name
         with self.swap(
             feedback_models.FeedbackThreadModel,
-            'generate_new_thread_id', self._generate_thread_id):
+            'generate_new_thread_id', self._generate_thread_id_1):
             feedback_services.create_suggestion(
                 self.EXP_ID1, self.user_id, 3, self.initial_state_name,
                 'description', 'new text')
+        with self.swap(
+            feedback_models.FeedbackThreadModel,
+            'generate_new_thread_id', self._generate_thread_id_2):
             feedback_services.create_suggestion(
                 self.EXP_ID2, self.user_id, 3, self.initial_state_name,
                 'description', 'new text')
@@ -2876,11 +2883,8 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                 exp_services.accept_suggestion(
                     self.editor_id, self.THREAD_ID1, self.EXP_ID1,
                     self.COMMIT_MESSAGE, False)
-        thread = feedback_models.FeedbackThreadModel.get(
-            feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                self.EXP_ID1, self.THREAD_ID1))
-        thread_messages = feedback_services.get_messages(
-            self.EXP_ID1, self.THREAD_ID1)
+        thread = feedback_models.FeedbackThreadModel.get(self.THREAD_ID1)
+        thread_messages = feedback_services.get_messages(self.THREAD_ID1)
         last_message = thread_messages[len(thread_messages) - 1]
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_FIXED)
         self.assertEqual(last_message.text, 'Suggestion accepted.')
@@ -2895,22 +2899,18 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
                 'has been removed/renamed.'
                 ):
                 exp_services.accept_suggestion(
-                    self.editor_id, self.THREAD_ID1, self.EXP_ID2,
+                    self.editor_id, self.THREAD_ID2, self.EXP_ID2,
                     self.COMMIT_MESSAGE, False)
-        thread = feedback_models.FeedbackThreadModel.get(
-            feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                self.EXP_ID2, self.THREAD_ID1))
+        thread = feedback_models.FeedbackThreadModel.get(self.THREAD_ID2)
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
 
     def test_accept_suggestion_empty_commit_message(self):
         with self.assertRaisesRegexp(
             Exception, 'Commit message cannot be empty.'):
             exp_services.accept_suggestion(
-                self.editor_id, self.THREAD_ID1, self.EXP_ID2,
+                self.editor_id, self.THREAD_ID2, self.EXP_ID2,
                 self.EMPTY_COMMIT_MESSAGE, False)
-        thread = feedback_models.FeedbackThreadModel.get(
-            feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                self.EXP_ID2, self.THREAD_ID1))
+        thread = feedback_models.FeedbackThreadModel.get(self.THREAD_ID2)
         self.assertEqual(thread.status, feedback_models.STATUS_CHOICES_OPEN)
 
     def test_accept_suggestion_that_has_already_been_handled(self):
@@ -2920,15 +2920,12 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
                 exp_services.accept_suggestion(
-                    self.editor_id, self.THREAD_ID1, self.EXP_ID2,
+                    self.editor_id, self.THREAD_ID2, self.EXP_ID2,
                     self.COMMIT_MESSAGE, False)
 
     def test_reject_suggestion(self):
-        exp_services.reject_suggestion(
-            self.editor_id, self.THREAD_ID1, self.EXP_ID2)
-        thread = feedback_models.FeedbackThreadModel.get(
-            feedback_models.FeedbackThreadModel.generate_full_thread_id(
-                self.EXP_ID2, self.THREAD_ID1))
+        exp_services.reject_suggestion(self.editor_id, self.THREAD_ID2)
+        thread = feedback_models.FeedbackThreadModel.get(self.THREAD_ID2)
         self.assertEqual(
             thread.status,
             feedback_models.STATUS_CHOICES_IGNORED)
@@ -2939,8 +2936,7 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
             exp_services, '_is_suggestion_handled',
             self._return_true):
             with self.assertRaisesRegexp(Exception, exception_message):
-                exp_services.reject_suggestion(
-                    self.editor_id, self.THREAD_ID1, self.EXP_ID2)
+                exp_services.reject_suggestion(self.editor_id, self.THREAD_ID2)
 
 
 class EditorAutoSavingUnitTests(test_utils.GenericTestBase):

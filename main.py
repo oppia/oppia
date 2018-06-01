@@ -227,9 +227,12 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.LEARNER_DASHBOARD_IDS_DATA_URL,
         learner_dashboard.LearnerDashboardIdsHandler),
     get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>' %
+        r'%s/<thread_id>' %
         feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL,
         learner_dashboard.LearnerDashboardFeedbackThreadHandler),
+    get_redirect_route(
+        r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD,
+        topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
 
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' %
@@ -418,13 +421,13 @@ URLS = MAPREDUCE_HANDLERS + [
         feedback.RecentFeedbackMessagesHandler),
 
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
+        r'%s/<thread_id>' % feconf.FEEDBACK_THREAD_VIEW_EVENT_URL,
         feedback.FeedbackThreadViewEventHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
         feedback.ThreadListHandler),
     get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
+        r'%s/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler),
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,

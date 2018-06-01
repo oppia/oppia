@@ -222,6 +222,8 @@ DEFAULT_STORY_TITLE = ''
 DEFAULT_STORY_DESCRIPTION = ''
 # Default notes for a newly-minted story.
 DEFAULT_STORY_NOTES = ''
+# Initial node id for a new story.
+DEFAULT_INITIAL_NODE_ID = 'node_1'
 
 # Default description for a newly-minted skill.
 DEFAULT_SKILL_DESCRIPTION = ''
@@ -362,6 +364,9 @@ ENABLE_PROMO_BAR = True
 # determines whether the site is in maintenance mode to avoid queries to the
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
+
+# Disables the topic page, till its completed.
+ENABLE_TOPIC_PAGE = False
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -626,6 +631,7 @@ SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor/create'
 TOPIC_MANAGER_PREFIX = '/assign_topic_manager'
+TOPICS_AND_SKILLS_DASHBOARD = '/topics_and_skills_dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
@@ -646,6 +652,7 @@ NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
+NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -869,3 +876,47 @@ VIEW_METHOD_USERNAME = 'username'
 QUESTION_BATCH_SIZE = 10
 
 STATE_ANSWER_STATS_MIN_FREQUENCY = 2
+
+# RTE content specifications according to the type of the editor.
+RTE_CONTENT_SPEC = {
+    'RTE_TYPE_TEXTANGULAR': {
+        # Valid parent-child relation in TextAngular.
+        'ALLOWED_PARENT_LIST': {
+            'p': ['blockquote', 'div', 'pre', '[document]'],
+            'b': ['i', 'li', 'p', 'pre'],
+            'br': ['b', 'i', 'li', 'p'],
+            'div': ['blockquote'],
+            'i': ['b', 'li', 'p', 'pre'],
+            'li': ['ol', 'ul'],
+            'ol': ['blockquote', 'li', 'pre', 'div', '[document]'],
+            'ul': ['blockquote', 'li', 'pre', 'div', '[document]'],
+            'pre': ['blockquote', '[document]'],
+            'blockquote': ['blockquote', '[document]'],
+            'oppia-noninteractive-link': ['b', 'li', 'i', 'p', 'pre'],
+            'oppia-noninteractive-math': ['b', 'li', 'i', 'p', 'pre'],
+            'oppia-noninteractive-image': ['li', 'p', 'pre'],
+            'oppia-noninteractive-collapsible': ['li', 'p', 'pre'],
+            'oppia-noninteractive-video': ['li', 'p', 'pre'],
+            'oppia-noninteractive-tabs': ['li', 'p', 'pre']
+        },
+        # Valid html tags in TextAngular.
+        'ALLOWED_TAG_LIST': [
+            'p',
+            'b',
+            'br',
+            'div',
+            'i',
+            'li',
+            'ol',
+            'ul',
+            'pre',
+            'blockquote',
+            'oppia-noninteractive-link',
+            'oppia-noninteractive-math',
+            'oppia-noninteractive-image',
+            'oppia-noninteractive-collapsible',
+            'oppia-noninteractive-video',
+            'oppia-noninteractive-tabs'
+        ]
+    }
+}
