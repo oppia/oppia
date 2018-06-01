@@ -41,7 +41,7 @@ class BaseSuggestion(object):
             review the suggestion.
         final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
             the suggestion.
-        change_cmd: dict. The actual content of the suggestion.
+        change_cmd: dict. The details of the suggestion.
         score_category: str. The scoring category for the suggestion.
     """
 
@@ -77,7 +77,9 @@ class BaseSuggestion(object):
             'Subclasses of BaseSuggestion should implement from_dict.')
 
     def get_score_type(self):
-        """Returns the first part of the score category.
+        """Returns the first part of the score category. The first part refers
+        to the the type of scoring. The value of this part will be among
+        suggestion_models.SCORE_CATEGORY_C
 
         Returns:
             str. The first part of the score category.

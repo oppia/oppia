@@ -56,9 +56,9 @@ def create_suggestion(
             accepted/rejected the suggestion.
     """
 
-    # TODO: Remove the check for target type once the feedback threads are
-    # generalised for all types of entities. As at the moment feedback threads
-    # can only be linked to explorations, we have this check.
+    # TODO(nithesh): Remove the check for target type once the feedback threads
+    # are generalised for all types of entities. As at the moment feedback
+    # threads can only be linked to explorations, we have this check.
     # This will be completed as a part of milestone 2 of the generalised review
     # system project.
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
@@ -83,7 +83,7 @@ def create_suggestion(
 
 
 def get_suggestion_from_model(suggestion_model):
-    """Converts the given SuggestionModel to a Suggestion object
+    """Converts the given SuggestionModel to a Suggestion domain object
 
     Args:
         suggestion_model: SuggestionModel.
@@ -181,10 +181,10 @@ def get_suggestions_by_status(status):
 
 
 def get_suggestion_by_type(suggestion_type):
-    """Gets a list of suggestions with the given sub_type.
+    """Gets a list of suggestions with the given type.
 
     Args:
-        suggestion_type: str. The sub type of the suggestion.
+        suggestion_type: str. The type of the suggestion.
 
     Returns:
         list(Suggestion). A list of suggestions of the given type.
@@ -261,10 +261,11 @@ def assign_reviewer_to_suggestion(suggestion, assigned_reviewer_id):
     _update_suggestion(suggestion)
 
 
-# This function is temporary. At the moment, the feedback threads id is of the
-# form exp_id.<random_str> while the suggestion ids are of the form
-# entity_type.entity_id.<random_str>. Once the feedback thread ID migration
-# is complete, these two IDs will be matched, and this function will be removed.
+# TODO (nithesh): This function is temporary. At the moment, the feedback
+# threads id is of the form exp_id.<random_str> while the suggestion ids are of
+# the form entity_type.entity_id.<random_str>. Once the feedback thread ID
+# migration is complete, these two IDs will be matched, and this function will
+# be removed.
 def get_thread_id_from_suggestion_id(suggestion_id):
     """Gets the thread_id from the suggestion_id.
 
