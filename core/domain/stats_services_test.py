@@ -393,11 +393,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         stats_services.create_exp_issues_for_new_exploration(
             exploration.id, exploration.version)
 
-        # TODO(pranavsid98): Replace below lines with get_exp_issues().
-        exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
-        exp_issues = stats_services.get_exp_issues_from_model(
-            exp_issues_instance)
         self.assertEqual(exp_issues.exp_id, exploration.id)
         self.assertEqual(exp_issues.exp_version, exploration.version)
         self.assertEqual(exp_issues.unresolved_issues, [])
@@ -416,11 +413,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
                 assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
-        # TODO(pranavsid98): Replace below lines with get_exp_issues().
-        exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
-        exp_issues = stats_services.get_exp_issues_from_model(
-            exp_issues_instance)
         self.assertEqual(exp_issues.exp_version, 1)
         self.assertEqual(exp_issues.unresolved_issues, [])
 
@@ -502,11 +496,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         stats_services.update_exp_issues_for_new_exp_version(
             exploration, exp_versions_diff, False)
 
-        # TODO(pranavsid98): Replace below lines with get_exp_issues().
-        exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
-        exp_issues = stats_services.get_exp_issues_from_model(
-            exp_issues_instance)
         self.assertEqual(exp_issues.exp_version, 2)
         self.assertEqual(
             exp_issues.unresolved_issues[0].issue_customization_args[
@@ -545,11 +536,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         stats_services.update_exp_issues_for_new_exp_version(
             exploration, exp_versions_diff, False)
 
-        # TODO(pranavsid98): Replace below lines with get_exp_issues().
-        exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
+        exp_issues = stats_services.get_exp_issues(
             exploration.id, exploration.version)
-        exp_issues = stats_services.get_exp_issues_from_model(
-            exp_issues_instance)
         self.assertEqual(exp_issues.exp_version, 3)
         self.assertEqual(
             exp_issues.unresolved_issues[0].issue_customization_args[

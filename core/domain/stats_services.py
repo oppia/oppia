@@ -297,21 +297,15 @@ def update_exp_issues_for_new_exp_version(
         revert_to_version: int|None. If the change is a revert, the version.
             Otherwise, None.
     """
-    # TODO(pranavsid98): Convert below two lines to use get_by_id() instead.
-    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
-        exploration.id, exploration.version - 1)
-    if exp_issues_model is None:
+    exp_issues = get_exp_issues(exploration.id, exploration.version)
+    if exp_issues is None:
         create_exp_issues_for_new_exploration(
             exploration.id, exploration.version - 1)
         return
-    exp_issues = get_exp_issues_from_model(exp_issues_model)
 
     # Handling reverts.
     if revert_to_version:
-        # TODO(pranavsid98): Convert below two lines to use get_by_id() instead.
-        old_exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
-            exploration.id, revert_to_version)
-        old_exp_issues = get_exp_issues_from_model(old_exp_issues_instance)
+        old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
         exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
         exp_issues.exp_version += 1
         create_exp_issues_model(exp_issues)
@@ -441,21 +435,10 @@ def get_playthroughs_multi(playthrough_ids):
     """
     playthrough_instances = stats_models.PlaythroughModel.get_multi(
         playthrough_ids)
-    # TODO(pranavsid98): Replace below lines with get_from_model.
     playthroughs = []
-    for playthrough_instance in playthrough_instances:
-        playthrough_actions = []
-        for action in playthrough_instance.playthrough_actions:
-            playthrough_actions.append(
-                stats_domain.LearnerAction.from_dict(action))
-        playthroughs.append(
-            stats_domain.Playthrough(
-                playthrough_instance.id,
-                playthrough_instance.exp_id,
-                playthrough_instance.exp_version,
-                playthrough_instance.issue_type,
-                playthrough_instance.issue_customization_args,
-                playthrough_actions))
+    playthroughs = [
+        get_playthrough_from_model(playthrough_instance)
+        for playthrough_instance in playthrough_instances]
     return playthroughs
 
 
