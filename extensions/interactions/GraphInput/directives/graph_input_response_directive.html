@@ -20,33 +20,33 @@
   <svg width="100%" height="250">
     <g ng-repeat="edge in graph.edges">
       <line ng-attr-x1="<[graph.vertices[edge.src].x - GRAPH_INPUT_LEFT_MARGIN]>"
-        ng-attr-y1="<[graph.vertices[edge.src].y]>"
-        ng-attr-x2="<[graph.vertices[edge.dst].x - GRAPH_INPUT_LEFT_MARGIN]>"
-        ng-attr-y2="<[graph.vertices[edge.dst].y]>"
-        ng-attr-style="stroke: black; stroke-width: <[::EDGE_WIDTH]>;">
+            ng-attr-y1="<[graph.vertices[edge.src].y]>"
+            ng-attr-x2="<[graph.vertices[edge.dst].x - GRAPH_INPUT_LEFT_MARGIN]>"
+            ng-attr-y2="<[graph.vertices[edge.dst].y]>"
+            ng-attr-style="stroke: black; stroke-width: <[::EDGE_WIDTH]>;">
       </line>
       <polygon ng-if="graph.isDirected"
-        ng-attr-points="<[getDirectedEdgeArrowPoints($index)]>"
-        ng-attr-style="fill: black;">
+               ng-attr-points="<[getDirectedEdgeArrowPoints($index)]>"
+               ng-attr-style="fill: black;">
       </polygon>
       <text ng-if="graph.isWeighted"
-        ng-attr-x="<[getEdgeCentre($index).x - GRAPH_INPUT_LEFT_MARGIN]>"
-        ng-attr-y="<[getEdgeCentre($index).y - 12]>"
-        class="unselectable-text">
+            ng-attr-x="<[getEdgeCentre($index).x - GRAPH_INPUT_LEFT_MARGIN]>"
+            ng-attr-y="<[getEdgeCentre($index).y - 12]>"
+            class="unselectable-text">
         <[edge.weight]>
       </text>
     </g>
     <g ng-repeat="vertex in graph.vertices"
-      ng-attr-transform="translate(<[vertex.x - GRAPH_INPUT_LEFT_MARGIN]>, <[vertex.y]>)">
+       ng-attr-transform="translate(<[vertex.x - GRAPH_INPUT_LEFT_MARGIN]>, <[vertex.y]>)">
       <text ng-if="graph.isLabeled"
-        x="0"
-        y="-10"
-        class="unselectable-text">
+            x="0"
+            y="-10"
+            class="unselectable-text">
         <[vertex.label]>
       </text>
       <circle cx="0"
-        cy="0"
-        ng-attr-r="<[::VERTEX_RADIUS]>">
+              cy="0"
+              ng-attr-r="<[::VERTEX_RADIUS]>">
       </circle>
     </g>
   </svg>

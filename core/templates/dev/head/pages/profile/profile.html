@@ -46,7 +46,7 @@
 
       <h2 class="oppia-profile-username-large-screen">
         <span popover-placement="right" ng-attr-uib-popover="<[usernameIsLong ? username.helpText : undefined]>"
-            popover-append-to-body popover-trigger="mouseenter">
+              popover-append-to-body popover-trigger="mouseenter">
           <strong><[username.value| truncate:16]></strong>
         </span>
       </h2>
@@ -115,17 +115,17 @@
     <md-card class="oppia-profile-content-card">
       <md-content class="oppia-profile-portfolio-container">
         <exploration-summary-tile ng-repeat="expl in getExplorationsToDisplay()"
-          exploration-id="expl.id"
-          exploration-title="expl.title"
-          last-updated-msec="expl.last_updated_msec"
-          objective="expl.objective"
-          category="expl.category"
-          ratings="expl.ratings"
-          thumbnail-icon-url="expl.thumbnail_icon_url"
-          thumbnail-bg-color="expl.thumbnail_bg_color"
-          num-views="expl.num_views"
-          is-community-editable="expl.community_editable"
-          mobile-cutoff-px="610">
+                                  exploration-id="expl.id"
+                                  exploration-title="expl.title"
+                                  last-updated-msec="expl.last_updated_msec"
+                                  objective="expl.objective"
+                                  category="expl.category"
+                                  ratings="expl.ratings"
+                                  thumbnail-icon-url="expl.thumbnail_icon_url"
+                                  thumbnail-bg-color="expl.thumbnail_bg_color"
+                                  num-views="expl.num_views"
+                                  is-community-editable="expl.community_editable"
+                                  mobile-cutoff-px="610">
         </exploration-summary-tile>
 
         <div ng-if="userEditedExplorations.length === 0" translate="I18N_PROFILE_NO_EXPLORATIONS">
