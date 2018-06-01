@@ -221,7 +221,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
-        # Invalidating the suggestion
+        # Invalidating the suggestion.
         suggestion.score_category = 'invalid_score_category'
         suggestion_services._update_suggestion(suggestion)
         with self.assertRaisesRegexp(
@@ -427,71 +427,3 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     def test_get_by_type(self):
         self.assertEqual(len(suggestion_services.get_suggestion_by_type(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)), 5)
-
-ENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id_1, self.target_version_at_submission,
-            self.author_id_1, self.change_cmd, self.score_category,
-            'test description', self.assigned_reviewer_id_1, self.reviewer_id_1)
-
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id_1, self.target_version_at_submission,
-            self.author_id_1, self.change_cmd, self.score_category,
-            'test description', self.assigned_reviewer_id_1)
-
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id_1, self.target_version_at_submission,
-            self.author_id_1, self.change_cmd, self.score_category,
-            'test description')
-
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id_1, self.target_version_at_submission,
-            self.author_id_2, self.change_cmd, self.score_category,
-            'test description', self.assigned_reviewer_id_1, self.reviewer_id_2)
-
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id_2, self.target_version_at_submission,
-            self.author_id_2, self.change_cmd, self.score_category,
-            'test description', self.assigned_reviewer_id_2, self.reviewer_id_2)
-
-    def test_get_by_author(self):
-        self.assertEqual(len(suggestion_services.get_suggestions_by_author(
-            self.author_id_1)), 3)
-        self.assertEqual(len(suggestion_services.get_suggestions_by_author(
-            self.author_id_2)), 2)
-
-    def test_get_by_reviewer(self):
-        self.assertEqual(len(suggestion_services.get_suggestions_reviewed_by(
-            self.reviewer_id_1)), 1)
-        self.assertEqual(len(suggestion_services.get_suggestions_reviewed_by(
-            self.reviewer_id_2)), 2)
-
-    def test_get_by_assigned_reviewer(self):
-        self.assertEqual(
-            len(suggestion_services.get_suggestions_assigned_to_reviewer(
-                self.assigned_reviewer_id_1)), 3)
-        self.assertEqual(
-            len(suggestion_services.get_suggestions_assigned_to_reviewer(
-                self.assigned_reviewer_id_2)), 1)
-
-    def test_get_by_target_id(self):
-        self.assertEqual(len(suggestion_services.get_suggestions_by_target_id(
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.target_id_1)), 4)
-        self.assertEqual(len(suggestion_services.get_suggestions_by_target_id(
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.target_id_2)), 1)
-
-    def test_get_by_status(self):
-        self.assertEqual(len(suggestion_services.get_suggestions_by_status(
-            suggestion_models.STATUS_IN_REVIEW)), 5)
-
-    def test_get_by_type(self):
-        self.assertEqual(len(suggestion_services.get_suggestion_by_type(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)), 5)

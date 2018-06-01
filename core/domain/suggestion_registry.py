@@ -105,8 +105,6 @@ class BaseSuggestion(object):
             ValidationError: One or more attributes of the BaseSuggestion object
                 are invalid.
         """
-        old_status = self.status
-        self.status = suggestion_models.STATUS_INVALID
         if (
                 self.suggestion_type not in
                 suggestion_models.SUGGESTION_TYPE_CHOICES):
@@ -148,8 +146,8 @@ class BaseSuggestion(object):
         if not isinstance(self.final_reviewer_id, basestring):
             if self.final_reviewer_id:
                 raise utils.ValidationError(
-                    'Expected final_reviewer_id to be a string, received %s' % type(
-                        self.final_reviewer_id))
+                    'Expected final_reviewer_id to be a string, received %s' %
+                    type(self.final_reviewer_id))
 
         if not isinstance(self.change_cmd, dict):
             raise utils.ValidationError(
@@ -184,9 +182,6 @@ class BaseSuggestion(object):
             raise utils.ValidationError(
                 'Expected the first part of score_category to be among allowed'
                 ' choices, received %s' % self.get_score_type())
-
-        # Suggestion is valid, so we revert to the old status
-        self.status = old_status
 
     def accept(self):
         """Accepts the suggestion. Each subclass must implement this function.
@@ -239,8 +234,6 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         super(SuggestionEditStateContent, self).validate()
 
-        old_status = self.status
-        self.status = suggestion_models.STATUS_INVALID
         if self.get_score_type() != suggestion_models.SCORE_TYPE_CONTENT:
             raise utils.ValidationError(
                 'Expected the first part of score_category to be %s '
@@ -283,9 +276,6 @@ class SuggestionEditStateContent(BaseSuggestion):
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' %
                 self.change_cmd['state_name'])
-
-        # Suggestion is valid, so we revert to the old status
-        self.status = old_status
 
     def update_change_cmd_before_accept(self):
         """Before accepting the suggestion, modifications need to be done to the

@@ -16,7 +16,6 @@
 suggestions.
 """
 
-from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import suggestion_registry
 from core.domain import user_services
@@ -216,7 +215,7 @@ def _update_suggestion(suggestion):
     """Updates the given suggestion.
 
     Args:
-        suggesstion: Suggestion. The domain object of the suggestion to be
+        suggestion: Suggestion. The domain object of the suggestion to be
             updated.
     """
 
@@ -336,16 +335,16 @@ def accept_suggestion(suggestion, reviewer_id, commit_message):
         # STATUS_INVALID.
         suggestion.validate()
     except utils.ValidationError:
-        _update_suggestion(suggestion)
+        invalidate_suggestion(suggestion)
         raise Exception('The given suggestion is not valid.')
 
     author_name = user_services.get_username(suggestion.author_id)
     commit_message = get_commit_message_for_suggestion(
         author_name, commit_message)
-    suggestion.accept(commit_message)
-
     mark_review_completed(
         suggestion, suggestion_models.STATUS_ACCEPTED, reviewer_id)
+    suggestion.accept(commit_message)
+
     feedback_services.create_message(
         get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
         feedback_models.STATUS_CHOICES_FIXED, None,
@@ -372,3 +371,14 @@ def reject_suggestion(suggestion, reviewer_id):
         get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
         feedback_models.STATUS_CHOICES_IGNORED, None,
         'Rejected by %s' % reviewer_id)
+
+
+def invalidate_suggestion(suggestion):
+    """Sets the status of the suggestion as STATUS_INVALID.
+
+    Args:
+        suggestion: Suggestion. The domain object of the suggestion to be
+            invalidated.
+    """
+    suggestion.status = suggestion_models.STATUS_INVALID
+    _update_suggestion(suggestion)
