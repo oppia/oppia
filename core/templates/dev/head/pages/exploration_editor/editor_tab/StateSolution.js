@@ -175,6 +175,8 @@ oppia.controller('StateSolution', [
           AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID, 4000);
         }
 
+        var contentId = result.solution.explanationHtml.contentId;
+        var contenIdsToAudioTranslations = state.contenIdsToAudioTranslations.addContentId(contentId);
         stateSolutionService.displayed = result.solution;
         stateSolutionService.saveDisplayedValue();
       });

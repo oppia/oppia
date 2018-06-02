@@ -98,8 +98,9 @@ oppia.factory('StatesObjectFactory', [
       for (var stateName in this._states) {
         var state = this._states[stateName];
 
-        for (var contentId in state.contenIdsToAudioTranslations) {
-          for (var languageCode in state.contenIdsToAudioTranslations[contentId]) {
+        for (var contentId in state.contentIdsToAudioTranslations) {
+          var audioLanguageCodes = state.contentIdsToAudioTranslations.getAudioLanguageCodes()
+          for (var languageCode in state.contentIdsToAudioTranslations[contentId]) {
             if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
               allAudioLanguageCodes.push(languageCode);
             }

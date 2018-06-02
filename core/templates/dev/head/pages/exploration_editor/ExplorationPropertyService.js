@@ -336,16 +336,8 @@ oppia.factory('ExplorationStatesService', [
       },
       content_ids_to_audio_translations: function(
         contentIdsToAudioTranslations) {
-        var content_ids_to_audio_translations_dict = {};
-        Object.keys(contentIdsToAudioTranslations).forEach(function(key) {
-          var audioTanslations = contentIdsToAudioTranslations[key];
-          var audioTranslationsDict = {};
-          Object.keys(audioTanslations).forEach(function(lang){
-            audioTranslationsDict[lang] = audioTanslations[lang].toBackendDict();
-          })
-          content_ids_to_audio_translations_dict[key] = audioTranslationsDict;
-        })
-        return content_ids_to_audio_translations_dict;
+
+        return contentIdsToAudioTranslations.toBackendDict();
       },
       default_outcome: function(defaultOutcome) {
         if (defaultOutcome) {

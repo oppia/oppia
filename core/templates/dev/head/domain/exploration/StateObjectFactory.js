@@ -18,10 +18,10 @@
  */
 
 oppia.factory('StateObjectFactory', [
-  'AnswerGroupObjectFactory', 'AudioTranslationObjectFactory',
+  'AudioTranslationObjectFactory','ContentIdsToAudioTranslationsObjectFactory',
   'InteractionObjectFactory', 'SubtitledHtmlObjectFactory',
-  'ParamChangesObjectFactory', function(AnswerGroupObjectFactory,
-      AudioTranslationObjectFactory, InteractionObjectFactory,
+  'ParamChangesObjectFactory', function(AudioTranslationObjectFactory,
+      ContentIdsToAudioTranslationsObjectFactory, InteractionObjectFactory,
       SubtitledHtmlObjectFactory, ParamChangesObjectFactory) {
     var State = function(name, classifierModelId, content, interaction,
         paramChanges, contentIdsToAudioTranslations) {
@@ -35,15 +35,6 @@ oppia.factory('StateObjectFactory', [
 
     // Instance methods.
     State.prototype.toBackendDict = function() {
-      var content_ids_to_audio_translations_dict = {};
-      Object.keys(this.contentIdsToAudioTranslations).forEach(function(key) {
-        var audioTanslations = this.contentIdsToAudioTranslations[key];
-        var audioTranslationsDict = {};
-        Object.keys(audioTanslations).forEach(function(lang){
-          audioTranslationsDict[lang] = audioTanslations[lang].toBackendDict();
-        })
-        content_ids_to_audio_translations_dict[key] = audioTranslationsDict;
-      })
 
       return {
         content: this.content.toBackendDict(),
@@ -53,33 +44,23 @@ oppia.factory('StateObjectFactory', [
           return paramChange.toBackendDict();
         }),
         content_ids_to_audio_translations: (
-            content_ids_to_audio_translations_dict)
+          contentIdsToAudioTranslations.toBackendDict())
       };
     };
 
     // Static class methods. Note that "this" is not available in
     // static contexts.
     State.createFromBackendDict = function(stateName, stateDict) {
-      var contentIdsToAudioTranslations = {};
-      Object.keys(stateDict.content_ids_to_audio_translations).forEach(
-        function(content_id) {
-        var audio_tanslations_dict = (
-            stateDict.content_ids_to_audio_translations[content_id])
-        var audioTranslations = {};
-        Object.keys(audio_tanslations_dict).forEach(function(lang){
-          audioTranslations[lang] = (
-            AudioTranslationObjectFactory.createFromBackendDict(
-              audio_tanslations_dict[lang]))
-        })
-        contentIdsToAudioTranslations.content_id = audioTranslations;
-      })
+
       return new State(
         stateName,
         stateDict.classifier_model_id,
         SubtitledHtmlObjectFactory.createFromBackendDict(stateDict.content),
         InteractionObjectFactory.createFromBackendDict(stateDict.interaction),
         ParamChangesObjectFactory.createFromBackendList(
-          stateDict.param_changes), contentIdsToAudioTranslations);
+          stateDict.param_changes),
+        ContentIdsToAudioTranslationsObjectFactory.createFromBackendDict(
+          contentIdsToAudioTranslations));
     };
 
     return State;
