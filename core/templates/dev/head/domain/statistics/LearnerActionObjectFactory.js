@@ -31,5 +31,12 @@ oppia.factory('LearnerActionObjectFactory', [function() {
       actionType, actionCustomizationArgs, schemaVersion);
   };
 
+  LearnerAction.createFromBackendDict = function(learnerActionBackendDict) {
+    return new LearnerAction(
+      learnerActionBackendDict.actionType,
+      learnerActionBackendDict.actionCustomizationArgs,
+      learnerActionBackendDict.schemaVersion);
+  };
+
   return LearnerAction;
 }]);

@@ -34,4 +34,18 @@ describe('Learner Action Object Factory', function() {
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});
     expect(learnerActionObject.schemaVersion).toEqual(1);
   });
+
+  it('should create a new learner action from a backend dict', function() {
+    var learnerActionBackendDict = {
+      actionType: 'AnswerSubmit',
+      actionCustomizationArgs: {},
+      schemaVersion: 1
+    };
+    var learnerActionObject = LearnerActionObjectFactory.createFromBackendDict(
+        learnerActionBackendDict);
+
+    expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
+    expect(learnerActionObject.actionCustomizationArgs).toEqual({});
+    expect(learnerActionObject.schemaVersion).toEqual(1);
+  });
 });
