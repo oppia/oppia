@@ -13,12 +13,11 @@
 # limitations under the License.
 
 """Tests for Oppia storage models."""
-import os
-import pkgutil
 import inspect
 
 from core.platform import models
 from core.tests import test_utils
+
 
 class StorageModelsTest(test_utils.GenericTestBase):
     """Tests for Oppia storage models."""
@@ -38,9 +37,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
                     ancestor_names = [
                         base_class.__name__ for base_class in clazz.__bases__]
                     if (
-                        'ndb.Model' in ancestor_names or
-                        'BaseModel' in ancestor_names or
-                        'VersionedModel' in ancestor_names):
+                            'ndb.Model' in ancestor_names or
+                            'BaseModel' in ancestor_names or
+                            'VersionedModel' in ancestor_names):
                         all_models.append(clazz.__name__)
 
         frequency_of_models = {}

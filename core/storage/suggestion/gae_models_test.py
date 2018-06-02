@@ -87,8 +87,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         suggestion_id = 'exploration.exp1.thread_6'
 
-        observed_suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
-            suggestion_id)
+        observed_suggestion_model = (
+            suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id))
 
 
         self.assertEqual(
@@ -128,8 +128,10 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
     def test_get_suggestions_by_type(self):
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel.get_suggestions_by_type(
-                suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)), 5)
+            len(
+                suggestion_models.GeneralSuggestionModel
+                .get_suggestions_by_type(
+                    suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)), 5)
         with self.assertRaisesRegexp(
             Exception, 'Value \'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
