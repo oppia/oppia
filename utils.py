@@ -826,7 +826,8 @@ def convert_to_text_angular(html_data):
         if p.parent.name == 'p':
             p.unwrap()
 
-    return str(soup)
+    # Keeping all line break tags as <br>.
+    return str(soup).replace('<br/>', '<br>')
 
 
 class OrderedCounter(collections.Counter, collections.OrderedDict):

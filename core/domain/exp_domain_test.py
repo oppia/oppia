@@ -3115,7 +3115,7 @@ states:
         choices:
           value:
           - <p>This is </p>value1 <br>for MultipleChoice
-          - This is value2<span> for <br/>MultipleChoice</span>
+          - This is value2<span> for <br>MultipleChoice</span>
       default_outcome:
         dest: state2
         feedback:
@@ -3300,8 +3300,8 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is </p><p>value1 </p><p><br/></p><p>for MultipleChoice</p>
-          - <p>This is value2 for </p><p><br/></p><p>MultipleChoice</p>
+          - <p>This is </p><p>value1 </p><p><br></p><p>for MultipleChoice</p>
+          - <p>This is value2 for </p><p><br></p><p>MultipleChoice</p>
       default_outcome:
         dest: state2
         feedback:
