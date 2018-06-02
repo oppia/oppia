@@ -297,7 +297,7 @@ def update_exp_issues_for_new_exp_version(
         revert_to_version: int|None. If the change is a revert, the version.
             Otherwise, None.
     """
-    exp_issues = get_exp_issues(exploration.id, exploration.version)
+    exp_issues = get_exp_issues(exploration.id, exploration.version - 1)
     if exp_issues is None:
         create_exp_issues_for_new_exploration(
             exploration.id, exploration.version - 1)
