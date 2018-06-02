@@ -26,5 +26,4 @@ class ActionRegistryUnitTests(test_utils.GenericTestBase):
     def test_action_registry(self):
         """Do some sanity checks on the action registry."""
         self.assertEqual(
-            len(action_registry.Registry.get_all_actions()),
-            len(action_registry.Registry.get_all_action_types()))
+            len(action_registry.Registry.get_all_actions()), 3)
