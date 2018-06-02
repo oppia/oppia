@@ -42,7 +42,7 @@ describe('Learner Action Object Factory', function() {
       schemaVersion: 1
     };
     var learnerActionObject = LearnerActionObjectFactory.createFromBackendDict(
-        learnerActionBackendDict);
+      learnerActionBackendDict);
 
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});

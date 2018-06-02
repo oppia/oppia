@@ -19,36 +19,36 @@
 
 oppia.factory('PlaythroughObjectFactory', [
   'LearnerActionObjectFactory', function(LearnerActionObjectFactory) {
-  var Playthrough = function(playthroughId, expId, expVersion, issueType,
-      issueCustomizationArgs, actions) {
-    this.playthroughId = playthroughId;
-    this.expId = expId;
-    this.expVersion = expVersion;
-    this.issueType = issueType;
-    this.issueCustomizationArgs = issueCustomizationArgs;
-    this.actions = actions;
-  };
+    var Playthrough = function(playthroughId, expId, expVersion, issueType,
+        issueCustomizationArgs, actions) {
+      this.playthroughId = playthroughId;
+      this.expId = expId;
+      this.expVersion = expVersion;
+      this.issueType = issueType;
+      this.issueCustomizationArgs = issueCustomizationArgs;
+      this.actions = actions;
+    };
 
-  Playthrough.create = function(
-      playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
-      actions) {
-    return new Playthrough(
-      playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
-      actions);
-  };
+    Playthrough.create = function(
+        playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
+        actions) {
+      return new Playthrough(
+        playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
+        actions);
+    };
 
-  Playthrough.createFromBackendDict = function(playthroughBackendDict) {
-    var actions = [], i;
-    for (i=0; i<playthroughBackendDict.actions.length; i++) {
-      actions.push(LearnerActionObjectFactory.createFromBackendDict(
-        playthroughBackendDict.actions[i]));
-    }
+    Playthrough.createFromBackendDict = function(playthroughBackendDict) {
+      var actions = [], i;
+      for (i = 0; i < playthroughBackendDict.actions.length; i++) {
+        actions.push(LearnerActionObjectFactory.createFromBackendDict(
+          playthroughBackendDict.actions[i]));
+      }
 
-    return new Playthrough(
-      playthroughBackendDict.playthroughId, playthroughBackendDict.expId,
-      playthroughBackendDict.expVersion, playthroughBackendDict.issueType,
-      playthroughBackendDict.issueCustomizationArgs, actions);
-  };
+      return new Playthrough(
+        playthroughBackendDict.playthroughId, playthroughBackendDict.expId,
+        playthroughBackendDict.expVersion, playthroughBackendDict.issueType,
+        playthroughBackendDict.issueCustomizationArgs, actions);
+    };
 
-  return Playthrough;
-}]);
+    return Playthrough;
+  }]);

@@ -32,7 +32,7 @@ describe('Playthrough Object Factory', function() {
     var actions = [
       LearnerActionObjectFactory.create('AnswerSubmit', {}, 1)];
     var playthroughObject = PlaythroughObjectFactory.create(
-        'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
+      'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
     expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
@@ -57,7 +57,7 @@ describe('Playthrough Object Factory', function() {
       actions: actionDicts
     };
     var playthroughObject = PlaythroughObjectFactory.createFromBackendDict(
-        playthroughBackendDict);
+      playthroughBackendDict);
 
     expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
@@ -65,6 +65,6 @@ describe('Playthrough Object Factory', function() {
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
     expect(playthroughObject.issueCustomizationArgs).toEqual({});
     expect(playthroughObject.actions[0]).toEqual(
-        LearnerActionObjectFactory.createFromBackendDict(actionDicts[0]));
+      LearnerActionObjectFactory.createFromBackendDict(actionDicts[0]));
   });
 });
