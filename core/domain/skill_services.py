@@ -522,7 +522,7 @@ def get_model_id(user_id, skill_id):
     Args:
         user_id: str. The user id of the logged in user.
         skill_id: str. The unique id of the skill.
-    
+
     Returns:
         str. The modal id corresponding to user and skill.
     """
@@ -601,7 +601,8 @@ def get_all_skill_mastery(user_id):
         skill_mastery: dict. Mastery degree of the user for every skill.
     """
     user_skill_mastery = {}
-    user_skill_summary = skill_models.SkillsMasteryModel.get_all().fetch()
+    user_skill_summary = skill_models.SkillsMasteryModel.get_user_mastery(
+        user_id)
 
     for skill in user_skill_summary:
         user_skill_mastery[skill.skill_id] = skill.degree_of_mastery

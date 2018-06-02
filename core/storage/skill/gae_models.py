@@ -165,3 +165,15 @@ class SkillsMasteryModel(base_models.BaseModel):
     skill_id = ndb.StringProperty(required=True, indexed=True)
     # The degree of mastery of the user in a skill.
     degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
+
+    @classmethod
+    def get_user_mastery(cls, USER_ID):
+        """Returns skill summary for a particular user.
+
+        Args:
+            USER_ID: str. The user id corresponding to a user.
+
+        Returns:
+            str. fetched objects where user_id belongs to the entered user.
+        """
+        return cls.query(cls.user_id == USER_ID).fetch()
