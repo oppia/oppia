@@ -15,43 +15,41 @@
 """Tests for Oppia storage models."""
 import os
 import pkgutil
+import inspect
 
 from core.platform import models
 from core.tests import test_utils
 
 class StorageModelsTest(test_utils.GenericTestBase):
-    """Tests for Oppia storage models"""
+    """Tests for Oppia storage models."""
 
     def test_all_model_names_unique(self):
-        all_model_file_paths = [
-            os.path.join('core', 'storage', name)
-            for name in vars(models.NAMES)]
-        all_models = []
-        for path in all_model_file_paths:
-            for loader, name, _ in pkgutil.iter_modules(path=[path]):
-                module = loader.find_module(name).load_module(name)
-                if '_test' in module.__file__: continue
-                #print module.__file__, dir(module)
-                for var in dir(module):
-                    if 'Model' in var:
-                        clazz = getattr(module, var)
-                        ancestor_names = [
-                            base_class.__name__ for base_class in clazz.__bases__]
-                        if (
-                            'ndb.Model' in ancestor_names or
-                            'BaseModel' in ancestor_names or
-                            'VersionedModel' in ancestor_names):
-                            #print module.__file__, clazz.__name__
-                            all_models.append(clazz.__name__)
-        print dir(module)
-        frequency_of_model_names = {}
-        for model in all_models:
-            if model in frequency_of_model_names:
-                frequency_of_model_names[model] += 1
-            else:
-                frequency_of_model_names[model] = 1
-        print frequency_of_model_names
-        for model in frequency_of_model_names:
-            print model, frequency_of_model_names[model]
-            self.assertEqual(frequency_of_model_names[model], 1)
+        all_model_names = []
+        for name in models.NAMES.__dict__:
+            if '__' not in name:
+                all_model_names.append(name)
 
+        all_models = []
+        for name in all_model_names:
+            (module, ) = models.Registry.import_models([name])
+            for member_name, member_obj in inspect.getmembers(module):
+                if inspect.isclass(member_obj):
+                    clazz = getattr(module, member_name)
+                    ancestor_names = [
+                        base_class.__name__ for base_class in clazz.__bases__]
+                    if (
+                        'ndb.Model' in ancestor_names or
+                        'BaseModel' in ancestor_names or
+                        'VersionedModel' in ancestor_names):
+                        all_models.append(clazz.__name__)
+
+        frequency_of_models = {}
+        for model in all_models:
+            if model in frequency_of_models:
+                frequency_of_models[model] += 1
+            else:
+                frequency_of_models[model] = 1
+
+        for model in frequency_of_models:
+            print model, frequency_of_models[model]
+            self.assertEqual(frequency_of_models[model], 1)
