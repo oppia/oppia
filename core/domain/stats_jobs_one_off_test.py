@@ -36,10 +36,10 @@ class ExplorationIssuesModelCreatorOneOffJobTest(test_utils.GenericTestBase):
         super(ExplorationIssuesModelCreatorOneOffJobTest, self).setUp()
         self.exp1 = self.save_new_valid_exploration(self.exp_id1, 'owner')
         self.exp1.add_states(['New state'])
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state'
-        }]
+        })]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
         self.exp1 = exp_services.get_exploration_by_id(self.exp1.id)

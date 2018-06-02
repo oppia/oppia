@@ -487,11 +487,11 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         # Test renaming of states.
         exploration.rename_state('Home', 'Renamed state')
         exploration.version += 1
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Home',
             'new_state_name': 'Renamed state'
-        }]
+        })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.update_exp_issues_for_new_exp_version(
             exploration, exp_versions_diff, False)
@@ -528,10 +528,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         # Test deletion of states.
         exploration.delete_state('End')
         exploration.version += 1
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'End'
-        }]
+        })]
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.update_exp_issues_for_new_exp_version(
             exploration, exp_versions_diff, False)
