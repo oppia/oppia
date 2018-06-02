@@ -64,7 +64,6 @@ ISSUE_TYPE_KEYNAME_MAPPING = {
 }
 
 
-
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
 
@@ -982,9 +981,9 @@ class ExplorationIssuesModel(base_models.BaseModel):
     issues.
     """
     # ID of exploration.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = ndb.StringProperty(indexed=True, required=True)
     # Version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
+    exp_version = ndb.IntegerProperty(indexed=True, required=True)
     # The unresolved issues for this exploration. This will be a list of dicts
     # where each dict represents an issue along with the associated
     # playthroughs.
@@ -1061,7 +1060,7 @@ class PlaythroughModel(base_models.BaseModel):
     # The playthrough actions for this playthrough. This will be a list of dicts
     # where each dict represents a single playthrough action. The list is
     # ordered by the time of occurence of the action.
-    playthrough_actions = ndb.JsonProperty(repeated=True)
+    actions = ndb.JsonProperty(repeated=True)
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -1095,7 +1094,7 @@ class PlaythroughModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, exp_id, exp_version, issue_type, issue_customization_args,
-            playthrough_actions):
+            actions):
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
 
@@ -1105,10 +1104,10 @@ class PlaythroughModel(base_models.BaseModel):
             issue_type: str. Type of the issue.
             issue_customization_args: dict. The customization args dict for the
                 given issue_type.
-            playthrough_actions: list(dict). The playthrough actions for this
-                playthrough. This will be a list of dicts where each dict
-                represents a single playthrough action. The list is ordered by
-                the time of occurence of the action.
+            actions: list(dict). The playthrough actions for this playthrough.
+                This will be a list of dicts where each dict represents a single
+                playthrough action. The list is ordered by the time of occurence
+                of the action.
 
         Returns:
             str. ID of the new PlaythroughModel instance.
@@ -1118,7 +1117,7 @@ class PlaythroughModel(base_models.BaseModel):
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             issue_type=issue_type,
             issue_customization_args=issue_customization_args,
-            playthrough_actions=playthrough_actions)
+            actions=actions)
         playthrough_instance.put()
         return instance_id
 

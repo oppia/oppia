@@ -1661,7 +1661,7 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
                 }
             })
         self.assertEqual(
-            response['playthrough_actions'], [{
+            response['actions'], [{
                 'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {

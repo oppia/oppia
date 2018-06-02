@@ -367,12 +367,11 @@ def update_exp_issues_for_new_exp_version(
             else:
                 playthrough.issue_customization_args['state_name']['value'] = (
                     new_state_name)
-            for idx1, action in enumerate(playthrough.playthrough_actions):
+            for idx1, action in enumerate(playthrough.actions):
                 if action.action_customization_args['state_name']['value'] == (
                         old_state_name):
-                    playthroughs[idx].playthrough_actions[
-                        idx1].action_customization_args['state_name'][
-                            'value'] = new_state_name
+                    playthroughs[idx].actions[idx1].action_customization_args[
+                        'state_name']['value'] = new_state_name
 
         all_playthrough_ids.extend(playthrough_ids)
         all_playthroughs.extend(playthroughs)
@@ -457,8 +456,7 @@ def update_playthroughs_multi(playthrough_ids, playthroughs):
         playthrough_instance.issue_type = playthrough_dict['issue_type']
         playthrough_instance.issue_customization_args = (
             playthrough_dict['issue_customization_args'])
-        playthrough_instance.playthrough_actions = (
-            playthrough_dict['playthrough_actions'])
+        playthrough_instance.actions = playthrough_dict['actions']
         updated_instances.append(playthrough_instance)
     stats_models.PlaythroughModel.put_multi(updated_instances)
 
@@ -568,15 +566,14 @@ def get_playthrough_from_model(playthrough_model):
     Returns:
         Playthrough. The domain object for a playthrough.
     """
-    playthrough_actions = []
-    for playthrough_action_dict in playthrough_model.playthrough_actions:
-        _migrate_to_latest_action_schema(playthrough_action_dict)
-        playthrough_actions.append(
-            stats_domain.LearnerAction.from_dict(playthrough_action_dict))
+    actions = []
+    for action_dict in playthrough_model.actions:
+        _migrate_to_latest_action_schema(action_dict)
+        actions.append(stats_domain.LearnerAction.from_dict(action_dict))
     return stats_domain.Playthrough(
         playthrough_model.id, playthrough_model.exp_id,
         playthrough_model.exp_version, playthrough_model.issue_type,
-        playthrough_model.issue_customization_args, playthrough_actions)
+        playthrough_model.issue_customization_args, actions)
 
 
 def create_stats_model(exploration_stats):

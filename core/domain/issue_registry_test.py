@@ -20,19 +20,11 @@ from core.domain import issue_registry
 from core.tests import test_utils
 
 
-class BaseExplorationIssueSpec(object):
-    pass
-
-
-class TestIssue(BaseExplorationIssueSpec):
-    pass
-
-
 class IssueRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the issue registry."""
 
     def test_issue_registry(self):
         """Do some sanity checks on the issue registry."""
-        issue_registry.Registry.set_issues({'TestIssue': TestIssue})
         self.assertEqual(
-            len(issue_registry.Registry.get_all_issues()), 1)
+            len(issue_registry.Registry.get_all_issues()),
+            len(issue_registry.Registry.get_all_issue_types()))

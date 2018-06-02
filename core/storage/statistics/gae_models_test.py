@@ -260,7 +260,7 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.exp_version, 1)
         self.assertEqual(model.issue_type, 'EarlyQuit')
         self.assertEqual(model.issue_customization_args, {})
-        self.assertEqual(model.playthrough_actions, [])
+        self.assertEqual(model.actions, [])
 
     def test_delete_playthroughs_multi(self):
         model_id1 = (

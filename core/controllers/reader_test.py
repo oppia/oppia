@@ -1247,7 +1247,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': 250
                 }
             },
-            'playthrough_actions': [{
+            'actions': [{
                 'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
@@ -1357,7 +1357,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
-            'playthrough_actions': [{
+            'actions': [{
                 'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
@@ -1436,7 +1436,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name1', 'state_name2']
                 },
             },
-            'playthrough_actions': [{
+            'actions': [{
                 'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {

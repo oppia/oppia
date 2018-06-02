@@ -419,7 +419,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 }
             })
         self.assertEqual(
-            playthrough_dict['playthrough_actions'], [
+            playthrough_dict['actions'], [
                 {
                     'action_type': 'ExplorationStart',
                     'action_customization_args': {
@@ -444,7 +444,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                     'value': 200
                 }
             },
-            'playthrough_actions': [{
+            'actions': [{
                 'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
@@ -471,7 +471,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 }
             })
         self.assertEqual(
-            playthrough.playthrough_actions[0].to_dict(),
+            playthrough.actions[0].to_dict(),
             {
                 'action_type': 'ExplorationStart',
                 'action_customization_args': {
@@ -524,7 +524,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
 
         # Change to invalid action_type.
         playthrough.issue_type = 'EarlyQuit'
-        playthrough.playthrough_actions = [
+        playthrough.actions = [
             stats_domain.LearnerAction.from_dict({
                 'action_type': 'InvalidActionType',
                 'schema_version': 1,

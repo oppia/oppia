@@ -512,8 +512,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             playthrough1_instance.issue_customization_args['state_name'][
                 'value'], 'Renamed state')
         self.assertEqual(
-            playthrough1_instance.playthrough_actions[
-                0]['action_customization_args']['state_name']['value'],
+            playthrough1_instance.actions[0]['action_customization_args'][
+                'state_name']['value'],
             'Renamed state')
         playthrough2_instance = stats_models.PlaythroughModel.get(
             playthrough_id2)
@@ -521,8 +521,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             playthrough2_instance.issue_customization_args['state_name'][
                 'value'], 'End')
         self.assertEqual(
-            playthrough2_instance.playthrough_actions[
-                0]['action_customization_args']['state_name']['value'],
+            playthrough2_instance.actions[0]['action_customization_args'][
+                'state_name']['value'],
             'End')
 
         # Test deletion of states.
@@ -554,8 +554,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             playthrough1_instance.issue_customization_args['state_name'][
                 'value'], 'Renamed state')
         self.assertEqual(
-            playthrough1_instance.playthrough_actions[
-                0]['action_customization_args']['state_name']['value'],
+            playthrough1_instance.actions[0]['action_customization_args'][
+                'state_name']['value'],
             'Renamed state')
         playthrough2_instance = stats_models.PlaythroughModel.get(
             playthrough_id2)
@@ -563,8 +563,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             playthrough2_instance.issue_customization_args['state_name'][
                 'value'], 'End')
         self.assertEqual(
-            playthrough2_instance.playthrough_actions[
-                0]['action_customization_args']['state_name']['value'],
+            playthrough2_instance.actions[0]['action_customization_args'][
+                'state_name']['value'],
             'End')
 
     def test_get_playthroughs_multi(self):
@@ -580,13 +580,13 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(playthroughs[0].exp_version, 1)
         self.assertEqual(playthroughs[0].issue_type, 'EarlyQuit')
         self.assertEqual(playthroughs[0].issue_customization_args, {})
-        self.assertEqual(playthroughs[0].playthrough_actions, [])
+        self.assertEqual(playthroughs[0].actions, [])
 
         self.assertEqual(playthroughs[1].exp_id, self.exp_id)
         self.assertEqual(playthroughs[1].exp_version, 1)
         self.assertEqual(playthroughs[1].issue_type, 'EarlyQuit')
         self.assertEqual(playthroughs[1].issue_customization_args, {})
-        self.assertEqual(playthroughs[1].playthrough_actions, [])
+        self.assertEqual(playthroughs[1].actions, [])
 
     def test_update_playthroughs_multi(self):
         """Test the update_playthroughs_multi method."""
@@ -610,13 +610,13 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(
             playthroughs[0].issue_type, 'MultipleIncorrectSubmissions')
         self.assertEqual(playthroughs[0].issue_customization_args, {})
-        self.assertEqual(playthroughs[0].playthrough_actions, [])
+        self.assertEqual(playthroughs[0].actions, [])
 
         self.assertEqual(playthroughs[1].exp_id, self.exp_id)
         self.assertEqual(playthroughs[1].exp_version, 1)
         self.assertEqual(playthroughs[1].issue_type, 'CyclicStateTransitions')
         self.assertEqual(playthroughs[1].issue_customization_args, {})
-        self.assertEqual(playthroughs[1].playthrough_actions, [])
+        self.assertEqual(playthroughs[1].actions, [])
 
     def test_create_exp_issues_model(self):
         """Test the create_exp_issues_model method."""
@@ -660,7 +660,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(playthrough.exp_version, 1)
         self.assertEqual(playthrough.issue_type, 'EarlyQuit')
         self.assertEqual(playthrough.issue_customization_args, {})
-        self.assertEqual(playthrough.playthrough_actions, [])
+        self.assertEqual(playthrough.actions, [])
 
     def test_get_exp_issues_by_id(self):
         """Test the get_exp_issues_by_id method."""
@@ -677,7 +677,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(playthrough.exp_version, 1)
         self.assertEqual(playthrough.issue_type, 'EarlyQuit')
         self.assertEqual(playthrough.issue_customization_args, {})
-        self.assertEqual(playthrough.playthrough_actions, [])
+        self.assertEqual(playthrough.actions, [])
 
     def test_get_exploration_stats_by_id(self):
         """Test the get_exploration_stats_by_id method."""

@@ -335,17 +335,16 @@ class StorePlaythroughHandler(base.BaseHandler):
         """
         playthrough_properties = [
             'exp_id', 'exp_version', 'issue_type', 'issue_customization_args',
-            'playthrough_actions']
+            'actions']
 
         for playthrough_property in playthrough_properties:
             if playthrough_property not in playthrough_data:
                 raise self.InvalidInputException(
                     '%s not in playthrough data dict.' % playthrough_property)
 
-        playthrough_actions = [
-            stats_domain.LearnerAction.from_dict(playthrough_action_dict)
-            for playthrough_action_dict in playthrough_data[
-                'playthrough_actions']]
+        actions = [
+            stats_domain.LearnerAction.from_dict(action_dict)
+            for action_dict in playthrough_data['actions']]
 
         dummy_playthrough = stats_domain.Playthrough(
             'dummy_playthrough_id',
@@ -353,7 +352,7 @@ class StorePlaythroughHandler(base.BaseHandler):
             playthrough_data['exp_version'],
             playthrough_data['issue_type'],
             playthrough_data['issue_customization_args'],
-            playthrough_actions)
+            actions)
 
         try:
             dummy_playthrough.validate()
@@ -400,7 +399,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                             playthrough_data['exp_version'],
                             playthrough_data['issue_type'],
                             playthrough_data['issue_customization_args'],
-                            playthrough_data['playthrough_actions'])
+                            playthrough_data['actions'])
                         exp_issues.unresolved_issues[
                             index].playthrough_ids.append(playthrough_id)
                     break
@@ -411,7 +410,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                 playthrough_data['exp_version'],
                 playthrough_data['issue_type'],
                 playthrough_data['issue_customization_args'],
-                playthrough_data['playthrough_actions'])
+                playthrough_data['actions'])
             issue = stats_domain.ExplorationIssue(
                 exp_issue_dict['issue_type'],
                 exp_issue_dict['issue_customization_args'],
