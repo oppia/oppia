@@ -29,6 +29,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     SKILL_IDS = []
     USER_ID = 'user'
     DEGREE_OF_MASTERY = 0.0
+    DEGREE_OF_MASTERY_1 = 0.5
     MISCONCEPTION_ID_1 = 'misconception_id_1'
     MISCONCEPTION_ID_2 = 'misconception_id_2'
 
@@ -39,8 +40,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', 'description', 'default_feedback')]
         self.SKILL_ID = skill_services.get_new_skill_id()
-        self.SKILL_ID1 = skill_services.get_new_skill_id()
-        self.SKILL_IDS = [self.SKILL_ID, self.SKILL_ID1]
+        self.SKILL_ID_1 = skill_services.get_new_skill_id()
+        self.SKILL_IDS = [self.SKILL_ID, self.SKILL_ID_1]
         self.skill = self.save_new_skill(
             self.SKILL_ID, self.USER_ID, 'Description', misconceptions,
             skill_contents
@@ -48,7 +49,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_services.create_skill_mastery(
             self.USER_ID, self.SKILL_ID, self.DEGREE_OF_MASTERY)
         skill_services.create_skill_mastery(
-            self.USER_ID, self.SKILL_ID1, self.DEGREE_OF_MASTERY)
+            self.USER_ID, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1)
 
     def test_compute_summary(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
@@ -109,13 +110,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.USER_ID, self.SKILL_IDS)
 
         self.assertEqual(
-            degree_of_mastery, [self.DEGREE_OF_MASTERY, self.DEGREE_OF_MASTERY])
+            degree_of_mastery, [self.DEGREE_OF_MASTERY, self.DEGREE_OF_MASTERY_1])
 
     def test_get_all_skill_mastery(self):
         degree_of_mastery = skill_services.get_all_skill_mastery(self.USER_ID)
 
-        self.assertEqual(
-            degree_of_mastery, [self.DEGREE_OF_MASTERY, self.DEGREE_OF_MASTERY])
+        self.assertEqual(degree_of_mastery, {
+                self.SKILL_ID_1: self.DEGREE_OF_MASTERY_1,
+                self.SKILL_ID: self.DEGREE_OF_MASTERY 
+            })
 
     def test_update_skill(self):
         changelist = [

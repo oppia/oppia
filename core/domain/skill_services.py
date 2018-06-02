@@ -581,8 +581,8 @@ def get_multi_skill_mastery(user_id, skill_ids):
     skills_summary = []
     model_ids = []
 
-    for i in skill_ids:
-        model_ids.append(get_model_id(user_id, i))
+    for skill_id in skill_ids:
+        model_ids.append(get_model_id(user_id, skill_id))
 
     skills_summary = skill_models.SkillsMasteryModel.get_multi(model_ids)
     for skill_summary in skills_summary:
@@ -600,7 +600,10 @@ def get_all_skill_mastery(user_id):
     Returns:
         skill_mastery: dict. Mastery degree of the user for every skill.
     """
-    degree_of_mastery = {}
-    degree_of_mastery = skill_models.SkillsMasteryModel.get_user_mastery(user_id)
+    user_skill_mastery = {}
+    user_skill_summary = skill_models.SkillsMasteryModel.get_all().fetch()
 
-    return degree_of_mastery
+    for skill in user_skill_summary:
+        user_skill_mastery[skill.skill_id] = skill.degree_of_mastery
+
+    return user_skill_mastery
