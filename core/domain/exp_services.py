@@ -54,9 +54,6 @@ taskqueue_services = models.Registry.import_taskqueue_services()
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
 
-# This takes additional 'title' and 'category' parameters.
-CMD_CREATE_NEW = 'create_new'
-
 # Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
@@ -694,7 +691,7 @@ def apply_change_list(exploration_id, change_list):
     Args:
         exploration_id: str. The id of the exploration to which the change list
             is to be applied.
-        change_list: list(dict). The list of changes to apply.
+        change_list: list(ExplorationChange). The list of changes to apply.
 
     Returns:
         Exploration. The exploration domain object that results from applying
@@ -705,9 +702,7 @@ def apply_change_list(exploration_id, change_list):
     """
     exploration = get_exploration_by_id(exploration_id)
     try:
-        changes = [exp_domain.ExplorationChange(change_dict)
-                   for change_dict in change_list]
-        for change in changes:
+        for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 exploration.add_states([change.state_name])
             elif change.cmd == exp_domain.CMD_RENAME_STATE:
@@ -865,7 +860,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
 
-    exploration_model.commit(committer_id, commit_message, change_list)
+    change_list_dict = [change.to_dict() for change in change_list]
+    exploration_model.commit(committer_id, commit_message, change_list_dict)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
     index_explorations_given_ids([exploration.id])
 
@@ -873,8 +869,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     # Trigger statistics model update.
     stats_services.handle_stats_creation_for_new_exp_version(
-        exploration.id, exploration.version, exploration.states,
-        change_list)
+        exploration.id, exploration.version, exploration.states, change_list)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
@@ -892,6 +887,15 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exploration, state_names_with_unchanged_answer_groups,
                 exp_versions_diff)
 
+    # Trigger exploration issues model updation.
+    if feconf.ENABLE_PLAYTHROUGHS:
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        revert_to_version = None
+        if change_list[0]['cmd'] == 'AUTO_revert_version_number':
+            revert_to_version = change_list[0]['version_number']
+        stats_services.update_exp_issues_for_new_exp_version(
+            exploration, exp_versions_diff, revert_to_version)
+
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
 
@@ -907,11 +911,9 @@ def _create_exploration(
         committer_id: str. The id of the user who made the commit.
         exploration: Exploration. The exploration domain object.
         commit_message: str. The commit description message.
-        commit_cmds: list(dict). A list of commands, describing changes
-            made in this model, which should give sufficient information to
-            reconstruct the commit. Each dict always contains:
-                cmd: str. Unique command.
-                and additional arguments for that command.
+        commit_cmds: list(ExplorationChange). A list of commands, describing
+            changes made in this model, which should give sufficient information
+            to reconstruct the commit.
     """
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
@@ -937,7 +939,8 @@ def _create_exploration(
         auto_tts_enabled=exploration.auto_tts_enabled,
         correctness_feedback_enabled=exploration.correctness_feedback_enabled
     )
-    model.commit(committer_id, commit_message, commit_cmds)
+    commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmds_dict)
     exploration.version += 1
 
     # Trigger statistics model creation.
@@ -956,6 +959,11 @@ def _create_exploration(
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train)
 
+    # Trigger exploration issues model creation.
+    if feconf.ENABLE_PLAYTHROUGHS:
+        stats_services.create_exp_issues_for_new_exploration(
+            exploration.id, exploration.version)
+
     # Save state id mapping model for new exploration.
     create_and_save_state_id_mapping_model(exploration, commit_cmds)
     create_exploration_summary(exploration.id, committer_id)
@@ -972,11 +980,12 @@ def save_new_exploration(committer_id, exploration):
         ('New exploration created with title \'%s\'.' % exploration.title)
         if exploration.title else 'New exploration created.')
     _create_exploration(
-        committer_id, exploration, commit_message, [{
-            'cmd': CMD_CREATE_NEW,
-            'title': exploration.title,
-            'category': exploration.category,
-        }])
+        committer_id, exploration, commit_message, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_CREATE_NEW,
+                'title': exploration.title,
+                'category': exploration.category,
+            })])
     user_services.add_created_exploration_id(committer_id, exploration.id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
     user_services.record_user_created_an_exploration(committer_id)
@@ -1117,9 +1126,8 @@ def update_exploration(
         committer_id: str. The id of the user who is performing the update
             action.
         exploration_id: str. The id of the exploration to be updated.
-        change_list: list(dict). A change list to be applied to the given
-            exploration. Each entry in change_list is a dict that represents an
-            ExplorationChange.
+        change_list: list(ExplorationChange). A change list to be applied to the
+            given exploration.
         commit_message: str or None. A description of changes made to the state.
             For published explorations, this must be present; for unpublished
             explorations, it should be equal to None. For suggestions that are
@@ -1507,11 +1515,12 @@ def save_new_exploration_from_yaml_and_assets(
         % exploration.title)
 
     _create_exploration(
-        committer_id, exploration, create_commit_message, [{
-            'cmd': CMD_CREATE_NEW,
-            'title': exploration.title,
-            'category': exploration.category,
-        }])
+        committer_id, exploration, create_commit_message, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_CREATE_NEW,
+                'title': exploration.title,
+                'category': exploration.category,
+            })])
 
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
@@ -1722,27 +1731,23 @@ def _is_suggestion_valid(thread_id, exploration_id):
     """
 
     states = get_exploration_by_id(exploration_id).states
-    suggestion = (
-        feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
-            exploration_id, thread_id))
+    suggestion = feedback_models.SuggestionModel.get_by_id(thread_id)
     return suggestion.state_name in states
 
 
-def _is_suggestion_handled(thread_id, exploration_id):
+def _is_suggestion_handled(thread_id):
     """Checks if the current suggestion has already been accepted/rejected.
 
     Args:
         thread_id: str. Thread id of the feedback thread containing the
             suggestion.
-        exploration_id: str. The id of the exploration.
 
     Returns:
         bool. Whether the current suggestion has already been acted upon (i.e.,
         accepted or rejected).
     """
 
-    thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
-        exploration_id, thread_id)
+    thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
     return (
         thread.status in [
             feedback_models.STATUS_CHOICES_FIXED,
@@ -1777,7 +1782,7 @@ def _create_change_list_from_suggestion(
         for _, translation in audio_translations.iteritems():
             translation.needs_update = True
 
-    return [{
+    return [exp_domain.ExplorationChange({
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'state_name': suggestion.state_name,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -1788,7 +1793,7 @@ def _create_change_list_from_suggestion(
                 for language_code, translation in audio_translations.iteritems()
             }
         }
-    }]
+    })]
 
 
 def _get_commit_message_for_suggestion(
@@ -1836,14 +1841,13 @@ def accept_suggestion(
 
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
-    if _is_suggestion_handled(thread_id, exploration_id):
+    if _is_suggestion_handled(thread_id):
         raise Exception('Suggestion has already been accepted/rejected.')
     elif not _is_suggestion_valid(thread_id, exploration_id):
         raise Exception('Invalid suggestion: The state for which it was made '
                         'has been removed/renamed.')
     else:
-        suggestion = feedback_services.get_suggestion(
-            exploration_id, thread_id)
+        suggestion = feedback_services.get_suggestion(thread_id)
         suggestion_author_username = suggestion.get_author_name()
         exploration = get_exploration_by_id(exploration_id)
         old_content = exploration.states[suggestion.state_name].content
@@ -1855,31 +1859,26 @@ def accept_suggestion(
                 suggestion_author_username, commit_message),
             is_suggestion=True)
         feedback_services.create_message(
-            exploration_id, thread_id, editor_id,
-            feedback_models.STATUS_CHOICES_FIXED, None,
+            thread_id, editor_id, feedback_models.STATUS_CHOICES_FIXED, None,
             'Suggestion accepted.')
 
 
-def reject_suggestion(editor_id, thread_id, exploration_id):
+def reject_suggestion(editor_id, thread_id):
     """Set the status of a suggestion to REJECTED.
 
     Args:
         editor_id: str. User id of the editor.
         thread_id: str. The id of the suggestion thread.
-        exploration_id: str. The id of the exploration that the suggestion is
-            for.
 
     Raises:
         Exception: The suggestion has already been accepted or rejected.
     """
-    if _is_suggestion_handled(thread_id, exploration_id):
+    if _is_suggestion_handled(thread_id):
         raise Exception('Suggestion has already been accepted/rejected.')
     else:
-        thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
-            exploration_id, thread_id)
+        thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
         feedback_services.create_message(
-            exploration_id, thread_id, editor_id,
-            feedback_models.STATUS_CHOICES_IGNORED,
+            thread_id, editor_id, feedback_models.STATUS_CHOICES_IGNORED,
             None, 'Suggestion rejected.')
         thread.put()
 
@@ -1912,8 +1911,8 @@ def create_or_update_draft(
     Args:
         exp_id: str. The id of the exploration.
         user_id: str. The id of the user.
-        change_list: list(str). A list that contains the changes to be made to
-            the ExplorationUserDataModel object.
+        change_list: list(ExplorationChange). A list that contains the changes
+            to be made to the ExplorationUserDataModel object.
         exp_version: int. The current version of the exploration.
         current_datetime: datetime.datetime. The current date and time.
     """
@@ -1931,7 +1930,8 @@ def create_or_update_draft(
 
     draft_change_list_id = exp_user_data.draft_change_list_id
     draft_change_list_id += 1
-    exp_user_data.draft_change_list = change_list
+    change_list_dict = [change.to_dict() for change in change_list]
+    exp_user_data.draft_change_list = change_list_dict
     exp_user_data.draft_change_list_last_updated = current_datetime
     exp_user_data.draft_change_list_exp_version = exp_version
     exp_user_data.draft_change_list_id = draft_change_list_id
@@ -1952,8 +1952,13 @@ def get_exp_with_draft_applied(exp_id, user_id):
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = get_exploration_by_id(exp_id)
+    if exp_user_data:
+        if exp_user_data.draft_change_list:
+            draft_change_list = [
+                exp_domain.ExplorationChange(change)
+                for change in exp_user_data.draft_change_list]
     return (
-        apply_change_list(exp_id, exp_user_data.draft_change_list)
+        apply_change_list(exp_id, draft_change_list)
         if exp_user_data and exp_user_data.draft_change_list and
         is_version_of_draft_valid(
             exp_id, exp_user_data.draft_change_list_exp_version)
@@ -2015,7 +2020,8 @@ def generate_state_id_mapping_model(exploration, change_list):
     Args:
         exploration: Exploration. Exploration for which state id mapping is
             to be stored.
-        change_list: list(dict). A list of changes made in the exploration.
+        change_list: list(ExplorationChange). A list of changes made in the
+            exploration.
 
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
@@ -2046,7 +2052,8 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
     Args:
         exploration: Exploration. Exploration for which state id mapping is
             to be stored.
-        change_list: list(dict). A list of changes made in the exploration.
+        change_list: list(ExplorationChange). A list of changes made in the
+            exploration.
 
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
@@ -2127,38 +2134,3 @@ def delete_state_id_mapping_model_for_exploration(
     exp_versions = range(1, exploration_version + 1)
     exp_models.StateIdMappingModel.delete_state_id_mapping_models(
         exploration_id, exp_versions)
-
-
-def find_all_values_for_key(key, dictionary):
-    """Finds the value of the key inside all the nested dictionaries
-    in a given dictionary.
-
-    Args:
-       key: str. The key whose value is to be found.
-       dictionary: dict or list. The dictionary or list in which the
-           key is to be searched.
-
-    Returns:
-        list. The values of the key in the given dictionary.
-
-    Yields:
-        str. The value of the given key.
-    """
-    if isinstance(dictionary, list):
-        for d in dictionary:
-            if isinstance(d, (dict, list)):
-                for result in find_all_values_for_key(key, d):
-                    yield result
-
-    else:
-        for k, v in dictionary.iteritems():
-            if k == key:
-                yield v
-            elif isinstance(v, dict):
-                for result in find_all_values_for_key(key, v):
-                    yield result
-            elif isinstance(v, list):
-                for d in v:
-                    if isinstance(d, (dict, list)):
-                        for result in find_all_values_for_key(key, d):
-                            yield result

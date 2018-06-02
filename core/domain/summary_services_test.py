@@ -19,6 +19,7 @@ from core.domain import activity_domain
 from core.domain import activity_services
 from core.domain import collection_domain
 from core.domain import collection_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import exp_services_test
 from core.domain import rating_services
@@ -89,27 +90,27 @@ class ExplorationDisplayableSummariesTest(
         self.save_new_valid_exploration(self.EXP_ID_1, self.albert_id)
 
         exp_services.update_exploration(
-            self.bob_id, self.EXP_ID_1, [{
+            self.bob_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 title'
-            }], 'Changed title.')
+            })], 'Changed title.')
 
         self.save_new_valid_exploration(self.EXP_ID_2, self.albert_id)
 
         exp_services.update_exploration(
-            self.albert_id, self.EXP_ID_1, [{
+            self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 1 Albert title'
-            }], 'Changed title to Albert1 title.')
+            })], 'Changed title to Albert1 title.')
 
         exp_services.update_exploration(
-            self.albert_id, self.EXP_ID_2, [{
+            self.albert_id, self.EXP_ID_2, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration 2 Albert title'
-            }], 'Changed title to Albert2 title.')
+            })], 'Changed title to Albert2 title.')
 
         exp_services.revert_exploration(self.bob_id, self.EXP_ID_1, 3, 2)
 
@@ -133,18 +134,18 @@ class ExplorationDisplayableSummariesTest(
 
         self.save_new_valid_exploration(self.EXP_ID_4, self.user_c_id)
         exp_services.update_exploration(
-            self.user_d_id, self.EXP_ID_4, [{
+            self.user_d_id, self.EXP_ID_4, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration updated title'
-            }], 'Changed title once.')
+            })], 'Changed title once.')
 
         exp_services.update_exploration(
-            self.user_d_id, self.EXP_ID_4, [{
+            self.user_d_id, self.EXP_ID_4, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'Exploration updated title again'
-            }], 'Changed title twice.')
+            })], 'Changed title twice.')
 
         self.save_new_valid_exploration(self.EXP_ID_5, self.bob_id)
 
@@ -811,11 +812,11 @@ class RecentlyPublishedExplorationDisplayableSummariesTest(
         # Test that editing an exploration does not change its
         # 'recently-published' status.
         exp_services.update_exploration(
-            self.albert_id, self.EXP_ID_1, [{
+            self.albert_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New title'
-            }], 'Changed title.')
+            })], 'Changed title.')
 
         recently_published_exploration_summaries = (
             summary_services.get_recently_published_exp_summary_dicts(
