@@ -25,6 +25,10 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
       this._contentIdsToAudioTranslations = contentIdsToAudioTranslations;
     };
 
+    ContentIdsToAudioTranslations.prototype.getAllContentId = function() {
+        return Object.keys(this._contentIdsToAudioTranslations);
+    };
+
     ContentIdsToAudioTranslations.prototype.getBindableAudioTranslations = (
       function(contentId) {
         return angular.copy(this._contentIdsToAudioTranslations[contentId]);
@@ -133,7 +137,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
             AudioTranslationObjectFactory.createFromBackendDict(
               audioTanslationsDict[lang]));
         });
-        contentIdsToAudioTranslations[content_id] = audioTranslations;
+        contentIdsToAudioTranslations[contentId] = audioTranslations;
       });
 
       return new ContentIdsToAudioTranslations(contentIdsToAudioTranslations);

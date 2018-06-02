@@ -66,7 +66,6 @@ oppia.factory('OutcomeObjectFactory', [
     };
 
     Outcome.createFromBackendDict = function(outcomeDict) {
-      console.log(outcomeDict.feedback);
       return new Outcome(
         outcomeDict.dest,
         SubtitledHtmlObjectFactory.createFromBackendDict(outcomeDict.feedback),

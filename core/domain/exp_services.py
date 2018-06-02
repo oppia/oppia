@@ -1727,7 +1727,7 @@ def _is_suggestion_handled(thread_id):
 
 
 def _create_change_list_from_suggestion(
-        suggestion, old_content, content_ids_to_audio_translations,
+        suggestion, old_content, old_content_ids_to_audio_translations,
         audio_update_required):
     """Creates a change list from a suggestion object.
 
@@ -1735,7 +1735,9 @@ def _create_change_list_from_suggestion(
         suggestion: Suggestion. The given Suggestion domain object.
         old_content: SubtitledHtml. A SubtitledHtml domain object representing
             the content of the old state.
-        content_ids_to_audio_translations:
+        content_ids_to_audio_translations: dict. A dict connecting
+            audio translations for SubtitledHtml objects with the help of
+            content_id as key.
         audio_update_required: bool. Whether the audio for the state content
             should be marked as needing an update.
 

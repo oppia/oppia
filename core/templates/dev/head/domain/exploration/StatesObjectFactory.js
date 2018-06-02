@@ -97,15 +97,18 @@ oppia.factory('StatesObjectFactory', [
       var allAudioLanguageCodes = [];
       for (var stateName in this._states) {
         var state = this._states[stateName];
-
-        for (var contentId in state.contentIdsToAudioTranslations) {
-          var audioLanguageCodes = state.contentIdsToAudioTranslations.getAudioLanguageCodes()
-          for (var languageCode in state.contentIdsToAudioTranslations[contentId]) {
+        var contentIdsList =
+          state.contentIdsToAudioTranslations.getAllContentId();
+        contentIdsList.forEach(function(contentId) {
+          var audioLanguageCodes = (
+            state.contentIdsToAudioTranslations.getAudioLanguageCodes(
+            contentId));
+          for (var languageCode in audioLanguageCodes) {
             if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
               allAudioLanguageCodes.push(languageCode);
             }
           }
-        }
+        });
       }
       return allAudioLanguageCodes;
     };
@@ -115,14 +118,16 @@ oppia.factory('StatesObjectFactory', [
       for (var stateName in this._states) {
         var state = this._states[stateName];
         allAudioTranslations[stateName] = [];
-
-        for (var contentId in state.contenIdsToAudioTranslations) {
-          var audioTranslations = state.contenIdsToAudioTranslations[contentId]
+        var contentIdsList =
+          state.contentIdsToAudioTranslations.getAllContentId();
+        contentIdsList.forEach(function(contentId) {
+          var audioTranslations = state.contentIdsToAudioTranslations
+            .getBindableAudioTranslations(contentId);
           if (audioTranslations.hasOwnProperty(languageCode)) {
             allAudioTranslations[stateName].push(
               audioTranslations[languageCode]);
           }
-        }
+        });
       }
       return allAudioTranslations;
     };

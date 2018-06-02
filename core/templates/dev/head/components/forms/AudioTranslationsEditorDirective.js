@@ -22,7 +22,8 @@ oppia.directive('audioTranslationsEditor', [
       restrict: 'E',
       scope: {
         componentName: '@',
-        subtitledHtml: '=',
+        contentIdsToAudioTranslations: '=',
+        contentId: '@',
         // A function that must be called at the outset of every attempt to
         // edit, even if the action is not subsequently taken through to
         // completion.
@@ -49,9 +50,10 @@ oppia.directive('audioTranslationsEditor', [
           // a race condition that is causing this directive to get
           // initialized when it shouldn't. This is hard to reproduce
           // deterministically, hence this guard.
-          if ($scope.subtitledHtml) {
+          if ($scope.contentIdsToAudioTranslations) {
             $scope.audioTranslations = (
-              $scope.subtitledHtml.getBindableAudioTranslations());
+              $scope.contentIdsToAudioTranslations
+                .getBindableAudioTranslations($scope.contentId));
           }
 
           var explorationId = ExplorationContextService.getExplorationId();
@@ -65,16 +67,24 @@ oppia.directive('audioTranslationsEditor', [
                 explorationId, filename));
           };
 
+          $scope.isFullyTranslated = function() {
+            console.log($scope.contentId, "fuck");
+            $scope.contentIdsToAudioTranslations.isFullyTranslated(
+              $scope.contentId);
+          };
+
           $scope.toggleNeedsUpdateAttribute = function(languageCode) {
             $scope.getOnStartEditFn()();
-            $scope.subtitledHtml.toggleNeedsUpdateAttribute(languageCode);
+            $scope.contentIdsToAudioTranslations
+              .toggleNeedsUpdateAttribute ($scope.contentId, languageCode);
             $scope.getOnChangeFn()();
           };
 
           $scope.openAddAudioTranslationModal = function() {
             var allowedAudioLanguageCodes = (
               LanguageUtilService.getComplementAudioLanguageCodes(
-                $scope.subtitledHtml.getAudioLanguageCodes()));
+                $scope.contentIdsToAudioTranslations
+                  .getAudioLanguageCodes ($scope.contentId)));
 
             if (allowedAudioLanguageCodes.length === 0) {
               AlertsService.addWarning(
@@ -192,8 +202,9 @@ oppia.directive('audioTranslationsEditor', [
                 }
               ]
             }).result.then(function(result) {
-              $scope.subtitledHtml.addAudioTranslation(
-                result.languageCode, result.filename, result.fileSizeBytes);
+              $scope.contentIdsToAudioTranslations.addAudioTranslation(
+                $scope.contentId, result.languageCode, result.filename,
+                result.fileSizeBytes);
               $scope.getOnChangeFn()();
             });
           };
@@ -232,7 +243,8 @@ oppia.directive('audioTranslationsEditor', [
                 }
               ]
             }).result.then(function(result) {
-              $scope.subtitledHtml.deleteAudioTranslation(languageCode);
+              $scope.contentIdsToAudioTranslations.deleteAudioTranslation(
+                $scope.contentId, languageCode);
               $scope.getOnChangeFn()();
             });
           };

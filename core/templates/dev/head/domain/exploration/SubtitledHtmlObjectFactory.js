@@ -18,8 +18,8 @@
  */
 
 oppia.factory('SubtitledHtmlObjectFactory', [
-  'AudioTranslationObjectFactory', 'GenerateContentIdService',
-  function(AudioTranslationObjectFactory, GenerateContentIdService) {
+  'AudioTranslationObjectFactory',
+  function(AudioTranslationObjectFactory) {
     var SubtitledHtml = function(html, contentId) {
       this._html = html;
       this._contentId = contentId;
@@ -57,8 +57,7 @@ oppia.factory('SubtitledHtmlObjectFactory', [
         subtitledHtmlBackendDict.html, subtitledHtmlBackendDict.content_id);
     };
 
-    SubtitledHtml.createDefault = function(html) {
-      var contentId = GenerateContentIdService.generateUniqueId();
+    SubtitledHtml.createDefault = function(html, contentId) {
       return new SubtitledHtml(html, contentId);
     };
 

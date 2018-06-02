@@ -507,7 +507,7 @@ def generate_content_id(old_ids):
         old_ids.
     """
     new_id = generate_random_string(6)
-    while(new_id in old_id):
+    while(new_id in old_ids):
       new_id = generate_random_string(6)
 
     return new_id

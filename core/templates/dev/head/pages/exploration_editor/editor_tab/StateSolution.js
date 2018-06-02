@@ -176,7 +176,8 @@ oppia.controller('StateSolution', [
         }
 
         var contentId = result.solution.explanationHtml.contentId;
-        var contenIdsToAudioTranslations = state.contenIdsToAudioTranslations.addContentId(contentId);
+        var contentIdsToAudioTranslations =
+          state.contentIdsToAudioTranslations.addContentId(contentId);
         stateSolutionService.displayed = result.solution;
         stateSolutionService.saveDisplayedValue();
       });

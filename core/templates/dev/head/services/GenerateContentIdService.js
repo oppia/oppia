@@ -18,8 +18,7 @@
  */
 
 oppia.factory('GenerateContentIdService', [
-  'stateContentIdsToAudioTranslationsService',
-  function(stateContentIdsToAudioTranslationsService) {
+  'ExplorationStatesService', function(ExplorationStatesService) {
     var generateRandomString = function() {
       randomString = '';
       while (randomStringlength != 6){
@@ -27,8 +26,9 @@ oppia.factory('GenerateContentIdService', [
       }
     };
     var _generateUniqueId = function() {
-      var ContentIdList = Object.keys(
-        stateContentIdsToAudioTranslationsService.displayed);
+      var contentIdsToAudioTranslations = (
+        ExplorationStatesService.getContentIdsToAudioTranslationsMemento());
+      var ContentIdList = contentIdsToAudioTranslations.getAllContnetId();
       var uniqueId = generateRandomString();
       while (ContentIdList.indexOf(uniqueId) >= 0) {
         uniqueId = generateRandomString();

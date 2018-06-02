@@ -54,7 +54,8 @@
 
   <div ng-if="stateHintsService.savedMemento[getIndexPlusOne() - 1] && !stateHintsService.savedMemento[getIndexPlusOne() - 1].isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_HINT]>"
-                               subtitled-html="stateHintsService.displayed[getIndexPlusOne() - 1].hintContent"
+                               content-ids-to-audio-translations="stateContentIdsToAudioTranslationsService.displayed"
+                               conten-id="stateHintsService.displayed[getIndexPlusOne() - 1].hintContent.getContentId()"
                                on-start-edit="onAudioTranslationsStartEditAction"
                                on-change="onAudioTranslationsEdited">
     </audio-translations-editor>

@@ -3978,6 +3978,11 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 24
 
+        if exploration_schema_version == 24:
+            exploration_dict = cls._convert_v24_dict_to_v25_dict(
+                exploration_dict)
+            exploration_schema_version = 25
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod

@@ -18,9 +18,8 @@
  */
 
 oppia.factory('StateObjectFactory', [
-  'AudioTranslationObjectFactory','ContentIdsToAudioTranslationsObjectFactory',
-  'InteractionObjectFactory', 'SubtitledHtmlObjectFactory',
-  'ParamChangesObjectFactory', function(AudioTranslationObjectFactory,
+  'ContentIdsToAudioTranslationsObjectFactory','InteractionObjectFactory',
+  'SubtitledHtmlObjectFactory', 'ParamChangesObjectFactory', function(
       ContentIdsToAudioTranslationsObjectFactory, InteractionObjectFactory,
       SubtitledHtmlObjectFactory, ParamChangesObjectFactory) {
     var State = function(name, classifierModelId, content, interaction,
@@ -51,7 +50,6 @@ oppia.factory('StateObjectFactory', [
     // Static class methods. Note that "this" is not available in
     // static contexts.
     State.createFromBackendDict = function(stateName, stateDict) {
-
       return new State(
         stateName,
         stateDict.classifier_model_id,
@@ -60,7 +58,7 @@ oppia.factory('StateObjectFactory', [
         ParamChangesObjectFactory.createFromBackendList(
           stateDict.param_changes),
         ContentIdsToAudioTranslationsObjectFactory.createFromBackendDict(
-          contentIdsToAudioTranslations));
+          stateDict.content_ids_to_audio_translations));
     };
 
     return State;
