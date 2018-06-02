@@ -18,7 +18,6 @@ from core.domain import story_domain
 from core.domain import story_services
 from core.platform import models
 from core.tests import test_utils
-import feconf
 
 (story_models,) = models.Registry.import_models([models.NAMES.story])
 
@@ -27,7 +26,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     """Test the story services module."""
 
     STORY_ID = None
-    NODE_ID_1 = feconf.DEFAULT_INITIAL_NODE_ID
+    NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
     NODE_ID_2 = 'node_2'
     USER_ID = 'user'
     story = None
@@ -142,8 +141,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[1].destination_node_ids,
             [self.NODE_ID_1])
-        self.assertEqual(story.story_contents.starting_node_id, self.NODE_ID_2)
-        self.assertEqual(story.story_contents.next_node_id, 3)
+        self.assertEqual(story.story_contents.initial_node_id, self.NODE_ID_2)
+        self.assertEqual(story.story_contents.next_node_id, 'node_3')
         self.assertEqual(story.version, 2)
 
         story_summary = story_services.get_story_summary_by_id(self.STORY_ID)

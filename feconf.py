@@ -222,8 +222,6 @@ DEFAULT_STORY_TITLE = ''
 DEFAULT_STORY_DESCRIPTION = ''
 # Default notes for a newly-minted story.
 DEFAULT_STORY_NOTES = ''
-# Initial node id for a new story.
-DEFAULT_INITIAL_NODE_ID = 'node_1'
 
 # Default description for a newly-minted skill.
 DEFAULT_SKILL_DESCRIPTION = ''
