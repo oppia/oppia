@@ -2914,6 +2914,7 @@ states_schema_version: 19
 tags: []
 title: Title
 """)
+
     YAML_CONTENT_V25 = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -3009,6 +3010,373 @@ states_schema_version: 20
 tags: []
 title: Title
 """)
+
+    YAML_CONTENT_V24_TEXTANGULAR = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: category
+correctness_feedback_enabled: false
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 24
+states:
+  Introduction:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Introduction
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    param_changes: []
+  state1:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <blockquote><p>Hello, this is state1</p></blockquote>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: state2
+        feedback:
+          audio_translations: {}
+          html: Default <p>outcome</p> for state1
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer: Answer1
+        explanation:
+          audio_translations: {}
+          html: This is <i>solution</i> for state1
+    param_changes: []
+  state2:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <p>Hello, </p>this <i>is </i>state2
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: state1
+          feedback:
+            audio_translations: {}
+            html: <div>Outcome1 for state2</div>
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        - inputs:
+            x: 1
+          rule_type: Equals
+        training_data: []
+      - outcome:
+          dest: state3
+          feedback:
+            audio_translations: {}
+            html: <pre>Outcome2 <br>for state2</pre>
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - <p>This is </p>value1 <br>for MultipleChoice
+          - This is value2<span> for <br/>MultipleChoice</span>
+      default_outcome:
+        dest: state2
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          audio_translations: {}
+          html: <p>Hello, this is<div> html1<b> for </b></div>state2</p>
+      - hint_content:
+          audio_translations: {}
+          html: Here is link 2 <oppia-noninteractive-link
+                text-with-value="&amp;quot;discussion forum&amp;quot;"
+                url-with-value="&amp;quot;https://groups.google.com/
+                forum/?fromgroups#!forum/oppia&amp;quot;">
+                </oppia-noninteractive-link>
+      id: MultipleChoiceInput
+      solution: null
+    param_changes: []
+  state3:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <p>Hello, this is state3</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: state1
+          feedback:
+            audio_translations: {}
+            html: Here is the image1 <i><oppia-noninteractive-image
+                filepath-with-value="amp;quot;startBlue.png&amp;quot;">
+                </oppia-noninteractive-image></i>Here is the image2
+                <div><oppia-noninteractive-image filepath-with-value="
+                amp;quot;startBlue.png&amp;quot;">
+                </oppia-noninteractive-image></div>
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - This <span>is value1 for </span>ItemSelectionInput
+          rule_type: Equals
+        - inputs:
+            x:
+            - This is value3 for ItemSelectionInput
+          rule_type: Equals
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - This <span>is value1 for </span>ItemSelection
+          - This <code>is value2</code> for ItemSelection
+          - This is value3 for ItemSelection
+        maxAllowableSelectionCount:
+          value: 1
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: state3
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    param_changes: []
+states_schema_version: 19
+tags: []
+title: title
+""")
+
+# pylint: disable=line-too-long
+    YAML_CONTENT_V25_TEXTANGULAR = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: category
+correctness_feedback_enabled: false
+init_state_name: Introduction
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 25
+states:
+  Introduction:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Introduction
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: null
+      solution: null
+    param_changes: []
+  state1:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <blockquote><p>Hello, this is state1</p></blockquote>
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: state2
+        feedback:
+          audio_translations: {}
+          html: <p>Default </p><p>outcome</p><p> for state1</p>
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution:
+        answer_is_exclusive: true
+        correct_answer: Answer1
+        explanation:
+          audio_translations: {}
+          html: <p>This is </p><p><i>solution</i></p><p> for state1</p>
+    param_changes: []
+  state2:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <p>Hello, </p><p>this </p><p><i>is </i></p><p>state2</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: state1
+          feedback:
+            audio_translations: {}
+            html: <p>Outcome1 for state2</p>
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        - inputs:
+            x: 1
+          rule_type: Equals
+        training_data: []
+      - outcome:
+          dest: state3
+          feedback:
+            audio_translations: {}
+            html: <pre>Outcome2 <p><br></p>for state2</pre>
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: 0
+          rule_type: Equals
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - <p>This is </p><p>value1 </p><p><br/></p><p>for MultipleChoice</p>
+          - <p>This is value2 for </p><p><br/></p><p>MultipleChoice</p>
+      default_outcome:
+        dest: state2
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints:
+      - hint_content:
+          audio_translations: {}
+          html: <p>Hello, this is html1<b> for </b>state2</p>
+      - hint_content:
+          audio_translations: {}
+          html: <p>Here is link 2 </p><p><oppia-noninteractive-link text-with-value="&amp;quot;discussion
+            forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/
+            forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
+      id: MultipleChoiceInput
+      solution: null
+    param_changes: []
+  state3:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <p>Hello, this is state3</p>
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: state1
+          feedback:
+            audio_translations: {}
+            html: <p>Here is the image1 </p><p><oppia-noninteractive-image filepath-with-value="amp;quot;startBlue.png&amp;quot;">
+              </oppia-noninteractive-image></p><p>Here is the image2 </p><p><oppia-noninteractive-image
+              filepath-with-value=" amp;quot;startBlue.png&amp;quot;"> </oppia-noninteractive-image></p>
+          labelled_as_correct: false
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x:
+            - <p>This is value1 for ItemSelectionInput</p>
+          rule_type: Equals
+        - inputs:
+            x:
+            - <p>This is value3 for ItemSelectionInput</p>
+          rule_type: Equals
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        choices:
+          value:
+          - <p>This is value1 for ItemSelection</p>
+          - <p>This is value2 for ItemSelection</p>
+          - <p>This is value3 for ItemSelection</p>
+        maxAllowableSelectionCount:
+          value: 1
+        minAllowableSelectionCount:
+          value: 1
+      default_outcome:
+        dest: state3
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: ItemSelectionInput
+      solution: null
+    param_changes: []
+states_schema_version: 20
+tags: []
+title: title
+""")
+# pylint: enable=line-too-long
     _LATEST_YAML_CONTENT = YAML_CONTENT_V25
 
     def test_load_from_v1(self):
@@ -3160,6 +3528,13 @@ title: Title
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V25)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v24_textangular(self):
+        """Test direct loading from a v25 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V24_TEXTANGULAR)
+        self.assertEqual(
+            exploration.to_yaml(), self.YAML_CONTENT_V25_TEXTANGULAR)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
