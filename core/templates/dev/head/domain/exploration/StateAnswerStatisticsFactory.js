@@ -16,32 +16,28 @@
  * @fileoverview TODO(brianrodri).
  */
 
-oppia.factory('StateAnswerStatisticsFactory', [
+oppia.factory('StateTopAnswerStatisticsFactory', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
   'ExplorationContextService', 'ExplorationStatesService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
       ExplorationContextService, ExplorationStatesService) {
+
     /**
      * @private @constructor
      * @param {string} stateName
-     * @param {Array.<*>} answers
-     * @param {number} frequency
+     * @param {Array.<{answer, frequency: number}>} topAnswers
      */
-    var StateAnswerStatistics = function(stateName, answers, frequency) {
+    var StateTopAnswerStatistics = function(stateName, topAnswers) {
       /** @member {string} */
       this._stateName = stateName;
       /** @member {*} */
-      this._answers = angular.copy(answers);
-      /** @member {number} */
-      this._frequency = frequency;
-      /** @member {boolean} */
-      this._isAddressed = true;
+      this._answers = angular.copy(topAnswers);
 
       this.updateIsAddressed();
     };
 
-    StateAnswerStatistics.prototype.updateIsAddressed = function() {
+    StateTopAnswerStatistics.prototype.updateIsAddressed = function() {
       var explorationId = ExplorationContextService.getExplorationId();
       var state = ExplorationStatesService.getState(this._stateName);
       var interactionRulesService =
@@ -55,22 +51,22 @@ oppia.factory('StateAnswerStatisticsFactory', [
     };
 
     /** @returns {*} */
-    StateAnswerStatistics.prototype.getAnswer = function() {
+    StateTopAnswerStatistics.prototype.getAnswer = function() {
       return angular.copy(this._answers);
     };
 
     /** @returns {number} */
-    StateAnswerStatistics.prototype.getFrequency = function() {
+    StateTopAnswerStatistics.prototype.getFrequency = function() {
       return this._frequency;
     };
 
     /** @returns {boolean} */
-    StateAnswerStatistics.prototype.isAddressed = function() {
+    StateTopAnswerStatistics.prototype.isAddressed = function() {
       return this._isAddressed;
     };
 
     /** @returns {{answer, frequency: number}} */
-    StateAnswerStatistics.prototype.toBackendDict = function() {
+    StateTopAnswerStatistics.prototype.toBackendDict = function() {
       return {
         state_name: this._stateName,
         answer: angular.copy(this._answer),
@@ -79,12 +75,14 @@ oppia.factory('StateAnswerStatisticsFactory', [
     };
 
     /**
-     * @param {{state_name: string, answer, frequency: number}} backendDict
-     * @returns {StateAnswerStatistics}
+     * @param {string} stateName - Name of the state this new instance will be
+     *     responsible for.
+     * @param {Array.<{answer, frequency: number}>} backendDict
+     * @returns {StateTopAnswerStatistics}
      */
-    StateAnswerStatistics.createFromBackendDict = function(backendDict) {
-      return new StateAnswerStatistics(
-        backendDict.state_name, backendDict.answer, backendDict.frequency);
+    StateTopAnswerStatistics.createFromBackendDict = function(
+        stateName, backendArray) {
+      return new StateTopAnswerStatistics(stateName, backendArray);
     };
   }
 ]);
