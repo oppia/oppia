@@ -18,7 +18,7 @@
       <div ng-if="displayCheckboxes">
         <label class="item-selection-input-item">
           <md-checkbox class="item-selection-input-checkbox" ng-model="userSelections[choice]" ng-checked="userSelections[choice]"
-            ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice]" tabindex="0">
+                       ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice]" tabindex="0">
             <span angular-html-bind="choice"></span>
           </md-checkbox>
         </label>

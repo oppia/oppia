@@ -71,8 +71,8 @@
         <li ng-if="canCreateCollections && collectionsList.length > 0"
             ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
           <a class="oppia-dashboard-tabs-text"
-              ng-click="setActiveTab('myCollections')"
-              translate="I18N_DASHBOARD_COLLECTIONS">
+             ng-click="setActiveTab('myCollections')"
+             translate="I18N_DASHBOARD_COLLECTIONS">
           </a>
         </li>
         <li ng-if="subscribersList.length > 0"
@@ -147,14 +147,14 @@
         <md-card layout="row"
                  class="oppia-dashboard-list-view-item">
           <table class="oppia-dashboard-table">
-             <colgroup>
-               <col style="width: 26%;">
-               <col style="width: 13%;">
-               <col style="width: 13%;">
-               <col style="width: 16%;">
-               <col style="width: 16%;">
-               <col style="width: 16%;">
-            </colgroup>
+              <colgroup>
+                <col style="width: 26%;">
+                <col style="width: 13%;">
+                <col style="width: 13%;">
+                <col style="width: 16%;">
+                <col style="width: 16%;">
+                <col style="width: 16%;">
+              </colgroup>
             <tr>
               <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
                   class="oppia-dashboard-table-headings"

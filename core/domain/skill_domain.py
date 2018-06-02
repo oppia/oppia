@@ -15,7 +15,9 @@
 """Domain objects relating to skills."""
 
 from constants import constants
+from core.domain import html_cleaner
 import feconf
+import utils
 
 # Do not modify the values of these constants. This is to preserve backwards
 # compatibility with previous change dicts.
@@ -40,6 +42,10 @@ CMD_ADD_SKILL_MISCONCEPTION = 'add_skill_misconception'
 CMD_DELETE_SKILL_MISCONCEPTION = 'delete_skill_misconception'
 
 CMD_CREATE_NEW = 'create_new'
+CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION = (
+    'migrate_contents_schema_to_latest_version')
+CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION = (
+    'migrate_misconceptions_schema_to_latest_version')
 
 
 class SkillChange(object):
@@ -56,6 +62,10 @@ class SkillChange(object):
         SKILL_MISCONCEPTIONS_PROPERTY_NOTES,
         SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK
     )
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'property_name', 'new_value', 'old_value', 'misconception_id'
+    ]
 
     def __init__(self, change_dict):
         """Initialize a SkillChange object from a dict.
@@ -104,8 +114,25 @@ class SkillChange(object):
             self.property_name = change_dict['property_name']
             self.new_value = change_dict['new_value']
             self.old_value = change_dict['old_value']
+        elif self.cmd == CMD_CREATE_NEW:
+            return
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the SkillChange domain object.
+
+        Returns:
+            A dict, mapping all fields of SkillChange instance.
+        """
+        skill_change_dict = {}
+        skill_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                skill_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return skill_change_dict
 
 
 class Misconception(object):
@@ -120,14 +147,16 @@ class Misconception(object):
             misconception_id: str. The unique id of each misconception.
             name: str. The name of the misconception.
             notes: str. General advice for creators about the
-                misconception (including examples) and general notes.
+                misconception (including examples) and general notes. This
+                should be an html string.
             feedback: str. This can auto-populate the feedback field
-                when an answer group has been tagged with a misconception.
+                when an answer group has been tagged with a misconception. This
+                should be an html string.
         """
         self.id = misconception_id
         self.name = name
-        self.notes = notes
-        self.feedback = feedback
+        self.notes = html_cleaner.clean(notes)
+        self.feedback = html_cleaner.clean(feedback)
 
     def to_dict(self):
         """Returns a dict representing this Misconception domain object.
@@ -159,6 +188,42 @@ class Misconception(object):
 
         return misconception
 
+    @classmethod
+    def create_default_misconception(cls, misconception_id):
+        """Creates a Misconception object with default values.
+
+        Args:
+            misconception_id: str. ID of the new misconception.
+
+        Returns:
+            Misconception. A misconception object with given id and default
+                values for all other fields.
+        """
+        return cls(
+            misconception_id, feconf.DEFAULT_MISCONCEPTION_NAME,
+            feconf.DEFAULT_MISCONCEPTION_NOTES,
+            feconf.DEFAULT_MISCONCEPTION_FEEDBACK)
+
+    def validate(self):
+        """Validates various properties of the Misconception object.
+
+        Raises:
+            ValidationError: One or more attributes of the misconception are
+            invalid.
+        """
+        if not isinstance(self.name, basestring):
+            raise utils.ValidationError(
+                'Expected misconception name to be a string, received %s' %
+                self.name)
+        if not isinstance(self.notes, basestring):
+            raise utils.ValidationError(
+                'Expected misconception notes to be a string, received %s' %
+                self.notes)
+        if not isinstance(self.feedback, basestring):
+            raise utils.ValidationError(
+                'Expected misconception feedback to be a string, received %s' %
+                self.feedback)
+
 
 class SkillContents(object):
     """Domain object representing the skill_contents dict."""
@@ -169,9 +234,32 @@ class SkillContents(object):
         Args:
             explanation: str. An explanation on how to apply the skill.
             worked_examples: list(str). A list of worked examples for the skill.
+                Each element should be an html string.
         """
         self.explanation = explanation
-        self.worked_examples = worked_examples
+        self.worked_examples = [
+            html_cleaner.clean(example) for example in worked_examples]
+
+    def validate(self):
+        """Validates various properties of the SkillContents object.
+
+        Raises:
+            ValidationError: One or more attributes of skill contents are
+            invalid.
+        """
+        if not isinstance(self.explanation, basestring):
+            raise utils.ValidationError(
+                'Expected skill explanation to be a string, received %s' %
+                self.explanation)
+        if not isinstance(self.worked_examples, list):
+            raise utils.ValidationError(
+                'Expected worked examples to be a list, received %s' %
+                self.worked_examples)
+        for example in self.worked_examples:
+            if not isinstance(example, basestring):
+                raise utils.ValidationError(
+                    'Expected each worked example to be a string, received %s' %
+                    example)
 
     def to_dict(self):
         """Returns a dict representing this SkillContents domain object.
@@ -242,6 +330,71 @@ class Skill(object):
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+
+    def validate(self):
+        """Validates various properties of the Skill object.
+
+        Raises:
+            ValidationError: One or more attributes of skill are invalid.
+        """
+        if not isinstance(self.description, basestring):
+            raise utils.ValidationError(
+                'Expected description to be a string, received %s'
+                % self.description)
+
+        if not isinstance(self.misconceptions_schema_version, int):
+            raise utils.ValidationError(
+                'Expected misconceptions schema version to be an integer, '
+                'received %s' % self.misconceptions_schema_version)
+        if (
+                self.misconceptions_schema_version !=
+                feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION):
+            raise utils.ValidationError(
+                'Expected misconceptions schema version to be %s, received %s'
+                % (
+                    feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+                    self.misconceptions_schema_version)
+            )
+
+        if not isinstance(self.skill_contents_schema_version, int):
+            raise utils.ValidationError(
+                'Expected skill contents schema version to be an integer, '
+                'received %s' % self.skill_contents_schema_version)
+        if (
+                self.skill_contents_schema_version !=
+                feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION):
+            raise utils.ValidationError(
+                'Expected skill contents schema version to be %s, received %s'
+                % (
+                    feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
+                    self.skill_contents_schema_version)
+            )
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+        if not any([self.language_code == lc['code']
+                    for lc in constants.ALL_LANGUAGE_CODES]):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.skill_contents, SkillContents):
+            raise utils.ValidationError(
+                'Expected skill_contents to be a SkillContents object, '
+                'received %s' % self.skill_contents)
+        self.skill_contents.validate()
+
+        if not isinstance(self.misconceptions, list):
+            raise utils.ValidationError(
+                'Expected misconceptions to be a list, '
+                'received %s' % self.skill_contents)
+        for misconception in self.misconceptions:
+            if not isinstance(misconception, Misconception):
+                raise utils.ValidationError(
+                    'Expected each misconception to be a Misconception '
+                    'object, received %s' % misconception)
+            misconception.validate()
 
     def to_dict(self):
         """Returns a dict representing this Skill domain object.
@@ -332,6 +485,128 @@ class Skill(object):
             updated_misconceptions.append(conversion_fn(misconception))
 
         versioned_misconceptions['misconceptions'] = updated_misconceptions
+
+    def update_description(self, description):
+        """Updates the description of the skill.
+
+        Args:
+            description: str. The new description of the skill.
+        """
+        self.description = description
+
+    def update_language_code(self, language_code):
+        """Updates the language code of the skill.
+
+        Args:
+            language_code: str. The new language code of the skill.
+        """
+        self.language_code = language_code
+
+    def update_explanation(self, explanation):
+        """Updates the explanation of the skill.
+
+        Args:
+            explanation: str. The new explanation of the skill.
+        """
+        self.skill_contents.explanation = explanation
+
+    def update_worked_examples(self, worked_examples):
+        """Updates the worked examples list of the skill.
+
+        Args:
+            worked_examples: list(str). The new worked examples of the skill.
+        """
+        self.skill_contents.worked_examples = worked_examples
+
+    def _find_misconception_index(self, misconception_id):
+        """Returns the index of the misconception with the given misconception
+        id, or None if it is not in the misconceptions list.
+
+        Args:
+            misconception_id: str. The id of the misconception.
+
+        Returns:
+            int or None. The index of the corresponding misconception, or None
+                if there is no such misconception.
+        """
+        for ind, misconception in enumerate(self.misconceptions):
+            if misconception.id == misconception_id:
+                return ind
+        return None
+
+    def add_misconception(self, misconception_id):
+        """Adds a new misconception to the skill.
+
+        Args:
+            misconception_id: str. The id of the new misconception to be added.
+        """
+        misconception = Misconception.create_default_misconception(
+            misconception_id)
+        self.misconceptions.append(misconception)
+
+    def delete_misconception(self, misconception_id):
+        """Removes a misconception with the given id.
+
+        Args:
+            misconception_id: str. The id of the misconception to be removed.
+
+        Raises:
+            ValueError: There is no misconception with the given id.
+        """
+        index = self._find_misconception_index(misconception_id)
+        if index is None:
+            raise ValueError(
+                'There is no misconception with the given id.')
+        del self.misconceptions[index]
+
+    def update_misconception_name(self, misconception_id, name):
+        """Updates the name of the misconception with the given id.
+
+        Args:
+            misconception_id: str. The id of the misconception to be edited.
+            name: str. The new name of the misconception.
+
+        Raises:
+            ValueError: There is no misconception with the given id.
+        """
+        index = self._find_misconception_index(misconception_id)
+        if index is None:
+            raise ValueError(
+                'There is no misconception with the given id.')
+        self.misconceptions[index].name = name
+
+    def update_misconception_notes(self, misconception_id, notes):
+        """Updates the notes of the misconception with the given id.
+
+        Args:
+            misconception_id: str. The id of the misconception to be edited.
+            notes: str. The new notes of the misconception.
+
+        Raises:
+            ValueError: There is no misconception with the given id.
+        """
+        index = self._find_misconception_index(misconception_id)
+        if index is None:
+            raise ValueError(
+                'There is no misconception with the given id.')
+        self.misconceptions[index].notes = notes
+
+    def update_misconception_feedback(self, misconception_id, feedback):
+        """Updates the feedback of the misconception with the given id.
+
+        Args:
+            misconception_id: str. The id of the misconception to be edited.
+            feedback: str. The html string that corresponds to the new feedback
+                of the misconception.
+
+        Raises:
+            ValueError: There is no misconception with the given id.
+        """
+        index = self._find_misconception_index(misconception_id)
+        if index is None:
+            raise ValueError(
+                'There is no misconception with the given id.')
+        self.misconceptions[index].feedback = feedback
 
 
 class SkillSummary(object):

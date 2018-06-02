@@ -111,9 +111,13 @@ class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
         change_list = []
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
-        change_list = [{'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': self.exp.init_state_name,
-                        'new_state_name': self.state_b}]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.exp.init_state_name,
+                'new_state_name': self.state_b
+            })
+        ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -233,9 +237,13 @@ class RecomputeAnswerSubmittedStatisticsTest(test_utils.GenericTestBase):
         self.exp = self.save_new_valid_exploration(self.exp_id, 'owner')
         self.state = self.exp.init_state_name
 
-        change_list = [{'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': self.state,
-                        'new_state_name': 'b'}]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.state,
+                'new_state_name': 'b'
+            })
+        ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -351,9 +359,13 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
         change_list = []
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
-        change_list = [{'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': self.state,
-                        'new_state_name': 'b'}]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.state,
+                'new_state_name': 'b'
+            })
+        ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -506,9 +518,13 @@ class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
         self.exp = self.save_new_valid_exploration(self.exp_id, 'owner')
         self.state = self.exp.init_state_name
 
-        change_list = [{'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': self.state,
-                        'new_state_name': 'b'}]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.state,
+                'new_state_name': 'b'
+            })
+        ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 

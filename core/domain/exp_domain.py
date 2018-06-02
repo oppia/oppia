@@ -60,6 +60,8 @@ STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 GADGET_PROPERTY_VISIBILITY = 'gadget_visibility'
 GADGET_PROPERTY_CUST_ARGS = 'gadget_customization_args'
 
+# This takes additional 'title' and 'category' parameters.
+CMD_CREATE_NEW = 'create_new'
 # This takes an additional 'state_name' parameter.
 CMD_ADD_STATE = 'add_state'
 # This takes additional 'old_state_name' and 'new_state_name' parameters.
@@ -223,6 +225,12 @@ class ExplorationChange(object):
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
 
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'state_name', 'old_state_name', 'new_state_name',
+        'property_name', 'new_value', 'old_value', 'name', 'from_version',
+        'to_version', 'title', 'category'
+    ]
+
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
 
@@ -274,8 +282,26 @@ class ExplorationChange(object):
         elif self.cmd == CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION:
             self.from_version = change_dict['from_version']
             self.to_version = change_dict['to_version']
+        elif self.cmd == CMD_CREATE_NEW:
+            self.title = change_dict['title']
+            self.category = change_dict['category']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the ExplorationChange domain object.
+
+        Returns:
+            A dict, mapping all fields of ExplorationChange instance.
+        """
+        exploration_change_dict = {}
+        exploration_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                exploration_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return exploration_change_dict
 
 
 class ExplorationCommitLogEntry(object):
@@ -1607,19 +1633,20 @@ class ExplorationVersionsDiff(object):
         """Constructs an ExplorationVersionsDiff domain object.
 
         Args:
-            change_list: list(dict). A list of all of the commit cmds from the
-                old version of the exploration up to the next version.
+            change_list: list(ExplorationChange). A list of all of the commit
+                cmds from the old version of the exploration up to the next
+                version.
         """
 
         added_state_names = []
         deleted_state_names = []
         new_to_old_state_names = {}
 
-        for change_dict in change_list:
-            if change_dict['cmd'] == CMD_ADD_STATE:
-                added_state_names.append(change_dict['state_name'])
-            elif change_dict['cmd'] == CMD_DELETE_STATE:
-                state_name = change_dict['state_name']
+        for change in change_list:
+            if change.cmd == CMD_ADD_STATE:
+                added_state_names.append(change.state_name)
+            elif change.cmd == CMD_DELETE_STATE:
+                state_name = change.state_name
                 if state_name in added_state_names:
                     added_state_names.remove(state_name)
                 else:
@@ -1628,9 +1655,9 @@ class ExplorationVersionsDiff(object):
                         original_state_name = new_to_old_state_names.pop(
                             original_state_name)
                     deleted_state_names.append(original_state_name)
-            elif change_dict['cmd'] == CMD_RENAME_STATE:
-                old_state_name = change_dict['old_state_name']
-                new_state_name = change_dict['new_state_name']
+            elif change.cmd == CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
                 if old_state_name in added_state_names:
                     added_state_names.remove(old_state_name)
                     added_state_names.append(new_state_name)
@@ -3975,7 +4002,7 @@ class ExplorationSummary(object):
     def __init__(
             self, exploration_id, title, category, objective,
             language_code, tags, ratings, scaled_average_rating, status,
-            community_owned, owner_ids, editor_ids,
+            community_owned, owner_ids, editor_ids, translator_ids,
             viewer_ids, contributor_ids, contributors_summary, version,
             exploration_model_created_on,
             exploration_model_last_updated,
@@ -4001,6 +4028,8 @@ class ExplorationSummary(object):
                 this exploration.
             editor_ids: list(str). List of the users ids who have access to
                 edit this exploration.
+            translator_ids: list(str). List of the users ids who have access to
+                translate this exploration.
             viewer_ids: list(str). List of the users ids who have access to
                 view this exploration.
             contributor_ids: list(str). List of the users ids of the user who
@@ -4028,6 +4057,7 @@ class ExplorationSummary(object):
         self.community_owned = community_owned
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
+        self.translator_ids = translator_ids
         self.viewer_ids = viewer_ids
         self.contributor_ids = contributor_ids
         self.contributors_summary = contributors_summary
@@ -4101,8 +4131,8 @@ class StateIdMapping(object):
         Args:
             old_exploration: Exploration. Old version of the exploration.
             new_exploration: Exploration. New version of the exploration.
-            change_list: list(dict). List of changes between old and new
-                exploration.
+            change_list: list(ExplorationChange). List of changes between old
+                and new exploration.
 
         Returns:
             StateIdMapping. Domain object for state id mapping.
@@ -4118,32 +4148,13 @@ class StateIdMapping(object):
 
         # Analyse each command in change list one by one to create state id
         # mapping for new exploration.
-        for change_dict in change_list:
-            # During v1 -> v2 migration of states, all pseudo END states were
-            # replaced by an explicit END state through this migration.
-            # We account for that change in the state id mapping too.
-            if change_dict['cmd'] == 'migrate_states_schema_to_latest_version':
-                pseudo_end_state_name = 'END'
-                if int(change_dict['from_version']) < 2 <= int(
-                        change_dict['to_version']):
-                    # The explicit end state is created only if there is some
-                    # state that used to refer to an implicit 'END' state.
-                    # This is confirmed by checking that there is a state
-                    # called 'END' in the immediate version of the exploration
-                    # after migration and no state called 'END' is present
-                    # in previous version of exploration.
-                    if (pseudo_end_state_name in (
-                            new_exploration.states) and (
-                                pseudo_end_state_name not in (
-                                    self.state_names_to_ids))):
-                        new_state_names.append(pseudo_end_state_name)
-            elif change_dict['cmd'] == CMD_ADD_STATE:
-                new_state_names.append(change_dict['state_name'])
-                assert change_dict['state_name'] not in (
-                    state_ids_to_names.values())
+        for change in change_list:
+            if change.cmd == CMD_ADD_STATE:
+                new_state_names.append(change.state_name)
+                assert change.state_name not in state_ids_to_names.values()
 
-            elif change_dict['cmd'] == CMD_DELETE_STATE:
-                removed_state_name = change_dict['state_name']
+            elif change.cmd == CMD_DELETE_STATE:
+                removed_state_name = change.state_name
 
                 # Find state name in state id mapping. If it exists then
                 # remove it from mapping.
@@ -4162,9 +4173,9 @@ class StateIdMapping(object):
                     # remove it from new state names list.
                     new_state_names.remove(removed_state_name)
 
-            elif change_dict['cmd'] == CMD_RENAME_STATE:
-                old_state_name = change_dict['old_state_name']
-                new_state_name = change_dict['new_state_name']
+            elif change.cmd == CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
 
                 # Find whether old state name is present in state id mapping.
                 # If it is then replace the old state name to new state name.
@@ -4193,6 +4204,30 @@ class StateIdMapping(object):
         # with its corresponding old state to find whether significant
         # change has happened or not.
         for (state_id, state_name) in state_ids_to_names.iteritems():
+            if state_name == 'END' and state_name not in new_exploration.states:
+                # If previous version of exploration has END state but new
+                # version does not have END state then exception will be raised
+                # below when comparing old state and corresponding new state.
+                # The exception is raised because there is no commit in change
+                # list corresponding to removal or renaming of END state.
+
+                # This problem arises when following scenario occurrs:
+                # Consider an exploration with two versions a and b (a < b).
+                # Both of these versions have their states dict schema version
+                # set to less than 2.
+                # Now version 'a' has explicit references to END
+                # state and thus when its states dict schema version will be
+                # upgraded to latest version, an 'END' state will be added.
+                # These explicit END references are not present in version 'b',
+                # however, and so no END state will be added during states dict
+                # schema migration.
+
+                # Thus we have no command of END state's removal or renaming
+                # in change_list and there is no END state present in later
+                # version of exploration.
+                new_state_names_to_ids.pop(state_name)
+                continue
+
             new_state = new_exploration.states[state_name]
             old_state = old_exploration.states[old_state_ids_to_names[state_id]]
 
@@ -4202,11 +4237,23 @@ class StateIdMapping(object):
                 new_state_names_to_ids.pop(state_name)
                 new_state_names.append(state_name)
 
+        # This may happen in exactly opposite scenario as the one written in
+        # comment above. Previous version of exploration may not have any rule
+        # having END state as its destination and hence during states schema
+        # migration END state won't be added. But next version of exploration
+        # might have END references and, hence, END state might be added
+        # to exploration during states schema migration.
+        # So we check whether such siatuation exists or not. If it exists then
+        # we consider END as a new state to which id will be assigned.
+        if 'END' in new_exploration.states and (
+                'END' not in new_state_names_to_ids and (
+                    'END' not in new_state_names)):
+            new_state_names.append('END')
+
         # Assign new ids to each state in new state names list.
         largest_state_id_used = self.largest_state_id_used
         for state_name in sorted(new_state_names):
             largest_state_id_used += 1
-
             # Check that the state name being assigned is not present in
             # mapping.
             assert state_name not in new_state_names_to_ids.keys()
@@ -4215,6 +4262,23 @@ class StateIdMapping(object):
         state_id_map = StateIdMapping(
             new_exploration.id, new_exploration.version, new_state_names_to_ids,
             largest_state_id_used)
+
+        # Do one final check that all state names in new exploration are present
+        # in generated state names to id mapping.
+        if set(new_state_names_to_ids.keys()) != set(
+                new_exploration.states.keys()):
+            unknown_state_names = ((
+                set(new_exploration.states.keys()) -
+                set(new_state_names_to_ids.keys())) + (
+                    set(new_state_names_to_ids.keys()) -
+                    set(new_exploration.states.keys())))
+            raise Exception(
+                'State names to ids mapping does not contain '
+                'state names (%s) which are present in corresponding '
+                'exploration %s, version %d' % (
+                    unknown_state_names,
+                    new_exploration.id, new_exploration.version))
+
         state_id_map.validate()
         return state_id_map
 
@@ -4249,9 +4313,15 @@ class StateIdMapping(object):
         if len(set(state_ids)) != len(state_ids):
             raise Exception('Assigned state ids should be unique.')
 
-        if not all(state_ids) <= self.largest_state_id_used:
+        if not all(x <= self.largest_state_id_used for x in state_ids):
             raise Exception(
                 'Assigned state ids should be smaller than last state id used.')
+
+        if not all(isinstance(x, int) for x in state_ids):
+            raise Exception(
+                'Assigned state ids should be integer values in '
+                'exploration %s, version %d' % (
+                    self.exploration_id, self.exploration_version))
 
     def get_state_id(self, state_name):
         """Get state id for given state name.

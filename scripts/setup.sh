@@ -71,7 +71,7 @@ function maybeInstallDependencies {
     install_node_module protractor-screenshot-reporter 0.0.5
     install_node_module jasmine-spec-reporter 3.2.0
 
-    $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.38
+    $NODE_MODULE_DIR/.bin/webdriver-manager update --versions.chrome 2.39
   fi
 
   if [ "$RUN_MINIFIED_TESTS" = "true" ]; then

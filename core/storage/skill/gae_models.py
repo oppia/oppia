@@ -92,7 +92,7 @@ class SkillModel(base_models.VersionedModel):
             feconf.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
-        skill_commit_log_entry.put_async()
+        skill_commit_log_entry.put()
 
 
 class SkillCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
@@ -165,3 +165,7 @@ class SkillsMasteryModel(base_models.BaseModel):
     skill_id = ndb.StringProperty(required=True, indexed=True)
     # The degree of mastery of the user in a skill.
     degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
+
+    @classmethod
+    def get_something(cls, USER_ID):
+        return cls.query(cls.user_id == USER_ID)
