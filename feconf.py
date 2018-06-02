@@ -671,6 +671,7 @@ COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 COMMIT_MESSAGE_SKILL_DELETED = 'Skill deleted.'
+COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
 ENABLE_PLAYTHROUGHS = False
@@ -862,7 +863,7 @@ QUESTION_BATCH_SIZE = 10
 
 STATE_ANSWER_STATS_MIN_FREQUENCY = 2
 
-# RTE content specifications according to the type.
+# RTE content specifications according to the type of the editor.
 RTE_CONTENT_SPEC = {
     'RTE_TYPE_TEXTANGULAR': {
         # Valid parent-child relation in TextAngular.
