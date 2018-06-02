@@ -945,7 +945,7 @@ tags: []
 
     def save_new_skill(
             self, skill_id, owner_id,
-            description, misconceptions, skill_contents,
+            description=None, misconceptions=None, skill_contents=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Skill and saves it.
 
@@ -963,11 +963,15 @@ tags: []
         Returns:
             Skill. A newly-created skill.
         """
-        skill = skill_domain.Skill(
-            skill_id, description, misconceptions, skill_contents,
-            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, language_code, 0
-        )
+        skill = skill_domain.Skill.create_default_skill(skill_id)
+        if description:
+            skill.description = description
+        if misconceptions:
+            skill.misconceptions = misconceptions
+        if skill_contents:
+            skill.skill_contents = skill_contents
+        skill.language_code = language_code
+        skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
         return skill
 

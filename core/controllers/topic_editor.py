@@ -26,6 +26,19 @@ import feconf
 import utils
 
 
+def _require_valid_topic_id(topic_id):
+    """Checks whether the topic id received from the frontend is a
+    valid one.
+    """
+    if not isinstance(topic_id, basestring):
+        raise base.BaseHandler.InvalidInputException(
+            Exception('Topic id should be a string.'))
+
+    if len(topic_id) != 12:
+        raise base.BaseHandler.InvalidInputException(
+            Exception('The topic id given is invalid.'))
+
+
 class NewStoryHandler(base.BaseHandler):
     """Creates a new story."""
 
@@ -65,13 +78,7 @@ class TopicEditorPage(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException()
 
-        if not isinstance(topic_id, basestring):
-            raise self.InvalidInputException(
-                Exception('Topic id should be a string.'))
-
-        if len(topic_id) != 12:
-            raise self.InvalidInputException(
-                Exception('The topic id given is invalid.'))
+        _require_valid_topic_id(topic_id)
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
 
@@ -103,25 +110,13 @@ class EditableTopicDataHandler(base.BaseHandler):
                 'which is too old. Please reload the page and try again.'
                 % (topic_version, version_from_payload))
 
-    def _require_valid_topic_id(self, topic_id):
-        """Checks whether the topic is received from the frontend is a
-        valid one.
-        """
-        if not isinstance(topic_id, basestring):
-            raise self.InvalidInputException(
-                Exception('Topic id should be a string.'))
-
-        if len(topic_id) != 12:
-            raise self.InvalidInputException(
-                Exception('The topic id given is invalid.'))
-
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException()
 
-        self._require_valid_topic_id(topic_id)
+        _require_valid_topic_id(topic_id)
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
 
@@ -141,7 +136,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException()
 
-        self._require_valid_topic_id(topic_id)
+        _require_valid_topic_id(topic_id)
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException(
@@ -176,7 +171,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException()
 
-        self._require_valid_topic_id(topic_id)
+        _require_valid_topic_id(topic_id)
         if not topic_id:
             raise self.PageNotFoundException
         topic_services.delete_topic(self.user_id, topic_id)
@@ -190,13 +185,7 @@ class TopicManagerRightsHandler(base.BaseHandler):
         """Assign topic manager role to a user for a particular topic, if the
         user has general topic manager rights.
         """
-        if not isinstance(topic_id, basestring):
-            raise self.InvalidInputException(
-                Exception('Topic id should be a string.'))
-
-        if len(topic_id) != 12:
-            raise self.InvalidInputException(
-                Exception('The topic id given is invalid.'))
+        _require_valid_topic_id(topic_id)
 
         if assignee_id is None:
             raise self.InvalidInputException(

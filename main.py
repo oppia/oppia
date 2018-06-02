@@ -38,6 +38,7 @@ from core.controllers import question
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.controllers import skill_editor
 from core.controllers import subscriptions
 from core.controllers import topic_editor
 from core.controllers import topics_and_skills_dashboard
@@ -494,6 +495,13 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_PREFIX,
         topic_editor.TopicManagerRightsHandler),
+
+    get_redirect_route(
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
+        skill_editor.SkillEditorPage),
+    get_redirect_route(
+        r'%s/<skill_id>' % feconf.EDITABLE_SKILL_DATA_URL_PREFIX,
+        skill_editor.EditableSkillDataHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
