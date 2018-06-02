@@ -168,4 +168,4 @@ class SkillsMasteryModel(base_models.BaseModel):
 
     @classmethod
     def get_something(cls, USER_ID):
-        return cls.query(cls.user_id == USER_ID)
+        return SkillSummaryModel.query().filter(cls.user_id == USER_ID)
