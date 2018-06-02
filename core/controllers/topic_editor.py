@@ -25,16 +25,25 @@ from core.domain import user_services
 import feconf
 import utils
 
-STORY_ID_KEY = 'storyId'
 
-
-class NewStory(base.BaseHandler):
+class NewStoryHandler(base.BaseHandler):
     """Creates a new story."""
 
     @acl_decorators.can_access_admin_page
     def post(self):
         """Handles POST requests."""
-        title = self.payload.get('title', feconf.DEFAULT_STORY_TITLE)
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException()
+
+        title = self.payload.get('title')
+
+        if not isinstance(title, basestring):
+            raise self.InvalidInputException(
+                Exception('Title should be a string.'))
+
+        if title == '':
+            raise self.InvalidInputException(
+                Exception('Title field should not be empty'))
 
         new_story_id = story_services.get_new_story_id()
         story = story_domain.Story.create_default_story(
@@ -42,7 +51,7 @@ class NewStory(base.BaseHandler):
         story_services.save_new_story(self.user_id, story)
 
         self.render_json({
-            STORY_ID_KEY: new_story_id
+            'storyId': new_story_id
         })
 
 
@@ -53,19 +62,27 @@ class TopicEditorPage(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
 
-        if not feconf.ENABLE_TOPIC_PAGE:
-            raise self.PageNotFoundException(
-                Exception('Topic Page is not accessible currently.'))
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException()
+
+        if not isinstance(topic_id, basestring):
+            raise self.InvalidInputException(
+                Exception('Topic id should be a string.'))
+
+        if len(topic_id) != 12:
+            raise self.InvalidInputException(
+                Exception('The topic id given is invalid.'))
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
+
+        if topic is None:
+            raise self.PageNotFoundException(
+                Exception('The topic with the given id doesn\'t exist.'))
+
         self.values.update({
-            'topic_id': topic.id,
-            'is_logged_in': bool(self.user_id),
-            'nav_mode': feconf.NAV_MODE_CREATE,
-            'TAG_REGEX': feconf.TAG_REGEX
+            'topic_id': topic.id
         })
 
-        # Render template will be written after the frontend is done.
         self.render_template('pages/topic_editor/topic_editor.html')
 
 
@@ -86,18 +103,34 @@ class EditableTopicDataHandler(base.BaseHandler):
                 'which is too old. Please reload the page and try again.'
                 % (topic_version, version_from_payload))
 
+    def _require_valid_topic_id(self, topic_id):
+        """Checks whether the topic is received from the frontend is a
+        valid one.
+        """
+        if not isinstance(topic_id, basestring):
+            raise self.InvalidInputException(
+                Exception('Topic id should be a string.'))
+
+        if len(topic_id) != 12:
+            raise self.InvalidInputException(
+                Exception('The topic id given is invalid.'))
+
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException()
 
-        try:
-            topic_dict = topic_services.get_topic_by_id(
-                topic_id, strict=False).to_dict()
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        self._require_valid_topic_id(topic_id)
+
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+
+        if topic is None:
+            raise self.PageNotFoundException(
+                Exception('The topic with the given id doesn\'t exist.'))
 
         self.values.update({
-            'topic': topic_dict
+            'topic': topic.to_dict()
         })
 
         self.render_json(self.values)
@@ -105,16 +138,23 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_topic
     def put(self, topic_id):
         """Updates properties of the given topic."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException()
 
-        topic = topic_services.get_topic_by_id(topic_id)
+        self._require_valid_topic_id(topic_id)
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise self.PageNotFoundException(
+                Exception('The topic with the given id doesn\'t exist.'))
+
         version = self.payload.get('version')
         self._require_valid_version(version, topic.version)
 
         commit_message = self.payload.get('commit_message')
-        change_dict_list = self.payload.get('change_list')
+        change_dicts = self.payload.get('change_dicts')
         change_list = [
             topic_domain.TopicChange(change_dict)
-            for change_dict in change_dict_list
+            for change_dict in change_dicts
         ]
         try:
             topic_services.update_topic(
@@ -133,12 +173,16 @@ class EditableTopicDataHandler(base.BaseHandler):
     @acl_decorators.can_edit_topic
     def delete(self, topic_id):
         """Handles Delete requests."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException()
+
+        self._require_valid_topic_id(topic_id)
         if not topic_id:
             raise self.PageNotFoundException
         topic_services.delete_topic(self.user_id, topic_id)
 
 
-class TopicManagerHandler(base.BaseHandler):
+class TopicManagerRightsHandler(base.BaseHandler):
     """A handler for assigning topic manager rights."""
 
     @acl_decorators.can_access_admin_page
@@ -146,6 +190,17 @@ class TopicManagerHandler(base.BaseHandler):
         """Assign topic manager role to a user for a particular topic, if the
         user has general topic manager rights.
         """
+        if not isinstance(topic_id, basestring):
+            raise self.InvalidInputException(
+                Exception('Topic id should be a string.'))
+
+        if len(topic_id) != 12:
+            raise self.InvalidInputException(
+                Exception('The topic id given is invalid.'))
+
+        if assignee_id is None:
+            raise self.InvalidInputException(
+                Exception('Expected a valid assignee id to be provided.'))
         assignee_actions_info = user_services.UserActionsInfo(assignee_id)
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         try:

@@ -365,8 +365,8 @@ ENABLE_PROMO_BAR = True
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
-# Disables the topic page, till its completed.
-ENABLE_TOPIC_PAGE = False
+# Disables all the new structures' pages, till they are completed.
+ENABLE_NEW_STRUCTURES = False
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -629,8 +629,8 @@ SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
-TOPIC_EDITOR_URL_PREFIX = '/topic_editor/create'
-TOPIC_MANAGER_PREFIX = '/assign_topic_manager'
+TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
+TOPIC_MANAGER_PREFIX = '/rightshandler/assign_topic_manager'
 TOPICS_AND_SKILLS_DASHBOARD = '/topics_and_skills_dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'

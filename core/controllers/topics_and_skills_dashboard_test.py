@@ -30,38 +30,38 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
 
-class NewTopicTest(BaseTopicsAndSkillsDashboardTest):
+class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_topic_creation(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        with self.swap(feconf, 'ENABLE_TOPIC_PAGE', True):
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD)
             csrf_token = self.get_csrf_token_from_response(response)
 
-        json_response = self.post_json(
-            '%s' % feconf.NEW_TOPIC_URL, {'name': 'Topic name'},
-            csrf_token=csrf_token)
-        topic_id = json_response['topicId']
-        self.assertEqual(len(topic_id), 12)
-        self.assertTrue(
-            topic_services.get_topic_by_id(topic_id, strict=False) is not None)
+            json_response = self.post_json(
+                '%s' % feconf.NEW_TOPIC_URL, {'name': 'Topic name'},
+                csrf_token=csrf_token)
+            topic_id = json_response['topicId']
+            self.assertEqual(len(topic_id), 12)
+            self.assertIsNotNone(
+                topic_services.get_topic_by_id(topic_id, strict=False))
         self.logout()
 
 
-class NewSkillTest(BaseTopicsAndSkillsDashboardTest):
+class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_skill_creation(self):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
-        with self.swap(feconf, 'ENABLE_TOPIC_PAGE', True):
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD)
             csrf_token = self.get_csrf_token_from_response(response)
 
-        json_response = self.post_json(
-            '%s' % feconf.NEW_SKILL_URL, {}, csrf_token=csrf_token)
-        skill_id = json_response['skillId']
-        self.assertEqual(len(skill_id), 12)
-        self.assertTrue(
-            skill_services.get_skill_by_id(skill_id, strict=False) is not None)
-        self.logout()
+            json_response = self.post_json(
+                '%s' % feconf.NEW_SKILL_URL, {}, csrf_token=csrf_token)
+            skill_id = json_response['skillId']
+            self.assertEqual(len(skill_id), 12)
+            self.assertIsNotNone(
+                skill_services.get_skill_by_id(skill_id, strict=False))
+            self.logout()

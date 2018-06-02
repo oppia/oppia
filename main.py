@@ -204,16 +204,19 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.CREATOR_DASHBOARD_DATA_URL,
         creator_dashboard.CreatorDashboardHandler),
     get_redirect_route(
-        r'%s' % feconf.NEW_EXPLORATION_URL, creator_dashboard.NewExploration),
+        r'%s' % feconf.NEW_EXPLORATION_URL,
+        creator_dashboard.NewExplorationHandler),
     get_redirect_route(
-        r'%s' % feconf.NEW_COLLECTION_URL, creator_dashboard.NewCollection),
+        r'%s' % feconf.NEW_COLLECTION_URL,
+        creator_dashboard.NewCollectionHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
-        topics_and_skills_dashboard.NewSkill),
+        topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
-        r'%s' % feconf.NEW_STORY_URL, topic_editor.NewStory),
+        r'%s' % feconf.NEW_STORY_URL, topic_editor.NewStoryHandler),
     get_redirect_route(
-        r'%s' % feconf.NEW_TOPIC_URL, topics_and_skills_dashboard.NewTopic),
+        r'%s' % feconf.NEW_TOPIC_URL,
+        topics_and_skills_dashboard.NewTopicHandler),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExploration),
@@ -490,7 +493,7 @@ URLS = MAPREDUCE_HANDLERS + [
         topic_editor.EditableTopicDataHandler),
     get_redirect_route(
         r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_PREFIX,
-        topic_editor.TopicManagerHandler),
+        topic_editor.TopicManagerRightsHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(

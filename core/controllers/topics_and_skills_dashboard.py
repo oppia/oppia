@@ -23,9 +23,6 @@ from core.domain import topic_domain
 from core.domain import topic_services
 import feconf
 
-TOPIC_ID_KEY = 'topicId'
-SKILL_ID_KEY = 'skillId'
-
 
 class TopicsAndSkillsDashboardPage(base.BaseHandler):
     """Page showing the topics and skills dashboard."""
@@ -33,10 +30,8 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
     @acl_decorators.can_access_admin_page
     def get(self):
 
-        if not feconf.ENABLE_TOPIC_PAGE:
-            raise self.PageNotFoundException(
-                Exception(
-                    'Topics and Skills dashboard is not accessible currently.'))
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException()
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD
@@ -46,33 +41,44 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
             'topics_and_skills_dashboard.html', redirect_url_on_logout='/')
 
 
-class NewTopic(base.BaseHandler):
+class NewTopicHandler(base.BaseHandler):
     """Creates a new topic."""
 
     @acl_decorators.can_access_admin_page
     def post(self):
         """Handles POST requests."""
-        name = self.payload.get('name', feconf.DEFAULT_TOPIC_NAME)
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException()
+        name = self.payload.get('name')
+
+        if not isinstance(name, basestring):
+            raise self.InvalidInputException(
+                Exception('Name should be a string.'))
+
+        if name == '':
+            raise self.InvalidInputException(
+                Exception('Name field should not be empty'))
 
         new_topic_id = topic_services.get_new_topic_id()
-        topic = topic_domain.Topic.create_default_topic(
-            new_topic_id, name=name)
+        topic = topic_domain.Topic.create_default_topic(new_topic_id, name)
         topic_services.save_new_topic(self.user_id, topic)
 
         self.render_json({
-            TOPIC_ID_KEY: new_topic_id
+            'topicId': new_topic_id
         })
 
 
-class NewSkill(base.BaseHandler):
+class NewSkillHandler(base.BaseHandler):
     """Creates a new skill."""
 
     @acl_decorators.can_access_admin_page
     def post(self):
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException()
         new_skill_id = skill_services.get_new_skill_id()
         skill = skill_domain.Skill.create_default_skill(new_skill_id)
         skill_services.save_new_skill(self.user_id, skill)
 
         self.render_json({
-            SKILL_ID_KEY: new_skill_id
+            'skillId': new_skill_id
         })
