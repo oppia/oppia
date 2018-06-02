@@ -259,6 +259,11 @@ body {
   width: 100%;
 }
 
+.oppia-creator-dashboard-main-content {
+  padding: 0;
+  width: 100%;
+}
+
 .oppia-learner-dashboard-title {
   color: #01645c;
   font-family: 'Capriola', 'Roboto', Arial, sans-serif;
