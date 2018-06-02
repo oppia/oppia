@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating new frontend instances of ParamType
- * domain objects.
+ * @fileoverview TODO(brianrodri).
  */
 
 oppia.factory('StateAnswerStatisticsFactory', [
@@ -26,14 +25,14 @@ oppia.factory('StateAnswerStatisticsFactory', [
     /**
      * @private @constructor
      * @param {string} stateName
-     * @param {*} answer
+     * @param {Array.<*>} answers
      * @param {number} frequency
      */
-    var StateAnswerStatistics = function(stateName, answer, frequency) {
+    var StateAnswerStatistics = function(stateName, answers, frequency) {
       /** @member {string} */
       this._stateName = stateName;
       /** @member {*} */
-      this._answer = angular.copy(answer);
+      this._answers = angular.copy(answers);
       /** @member {number} */
       this._frequency = frequency;
       /** @member {boolean} */
@@ -51,13 +50,13 @@ oppia.factory('StateAnswerStatisticsFactory', [
 
       this._isAddressed =
         AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-          explorationId, this._stateName, state, this._answer,
+          explorationId, this._stateName, state, this._answers,
           interactionRulesService);
     };
 
     /** @returns {*} */
     StateAnswerStatistics.prototype.getAnswer = function() {
-      return angular.copy(this._answer);
+      return angular.copy(this._answers);
     };
 
     /** @returns {number} */
