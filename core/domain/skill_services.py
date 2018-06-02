@@ -600,7 +600,7 @@ def get_all_skill_mastery(user_id):
     Returns:
         skill_mastery: dict. Mastery degree of the user for every skill.
     """
-    degree_of_mastery = []
-    degree_of_mastery = skill_models.SkillsMasteryModel.get_user_summary(user_id)
+    degree_of_mastery = {}
+    degree_of_mastery = skill_models.SkillsMasteryModel.get_user_mastery(user_id)
 
     return degree_of_mastery

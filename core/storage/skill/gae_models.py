@@ -167,5 +167,10 @@ class SkillsMasteryModel(base_models.BaseModel):
     degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
 
     @classmethod
-    def get_something(cls, USER_ID):
+    def get_user_mastery(cls, USER_ID):
+        """Returns skill summary for a particular user.
+
+        Args:
+            USER_ID: str. The user id corresponding to a user.
+        """            
         return SkillSummaryModel.query().filter(cls.user_id == USER_ID)
