@@ -455,11 +455,13 @@ class StoryContents(object):
         Returns:
             StoryContents. The corresponding StoryContents domain object.
         """
-        story_contents = cls([
-            StoryNode.from_dict(story_node_dict)
-            for story_node_dict in story_contents_dict['nodes']
-        ], story_contents_dict['starting_node_id'],
-        story_contents_dict['next_node_id'])
+        story_contents = cls(
+            [
+                StoryNode.from_dict(story_node_dict)
+                for story_node_dict in story_contents_dict['nodes']
+            ], story_contents_dict['starting_node_id'],
+            story_contents_dict['next_node_id']
+        )
 
         return story_contents
 
