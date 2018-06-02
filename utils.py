@@ -775,7 +775,9 @@ def convert_to_text_angular(html_data):
         elif tag.name not in allowed_tag_list:
             tag.unwrap()
 
-    # To combine parts after removal of tags.
+    # Removal of tags can break the soup into parts which are continuous
+    # and not wrapped in any tag. This part recombines the continuous
+    # parts not wrapped in any tag.
     soup = bs4.BeautifulSoup(str(soup), 'html.parser')
 
     oppia_inline_components = [
@@ -810,6 +812,14 @@ def convert_to_text_angular(html_data):
 
     # Ensure that every italics tag is a child of any of its allowed parents.
     enforce_valid_parent(soup, 'i', allowed_parent_list['i'], 'p')
+
+    # Ensure that p tag has a valid parent. p tags having parent tag as p
+    # is checked separately since in that case the child p tag is to
+    # be unwrapped instead of the parent p tag.
+    for p in soup.findAll('p'):
+        if p.parent.name != 'p' and (
+                p.parent.name not in allowed_parent_list['p']):
+            p.parent.unwrap()
 
     # Ensure that p tag is not wrapped in p tag.
     for p in soup.findAll('p'):

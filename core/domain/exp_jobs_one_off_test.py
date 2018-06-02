@@ -785,22 +785,25 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         content1_dict = {
-            'html': '''<blockquote><div><p>Hello, this <i>is</i> state1
-                </p> </div> </blockquote> <pre>I'm looking for a particular
-                <b>Hello Oppia</b> message</pre>. <p> Don't you want to
-                say hello? You can learn more about oppia
-                <oppia-noninteractive-link url-with-value="&amp;quot;
-                https://www.example.com&amp;quot;" text-with-value="&amp;quot;
-                here&amp;quot;"></oppia-noninteractive-link></p>''',
+            'html': (
+                '<blockquote><p>Hello, this <i>is</i> state1 '
+                '</p></blockquote><pre>I am looking for a particular '
+                '<b>Hello Oppia</b> message</pre>. <p> Don\'t you want to '
+                'say hello? You can learn more about oppia '
+                '<oppia-noninteractive-link url-with-value="&amp;quot;'
+                'https://www.example.com&amp;quot;" text-with-value="&amp;quot;'
+                'here&amp;quot;"></oppia-noninteractive-link></p>'
+            ),
             'audio_translations': {}
         }
         content2_dict = {
-            'html': '''<pre>Hello, this is state2.</pre> <blockquote>
-                <ol> <li>item1</li> <li>item2</li> </ol> </blockquote>.<p>
-                You can see this equation <b> <oppia-noninteractive-math
-                raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;
-                quot;"></oppia-noninteractive-math></b></p>
-                ''',
+            'html': (
+                '<pre>Hello, this is state2.</pre> <blockquote>'
+                '<ol> <li>item1</li> <li>item2</li> </ol> </blockquote>.<p>'
+                'You can see this equation <b> <oppia-noninteractive-math'
+                'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;'
+                'quot;"></oppia-noninteractive-math></b></p>'
+            ),
             'audio_translations': {}
         }
         state1.update_content(content1_dict)
@@ -821,14 +824,16 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         default_outcome_dict = {
             'dest': 'State2',
             'feedback': {
-                'html': '''<p>Sorry, it doesn't look like your <span>program
-                </span>prints any output</p>.<blockquote><p> Could you get
-                it to print something?</p></blockquote> You can do this by
-                using a statement like prints. <br> You can ask any if you have
-                <oppia-noninteractive-link url-with-value="&amp;quot;
-                https://www.example.com&amp;quot;" text-with-value="
-                &amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.
-                ''',
+                'html': (
+                    '<p>Sorry, it doesn\'t look like your <div><span>program '
+                    '</span></div>prints any output</p>.<blockquote><p> Could '
+                    'you get it to print something?</p></blockquote> You can '
+                    'do this by using a statement like prints. <br> You can '
+                    'ask any if you have'
+                    '<oppia-noninteractive-link url-with-value="&amp;quot;'
+                    'https://www.example.com&amp;quot;" text-with-value="'
+                    '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
+                ),
                 'audio_translations': {}
             },
             'labelled_as_correct': False,
@@ -847,9 +852,187 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
             exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
 
         expected_output = [
-            u"[u'br', [u'[document]']]",
-            u"[u'invalidTags', [u'span']]",
-            u"[u'oppia-noninteractive-link', [u'[document]']]"
+            "[u'br', [u'[document]']]",
+            "[u'invalidTags', [u'div', u'span']]",
+            "[u'oppia-noninteractive-link', [u'[document]']]"
         ]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class TextAngularValiationAndMigrationTest(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(TextAngularValiationAndMigrationTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_textangular_validation_and_migration(self):
+        """Tests that the exploration validation and migration job for
+        TextAngular RTE.
+        """
+        test_cases = (
+            feconf.RTE_TEST_CASES[
+                'RTE_TYPE_TEXTANGULAR']['TEST_CASES'])
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        exploration.add_states([
+            'State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+
+        content1_dict = {
+            'html': test_cases[0]['html_content'],
+            'audio_translations': {}
+        }
+        content2_dict = {
+            'html': test_cases[1]['html_content'],
+            'audio_translations': {}
+        }
+        content3_dict = {
+            'html': test_cases[2]['html_content'],
+            'audio_translations': {}
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+        state3.update_content(content3_dict)
+
+        default_outcome_dict1 = {
+            'dest': 'State2',
+            'feedback': {
+                'html': test_cases[3]['html_content'],
+                'audio_translations': {}
+            },
+            'param_changes': [],
+            'labelled_as_correct': False,
+            'refresher_exploration_id': None
+        }
+        default_outcome_dict2 = {
+            'dest': 'State3',
+            'feedback': {
+                'html': test_cases[4]['html_content'],
+                'audio_translations': {}
+            },
+            'param_changes': [],
+            'labelled_as_correct': False,
+            'refresher_exploration_id': None
+        }
+        default_outcome_dict3 = {
+            'dest': 'State1',
+            'feedback': {
+                'html': test_cases[5]['html_content'],
+                'audio_translations': {}
+            },
+            'param_changes': [],
+            'labelled_as_correct': False,
+            'refresher_exploration_id': None
+        }
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        state3.update_interaction_default_outcome(default_outcome_dict3)
+
+        hint_list1 = [{
+            'hint_content': {
+                'html': test_cases[6]['html_content'],
+                'audio_translations': {}
+            }
+        }]
+        hint_list2 = [{
+            'hint_content': {
+                'html': test_cases[7]['html_content'],
+                'audio_translations': {}
+            }
+        }]
+        hint_list3 = [{
+            'hint_content': {
+                'html': test_cases[8]['html_content'],
+                'audio_translations': {}
+            }
+        }]
+        state1.update_interaction_hints(hint_list1)
+        state2.update_interaction_hints(hint_list2)
+        state3.update_interaction_hints(hint_list3)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start validation job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationContentValidationJob.create_new()
+        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
+
+        expected_output = [
+            "[u'br', [u'pre', u'div', u'span', u'[document]']]",
+            "[u'i', [u'div', u'span', u'[document]']]",
+            "[u'b', [u'span']]",
+            (
+                "[u'invalidTags', "
+                "[u'code', u'span', u'tr', u'tbody', u'table', u'div', u'td']]"
+            ),
+            (
+                "[u'oppia-noninteractive-image', "
+                "[u'i', u'div', u'span', u'[document]']]"
+            ),
+            "[u'oppia-noninteractive-link', [u'div', u'[document]']]"]
+
+        self.assertEqual(actual_output, expected_output)
+
+        exploration_dict = exploration.to_dict()
+        updated_dict = exp_domain.Exploration._convert_v24_dict_to_v25_dict( # pylint: disable=protected-access
+            exploration_dict)
+        updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
+
+        state1 = updated_exploration.states['State1']
+        state2 = updated_exploration.states['State2']
+        state3 = updated_exploration.states['State3']
+
+        self.assertEqual(state1.content.html, test_cases[0]['expected_output'])
+        self.assertEqual(state2.content.html, test_cases[1]['expected_output'])
+        self.assertEqual(state3.content.html, test_cases[2]['expected_output'])
+
+        self.assertEqual(
+            state1.interaction.default_outcome.feedback.html,
+            test_cases[3]['expected_output'])
+        self.assertEqual(
+            state2.interaction.default_outcome.feedback.html,
+            test_cases[4]['expected_output'])
+        self.assertEqual(
+            state3.interaction.default_outcome.feedback.html,
+            test_cases[5]['expected_output'])
+
+        self.assertEqual(
+            state1.interaction.hints[0].hint_content.html,
+            test_cases[6]['expected_output'])
+        self.assertEqual(
+            state2.interaction.hints[0].hint_content.html,
+            test_cases[7]['expected_output'])
+        self.assertEqual(
+            state3.interaction.hints[0].hint_content.html,
+            test_cases[8]['expected_output'])
+
+        exp_services.save_new_exploration(self.albert_id, updated_exploration)
+
+        # Start validation job on updated exploration.
+        job_id = exp_jobs_one_off.ExplorationContentValidationJob.create_new()
+        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
+
+        self.assertEqual(actual_output, [])
