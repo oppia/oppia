@@ -2190,25 +2190,6 @@ pre.oppia-pre-wrapped-text {
   position: relative;
 }
 
-.oppia-preferences-page-heading {
-  color: #01645c;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 3em;
-  margin-top: 0;
-  margin-bottom: 10px;
-  padding-top: 45px;
-  position: relative;
-  text-align: center;
-}
-
-.oppia-preferences-page-heading-subtext {
-  color: #01645c;
-  font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-  font-size: 1.2em;
-  position: relative;
-  text-align: center;
-}
-
 .oppia-collection-player-tiles-container .oppia-page-heading {
   color: #005048;
   text-align: center;
