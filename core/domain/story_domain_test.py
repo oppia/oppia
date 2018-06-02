@@ -65,7 +65,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                     'outline': '',
                     'exploration_id': None
                 }],
-                'starting_node_id': self.NODE_ID_1
+                'starting_node_id': self.NODE_ID_1,
+                'next_node_id': 2
             },
             'schema_version': feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
@@ -168,6 +169,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'to be mutually exclusive.')
 
     def test_all_nodes_visited(self):
+        self.story.story_contents.next_node_id = 4
         # Case 1: Prerequisite skills not acquired.
         node_1 = {
             'id': 'node_1',
@@ -301,6 +303,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'The node id node_2 is duplicated in the story.')
 
+        self.story.story_contents.next_node_id = 5
         # Case 5: A valid graph.
         node_1 = {
             'id': 'node_1',
@@ -351,7 +354,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             [self.SKILL_ID_1], [self.SKILL_ID_2],
             'Outline', self.EXP_ID)
         story_contents = story_domain.StoryContents(
-            [story_node], self.NODE_ID_1)
+            [story_node], self.NODE_ID_1, 2)
         story_contents_dict = story_contents.to_dict()
         story_contents_from_dict = story_domain.StoryContents.from_dict(
             story_contents_dict)

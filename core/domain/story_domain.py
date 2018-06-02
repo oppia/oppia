@@ -32,7 +32,7 @@ STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
 STORY_NODE_PROPERTY_OUTLINE = 'outline'
 STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
-INITIAL_NODE_ID = 'starting_node_id'
+INITIAL_NODE_ID = 'initial_node_id'
 
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
 
@@ -242,6 +242,10 @@ class StoryNode(object):
                 'Expected node ID to be a string, received %s' %
                 self.id)
 
+        if 'node_' not in self.id:
+            raise utils.ValidationError(
+                'Invalid node id for node with id %s' % self.id)
+
         if not isinstance(self.prerequisite_skill_ids, list):
             raise utils.ValidationError(
                 'Expected prerequisite skill ids to be a list, received %s' %
@@ -297,16 +301,19 @@ class StoryNode(object):
 class StoryContents(object):
     """Domain object representing the story_contents dict."""
 
-    def __init__(self, story_nodes, starting_node_id):
+    def __init__(self, story_nodes, starting_node_id, next_node_id):
         """Constructs a StoryContents domain object.
 
         Args:
             story_nodes: list(StoryNode). The list of story nodes that are part
                 of this story.
             starting_node_id: str. The id of the starting node of the story.
+            next_node_id: int. The index for the next node to be added to the
+                story.
         """
         self.starting_node_id = starting_node_id
         self.nodes = story_nodes
+        self.next_node_id = next_node_id
 
     def validate(self):
         """Validates various properties of the story contents object.
@@ -341,6 +348,11 @@ class StoryContents(object):
             node.validate()
             if node.id == self.starting_node_id:
                 initial_node_is_present = True
+            # Checks whether the number in the id of any node is greater than
+            # the value of next_node_id.
+            if int(node.id.replace('node_', '')) >= self.next_node_id:
+                raise utils.ValidationError(
+                    'The node with id %s is out of bounds.' % node.id)
             node_id_list.append(node.id)
 
         if not initial_node_is_present:
@@ -428,7 +440,8 @@ class StoryContents(object):
             'nodes': [
                 node.to_dict() for node in self.nodes
             ],
-            'starting_node_id': self.starting_node_id
+            'starting_node_id': self.starting_node_id,
+            'next_node_id': self.next_node_id
         }
 
     @classmethod
@@ -445,7 +458,8 @@ class StoryContents(object):
         story_contents = cls([
             StoryNode.from_dict(story_node_dict)
             for story_node_dict in story_contents_dict['nodes']
-        ], story_contents_dict['starting_node_id'])
+        ], story_contents_dict['starting_node_id'],
+        story_contents_dict['next_node_id'])
 
         return story_contents
 
@@ -565,7 +579,7 @@ class Story(object):
                 StoryNode.create_default_story_node(
                     feconf.DEFAULT_INITIAL_NODE_ID)
             ],
-            feconf.DEFAULT_INITIAL_NODE_ID)
+            feconf.DEFAULT_INITIAL_NODE_ID, 2)
         return cls(
             story_id, feconf.DEFAULT_STORY_TITLE,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
@@ -636,6 +650,7 @@ class Story(object):
         """
         self.story_contents.nodes.append(
             StoryNode.create_default_story_node(node_id))
+        self.story_contents.next_node_id = self.story_contents.next_node_id + 1
 
     def _check_exploration_id_already_present(self, exploration_id):
         """Returns whether a node with the given exploration id is already
@@ -670,6 +685,9 @@ class Story(object):
             raise ValueError(
                 'The node with id %s is the starting node for the story, change'
                 'the starting node before deleting it.' % node_id)
+        for node in self.story_contents.nodes:
+            if node_id in node.destination_node_ids:
+                node.destination_node_ids.remove(node_id)
         del self.story_contents.nodes[node_index]
 
     def update_node_outline(self, node_id, new_outline):
