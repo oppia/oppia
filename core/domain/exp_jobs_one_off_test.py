@@ -814,7 +814,7 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
 
         actual_output = (
             exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
-        expected_output = [u"[u'Errors', [u'{}']]"]
+        expected_output = []
 
         self.assertEqual(actual_output, expected_output)
 
@@ -822,9 +822,9 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
             'dest': 'State2',
             'feedback': {
                 'html': '''<p>Sorry, it doesn't look like your <span>program
-                </span>prints any output</p>.<p> <blockquote> Could you get
-                it to print something?</blockquote> You can do this by using a
-                statement like print</p>. <br> You can ask any doubt if you have
+                </span>prints any output</p>.<blockquote><p> Could you get
+                it to print something?</p></blockquote> You can do this by
+                using a statement like prints. <br> You can ask any if you have
                 <oppia-noninteractive-link url-with-value="&amp;quot;
                 https://www.example.com&amp;quot;" text-with-value="
                 &amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.
@@ -845,6 +845,11 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
 
         actual_output = (
             exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
-        expected_output = [u'[u\'Errors\', [u"{\'invalidTags\': [u\'span\'], u\'oppia-noninteractive-link\': [u\'[document]\'], u\'br\': [u\'[document]\']}"]]'] # pylint: disable=line-too-long
+
+        expected_output = [
+            u"[u'br', [u'[document]']]",
+            u"[u'invalidTags', [u'span']]",
+            u"[u'oppia-noninteractive-link', [u'[document]']]"
+        ]
 
         self.assertEqual(actual_output, expected_output)
