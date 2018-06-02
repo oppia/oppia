@@ -17,11 +17,10 @@
 """Tests for the base issue specification."""
 
 from core.domain import issue_registry
+from core.platform import models
 from core.tests import test_utils
 
-EARLY_QUIT_ID = 'EarlyQuit'
-MULTIPLE_INCORRECT_SUBMISSIONS_ID = 'MultipleIncorrectSubmissions'
-CYCLIC_STATE_TRANSITIONS_ID = 'CyclicStateTransitions'
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
 class IssueUnitTests(test_utils.GenericTestBase):
@@ -30,7 +29,8 @@ class IssueUnitTests(test_utils.GenericTestBase):
     def test_issue_properties_for_early_quit(self):
         """Test the standard properties of early quit issue."""
 
-        issue = issue_registry.Registry.get_issue_by_id(EARLY_QUIT_ID)
+        issue = issue_registry.Registry.get_issue_by_type(
+            stats_models.ISSUE_TYPE_EARLY_QUIT)
 
         issue_dict = issue.to_dict()
         self.assertItemsEqual(issue_dict.keys(), [
@@ -59,8 +59,8 @@ class IssueUnitTests(test_utils.GenericTestBase):
         issue.
         """
 
-        issue = issue_registry.Registry.get_issue_by_id(
-            MULTIPLE_INCORRECT_SUBMISSIONS_ID)
+        issue = issue_registry.Registry.get_issue_by_type(
+            stats_models.ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS)
 
         issue_dict = issue.to_dict()
         self.assertItemsEqual(issue_dict.keys(), [
@@ -86,8 +86,8 @@ class IssueUnitTests(test_utils.GenericTestBase):
     def test_issue_properties_for_cyclic_state_transitions(self):
         """Test the standard properties of cyclic state transitions issue."""
 
-        issue = issue_registry.Registry.get_issue_by_id(
-            CYCLIC_STATE_TRANSITIONS_ID)
+        issue = issue_registry.Registry.get_issue_by_type(
+            stats_models.ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS)
 
         issue_dict = issue.to_dict()
         self.assertItemsEqual(issue_dict.keys(), [

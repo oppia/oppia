@@ -20,6 +20,7 @@ import ast
 import logging
 import traceback
 
+import bs4
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
@@ -210,12 +211,12 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
             # exp_services.apply_change_list for more information.
-            commit_cmds = [{
+            commit_cmds = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': str(item.states_schema_version),
                 'to_version': str(
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-            }]
+            })]
             exp_services.update_exploration(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update exploration states from schema version %d to %d.' % (
@@ -470,3 +471,61 @@ class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates it.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+        # err_dict is a dictionary to store the invalid tags and the
+        # invalid parent-child relations that we find.
+        err_dict = {}
+
+        allowed_parent_list = (
+            feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+            ['ALLOWED_PARENT_LIST'])
+        allowed_tag_list = (
+            feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+            ['ALLOWED_TAG_LIST'])
+
+        html_list = exploration.get_all_html_content_strings()
+
+        for html_data in html_list:
+            soup = bs4.BeautifulSoup(html_data, 'html.parser')
+
+            for tag in soup.findAll():
+                # Checking for tags not allowed in RTE.
+                if tag.name not in allowed_tag_list:
+                    if 'invalidTags' in err_dict:
+                        err_dict['invalidTags'] += [tag.name]
+                    else:
+                        err_dict['invalidTags'] = [tag.name]
+                # Checking for parent-child relation that are not
+                # allowed in RTE.
+                parent = tag.parent.name
+                if (tag.name in allowed_tag_list) and (
+                        parent not in allowed_parent_list[tag.name]):
+                    if tag.name in err_dict:
+                        err_dict[tag.name] += [parent]
+                    else:
+                        err_dict[tag.name] = [parent]
+
+        for key in err_dict:
+            yield(key, list(set(err_dict[key])))
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))

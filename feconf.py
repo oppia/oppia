@@ -48,6 +48,7 @@ CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
+CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
 EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if not DEV_MODE else '')
@@ -164,6 +165,15 @@ CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 19
 # number must be changed.
 CURRENT_COLLECTION_SCHEMA_VERSION = 6
 
+# The current version of story contents dict in the story schema.
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
+
+# The current version of skill contents dict in the skill schema.
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
+
+# The current version of misconceptions dict in the skill schema.
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
+
 # The current version of the question schema.
 CURRENT_QUESTION_SCHEMA_VERSION = 1
 
@@ -205,6 +215,29 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
+
+# Default title for a newly-minted story.
+DEFAULT_STORY_TITLE = ''
+# Default description for a newly-minted story.
+DEFAULT_STORY_DESCRIPTION = ''
+# Default notes for a newly-minted story.
+DEFAULT_STORY_NOTES = ''
+
+# Default description for a newly-minted skill.
+DEFAULT_SKILL_DESCRIPTION = ''
+# Default explanation for a newly-minted skill.
+DEFAULT_SKILL_EXPLANATION = ''
+# Default name for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_NAME = ''
+# Default notes for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_NOTES = ''
+# Default feedback for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_FEEDBACK = ''
+
+# Default name for a newly-minted topic.
+DEFAULT_TOPIC_NAME = ''
+# Default description for a newly-minted topic.
+DEFAULT_TOPIC_DESCRIPTION = ''
 
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'
@@ -637,6 +670,8 @@ PLAY_TYPE_NORMAL = 'normal'
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
+COMMIT_MESSAGE_SKILL_DELETED = 'Skill deleted.'
+COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
 ENABLE_PLAYTHROUGHS = False
@@ -650,19 +685,6 @@ NUM_REPEATED_CYCLES_THRESHOLD = 3
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 # Probability of recording a playthrough.
 RECORD_PLAYTHROUGH_PROBABILITY = 0.2
-# IDs of allowed types of issues.
-ALLOWED_ISSUE_IDS = [
-    'EarlyQuit',
-    'MultipleIncorrectSubmissions',
-    'CyclicStateTransitions'
-]
-# IDs of allowed learner actions.
-ALLOWED_ACTION_IDS = [
-    'ExplorationStart',
-    'AnswerSubmit',
-    'ExplorationQuit'
-]
-
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
@@ -838,3 +860,49 @@ VIEW_METHOD_ROLE = 'role'
 VIEW_METHOD_USERNAME = 'username'
 
 QUESTION_BATCH_SIZE = 10
+
+STATE_ANSWER_STATS_MIN_FREQUENCY = 2
+
+# RTE content specifications according to the type of the editor.
+RTE_CONTENT_SPEC = {
+    'RTE_TYPE_TEXTANGULAR': {
+        # Valid parent-child relation in TextAngular.
+        'ALLOWED_PARENT_LIST': {
+            'p': ['blockquote', 'div', 'pre', '[document]'],
+            'b': ['i', 'li', 'p', 'pre'],
+            'br': ['b', 'i', 'li', 'p'],
+            'div': ['blockquote'],
+            'i': ['b', 'li', 'p', 'pre'],
+            'li': ['ol', 'ul'],
+            'ol': ['blockquote', 'li', 'pre', 'div', '[document]'],
+            'ul': ['blockquote', 'li', 'pre', 'div', '[document]'],
+            'pre': ['blockquote', '[document]'],
+            'blockquote': ['blockquote', '[document]'],
+            'oppia-noninteractive-link': ['b', 'li', 'i', 'p', 'pre'],
+            'oppia-noninteractive-math': ['b', 'li', 'i', 'p', 'pre'],
+            'oppia-noninteractive-image': ['li', 'p', 'pre'],
+            'oppia-noninteractive-collapsible': ['li', 'p', 'pre'],
+            'oppia-noninteractive-video': ['li', 'p', 'pre'],
+            'oppia-noninteractive-tabs': ['li', 'p', 'pre']
+        },
+        # Valid html tags in TextAngular.
+        'ALLOWED_TAG_LIST': [
+            'p',
+            'b',
+            'br',
+            'div',
+            'i',
+            'li',
+            'ol',
+            'ul',
+            'pre',
+            'blockquote',
+            'oppia-noninteractive-link',
+            'oppia-noninteractive-math',
+            'oppia-noninteractive-image',
+            'oppia-noninteractive-collapsible',
+            'oppia-noninteractive-video',
+            'oppia-noninteractive-tabs'
+        ]
+    }
+}

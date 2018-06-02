@@ -137,6 +137,13 @@ oppia.controller('LearnerDashboard', [
       return ($window.innerWidth < 500);
     };
 
+    $scope.getVisibleExplorationList = function(startCompletedExpIndex) {
+      return $scope.completedExplorationsList.slice(
+        startCompletedExpIndex, Math.min(
+          startCompletedExpIndex + $scope.PAGE_SIZE,
+          $scope.completedExplorationsList.length));
+    };
+
     $scope.showUsernamePopover = function(subscriberUsername) {
       // The popover on the subscription card is only shown if the length of
       // the subscriber username is greater than 10 and the user hovers over
@@ -187,7 +194,7 @@ oppia.controller('LearnerDashboard', [
       } else if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
         if (subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
           if ($scope.startCompletedExpIndex +
-            $scope.PAGE_SIZE <= $scope.startCompletedExpIndex.length) {
+            $scope.PAGE_SIZE <= $scope.completedExplorationsList.length) {
             $scope.startCompletedExpIndex += $scope.PAGE_SIZE;
           }
         } else if (
@@ -297,8 +304,7 @@ oppia.controller('LearnerDashboard', [
         threadStatus, explorationId, threadId, explorationTitle) {
       $scope.loadingFeedbacks = true;
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
-        '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
-          explorationId: explorationId,
+        '/learnerdashboardthreadhandler/<threadId>', {
           threadId: threadId
         });
       $scope.explorationTitle = explorationTitle;
@@ -308,8 +314,7 @@ oppia.controller('LearnerDashboard', [
       $scope.threadId = threadId;
 
       for (var index = 0; index < $scope.threadSummaries.length; index++) {
-        if ($scope.threadSummaries[index].explorationId === explorationId &&
-            $scope.threadSummaries[index].threadId === threadId) {
+        if ($scope.threadSummaries[index].threadId === threadId) {
           threadIndex = index;
           var threadSummary = $scope.threadSummaries[index];
           threadSummary.markTheLastTwoMessagesAsRead();
@@ -336,10 +341,9 @@ oppia.controller('LearnerDashboard', [
       threadIndex = null;
     };
 
-    $scope.addNewMessage = function(explorationId, threadId, newMessage) {
+    $scope.addNewMessage = function(threadId, newMessage) {
       var url = UrlInterpolationService.interpolateUrl(
-        '/threadhandler/<explorationId>/<threadId>', {
-          explorationId: explorationId,
+        '/threadhandler/<threadId>', {
           threadId: threadId
         });
       var payload = {
@@ -365,7 +369,7 @@ oppia.controller('LearnerDashboard', [
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/learner_dashboard/' +
+          '/pages/' +
           'learner_view_suggestion_modal_directive.html'),
         backdrop: true,
         resolve: {

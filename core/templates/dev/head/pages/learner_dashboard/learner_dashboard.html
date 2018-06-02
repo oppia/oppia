@@ -252,17 +252,16 @@
                  ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                  uib-tooltip="Remove"
                  tooltip-placement="top"></i>
-              <exploration-summary-tile
-                                      exploration-id="tile.id"
-                                      exploration-title="tile.title"
-                                      last-updated-msec="tile.last_updated_msec"
-                                      objective="tile.objective"
-                                      category="tile.category"
-                                      ratings="tile.ratings"
-                                      num-views="tile.num_views"
-                                      thumbnail-icon-url="tile.thumbnail_icon_url"
-                                      thumbnail-bg-color="tile.thumbnail_bg_color"
-                                      class="protractor-test-exp-summary-tile">
+              <exploration-summary-tile exploration-id="tile.id"
+                                        exploration-title="tile.title"
+                                        last-updated-msec="tile.last_updated_msec"
+                                        objective="tile.objective"
+                                        category="tile.category"
+                                        ratings="tile.ratings"
+                                        num-views="tile.num_views"
+                                        thumbnail-icon-url="tile.thumbnail_icon_url"
+                                        thumbnail-bg-color="tile.thumbnail_bg_color"
+                                        class="protractor-test-exp-summary-tile">
               </exploration-summary-tile>
             </div>
 
@@ -298,19 +297,18 @@
               </div>
             </md-card>
 
-            <div ng-repeat="tile in completedExplorationsList | orderBy:getValueOfExplorationSortKey:isCurrentExpSortDescending track by tile.id"
+            <div ng-repeat="tile in getVisibleExplorationList(startCompletedExpIndex) | orderBy:getValueOfExplorationSortKey:isCurrentExpSortDescending track by tile.id"
                  style="display: inline-block; margin-left: 1px;">
-              <exploration-summary-tile
-                                      exploration-id="tile.id"
-                                      exploration-title="tile.title"
-                                      last-updated-msec="tile.last_updated_msec"
-                                      objective="tile.objective"
-                                      category="tile.category"
-                                      ratings="tile.ratings"
-                                      num-views="tile.num_views"
-                                      thumbnail-icon-url="tile.thumbnail_icon_url"
-                                      thumbnail-bg-color="tile.thumbnail_bg_color"
-                                      class="protractor-test-exp-summary-tile">
+              <exploration-summary-tile exploration-id="tile.id"
+                                        exploration-title="tile.title"
+                                        last-updated-msec="tile.last_updated_msec"
+                                        objective="tile.objective"
+                                        category="tile.category"
+                                        ratings="tile.ratings"
+                                        num-views="tile.num_views"
+                                        thumbnail-icon-url="tile.thumbnail_icon_url"
+                                        thumbnail-bg-color="tile.thumbnail_bg_color"
+                                        class="protractor-test-exp-summary-tile">
               </exploration-summary-tile>
             </div>
 
@@ -739,7 +737,7 @@
                       </div>
                       <div>
                         <button class="btn btn-success feedback-thread-new-message-send"
-                                ng-click="addNewMessage(explorationId, threadId, newMessage.text)"
+                                ng-click="addNewMessage(threadId, newMessage.text)"
                                 ng-disabled="messageSendingInProgress || !newMessage.text">
                           <span ng-if="messageSendingInProgress" translate="I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS"></span>
                           <span class="protractor-test-feedback-send-message"
