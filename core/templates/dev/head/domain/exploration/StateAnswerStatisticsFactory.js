@@ -31,7 +31,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     var StateTopAnswerStatistics = function(stateName, topAnswers) {
       /** @member {string} */
       this._stateName = stateName;
-      /** @member {*} */
+      /** @member {Array.<{answer, frequency: number}>} */
       this._answers = angular.copy(topAnswers);
 
       this.updateIsAddressed();
