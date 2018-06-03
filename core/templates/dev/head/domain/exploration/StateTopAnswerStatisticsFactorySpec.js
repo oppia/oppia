@@ -24,6 +24,28 @@ describe('StateTopAnswerStatisticsFactory', function() {
       $injector.get('StateTopAnswerStatisticsFactory');
   }));
 
+  beforeEach(function() {
+    this.STATES = {
+      Hola: {
+        name: 'Hola',
+        interaction: {
+          answerGroups: [{
+            rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
+            outcome: {dest: 'Me Llamo'}
+          }, {
+            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
+            outcome: {dest: 'Me Llamo'}
+          }, {
+            rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
+            outcome: {dest: 'Hola'}
+          }],
+          defaultOutcome: {dest: 'Hola'},
+          id: 'TextInput'
+        }
+      }
+    };
+  });
+
   describe('stale instances', function() {
     describe('constructor', function() {
       it('copies ordered frequency data of backend values', function() {
@@ -49,29 +71,10 @@ describe('StateTopAnswerStatisticsFactory', function() {
     }));
 
     beforeEach(inject(function(ExplorationStatesService) {
-      // Only the 'Hola' state exists in this fake exploration.
+      var that = this;
       spyOn(ExplorationStatesService, 'getState').and.callFake(
         function(stateName) {
-          if (stateName !== 'Hola') {
-            throw new Error(stateName + ' does not exist.');
-          }
-          return {
-            name: 'Hola',
-            interaction: {
-              answerGroups: [{
-                rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
-                outcome: {dest: 'Me Llamo'}
-              }, {
-                rules: [{type: 'Contains', inputs: {x: 'hola'}}],
-                outcome: {dest: 'Me Llamo'}
-              }, {
-                rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
-                outcome: {dest: 'Hola'}
-              }],
-              defaultOutcome: {dest: 'Hola'},
-              id: 'TextInput'
-            }
-          };
+          return that.STATES[stateName];
         });
     }));
 
