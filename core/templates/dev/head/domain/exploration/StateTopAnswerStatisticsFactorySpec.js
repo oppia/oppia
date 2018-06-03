@@ -13,24 +13,25 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for StateTopAnswerStatistics.
+ * @fileoverview Unit tests for StateTopAnswerStatisticsFactory.
  */
 
-describe('StateTopAnswerStatistics', function() {
+describe('StateTopAnswerStatisticsFactory', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    this.StateTopAnswerStatistics =
+    this.StateTopAnswerStatisticsFactory =
       $injector.get('StateTopAnswerStatisticsFactory');
   }));
 
   describe('stale instances', function() {
     it('copies ordered frequency data of backend values', function() {
-      var stateTopAnswerStatistics = new this.StateTopAnswerStatistics('Hola', [
-        {answer: 'aloha', frequency: 5},
-        {answer: 'adios', frequency: 3},
-        {answer: 'ni hao', frequency: 2},
-      ]);
+      var stateTopAnswerStatistics =
+        new this.StateTopAnswerStatisticsFactory('Hola', [
+          {answer: 'aloha', frequency: 5},
+          {answer: 'adios', frequency: 3},
+          {answer: 'ni hao', frequency: 2},
+        ]);
 
       expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
         jasmine.objectContaining({answer: 'aloha', frequency: 5}),
@@ -88,7 +89,7 @@ describe('StateTopAnswerStatistics', function() {
     describe('updateIsAddressed', function() {
       it('makes isAddressed info fresh', function() {
         var stateTopAnswerStatistics =
-          new this.StateTopAnswerStatistics('Hola', this.backendDict);
+          new this.StateTopAnswerStatisticsFactory('Hola', this.backendDict);
 
         // Should be stale.
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
@@ -111,7 +112,7 @@ describe('StateTopAnswerStatistics', function() {
     describe('createFromBackendDict', function() {
       it('returns a fresh instance', function() {
         var stateTopAnswerStatistics =
-          this.StateTopAnswerStatistics.createFromBackendDict(
+          this.StateTopAnswerStatisticsFactory.createFromBackendDict(
             'Hola', this.backendDict);
 
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
