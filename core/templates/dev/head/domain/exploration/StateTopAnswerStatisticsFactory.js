@@ -49,8 +49,8 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     /**
      * @private @constructor
      * Returns a state's top answers with stale data. For a fresh instance, use
-     * @link StateTopAnswerStatistics#createFromBackendDict instead, or call
-     * @link StateTopAnswerStatistics#updateIsAddressed after construction.
+     * {@link StateTopAnswerStatistics#createFromBackendDict} instead, or call
+     * {@link StateTopAnswerStatistics#updateIsAddressed} after construction.
      *
      * @param {!string} stateName
      * @param {!{answer, frequency: number}[]} backendTopAnswers
