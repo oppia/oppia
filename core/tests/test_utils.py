@@ -701,7 +701,8 @@ tags: []
                 sequentially in the exploration. Must be a non-empty list.
             interaction_ids: list(str). The names of the interaction ids to be
                 assigned to each state. Values will be cycled, so it doesn't
-                need to be the same size as state_names.
+                need to be the same size as state_names, but it must be
+                non-empty.
             title: str. The title of the exploration.
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
