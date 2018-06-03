@@ -1799,7 +1799,7 @@ class Exploration(object):
         taken from feconf; 'tags' and 'param_changes_list' are initialized to
         empty list; 'states_schema_version' is taken from feconf; 'states_dict'
         is derived from feconf; 'param_specs_dict' is an empty dict; 'blurb' and
-        'author_notes' are initialized to empty empty string; 'version' is
+        'author_notes' are initialized to empty string; 'version' is
         initializated to 0.
 
         Args:
