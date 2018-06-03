@@ -48,18 +48,22 @@ class ExplorationIssuesModelCreatorOneOffJob(
     @staticmethod
     def map(exploration_model):
         if not exploration_model.deleted:
-            exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
-                exploration_model.id, exploration_model.version)
-            if not exp_issues_model:
-                exp_issues_default = (
-                    stats_domain.ExplorationIssues.create_default(
-                        exploration_model.id, exploration_model.version))
-                stats_models.ExplorationIssuesModel.create(
-                    exp_issues_default.exp_id, exp_issues_default.exp_version,
-                    exp_issues_default.unresolved_issues)
-            else:
-                exp_issues_model.unresolved_issues = []
-                exp_issues_model.put()
+            current_version = exploration_model.version
+            for exp_version in xrange(1, current_version + 1):
+                exp_issues_model = (
+                    stats_models.ExplorationIssuesModel.get_model(
+                        exploration_model.id, exp_version))
+                if not exp_issues_model:
+                    exp_issues_default = (
+                        stats_domain.ExplorationIssues.create_default(
+                            exploration_model.id, exp_version))
+                    stats_models.ExplorationIssuesModel.create(
+                        exp_issues_default.exp_id,
+                        exp_issues_default.exp_version,
+                        exp_issues_default.unresolved_issues)
+                else:
+                    exp_issues_model.unresolved_issues = []
+                    exp_issues_model.put()
             yield(
                 exploration_model.id,
                 'ExplorationIssuesModel created')

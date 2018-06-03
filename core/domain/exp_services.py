@@ -893,6 +893,15 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exploration, state_names_with_unchanged_answer_groups,
                 exp_versions_diff)
 
+    # Trigger exploration issues model updation.
+    if feconf.ENABLE_PLAYTHROUGHS:
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        revert_to_version = None
+        if change_list[0]['cmd'] == 'AUTO_revert_version_number':
+            revert_to_version = change_list[0]['version_number']
+        stats_services.update_exp_issues_for_new_exp_version(
+            exploration, exp_versions_diff, revert_to_version)
+
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
 
@@ -955,6 +964,11 @@ def _create_exploration(
         if state_names_to_train:
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train)
+
+    # Trigger exploration issues model creation.
+    if feconf.ENABLE_PLAYTHROUGHS:
+        stats_services.create_exp_issues_for_new_exploration(
+            exploration.id, exploration.version)
 
     # Save state id mapping model for new exploration.
     create_and_save_state_id_mapping_model(exploration, commit_cmds)
@@ -2118,38 +2132,3 @@ def delete_state_id_mapping_model_for_exploration(
     exp_versions = range(1, exploration_version + 1)
     exp_models.StateIdMappingModel.delete_state_id_mapping_models(
         exploration_id, exp_versions)
-
-
-def find_all_values_for_key(key, dictionary):
-    """Finds the value of the key inside all the nested dictionaries
-    in a given dictionary.
-
-    Args:
-       key: str. The key whose value is to be found.
-       dictionary: dict or list. The dictionary or list in which the
-           key is to be searched.
-
-    Returns:
-        list. The values of the key in the given dictionary.
-
-    Yields:
-        str. The value of the given key.
-    """
-    if isinstance(dictionary, list):
-        for d in dictionary:
-            if isinstance(d, (dict, list)):
-                for result in find_all_values_for_key(key, d):
-                    yield result
-
-    else:
-        for k, v in dictionary.iteritems():
-            if k == key:
-                yield v
-            elif isinstance(v, dict):
-                for result in find_all_values_for_key(key, v):
-                    yield result
-            elif isinstance(v, list):
-                for d in v:
-                    if isinstance(d, (dict, list)):
-                        for result in find_all_values_for_key(key, d):
-                            yield result
