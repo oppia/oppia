@@ -1268,8 +1268,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': 250
                 }
             },
+            'playthrough_ids': [],
             'schema_version': 1,
-            'is_valid': True
+            'is_valid': True,
         }
 
         response = self.testapp.get('/explore/%s' % self.exp_id)
@@ -1375,6 +1376,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
+            'playthrough_ids': [],
             'schema_version': 1,
             'is_valid': True
         }
@@ -1454,6 +1456,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name1', 'state_name2']
                 },
             },
+            'playthrough_ids': [],
             'schema_version': 1,
             'is_valid': True
         }

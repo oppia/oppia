@@ -482,6 +482,20 @@ class PlaythroughTests(test_utils.GenericTestBase):
                 'schema_version': 1
             })
 
+    def test_from_backend_dict(self):
+        """Test the from_backend_dict() method."""
+        # Test that a playthrough dict without 'exp_id' key raises exception.
+        playthrough_dict = {
+            'exp_version': 1,
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': {},
+            'actions': []
+        }
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'exp_id not in playthrough data dict.'):
+            stats_domain.Playthrough.from_backend_dict(playthrough_dict)
+
     def test_validate(self):
         playthrough = stats_domain.Playthrough(
             'playthrough_id1', 'exp_id1', 1, 'EarlyQuit', {
@@ -570,6 +584,21 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
                 'schema_version': 1,
                 'is_valid': True
             })
+
+    def test_from_backend_dict(self):
+        """Test the from_backend_dict() method."""
+        # Test that an exploration issue dict without 'issue_type' key raises
+        # exception.
+        exp_issue_dict = {
+            'issue_customization_args': {},
+            'playthrough_ids': [],
+            'schema_version': 1,
+            'is_valid': True
+        }
+        with self.assertRaisesRegexp(
+                utils.ValidationError,
+                'issue_type not in exploration issue dict.'):
+            stats_domain.ExplorationIssue.from_backend_dict(exp_issue_dict)
 
     def test_update_exp_issue_from_model(self):
         """Test the migration of exploration issue domain objects."""

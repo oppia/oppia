@@ -812,36 +812,15 @@ class ResolveIssueHandler(EditorHandler):
     instances are deleted.
     """
 
-    def _require_exp_issue_dict_is_valid(self, exp_issue_dict):
-        """Checks whether the exploration issue dict has the correct keys.
-
-        Args:
-            exp_issue_dict: dict. Dict representing an exploration issue.
-        """
-        exp_issue_properties = [
-            'issue_type', 'schema_version', 'issue_customization_args',
-            'playthrough_ids', 'is_valid']
-
-        for exp_issue_property in exp_issue_properties:
-            if exp_issue_property not in exp_issue_dict:
-                raise self.PageNotFoundException(
-                    '%s not in exploration issue dict.' % (exp_issue_property))
-
-        dummy_exp_issue = stats_domain.ExplorationIssue(
-            exp_issue_dict['issue_type'],
-            exp_issue_dict['issue_customization_args'], [],
-            exp_issue_dict['schema_version'], exp_issue_dict['is_valid'])
-
-        try:
-            dummy_exp_issue.validate()
-        except utils.ValidationError as e:
-            raise self.PageNotFoundException(e)
-
     @acl_decorators.can_view_exploration_stats
     def post(self, exp_id):
         """Handles POST requests."""
         exp_issue_dict = self.payload.get('exp_issue_dict')
-        self._require_exp_issue_dict_is_valid(exp_issue_dict)
+        try:
+            unused_exp_issue = stats_domain.ExplorationIssue.from_backend_dict(
+                exp_issue_dict)
+        except utils.ValidationError as e:
+            raise self.PageNotFoundException(e)
 
         exp_version = self.payload.get('exp_version')
 
