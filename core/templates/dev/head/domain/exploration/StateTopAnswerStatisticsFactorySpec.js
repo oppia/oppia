@@ -26,7 +26,7 @@ describe('StateTopAnswerStatistics', function() {
 
   describe('constructor', function() {
     it('copies ordered frequency data of backend values', function() {
-      var stateTopAnswerStatistics = new StateTopAnswerStatistics('Hola', [
+      var stateTopAnswerStatistics = new this.StateTopAnswerStatistics('Hola', [
         {answer: 'aloha', frequency: 3},
         {answer: '???', frequency: 2},
       ]);
