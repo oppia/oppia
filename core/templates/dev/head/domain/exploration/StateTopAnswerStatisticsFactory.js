@@ -50,7 +50,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      * @private @constructor
      * Returns a state's top answers with stale data. For a fresh instance, use
      * {@link StateTopAnswerStatistics#createFromBackendDict} instead, or call
-     * {@link StateTopAnswerStatistics#updateIsAddressed} after construction.
+     * {@link StateTopAnswerStatistics#refreshIsAddressed} after construction.
      *
      * @param {!string} stateName
      * @param {!{answer, frequency: number}[]} backendTopAnswers
@@ -70,7 +70,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     };
 
     /** Examines associated state to refresh the addressed info of answers. */
-    StateTopAnswerStatistics.prototype.updateIsAddressed = function() {
+    StateTopAnswerStatistics.prototype.refreshIsAddressed = function() {
       var explorationId = ExplorationContextService.getExplorationId();
       var state = ExplorationStatesService.getState(this._stateName);
       var interactionRulesService = $injector.get(
@@ -111,7 +111,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
         stateName, backendArray) {
       stateTopAnswerStatistics =
         new StateTopAnswerStatistics(stateName, backendArray);
-      stateTopAnswerStatistics.updateIsAddressed();
+      stateTopAnswerStatistics.refreshIsAddressed();
       return stateTopAnswerStatistics;
     };
 

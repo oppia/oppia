@@ -83,7 +83,7 @@ describe('StateTopAnswerStatisticsFactory', function() {
         });
     }));
 
-    describe('updateIsAddressed', function() {
+    describe('refreshIsAddressed', function() {
       it('makes isAddressed info fresh', function() {
         var stateTopAnswerStatistics =
           new this.StateTopAnswerStatisticsFactory('Hola', [
@@ -99,7 +99,7 @@ describe('StateTopAnswerStatisticsFactory', function() {
           jasmine.objectContaining({answer: 'ni hao', isAddressed: false}),
         ]);
 
-        stateTopAnswerStatistics.updateIsAddressed();
+        stateTopAnswerStatistics.refreshIsAddressed();
 
         // Should now be fresh.
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
