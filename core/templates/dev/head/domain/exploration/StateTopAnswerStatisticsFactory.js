@@ -40,7 +40,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      * @returns {string}
      */
     var convertAnswerToHtml = function(answer) {
-      return (typeof answer === 'string') ? answer : JSON.toString(answer);
+      return (typeof answer === 'string') ? answer : JSON.stringify(answer);
     };
 
     /**
