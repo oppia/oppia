@@ -34,8 +34,8 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      */
 
     /**
-     * TODO(brianrodri): Create a proper service for this which takes
-     * interactions into account.
+     * TODO(brianrodri): Move this helper function into a proper service which
+     * takes the state's interaction type into account when formatting the HTML.
      * @param {*} answer
      * @returns {string}
      */
