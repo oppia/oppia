@@ -32,6 +32,22 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      * @property {boolean} isAddressed
      */
 
+    /** Converts input answer into an HTML representation.
+     *
+     * TODO(brianrodri): Create a proper service for this which takes
+     * interactions into account.
+     *
+     * @param {*} answer
+     * @returns {string}
+     */
+    var answerToHtml = function(answer) {
+      if (typeof answer === "string") {
+        return answer;
+      } else {
+        return JSON.toString(answer);
+      }
+    };
+
     /**
      * @private @constructor
      * Returns a state's top answers with stale data. For a fresh instance, use
@@ -48,10 +64,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       this._answers = backendTopAnswers.map(function(answerFrequencyPair) {
         return {
           answer: angular.copy(answerFrequencyPair.answer),
-          // TODO(brianrodri): Create a proper service to convert the raw
-          // answers into HTML, because JSON.stringify will not always print a
-          // "pretty" value.
-          answerAsHtml: JSON.stringify(answerFrequencyPair.answer),
+          answerAsHtml: answerToHtml(answerFrequencyPair.answer),
           frequency: answerFrequencyPair.frequency,
           isAddressed: false,
         };
