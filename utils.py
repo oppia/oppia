@@ -826,7 +826,12 @@ def convert_to_text_angular(html_data):
         if p.parent.name == 'p':
             p.unwrap()
 
-    # Keeping all line break tags as <br>.
+    # Beautiful soup automatically changes <br> to <br/>,
+    # so it has to be replaced directly in the string.
+    # Also, when any html string with <br/> is stored in exploration
+    # html strings they are stored as <br>. Since both of these
+    # should match and <br> and <br/> have same working,
+    # so the tag has to be replaced in this way.
     return str(soup).replace('<br/>', '<br>')
 
 

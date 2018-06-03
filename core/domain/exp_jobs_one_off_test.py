@@ -990,6 +990,7 @@ class TextAngularValiationAndMigrationTest(test_utils.GenericTestBase):
             ),
             "[u'oppia-noninteractive-link', [u'div', u'[document]']]"]
 
+        # Test that invalid html fails validation before migration.
         self.assertEqual(actual_output, expected_output)
 
         exploration_dict = exploration.to_dict()
@@ -1001,6 +1002,7 @@ class TextAngularValiationAndMigrationTest(test_utils.GenericTestBase):
         state2 = updated_exploration.states['State2']
         state3 = updated_exploration.states['State3']
 
+        # Test that html matches the expected format after migration.
         self.assertEqual(state1.content.html, test_cases[0]['expected_output'])
         self.assertEqual(state2.content.html, test_cases[1]['expected_output'])
         self.assertEqual(state3.content.html, test_cases[2]['expected_output'])
@@ -1035,4 +1037,5 @@ class TextAngularValiationAndMigrationTest(test_utils.GenericTestBase):
         actual_output = (
             exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
 
+        # Test that html after migration passes validation.
         self.assertEqual(actual_output, [])
