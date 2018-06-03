@@ -33,7 +33,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      */
 
     /**
-     * @constructor
+     * @private @constructor
      * @param {!string} stateName
      * @param {!{answer, frequency: number}[]} backendTopAnswers
      */
