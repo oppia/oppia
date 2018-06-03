@@ -855,13 +855,13 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
             "[u'invalidTags', [u'span']]",
             "[u'oppia-noninteractive-link', [u'[document]']]",
             (
-                '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look like your '
-                '<span>program </span>prints any output</p>.<blockquote><p> '
-                'Could you get it to print something?</p></blockquote> You '
-                'can do this by using a statement like prints. <br> You '
-                'can ask any if you have <oppia-noninteractive-link text-'
-                'with-value="&amp;quot;Here&amp;quot;" url-with-value='
-                '"&amp;quot;https://www.example.com&amp;quot;">'
+                '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look '
+                'like your <span>program </span>prints output</p>.<blockquote>'
+                '<p> Could you get it to print something?</p></blockquote> '
+                'Can do this by using statement like prints. <br> You can '
+                'ask any if you have<oppia-noninteractive-link text-with-value'
+                '="&amp;quot;Here&amp;quot;" url-with-value="&amp;quot;'
+                'https://www.example.com&amp;quot;">'
                 '</oppia-noninteractive-link>.\']]'
             )
         ]
