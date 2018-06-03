@@ -506,7 +506,7 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
         for html_data in html_list:
             soup = bs4.BeautifulSoup(html_data, 'html.parser')
 
-            # Any html string with unwrapped text is also invalid.
+            # Text with no parent tag is also invalid.
             for content in soup.contents:
                 if not content.name:
                     err_dict['strings'].append(html_data)
