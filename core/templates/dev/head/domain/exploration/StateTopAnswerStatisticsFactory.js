@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview TODO(brianrodri).
+ * @fileoverview Factory for domain object which holds the list of top answer
+ * statistics for a particular state.
  */
 
 oppia.factory('StateTopAnswerStatisticsFactory', [
