@@ -24,8 +24,12 @@ describe('StateTopAnswerStatisticsFactory', function() {
       $injector.get('StateTopAnswerStatisticsFactory');
   }));
 
-  beforeEach(function() {
-    this.STATES = {
+  beforeEach(inject(function(ExplorationContextService) {
+    spyOn(ExplorationContextService, 'getExplorationId').and.returnValue('7');
+  }));
+
+  beforeEach(inject(function(ExplorationStatesService) {
+    var states = {
       Hola: {
         name: 'Hola',
         interaction: {
@@ -44,9 +48,13 @@ describe('StateTopAnswerStatisticsFactory', function() {
         }
       }
     };
-  });
+    spyOn(ExplorationStatesService, 'getState').and.callFake(
+      function(stateName) {
+        return that.states[stateName];
+      });
+  }));
 
-  describe('stale instances', function() {
+  describe('Stale Instances', function() {
     describe('constructor', function() {
       it('copies ordered frequency data of backend values', function() {
         var stateTopAnswerStatistics =
@@ -65,19 +73,7 @@ describe('StateTopAnswerStatisticsFactory', function() {
     });
   });
 
-  describe('fresh instances', function() {
-    beforeEach(inject(function(ExplorationContextService) {
-      spyOn(ExplorationContextService, 'getExplorationId').and.returnValue('7');
-    }));
-
-    beforeEach(inject(function(ExplorationStatesService) {
-      var that = this;
-      spyOn(ExplorationStatesService, 'getState').and.callFake(
-        function(stateName) {
-          return that.STATES[stateName];
-        });
-    }));
-
+  describe('Fresh Instances', function() {
     describe('refreshIsAddressed', function() {
       it('makes isAddressed info fresh', function() {
         var stateTopAnswerStatistics =
