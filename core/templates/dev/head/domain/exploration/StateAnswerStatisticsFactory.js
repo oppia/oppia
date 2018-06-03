@@ -76,7 +76,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
         return {
           answer: answerStats.answerHtml,
           frequency: answerStats.frequency,
-          isAddressed: answerStats.isAddressed
+          isAddressed: answerStats.isAddressed,
         };
       });
     };
@@ -84,7 +84,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     StateTopAnswerStatistics.prototype.toBackendDict = function() {
       return this._answers.map(function(answerStats) {
         return {
-          answer: angular.copy(answerStats.answerRaw);
+          answer: angular.copy(answerStats.answerRaw),
           frequency: answerStats.frequency,
         };
       });
