@@ -93,7 +93,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     /**
      * @param {string} stateName - Name of the state this new instance will be
      *     responsible for.
-     * @param {Array.<{answer, frequency: number}>} backendDict
+     * @param {{answer, frequency: number}[]} backendDict
      * @returns {StateTopAnswerStatistics}
      */
     StateTopAnswerStatistics.createFromBackendDict = function(
