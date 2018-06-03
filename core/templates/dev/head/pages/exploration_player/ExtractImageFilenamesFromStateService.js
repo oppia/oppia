@@ -190,6 +190,21 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     */
     var _getImageDimensionsInState = function(state) {
       var fileDimensions = {};
+      if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
+        var filepathObject = state.interaction.customizationArgs.imageAndRegions.value.imagePath;
+        if(!filepathObject.width) {
+          var filename = filepathObject;
+          filepathObject = {
+            name: filename,
+            width: 500,
+            height: 200
+          };
+        }
+        fileDimensions[filepathObject.name] = {
+          width: filepathObject.width,
+          height: filepathObject.height
+        };
+      }
       var allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {
         fileDimensions = Object.assign(fileDimensions,
@@ -208,9 +223,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       // The Image Click Input interaction has an image whose filename is
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath
-      if (state.interaction.id === 'INTERACTION_TYPE_IMAGE_CLICK_INPUT') {
-        filenamesInState.push(
-          state.interaction.customizationArgs.imageAndRegions.value.imagePath);
+      if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
+        var filepathObject = state.interaction.customizationArgs.imageAndRegions.value.imagePath;
+        filenamesInState.push(filepathObject.name);
       }
       allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {

@@ -23,11 +23,13 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT',
+  'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT', 'ImagePreloaderService',
+  'AssetsBackendApiService',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT) {
+      EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT, ImagePreloaderService,
+      AssetsBackendApiService) {
     return {
       restrict: 'E',
       scope: {
@@ -44,12 +46,45 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.highlightRegionsOnHover =
             ($attrs.highlightRegionsOnHoverWithValue === 'true');
           $scope.filepath = imageAndRegions.imagePath;
-          $scope.imageUrl = (
-            $scope.filepath ?
-              $sce.trustAsResourceUrl(
-                '/imagehandler/' +
-                ExplorationContextService.getExplorationId() +
-                '/' + encodeURIComponent($scope.filepath)) : null);
+          $scope.imageUrl = null;
+          $scope.loadingIndicatorUrl = (
+            UrlInterpolationService.getStaticImageUrl(
+              '/activity/loadingIndicator.gif')
+          );
+          // It is initialised to false so that if it is the preview in the
+          // exploration editor, the loading indicator doesn't appear there.
+          $scope.isLoadingIndicatorShown = false;
+
+          if (ImagePreloaderService.inExplorationPlayer()) {
+            $scope.isLoadingIndicatorShown = true;
+            $scope.dimensions = (
+              ImagePreloaderService.getDimensionsOfImage(
+                $scope.filepath.name));
+            ImagePreloaderService.getImageUrl($scope.filepath.name
+            ).then(function(objectUrl) {
+              $scope.isLoadingIndicatorShown = false;
+              $scope.imageUrl = objectUrl;
+            });
+            // For aligning the gif to the center of it's container
+            var paddingTop = Math.max(0, ($scope.dimensions.height * 0.5)
+              - 60);
+            $scope.loadingIndicatorContainerStyle =
+            {
+              'background-color': 'rgba(224,242,241,1)',
+              'padding-top': paddingTop + 'px',
+              height: $scope.dimensions.height + 'px'
+            };
+          } else {
+            // This is for loading the image for preview while editing an
+            // exploration.
+            AssetsBackendApiService.loadImage(
+              ExplorationContextService.getExplorationId(),
+            $scope.filepath.name).then(function(loadedImageFile) {
+              var objectUrl = URL.createObjectURL(loadedImageFile.data);
+              $scope.imageUrl = objectUrl;
+            });
+          }
+
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
