@@ -253,3 +253,40 @@ class QuestionSummary(object):
             'question_id': self.question_id,
             'question_title': self.question_title
         }
+
+class QuestionSkillLink(object):
+    """Domain object for Question Skill Link.
+
+    Attributes:
+        question_id: str. The ID of the question.
+        skill_id: str. The ID of the skill to which the question is linked.
+        review_status: int. Status of the review: Pending(0)/Approved(1)/Rejected(-1)
+        difficulty: int. Level of difficulty of the question.
+    """
+
+    def __init__(self, question_id, skill_id, review_status, difficulty):
+        """Constructs a Question Skill Link domain object.
+
+        Args:
+            question_id: str. The ID of the question.
+            skill_id: str. The ID of the skill to which the question is linked.
+            review_status: int. Status of the review: Pending(0)/Approved(1)/Rejected(-1)
+            difficulty: int. Level of difficulty of the question.
+        """
+        self.question_id = question_id
+        self.skill_id = skill_id
+        self.review_status = review_status
+        self.difficulty = difficulty
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this QuestionSkillLink object.
+        """
+        return {
+            'question_id': self.question_id,
+            'skill_id': self.skill_id,
+            'review_status': self.review_status,
+            'difficulty': self.difficulty
+        }
