@@ -492,8 +492,8 @@ class PlaythroughTests(test_utils.GenericTestBase):
             'actions': []
         }
         with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'exp_id not in playthrough data dict.'):
+            utils.ValidationError,
+            'exp_id not in playthrough data dict.'):
             stats_domain.Playthrough.from_backend_dict(playthrough_dict)
 
     def test_validate(self):
@@ -596,8 +596,8 @@ class ExplorationIssueTests(test_utils.GenericTestBase):
             'is_valid': True
         }
         with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'issue_type not in exploration issue dict.'):
+            utils.ValidationError,
+            'issue_type not in exploration issue dict.'):
             stats_domain.ExplorationIssue.from_backend_dict(exp_issue_dict)
 
     def test_update_exp_issue_from_model(self):

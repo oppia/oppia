@@ -772,7 +772,7 @@ class StateRulesStatsHandler(EditorHandler):
 
 class FetchIssuesHandler(EditorHandler):
     """Handler used for retrieving the list of unresolved issues in an
-    exploration.
+    exploration. This only retrieves the issues that are valid.
     """
 
     @acl_decorators.can_view_exploration_stats
