@@ -26,8 +26,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     """Test the story domain object."""
 
     STORY_ID = 'story_id'
-    NODE_ID_1 = feconf.DEFAULT_INITIAL_NODE_ID
-    NODE_ID_2 = 'node_id_2'
+    NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
+    NODE_ID_2 = 'node_2'
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
     EXP_ID = 'exp_id'
@@ -65,7 +65,8 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                     'outline': '',
                     'exploration_id': None
                 }],
-                'starting_node_id': self.NODE_ID_1
+                'initial_node_id': self.NODE_ID_1,
+                'next_node_id': 'node_2'
             },
             'schema_version': feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
@@ -108,9 +109,19 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 self.story.schema_version)
         )
 
+    def test_get_number_from_node_id(self):
+        self.assertEqual(
+            story_domain.StoryNode.get_number_from_node_id('node_10'), 10)
+
     def test_nodes_validation(self):
-        self.story.story_contents.starting_node_id = 'node'
+        self.story.story_contents.initial_node_id = 'node_10'
         self._assert_validation_error('Expected starting node to exist')
+        self.story.story_contents.initial_node_id = 'node_id_1'
+        self._assert_validation_error('Invalid node_id: node_id_1')
+        self.story.story_contents.initial_node_id = 'node_abc'
+        self._assert_validation_error('Invalid node_id: node_abc')
+
+        self.story.story_contents.initial_node_id = 'node_1'
         self.story.story_contents.nodes = {}
         self._assert_validation_error(
             'Expected nodes field to be a list, received {}')
@@ -121,7 +132,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict({
-                'id': 'node_id',
+                'id': 'node_1',
                 'destination_node_ids': [self.NODE_ID_2],
                 'prerequisite_skill_ids': [],
                 'acquired_skill_ids': [],
@@ -168,6 +179,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'to be mutually exclusive.')
 
     def test_all_nodes_visited(self):
+        self.story.story_contents.next_node_id = 'node_4'
         # Case 1: Prerequisite skills not acquired.
         node_1 = {
             'id': 'node_1',
@@ -193,15 +205,15 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'outline': '',
             'exploration_id': None
         }
-        self.story.story_contents.starting_node_id = 'node_1'
+        self.story.story_contents.initial_node_id = 'node_1'
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict(node_1),
             story_domain.StoryNode.from_dict(node_2),
             story_domain.StoryNode.from_dict(node_3)
         ]
         self._assert_validation_error(
-            'Expected the user to have acquired all prerequisite skills by the '
-            'time a new node is visible.')
+            'The prerequisite skills skill_3 were not completed before '
+            'the node with id node_3 was unlocked.')
 
         # Case 2: Story with loops.
         node_1 = {
@@ -265,9 +277,44 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_2),
             story_domain.StoryNode.from_dict(node_3)
         ]
-        self._assert_validation_error('Expected all nodes to be reachable.')
+        self._assert_validation_error(
+            'The node with id node_3 is disconnected from the story graph.')
 
-        # Case 4: A valid graph.
+        # Case 4: Graph with duplicate nodes.
+        node_1 = {
+            'id': 'node_1',
+            'destination_node_ids': ['node_2'],
+            'acquired_skill_ids': ['skill_2'],
+            'prerequisite_skill_ids': ['skill_1'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_2 = {
+            'id': 'node_2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_3'],
+            'prerequisite_skill_ids': ['skill_2'],
+            'outline': '',
+            'exploration_id': None
+        }
+        node_3 = {
+            'id': 'node_2',
+            'destination_node_ids': [],
+            'acquired_skill_ids': ['skill_4'],
+            'prerequisite_skill_ids': ['skill_3'],
+            'outline': '',
+            'exploration_id': None
+        }
+        self.story.story_contents.nodes = [
+            story_domain.StoryNode.from_dict(node_1),
+            story_domain.StoryNode.from_dict(node_2),
+            story_domain.StoryNode.from_dict(node_3)
+        ]
+        self._assert_validation_error(
+            'The node id node_2 is duplicated in the story.')
+
+        self.story.story_contents.next_node_id = 'node_5'
+        # Case 5: A valid graph.
         node_1 = {
             'id': 'node_1',
             'destination_node_ids': ['node_2'],
@@ -317,7 +364,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             [self.SKILL_ID_1], [self.SKILL_ID_2],
             'Outline', self.EXP_ID)
         story_contents = story_domain.StoryContents(
-            [story_node], self.NODE_ID_1)
+            [story_node], self.NODE_ID_1, 2)
         story_contents_dict = story_contents.to_dict()
         story_contents_from_dict = story_domain.StoryContents.from_dict(
             story_contents_dict)

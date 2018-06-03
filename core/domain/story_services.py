@@ -301,8 +301,8 @@ def apply_change_list(story_id, change_list):
                     story.update_language_code(change.new_value)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
                 if (change.property_name ==
-                        story_domain.STORY_CONTENTS_PROPERTY_STARTING_NODE_ID):
-                    story.update_starting_node(change.new_value)
+                        story_domain.INITIAL_NODE_ID):
+                    story.update_initial_node(change.new_value)
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
