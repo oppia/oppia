@@ -27,7 +27,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
     STORY_ID = 'story_id'
     NODE_ID_1 = story_domain.NODE_ID_PREFIX + '1'
-    NODE_ID_2 = 'node_id_2'
+    NODE_ID_2 = 'node_2'
     SKILL_ID_1 = 'skill_id_1'
     SKILL_ID_2 = 'skill_id_2'
     EXP_ID = 'exp_id'
@@ -109,9 +109,18 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 self.story.schema_version)
         )
 
+    def test_get_number_from_node_id(self):
+        self.assertEqual(
+            story_domain.StoryNode.get_number_from_node_id('node_10'), 10)
+
     def test_nodes_validation(self):
         self.story.story_contents.initial_node_id = 'node_10'
         self._assert_validation_error('Expected starting node to exist')
+        self.story.story_contents.initial_node_id = 'node_id_1'
+        self._assert_validation_error('Invalid node_id: node_id_1')
+        self.story.story_contents.initial_node_id = 'node_abc'
+        self._assert_validation_error('Invalid node_id: node_abc')
+
         self.story.story_contents.initial_node_id = 'node_1'
         self.story.story_contents.nodes = {}
         self._assert_validation_error(
@@ -123,7 +132,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
 
         self.story.story_contents.nodes = [
             story_domain.StoryNode.from_dict({
-                'id': 'node_id',
+                'id': 'node_1',
                 'destination_node_ids': [self.NODE_ID_2],
                 'prerequisite_skill_ids': [],
                 'acquired_skill_ids': [],

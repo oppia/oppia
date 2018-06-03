@@ -14,6 +14,8 @@
 
 """Domain objects relating to stories."""
 
+import re
+
 from constants import constants
 from core.domain import html_cleaner
 import feconf
@@ -176,25 +178,44 @@ class StoryNode(object):
         self.outline = html_cleaner.clean(outline)
         self.exploration_id = exploration_id
 
-    def get_number_from_node_id(self, node_id=None, external_id=False):
+    @classmethod
+    def get_number_from_node_id(cls, node_id):
         """Decodes the node_id to get the number at the end of the id.
 
         Args:
             node_id: str. The id of the node.
-            external_id: bool. Whether the id to be decoded is the current
-                node's itself or an external one (like next_node_id).
 
         Returns:
             int. The number at the end of the id.
         """
-        if external_id:
-            if node_id is None:
-                raise Exception(
-                    'A node id needs to be provided to the function to get '
-                    'the number.')
-            return int(node_id.replace(NODE_ID_PREFIX, ''))
-        else:
-            return int(self.id.replace(NODE_ID_PREFIX, ''))
+        return int(node_id.replace(NODE_ID_PREFIX, ''))
+
+    @classmethod
+    def get_incremented_node_id(cls, node_id):
+        """Increments the next node id of the story.
+
+        Returns:
+            str. The new next node id.
+        """
+        current_number = StoryNode.get_number_from_node_id(node_id)
+        incremented_node_id = NODE_ID_PREFIX + str(current_number + 1)
+        return incremented_node_id
+
+    @classmethod
+    def require_valid_node_id(cls, node_id):
+        """Validates the node id for a StoryNode object.
+
+        Args:
+            node_id: str. The node id to be validated.
+        """
+        if not isinstance(node_id, basestring):
+            raise utils.ValidationError(
+                'Expected node ID to be a string, received %s' %
+                node_id)
+        pattern = re.compile('%s[0-9]+' % NODE_ID_PREFIX)
+        if not pattern.match(node_id):
+            raise utils.ValidationError(
+                'Invalid node_id: %s' % node_id)
 
     def to_dict(self):
         """Returns a dict representing this StoryNode domain object.
@@ -260,14 +281,7 @@ class StoryNode(object):
                 'Expected outline to be a string, received %s' %
                 self.outline)
 
-        if not isinstance(self.id, basestring):
-            raise utils.ValidationError(
-                'Expected node ID to be a string, received %s' %
-                self.id)
-
-        if NODE_ID_PREFIX != self.id[:len(NODE_ID_PREFIX)]:
-            raise utils.ValidationError(
-                'Invalid node id for node with id %s' % self.id)
+        self.require_valid_node_id(self.id)
 
         if not isinstance(self.prerequisite_skill_ids, list):
             raise utils.ValidationError(
@@ -312,10 +326,7 @@ class StoryNode(object):
                 self.destination_node_ids)
 
         for node_id in self.destination_node_ids:
-            if not isinstance(node_id, basestring):
-                raise utils.ValidationError(
-                    'Expected each destination node id to be a string, '
-                    'received %s' % node_id)
+            self.require_valid_node_id(node_id)
             if node_id == self.id:
                 raise utils.ValidationError(
                     'The story node with ID %s points to itself.' % node_id)
@@ -338,19 +349,6 @@ class StoryContents(object):
         self.nodes = story_nodes
         self.next_node_id = next_node_id
 
-    def increment_next_node_id(self):
-        """Increments the next node id of the story.
-
-        Returns:
-            str. The new next node id.
-        """
-        # A node instance is required to access the function, and hence the
-        # first node is used.
-        current_number = self.nodes[0].get_number_from_node_id(
-            self.next_node_id, external_id=True)
-        new_next_node_id = NODE_ID_PREFIX + str(current_number + 1)
-        return new_next_node_id
-
     def validate(self):
         """Validates various properties of the story contents object.
 
@@ -362,23 +360,8 @@ class StoryContents(object):
             raise utils.ValidationError(
                 'Expected nodes field to be a list, received %s' % self.nodes)
 
-        if not isinstance(self.initial_node_id, basestring):
-            raise utils.ValidationError(
-                'Expected starting node id to be a string, received %s'
-                % self.initial_node_id)
-
-        if NODE_ID_PREFIX != self.initial_node_id[:len(NODE_ID_PREFIX)]:
-            raise utils.ValidationError(
-                'Invalid initial node id %s' % self.initial_node_id)
-
-        if not isinstance(self.next_node_id, basestring):
-            raise utils.ValidationError(
-                'Expected next node id to be a string, received %s'
-                % self.next_node_id)
-
-        if NODE_ID_PREFIX != self.next_node_id[:len(NODE_ID_PREFIX)]:
-            raise utils.ValidationError(
-                'Invalid next node id %s' % self.next_node_id)
+        StoryNode.require_valid_node_id(self.initial_node_id)
+        StoryNode.require_valid_node_id(self.next_node_id)
 
         initial_node_is_present = False
         node_id_list = []
@@ -388,20 +371,19 @@ class StoryContents(object):
                 raise utils.ValidationError(
                     'Expected each node to be a StoryNode object, received %s' %
                     node)
+            node.validate()
             for destination_node_id in node.destination_node_ids:
                 if next(
                         (node for node in self.nodes
                          if node.id == destination_node_id), None) is None:
                     raise utils.ValidationError(
                         'Expected all destination nodes to exist')
-            node.validate()
             if node.id == self.initial_node_id:
                 initial_node_is_present = True
             # Checks whether the number in the id of any node is greater than
             # the value of next_node_id.
-            if (node.get_number_from_node_id(external_id=False) >=
-                    node.get_number_from_node_id(
-                        self.next_node_id, external_id=True)):
+            if (StoryNode.get_number_from_node_id(node.id) >=
+                    StoryNode.get_number_from_node_id(self.next_node_id)):
                 raise utils.ValidationError(
                     'The node with id %s is out of bounds.' % node.id)
             node_id_list.append(node.id)
@@ -628,13 +610,13 @@ class Story(object):
             Story. The Story domain object with the default values.
         """
         # Initial node id for a new story.
-        DEFAULT_INITIAL_NODE_ID = NODE_ID_PREFIX + '1'
+        initial_node_id = '%s1' % NODE_ID_PREFIX
         story_contents = StoryContents(
             [
-                StoryNode.create_default_story_node(
-                    DEFAULT_INITIAL_NODE_ID)
+                StoryNode.create_default_story_node(initial_node_id)
             ],
-            DEFAULT_INITIAL_NODE_ID, NODE_ID_PREFIX + '2')
+            initial_node_id, StoryNode.get_incremented_node_id(
+                initial_node_id))
         return cls(
             story_id, feconf.DEFAULT_STORY_TITLE,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
@@ -706,7 +688,7 @@ class Story(object):
         self.story_contents.nodes.append(
             StoryNode.create_default_story_node(node_id))
         self.story_contents.next_node_id = (
-            self.story_contents.increment_next_node_id())
+            StoryNode.get_incremented_node_id(self.story_contents.next_node_id))
 
     def _check_exploration_id_already_present(self, exploration_id):
         """Returns whether a node with the given exploration id is already
@@ -840,7 +822,7 @@ class Story(object):
         self.story_contents.nodes[node_index].exploration_id = (
             new_exploration_id)
 
-    def update_starting_node(self, new_initial_node_id):
+    def update_initial_node(self, new_initial_node_id):
         """Updates the starting node of the story.
 
         Args:
