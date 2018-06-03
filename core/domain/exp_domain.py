@@ -1817,7 +1817,9 @@ class Exploration(object):
         init_state_dict = State.create_default_state(
             init_state_name, is_initial_state=True).to_dict()
 
-        states_dict = {init_state_name: init_state_dict}
+        states_dict = {
+            init_state_name: init_state_dict
+        }
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
