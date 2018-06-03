@@ -37,7 +37,7 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.imageUrl = '';
         $scope.loadingIndicatorUrl = (
           UrlInterpolationService.getStaticImageUrl(
-            '/activity/Oppia_loading_indicator.gif')
+            '/activity/loadingIndicator.gif')
         );
         // It is initialised to false so that if it is the preview in the
         // exploration editor, the loading indicator doesn't appear there.
