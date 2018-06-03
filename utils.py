@@ -725,8 +725,7 @@ def get_hashable_value(value):
         return value
 
 
-def enforce_valid_parent(
-        soup, tag_name, allowed_parent_list, default_parent_name):
+def enforce_valid_parent(soup, tag_name):
     """This function validates the parent of a tag and if the parent is not
     valid, it enforces a default parent.
 
@@ -734,14 +733,41 @@ def enforce_valid_parent(
         soup: bs4.BeautifulSoup. The html soup in which tag parent is to
             be checked.
         tag_name: str. Tag name to be checked.
-        allowed_parent_list: list(str). List of valid parents for the tag.
-        default_parent_name: str. The parent tag name to be enforced if the
-            current parent is invalid.
     """
-
+    independent_parents = ['p', 'pre', 'ol', 'ul', 'blockquote']
     for tag in soup.findAll(tag_name):
-        if tag.parent.name not in allowed_parent_list:
-            tag.wrap(soup.new_tag(default_parent_name))
+        if tag.parent.name == '[document]':
+            prev_sib = list(tag.previous_siblings)
+            next_sib = list(tag.next_siblings)
+            p = soup.new_tag('p')
+            index_of_first_unwrapped_sibling = -1
+
+            # Previous siblings are stored in order with the closest one
+            # being the first. All the continuous siblings which cannot be
+            # a valid parent by their own have to be wrapped in same p tag.
+            # This loop finds the index of first sibling which is a valid
+            # parent on its own.
+            for index, sib in enumerate(prev_sib):
+                if sib.name in independent_parents:
+                    index_of_first_unwrapped_sibling = len(prev_sib) - index
+                    break
+
+            # Previous siblings are accessed in reversed order to
+            # avoid reversing the order of siblings on being wrapped.
+            for index, sib in enumerate(reversed(prev_sib)):
+                if index >= index_of_first_unwrapped_sibling:
+                    sib.wrap(p)
+
+            # Wrap the tag in same p tag as previous siblings.
+            tag.wrap(p)
+
+            # To wrap the next siblings which are not valid parents on
+            # their own in the same p tag as previous siblings.
+            for sib in next_sib:
+                if sib.name not in independent_parents:
+                    sib.wrap(p)
+                else:
+                    break
 
 
 def convert_to_text_angular(html_data):
@@ -761,15 +787,12 @@ def convert_to_text_angular(html_data):
     allowed_tag_list = (
         feconf.RTE_CONTENT_SPEC[
             'RTE_TYPE_TEXTANGULAR']['ALLOWED_TAG_LIST'])
-    allowed_parent_list = (
-        feconf.RTE_CONTENT_SPEC[
-            'RTE_TYPE_TEXTANGULAR']['ALLOWED_PARENT_LIST'])
 
     # To remove all tags except those in allowed tag list.
     all_tags = soup.findAll()
     for tag in all_tags:
         if tag.name == 'td' and tag.next_sibling:
-            tag.string = tag.string + " "
+            tag.string = tag.string + "\t"
         if tag.name == 'div' or tag.name == 'tr':
             tag.name = 'p'
         elif tag.name not in allowed_tag_list:
@@ -789,37 +812,35 @@ def convert_to_text_angular(html_data):
         'oppia-noninteractive-tabs'
     ]
 
-    # Ensure that every content in html is wrapped in a tag.
-    for content in soup.contents:
-        if not content.name:
-            content.wrap(soup.new_tag('p'))
+    # If parent of line break is pre replace the tag with newline character.
+    for br in soup.findAll('br'):
+        if br.parent.name == 'pre':
+            br.insert_after('\n')
+            br.unwrap()
 
-    # Ensure that every line break is a child of any of its allowed parents.
-    enforce_valid_parent(soup, 'br', allowed_parent_list['br'], 'p')
+    # Ensure that every linebreak is a child of any of its allowed parents.
+    enforce_valid_parent(soup, 'br')
 
     # Ensure that every oppia inline component is a child of any
     # of its allowed parents.
     for tag_name in oppia_inline_components:
-        enforce_valid_parent(soup, tag_name, allowed_parent_list[tag_name], 'p')
+        enforce_valid_parent(soup, tag_name)
 
     # Ensure that every oppia block component is a child of any of its
     # allowed parents.
     for tag_name in oppia_block_components:
-        enforce_valid_parent(soup, tag_name, allowed_parent_list[tag_name], 'p')
+        enforce_valid_parent(soup, tag_name)
 
     # Ensure that every bold tag is a child of any of its allowed parents.
-    enforce_valid_parent(soup, 'b', allowed_parent_list['b'], 'p')
+    enforce_valid_parent(soup, 'b')
 
     # Ensure that every italics tag is a child of any of its allowed parents.
-    enforce_valid_parent(soup, 'i', allowed_parent_list['i'], 'p')
+    enforce_valid_parent(soup, 'i')
 
-    # Ensure that p tag has a valid parent. p tags having parent tag as p
-    # is checked separately since in that case the child p tag is to
-    # be unwrapped instead of the parent p tag.
-    for p in soup.findAll('p'):
-        if p.parent.name != 'p' and (
-                p.parent.name not in allowed_parent_list['p']):
-            p.parent.unwrap()
+    # Ensure that every content in html is wrapped in a tag.
+    for content in soup.contents:
+        if not content.name:
+            content.wrap(soup.new_tag('p'))
 
     # Ensure that p tag is not wrapped in p tag.
     for p in soup.findAll('p'):

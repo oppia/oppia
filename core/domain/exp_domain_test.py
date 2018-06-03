@@ -3258,13 +3258,13 @@ states:
         correct_answer: Answer1
         explanation:
           audio_translations: {}
-          html: <p>This is </p><p><i>solution</i></p><p> for state1</p>
+          html: <p>This is <i>solution</i> for state1</p>
     param_changes: []
   state2:
     classifier_model_id: null
     content:
       audio_translations: {}
-      html: <p>Hello, </p><p>this </p><p><i>is </i></p><p>state2</p>
+      html: <p>Hello, </p><p>this <i>is </i>state2</p>
     interaction:
       answer_groups:
       - outcome:
@@ -3287,7 +3287,7 @@ states:
           dest: state3
           feedback:
             audio_translations: {}
-            html: <pre>Outcome2 <p><br></p>for state2</pre>
+            html: \"<pre>Outcome2 \\nfor state2</pre>\"
           labelled_as_correct: false
           param_changes: []
           refresher_exploration_id: null
@@ -3300,8 +3300,8 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is </p><p>value1 </p><p><br></p><p>for MultipleChoice</p>
-          - <p>This is value2 for </p><p><br></p><p>MultipleChoice</p>
+          - <p>This is </p><p>value1 <br>for MultipleChoice</p>
+          - <p>This is value2 for <br>MultipleChoice</p>
       default_outcome:
         dest: state2
         feedback:
@@ -3316,7 +3316,7 @@ states:
           html: <p>Hello, this is html1<b> for </b>state2</p>
       - hint_content:
           audio_translations: {}
-          html: <p>Here is link 2 </p><p><oppia-noninteractive-link text-with-value="&amp;quot;discussion
+          html: <p>Here is link 2 <oppia-noninteractive-link text-with-value="&amp;quot;discussion
             forum&amp;quot;" url-with-value="&amp;quot;https://groups.google.com/
             forum/?fromgroups#!forum/oppia&amp;quot;"> </oppia-noninteractive-link></p>
       id: MultipleChoiceInput
@@ -3333,8 +3333,8 @@ states:
           dest: state1
           feedback:
             audio_translations: {}
-            html: <p>Here is the image1 </p><p><oppia-noninteractive-image filepath-with-value="amp;quot;startBlue.png&amp;quot;">
-              </oppia-noninteractive-image></p><p>Here is the image2 </p><p><oppia-noninteractive-image
+            html: <p>Here is the image1 <i><oppia-noninteractive-image filepath-with-value="amp;quot;startBlue.png&amp;quot;">
+              </oppia-noninteractive-image></i>Here is the image2 </p><p><oppia-noninteractive-image
               filepath-with-value=" amp;quot;startBlue.png&amp;quot;"> </oppia-noninteractive-image></p>
           labelled_as_correct: false
           param_changes: []

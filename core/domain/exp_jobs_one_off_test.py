@@ -16,6 +16,9 @@
 
 """Tests for Exploration-related jobs."""
 
+import json
+import os
+
 from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
@@ -881,9 +884,11 @@ class TextAngularValiationAndMigrationTest(test_utils.GenericTestBase):
         """Tests that the exploration validation and migration job for
         TextAngular RTE.
         """
-        test_cases = (
-            feconf.RTE_TEST_CASES[
-                'RTE_TYPE_TEXTANGULAR']['TEST_CASES'])
+        test_file = os.path.join(
+            feconf.TESTS_DATA_DIR, 'test_cases_for_rte.json')
+        with open(test_file, 'r') as f:
+            json_data = json.load(f)
+        test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
@@ -986,7 +991,7 @@ class TextAngularValiationAndMigrationTest(test_utils.GenericTestBase):
             ),
             (
                 "[u'oppia-noninteractive-image', "
-                "[u'i', u'div', u'span', u'[document]']]"
+                "[u'div', u'span', u'[document]']]"
             ),
             "[u'oppia-noninteractive-link', [u'div', u'[document]']]"]
 

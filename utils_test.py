@@ -16,6 +16,8 @@
 
 import copy
 import datetime
+import json
+import os
 
 # pylint: disable=relative-import
 from core.tests import test_utils
@@ -253,9 +255,11 @@ class UtilsTests(test_utils.GenericTestBase):
             })
 
     def test_convert_to_text_angular(self):
-        test_cases = (
-            feconf.RTE_TEST_CASES[
-                'RTE_TYPE_TEXTANGULAR']['TEST_CASES'])
+        test_file = os.path.join(
+            feconf.TESTS_DATA_DIR, 'test_cases_for_rte.json')
+        with open(test_file, 'r') as f:
+            json_data = json.load(f)
+        test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
         for test_case in test_cases:
             actual_output = utils.convert_to_text_angular(
                 test_case['html_content'])
