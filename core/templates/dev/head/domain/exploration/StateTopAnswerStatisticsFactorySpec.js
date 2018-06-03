@@ -77,17 +77,41 @@ describe('StateTopAnswerStatistics', function() {
           };
         });
     }));
+    beforeEach(function() {
+      this.backendDict = [
+        {answer: 'hola', frequency: 5},
+        {answer: 'adios', frequency: 3},
+        {answer: 'ni hao', frequency: 2},
+      ];
+    });
 
     describe('updateIsAddressed', function() {
       it('makes isAddressed info fresh', function() {
         var stateTopAnswerStatistics =
-          new this.StateTopAnswerStatistics('Hola', [
-            {answer: 'hola', frequency: 5},
-            {answer: 'adios', frequency: 3},
-            {answer: 'ni hao', frequency: 2},
-          ]);
+          new this.StateTopAnswerStatistics('Hola', this.backendDict);
+
+        // Should be stale.
+        expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
+          jasmine.objectContaining({answer: 'hola', isAddressed: false}),
+          jasmine.objectContaining({answer: 'adios', isAddressed: false}),
+          jasmine.objectContaining({answer: 'ni hao', isAddressed: false}),
+        ]);
 
         stateTopAnswerStatistics.updateIsAddressed();
+
+        // Should now be fresh.
+        expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
+          jasmine.objectContaining({answer: 'hola', isAddressed: true}),
+          jasmine.objectContaining({answer: 'adios', isAddressed: false}),
+          jasmine.objectContaining({answer: 'ni hao', isAddressed: false}),
+        ]);
+      });
+    });
+
+    describe('createFromBackendDict', function() {
+      it('returns a fresh instance', function() {
+        var stateTopAnswerStatistics =
+          StateTopAnswerStatistics.createFromBackendDict('Hola', backendDict);
 
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
           jasmine.objectContaining({answer: 'hola', isAddressed: true}),
