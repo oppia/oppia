@@ -723,15 +723,13 @@ tags: []
         exploration.objective = objective
         exploration.add_states(state_names)
 
-        from_names = [exploration.init_state_name] + state_names[:-1]
-        to_names = state_names
-        for from_name, to_name in zip(from_names, to_names):
-            from_state = exploration.states[from_name]
+        all_state_names = [exploration.init_state_name] + state_names
+        for from_state_name, dest_state_name in (
+                zip(all_state_names[:-1], all_state_names[1:])):
+            from_state = exploration.states[from_state_name]
             from_state.update_interaction_id(next(interaction_ids))
-            from_state.interaction.default_outcome.dest = to_name
-
-        # Prepare end_state.
-        end_state = exploration.states[to_names[-1]]
+            from_state.interaction.default_outcome.dest = dest_state_name
+        end_state = exploration.states[all_state_names[-1]]
         end_state.update_interaction_id('EndExploration')
         end_state.interaction.default_outcome = None
 
