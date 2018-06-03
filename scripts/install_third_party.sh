@@ -34,8 +34,9 @@ install_node_module gulp-uglify 2.0.1
 install_node_module gulp-util 3.0.7
 install_node_module htmllint 0.7.2
 install_node_module htmllint-cli 0.0.7
-install_node_module stylelint 8.4.0
-install_node_module stylelint-config-standard 18.0.0
+install_node_module @mapbox/stylelint-processor-arbitrary-tags 0.2.0
+install_node_module stylelint 9.2.1
+install_node_module stylelint-config-standard 18.2.0
 install_node_module through2 2.0.0
 install_node_module uglify-js 3.3.11
 install_node_module yargs 3.29.0

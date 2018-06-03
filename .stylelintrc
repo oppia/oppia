@@ -1,7 +1,11 @@
 { 
   "extends": "stylelint-config-recommended",
+  "processors": [
+    ["@mapbox/stylelint-processor-arbitrary-tags", { "fileFilterRegex": [/\.html$/]}]
+    ]
   "rules": {
     "no-duplicate-selectors": true,
+    "no-empty-source": ,
     "selector-type-no-unknown": [
       true,
       {
