@@ -112,7 +112,7 @@ describe('StateTopAnswerStatistics', function() {
       it('returns a fresh instance', function() {
         var stateTopAnswerStatistics =
           this.StateTopAnswerStatistics.createFromBackendDict(
-            'Hola', backendDict);
+            'Hola', this.backendDict);
 
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
           jasmine.objectContaining({answer: 'hola', isAddressed: true}),
