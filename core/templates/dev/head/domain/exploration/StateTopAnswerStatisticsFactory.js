@@ -24,7 +24,9 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       $http, $injector, AngularNameService, AnswerClassificationService,
       ExplorationContextService, ExplorationStatesService) {
     /**
-     * @typedef {Object} AnswerStatistics
+     * @typedef {Object} AnswerStatistics - A record for the statistics of a
+     * single top answer.
+     *
      * @property {*} answer - Contains the answer in its raw form, directly from
      *    the backend.
      * @property {string} answerAsHtml - Contains the answer as a string which
@@ -47,8 +49,8 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     /**
      * @private @constructor
      * Returns a state's top answers with stale data. For a fresh instance, use
-     * @link StateTopAnswerStatistics#createFromBackendDict instead, or call the
-     * update methods after construction.
+     * @link StateTopAnswerStatistics#createFromBackendDict instead, or call
+     * @link StateTopAnswerStatistics#updateIsAddressed after construction.
      *
      * @param {!string} stateName
      * @param {!{answer, frequency: number}[]} backendTopAnswers
@@ -62,7 +64,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
           answer: angular.copy(answerFrequencyPair.answer),
           answerAsHtml: convertAnswerToHtml(answerFrequencyPair.answer),
           frequency: answerFrequencyPair.frequency,
-          isAddressed: false,
+          isAddressed: false, // stale, needs to be updated.
         };
       });
     };
