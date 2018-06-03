@@ -715,15 +715,14 @@ tags: []
             raise ValueError('must provide at least one state name')
         if not interaction_ids:
             raise ValueError('must provide at least one interaction type')
+        interaction_ids = itertools.cycle(interaction_ids)
 
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title=title, init_state_name=state_names[0],
-            category=category, language_code=language_code)
-        exploration.objective = objective
-        exploration.add_states(state_names[1:])
+            category=category, objective=objective, language_code=language_code)
 
         if len(state_names) > 1:
-            interaction_ids = itertools.cycle(interaction_ids)
+            exploration.add_states(state_names[1:])
             for from_state_name, dest_state_name in (
                     zip(state_names[:-1], state_names[1:])):
                 from_state = exploration.states[from_state_name]
