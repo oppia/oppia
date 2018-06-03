@@ -522,9 +522,7 @@ class Playthrough(object):
         Returns:
             dict. A dict mapping of all fields of Playthrough object.
         """
-        action_dicts = [
-            action.to_dict()
-            for action in self.actions]
+        action_dicts = [action.to_dict() for action in self.actions]
         return {
             'id': self.id,
             'exp_id': self.exp_id,

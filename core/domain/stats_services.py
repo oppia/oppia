@@ -324,11 +324,12 @@ def update_exp_issues_for_new_exp_version(
                         exp_versions_diff.deleted_state_names))
 
                 # Handle exp issues changes for renamed states.
-                exp_issues.unresolved_issues[i_idx], playthrough_ids_by_state_name = ( # pylint: disable=line-too-long
-                    _handle_exp_issues_after_state_rename(
-                        state_name, exp_issue,
-                        exp_versions_diff.old_to_new_state_names,
-                        playthrough_ids_by_state_name))
+                exp_issues.unresolved_issues[
+                    i_idx], playthrough_ids_by_state_name = (
+                        _handle_exp_issues_after_state_rename(
+                            state_name, exp_issue,
+                            exp_versions_diff.old_to_new_state_names,
+                            playthrough_ids_by_state_name))
         else:
             state_name = exp_issue.issue_customization_args[keyname]['value']
 
