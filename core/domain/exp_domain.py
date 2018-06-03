@@ -1805,7 +1805,7 @@ class Exploration(object):
         Args:
             exploration_id: str. The id of the exploration.
             title: str. The exploration title.
-            init_state_name: str. The new name of the initial state.
+            init_state_name: str. The name of the initial state.
             category: str. The category of the exploration.
             objective: str. The objective of the exploration.
             language_code: str. The language code of the exploration.
