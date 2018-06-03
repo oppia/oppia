@@ -24,7 +24,7 @@ describe('StateTopAnswerStatistics', function() {
       $injector.get('StateTopAnswerStatisticsFactory');
   }));
 
-  describe('constructor', function() {
+  describe('stale instances', function() {
     it('copies ordered frequency data of backend values', function() {
       var stateTopAnswerStatistics = new this.StateTopAnswerStatistics('Hola', [
         {answer: 'aloha', frequency: 5},
@@ -40,7 +40,7 @@ describe('StateTopAnswerStatistics', function() {
     });
   });
 
-  describe('updateIsAddressed', function() {
+  describe('fresh instances', function() {
     beforeEach(inject(function($injector) {
       this.$httpBackend = $injector.get('$httpBackend');
     }));
@@ -78,20 +78,22 @@ describe('StateTopAnswerStatistics', function() {
         });
     }));
 
-    it('should assign the correct values for addressed info', function() {
-      var stateTopAnswerStatistics = new this.StateTopAnswerStatistics('Hola', [
-        {answer: 'hola', frequency: 5},
-        {answer: 'adios', frequency: 3},
-        {answer: 'ni hao', frequency: 2},
-      ]);
+    describe('updateIsAddressed', function() {
+      it('makes isAddressed info fresh', function() {
+        var stateTopAnswerStatistics = new this.StateTopAnswerStatistics('Hola', [
+          {answer: 'hola', frequency: 5},
+          {answer: 'adios', frequency: 3},
+          {answer: 'ni hao', frequency: 2},
+        ]);
 
-      stateTopAnswerStatistics.updateIsAddressed();
+        stateTopAnswerStatistics.updateIsAddressed();
 
-      expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
-        jasmine.objectContaining({answer: 'hola', isAddressed: true}),
-        jasmine.objectContaining({answer: 'adios', isAddressed: false}),
-        jasmine.objectContaining({answer: 'ni hao', isAddressed: false}),
-      ]);
+        expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
+          jasmine.objectContaining({answer: 'hola', isAddressed: true}),
+          jasmine.objectContaining({answer: 'adios', isAddressed: false}),
+          jasmine.objectContaining({answer: 'ni hao', isAddressed: false}),
+        ]);
+      });
     });
   });
 });
