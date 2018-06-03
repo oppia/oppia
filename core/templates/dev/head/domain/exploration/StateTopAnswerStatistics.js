@@ -92,6 +92,9 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     };
 
     /**
+     * Prepares a new StateTopAnswerStatistics instance.
+     * Use this function to build new instances, *not* the constructor!
+     *
      * @param {string} stateName - Name of the state this new instance will be
      *     responsible for.
      * @param {{answer, frequency: number}[]} backendDict
@@ -99,7 +102,10 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      */
     StateTopAnswerStatistics.createFromBackendDict = function(
         stateName, backendArray) {
-      return new StateTopAnswerStatistics(stateName, backendArray);
+      stateTopAnswerStatistics =
+        new StateTopAnswerStatistics(stateName, backendArray);
+      stateTopAnswerStatistics.updateIsAddressed();
+      return stateTopAnswerStatistics;
     };
 
     return StateTopAnswerStatistics;
