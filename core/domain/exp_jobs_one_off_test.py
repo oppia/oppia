@@ -785,22 +785,25 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         content1_dict = {
-            'html': '''<blockquote><div><p>Hello, this <i>is</i> state1
-                </p> </div> </blockquote> <pre>I'm looking for a particular
-                <b>Hello Oppia</b> message</pre>. <p> Don't you want to
-                say hello? You can learn more about oppia
-                <oppia-noninteractive-link url-with-value="&amp;quot;
-                https://www.example.com&amp;quot;" text-with-value="&amp;quot;
-                here&amp;quot;"></oppia-noninteractive-link></p>''',
+            'html': (
+                '<blockquote><p>Hello, this <i>is</i> state1 '
+                '</p></blockquote><pre>I\'m looking for a particular '
+                '<b>Hello Oppia</b> message.</pre><p> Don\'t you want to '
+                'say hello? You can learn more about oppia '
+                '<oppia-noninteractive-link url-with-value="&amp;quot;'
+                'https://www.example.com&amp;quot;" text-with-value="&amp;quot;'
+                'here&amp;quot;"></oppia-noninteractive-link></p>'
+            ),
             'audio_translations': {}
         }
         content2_dict = {
-            'html': '''<pre>Hello, this is state2.</pre> <blockquote>
-                <ol> <li>item1</li> <li>item2</li> </ol> </blockquote>.<p>
-                You can see this equation <b> <oppia-noninteractive-math
-                raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;
-                quot;"></oppia-noninteractive-math></b></p>
-                ''',
+            'html': (
+                '<pre>Hello, this is state2.</pre><blockquote>'
+                '<ol><li>item1</li><li>item2</li></ol></blockquote><p>'
+                'You can see this equation <b><oppia-noninteractive-math'
+                'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;'
+                'quot;"></oppia-noninteractive-math></b></p>'
+            ),
             'audio_translations': {}
         }
         state1.update_content(content1_dict)
@@ -821,14 +824,15 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         default_outcome_dict = {
             'dest': 'State2',
             'feedback': {
-                'html': '''<p>Sorry, it doesn't look like your <span>program
-                </span>prints any output</p>.<blockquote><p> Could you get
-                it to print something?</p></blockquote> You can do this by
-                using a statement like prints. <br> You can ask any if you have
-                <oppia-noninteractive-link url-with-value="&amp;quot;
-                https://www.example.com&amp;quot;" text-with-value="
-                &amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.
-                ''',
+                'html': (
+                    '<p>Sorry, it doesn\'t look like your <span>program '
+                    '</span>prints output</p>.<blockquote><p> Could you get '
+                    'it to print something?</p></blockquote> Can do this by '
+                    'using statement like prints. <br> You can ask any if you '
+                    'have<oppia-noninteractive-link url-with-value="&amp;quot;'
+                    'https://www.example.com&amp;quot;" text-with-value="'
+                    '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
+                ),
                 'audio_translations': {}
             },
             'labelled_as_correct': False,
@@ -847,9 +851,19 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
             exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
 
         expected_output = [
-            u"[u'br', [u'[document]']]",
-            u"[u'invalidTags', [u'span']]",
-            u"[u'oppia-noninteractive-link', [u'[document]']]"
+            "[u'br', [u'[document]']]",
+            "[u'invalidTags', [u'span']]",
+            "[u'oppia-noninteractive-link', [u'[document]']]",
+            (
+                '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look '
+                'like your <span>program </span>prints output</p>.<blockquote>'
+                '<p> Could you get it to print something?</p></blockquote> '
+                'Can do this by using statement like prints. <br> You can '
+                'ask any if you have<oppia-noninteractive-link text-with-value'
+                '="&amp;quot;Here&amp;quot;" url-with-value="&amp;quot;'
+                'https://www.example.com&amp;quot;">'
+                '</oppia-noninteractive-link>.\']]'
+            )
         ]
 
         self.assertEqual(actual_output, expected_output)
