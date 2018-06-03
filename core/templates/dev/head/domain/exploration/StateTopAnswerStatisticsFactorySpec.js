@@ -27,14 +27,15 @@ describe('StateTopAnswerStatistics', function() {
   describe('constructor', function() {
     it('copies ordered frequency data of backend values', function() {
       var stateTopAnswerStatistics = new this.StateTopAnswerStatistics('Hola', [
-        {answer: 'aloha', frequency: 3},
-        {answer: '???', frequency: 2},
+        {answer: 'aloha', frequency: 5},
+        {answer: 'adios', frequency: 3},
+        {answer: 'ni hao', frequency: 2},
       ]);
 
       expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
+        jasmine.objectContaining({frequency: 5}),
         jasmine.objectContaining({frequency: 3}),
         jasmine.objectContaining({frequency: 2}),
-        jasmine.objectContaining({frequency: 1}),
       ]);
     });
   });
