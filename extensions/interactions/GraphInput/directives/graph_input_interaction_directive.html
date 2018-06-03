@@ -7,14 +7,14 @@
 
 <div class="graph-input-container">
   <graph-viz graph="graph"
-    can-add-vertex="canAddVertex"
-    can-delete-vertex="canDeleteVertex"
-    can-edit-vertex-label="canEditVertexLabel"
-    can-move-vertex="canMoveVertex"
-    can-add-edge="canAddEdge"
-    can-delete-edge="canDeleteEdge"
-    can-edit-edge-weight="canEditEdgeWeight"
-    interaction-is-active="interactionIsActive">
+             can-add-vertex="canAddVertex"
+             can-delete-vertex="canDeleteVertex"
+             can-edit-vertex-label="canEditVertexLabel"
+             can-move-vertex="canMoveVertex"
+             can-add-edge="canAddEdge"
+             can-delete-edge="canDeleteEdge"
+             can-edit-edge-weight="canEditEdgeWeight"
+             interaction-is-active="interactionIsActive">
   </graph-viz>
   <md-button class="md-raised" ng-click="resetGraph()" ng-disabled="!interactionIsActive" translate="I18N_INTERACTIONS_GRAPH_RESET_BUTTON"></md-button>
   <span ng-show="errorMessage" style="color: red; margin-left: 30px;" aria-live="assertive">
