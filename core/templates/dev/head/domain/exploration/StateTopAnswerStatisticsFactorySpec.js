@@ -20,11 +20,23 @@ describe('StateTopAnswerStatistics', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    this.StateTopAnswerStatisticsFactory =
+    this.StateTopAnswerStatistics =
       $injector.get('StateTopAnswerStatisticsFactory');
   }));
 
   describe('constructor', function() {
+    it('copies ordered frequency data of backend values', function() {
+      var stateTopAnswerStatistics = new StateTopAnswerStatistics('Hola', [
+        {answer: 'aloha', frequency: 3},
+        {answer: '???', frequency: 2},
+      ]);
+
+      expect(stateTopAnswerStatistics).toEqual([
+        jasmine.objectContaining({frequency: 3}),
+        jasmine.objectContaining({frequency: 2}),
+        jasmine.objectContaining({frequency: 1}),
+      ]);
+    });
   });
 
   describe('updateIsAddressed', function() {
