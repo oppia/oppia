@@ -160,6 +160,7 @@ class QuestionSummaryDomainTest(test_utils.GenericTestBase):
         observed_object = question_domain.QuestionSummary('abc', 'hello')
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
+
 class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
     """Test for Question Summary Domain object."""
 
@@ -170,5 +171,6 @@ class QuestionSkillLinkDomainTest(test_utils.GenericTestBase):
             'review_status': 0,
             'difficulty': 2
         }
-        observed_object = question_domain.QuestionSkillLink('testquestion', 'testskill', 0, 2)
+        observed_object = question_domain.QuestionSkillLink(
+            'testquestion', 'testskill', 0, 2)
         self.assertEqual(expected_object_dict, observed_object.to_dict())

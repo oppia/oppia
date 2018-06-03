@@ -254,13 +254,16 @@ class QuestionSummary(object):
             'question_title': self.question_title
         }
 
+
 class QuestionSkillLink(object):
     """Domain object for Question Skill Link.
 
     Attributes:
         question_id: str. The ID of the question.
-        skill_id: str. The ID of the skill to which the question is linked.
-        review_status: int. Status of the review: Pending(0)/Approved(1)/Rejected(-1)
+        skill_id: str. The ID of the skill to which the
+                  question is linked.
+        review_status: int. Status of the review:
+                       Pending(0)/Approved(1)/Rejected(-1)
         difficulty: int. Level of difficulty of the question.
     """
 
@@ -270,7 +273,8 @@ class QuestionSkillLink(object):
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
-            review_status: int. Status of the review: Pending(0)/Approved(1)/Rejected(-1)
+            review_status: int. Status of the review:
+                           Pending(0)/Approved(1)/Rejected(-1)
             difficulty: int. Level of difficulty of the question.
         """
         self.question_id = question_id
