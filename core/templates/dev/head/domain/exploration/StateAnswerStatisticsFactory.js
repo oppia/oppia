@@ -22,17 +22,36 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
       ExplorationContextService, ExplorationStatesService) {
+    /**
+     * @typedef {Object} AnswerStatistics
+     * @property {*} answerRaw - Contains the answer in raw form, directly from
+     *    the backend. Can be any type which encodes its specifics.
+     * @property {string} answerHtml - Contains the answer as a string which can
+     *    be rendered directly as HTML.
+     * @property {number} frequency
+     * @property {boolean} isAddressed
+     */
 
     /**
-     * @private @constructor
-     * @param {string} stateName
-     * @param {Array.<{answer, frequency: number}>} topAnswers
+     * @constructor
+     * @param {!string} stateName
+     * @param {!{answer: *, frequency: number}[]} backendTopAnswers
      */
-    var StateTopAnswerStatistics = function(stateName, topAnswers) {
-      /** @member {string} */
+    var StateTopAnswerStatistics = function(stateName, backendTopAnswers) {
+      /** @type {string} */
       this._stateName = stateName;
-      /** @member {Array.<{answer, frequency: number}>} */
-      this._answers = angular.copy(topAnswers);
+      /** @type {AnswerStatistics[]} */
+      this._answers = backendTopAnswers.map(function(answerFrequencyPair) {
+        return {
+          answerRaw: angular.copy(answerFrequencyPair.answer),
+          // TODO(brianrodri): Create a proper service to convert the raw
+          // answers into HTML, because JSON.stringify will not always print a
+          // "pretty" value.
+          answerHtml: JSON.stringify(answerFrequencyPair.answer),
+          frequency: answerFrequencyPair.frequency,
+          isAddressed: false,
+        };
+      });
 
       this.updateIsAddressed();
     };
@@ -44,34 +63,31 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
         AngularNameService.getNameOfInteractionRulesService(
           state.interaction.id);
 
-      this._isAddressed =
-        AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-          explorationId, this._stateName, state, this._answers,
-          interactionRulesService);
+      this._answers.forEach(function(answerStats) {
+        answerStats.isAddressed =
+          AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+            explorationId, state.name, state, answerStats.answerRaw,
+            interactionRulesService);
+      });
     };
 
-    /** @returns {*} */
-    StateTopAnswerStatistics.prototype.getAnswer = function() {
-      return angular.copy(this._answers);
+    StateTopAnswerStatistics.prototype.getAnswerStats = function() {
+      return this._answers.map(function(answerStats) {
+        return {
+          answer: answerStats.answerHtml,
+          frequency: answerStats.frequency,
+          isAddressed: answerStats.isAddressed
+        };
+      });
     };
 
-    /** @returns {number} */
-    StateTopAnswerStatistics.prototype.getFrequency = function() {
-      return this._frequency;
-    };
-
-    /** @returns {boolean} */
-    StateTopAnswerStatistics.prototype.isAddressed = function() {
-      return this._isAddressed;
-    };
-
-    /** @returns {{answer, frequency: number}} */
     StateTopAnswerStatistics.prototype.toBackendDict = function() {
-      return {
-        state_name: this._stateName,
-        answer: angular.copy(this._answer),
-        frequency: this._frequency,
-      };
+      return this._answers.map(function(answerStats) {
+        return {
+          answer: angular.copy(answerStats.answerRaw);
+          frequency: answerStats.frequency,
+        };
+      });
     };
 
     /**
@@ -84,5 +100,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
         stateName, backendArray) {
       return new StateTopAnswerStatistics(stateName, backendArray);
     };
+
+    return StateTopAnswerStatistics;
   }
 ]);
