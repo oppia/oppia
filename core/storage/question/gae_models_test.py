@@ -39,6 +39,7 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             question_data_schema_version)
         self.assertEqual(question_model.language_code, language_code)
 
+
 class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionModel class."""
 
@@ -47,12 +48,12 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
         skill_id = 'A Test Skill Id'
         review_status = 0
         difficulty = 1
-        question_skill_link_model = question_models.QuestionSkillLinkModel.create(
+        questionskilllink_model = question_models.QuestionSkillLinkModel.create(
             question_id, skill_id, review_status, difficulty)
 
-        self.assertEqual(question_skill_link_model.question_id, question_id)
-        self.assertEqual(question_skill_link_model.skill_id, skill_id)
+        self.assertEqual(questionskilllink_model.question_id, question_id)
+        self.assertEqual(questionskilllink_model.skill_id, skill_id)
         self.assertEqual(
-            question_skill_link_model.review_status,
+            questionskilllink_model.review_status,
             review_status)
-        self.assertEqual(question_skill_link_model.difficulty, difficulty)
+        self.assertEqual(questionskilllink_model.difficulty, difficulty)
