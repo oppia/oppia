@@ -24,8 +24,8 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       ExplorationContextService, ExplorationStatesService) {
     /**
      * @typedef {Object} AnswerStatistics
-     * @property {*} answerRaw - Contains the answer in its raw form, directly
-     *    from the backend.
+     * @property {*} answer - Contains the answer in its raw form, directly from
+     *    the backend.
      * @property {string} answerHtml - Contains the answer as a string which can
      *    be rendered directly as HTML.
      * @property {number} frequency
@@ -47,7 +47,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       /** @type {AnswerStatistics[]} */
       this._answers = backendTopAnswers.map(function(answerFrequencyPair) {
         return {
-          answerRaw: angular.copy(answerFrequencyPair.answer),
+          answer: angular.copy(answerFrequencyPair.answer),
           // TODO(brianrodri): Create a proper service to convert the raw
           // answers into HTML, because JSON.stringify will not always print a
           // "pretty" value.
@@ -68,7 +68,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       this._answers.forEach(function(answerStats) {
         answerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            explorationId, state.name, state, answerStats.answerRaw,
+            explorationId, state.name, state, answerStats.answer,
             interactionRulesService);
       });
     };
@@ -86,7 +86,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     StateTopAnswerStatistics.prototype.toBackendDict = function() {
       return this._answers.map(function(answerStats) {
         return {
-          answer: angular.copy(answerStats.answerRaw),
+          answer: angular.copy(answerStats.answer),
           frequency: answerStats.frequency,
         };
       });
