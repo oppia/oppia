@@ -78,18 +78,15 @@ describe('StateTopAnswerStatisticsFactory', function() {
           };
         });
     }));
-    beforeEach(function() {
-      this.backendDict = [
-        {answer: 'hola', frequency: 5},
-        {answer: 'adios', frequency: 3},
-        {answer: 'ni hao', frequency: 2},
-      ];
-    });
 
     describe('updateIsAddressed', function() {
       it('makes isAddressed info fresh', function() {
         var stateTopAnswerStatistics =
-          new this.StateTopAnswerStatisticsFactory('Hola', this.backendDict);
+          new this.StateTopAnswerStatisticsFactory('Hola', [
+            {answer: 'hola', frequency: 5},
+            {answer: 'adios', frequency: 3},
+            {answer: 'ni hao', frequency: 2},
+          ]);
 
         // Should be stale.
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
@@ -112,8 +109,11 @@ describe('StateTopAnswerStatisticsFactory', function() {
     describe('createFromBackendDict', function() {
       it('returns a fresh instance', function() {
         var stateTopAnswerStatistics =
-          this.StateTopAnswerStatisticsFactory.createFromBackendDict(
-            'Hola', this.backendDict);
+          this.StateTopAnswerStatisticsFactory.createFromBackendDict('Hola', [
+            {answer: 'hola', frequency: 5},
+            {answer: 'adios', frequency: 3},
+            {answer: 'ni hao', frequency: 2},
+          ]);
 
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
           jasmine.objectContaining({answer: 'hola', isAddressed: true}),
