@@ -835,13 +835,15 @@ class ResolveIssueHandler(EditorHandler):
         for issue in exp_issues.unresolved_issues:
             if issue.to_dict() == exp_issue_dict:
                 issue_to_remove = issue
-                exp_issues.unresolved_issues.remove(issue_to_remove)
                 break
 
         if not issue_to_remove:
             raise self.PageNotFoundException(
                 'Exploration issue does not exist in the list of issues for '
                 'the exploration with ID %s' % exp_id)
+
+        # Remove the issue from the unresolved issues list.
+        exp_issues.unresolved_issues.remove(issue_to_remove)
 
         # Update the exploration issues instance and delete the playthrough
         # instances.
