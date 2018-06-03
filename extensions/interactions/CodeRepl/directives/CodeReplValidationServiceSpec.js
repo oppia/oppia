@@ -37,7 +37,8 @@ describe('CodeReplValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      skill_id: null
     });
 
     customizationArguments = {

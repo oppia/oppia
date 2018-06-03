@@ -751,6 +751,7 @@ class Outcome(object):
             'param_changes': [
                 param_change.to_dict() for param_change in self.param_changes],
             'refresher_exploration_id': self.refresher_exploration_id,
+            'skill_id': self.skill_id
         }
 
     @classmethod
@@ -772,11 +773,12 @@ class Outcome(object):
                 param_change['customization_args'])
              for param_change in outcome_dict['param_changes']],
             outcome_dict['refresher_exploration_id'],
+            outcome_dict['skill_id']
         )
 
     def __init__(
             self, dest, feedback, labelled_as_correct, param_changes,
-            refresher_exploration_id):
+            refresher_exploration_id, skill_id):
         """Initializes a Outcome domain object.
 
         Args:
@@ -791,6 +793,8 @@ class Outcome(object):
                 to redirect the learner to if they seem to lack understanding
                 of a prerequisite concept. This should only exist if the
                 destination state for this outcome is a self-loop.
+            skill_id: str or None. The id of the skill that this answer group
+                tests and would redirect to when a user receives this outcome.
         """
         # Id of the destination state.
         # TODO(sll): Check that this state actually exists.
@@ -807,6 +811,9 @@ class Outcome(object):
         # understanding of a prerequisite concept. This should only exist if
         # the destination state for this outcome is a self-loop.
         self.refresher_exploration_id = refresher_exploration_id
+        # An optional skill id whose concept card would be shown to the learner
+        # when the learner receives this outcome.
+        self.skill_id = skill_id
 
     def validate(self):
         """Validates various properties of the Outcome.
@@ -820,6 +827,12 @@ class Outcome(object):
             raise utils.ValidationError(
                 'The "labelled_as_correct" field should be a boolean, received '
                 '%s' % self.labelled_as_correct)
+
+        if self.skill_id is not None:
+            if not isinstance(self.skill_id, basestring):
+                raise utils.ValidationError(
+                    'Expected outcome skill_id to be a string, received '
+                    '%s' % self.skill_id)
 
         if not isinstance(self.param_changes, list):
             raise utils.ValidationError(
@@ -853,7 +866,8 @@ class AnswerGroup(object):
             'rule_specs': [rule_spec.to_dict()
                            for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
-            'training_data': self.training_data
+            'training_data': self.training_data,
+            'tagged_misconception_id': self.tagged_misconception_id
         }
 
     @classmethod
@@ -870,10 +884,12 @@ class AnswerGroup(object):
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
-            answer_group_dict['training_data']
+            answer_group_dict['training_data'],
+            answer_group_dict['tagged_misconception_id']
         )
 
-    def __init__(self, outcome, rule_specs, training_data):
+    def __init__(
+            self, outcome, rule_specs, training_data, tagged_misconception_id):
         """Initializes a AnswerGroup domain object.
 
         Args:
@@ -881,6 +897,9 @@ class AnswerGroup(object):
             rule_specs: list(RuleSpec). List of rule specifications.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
+            tagged_misconception_id: str or None. The id of the tagged
+                misconception for the answer group, when a state is part of a
+                Question object in a Skill.
         """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
@@ -888,6 +907,7 @@ class AnswerGroup(object):
 
         self.outcome = outcome
         self.training_data = training_data
+        self.tagged_misconception_id = tagged_misconception_id
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -909,6 +929,12 @@ class AnswerGroup(object):
             raise utils.ValidationError(
                 'Expected answer group rules to be a list, received %s'
                 % self.rule_specs)
+
+        if self.tagged_misconception_id is not None:
+            if not isinstance(self.tagged_misconception_id, basestring):
+                raise utils.ValidationError(
+                    'Expected tagged misconception id to be a string, '
+                    'received %s' % self.tagged_misconception_id)
 
         if len(self.rule_specs) == 0 and len(self.training_data) == 0:
             raise utils.ValidationError(
@@ -1245,7 +1271,8 @@ class InteractionInstance(object):
         """
         default_outcome = Outcome(
             default_dest_state_name,
-            SubtitledHtml.create_default_subtitled_html(), False, {}, None)
+            SubtitledHtml.create_default_subtitled_html(), False, {}, None,
+            None)
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
@@ -1303,6 +1330,7 @@ class State(object):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
+            'skill_id': None
         },
         'confirmed_unclassified_answers': [],
         'hints': [],
@@ -1467,7 +1495,8 @@ class State(object):
 
             answer_group = AnswerGroup(
                 Outcome.from_dict(answer_group_dict['outcome']), [],
-                answer_group_dict['training_data'])
+                answer_group_dict['training_data'],
+                answer_group_dict['tagged_misconception_id'])
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
@@ -3245,6 +3274,32 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v19_dict_to_v20_dict(cls, states_dict):
+        """Converts from version 19 to 20. Version 20 adds
+        tagged_misconception field to answer groups and skill_id field to
+        outcomes.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['outcome']['skill_id'] = None
+                answer_group['tagged_misconception_id'] = None
+
+            default_outcome = state_dict['interaction']['default_outcome']
+            if default_outcome is not None:
+                default_outcome['skill_id'] = None
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3275,7 +3330,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 24
+    CURRENT_EXP_SCHEMA_VERSION = 25
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3736,6 +3791,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v24_dict_to_v25_dict(cls, exploration_dict):
+        """ Converts a v24 exploration dict into a v25 exploration dict.
+
+        Adds additional tagged_misconception_id and skill_id fields to answer
+        groups and outcomes respectively.
+        """
+        exploration_dict['schema_version'] = 25
+
+        exploration_dict['states'] = cls._convert_states_v19_dict_to_v20_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 20
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3886,6 +3956,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v23_dict_to_v24_dict(
                 exploration_dict)
             exploration_schema_version = 24
+
+        if exploration_schema_version == 24:
+            exploration_dict = cls._convert_v24_dict_to_v25_dict(
+                exploration_dict)
+            exploration_schema_version = 25
 
         return (exploration_dict, initial_schema_version)
 

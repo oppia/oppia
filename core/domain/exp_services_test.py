@@ -682,6 +682,7 @@ states:
           labelled_as_correct: false
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: InputString
@@ -700,6 +701,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
         - hint_content:
             html: hint one,
@@ -737,6 +739,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: null
       solution: null
@@ -892,6 +895,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: TextInput
       solution: null
@@ -917,6 +921,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: TextInput
       solution: null
@@ -964,6 +969,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: TextInput
       solution: null
@@ -989,6 +995,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: TextInput
       solution: null
@@ -1122,6 +1129,7 @@ interaction:
     labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
+    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1150,6 +1158,7 @@ interaction:
     labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
+    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1179,6 +1188,7 @@ interaction:
     labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
+    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1293,8 +1303,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'labelled_as_correct': False,
                 'param_changes': [],
                 'refresher_exploration_id': None,
+                'skill_id': None
             },
             'training_data': []
+            'tagged_misconception_id': None
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
@@ -1306,6 +1318,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
+            'skill_id': None
         }
 
     def test_add_state_cmd(self):
@@ -2572,6 +2585,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: Continue
       solution: null

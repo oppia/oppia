@@ -595,6 +595,7 @@ interaction:
     labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
+    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -620,6 +621,7 @@ interaction:
     labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
+    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -645,6 +647,7 @@ interaction:
     labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
+    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -672,6 +675,7 @@ interaction:
     labelled_as_correct: false
     param_changes: []
     refresher_exploration_id: null
+    skill_id: null
   hints: []
   id: TextInput
   solution: null

@@ -60,6 +60,7 @@ states:
           html: ''
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: Continue
       solution: null
@@ -83,6 +84,7 @@ states:
             html: <p>Nice!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: x
@@ -104,6 +106,7 @@ states:
           html: <p>Nice work.</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: CodeRepl
       solution: null
@@ -131,6 +134,7 @@ states:
             html: <p>I like cats too.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: cat
@@ -147,6 +151,7 @@ states:
             html: <p>I like dogs too.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: dog
@@ -168,6 +173,7 @@ states:
           html: <p>I'm not sure what that animal is.</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
       - hint_content:
           audio_translations:

@@ -206,6 +206,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: null
       solution: null
@@ -227,6 +228,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: null
       solution: null
@@ -265,6 +267,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       fallbacks: []
       id: null
     param_changes: []
@@ -282,6 +285,7 @@ states:
         labelled_as_correct: false
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       fallbacks: []
       id: null
     param_changes: []

@@ -40,7 +40,8 @@ describe('LogicProofValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      skill_id: null
     });
 
     badOutcome = oof.createFromBackendDict({
@@ -51,7 +52,8 @@ describe('LogicProofValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      skill_id: null
     });
 
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];

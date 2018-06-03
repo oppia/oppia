@@ -25,6 +25,7 @@ states:
             html: <p>Hello! Let's move onto another interaction.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: Hello Oppia
@@ -47,6 +48,7 @@ states:
             to say hello?</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: CodeRepl
       solution: null
@@ -69,6 +71,7 @@ states:
           html: <p>Moving onward!</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: Continue
       solution: null
@@ -104,6 +107,7 @@ states:
             html: <p>Yes, well done!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             f:
@@ -123,6 +127,7 @@ states:
           html: <p>No, that's not right. The answer is 2/5.</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: FractionInput
       solution: null
@@ -142,6 +147,7 @@ states:
             html: <p>Penta-penta-pentagon!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             g:
@@ -189,6 +195,7 @@ states:
             html: <p>That's a triangle. Your shape needs more sides.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             g:
@@ -224,6 +231,7 @@ states:
             html: <p>Your shape is missing one side!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             g:
@@ -305,6 +313,7 @@ states:
           html: <p>That's not quite a pentagon. Please try again!</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
       - hint_content:
           audio_translations: {}
@@ -327,6 +336,7 @@ states:
             html: <p>That's the class definition. Try again.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: classdef
@@ -339,6 +349,7 @@ states:
             html: <p>That's the class's docstring. Try again.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: docstring
@@ -352,6 +363,7 @@ states:
               Try again!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: instancefunc
@@ -365,6 +377,7 @@ states:
               anything. Try again!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: classfunc
@@ -378,6 +391,7 @@ states:
               new class object.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: ctor
@@ -438,6 +452,7 @@ states:
             \ are also functions themselves.</p>"
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
       - hint_content:
           audio_translations: {}
@@ -460,6 +475,7 @@ states:
             html: <p>That's right!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x:
@@ -474,6 +490,7 @@ states:
             html: <p>That's not a good option!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x:
@@ -487,6 +504,7 @@ states:
             html: <p>That's not all of the good options!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: []
@@ -509,6 +527,7 @@ states:
           html: <p>The two good options actually have the word 'good' in them.</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
       - hint_content:
           audio_translations: {}
@@ -531,6 +550,7 @@ states:
             html: <p>No, you want the one below this one.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x:
@@ -544,6 +564,7 @@ states:
             html: <p>Yes, good choice!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x:
@@ -557,6 +578,7 @@ states:
             html: <p>No, you want the choice above this one.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x:
@@ -580,6 +602,7 @@ states:
           html: ''
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: ItemSelectionInput
       solution: null
@@ -599,6 +622,7 @@ states:
             html: <p>You proved p!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs: {}
           rule_type: Correct
@@ -624,6 +648,7 @@ states:
           html: <p>Given p, we have p. Try again.</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: LogicProof
       solution: null
@@ -645,6 +670,7 @@ states:
             html: <p>That is the normal form of a line. Good job!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: ax+by+c=0
@@ -657,6 +683,7 @@ states:
             html: <p>That's slope-intercept form. A popular form!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: y=mx+b
@@ -669,6 +696,7 @@ states:
             html: <p>That's point-slope form! Great!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: y-y0=m(x-x0)
@@ -683,6 +711,7 @@ states:
             these can each be derived from each other.</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
       - hint_content:
           audio_translations: {}
@@ -719,6 +748,7 @@ states:
             html: <p>Nice choice!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: 1
@@ -731,6 +761,7 @@ states:
             html: <p>Hmm, not quite. Perhaps the right option is below this one.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: 0
@@ -743,6 +774,7 @@ states:
             html: <p>Hmm, not quite. Perhaps the answer is above this one.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: 2
@@ -761,6 +793,7 @@ states:
           html: ''
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
       - hint_content:
           audio_translations: {}
@@ -784,6 +817,7 @@ states:
             html: <p>You found the next C! Excellent.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x:
@@ -809,6 +843,7 @@ states:
           html: <p>That's not the next C. Try again?</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
       - hint_content:
           audio_translations: {}
@@ -832,6 +867,7 @@ states:
             html: <p>That number has more than one digit. Right!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: 9.0
@@ -845,6 +881,7 @@ states:
           html: <p>That's only one digit! Try again.</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: NumericInput
       solution: null
@@ -865,6 +902,7 @@ states:
             html: <p>Goodbye! Well, not quite. We still have a little more to explore.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: Bye Oppia
@@ -877,6 +915,7 @@ states:
             html: <p>Goodbye! Well, not quite. We still have a little more to explore.<br></p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: Goodbye Oppia
@@ -893,6 +932,7 @@ states:
             so much, together!</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints: []
       id: PencilCodeEditor
       solution: null
@@ -914,6 +954,7 @@ states:
               hard to use in rhyming devices.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x:
@@ -930,6 +971,7 @@ states:
           html: <p>Not quite.</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
       - hint_content:
           audio_translations: {}
@@ -959,6 +1001,7 @@ states:
             html: <p>Omnomnom.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             x: ate
@@ -976,6 +1019,7 @@ states:
           html: <p>The answer needs to contain "ate".</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
       - hint_content:
           audio_translations: {}
@@ -999,6 +1043,7 @@ states:
             html: <p>That's Washington, D.C., the capital of the United States.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             d: 100.0
@@ -1014,6 +1059,7 @@ states:
             html: <p>Ottawa, the capital of Canada!</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             d: 100.0
@@ -1029,6 +1075,7 @@ states:
             html: <p>Mexico City, Mexico. The capital of Mexico.</p>
           param_changes: []
           refresher_exploration_id: null
+          skill_id: null
         rule_specs:
         - inputs:
             d: 100.0
@@ -1051,6 +1098,7 @@ states:
           html: <p>Not quite. Try again!</p>
         param_changes: []
         refresher_exploration_id: null
+        skill_id: null
       hints:
       - hint_content:
           audio_translations: {}
