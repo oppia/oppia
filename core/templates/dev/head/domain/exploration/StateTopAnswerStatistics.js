@@ -34,6 +34,9 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
 
     /**
      * @private @constructor
+     * Should not be called directly (except for testing)!
+     * Use @link StateTopAnswerStatistics#createFromBackendDict instead.
+     *
      * @param {!string} stateName
      * @param {!{answer, frequency: number}[]} backendTopAnswers
      */
@@ -52,8 +55,6 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
           isAddressed: false,
         };
       });
-
-      this.updateIsAddressed();
     };
 
     StateTopAnswerStatistics.prototype.updateIsAddressed = function() {
