@@ -102,7 +102,7 @@ oppia.factory('StatesObjectFactory', [
         contentIdsList.forEach(function(contentId) {
           var audioLanguageCodes = (
             state.contentIdsToAudioTranslations.getAudioLanguageCodes(
-            contentId));
+              contentId));
           for (var languageCode in audioLanguageCodes) {
             if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
               allAudioLanguageCodes.push(languageCode);

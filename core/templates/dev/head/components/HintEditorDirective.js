@@ -63,8 +63,8 @@ oppia.directive('hintEditor', [
             var hintContentId = $scope.hint.hintContent.getContentId();
             $scope.hintMemento = null;
             if (stateContentIdsToAudioTranslationsService.displayed
-                .hasUnflaggedAudioTranslations(hintContentId) &&
-                contentHasChanged) {
+              .hasUnflaggedAudioTranslations(hintContentId) &&
+              contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
             $scope.getOnSaveFn()();

@@ -46,8 +46,8 @@ oppia.directive('stateContentEditor', [
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
+          $scope.stateContentService = stateContentService;
 
-          $scope.stateContentId = stateContentService.displayed.getContentId();
           $scope.stateContentIdsToAudioTranslationsService =
             stateContentIdsToAudioTranslationsService;
           $scope.contentEditorIsOpen = false;
@@ -70,7 +70,7 @@ oppia.directive('stateContentEditor', [
             }).result.then(function() {
               var contentId = stateContentService.displayed.getContentId();
               stateContentIdsToAudioTranslationsService.displayed
-              .markAllAudioAsNeedingUpdate(contentId);
+                .markAllAudioAsNeedingUpdate(contentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
             });
           };
@@ -100,7 +100,7 @@ oppia.directive('stateContentEditor', [
             var contentHasChanged = (
               savedContent.getHtml() !==
               stateContentService.displayed.getHtml());
-            if (stateContentIdsToAudioTranslationsService
+            if (stateContentIdsToAudioTranslationsService.displayed
               .hasUnflaggedAudioTranslations(savedContent.getContentId()) &&
               contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();

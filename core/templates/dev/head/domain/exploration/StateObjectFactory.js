@@ -18,7 +18,7 @@
  */
 
 oppia.factory('StateObjectFactory', [
-  'ContentIdsToAudioTranslationsObjectFactory','InteractionObjectFactory',
+  'ContentIdsToAudioTranslationsObjectFactory', 'InteractionObjectFactory',
   'SubtitledHtmlObjectFactory', 'ParamChangesObjectFactory', function(
       ContentIdsToAudioTranslationsObjectFactory, InteractionObjectFactory,
       SubtitledHtmlObjectFactory, ParamChangesObjectFactory) {
@@ -34,7 +34,6 @@ oppia.factory('StateObjectFactory', [
 
     // Instance methods.
     State.prototype.toBackendDict = function() {
-
       return {
         content: this.content.toBackendDict(),
         classifier_model_id: this.classifierModelId,

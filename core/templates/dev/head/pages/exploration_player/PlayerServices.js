@@ -360,7 +360,8 @@ oppia.factory('ExplorationPlayerService', [
         answerIsBeingProcessed = true;
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
-        var contentIdsToAudioTranslations = oldState.contentIdsToAudioTranslations;
+        var contentIdsToAudioTranslations =
+          oldState.contentIdsToAudioTranslations;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             _explorationId, oldStateName, oldState, answer,
@@ -395,7 +396,7 @@ oppia.factory('ExplorationPlayerService', [
         oldParams.answer = answer;
         var feedbackHtml =
           makeFeedback(outcome.feedback.getHtml(), [oldParams]);
-        var feedbackContentId = outcome.feedback.getContentId()
+        var feedbackContentId = outcome.feedback.getContentId();
         var feedbackAudioTranslations =
           contentIdsToAudioTranslations.getBindableAudioTranslations(
             feedbackContentId);

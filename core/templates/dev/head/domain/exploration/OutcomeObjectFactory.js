@@ -56,7 +56,7 @@ oppia.factory('OutcomeObjectFactory', [
     };
 
     Outcome.createNew = function(dest, feedbackText, feedbacktextId,
-         paramChanges) {
+        paramChanges) {
       return new Outcome(
         dest,
         SubtitledHtmlObjectFactory.createDefault(feedbackText),

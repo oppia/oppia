@@ -169,8 +169,8 @@ oppia.directive('outcomeEditor', [
               $scope.outcome.feedback);
             var feedbackContentId = $scope.savedOutcome.feedback.getContentId();
             if (stateContentIdsToAudioTranslationsService.displayed
-                .hasUnflaggedAudioTranslations(feedbackContentId) &&
-                fromClickSaveFeedbackButton && contentHasChanged) {
+              .hasUnflaggedAudioTranslations(feedbackContentId) &&
+              fromClickSaveFeedbackButton && contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
             $scope.getOnSaveFeedbackFn()($scope.savedOutcome);

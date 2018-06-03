@@ -121,18 +121,18 @@ oppia.factory('ExplorationObjectFactory', [
 
     Exploration.prototype.getAudioTranslations = function(stateName) {
       var state = this.getState(stateName);
-      var  contentIdsToAudioTranslations = state. contentIdsToAudioTranslations;
+      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
       var contentId = state.content.getContentId();
-      return  contentIdsToAudioTranslations.getBindableAudioTranslations(
+      return contentIdsToAudioTranslations.getBindableAudioTranslations(
         contentId);
     };
 
     Exploration.prototype.getAudioTranslation = function(
         stateName, languageCode) {
       var state = this.getState(stateName);
-      var  contentIdsToAudioTranslations = state. contentIdsToAudioTranslations;
+      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
       var contentId = state.content.getContentId();
-      return  contentIdsToAudioTranslations.getAudioTranslation(
+      return contentIdsToAudioTranslations.getAudioTranslation(
         contentId, languageCode);
     };
 

@@ -335,8 +335,7 @@ oppia.factory('ExplorationStatesService', [
         return content.toBackendDict();
       },
       content_ids_to_audio_translations: function(
-        contentIdsToAudioTranslations) {
-
+          contentIdsToAudioTranslations) {
         return contentIdsToAudioTranslations.toBackendDict();
       },
       default_outcome: function(defaultOutcome) {
@@ -562,7 +561,7 @@ oppia.factory('ExplorationStatesService', [
           stateName, 'content_ids_to_audio_translations');
       },
       saveContentIdsToAudioTranslations: function(
-        stateName, newContentIdsToAudioTranslations) {
+          stateName, newContentIdsToAudioTranslations) {
         saveStateProperty(
           stateName, 'content_ids_to_audio_translations',
           newContentIdsToAudioTranslations);

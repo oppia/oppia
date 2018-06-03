@@ -26,7 +26,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
     };
 
     ContentIdsToAudioTranslations.prototype.getAllContentId = function() {
-        return Object.keys(this._contentIdsToAudioTranslations);
+      return Object.keys(this._contentIdsToAudioTranslations);
     };
 
     ContentIdsToAudioTranslations.prototype.getBindableAudioTranslations = (
@@ -146,4 +146,3 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
     return ContentIdsToAudioTranslations;
   }
 ]);
-

@@ -21,8 +21,8 @@ oppia.factory('GenerateContentIdService', [
   'ExplorationStatesService', function(ExplorationStatesService) {
     var generateRandomString = function() {
       randomString = '';
-      while (randomStringlength != 6){
-        randomString = Math.random().toString(36).substring(2,8);
+      while (randomStringlength !== 6){
+        randomString = Math.random().toString(36).substring(2, 8);
       }
     };
     var _generateUniqueId = function() {

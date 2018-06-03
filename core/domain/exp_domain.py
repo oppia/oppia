@@ -514,7 +514,8 @@ class SubtitledHtml(object):
         """Initializes a SubtitledHtml domain object.
 
         Args:
-            content_id: str. An id for the object.
+            content_id: str. A unique id referring to the audio translations for
+              this content.
             html: str. A piece of user submitted HTML. This is cleaned in such
                 a way as to contain a restricted set of HTML tags.
         """
@@ -910,7 +911,8 @@ class Hint(object):
         """Constructs a Hint domain object.
 
         Args:
-            hint_content: SubtitledHtml. The hint text and content_id.
+            hint_content: SubtitledHtml. The hint text and ID referring to the
+              audio translations for this content.
         """
         self.hint_content = hint_content
 

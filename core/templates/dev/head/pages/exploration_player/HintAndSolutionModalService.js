@@ -74,7 +74,7 @@ oppia.factory('HintAndSolutionModalService', [
                   PlayerPositionService.getCurrentStateName());
               AudioTranslationManagerService.setSecondaryAudioTranslations(
                 contenIdsToAudioTranslations.getBindableAudioTranslations(
-                solutionContentId), solution.explanation.getHtml(),
+                  solutionContentId), solution.explanation.getHtml(),
                 COMPONENT_NAME_SOLUTION);
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               var interaction = ExplorationPlayerService.getInteraction(
