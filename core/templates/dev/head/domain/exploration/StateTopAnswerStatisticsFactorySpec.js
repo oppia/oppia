@@ -25,19 +25,21 @@ describe('StateTopAnswerStatisticsFactory', function() {
   }));
 
   describe('stale instances', function() {
-    it('copies ordered frequency data of backend values', function() {
-      var stateTopAnswerStatistics =
-        new this.StateTopAnswerStatisticsFactory('Hola', [
-          {answer: 'aloha', frequency: 5},
-          {answer: 'adios', frequency: 3},
-          {answer: 'ni hao', frequency: 2},
-        ]);
+    describe('constructor', function() {
+      it('copies ordered frequency data of backend values', function() {
+        var stateTopAnswerStatistics =
+          new this.StateTopAnswerStatisticsFactory('Hola', [
+            {answer: 'aloha', frequency: 5},
+            {answer: 'adios', frequency: 3},
+            {answer: 'ni hao', frequency: 2},
+          ]);
 
-      expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
-        jasmine.objectContaining({answer: 'aloha', frequency: 5}),
-        jasmine.objectContaining({answer: 'adios', frequency: 3}),
-        jasmine.objectContaining({answer: 'ni hao', frequency: 2}),
-      ]);
+        expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
+          jasmine.objectContaining({answer: 'aloha', frequency: 5}),
+          jasmine.objectContaining({answer: 'adios', frequency: 3}),
+          jasmine.objectContaining({answer: 'ni hao', frequency: 2}),
+        ]);
+      });
     });
   });
 
