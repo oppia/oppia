@@ -58,7 +58,9 @@ describe('StateTopAnswerStatisticsFactory', function() {
       // Only the 'Hola' state exists in this fake exploration.
       spyOn(ExplorationStatesService, 'getState').and.callFake(
         function(stateName) {
-          if (stateName !== 'Hola') throw Error(stateName + ' does not exist.');
+          if (stateName !== 'Hola') {
+            throw new Error(stateName + ' does not exist.');
+          }
           return {
             name: 'Hola',
             interaction: {
