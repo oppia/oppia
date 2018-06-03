@@ -23,14 +23,14 @@ import feconf
 import utils
 
 
-def _require_valid_id(id):
+def _require_valid_id(entity_id):
     """Checks whether the id received from the frontend is a valid one.
     """
-    if not isinstance(id, basestring):
+    if not isinstance(entity_id, basestring):
         raise base.BaseHandler.InvalidInputException(
-            Exception('The id should be a string.'))
+            Exception('All ids should be strings.'))
 
-    if len(id) != 12:
+    if len(entity_id) != 12:
         raise base.BaseHandler.InvalidInputException(
             Exception('The id given is invalid.'))
 

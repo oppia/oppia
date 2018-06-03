@@ -50,16 +50,18 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             # Check that non-admins cannot access the editor page.
             response = self.testapp.get(
-                '%s/%s/%s' % (feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
+                '%s/%s/%s' % (
+                    feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
+                    self.story_id))
             self.assertEqual(response.status_int, 302)
 
             # Check that admins can access and edit in the editor
             # page.
             self.login(self.ADMIN_EMAIL, is_super_admin=True)
             response = self.testapp.get(
-                '%s/%s/%s' % (feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
+                '%s/%s/%s' % (
+                    feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
+                    self.story_id))
             self.assertEqual(response.status_int, 200)
             self.logout()
 
@@ -97,8 +99,9 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
         self.login(self.ADMIN_EMAIL, is_super_admin=True)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
-                '%s/%s/%s' % (feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                self.story_id))
+                '%s/%s/%s' % (
+                    feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
+                    self.story_id))
             csrf_token = self.get_csrf_token_from_response(response)
 
             json_response = self.put_json(
