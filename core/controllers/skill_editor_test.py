@@ -14,7 +14,6 @@
 
 """Tests for the skill editor page."""
 
-from core.domain import story_services
 from core.domain import skill_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -61,7 +60,7 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (
-                    feconf.EDITABLE_SKILL_DATA_URL_PREFIX, self.skill_id))
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id))
             self.assertEqual(response.status_int, 302)
 
             # Check that admins can access the editable skill data.
@@ -69,7 +68,7 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
 
             json_response = self.get_json(
                 '%s/%s' % (
-                    feconf.EDITABLE_SKILL_DATA_URL_PREFIX, self.skill_id))
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id))
             self.assertEqual(self.skill_id, json_response['skill']['id'])
             self.logout()
 
@@ -93,7 +92,7 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
 
             json_response = self.put_json(
                 '%s/%s' % (
-                    feconf.EDITABLE_SKILL_DATA_URL_PREFIX, self.skill_id),
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
                 change_cmd, csrf_token=csrf_token)
             self.assertEqual(self.skill_id, json_response['skill']['id'])
             self.assertEqual(
@@ -103,7 +102,7 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             # Check that non-admins cannot edit a skill.
             json_response = self.put_json(
                 '%s/%s' % (
-                    feconf.EDITABLE_SKILL_DATA_URL_PREFIX, self.skill_id),
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
                 change_cmd, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=401)
             self.assertEqual(json_response['status_code'], 401)
@@ -114,12 +113,12 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             self.login(self.ADMIN_EMAIL, is_super_admin=True)
             response = self.testapp.delete(
                 '%s/%s' % (
-                    feconf.EDITABLE_SKILL_DATA_URL_PREFIX, self.skill_id))
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id))
             self.assertEqual(response.status_int, 200)
             self.logout()
 
             # Check that non-admins cannot delete a skill.
             response = self.testapp.delete(
                 '%s/%s' % (
-                    feconf.EDITABLE_SKILL_DATA_URL_PREFIX, self.skill_id))
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id))
             self.assertEqual(response.status_int, 302)

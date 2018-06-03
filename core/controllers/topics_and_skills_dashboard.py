@@ -75,8 +75,19 @@ class NewSkillHandler(base.BaseHandler):
     def post(self):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException()
+        description = self.payload.get('description')
+
+        if not isinstance(description, basestring):
+            raise self.InvalidInputException(
+                Exception('Description should be a string.'))
+
+        if description == '':
+            raise self.InvalidInputException(
+                Exception('Description field should not be empty'))
+
         new_skill_id = skill_services.get_new_skill_id()
-        skill = skill_domain.Skill.create_default_skill(new_skill_id)
+        skill = skill_domain.Skill.create_default_skill(
+            new_skill_id, description)
         skill_services.save_new_skill(self.user_id, skill)
 
         self.render_json({

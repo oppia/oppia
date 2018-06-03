@@ -51,16 +51,19 @@ class BaseTopicEditorControllerTest(test_utils.GenericTestBase):
 class NewStoryHandlerTest(BaseTopicEditorControllerTest):
 
     def test_story_creation(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
             json_response = self.post_json(
-                '%s' % feconf.NEW_STORY_URL, {'title': 'Story title'},
+                '%s/%s' % (feconf.NEW_STORY_URL, self.topic_id),
+                {'title': 'Story title'},
                 csrf_token=csrf_token)
+            topic = topic_services.get_topic_by_id(self.topic_id)
             story_id = json_response['storyId']
             self.assertEqual(len(story_id), 12)
+            self.assertEqual(topic.canonical_story_ids, [story_id])
             self.assertIsNotNone(
                 story_services.get_story_by_id(story_id, strict=False))
         self.logout()
@@ -68,10 +71,98 @@ class NewStoryHandlerTest(BaseTopicEditorControllerTest):
 
 class TopicEditorTest(BaseTopicEditorControllerTest):
 
+    def test_access_topic_editor_page(self):
+        """Test access to editor pages for the sample topic."""
+
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            # Check that non-admin and topic_manager cannot access the editor
+            # page.
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            self.assertEqual(response.status_int, 302)
+
+            # Check that topic admins can access and edit in the editor
+            # page.
+            self.login(self.ADMIN_EMAIL)
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            self.assertEqual(response.status_int, 200)
+            self.logout()
+
+    def test_editable_topic_handler_get(self):
+        # Check that non-admins cannot access the editable topic data.
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
+            self.assertEqual(response.status_int, 302)
+
+            # Check that admins can access the editable topic data.
+            self.login(self.ADMIN_EMAIL)
+
+            json_response = self.get_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
+            self.assertEqual(self.topic_id, json_response['topic']['id'])
+            self.logout()
+
+    def test_editable_topic_handler_put(self):
+        # Check that admins can edit a topic.
+        change_cmd = {
+            'version': 1,
+            'commit_message': 'changed name',
+            'change_dicts': [{
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 'A new name'
+            }]
+        }
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                change_cmd, csrf_token=csrf_token)
+            self.assertEqual(self.topic_id, json_response['topic']['id'])
+            self.assertEqual('A new name', json_response['topic']['name'])
+            self.logout()
+
+            # Check that non-admins cannot edit a topic.
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                change_cmd, csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=401)
+            self.assertEqual(json_response['status_code'], 401)
+
+    def test_editable_topic_handler_delete(self):
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            # Check that admins can delete a topic.
+            self.login(self.ADMIN_EMAIL)
+            response = self.testapp.delete(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
+            self.assertEqual(response.status_int, 200)
+            self.logout()
+
+            # Check that non-admins cannot delete a topic.
+            response = self.testapp.delete(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
+            self.assertEqual(response.status_int, 302)
+
+
+class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
+
     def test_assign_topic_manager_role(self):
         """Test the assign topic manager role for a topic functionality.
         """
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
@@ -106,88 +197,3 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
                 {}, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=401)
             self.assertEqual(json_response['status_code'], 401)
-
-    def test_access_topic_editor_page(self):
-        """Test access to editor pages for the sample topic."""
-
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-            # Check that non-admin and topic_manager cannot access the editor
-            # page.
-            response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 302)
-
-            # Check that topic admins can access and edit in the editor
-            # page.
-            self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 200)
-            self.logout()
-
-    def test_editable_topic_handler_get(self):
-        # Check that non-admins cannot access the editable topic data.
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(
-                '%s/%s' % (
-                    feconf.EDITABLE_TOPIC_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 302)
-
-            # Check that admins can access the editable topic data.
-            self.login(self.ADMIN_EMAIL)
-
-            json_response = self.get_json(
-                '%s/%s' % (
-                    feconf.EDITABLE_TOPIC_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(self.topic_id, json_response['topic']['id'])
-            self.logout()
-
-    def test_editable_topic_handler_put(self):
-        # Check that admins can edit a topic.
-        change_cmd = {
-            'version': 1,
-            'commit_message': 'changed name',
-            'change_dicts': [{
-                'cmd': 'update_topic_property',
-                'property_name': 'name',
-                'old_value': '',
-                'new_value': 'A new name'
-            }]
-        }
-        self.login(self.ADMIN_EMAIL)
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-            response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            csrf_token = self.get_csrf_token_from_response(response)
-
-            json_response = self.put_json(
-                '%s/%s' % (
-                    feconf.EDITABLE_TOPIC_DATA_URL_PREFIX, self.topic_id),
-                change_cmd, csrf_token=csrf_token)
-            self.assertEqual(self.topic_id, json_response['topic']['id'])
-            self.assertEqual('A new name', json_response['topic']['name'])
-            self.logout()
-
-            # Check that non-admins cannot edit a topic.
-            json_response = self.put_json(
-                '%s/%s' % (
-                    feconf.EDITABLE_TOPIC_DATA_URL_PREFIX, self.topic_id),
-                change_cmd, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=401)
-            self.assertEqual(json_response['status_code'], 401)
-
-    def test_editable_topic_handler_delete(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-            # Check that admins can delete a topic.
-            self.login(self.ADMIN_EMAIL)
-            response = self.testapp.delete(
-                '%s/%s' % (
-                    feconf.EDITABLE_TOPIC_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 200)
-            self.logout()
-
-            # Check that non-admins cannot delete a topic.
-            response = self.testapp.delete(
-                '%s/%s' % (
-                    feconf.EDITABLE_TOPIC_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 302)

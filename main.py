@@ -214,7 +214,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
-        r'%s' % feconf.NEW_STORY_URL, topic_editor.NewStoryHandler),
+        r'%s/<topic_id>' % feconf.NEW_STORY_URL, topic_editor.NewStoryHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),
@@ -467,7 +467,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
         collection_editor.CollectionEditorPage),
     get_redirect_route(
-        r'%s/<collection_id>' % feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
         collection_editor.EditableCollectionDataHandler),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
@@ -490,7 +490,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,
         topic_editor.TopicEditorPage),
     get_redirect_route(
-        r'%s/<topic_id>' % feconf.EDITABLE_TOPIC_DATA_URL_PREFIX,
+        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableTopicDataHandler),
     get_redirect_route(
         r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_PREFIX,
@@ -500,7 +500,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),
     get_redirect_route(
-        r'%s/<skill_id>' % feconf.EDITABLE_SKILL_DATA_URL_PREFIX,
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),

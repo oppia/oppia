@@ -416,20 +416,22 @@ class Skill(object):
         }
 
     @classmethod
-    def create_default_skill(cls, skill_id):
+    def create_default_skill(
+            cls, skill_id, description=feconf.DEFAULT_SKILL_DESCRIPTION):
         """Returns a skill domain object with default values. This is for
         the frontend where a default blank skill would be shown to the user
         when the skill is created for the first time.
 
         Args:
             skill_id: str. The unique id of the skill.
+            description: str. The initial description for the skill.
 
         Returns:
             Skill. The Skill domain object with the default values.
         """
         skill_contents = SkillContents(feconf.DEFAULT_SKILL_EXPLANATION, [])
         return cls(
-            skill_id, feconf.DEFAULT_SKILL_DESCRIPTION, [], skill_contents,
+            skill_id, description, [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)

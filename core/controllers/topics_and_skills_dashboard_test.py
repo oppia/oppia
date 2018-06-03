@@ -59,7 +59,8 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
             csrf_token = self.get_csrf_token_from_response(response)
 
             json_response = self.post_json(
-                '%s' % feconf.NEW_SKILL_URL, {}, csrf_token=csrf_token)
+                '%s' % feconf.NEW_SKILL_URL,
+                {'description': 'Skill Description'}, csrf_token=csrf_token)
             skill_id = json_response['skillId']
             self.assertEqual(len(skill_id), 12)
             self.assertIsNotNone(

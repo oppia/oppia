@@ -21,6 +21,7 @@ from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import topic_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -827,3 +828,63 @@ def can_edit_topic(handler):
     test_can_edit.__wrapped__ = True
 
     return test_can_edit
+
+
+def can_add_new_story_to_topic(handler):
+    """Decorator to check whether the user can add a story to a given topic."""
+    def test_can_add_story(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to add a story to this topic.')
+    test_can_add_story.__wrapped__ = True
+
+    return test_can_add_story
+
+
+def can_delete_topic(handler):
+    """Decorator to check whether the user can delete a topic."""
+
+    def test_can_delete_topic(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to delete the'
+                ' topic.' % self.user_id)
+    test_can_delete_topic.__wrapped__ = True
+
+    return test_can_delete_topic
+
+
+def can_manage_rights_for_topic(handler):
+    """Decorator to check whether the user can manage a topic's rights."""
+
+    def test_can_manage_topic_rights(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to delete the '
+                'topic.' % self.user_id)
+    test_can_manage_topic_rights.__wrapped__ = True
+
+    return test_can_manage_topic_rights

@@ -42,18 +42,22 @@ def _require_valid_topic_id(topic_id):
 class NewStoryHandler(base.BaseHandler):
     """Creates a new story."""
 
-    @acl_decorators.can_access_admin_page
-    def post(self):
+    @acl_decorators.can_add_new_story_to_topic
+    def post(self, topic_id):
         """Handles POST requests."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException()
-
+        _require_valid_topic_id(topic_id)
         title = self.payload.get('title')
+
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise self.PageNotFoundException(
+                Exception('The topic with the given id doesn\'t exist.'))
 
         if not isinstance(title, basestring):
             raise self.InvalidInputException(
                 Exception('Title should be a string.'))
-
         if title == '':
             raise self.InvalidInputException(
                 Exception('Title field should not be empty'))
@@ -63,6 +67,17 @@ class NewStoryHandler(base.BaseHandler):
             new_story_id, title=title)
         story_services.save_new_story(self.user_id, story)
 
+        canonical_story_ids = topic.canonical_story_ids
+        canonical_story_ids.append(new_story_id)
+        change_list = [topic_domain.TopicChange({
+            'cmd': 'update_topic_property',
+            'property_name': 'canonical_story_ids',
+            'old_value': topic.canonical_story_ids,
+            'new_value': canonical_story_ids
+        })]
+        topic_services.update_topic(
+            self.user_id, topic_id, change_list,
+            'Added %s to canonical story ids' % new_story_id)
         self.render_json({
             'storyId': new_story_id
         })
@@ -165,22 +180,24 @@ class EditableTopicDataHandler(base.BaseHandler):
 
         self.render_json(self.values)
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_delete_topic
     def delete(self, topic_id):
         """Handles Delete requests."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException()
 
         _require_valid_topic_id(topic_id)
-        if not topic_id:
-            raise self.PageNotFoundException
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None:
+            raise self.PageNotFoundException(
+                Exception('The topic with the given id doesn\'t exist.'))
         topic_services.delete_topic(self.user_id, topic_id)
 
 
 class TopicManagerRightsHandler(base.BaseHandler):
     """A handler for assigning topic manager rights."""
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_manage_rights_for_topic
     def put(self, topic_id, assignee_id):
         """Assign topic manager role to a user for a particular topic, if the
         user has general topic manager rights.
