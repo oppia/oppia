@@ -516,29 +516,16 @@ def save_skill_summary(skill_summary):
     skill_summary_model.put()
 
 
-def get_model_id(user_id, skill_id):
-    """Returns modal id corresponding to user and skill.
-
-    Args:
-        user_id: str. The user id of the logged in user.
-        skill_id: str. The unique id of the skill.
-
-    Returns:
-        str. The modal id corresponding to user and skill.
-    """
-    return user_id + '-' + skill_id
-
-
 def create_skill_mastery(user_id, skill_id, degree_of_mastery):
     """Creates and stores skill mastery of a user.
 
     Args:
         user_id: str. The user id of the logged in user.
         skill_id: str. The unique id of the skill.
-        degree_of_mastery: float. The language code of the skill.
+        degree_of_mastery: float. The degree of mastery of user in the skill.
     """
     skill_mastery_model = skill_models.SkillsMasteryModel(
-        id=get_model_id(user_id, skill_id),
+        id=skill_domain.SkillsMastery.get_model_id(user_id, skill_id),
         user_id=user_id,
         skill_id=skill_id,
         degree_of_mastery=degree_of_mastery
@@ -560,7 +547,8 @@ def get_skill_mastery(user_id, skill_id):
             skill.
     """
     degree_of_mastery = skill_models.SkillsMasteryModel.get(
-        get_model_id(user_id, skill_id)).degree_of_mastery
+        skill_domain.SkillsMastery.get_model_id(
+            user_id, skill_id)).degree_of_mastery
 
     return degree_of_mastery
 
@@ -582,7 +570,8 @@ def get_multi_skill_mastery(user_id, skill_ids):
     model_ids = []
 
     for skill_id in skill_ids:
-        model_ids.append(get_model_id(user_id, skill_id))
+        model_ids.append(
+            skill_domain.SkillsMastery.get_model_id(user_id, skill_id))
 
     skills_summary = skill_models.SkillsMasteryModel.get_multi(model_ids)
     for skill_summary in skills_summary:
