@@ -80,11 +80,12 @@ describe('StateTopAnswerStatistics', function() {
 
     describe('updateIsAddressed', function() {
       it('makes isAddressed info fresh', function() {
-        var stateTopAnswerStatistics = new this.StateTopAnswerStatistics('Hola', [
-          {answer: 'hola', frequency: 5},
-          {answer: 'adios', frequency: 3},
-          {answer: 'ni hao', frequency: 2},
-        ]);
+        var stateTopAnswerStatistics =
+          new this.StateTopAnswerStatistics('Hola', [
+            {answer: 'hola', frequency: 5},
+            {answer: 'adios', frequency: 3},
+            {answer: 'ni hao', frequency: 2},
+          ]);
 
         stateTopAnswerStatistics.updateIsAddressed();
 
