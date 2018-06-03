@@ -36,7 +36,6 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     /**
      * TODO(brianrodri): Create a proper service for this which takes
      * interactions into account.
-     *
      * @param {*} answer
      * @returns {string}
      */
@@ -98,8 +97,8 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     /**
      * Prepares a fresh new StateTopAnswerStatistics instance from backend data.
      *
-     * This should be the prefered way to create new instances because it
-     * ensures the data is fresh.
+     * This is the prefered way to create new instances because it ensures the
+     * data is fresh.
      *
      * @param {string} stateName - Name of the state this new instance will be
      *     responsible for.
