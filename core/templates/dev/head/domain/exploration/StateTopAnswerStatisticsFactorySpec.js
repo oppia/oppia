@@ -33,9 +33,9 @@ describe('StateTopAnswerStatistics', function() {
       ]);
 
       expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
-        jasmine.objectContaining({frequency: 5}),
-        jasmine.objectContaining({frequency: 3}),
-        jasmine.objectContaining({frequency: 2}),
+        jasmine.objectContaining({answer: 'aloha', frequency: 5}),
+        jasmine.objectContaining({answer: 'adios', frequency: 3}),
+        jasmine.objectContaining({answer: 'ni hao', frequency: 2}),
       ]);
     });
   });
