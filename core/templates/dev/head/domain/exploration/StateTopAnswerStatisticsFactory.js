@@ -94,16 +94,6 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       });
     };
 
-    /** Encodes a state's answers back into the backend form. */
-    StateTopAnswerStatistics.prototype.toBackendDict = function() {
-      return this._answers.map(function(answerStats) {
-        return {
-          answer: angular.copy(answerStats.answer),
-          frequency: answerStats.frequency,
-        };
-      });
-    };
-
     /**
      * Prepares a fresh new StateTopAnswerStatistics instance from backend data.
      *
