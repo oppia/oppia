@@ -300,11 +300,12 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _lint_css_files(stylelint_path, files_to_lint, stdout, result):
+def _lint_css_files(stylelint_path, config_path, files_to_lint, stdout, result):
     """Prints a list of lint errors in the given list of CSS files.
 
     Args:
         stylelint_path: str. Path to the Stylelint binary.
+        config_path: str. Path to the configuration file.
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store Stylelint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
@@ -319,7 +320,8 @@ def _lint_css_files(stylelint_path, files_to_lint, stdout, result):
         return
 
     print 'Total css files: ', num_css_files
-    stylelint_cmd_args = [stylelint_path]
+    stylelint_cmd_args = [
+        stylelint_path, '--config=' + config_path]
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
@@ -569,62 +571,83 @@ def _pre_commit_linter(all_files):
         parent_dir, 'node_modules', 'eslint', 'bin', 'eslint.js')
     stylelint_path = os.path.join(
         parent_dir, 'node_modules', 'stylelint', 'bin', 'stylelint.js')
+    config_path_for_css_in_html = os.path.join(
+        parent_dir, 'oppia', '.stylelintrc')
+    config_path_for_oppia_css = os.path.join(
+        parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
+        'css', '.stylelintrc')
     if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
         print ''
         print 'ERROR    Please run start.sh first to install node-eslint '
         print '         or node-stylelint and its dependencies.'
         sys.exit(1)
 
-    js_files_to_lint = [
-        filename for filename in all_files if filename.endswith('.js')]
-    py_files_to_lint = [
-        filename for filename in all_files if filename.endswith('.py')]
+    #js_files_to_lint = [
+    #    filename for filename in all_files if filename.endswith('.js')]
+    #py_files_to_lint = [
+    #    filename for filename in all_files if filename.endswith('.py')]
     # TODO(apb7): Enable CSS lint.
-    css_files_to_lint = [
+    html_files_to_lint_for_css = [
         filename for filename in all_files if filename.endswith('.html')]
+    css_files_to_lint = [
+        filename for filename in all_files if filename.endswith('oppia.css')]
+
+    css_in_html_result = multiprocessing.Queue()
+    css_in_html_stdout = multiprocessing.Queue()
+    css_in_html_linting_process = multiprocessing.Process(
+        target=_lint_css_files, args=(
+            stylelint_path,
+            config_path_for_css_in_html,
+            html_files_to_lint_for_css, css_in_html_stdout,
+            css_in_html_result))
 
     css_result = multiprocessing.Queue()
     css_stdout = multiprocessing.Queue()
     css_linting_process = multiprocessing.Process(
         target=_lint_css_files, args=(
-            stylelint_path, css_files_to_lint,
-            css_stdout, css_result))
+            stylelint_path,
+            config_path_for_oppia_css,
+            css_files_to_lint, css_stdout,
+            css_result))
 
-    js_result = multiprocessing.Queue()
-    js_stdout = multiprocessing.Queue()
-    js_linting_process = multiprocessing.Process(
-        target=_lint_js_files, args=(
-            node_path, eslint_path, js_files_to_lint,
-            js_stdout, js_result))
+    #js_result = multiprocessing.Queue()
+    #js_stdout = multiprocessing.Queue()
+    #js_linting_process = multiprocessing.Process(
+    #    target=_lint_js_files, args=(
+    #        node_path, eslint_path, js_files_to_lint,
+    #        js_stdout, js_result))
 
-    py_result = multiprocessing.Queue()
-    py_linting_process = multiprocessing.Process(
-        target=_lint_py_files,
-        args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result))
+    #py_result = multiprocessing.Queue()
+    #py_linting_process = multiprocessing.Process(
+    #    target=_lint_py_files,
+    #    args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result))
     print 'Starting CSS, Javascript and Python Linting'
     print '----------------------------------------'
+    css_in_html_linting_process.start()
     css_linting_process.start()
-    js_linting_process.start()
-    py_linting_process.start()
+    #js_linting_process.start()
+    #py_linting_process.start()
 
 
     # Require timeout parameter to prevent against endless waiting for the
     # CSS, JS and Python linting functions to return.
-    css_linting_process.join(timeout=600)
-    js_linting_process.join(timeout=600)
-    py_linting_process.join(timeout=600)
+    css_in_html_linting_process.join(timeout=50)
+    css_linting_process.join(timeout=50)
+    #js_linting_process.join(timeout=600)
+    #py_linting_process.join(timeout=600)
 
-    js_messages = []
-    while not js_stdout.empty():
-        js_messages.append(js_stdout.get())
+    #js_messages = []
+    #while not js_stdout.empty():
+    #    js_messages.append(js_stdout.get())
 
     print ''
-    print '\n'.join(js_messages)
+    #print '\n'.join(js_messages)
     print '----------------------------------------'
     summary_messages = []
-    # summary_messages.append(css_result.get())
-    summary_messages.append(js_result.get())
-    summary_messages.append(py_result.get())
+    summary_messages.append(css_in_html_result.get())
+    summary_messages.append(css_result.get())
+    #summary_messages.append(js_result.get())
+    #summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
     print ''
     return summary_messages
@@ -1251,15 +1274,24 @@ def main():
     all_files = _get_all_files()
     # TODO(apb7): Enable the _check_directive_scope function.
     directive_scope_messages = []
-    html_directive_name_messages = _check_html_directive_name(all_files)
-    import_order_messages = _check_import_order(all_files)
-    newline_messages = _check_newline_character(all_files)
-    docstring_messages = _check_docstrings(all_files)
-    comment_messages = _check_comments(all_files)
-    html_indent_messages = _check_html_indent(all_files)
-    html_linter_messages = _lint_html_files(all_files)
+    #html_directive_name_messages = _check_html_directive_name(all_files)
+    #import_order_messages = _check_import_order(all_files)
+    #newline_messages = _check_newline_character(all_files)
+    #docstring_messages = _check_docstrings(all_files)
+    #comment_messages = _check_comments(all_files)
+    #html_indent_messages = _check_html_indent(all_files)
+    #html_linter_messages = _lint_html_files(all_files)
+    #linter_messages = _pre_commit_linter(all_files)
+    #pattern_messages = _check_bad_patterns(all_files)
+    html_directive_name_messages = []
+    import_order_messages = []
+    newline_messages = []
+    docstring_messages = []
+    comment_messages = []
+    html_indent_messages = []
+    html_linter_messages = []
     linter_messages = _pre_commit_linter(all_files)
-    pattern_messages = _check_bad_patterns(all_files)
+    pattern_messages = []
     all_messages = (
         directive_scope_messages + html_directive_name_messages +
         import_order_messages + newline_messages +

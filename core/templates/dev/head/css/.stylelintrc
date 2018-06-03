@@ -1,9 +1,7 @@
 { 
   "extends": "stylelint-config-recommended",
-  "processors": ["@mapbox/stylelint-processor-arbitrary-tags"],
   "rules": {
     "no-duplicate-selectors": true,
-    "no-empty-source": null,
     "selector-type-no-unknown": [
       true,
       {
