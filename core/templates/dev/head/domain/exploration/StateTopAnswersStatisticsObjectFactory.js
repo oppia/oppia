@@ -43,7 +43,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      */
     var convertAnswerToHtml = function(answer) {
       // Don't render quotes when the answer is a string.
-      return (typeof answer === 'string') ? answer : JSON.stringify(answer);
+      return (typeof answer === 'string') ? answer : angular.toJson(answer);
     };
 
     /**
