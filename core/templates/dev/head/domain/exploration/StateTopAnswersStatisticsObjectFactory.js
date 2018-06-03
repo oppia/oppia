@@ -29,8 +29,8 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      *
      * @property {*} answer - Contains the answer in its raw form, directly from
      *    the backend.
-     * @property {string} answerAsHtml - Contains the answer as a string which
-     *    can be rendered directly as HTML.
+     * @property {string} answerHtml - Contains the answer as a string which can
+     *    be rendered directly as HTML.
      * @property {number} frequency
      * @property {boolean} isAddressed
      */
@@ -62,7 +62,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       this._answers = backendTopAnswers.map(function(answerFrequencyPair) {
         return {
           answer: angular.copy(answerFrequencyPair.answer),
-          answerAsHtml: convertAnswerToHtml(answerFrequencyPair.answer),
+          answerHtml: convertAnswerToHtml(answerFrequencyPair.answer),
           frequency: answerFrequencyPair.frequency,
           isAddressed: false, // stale, needs to be updated.
         };
@@ -89,7 +89,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     StateTopAnswerStatistics.prototype.getAnswerStats = function() {
       return this._answers.map(function(answerStats) {
         return {
-          answer: answerStats.answerAsHtml,
+          answer: answerStats.answerHtml,
           frequency: answerStats.frequency,
           isAddressed: answerStats.isAddressed,
         };
