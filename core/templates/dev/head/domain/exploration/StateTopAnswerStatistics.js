@@ -24,8 +24,8 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       ExplorationContextService, ExplorationStatesService) {
     /**
      * @typedef {Object} AnswerStatistics
-     * @property {*} answerRaw - Contains the answer in raw form, directly from
-     *    the backend. Can be any type which encodes its specifics.
+     * @property {*} answerRaw - Contains the answer in its raw form, directly
+     *    from the backend.
      * @property {string} answerHtml - Contains the answer as a string which can
      *    be rendered directly as HTML.
      * @property {number} frequency
