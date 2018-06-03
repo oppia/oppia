@@ -26,8 +26,8 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      * @typedef {Object} AnswerStatistics
      * @property {*} answer - Contains the answer in its raw form, directly from
      *    the backend.
-     * @property {string} answerHtml - Contains the answer as a string which can
-     *    be rendered directly as HTML.
+     * @property {string} answerAsHtml - Contains the answer as a string which
+     *    can be rendered directly as HTML.
      * @property {number} frequency
      * @property {boolean} isAddressed
      */
@@ -51,7 +51,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
           // TODO(brianrodri): Create a proper service to convert the raw
           // answers into HTML, because JSON.stringify will not always print a
           // "pretty" value.
-          answerHtml: JSON.stringify(answerFrequencyPair.answer),
+          answerAsHtml: JSON.stringify(answerFrequencyPair.answer),
           frequency: answerFrequencyPair.frequency,
           isAddressed: false,
         };
@@ -76,7 +76,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     StateTopAnswerStatistics.prototype.getAnswerStats = function() {
       return this._answers.map(function(answerStats) {
         return {
-          answer: answerStats.answerHtml,
+          answer: answerStats.answerAsHtml,
           frequency: answerStats.frequency,
           isAddressed: answerStats.isAddressed,
         };
