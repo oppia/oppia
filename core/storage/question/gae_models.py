@@ -103,3 +103,42 @@ class QuestionModel(base_models.VersionedModel):
             language_code=language_code)
 
         return question_model_instance
+
+class QuestionSkillLinkModel(base_models.VersionedModel):
+    """Model for storing Question-Skill Links.
+
+    The ID of instances of this class has the form
+    {{random_hash_of_16_chars}}
+    """
+    ALLOW_REVERT = True
+
+    # The ID of the question.
+    question_id = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the skill to which the question is linked.
+    skill_id = ndb.StringProperty(required=True, indexed=True)
+    # Status of the review: Pending(0)/Approved(1)/Rejected(-1)
+    review_status = ndb.IntegerProperty(required=True,choices=[-1,0,1])
+    # Level of difficulty of the question.
+    difficulty = ndb.IntegerProperty(required=False)
+
+    @classmethod
+    def create(
+            cls, question_id, skill_id, review_status, difficulty):
+        """Creates a new QuestionSkillLinkModel entry.
+
+        Args:
+            question_id: str. The ID of the question.
+            skill_id: str. The ID of the skill to which the question is linked.
+            review_status: int. Status of the review: Pending(0)/Approved(1)/Rejected(-1)
+            difficulty: int. Level of difficulty of the question.
+
+        Returns:
+            QuestionSkillLinkModel. Instance of the new QuestionSkillLinkModel entry.
+        """
+        
+        question_skill_link_model_instance = cls(
+            question_id=question_id, skill_id=skill_id,
+            review_status=review_status,
+            difficulty=difficulty)
+
+        return question_skill_link_model_instance
