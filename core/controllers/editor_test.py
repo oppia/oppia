@@ -1788,6 +1788,8 @@ class ResolveIssueHandlerTest(test_utils.GenericTestBase):
         dict.
         """
         del self.exp_issue_dict['issue_type']
+        # Since we deleted the 'issue_type' key in the exploration issue dict,
+        # the dict is invalid now and exception should be raised.
         self.post_json(
             '/resolveissuehandler/%s' % (self.EXP_ID),
             {

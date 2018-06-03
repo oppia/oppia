@@ -220,7 +220,6 @@ def create_exp_issues_for_new_exploration(exp_id, exp_version):
     Args:
         exp_id: str. ID of the exploration.
         exp_version: int. Version of the exploration.
-
     """
     stats_models.ExplorationIssuesModel.create(exp_id, exp_version, [])
 
@@ -313,19 +312,19 @@ def update_exp_issues_for_new_exp_version(
 
     playthrough_ids_by_state_name = collections.defaultdict(list)
 
-    for idx, exp_issue in enumerate(exp_issues.unresolved_issues):
+    for e_idx, exp_issue in enumerate(exp_issues.unresolved_issues):
         keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type]
         if keyname == 'state_names':
             state_names = exp_issue.issue_customization_args[keyname]['value']
             for state_name in state_names:
                 # Handle exp issues changes for deleted states.
-                exp_issues.unresolved_issues[idx] = (
+                exp_issues.unresolved_issues[e_idx] = (
                     _handle_exp_issues_after_state_deletion(
                         state_name, exp_issue,
                         exp_versions_diff.deleted_state_names))
 
                 # Handle exp issues changes for renamed states.
-                exp_issues.unresolved_issues[idx], playthrough_ids_by_state_name = ( # pylint: disable=line-too-long
+                exp_issues.unresolved_issues[e_idx], playthrough_ids_by_state_name = ( # pylint: disable=line-too-long
                     _handle_exp_issues_after_state_rename(
                         state_name, exp_issue,
                         exp_versions_diff.old_to_new_state_names,
@@ -334,13 +333,13 @@ def update_exp_issues_for_new_exp_version(
             state_name = exp_issue.issue_customization_args[keyname]['value']
 
             # Handle exp issues changes for deleted states.
-            exp_issues.unresolved_issues[idx] = (
+            exp_issues.unresolved_issues[e_idx] = (
                 _handle_exp_issues_after_state_deletion(
                     state_name, exp_issue,
                     exp_versions_diff.deleted_state_names))
 
             # Handle exp issues changes for renamed states.
-            exp_issues.unresolved_issues[idx], playthrough_ids_by_state_name = (
+            exp_issues.unresolved_issues[e_idx], playthrough_ids_by_state_name = (
                 _handle_exp_issues_after_state_rename(
                     state_name, exp_issue,
                     exp_versions_diff.old_to_new_state_names,
@@ -355,7 +354,7 @@ def update_exp_issues_for_new_exp_version(
         playthrough_ids = playthrough_ids_by_state_name[old_state_name]
 
         playthroughs = get_playthroughs_multi(playthrough_ids)
-        for idx, playthrough in enumerate(playthroughs):
+        for p_idx, playthrough in enumerate(playthroughs):
             if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
                     playthrough.issue_type] == 'state_names':
                 state_names = playthrough.issue_customization_args[
@@ -367,11 +366,12 @@ def update_exp_issues_for_new_exp_version(
             else:
                 playthrough.issue_customization_args['state_name']['value'] = (
                     new_state_name)
-            for idx1, action in enumerate(playthrough.actions):
+            for a_idx, action in enumerate(playthrough.actions):
                 if action.action_customization_args['state_name']['value'] == (
                         old_state_name):
-                    playthroughs[idx].actions[idx1].action_customization_args[
-                        'state_name']['value'] = new_state_name
+                    playthroughs[p_idx].actions[
+                        a_idx].action_customization_args['state_name'][
+                            'value'] = new_state_name
 
         all_playthrough_ids.extend(playthrough_ids)
         all_playthroughs.extend(playthroughs)
@@ -411,9 +411,6 @@ def get_playthrough_by_id(playthrough_id):
     Returns:
         Playthrough|None: The domain object for the playthrough or None if the
             playthrough_id is invalid.
-
-    Raises:
-        Exception: Entity for class PlaythroughModel with id not found.
     """
     playthrough = None
     playthrough_model = stats_models.PlaythroughModel.get(
