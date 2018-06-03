@@ -44,14 +44,6 @@ describe('StateTopAnswerStatisticsFactory', function() {
   });
 
   describe('fresh instances', function() {
-    beforeEach(inject(function($injector) {
-      this.$httpBackend = $injector.get('$httpBackend');
-    }));
-    afterEach(function() {
-      this.$httpBackend.verifyNoOutstandingExpectation();
-      this.$httpBackend.verifyNoOutstandingRequest();
-    });
-
     beforeEach(inject(function(ExplorationContextService) {
       spyOn(ExplorationContextService, 'getExplorationId').and.returnValue('7');
     }));
