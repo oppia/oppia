@@ -1,5 +1,19 @@
 <figure>
-  <img ng-src="<[imageUrl]>" alt="<[imageAltText]>"
-       style="display: block; margin-left: auto; margin-right: auto;">
-  <figcaption style="text-align:center;"><[imageCaption]></figcaption>
+  <div ng-if="!isLoadingIndicatorShown">
+    <img ng-src="<[imageUrl]>" alt="<[imageAltText]>"
+         style="display: block; margin-left: auto; margin-right: auto;">
+    <figcaption style="text-align:center;"><[imageCaption]></figcaption>
+  </div>
+  <div ng-if="isLoadingIndicatorShown" ng-style="loadingIndicatorContainerStyle">
+    <img ng-src="<[loadingIndicatorUrl]>" class="loading-indicator-gif" alt="Loading...">
+  </div>
 </figure>
+<style>
+  .loading-indicator-gif {
+    display: block;
+    height: 120px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 120px;
+  }
+</style>

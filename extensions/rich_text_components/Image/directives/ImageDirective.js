@@ -35,13 +35,41 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
         $scope.imageUrl = '';
-        ImagePreloaderService.getImageUrl($scope.filepath)
-          .then(function(objectUrl) {
+        $scope.loadingIndicatorUrl = (
+          UrlInterpolationService.getStaticImageUrl(
+            '/activity/Oppia_loading_indicator.gif')
+        );
+        // It is initialised to false so that if it is the preview in the
+        // exploration editor, the loading indicator doesn't appear there.
+        $scope.isLoadingIndicatorShown = false;
+
+        if (ImagePreloaderService.inExplorationPlayer()) {
+          $scope.isLoadingIndicatorShown = true;
+          $scope.dimensions = (
+            ImagePreloaderService.getDimensionsOfImage($scope.filepath.name));
+          ImagePreloaderService.getImageUrl($scope.filepath.name
+          ).then(function(objectUrl) {
+            $scope.isLoadingIndicatorShown = false;
             $scope.imageUrl = objectUrl;
           });
-        // [TODO] Display a loading indicator instead. For now, if the
-        // image is not there in the cache alternate text will be shown
-
+          // For aligning the gif to the center of it's container
+          var paddingTop = Math.max(0, ($scope.dimensions.height * 0.5) - 60);
+          $scope.loadingIndicatorContainerStyle =
+          {
+            'background-color': 'rgba(224,242,241,1)',
+            'padding-top': paddingTop + 'px',
+            height: $scope.dimensions.height + 'px'
+          };
+        } else {
+          // This is for loading the image for preview while editing an
+          // exploration.
+          AssetsBackendApiService.loadImage(
+            ExplorationContextService.getExplorationId(), $scope.filepath.name
+          ).then(function(loadedImageFile) {
+            var objectUrl = URL.createObjectURL(loadedImageFile.data);
+            $scope.imageUrl = objectUrl;
+          });
+        }
         $scope.imageCaption = '';
         if ($attrs.captionWithValue) {
           $scope.imageCaption = HtmlEscaperService.escapedJsonToObj(

@@ -108,14 +108,14 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     };
 
     /**
-     * Extracts the filenames from the filepath-value attribute of the
+     * Extracts the filepath object from the filepath-value attribute of the
      * oppia-noninteractive-image tags in the strHtml(given string).
-     * @param {string} strHtml - The string from which the filenames of images
-     *                           should be extracted.
+     * @param {string} strHtml - The string from which the object of
+     *                           filepath should be extracted.
      */
     var _extractFilepathValueFromOppiaNonInteractiveImageTag = function(
         strHtml) {
-      var filenames = [];
+      var fileInfo = [];
       var dummyElement = document.createElement('div');
       dummyElement.innerHTML = (
         HtmlEscaperService.escapedStrToUnescapedStr(strHtml));
@@ -123,15 +123,79 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       var imageTagList = dummyElement.getElementsByTagName(
         'oppia-noninteractive-image');
       for (i = 0; i < imageTagList.length; i++) {
-        filenames.push(imageTagList[i].getAttribute('filepath-with-value'));
+        var filepathObject = JSON.parse((imageTagList[i].getAttribute(
+          'filepath-with-value')));
+        // The images already there in Oppia have image filenames as the value
+        // for the attribute 'filepath-with-value'. In explorations the
+        // the attribute value is an object of the form --
+        // {
+        //    name: filename,
+        //    width: widthOfImage,
+        //    height: heightOfImage
+        // }
+        // So, we create an object similar to it for the images which had
+        // filenames as the attribute's value with default dimensions of
+        // 500px x 200px
+        if (!filepathObject.width) {
+          var filename = filepathObject;
+          filepathObject = {
+            name: filename,
+            width: 500,
+            height: 200
+          };
+        }
+        fileInfo.push(filepathObject);
       }
-      // The name in the array is stored as '"image.png"'. We need to remove
-      // the inverted commas. We remove the first and the last character from
-      // the string (name).
-      filenames = filenames.map(function(filename) {
-        return filename.slice(1, filename.length - 1);
+      return fileInfo;
+    };
+
+    /**
+    * Gets the filenames of the images from the html provided.
+    * @param {string} htmlStr - The string from which the filenames of the
+    *                           images should be extracted.
+    */
+    var _getImageFilenamesFromFilepathValue = function(htmlStr) {
+      var fileInfos = (
+        _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+      var filenames = [];
+      filenames = fileInfos.map(function(fileInfo) {
+        return fileInfo.name;
       });
       return filenames;
+    };
+
+    /**
+    * Gets the dimensions of the images from the html provided.
+    * @param {string} htmlStr - The string from which the dimensions of the
+    *                           images should be extracted.
+    */
+    var _getImageDimensionsFromFilepathValue = function(htmlStr) {
+      var fileInfos = (
+        _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+      var fileDimensions = {};
+      fileInfos.forEach(function(fileInfo){
+        var filename = fileInfo.name;
+        fileDimensions[filename] = {
+          width: fileInfo.width,
+          height: fileInfo.height
+        };
+      });
+      return fileDimensions;
+    };
+
+    /**
+    * Gets the dimensions of the images from the state provided.
+    * @param {object} state - The state from which the dimensions of the
+    *                           images should be extracted.
+    */
+    var _getImageDimensionsInState = function(state) {
+      var fileDimensions = {};
+      var allHtmlOfState = _getAllHtmlOfState(state);
+      allHtmlOfState.forEach(function(htmlStr) {
+        fileDimensions = Object.assign(fileDimensions,
+          _getImageDimensionsFromFilepathValue(htmlStr));
+      });
+      return fileDimensions;
     };
 
     /**
@@ -151,16 +215,13 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {
         filenamesInState = filenamesInState.concat(
-          _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+          _getImageFilenamesFromFilepathValue(htmlStr));
       });
       return filenamesInState;
     };
 
     return {
       getImageFilenamesInState: _getImageFilenamesInState,
-      getImageFilenamesInHints: function(state) {
-        var hintsHtml = _getHintsHtml(state);
-        return _extractFilepathValueFromOppiaNonInteractiveImageTag(hintsHtml);
-      }
+      getImageDimensionsInState: _getImageDimensionsInState
     };
   }]);
