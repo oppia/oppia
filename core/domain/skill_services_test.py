@@ -116,9 +116,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         degree_of_mastery = skill_services.get_all_skill_mastery(self.USER_ID)
 
         self.assertEqual(degree_of_mastery, {
-                self.SKILL_ID_1: self.DEGREE_OF_MASTERY_1,
-                self.SKILL_ID: self.DEGREE_OF_MASTERY 
-            })
+            self.SKILL_ID_1: self.DEGREE_OF_MASTERY_1,
+            self.SKILL_ID: self.DEGREE_OF_MASTERY 
+        })
 
     def test_update_skill(self):
         changelist = [
