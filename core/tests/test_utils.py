@@ -698,7 +698,8 @@ tags: []
             exploration_id: str. The id of the new validated exploration.
             owner_id: str. The user_id of the creator of the exploration.
             state_names: list(str). The names of states to be linked
-                sequentially in the exploration. Must be a non-empty list.
+                sequentially in the exploration. Must be a non-empty list and
+                contain no duplicates.
             interaction_ids: list(str). The names of the interaction ids to be
                 assigned to each state. Values will be cycled, so it doesn't
                 need to be the same size as state_names, but it must be
