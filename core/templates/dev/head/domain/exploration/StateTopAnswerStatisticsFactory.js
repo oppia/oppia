@@ -40,6 +40,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      * @returns {string}
      */
     var convertAnswerToHtml = function(answer) {
+      // Don't render quotes when the answer is a string.
       return (typeof answer === 'string') ? answer : JSON.stringify(answer);
     };
 
