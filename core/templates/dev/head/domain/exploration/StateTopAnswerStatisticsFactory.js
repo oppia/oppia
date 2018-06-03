@@ -58,6 +58,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       });
     };
 
+    /** Examines associated state to refresh the addressed info of answers. */
     StateTopAnswerStatistics.prototype.updateIsAddressed = function() {
       var explorationId = ExplorationContextService.getExplorationId();
       var state = ExplorationStatesService.getState(this._stateName);
@@ -73,6 +74,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       });
     };
 
+    /** Returns rendering data for each answer and their statistics. */
     StateTopAnswerStatistics.prototype.getAnswerStats = function() {
       return this._answers.map(function(answerStats) {
         return {
@@ -83,6 +85,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       });
     };
 
+    /** Encodes a state's answers back into the backend form. */
     StateTopAnswerStatistics.prototype.toBackendDict = function() {
       return this._answers.map(function(answerStats) {
         return {
@@ -93,8 +96,10 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     };
 
     /**
-     * Prepares a new StateTopAnswerStatistics instance.
-     * Use this function to build new instances, *not* the constructor!
+     * Prepares a fresh new StateTopAnswerStatistics instance from backend data.
+     *
+     * This should be the prefered way to create new instances because it
+     * ensures the data is fresh.
      *
      * @param {string} stateName - Name of the state this new instance will be
      *     responsible for.
