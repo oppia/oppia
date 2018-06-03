@@ -35,7 +35,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     /**
      * @constructor
      * @param {!string} stateName
-     * @param {!{answer: *, frequency: number}[]} backendTopAnswers
+     * @param {!{answer, frequency: number}[]} backendTopAnswers
      */
     var StateTopAnswerStatistics = function(stateName, backendTopAnswers) {
       /** @type {string} */
