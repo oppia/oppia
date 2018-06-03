@@ -850,6 +850,49 @@ def can_add_new_story_to_topic(handler):
     return test_can_add_story
 
 
+def can_edit_story(handler):
+    """Decorator to check whether the user can edit a story belonging to a given
+    topic.
+    """
+    def test_can_edit_story(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this story.')
+    test_can_edit_story.__wrapped__ = True
+
+    return test_can_edit_story
+
+
+def can_delete_story(handler):
+    """Decorator to check whether the user can delete a story in a given topic.
+    """
+    def test_can_delete_story(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to delete this story.')
+    test_can_delete_story.__wrapped__ = True
+
+    return test_can_delete_story
+
+
 def can_delete_topic(handler):
     """Decorator to check whether the user can delete a topic."""
 
