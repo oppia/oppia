@@ -40,7 +40,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      * @param {*} answer
      * @returns {string}
      */
-    var answerToHtml = function(answer) {
+    var convertAnswerToHtml = function(answer) {
       if (typeof answer === "string") {
         return answer;
       } else {
@@ -64,7 +64,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
       this._answers = backendTopAnswers.map(function(answerFrequencyPair) {
         return {
           answer: angular.copy(answerFrequencyPair.answer),
-          answerAsHtml: answerToHtml(answerFrequencyPair.answer),
+          answerAsHtml: convertAnswerToHtml(answerFrequencyPair.answer),
           frequency: answerFrequencyPair.frequency,
           isAddressed: false,
         };
