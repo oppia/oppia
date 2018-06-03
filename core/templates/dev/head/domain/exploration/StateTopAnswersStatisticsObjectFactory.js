@@ -49,7 +49,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     /**
      * @private @constructor
      * Returns a state's top answers with stale data. Needs to be refreshed by a
-     * call to {@link StateTopAnswerStatistics#refreshIsAddressed} after
+     * call to {@link StateTopAnswerStatistics#refreshAddressedInfo} after
      * construction.
      *
      * @param {!string} stateName
@@ -70,7 +70,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     };
 
     /** Examines associated state to refresh the addressed info of answers. */
-    StateTopAnswerStatistics.prototype.refreshIsAddressed = function() {
+    StateTopAnswerStatistics.prototype.refreshAddressedInfo = function() {
       var explorationId = ExplorationContextService.getExplorationId();
       var state = ExplorationStatesService.getState(this._stateName);
       var interactionRulesService = $injector.get(
@@ -111,7 +111,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
         stateName, backendArray) {
       stateTopAnswerStatistics =
         new StateTopAnswerStatistics(stateName, backendArray);
-      stateTopAnswerStatistics.refreshIsAddressed();
+      stateTopAnswerStatistics.refreshAddressedInfo();
       return stateTopAnswerStatistics;
     };
 
