@@ -1250,6 +1250,46 @@ class InteractionInstance(object):
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
 
+    def get_all_html_content_strings(self):
+        """Get all html content strings in the interaction.
+
+        Returns:
+            list(str): The list of all html content strings in the interaction.
+        """
+        html_list = []
+
+        for answer_group in self.answer_groups:
+            outcome_html = answer_group.outcome.feedback.html
+            html_list = html_list + [outcome_html]
+
+        # Note that ItemSelectionInput replicates the customization arg HTML
+        # in its answer groups.
+        if self.id == 'ItemSelectionInput':
+            for answer_group in self.answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec_html = rule_spec.inputs['x']
+                    html_list = html_list + rule_spec_html
+
+        if self.default_outcome:
+            default_outcome_html = self.default_outcome.feedback.html
+            html_list = html_list + [default_outcome_html]
+
+        for hint in self.hints:
+            hint_html = hint.hint_content.html
+            html_list = html_list + [hint_html]
+
+        if self.solution:
+            solution_html = self.solution.explanation.html
+            html_list = html_list + [solution_html]
+
+        if self.id in ('ItemSelectionInput', 'MultipleChoiceInput'):
+            customization_args_html_list = (
+                self.customization_args['choices']['value'])
+            html_list = html_list + customization_args_html_list
+
+        return html_list
+
+
 class State(object):
     """Domain object for a state."""
 
@@ -3994,6 +4034,21 @@ class Exploration(object):
         return list(set([
             state.interaction.id for state in self.states.itervalues()
             if state.interaction.id is not None]))
+
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this exploration.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_list = []
+        for state in self.states.itervalues():
+            content_html = state.content.html
+            interaction_html_list = (
+                state.interaction.get_all_html_content_strings())
+            html_list = html_list + [content_html] + interaction_html_list
+
+        return html_list
 
 
 class ExplorationSummary(object):
