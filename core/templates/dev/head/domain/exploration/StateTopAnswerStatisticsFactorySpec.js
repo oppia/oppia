@@ -50,7 +50,7 @@ describe('StateTopAnswerStatisticsFactory', function() {
     };
     spyOn(ExplorationStatesService, 'getState').and.callFake(
       function(stateName) {
-        return that.states[stateName];
+        return states[stateName];
       });
   }));
 
