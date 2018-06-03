@@ -52,5 +52,46 @@ describe('StateTopAnswerStatistics', function() {
     beforeEach(inject(function(ExplorationContextService) {
       spyOn(ExplorationContextService, 'getExplorationId').and.returnValue('7');
     }));
+
+    beforeEach(inject(function(ExplorationStatesService) {
+      // Only the 'Hola' state exists in this fake exploration.
+      spyOn(ExplorationStatesService, 'getState').and.callFake(
+        function(stateName) {
+          if (stateName !== 'Hola') throw Error(stateName + ' does not exist.');
+          return {
+            name: 'Hola',
+            interaction: {
+              answerGroups: [{
+                rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
+                outcome: {dest: 'Me Llamo'}
+              }, {
+                rules: [{type: 'Contains', inputs: {x: 'hola'}}],
+                outcome: {dest: 'Me Llamo'}
+              }, {
+                rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
+                outcome: {dest: 'Hola'}
+              }],
+              defaultOutcome: {dest: 'Hola'},
+              id: 'TextInput'
+            }
+          };
+        });
+    }));
+
+    it('should assign the correct values for addressed info', function() {
+      var stateTopAnswerStatistics = new this.StateTopAnswerStatistics('Hola', [
+        {answer: 'hola', frequency: 5},
+        {answer: 'adios', frequency: 3},
+        {answer: 'ni hao', frequency: 2},
+      ]);
+
+      stateTopAnswerStatistics.updateIsAddressed();
+
+      expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
+        jasmine.objectContaining({answer: 'hola', isAddressed: true}),
+        jasmine.objectContaining({answer: 'adios', isAddressed: false}),
+        jasmine.objectContaining({answer: 'ni hao', isAddressed: false}),
+      ]);
+    });
   });
 });

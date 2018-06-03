@@ -71,9 +71,9 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
     StateTopAnswerStatistics.prototype.updateIsAddressed = function() {
       var explorationId = ExplorationContextService.getExplorationId();
       var state = ExplorationStatesService.getState(this._stateName);
-      var interactionRulesService =
+      var interactionRulesService = $injector.get(
         AngularNameService.getNameOfInteractionRulesService(
-          state.interaction.id);
+          state.interaction.id));
 
       this._answers.forEach(function(answerStats) {
         answerStats.isAddressed =
