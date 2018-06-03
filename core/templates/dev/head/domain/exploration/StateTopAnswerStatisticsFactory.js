@@ -32,8 +32,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      * @property {boolean} isAddressed
      */
 
-    /** Converts input answer into an HTML representation.
-     *
+    /**
      * TODO(brianrodri): Create a proper service for this which takes
      * interactions into account.
      *
@@ -41,11 +40,7 @@ oppia.factory('StateTopAnswerStatisticsFactory', [
      * @returns {string}
      */
     var convertAnswerToHtml = function(answer) {
-      if (typeof answer === "string") {
-        return answer;
-      } else {
-        return JSON.toString(answer);
-      }
+      return (typeof answer === 'string') ? answer : JSON.toString(answer);
     };
 
     /**
