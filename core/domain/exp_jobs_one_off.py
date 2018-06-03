@@ -491,6 +491,9 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
         # invalid parent-child relations that we find.
         err_dict = {}
 
+        # To store all the invalid html strings.
+        err_dict['strings'] = []
+
         allowed_parent_list = (
             feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
             ['ALLOWED_PARENT_LIST'])
@@ -503,6 +506,12 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
         for html_data in html_list:
             soup = bs4.BeautifulSoup(html_data, 'html.parser')
 
+            # Any html string with unwrapped text is also invalid.
+            for content in soup.contents:
+                if not content.name:
+                    err_dict['strings'] += [html_data]
+                    break
+
             for tag in soup.findAll():
                 # Checking for tags not allowed in RTE.
                 if tag.name not in allowed_tag_list:
@@ -510,6 +519,7 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
                         err_dict['invalidTags'] += [tag.name]
                     else:
                         err_dict['invalidTags'] = [tag.name]
+                    err_dict['strings'] += [html_data]
                 # Checking for parent-child relation that are not
                 # allowed in RTE.
                 parent = tag.parent.name
@@ -519,9 +529,11 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
                         err_dict[tag.name] += [parent]
                     else:
                         err_dict[tag.name] = [parent]
+                    err_dict['strings'] += [html_data]
 
         for key in err_dict:
-            yield(key, list(set(err_dict[key])))
+            if err_dict[key]:
+                yield(key, list(set(err_dict[key])))
 
     @staticmethod
     def reduce(key, values):
