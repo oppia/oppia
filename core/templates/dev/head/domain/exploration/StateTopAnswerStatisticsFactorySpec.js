@@ -32,7 +32,7 @@ describe('StateTopAnswerStatistics', function() {
         {answer: 'ni hao', frequency: 2},
       ]);
 
-      expect(stateTopAnswerStatistics._answers).toEqual([
+      expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
         jasmine.objectContaining({answer: 'aloha', frequency: 5}),
         jasmine.objectContaining({answer: 'adios', frequency: 3}),
         jasmine.objectContaining({answer: 'ni hao', frequency: 2}),
