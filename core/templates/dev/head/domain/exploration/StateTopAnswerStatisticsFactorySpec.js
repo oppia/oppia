@@ -58,15 +58,15 @@ describe('StateTopAnswerStatisticsFactory', function() {
     it('copies ordered frequency data of backend values', function() {
       var stateTopAnswerStatistics =
         new this.StateTopAnswerStatisticsFactory('Hola', [
-          {answer: 'aloha', frequency: 5},
+          {answer: 'hola', frequency: 5},
           {answer: 'adios', frequency: 3},
-          {answer: 'ni hao', frequency: 2},
+          {answer: 'que?', frequency: 2},
         ]);
 
       expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
-        jasmine.objectContaining({answer: 'aloha', frequency: 5}),
+        jasmine.objectContaining({answer: 'hola', frequency: 5}),
         jasmine.objectContaining({answer: 'adios', frequency: 3}),
-        jasmine.objectContaining({answer: 'ni hao', frequency: 2}),
+        jasmine.objectContaining({answer: 'que?', frequency: 2}),
       ]);
     });
   });
@@ -79,14 +79,14 @@ describe('StateTopAnswerStatisticsFactory', function() {
             // 'hola' *is* an addressed answer.
             {answer: 'hola', frequency: 5},
             {answer: 'adios', frequency: 3},
-            {answer: 'ni hao', frequency: 2},
+            {answer: 'que?', frequency: 2},
           ]);
 
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
           // However, it is left stale to avoid backend calls.
           jasmine.objectContaining({answer: 'hola', isAddressed: false}),
           jasmine.objectContaining({answer: 'adios', isAddressed: false}),
-          jasmine.objectContaining({answer: 'ni hao', isAddressed: false}),
+          jasmine.objectContaining({answer: 'que?', isAddressed: false}),
         ]);
       });
     });
@@ -99,14 +99,14 @@ describe('StateTopAnswerStatisticsFactory', function() {
           new this.StateTopAnswerStatisticsFactory('Hola', [
             {answer: 'hola', frequency: 5},
             {answer: 'adios', frequency: 3},
-            {answer: 'ni hao', frequency: 2},
+            {answer: 'que?', frequency: 2},
           ]);
 
         // Should be stale.
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
           jasmine.objectContaining({answer: 'hola', isAddressed: false}),
           jasmine.objectContaining({answer: 'adios', isAddressed: false}),
-          jasmine.objectContaining({answer: 'ni hao', isAddressed: false}),
+          jasmine.objectContaining({answer: 'que?', isAddressed: false}),
         ]);
 
         stateTopAnswerStatistics.refreshIsAddressed();
@@ -115,7 +115,7 @@ describe('StateTopAnswerStatisticsFactory', function() {
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
           jasmine.objectContaining({answer: 'hola', isAddressed: true}),
           jasmine.objectContaining({answer: 'adios', isAddressed: false}),
-          jasmine.objectContaining({answer: 'ni hao', isAddressed: false}),
+          jasmine.objectContaining({answer: 'que?', isAddressed: false}),
         ]);
       });
     });
@@ -126,13 +126,13 @@ describe('StateTopAnswerStatisticsFactory', function() {
           this.StateTopAnswerStatisticsFactory.createFromBackendDict('Hola', [
             {answer: 'hola', frequency: 5},
             {answer: 'adios', frequency: 3},
-            {answer: 'ni hao', frequency: 2},
+            {answer: 'que?', frequency: 2},
           ]);
 
         expect(stateTopAnswerStatistics.getAnswerStats()).toEqual([
           jasmine.objectContaining({answer: 'hola', isAddressed: true}),
           jasmine.objectContaining({answer: 'adios', isAddressed: false}),
-          jasmine.objectContaining({answer: 'ni hao', isAddressed: false}),
+          jasmine.objectContaining({answer: 'que?', isAddressed: false}),
         ]);
       });
     });
