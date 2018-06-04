@@ -28,7 +28,7 @@ class StorageModelsTest(test_utils.GenericTestBase):
             if '__' not in name:
                 all_model_names.append(name)
 
-        all_models = []
+        names_of_ndb_model_subclasses = []
         for name in all_model_names:
             (module, ) = models.Registry.import_models([name])
             for member_name, member_obj in inspect.getmembers(module):
@@ -40,15 +40,8 @@ class StorageModelsTest(test_utils.GenericTestBase):
                             'ndb.Model' in ancestor_names or
                             'BaseModel' in ancestor_names or
                             'VersionedModel' in ancestor_names):
-                        all_models.append(clazz.__name__)
+                        names_of_ndb_model_subclasses.append(clazz.__name__)
 
-        frequency_of_models = {}
-        for model in all_models:
-            if model in frequency_of_models:
-                frequency_of_models[model] += 1
-            else:
-                frequency_of_models[model] = 1
-
-        for model in frequency_of_models:
-            print model, frequency_of_models[model]
-            self.assertEqual(frequency_of_models[model], 1)
+        self.assertEqual(
+            len(set(names_of_ndb_model_subclasses)),
+            len(names_of_ndb_model_subclasses))
