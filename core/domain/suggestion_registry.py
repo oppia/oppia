@@ -269,7 +269,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         if self.change_cmd.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
-                    exp_domain.CMD_EDIT_STATE_PROPERTY, self.change_cmd['cmd']))
+                    exp_domain.CMD_EDIT_STATE_PROPERTY, self.change_cmd.cmd))
 
         if (self.change_cmd.property_name !=
                 exp_domain.STATE_PROPERTY_CONTENT):

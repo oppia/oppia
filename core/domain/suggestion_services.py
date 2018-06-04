@@ -128,7 +128,8 @@ def get_suggestions_by_author(author_id):
     """
     return [
         get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel.get_suggestions_by_author(
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_suggestions_by_author(
             author_id)]
 
 
@@ -143,8 +144,8 @@ def get_suggestions_reviewed_by(reviewer_id):
     """
     return [
         get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel.get_suggestions_reviewed_by(
-            reviewer_id)]
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_suggestions_reviewed_by(reviewer_id)]
 
 
 def get_suggestions_assigned_to_reviewer(assigned_reviewer_id):
@@ -159,8 +160,8 @@ def get_suggestions_assigned_to_reviewer(assigned_reviewer_id):
             for review.
     """
     return [get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_suggestions_assigned_to_reviewer(assigned_reviewer_id)]
+            for s in suggestion_models.GeneralSuggestionModel
+            .get_suggestions_assigned_to_reviewer(assigned_reviewer_id)]
 
 
 def get_suggestions_by_status(status):
@@ -173,8 +174,8 @@ def get_suggestions_by_status(status):
         list(Suggestion). A list of suggestions with the given status.
     """
     return [get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_suggestions_by_status(status)]
+            for s in suggestion_models.GeneralSuggestionModel
+            .get_suggestions_by_status(status)]
 
 
 def get_suggestion_by_type(suggestion_type):
@@ -187,8 +188,8 @@ def get_suggestion_by_type(suggestion_type):
         list(Suggestion). A list of suggestions of the given type.
     """
     return [get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_suggestions_by_type(suggestion_type)]
+            for s in suggestion_models.GeneralSuggestionModel
+            .get_suggestions_by_type(suggestion_type)]
 
 
 def get_suggestions_by_target_id(target_type, target_id):
@@ -202,8 +203,8 @@ def get_suggestions_by_target_id(target_type, target_id):
         list(Suggestion). A list of suggestions linked to the entity.
     """
     return [get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_suggestions_by_target_id(target_type, target_id)]
+            for s in suggestion_models.GeneralSuggestionModel
+            .get_suggestions_by_target_id(target_type, target_id)]
 
 
 def _update_suggestion(suggestion):
@@ -235,8 +236,8 @@ def mark_review_completed(suggestion, status, reviewer_id):
             are STATUS_ACCEPTED or STATUS_REJECTED.
         reviewer_id: str. The ID of the user who completed the review.
     """
-    if(status not in
-        [suggestion_models.STATUS_ACCEPTED, suggestion_models.STATUS_REJECTED]):
+    if(status not in [suggestion_models.STATUS_ACCEPTED,
+                      suggestion_models.STATUS_REJECTED]):
         raise Exception('Invalid status after review.')
 
     suggestion.status = status

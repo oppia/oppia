@@ -237,8 +237,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         suggestion.score_category = 'invalid_score_category'
         with self.assertRaisesRegexp(
             utils.ValidationError, 'Expected score_category to be of the form '
-                       'score_type.score_sub_type, received '
-                       'invalid_score_category'):
+                                   'score_type.score_sub_type, received '
+                                   'invalid_score_category'):
             suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
             suggestion_services.accept_suggestion(
                 suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
