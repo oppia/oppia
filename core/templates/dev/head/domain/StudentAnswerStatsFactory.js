@@ -17,7 +17,7 @@
  * particular answer from some particular state.
  */
 
-oppia.factory('StudentAnswerStatsFactory', [function() {
+oppia.factory('AnswerStatsFactory', [function() {
   /**
    * @constructor
    * @param {*} answer - raw answer object.
@@ -26,7 +26,7 @@ oppia.factory('StudentAnswerStatsFactory', [function() {
    * @param {boolean} isAddressed - whether this answer is addressed by the
    *    associated state's answer groups.
    */
-  var StudentAnswerStats = function(answer, frequency, answerHtml, isAddressed) {
+  var AnswerStats = function(answer, frequency, answerHtml, isAddressed) {
     /** @type {*} */
     this.answer = angular.copy(answer);
     /** @type {number} */
@@ -38,7 +38,7 @@ oppia.factory('StudentAnswerStatsFactory', [function() {
   };
 
   /** @returns {answer, frequency: number} */
-  StudentAnswerStats.prototype.toBackendDict = function() {
+  AnswerStats.prototype.toBackendDict = function() {
     return {
       answer: angular.copy(this.answer),
       frequency: this.frequency
@@ -50,16 +50,16 @@ oppia.factory('StudentAnswerStatsFactory', [function() {
    * Use {@link StateTopAnswerStatsService} to keep these instances fresh.
    *
    * @param {{answer, frequency: number}} backendDict
-   * @returns {StudentAnswerStats}
+   * @returns {AnswerStats}
    */
-  StudentAnswerStats.createFromBackendDict = function(backendDict) {
+  AnswerStats.createFromBackendDict = function(backendDict) {
     // TODO(brianrodri): Use a proper service which takes the state's
     // interaction type into account for generating the answer's HTML.
     var answerHtml = (typeof backendDict.answer === 'string')
       ? backendDict.answer : angular.toJson(backendDict.answer);
-    return new StudentAnswerStats(
+    return new AnswerStats(
       backendDict.answer, backendDict.frequency, answerHtml, false);
   };
 
-  return StudentAnswerStats;
+  return AnswerStats;
 }]);

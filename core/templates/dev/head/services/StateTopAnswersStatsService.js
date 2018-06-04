@@ -19,13 +19,13 @@
 
 oppia.factory('StateTopAnswersStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ExplorationContextService', 'ExplorationStatesService',
-  'StudentAnswerStatsFactory', 'UrlInterpolationService',
+  'ExplorationContextService', 'ExplorationStatesService', 'AnswerStatsFactory',
+  'UrlInterpolationService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      ExplorationContextService, ExplorationStatesService,
-      StudentAnswerStatsFactory, UrlInterpolationService) {
-    /** @type {Object.<string, StudentAnswerStats[]>} */
+      ExplorationContextService, ExplorationStatesService, AnswerStatsFactory,
+      UrlInterpolationService) {
+    /** @type {Object.<string, AnswerStats[]>} */
     var stateTopAnswersCache = {};
 
     /**
@@ -60,9 +60,9 @@ oppia.factory('StateTopAnswersStatsService', [
         ).then(function(response) {
           stateTopAnswersCache = {};
           Object.keys(response.data.answers).forEach(function(stateName) {
-            var stateAnswerStatsBackendDicts = response.data.answers[stateName];
-            stateTopAnswersCache[stateName] = stateAnswerStatsBackendDicts.map(
-              StudentAnswerStatsFactory.createFromBackendDict);
+            var answerStatsBackendDicts = response.data.answers[stateName];
+            stateTopAnswersCache[stateName] = answerStatsBackendDicts.map(
+              AnswerStatsFactory.createFromBackendDict);
             // Still need to manually refresh the addressed information.
             refreshAddressedInfo(stateName);
           });
@@ -71,8 +71,7 @@ oppia.factory('StateTopAnswersStatsService', [
 
       /**
        * @param {string} stateName
-       * @returns {StudentAnswerStats[]} - list of the statistics for the top
-       *    answers.
+       * @returns {AnswerStats[]} - list of the statistics for the top answers.
        */
       getStateStats: function(stateName) {
         return angular.copy(stateTopAnswersCache[stateName]);
