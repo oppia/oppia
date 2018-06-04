@@ -73,14 +73,13 @@ oppia.factory('StateTopAnswersStatsService', [
 
     return {
       /**
-       * Calls backend to setup the answer statistics of each state this
-       * exploration contains.
-       * @returns {Promise}
+       * Calls the backend asynchronously to setup the answer statistics of each
+       * state this exploration contains.
        */
       init: function() {
         var explorationId = ExplorationContextService.getExplorationId();
 
-        return $http.get(
+        $http.get(
           UrlInterpolationService.interpolateUrl(
             '/createhandler/state_answer_stats/<exploration_id>',
             {exploration_id: explorationId})
