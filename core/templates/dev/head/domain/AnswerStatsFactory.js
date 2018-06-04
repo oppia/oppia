@@ -22,7 +22,7 @@ oppia.factory('AnswerStatsFactory', [function() {
    * @constructor
    * @param {*} answer - raw answer object.
    * @param {string} answerHtml - answer as renderable HTML.
-   * @param {number} frequency - frequency at which the object appears.
+   * @param {number} frequency - frequency at which the answer appears.
    * @param {boolean} isAddressed - whether this answer is addressed by the
    *    associated state's answer groups.
    */
