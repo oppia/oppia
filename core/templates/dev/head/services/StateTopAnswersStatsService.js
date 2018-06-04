@@ -89,11 +89,11 @@ oppia.factory('StateTopAnswersStatsService', [
             var stateAnswerStatsBackendDicts = response.data.answers[stateName];
 
             stateTopAnswersCache[stateName] =
-              stateAnswerStatsBackendDicts.map(function(answerFrequencyPair) {
+              stateAnswerStatsBackendDicts.map(function(answerFrequencyDict) {
                 return /** @type {AnswerStats} */ {
-                  answer: angular.copy(answerFrequencyPair.answer),
-                  frequency: answerFrequencyPair.frequency,
-                  answerHtml: convertAnswerToHtml(answerFrequencyPair.answer),
+                  answer: angular.copy(answerFrequencyDict.answer),
+                  frequency: answerFrequencyDict.frequency,
+                  answerHtml: convertAnswerToHtml(answerFrequencyDict.answer),
                   isAddressed: false, // Stale, needs to be refreshed.
                 };
               });
