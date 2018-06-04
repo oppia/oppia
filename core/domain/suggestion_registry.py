@@ -73,7 +73,7 @@ class BaseSuggestion(object):
 
     @classmethod
     def from_dict(cls):
-        """Return a Suggestion object of type from a dict."""
+        """Return a Suggestion object from a dict."""
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement from_dict.')
 
