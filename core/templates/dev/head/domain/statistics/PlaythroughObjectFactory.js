@@ -19,6 +19,15 @@
 
 oppia.factory('PlaythroughObjectFactory', [
   'LearnerActionObjectFactory', function(LearnerActionObjectFactory) {
+    /**
+     * @constructor
+     * @param {string} playthroughId - ID of a playthrough.
+     * @param {string} expId - ID of an exploration.
+     * @param {number} expVersion - Version of an exploration.
+     * @param {string} issueType - type of an issue.
+     * @param {*} issueCustomizationArgs - customization dict for an issue.
+     * @param {list(LearnerAction)} actions - list of learner actions.
+     */
     var Playthrough = function(playthroughId, expId, expVersion, issueType,
         issueCustomizationArgs, actions) {
       this.playthroughId = playthroughId;
@@ -29,6 +38,15 @@ oppia.factory('PlaythroughObjectFactory', [
       this.actions = actions;
     };
 
+    /**
+     * @param {string} playthroughId - ID of a playthrough.
+     * @param {string} expId - ID of an exploration.
+     * @param {number} expVersion - Version of an exploration.
+     * @param {string} issueType - type of an issue.
+     * @param {*} issueCustomizationArgs - customization dict for an issue.
+     * @param {list(LearnerAction)} actions - list of learner actions.
+     * @returns {Playthrough}
+     */
     Playthrough.create = function(
         playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
         actions) {
@@ -37,12 +55,13 @@ oppia.factory('PlaythroughObjectFactory', [
         actions);
     };
 
+    /**
+     * @param {{playthroughId: string, expId: string, expVersion: number, issueType: string, issueCustomizationArgs, actions: list(LearnerAction)}} playthroughBackendDict
+     * @returns {Playthrough}
+     */
     Playthrough.createFromBackendDict = function(playthroughBackendDict) {
-      var actions = [], i;
-      for (i = 0; i < playthroughBackendDict.actions.length; i++) {
-        actions.push(LearnerActionObjectFactory.createFromBackendDict(
-          playthroughBackendDict.actions[i]));
-      }
+      var actions = playthroughBackendDict.actions.map(
+        LearnerActionObjectFactory.createFromBackendDict);
 
       return new Playthrough(
         playthroughBackendDict.playthroughId, playthroughBackendDict.expId,

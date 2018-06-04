@@ -17,21 +17,19 @@
  */
 
 describe('Playthrough Object Factory', function() {
-  var PlaythroughObjectFactory;
-
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    PlaythroughObjectFactory = $injector.get(
+    this.PlaythroughObjectFactory = $injector.get(
       'PlaythroughObjectFactory');
-    LearnerActionObjectFactory = $injector.get(
+    this.LearnerActionObjectFactory = $injector.get(
       'LearnerActionObjectFactory');
   }));
 
   it('should create a new playthrough', function() {
     var actions = [
-      LearnerActionObjectFactory.create('AnswerSubmit', {}, 1)];
-    var playthroughObject = PlaythroughObjectFactory.create(
+      this.LearnerActionObjectFactory.create('AnswerSubmit', {}, 1)];
+    var playthroughObject = this.PlaythroughObjectFactory.create(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
     expect(playthroughObject.playthroughId).toEqual('playthroughId1');
@@ -56,7 +54,7 @@ describe('Playthrough Object Factory', function() {
       issueCustomizationArgs: {},
       actions: actionDicts
     };
-    var playthroughObject = PlaythroughObjectFactory.createFromBackendDict(
+    var playthroughObject = this.PlaythroughObjectFactory.createFromBackendDict(
       playthroughBackendDict);
 
     expect(playthroughObject.playthroughId).toEqual('playthroughId1');
@@ -65,6 +63,6 @@ describe('Playthrough Object Factory', function() {
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
     expect(playthroughObject.issueCustomizationArgs).toEqual({});
     expect(playthroughObject.actions[0]).toEqual(
-      LearnerActionObjectFactory.createFromBackendDict(actionDicts[0]));
+      this.LearnerActionObjectFactory.createFromBackendDict(actionDicts[0]));
   });
 });

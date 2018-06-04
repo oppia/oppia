@@ -17,18 +17,16 @@
  */
 
 describe('Learner Action Object Factory', function() {
-  var LearnerActionObjectFactory;
-
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    LearnerActionObjectFactory = $injector.get(
+    this.LearnerActionObjectFactory = $injector.get(
       'LearnerActionObjectFactory');
   }));
 
   it('should create a new learner action', function() {
     var learnerActionObject = (
-      LearnerActionObjectFactory.create('AnswerSubmit', {}, 1));
+      this.LearnerActionObjectFactory.create('AnswerSubmit', {}, 1));
 
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});
@@ -41,8 +39,9 @@ describe('Learner Action Object Factory', function() {
       actionCustomizationArgs: {},
       schemaVersion: 1
     };
-    var learnerActionObject = LearnerActionObjectFactory.createFromBackendDict(
-      learnerActionBackendDict);
+    var learnerActionObject = (
+      this.LearnerActionObjectFactory.createFromBackendDict(
+        learnerActionBackendDict));
 
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});

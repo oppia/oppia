@@ -17,18 +17,16 @@
  */
 
 describe('Exploration Issue Object Factory', function() {
-  var ExplorationIssueObjectFactory;
-
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    ExplorationIssueObjectFactory = $injector.get(
+    this.ExplorationIssueObjectFactory = $injector.get(
       'ExplorationIssueObjectFactory');
   }));
 
   it('should create a new exploration issue', function() {
     var explorationIssueObject = (
-      ExplorationIssueObjectFactory.create('EarlyQuit', {}, [], 1, true));
+      this.ExplorationIssueObjectFactory.create('EarlyQuit', {}, [], 1, true));
 
     expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
     expect(explorationIssueObject.issueCustomizationArgs).toEqual({});

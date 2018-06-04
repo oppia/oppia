@@ -18,15 +18,36 @@
  */
 
 oppia.factory('ExplorationIssueObjectFactory', [function() {
+  /**
+   * @constructor
+   * @param {string} issueType - type of an issue.
+   * @param {*} issueCustomizationArgs - customization dict for an issue.
+   * @param {list(string)} playthroughIds - list of playthrough IDs.
+   * @param {number} schemaVersion - schema version of the class instance.
+   * @param {boolean} isValid - whether the issue is valid.
+   */
   var ExplorationIssue = function(issueType, issueCustomizationArgs,
       playthroughIds, schemaVersion, isValid) {
+    /** @type {string} */
     this.issueType = issueType;
+    /** @type {*} */
     this.issueCustomizationArgs = issueCustomizationArgs;
+    /** @type {list(string)} */
     this.playthroughIds = playthroughIds;
+    /** @type {number} */
     this.schemaVersion = schemaVersion;
+    /** @type {boolean} */
     this.isValid = isValid;
   };
 
+  /**
+   * @param {string} issueType - type of an issue.
+   * @param {*} issueCustomizationArgs - customization dict for an issue.
+   * @param {list(string)} playthroughIds - list of playthrough IDs.
+   * @param {number} schemaVersion - schema version of the class instance.
+   * @param {boolean} isValid - whether the issue is valid.
+   * @returns {ExplorationIssue}
+   */
   ExplorationIssue.create = function(
       issueType, issueCustomizationArgs, playthroughIds, schemaVersion,
       isValid) {
