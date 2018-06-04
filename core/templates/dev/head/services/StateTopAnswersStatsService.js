@@ -25,7 +25,7 @@ oppia.factory('StateTopAnswersStatsService', [
       $http, $injector, AngularNameService, AnswerClassificationService,
       ExplorationContextService, ExplorationStatesService,
       StateAnswerStatsFactory, UrlInterpolationService) {
-    /** @type {Object.<string, AnswerStats[]>} */
+    /** @type {Object.<string, StateAnswerStats[]>} */
     var stateTopAnswersCache = {};
 
     /**
@@ -73,7 +73,8 @@ oppia.factory('StateTopAnswersStatsService', [
 
       /**
        * @param {string} stateName
-       * @returns {AnswerStats[]} - list of the statistics for the top answers.
+       * @returns {StateAnswerStats[]} - list of the statistics for the top
+       *    answers.
        */
       getStateStats: function(stateName) {
         return angular.copy(stateTopAnswersCache[stateName]);
