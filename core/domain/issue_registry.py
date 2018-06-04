@@ -41,16 +41,6 @@ class Registry(object):
         return stats_models.ALLOWED_ISSUE_TYPES
 
     @classmethod
-    def set_issues(cls, issues):
-        """Sets the mapping between issue types to instances of the issue
-        classes to the provided value.
-
-        Args:
-            issues: dict. Mapping issue types to instances of the issues.
-        """
-        cls._issues = issues
-
-    @classmethod
     def _refresh(cls):
         """Initializes the mapping between issue types to instances of the issue
         classes.
