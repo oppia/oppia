@@ -131,11 +131,11 @@ describe('StateTopAnswersStatsService', function() {
         jasmine.objectContaining({answer: 'adios', isAddressed: false})
       ]);
 
-      // Now, 'adios' is addressed by the Hola state.
       this.EXP_STATES.Hola.interaction.answerGroups.push({
         rules: [{type: 'Equals', inputs: {x: 'adios'}}],
         outcome: {dest: 'Hola'}
       });
+      // Now, 'adios' is addressed by the Hola state.
       this.StateTopAnswersStatsService.refreshStateStats('Hola');
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
