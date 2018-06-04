@@ -140,7 +140,6 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
 oppia.factory('numberWithUnitsRulesService', [
   'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
   function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
-
     return {
       IsEqualTo: function(answer, inputs) {
         return angular.equals(answer, inputs.f);

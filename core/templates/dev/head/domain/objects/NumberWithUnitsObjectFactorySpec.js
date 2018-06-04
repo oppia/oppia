@@ -36,8 +36,8 @@ describe('NumberWithUnitsObjectFactory', function() {
         {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
       expect(Units.fromStringToDict('mol/(kg / (N m / s^2)')).toEqual(
         {mol: 1, kg: -1, N: 1, m: 1, s: -2});
-      expect(Units.fromStringToDict('kg per kg^2 K mol per (N m s^2) K s')).toEqual(
-        {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
+      expect(Units.fromStringToDict('kg per kg^2 K mol per (N m s^2) K s'
+      )).toEqual({kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
     });
 
     it('should convert units from dict to string format', function() {
@@ -75,10 +75,10 @@ describe('NumberWithUnitsObjectFactory', function() {
       ), Units.fromRawInputString('m / s^2')).toString()).toBe('-4/3 m^1 s^-2');
       expect(new NumberWithUnits('fraction', 0, new Fraction(
         false, 0, 4, 3), Units.fromRawInputString('$ per hour')).toString(
-          )).toBe('$ 4/3 hour^-1');
+      )).toBe('$ 4/3 hour^-1');
       expect(new NumberWithUnits('real', 40, new Fraction(
         false, 0, 0, 1), Units.fromRawInputString('Rs per hour')).toString(
-          )).toBe('Rs 40 hour^-1');
+      )).toBe('Rs 40 hour^-1');
     });
 
     it('should parse valid units strings', function() {
