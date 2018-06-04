@@ -127,6 +127,7 @@ describe('StateTopAnswersStatsService', function() {
         }
       });
 
+      // Initially, 'adios' isn't addressed by the Hola state.
       this.StateTopAnswersStatsService.init();
       this.$httpBackend.flush();
 
@@ -134,6 +135,7 @@ describe('StateTopAnswersStatsService', function() {
         jasmine.objectContaining({answer: 'adios', isAddressed: false})
       );
 
+      // Now, 'adios' is addressed by the Hola state.
       this.EXP_STATES.Hola.interaction.answerGroups.push({
         rules: [{type: 'Equals', inputs: {x: 'adios'}}],
         outcome: {dest: 'Adios'}
