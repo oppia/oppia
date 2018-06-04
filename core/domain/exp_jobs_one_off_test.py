@@ -790,8 +790,8 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         content1_dict = {
             'html': (
                 '<blockquote><p>Hello, this <i>is</i> state1 '
-                '</p></blockquote><pre>I am looking for a particular '
-                '<b>Hello Oppia</b> message</pre>. <p> Don\'t you want to '
+                '</p></blockquote><pre>I\'m looking for a particular '
+                '<b>Hello Oppia</b> message.</pre><p> Don\'t you want to '
                 'say hello? You can learn more about oppia '
                 '<oppia-noninteractive-link url-with-value="&amp;quot;'
                 'https://www.example.com&amp;quot;" text-with-value="&amp;quot;'
@@ -801,9 +801,9 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         }
         content2_dict = {
             'html': (
-                '<pre>Hello, this is state2.</pre> <blockquote>'
-                '<ol> <li>item1</li> <li>item2</li> </ol> </blockquote>.<p>'
-                'You can see this equation <b> <oppia-noninteractive-math'
+                '<pre>Hello, this is state2.</pre><blockquote>'
+                '<ol><li>item1</li><li>item2</li></ol></blockquote><p>'
+                'You can see this equation <b><oppia-noninteractive-math'
                 'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;'
                 'quot;"></oppia-noninteractive-math></b></p>'
             ),
@@ -828,12 +828,11 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
             'dest': 'State2',
             'feedback': {
                 'html': (
-                    '<p>Sorry, it doesn\'t look like your <div><span>program '
-                    '</span></div>prints any output</p>.<blockquote><p> Could '
-                    'you get it to print something?</p></blockquote> You can '
-                    'do this by using a statement like prints. <br> You can '
-                    'ask any if you have'
-                    '<oppia-noninteractive-link url-with-value="&amp;quot;'
+                    '<p>Sorry, it doesn\'t look like your <span>program '
+                    '</span>prints output</p>.<blockquote><p> Could you get '
+                    'it to print something?</p></blockquote> Can do this by '
+                    'using statement like prints. <br> You can ask any if you '
+                    'have<oppia-noninteractive-link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
                     '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
                 ),
@@ -856,14 +855,24 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
 
         expected_output = [
             "[u'br', [u'[document]']]",
-            "[u'invalidTags', [u'div', u'span']]",
-            "[u'oppia-noninteractive-link', [u'[document]']]"
+            "[u'invalidTags', [u'span']]",
+            "[u'oppia-noninteractive-link', [u'[document]']]",
+            (
+                '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look '
+                'like your <span>program </span>prints output</p>.<blockquote>'
+                '<p> Could you get it to print something?</p></blockquote> '
+                'Can do this by using statement like prints. <br> You can '
+                'ask any if you have<oppia-noninteractive-link text-with-value'
+                '="&amp;quot;Here&amp;quot;" url-with-value="&amp;quot;'
+                'https://www.example.com&amp;quot;">'
+                '</oppia-noninteractive-link>.\']]'
+            )
         ]
 
         self.assertEqual(actual_output, expected_output)
 
 
-class TextAngularValiationAndMigrationTest(test_utils.GenericTestBase):
+class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -873,7 +882,7 @@ class TextAngularValiationAndMigrationTest(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(TextAngularValiationAndMigrationTest, self).setUp()
+        super(TextAngularValidationAndMigrationTest, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -989,11 +998,82 @@ class TextAngularValiationAndMigrationTest(test_utils.GenericTestBase):
                 "[u'invalidTags', "
                 "[u'code', u'span', u'tr', u'tbody', u'table', u'div', u'td']]"
             ),
+            "[u'oppia-noninteractive-image', [u'div', u'span', u'[document]']]",
+            "[u'oppia-noninteractive-link', [u'div', u'[document]']]",
             (
-                "[u'oppia-noninteractive-image', "
-                "[u'div', u'span', u'[document]']]"
-            ),
-            "[u'oppia-noninteractive-link', [u'div', u'[document]']]"]
+                '[u\'strings\', '
+                '[u\'There are number of ways by which we can give our share '
+                'to <blockquote><div><p>the open source community. It is not '
+                'just always opening the PRs.</p></div></blockquote><div> You '
+                'can help <br> fellow members, <br>open issues, <br><span> '
+                'review PRs </span>etc. </div>\', '
+                'u\'<span>hello</span><code> this is </code><div>test '
+                '</div><div>case4</div> for testing\', '
+                'u\'That is a quick <div>sample of Oppia. For more sample '
+                'explorations check out the Library.</div> You can also create '
+                'new explorations, like this one, by clicking on "Create" '
+                'button in the top right of the page.<br><div>We hope '
+                'you enjoy using Oppia. If you have feedback, please '
+                'let us know at our <oppia-noninteractive-link text-'
+                'with-value="&amp;quot;discussion forum&amp;quot;" url-'
+                'with-value="&amp;quot;https://groups.google.com/forum/?'
+                'fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-'
+                'link>!</div>Here is link 2 <oppia-noninteractive-link '
+                'text-with-value="&amp;quot;discussion forum&amp;quot;" '
+                'url-with-value="&amp;quot;https://groups.google.com/forum/?'
+                'fromgroups#!forum/oppia&amp;quot;">'
+                '</oppia-noninteractive-link>\', '
+                'u\'<div><i>hello</i></div> this is<i>test case1</i> for'
+                ' <span><i>testing</i></span>\', '
+                'u\'<div><br>hello</div> this is<br>test<pre> case2<br></pre>'
+                ' for <span><br>testing</span>\', '
+                'u\'So: <br><br>There is 1 way to arrange 1 ball. <br>There '
+                'are 2 ways to arrange 2 balls.<br>There are 6 ways to '
+                'arrange 3 balls.<br><br>Lets give these names. We will '
+                'say F1 = 1, F2 = 2, F3 = 6. So, if you have n balls where n '
+                'is 1, 2, 3, ..., then Fn is the number of ways to arrange '
+                'them. <br><oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;patterns.png&amp;quot;">'
+                '</oppia-noninteractive-image><br><br>Can you see a pattern, '
+                'or a systematic way to count them? Let us have a look at the '
+                '3-ball case.<br><br><br><br>First you pick the ball on the '
+                'left. This could be red, blue or yellow. There are three '
+                'cases to consider:<br><br>If first ball is red, '
+                'two balls are left to arrange in the other two slots. '
+                'And there are F2 ways to do this.<div>'
+                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'startRed.png&amp;quot;"></oppia-noninteractive-image><br>'
+                '<span><br></span></div><div><span>If the first ball is blue, '
+                'then there are two balls left to ... hey, this is the same '
+                'thing, it is just F2. </span></div><div>'
+                '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                'startBlue.png&amp;quot;"></oppia-noninteractive-image><br>'
+                '</div><div><br><span>And, if first ball is yellow, then ... '
+                'yada, yada, F2. </span><br><oppia-noninteractive-image '
+                'filepath-with-value="&amp;quot;startYellow.png&amp;quot;">'
+                '</oppia-noninteractive-image> <br><br>So total number of '
+                'ways to arrange 3 balls, F3, is equal to 3 * F2. All this '
+                'works out correctly, because F2 = 2, and F3 = 3 * 2 = 6.<br>'
+                '<br><br><br>Now, can you write out a similar expression for '
+                'F2, in terms of F1? Then we"ll move on to figuring out F4, '
+                'which starts to become hard to compute manually.</div>Here '
+                'is the image1 <i><oppia-noninteractive-image '
+                'filepath-with-value="amp;quot;startBlue.png&amp;quot;">'
+                '</oppia-noninteractive-image></i>Here is the image2 '
+                '<span><oppia-noninteractive-image filepath-with-value='
+                '"amp;quot;startBlue.png&amp;quot;">'
+                '</oppia-noninteractive-image></span>\', '
+                'u\'<table><tbody><tr><td>January</td><td>$100</td>'
+                '<td>200</td></tr><tr><td>February</td><td>$80</td><td>400'
+                '</td></tr></tbody></table>\', '
+                'u\'Hello, <span><b>How can I help You?</b></span><br><p>'
+                'I am quite fluent in python can you guide me how can I '
+                'start</p><span>contribtuing <div>in Oppia.</div>Ya Sure!'
+                'visit,the oppia documentation, sign the CLA,</span><pre>'
+                'and <br>have your first PR to go.</pre>\', '
+                'u\'hello <p> this is case3 for </p> testing\']]'
+            )
+        ]
 
         # Test that invalid html fails validation before migration.
         self.assertEqual(actual_output, expected_output)

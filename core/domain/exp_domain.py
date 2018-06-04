@@ -1789,20 +1789,23 @@ class Exploration(object):
     @classmethod
     def create_default_exploration(
             cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Returns a Exploration domain object with default values.
-            'title', 'category', 'objective' if not provided are taken from
-            feconf; 'tags' and 'param_changes_list' are initialized to empty
-            list; 'states_schema_version' and 'init_state_name' are taken from
-            feconf; 'states_dict' is derived from feconf; 'param_specs_dict' is
-            an empty dict; 'blurb' and 'author_notes' are initialized to empty
-            empty string; 'version' is initializated to 0.
+
+        'title', 'init_state_name', 'category', 'objective' if not provided are
+        taken from feconf; 'tags' and 'param_changes_list' are initialized to
+        empty list; 'states_schema_version' is taken from feconf; 'states_dict'
+        is derived from feconf; 'param_specs_dict' is an empty dict; 'blurb' and
+        'author_notes' are initialized to empty string; 'version' is
+        initializated to 0.
 
         Args:
             exploration_id: str. The id of the exploration.
             title: str. The exploration title.
+            init_state_name: str. The name of the initial state.
             category: str. The category of the exploration.
             objective: str. The objective of the exploration.
             language_code: str. The language code of the exploration.
@@ -1812,16 +1815,16 @@ class Exploration(object):
             values.
         """
         init_state_dict = State.create_default_state(
-            feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+            init_state_name, is_initial_state=True).to_dict()
 
         states_dict = {
-            feconf.DEFAULT_INIT_STATE_NAME: init_state_dict
+            init_state_name: init_state_dict
         }
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0,
+            init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
     @classmethod

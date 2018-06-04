@@ -1247,7 +1247,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': 250
                 }
             },
-            'playthrough_actions': [{
+            'actions': [{
                 'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
@@ -1268,8 +1268,9 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': 250
                 }
             },
+            'playthrough_ids': [],
             'schema_version': 1,
-            'is_valid': True
+            'is_valid': True,
         }
 
         response = self.testapp.get('/explore/%s' % self.exp_id)
@@ -1357,7 +1358,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
-            'playthrough_actions': [{
+            'actions': [{
                 'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
@@ -1375,6 +1376,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name2', 'state_name1']
                 },
             },
+            'playthrough_ids': [],
             'schema_version': 1,
             'is_valid': True
         }
@@ -1436,7 +1438,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name1', 'state_name2']
                 },
             },
-            'playthrough_actions': [{
+            'actions': [{
                 'action_type': 'ExplorationStart',
                 'action_customization_args': {
                     'state_name': {
@@ -1454,6 +1456,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                     'value': ['state_name1', 'state_name1', 'state_name2']
                 },
             },
+            'playthrough_ids': [],
             'schema_version': 1,
             'is_valid': True
         }
@@ -1506,7 +1509,10 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'exp_issue_dict': self.exp_issue_dict
             }, self.csrf_token, expect_errors=True, expected_status_int=400)
 
-        self.exp_issue_dict['issue_type'] = 'EarlyQuit'
+    def test_error_without_schema_version_in_exp_issue_dict(self):
+        """Test that passing an exploration issue dict without schema version
+        raises an exception.
+        """
         del self.exp_issue_dict['schema_version']
 
         self.post_json(
