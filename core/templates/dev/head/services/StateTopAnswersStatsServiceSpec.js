@@ -45,14 +45,8 @@ describe('StateTopAnswersStatsService', function() {
         name: 'Hola',
         interaction: {
           answerGroups: [{
-            rules: [{type: 'Equals', inputs: {x: 'hola!'}}],
-            outcome: {dest: 'Me Llamo'}
-          }, {
             rules: [{type: 'Contains', inputs: {x: 'hola'}}],
             outcome: {dest: 'Me Llamo'}
-          }, {
-            rules: [{type: 'FuzzyEquals', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Hola'}
           }],
           defaultOutcome: {dest: 'Hola'},
           id: 'TextInput'
