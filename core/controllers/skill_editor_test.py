@@ -52,31 +52,16 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             # Check that non-admins cannot access the editor page.
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id, ' '),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
-
-            response = self.testapp.get(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id,
-                    self.topic_id),
+                '%s/%s' % (
+                    feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id),
                 expect_errors=True)
             self.assertEqual(response.status_int, 401)
             self.logout()
 
-            # Check that admins can access and edit in the editor
-            # page.
+            # Check that admins can access and edit in the editor page.
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id, ' '))
-            self.assertEqual(response.status_int, 200)
-
-            response = self.testapp.get(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id,
-                    self.topic_id))
+                '%s/%s' % (feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id))
             self.assertEqual(response.status_int, 200)
             self.logout()
 
@@ -85,8 +70,8 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id, ' '),
+                '%s/%s' % (
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
                 expect_errors=True)
             self.assertEqual(response.status_int, 401)
             self.logout()
@@ -94,8 +79,8 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             # Check that admins can access the editable skill data.
             self.login(self.ADMIN_EMAIL)
             json_response = self.get_json(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id, ' '))
+                '%s/%s' % (
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id))
             self.assertEqual(self.skill_id, json_response['skill']['id'])
             self.logout()
 
@@ -114,13 +99,13 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id, ' '))
+                '%s/%s' % (
+                    feconf.SKILL_EDITOR_URL_PREFIX, self.skill_id))
             csrf_token = self.get_csrf_token_from_response(response)
 
             json_response = self.put_json(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id, ' '),
+                '%s/%s' % (
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
                 change_cmd, csrf_token=csrf_token)
             self.assertEqual(self.skill_id, json_response['skill']['id'])
             self.assertEqual(
@@ -130,8 +115,8 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             # Check that non-admins cannot edit a skill.
             self.login(self.NEW_USER_EMAIL)
             json_response = self.put_json(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id, ' '),
+                '%s/%s' % (
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
                 change_cmd, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=401)
             self.assertEqual(json_response['status_code'], 401)
@@ -142,38 +127,16 @@ class SkillEditorTest(BaseSkillEditorControllerTest):
             # Check that admins can delete a skill.
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.delete(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id, ' '))
+                '%s/%s' % (
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id))
             self.assertEqual(response.status_int, 200)
             self.logout()
 
             # Check that non-admins cannot delete a skill.
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.delete(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id, ' '),
+                '%s/%s' % (
+                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id),
                 expect_errors=True)
-            self.assertEqual(response.status_int, 401)
-            self.logout()
-
-    def test_editable_skill_handler_delete_from_topic(self):
-        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
-            # Check that admins can delete a skill.
-            self.login(self.ADMIN_EMAIL)
-            response = self.testapp.delete(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id,
-                    self.topic_id))
-            self.assertEqual(response.status_int, 200)
-            topic = topic_services.get_topic_by_id(self.topic_id)
-            self.assertEqual(topic.skill_ids, [])
-            self.logout()
-
-            # Check that non-admins cannot delete a skill.
-            self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.delete(
-                '%s/%s/%s' % (
-                    feconf.SKILL_EDITOR_DATA_URL_PREFIX, self.skill_id,
-                    self.topic_id), expect_errors=True)
             self.assertEqual(response.status_int, 401)
             self.logout()

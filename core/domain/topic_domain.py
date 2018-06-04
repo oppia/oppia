@@ -195,6 +195,19 @@ class Topic(object):
         skill_ids.remove(skill_id)
         return skill_ids
 
+    def add_skill(self, skill_id):
+        """Adds a skill to the skill_ids list.
+
+        Args:
+            skill_id: str. The skill id to add to the list.
+
+        Returns:
+            list. The updated list of skill ids.
+        """
+        skill_ids = self.skill_ids
+        skill_ids.append(skill_id)
+        return skill_ids
+
     def delete_story(self, story_id):
         """Removes a story from the canonical_story_ids list.
 

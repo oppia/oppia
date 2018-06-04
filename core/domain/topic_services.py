@@ -332,6 +332,26 @@ def delete_skill(user_id, topic_id, skill_id):
         user_id, topic_id, change_list, 'Removed %s from skill ids' % skill_id)
 
 
+def add_skill(user_id, topic_id, skill_id):
+    """Adds a skill with given id to the topic.
+
+    Args:
+        user_id: str. The id of the user who is performing the action.
+        topic_id: str. The id of the topic to which the skill is to be added.
+        skill_id: str. The skill to add to the topic.
+    """
+    topic = get_topic_by_id(topic_id)
+    new_skill_ids = topic.add_skill(skill_id)
+    change_list = [topic_domain.TopicChange({
+        'cmd': 'update_topic_property',
+        'property_name': 'skill_ids',
+        'old_value': topic.skill_ids,
+        'new_value': new_skill_ids
+    })]
+    update_topic(
+        user_id, topic_id, change_list, 'Added %s to skill ids' % skill_id)
+
+
 def delete_story(user_id, topic_id, story_id):
     """Removes story with given id from the topic.
 

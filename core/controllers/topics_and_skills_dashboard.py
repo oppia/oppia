@@ -66,11 +66,11 @@ class NewSkillHandler(base.BaseHandler):
     """Creates a new skill."""
 
     @acl_decorators.can_create_skill
-    def post(self, topic_id):
+    def post(self):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-        if topic_id == ' ':
-            topic_id = None
+        topic_id = None
+        topic_id = self.payload.get('topic_id')
 
         if topic_id is not None:
             topic = topic_services.get_topic_by_id(topic_id, strict=False)
@@ -87,17 +87,7 @@ class NewSkillHandler(base.BaseHandler):
         skill_services.save_new_skill(self.user_id, skill)
 
         if topic_id is not None:
-            skill_ids = topic.skill_ids
-            skill_ids.append(new_skill_id)
-            change_list = [topic_domain.TopicChange({
-                'cmd': 'update_topic_property',
-                'property_name': 'skill_ids',
-                'old_value': topic.skill_ids,
-                'new_value': skill_ids
-            })]
-            topic_services.update_topic(
-                self.user_id, topic_id, change_list,
-                'Added %s to skill ids' % new_skill_id)
+            topic_services.add_skill(self.user_id, topic_id, new_skill_id)
 
         self.render_json({
             'skillId': new_skill_id

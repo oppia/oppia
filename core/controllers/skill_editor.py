@@ -27,27 +27,16 @@ class SkillEditorPage(base.BaseHandler):
     """The editor page for a single skill."""
 
     @acl_decorators.can_edit_skill
-    def get(self, skill_id, topic_id):
+    def get(self, skill_id):
         """Handles GET requests."""
 
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        if topic_id == ' ':
-            topic_id = None
-
-        if topic_id is not None:
-            topic = topic_services.get_topic_by_id(topic_id, strict=False)
-            if topic is None:
-                raise self.PageNotFoundException(
-                    Exception('The topic with the given id doesn\'t exist.'))
-            if skill_id not in topic.skill_ids:
-                raise self.InvalidInputException(
-                    'The skill id: %s provided is not part of the given '
-                    'topic: %s' % (skill_id, topic_id))
-
         skill_domain.Skill.require_valid_skill_id(skill_id)
+
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
+
         if skill is None:
             raise self.PageNotFoundException(
                 Exception('The skill with the given id doesn\'t exist.'))
@@ -77,23 +66,10 @@ class EditableSkillDataHandler(base.BaseHandler):
                 % (skill_version, version_from_payload))
 
     @acl_decorators.can_edit_skill
-    def get(self, skill_id, topic_id):
+    def get(self, skill_id):
         """Populates the data on the individual skill page."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-
-        if topic_id == ' ':
-            topic_id = None
-
-        if topic_id is not None:
-            topic = topic_services.get_topic_by_id(topic_id, strict=False)
-            if topic is None:
-                raise self.PageNotFoundException(
-                    Exception('The topic with the given id doesn\'t exist.'))
-            if skill_id not in topic.skill_ids:
-                raise self.InvalidInputException(
-                    'The skill id: %s provided is not part of the given '
-                    'topic: %s' % (skill_id, topic_id))
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
@@ -108,23 +84,10 @@ class EditableSkillDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_edit_skill
-    def put(self, skill_id, topic_id):
+    def put(self, skill_id):
         """Updates properties of the given skill."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-
-        if topic_id == ' ':
-            topic_id = None
-
-        if topic_id is not None:
-            topic = topic_services.get_topic_by_id(topic_id, strict=False)
-            if topic is None:
-                raise self.PageNotFoundException(
-                    Exception('The topic with the given id doesn\'t exist.'))
-            if skill_id not in topic.skill_ids:
-                raise self.InvalidInputException(
-                    'The skill id: %s provided is not part of the given '
-                    'topic: %s' % (skill_id, topic_id))
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
@@ -156,28 +119,12 @@ class EditableSkillDataHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @acl_decorators.can_delete_skill
-    def delete(self, skill_id, topic_id):
+    def delete(self, skill_id):
         """Handles Delete requests."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-
-        if topic_id == ' ':
-            topic_id = None
-
-        if topic_id is not None:
-            topic = topic_services.get_topic_by_id(topic_id, strict=False)
-            if topic is None:
-                raise self.PageNotFoundException(
-                    Exception('The topic with the given id doesn\'t exist.'))
-            if skill_id not in topic.skill_ids:
-                raise self.InvalidInputException(
-                    'The skill id: %s provided is not part of the given '
-                    'topic: %s' % (skill_id, topic_id))
 
         skill_domain.Skill.require_valid_skill_id(skill_id)
         if not skill_id:
             raise self.PageNotFoundException
         skill_services.delete_skill(self.user_id, skill_id)
-        if topic_id is not None:
-            topic_services.delete_skill(
-                self.user_id, topic_id, skill_id)

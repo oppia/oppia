@@ -212,7 +212,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_COLLECTION_URL,
         creator_dashboard.NewCollectionHandler),
     get_redirect_route(
-        r'%s/<topic_id>' % feconf.NEW_SKILL_URL,
+        r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
         r'%s/<topic_id>' % feconf.NEW_STORY_URL, topic_editor.NewStoryHandler),
@@ -498,10 +498,10 @@ URLS = MAPREDUCE_HANDLERS + [
         topic_editor.TopicManagerRightsHandler),
 
     get_redirect_route(
-        r'%s/<skill_id>/<topic_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),
     get_redirect_route(
-        r'%s/<skill_id>/<topic_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
         skill_editor.EditableSkillDataHandler),
 
     get_redirect_route(

@@ -876,26 +876,13 @@ def can_edit_skill(handler):
     """Decorator to check whether the user can edit a skill, which can be
     independent or belong to a topic.
     """
-    def test_can_edit_skill(self, skill_id, topic_id):
+    def test_can_edit_skill(self, **kwargs):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        can_user_edit_skill = False
-        if topic_id == ' ':
-            topic_id = None
-
-        if topic_id is not None:
-            topic_rights = topic_services.get_topic_rights(topic_id)
-            if topic_rights is not None:
-                if topic_services.check_can_edit_topic(self.user, topic_rights):
-                    can_user_edit_skill = True
-        else:
-            user_actions_info = user_services.UserActionsInfo(self.user_id)
-            if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
-                can_user_edit_skill = True
-
-        if can_user_edit_skill:
-            return handler(self, skill_id, topic_id)
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        if role_services.ACTION_EDIT_OWNED_TOPIC in user_actions_info.actions:
+            return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
@@ -907,20 +894,16 @@ def can_edit_skill(handler):
 def can_delete_skill(handler):
     """Decorator to check whether the user can delete a skill.
     """
-    def test_can_delete_skill(self, skill_id, topic_id):
+    def test_can_delete_skill(self, **kwargs):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if topic_id == ' ':
-            topic_id = None
-
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
-            return handler(self, skill_id, topic_id)
+            return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                '%s does not have enough rights to delete the'
-                ' skill.' % self.user_id)
+                'You do not have credentials to delete the skill.')
 
     test_can_delete_skill.__wrapped__ = True
     return test_can_delete_skill
@@ -930,26 +913,13 @@ def can_create_skill(handler):
     """Decorator to check whether the user can create a skill, which can be
     independent or added to a topic.
     """
-    def test_can_create_skill(self, topic_id):
+    def test_can_create_skill(self, **kwargs):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        can_user_create_skill = False
-        if topic_id == ' ':
-            topic_id = None
-
-        if topic_id is not None:
-            topic_rights = topic_services.get_topic_rights(topic_id)
-            if topic_rights is not None:
-                if topic_services.check_can_edit_topic(self.user, topic_rights):
-                    can_user_create_skill = True
-        else:
-            user_actions_info = user_services.UserActionsInfo(self.user_id)
-            if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
-                can_user_create_skill = True
-
-        if can_user_create_skill:
-            return handler(self, topic_id)
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+            return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to create a skill.')
