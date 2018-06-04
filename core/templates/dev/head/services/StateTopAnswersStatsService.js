@@ -26,7 +26,7 @@ oppia.factory('StateTopAnswersStatsService', [
       ExplorationContextService, ExplorationStatesService, AnswerStatsFactory,
       UrlInterpolationService) {
     /** @type {Object.<string, AnswerStats[]>} */
-    var stateTopAnswersCache = {};
+    var stateTopAnswerStatsCache = {};
 
     /**
      * @param {string} stateName - target state to have its addressed info
@@ -38,10 +38,10 @@ oppia.factory('StateTopAnswersStatsService', [
       var interactionRulesService = $injector.get(
         AngularNameService.getNameOfInteractionRulesService(
           state.interaction.id));
-      stateTopAnswersCache[stateName].forEach(function(stateAnswerStats) {
-        stateAnswerStats.isAddressed =
+      stateTopAnswerStatsCache[stateName].forEach(function(answerStats) {
+        answerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            explorationId, stateName, state, stateAnswerStats.answer,
+            explorationId, stateName, state, answerStats.answer,
             interactionRulesService);
       });
     };
@@ -58,10 +58,10 @@ oppia.factory('StateTopAnswersStatsService', [
             '/createhandler/state_answer_stats/<exploration_id>',
             {exploration_id: explorationId})
         ).then(function(response) {
-          stateTopAnswersCache = {};
+          stateTopAnswerStatsCache = {};
           Object.keys(response.data.answers).forEach(function(stateName) {
             var answerStatsBackendDicts = response.data.answers[stateName];
-            stateTopAnswersCache[stateName] = answerStatsBackendDicts.map(
+            stateTopAnswerStatsCache[stateName] = answerStatsBackendDicts.map(
               AnswerStatsFactory.createFromBackendDict);
             // Still need to manually refresh the addressed information.
             refreshAddressedInfo(stateName);
@@ -74,7 +74,7 @@ oppia.factory('StateTopAnswersStatsService', [
        * @returns {AnswerStats[]} - list of the statistics for the top answers.
        */
       getStateStats: function(stateName) {
-        return angular.copy(stateTopAnswersCache[stateName]);
+        return angular.copy(stateTopAnswerStatsCache[stateName]);
       },
 
       /**
