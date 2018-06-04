@@ -138,7 +138,7 @@ describe('StateTopAnswersStatsService', function() {
       // Now, 'adios' is addressed by the Hola state.
       this.EXP_STATES.Hola.interaction.answerGroups.push({
         rules: [{type: 'Equals', inputs: {x: 'adios'}}],
-        outcome: {dest: 'Adios'}
+        outcome: {dest: 'Hola'}
       });
       this.StateTopAnswersStatsService.refreshStateStats('Hola');
 
