@@ -41,16 +41,6 @@ class Registry(object):
         return stats_models.ALLOWED_ACTION_TYPES
 
     @classmethod
-    def set_actions(cls, actions):
-        """Sets the mapping between action types to instances of the action
-        classes to the provided value.
-
-        Args:
-            actions: dict. Mapping action types to instances of the actions.
-        """
-        cls._actions = actions
-
-    @classmethod
     def _refresh(cls):
         """Initializes the mapping between action types to instances of the
         action classes.

@@ -260,4 +260,18 @@ class PlaythroughModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(model.exp_version, 1)
         self.assertEqual(model.issue_type, 'EarlyQuit')
         self.assertEqual(model.issue_customization_args, {})
-        self.assertEqual(model.playthrough_actions, [])
+        self.assertEqual(model.actions, [])
+
+    def test_delete_playthroughs_multi(self):
+        model_id1 = (
+            stat_models.PlaythroughModel.create(
+                'exp_id1', 1, 'EarlyQuit', {}, []))
+        model_id2 = (
+            stat_models.PlaythroughModel.create(
+                'exp_id1', 1, 'EarlyQuit', {}, []))
+
+        instance_ids = [model_id1, model_id2]
+        stat_models.PlaythroughModel.delete_playthroughs_multi(instance_ids)
+
+        instances = stat_models.PlaythroughModel.get_multi(instance_ids)
+        self.assertEqual(instances, [None, None])
