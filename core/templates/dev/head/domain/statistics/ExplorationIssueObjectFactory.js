@@ -21,18 +21,20 @@ oppia.factory('ExplorationIssueObjectFactory', [function() {
   /**
    * @constructor
    * @param {string} issueType - type of an issue.
-   * @param {*} issueCustomizationArgs - customization dict for an issue.
-   * @param {list(string)} playthroughIds - list of playthrough IDs.
+   * @param {Object.<string, *>} issueCustomizationArgs - customization dict for
+   *   an issue.
+   * @param {string[]} playthroughIds - list of playthrough IDs.
    * @param {number} schemaVersion - schema version of the class instance.
    * @param {boolean} isValid - whether the issue is valid.
    */
-  var ExplorationIssue = function(issueType, issueCustomizationArgs,
-      playthroughIds, schemaVersion, isValid) {
+  var ExplorationIssue = function(
+      issueType, issueCustomizationArgs, playthroughIds, schemaVersion,
+      isValid) {
     /** @type {string} */
     this.issueType = issueType;
-    /** @type {*} */
+    /** @type {Object.<string, *>} */
     this.issueCustomizationArgs = issueCustomizationArgs;
-    /** @type {list(string)} */
+    /** @type {string[]} */
     this.playthroughIds = playthroughIds;
     /** @type {number} */
     this.schemaVersion = schemaVersion;
@@ -42,8 +44,9 @@ oppia.factory('ExplorationIssueObjectFactory', [function() {
 
   /**
    * @param {string} issueType - type of an issue.
-   * @param {*} issueCustomizationArgs - customization dict for an issue.
-   * @param {list(string)} playthroughIds - list of playthrough IDs.
+   * @param {Object.<string, *>} issueCustomizationArgs - customization dict for
+   *   an issue.
+   * @param {string[]} playthroughIds - list of playthrough IDs.
    * @param {number} schemaVersion - schema version of the class instance.
    * @param {boolean} isValid - whether the issue is valid.
    * @returns {ExplorationIssue}

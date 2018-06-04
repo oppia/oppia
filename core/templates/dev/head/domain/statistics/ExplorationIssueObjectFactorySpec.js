@@ -25,8 +25,8 @@ describe('Exploration Issue Object Factory', function() {
   }));
 
   it('should create a new exploration issue', function() {
-    var explorationIssueObject = (
-      this.ExplorationIssueObjectFactory.create('EarlyQuit', {}, [], 1, true));
+    var explorationIssueObject =
+      this.ExplorationIssueObjectFactory.create('EarlyQuit', {}, [], 1, true);
 
     expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
     expect(explorationIssueObject.issueCustomizationArgs).toEqual({});

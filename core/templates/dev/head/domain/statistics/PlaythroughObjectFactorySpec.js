@@ -28,7 +28,8 @@ describe('Playthrough Object Factory', function() {
 
   it('should create a new playthrough', function() {
     var actions = [
-      this.LearnerActionObjectFactory.create('AnswerSubmit', {}, 1)];
+      this.LearnerActionObjectFactory.create('AnswerSubmit', {}, 1)
+    ];
     var playthroughObject = this.PlaythroughObjectFactory.create(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 

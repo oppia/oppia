@@ -25,16 +25,24 @@ oppia.factory('PlaythroughObjectFactory', [
      * @param {string} expId - ID of an exploration.
      * @param {number} expVersion - Version of an exploration.
      * @param {string} issueType - type of an issue.
-     * @param {*} issueCustomizationArgs - customization dict for an issue.
-     * @param {list(LearnerAction)} actions - list of learner actions.
+     * @param {Object.<string, *>} issueCustomizationArgs - customization dict
+     *   for an issue.
+     * @param {LearnerAction[]} actions - list of learner actions.
      */
-    var Playthrough = function(playthroughId, expId, expVersion, issueType,
-        issueCustomizationArgs, actions) {
+    var Playthrough = function(
+        playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
+        actions) {
+      /** @type {string} */
       this.playthroughId = playthroughId;
+      /** @type {string} */
       this.expId = expId;
+      /** @type {number} */
       this.expVersion = expVersion;
+      /** @type {string} */
       this.issueType = issueType;
+      /** @type {Object.<string, *>} */
       this.issueCustomizationArgs = issueCustomizationArgs;
+      /** @type {LearnerAction[]} */
       this.actions = actions;
     };
 
@@ -43,8 +51,9 @@ oppia.factory('PlaythroughObjectFactory', [
      * @param {string} expId - ID of an exploration.
      * @param {number} expVersion - Version of an exploration.
      * @param {string} issueType - type of an issue.
-     * @param {*} issueCustomizationArgs - customization dict for an issue.
-     * @param {list(LearnerAction)} actions - list of learner actions.
+     * @param {Object.<string, *>} issueCustomizationArgs - customization dict
+     *   for an issue.
+     * @param {LearnerAction[]} actions - list of learner actions.
      * @returns {Playthrough}
      */
     Playthrough.create = function(
@@ -56,7 +65,18 @@ oppia.factory('PlaythroughObjectFactory', [
     };
 
     /**
-     * @param {{playthroughId: string, expId: string, expVersion: number, issueType: string, issueCustomizationArgs, actions: list(LearnerAction)}} playthroughBackendDict
+     * @typedef PlaythroughBackendDict
+     * @property {string} playthroughId - ID of a playthrough.
+     * @property {string} expId - ID of an exploration.
+     * @property {number} expVersion - Version of an exploration.
+     * @property {string} issueType - type of an issue.
+     * @property {Object.<string, *>} issueCustomizationArgs - customization
+     *   dict for an issue.
+     * @property {LearnerAction[]} actions - list of learner actions.
+     */
+    /**
+     * @typedef
+     * @param {PlaythroughBackendDict} playthroughBackendDict
      * @returns {Playthrough}
      */
     Playthrough.createFromBackendDict = function(playthroughBackendDict) {

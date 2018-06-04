@@ -21,19 +21,24 @@ oppia.factory('LearnerActionObjectFactory', [function() {
   /**
    * @constructor
    * @param {string} actionType - type of an action.
-   * @param {*} actionCustomizationArgs - customization dict for an action.
+   * @param {Object.<string, *>} actionCustomizationArgs - customization dict
+   *   for an action.
    * @param {number} schemaVersion - schema version of the class instance.
    */
-  var LearnerAction = function(actionType, actionCustomizationArgs,
-      schemaVersion) {
+  var LearnerAction = function(
+      actionType, actionCustomizationArgs, schemaVersion) {
+    /** @type {string} */
     this.actionType = actionType;
+    /** @type {Object.<string, *>} */
     this.actionCustomizationArgs = actionCustomizationArgs;
+    /** @type {number} */
     this.schemaVersion = schemaVersion;
   };
 
   /**
    * @param {string} actionType - type of an action.
-   * @param {*} actionCustomizationArgs - customization dict for an action.
+   * @param {Object.<string, *>} actionCustomizationArgs - customization dict
+   *   for an action.
    * @param {number} schemaVersion - schema version of the class instance.
    * @returns {LearnerAction}
    */
@@ -44,7 +49,14 @@ oppia.factory('LearnerActionObjectFactory', [function() {
   };
 
   /**
-   * @param {{actionType: string, actionCustomizationArgs, schemaVersion: number}} learnerActionBackendDict
+   * @typedef LearnerActionBackendDict
+   * @property {string} actionType - type of an action.
+   * @property {Object.<string, *>} actionCustomizationArgs - customization dict
+   *   for an action.
+   * @property {number} schemaVersion - schema version of the class instance.
+   */
+  /**
+   * @param {LearnerActionBackendDict} learnerActionBackendDict
    * @returns {LearnerAction}
    */
   LearnerAction.createFromBackendDict = function(learnerActionBackendDict) {
