@@ -191,8 +191,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var _getImageDimensionsInState = function(state) {
       var fileDimensions = {};
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-        var filepathObject = state.interaction.customizationArgs.imageAndRegions.value.imagePath;
-        if(!filepathObject.width) {
+        var filepathObject = (
+          state.interaction.customizationArgs.imageAndRegions.value.imagePath);
+        if (!filepathObject.width) {
           var filename = filepathObject;
           filepathObject = {
             name: filename,
@@ -224,7 +225,16 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-        var filepathObject = state.interaction.customizationArgs.imageAndRegions.value.imagePath;
+        var filepathObject = (
+          state.interaction.customizationArgs.imageAndRegions.value.imagePath);
+        if (!filepathObject.width) {
+          var filename = filepathObject;
+          filepathObject = {
+            name: filename,
+            width: 500,
+            height: 200
+          };
+        }
         filenamesInState.push(filepathObject.name);
       }
       allHtmlOfState = _getAllHtmlOfState(state);

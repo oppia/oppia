@@ -66,8 +66,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               $scope.imageUrl = objectUrl;
             });
             // For aligning the gif to the center of it's container
-            var paddingTop = Math.max(0, ($scope.dimensions.height * 0.5)
-              - 60);
+            var paddingTop = Math.max(0, ($scope.dimensions.height * 0.5) -
+              60);
             $scope.loadingIndicatorContainerStyle =
             {
               'background-color': 'rgba(224,242,241,1)',
@@ -79,7 +79,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             // exploration.
             AssetsBackendApiService.loadImage(
               ExplorationContextService.getExplorationId(),
-            $scope.filepath.name).then(function(loadedImageFile) {
+              $scope.filepath.name).then(function(loadedImageFile) {
               var objectUrl = URL.createObjectURL(loadedImageFile.data);
               $scope.imageUrl = objectUrl;
             });
