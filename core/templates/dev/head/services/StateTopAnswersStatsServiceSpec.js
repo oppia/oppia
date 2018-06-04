@@ -77,8 +77,8 @@ describe('StateTopAnswersStatsService', function() {
 
       this.StateTopAnswersStatsService.init();
       this.$httpBackend.flush();
-      var stateStats = this.StateTopAnswersStatsService.getStateStats('Hola');
 
+      var stateStats = this.StateTopAnswersStatsService.getStateStats('Hola');
       expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
       expect(stateStats).toContain(joC({answer: 'adios', isAddressed: false}));
       expect(stateStats).toContain(joC({answer: 'que?', isAddressed: false}));
