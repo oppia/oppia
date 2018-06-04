@@ -2961,8 +2961,8 @@ states:
         - inputs:
             x: InputString
           rule_type: Equals
-        training_data: []
         tagged_misconception_id: null
+        training_data: []
       confirmed_unclassified_answers: []
       customization_args:
         placeholder:
@@ -3028,13 +3028,14 @@ states_schema_version: 20
 tags: []
 title: Title
 """)
-
     _LATEST_YAML_CONTENT = YAML_CONTENT_V25
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
             'eid', 'Title', 'Category', self.YAML_CONTENT_V1)
+        print exploration.to_yaml()
+        print self._LATEST_YAML_CONTENT
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v2(self):

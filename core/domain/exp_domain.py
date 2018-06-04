@@ -3296,7 +3296,6 @@ class Exploration(object):
             default_outcome = state_dict['interaction']['default_outcome']
             if default_outcome is not None:
                 default_outcome['skill_id'] = None
-
         return states_dict
 
     @classmethod

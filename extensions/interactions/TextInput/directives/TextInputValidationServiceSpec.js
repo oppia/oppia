@@ -57,7 +57,7 @@ describe('TextInputValidationService', function() {
       }
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
   }));
 
   it('should be able to perform basic validation', function() {

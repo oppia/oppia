@@ -1305,7 +1305,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'refresher_exploration_id': None,
                 'skill_id': None
             },
-            'training_data': []
+            'training_data': [],
             'tagged_misconception_id': None
         }]
         # Default outcome specification for an interaction.

@@ -129,82 +129,94 @@ describe('Exploration history', function() {
         highlighted: true
       },
       15: {
-        text: '    rule_specs:',
+        text: '      skill_id: null',
         highlighted: true
       },
       16: {
-        text: '    - inputs:',
+        text: '    rule_specs:',
         highlighted: true
       },
       17: {
-        text: '        x: 6',
+        text: '    - inputs:',
         highlighted: true
       },
       18: {
-        text: '      rule_type: Equals',
+        text: '        x: 6',
         highlighted: true
       },
       19: {
-        text: '    training_data: []',
+        text: '      rule_type: Equals',
         highlighted: true
       },
       20: {
+        text: '    tagged_misconception_id: null',
+        highlighted: true
+      },
+      21: {
+        text: '    training_data: []',
+        highlighted: true
+      },
+      22: {
         text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
-      21: {
+      23: {
         text: '  customization_args: {}',
         highlighted: false
       },
-      22: {
+      24: {
         text: '  default_outcome:',
         highlighted: false
       },
-      23: {
+      25: {
         text: '    dest: first',
         highlighted: true
       },
-      24: {
+      26: {
         text: '    feedback:',
         highlighted: false
       },
-      25: {
+      27: {
         text: '      audio_translations: {}',
         highlighted: false
       },
-      26: {
+      28: {
         text: '      html: \'\'',
         highlighted: false
       },
-      27: {
+      29: {
         text: '    labelled_as_correct: false',
         highlighted: false
       },
-      28: {
+      30: {
         text: '    param_changes: []',
         highlighted: false
       },
-      29: {
+      31: {
         text: '    refresher_exploration_id: null',
         highlighted: false
       },
-      30: {
-        text: '  hints: []',
-        highlighted: false
-      },
-      31: {
-        text: '  id: NumericInput',
-        highlighted: true
-      },
       32: {
-        text: '  solution: null',
+        text: '    skill_id: null',
         highlighted: false
       },
       33: {
-        text: 'param_changes: []',
+        text: '  hints: []',
         highlighted: false
       },
       34: {
+        text: '  id: NumericInput',
+        highlighted: true
+      },
+      35: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      36: {
+        text: 'param_changes: []',
+        highlighted: false
+      },
+      37: {
         text: ' ',
         highlighted: false
       }
@@ -278,22 +290,26 @@ describe('Exploration history', function() {
         highlighted: false
       },
       17: {
-        text: '  hints: []',
+        text: '    skill_id: null',
         highlighted: false
       },
       18: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      19: {
         text: '  id: null',
         highlighted: true
       },
-      19: {
+      20: {
         text: '  solution: null',
         highlighted: false
       },
-      20: {
+      21: {
         text: 'param_changes: []',
         highlighted: false
       },
-      21: {
+      22: {
         text: ' ',
         highlighted: false
       }
@@ -318,6 +334,7 @@ describe('Exploration history', function() {
       '    labelled_as_correct: false\n' +
       '    param_changes: []\n' +
       '    refresher_exploration_id: null\n' +
+      '    skill_id: null\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +

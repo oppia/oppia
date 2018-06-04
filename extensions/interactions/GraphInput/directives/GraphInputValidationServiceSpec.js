@@ -72,7 +72,8 @@ describe('GraphInputValidationService', function() {
         rule_type: 'IsIsomorphicTo'
       })],
       goodDefaultOutcome,
-      false
+      false,
+      null
     );
     answerGroups = [answerGroup, angular.copy(answerGroup)];
   }));

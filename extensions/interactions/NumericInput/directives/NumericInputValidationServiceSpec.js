@@ -66,7 +66,8 @@ describe('NumericInputValidationService', function() {
     answerGroups = [agof.createNew(
       [equalsZeroRule, betweenNegativeOneAndOneRule],
       goodDefaultOutcome,
-      false
+      false,
+      null
     )];
   }));
 

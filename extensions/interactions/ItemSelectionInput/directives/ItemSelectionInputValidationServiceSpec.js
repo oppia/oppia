@@ -65,7 +65,8 @@ describe('ItemSelectionInputValidationService', function() {
         }
       })],
       goodDefaultOutcome,
-      false)
+      false,
+      null)
     ];
   }));
 

@@ -42,7 +42,7 @@ describe('ContinueValidationService', function() {
       skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
     customizationArguments = {
       buttonText: {
         value: 'Some Button Text'

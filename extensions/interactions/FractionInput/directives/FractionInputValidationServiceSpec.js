@@ -199,7 +199,8 @@ describe('FractionInputValidationService', function() {
     answerGroups = [agof.createNew(
       [equalsOneRule, lessThanTwoRule],
       goodDefaultOutcome,
-      false
+      false,
+      null
     )];
   }));
 

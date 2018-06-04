@@ -83,9 +83,11 @@ describe('TrainingDataService', function() {
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              skill_id: null
             },
-            training_data: []
+            training_data: [],
+            tagged_misconception_id: null
           }],
           default_outcome: {
             dest: 'State',
@@ -95,7 +97,8 @@ describe('TrainingDataService', function() {
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null
+            refresher_exploration_id: null,
+            skill_id: null
           },
           hints: [],
           confirmed_unclassified_answers: []

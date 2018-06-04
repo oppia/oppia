@@ -80,8 +80,8 @@ describe('Interaction validator', function() {
     });
 
     goodAnswerGroups = [
-      agof.createNew([], goodOutcomeDest, false),
-      agof.createNew([], goodOutcomeFeedback, false)
+      agof.createNew([], goodOutcomeDest, false, null),
+      agof.createNew([], goodOutcomeFeedback, false, null)
     ];
     goodDefaultOutcome = goodOutcomeDest;
   }));
@@ -97,9 +97,9 @@ describe('Interaction validator', function() {
     it('should have a warning for an answer group with a confusing outcome',
       function() {
         var answerGroups = [
-          agof.createNew([], goodOutcomeDest, false),
-          agof.createNew([], badOutcome, false),
-          agof.createNew([], goodOutcomeFeedback, false)
+          agof.createNew([], goodOutcomeDest, false, null),
+          agof.createNew([], badOutcome, false, null),
+          agof.createNew([], goodOutcomeFeedback, false, null)
         ];
         var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
         expect(warnings).toEqual([{
@@ -139,9 +139,9 @@ describe('Interaction validator', function() {
     it('should be able to concatenate warnings for both answer groups and ' +
         'the default outcome', function() {
       var badAnswerGroups = [
-        agof.createNew([], goodOutcomeDest, false),
-        agof.createNew([], badOutcome, false),
-        agof.createNew([], badOutcome, false)
+        agof.createNew([], goodOutcomeDest, false, null),
+        agof.createNew([], badOutcome, false, null),
+        agof.createNew([], badOutcome, false, null)
       ];
       var warnings = bivs.getAllOutcomeWarnings(
         badAnswerGroups, badOutcome, currentState);

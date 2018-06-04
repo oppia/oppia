@@ -64,7 +64,8 @@ describe('InteractiveMapValidationService', function() {
         }
       })],
       goodDefaultOutcome,
-      false
+      false,
+      null
     )];
   }));
 
