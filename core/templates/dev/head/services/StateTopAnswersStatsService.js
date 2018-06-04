@@ -29,8 +29,9 @@ oppia.factory('StateTopAnswersStatsService', [
     var stateTopAnswerStatsCache = {};
 
     /**
-     * @param {string} stateName - target state to have its addressed info
-     * refreshed.
+     * Updates the addressed info of all the answers cached for the given state
+     * to reflect any changes in the state's structure.
+     * @param {string} stateName
      */
     var refreshAddressedInfo = function(stateName) {
       var explorationId = ExplorationContextService.getExplorationId();
