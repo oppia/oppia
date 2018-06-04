@@ -113,7 +113,7 @@ describe('StateTopAnswersStatsService', function() {
     });
   });
 
-  describe('refreshStateStats', function() {
+  describe('.refreshStateStats', function() {
     it('correctly identifies unaddressed issues', function() {
       this.$httpBackend.expectGET(
         '/createhandler/state_answer_stats/7'
