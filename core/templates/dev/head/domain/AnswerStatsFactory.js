@@ -47,7 +47,8 @@ oppia.factory('AnswerStatsFactory', [function() {
 
   /**
    * Returns a stale instance, specifically, isAddressed will always be false.
-   * Use {@link StateTopAnswerStatsService} to keep these instances fresh.
+   * Use {@link StateTopAnswerStatsService#refreshStateStats} to keep these
+   * instances fresh.
    *
    * @param {{answer, frequency: number}} backendDict
    * @returns {AnswerStats}
