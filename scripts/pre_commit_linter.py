@@ -85,12 +85,12 @@ BAD_PATTERNS = {
         'excluded_dirs': ()},
     '\t': {
         'message': 'Please use spaces instead of tabs.',
-        'excluded_files': (),
+        'excluded_files': ('assets/images/activity/loadingIndicator.gif'),
         'excluded_dirs': (
             'assets/i18n/',)},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
-        'excluded_files': (),
+        'excluded_files': ('assets/images/activity/loadingIndicator.gif'),
         'excluded_dirs': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
