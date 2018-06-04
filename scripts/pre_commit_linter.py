@@ -85,12 +85,12 @@ BAD_PATTERNS = {
         'excluded_dirs': ()},
     '\t': {
         'message': 'Please use spaces instead of tabs.',
-        'excluded_files': ('assets/images/activity/loadingIndicator.gif'),
+        'excluded_files': (),
         'excluded_dirs': (
             'assets/i18n/',)},
     '\r': {
         'message': 'Please make sure all files only have LF endings (no CRLF).',
-        'excluded_files': ('assets/images/activity/loadingIndicator.gif'),
+        'excluded_files': (),
         'excluded_dirs': ()},
     'glyphicon': {
         'message': 'Please use equivalent material-icons '
@@ -169,7 +169,7 @@ EXCLUDED_PHRASES = [
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
