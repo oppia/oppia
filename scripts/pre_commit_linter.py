@@ -130,7 +130,8 @@ BAD_PATTERNS_JS_REGEXP = [
     {
         'regexp': r"\$scope\.\$parent",
         'message': "Please do not access parent properties " +
-                "using $scope.$parent. Use the scope object for this purpose.",
+                   "using $scope.$parent. Use the scope object" +
+                   "for this purpose.",
         'excluded_files': (),
         'excluded_dirs': ()
     }
