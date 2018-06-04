@@ -57,8 +57,8 @@ oppia.factory('AnswerStatsFactory', [function() {
   AnswerStats.createFromBackendDict = function(backendDict) {
     // TODO(brianrodri): Use a proper service which takes the state's
     // interaction type into account for generating the answer's HTML.
-    var answerHtml = (typeof backendDict.answer === 'string')
-      ? backendDict.answer : angular.toJson(backendDict.answer);
+    var answerHtml = (typeof backendDict.answer === 'string') ?
+      backendDict.answer : angular.toJson(backendDict.answer);
     return new AnswerStats(
       backendDict.answer, answerHtml, backendDict.frequency, false);
   };
