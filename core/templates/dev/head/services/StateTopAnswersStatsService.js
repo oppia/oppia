@@ -20,37 +20,13 @@
 oppia.factory('StateTopAnswersStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
   'ExplorationContextService', 'ExplorationStatesService',
-  'UrlInterpolationService',
+  'StateAnswerStatsFactory', 'UrlInterpolationService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
       ExplorationContextService, ExplorationStatesService,
-      UrlInterpolationService) {
-    /**
-     * @typedef {Object} AnswerStats - A record for the statistics of a single
-     * top answer. TODO(brianrodri): Consider placing this into its own domain
-     * object.
-     *
-     * @property {*} answer - Contains the answer in its raw form, directly from
-     *    the backend.
-     * @property {string} answerHtml - Contains the answer as a string which can
-     *    be rendered directly as HTML.
-     * @property {number} frequency
-     * @property {boolean} isAddressed
-     */
-
+      StateAnswerStatsFactory, UrlInterpolationService) {
     /** @type {Object.<string, AnswerStats[]>} */
     var stateTopAnswersCache = {};
-
-    /**
-     * TODO(brianrodri): Move this helper function into a proper service which
-     * takes the state's interaction type into account when formatting the HTML.
-     * @param {*} answer
-     * @returns {string}
-     */
-    var convertAnswerToHtml = function(answer) {
-      // Don't render quotes when the answer is a string.
-      return (typeof answer === 'string') ? answer : angular.toJson(answer);
-    };
 
     /**
      * @param {string} stateName - target state to have its addressed info
@@ -63,10 +39,10 @@ oppia.factory('StateTopAnswersStatsService', [
         AngularNameService.getNameOfInteractionRulesService(
           state.interaction.id));
 
-      stateTopAnswersCache[stateName].forEach(function(answerStats) {
-        answerStats.isAddressed =
+      stateTopAnswersCache[stateName].forEach(function(stateAnswerStats) {
+        stateAnswerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
-            explorationId, stateName, state, answerStats.answer,
+            explorationId, stateName, state, stateAnswerStats.answer,
             interactionRulesService);
       });
     };
@@ -88,15 +64,8 @@ oppia.factory('StateTopAnswersStatsService', [
           Object.keys(response.data.answers).forEach(function(stateName) {
             var stateAnswerStatsBackendDicts = response.data.answers[stateName];
 
-            stateTopAnswersCache[stateName] =
-              stateAnswerStatsBackendDicts.map(function(answerFrequencyDict) {
-                return /** @type {AnswerStats} */ {
-                  answer: angular.copy(answerFrequencyDict.answer),
-                  frequency: answerFrequencyDict.frequency,
-                  answerHtml: convertAnswerToHtml(answerFrequencyDict.answer),
-                  isAddressed: false, // Stale, needs to be refreshed.
-                };
-              });
+            stateTopAnswersCache[stateName] = stateAnswerStatsBackendDicts.map(
+              StateAnswerStatsFactory.createFromBackendDict);
             refreshAddressedInfo(stateName);
           });
         });
