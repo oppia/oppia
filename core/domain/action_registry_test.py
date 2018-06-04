@@ -20,19 +20,10 @@ from core.domain import action_registry
 from core.tests import test_utils
 
 
-class BaseLearnerActionSpec(object):
-    pass
-
-
-class TestAction(BaseLearnerActionSpec):
-    pass
-
-
 class ActionRegistryUnitTests(test_utils.GenericTestBase):
     """Test for the action registry."""
 
     def test_action_registry(self):
         """Do some sanity checks on the action registry."""
-        action_registry.Registry.set_actions({'TestAction': TestAction})
         self.assertEqual(
-            len(action_registry.Registry.get_all_actions()), 1)
+            len(action_registry.Registry.get_all_actions()), 3)
