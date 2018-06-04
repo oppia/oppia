@@ -217,10 +217,6 @@ oppia.directive('outcomeEditor', [
               $scope.saveThisFeedback(false);
             }
           };
-
-          $scope.onAudioTranslationsEdited = function() {
-            stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-          };
         }
       ]
     };

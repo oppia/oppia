@@ -21,14 +21,15 @@ oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$uibModal', '$filter', 'stateInteractionIdService',
   'EditorStateService', 'AlertsService', 'ResponsesService', 'RouterService',
   'ExplorationContextService', 'TrainingDataService',
-  'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
-  'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
-  function(
+  'stateContentIdsToAudioTranslationsService', 'stateCustomizationArgsService',
+  'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS', 'UrlInterpolationService',
+  'AnswerGroupObjectFactory', function(
       $scope, $rootScope, $uibModal, $filter, stateInteractionIdService,
       EditorStateService, AlertsService, ResponsesService, RouterService,
       ExplorationContextService, TrainingDataService,
-      stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
-      INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
+      stateContentIdsToAudioTranslationsService, stateCustomizationArgsService,
+      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS, UrlInterpolationService,
+      AnswerGroupObjectFactory) {
     $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
       GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
     $scope.EditorStateService = EditorStateService;
@@ -374,18 +375,22 @@ oppia.controller('StateResponses', [
           '$scope', '$uibModalInstance', 'ResponsesService',
           'EditorStateService', 'EditorFirstTimeEventsService',
           'RuleObjectFactory', 'OutcomeObjectFactory',
-          function(
+          'GenerateContentIdService', function(
               $scope, $uibModalInstance, ResponsesService,
               EditorStateService, EditorFirstTimeEventsService,
-              RuleObjectFactory, OutcomeObjectFactory) {
+              RuleObjectFactory, OutcomeObjectFactory,
+              GenerateContentIdService) {
             $scope.feedbackEditorIsOpen = false;
 
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };
             $scope.tmpRule = RuleObjectFactory.createNew(null, {});
+            var feedbackContentId = GenerateContentIdService.generateUniqueId();
+
             $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(), '', []);
+              EditorStateService.getActiveStateName(), feedbackContentId, '',
+              []);
 
             $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
               return (
@@ -420,6 +425,9 @@ oppia.controller('StateResponses', [
         $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
           [result.tmpRule], result.tmpOutcome, []));
         ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
+        stateContentIdsToAudioTranslationsService.displayed.addContentId(
+          result.tmpOutcome.feedback.getContentId());
+        stateContentIdsToAudioTranslationsService.saveDisplayedValue();
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
 
         // After saving it, check if the modal should be reopened right away.
@@ -474,7 +482,12 @@ oppia.controller('StateResponses', [
           }
         ]
       }).result.then(function() {
+        var deletedOutcome = ResponsesService.getAnswerGroup(index).outcome;
         ResponsesService.deleteAnswerGroup(index);
+        var deletedFeedbackContentId = deletedOutcome.feedback.getContentId();
+        stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+          deletedFeedbackContentId);
+        stateContentIdsToAudioTranslationsService.saveDisplayedValue();
       });
     };
 

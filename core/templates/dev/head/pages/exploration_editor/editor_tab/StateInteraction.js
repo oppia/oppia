@@ -19,20 +19,22 @@
 oppia.controller('StateInteraction', [
   '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
   'AlertsService', 'EditorStateService', 'HtmlEscaperService',
-  'INTERACTION_SPECS', 'stateInteractionIdService',
+  'INTERACTION_SPECS', 'stateInteractionIdService', 'GenerateContentIdService',
   'stateCustomizationArgsService', 'EditabilityService',
   'ExplorationStatesService', 'GraphDataService',
-  'InteractionDetailsCacheService',
+  'InteractionDetailsCacheService', 'stateContentIdsToAudioTranslationsService',
   'ExplorationHtmlFormatterService', 'UrlInterpolationService',
-  'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateContentService',
-  function($scope, $http, $rootScope, $uibModal, $injector, $filter,
+  'SubtitledHtmlObjectFactory', 'stateSolutionService', 'stateHintsService',
+  'stateContentService', function(
+      $scope, $http, $rootScope, $uibModal, $injector, $filter,
       AlertsService, EditorStateService, HtmlEscaperService,
-      INTERACTION_SPECS, stateInteractionIdService,
+      INTERACTION_SPECS, stateInteractionIdService, GenerateContentIdService,
       stateCustomizationArgsService, EditabilityService,
       ExplorationStatesService, GraphDataService,
-      InteractionDetailsCacheService,
+      InteractionDetailsCacheService, stateContentIdsToAudioTranslationsService,
       ExplorationHtmlFormatterService, UrlInterpolationService,
-      SubtitledHtmlObjectFactory, stateSolutionService, stateContentService) {
+      SubtitledHtmlObjectFactory, stateSolutionService, stateHintsService,
+      stateContentService) {
     var DEFAULT_TERMINAL_STATE_CONTENT = 'Congratulations, you have finished!';
 
     // Declare dummy submitAnswer() and adjustPageHeight() methods for the
@@ -113,10 +115,14 @@ oppia.controller('StateInteraction', [
         return;
       }
 
+      var contentId = GenerateContentIdService.generateUniqueId();
       // Update the state's content.
       stateContentService.displayed = SubtitledHtmlObjectFactory.createDefault(
-        DEFAULT_TERMINAL_STATE_CONTENT);
+        DEFAULT_TERMINAL_STATE_CONTENT, contentId);
       stateContentService.saveDisplayedValue();
+      stateContentIdsToAudioTranslationsService.displayed.addContentId(
+        contentId);
+      stateContentIdsToAudioTranslationsService.saveDisplayedValue();
     };
 
     $scope.onCustomizationModalSavePostHook = function() {
@@ -337,7 +343,6 @@ oppia.controller('StateInteraction', [
             $scope.reallyDelete = function() {
               $uibModalInstance.close();
             };
-
             $scope.cancel = function() {
               $uibModalInstance.dismiss('cancel');
               AlertsService.clearWarnings();
@@ -345,14 +350,19 @@ oppia.controller('StateInteraction', [
           }
         ]
       }).result.then(function() {
+        // TODO(SD): Clean Hints and Responses to resolve #4634.
         stateInteractionIdService.displayed = null;
         stateCustomizationArgsService.displayed = {};
         stateSolutionService.displayed = null;
+        stateContentIdsToAudioTranslationsService.displayed
+          .deleteAllexceptThisContentId(
+            stateContentService.displayed.getContentId());
         InteractionDetailsCacheService.removeDetails(
           stateInteractionIdService.savedMemento);
         stateInteractionIdService.saveDisplayedValue();
         stateCustomizationArgsService.saveDisplayedValue();
         stateSolutionService.saveDisplayedValue();
+        stateContentIdsToAudioTranslationsService.saveDisplayedValue();
         $rootScope.$broadcast(
           'onInteractionIdChanged', stateInteractionIdService.savedMemento);
         GraphDataService.recompute();

@@ -1749,7 +1749,7 @@ def _create_change_list_from_suggestion(
         suggestion: Suggestion. The given Suggestion domain object.
         old_content: SubtitledHtml. A SubtitledHtml domain object representing
             the content of the old state.
-        content_ids_to_audio_translations: dict. A dict connecting
+        old_content_ids_to_audio_translations: dict. A dict connecting
             audio translations for SubtitledHtml objects with the help of
             content_id as key.
         audio_update_required: bool. Whether the audio for the state content
@@ -1778,14 +1778,14 @@ def _create_change_list_from_suggestion(
     })]
 
     if audio_update_required:
-        for _, translation in content_ids_to_audio_translations[
-            old_content.content_id].iteritems():
+        for _, translation in old_content_ids_to_audio_translations[
+                old_content.content_id].iteritems():
             translation.needs_update = True
         change_list.append(exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': suggestion.state_name,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS, # pylint: disable=line-too-long
-            'new_value': content_ids_to_audio_translations
+            'new_value': old_content_ids_to_audio_translations
         }))
 
     return change_list

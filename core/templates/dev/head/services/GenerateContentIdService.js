@@ -18,24 +18,28 @@
  */
 
 oppia.factory('GenerateContentIdService', [
-  'ExplorationStatesService', function(ExplorationStatesService) {
+  'stateContentIdsToAudioTranslationsService', function(
+      stateContentIdsToAudioTranslationsService) {
     var generateRandomString = function() {
       randomString = '';
-      while (randomStringlength !== 6){
+      while (randomString.length !== 6){
         randomString = Math.random().toString(36).substring(2, 8);
       }
+      return randomString;
     };
     var _generateUniqueId = function() {
-      var contentIdsToAudioTranslations = (
-        ExplorationStatesService.getContentIdsToAudioTranslationsMemento());
-      var ContentIdList = contentIdsToAudioTranslations.getAllContnetId();
+      var ContentIdList = stateContentIdsToAudioTranslationsService
+        .displayed.getAllContentId();
       var uniqueId = generateRandomString();
       while (ContentIdList.indexOf(uniqueId) >= 0) {
         uniqueId = generateRandomString();
       }
+      return uniqueId;
     };
 
     return {
-      generateUniqueId: _generateUniqueId()
+      generateUniqueId: function() {
+        return _generateUniqueId();
+      }
     };
   }]);

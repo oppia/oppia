@@ -55,11 +55,11 @@ oppia.factory('OutcomeObjectFactory', [
       return this.feedback.getHtml().trim() !== '';
     };
 
-    Outcome.createNew = function(dest, feedbackText, feedbacktextId,
+    Outcome.createNew = function(dest, feedbacktextId, feedbackText,
         paramChanges) {
       return new Outcome(
         dest,
-        SubtitledHtmlObjectFactory.createDefault(feedbackText),
+        SubtitledHtmlObjectFactory.createDefault(feedbackText, feedbacktextId),
         false,
         paramChanges,
         null);

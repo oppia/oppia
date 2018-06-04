@@ -59,7 +59,7 @@ oppia.controller('StateEditor', [
         stateContentIdsToAudioTranslationsService.init(
           EditorStateService.getActiveStateName(),
           stateData.contentIdsToAudioTranslations);
-        console.log(stateContentService.displayed.getHtml(), "FU");
+
         $rootScope.$broadcast('stateEditorInitialized', stateData);
         var interactionId = ExplorationStatesService.getInteractionIdMemento(
           stateName);

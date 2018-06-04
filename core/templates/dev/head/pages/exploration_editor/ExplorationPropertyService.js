@@ -373,7 +373,7 @@ oppia.factory('ExplorationStatesService', [
       confirmed_unclassified_answers: [
         'interaction', 'confirmedUnclassifiedAnswers'],
       content: ['content'],
-      contenIdsToAudioTranslations: ['content_ids_to_audio_translations'],
+      content_ids_to_audio_translations: ['contentIdsToAudioTranslations'],
       default_outcome: ['interaction', 'defaultOutcome'],
       param_changes: ['paramChanges'],
       param_specs: ['paramSpecs'],

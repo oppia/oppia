@@ -83,6 +83,27 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
       this._contentIdsToAudioTranslations[contentId] = {};
     };
 
+    ContentIdsToAudioTranslations.prototype.deleteContentId = function(
+        contentId) {
+      if (!this._contentIdsToAudioTranslations.hasOwnProperty(contentId)) {
+        throw Error('Unable to find the given content id.');
+      }
+      delete this._contentIdsToAudioTranslations[contentId];
+    };
+
+    ContentIdsToAudioTranslations.prototype.deleteAllexceptThisContentId =
+      function(contentId) {
+        var ContentIdList = this.getAllContentId();
+        if (ContentIdList.indexOf(contentId) < 0) {
+          throw Error('Unable to find the given content id.');
+        }
+        for (index in ContentIdList) {
+          if (ContentIdList[index] !== contentId) {
+            this.deleteContentId(ContentIdList[index]);
+          }
+        }
+      };
+
     ContentIdsToAudioTranslations.prototype.addAudioTranslation = function(
         contentId, languageCode, filename, fileSizeBytes) {
       var audioTranslations = this._contentIdsToAudioTranslations[contentId];
@@ -112,14 +133,14 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
 
     ContentIdsToAudioTranslations.prototype.toBackendDict = function() {
       var contentIdsToAudioTranslationsDict = {};
-      Object.keys(this._contentIdsToAudioTranslations).forEach(function(key) {
-        var audioTanslations = this._contentIdsToAudioTranslations[key];
+      for (contentId in this._contentIdsToAudioTranslations) {
+        var audioTanslations = this._contentIdsToAudioTranslations[contentId];
         var audioTranslationsDict = {};
         Object.keys(audioTanslations).forEach(function(lang){
           audioTranslationsDict[lang] = audioTanslations[lang].toBackendDict();
         });
-        contentIdsToAudioTranslationsDict[key] = audioTranslationsDict;
-      });
+        contentIdsToAudioTranslationsDict[contentId] = audioTranslationsDict;
+      }
 
       return contentIdsToAudioTranslationsDict;
     };
@@ -135,7 +156,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
         Object.keys(audioTanslationsDict).forEach(function(langCode){
           audioTranslations[langCode] = (
             AudioTranslationObjectFactory.createFromBackendDict(
-              audioTanslationsDict[lang]));
+              audioTanslationsDict[langCode]));
         });
         contentIdsToAudioTranslations[contentId] = audioTranslations;
       });

@@ -34,8 +34,6 @@ oppia.directive('hintEditor', [
             stateContentIdsToAudioTranslationsService, COMPONENT_NAME_HINT) {
           $scope.isEditable = EditabilityService.isEditable();
           $scope.stateHintsService = stateHintsService;
-          $scope.stateContentIdsToAudioTranslationsService =
-            stateContentIdsToAudioTranslationsService;
           $scope.editHintForm = {};
           $scope.hintEditorIsOpen = false;
 
@@ -82,10 +80,6 @@ oppia.directive('hintEditor', [
             if ($scope.hintEditorIsOpen) {
               $scope.saveThisHint();
             }
-          };
-
-          $scope.onAudioTranslationsEdited = function() {
-            stateContentIdsToAudioTranslationsService.saveDisplayedValue();
           };
 
           $scope.$on('externalSave', function() {

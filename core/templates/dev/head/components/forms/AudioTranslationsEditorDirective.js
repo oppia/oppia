@@ -22,28 +22,32 @@ oppia.directive('audioTranslationsEditor', [
       restrict: 'E',
       scope: {
         componentName: '@',
-        contentIdsToAudioTranslations: '=',
-        contentId: '@',
+        contentId: '=',
         // A function that must be called at the outset of every attempt to
         // edit, even if the action is not subsequently taken through to
         // completion.
-        getOnStartEditFn: '&onStartEdit',
-        // A function that must be called on completion of an action which
-        // changes the audio translation data in a persistent way.
-        getOnChangeFn: '&onChange'
+        getOnStartEditFn: '&onStartEdit'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/audio_translations_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', '$sce', 'stateContentService', 'stateContentIdsToAudioTranslationsService',
+        '$scope', '$rootScope', '$uibModal', '$sce', 'stateContentService',
+        'stateContentIdsToAudioTranslationsService',
         'EditabilityService', 'LanguageUtilService', 'AlertsService',
         'ExplorationContextService', 'AssetsBackendApiService',
         function(
-            $scope, $uibModal, $sce, stateContentService, stateContentIdsToAudioTranslationsService, EditabilityService,
+            $scope, $rootScope, $uibModal, $sce, stateContentService,
+            stateContentIdsToAudioTranslationsService, EditabilityService,
             LanguageUtilService, AlertsService, ExplorationContextService,
             AssetsBackendApiService) {
           $scope.isEditable = EditabilityService.isEditable;
-          console.log($scope.contentId, "asssssssssssssssssssssssssssssasssssssssssssssssssssssssssssss");
+
+          $rootScope.$on('audioTranslationChange', function() {
+            $scope.audioTranslations = (
+              stateContentIdsToAudioTranslationsService.displayed
+                .getBindableAudioTranslations($scope.contentId));
+          });
+
           // The following if-condition is present because, sometimes,
           // Travis-CI throws an error of the form "Cannot read property
           // getBindableAudioTranslations of undefined". It looks like there is
@@ -54,6 +58,9 @@ oppia.directive('audioTranslationsEditor', [
             $scope.audioTranslations = (
               stateContentIdsToAudioTranslationsService.displayed
                 .getBindableAudioTranslations($scope.contentId));
+            $scope.hasAudioTranslations =
+              stateContentIdsToAudioTranslationsService.displayed
+                .hasAudioTranslations($scope.contentId);
           }
 
           var explorationId = ExplorationContextService.getExplorationId();
@@ -68,15 +75,15 @@ oppia.directive('audioTranslationsEditor', [
           };
 
           $scope.isFullyTranslated = function() {
-            stateContentIdsToAudioTranslationsService.displayed.isFullyTranslated(
-              $scope.contentId);
+            stateContentIdsToAudioTranslationsService.displayed
+              .isFullyTranslated($scope.contentId);
           };
 
           $scope.toggleNeedsUpdateAttribute = function(languageCode) {
             $scope.getOnStartEditFn()();
             stateContentIdsToAudioTranslationsService.displayed
-              .toggleNeedsUpdateAttribute ($scope.contentId, languageCode);
-            $scope.getOnChangeFn()();
+              .toggleNeedsUpdateAttribute($scope.contentId, languageCode);
+            stateContentIdsToAudioTranslationsService.saveDisplayedValue();
           };
 
           $scope.openAddAudioTranslationModal = function() {
@@ -201,10 +208,12 @@ oppia.directive('audioTranslationsEditor', [
                 }
               ]
             }).result.then(function(result) {
-              stateContentIdsToAudioTranslationsService.displayed.addAudioTranslation(
-                $scope.contentId, result.languageCode, result.filename,
-                result.fileSizeBytes);
-              $scope.getOnChangeFn()();
+              stateContentIdsToAudioTranslationsService.displayed
+                .addAudioTranslation(
+                  $scope.contentId, result.languageCode, result.filename,
+                  result.fileSizeBytes);
+              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $rootScope.$broadcast('audioTranslationChange');
             });
           };
 
@@ -242,9 +251,10 @@ oppia.directive('audioTranslationsEditor', [
                 }
               ]
             }).result.then(function(result) {
-              stateContentIdsToAudioTranslationsService.displayed.deleteAudioTranslation(
-                $scope.contentId, languageCode);
-              $scope.getOnChangeFn()();
+              stateContentIdsToAudioTranslationsService.displayed
+                .deleteAudioTranslation($scope.contentId, languageCode);
+              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $rootScope.$broadcast('audioTranslationChange');
             });
           };
         }

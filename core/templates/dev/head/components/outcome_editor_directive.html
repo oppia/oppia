@@ -68,10 +68,8 @@
 
 <div ng-if="!outcome.feedback.getHtml().isEmpty() && displayFeedback">
   <audio-translations-editor component-name="<[COMPONENT_NAME_FEEDBACK]>"
-                             content-ids-to-audio-translations="stateContentIdsToAudioTranslationsService.displayed"
                              content-id="outcome.feedback.getContentId()"
-                             on-start-edit="onAudioTranslationsStartEditAction"
-                             on-change="onAudioTranslationsEdited">
+                             on-start-edit="onAudioTranslationsStartEditAction">
   </audio-translations-editor>
 </div>
 

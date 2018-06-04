@@ -103,11 +103,11 @@ oppia.factory('StatesObjectFactory', [
           var audioLanguageCodes = (
             state.contentIdsToAudioTranslations.getAudioLanguageCodes(
               contentId));
-          for (var languageCode in audioLanguageCodes) {
+          audioLanguageCodes.forEach(function(languageCode) {
             if (allAudioLanguageCodes.indexOf(languageCode) === -1) {
               allAudioLanguageCodes.push(languageCode);
             }
-          }
+          });
         });
       }
       return allAudioLanguageCodes;

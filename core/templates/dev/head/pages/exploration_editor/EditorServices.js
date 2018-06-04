@@ -154,7 +154,7 @@ oppia.factory('stateSolutionService', [
 oppia.factory('stateContentIdsToAudioTranslationsService', [
   'statePropertyService', function(statePropertyService) {
     var child = Object.create(statePropertyService);
-    child.setterMethodKey = 'saveContentIdsToAudioTranslationsService';
+    child.setterMethodKey = 'saveContentIdsToAudioTranslations';
     return child;
   }
 ]);

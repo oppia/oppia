@@ -47,6 +47,9 @@ oppia.directive('stateContentEditor', [
             type: 'html'
           };
           $scope.stateContentService = stateContentService;
+          if (stateContentService.displayed) {
+            $scope.contentId = stateContentService.displayed.getContentId();
+          }
 
           $scope.stateContentIdsToAudioTranslationsService =
             stateContentIdsToAudioTranslationsService;
