@@ -21,6 +21,7 @@ from core.domain import suggestion_registry
 from core.domain import suggestion_services
 from core.platform import models
 from core.tests import test_utils
+import utils
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
     models.NAMES.suggestion, models.NAMES.feedback])
@@ -38,7 +39,8 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     change_cmd = {
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-        'state_name': 'state_1'
+        'state_name': 'state_1',
+        'new_value': 'new suggestion content'
     }
 
     AUTHOR_EMAIL = 'author@example.com'
@@ -75,7 +77,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
     # All mock explorations created for testing.
     explorations = [
-        MockExploration('exp1', ['state_1', 'state_2'])
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}})
     ]
 
     def mock_get_exploration_by_id(self, exp_id):
@@ -106,7 +108,13 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'author_id': self.author_id,
             'final_reviewer_id': self.reviewer_id,
             'assigned_reviewer_id': self.assigned_reviewer_id,
-            'change_cmd': self.change_cmd,
+            'change_cmd': {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'state_1',
+                'new_value': 'new suggestion content',
+                'old_value': None
+            },
             'score_category': self.score_category
         }
         with self.swap(
@@ -153,9 +161,14 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 self.mock_get_exploration_by_id):
                 with self.swap(
                     suggestion_registry.SuggestionEditStateContent,
-                    'update_change_cmd_before_accept', self.null_function):
-                    suggestion_services.accept_suggestion(
-                        suggestion, self.reviewer_id, self.COMMIT_MESSAGE)
+                    'pre_accept_validate', self.null_function):
+                    with self.swap(
+                        suggestion_registry.SuggestionEditStateContent,
+                        'get_change_list_for_accepting_suggestion',
+                        self.null_function):
+                        suggestion_services.accept_suggestion(
+                            suggestion, self.reviewer_id, self.COMMIT_MESSAGE,
+                            'review message')
             suggestion = suggestion_services.get_suggestion_by_id(
                 self.suggestion_id)
             self.assertEqual(
@@ -166,7 +179,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             thread_messages = feedback_services.get_messages(self.THREAD_ID)
             last_message = thread_messages[len(thread_messages) - 1]
             self.assertEqual(
-                last_message.text, 'Accepted by %s' % self.reviewer_id)
+                last_message.text, 'review message')
 
     def test_accept_suggestion_handled_suggestion_failure(self):
         with self.swap(
@@ -188,7 +201,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'The suggestion has already been accepted/rejected.'):
             suggestion_services.accept_suggestion(
-                suggestion, self.reviewer_id, self.COMMIT_MESSAGE)
+                suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -201,7 +214,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'The suggestion has already been accepted/rejected.'):
             suggestion_services.accept_suggestion(
-                suggestion, self.reviewer_id, self.COMMIT_MESSAGE)
+                suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
         self.assertEqual(
@@ -222,16 +235,16 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
 
         # Invalidating the suggestion.
         suggestion.score_category = 'invalid_score_category'
-        suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
         with self.assertRaisesRegexp(
-            Exception, 'The given suggestion is not valid.'):
+            utils.ValidationError, 'Expected score_category to be of the form '
+                       'score_type.score_sub_type, received '
+                       'invalid_score_category'):
+            suggestion_services._update_suggestion(suggestion) # pylint: disable=protected-access
             suggestion_services.accept_suggestion(
-                suggestion, self.reviewer_id, self.COMMIT_MESSAGE)
+                suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
-
-        self.assertEqual(suggestion.status, suggestion_models.STATUS_INVALID)
 
     def test_accept_suggestion_no_commit_message_failure(self):
         with self.swap(
@@ -249,7 +262,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Commit message cannot be empty.'):
             suggestion_services.accept_suggestion(
-                suggestion, self.reviewer_id, self.EMPTY_COMMIT_MESSAGE)
+                suggestion, self.reviewer_id, self.EMPTY_COMMIT_MESSAGE, None)
 
     def test_reject_suggestion_successfully(self):
         with self.swap(
@@ -265,7 +278,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             self.suggestion_id)
 
         suggestion_services.reject_suggestion(
-            suggestion, self.reviewer_id)
+            suggestion, self.reviewer_id, 'reject review message')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
         self.assertEqual(
@@ -274,7 +287,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             suggestion.final_reviewer_id, self.reviewer_id)
         thread_messages = feedback_services.get_messages(self.THREAD_ID)
         last_message = thread_messages[len(thread_messages) - 1]
-        self.assertEqual(last_message.text, 'Rejected by %s' % self.reviewer_id)
+        self.assertEqual(last_message.text, 'reject review message')
 
     def test_reject_suggestion_handled_suggestion_failure(self):
         with self.swap(
@@ -295,7 +308,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'The suggestion has already been accepted/rejected.'):
             suggestion_services.reject_suggestion(
-                suggestion, self.reviewer_id)
+                suggestion, self.reviewer_id, 'reject review message')
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -309,7 +322,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'The suggestion has already been accepted/rejected.'):
             suggestion_services.reject_suggestion(
-                suggestion, self.reviewer_id)
+                suggestion, self.reviewer_id, 'reject review message')
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
         self.assertEqual(
@@ -324,7 +337,12 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     target_id_1 = 'exp1'
     target_id_2 = 'exp2'
     target_version_at_submission = 1
-    change_cmd = {}
+    change_cmd = {
+        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+        'state_name': 'state_1',
+        'new_value': 'new suggestion content'
+    }
 
 
     AUTHOR_EMAIL_1 = 'author1@example.com'

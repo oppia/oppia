@@ -50,9 +50,9 @@ def create_suggestion(
         change_cmd: dict. The details of the suggestion.
         score_category: str. The category to score the author on.
         description: str. The description of the changes provided by the author.
-        assigned_reviewer_id: str(optional). The ID of the user assigned to
+        assigned_reviewer_id: str|None. The ID of the user assigned to
             review the suggestion.
-        final_reviewer_id: str(optional). The ID of the reviewer who has
+        final_reviewer_id: str|None. The ID of the reviewer who has
             accepted/rejected the suggestion.
     """
 
@@ -65,21 +65,20 @@ def create_suggestion(
         thread_id = feedback_services.create_thread(
             target_id, None, author_id, description,
             DEFAULT_SUGGESTION_THREAD_SUBJECT)
-        # This line will be removed after the feedback thread migration is
-        # complete and the IDs for both models match.
+        # This line and the if..else will be removed after the feedback thread
+        # migration is complete and the IDs for both models match.
         thread_id = suggestion_models.TARGET_TYPE_EXPLORATION + '.' + thread_id
-    if assigned_reviewer_id:
-        suggestion_models.SuggestionModel.create(
-            suggestion_type, target_type, target_id,
-            target_version_at_submission, suggestion_models.STATUS_IN_REVIEW,
-            author_id, assigned_reviewer_id, final_reviewer_id, change_cmd,
-            score_category, thread_id)
     else:
-        suggestion_models.SuggestionModel.create(
-            suggestion_type, target_type, target_id,
-            target_version_at_submission, suggestion_models.STATUS_RECEIVED,
-            author_id, assigned_reviewer_id, final_reviewer_id, change_cmd,
-            score_category, thread_id)
+        raise Exception('Feedback threads can only be linked to explorations')
+
+    status = (
+        suggestion_models.STATUS_IN_REVIEW if assigned_reviewer_id else
+        suggestion_models.STATUS_RECEIVED)
+
+    suggestion_models.GeneralSuggestionModel.create(
+        suggestion_type, target_type, target_id,
+        target_version_at_submission, status, author_id, assigned_reviewer_id,
+        final_reviewer_id, change_cmd, score_category, thread_id)
 
 
 def get_suggestion_from_model(suggestion_model):
@@ -113,7 +112,7 @@ def get_suggestion_by_id(suggestion_id):
         Suggestion|None. The corresponding suggestion, or None if no suggestion
             is found.
     """
-    model = suggestion_models.SuggestionModel.get_by_id(suggestion_id)
+    model = suggestion_models.GeneralSuggestionModel.get_by_id(suggestion_id)
 
     return get_suggestion_from_model(model) if model else None
 
@@ -129,7 +128,7 @@ def get_suggestions_by_author(author_id):
     """
     return [
         get_suggestion_from_model(s)
-        for s in suggestion_models.SuggestionModel.get_suggestions_by_author(
+        for s in suggestion_models.GeneralSuggestionModel.get_suggestions_by_author(
             author_id)]
 
 
@@ -144,7 +143,7 @@ def get_suggestions_reviewed_by(reviewer_id):
     """
     return [
         get_suggestion_from_model(s)
-        for s in suggestion_models.SuggestionModel.get_suggestions_reviewed_by(
+        for s in suggestion_models.GeneralSuggestionModel.get_suggestions_reviewed_by(
             reviewer_id)]
 
 
@@ -159,9 +158,8 @@ def get_suggestions_assigned_to_reviewer(assigned_reviewer_id):
         list(Suggestion). A list of suggestions assigned to the given user
             for review.
     """
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.SuggestionModel
+    return [get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel
         .get_suggestions_assigned_to_reviewer(assigned_reviewer_id)]
 
 
@@ -174,10 +172,9 @@ def get_suggestions_by_status(status):
     Returns:
         list(Suggestion). A list of suggestions with the given status.
     """
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.SuggestionModel.get_suggestions_by_status(
-            status)]
+    return [get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_suggestions_by_status(status)]
 
 
 def get_suggestion_by_type(suggestion_type):
@@ -189,10 +186,9 @@ def get_suggestion_by_type(suggestion_type):
     Returns:
         list(Suggestion). A list of suggestions of the given type.
     """
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.SuggestionModel.get_suggestions_by_type(
-            suggestion_type)]
+    return [get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_suggestions_by_type(suggestion_type)]
 
 
 def get_suggestions_by_target_id(target_type, target_id):
@@ -205,27 +201,26 @@ def get_suggestions_by_target_id(target_type, target_id):
     Returns:
         list(Suggestion). A list of suggestions linked to the entity.
     """
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.SuggestionModel.get_suggestions_by_target_id(
-            target_type, target_id)]
+    return [get_suggestion_from_model(s)
+        for s in suggestion_models.GeneralSuggestionModel
+        .get_suggestions_by_target_id(target_type, target_id)]
 
 
 def _update_suggestion(suggestion):
     """Updates the given suggestion.
 
     Args:
-        suggestion: Suggestion. The domain object of the suggestion to be
-            updated.
+        suggestion: Suggestion. The suggestion to be updated.
     """
+    suggestion.validate()
 
-    suggestion_model = suggestion_models.SuggestionModel.get_by_id(
+    suggestion_model = suggestion_models.GeneralSuggestionModel.get_by_id(
         suggestion.suggestion_id)
 
     suggestion_model.status = suggestion.status
     suggestion_model.assigned_reviewer_id = suggestion.assigned_reviewer_id
     suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
-    suggestion_model.change_cmd = suggestion.change_cmd
+    suggestion_model.change_cmd = suggestion.change_cmd.to_dict()
     suggestion_model.score_category = suggestion.score_category
 
     suggestion_model.put()
@@ -235,11 +230,15 @@ def mark_review_completed(suggestion, status, reviewer_id):
     """Marks that a review has been completed.
 
     Args:
-        suggestion: Suggestion. The domain object of the suggestion to be
-            updated.
-        status: str. The status of the suggestion post review.
+        suggestion: Suggestion. The suggestion to be updated.
+        status: str. The status of the suggestion post review. Possible values
+            are STATUS_ACCEPTED or STATUS_REJECTED.
         reviewer_id: str. The ID of the user who completed the review.
     """
+    if(status not in
+        [suggestion_models.STATUS_ACCEPTED, suggestion_models.STATUS_REJECTED]):
+        raise Exception('Invalid status after review.')
+
     suggestion.status = status
     suggestion.final_reviewer_id = reviewer_id
     suggestion.assigned_reviewer_id = None
@@ -251,8 +250,7 @@ def assign_reviewer_to_suggestion(suggestion, assigned_reviewer_id):
     """Assigns a user to review the suggestion.
 
     Args:
-        suggestion: Suggestion. The domain object of the suggestion to be
-            updated.
+        suggestion: Suggestion. The suggestion to be updated.
         assigned_reviewer_id: str. The ID of the user who is assigned to review.
     """
     suggestion.status = suggestion_models.STATUS_IN_REVIEW
@@ -278,20 +276,6 @@ def get_thread_id_from_suggestion_id(suggestion_id):
     return suggestion_id[suggestion_id.find('.') + 1:]
 
 
-def is_suggestion_handled(suggestion):
-    """Checks if the suggestion has been accepted or rejected.
-
-    Args:
-        suggestion: Suggestion. The domain object of the suggestion to be
-            checked.
-
-    Returns:
-        bool. Whether the suggestion has been handled or not.
-    """
-    return (suggestion.status not in [suggestion_models.STATUS_IN_REVIEW,
-                                      suggestion_models.STATUS_RECEIVED])
-
-
 def get_commit_message_for_suggestion(author_username, commit_message):
     """Returns a modified commit message for an accepted suggestion.
 
@@ -309,32 +293,27 @@ def get_commit_message_for_suggestion(author_username, commit_message):
         author_username, commit_message)
 
 
-def accept_suggestion(suggestion, reviewer_id, commit_message):
+def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
     """Accepts the given suggestion after validating it.
 
     Args:
-        suggestion: Suggestion. The domain object of the suggestion to be
-            accepted.
+        suggestion: Suggestion. The suggestion to be accepted.
         reviewer_id: str. The ID of the reviewer accepting the suggestion.
         commit_message: str. The commit message.
+        review_message: str. The message provided by the reviewer while
+            accepting the suggestion.
 
     Raises:
         Exception: The suggestion is already handled.
         Exception: The suggestion is not valid.
         Exception: The commit message is empty.
     """
-    if is_suggestion_handled(suggestion):
+    if suggestion.is_handled:
         raise Exception('The suggestion has already been accepted/rejected.')
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
 
-    try:
-        # If an exception is raised, the suggestion status will be set as
-        # STATUS_INVALID.
-        suggestion.validate()
-    except utils.ValidationError:
-        invalidate_suggestion(suggestion)
-        raise Exception('The given suggestion is not valid.')
+    suggestion.pre_accept_validate()
 
     author_name = user_services.get_username(suggestion.author_id)
     commit_message = get_commit_message_for_suggestion(
@@ -345,38 +324,27 @@ def accept_suggestion(suggestion, reviewer_id, commit_message):
 
     feedback_services.create_message(
         get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
-        feedback_models.STATUS_CHOICES_FIXED, None,
-        'Accepted by %s' % reviewer_id)
+        feedback_models.STATUS_CHOICES_FIXED, None, review_message)
 
 
-def reject_suggestion(suggestion, reviewer_id):
+def reject_suggestion(suggestion, reviewer_id, review_message):
     """Rejects the suggestion.
 
      Args:
-        suggestion: Suggestion. The domain object of the suggestion to be
-            rejected.
+        suggestion: Suggestion. The suggestion to be rejected.
         reviewer_id: str. The ID of the reviewer rejecting the suggestion.
+        review_message: str. The message provided by the reviewer while
+            rejecting the suggestion.
 
     Raises:
         Exception: The suggestion is already handled.
     """
-    if is_suggestion_handled(suggestion):
+    if suggestion.is_handled:
         raise Exception('The suggestion has already been accepted/rejected.')
-
+    if not review_message:
+        raise Exception('Review message cannot be empty.')
     mark_review_completed(
         suggestion, suggestion_models.STATUS_REJECTED, reviewer_id)
     feedback_services.create_message(
         get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
-        feedback_models.STATUS_CHOICES_IGNORED, None,
-        'Rejected by %s' % reviewer_id)
-
-
-def invalidate_suggestion(suggestion):
-    """Sets the status of the suggestion as STATUS_INVALID.
-
-    Args:
-        suggestion: Suggestion. The domain object of the suggestion to be
-            invalidated.
-    """
-    suggestion.status = suggestion_models.STATUS_INVALID
-    _update_suggestion(suggestion)
+        feedback_models.STATUS_CHOICES_IGNORED, None, review_message)

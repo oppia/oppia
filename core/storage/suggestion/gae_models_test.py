@@ -206,11 +206,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 suggestion_models.GeneralSuggestionModel
                 .get_suggestions_by_status(
                     suggestion_models.STATUS_ACCEPTED)), 2)
-        self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_status(
-                    suggestion_models.STATUS_INVALID)), 0)
 
     def test_get_suggestions_by_target_id(self):
         self.assertEqual(

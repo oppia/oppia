@@ -41,7 +41,8 @@ class BaseSuggestion(object):
             review the suggestion.
         final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
             the suggestion.
-        change_cmd: dict. The details of the suggestion.
+        change_cmd: Change. The details of the suggestion. This should be an
+            object of type ExplorationChange, TopicChange, etc.
         score_category: str. The scoring category for the suggestion.
     """
 
@@ -66,7 +67,7 @@ class BaseSuggestion(object):
             'author_id': self.author_id,
             'final_reviewer_id': self.final_reviewer_id,
             'assigned_reviewer_id': self.assigned_reviewer_id,
-            'change_cmd': self.change_cmd,
+            'change_cmd': self.change_cmd.to_dict(),
             'score_category': self.score_category
         }
 
@@ -153,11 +154,6 @@ class BaseSuggestion(object):
                     'Expected final_reviewer_id to be a string, received %s' %
                     type(self.final_reviewer_id))
 
-        if not isinstance(self.change_cmd, dict):
-            raise utils.ValidationError(
-                'Expected change_cmd to be a dict, received %s' % type(
-                    self.change_cmd))
-
         if not isinstance(self.score_category, basestring):
             raise utils.ValidationError(
                 'Expected score_category to be a string, received %s' % type(
@@ -192,14 +188,31 @@ class BaseSuggestion(object):
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement accept.')
 
-    def update_change_cmd_before_accept(self):
-        """Before accepting the suggestion, some parts of the change_cmd might
-        need to be updated. Each subclass must implement this function as
-        applicable.
+    def get_change_list_for_accepting_suggestion(self):
+        """Before accepting the suggestion, a change_list needs to be generated
+        from the change_cmd. Each subclass must implement this function.
         """
         raise NotImplementedError(
             'Subclasses of BaseSuggestion should implement '
-            'update_change_cmd_before_accept.')
+            'get_change_list_for_accepting_suggestion.')
+
+    def pre_accept_validate(self):
+        """Performs referential validation. This function needs to be called
+        before accepting the suggestion.
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseSuggestion should implement '
+            'pre_accept_validate.')
+
+    @property
+    def is_handled(self):
+        """Returns if the suggestion has either been accepted or rejected.
+
+        Returns:
+            bool. Whether the suggestion has been handled or not.
+        """
+        return (self.status not in [suggestion_models.STATUS_IN_REVIEW,
+                                    suggestion_models.STATUS_RECEIVED])
 
 
 class SuggestionEditStateContent(BaseSuggestion):
@@ -211,8 +224,8 @@ class SuggestionEditStateContent(BaseSuggestion):
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, assigned_reviewer_id, final_reviewer_id,
             change_cmd, score_category):
-        """Initializes a Suggestion object of type
-        SUGGESTION_TYPE_EDIT_STATE_CONTENT.
+        """Initializes an object of type SuggestionEditStateContent
+        corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
         self.suggestion_id = suggestion_id
         self.suggestion_type = (
@@ -224,18 +237,22 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.author_id = author_id
         self.assigned_reviewer_id = assigned_reviewer_id
         self.final_reviewer_id = final_reviewer_id
-        self.change_cmd = change_cmd
+        self.change_cmd = exp_domain.ExplorationChange(change_cmd)
         self.score_category = score_category
 
     def validate(self):
-        """Validates a suggestion object of type
-        SUGGESTION_TYPE_EDIT_STATE_CONTENT.
+        """Validates a suggestion object of type SuggestionEditStateContent.
 
         Raises:
             ValidationError: One or more attributes of the
                 SuggestionEditStateContent object are invalid.
         """
         super(SuggestionEditStateContent, self).validate()
+
+        if not isinstance(self.change_cmd, exp_domain.ExplorationChange):
+            raise utils.ValidationError(
+                'Expected change_cmd to be an ExplorationChange, received %s'
+                % type(self.change_cmd))
 
         if self.get_score_type() != suggestion_models.SCORE_TYPE_CONTENT:
             raise utils.ValidationError(
@@ -249,48 +266,46 @@ class SuggestionEditStateContent(BaseSuggestion):
                 'Expected the second part of score_category to be a valid'
                 ' category, received %s' % self.get_score_sub_type())
 
-        if 'cmd' not in self.change_cmd:
-            raise utils.ValidationError(
-                'Expected change_cmd to contain a cmd key')
-
-        if self.change_cmd['cmd'] != exp_domain.CMD_EDIT_STATE_PROPERTY:
+        if self.change_cmd.cmd != exp_domain.CMD_EDIT_STATE_PROPERTY:
             raise utils.ValidationError(
                 'Expected cmd to be %s, received %s' % (
                     exp_domain.CMD_EDIT_STATE_PROPERTY, self.change_cmd['cmd']))
 
-        if 'property_name' not in self.change_cmd:
-            raise utils.ValidationError(
-                'Expected change_cmd to contain a property_name key')
-
-        if (
-                self.change_cmd['property_name'] !=
+        if (self.change_cmd.property_name !=
                 exp_domain.STATE_PROPERTY_CONTENT):
             raise utils.ValidationError(
                 'Expected property_name to be %s, received %s' % (
                     exp_domain.STATE_PROPERTY_CONTENT,
-                    self.change_cmd['property_name']))
+                    self.change_cmd.property_name))
 
-        if 'state_name' not in self.change_cmd:
-            raise utils.ValidationError(
-                'Expected change_cmd to contain a state_name key')
-
+    def pre_accept_validate(self):
+        """Performs referential validation. This function needs to be called
+        before accepting the suggestion.
+        """
+        self.validate()
         states = exp_services.get_exploration_by_id(self.target_id).states
-        if self.change_cmd['state_name'] not in states:
+        if self.change_cmd.state_name not in states:
             raise utils.ValidationError(
                 'Expected %s to be a valid state name' %
-                self.change_cmd['state_name'])
+                self.change_cmd.state_name)
 
-    def update_change_cmd_before_accept(self):
-        """Before accepting the suggestion, modifications need to be done to the
-        change_cmd.
+    def get_change_list_for_accepting_suggestion(self):
+        """Gets a complete change_cmd for the suggestion.
+
+        Returns:
+            list(ExplorationChange). The change_list corresponding to the
+                suggestion.
         """
+        change_cmd = self.change_cmd
         exploration = exp_services.get_exploration_by_id(self.target_id)
-        old_content = exploration.states[self.change_cmd['state_name']].content
+        old_content = exploration.states[self.change_cmd.state_name].content
 
-        self.change_cmd['old_content'] = old_content
+        change_cmd.old_content = old_content
 
-        self.change_cmd['new_content']['audio_translations'] = (
+        change_cmd.new_content['audio_translations'] = (
             old_content['audio_translations'])
+
+        return [change_cmd]
 
     def accept(self, commit_message):
         """Accepts the suggestion.
@@ -298,21 +313,22 @@ class SuggestionEditStateContent(BaseSuggestion):
         Args:
             commit_message: str. The commit message.
         """
-        self.update_change_cmd_before_accept()
-        change_list = [self.change_cmd]
+        change_list = self.get_change_list_for_accepting_suggestion()
         exp_services.update_exploration(
             self.final_reviewer_id, self.target_type, change_list,
             commit_message, is_suggestion=True)
 
     @classmethod
     def from_dict(cls, suggestion_dict):
-        """Return a Suggestion object of type from a dict.
+        """Return a Suggestion object of type SUGGESTION_TYPE_EDIT_STATE_CONTENT
+        from a dict.
 
         Args:
             suggestion_dict: dict. The dict representation of the suggestion.
 
         Returns:
-            BaseSuggestion. The corresponding Suggestion domain object.
+            SuggestionEditStateContent. The corresponding Suggestion domain
+                object.
         """
         suggestion = cls(
             suggestion_dict['suggestion_id'],
