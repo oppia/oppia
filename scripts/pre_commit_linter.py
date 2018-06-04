@@ -630,12 +630,13 @@ def _pre_commit_linter(all_files):
     print '----------------------------------------'
 
     for process in linting_processes:
+        process.daemon = True
         process.start()
 
     for process in linting_processes:
         # Require timeout parameter to prevent against endless waiting for the
         # linting function to return.
-        process.join(timeout=600)
+        process.join(timeout=200)
 
     js_messages = []
     while not js_stdout.empty():
