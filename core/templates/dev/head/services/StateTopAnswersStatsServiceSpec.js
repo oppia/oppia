@@ -119,11 +119,7 @@ describe('StateTopAnswersStatsService', function() {
         '/createhandler/state_answer_stats/7'
       ).respond({
         answers: {
-          Hola: [
-            {answer: 'hola', frequency: 7},
-            {answer: 'adios', frequency: 4},
-            {answer: 'que?', frequency: 2},
-          ]
+          Hola: [{answer: 'adios', frequency: 4}]
         }
       });
 
@@ -131,9 +127,9 @@ describe('StateTopAnswersStatsService', function() {
       this.StateTopAnswersStatsService.init();
       this.$httpBackend.flush();
 
-      expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toContain(
+      expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
         jasmine.objectContaining({answer: 'adios', isAddressed: false})
-      );
+      ]);
 
       // Now, 'adios' is addressed by the Hola state.
       this.EXP_STATES.Hola.interaction.answerGroups.push({
@@ -142,9 +138,9 @@ describe('StateTopAnswersStatsService', function() {
       });
       this.StateTopAnswersStatsService.refreshStateStats('Hola');
 
-      expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toContain(
+      expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
         jasmine.objectContaining({answer: 'adios', isAddressed: true}),
-      );
+      ]);
     });
   });
 });
