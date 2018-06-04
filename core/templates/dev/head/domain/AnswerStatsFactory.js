@@ -21,18 +21,18 @@ oppia.factory('AnswerStatsFactory', [function() {
   /**
    * @constructor
    * @param {*} answer - raw answer object.
-   * @param {number} frequency - frequency at which the object appears.
    * @param {string} answerHtml - answer as renderable HTML.
+   * @param {number} frequency - frequency at which the object appears.
    * @param {boolean} isAddressed - whether this answer is addressed by the
    *    associated state's answer groups.
    */
-  var AnswerStats = function(answer, frequency, answerHtml, isAddressed) {
+  var AnswerStats = function(answer, answerHtml, frequency, isAddressed) {
     /** @type {*} */
     this.answer = angular.copy(answer);
-    /** @type {number} */
-    this.frequency = frequency;
     /** @type {string} */
     this.answerHtml = answerHtml;
+    /** @type {number} */
+    this.frequency = frequency;
     /** @type {boolean} */
     this.isAddressed = isAddressed;
   };
@@ -58,7 +58,7 @@ oppia.factory('AnswerStatsFactory', [function() {
     var answerHtml = (typeof backendDict.answer === 'string')
       ? backendDict.answer : angular.toJson(backendDict.answer);
     return new AnswerStats(
-      backendDict.answer, backendDict.frequency, answerHtml, false);
+      backendDict.answer, answerHtml, backendDict.frequency, false);
   };
 
   return AnswerStats;
