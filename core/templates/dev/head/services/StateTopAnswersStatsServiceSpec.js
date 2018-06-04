@@ -18,6 +18,8 @@
  */
 
 describe('StateTopAnswersStatsService', function() {
+  var joC = jasmine.objectContaining;
+
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
@@ -81,12 +83,11 @@ describe('StateTopAnswersStatsService', function() {
 
       this.StateTopAnswersStatsService.init();
       this.$httpBackend.flush();
+      var stateStats = this.StateTopAnswersStatsService.getStateStats('Hola');
 
-      expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
-        jasmine.objectContaining({answer: 'hola', isAddressed: true}),
-        jasmine.objectContaining({answer: 'adios', isAddressed: false}),
-        jasmine.objectContaining({answer: 'que?', isAddressed: false}),
-      ]);
+      expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
+      expect(stateStats).toContain(joC({answer: 'adios', isAddressed: false}));
+      expect(stateStats).toContain(joC({answer: 'que?', isAddressed: false}));
     });
 
     it('maintains frequency in order', function() {
@@ -106,9 +107,9 @@ describe('StateTopAnswersStatsService', function() {
       this.$httpBackend.flush();
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
-        jasmine.objectContaining({answer: 'hola', frequency: 7}),
-        jasmine.objectContaining({answer: 'adios', frequency: 4}),
-        jasmine.objectContaining({answer: 'que?', frequency: 2}),
+        joC({answer: 'hola', frequency: 7}),
+        joC({answer: 'adios', frequency: 4}),
+        joC({answer: 'que?', frequency: 2}),
       ]);
     });
   });
@@ -128,7 +129,7 @@ describe('StateTopAnswersStatsService', function() {
       this.$httpBackend.flush();
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
-        jasmine.objectContaining({answer: 'adios', isAddressed: false})
+        joC({answer: 'adios', isAddressed: false})
       ]);
 
       this.EXP_STATES.Hola.interaction.answerGroups.push({
@@ -139,7 +140,7 @@ describe('StateTopAnswersStatsService', function() {
       this.StateTopAnswersStatsService.refreshStateStats('Hola');
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
-        jasmine.objectContaining({answer: 'adios', isAddressed: true}),
+        joC({answer: 'adios', isAddressed: true}),
       ]);
     });
   });
