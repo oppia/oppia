@@ -53,7 +53,6 @@ oppia.factory('StateTopAnswersStatsService', [
        */
       init: function() {
         var explorationId = ExplorationContextService.getExplorationId();
-
         $http.get(
           UrlInterpolationService.interpolateUrl(
             '/createhandler/state_answer_stats/<exploration_id>',
@@ -62,7 +61,6 @@ oppia.factory('StateTopAnswersStatsService', [
           stateTopAnswersCache = {};
           Object.keys(response.data.answers).forEach(function(stateName) {
             var stateAnswerStatsBackendDicts = response.data.answers[stateName];
-
             stateTopAnswersCache[stateName] = stateAnswerStatsBackendDicts.map(
               StateAnswerStatsFactory.createFromBackendDict);
             refreshAddressedInfo(stateName);
