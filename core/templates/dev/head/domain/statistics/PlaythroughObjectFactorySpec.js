@@ -28,9 +28,9 @@ describe('Playthrough Object Factory', function() {
 
   it('should create a new playthrough', function() {
     var actions = [
-      this.LearnerActionObjectFactory.create('AnswerSubmit', {}, 1)
+      new this.LearnerActionObjectFactory('AnswerSubmit', {}, 1)
     ];
-    var playthroughObject = this.PlaythroughObjectFactory.create(
+    var playthroughObject = new this.PlaythroughObjectFactory(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
     expect(playthroughObject.playthroughId).toEqual('playthroughId1');
@@ -42,21 +42,20 @@ describe('Playthrough Object Factory', function() {
   });
 
   it('should create a new playthrough from a backend dict', function() {
-    var actionDicts = [{
-      actionType: 'AnswerSubmit',
-      actionCustomizationArgs: {},
-      schemaVersion: 1
-    }];
-    var playthroughBackendDict = {
-      playthroughId: 'playthroughId1',
-      expId: 'expId1',
-      expVersion: 1,
-      issueType: 'EarlyQuit',
-      issueCustomizationArgs: {},
-      actions: actionDicts
-    };
     var playthroughObject = this.PlaythroughObjectFactory.createFromBackendDict(
-      playthroughBackendDict);
+      {
+        playthroughId: 'playthroughId1',
+        expId: 'expId1',
+        expVersion: 1,
+        issueType: 'EarlyQuit',
+        issueCustomizationArgs: {},
+        actions: [{
+          actionType: 'AnswerSubmit',
+          actionCustomizationArgs: {},
+          schemaVersion: 1
+        }]
+      }
+    );
 
     expect(playthroughObject.playthroughId).toEqual('playthroughId1');
     expect(playthroughObject.expId).toEqual('expId1');
@@ -64,6 +63,10 @@ describe('Playthrough Object Factory', function() {
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
     expect(playthroughObject.issueCustomizationArgs).toEqual({});
     expect(playthroughObject.actions[0]).toEqual(
-      this.LearnerActionObjectFactory.createFromBackendDict(actionDicts[0]));
+      this.LearnerActionObjectFactory.createFromBackendDict({
+        actionType: 'AnswerSubmit',
+        actionCustomizationArgs: {},
+        schemaVersion: 1
+      }));
   });
 });

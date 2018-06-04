@@ -26,7 +26,24 @@ describe('Exploration Issue Object Factory', function() {
 
   it('should create a new exploration issue', function() {
     var explorationIssueObject =
-      this.ExplorationIssueObjectFactory.create('EarlyQuit', {}, [], 1, true);
+      new this.ExplorationIssueObjectFactory('EarlyQuit', {}, [], 1, true);
+
+    expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
+    expect(explorationIssueObject.issueCustomizationArgs).toEqual({});
+    expect(explorationIssueObject.playthroughIds).toEqual([]);
+    expect(explorationIssueObject.schemaVersion).toEqual(1);
+    expect(explorationIssueObject.isValid).toEqual(true);
+  });
+
+  it('should create a new exploration issue from a backend dict', function() {
+    var explorationIssueObject =
+      this.ExplorationIssueObjectFactory.createFromBackendDict({
+        issueType: 'EarlyQuit',
+        issueCustomizationArgs: {},
+        playthroughIds: [],
+        schemaVersion: 1,
+        isValid: true
+      });
 
     expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
     expect(explorationIssueObject.issueCustomizationArgs).toEqual({});

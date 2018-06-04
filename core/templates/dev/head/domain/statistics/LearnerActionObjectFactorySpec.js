@@ -26,7 +26,7 @@ describe('Learner Action Object Factory', function() {
 
   it('should create a new learner action', function() {
     var learnerActionObject =
-      this.LearnerActionObjectFactory.create('AnswerSubmit', {}, 1);
+      new this.LearnerActionObjectFactory('AnswerSubmit', {}, 1);
 
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});
@@ -34,14 +34,12 @@ describe('Learner Action Object Factory', function() {
   });
 
   it('should create a new learner action from a backend dict', function() {
-    var learnerActionBackendDict = {
-      actionType: 'AnswerSubmit',
-      actionCustomizationArgs: {},
-      schemaVersion: 1
-    };
     var learnerActionObject =
-      this.LearnerActionObjectFactory.createFromBackendDict(
-        learnerActionBackendDict);
+      this.LearnerActionObjectFactory.createFromBackendDict({
+        actionType: 'AnswerSubmit',
+        actionCustomizationArgs: {},
+        schemaVersion: 1
+      });
 
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});
