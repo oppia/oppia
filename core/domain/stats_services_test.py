@@ -1505,6 +1505,8 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+        ModifiedInteractionAnswerSummariesAggregator.stop_computation(
+            feconf.SYSTEM_COMMITTER_ID)
 
     def setUp(self):
         super(StateAnswersStatisticsTest, self).setUp()
@@ -1541,6 +1543,20 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
                 {'answer': 'A', 'frequency': 2},
                 {'answer': 'C', 'frequency': 1},
                 {'answer': 'E', 'frequency': 1}
+            ])
+
+        self._record_answer(
+            'A', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
+        self._record_answer(
+            'E', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
+        self._run_answer_summaries_aggregator()
+
+        with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 1):
+            state_answers_stats = self._get_top_state_unresolved_answer_stats()
+
+        self.assertEqual(
+            state_answers_stats, [
+                {'answer': 'C', 'frequency': 1}
             ])
 
     def test_get_top_state_answer_stats(self):

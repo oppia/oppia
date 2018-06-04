@@ -1244,6 +1244,10 @@ class StateAnswersModel(base_models.BaseModel):
 
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
+    # NOTE: The answers stored in submitted_answers_list must be sorted
+    # according to the chronological order of their submission otherwise
+    # TopNUnresolvedAnswersByFrequency calculation in
+    # InteractionAnswerSummariesAggregator will output invalid results.
     submitted_answer_list = ndb.JsonProperty(repeated=True, indexed=False)
     # The version of the submitted_answer_list currently supported by Oppia. If
     # the internal JSON structure of submitted_answer_list changes,
@@ -1337,6 +1341,11 @@ class StateAnswersModel(base_models.BaseModel):
         """See the insert_submitted_answers for general documentation of what
         this method does. It's only safe to call this method from within a
         transaction.
+
+        NOTE: The answers stored in submitted_answers_list must be sorted
+        according to the chronological order of their submission otherwise
+        TopNUnresolvedAnswersByFrequency calculation in
+        InteractionAnswerSummariesAggregator will output invalid results.
 
         Args:
             exploration_id: str. ID of the exploration currently being played.

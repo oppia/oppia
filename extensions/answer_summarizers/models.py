@@ -98,40 +98,45 @@ def _get_top_answers_by_frequency(answers, limit=None):
 
 def _get_top_unresolved_answers_by_frequency(
         answers_with_classification, limit=None):
-    hashable_answers_with_classification = [{
-        'hashable_answer': _HashableAnswer(ans['answer']),
-        'classification_categorization': ans['classification_categorization']
-    } for ans in answers_with_classification]
+    """Computes the list of unresolved answers by keeping track of their latest
+    classification categorization and then computes the occurrences of each
+    unresolved answer, keeping only limit answers, and returns an
+    AnswerFrequencyList.
 
+    This method is run from within the context of a MapReduce job.
+
+    Args:
+        answers_with_classification: iterable(*). The collection of answers
+            with their corresponding classification categorization.
+        limit: int or None. The maximum number of answers to return. When None,
+            all answers are returned.
+
+    Returns:
+        stats_domain.AnswerFrequencyList. A list of the top "limit"
+            unresolved answers.
+    """
     classification_results_dict = {}
-    for ans in hashable_answers_with_classification:
+
+    # The list of answers is sorted according to the time of answer submission.
+    # Thus following loop goes through the list and aggregates the most recent
+    # classification categorization of each answer.
+    for ans in answers_with_classification:
         frequency = 0
-        if ans['hashable_answer'] in classification_results_dict:
-            frequency = classification_results_dict[ans['hashable_answer']][
-                'frequency']
-        classification_results_dict[ans['hashable_answer']] = {
+        if _HashableAnswer(ans['answer']) in classification_results_dict:
+            frequency = classification_results_dict[_HashableAnswer(
+                ans['answer'])]['frequency']
+        classification_results_dict[_HashableAnswer(ans['answer'])] = {
             'classification_categorization': (
                 ans['classification_categorization']),
             'frequency': frequency + 1
         }
 
-    answers_with_most_recent_classification = [{
+    unresolved_answers_with_frequency_list = [{
         'answer': ans.answer,
-        'classification_categorization': val['classification_categorization'],
         'frequency': val['frequency']
-    } for ans, val in classification_results_dict.iteritems()]
-
-    grouped_hashable_answers = itertools.groupby(
-        answers_with_most_recent_classification,
-        operator.itemgetter('classification_categorization'))
-
-    unresolved_answers_with_frequency_list = []
-    for category, answers in grouped_hashable_answers:
-        if category in UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES:
-            unresolved_answers_with_frequency_list.extend({
-                'answer': ans['answer'],
-                'frequency': ans['frequency']
-            } for ans in answers)
+    } for ans, val in classification_results_dict.iteritems() if val[
+        'classification_categorization'] in (
+            UNRESOLVED_ANSWER_CLASSIFICATION_CATEGORIES)]
 
     unresolved_answers_with_frequency_list.sort(
         key=lambda x: x['frequency'], reverse=True)
@@ -295,23 +300,33 @@ class TopAnswersByCategorization(BaseCalculation):
 
 class TopNUnresolvedAnswersByFrequency(BaseCalculation):
     """Calculation for the top unresolved answers by frequency
-    The output from this calculation is a ranked list of unresolved answers, by
-    frequency.
+    The output from this calculation is a ranked list of unresolved answers,
+    in descending order of frequency.
     """
 
     def calculate_from_state_answers_dict(self, state_answers_dict):
         """Filters unresolved answers and then computes the number of
-        occurrences of each unresolved answers.
+        occurrences of each unresolved answer.
 
-        This method is run within the context of MapReduce job.
+        This method is run within the context of a MapReduce job.
 
         Args:
             state_answers_dict: dict. A dict containing state answers and
-                exploration information.
+                exploration information such as:
+                * exploration_id: id of the exploration.
+                * exploration_version: Specific version of the exploration or
+                    VERSION_ALL is used if answers are aggragated across
+                    multiple versions.
+                * state_name: Name of the state.
+                * interaction_id: id of the interaction.
+                * submitted_answer_list: A list of submitted answers.
+                    NOTE: The answers in this list must be sorted in
+                    chronological order of their submission.
 
         Returns:
-            stats_domain.StateAnswersCalcOutput. A calculation output
-                domain object.
+            stats_domain.StateAnswersCalcOutput. A calculation output object
+                containing the list of top unresolved answers, in descending
+                order of frequency (up to at most limit answers).
         """
         answers_with_classification = [{
             'answer': ans['answer'],
