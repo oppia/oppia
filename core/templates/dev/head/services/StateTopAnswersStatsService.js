@@ -20,12 +20,12 @@
 oppia.factory('StateTopAnswersStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
   'ExplorationContextService', 'ExplorationStatesService',
-  'StateAnswerStatsFactory', 'UrlInterpolationService',
+  'StudentAnswerStatsFactory', 'UrlInterpolationService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
       ExplorationContextService, ExplorationStatesService,
-      StateAnswerStatsFactory, UrlInterpolationService) {
-    /** @type {Object.<string, StateAnswerStats[]>} */
+      StudentAnswerStatsFactory, UrlInterpolationService) {
+    /** @type {Object.<string, StudentAnswerStats[]>} */
     var stateTopAnswersCache = {};
 
     /**
@@ -62,7 +62,8 @@ oppia.factory('StateTopAnswersStatsService', [
           Object.keys(response.data.answers).forEach(function(stateName) {
             var stateAnswerStatsBackendDicts = response.data.answers[stateName];
             stateTopAnswersCache[stateName] = stateAnswerStatsBackendDicts.map(
-              StateAnswerStatsFactory.createFromBackendDict);
+              StudentAnswerStatsFactory.createFromBackendDict);
+            // Still need to manually refresh the addressed information.
             refreshAddressedInfo(stateName);
           });
         });
@@ -70,7 +71,7 @@ oppia.factory('StateTopAnswersStatsService', [
 
       /**
        * @param {string} stateName
-       * @returns {StateAnswerStats[]} - list of the statistics for the top
+       * @returns {StudentAnswerStats[]} - list of the statistics for the top
        *    answers.
        */
       getStateStats: function(stateName) {
