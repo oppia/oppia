@@ -500,14 +500,10 @@ textarea {
   margin-top: 5px;
 }
 
-.oppia-sidebar-footer a:hover {
-  background: none;
+  .oppia-footer-container a {
+  color: #fff;
 }
 
-
-/*
-  Styles for footer
-*/
 .oppia-footer {
   background-color: #094142;
   bottom: 0;
@@ -525,9 +521,19 @@ textarea {
   padding: 30px 80px;
 }
 
-.oppia-footer-container a {
-  color: #fff;
+.oppia-share-dropdown-menu li > a {
+  font-weight: bolder;
+  padding: 10px;
+  text-align: center;
 }
+
+.oppia-sidebar-footer a:hover {
+  background: none;
+}
+
+/*
+  Styles for footer
+*/
 
 .oppia-footer-container h4 {
   font-weight: bold;
@@ -617,9 +623,32 @@ textarea {
   width: 20px;
 }
 
+.navbar-nav > li.active > a {
+  color: white;
+  background: rgb(2, 38, 86);
+}
+
+.navbar-default .navbar-nav > li > a, {
+  color: #fff;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+  background: white;
+}
+
+.oppia-navbar-button-container > .uib-dropdown-menu > li > a {
+  white-space: normal;
+}
+
+.navbar-default .navbar-nav > .active > a {
+  background-color: #06b9ac;
+  color: #fff;
+}
+
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
-  color: #fff;
+  background: #fff;
+  color: #009688;
 }
 
 .navbar-default .navbar-nav > li > a.oppia-no-hover-change:hover,
@@ -628,10 +657,16 @@ textarea {
   color: #fff;
 }
 
-.navbar-nav > li.active > a, .navbar-nav > li.active > a:hover,
-.navbar-nav > li.active > a, .navbar-nav > li.active > a:focus {
+.navbar-nav > li.active > a:hover,
+.navbar-nav > li.active > a:focus {
   color: white;
   background: rgb(2, 38, 86);
+}
+
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus {
+  background-color: #06b9ac;
+  color: #fff;
 }
 
 .navbar-default .navbar-container {
@@ -644,47 +679,37 @@ textarea {
   margin-top: 0;
 }
 
-.navbar-default .navbar-nav > li > a, {
-  color: #fff;
-}
-
-.navbar-default .navbar-nav > li > a:hover,
-.navbar-default .navbar-nav .open > a:hover,
-.navbar-default .navbar-nav .open .uib-dropdown-menu > li > a,
-.navbar-default .navbar-nav .open .uib-dropdown-menu > li > a:hover {
+.navbar-default .navbar-nav .open > a:hover {
   color: #009688;
 }
 
-.navbar-default .navbar-nav > li > a:hover,
-.navbar-default .navbar-nav > li > a:focus,
 .navbar-default .navbar-nav .open > a:hover,
-.navbar-default .navbar-nav .open > a:focus,
+.navbar-default .navbar-nav .open > a:focus {
+  background: #fff;
+  color: #009688;
+}
+
+.navbar-default .navbar-nav .open .uib-dropdown-menu > li > a {
+  color: #009688;
+}
+
+.navbar-default .navbar-nav > li.uib-dropdown.open,
+.navbar-default .navbar-nav > li.uib-dropdown.open > a,
 .navbar-default .navbar-nav .open .uib-dropdown-menu > li > a:hover,
 .navbar-default .navbar-nav .open .uib-dropdown-menu > li > a:focus {
   background: #fff;
   color: #009688;
 }
 
-.navbar-default .navbar-nav > li.uib-dropdown.open,
-.navbar-default .navbar-nav > li.uib-dropdown.open > a {
+.navbar-default .navbar-nav .open .uib-dropdown-menu > li > a:hover {
   background: #fff;
   color: #009688;
-}
-
-.navbar-default .navbar-nav > .active > a,
-.navbar-default .navbar-nav > .active > a:hover,
-.navbar-default .navbar-nav > .active > a:focus {
-  background-color: #06b9ac;
-  color: #fff;
 }
 
 /* In Bootstrap, the link at the top of the default dropdown menu cannot be
    clicked -- so, in such cases (e.g. for the 'Sign in' link at the top right),
    we use this instead.
 */
-.oppia-clickable-navbar-element:hover {
-  display: block;
-}
 
 .oppia-top-right-menu-item-separator {
   margin-top: 5px;
@@ -696,12 +721,6 @@ textarea {
   width: 46px;
 }
 
-.oppia-share-dropdown-menu li > a {
-  font-weight: bolder;
-  padding: 10px;
-  text-align: center;
-}
-
 .oppia-share-dropdown-menu:hover .oppia-share-dropdown-toggle {
   color: #009688;
   background-color: white;
@@ -709,10 +728,6 @@ textarea {
 
 .nav .uib-dropdown:hover > .uib-dropdown-menu {
   border: none;
-}
-
-.nav > li > a:hover, .nav > li > a:focus {
-  background: white;
 }
 
 @media(max-width: 768px) {
@@ -812,9 +827,6 @@ textarea {
 /* In Bootstrap, white-space for dropdown list is no-wrap. Use this instead
    to align ticks and dropdown options.
 */
-.oppia-navbar-button-container > .uib-dropdown-menu > li > a {
-  white-space: normal;
-}
 .btn.oppia-navbar-button {
   background-color: rgba(0,0,0,0.2);
   color: rgba(255,255,255,1.0);
@@ -1001,6 +1013,7 @@ span.sort-explorations-select .sort-order {
 
 md-card.oppia-dashboard-tile {
   background-color: #fff;
+  border-bottom: 1px solid #ccc;
   color: #888;
   height: 120px;
   margin: 0;
@@ -1121,7 +1134,7 @@ md-card.oppia-dashboard-tile {
   color: #FFFFFF;
   display: flex;
   float: left;
-  font-family: 'Material Icons';
+  font-family: 'Material Icons', sans-serif;
   font-size: 24px;
   margin: auto 5px auto -37px;
   position: absolute;
@@ -1563,18 +1576,11 @@ pre.oppia-pre-wrapped-text {
   cursor: pointer;
   height: 30px;
   opacity: 0.5;
-  width: 30px;
-}
-.oppia-delete-interaction-button,
-.oppia-close-popover-button {
   position: absolute;
-}
-.oppia-delete-interaction-button,
-.oppia-close-popover-button {
   right: 8px;
   top: 8px;
+  width: 30px;
 }
-
 .oppia-delete-interaction-button:hover,
 .oppia-close-popover-button:hover {
   opacity: 1;
@@ -1762,16 +1768,6 @@ oppia-parameter {
   margin-left: 10px;
   padding-left: 20px;
   padding-right: 20px;
-}
-
-md-card.oppia-dashboard-tile {
-  background-color: #fff;
-  border-bottom: 1px solid #ccc;
-  color: #888;
-  height: 120px;
-  margin: 0;
-  padding: 0;
-  position: relative;
 }
 
 .stat-block .heading-text span {
@@ -2050,8 +2046,8 @@ div#ng-curtain {
 .oppia-editor-sidebar-section-body {
   background-color: #fff;
   margin-bottom: 5px;
-  padding-right: 25px;
   padding: 0 10px;
+  padding-right: 25px;
 }
 
 .oppia-editor-warnings-indicator {
@@ -2547,14 +2543,14 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-splash-background-icon-row {
   margin-top: 0;
   margin-bottom: 0;
-  margin-left: -webkit-calc((100% - 2700px)/2);
-  margin-left: -moz-calc((100% - 2700px)/2);
-  margin-left: -o-calc((100% - 2700px)/2);
-  margin-left: calc((100% - 2700px)/2);
-  margin-right: -webkit-calc((100% - 2700px)/2);
-  margin-right: -moz-calc((100% - 2700px)/2);
-  margin-right: -o-calc((100% - 2700px)/2);
-  margin-right: calc((100% - 2700px)/2);
+  margin-left: -webkit-calc((100% - 2700px) / 2);
+  margin-left: -moz-calc((100% - 2700px) / 2);
+  margin-left: -o-calc((100% - 2700px) / 2);
+  margin-left: calc((100% - 2700px) / 2);
+  margin-right: -webkit-calc((100% - 2700px) / 2);
+  margin-right: -moz-calc((100% - 2700px) / 2);
+  margin-right: -o-calc((100% - 2700px) / 2);
+  margin-right: calc((100% - 2700px) / 2);
   position: relative;
   text-align: center;
   width: 2700px;
@@ -3018,7 +3014,7 @@ md-card.preview-conversation-skin-supplemental-card {
 .oppia-activity-summary-tile .all-avatars .num-remaining-avatars,
 .oppia-activity-summary-tile-mobile .all-avatars .num-remaining-avatars {
   color: white;
-  font-family: Roboto;
+  font-family: 'Roboto', sans-serif;
   font-size: 0.7em;
   font-weight: normal;
   left: 7px;
