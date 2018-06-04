@@ -30,7 +30,7 @@ oppia.factory('StateTopAnswersStatsService', [
 
     /**
      * Updates the addressed info of all the answers cached for the given state
-     * to reflect any changes in the state's structure.
+     * to reflect any changes in the state's answer groups.
      * @param {string} stateName
      */
     var refreshAddressedInfo = function(stateName) {
