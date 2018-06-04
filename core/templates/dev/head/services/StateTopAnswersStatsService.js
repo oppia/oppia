@@ -38,7 +38,6 @@ oppia.factory('StateTopAnswersStatsService', [
       var interactionRulesService = $injector.get(
         AngularNameService.getNameOfInteractionRulesService(
           state.interaction.id));
-
       stateTopAnswersCache[stateName].forEach(function(stateAnswerStats) {
         stateAnswerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
