@@ -34,11 +34,17 @@ oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
       scope.getInitArgs = function() {
         return scope.initArgs;
       };
+      scope.getAlwaysEditable = function() {
+        return scope.alwaysEditable;
+      };
+      scope.getIsEditable = function() {
+        return scope.isEditable;
+      };
       if (directiveName) {
         element.html(
           '<' + directiveName +
-          '-editor always-editable="alwaysEditable"' +
-          'get-init-args="getInitArgs()" is-editable="isEditable"' +
+          '-editor get-always-editable="getAlwaysEditable()"' +
+          'get-init-args="getInitArgs()" get-is-editable="getIsEditable()"' +
           'obj-type="objType" value="value"></' +
           directiveName + '-editor>');
         $compile(element.contents())(scope);
