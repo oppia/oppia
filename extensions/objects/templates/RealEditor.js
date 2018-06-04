@@ -33,14 +33,14 @@ oppia.directive('realEditor', [
         };
 
         $scope.$watch('$parent.value', function() {
-          if ($scope.$parent.value === '') {
+          if ($scope.value === '') {
             // A new rule
-            $scope.$parent.value = 0.0;
+            $scope.value = 0.0;
           }
         });
 
-        if ($scope.$parent.value === '') {
-          $scope.$parent.value = 0.0;
+        if ($scope.value === '') {
+          $scope.value = 0.0;
         }
       }]
     };

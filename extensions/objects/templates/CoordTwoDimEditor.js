@@ -56,8 +56,8 @@ oppia.directive('coordTwoDimEditor', [
 
         $scope.$watch('$parent.value', function(newValue, oldValue) {
           // A new rule has just been created.
-          if ($scope.$parent.value === '') {
-            $scope.$parent.value = [0.0, 0.0];
+          if ($scope.value === '') {
+            $scope.value = [0.0, 0.0];
           }
 
           if (!angular.equals(newValue, oldValue)) {
@@ -66,14 +66,14 @@ oppia.directive('coordTwoDimEditor', [
         });
 
         // A new rule has just been created.
-        if ($scope.$parent.value === '') {
-          $scope.$parent.value = [0.0, 0.0];
+        if ($scope.value === '') {
+          $scope.value = [0.0, 0.0];
         }
 
         // This is required in order to avoid the following bug:
         //   http://stackoverflow.com/q/18769287
         $timeout(function() {
-          updateMarker($scope.$parent.value[0], $scope.$parent.value[1]);
+          updateMarker($scope.value[0], $scope.value[1]);
           if ($scope.map) {
             google.maps.event.trigger($scope.map, 'resize');
           }
@@ -81,8 +81,8 @@ oppia.directive('coordTwoDimEditor', [
 
         $scope.mapOptions = {
           center: new google.maps.LatLng(
-            $scope.$parent.value[0],
-            $scope.$parent.value[1]
+            $scope.value[0],
+            $scope.value[1]
           ),
           mapTypeId: google.maps.MapTypeId.ROADMAP,
           zoom: 0
@@ -91,7 +91,7 @@ oppia.directive('coordTwoDimEditor', [
         $scope.registerClick = function($event, $params) {
           var latLng = $params[0].latLng;
           updateMarker(latLng.lat(), latLng.lng());
-          $scope.$parent.value = [latLng.lat(), latLng.lng()];
+          $scope.value = [latLng.lat(), latLng.lng()];
         };
       }],
       link: function(scope, element) {

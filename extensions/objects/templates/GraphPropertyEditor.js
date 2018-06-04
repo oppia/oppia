@@ -53,13 +53,13 @@ oppia.directive('graphPropertyEditor', [
         };
 
         for (var i = 0; i < $scope.graphProperties.length; i++) {
-          if ($scope.graphProperties[i].name === $scope.$parent.value) {
+          if ($scope.graphProperties[i].name === $scope.value) {
             $scope.localValue.property = $scope.graphProperties[i];
           }
         }
 
         $scope.$watch('localValue.property', function() {
-          $scope.$parent.value = $scope.localValue.property.name;
+          $scope.value = $scope.localValue.property.name;
         });
       }]
     };

@@ -28,13 +28,14 @@ oppia.directive('unicodeStringEditor', [
       },
       restrict: 'E',
       scope: {
-        alwaysEditable: '@',
-        initArgs: '@',
+        getAlwaysEditable: '&',
+        getInitArgs: '&',
         value: '='
       },
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = $scope.$parent.alwaysEditable;
+        $scope.alwaysEditable = $scope.getAlwaysEditable();
+        $scope.initArgs = $scope.getInitArgs();
         $scope.largeInput = false;
 
         $scope.$watch('$parent.initArgs', function(newValue) {
@@ -48,13 +49,13 @@ oppia.directive('unicodeStringEditor', [
         // of an editable list).
         $scope.$watch('$parent.value', function() {
           $scope.localValue = {
-            label: $scope.$parent.value || ''
+            label: $scope.value || ''
           };
         }, true);
 
         if ($scope.alwaysEditable) {
           $scope.$watch('localValue.label', function(newValue) {
-            $scope.$parent.value = newValue;
+            $scope.value = newValue;
           });
         } else {
           $scope.openEditor = function() {
@@ -69,7 +70,7 @@ oppia.directive('unicodeStringEditor', [
             $scope.localValue = {
               label: newValue
             };
-            $scope.$parent.value = newValue;
+            $scope.value = newValue;
             $scope.closeEditor();
           };
 

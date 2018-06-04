@@ -39,8 +39,8 @@ oppia.directive('listOfUnicodeStringEditor', [
           }
         };
 
-        if (!$scope.$parent.value) {
-          $scope.$parent.value = [];
+        if (!$scope.value) {
+          $scope.value = [];
         }
       }]
     };

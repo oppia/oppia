@@ -40,24 +40,24 @@ oppia.directive('setOfHtmlStringEditor', [
           }
         };
 
-        if (!$scope.$parent.value) {
-          $scope.$parent.value = [];
+        if (!$scope.value) {
+          $scope.value = [];
         }
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
         $scope.selections = $scope.choices.map(function(choice) {
-          return $scope.$parent.value.indexOf(choice.id) !== -1;
+          return $scope.value.indexOf(choice.id) !== -1;
         });
 
         // The following function is necessary to insert elements into the
         // answer groups for the Item Selection Widget.
         $scope.toggleSelection = function(choiceListIndex) {
           var choiceHtml = $scope.choices[choiceListIndex].id;
-          var selectedChoicesIndex = $scope.$parent.value.indexOf(choiceHtml);
+          var selectedChoicesIndex = $scope.value.indexOf(choiceHtml);
           if (selectedChoicesIndex > -1) {
-            $scope.$parent.value.splice(selectedChoicesIndex, 1);
+            $scope.value.splice(selectedChoicesIndex, 1);
           } else {
-            $scope.$parent.value.push(choiceHtml);
+            $scope.value.push(choiceHtml);
           }
         };
       }]

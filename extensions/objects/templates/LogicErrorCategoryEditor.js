@@ -63,13 +63,13 @@ oppia.directive('logicErrorCategoryEditor', [
           category: $scope.errorCategories[0]
         };
         for (var i = 0; i < $scope.errorCategories.length; i++) {
-          if ($scope.errorCategories[i].name === $scope.$parent.value) {
+          if ($scope.errorCategories[i].name === $scope.value) {
             $scope.localValue.category = $scope.errorCategories[i];
           }
         }
 
         $scope.$watch('localValue.category', function() {
-          $scope.$parent.value = $scope.localValue.category.name;
+          $scope.value = $scope.localValue.category.name;
         });
       }]
     };

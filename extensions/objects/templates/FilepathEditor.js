@@ -592,7 +592,7 @@ oppia.directive('filepathEditor', [
           };
           if (updateParent) {
             AlertsService.clearWarnings();
-            $scope.$parent.value = filename;
+            $scope.value = filename;
           }
         };
 

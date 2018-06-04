@@ -42,8 +42,8 @@ oppia.directive('nonnegativeIntEditor', [
           }]
         };
 
-        if (!$scope.$parent.value) {
-          $scope.$parent.value = 0;
+        if (!$scope.value) {
+          $scope.value = 0;
         }
       }]
     };

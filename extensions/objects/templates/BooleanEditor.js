@@ -28,7 +28,7 @@ oppia.directive('booleanEditor', [
         }, true);
 
         $scope.$watch('localValue.label', function(newValue) {
-          $scope.$parent.value = newValue;
+          $scope.value = newValue;
         });
       }],
       link: function(scope, element) {

@@ -60,7 +60,7 @@ oppia.directive('parameterNameEditor', [
           }, true);
 
           $scope.$watch('localValue', function(newValue) {
-            $scope.$parent.value = newValue;
+            $scope.value = newValue;
           });
         }
       ]

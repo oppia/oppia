@@ -54,7 +54,7 @@ oppia.directive('musicPhraseEditor', [
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
         $scope.$watch('$parent.value', function(newValue) {
-          // TODO(sll): Check that $scope.$parent.value is a list.
+          // TODO(sll): Check that $scope.value is a list.
           $scope.localValue = [];
           if (newValue) {
             for (var i = 0; i < newValue.length; i++) {
@@ -79,7 +79,7 @@ oppia.directive('musicPhraseEditor', [
                   }
                 });
               }
-              $scope.$parent.value = parentValues;
+              $scope.value = parentValues;
             }
           }
         }, true);
