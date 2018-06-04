@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for domain object which holds the list of top answer
- * statistics for a particular state.
+ * @fileoverview Factory for domain object which holds the statistics of a
+ * particular answer from some particular state.
  */
 
 oppia.factory('StateAnswerStatsFactory', [function() {
