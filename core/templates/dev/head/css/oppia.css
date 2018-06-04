@@ -527,6 +527,10 @@ textarea {
   text-align: center;
 }
 
+.oppia-navbar-nav > li > a {
+  padding: 10px 5px;
+}
+
 .oppia-sidebar-footer a:hover {
   background: none;
 }
@@ -594,6 +598,11 @@ textarea {
   width: 100%;
 }
 
+.oppia-navbar-nav .open > a {
+  background-color: #fff;
+  color: #009688;
+}
+
 .navbar-nav.oppia-navbar-nav > li > a {
   color: #fff;
   font-size: 16px;
@@ -638,6 +647,14 @@ textarea {
 
 .oppia-navbar-button-container > .uib-dropdown-menu > li > a {
   white-space: normal;
+}
+
+.oppia-navbar-nav > li > a:hover,
+.oppia-navbar-nav > li > a:focus,
+.oppia-navbar-tabs > li > a:hover,
+.oppia-navbar-nav .open > a:hover {
+    background-color: #fff;
+    color: #009688;
 }
 
 .navbar-default .navbar-nav > .active > a {
@@ -706,6 +723,12 @@ textarea {
   color: #009688;
 }
 
+.oppia-navbar-tabs > li > a:focus
+.oppia-navbar-nav .open > a:focus {
+  background-color: #fff;
+  color: #009688;
+}
+
 /* In Bootstrap, the link at the top of the default dropdown menu cannot be
    clicked -- so, in such cases (e.g. for the 'Sign in' link at the top right),
    we use this instead.
@@ -724,6 +747,11 @@ textarea {
 .oppia-share-dropdown-menu:hover .oppia-share-dropdown-toggle {
   color: #009688;
   background-color: white;
+}
+
+.oppia-navbar-nav .uib-dropdown-menu {
+  left: auto;
+  right: 0;
 }
 
 .nav .uib-dropdown:hover > .uib-dropdown-menu {
@@ -1355,12 +1383,20 @@ pre.oppia-pre-wrapped-text {
   margin-top: 18px;
 }
 
-.oppia-rte-editor > p:first-child,
+/* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
+.ng-joyride .popover-content p {
+  margin-top: 10px;
+}
+
+.oppia-rte-editor > p:first-child {
+  margin-top: 0;
+}
+.oppia-rte-editor > p:last-child {
+  margin-bottom: 0;
+}
 .form-control.oppia-rte-content > div > p:first-child {
   margin-top: 0;
 }
-
-.oppia-rte-editor > p:last-child,
 .form-control.oppia-rte-content > div > p:last-child {
   margin-bottom: 0;
 }
@@ -1405,14 +1441,14 @@ pre.oppia-pre-wrapped-text {
   -webkit-transition: all 200ms;
 }
 
-.oppia-editable-section:hover .oppia-interaction-preview {
-  background: rgba(5, 140, 166, 0.5);
-  border-radius: 4px;
-}
-
 .oppia-interaction-preview {
   opacity: 0.5;
   padding: 4px;
+}
+
+.oppia-editable-section:hover .oppia-interaction-preview {
+  background: rgba(5, 140, 166, 0.5);
+  border-radius: 4px;
 }
 
 .oppia-editor-edit-icon {
@@ -1879,11 +1915,6 @@ div#ng-curtain {
   z-index: 997;
 }
 
-/* Add inter-paragraph spacing to the ng-joyride tutorial contents. */
-.ng-joyride .popover-content p {
-  margin-top: 10px;
-}
-
 .oppia-navbar {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   cursor: default;
@@ -1937,10 +1968,6 @@ div#ng-curtain {
 .oppia-clickable-navbar-element:hover {
   display: inline-block;
 }
-.oppia-navbar-nav .uib-dropdown-menu {
-  left: auto;
-  right: 0;
-}
 .navbar-header {
   /* Prevent whitespace from inline-block elements from adding space. */
   font-size: 0;
@@ -1963,17 +1990,6 @@ div#ng-curtain {
   color: #fff;
 }
 
-.oppia-navbar-nav > li > a {
-  padding: 10px 5px;
-}
-
-.oppia-navbar-nav > li > a:hover,
-.oppia-navbar-nav > li > a:focus,
-.oppia-navbar-nav .open > a,
-.oppia-navbar-nav .open > a:hover,
-.oppia-navbar-nav .open > a:focus,
-.oppia-navbar-tabs > li > a:hover,
-.oppia-navbar-tabs > li > a:focus,
 .oppia-navbar-dropdown-toggle:focus {
   background-color: #fff;
   color: #009688;
