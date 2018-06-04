@@ -115,7 +115,7 @@ describe('StateTopAnswersStatsService', function() {
   });
 
   describe('.refreshStateStats', function() {
-    it('correctly identifies unaddressed issues', function() {
+    it('correctly updates addressed info', function() {
       this.$httpBackend.expectGET(
         '/createhandler/state_answer_stats/7'
       ).respond({
