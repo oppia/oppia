@@ -698,10 +698,12 @@ tags: []
             exploration_id: str. The id of the new validated exploration.
             owner_id: str. The user_id of the creator of the exploration.
             state_names: list(str). The names of states to be linked
-                sequentially in the exploration. Must be a non-empty list.
+                sequentially in the exploration. Must be a non-empty list and
+                contain no duplicates.
             interaction_ids: list(str). The names of the interaction ids to be
                 assigned to each state. Values will be cycled, so it doesn't
-                need to be the same size as state_names.
+                need to be the same size as state_names, but it must be
+                non-empty.
             title: str. The title of the exploration.
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
@@ -717,20 +719,16 @@ tags: []
         interaction_ids = itertools.cycle(interaction_ids)
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title=title, category=category,
-            language_code=language_code)
-        exploration.objective = objective
-        exploration.add_states(state_names)
+            exploration_id, title=title, init_state_name=state_names[0],
+            category=category, objective=objective, language_code=language_code)
 
-        from_names = [exploration.init_state_name] + state_names[:-1]
-        to_names = state_names
-        for from_name, to_name in zip(from_names, to_names):
-            from_state = exploration.states[from_name]
+        exploration.add_states(state_names[1:])
+        for from_state_name, dest_state_name in (
+                zip(state_names[:-1], state_names[1:])):
+            from_state = exploration.states[from_state_name]
             from_state.update_interaction_id(next(interaction_ids))
-            from_state.interaction.default_outcome.dest = to_name
-
-        # Prepare end_state.
-        end_state = exploration.states[to_names[-1]]
+            from_state.interaction.default_outcome.dest = dest_state_name
+        end_state = exploration.states[state_names[-1]]
         end_state.update_interaction_id('EndExploration')
         end_state.interaction.default_outcome = None
 
@@ -886,7 +884,7 @@ tags: []
 
     def save_new_story(
             self, story_id, owner_id, title,
-            description, notes, story_contents,
+            description, notes,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Story and saves it.
 
@@ -897,18 +895,17 @@ tags: []
             description: str. The high level description of the story.
             notes: str. A set of notes, that describe the characters,
                 main storyline, and setting.
-            story_contents: StoryContents. A StoryContents object containing the
-                list of nodes.
             language_code: str. The ISO 639-1 code for the language this
                 story is written in.
 
         Returns:
             Story. A newly-created story.
         """
-        story = story_domain.Story(
-            story_id, title, description, notes, story_contents,
-            feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION, language_code, 0
-        )
+        story = story_domain.Story.create_default_story(story_id)
+        story.title = title
+        story.description = description
+        story.notes = notes
+        story.language_code = language_code
         story_services.save_new_story(owner_id, story)
         return story
 

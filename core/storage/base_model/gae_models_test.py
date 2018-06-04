@@ -81,6 +81,27 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(result, [model1, None, None, model3, None, None])
 
+    def test_delete_multi(self):
+        model1 = base_models.BaseModel()
+        model2 = base_models.BaseModel()
+        model3 = base_models.BaseModel()
+        model2.deleted = True
+
+        model1.put()
+        model2.put()
+        model3.put()
+
+        model1_id = model1.id
+        model2_id = model2.id
+        model3_id = model3.id
+
+        base_models.BaseModel.delete_multi([model1, model2, model3])
+
+        result = base_models.BaseModel.get_multi([
+            model1_id, model2_id, model3_id])
+
+        self.assertEqual(result, [None, None, None])
+
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])
         for _ in range(100):

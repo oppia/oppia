@@ -35,6 +35,7 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -767,6 +768,91 @@ class StateRulesStatsHandler(EditorHandler):
                 current_exploration.id, state_name,
                 current_exploration.states[state_name].interaction.id),
         })
+
+
+class FetchIssuesHandler(EditorHandler):
+    """Handler used for retrieving the list of unresolved issues in an
+    exploration. This removes the invalid issues and returns the remaining
+    unresolved ones.
+    """
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, exp_id):
+        """Handles GET requests."""
+        exp_version = self.request.get('exp_version')
+        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        if exp_issues is None:
+            raise self.PageNotFoundException(
+                'Invalid exploration ID %s' % (exp_id))
+        unresolved_issues = []
+        for issue in exp_issues.unresolved_issues:
+            if issue.is_valid:
+                unresolved_issues.append(issue)
+        exp_issues.unresolved_issues = unresolved_issues
+        exp_issues_dict = exp_issues.to_dict()
+        self.render_json(exp_issues_dict['unresolved_issues'])
+
+
+class FetchPlaythroughHandler(EditorHandler):
+    """Handler used for retrieving a playthrough."""
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, unused_exploration_id, playthrough_id):
+        """Handles GET requests."""
+        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
+        if playthrough is None:
+            raise self.PageNotFoundException(
+                'Invalid playthrough ID %s' % (playthrough_id))
+        self.render_json(playthrough.to_dict())
+
+
+class ResolveIssueHandler(EditorHandler):
+    """Handler used for resolving an issue. Currently, when an issue is
+    resolved, the issue is removed from the unresolved issues list in the
+    ExplorationIssuesModel instance, and all corresponding playthrough
+    instances are deleted.
+    """
+
+    @acl_decorators.can_view_exploration_stats
+    def post(self, exp_id):
+        """Handles POST requests."""
+        exp_issue_dict = self.payload.get('exp_issue_dict')
+        try:
+            unused_exp_issue = stats_domain.ExplorationIssue.from_backend_dict(
+                exp_issue_dict)
+        except utils.ValidationError as e:
+            raise self.PageNotFoundException(e)
+
+        exp_version = self.payload.get('exp_version')
+
+        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        if exp_issues is None:
+            raise self.PageNotFoundException(
+                'Invalid exploration ID %s' % (exp_id))
+
+        # Check that the passed in issue actually exists in the exploration
+        # issues instance.
+        issue_to_remove = None
+        for issue in exp_issues.unresolved_issues:
+            if issue.to_dict() == exp_issue_dict:
+                issue_to_remove = issue
+                break
+
+        if not issue_to_remove:
+            raise self.PageNotFoundException(
+                'Exploration issue does not exist in the list of issues for '
+                'the exploration with ID %s' % exp_id)
+
+        # Remove the issue from the unresolved issues list.
+        exp_issues.unresolved_issues.remove(issue_to_remove)
+
+        # Update the exploration issues instance and delete the playthrough
+        # instances.
+        stats_services.delete_playthroughs_multi(
+            issue_to_remove.playthrough_ids)
+        stats_services.save_exp_issues_model_transactional(exp_issues)
+
+        self.render_json({})
 
 
 class ImageUploadHandler(EditorHandler):

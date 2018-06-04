@@ -245,37 +245,6 @@ body {
   width: 100%;
 }
 
-.oppia-creator-dashboard-main-content {
-  padding: 0;
-  width: 100%;
-}
-
-.oppia-creator-dashboard-main-content .stats-card {
-  min-height: 63px;
-  position: relative;
-}
-
-.oppia-creator-dashboard-main-content .stats-card .stat-description {
-  line-height: 1.646;
-  margin-bottom: 3em;
-  padding-right: 10px;
-}
-
-.oppia-creator-dashboard-main-content .stats-card .stat-value-with-rating {
-  top: 0.75em;
-  position: absolute;
-}
-
-.oppia-creator-dashboard-main-content .stats-card .stat-value-without-rating {
-  bottom: -0.7em;
-  position: absolute;
-}
-
-.oppia-creator-dashboard-mobile-mode {
-  margin: auto;
-  width: 100%;
-}
-
 @media (max-width: 768px) {
   .headroom {
     will-change: transform;

@@ -302,64 +302,6 @@ class ExplorationHandler(base.BaseHandler):
 class StorePlaythroughHandler(base.BaseHandler):
     """Handles a useful playthrough coming in from the frontend to store it."""
 
-    def _require_exp_issue_dict_is_valid(self, exp_issue_dict):
-        """Checks whether the exploration issue dict has the correct keys.
-
-        Args:
-            exp_issue_dict: dict. Dict representing an exploration issue.
-        """
-        exp_issue_properties = [
-            'issue_type', 'schema_version', 'issue_customization_args',
-            'is_valid']
-
-        for exp_issue_property in exp_issue_properties:
-            if exp_issue_property not in exp_issue_dict:
-                raise self.InvalidInputException(
-                    '%s not in exploration issue dict.' % (exp_issue_property))
-
-        dummy_exp_issue = stats_domain.ExplorationIssue(
-            exp_issue_dict['issue_type'],
-            exp_issue_dict['issue_customization_args'], [],
-            exp_issue_dict['schema_version'], exp_issue_dict['is_valid'])
-
-        try:
-            dummy_exp_issue.validate()
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
-    def _require_playthrough_data_is_valid(self, playthrough_data):
-        """Checks whether the playthrough data dict has the correct keys.
-
-        Args:
-            playthrough_data: dict. Dict representing a playthrough.
-        """
-        playthrough_properties = [
-            'exp_id', 'exp_version', 'issue_type', 'issue_customization_args',
-            'playthrough_actions']
-
-        for playthrough_property in playthrough_properties:
-            if playthrough_property not in playthrough_data:
-                raise self.InvalidInputException(
-                    '%s not in playthrough data dict.' % playthrough_property)
-
-        playthrough_actions = [
-            stats_domain.LearnerAction.from_dict(playthrough_action_dict)
-            for playthrough_action_dict in playthrough_data[
-                'playthrough_actions']]
-
-        dummy_playthrough = stats_domain.Playthrough(
-            'dummy_playthrough_id',
-            playthrough_data['exp_id'],
-            playthrough_data['exp_version'],
-            playthrough_data['issue_type'],
-            playthrough_data['issue_customization_args'],
-            playthrough_actions)
-
-        try:
-            dummy_playthrough.validate()
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests. Appends to existing list of playthroughs or
@@ -369,10 +311,18 @@ class StorePlaythroughHandler(base.BaseHandler):
             exploration_id: str. The ID of the exploration.
         """
         exp_issue_dict = self.payload.get('exp_issue_dict')
-        self._require_exp_issue_dict_is_valid(exp_issue_dict)
+        try:
+            unused_exp_issue = stats_domain.ExplorationIssue.from_backend_dict(
+                exp_issue_dict)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         playthrough_data = self.payload.get('playthrough_data')
-        self._require_playthrough_data_is_valid(playthrough_data)
+        try:
+            unused_playthrough = stats_domain.Playthrough.from_backend_dict(
+                playthrough_data)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
 
         exp_version = playthrough_data['exp_version']
 
@@ -400,7 +350,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                             playthrough_data['exp_version'],
                             playthrough_data['issue_type'],
                             playthrough_data['issue_customization_args'],
-                            playthrough_data['playthrough_actions'])
+                            playthrough_data['actions'])
                         exp_issues.unresolved_issues[
                             index].playthrough_ids.append(playthrough_id)
                     break
@@ -411,7 +361,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                 playthrough_data['exp_version'],
                 playthrough_data['issue_type'],
                 playthrough_data['issue_customization_args'],
-                playthrough_data['playthrough_actions'])
+                playthrough_data['actions'])
             issue = stats_domain.ExplorationIssue(
                 exp_issue_dict['issue_type'],
                 exp_issue_dict['issue_customization_args'],
