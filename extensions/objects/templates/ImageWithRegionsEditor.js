@@ -31,14 +31,13 @@ oppia.directive('imageWithRegionsEditor', [
       },
       restrict: 'E',
       scope: {
-        value: '@'
+        value: '='
       },
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: [
         '$scope', '$element', '$uibModal',
         function($scope, $element, $uibModal) {
           $scope.alwaysEditable = true;
-          $scope.value = $scope.$parent.value;
           // Dynamically defines the CSS style for the region rectangle.
           $scope.getRegionStyle = function(index) {
             if (index === $scope.selectedRegion) {

@@ -28,7 +28,7 @@ oppia.directive('setOfHtmlStringEditor', [
       },
       restrict: 'E',
       scope: {
-        initArgs: '@',
+        getInitArgs: '&',
         value: '='
       },
       template: '<span ng-include="getTemplateUrl()"></span>',
@@ -43,8 +43,7 @@ oppia.directive('setOfHtmlStringEditor', [
         if (!$scope.$parent.value) {
           $scope.$parent.value = [];
         }
-
-        $scope.initArgs = $scope.$parent.initArgs;
+        $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
         $scope.selections = $scope.choices.map(function(choice) {
           return $scope.$parent.value.indexOf(choice.id) !== -1;
