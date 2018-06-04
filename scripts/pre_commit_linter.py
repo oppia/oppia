@@ -582,11 +582,10 @@ def _pre_commit_linter(all_files):
         print '         or node-stylelint and its dependencies.'
         sys.exit(1)
 
-    #js_files_to_lint = [
-    #    filename for filename in all_files if filename.endswith('.js')]
-    #py_files_to_lint = [
-    #    filename for filename in all_files if filename.endswith('.py')]
-    # TODO(apb7): Enable CSS lint.
+    js_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.js')]
+    py_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.py')]
     html_files_to_lint_for_css = [
         filename for filename in all_files if filename.endswith('.html')]
     css_files_to_lint = [
@@ -610,44 +609,44 @@ def _pre_commit_linter(all_files):
             css_files_to_lint, css_stdout,
             css_result))
 
-    #js_result = multiprocessing.Queue()
-    #js_stdout = multiprocessing.Queue()
-    #js_linting_process = multiprocessing.Process(
-    #    target=_lint_js_files, args=(
-    #        node_path, eslint_path, js_files_to_lint,
-    #        js_stdout, js_result))
+    js_result = multiprocessing.Queue()
+    js_stdout = multiprocessing.Queue()
+    js_linting_process = multiprocessing.Process(
+        target=_lint_js_files, args=(
+            node_path, eslint_path, js_files_to_lint,
+            js_stdout, js_result))
 
-    #py_result = multiprocessing.Queue()
-    #py_linting_process = multiprocessing.Process(
-    #    target=_lint_py_files,
-    #    args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result))
+    py_result = multiprocessing.Queue()
+    py_linting_process = multiprocessing.Process(
+        target=_lint_py_files,
+        args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result))
     print 'Starting CSS, Javascript and Python Linting'
     print '----------------------------------------'
     css_in_html_linting_process.start()
     css_linting_process.start()
-    #js_linting_process.start()
-    #py_linting_process.start()
+    js_linting_process.start()
+    py_linting_process.start()
 
 
     # Require timeout parameter to prevent against endless waiting for the
     # CSS, JS and Python linting functions to return.
     css_in_html_linting_process.join(timeout=50)
     css_linting_process.join(timeout=50)
-    #js_linting_process.join(timeout=600)
-    #py_linting_process.join(timeout=600)
+    js_linting_process.join(timeout=600)
+    py_linting_process.join(timeout=600)
 
-    #js_messages = []
-    #while not js_stdout.empty():
-    #    js_messages.append(js_stdout.get())
+    js_messages = []
+    while not js_stdout.empty():
+        js_messages.append(js_stdout.get())
 
     print ''
-    #print '\n'.join(js_messages)
+    print '\n'.join(js_messages)
     print '----------------------------------------'
     summary_messages = []
     summary_messages.append(css_in_html_result.get())
     summary_messages.append(css_result.get())
-    #summary_messages.append(js_result.get())
-    #summary_messages.append(py_result.get())
+    summary_messages.append(js_result.get())
+    summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
     print ''
     return summary_messages
@@ -1274,24 +1273,15 @@ def main():
     all_files = _get_all_files()
     # TODO(apb7): Enable the _check_directive_scope function.
     directive_scope_messages = []
-    #html_directive_name_messages = _check_html_directive_name(all_files)
-    #import_order_messages = _check_import_order(all_files)
-    #newline_messages = _check_newline_character(all_files)
-    #docstring_messages = _check_docstrings(all_files)
-    #comment_messages = _check_comments(all_files)
-    #html_indent_messages = _check_html_indent(all_files)
-    #html_linter_messages = _lint_html_files(all_files)
-    #linter_messages = _pre_commit_linter(all_files)
-    #pattern_messages = _check_bad_patterns(all_files)
-    html_directive_name_messages = []
-    import_order_messages = []
-    newline_messages = []
-    docstring_messages = []
-    comment_messages = []
-    html_indent_messages = []
-    html_linter_messages = []
+    html_directive_name_messages = _check_html_directive_name(all_files)
+    import_order_messages = _check_import_order(all_files)
+    newline_messages = _check_newline_character(all_files)
+    docstring_messages = _check_docstrings(all_files)
+    comment_messages = _check_comments(all_files)
+    html_indent_messages = _check_html_indent(all_files)
+    html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
-    pattern_messages = []
+    pattern_messages = _check_bad_patterns(all_files)
     all_messages = (
         directive_scope_messages + html_directive_name_messages +
         import_order_messages + newline_messages +
