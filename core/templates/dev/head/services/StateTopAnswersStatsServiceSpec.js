@@ -17,9 +17,9 @@
  * statistics for a particular state.
  */
 
-describe('StateTopAnswersStatsService', function() {
-  var joC = jasmine.objectContaining;
+var joC = jasmine.objectContaining;
 
+describe('StateTopAnswersStatsService', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
@@ -40,8 +40,7 @@ describe('StateTopAnswersStatsService', function() {
   }));
 
   beforeEach(inject(function(ExplorationStatesService) {
-    var that = this;
-    that.EXP_STATES = {
+    this.EXP_STATES = {
       Hola: {
         name: 'Hola',
         interaction: {
@@ -61,6 +60,7 @@ describe('StateTopAnswersStatsService', function() {
       }
     };
 
+    var that = this;
     spyOn(ExplorationStatesService, 'getState').and.callFake(
       function(stateName) {
         return that.EXP_STATES[stateName];
