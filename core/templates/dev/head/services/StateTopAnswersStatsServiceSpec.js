@@ -137,7 +137,7 @@ describe('StateTopAnswersStatsService', function() {
       ]);
 
       this.EXP_STATES.Hola.interaction.answerGroups.push({
-        rules: [{types: 'Equals', inputs: {x: 'adios'}}],
+        rules: [{type: 'Equals', inputs: {x: 'adios'}}],
         outcome: {dest: 'Adios'}
       });
       this.StateTopAnswersStatsService.refreshStateStats('Hola');
