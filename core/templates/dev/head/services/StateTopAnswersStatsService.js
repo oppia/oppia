@@ -27,7 +27,8 @@ oppia.factory('StateTopAnswersStatsService', [
       UrlInterpolationService) {
     /**
      * @typedef {Object} AnswerStats - A record for the statistics of a single
-     * top answer. TODO(brianrodri): Move this into its own domain object.
+     * top answer. TODO(brianrodri): Consider placing this into its own domain
+     * object.
      *
      * @property {*} answer - Contains the answer in its raw form, directly from
      *    the backend.
