@@ -593,47 +593,49 @@ def _pre_commit_linter(all_files):
 
     css_in_html_result = multiprocessing.Queue()
     css_in_html_stdout = multiprocessing.Queue()
-    css_in_html_linting_process = multiprocessing.Process(
+
+    linting_processes = []
+    linting_processes.append(multiprocessing.Process(
         target=_lint_css_files, args=(
             stylelint_path,
             config_path_for_css_in_html,
             html_files_to_lint_for_css, css_in_html_stdout,
-            css_in_html_result))
+            css_in_html_result)))
 
     css_result = multiprocessing.Queue()
     css_stdout = multiprocessing.Queue()
-    css_linting_process = multiprocessing.Process(
+
+    linting_processes.append(multiprocessing.Process(
         target=_lint_css_files, args=(
             stylelint_path,
             config_path_for_oppia_css,
             css_files_to_lint, css_stdout,
-            css_result))
+            css_result)))
 
     js_result = multiprocessing.Queue()
     js_stdout = multiprocessing.Queue()
-    js_linting_process = multiprocessing.Process(
+
+    linting_processes.append(multiprocessing.Process(
         target=_lint_js_files, args=(
             node_path, eslint_path, js_files_to_lint,
-            js_stdout, js_result))
+            js_stdout, js_result)))
 
     py_result = multiprocessing.Queue()
-    py_linting_process = multiprocessing.Process(
+
+    linting_processes.append(multiprocessing.Process(
         target=_lint_py_files,
-        args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result))
+        args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result)))
+
     print 'Starting CSS, Javascript and Python Linting'
     print '----------------------------------------'
-    css_in_html_linting_process.start()
-    css_linting_process.start()
-    js_linting_process.start()
-    py_linting_process.start()
 
+    for process in linting_processes:
+        process.start()
 
-    # Require timeout parameter to prevent against endless waiting for the
-    # CSS, JS and Python linting functions to return.
-    css_in_html_linting_process.join(timeout=50)
-    css_linting_process.join(timeout=50)
-    js_linting_process.join(timeout=600)
-    py_linting_process.join(timeout=600)
+    for process in linting_processes:
+        # Require timeout parameter to prevent against endless waiting for the
+        # linting function to return.
+        process.join(timeout=600)
 
     js_messages = []
     while not js_stdout.empty():
