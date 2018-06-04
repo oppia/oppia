@@ -35,10 +35,22 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
         $scope.imageUrl = '';
-        ImagePreloaderService.getImageUrl($scope.filepath)
-          .then(function(objectUrl) {
+
+        if (ImagePreloaderService.inExplorationPlayer()) {
+          ImagePreloaderService.getImageUrl($scope.filepath
+          ).then(function(objectUrl) {
             $scope.imageUrl = objectUrl;
           });
+        } else {
+          // This is for loading the image for preview while editing an
+          // exploration.
+          AssetsBackendApiService.loadImage(
+            ExplorationContextService.getExplorationId(), $scope.filepath
+          ).then(function(loadedImageFile) {
+            var objectUrl = URL.createObjectURL(loadedImageFile.data);
+            $scope.imageUrl = objectUrl;
+          });
+        }
         // [TODO] Display a loading indicator instead. For now, if the
         // image is not there in the cache alternate text will be shown
 

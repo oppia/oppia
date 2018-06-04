@@ -33,10 +33,12 @@ oppia.factory('ImagePreloaderService', [
     // directive).The object contains the resolve method of the promise
     // attached with getInImageUrl method.
     var _imageLoadedCallback = {};
+    var _hasImagePreloaderServiceStarted = false;
 
     var _init = function(exploration) {
       _exploration = exploration;
       _states = exploration.states;
+      _hasImagePreloaderServiceStarted = true;
     };
 
     /**
@@ -180,6 +182,9 @@ oppia.factory('ImagePreloaderService', [
       },
       getFilenamesOfImageCurrentlyDownloading: function() {
         return _filenamesOfImageCurrentlyDownloading;
+      },
+      inExplorationPlayer: function() {
+        return _hasImagePreloaderServiceStarted;
       },
       getImageUrl: function(filename) {
         return $q(function(resolve, reject){
