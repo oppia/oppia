@@ -19,7 +19,7 @@ from extensions.interactions import base
 class NumberWithUnits(base.BaseInteraction):
     """Interaction for number with units."""
 
-    name = 'Number with units input'
+    name = 'Number With Units'
     description = 'Allows learners to enter number with units.'
     display_mode = base.DISPLAY_MODE_INLINE
     is_trainable = False

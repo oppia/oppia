@@ -32,20 +32,20 @@ describe('NumberWithUnitsObjectFactory', function() {
     }));
 
     it('should convert units to dict format', function() {
-      expect(new Units('kg / kg^2 K mol / (N m s^2) K s').toDict()).toEqual(
+      expect(Units.fromStringToDict('kg / kg^2 K mol / (N m s^2) K s')).toEqual(
         {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
-      expect(new Units('mol/(kg / (N m / s^2)').toDict()).toEqual(
+      expect(Units.fromStringToDict('mol/(kg / (N m / s^2)')).toEqual(
         {mol: 1, kg: -1, N: 1, m: 1, s: -2});
-      expect(new Units('kg per kg^2 K mol per (N m s^2) K s').toDict()).toEqual(
+      expect(Units.fromStringToDict('kg per kg^2 K mol per (N m s^2) K s')).toEqual(
         {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
     });
 
     it('should convert units from dict to string format', function() {
-      expect(Units.fromDictToString(
-        {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1})).toBe(
+      expect(new Units(
+        {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1}).toString()).toBe(
         'kg^-1 K^2 mol^1 N^-1 m^-1 s^-1');
-      expect(Units.fromDictToString(
-        {mol: 1, kg: -1, N: 1, m: 1, s: -2, K: -1})).toBe(
+      expect(new Units(
+        {mol: 1, kg: -1, N: 1, m: 1, s: -2, K: -1}).toString()).toBe(
         'mol^1 kg^-1 N^1 m^1 s^-2 K^-1');
     });
 
@@ -65,44 +65,48 @@ describe('NumberWithUnitsObjectFactory', function() {
     });
 
     it('should convert itself to a string', function() {
-      expect(new NumberWithUnits('real', 2.02, '', new Units('m / s^2'
-      )).toString()).toBe('2.02 m / s^2');
-      expect(new NumberWithUnits('real', 2.02, '', new Units('Rs')).toString(
-      )).toBe('Rs 2.02');
-      expect(new NumberWithUnits('real', 2, '', new Units('')).toString(
-      )).toBe('2');
-      expect(new NumberWithUnits('fraction', '', new Fraction(
-        true, 0, 4, 3), new Units('m / s^2')).toString()).toBe('-4/3 m / s^2');
-      expect(new NumberWithUnits('fraction', '', new Fraction(
-        false, 0, 4, 3), new Units('$ per hour')).toString()).toBe(
-        '$ 4/3 per hour');
-      expect(new NumberWithUnits('real', 40, '', new Units('Rs per hour'
-      )).toString()).toBe('Rs 40 per hour');
+      expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
+      ), Units.fromRawInputString('m / s^2')).toString()).toBe('2.02 m^1 s^-2');
+      expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
+      ), Units.fromRawInputString('Rs')).toString()).toBe('Rs 2.02');
+      expect(new NumberWithUnits('real', 2, new Fraction(false, 0, 0, 1
+      ), Units.fromRawInputString('')).toString()).toBe('2');
+      expect(new NumberWithUnits('fraction', 0, new Fraction(true, 0, 4, 3
+      ), Units.fromRawInputString('m / s^2')).toString()).toBe('-4/3 m^1 s^-2');
+      expect(new NumberWithUnits('fraction', 0, new Fraction(
+        false, 0, 4, 3), Units.fromRawInputString('$ per hour')).toString(
+          )).toBe('$ 4/3 hour^-1');
+      expect(new NumberWithUnits('real', 40, new Fraction(
+        false, 0, 0, 1), Units.fromRawInputString('Rs per hour')).toString(
+          )).toBe('Rs 40 hour^-1');
     });
 
     it('should parse valid units strings', function() {
-      expect(Units.fromRawInputString('kg per (K mol^-2)').toDict()).toEqual(
-        new Units('kg / (K mol^-2)').toDict());
-      expect(Units.fromRawInputString('kg / (K mol^-2) N / m^2').toDict(
-      )).toEqual(new Units('kg / (K mol^-2) N / m^2').toDict());
+      expect(Units.fromRawInputString('kg per (K mol^-2)')).toEqual(
+        new Units(Units.fromStringToDict('kg / (K mol^-2)')));
+      expect(Units.fromRawInputString('kg / (K mol^-2) N / m^2')).toEqual(
+        new Units(Units.fromStringToDict('kg / (K mol^-2) N / m^2')));
     });
 
     it('should parse valid number with units strings', function() {
       expect(NumberWithUnits.fromRawInputString('2.02 kg / m^3')).toEqual(
-        new NumberWithUnits('real', 2.02, '', new Units('kg / m^3')));
+        new NumberWithUnits('real', 2.02, new Fraction(
+          false, 0, 0, 1), Units.fromRawInputString('kg / m^3')));
       expect(NumberWithUnits.fromRawInputString('2 / 3 kg / m^3')).toEqual(
-        new NumberWithUnits('fraction', '', new Fraction(
-          false, 0, 2, 3), new Units('kg / m^3')));
+        new NumberWithUnits('fraction', 0, new Fraction(
+          false, 0, 2, 3), Units.fromRawInputString('kg / m^3')));
       expect(NumberWithUnits.fromRawInputString('2')).toEqual(
-        new NumberWithUnits('real', 2, '', new Units('')));
+        new NumberWithUnits('real', 2, new Fraction(
+          false, 0, 0, 1), Units.fromRawInputString('')));
       expect(NumberWithUnits.fromRawInputString('2 / 3')).toEqual(
-        new NumberWithUnits('fraction', '', new Fraction(false, 0, 2, 3
-        ), new Units('')));
+        new NumberWithUnits('fraction', 0, new Fraction(
+          false, 0, 2, 3), Units.fromRawInputString('')));
       expect(NumberWithUnits.fromRawInputString('$ 2.02')).toEqual(
-        new NumberWithUnits('real', 2.02, '', new Units('$')));
+        new NumberWithUnits('real', 2.02, new Fraction(
+          false, 0, 0, 1), Units.fromRawInputString('$')));
       expect(NumberWithUnits.fromRawInputString('Rs 2 / 3 per hour')).toEqual(
-        new NumberWithUnits('fraction', '', new Fraction(
-          false, 0, 2, 3), new Units('Rs / hour')));
+        new NumberWithUnits('fraction', 0, new Fraction(
+          false, 0, 2, 3), Units.fromRawInputString('Rs / hour')));
     });
 
     it('should throw errors for invalid number with units', function() {

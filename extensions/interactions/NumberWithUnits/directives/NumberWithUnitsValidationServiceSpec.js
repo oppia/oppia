@@ -32,13 +32,29 @@ describe('NumberWithUnitsValidationService', function() {
     rof = $injector.get('RuleObjectFactory');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
-    createNumberWithUnitsDict = function(
-        type, real, fraction, units) {
+    var createFractionDict = function(
+        isNegative, wholeNumber, numerator, denominator) {
+      return {
+        isNegative: isNegative,
+        wholeNumber: wholeNumber,
+        numerator: numerator,
+        denominator: denominator
+      };
+    };
+
+    var createUnitsDict = function(unitDict) {
+      return {
+        units: unitDict
+      };
+    };
+
+    var createNumberWithUnitsDict = function(
+        type, real, fractionDict, unitDict) {
       return {
         type: type,
         real: real,
-        fraction: fraction,
-        units: units
+        fraction: fractionDict,
+        units: unitDict
       };
     };
 
@@ -57,40 +73,45 @@ describe('NumberWithUnitsValidationService', function() {
     equalsTwoRule = rof.createFromBackendDict({
       rule_type: 'IsEqualTo',
       inputs: {
-        f: createNumberWithUnitsDict('real', 2, '', 'kg / m^2')
+        f: createNumberWithUnitsDict('real', 2, createFractionDict(
+          false, 0, 0, 1), createUnitsDict({kg: 1, m: -2}))
       }
     });
 
     equivalentToTwoThousandRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        f: createNumberWithUnitsDict('real', 2000, '', 'g / m^2')
+        f: createNumberWithUnitsDict('real', 2000, createFractionDict(
+          false, 0, 0, 1), createUnitsDict({g: 1, m: -2}))
       }
     });
 
     equivalentToTwoRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        f: createNumberWithUnitsDict('real', 2, '', 'kg / m^2')
+        f: createNumberWithUnitsDict('real', 2, createFractionDict(
+          false, 0, 0, 1), createUnitsDict({kg: 1, m: -2}))
       }
     });
 
     equalsTwoByThreeRule = rof.createFromBackendDict({
       rule_type: 'IsEqualTo',
       inputs: {
-        f: createNumberWithUnitsDict('fraction', 0, '2/3', 'kg / m^2')
+        f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
+          false, 0, 2, 3), createUnitsDict({kg: 1, m: -2}))
       }
     });
 
     equivalentToTwoByThreeRule = rof.createFromBackendDict({
       rule_type: 'IsEquivalentTo',
       inputs: {
-        f: createNumberWithUnitsDict('fraction', 0, '2000/3', 'g / m^2')
+        f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
+          false, 0, 2000, 3), createUnitsDict({g: 1, m: -2}))
       }
     });
 
     answerGroups = [agof.createNew(
-      [equalsTwoRule],
+      [equalsTwoRule, equalsTwoByThreeRule],
       goodDefaultOutcome,
       false
     )];

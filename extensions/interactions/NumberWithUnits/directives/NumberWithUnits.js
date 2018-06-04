@@ -107,7 +107,7 @@ oppia.directive('oppiaResponseNumberWithUnits', [
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
-        'number_with_units_directive.html'),
+        'number_with_units_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.answer = NumberWithUnitsObjectFactory.fromDict(
@@ -126,7 +126,7 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
-        'number_with_units_directive.html'),
+        'number_with_units_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.answer = NumberWithUnitsObjectFactory.fromDict(
@@ -140,20 +140,10 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
 oppia.factory('numberWithUnitsRulesService', [
   'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
   function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
-    var isEqualValues = function(answer, inputs) {
-      if (answer.type === 'fraction') {
-        return answer.fraction.toString() === inputs.fraction.toString();
-      } else {
-        return answer.real === inputs.real;
-      }
-    };
 
     return {
       IsEqualTo: function(answer, inputs) {
-        answer = NumberWithUnitsObjectFactory.fromDict(answer);
-        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
-        return answer.type === inputs.type && isEqualValues(answer, inputs) &&
-          angular.equals(answer.units.toDict(), inputs.units.toDict());
+        return angular.equals(answer, inputs.f);
       },
       IsEquivalentTo: function(answer, inputs) {
         answer = NumberWithUnitsObjectFactory.fromDict(answer);

@@ -33,29 +33,7 @@ oppia.factory('NumberWithUnitsValidationService', [
           this.getCustomizationArgsWarnings(customizationArgs));
 
         var checkEquality = function(earlierRule, laterRule) {
-          earlierInput = NumberWithUnitsObjectFactory.fromDict(
-            earlierRule.inputs.f);
-          laterInput = NumberWithUnitsObjectFactory.fromDict(
-            laterRule.inputs.f);
-
-          if (earlierInput.type === laterInput.type) {
-            if (earlierInput.type === 'fraction') {
-              if (earlierInput.fraction.tofloat() !== laterInput.fraction.
-                toFloat()) {
-                return false;
-              }
-
-              if (!angular.equals(earlierInput.units.toDict(), laterInput.units.
-                toDict())) {
-                return false;
-              }
-              return true;
-            } else if (earlierInput.type === 'real') {
-              return earlierInput.real === laterInput.real && angular.equals(
-                earlierInput.units.toDict(), laterInput.units.toDict());
-            }
-          }
-          return false;
+          return angular.equals(earlierRule.inputs.f, laterRule.inputs.f);
         };
 
         var checkEquivalency = function(earlierRule, laterRule) {
@@ -91,7 +69,7 @@ oppia.factory('NumberWithUnitsValidationService', [
             for (var k = 0; k < ranges.length; k++) {
               var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
                 rules[ranges[k].ruleIndex - 1];
-              if (earlierRule.rule_type === 'IsEqualTo') {
+              if (earlierRule.type === 'IsEqualTo') {
                 if (checkEquality(earlierRule, rule)) {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,
@@ -105,7 +83,7 @@ oppia.factory('NumberWithUnitsValidationService', [
                 }
               }
 
-              if (earlierRule.rule_type === 'IsEquivalentTo') {
+              if (earlierRule.type === 'IsEquivalentTo') {
                 if (checkEquivalency(earlierRule, rule)) {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,

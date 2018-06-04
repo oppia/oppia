@@ -839,7 +839,13 @@ class Units(BaseObject):
 
     SCHEMA = {
         'type': 'dict',
-        'properties': []
+        'properties': [{
+            'name': 'units',
+            'schema': {
+                'type': 'dict',
+                'properties': []
+            }
+        }]
     }
 
 
@@ -864,15 +870,15 @@ class NumberWithUnits(BaseObject):
                 'type': 'unicode'
             }
         }, {
-            'name': 'fraction',
-            'schema': Fraction.SCHEMA
-        }, {
             'name': 'real',
             'schema': {
                 'type': 'float'
             }
         }, {
-            'name': 'unit',
+            'name': 'fraction',
+            'schema': Fraction.SCHEMA
+        }, {
+            'name': 'units',
             'schema': Units.SCHEMA
         }]
     }
