@@ -905,7 +905,7 @@ tags: []
         Returns:
             Story. A newly-created story.
         """
-        story = story_domain.Story.create_default_story(story_id)
+        story = story_domain.Story.create_default_story(story_id, title)
         story.title = title
         story.description = description
         story.notes = notes
@@ -945,7 +945,7 @@ tags: []
 
     def save_new_skill(
             self, skill_id, owner_id,
-            description=None, misconceptions=None, skill_contents=None,
+            description, misconceptions=None, skill_contents=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Skill and saves it.
 
@@ -963,9 +963,7 @@ tags: []
         Returns:
             Skill. A newly-created skill.
         """
-        skill = skill_domain.Skill.create_default_skill(skill_id)
-        if description:
-            skill.description = description
+        skill = skill_domain.Skill.create_default_skill(skill_id, description)
         if misconceptions:
             skill.misconceptions = misconceptions
         if skill_contents:

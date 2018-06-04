@@ -15,6 +15,7 @@
 """Controllers for the topics editor, from where topics are edited and stories
 are created.
 """
+
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_domain
@@ -26,28 +27,18 @@ import feconf
 import utils
 
 
-def _require_valid_topic_id(topic_id):
-    """Checks whether the topic id received from the frontend is a
-    valid one.
-    """
-    if not isinstance(topic_id, basestring):
-        raise base.BaseHandler.InvalidInputException(
-            Exception('Topic id should be a string.'))
-
-    if len(topic_id) != 12:
-        raise base.BaseHandler.InvalidInputException(
-            Exception('The topic id given is invalid.'))
-
-
 class NewStoryHandler(base.BaseHandler):
     """Creates a new story."""
 
     @acl_decorators.can_add_new_story_to_topic
     def post(self, topic_id):
-        """Handles POST requests."""
+        """Handles POST requests.
+        Currently, this only adds the story to the canonical story id list of
+        the topic.
+        """
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
-        _require_valid_topic_id(topic_id)
+            raise self.PageNotFoundException
+        topic_domain.Topic.require_valid_topic_id(topic_id)
         title = self.payload.get('title')
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
@@ -55,29 +46,13 @@ class NewStoryHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        if not isinstance(title, basestring):
-            raise self.InvalidInputException(
-                Exception('Title should be a string.'))
-        if title == '':
-            raise self.InvalidInputException(
-                Exception('Title field should not be empty'))
+        story_domain.Story.require_valid_title(title)
 
         new_story_id = story_services.get_new_story_id()
         story = story_domain.Story.create_default_story(
             new_story_id, title=title)
         story_services.save_new_story(self.user_id, story)
-
-        canonical_story_ids = topic.canonical_story_ids
-        canonical_story_ids.append(new_story_id)
-        change_list = [topic_domain.TopicChange({
-            'cmd': 'update_topic_property',
-            'property_name': 'canonical_story_ids',
-            'old_value': topic.canonical_story_ids,
-            'new_value': canonical_story_ids
-        })]
-        topic_services.update_topic(
-            self.user_id, topic_id, change_list,
-            'Added %s to canonical story ids' % new_story_id)
+        topic_services.add_canonical_story(self.user_id, topic_id, new_story_id)
         self.render_json({
             'storyId': new_story_id
         })
@@ -91,9 +66,9 @@ class TopicEditorPage(base.BaseHandler):
         """Handles GET requests."""
 
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
+            raise self.PageNotFoundException
 
-        _require_valid_topic_id(topic_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
 
@@ -129,9 +104,9 @@ class EditableTopicDataHandler(base.BaseHandler):
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
+            raise self.PageNotFoundException
 
-        _require_valid_topic_id(topic_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
 
@@ -149,9 +124,9 @@ class EditableTopicDataHandler(base.BaseHandler):
     def put(self, topic_id):
         """Updates properties of the given topic."""
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
+            raise self.PageNotFoundException
 
-        _require_valid_topic_id(topic_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException(
@@ -184,9 +159,9 @@ class EditableTopicDataHandler(base.BaseHandler):
     def delete(self, topic_id):
         """Handles Delete requests."""
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
+            raise self.PageNotFoundException
 
-        _require_valid_topic_id(topic_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException(
@@ -202,7 +177,7 @@ class TopicManagerRightsHandler(base.BaseHandler):
         """Assign topic manager role to a user for a particular topic, if the
         user has general topic manager rights.
         """
-        _require_valid_topic_id(topic_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
 
         if assignee_id is None:
             raise self.InvalidInputException(

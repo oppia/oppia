@@ -28,15 +28,18 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        self.topic_id = topic_services.get_new_topic_id()
+        self.save_new_topic(
+            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [])
 
 
 class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_topic_creation(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
-                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD)
+                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             json_response = self.post_json(
@@ -52,17 +55,35 @@ class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
 class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
 
     def test_skill_creation(self):
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
-                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD)
+                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
 
             json_response = self.post_json(
-                '%s' % feconf.NEW_SKILL_URL,
+                '%s/%s' % (feconf.NEW_SKILL_URL, ' '),
                 {'description': 'Skill Description'}, csrf_token=csrf_token)
             skill_id = json_response['skillId']
             self.assertEqual(len(skill_id), 12)
             self.assertIsNotNone(
                 skill_services.get_skill_by_id(skill_id, strict=False))
+            self.logout()
+
+    def test_skill_creation_in_topic(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(
+                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            json_response = self.post_json(
+                '%s/%s' % (feconf.NEW_SKILL_URL, self.topic_id),
+                {'description': 'Skill Description'}, csrf_token=csrf_token)
+            skill_id = json_response['skillId']
+            self.assertEqual(len(skill_id), 12)
+            self.assertIsNotNone(
+                skill_services.get_skill_by_id(skill_id, strict=False))
+            topic = topic_services.get_topic_by_id(self.topic_id)
+            self.assertEqual(topic.skill_ids, [skill_id])
             self.logout()

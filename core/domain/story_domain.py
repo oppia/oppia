@@ -463,22 +463,6 @@ class StoryContents(object):
                 return ind
         return None
 
-    def find_node_index(self, node_id):
-        """Returns the index of the story node with the given node
-        id, or None if the node id is not in the story contents dict.
-
-        Args:
-            node_id: str. The id of the node.
-
-        Returns:
-            int or None. The index of the corresponding node, or None if there
-            is no such node.
-        """
-        for ind, node in enumerate(self.nodes):
-            if node.id == node_id:
-                return ind
-        return None
-
     def to_dict(self):
         """Returns a dict representing this StoryContents domain object.
 
@@ -559,9 +543,7 @@ class Story(object):
         Raises:
             ValidationError: One or more attributes of story are invalid.
         """
-        if not isinstance(self.title, basestring):
-            raise utils.ValidationError(
-                'Expected title to be a string, received %s' % self.title)
+        self.require_valid_title(self.title)
 
         if not isinstance(self.description, basestring):
             raise utils.ValidationError(
@@ -595,6 +577,32 @@ class Story(object):
 
         self.story_contents.validate()
 
+    @classmethod
+    def require_valid_story_id(cls, story_id):
+        """Checks whether the story id is a valid one.
+
+        Args:
+            story_id: str. The story id to validate.
+        """
+        if not isinstance(story_id, basestring):
+            raise utils.ValidationError(
+                'Story id should be a string, received: %s' % story_id)
+
+        if len(story_id) != 12:
+            raise utils.ValidationError('Invalid story id.')
+
+    @classmethod
+    def require_valid_title(cls, title):
+        """Checks whether the story title is a valid one.
+
+        Args:
+            title: str. The title to validate.
+        """
+
+        if not isinstance(title, basestring):
+            raise utils.ValidationError('Title should be a string.')
+        if title == '':
+            raise utils.ValidationError('Title field should not be empty')
 
     def to_dict(self):
         """Returns a dict representing this Story domain object.
@@ -614,7 +622,7 @@ class Story(object):
         }
 
     @classmethod
-    def create_default_story(cls, story_id, title=feconf.DEFAULT_STORY_TITLE):
+    def create_default_story(cls, story_id, title):
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.

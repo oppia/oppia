@@ -15,6 +15,7 @@
 """Controllers for the topics and skills dashboard, from where topics and skills
 are created.
 """
+
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import skill_domain
@@ -27,11 +28,11 @@ import feconf
 class TopicsAndSkillsDashboardPage(base.BaseHandler):
     """Page showing the topics and skills dashboard."""
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_create_topic
     def get(self):
 
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
+            raise self.PageNotFoundException
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD
@@ -44,21 +45,14 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
 class NewTopicHandler(base.BaseHandler):
     """Creates a new topic."""
 
-    @acl_decorators.can_access_admin_page
+    @acl_decorators.can_create_topic
     def post(self):
         """Handles POST requests."""
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
+            raise self.PageNotFoundException
         name = self.payload.get('name')
 
-        if not isinstance(name, basestring):
-            raise self.InvalidInputException(
-                Exception('Name should be a string.'))
-
-        if name == '':
-            raise self.InvalidInputException(
-                Exception('Name field should not be empty'))
-
+        topic_domain.Topic.require_valid_name(name)
         new_topic_id = topic_services.get_new_topic_id()
         topic = topic_domain.Topic.create_default_topic(new_topic_id, name)
         topic_services.save_new_topic(self.user_id, topic)
@@ -71,24 +65,39 @@ class NewTopicHandler(base.BaseHandler):
 class NewSkillHandler(base.BaseHandler):
     """Creates a new skill."""
 
-    @acl_decorators.can_access_admin_page
-    def post(self):
+    @acl_decorators.can_create_skill
+    def post(self, topic_id):
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
+            raise self.PageNotFoundException
+        if topic_id == ' ':
+            topic_id = None
+
+        if topic_id is not None:
+            topic = topic_services.get_topic_by_id(topic_id, strict=False)
+            if topic is None:
+                raise self.PageNotFoundException(
+                    Exception('The topic with the given id doesn\'t exist.'))
         description = self.payload.get('description')
 
-        if not isinstance(description, basestring):
-            raise self.InvalidInputException(
-                Exception('Description should be a string.'))
-
-        if description == '':
-            raise self.InvalidInputException(
-                Exception('Description field should not be empty'))
+        skill_domain.Skill.require_valid_description(description)
 
         new_skill_id = skill_services.get_new_skill_id()
         skill = skill_domain.Skill.create_default_skill(
             new_skill_id, description)
         skill_services.save_new_skill(self.user_id, skill)
+
+        if topic_id is not None:
+            skill_ids = topic.skill_ids
+            skill_ids.append(new_skill_id)
+            change_list = [topic_domain.TopicChange({
+                'cmd': 'update_topic_property',
+                'property_name': 'skill_ids',
+                'old_value': topic.skill_ids,
+                'new_value': skill_ids
+            })]
+            topic_services.update_topic(
+                self.user_id, topic_id, change_list,
+                'Added %s to skill ids' % new_skill_id)
 
         self.render_json({
             'skillId': new_skill_id

@@ -27,8 +27,10 @@ class BaseStoryEditorControllerTest(test_utils.GenericTestBase):
         """Completes the sign-up process for the various users."""
         super(BaseStoryEditorControllerTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
 
@@ -49,15 +51,17 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
 
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             # Check that non-admins cannot access the editor page.
+            self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
-                    self.story_id))
-            self.assertEqual(response.status_int, 302)
+                    self.story_id), expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
 
             # Check that admins can access and edit in the editor
             # page.
-            self.login(self.ADMIN_EMAIL, is_super_admin=True)
+            self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_URL_PREFIX, self.topic_id,
@@ -68,14 +72,16 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
     def test_editable_story_handler_get(self):
         # Check that non-admins cannot access the editable story data.
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                    self.story_id))
-            self.assertEqual(response.status_int, 302)
+                    self.story_id), expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
 
             # Check that admins can access the editable story data.
-            self.login(self.ADMIN_EMAIL, is_super_admin=True)
+            self.login(self.ADMIN_EMAIL)
 
             json_response = self.get_json(
                 '%s/%s/%s' % (
@@ -96,7 +102,7 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
                 'new_value': 'New Description'
             }]
         }
-        self.login(self.ADMIN_EMAIL, is_super_admin=True)
+        self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
                 '%s/%s/%s' % (
@@ -126,7 +132,7 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
     def test_editable_story_handler_delete(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             # Check that admins can delete a story.
-            self.login(self.ADMIN_EMAIL, is_super_admin=True)
+            self.login(self.ADMIN_EMAIL)
             response = self.testapp.delete(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
@@ -135,8 +141,10 @@ class StoryEditorTest(BaseStoryEditorControllerTest):
             self.logout()
 
             # Check that non-admins cannot delete a story.
+            self.login(self.NEW_USER_EMAIL)
             response = self.testapp.delete(
                 '%s/%s/%s' % (
                     feconf.STORY_EDITOR_DATA_URL_PREFIX, self.topic_id,
-                    self.story_id))
-            self.assertEqual(response.status_int, 302)
+                    self.story_id), expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()

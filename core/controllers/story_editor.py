@@ -13,6 +13,7 @@
 # limitations under the License.
 
 """Controllers for the story editor."""
+
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_domain
@@ -23,18 +24,6 @@ import feconf
 import utils
 
 
-def _require_valid_id(entity_id):
-    """Checks whether the id received from the frontend is a valid one.
-    """
-    if not isinstance(entity_id, basestring):
-        raise base.BaseHandler.InvalidInputException(
-            Exception('All ids should be strings.'))
-
-    if len(entity_id) != 12:
-        raise base.BaseHandler.InvalidInputException(
-            Exception('The id given is invalid.'))
-
-
 class StoryEditorPage(base.BaseHandler):
     """The editor page for a single story."""
 
@@ -43,16 +32,25 @@ class StoryEditorPage(base.BaseHandler):
         """Handles GET requests."""
 
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
+            raise self.PageNotFoundException
 
-        _require_valid_id(story_id)
-        _require_valid_id(topic_id)
+        story_domain.Story.require_valid_story_id(story_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
 
         story = story_services.get_story_by_id(story_id, strict=False)
-
         if story is None:
             raise self.PageNotFoundException(
                 Exception('The story with the given id doesn\'t exist.'))
+
+        if topic_id is not None:
+            topic = topic_services.get_topic_by_id(topic_id, strict=False)
+            if topic is None:
+                raise self.PageNotFoundException(
+                    Exception('The topic with the given id doesn\'t exist.'))
+            if story_id not in topic.canonical_story_ids:
+                raise self.InvalidInputException(
+                    'The story id: %s provided is not part of the given '
+                    'topic: %s' % (story_id, topic_id))
 
         self.values.update({
             'story_id': story.id
@@ -82,16 +80,25 @@ class EditableStoryDataHandler(base.BaseHandler):
     def get(self, topic_id, story_id):
         """Populates the data on the individual story page."""
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
+            raise self.PageNotFoundException
 
-        _require_valid_id(story_id)
-        _require_valid_id(topic_id)
+        story_domain.Story.require_valid_story_id(story_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
 
         story = story_services.get_story_by_id(story_id, strict=False)
-
         if story is None:
             raise self.PageNotFoundException(
                 Exception('The story with the given id doesn\'t exist.'))
+
+        if topic_id is not None:
+            topic = topic_services.get_topic_by_id(topic_id, strict=False)
+            if topic is None:
+                raise self.PageNotFoundException(
+                    Exception('The topic with the given id doesn\'t exist.'))
+            if story_id not in topic.canonical_story_ids:
+                raise self.InvalidInputException(
+                    'The story id: %s provided is not part of the given '
+                    'topic: %s' % (story_id, topic_id))
 
         self.values.update({
             'story': story.to_dict()
@@ -103,14 +110,24 @@ class EditableStoryDataHandler(base.BaseHandler):
     def put(self, topic_id, story_id):
         """Updates properties of the given story."""
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
+            raise self.PageNotFoundException
 
-        _require_valid_id(story_id)
-        _require_valid_id(topic_id)
+        story_domain.Story.require_valid_story_id(story_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
         story = story_services.get_story_by_id(story_id, strict=False)
         if story is None:
             raise self.PageNotFoundException(
                 Exception('The story with the given id doesn\'t exist.'))
+
+        if topic_id is not None:
+            topic = topic_services.get_topic_by_id(topic_id, strict=False)
+            if topic is None:
+                raise self.PageNotFoundException(
+                    Exception('The topic with the given id doesn\'t exist.'))
+            if story_id not in topic.canonical_story_ids:
+                raise self.InvalidInputException(
+                    'The story id: %s provided is not part of the given '
+                    'topic: %s' % (story_id, topic_id))
 
         version = self.payload.get('version')
         self._require_valid_version(version, story.version)
@@ -139,12 +156,25 @@ class EditableStoryDataHandler(base.BaseHandler):
     def delete(self, topic_id, story_id):
         """Handles Delete requests."""
         if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException()
-
-        _require_valid_id(story_id)
-        _require_valid_id(topic_id)
-        if not story_id:
             raise self.PageNotFoundException
+
+        story_domain.Story.require_valid_story_id(story_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
+
+        story = story_services.get_story_by_id(story_id, strict=False)
+        if story is None:
+            raise self.PageNotFoundException(
+                Exception('The story with the given id doesn\'t exist.'))
+
+        if topic_id is not None:
+            topic = topic_services.get_topic_by_id(topic_id, strict=False)
+            if topic is None:
+                raise self.PageNotFoundException(
+                    Exception('The topic with the given id doesn\'t exist.'))
+            if story_id not in topic.canonical_story_ids:
+                raise self.InvalidInputException(
+                    'The story id: %s provided is not part of the given '
+                    'topic: %s' % (story_id, topic_id))
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         if topic is None:
@@ -152,14 +182,4 @@ class EditableStoryDataHandler(base.BaseHandler):
                 Exception('The topic with the given id doesn\'t exist.'))
 
         story_services.delete_story(self.user_id, story_id)
-        canonical_story_ids = topic.canonical_story_ids
-        canonical_story_ids.remove(story_id)
-        change_list = [topic_domain.TopicChange({
-            'cmd': 'update_topic_property',
-            'property_name': 'canonical_story_ids',
-            'old_value': topic.canonical_story_ids,
-            'new_value': canonical_story_ids
-        })]
-        topic_services.update_topic(
-            self.user_id, topic_id, change_list,
-            'Removed %s from canonical story ids' % story_id)
+        topic_services.delete_story(self.user_id, topic_id, story_id)

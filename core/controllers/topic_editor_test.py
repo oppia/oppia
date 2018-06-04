@@ -77,12 +77,15 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             # Check that non-admin and topic_manager cannot access the editor
             # page.
+            self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 302)
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
 
-            # Check that topic admins can access and edit in the editor
-            # page.
+            # Check that admins can access and edit in the editor page.
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
@@ -92,10 +95,13 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
     def test_editable_topic_handler_get(self):
         # Check that non-admins cannot access the editable topic data.
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
                 '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 302)
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
 
             # Check that admins can access the editable topic data.
             self.login(self.ADMIN_EMAIL)
@@ -151,10 +157,13 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             self.logout()
 
             # Check that non-admins cannot delete a topic.
+            self.login(self.NEW_USER_EMAIL)
             response = self.testapp.delete(
                 '%s/%s' % (
-                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(response.status_int, 302)
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
 
 
 class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
@@ -172,7 +181,7 @@ class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
             # manager for a topic.
             json_response = self.put_json(
                 '%s/%s/%s' % (
-                    feconf.TOPIC_MANAGER_PREFIX, self.topic_id,
+                    feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
                     self.new_user_id),
                 {}, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=401)
@@ -181,7 +190,7 @@ class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
             # Test for valid case.
             json_response = self.put_json(
                 '%s/%s/%s' % (
-                    feconf.TOPIC_MANAGER_PREFIX, self.topic_id,
+                    feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
                     self.topic_manager_id),
                 {}, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=200)
@@ -192,7 +201,7 @@ class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
             # someone as manager.
             json_response = self.put_json(
                 '%s/%s/%s' % (
-                    feconf.TOPIC_MANAGER_PREFIX, self.topic_id,
+                    feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX, self.topic_id,
                     self.new_user_id),
                 {}, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=401)

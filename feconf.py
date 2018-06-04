@@ -216,17 +216,11 @@ DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
 
-# Default title for a newly-minted story.
-DEFAULT_STORY_TITLE = ''
 # Default description for a newly-minted story.
 DEFAULT_STORY_DESCRIPTION = ''
 # Default notes for a newly-minted story.
 DEFAULT_STORY_NOTES = ''
-# Initial node id for a new story.
-DEFAULT_INITIAL_NODE_ID = 'node_1'
 
-# Default description for a newly-minted skill.
-DEFAULT_SKILL_DESCRIPTION = ''
 # Default explanation for a newly-minted skill.
 DEFAULT_SKILL_EXPLANATION = ''
 # Default name for a newly-minted misconception.
@@ -236,8 +230,6 @@ DEFAULT_MISCONCEPTION_NOTES = ''
 # Default feedback for a newly-minted misconception.
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
 
-# Default name for a newly-minted topic.
-DEFAULT_TOPIC_NAME = ''
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
 
@@ -634,8 +626,8 @@ SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
-TOPIC_MANAGER_PREFIX = '/rightshandler/assign_topic_manager'
-TOPICS_AND_SKILLS_DASHBOARD = '/topics_and_skills_dashboard'
+TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
+TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'

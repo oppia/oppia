@@ -155,6 +155,72 @@ class Topic(object):
             'version': self.version
         }
 
+    @classmethod
+    def require_valid_topic_id(cls, topic_id):
+        """Checks whether the topic id is a valid one.
+
+        Args:
+            topic_id: str. The topic id to validate.
+        """
+        if not isinstance(topic_id, basestring):
+            raise utils.ValidationError(
+                'Topic id should be a string, received: %s' % topic_id)
+
+        if len(topic_id) != 12:
+            raise utils.ValidationError('Topic id %s is invalid' % topic_id)
+
+    @classmethod
+    def require_valid_name(cls, name):
+        """Checks whether the name of the topic is a valid one.
+
+        Args:
+            name: str. The name to validate.
+        """
+        if not isinstance(name, basestring):
+            raise utils.ValidationError('Name should be a string.')
+
+        if name == '':
+            raise utils.ValidationError('Name field should not be empty')
+
+    def delete_skill(self, skill_id):
+        """Removes a skill from the skill_ids list.
+
+        Args:
+            skill_id: str. The skill id to remove from the list.
+
+        Returns:
+            list. The updated list of skill ids.
+        """
+        skill_ids = self.skill_ids
+        skill_ids.remove(skill_id)
+        return skill_ids
+
+    def delete_story(self, story_id):
+        """Removes a story from the canonical_story_ids list.
+
+        Args:
+            story_id: str. The story id to remove from the list.
+
+        Returns:
+            list. The updated list of canonical story ids.
+        """
+        canonical_story_ids = self.canonical_story_ids
+        canonical_story_ids.remove(story_id)
+        return canonical_story_ids
+
+    def add_canonical_story(self, story_id):
+        """Adds a story to the canonical_story_ids list.
+
+        Args:
+            story_id: str. The story id to add to the list.
+
+        Returns:
+            list. The updated list of canonical story ids.
+        """
+        canonical_story_ids = self.canonical_story_ids
+        canonical_story_ids.append(story_id)
+        return canonical_story_ids
+
     def validate(self):
         """Validates all properties of this topic and its constituents.
 
@@ -162,9 +228,7 @@ class Topic(object):
             ValidationError: One or more attributes of the Topic are not
                 valid.
         """
-        if not isinstance(self.name, basestring):
-            raise utils.ValidationError(
-                'Expected name to be a string, received %s' % self.name)
+        self.require_valid_name(self.name)
         if not isinstance(self.description, basestring):
             raise utils.ValidationError(
                 'Expected description to be a string, received %s'
@@ -208,7 +272,7 @@ class Topic(object):
                 % self.skill_ids)
 
     @classmethod
-    def create_default_topic(cls, topic_id, name=feconf.DEFAULT_TOPIC_NAME):
+    def create_default_topic(cls, topic_id, name):
         """Returns a topic domain object with default values. This is for
         the frontend where a default blank topic would be shown to the user
         when the topic is created for the first time.
