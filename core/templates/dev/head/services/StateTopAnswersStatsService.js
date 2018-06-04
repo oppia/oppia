@@ -52,11 +52,10 @@ oppia.factory('StateTopAnswersStatsService', [
        * state this exploration contains.
        */
       init: function() {
-        var explorationId = ExplorationContextService.getExplorationId();
         $http.get(
           UrlInterpolationService.interpolateUrl(
             '/createhandler/state_answer_stats/<exploration_id>',
-            {exploration_id: explorationId})
+            {exploration_id: ExplorationContextService.getExplorationId()})
         ).then(function(response) {
           stateTopAnswerStatsCache = {};
           Object.keys(response.data.answers).forEach(function(stateName) {
