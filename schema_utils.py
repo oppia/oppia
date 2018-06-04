@@ -42,6 +42,7 @@ SCHEMA_KEY_SCHEMA = 'schema'
 SCHEMA_KEY_OBJ_TYPE = 'obj_type'
 SCHEMA_KEY_VALIDATORS = 'validators'
 
+SCHEMA_TYPE_ARBITRARY_DICT = 'ArbitraryDict'
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_CUSTOM = 'custom'
 SCHEMA_TYPE_DICT = 'dict'
@@ -85,6 +86,8 @@ def normalize_against_schema(obj, schema, apply_custom_validators=True):
             key = prop[SCHEMA_KEY_NAME]
             normalized_obj[key] = normalize_against_schema(
                 obj[key], prop[SCHEMA_KEY_SCHEMA])
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_ARBITRARY_DICT:
+        pass
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
         obj = float(obj)
         assert isinstance(obj, numbers.Real), (

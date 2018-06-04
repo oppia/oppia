@@ -69,7 +69,8 @@ oppia.factory('NumberWithUnitsValidationService', [
             for (var k = 0; k < ranges.length; k++) {
               var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
                 rules[ranges[k].ruleIndex - 1];
-              if (earlierRule.type === 'IsEqualTo') {
+              if (earlierRule.type === 'IsEqualTo' &&
+                rule.type === 'IsEqualTo') {
                 if (checkEquality(earlierRule, rule)) {
                   warningsList.push({
                     type: WARNING_TYPES.ERROR,

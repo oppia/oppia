@@ -142,24 +142,18 @@ describe('NumberWithUnitsValidationService', function() {
       expect(warnings).toEqual([]);
     });
 
-  it('should not catch equals followed by equivalent with unequal values',
+  it('should not catch equals followed by equivalent as redundant',
     function() {
       answerGroups[0].rules = [equalsTwoRule, equivalentToTwoThousandRule];
       var warnings = validatorService.getAllWarnings(
         currentState, {}, answerGroups, goodDefaultOutcome);
       expect(warnings).toEqual([]);
-    });
 
-  it('should catch equals followed by equivalent with same value', function() {
-    answerGroups[0].rules = [equalsTwoRule, equivalentToTwoRule];
-    var warnings = validatorService.getAllWarnings(
-      currentState, {}, answerGroups, goodDefaultOutcome);
-    expect(warnings).toEqual([{
-      type: WARNING_TYPES.ERROR,
-      message: 'Rule 2 from answer group 1 will never be matched ' +
-        'because it is made redundant by rule 1 from answer group 1.'
-    }]);
-  });
+      answerGroups[0].rules = [equalsTwoRule, equivalentToTwoRule];
+      var warnings = validatorService.getAllWarnings(
+        currentState, {}, answerGroups, goodDefaultOutcome);
+      expect(warnings).toEqual([]);
+    });
 
   it('should catch equivalent followed by equals with equivalent values',
     function() {

@@ -56,7 +56,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
 
       if (this.type === 'real') {
         numberWithUnitsString += this.real + ' ';
-      } else {
+      } else if (this.type === 'fraction') {
         numberWithUnitsString += this.fraction.toString() + ' ';
       }
       numberWithUnitsString += unitsString.trim();
@@ -84,54 +84,60 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       var value = '';
       var unitObj = {};
 
-      // Start with digit when there is no currency unit.
-      if (rawInput.match(/^\d/)) {
-        var ind = rawInput.indexOf(rawInput.match(/[a-z(]/i));
-        if (ind === -1) {
-          // There is value with no units.
-          value = rawInput;
-          units = '';
+      // Allow validation only when rawInput is not null or an empty string.
+      if (rawInput !== '' && rawInput !== null) {
+        // Start with digit when there is no currency unit.
+        if (rawInput.match(/^\d/)) {
+          var ind = rawInput.indexOf(rawInput.match(/[a-z(]/i));
+          if (ind === -1) {
+            // There is value with no units.
+            value = rawInput;
+            units = '';
+          } else {
+            value = rawInput.substr(0, ind).trim();
+            units = rawInput.substr(ind).trim();
+          }
         } else {
-          value = rawInput.substr(0, ind).trim();
-          units = rawInput.substr(ind).trim();
+          if (!rawInput.startsWith('$ ') && !rawInput.startsWith('Rs ') &&
+            !rawInput.startsWith('₹ ')) {
+            throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+          }
+          var ind = rawInput.indexOf(' ');
+          if (ind === -1) {
+            throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+          }
+          units = rawInput.substr(0, ind) + ' ';
+          var ind2 = rawInput.indexOf(
+            rawInput.substr(ind + 1).match(/[a-z(]/i));
+          if (ind2 !== -1) {
+            value = rawInput.substr(ind + 1, ind2 - ind - 1).trim();
+            units += rawInput.substr(ind2).trim();
+          } else {
+            value = rawInput.substr(ind + 1).trim();
+            units = units.trim();
+          }
         }
-      } else {
-        if (!rawInput.startsWith('$ ') && !rawInput.startsWith('Rs ') &&
-          !rawInput.startsWith('₹ ') && !(rawInput === null)) {
-          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+        // Checking invalid characters in value.
+        if (value.match(/[a-z]/i) || value.match(/[*^$₹()#@]/)) {
+          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_VALUE);
         }
-        var ind = rawInput.indexOf(' ');
-        if (ind === -1) {
-          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
-        }
-        units = rawInput.substr(0, ind) + ' ';
-        var ind2 = rawInput.indexOf(rawInput.substr(ind + 1).match(/[a-z(]/i));
-        if (ind2 !== -1) {
-          value = rawInput.substr(ind + 1, ind2 - ind - 1).trim();
-          units += rawInput.substr(ind2).trim();
+
+        if (value.includes('/')) {
+          type = 'fraction';
+          fractionObj = FractionObjectFactory.fromRawInputString(value);
         } else {
-          value = rawInput.substr(ind + 1).trim();
-          units = units.trim();
+          type = 'real';
+          real = parseFloat(value);
         }
-      }
-      // Checking invalid characters in value.
-      if (value.match(/[a-z]/i) || value.match(/[*^$₹()#@]/)) {
-        throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_VALUE);
+        if (units !== '') {
+          // Checking invalid characters in units.
+          if (units.match(/[^0-9a-z/* ^()₹$-]/i)) {
+            throw new Error(
+              NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
+          }
+        }
       }
 
-      if (value.includes('/')) {
-        type = 'fraction';
-        fractionObj = FractionObjectFactory.fromRawInputString(value);
-      } else {
-        type = 'real';
-        real = parseFloat(value);
-      }
-      if (units !== '') {
-        // Checking invalid characters in units.
-        if (units.match(/[^0-9a-z/* ^()₹$-]/i)) {
-          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
-        }
-      }
       unitsObj = UnitsObjectFactory.fromRawInputString(units);
       return new NumberWithUnits(type, real, fractionObj, unitsObj);
     };

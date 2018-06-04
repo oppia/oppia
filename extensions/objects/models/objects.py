@@ -842,7 +842,7 @@ class Units(BaseObject):
         'properties': [{
             'name': 'units',
             'schema': {
-                'type': 'dict',
+                'type': 'ArbitraryDict',
                 'properties': []
             }
         }]
