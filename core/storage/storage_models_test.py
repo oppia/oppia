@@ -24,6 +24,9 @@ class StorageModelsTest(test_utils.GenericTestBase):
 
     def test_all_model_names_unique(self):
         all_model_names = []
+
+        # As models.NAMES is an enum, it cannot be iterated. So we use the
+        # __dict__ property which can be iterated.
         for name in models.NAMES.__dict__:
             if '__' not in name:
                 all_model_names.append(name)
