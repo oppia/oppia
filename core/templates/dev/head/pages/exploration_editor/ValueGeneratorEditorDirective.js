@@ -43,9 +43,9 @@ oppia.directive('valueGeneratorEditor', ['$compile', function($compile) {
         };
         element.html('<' + directiveName +
         ' customization-args="customizationArgs"' +
-        'get-generator-id="getGeneratorId()"' +
-        'get-init-args="getInitArgs()"' +
-        'get-obj-type="getObjType()"' +
+        ' get-generator-id="getGeneratorId()"' +
+        ' get-init-args="getInitArgs()"' +
+        ' get-obj-type="getObjType()"' +
         '></' + directiveName + '>');
         $compile(element.contents())(scope);
       });

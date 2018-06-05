@@ -44,8 +44,8 @@ oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
         element.html(
           '<' + directiveName +
           '-editor get-always-editable="getAlwaysEditable()"' +
-          'get-init-args="getInitArgs()" get-is-editable="getIsEditable()"' +
-          'obj-type="objType" value="value"></' +
+          ' get-init-args="getInitArgs()" get-is-editable="getIsEditable()"' +
+          ' obj-type="objType" value="value"></' +
           directiveName + '-editor>');
         $compile(element.contents())(scope);
       } else {
