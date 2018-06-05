@@ -190,29 +190,22 @@ class Topic(object):
 
         Raises:
             Exception. The skill_id is not present in the topic.
-
-        Returns:
-            list. The updated list of skill ids.
         """
         if skill_id not in self.skill_ids:
             raise Exception(
                 'The skill id %s is not present in the topic.' % skill_id)
-        skill_ids = self.skill_ids
-        skill_ids.remove(skill_id)
-        return skill_ids
+        self.skill_ids.remove(skill_id)
 
     def add_skill(self, skill_id):
         """Adds a skill to the skill_ids list.
 
         Args:
             skill_id: str. The skill id to add to the list.
-
-        Returns:
-            list. The updated list of skill ids.
         """
-        skill_ids = self.skill_ids
-        skill_ids.append(skill_id)
-        return skill_ids
+        if skill_id in self.skill_ids:
+            raise Exception(
+                'The skill id %s is already present in the topic.' % skill_id)
+        self.skill_ids.append(skill_id)
 
     def delete_story(self, story_id):
         """Removes a story from the canonical_story_ids list.
@@ -223,30 +216,24 @@ class Topic(object):
         Raises:
             Exception. The story_id is not present in the canonical story ids
                 list of the topic.
-
-        Returns:
-            list. The updated list of canonical story ids.
         """
         if story_id not in self.canonical_story_ids:
             raise Exception(
                 'The story_id %s is not present in the canonical '
                 'story ids list of the topic.' % story_id)
-        canonical_story_ids = self.canonical_story_ids
-        canonical_story_ids.remove(story_id)
-        return canonical_story_ids
+        self.canonical_story_ids.remove(story_id)
 
     def add_canonical_story(self, story_id):
         """Adds a story to the canonical_story_ids list.
 
         Args:
             story_id: str. The story id to add to the list.
-
-        Returns:
-            list. The updated list of canonical story ids.
         """
-        canonical_story_ids = self.canonical_story_ids
-        canonical_story_ids.append(story_id)
-        return canonical_story_ids
+        if story_id in self.canonical_story_ids:
+            raise Exception(
+                'The story_id %s is already present in the canonical '
+                'story ids list of the topic.' % story_id)
+        self.canonical_story_ids.append(story_id)
 
     def validate(self):
         """Validates all properties of this topic and its constituents.

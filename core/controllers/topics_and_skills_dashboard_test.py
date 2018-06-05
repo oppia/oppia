@@ -70,7 +70,22 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
                 skill_services.get_skill_by_id(skill_id, strict=False))
             self.logout()
 
-    def test_skill_creation_in_topic(self):
+    def test_skill_creation_in_invalid_topic(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(
+                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            json_response = self.post_json(
+                '%s' % feconf.NEW_SKILL_URL,
+                {'description': 'Skill Description', 'topic_id': 'topic'},
+                csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=400)
+            self.assertEqual(json_response['status_code'], 400)
+            self.logout()
+
+    def test_skill_creation_in_valid_topic(self):
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(

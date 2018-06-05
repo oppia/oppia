@@ -120,7 +120,8 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
                 self.admin, topic_manager_2, topic_domain.ROLE_MANAGER,
                 topic_id_2)
 
-            # Verify that the created user can edit the assigned topic.
+            # Verify that the second topic manager can edit their
+            # assigned topic.
             self.login('topicmanager2@example.com')
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id_2))

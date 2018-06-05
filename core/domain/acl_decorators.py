@@ -990,7 +990,9 @@ def can_create_topic(handler):
 
 
 def can_access_topics_and_skills_dashboard(handler):
-    """Decorator to check whether the user can create a topic."""
+    """Decorator to check whether the user can access the topics and skills
+    dashboard.
+    """
 
     def test_can_access_topics_and_skills_dashboard(self, **kwargs):
         if not self.user_id:
@@ -998,7 +1000,9 @@ def can_access_topics_and_skills_dashboard(handler):
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
-        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+        if (
+                role_services.ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD in
+                user_actions_info.actions):
             return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(

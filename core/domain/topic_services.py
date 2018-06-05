@@ -322,12 +322,13 @@ def delete_skill(user_id, topic_id, skill_id):
         skill_id: str. The skill to remove from the topic.
     """
     topic = get_topic_by_id(topic_id)
-    new_skill_ids = topic.delete_skill(skill_id)
+    old_skill_ids = copy.deepcopy(topic.skill_ids)
+    topic.delete_skill(skill_id)
     change_list = [topic_domain.TopicChange({
         'cmd': 'update_topic_property',
         'property_name': 'skill_ids',
-        'old_value': copy.deepcopy(topic.skill_ids),
-        'new_value': new_skill_ids
+        'old_value': old_skill_ids,
+        'new_value': topic.skill_ids
     })]
     update_topic(
         user_id, topic_id, change_list, 'Removed %s from skill ids' % skill_id)
@@ -342,12 +343,13 @@ def add_skill(user_id, topic_id, skill_id):
         skill_id: str. The skill to add to the topic.
     """
     topic = get_topic_by_id(topic_id)
-    new_skill_ids = topic.add_skill(skill_id)
+    old_skill_ids = copy.deepcopy(topic.skill_ids)
+    topic.add_skill(skill_id)
     change_list = [topic_domain.TopicChange({
         'cmd': 'update_topic_property',
         'property_name': 'skill_ids',
-        'old_value': copy.deepcopy(topic.skill_ids),
-        'new_value': new_skill_ids
+        'old_value': old_skill_ids,
+        'new_value': topic.skill_ids
     })]
     update_topic(
         user_id, topic_id, change_list, 'Added %s to skill ids' % skill_id)
@@ -365,12 +367,13 @@ def delete_story(user_id, topic_id, story_id):
         story_id: str. The story to remove from the topic.
     """
     topic = get_topic_by_id(topic_id)
-    new_canonical_story_ids = topic.delete_story(story_id)
+    old_canonical_story_ids = copy.deepcopy(topic.canonical_story_ids)
+    topic.delete_story(story_id)
     change_list = [topic_domain.TopicChange({
         'cmd': 'update_topic_property',
         'property_name': 'canonical_story_ids',
-        'old_value': copy.deepcopy(topic.canonical_story_ids),
-        'new_value': new_canonical_story_ids
+        'old_value': old_canonical_story_ids,
+        'new_value': topic.canonical_story_ids
     })]
     update_topic(
         user_id, topic_id, change_list,
@@ -386,12 +389,13 @@ def add_canonical_story(user_id, topic_id, story_id):
         story_id: str. The story to add to the topic.
     """
     topic = get_topic_by_id(topic_id)
-    new_canonical_story_ids = topic.add_canonical_story(story_id)
+    old_canonical_story_ids = copy.deepcopy(topic.canonical_story_ids)
+    topic.add_canonical_story(story_id)
     change_list = [topic_domain.TopicChange({
         'cmd': 'update_topic_property',
         'property_name': 'canonical_story_ids',
-        'old_value': copy.deepcopy(topic.canonical_story_ids),
-        'new_value': new_canonical_story_ids
+        'old_value': old_canonical_story_ids,
+        'new_value': topic.canonical_story_ids
     })]
     update_topic(
         user_id, topic_id, change_list,

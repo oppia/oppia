@@ -57,10 +57,20 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
+    def test_add_skill(self):
+        self.topic.skill_ids = ['skill_id_1', 'skill_id_2']
+        self.topic.add_skill('skill_id_3')
+        self.assertEqual(
+            self.topic.skill_ids, ['skill_id_1', 'skill_id_2', 'skill_id_3'])
+        with self.assertRaisesRegexp(
+            Exception, 'The skill id skill_id_3 is already present in '
+            'the topic'):
+            self.topic.add_skill('skill_id_3')
+
     def test_delete_skill(self):
         self.topic.skill_ids = ['skill_id', 'skill_id_1', 'skill_id_2']
-        new_skill_ids = self.topic.delete_skill('skill_id_1')
-        self.assertEqual(new_skill_ids, ['skill_id', 'skill_id_2'])
+        self.topic.delete_skill('skill_id_1')
+        self.assertEqual(self.topic.skill_ids, ['skill_id', 'skill_id_2'])
         with self.assertRaisesRegexp(
             Exception, 'The skill id skill_id_5 is not present in the topic'):
             self.topic.delete_skill('skill_id_5')
@@ -68,8 +78,9 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_delete_story(self):
         self.topic.canonical_story_ids = [
             'story_id', 'story_id_1', 'story_id_2']
-        new_canonical_story_ids = self.topic.delete_story('story_id_1')
-        self.assertEqual(new_canonical_story_ids, ['story_id', 'story_id_2'])
+        self.topic.delete_story('story_id_1')
+        self.assertEqual(
+            self.topic.canonical_story_ids, ['story_id', 'story_id_2'])
         with self.assertRaisesRegexp(
             Exception, 'The story_id story_id_5 is not present in the canonical'
             ' story ids list of the topic.'):
@@ -78,9 +89,14 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
     def test_add_canonical_story(self):
         self.topic.canonical_story_ids = [
             'story_id', 'story_id_1']
-        new_canonical_story_ids = self.topic.add_canonical_story('story_id_2')
+        self.topic.add_canonical_story('story_id_2')
         self.assertEqual(
-            new_canonical_story_ids, ['story_id', 'story_id_1', 'story_id_2'])
+            self.topic.canonical_story_ids,
+            ['story_id', 'story_id_1', 'story_id_2'])
+        with self.assertRaisesRegexp(
+            Exception, 'The story_id story_id_2 is already present in the '
+            'canonical story ids list of the topic.'):
+            self.topic.add_canonical_story('story_id_2')
 
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the topic passes strict validation."""

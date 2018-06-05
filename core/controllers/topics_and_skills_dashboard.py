@@ -74,7 +74,8 @@ class NewSkillHandler(base.BaseHandler):
         if topic_id is not None:
             topic = topic_services.get_topic_by_id(topic_id, strict=False)
             if topic is None:
-                raise self.InvalidInputError
+                raise self.InvalidInputException
+
         description = self.payload.get('description')
 
         skill_domain.Skill.require_valid_description(description)
