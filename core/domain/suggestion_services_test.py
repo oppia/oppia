@@ -520,7 +520,6 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.target_version_at_submission = exploration.version
 
     def test_create_and_accept_suggestion(self):
-
         with self.swap(
             feedback_models.FeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
@@ -538,6 +537,63 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertEqual(
+            exploration.states['State 1'].content.html,
+            'new content')
+
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
+
+    def test_create_and_reject_suggestion(self):
+        with self.swap(
+            feedback_models.FeedbackThreadModel,
+            'generate_new_thread_id', self.generate_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.EXP_ID, self.target_version_at_submission,
+                self.author_id, self.change_cmd, self.score_category,
+                'test description', self.assigned_reviewer_id, None)
+
+        suggestion_id = 'exploration.' + self.THREAD_ID
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        suggestion_services.reject_suggestion(
+            suggestion, self.reviewer_id, 'Reject message')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
+        last_message = thread_messages[len(thread_messages) - 1]
+        self.assertEqual(
+            last_message.text, 'Reject message')
+        self.assertEqual(
+            exploration.states['State 1'].content.html,
+            'old content')
+
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_REJECTED)
+
+    def test_create_and_accept_suggestion_with_message(self):
+        with self.swap(
+            feedback_models.FeedbackThreadModel,
+            'generate_new_thread_id', self.generate_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.EXP_ID, self.target_version_at_submission,
+                self.author_id, self.change_cmd, self.score_category,
+                'test description', self.assigned_reviewer_id, None)
+
+        suggestion_id = 'exploration.' + self.THREAD_ID
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        suggestion_services.accept_suggestion(
+            suggestion, self.reviewer_id, self.COMMIT_MESSAGE, 'Accept message')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        thread_messages = feedback_services.get_messages(self.THREAD_ID)
+        last_message = thread_messages[len(thread_messages) - 1]
+        self.assertEqual(
+            last_message.text, 'Accept message')
 
         self.assertEqual(
             exploration.states['State 1'].content.html,
