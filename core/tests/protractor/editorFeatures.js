@@ -282,15 +282,15 @@ describe('Exploration history', function() {
         highlighted: false
       },
       15: {
-        text: '    param_changes: []',
+        text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
       16: {
-        text: '    refresher_exploration_id: null',
+        text: '    param_changes: []',
         highlighted: false
       },
       17: {
-        text: '    missing_prerequisite_skill_id: null',
+        text: '    refresher_exploration_id: null',
         highlighted: false
       },
       18: {
@@ -332,9 +332,9 @@ describe('Exploration history', function() {
       '      audio_translations: {}\n' +
       '      html: \'\'\n' +
       '    labelled_as_correct: false\n' +
+      '    missing_prerequisite_skill_id: null\n' +
       '    param_changes: []\n' +
       '    refresher_exploration_id: null\n' +
-      '    missing_prerequisite_skill_id: null\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +
