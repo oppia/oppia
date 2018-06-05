@@ -31,13 +31,13 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
 
     ContentIdsToAudioTranslations.prototype.getBindableAudioTranslations = (
       function(contentId) {
-        return angular.copy(this._contentIdsToAudioTranslations[contentId]);
+        return this._contentIdsToAudioTranslations[contentId];
       });
 
     ContentIdsToAudioTranslations.prototype.getAudioTranslation = function(
         contentId, langCode) {
-      return angular.copy(this._contentIdsToAudioTranslations[contentId][
-        langCode]);
+      return this._contentIdsToAudioTranslations[contentId][
+        langCode];
     };
 
     ContentIdsToAudioTranslations.prototype.markAllAudioAsNeedingUpdate = (

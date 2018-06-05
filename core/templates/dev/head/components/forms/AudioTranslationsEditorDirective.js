@@ -42,12 +42,8 @@ oppia.directive('audioTranslationsEditor', [
             AssetsBackendApiService) {
           $scope.isEditable = EditabilityService.isEditable;
 
-          $rootScope.$on('audioTranslationChange', function() {
-            $scope.audioTranslations = (
-              stateContentIdsToAudioTranslationsService.displayed
-                .getBindableAudioTranslations($scope.contentId));
-          });
-
+            $scope.stateContentIdsToAudioTranslationsService =
+              stateContentIdsToAudioTranslationsService;
           // The following if-condition is present because, sometimes,
           // Travis-CI throws an error of the form "Cannot read property
           // getBindableAudioTranslations of undefined". It looks like there is
@@ -213,7 +209,6 @@ oppia.directive('audioTranslationsEditor', [
                   $scope.contentId, result.languageCode, result.filename,
                   result.fileSizeBytes);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $rootScope.$broadcast('audioTranslationChange');
             });
           };
 
@@ -254,7 +249,6 @@ oppia.directive('audioTranslationsEditor', [
               stateContentIdsToAudioTranslationsService.displayed
                 .deleteAudioTranslation($scope.contentId, languageCode);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $rootScope.$broadcast('audioTranslationChange');
             });
           };
         }

@@ -1,8 +1,8 @@
 <div>
-  <span ng-if="hasAudioTranslations">
+  <span ng-if="stateContentIdsToAudioTranslationsService.displayed.hasAudioTranslations(contentId)">
     <hr class="oppia-audio-translations-divider">
     <h4 class="oppia-audio-translations-header">Audio Translations</h4>
-    <div ng-repeat="(languageCode, audioTranslation) in audioTranslations">
+    <div ng-repeat="(languageCode, audioTranslation) in stateContentIdsToAudioTranslationsService.displayed.getBindableAudioTranslations(contentId)">
       <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-3 audio-language-description">
           <span class="needs-update-marker"

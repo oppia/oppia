@@ -76,7 +76,7 @@ oppia.directive('outcomeEditor', [
               controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
               var feedbackContentId = $scope.outcome.feedback.getContentId();
-              stateContentIdsToAudioTranslationsService
+              stateContentIdsToAudioTranslationsService.displayed
                 .markAllAudioAsNeedingUpdate(feedbackContentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
             });
