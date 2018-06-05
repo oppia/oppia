@@ -575,8 +575,9 @@ class DocstringParameterChecker(BaseChecker):
                                 not_needed_type_in_docstring)
 
     def check_single_constructor_params(self, class_doc, init_doc, class_node):
-        """Checks whether the class as well as init() method have documentation,
-        If they have documentation, it adds an error message.
+        """Checks whether a class and corresponding  init() method are
+        documented. If both of them are documented, it adds an error message.
+
 
         Args:
             class_doc: Docstring. Pylint docstring class instance representing
