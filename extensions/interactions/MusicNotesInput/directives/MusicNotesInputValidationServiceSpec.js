@@ -41,7 +41,7 @@ describe('MusicNotesInputValidationService', function() {
       labelled_as_correct: false,
       param_changes: [],
       refresher_exploration_id: null,
-      skill_id: null
+      missing_prerequisite_skill_id: null
     });
     goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
   }));

@@ -155,7 +155,7 @@ describe('Image preloader service', function() {
                   },
                   param_changes: [],
                   refresher_exploration_id: null,
-                  skill_id: null
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [
                   {
@@ -176,7 +176,7 @@ describe('Image preloader service', function() {
                   },
                   param_changes: [],
                   refresher_exploration_id: null,
-                  skill_id: null
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [
                   {
@@ -208,7 +208,7 @@ describe('Image preloader service', function() {
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              skill_id: null
+              missing_prerequisite_skill_id: null
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -234,7 +234,7 @@ describe('Image preloader service', function() {
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
-                skill_id: null
+                missing_prerequisite_skill_id: null
               }
             }, {
               rule_specs: [{
@@ -251,7 +251,7 @@ describe('Image preloader service', function() {
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
-                skill_id: null
+                missing_prerequisite_skill_id: null
               }
             }],
             hints: [{

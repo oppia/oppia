@@ -751,7 +751,7 @@ class Outcome(object):
             'param_changes': [
                 param_change.to_dict() for param_change in self.param_changes],
             'refresher_exploration_id': self.refresher_exploration_id,
-            'skill_id': self.skill_id
+            'missing_prerequisite_skill_id': self.missing_prerequisite_skill_id
         }
 
     @classmethod
@@ -773,12 +773,12 @@ class Outcome(object):
                 param_change['customization_args'])
              for param_change in outcome_dict['param_changes']],
             outcome_dict['refresher_exploration_id'],
-            outcome_dict['skill_id']
+            outcome_dict['missing_prerequisite_skill_id']
         )
 
     def __init__(
             self, dest, feedback, labelled_as_correct, param_changes,
-            refresher_exploration_id, skill_id):
+            refresher_exploration_id, missing_prerequisite_skill_id):
         """Initializes a Outcome domain object.
 
         Args:
@@ -793,8 +793,10 @@ class Outcome(object):
                 to redirect the learner to if they seem to lack understanding
                 of a prerequisite concept. This should only exist if the
                 destination state for this outcome is a self-loop.
-            skill_id: str or None. The id of the skill that this answer group
-                tests and would redirect to when a user receives this outcome.
+            missing_prerequisite_skill_id: str or None. The id of the skill that
+                this answer group tests. If this is not None, the exploration
+                player would redirect to this skill when a learner receives this
+                outcome.
         """
         # Id of the destination state.
         # TODO(sll): Check that this state actually exists.
@@ -813,7 +815,7 @@ class Outcome(object):
         self.refresher_exploration_id = refresher_exploration_id
         # An optional skill id whose concept card would be shown to the learner
         # when the learner receives this outcome.
-        self.skill_id = skill_id
+        self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
 
     def validate(self):
         """Validates various properties of the Outcome.
@@ -828,11 +830,11 @@ class Outcome(object):
                 'The "labelled_as_correct" field should be a boolean, received '
                 '%s' % self.labelled_as_correct)
 
-        if self.skill_id is not None:
-            if not isinstance(self.skill_id, basestring):
+        if self.missing_prerequisite_skill_id is not None:
+            if not isinstance(self.missing_prerequisite_skill_id, basestring):
                 raise utils.ValidationError(
-                    'Expected outcome skill_id to be a string, received '
-                    '%s' % self.skill_id)
+                    'Expected outcome missing_prerequisite_skill_id to be a '
+                    'string, received %s' % self.missing_prerequisite_skill_id)
 
         if not isinstance(self.param_changes, list):
             raise utils.ValidationError(
@@ -899,7 +901,7 @@ class AnswerGroup(object):
                 data of this answer group.
             tagged_misconception_id: str or None. The id of the tagged
                 misconception for the answer group, when a state is part of a
-                Question object in a Skill.
+                Question object that tests a particular skill.
         """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
@@ -1330,7 +1332,7 @@ class State(object):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'skill_id': None
+            'missing_prerequisite_skill_id': None
         },
         'confirmed_unclassified_answers': [],
         'hints': [],
@@ -3276,8 +3278,8 @@ class Exploration(object):
     @classmethod
     def _convert_states_v19_dict_to_v20_dict(cls, states_dict):
         """Converts from version 19 to 20. Version 20 adds
-        tagged_misconception field to answer groups and skill_id field to
-        outcomes.
+        tagged_misconception field to answer groups and
+        missing_prerequisite_skill_id field to outcomes.
 
         Args:
             states_dict: dict. A dict where each key-value pair represents,
@@ -3290,12 +3292,12 @@ class Exploration(object):
         for state_dict in states_dict.values():
             answer_groups = state_dict['interaction']['answer_groups']
             for answer_group in answer_groups:
-                answer_group['outcome']['skill_id'] = None
+                answer_group['outcome']['missing_prerequisite_skill_id'] = None
                 answer_group['tagged_misconception_id'] = None
 
             default_outcome = state_dict['interaction']['default_outcome']
             if default_outcome is not None:
-                default_outcome['skill_id'] = None
+                default_outcome['missing_prerequisite_skill_id'] = None
         return states_dict
 
     @classmethod
@@ -3793,8 +3795,9 @@ class Exploration(object):
     def _convert_v24_dict_to_v25_dict(cls, exploration_dict):
         """ Converts a v24 exploration dict into a v25 exploration dict.
 
-        Adds additional tagged_misconception_id and skill_id fields to answer
-        groups and outcomes respectively.
+        Adds additional tagged_misconception_id and
+        missing_prerequisite_skill_id fields to answer groups and outcomes
+        respectively.
         """
         exploration_dict['schema_version'] = 25
 

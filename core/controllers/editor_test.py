@@ -593,9 +593,9 @@ interaction:
       audio_translations: {}
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
-    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -619,9 +619,9 @@ interaction:
       audio_translations: {}
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
-    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -645,9 +645,9 @@ interaction:
       audio_translations: {}
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
-    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -673,9 +673,9 @@ interaction:
       audio_translations: {}
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
-    skill_id: null
   hints: []
   id: TextInput
   solution: null

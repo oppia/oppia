@@ -250,7 +250,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'labelled_as_correct': False,
                     'param_changes': [],
                     'refresher_exploration_id': None,
-                    'skill_id': None
+                    'missing_prerequisite_skill_id': None
                 },
                 'rule_specs': [{
                     'inputs': {
@@ -361,15 +361,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         outcome.refresher_exploration_id = 'valid_string'
         exploration.validate()
 
-        outcome.skill_id = 12345
+        outcome.missing_prerequisite_skill_id = 12345
         self._assert_validation_error(
             exploration,
-            'Expected outcome skill_id to be a string')
+            'Expected outcome missing_prerequisite_skill_id to be a string')
 
-        outcome.skill_id = None
+        outcome.missing_prerequisite_skill_id = None
         exploration.validate()
 
-        outcome.skill_id = 'valid_string'
+        outcome.missing_prerequisite_skill_id = 'valid_string'
         exploration.validate()
 
         # Test that refresher_exploration_id must be None for non-self-loops.
@@ -905,7 +905,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     'labelled_as_correct': False,
                     'param_changes': [],
                     'refresher_exploration_id': None,
-                    'skill_id': None
+                    'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
                 'id': None,
@@ -2954,9 +2954,9 @@ states:
             audio_translations: {}
             html: Correct!
           labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-          skill_id: null
         rule_specs:
         - inputs:
             x: InputString
@@ -2975,9 +2975,9 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: TextInput
       solution: null
@@ -3017,9 +3017,9 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: TextInput
       solution: null
@@ -3211,7 +3211,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'labelled_as_correct': False,
                         'param_changes': [],
                         'refresher_exploration_id': None,
-                        'skill_id': None
+                        'missing_prerequisite_skill_id': None
                     },
                     'hints': [],
                     'id': None,
@@ -3922,7 +3922,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             'param_changes': [],
             'labelled_as_correct': False,
             'refresher_exploration_id': None,
-            'skill_id': None
+            'missing_prerequisite_skill_id': None
         }
         state1.update_interaction_default_outcome(default_outcome_dict1)
 
@@ -3968,7 +3968,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 'param_changes': [],
                 'labelled_as_correct': False,
                 'refresher_exploration_id': None,
-                'skill_id': None
+                'missing_prerequisite_skill_id': None
             },
             'training_data': [],
             'tagged_misconception_id': None
@@ -3986,7 +3986,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 'param_changes': [],
                 'labelled_as_correct': False,
                 'refresher_exploration_id': None,
-                'skill_id': None
+                'missing_prerequisite_skill_id': None
             },
             'training_data': [],
             'tagged_misconception_id': None
@@ -4012,7 +4012,7 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 'param_changes': [],
                 'labelled_as_correct': False,
                 'refresher_exploration_id': None,
-                'skill_id': None
+                'missing_prerequisite_skill_id': None
             },
             'training_data': [],
             'tagged_misconception_id': None

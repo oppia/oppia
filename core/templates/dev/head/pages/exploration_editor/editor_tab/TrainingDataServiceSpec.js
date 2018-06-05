@@ -84,7 +84,7 @@ describe('TrainingDataService', function() {
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              skill_id: null
+              missing_prerequisite_skill_id: null
             },
             training_data: [],
             tagged_misconception_id: null
@@ -98,7 +98,7 @@ describe('TrainingDataService', function() {
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null,
-            skill_id: null
+            missing_prerequisite_skill_id: null
           },
           hints: [],
           confirmed_unclassified_answers: []

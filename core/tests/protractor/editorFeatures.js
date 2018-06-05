@@ -121,15 +121,15 @@ describe('Exploration history', function() {
         highlighted: true
       },
       13: {
-        text: '      param_changes: []',
+        text: '      missing_prerequisite_skill_id: null',
         highlighted: true
       },
       14: {
-        text: '      refresher_exploration_id: null',
+        text: '      param_changes: []',
         highlighted: true
       },
       15: {
-        text: '      skill_id: null',
+        text: '      refresher_exploration_id: null',
         highlighted: true
       },
       16: {
@@ -189,15 +189,15 @@ describe('Exploration history', function() {
         highlighted: false
       },
       30: {
-        text: '    param_changes: []',
+        text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
       31: {
-        text: '    refresher_exploration_id: null',
+        text: '    param_changes: []',
         highlighted: false
       },
       32: {
-        text: '    skill_id: null',
+        text: '    refresher_exploration_id: null',
         highlighted: false
       },
       33: {
@@ -290,7 +290,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       17: {
-        text: '    skill_id: null',
+        text: '    missing_prerequisite_skill_id: null',
         highlighted: false
       },
       18: {
@@ -334,7 +334,7 @@ describe('Exploration history', function() {
       '    labelled_as_correct: false\n' +
       '    param_changes: []\n' +
       '    refresher_exploration_id: null\n' +
-      '    skill_id: null\n' +
+      '    missing_prerequisite_skill_id: null\n' +
       '  hints: []\n' +
       '  id: Continue\n' +
       '  solution: null\n' +

@@ -204,9 +204,9 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: null
       solution: null
@@ -226,9 +226,9 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: null
       solution: null
@@ -265,9 +265,9 @@ states:
         dest: %s
         feedback: []
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       fallbacks: []
       id: null
     param_changes: []
@@ -283,9 +283,9 @@ states:
         dest: New state
         feedback: []
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       fallbacks: []
       id: null
     param_changes: []

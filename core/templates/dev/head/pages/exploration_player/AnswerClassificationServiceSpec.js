@@ -62,7 +62,7 @@ describe('Answer classification service with string classifier disabled',
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              skill_id: null
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -80,7 +80,7 @@ describe('Answer classification service with string classifier disabled',
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              skill_id: null
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -108,7 +108,7 @@ describe('Answer classification service with string classifier disabled',
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null,
-            skill_id: null
+            missing_prerequisite_skill_id: null
           },
           hints: []
         },
@@ -185,7 +185,7 @@ describe('Answer classification service with string classifier disabled',
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              skill_id: null
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -203,7 +203,7 @@ describe('Answer classification service with string classifier disabled',
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null,
-            skill_id: null
+            missing_prerequisite_skill_id: null
           },
           hints: []
         },
@@ -278,7 +278,7 @@ describe('Answer classification service with string classifier enabled',
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              skill_id: null
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -296,7 +296,7 @@ describe('Answer classification service with string classifier enabled',
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              skill_id: null
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -319,7 +319,7 @@ describe('Answer classification service with string classifier enabled',
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null,
-            skill_id: null
+            missing_prerequisite_skill_id: null
           },
           hints: []
         },
@@ -430,7 +430,7 @@ describe('Answer classification service with training data classification',
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              skill_id: null
+              missing_prerequisite_skill_id: null
             },
             training_data: ['abc', 'input'],
             rule_specs: [{
@@ -449,7 +449,7 @@ describe('Answer classification service with training data classification',
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
-              skill_id: null
+              missing_prerequisite_skill_id: null
             },
             training_data: ['xyz'],
             rule_specs: [{
@@ -468,7 +468,7 @@ describe('Answer classification service with training data classification',
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null,
-            skill_id: null
+            missing_prerequisite_skill_id: null
           },
           hints: []
         },

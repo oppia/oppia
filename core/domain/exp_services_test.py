@@ -680,9 +680,9 @@ states:
                     needs_update: false
             html: Correct!
           labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-          skill_id: null
         rule_specs:
         - inputs:
             x: InputString
@@ -699,9 +699,9 @@ states:
                 needs_update: false
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints:
         - hint_content:
             html: hint one,
@@ -737,9 +737,9 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: null
       solution: null
@@ -893,9 +893,9 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: TextInput
       solution: null
@@ -919,9 +919,9 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: TextInput
       solution: null
@@ -967,9 +967,9 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: TextInput
       solution: null
@@ -993,9 +993,9 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: TextInput
       solution: null
@@ -1127,9 +1127,9 @@ interaction:
       audio_translations: {}
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
-    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1156,9 +1156,9 @@ interaction:
       audio_translations: {}
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
-    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1186,9 +1186,9 @@ interaction:
       audio_translations: {}
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
-    skill_id: null
   hints: []
   id: TextInput
   solution: null
@@ -1303,7 +1303,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'labelled_as_correct': False,
                 'param_changes': [],
                 'refresher_exploration_id': None,
-                'skill_id': None
+                'missing_prerequisite_skill_id': None
             },
             'training_data': [],
             'tagged_misconception_id': None
@@ -1318,7 +1318,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
-            'skill_id': None
+            'missing_prerequisite_skill_id': None
         }
 
     def test_add_state_cmd(self):
@@ -2583,9 +2583,9 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: Continue
       solution: null

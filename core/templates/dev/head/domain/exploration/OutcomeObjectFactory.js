@@ -22,13 +22,13 @@ oppia.factory('OutcomeObjectFactory', [
   function(SubtitledHtmlObjectFactory) {
     var Outcome = function(
         dest, feedback, labelledAsCorrect, paramChanges,
-        refresherExplorationId, skillId) {
+        refresherExplorationId, missingPrerequisiteSkillId) {
       this.dest = dest;
       this.feedback = feedback;
       this.labelledAsCorrect = labelledAsCorrect;
       this.paramChanges = paramChanges;
       this.refresherExplorationId = refresherExplorationId;
-      this.skillId = skillId;
+      this.missingPrerequisiteSkillId = missingPrerequisiteSkillId;
     };
 
     Outcome.prototype.toBackendDict = function() {
@@ -38,7 +38,7 @@ oppia.factory('OutcomeObjectFactory', [
         labelled_as_correct: this.labelledAsCorrect,
         param_changes: this.paramChanges,
         refresher_exploration_id: this.refresherExplorationId,
-        skill_id: this.skillId
+        missing_prerequisite_skill_id: this.missingPrerequisiteSkillId
       };
     };
     /**
@@ -74,7 +74,7 @@ oppia.factory('OutcomeObjectFactory', [
         outcomeDict.labelled_as_correct,
         outcomeDict.param_changes,
         outcomeDict.refresher_exploration_id,
-        outcomeDict.skill_id);
+        outcomeDict.missing_prerequisite_skill_id);
     };
 
     return Outcome;

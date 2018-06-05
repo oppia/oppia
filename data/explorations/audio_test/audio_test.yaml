@@ -58,9 +58,9 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: Continue
       solution: null
@@ -82,9 +82,9 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Nice!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-          skill_id: null
         rule_specs:
         - inputs:
             x: x
@@ -104,9 +104,9 @@ states:
         feedback:
           audio_translations: {}
           html: <p>Nice work.</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints: []
       id: CodeRepl
       solution: null
@@ -132,9 +132,9 @@ states:
                 filename: feedback-en-kt33y1e2rwg.mp3
                 needs_update: false
             html: <p>I like cats too.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-          skill_id: null
         rule_specs:
         - inputs:
             x: cat
@@ -149,9 +149,9 @@ states:
                 filename: feedback-en-vvixng5ajds.mp3
                 needs_update: false
             html: <p>I like dogs too.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
-          skill_id: null
         rule_specs:
         - inputs:
             x: dog
@@ -171,9 +171,9 @@ states:
               filename: feedback-en-s0w3v9gslr9.mp3
               needs_update: false
           html: <p>I'm not sure what that animal is.</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
-        skill_id: null
       hints:
       - hint_content:
           audio_translations:
