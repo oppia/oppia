@@ -16,6 +16,7 @@
 
 """Commands for operations on topics, and related models."""
 
+import copy
 import logging
 
 from core.domain import role_services
@@ -325,7 +326,7 @@ def delete_skill(user_id, topic_id, skill_id):
     change_list = [topic_domain.TopicChange({
         'cmd': 'update_topic_property',
         'property_name': 'skill_ids',
-        'old_value': topic.skill_ids,
+        'old_value': copy.deepcopy(topic.skill_ids),
         'new_value': new_skill_ids
     })]
     update_topic(
@@ -345,7 +346,7 @@ def add_skill(user_id, topic_id, skill_id):
     change_list = [topic_domain.TopicChange({
         'cmd': 'update_topic_property',
         'property_name': 'skill_ids',
-        'old_value': topic.skill_ids,
+        'old_value': copy.deepcopy(topic.skill_ids),
         'new_value': new_skill_ids
     })]
     update_topic(
@@ -368,7 +369,7 @@ def delete_story(user_id, topic_id, story_id):
     change_list = [topic_domain.TopicChange({
         'cmd': 'update_topic_property',
         'property_name': 'canonical_story_ids',
-        'old_value': topic.canonical_story_ids,
+        'old_value': copy.deepcopy(topic.canonical_story_ids),
         'new_value': new_canonical_story_ids
     })]
     update_topic(
@@ -389,7 +390,7 @@ def add_canonical_story(user_id, topic_id, story_id):
     change_list = [topic_domain.TopicChange({
         'cmd': 'update_topic_property',
         'property_name': 'canonical_story_ids',
-        'old_value': topic.canonical_story_ids,
+        'old_value': copy.deepcopy(topic.canonical_story_ids),
         'new_value': new_canonical_story_ids
     })]
     update_topic(

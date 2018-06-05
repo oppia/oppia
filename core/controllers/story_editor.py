@@ -39,18 +39,11 @@ class StoryEditorPage(base.BaseHandler):
 
         story = story_services.get_story_by_id(story_id, strict=False)
         if story is None:
-            raise self.PageNotFoundException(
-                Exception('The story with the given id doesn\'t exist.'))
+            raise self.PageNotFoundException
 
-        if topic_id is not None:
-            topic = topic_services.get_topic_by_id(topic_id, strict=False)
-            if topic is None:
-                raise self.PageNotFoundException(
-                    Exception('The topic with the given id doesn\'t exist.'))
-            if story_id not in topic.canonical_story_ids:
-                raise self.InvalidInputException(
-                    'The story id: %s provided is not part of the given '
-                    'topic: %s' % (story_id, topic_id))
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None or story_id not in topic.canonical_story_ids:
+            raise self.PageNotFoundException
 
         self.values.update({
             'story_id': story.id
@@ -87,18 +80,11 @@ class EditableStoryDataHandler(base.BaseHandler):
 
         story = story_services.get_story_by_id(story_id, strict=False)
         if story is None:
-            raise self.PageNotFoundException(
-                Exception('The story with the given id doesn\'t exist.'))
+            raise self.PageNotFoundException
 
-        if topic_id is not None:
-            topic = topic_services.get_topic_by_id(topic_id, strict=False)
-            if topic is None:
-                raise self.PageNotFoundException(
-                    Exception('The topic with the given id doesn\'t exist.'))
-            if story_id not in topic.canonical_story_ids:
-                raise self.InvalidInputException(
-                    'The story id: %s provided is not part of the given '
-                    'topic: %s' % (story_id, topic_id))
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None or story_id not in topic.canonical_story_ids:
+            raise self.PageNotFoundException
 
         self.values.update({
             'story': story.to_dict()
@@ -116,18 +102,11 @@ class EditableStoryDataHandler(base.BaseHandler):
         topic_domain.Topic.require_valid_topic_id(topic_id)
         story = story_services.get_story_by_id(story_id, strict=False)
         if story is None:
-            raise self.PageNotFoundException(
-                Exception('The story with the given id doesn\'t exist.'))
+            raise self.PageNotFoundException
 
-        if topic_id is not None:
-            topic = topic_services.get_topic_by_id(topic_id, strict=False)
-            if topic is None:
-                raise self.PageNotFoundException(
-                    Exception('The topic with the given id doesn\'t exist.'))
-            if story_id not in topic.canonical_story_ids:
-                raise self.InvalidInputException(
-                    'The story id: %s provided is not part of the given '
-                    'topic: %s' % (story_id, topic_id))
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None or story_id not in topic.canonical_story_ids:
+            raise self.PageNotFoundException
 
         version = self.payload.get('version')
         self._require_valid_version(version, story.version)
@@ -163,18 +142,11 @@ class EditableStoryDataHandler(base.BaseHandler):
 
         story = story_services.get_story_by_id(story_id, strict=False)
         if story is None:
-            raise self.PageNotFoundException(
-                Exception('The story with the given id doesn\'t exist.'))
+            raise self.PageNotFoundException
 
-        if topic_id is not None:
-            topic = topic_services.get_topic_by_id(topic_id, strict=False)
-            if topic is None:
-                raise self.PageNotFoundException(
-                    Exception('The topic with the given id doesn\'t exist.'))
-            if story_id not in topic.canonical_story_ids:
-                raise self.InvalidInputException(
-                    'The story id: %s provided is not part of the given '
-                    'topic: %s' % (story_id, topic_id))
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        if topic is None or story_id not in topic.canonical_story_ids:
+            raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         if topic is None:

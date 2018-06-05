@@ -15,6 +15,7 @@
 """Tests for the topic editor page."""
 
 from core.domain import story_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
 from core.tests import test_utils
@@ -90,6 +91,55 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             self.assertEqual(response.status_int, 200)
+            self.logout()
+
+            # Assign TOPIC_MANAGER_USERNAME as a topic_manager for topic_id.
+            topic_services.assign_role(
+                self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
+                self.topic_id)
+            # Check that a topic manager for a topic can access and edit in the
+            # editor page.
+            self.login(self.TOPIC_MANAGER_EMAIL)
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            self.assertEqual(response.status_int, 200)
+            self.logout()
+
+            # Create a new topic, and assign another user as its topic manager.
+            topic_id_2 = topic_services.get_new_topic_id()
+            self.save_new_topic(
+                topic_id_2, self.admin_id, 'Name', 'Description',
+                [], [], [])
+            self.signup('topicmanager2@example.com', 'topicmanager2')
+            topic_manager_id_2 = self.get_user_id_from_email(
+                'topicmanager2@example.com')
+            self.set_topic_managers(['topicmanager2'])
+            topic_manager_2 = user_services.UserActionsInfo(
+                topic_manager_id_2)
+            topic_services.assign_role(
+                self.admin, topic_manager_2, topic_domain.ROLE_MANAGER,
+                topic_id_2)
+
+            # Verify that the created user can edit the assigned topic.
+            self.login('topicmanager2@example.com')
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id_2))
+            self.assertEqual(response.status_int, 200)
+            self.logout()
+
+            # Check that a topic manager for one topic cannot edit the other
+            # one and vice-versa.
+            self.login(self.TOPIC_MANAGER_EMAIL)
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id_2),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
+            self.login('topicmanager2@example.com')
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
             self.logout()
 
     def test_editable_topic_handler_get(self):

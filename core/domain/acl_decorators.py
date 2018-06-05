@@ -881,7 +881,7 @@ def can_edit_skill(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
-        if role_services.ACTION_EDIT_OWNED_TOPIC in user_actions_info.actions:
+        if role_services.ACTION_EDIT_ANY_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -899,7 +899,7 @@ def can_delete_skill(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
-        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+        if role_services.ACTION_DELETE_ANY_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -918,7 +918,7 @@ def can_create_skill(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
-        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+        if role_services.ACTION_CREATE_NEW_SKILL in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -978,7 +978,7 @@ def can_create_topic(handler):
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
-        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+        if role_services.ACTION_CREATE_NEW_TOPIC in user_actions_info.actions:
             return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -987,6 +987,26 @@ def can_create_topic(handler):
     test_can_create_topic.__wrapped__ = True
 
     return test_can_create_topic
+
+
+def can_access_topics_and_skills_dashboard(handler):
+    """Decorator to check whether the user can create a topic."""
+
+    def test_can_access_topics_and_skills_dashboard(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to access the topics and skills'
+                ' dashboard.' % self.user_id)
+    test_can_access_topics_and_skills_dashboard.__wrapped__ = True
+
+    return test_can_access_topics_and_skills_dashboard
 
 
 def can_manage_rights_for_topic(handler):
@@ -999,7 +1019,7 @@ def can_manage_rights_for_topic(handler):
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
         if (
-                role_services.ACTION_CAN_MANAGE_TOPIC_RIGHTS in
+                role_services.ACTION_MANAGE_TOPIC_RIGHTS in
                 user_actions_info.actions):
             return handler(self, topic_id, **kwargs)
         else:

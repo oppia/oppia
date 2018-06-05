@@ -188,9 +188,15 @@ class Topic(object):
         Args:
             skill_id: str. The skill id to remove from the list.
 
+        Raises:
+            Exception. The skill_id is not present in the topic.
+
         Returns:
             list. The updated list of skill ids.
         """
+        if skill_id not in self.skill_ids:
+            raise Exception(
+                'The skill id %s is not present in the topic.' % skill_id)
         skill_ids = self.skill_ids
         skill_ids.remove(skill_id)
         return skill_ids
@@ -214,9 +220,17 @@ class Topic(object):
         Args:
             story_id: str. The story id to remove from the list.
 
+        Raises:
+            Exception. The story_id is not present in the canonical story ids
+                list of the topic.
+
         Returns:
             list. The updated list of canonical story ids.
         """
+        if story_id not in self.canonical_story_ids:
+            raise Exception(
+                'The story_id %s is not present in the canonical '
+                'story ids list of the topic.' % story_id)
         canonical_story_ids = self.canonical_story_ids
         canonical_story_ids.remove(story_id)
         return canonical_story_ids

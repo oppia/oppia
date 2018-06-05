@@ -61,12 +61,19 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.skill_ids = ['skill_id', 'skill_id_1', 'skill_id_2']
         new_skill_ids = self.topic.delete_skill('skill_id_1')
         self.assertEqual(new_skill_ids, ['skill_id', 'skill_id_2'])
+        with self.assertRaisesRegexp(
+            Exception, 'The skill id skill_id_5 is not present in the topic'):
+            self.topic.delete_skill('skill_id_5')
 
     def test_delete_story(self):
         self.topic.canonical_story_ids = [
             'story_id', 'story_id_1', 'story_id_2']
         new_canonical_story_ids = self.topic.delete_story('story_id_1')
         self.assertEqual(new_canonical_story_ids, ['story_id', 'story_id_2'])
+        with self.assertRaisesRegexp(
+            Exception, 'The story_id story_id_5 is not present in the canonical'
+            ' story ids list of the topic.'):
+            self.topic.delete_story('story_id_5')
 
     def test_add_canonical_story(self):
         self.topic.canonical_story_ids = [

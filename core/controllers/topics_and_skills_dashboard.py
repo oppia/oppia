@@ -28,7 +28,7 @@ import feconf
 class TopicsAndSkillsDashboardPage(base.BaseHandler):
     """Page showing the topics and skills dashboard."""
 
-    @acl_decorators.can_create_topic
+    @acl_decorators.can_access_topics_and_skills_dashboard
     def get(self):
 
         if not feconf.ENABLE_NEW_STRUCTURES:
@@ -69,14 +69,12 @@ class NewSkillHandler(base.BaseHandler):
     def post(self):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-        topic_id = None
         topic_id = self.payload.get('topic_id')
 
         if topic_id is not None:
             topic = topic_services.get_topic_by_id(topic_id, strict=False)
             if topic is None:
-                raise self.PageNotFoundException(
-                    Exception('The topic with the given id doesn\'t exist.'))
+                raise self.InvalidInputError
         description = self.payload.get('description')
 
         skill_domain.Skill.require_valid_description(description)

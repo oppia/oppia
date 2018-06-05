@@ -146,20 +146,17 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.name, 'New Name')
         self.assertEqual(topic_summary.version, 3)
 
-
     def test_delete_skill(self):
         topic_services.delete_skill(
             self.user_id_admin, self.TOPIC_ID, self.skill_id)
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.skill_ids, [])
 
-
     def test_delete_story(self):
         topic_services.delete_story(
             self.user_id_admin, self.TOPIC_ID, self.story_id_1)
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.canonical_story_ids, [self.story_id_2])
-
 
     def test_add_canonical_story(self):
         topic_services.add_canonical_story(
@@ -169,7 +166,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic.canonical_story_ids,
             [self.story_id_1, self.story_id_2, 'story_id'])
 
-
     def test_delete_topic(self):
         # Test whether an admin can delete a topic.
         topic_services.delete_topic(self.user_id_admin, self.TOPIC_ID)
@@ -178,7 +174,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_services.get_topic_summary_by_id(
                 self.TOPIC_ID, strict=False), None)
-
 
     def test_admin_can_manage_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
