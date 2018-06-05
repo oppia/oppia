@@ -14,12 +14,8 @@
 
 """Tests the methods defined in skill services."""
 
-from core.domain import skill_domain
 from core.domain import skill_services
-from core.platform import models
 from core.tests import test_utils
-
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
     """Test the skill services module."""

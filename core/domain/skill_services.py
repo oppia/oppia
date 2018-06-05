@@ -22,7 +22,8 @@ from core.domain import skill_domain
 from core.platform import models
 import feconf
 
-(skill_models,) = models.Registry.import_models([models.NAMES.skill])
+(skill_models, user_models) = models.Registry.import_models(
+    [models.NAMES.skill, models.NAMES.user])
 datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
@@ -524,7 +525,7 @@ def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
         skill_id: str. The unique id of the skill.
         degree_of_mastery: float. The degree of mastery of user in the skill.
     """
-    model_id = skill_models.UserSkillMasteryModel.get_model_id(
+    model_id = user_models.UserSkillMasteryModel.get_model_id(
         user_id, skill_id)
 
     user_skill_mastery = skill_domain.UserSkillMastery(
@@ -538,7 +539,7 @@ def save_user_skill_mastery(user_skill_mastery):
     Args:
         user_skill_mastery: dict. The user skill mastery model of a user.
     """
-    user_skill_mastery_model = skill_models.UserSkillMasteryModel(
+    user_skill_mastery_model = user_models.UserSkillMasteryModel(
         id=user_skill_mastery.id,
         user_id=user_skill_mastery.user_id,
         skill_id=user_skill_mastery.skill_id,
@@ -559,8 +560,8 @@ def get_skill_mastery(user_id, skill_id):
         degree_of_mastery: float. Mastery degree of the user for the
             requested skill.
     """
-    degree_of_mastery = skill_models.UserSkillMasteryModel.get(
-        skill_models.UserSkillMasteryModel.get_model_id(
+    degree_of_mastery = user_models.UserSkillMasteryModel.get(
+        user_models.UserSkillMasteryModel.get_model_id(
             user_id, skill_id)).degree_of_mastery
 
     return degree_of_mastery
@@ -583,9 +584,9 @@ def get_multi_skill_mastery(user_id, skill_ids):
 
     for skill_id in skill_ids:
         model_ids.append(
-            skill_models.UserSkillMasteryModel.get_model_id(user_id, skill_id))
+            user_models.UserSkillMasteryModel.get_model_id(user_id, skill_id))
 
-    skill_mastery_models = skill_models.UserSkillMasteryModel.get_multi(
+    skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)
     for skill_summary in skill_mastery_models:
         degrees_of_mastery.append(skill_summary.degree_of_mastery)
@@ -611,7 +612,7 @@ def get_mastery_for_all_skills(user_id):
             }
     """
     user_skill_mastery = {}
-    skill_mastery_models = skill_models.UserSkillMasteryModel.get_user_mastery(
+    skill_mastery_models = user_models.UserSkillMasteryModel.get_user_mastery(
         user_id)
 
     for skill in skill_mastery_models:
