@@ -111,7 +111,7 @@ class HangingIndentChecker(BaseChecker):
         """Process a module.
 
         Args:
-            node: astroid.scoped_nodes.Function.Node to access module content.
+            node: astroid.scoped_nodes.Function. Node to access module content.
         """
         file_content = node.stream().readlines()
         file_length = len(file_content)
