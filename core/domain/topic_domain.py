@@ -16,6 +16,8 @@
 
 """Domain objects for topics, and related models."""
 
+import copy
+
 from constants import constants
 from core.domain import user_services
 from core.platform import models
@@ -77,8 +79,8 @@ class TopicChange(object):
             if change_dict['property_name'] not in self.TOPIC_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_CREATE_NEW:
             self.name = change_dict['name']
         else:

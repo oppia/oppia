@@ -14,6 +14,8 @@
 
 """Domain objects relating to skills."""
 
+import copy
+
 from constants import constants
 from core.domain import html_cleaner
 import feconf
@@ -105,15 +107,15 @@ class SkillChange(object):
             if change_dict['property_name'] not in self.SKILL_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
             if (change_dict['property_name'] not in
                     self.SKILL_CONTENTS_PROPERTIES):
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_CREATE_NEW:
             return
         else:
