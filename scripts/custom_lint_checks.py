@@ -269,6 +269,14 @@ class DocstringParameterChecker(BaseChecker):
         self.check_functiondef_yields(node, node_doc)
 
     def check_functiondef_params(self, node, node_doc):
+        """Checks whether all parameters in a function definition are documented.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+            node_doc: Pylint docstring class. It represents an AST node's
+                docstring.
+        """
         node_allow_no_param = None
         if node.name in self.constructor_names:
             class_node = checker_utils.node_frame_class(node)
@@ -297,6 +305,14 @@ class DocstringParameterChecker(BaseChecker):
             node_doc, node.args, node, node_allow_no_param)
 
     def check_functiondef_returns(self, node, node_doc):
+        """Checks whether all returns in a function definition are documented.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+            node_doc: Pylint docstring class. It represents an AST node's
+                docstring.
+        """
         if not node_doc.supports_yields and node.is_generator():
             return
 
@@ -311,6 +327,14 @@ class DocstringParameterChecker(BaseChecker):
                 node=node)
 
     def check_functiondef_yields(self, node, node_doc):
+        """Checks whether all yields in a function definition are documented.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+            node_doc: Pylint docstring class. It represents an AST node's
+                docstring.
+        """
         if not node_doc.supports_yields:
             return
 
@@ -321,6 +345,12 @@ class DocstringParameterChecker(BaseChecker):
                 node=node)
 
     def visit_raise(self, node):
+        """Called for raise. Adds raise message.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+        """
         func_node = node.frame()
         if not isinstance(func_node, astroid.FunctionDef):
             return
@@ -347,6 +377,12 @@ class DocstringParameterChecker(BaseChecker):
         self._add_raise_message(missing_excs, func_node)
 
     def visit_return(self, node):
+        """Called for return. Checks and adds message regarding return.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+        """
         if not docstrings_checker.returns_something(node):
             return
 
@@ -375,6 +411,12 @@ class DocstringParameterChecker(BaseChecker):
             )
 
     def visit_yield(self, node):
+        """Called for yield. Checks and adds message regarding yield.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+        """
         func_node = node.frame()
         if not isinstance(func_node, astroid.FunctionDef):
             return
@@ -403,6 +445,11 @@ class DocstringParameterChecker(BaseChecker):
             )
 
     def visit_yieldfrom(self, node):
+        """Called for yieldfrom.
+
+        Args:
+            node: Node to access module content.
+        """
         self.visit_yield(node)
 
     def check_arguments_in_docstring(
@@ -520,6 +567,14 @@ class DocstringParameterChecker(BaseChecker):
                                 not_needed_type_in_docstring)
 
     def check_single_constructor_params(self, class_doc, init_doc, class_node):
+        """Check single constructor Parameters
+
+        Args:
+            class_doc: The docstring class instance that represents a class's docstring.
+            init_doc:  The docstring class instance that represents a method's docstring, the method
+                here is the constructor method for the above class.
+            class_node: Node. Node for class definition in AST.
+        """
         if class_doc.has_params() and init_doc.has_params():
             self.add_message(
                 'multiple-constructor-doc',
@@ -527,6 +582,12 @@ class DocstringParameterChecker(BaseChecker):
                 node=class_node)
 
     def _handle_no_raise_doc(self, excs, node):
+        """Check if there is no raise, then add a message.
+
+        Args:
+            excs: A set of strings. A list of exception types.
+            node: node to access module content.
+        """
         if self.config.accept_no_raise_doc:
             return
 
