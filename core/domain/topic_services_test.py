@@ -146,17 +146,50 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.name, 'New Name')
         self.assertEqual(topic_summary.version, 3)
 
+    def test_add_skill(self):
+        topic_services.add_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_2')
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.skill_ids, [self.skill_id, 'skill_id_2'])
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 2)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Added skill_id_2 to skill ids')
+
     def test_delete_skill(self):
         topic_services.delete_skill(
             self.user_id_admin, self.TOPIC_ID, self.skill_id)
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.skill_ids, [])
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 2)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Removed %s from skill ids' % self.skill_id)
 
     def test_delete_story(self):
         topic_services.delete_story(
             self.user_id_admin, self.TOPIC_ID, self.story_id_1)
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.canonical_story_ids, [self.story_id_2])
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 2)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Removed %s from canonical story ids' % self.story_id_1)
 
     def test_add_canonical_story(self):
         topic_services.add_canonical_story(
@@ -165,6 +198,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic.canonical_story_ids,
             [self.story_id_1, self.story_id_2, 'story_id'])
+        topic_commit_log_entry = (
+            topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 2)
+        )
+        self.assertEqual(topic_commit_log_entry.commit_type, 'edit')
+        self.assertEqual(topic_commit_log_entry.topic_id, self.TOPIC_ID)
+        self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
+        self.assertEqual(
+            topic_commit_log_entry.commit_message,
+            'Added %s to canonical story ids' % 'story_id')
 
     def test_delete_topic(self):
         # Test whether an admin can delete a topic.
