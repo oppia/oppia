@@ -1,3 +1,11 @@
+<style>
+  .numeric-input-tooltip {
+    padding-left: 325px;
+    padding-top: 25px;
+    position: absolute;
+  }
+</style>
+
 <div class="row numeric-input-container">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
@@ -8,4 +16,5 @@
       </ng-form>
     </div>
   </form>
+  <private-info-tooltip class="numeric-input-tooltip"></private-info-tooltip>
 </div>

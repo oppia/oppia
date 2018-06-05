@@ -1,3 +1,11 @@
+<style>
+  .set-input-tooltip {
+    padding-left: 325px;
+    padding-top: 25px;
+    position: absolute;
+  }
+</style>
+
 <div ng-if="answer.length === 0">
   <em translate="I18N_INTERACTIONS_SET_INPUT_EMPTY_SET"></em>
 </div>
@@ -5,6 +13,7 @@
 <div>
   <schema-based-editor schema="schema" local-value="answer">
   </schema-based-editor>
+  <private-info-tooltip class="set-input-tooltip"></private-info-tooltip>
 </div>
 
 <div ng-if="errorMessage" class="oppia-form-error" aria-live="assertive" translate="<[errorMessage]>"></div>

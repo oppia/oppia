@@ -520,5 +520,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Text displayed inside the Sign In dropdown. - When clicked, the user is signed in with Google Oauth - The text in the button needs to be less than 25 characters long",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Text displayed inside drop-down menu - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the teach with oppia page is loaded which contains information specific for teachers who would like to create explorations.",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Text displayed under the subscribers tab in creator dashboard. Tells the creator the total number of subscribers he/she has.",
+	"I18N_TUTOR_CARD_TOOLTIP": "Text displayed on hovering over the private info tooltip - When hovered, the warning message about the private information of the learner is displayed.",
 	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "The text that appears on the unsubscribe button, which allows users to unsubscribe from creators.\n{{Identical|Unsubscribe}}"
 }

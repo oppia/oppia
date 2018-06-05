@@ -1,0 +1,37 @@
+<style>
+  private-info-tooltip .conversation-skin-tutor-card-tooltip {
+    display: inline-block;
+    padding-top: 5px;
+  }
+
+  private-info-tooltip .conversation-skin-tutor-card-tooltip-button {
+    background-color: #d3d3d3;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 900;
+    padding-top: 4px;
+    position: relative;
+    text-align: center;
+  }
+
+  private-info-tooltip .conversation-skin-tutor-card-tooltip-text {
+    background-color: #A9A9A9;
+    border-radius: 3%;
+    color: #ffffff;
+    padding: 2px;
+    position: absolute;
+    visibility: hidden;
+    width: 400px;
+  }
+
+  private-info-tooltip .conversation-skin-tutor-card-tooltip-button:hover .conversation-skin-tutor-card-tooltip-text {
+    visibility: visible;
+  }
+</style>
+
+<div class="conversation-skin-tutor-card-tooltip">
+  <button class="conversation-skin-tutor-card-tooltip-button">?
+    <span class="conversation-skin-tutor-card-tooltip-text" translate="I18N_TUTOR_CARD_TOOLTIP"></span>
+  </button>
+</div>

@@ -520,5 +520,6 @@
     "I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Sign in with Google",
     "I18N_TOPNAV_TEACH_WITH_OPPIA": "Teach with Oppia",
     "I18N_TOTAL_SUBSCRIBERS_TEXT": "You have a total of <[totalSubscribers]> subscribers.",
+    "I18N_TUTOR_CARD_TOOLTIP": "Please don't enter any personal information here. Your answer will be saved and can be read by the creator of this lesson to help them improve it.",
     "I18N_UNSUBSCRIBE_BUTTON_TEXT": "Unsubscribe"
 }

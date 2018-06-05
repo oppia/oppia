@@ -1,3 +1,24 @@
+<style>
+  .oppia-fraction-input-error {
+    margin-top: 10px;
+  }
+
+  .ng-invalid {
+    border-color: red;
+    outline-color: red;
+  }
+
+  .fraction-input-tooltip {
+    padding-left: 325px;
+    padding-top: 25px;
+    position: absolute;
+  }
+
+  .fraction-input-interaction .input .form-control {
+    width: 100%;
+  }
+</style>
+
 <form ng-disabled="FractionInputForm.$invalid" ng-submit="submitAnswer(answer)" role="form" class="form-horizontal fraction-input-interaction">
   <!-- This ng-form is needed for submitting answer on hitting enter. -->
   <ng-form name="FractionInputForm" class="input">
@@ -9,19 +30,4 @@
     <[getWarningText()]>
   </div>
 </form>
-</div>
-
-<style>
-  .oppia-fraction-input-error {
-    margin-top: 10px;
-  }
-
-  .ng-invalid {
-    border-color: red;
-    outline-color: red;
-  }
-
-  .fraction-input-interaction .input .form-control {
-    width: 100%;
-  }
-</style>
+<private-info-tooltip class="fraction-input-tooltip"></private-info-tooltip>
