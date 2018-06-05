@@ -3247,6 +3247,65 @@ class Exploration(object):
 
         return states_dict
 
+
+    @classmethod
+    def _convert_states_v20_dict_to_v21_dict(cls, states_dict):
+        """Converts from version 20 to 21. Version 21 converts non textangular
+        html content to the textangular html content.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+
+            state_dict['content']['html'] = utils.convert_to_ckeditor(
+                state_dict['content']['html'])
+            if state_dict['interaction']['default_outcome']:
+                state_dict[
+                    'interaction']['default_outcome']['feedback']['html'] = (
+                        utils.convert_to_ckeditor(
+                            state_dict[
+                                'interaction']['default_outcome']['feedback'][
+                                    'html']))
+
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['outcome']['feedback']['html'] = (
+                    utils.convert_to_ckeditor(
+                        answer_group['outcome']['feedback']['html']))
+                if state_dict['interaction']['id'] == 'ItemSelectionInput':
+                    rule_specs = answer_group['rule_spec']
+                    for rule_spec in rule_specs:
+                        rule_spec['inputs']['x'] = (
+                            utils.convert_to_ckeditor(
+                                answer_group['rule_specs']['inputs']['x']))
+
+            hints = state_dict['interaction']['hints']
+            for hint in hints:
+                hint['hint_content']['html'] = utils.convert_to_ckeditor(
+                    hint['hint_content']['html'])
+
+            if state_dict['interaction']['solution']:
+                state_dict['interaction']['solution']['explanation']['html'] = (
+                    utils.convert_to_ckeditor(
+                        state_dict[
+                            'interaction']['solution']['explanation']['html']))
+
+            if state_dict['interaction']['id'] in (
+                    'ItemSelectionInput', 'MultipleChoiceInput'):
+                values = state_dict[
+                    'interaction']['customization_args']['choices']['value']
+                for value in values:
+                    value = utils.convert_to_ckeditor(value)
+
+        return states_dict
+
+
     @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
@@ -3278,7 +3337,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 24
+    CURRENT_EXP_SCHEMA_VERSION = 26
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3739,6 +3798,20 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v25_dict_to_v26_dict(cls, exploration_dict):
+        """ Converts a v25 exploration dict into a v26 exploration dict.
+
+        Converts the textangular html to ckeditor html.
+        """
+        exploration_dict['schema_version'] = 26
+
+        exploration_dict['states'] = cls._convert_states_v20_dict_to_v21_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 21
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3889,6 +3962,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v23_dict_to_v24_dict(
                 exploration_dict)
             exploration_schema_version = 24
+
+        if exploration_schema_version == 25:
+            exploration_dict = cls._convert_v25_dict_to_v26_dict(
+                exploration_dict)
+            exploration_schema_version = 26
 
         return (exploration_dict, initial_schema_version)
 
