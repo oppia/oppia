@@ -129,11 +129,12 @@ BAD_PATTERNS_JS_REGEXP = [
             'extensions/visualizations/')
     },
     {
-        'regexp': r"\$scope\.\$parent",
+        'regexp': r"\$parent",
         'message': "Please do not access parent properties " +
-                   "using $scope.$parent. Use the scope object" +
+                   "using $parent. Use the scope object" +
                    "for this purpose.",
-        'excluded_files': (),
+        'excluded_files': (
+            'core/templates/dev/head/app.js'),
         'excluded_dirs': ()
     }
 ]
