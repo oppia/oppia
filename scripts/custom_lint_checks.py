@@ -111,7 +111,7 @@ class HangingIndentChecker(BaseChecker):
         """Process a module.
 
         Args:
-            node: Node to access module content.
+            node: astroid.scoped_nodes.Function.Node to access module content.
         """
         file_content = node.stream().readlines()
         file_length = len(file_content)
@@ -260,8 +260,8 @@ class DocstringParameterChecker(BaseChecker):
         """Called for function and method definitions (def).
 
         Args:
-            node: Docstring. Pylint Docstring class instance representing
-                a node's docstring.
+            node: astroid.scoped_nodes.Function. Pylint Docstring class instance
+                representing a node's docstring.
         """
         node_doc = docstrings_checker.docstringify(node.doc)
         self.check_functiondef_params(node, node_doc)
@@ -581,7 +581,8 @@ class DocstringParameterChecker(BaseChecker):
             init_doc:  Docstring. Pylint docstring class instance representing
                 a method's docstring, the method here is the constructor method
                 for the above class.
-            class_node: Node. Node for class definition in AST.
+            class_node: astroid.scoped_nodes.Function. Node for class definition
+                in AST.
         """
         if class_doc.has_params() and init_doc.has_params():
             self.add_message(
