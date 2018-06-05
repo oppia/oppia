@@ -23,7 +23,7 @@ oppia.directive('randomSelector', ['$compile', function($compile) {
     restrict: 'E',
     scope: {
       customizationArgs: '=',
-      generatorId: '@'
+      getGeneratorId: '&'
     },
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope) {
@@ -36,9 +36,10 @@ oppia.directive('randomSelector', ['$compile', function($compile) {
           add_element_text: 'Add New Choice'
         }
       };
-      $scope.generatorId = $scope.$parent.generatorId;
-      if (!$scope.$parent.customizationArgs.list_of_values) {
-        $scope.$parent.customizationArgs.list_of_values = [];
+      // $scope.generatorId = $scope.$parent.generatorId;
+      $scope.generatorId = $scope.getGeneratorId();
+      if (!$scope.customizationArgs.list_of_values) {
+        $scope.customizationArgs.list_of_values = [];
       }
     }
   };

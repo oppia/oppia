@@ -32,7 +32,21 @@ oppia.directive('valueGeneratorEditor', ['$compile', function($compile) {
       scope.$watch('generatorId', function() {
         var directiveName = scope.generatorId.replace(
           /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
-        element.html('<' + directiveName + '></' + directiveName + '>');
+        scope.getGeneratorId = function() {
+          return scope.generatorId;
+        };
+        scope.getInitArgs = function() {
+          return scope.initArgs;
+        };
+        scope.getObjType = function() {
+          return scope.objType;
+        };
+        element.html('<' + directiveName +
+        ' customization-args="customizationArgs"' +
+        'get-generator-id="getGeneratorId()"' +
+        'get-init-args="getInitArgs()"' +
+        'get-obj-type="getObjType()"' +
+        '></' + directiveName + '>');
         $compile(element.contents())(scope);
       });
     }
