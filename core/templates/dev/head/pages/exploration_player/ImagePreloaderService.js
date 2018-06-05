@@ -48,7 +48,7 @@ oppia.factory('ImagePreloaderService', [
      * @param {function} onLoadCallback - Function that is called when the
      *                                    Url of the loaded image is obtained.
      */
-    var _getUrlUsingFileInCache = function(filename, onLoadCallback) {
+    var _getImageUrl = function(filename, onLoadCallback) {
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), filename)
         .then(function(loadedImageFile) {
@@ -102,7 +102,7 @@ oppia.factory('ImagePreloaderService', [
         if (_imageLoadedCallback[loadedImage.filename]) {
           var onLoadImageResolve = (
             (_imageLoadedCallback[loadedImage.filename]).resolveMethod);
-          _getUrlUsingFileInCache(loadedImage.filename, onLoadImageResolve);
+          _getImageUrl(loadedImage.filename, onLoadImageResolve);
           _imageLoadedCallback[loadedImage.filename] = null;
         }
       });
@@ -183,13 +183,11 @@ oppia.factory('ImagePreloaderService', [
       getFilenamesOfImageCurrentlyDownloading: function() {
         return _filenamesOfImageCurrentlyDownloading;
       },
-      inExplorationPlayer: function() {
-        return _hasImagePreloaderServiceStarted;
-      },
       getImageUrl: function(filename) {
         return $q(function(resolve, reject){
-          if (AssetsBackendApiService.isCached(filename)) {
-            _getUrlUsingFileInCache(filename, resolve);
+          if (AssetsBackendApiService.isCached(filename) ||
+            !_hasImagePreloaderServiceStarted) {
+            _getImageUrl(filename, resolve);
           } else {
             _imageLoadedCallback[filename] = {
               resolveMethod: resolve,

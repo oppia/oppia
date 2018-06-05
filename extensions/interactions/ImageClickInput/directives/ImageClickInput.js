@@ -48,21 +48,10 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.filepath = imageAndRegions.imagePath;
           $scope.imageUrl = null;
 
-          if (ImagePreloaderService.inExplorationPlayer()) {
-            ImagePreloaderService.getImageUrl($scope.filepath
-            ).then(function(objectUrl) {
-              $scope.imageUrl = objectUrl;
-            });
-          } else {
-            // This is for loading the image for preview while editing an
-            // exploration.
-            AssetsBackendApiService.loadImage(
-              ExplorationContextService.getExplorationId(), $scope.filepath
-            ).then(function(loadedImageFile) {
-              var objectUrl = URL.createObjectURL(loadedImageFile.data);
-              $scope.imageUrl = objectUrl;
-            });
-          }
+          ImagePreloaderService.getImageUrl($scope.filepath
+          ).then(function(objectUrl) {
+            $scope.imageUrl = objectUrl;
+          });
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
