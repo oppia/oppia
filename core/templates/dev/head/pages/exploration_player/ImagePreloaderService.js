@@ -88,25 +88,26 @@ oppia.factory('ImagePreloaderService', [
     var _loadImage = function(imageFilename) {
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), imageFilename)
-      .then(function(loadedImage) {
-        _filenamesOfImageCurrentlyDownloading = (
-          _filenamesOfImageCurrentlyDownloading.filter(function(imageFilename) {
-            return loadedImage.filename !== imageFilename;
-          })
-        );
-        if (_filenamesOfImageToBeDownloaded.length > 0) {
-          var nextImageFilename = _filenamesOfImageToBeDownloaded.shift();
-          _filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
-          _loadImage(nextImageFilename);
-        }
-        if (_imageLoadedCallback[loadedImage.filename]) {
-          var onLoadImageResolve = (
-            (_imageLoadedCallback[loadedImage.filename]).resolveMethod);
-          var objectUrl = URL.createObjectURL(loadedImage.data);
-          onLoadImageResolve(objectUrl);
-          _imageLoadedCallback[loadedImage.filename] = null;
-        }
-      });
+        .then(function(loadedImage) {
+          _filenamesOfImageCurrentlyDownloading = (
+            _filenamesOfImageCurrentlyDownloading.filter(function(
+                imageFilename) {
+              return loadedImage.filename !== imageFilename;
+            })
+          );
+          if (_filenamesOfImageToBeDownloaded.length > 0) {
+            var nextImageFilename = _filenamesOfImageToBeDownloaded.shift();
+            _filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
+            _loadImage(nextImageFilename);
+          }
+          if (_imageLoadedCallback[loadedImage.filename]) {
+            var onLoadImageResolve = (
+              (_imageLoadedCallback[loadedImage.filename]).resolveMethod);
+            var objectUrl = URL.createObjectURL(loadedImage.data);
+            onLoadImageResolve(objectUrl);
+            _imageLoadedCallback[loadedImage.filename] = null;
+          }
+        });
     };
 
     /**
