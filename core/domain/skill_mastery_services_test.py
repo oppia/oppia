@@ -17,6 +17,7 @@
 from core.domain import skill_services
 from core.tests import test_utils
 
+
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
     """Test the skill services module."""
 
