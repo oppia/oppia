@@ -32,7 +32,7 @@ oppia.directive('realEditor', [
           type: 'float'
         };
 
-        $scope.$watch('$parent.value', function() {
+        $scope.$watch('value', function() {
           if ($scope.value === '') {
             // A new rule
             $scope.value = 0.0;

@@ -53,7 +53,7 @@ oppia.directive('parameterNameEditor', [
 
           // Reset the component each time the value changes (e.g. if this is
           // part of an editable list).
-          $scope.$watch('$parent.value', function(newValue) {
+          $scope.$watch('value', function(newValue) {
             if (newValue) {
               $scope.localValue = newValue;
             }

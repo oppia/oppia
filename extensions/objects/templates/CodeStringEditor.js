@@ -43,7 +43,7 @@ oppia.directive('codeStringEditor', [
 
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('$parent.value', function() {
+        $scope.$watch('value', function() {
           $scope.localValue = {
             label: $scope.value || ''
           };

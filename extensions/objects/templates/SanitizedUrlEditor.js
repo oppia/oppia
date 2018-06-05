@@ -33,14 +33,14 @@ oppia.directive('sanitizedUrlEditor', [
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
         $scope.initArgs = $scope.getInitArgs();
-        $scope.$watch('$parent.initArgs', function(newValue) {
+        $scope.$watch('initArgs', function(newValue) {
           $scope.largeInput = false;
           if (newValue && newValue.largeInput) {
             $scope.largeInput = newValue.largeInput;
           }
         });
 
-        $scope.$watch('$parent.value', function(newValue) {
+        $scope.$watch('value', function(newValue) {
           $scope.localValue = {
             label: String(newValue) || ''
           };

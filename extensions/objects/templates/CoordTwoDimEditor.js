@@ -54,7 +54,7 @@ oppia.directive('coordTwoDimEditor', [
           }, 10);
         };
 
-        $scope.$watch('$parent.value', function(newValue, oldValue) {
+        $scope.$watch('value', function(newValue, oldValue) {
           // A new rule has just been created.
           if ($scope.value === '') {
             $scope.value = [0.0, 0.0];

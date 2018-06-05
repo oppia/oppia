@@ -36,7 +36,7 @@ oppia.directive('normalizedStringEditor', [
         $scope.initArgs = $scope.getInitArgs();
         $scope.largeInput = false;
 
-        $scope.$watch('$parent.initArgs', function(newValue) {
+        $scope.$watch('initArgs', function(newValue) {
           $scope.largeInput = false;
           if (newValue && newValue.largeInput) {
             $scope.largeInput = newValue.largeInput;
@@ -45,7 +45,7 @@ oppia.directive('normalizedStringEditor', [
 
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('$parent.value', function() {
+        $scope.$watch('value', function() {
           $scope.localValue = {
             label: $scope.value || ''
           };
