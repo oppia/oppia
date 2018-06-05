@@ -485,9 +485,10 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         self.login(self.EDITOR_EMAIL)
 
         # Create exploration.
-        exploration = self.save_new_linear_exp_with_state_names_and_interactions(
-            self.EXP_ID, self.editor_id, ['State 1', 'State 2'], ['TextInput'],
-            category='Algebra')
+        exploration = (
+            self.save_new_linear_exp_with_state_names_and_interactions(
+                self.EXP_ID, self.editor_id, ['State 1', 'State 2'],
+                ['TextInput'], category='Algebra'))
 
         self.old_content = exp_domain.SubtitledHtml('old content', {
             self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(

@@ -19,7 +19,6 @@ from core.domain import exp_services
 from core.domain import suggestion_registry
 from core.platform import models
 from core.tests import test_utils
-import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
