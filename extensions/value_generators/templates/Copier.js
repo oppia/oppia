@@ -35,11 +35,11 @@ oppia.directive('copier', ['$compile', function($compile) {
       $scope.generatorId = $scope.getGeneratorId();
       $scope.initArgs = $scope.getInitArgs();
       $scope.objType = $scope.getObjType();
-      $scope.$watch('$parent.initArgs', function() {
+      $scope.$watch('initArgs', function() {
         $scope.initArgs = $scope.getInitArgs();
       }, true);
 
-      $scope.$watch('$parent.objType', function() {
+      $scope.$watch('objType', function() {
         $scope.objType = $scope.getObjType();
       }, true);
     }
