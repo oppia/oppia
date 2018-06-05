@@ -1202,8 +1202,7 @@ def _check_html_indent(all_files):
 
 def main():
     all_files = _get_all_files()
-    # TODO(apb7): Enable the _check_directive_scope function.
-    directive_scope_messages = []
+    directive_scope_messages = _check_directive_scope(all_files)
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
