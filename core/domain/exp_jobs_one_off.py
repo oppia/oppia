@@ -18,10 +18,9 @@
 
 import ast
 import logging
-import os
 import traceback
 
-from bs4 import BeautifulSoup
+import bs4
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
@@ -212,12 +211,12 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
             # exp_services.apply_change_list for more information.
-            commit_cmds = [{
+            commit_cmds = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': str(item.states_schema_version),
                 'to_version': str(
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-            }]
+            })]
             exp_services.update_exploration(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update exploration states from schema version %d to %d.' % (
@@ -492,46 +491,53 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
         # invalid parent-child relations that we find.
         err_dict = {}
 
-        htmlValidation_filepath = os.path.join(
-            feconf.CONTENT_VALIDATION_DIR, 'htmlValidation.yaml')
-        htmlValidation_yaml = utils.get_file_contents(htmlValidation_filepath)
-        # Convert the yaml content to dictionary.
-        htmlValidation_dict = utils.dict_from_yaml(htmlValidation_yaml)
+        # All the invalid html strings will be stored in this.
+        err_dict['strings'] = []
 
-        allowed_parent_list = htmlValidation_dict['allowed_parent_list']
-        allowed_tag_list = htmlValidation_dict['allowed_tag_list']
+        allowed_parent_list = (
+            feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+            ['ALLOWED_PARENT_LIST'])
+        allowed_tag_list = (
+            feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+            ['ALLOWED_TAG_LIST'])
 
-        for state in exploration.states.itervalues():
-            # result is the list of all the html present in the state.
-            result = exp_services.find_all_values_for_key(
-                'html', state.to_dict())
+        html_list = exploration.get_all_html_content_strings()
 
-            for html_data in result:
-                html_data = html_data.encode('utf-8')
-                soup = BeautifulSoup(html_data, 'html.parser')
+        for html_data in html_list:
+            soup = bs4.BeautifulSoup(html_data, 'html.parser')
 
-                for tag in soup.findAll():
-                    # Checking for tags not allowed in RTE.
-                    if tag.name not in allowed_tag_list:
-                        if 'invalidTags' in err_dict:
-                            err_dict['invalidTags'] += [tag.name]
-                        else:
-                            err_dict['invalidTags'] = [tag.name]
-                    # Checking for parent-child relation that are not
-                    # allowed in RTE.
-                    parent = tag.parent.name
-                    if (tag.name in allowed_tag_list and parent not in
-                            allowed_parent_list[tag.name]):
-                        if tag.name in err_dict:
-                            err_dict[tag.name] += [parent]
-                        else:
-                            err_dict[tag.name] = [parent]
+            # Text with no parent tag is also invalid.
+            for content in soup.contents:
+                if not content.name:
+                    err_dict['strings'].append(html_data)
+                    break
 
-        for key in err_dict.iterkeys():
-            err_dict[key] = list(set(err_dict[key]))
+            for tag in soup.findAll():
+                # Checking for tags not allowed in RTE.
+                if tag.name not in allowed_tag_list:
+                    if 'invalidTags' in err_dict:
+                        err_dict['invalidTags'].append(tag.name)
+                    else:
+                        err_dict['invalidTags'] = [tag.name]
+                    err_dict['strings'].append(html_data)
+                # Checking for parent-child relation that are not
+                # allowed in RTE.
+                parent = tag.parent.name
+                if (tag.name in allowed_tag_list) and (
+                        parent not in allowed_parent_list[tag.name]):
+                    if tag.name in err_dict:
+                        err_dict[tag.name].append(parent)
+                    else:
+                        err_dict[tag.name] = [parent]
+                    err_dict['strings'].append(html_data)
 
-        yield('Errors', err_dict)
+        for key in err_dict:
+            if err_dict[key]:
+                yield(key, list(set(err_dict[key])))
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))

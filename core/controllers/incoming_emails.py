@@ -37,7 +37,6 @@ class IncomingReplyEmailHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         user_id = model.user_id
-        exploration_id = model.exploration_id
         thread_id = model.thread_id
 
         # Get text message from email.
@@ -46,6 +45,5 @@ class IncomingReplyEmailHandler(base.BaseHandler):
 
         # Add new feedback message to thread.
         feedback_services.create_message(
-            exploration_id, thread_id, user_id, None, None, msg,
-            received_via_email=True)
+            thread_id, user_id, None, None, msg, received_via_email=True)
         self.render_json({})

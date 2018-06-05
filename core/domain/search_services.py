@@ -75,6 +75,10 @@ def _should_index_exploration(exp_summary):
 
     Args:
         exp_summary: ExpSummaryModel. ExplorationSummary domain object.
+
+    Returns:
+        bool. Whether the given exploration should be indexed for future
+        search queries.
     """
     rights = rights_manager.get_exploration_rights(exp_summary.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
@@ -162,6 +166,9 @@ def _should_index_collection(collection):
 
     Args:
         collection: CollectionSummaryModel.
+
+    Returns:
+        bool. Whether a particular collection should be indexed.
     """
     rights = rights_manager.get_collection_rights(collection.id)
     return rights.status != rights_manager.ACTIVITY_STATUS_PRIVATE
@@ -171,7 +178,7 @@ def search_explorations(query, limit, sort=None, cursor=None):
     """Searches through the available explorations.
 
     Args:
-        query_string: str or None. The query string to search for.
+        query: str or None. The query string to search for.
         limit: int. The maximum number of results to return.
         sort: str. A string indicating how to sort results. This should be a
             string of space separated values. Each value should start with a
@@ -233,7 +240,7 @@ def search_collections(query, limit, sort=None, cursor=None):
     """Searches through the available collections.
 
     Args:
-        query_string: str or None. the query string to search for.
+        query: str or None. the query string to search for.
         limit: int. the maximum number of results to return.
         sort: str. This indicates how to sort results. This should be a string
             of space separated values. Each value should start with a '+' or a

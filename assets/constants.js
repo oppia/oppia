@@ -227,20 +227,8 @@ var constants = {
     "id": "en",
     "text": "English"
   }, {
-    "id": "de",
-    "text": "Deutsch"
-  }, {
-    "id": "fr",
-    "text": "Français"
-  }, {
-    "id": "nl",
-    "text": "Nederlands"
-  }, {
     "id": "es",
     "text": "Español"
-  }, {
-    "id": "pt",
-    "text": "Português"
   }, {
     "id": "pt-br",
     "text": "Português (Brasil)"

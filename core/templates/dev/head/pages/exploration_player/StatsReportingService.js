@@ -103,9 +103,12 @@ oppia.factory('StatsReportingService', [
     if (!_editorPreviewMode) {
       $interval(function() {
         postStatsToBackend();
-      }, 10000);
+      }, 300000);
     }
 
+    // This method is called whenever a learner tries to leave an exploration,
+    // when a learner starts an exploration, when a learner completes an
+    // exploration and also every five minutes.
     var postStatsToBackend = function() {
       $http.post(getFullStatsUrl('STATS_EVENTS'), {
         aggregated_stats: aggregatedStats,

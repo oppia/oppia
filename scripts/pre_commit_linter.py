@@ -49,6 +49,7 @@ Note that the root folder MUST be named 'oppia'.
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
+import HTMLParser
 import argparse
 import fnmatch
 import multiprocessing
@@ -642,7 +643,7 @@ def _check_bad_pattern_in_file(filename, content, pattern):
     Args:
         filename: str. Name of the file.
         content: str. Contents of the file.
-        pattern: dict ( regexp(regex pattern) : pattern to match,
+        pattern: dict. (regexp(regex pattern) : pattern to match,
             message(str) : message to show if pattern matches,
             excluded_files(tuple(str)) : files to be excluded from matching,
             excluded_dirs(tuple(str)) : directories to be excluded from
@@ -1093,6 +1094,112 @@ def _check_directive_scope(all_files):
     return summary_messages
 
 
+class CustomHTMLParser(HTMLParser.HTMLParser):
+    """Custom HTML parser to check indentation."""
+
+    def __init__(self, filename, file_lines, failed=False):
+        HTMLParser.HTMLParser.__init__(self)
+        self.failed = failed
+        self.filename = filename
+        self.previous_tag_line_number = None
+        self.file_lines = file_lines
+
+    def handle_starttag(self, tag, attrs):
+        line_number, column_number = self.getpos()
+        # Check the indentation of the tag.
+        tag_line = self.file_lines[line_number - 1].lstrip()
+        opening_tag = '<' + tag
+        if tag_line.startswith(opening_tag):
+            if self.previous_tag_line_number is None:
+                if column_number % 2 != 0:
+                    print (
+                        '%s --> Indentation level for %s '
+                        'tag on line %s should be a '
+                        'multiple of 2 ' % (
+                            self.filename, tag, line_number))
+                    self.failed = True
+            else:
+                if column_number % 2 != 0 and (
+                        line_number != self.previous_tag_line_number):
+                    print (
+                        '%s --> Indentation level for %s '
+                        'tag on line %s should be a '
+                        'multiple of 2 ' % (
+                            self.filename, tag, line_number))
+                    self.failed = True
+            self.previous_tag_line_number = line_number
+
+        # Check the indentation of the attributes of the tag.
+        indentation_of_first_attribute = (
+            column_number + len(tag) + 2)
+        starttag_text = self.get_starttag_text()
+
+        for line_num, line in enumerate(
+                str.splitlines(starttag_text)):
+            if line_num == 0:
+                continue
+
+            leading_spaces_count = len(line) - len(line.lstrip())
+            list_of_attrs = []
+
+            for attr, _ in attrs:
+                list_of_attrs.append(attr)
+
+            if not line.lstrip().startswith(tuple(list_of_attrs)):
+                continue
+            if (
+                    indentation_of_first_attribute != (
+                        leading_spaces_count)):
+                line_num_of_error = line_number + line_num
+                print (
+                    '%s --> Attribute for tag %s on line '
+                    '%s should align with the leftmost '
+                    'attribute on line %s ' % (
+                        self.filename, tag,
+                        line_num_of_error, line_number))
+                self.failed = True
+
+
+def _check_html_indent(all_files):
+    """This function checks the indentation of lines in HTML files."""
+
+    print 'Starting HTML indentation check'
+    print '----------------------------------------'
+
+    html_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.html')]
+
+    failed = False
+    summary_messages = []
+
+    for filename in html_files_to_lint:
+        with open(filename, 'r') as f:
+            file_content = f.read()
+            file_lines = file_content.split('\n')
+            parser = CustomHTMLParser(filename, file_lines)
+            parser.feed(file_content)
+
+            if parser.failed:
+                failed = True
+
+    if failed:
+        summary_message = '%s   HTML indentation check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s  HTML indentation check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
     # TODO(apb7): Enable the _check_directive_scope function.
@@ -1102,6 +1209,7 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
+    html_indent_messages = _check_html_indent(all_files)
     html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
@@ -1109,8 +1217,8 @@ def main():
         directive_scope_messages + html_directive_name_messages +
         import_order_messages + newline_messages +
         docstring_messages + comment_messages +
-        html_linter_messages + linter_messages +
-        pattern_messages)
+        html_indent_messages + html_linter_messages +
+        linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

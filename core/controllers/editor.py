@@ -35,6 +35,7 @@ from core.domain import interaction_registry
 from core.domain import obj_services
 from core.domain import rights_manager
 from core.domain import search_services
+from core.domain import stats_domain
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -307,7 +308,9 @@ class ExplorationHandler(EditorHandler):
         _require_valid_version(version, exploration.version)
 
         commit_message = self.payload.get('commit_message')
-        change_list = self.payload.get('change_list')
+        change_list_dict = self.payload.get('change_list')
+        change_list = [
+            exp_domain.ExplorationChange(change) for change in change_list_dict]
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message)
@@ -767,6 +770,91 @@ class StateRulesStatsHandler(EditorHandler):
         })
 
 
+class FetchIssuesHandler(EditorHandler):
+    """Handler used for retrieving the list of unresolved issues in an
+    exploration. This removes the invalid issues and returns the remaining
+    unresolved ones.
+    """
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, exp_id):
+        """Handles GET requests."""
+        exp_version = self.request.get('exp_version')
+        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        if exp_issues is None:
+            raise self.PageNotFoundException(
+                'Invalid exploration ID %s' % (exp_id))
+        unresolved_issues = []
+        for issue in exp_issues.unresolved_issues:
+            if issue.is_valid:
+                unresolved_issues.append(issue)
+        exp_issues.unresolved_issues = unresolved_issues
+        exp_issues_dict = exp_issues.to_dict()
+        self.render_json(exp_issues_dict['unresolved_issues'])
+
+
+class FetchPlaythroughHandler(EditorHandler):
+    """Handler used for retrieving a playthrough."""
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, unused_exploration_id, playthrough_id):
+        """Handles GET requests."""
+        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
+        if playthrough is None:
+            raise self.PageNotFoundException(
+                'Invalid playthrough ID %s' % (playthrough_id))
+        self.render_json(playthrough.to_dict())
+
+
+class ResolveIssueHandler(EditorHandler):
+    """Handler used for resolving an issue. Currently, when an issue is
+    resolved, the issue is removed from the unresolved issues list in the
+    ExplorationIssuesModel instance, and all corresponding playthrough
+    instances are deleted.
+    """
+
+    @acl_decorators.can_view_exploration_stats
+    def post(self, exp_id):
+        """Handles POST requests."""
+        exp_issue_dict = self.payload.get('exp_issue_dict')
+        try:
+            unused_exp_issue = stats_domain.ExplorationIssue.from_backend_dict(
+                exp_issue_dict)
+        except utils.ValidationError as e:
+            raise self.PageNotFoundException(e)
+
+        exp_version = self.payload.get('exp_version')
+
+        exp_issues = stats_services.get_exp_issues(exp_id, exp_version)
+        if exp_issues is None:
+            raise self.PageNotFoundException(
+                'Invalid exploration ID %s' % (exp_id))
+
+        # Check that the passed in issue actually exists in the exploration
+        # issues instance.
+        issue_to_remove = None
+        for issue in exp_issues.unresolved_issues:
+            if issue.to_dict() == exp_issue_dict:
+                issue_to_remove = issue
+                break
+
+        if not issue_to_remove:
+            raise self.PageNotFoundException(
+                'Exploration issue does not exist in the list of issues for '
+                'the exploration with ID %s' % exp_id)
+
+        # Remove the issue from the unresolved issues list.
+        exp_issues.unresolved_issues.remove(issue_to_remove)
+
+        # Update the exploration issues instance and delete the playthrough
+        # instances.
+        stats_services.delete_playthroughs_multi(
+            issue_to_remove.playthrough_ids)
+        stats_services.save_exp_issues_model_transactional(exp_issues)
+
+        self.render_json({})
+
+
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
@@ -926,7 +1014,10 @@ class EditorAutosaveHandler(ExplorationHandler):
         # Raise an Exception if the draft change list fails non-strict
         # validation.
         try:
-            change_list = self.payload.get('change_list')
+            change_list_dict = self.payload.get('change_list')
+            change_list = [
+                exp_domain.ExplorationChange(change)
+                for change in change_list_dict]
             version = self.payload.get('version')
             exp_services.create_or_update_draft(
                 exploration_id, self.user_id, change_list, version,
@@ -950,3 +1041,21 @@ class EditorAutosaveHandler(ExplorationHandler):
         """Handles POST request for discarding draft changes."""
         exp_services.discard_draft(exploration_id, self.user_id)
         self.render_json({})
+
+
+class StateAnswerStatisticsHandler(EditorHandler):
+    """Returns basic learner answer statistics for a state."""
+
+    @acl_decorators.can_view_exploration_stats
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        try:
+            current_exploration = (
+                exp_services.get_exploration_by_id(exploration_id))
+        except:
+            raise self.PageNotFoundException
+
+        self.render_json({
+            'answers': stats_services.get_top_state_answer_stats_multi(
+                exploration_id, current_exploration.states)
+        })
