@@ -17,8 +17,10 @@
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import rights_manager
 from core.domain import suggestion_registry
 from core.domain import suggestion_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import utils
@@ -444,3 +446,99 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     def test_get_by_type(self):
         self.assertEqual(len(suggestion_services.get_suggestion_by_type(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)), 5)
+
+class SuggestionIntegrationTests(test_utils.GenericTestBase):
+
+    EXP_ID = 'exp1'
+    TRANSLATION_LANGUAGE_CODE = 'en'
+
+    AUTHOR_EMAIL = 'author@example.com'
+    ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
+
+    score_category = (
+        suggestion_models.SCORE_TYPE_CONTENT +
+        suggestion_models.SCORE_CATEGORY_DELIMITER + 'Algebra')
+
+    THREAD_ID = 'exp1.thread_1'
+
+    COMMIT_MESSAGE = 'commit message'
+
+    def generate_thread_id(self, unused_exp_id):
+        return self.THREAD_ID
+
+    def setUp(self):
+        super(SuggestionIntegrationTests, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.signup(self.ASSIGNED_REVIEWER_EMAIL, 'assignedReviewer')
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+        self.reviewer_id = self.editor_id
+        self.assigned_reviewer_id = self.get_user_id_from_email(
+            self.ASSIGNED_REVIEWER_EMAIL)
+
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
+        # Login and create exploration and suggestions.
+        self.login(self.EDITOR_EMAIL)
+
+        # Create exploration.
+        exploration = self.save_new_linear_exp_with_state_names_and_interactions(
+            self.EXP_ID, self.editor_id, ['State 1', 'State 2'], ['TextInput'],
+            category='Algebra')
+
+        self.old_content = exp_domain.SubtitledHtml('old content', {
+            self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
+                'filename.mp3', 20, False)
+        }).to_dict()
+
+        # Create content in State A with a single audio subtitle.
+        exploration.states['State 1'].update_content(self.old_content)
+        exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
+
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
+        rights_manager.assign_role_for_exploration(
+            self.editor, self.EXP_ID, self.owner_id,
+            rights_manager.ROLE_EDITOR)
+
+        self.new_content = exp_domain.SubtitledHtml('new content', {
+            self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
+                'filename.mp3', 20, False)
+        }).to_dict()
+
+        self.change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'State 1',
+            'new_value': self.new_content
+        }
+
+        self.target_version_at_submission = exploration.version
+
+    def test_create_and_accept_suggestion(self):
+
+        with self.swap(
+            feedback_models.FeedbackThreadModel,
+            'generate_new_thread_id', self.generate_thread_id):
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.EXP_ID, self.target_version_at_submission,
+                self.author_id, self.change_cmd, self.score_category,
+                'test description', self.assigned_reviewer_id, None)
+
+        suggestion_id = 'exploration.' + self.THREAD_ID
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        suggestion_services.accept_suggestion(
+            suggestion, self.reviewer_id, self.COMMIT_MESSAGE, None)
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
+        self.assertEqual(
+            exploration.states['State 1'].content.html,
+            'new content')
+
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)

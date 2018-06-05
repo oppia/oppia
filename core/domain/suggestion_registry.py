@@ -298,11 +298,11 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         change_cmd = self.change_cmd
         exploration = exp_services.get_exploration_by_id(self.target_id)
-        old_content = exploration.states[self.change_cmd.state_name].content
+        old_content = (
+            exploration.states[self.change_cmd.state_name].content.to_dict())
 
-        change_cmd.old_content = old_content
-
-        change_cmd.new_content['audio_translations'] = (
+        change_cmd.old_value = old_content
+        change_cmd.new_value['audio_translations'] = (
             old_content['audio_translations'])
 
         return [change_cmd]
@@ -315,7 +315,7 @@ class SuggestionEditStateContent(BaseSuggestion):
         """
         change_list = self.get_change_list_for_accepting_suggestion()
         exp_services.update_exploration(
-            self.final_reviewer_id, self.target_type, change_list,
+            self.final_reviewer_id, self.target_id, change_list,
             commit_message, is_suggestion=True)
 
     @classmethod
