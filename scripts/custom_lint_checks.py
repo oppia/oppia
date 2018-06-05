@@ -270,7 +270,7 @@ class DocstringParameterChecker(BaseChecker):
 
     def check_functiondef_params(self, node, node_doc):
         """Checks whether all parameters in a function definition are
-            documented.
+        documented.
 
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or
@@ -307,7 +307,7 @@ class DocstringParameterChecker(BaseChecker):
 
     def check_functiondef_returns(self, node, node_doc):
         """Checks whether a function documented with a return value actually has
-            a return statement in its definition
+        a return statement in its definition.
 
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or
@@ -330,7 +330,7 @@ class DocstringParameterChecker(BaseChecker):
 
     def check_functiondef_yields(self, node, node_doc):
         """Checks whether a function documented with a yield value actually has
-            a yield statement in its definition.
+        a yield statement in its definition.
 
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or
@@ -349,7 +349,7 @@ class DocstringParameterChecker(BaseChecker):
 
     def visit_raise(self, node):
         """Visits a function node that raises an exception and verifies that all
-            exceptions raised in the function definition are documented.
+        exceptions raised in the function definition are documented.
 
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or
@@ -382,7 +382,7 @@ class DocstringParameterChecker(BaseChecker):
 
     def visit_return(self, node):
         """Visits a function node that contains a return statement and verifies
-            that the return value and the return type are documented.
+        that the return value and the return type are documented.
 
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or
@@ -417,7 +417,7 @@ class DocstringParameterChecker(BaseChecker):
 
     def visit_yield(self, node):
         """Visits a function node that contains a yield statement and verifies
-            that the yield value and the yield type are documented.
+        that the yield value and the yield type are documented.
 
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or
@@ -592,10 +592,10 @@ class DocstringParameterChecker(BaseChecker):
 
     def _handle_no_raise_doc(self, excs, node):
         """Checks whether the raised exception in a function has been
-            documented, add a message otherwise.
+        documented, add a message otherwise.
 
         Args:
-            excs: list. A list of exception types.
+            excs: list(str). A list of exception types.
             node: astroid.scoped_nodes.Function. Node to access module content.
         """
         if self.config.accept_no_raise_doc:
