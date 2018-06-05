@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,13 +20,11 @@ describe('Exploration Issue Object Factory', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    this.ExplorationIssueObjectFactory = $injector.get(
-      'ExplorationIssueObjectFactory');
+    this.eiof = $injector.get('ExplorationIssueObjectFactory');
   }));
 
   it('should create a new exploration issue', function() {
-    var explorationIssueObject =
-      new this.ExplorationIssueObjectFactory('EarlyQuit', {}, [], 1, true);
+    var explorationIssueObject = new this.eiof('EarlyQuit', {}, [], 1, true);
 
     expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
     expect(explorationIssueObject.issueCustomizationArgs).toEqual({});
@@ -36,14 +34,13 @@ describe('Exploration Issue Object Factory', function() {
   });
 
   it('should create a new exploration issue from a backend dict', function() {
-    var explorationIssueObject =
-      this.ExplorationIssueObjectFactory.createFromBackendDict({
-        issueType: 'EarlyQuit',
-        issueCustomizationArgs: {},
-        playthroughIds: [],
-        schemaVersion: 1,
-        isValid: true
-      });
+    var explorationIssueObject = this.eiof.createFromBackendDict({
+      issueType: 'EarlyQuit',
+      issueCustomizationArgs: {},
+      playthroughIds: [],
+      schemaVersion: 1,
+      isValid: true
+    });
 
     expect(explorationIssueObject.issueType).toEqual('EarlyQuit');
     expect(explorationIssueObject.issueCustomizationArgs).toEqual({});

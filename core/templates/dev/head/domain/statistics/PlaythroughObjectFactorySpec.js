@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,17 +20,13 @@ describe('Playthrough Object Factory', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    this.PlaythroughObjectFactory = $injector.get(
-      'PlaythroughObjectFactory');
-    this.LearnerActionObjectFactory = $injector.get(
-      'LearnerActionObjectFactory');
+    this.pof = $injector.get('PlaythroughObjectFactory');
+    this.laof = $injector.get('LearnerActionObjectFactory');
   }));
 
   it('should create a new playthrough', function() {
-    var actions = [
-      new this.LearnerActionObjectFactory('AnswerSubmit', {}, 1)
-    ];
-    var playthroughObject = new this.PlaythroughObjectFactory(
+    var actions = [new this.laof('AnswerSubmit', {}, 1)];
+    var playthroughObject = new this.pof(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
     expect(playthroughObject.playthroughId).toEqual('playthroughId1');
@@ -42,7 +38,7 @@ describe('Playthrough Object Factory', function() {
   });
 
   it('should create a new playthrough from a backend dict', function() {
-    var playthroughObject = this.PlaythroughObjectFactory.createFromBackendDict(
+    var playthroughObject = this.pof.createFromBackendDict(
       {
         playthroughId: 'playthroughId1',
         expId: 'expId1',
@@ -62,11 +58,10 @@ describe('Playthrough Object Factory', function() {
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
     expect(playthroughObject.issueCustomizationArgs).toEqual({});
-    expect(playthroughObject.actions[0]).toEqual(
-      this.LearnerActionObjectFactory.createFromBackendDict({
-        actionType: 'AnswerSubmit',
-        actionCustomizationArgs: {},
-        schemaVersion: 1
-      }));
+    expect(playthroughObject.actions).toEqual([this.laof.createFromBackendDict({
+      actionType: 'AnswerSubmit',
+      actionCustomizationArgs: {},
+      schemaVersion: 1
+    })]);
   });
 });

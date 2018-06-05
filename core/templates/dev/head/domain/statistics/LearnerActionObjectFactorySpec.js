@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,13 +20,11 @@ describe('Learner Action Object Factory', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    this.LearnerActionObjectFactory = $injector.get(
-      'LearnerActionObjectFactory');
+    this.laof = $injector.get('LearnerActionObjectFactory');
   }));
 
   it('should create a new learner action', function() {
-    var learnerActionObject =
-      new this.LearnerActionObjectFactory('AnswerSubmit', {}, 1);
+    var learnerActionObject = new this.laof('AnswerSubmit', {}, 1);
 
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});
@@ -34,12 +32,11 @@ describe('Learner Action Object Factory', function() {
   });
 
   it('should create a new learner action from a backend dict', function() {
-    var learnerActionObject =
-      this.LearnerActionObjectFactory.createFromBackendDict({
-        actionType: 'AnswerSubmit',
-        actionCustomizationArgs: {},
-        schemaVersion: 1
-      });
+    var learnerActionObject = this.laof.createFromBackendDict({
+      actionType: 'AnswerSubmit',
+      actionCustomizationArgs: {},
+      schemaVersion: 1
+    });
 
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});
