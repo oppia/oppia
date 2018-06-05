@@ -36,7 +36,6 @@ oppia.directive('randomSelector', ['$compile', function($compile) {
           add_element_text: 'Add New Choice'
         }
       };
-      // $scope.generatorId = $scope.$parent.generatorId;
       $scope.generatorId = $scope.getGeneratorId();
       if (!$scope.customizationArgs.list_of_values) {
         $scope.customizationArgs.list_of_values = [];
