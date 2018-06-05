@@ -22,10 +22,9 @@
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'UrlInterpolationService', 'ImagePreloaderService',
-  'AssetsBackendApiService', function(
+  function(
       $rootScope, $sce, HtmlEscaperService, ExplorationContextService,
-      UrlInterpolationService, ImagePreloaderService,
-      AssetsBackendApiService) {
+      UrlInterpolationService, ImagePreloaderService) {
     return {
       restrict: 'E',
       scope: {},
@@ -36,8 +35,8 @@ oppia.directive('oppiaNoninteractiveImage', [
           $attrs.filepathWithValue);
         $scope.imageUrl = '';
 
-        ImagePreloaderService.getImageUrl($scope.filepath
-        ).then(function(objectUrl) {
+        ImagePreloaderService.getImageUrl($scope.filepath)
+        .then(function(objectUrl) {
           $scope.imageUrl = objectUrl;
         });
         // [TODO] Display a loading indicator instead. For now, if the

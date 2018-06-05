@@ -87,8 +87,8 @@ oppia.factory('ImagePreloaderService', [
      */
     var _loadImage = function(imageFilename) {
       AssetsBackendApiService.loadImage(
-        ExplorationContextService.getExplorationId(), imageFilename
-      ).then(function(loadedImage) {
+        ExplorationContextService.getExplorationId(), imageFilename)
+      .then(function(loadedImage) {
         _filenamesOfImageCurrentlyDownloading = (
           _filenamesOfImageCurrentlyDownloading.filter(function(imageFilename) {
             return loadedImage.filename !== imageFilename;
@@ -102,7 +102,8 @@ oppia.factory('ImagePreloaderService', [
         if (_imageLoadedCallback[loadedImage.filename]) {
           var onLoadImageResolve = (
             (_imageLoadedCallback[loadedImage.filename]).resolveMethod);
-          _getImageUrl(loadedImage.filename, onLoadImageResolve);
+          var objectUrl = URL.createObjectURL(loadedImage.data);
+          onLoadImageResolve(objectUrl);
           _imageLoadedCallback[loadedImage.filename] = null;
         }
       });
@@ -186,7 +187,7 @@ oppia.factory('ImagePreloaderService', [
       getImageUrl: function(filename) {
         return $q(function(resolve, reject){
           if (AssetsBackendApiService.isCached(filename) ||
-            !_hasImagePreloaderServiceStarted) {
+              !_hasImagePreloaderServiceStarted) {
             _getImageUrl(filename, resolve);
           } else {
             _imageLoadedCallback[filename] = {
