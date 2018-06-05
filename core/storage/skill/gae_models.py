@@ -152,28 +152,44 @@ class SkillSummaryModel(base_models.BaseModel):
     version = ndb.IntegerProperty(required=True)
 
 
-class SkillsMasteryModel(base_models.BaseModel):
-    """Mastery model of a user for Oppia Skill.
+class UserSkillMasteryModel(base_models.BaseModel):
+    """Model for storing a user's degree of mastery of a skill in Oppia.
 
-    This model stores progress of each skill for a given user
-    and returns skill id.
+    This model stores the degree of mastery of each skill for a given user.
+
+    The id for this model is of form '{{USER_ID}}:{{SKILL_ID}}'
     """
 
-    # The user id of the currently logged in user.
+    # The user id of the user.
     user_id = ndb.StringProperty(required=True, indexed=True)
-    # The skill id for which degree of mastery is stored.
+    # The skill id for which the degree of mastery is stored.
     skill_id = ndb.StringProperty(required=True, indexed=True)
-    # The degree of mastery of the user in a skill.
+    # The degree of mastery of the user in the skill.
     degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
 
     @classmethod
-    def get_user_mastery(cls, user_id):
-        """Returns skill summary for a particular user.
+    def get_model_id(cls, user_id, skill_id):
+        """Returns model id corresponding to user and skill.
+
+        Args:
+            user_id: str. The user id of the logged in user.
+            skill_id: str. The unique id of the skill.
+
+        Returns:
+            str. The model id corresponding to user and skill.
+        """
+        return '%s:%s' % (user_id, skill_id)
+
+    @classmethod
+    def get_all_skill_mastery_models_for_user(cls, user_id):
+        """Returns all skill mastery models of a particular user.
 
         Args:
             user_id: str. The user id corresponding to a user.
 
         Returns:
-            str. fetched objects where user_id belongs to the entered user.
+            list. All skill mastery models where user_id belongs to the
+                entered user are returned as a list where each element
+                is one skill mastery model.
         """
         return cls.query(cls.user_id == user_id).fetch()

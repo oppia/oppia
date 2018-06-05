@@ -655,33 +655,21 @@ class SkillSummary(object):
         }
 
 
-class SkillsMastery(object):
-    """Domain object for an Oppia Skills Mastery."""
+class UserSkillMastery(object):
+    """Domain object for a user's mastery of a particular skill."""
 
-    @classmethod
-    def get_model_id(cls, user_id, skill_id):
-        """Returns model id corresponding to user and skill.
-
-        Args:
-            user_id: str. The user id of the logged in user.
-            skill_id: str. The unique id of the skill.
-
-        Returns:
-            str. The model id corresponding to user and skill.
-        """
-        return user_id + '-' + skill_id
-
-    def __init__(self, user_id, skill_id, degree_of_mastery):
+    def __init__(self, model_id, user_id, skill_id, degree_of_mastery):
         """Constructs a SkillMastery domain object.
 
         Args:
+            model_id: str. The model id corresponding to the user and
+                the skill.
             user_id: str. The user id of the logged in user.
             skill_id: str. The id of the skill.
             degree_of_mastery: float. The progress of user for the
                 corresponding skill.
         """
-
-        self.id = self.get_model_id(user_id, skill_id)
+        self.id = model_id
         self.user_id = user_id
         self.skill_id = skill_id
         self.degree_of_mastery = degree_of_mastery
@@ -693,7 +681,7 @@ class SkillsMastery(object):
             dict. A dict representing this SkillMastery object.
         """
         return {
-            'model_id': self.id,
+            'id': self.id,
             'user_id': self.user_id,
             'skill_id': self.skill_id,
             'degree_of_mastery': self.degree_of_mastery
