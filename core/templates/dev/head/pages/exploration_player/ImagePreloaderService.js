@@ -90,10 +90,10 @@ oppia.factory('ImagePreloaderService', [
         ExplorationContextService.getExplorationId(), imageFilename)
         .then(function(loadedImage) {
           _filenamesOfImageCurrentlyDownloading = (
-            _filenamesOfImageCurrentlyDownloading.filter(function(
-                imageFilename) {
-              return loadedImage.filename !== imageFilename;
-            })
+            _filenamesOfImageCurrentlyDownloading.filter(
+              function(imageFilename) {
+                return loadedImage.filename !== imageFilename;
+              })
           );
           if (_filenamesOfImageToBeDownloaded.length > 0) {
             var nextImageFilename = _filenamesOfImageToBeDownloaded.shift();
