@@ -260,8 +260,8 @@ class DocstringParameterChecker(BaseChecker):
         """Called for function and method definitions (def).
 
         Args:
-            node: astroid.scoped_nodes.Function. Pylint Docstring class instance
-                representing a node's docstring.
+            node: astroid.scoped_nodes.Function. Node for a function or
+            method definition in the AST.
         """
         node_doc = docstrings_checker.docstringify(node.doc)
         self.check_functiondef_params(node, node_doc)
