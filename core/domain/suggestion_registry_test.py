@@ -52,7 +52,13 @@ class SuggestionRegistryUnitTests(test_utils.GenericTestBase):
             'author_id': self.author_id,
             'final_reviewer_id': self.reviewer_id,
             'assigned_reviewer_id': self.assigned_reviewer_id,
-            'change_cmd': {},
+            'change_cmd': {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'state_1',
+                'new_value': 'new suggestion content',
+                'old_value': None
+            },
             'score_category': 'content.Algebra'
         }
 
@@ -115,7 +121,7 @@ class SuggestionRegistryUnitTests(test_utils.GenericTestBase):
 
     # All mock explorations created for testing.
     explorations = [
-        MockExploration('exp1', ['state_1', 'state_2'])
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}})
     ]
 
     def mock_get_exploration_by_id(self, exp_id):
@@ -126,11 +132,7 @@ class SuggestionRegistryUnitTests(test_utils.GenericTestBase):
 
     def test_validate_suggestion_edit_state_content(self):
         expected_suggestion_dict = self.suggestion_dict
-        expected_suggestion_dict['change_cmd'] = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'state_1'
-        }
+
         suggestion = suggestion_registry.SuggestionEditStateContent(
             expected_suggestion_dict['suggestion_id'],
             expected_suggestion_dict['target_id'],
@@ -144,24 +146,3 @@ class SuggestionRegistryUnitTests(test_utils.GenericTestBase):
             exp_services, 'get_exploration_by_id',
             self.mock_get_exploration_by_id):
             suggestion.validate()
-
-        expected_suggestion_dict['change_cmd'] = {
-            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-            'state_name': 'state_unknown'
-        }
-        suggestion = suggestion_registry.SuggestionEditStateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.assigned_reviewer_id, self.reviewer_id,
-            expected_suggestion_dict['change_cmd'],
-            expected_suggestion_dict['score_category'])
-        with self.swap(
-            exp_services, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            with self.assertRaisesRegexp(
-                utils.ValidationError, 'Expected state_unknown to be a valid '
-                                       'state name'):
-                suggestion.validate()
