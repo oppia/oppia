@@ -95,8 +95,7 @@ class StoryChange(object):
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_ADD_STORY_NODE:
-            # This command doesn't need any parameters.
-            pass
+            self.node_id = change_dict['node_id']
         elif self.cmd == CMD_DELETE_STORY_NODE:
             self.node_id = change_dict['node_id']
         elif self.cmd == CMD_UPDATE_STORY_NODE_PROPERTY:
@@ -680,12 +679,22 @@ class Story(object):
         """
         self.language_code = language_code
 
-    def add_node(self):
+    def add_node(self, desired_node_id):
         """Adds a new default node with the id as story_contents.next_node_id.
+
+        Args:
+            desired_node_id: str. The node id to be given to the new node in the
+                story.
+
+        Raises:
+            Exception: The desired_node_id differs from
+                story_contents.next_node_id
         """
-        next_node_id = self.story_contents.next_node_id
+        if self.story_contents.next_node_id != desired_node_id:
+            raise Exception('The node id %s does not match the expected '
+                'next node id for the story.' % desired_node_id)
         self.story_contents.nodes.append(
-            StoryNode.create_default_story_node(next_node_id))
+            StoryNode.create_default_story_node(desired_node_id))
         self.story_contents.next_node_id = (
             StoryNode.get_incremented_node_id(self.story_contents.next_node_id))
 

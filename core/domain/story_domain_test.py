@@ -109,6 +109,12 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 self.story.schema_version)
         )
 
+    def test_add_node_validation(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The node id node_3 does not match the expected '
+                'next node id for the story'):
+            self.story.add_node('node_3')
+
     def test_get_number_from_node_id(self):
         self.assertEqual(
             story_domain.StoryNode.get_number_from_node_id('node_10'), 10)

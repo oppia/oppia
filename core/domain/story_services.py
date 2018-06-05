@@ -263,7 +263,7 @@ def apply_change_list(story_id, change_list):
     try:
         for change in change_list:
             if change.cmd == story_domain.CMD_ADD_STORY_NODE:
-                story.add_node()
+                story.add_node(change.node_id)
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
                 story.delete_node(change.node_id)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
