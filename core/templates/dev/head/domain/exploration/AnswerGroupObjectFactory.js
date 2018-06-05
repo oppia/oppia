@@ -35,7 +35,7 @@ oppia.factory('AnswerGroupObjectFactory', [
         }),
         outcome: this.outcome.toBackendDict(),
         training_data: this.trainingData,
-        taggedMisconceptionId: this.taggedMisconceptionId
+        tagged_misconception_id: this.taggedMisconceptionId
       };
     };
 

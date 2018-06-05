@@ -3034,8 +3034,6 @@ title: Title
         """Test direct loading from a v1 yaml file."""
         exploration = exp_domain.Exploration.from_untitled_yaml(
             'eid', 'Title', 'Category', self.YAML_CONTENT_V1)
-        print exploration.to_yaml()
-        print self._LATEST_YAML_CONTENT
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v2(self):
