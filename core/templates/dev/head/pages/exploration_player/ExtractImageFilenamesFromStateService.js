@@ -157,11 +157,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var _getImageFilenamesFromFilepathValue = function(htmlStr) {
       var fileInfos = (
         _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
-      var filenames = [];
-      filenames = fileInfos.map(function(fileInfo) {
+      return fileInfos.map(function(fileInfo) {
         return fileInfo.name;
       });
-      return filenames;
     };
 
     /**
