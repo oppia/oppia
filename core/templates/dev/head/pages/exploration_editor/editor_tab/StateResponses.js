@@ -18,16 +18,16 @@
  */
 
 oppia.controller('StateResponses', [
-  '$scope', '$rootScope', '$uibModal', '$filter', 'stateInteractionIdService',
+  '$scope', '$rootScope', '$uibModal', '$filter', 'StateInteractionIdService',
   'EditorStateService', 'AlertsService', 'ResponsesService', 'RouterService',
   'ExplorationContextService', 'TrainingDataService',
-  'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
+  'StateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
   'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
   function(
-      $scope, $rootScope, $uibModal, $filter, stateInteractionIdService,
+      $scope, $rootScope, $uibModal, $filter, StateInteractionIdService,
       EditorStateService, AlertsService, ResponsesService, RouterService,
       ExplorationContextService, TrainingDataService,
-      stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
+      StateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
       INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
     $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
       GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
@@ -49,7 +49,7 @@ oppia.controller('StateResponses', [
       // This array contains the text of each of the possible answers
       // for the interaction.
       var answerChoices = [];
-      var customizationArgs = stateCustomizationArgsService.savedMemento;
+      var customizationArgs = StateCustomizationArgsService.savedMemento;
       var handledAnswersArray = [];
 
       if (interactionId === 'MultipleChoiceInput') {
@@ -144,7 +144,7 @@ oppia.controller('StateResponses', [
     };
 
     $scope.getCurrentInteractionId = function() {
-      return stateInteractionIdService.savedMemento;
+      return StateInteractionIdService.savedMemento;
     };
 
     $scope.isCurrentInteractionTrainable = function() {
@@ -260,7 +260,7 @@ oppia.controller('StateResponses', [
         controller: [
           '$scope', '$injector', '$uibModalInstance',
           'ExplorationHtmlFormatterService',
-          'stateInteractionIdService', 'stateCustomizationArgsService',
+          'StateInteractionIdService', 'StateCustomizationArgsService',
           'ExplorationContextService', 'EditorStateService',
           'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
@@ -268,7 +268,7 @@ oppia.controller('StateResponses', [
           function(
               $scope, $injector, $uibModalInstance,
               ExplorationHtmlFormatterService,
-              stateInteractionIdService, stateCustomizationArgsService,
+              StateInteractionIdService, StateCustomizationArgsService,
               ExplorationContextService, EditorStateService,
               ExplorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
@@ -280,8 +280,8 @@ oppia.controller('StateResponses', [
             $scope.stateContent = _state.content.getHtml();
             $scope.inputTemplate = (
               ExplorationHtmlFormatterService.getInteractionHtml(
-                stateInteractionIdService.savedMemento,
-                stateCustomizationArgsService.savedMemento,
+                StateInteractionIdService.savedMemento,
+                StateCustomizationArgsService.savedMemento,
                 false,
                 'testInteractionInput'));
             $scope.answerTemplate = '';
@@ -292,7 +292,7 @@ oppia.controller('StateResponses', [
             $scope.trainingDataOutcomeDest = '';
 
             // Retrieve the interaction ID.
-            var interactionId = stateInteractionIdService.savedMemento;
+            var interactionId = StateInteractionIdService.savedMemento;
 
             var rulesServiceName =
               AngularNameService.getNameOfInteractionRulesService(
@@ -319,8 +319,8 @@ oppia.controller('StateResponses', [
             $scope.submitAnswer = function(answer) {
               $scope.answerTemplate = (
                 ExplorationHtmlFormatterService.getAnswerHtml(
-                  answer, stateInteractionIdService.savedMemento,
-                  stateCustomizationArgsService.savedMemento));
+                  answer, StateInteractionIdService.savedMemento,
+                  StateCustomizationArgsService.savedMemento));
 
               var classificationResult = (
                 AnswerClassificationService.getMatchingClassificationResult(

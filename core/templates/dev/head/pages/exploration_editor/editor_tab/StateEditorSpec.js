@@ -25,7 +25,7 @@ describe('State Editor controller', function() {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
       ess = $injector.get('ExplorationStatesService');
-      scs = $injector.get('stateContentService');
+      scs = $injector.get('StateContentService');
 
       ess.init({
         'First State': {

@@ -52,9 +52,9 @@
     </div>
   </div>
 
-  <div ng-if="stateHintsService.savedMemento[getIndexPlusOne() - 1] && !stateHintsService.savedMemento[getIndexPlusOne() - 1].isEmpty()">
+  <div ng-if="StateHintsService.savedMemento[getIndexPlusOne() - 1] && !StateHintsService.savedMemento[getIndexPlusOne() - 1].isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_HINT]>"
-                               subtitled-html="stateHintsService.displayed[getIndexPlusOne() - 1].hintContent"
+                               subtitled-html="StateHintsService.displayed[getIndexPlusOne() - 1].hintContent"
                                on-start-edit="onAudioTranslationsStartEditAction"
                                on-change="onAudioTranslationsEdited">
     </audio-translations-editor>

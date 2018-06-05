@@ -36,11 +36,11 @@ oppia.factory('TrainingModalService', [
             '$scope', '$injector', '$uibModalInstance',
             'ExplorationStatesService', 'EditorStateService',
             'AnswerClassificationService', 'ExplorationContextService',
-            'stateInteractionIdService', 'AngularNameService',
+            'StateInteractionIdService', 'AngularNameService',
             function($scope, $injector, $uibModalInstance,
                 ExplorationStatesService, EditorStateService,
                 AnswerClassificationService, ExplorationContextService,
-                stateInteractionIdService, AngularNameService) {
+                StateInteractionIdService, AngularNameService) {
               $scope.trainingDataAnswer = '';
               $scope.trainingDataFeedback = '';
               $scope.trainingDataOutcomeDest = '';
@@ -64,7 +64,7 @@ oppia.factory('TrainingModalService', [
                 var state = ExplorationStatesService.getState(currentStateName);
 
                 // Retrieve the interaction ID.
-                var interactionId = stateInteractionIdService.savedMemento;
+                var interactionId = StateInteractionIdService.savedMemento;
 
                 var rulesServiceName =
                   AngularNameService.getNameOfInteractionRulesService(

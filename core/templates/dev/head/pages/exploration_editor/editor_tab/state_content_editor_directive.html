@@ -8,7 +8,7 @@
     <div class="oppia-state-content-display oppia-transition-200"
          ng-class="{'oppia-prevent-selection': isEditable()}"
          title="Card Content">
-      <span ng-show="stateContentService.savedMemento.hasNoHtml()" class="oppia-placeholder">
+      <span ng-show="StateContentService.savedMemento.hasNoHtml()" class="oppia-placeholder">
         <span ng-show="isCurrentStateInitialState()">
           This is the first card of your exploration. Use this space to introduce
           your topic and engage the learner, then ask them a question.
@@ -17,7 +17,7 @@
           You can speak to the learner here, then ask them a question.
         </span>
       </span>
-      <span angular-html-bind="stateContentService.savedMemento.getHtml()"
+      <span angular-html-bind="StateContentService.savedMemento.getHtml()"
             class="oppia-rte-editor protractor-test-state-content-display">
       </span>
     </div>
@@ -26,9 +26,9 @@
     </div>
   </div>
 
-  <div ng-if="stateContentService.savedMemento && !stateContentService.savedMemento.isEmpty()">
+  <div ng-if="StateContentService.savedMemento && !StateContentService.savedMemento.isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_CONTENT]>"
-                               subtitled-html="stateContentService.displayed"
+                               subtitled-html="StateContentService.displayed"
                                on-start-edit="onAudioTranslationsStartEditAction"
                                on-change="onAudioTranslationsEdited">
     </audio-translations-editor>
@@ -37,7 +37,7 @@
 
 <div ng-if="contentEditorIsOpen" class="protractor-test-state-content-editor">
   <!-- TODO(sll): Find a way to do this without resorting to private properties like _html -->
-  <schema-based-editor schema="HTML_SCHEMA" local-value="stateContentService.displayed._html">
+  <schema-based-editor schema="HTML_SCHEMA" local-value="StateContentService.displayed._html">
   </schema-based-editor>
 
   <div style="margin-top: 2px;">

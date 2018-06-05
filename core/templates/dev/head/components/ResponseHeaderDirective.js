@@ -35,15 +35,15 @@ oppia.directive('responseHeader', [
       controller: [
         '$scope', 'EditabilityService', 'EditorStateService', 'RouterService',
         'PLACEHOLDER_OUTCOME_DEST', 'ExplorationCorrectnessFeedbackService',
-        'stateInteractionIdService', 'INTERACTION_SPECS',
+        'StateInteractionIdService', 'INTERACTION_SPECS',
         function(
             $scope, EditabilityService, EditorStateService, RouterService,
             PLACEHOLDER_OUTCOME_DEST, ExplorationCorrectnessFeedbackService,
-            stateInteractionIdService, INTERACTION_SPECS) {
+            StateInteractionIdService, INTERACTION_SPECS) {
           $scope.EditabilityService = EditabilityService;
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           // This returns false if the current interaction ID is null.
