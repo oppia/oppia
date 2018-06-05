@@ -451,7 +451,7 @@ class DocstringParameterChecker(BaseChecker):
             )
 
     def visit_yieldfrom(self, node):
-        """Called for yieldfrom.
+        """Visits a function node.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
@@ -573,7 +573,8 @@ class DocstringParameterChecker(BaseChecker):
                                 not_needed_type_in_docstring)
 
     def check_single_constructor_params(self, class_doc, init_doc, class_node):
-        """Check single constructor Parameters
+        """Checks whether the class as well as init() method have documentation,
+        If they have documentation, it adds an error message.
 
         Args:
             class_doc: Docstring. Pylint docstring class instance representing
