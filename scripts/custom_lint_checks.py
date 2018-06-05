@@ -451,7 +451,9 @@ class DocstringParameterChecker(BaseChecker):
             )
 
     def visit_yieldfrom(self, node):
-        """Visits a function node.
+        """Visits a function node that contains a yield from statement and
+        verifies that the yield from value and the yield from type are
+        documented.
 
         Args:
             node: astroid.scoped_nodes.Function. Node to access module content.
