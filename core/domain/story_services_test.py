@@ -116,8 +116,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_update_story_node_properties(self):
         changelist = [
             story_domain.StoryChange({
-                'cmd': story_domain.CMD_ADD_STORY_NODE,
-                'node_id': self.NODE_ID_2
+                'cmd': story_domain.CMD_ADD_STORY_NODE
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_PROPERTY,
