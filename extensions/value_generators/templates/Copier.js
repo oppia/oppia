@@ -42,14 +42,6 @@ oppia.directive('copier', ['$compile', function($compile) {
       $scope.$watch('$parent.objType', function() {
         $scope.objType = $scope.getObjType();
       }, true);
-
-      $scope.$watch('$parent.customizationArgs', function() {
-        $scope.customizationArgs = $scope.$parent.customizationArgs;
-      }, true);
-
-      $scope.$watch('customizationArgs', function() {
-        $scope.$parent.customizationArgs = $scope.customizationArgs;
-      }, true);
     }
   };
 }]);
