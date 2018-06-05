@@ -53,7 +53,7 @@ oppia.factory('AnswerGroupObjectFactory', [
         OutcomeObjectFactory.createFromBackendDict(
           answerGroupBackendDict.outcome),
         answerGroupBackendDict.training_data,
-        answerGroupBackendDict.taggedMisconceptionId);
+        answerGroupBackendDict.tagged_misconception_id);
     };
 
     var generateRulesFromBackend = function(ruleBackendDicts) {
