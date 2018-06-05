@@ -691,7 +691,8 @@ class Story(object):
                 story_contents.next_node_id
         """
         if self.story_contents.next_node_id != desired_node_id:
-            raise Exception('The node id %s does not match the expected '
+            raise Exception(
+                'The node id %s does not match the expected '
                 'next node id for the story.' % desired_node_id)
         self.story_contents.nodes.append(
             StoryNode.create_default_story_node(desired_node_id))
