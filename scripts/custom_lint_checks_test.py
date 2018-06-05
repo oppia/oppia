@@ -416,7 +416,6 @@ class DocstringParameterChecker(BaseChecker):
         Args:
             node: astroid.scoped_nodes.Function. Node for a function or
                 method definition in the AST.
-
         """
         func_node = node.frame()
         if not isinstance(func_node, astroid.FunctionDef):
