@@ -447,6 +447,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestion_services.get_suggestion_by_type(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)), 5)
 
+
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp1'
