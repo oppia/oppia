@@ -454,7 +454,7 @@ class DocstringParameterChecker(BaseChecker):
         """Called for yieldfrom.
 
         Args:
-            node: node. Node to access module content.
+            node: astroid.scoped_nodes. Node to access module content.
         """
         self.visit_yield(node)
 
@@ -595,7 +595,7 @@ class DocstringParameterChecker(BaseChecker):
 
         Args:
             excs: list. A list of exception types.
-            node: node. Node to access module content.
+            node: astroid.scoped_nodes. Node to access module content.
         """
         if self.config.accept_no_raise_doc:
             return
