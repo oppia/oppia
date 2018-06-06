@@ -57,7 +57,7 @@ class TopicChange(object):
     TOPIC_PROPERTIES = (
         TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_DESCRIPTION,
         TOPIC_PROPERTY_CANONICAL_STORY_IDS, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
-        TOPIC_PROPERTY_SKILL_IDS, TOPIC_PROPERTY_LANGUAGE_CODE)
+        TOPIC_PROPERTY_LANGUAGE_CODE)
 
     SUBTOPIC_PROPERTIES = (
         SUBTOPIC_PROPERTY_TITLE, SUBTOPIC_PROPERTY_SKILL_IDS)
@@ -86,12 +86,12 @@ class TopicChange(object):
 
         if self.cmd == CMD_ADD_SUBTOPIC:
             self.id = change_dict['subtopic_id']
-            self.title =  change_dict['title']
+            self.title = change_dict['title']
         elif self.cmd == CMD_DELETE_SUBTOPIC:
             self.id = change_dict['subtopic_id']
         elif self.cmd == CMD_ADD_UNCATEGORIZED_SKILL_ID:
-            self.id =  change_dict['new_uncategorized_skill_id']
-        elif self.cmd == CMD_DELETE_UNCATEGORIZED_SKILL_ID:
+            self.id = change_dict['new_uncategorized_skill_id']
+        elif self.cmd == CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
             self.id = change_dict['uncategorized_skill_id']
         elif self.cmd == CMD_UPDATE_TOPIC_PROPERTY:
             if change_dict['property_name'] not in self.TOPIC_PROPERTIES:
@@ -453,8 +453,9 @@ class Topic(object):
         """
         for subtopic in self.subtopics:
             if new_uncategorized_skill_id in subtopic.skill_ids:
-                raise Exception('The skill id %s already exists in subtopic '
-                    'with id %s.' % (new_uncategorized_skill_id, subtopic.id))
+                raise Exception(
+                    'The skill id %s already exists in subtopic with id %s.'
+                    % (new_uncategorized_skill_id, subtopic.id))
         self.uncategorized_skill_ids.append(new_uncategorized_skill_id)
 
     def remove_uncategorized_skill_id(self, uncategorized_skill_id):
@@ -469,7 +470,8 @@ class Topic(object):
                 uncategorized_skill_ids list.
         """
         if uncategorized_skill_id not in self.uncategorized_skill_ids:
-            raise Exception('The skill id %s is not present in the topic.'
+            raise Exception(
+                'The skill id %s is not present in the topic.'
                 % uncategorized_skill_id)
         self.uncategorized_skill_ids.remove(uncategorized_skill_id)
 
@@ -565,8 +567,9 @@ class TopicSummary(object):
 
     def __init__(
             self, topic_id, name, language_code, version,
-            canonical_story_count, additional_story_count, skill_count,
-            subtopic_count, topic_model_created_on, topic_model_last_updated):
+            canonical_story_count, additional_story_count,
+            uncategorized_skill_count, subtopic_count, topic_model_created_on,
+            topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
         Args:

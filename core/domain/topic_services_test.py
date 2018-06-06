@@ -39,7 +39,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.topic = self.save_new_topic(
             self.TOPIC_ID, self.user_id, 'Name', 'Description',
             [self.story_id_1, self.story_id_2], [self.story_id_3],
-            [self.skill_id]
+            [self.skill_id], []
         )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')

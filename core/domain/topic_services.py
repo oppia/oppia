@@ -85,7 +85,8 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.version,
         topic_summary_model.canonical_story_count,
         topic_summary_model.additional_story_count,
-        topic_summary_model.skill_count,
+        topic_summary_model.uncategorized_skill_count,
+        topic_summary_model.subtopic_count,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
@@ -210,13 +211,13 @@ def apply_change_list(topic_id, change_list):
     topic = get_topic_by_id(topic_id)
     try:
         for change in change_list:
-            if change.cmd == topic_domamin.CMD_ADD_SUBTOPIC:
+            if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
                 topic.add_subtopic(change.id, change.title)
-            elif change.cmd == topic_domamin.CMD_DELETE_SUBTOPIC:
+            elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
                 topic.delete_subtopic(change.id)
-            elif change.cmd == topic_domamin.CMD_ADD_UNCATEGORIZED_SKILL_ID:
+            elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
                 topic.add_uncategorized_skill_id(change.id)
-            elif change.cmd == topic_domamin.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
+            elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
                 topic.remove_uncategorized_skill_id(change.id)
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if (change.property_name ==
@@ -486,12 +487,14 @@ def compute_summary_of_topic(topic):
     """
     topic_model_canonical_story_count = len(topic.canonical_story_ids)
     topic_model_additional_story_count = len(topic.additional_story_ids)
-    topic_model_skill_count = len(topic.skill_ids)
+    topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
+    topic_model_subtopic_count = len(topic.subtopics)
 
     topic_summary = topic_domain.TopicSummary(
         topic.id, topic.name, topic.language_code,
         topic.version, topic_model_canonical_story_count,
-        topic_model_additional_story_count, topic_model_skill_count,
+        topic_model_additional_story_count,
+        topic_model_uncategorized_skill_count, topic_model_subtopic_count,
         topic.created_on, topic.last_updated
     )
 
