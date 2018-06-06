@@ -4,13 +4,6 @@
     padding: 8px;
     position: relative;
   }
-  .loading-indicator-gif {
-    display: block;
-    height: 120px;
-    margin-left: auto;
-    margin-right: auto;
-    width: 120px;
-  }
   .oppia-image-click-img {
     cursor: pointer;
     display: block;
@@ -33,7 +26,7 @@
 <div ng-if="!imageUrl" translate="I18N_INTERACTIONS_IMAGE_CLICK_SELECT"></div>
 
 <div ng-if="isLoadingIndicatorShown" ng-style="loadingIndicatorContainerStyle">
-  <img ng-src="<[loadingIndicatorUrl]>" class="loading-indicator-gif" alt="Loading...">
+  <img ng-src="<[loadingIndicatorUrl]>" ng-style="loadingIndicatorStyle" alt="Loading...">
 </div>
 
 <div class="image-click-container" ng-if="!isLoadingIndicatorShown">

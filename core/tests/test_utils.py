@@ -143,6 +143,8 @@ class TestBase(unittest.TestCase):
     OWNER_USERNAME = 'owner'
     EDITOR_EMAIL = 'editor@example.com'
     EDITOR_USERNAME = 'editor'
+    TOPIC_MANAGER_EMAIL = 'topicmanager@example.com'
+    TOPIC_MANAGER_USERNAME = 'topicmanager'
     TRANSLATOR_EMAIL = 'translator@example.com'
     TRANSLATOR_USERNAME = 'translator'
     VIEWER_EMAIL = 'viewer@example.com'
@@ -204,6 +206,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -225,6 +228,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -263,6 +267,7 @@ states:
         dest: %s
         feedback: []
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       fallbacks: []
@@ -280,6 +285,7 @@ states:
         dest: New state
         feedback: []
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       fallbacks: []
@@ -572,6 +578,15 @@ tags: []
         for name in admin_usernames:
             self.set_user_role(name, feconf.ROLE_ID_ADMIN)
 
+    def set_topic_managers(self, topic_manager_usernames):
+        """Sets role of given users as TOPIC_MANAGER.
+
+        Args:
+            topic_manager_usernames: list(str). List of usernames.
+        """
+        for name in topic_manager_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
+
     def set_moderators(self, moderator_usernames):
         """Sets role of given users as MODERATOR.
 
@@ -598,15 +613,6 @@ tags: []
         """
         for name in collection_editor_usernames:
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
-
-    def set_topic_managers(self, topic_manager_usernames):
-        """Sets role of given users as TOPIC_MANAGER.
-
-        Args:
-            topic_manager_usernames: list(str). List of usernames.
-        """
-        for name in topic_manager_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
 
     def get_current_logged_in_user_id(self):
         """Gets the user_id of the current logged-in user.
@@ -901,7 +907,7 @@ tags: []
         Returns:
             Story. A newly-created story.
         """
-        story = story_domain.Story.create_default_story(story_id)
+        story = story_domain.Story.create_default_story(story_id, title)
         story.title = title
         story.description = description
         story.notes = notes
@@ -941,7 +947,7 @@ tags: []
 
     def save_new_skill(
             self, skill_id, owner_id,
-            description, misconceptions, skill_contents,
+            description, misconceptions=None, skill_contents=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Skill and saves it.
 
@@ -959,11 +965,13 @@ tags: []
         Returns:
             Skill. A newly-created skill.
         """
-        skill = skill_domain.Skill(
-            skill_id, description, misconceptions, skill_contents,
-            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, language_code, 0
-        )
+        skill = skill_domain.Skill.create_default_skill(skill_id, description)
+        if misconceptions:
+            skill.misconceptions = misconceptions
+        if skill_contents:
+            skill.skill_contents = skill_contents
+        skill.language_code = language_code
+        skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
         return skill
 

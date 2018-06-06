@@ -26,7 +26,9 @@ oppia.directive('parameterNameEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        value: '='
+      },
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: [
         '$scope', '$attrs', 'ExplorationParamSpecsService',
@@ -51,14 +53,14 @@ oppia.directive('parameterNameEditor', [
 
           // Reset the component each time the value changes (e.g. if this is
           // part of an editable list).
-          $scope.$watch('$parent.value', function(newValue) {
+          $scope.$watch('value', function(newValue) {
             if (newValue) {
               $scope.localValue = newValue;
             }
           }, true);
 
           $scope.$watch('localValue', function(newValue) {
-            $scope.$parent.value = newValue;
+            $scope.value = newValue;
           });
         }
       ]

@@ -22,10 +22,9 @@
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'UrlInterpolationService', 'ImagePreloaderService',
-  'AssetsBackendApiService', function(
+  function(
       $rootScope, $sce, HtmlEscaperService, ExplorationContextService,
-      UrlInterpolationService, ImagePreloaderService,
-      AssetsBackendApiService) {
+      UrlInterpolationService, ImagePreloaderService) {
     return {
       restrict: 'E',
       scope: {},
@@ -39,19 +38,11 @@ oppia.directive('oppiaNoninteractiveImage', [
           UrlInterpolationService.getStaticImageUrl(
             '/activity/loadingIndicator.gif')
         );
-        // It is initialised to false so that if it is the preview in the
-        // exploration editor, the loading indicator doesn't appear there.
         $scope.isLoadingIndicatorShown = false;
-
         if (ImagePreloaderService.inExplorationPlayer()) {
           $scope.isLoadingIndicatorShown = true;
           $scope.dimensions = (
             ImagePreloaderService.getDimensionsOfImage($scope.filepath.name));
-          ImagePreloaderService.getImageUrl($scope.filepath.name
-          ).then(function(objectUrl) {
-            $scope.isLoadingIndicatorShown = false;
-            $scope.imageUrl = objectUrl;
-          });
           // For aligning the gif to the center of it's container
           var loadingIndicatorSize = 120;
           if ($scope.dimensions.height < 124) {
@@ -72,16 +63,14 @@ oppia.directive('oppiaNoninteractiveImage', [
             'margin-right': 'auto',
             width: loadingIndicatorSize + 'px'
           };
-        } else {
-          // This is for loading the image for preview while editing an
-          // exploration.
-          AssetsBackendApiService.loadImage(
-            ExplorationContextService.getExplorationId(), $scope.filepath.name
-          ).then(function(loadedImageFile) {
-            var objectUrl = URL.createObjectURL(loadedImageFile.data);
-            $scope.imageUrl = objectUrl;
-          });
         }
+
+        ImagePreloaderService.getImageUrl($scope.filepath.name
+        ).then(function(objectUrl) {
+          $scope.isLoadingIndicatorShown = false;
+          $scope.imageUrl = objectUrl;
+        });
+
         $scope.imageCaption = '';
         if ($attrs.captionWithValue) {
           $scope.imageCaption = HtmlEscaperService.escapedJsonToObj(

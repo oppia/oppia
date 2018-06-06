@@ -837,7 +837,8 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
             },
             'labelled_as_correct': False,
             'param_changes': [],
-            'refresher_exploration_id': None
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
         }
 
         state1.update_interaction_default_outcome(default_outcome_dict)

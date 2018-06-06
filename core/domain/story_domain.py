@@ -14,6 +14,7 @@
 
 """Domain objects relating to stories."""
 
+import copy
 import re
 
 from constants import constants
@@ -104,21 +105,21 @@ class StoryChange(object):
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.node_id = change_dict['node_id']
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_UPDATE_STORY_PROPERTY:
             if change_dict['property_name'] not in self.STORY_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_UPDATE_STORY_CONTENTS_PROPERTY:
             if change_dict['property_name'] not in (
                     self.STORY_CONTENTS_PROPERTIES):
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
             self.from_version = change_dict['from_version']
             self.to_version = change_dict['to_version']
@@ -543,9 +544,7 @@ class Story(object):
         Raises:
             ValidationError: One or more attributes of story are invalid.
         """
-        if not isinstance(self.title, basestring):
-            raise utils.ValidationError(
-                'Expected title to be a string, received %s' % self.title)
+        self.require_valid_title(self.title)
 
         if not isinstance(self.description, basestring):
             raise utils.ValidationError(
@@ -579,6 +578,32 @@ class Story(object):
 
         self.story_contents.validate()
 
+    @classmethod
+    def require_valid_story_id(cls, story_id):
+        """Checks whether the story id is a valid one.
+
+        Args:
+            story_id: str. The story id to validate.
+        """
+        if not isinstance(story_id, basestring):
+            raise utils.ValidationError(
+                'Story id should be a string, received: %s' % story_id)
+
+        if len(story_id) != 12:
+            raise utils.ValidationError('Invalid story id.')
+
+    @classmethod
+    def require_valid_title(cls, title):
+        """Checks whether the story title is a valid one.
+
+        Args:
+            title: str. The title to validate.
+        """
+
+        if not isinstance(title, basestring):
+            raise utils.ValidationError('Title should be a string.')
+        if title == '':
+            raise utils.ValidationError('Title field should not be empty')
 
     def to_dict(self):
         """Returns a dict representing this Story domain object.
@@ -598,13 +623,14 @@ class Story(object):
         }
 
     @classmethod
-    def create_default_story(cls, story_id):
+    def create_default_story(cls, story_id, title):
         """Returns a story domain object with default values. This is for
         the frontend where a default blank story would be shown to the user
         when the story is created for the first time.
 
         Args:
             story_id: str. The unique id of the story.
+            title: str. The title for the newly created story.
 
         Returns:
             Story. The Story domain object with the default values.
@@ -618,7 +644,7 @@ class Story(object):
             initial_node_id, StoryNode.get_incremented_node_id(
                 initial_node_id))
         return cls(
-            story_id, feconf.DEFAULT_STORY_TITLE,
+            story_id, title,
             feconf.DEFAULT_STORY_DESCRIPTION, feconf.DEFAULT_STORY_NOTES,
             story_contents, feconf.CURRENT_STORY_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
@@ -679,14 +705,23 @@ class Story(object):
         """
         self.language_code = language_code
 
-    def add_node(self, node_id):
-        """Adds a new default node with the given node_id.
+    def add_node(self, desired_node_id):
+        """Adds a new default node with the id as story_contents.next_node_id.
 
         Args:
-            node_id: str. The id of the node.
+            desired_node_id: str. The node id to be given to the new node in the
+                story.
+
+        Raises:
+            Exception: The desired_node_id differs from
+                story_contents.next_node_id
         """
+        if self.story_contents.next_node_id != desired_node_id:
+            raise Exception(
+                'The node id %s does not match the expected '
+                'next node id for the story.' % desired_node_id)
         self.story_contents.nodes.append(
-            StoryNode.create_default_story_node(node_id))
+            StoryNode.create_default_story_node(desired_node_id))
         self.story_contents.next_node_id = (
             StoryNode.get_incremented_node_id(self.story_contents.next_node_id))
 

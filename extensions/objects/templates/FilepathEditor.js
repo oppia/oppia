@@ -28,7 +28,9 @@ oppia.directive('filepathEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        value: '='
+      },
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', function($scope) {
         var MODE_EMPTY = 1;
@@ -321,7 +323,7 @@ oppia.directive('filepathEditor', [
 
         // Reset the component each time the value changes
         // (e.g. if this is part of an editable list).
-        $scope.$watch('$parent.value', function(newValue) {
+        $scope.$watch('value', function(newValue) {
           if (newValue) {
             $scope.setSavedImageFilename(newValue.name, false);
           }
@@ -591,7 +593,7 @@ oppia.directive('filepathEditor', [
           };
           if (updateParent) {
             AlertsService.clearWarnings();
-            $scope.$parent.value = {
+            $scope.value = {
               name: filename,
               width: dimensions.width,
               height: dimensions.height

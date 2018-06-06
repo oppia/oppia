@@ -127,6 +127,15 @@ BAD_PATTERNS_JS_REGEXP = [
             'extensions/objects/',
             'extensions/value_generators/',
             'extensions/visualizations/')
+    },
+    {
+        'regexp': r"\$parent",
+        'message': "Please do not access parent properties " +
+                   "using $parent. Use the scope object" +
+                   "for this purpose.",
+        'excluded_files': (
+            'core/templates/dev/head/app.js'),
+        'excluded_dirs': ()
     }
 ]
 
@@ -151,6 +160,17 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
         'message': "There should not be any trailing whitespaces.",
         'excluded_files': (),
         'excluded_dirs': ()
+    }
+]
+
+BAD_PATTERNS_PYTHON_REGEXP = [
+    {
+        'regexp': r"print \'",
+        'message': "Please do not use print statement.",
+        'excluded_files': (
+            'core/tests/test_utils.py',
+            'core/tests/performance_framework/perf_domain.py'),
+        'excluded_dirs': ('scripts/',)
     }
 ]
 
@@ -300,6 +320,55 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
+def _lint_css_files(stylelint_path, config_path, files_to_lint, stdout, result):
+    """Prints a list of lint errors in the given list of CSS files.
+
+    Args:
+        stylelint_path: str. Path to the Stylelint binary.
+        config_path: str. Path to the configuration file.
+        files_to_lint: list(str). A list of filepaths to lint.
+        stdout:  multiprocessing.Queue. A queue to store Stylelint outputs.
+        result: multiprocessing.Queue. A queue to put results of test.
+    """
+    start_time = time.time()
+    num_files_with_errors = 0
+
+    num_css_files = len(files_to_lint)
+    if not files_to_lint:
+        result.put('')
+        print 'There are no CSS files to lint.'
+        return
+
+    print 'Total css files: ', num_css_files
+    stylelint_cmd_args = [
+        stylelint_path, '--config=' + config_path]
+    for _, filename in enumerate(files_to_lint):
+        print 'Linting: ', filename
+        proc_args = stylelint_cmd_args + [filename]
+        proc = subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        linter_stdout, linter_stderr = proc.communicate()
+        if linter_stderr:
+            print 'LINTER FAILED'
+            print linter_stderr
+            sys.exit(1)
+
+        if linter_stdout:
+            num_files_with_errors += 1
+            print linter_stdout
+            stdout.put(linter_stdout)
+
+    if num_files_with_errors:
+        result.put('%s    %s CSS file' % (
+            _MESSAGE_TYPE_FAILED, num_files_with_errors))
+    else:
+        result.put('%s   %s CSS file linted (%.1f secs)' % (
+            _MESSAGE_TYPE_SUCCESS, num_css_files, time.time() - start_time))
+
+    print 'CSS linting finished.'
+
+
 def _lint_js_files(
         node_path, eslint_path, files_to_lint, stdout, result):
     """Prints a list of lint errors in the given list of JavaScript files.
@@ -310,9 +379,6 @@ def _lint_js_files(
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store ESLint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
-
-    Returns:
-        None
     """
     start_time = time.time()
     num_files_with_errors = 0
@@ -359,9 +425,6 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         config_pycodestyle: str. Path to the tox.ini file.
         files_to_lint: list(str). A list of filepaths to lint.
         result: multiprocessing.Queue. A queue to put results of test.
-
-    Returns:
-        None
     """
     start_time = time.time()
     are_there_errors = False
@@ -526,39 +589,74 @@ def _pre_commit_linter(all_files):
         parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
     eslint_path = os.path.join(
         parent_dir, 'node_modules', 'eslint', 'bin', 'eslint.js')
-
-    if not os.path.exists(eslint_path):
+    stylelint_path = os.path.join(
+        parent_dir, 'node_modules', 'stylelint', 'bin', 'stylelint.js')
+    config_path_for_css_in_html = os.path.join(
+        parent_dir, 'oppia', '.stylelintrc')
+    config_path_for_oppia_css = os.path.join(
+        parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
+        'css', '.stylelintrc')
+    if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
         print ''
         print 'ERROR    Please run start.sh first to install node-eslint '
-        print '         and its dependencies.'
+        print '         or node-stylelint and its dependencies.'
         sys.exit(1)
 
     js_files_to_lint = [
         filename for filename in all_files if filename.endswith('.js')]
     py_files_to_lint = [
         filename for filename in all_files if filename.endswith('.py')]
+    html_files_to_lint_for_css = [
+        filename for filename in all_files if filename.endswith('.html')]
+    css_files_to_lint = [
+        filename for filename in all_files if filename.endswith('oppia.css')]
+
+    css_in_html_result = multiprocessing.Queue()
+    css_in_html_stdout = multiprocessing.Queue()
+
+    linting_processes = []
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_css_files, args=(
+            stylelint_path,
+            config_path_for_css_in_html,
+            html_files_to_lint_for_css, css_in_html_stdout,
+            css_in_html_result)))
+
+    css_result = multiprocessing.Queue()
+    css_stdout = multiprocessing.Queue()
+
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_css_files, args=(
+            stylelint_path,
+            config_path_for_oppia_css,
+            css_files_to_lint, css_stdout,
+            css_result)))
 
     js_result = multiprocessing.Queue()
-    linting_processes = []
     js_stdout = multiprocessing.Queue()
+
     linting_processes.append(multiprocessing.Process(
         target=_lint_js_files, args=(
             node_path, eslint_path, js_files_to_lint,
             js_stdout, js_result)))
 
     py_result = multiprocessing.Queue()
+
     linting_processes.append(multiprocessing.Process(
         target=_lint_py_files,
         args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result)))
-    print 'Starting Javascript and Python Linting'
+
+    print 'Starting CSS, Javascript and Python Linting'
     print '----------------------------------------'
+
     for process in linting_processes:
+        process.daemon = True
         process.start()
 
     for process in linting_processes:
         # Require timeout parameter to prevent against endless waiting for the
         # linting function to return.
-        process.join(timeout=600)
+        process.join(timeout=200)
 
     js_messages = []
     while not js_stdout.empty():
@@ -568,6 +666,8 @@ def _pre_commit_linter(all_files):
     print '\n'.join(js_messages)
     print '----------------------------------------'
     summary_messages = []
+    summary_messages.append(css_in_html_result.get())
+    summary_messages.append(css_result.get())
     summary_messages.append(js_result.get())
     summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
@@ -697,6 +797,12 @@ def _check_bad_patterns(all_files):
 
             if filename.endswith('.html'):
                 for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
+                    if _check_bad_pattern_in_file(filename, content, regexp):
+                        failed = True
+                        total_error_count += 1
+
+            if filename.endswith('.py'):
+                for regexp in BAD_PATTERNS_PYTHON_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
                         total_error_count += 1
@@ -1194,8 +1300,7 @@ def _check_html_indent(all_files):
 
 def main():
     all_files = _get_all_files()
-    # TODO(apb7): Enable the _check_directive_scope function.
-    directive_scope_messages = []
+    directive_scope_messages = _check_directive_scope(all_files)
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
