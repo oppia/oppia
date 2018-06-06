@@ -18,13 +18,18 @@
 
 import ast
 
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import feedback_jobs_one_off
 from core.domain import feedback_services
+from core.domain import rights_manager
 from core.domain import subscription_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 
-(feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+(suggestion_models, feedback_models) = models.Registry.import_models([
+    models.NAMES.suggestion, models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -253,3 +258,108 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(threads[3].last_updated, threads_old[3].last_updated)
         self.assertEqual(threads[4].last_updated, threads_old[4].last_updated)
         self.assertEqual(threads[5].last_updated, threads_old[5].last_updated)
+
+
+class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
+    """Tests for the suggestion migration one-off job."""
+
+    AUTHOR_EMAIL = 'author@example.com'
+
+    EXP_ID = 'eid1'
+    TRANSLATION_LANGUAGE_CODE = 'en'
+
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            feedback_jobs_one_off.SuggestionMigrationOneOffJob.create_new())
+        feedback_jobs_one_off.SuggestionMigrationOneOffJob.enqueue(
+            job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+    def setUp(self):
+        super(SuggestionMigrationOneOffJobTest, self).setUp()
+
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.AUTHOR_EMAIL, 'author')
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
+
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
+        # Login and create exploration and suggestions.
+        self.login(self.EDITOR_EMAIL)
+
+        # Create exploration.
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id,
+            title='Exploration for suggestions',
+            category='Algebra', objective='Test a suggestion.')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        init_state = exploration.states[exploration.init_state_name]
+        init_interaction = init_state.interaction
+        init_interaction.default_outcome.dest = exploration.init_state_name
+        exploration.add_states(['State 1'])
+
+        self.old_content = exp_domain.SubtitledHtml('old content', {
+            self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
+                'filename.mp3', 20, False)
+        }).to_dict()
+
+        # Create content in State A with a single audio subtitle.
+        exploration.states['State 1'].update_content(self.old_content)
+        exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
+        rights_manager.assign_role_for_exploration(
+            self.editor, self.EXP_ID, self.owner_id,
+            rights_manager.ROLE_EDITOR)
+
+
+
+    def test_migration_suggestion(self):
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        feedback_services.create_suggestion(
+            self.EXP_ID, self.author_id, exploration.version, 'State 1',
+            'description', 'new_value')
+
+        self._run_one_off_job()
+
+        suggestion = (
+            suggestion_models.GeneralSuggestionModel
+            .get_suggestions_by_target_id('exploration', self.EXP_ID)[0])
+
+        expected_change_cmd = {
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+            'state_name': 'State 1',
+            'new_value': {
+                'html': 'new_value',
+                'audio_translations': {}
+            }
+        }
+
+        #self.assertEqual(suggestion, 1)
+        self.assertEqual(suggestion.id.split('.')[0], 'exploration')
+        self.assertEqual(suggestion.id.split('.')[1], self.EXP_ID)
+        self.assertEqual(
+            suggestion.suggestion_type,
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
+        self.assertEqual(
+            suggestion.target_type, suggestion_models.TARGET_TYPE_EXPLORATION)
+        self.assertEqual(suggestion.target_id, self.EXP_ID)
+        self.assertEqual(
+            suggestion.target_version_at_submission, exploration.version)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_RECEIVED)
+        self.assertEqual(suggestion.author_id, self.author_id)
+        self.assertEqual(suggestion.final_reviewer_id, None)
+        self.assertEqual(suggestion.assigned_reviewer_id, None)
+        self.assertDictEqual(
+            suggestion.change_cmd, expected_change_cmd)
+        self.assertEqual(
+            suggestion.score_category, 'content.' + exploration.category)
