@@ -16,6 +16,7 @@
 
 """Commands for operations on topics, and related models."""
 
+import copy
 import logging
 
 from core.domain import role_services
@@ -312,6 +313,95 @@ def update_topic(
     create_topic_summary(topic.id)
 
 
+def delete_skill(user_id, topic_id, skill_id):
+    """Removes skill with given id from the topic.
+
+    Args:
+        user_id: str. The id of the user who is performing the action.
+        topic_id: str. The id of the topic from which to remove the skill.
+        skill_id: str. The skill to remove from the topic.
+    """
+    topic = get_topic_by_id(topic_id)
+    old_skill_ids = copy.deepcopy(topic.skill_ids)
+    topic.delete_skill(skill_id)
+    change_list = [topic_domain.TopicChange({
+        'cmd': 'update_topic_property',
+        'property_name': 'skill_ids',
+        'old_value': old_skill_ids,
+        'new_value': topic.skill_ids
+    })]
+    update_topic(
+        user_id, topic_id, change_list, 'Removed %s from skill ids' % skill_id)
+
+
+def add_skill(user_id, topic_id, skill_id):
+    """Adds a skill with given id to the topic.
+
+    Args:
+        user_id: str. The id of the user who is performing the action.
+        topic_id: str. The id of the topic to which the skill is to be added.
+        skill_id: str. The skill to add to the topic.
+    """
+    topic = get_topic_by_id(topic_id)
+    old_skill_ids = copy.deepcopy(topic.skill_ids)
+    topic.add_skill(skill_id)
+    change_list = [topic_domain.TopicChange({
+        'cmd': 'update_topic_property',
+        'property_name': 'skill_ids',
+        'old_value': old_skill_ids,
+        'new_value': topic.skill_ids
+    })]
+    update_topic(
+        user_id, topic_id, change_list, 'Added %s to skill ids' % skill_id)
+
+
+def delete_story(user_id, topic_id, story_id):
+    """Removes story with given id from the topic.
+
+    NOTE TO DEVELOPERS: Presently, this function only removes story_id from
+    canonical_story_ids list.
+
+    Args:
+        user_id: str. The id of the user who is performing the action.
+        topic_id: str. The id of the topic from which to remove the story.
+        story_id: str. The story to remove from the topic.
+    """
+    topic = get_topic_by_id(topic_id)
+    old_canonical_story_ids = copy.deepcopy(topic.canonical_story_ids)
+    topic.delete_story(story_id)
+    change_list = [topic_domain.TopicChange({
+        'cmd': 'update_topic_property',
+        'property_name': 'canonical_story_ids',
+        'old_value': old_canonical_story_ids,
+        'new_value': topic.canonical_story_ids
+    })]
+    update_topic(
+        user_id, topic_id, change_list,
+        'Removed %s from canonical story ids' % story_id)
+
+
+def add_canonical_story(user_id, topic_id, story_id):
+    """Adds a story to the canonical story id list of a topic.
+
+    Args:
+        user_id: str. The id of the user who is performing the action.
+        topic_id: str. The id of the topic to which the story is to be added.
+        story_id: str. The story to add to the topic.
+    """
+    topic = get_topic_by_id(topic_id)
+    old_canonical_story_ids = copy.deepcopy(topic.canonical_story_ids)
+    topic.add_canonical_story(story_id)
+    change_list = [topic_domain.TopicChange({
+        'cmd': 'update_topic_property',
+        'property_name': 'canonical_story_ids',
+        'old_value': old_canonical_story_ids,
+        'new_value': topic.canonical_story_ids
+    })]
+    update_topic(
+        user_id, topic_id, change_list,
+        'Added %s to canonical story ids' % story_id)
+
+
 def delete_topic(committer_id, topic_id, force_deletion=False):
     """Deletes the topic with the given topic_id.
 
@@ -535,7 +625,6 @@ def assign_role(committer, assignee, new_role, topic_id):
     """
     committer_id = committer.user_id
     topic_rights = get_topic_rights(topic_id)
-
     if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
             committer.actions):
         logging.error(
