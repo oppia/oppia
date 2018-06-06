@@ -480,6 +480,11 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         if calc_output_domain_object is None:
             continue
 
+        # Don't show top unresolved answers calculation ouutput in stats of
+        # exploration.
+        if calculation_id == 'TopNUnresolvedAnswersByFrequency':
+            continue
+
         # If the output was associated with a different interaction ID, skip the
         # results. This filtering step is needed since the same calculation_id
         # can be shared across multiple interaction types.
