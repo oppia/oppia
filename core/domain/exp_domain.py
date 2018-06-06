@@ -285,6 +285,9 @@ class ExplorationChange(object):
         elif self.cmd == CMD_CREATE_NEW:
             self.title = change_dict['title']
             self.category = change_dict['category']
+        elif self.cmd.endswith('revert_version_number'):
+            # If commit is an exploration version revert commit.
+            self.version_number = change_dict['version_number']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
 
