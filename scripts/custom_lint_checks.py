@@ -111,7 +111,7 @@ class HangingIndentChecker(BaseChecker):
         """Process a module.
 
         Args:
-            node: Node to access module content.
+            node: astroid.scoped_nodes.Function. Node to access module content.
         """
         file_content = node.stream().readlines()
         file_length = len(file_content)
@@ -269,6 +269,15 @@ class DocstringParameterChecker(BaseChecker):
         self.check_functiondef_yields(node, node_doc)
 
     def check_functiondef_params(self, node, node_doc):
+        """Checks whether all parameters in a function definition are
+        documented.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+            node_doc: Docstring. Pylint Docstring class instance representing
+                a node's docstring.
+        """
         node_allow_no_param = None
         if node.name in self.constructor_names:
             class_node = checker_utils.node_frame_class(node)
@@ -297,6 +306,15 @@ class DocstringParameterChecker(BaseChecker):
             node_doc, node.args, node, node_allow_no_param)
 
     def check_functiondef_returns(self, node, node_doc):
+        """Checks whether a function documented with a return value actually has
+        a return statement in its definition.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+            node_doc: Docstring. Pylint Docstring class instance representing
+                a node's docstring.
+        """
         if not node_doc.supports_yields and node.is_generator():
             return
 
@@ -311,6 +329,15 @@ class DocstringParameterChecker(BaseChecker):
                 node=node)
 
     def check_functiondef_yields(self, node, node_doc):
+        """Checks whether a function documented with a yield value actually has
+        a yield statement in its definition.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+            node_doc: Docstring. Pylint Docstring class instance representing
+                a node's docstring.
+        """
         if not node_doc.supports_yields:
             return
 
@@ -321,6 +348,13 @@ class DocstringParameterChecker(BaseChecker):
                 node=node)
 
     def visit_raise(self, node):
+        """Visits a function node that raises an exception and verifies that all
+        exceptions raised in the function definition are documented.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+        """
         func_node = node.frame()
         if not isinstance(func_node, astroid.FunctionDef):
             return
@@ -347,6 +381,13 @@ class DocstringParameterChecker(BaseChecker):
         self._add_raise_message(missing_excs, func_node)
 
     def visit_return(self, node):
+        """Visits a function node that contains a return statement and verifies
+        that the return value and the return type are documented.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+        """
         if not docstrings_checker.returns_something(node):
             return
 
@@ -375,6 +416,13 @@ class DocstringParameterChecker(BaseChecker):
             )
 
     def visit_yield(self, node):
+        """Visits a function node that contains a yield statement and verifies
+        that the yield value and the yield type are documented.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node for a function or
+                method definition in the AST.
+        """
         func_node = node.frame()
         if not isinstance(func_node, astroid.FunctionDef):
             return
@@ -403,6 +451,13 @@ class DocstringParameterChecker(BaseChecker):
             )
 
     def visit_yieldfrom(self, node):
+        """Visits a function node that contains a yield from statement and
+        verifies that the yield from value and the yield from type are
+        documented.
+
+        Args:
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
         self.visit_yield(node)
 
     def check_arguments_in_docstring(
@@ -520,6 +575,19 @@ class DocstringParameterChecker(BaseChecker):
                                 not_needed_type_in_docstring)
 
     def check_single_constructor_params(self, class_doc, init_doc, class_node):
+        """Checks whether a class and corresponding  init() method are
+        documented. If both of them are documented, it adds an error message.
+
+
+        Args:
+            class_doc: Docstring. Pylint docstring class instance representing
+                a class's docstring.
+            init_doc:  Docstring. Pylint docstring class instance representing
+                a method's docstring, the method here is the constructor method
+                for the above class.
+            class_node: astroid.scoped_nodes.Function. Node for class definition
+                in AST.
+        """
         if class_doc.has_params() and init_doc.has_params():
             self.add_message(
                 'multiple-constructor-doc',
@@ -527,6 +595,13 @@ class DocstringParameterChecker(BaseChecker):
                 node=class_node)
 
     def _handle_no_raise_doc(self, excs, node):
+        """Checks whether the raised exception in a function has been
+        documented, add a message otherwise.
+
+        Args:
+            excs: list(str). A list of exception types.
+            node: astroid.scoped_nodes.Function. Node to access module content.
+        """
         if self.config.accept_no_raise_doc:
             return
 
