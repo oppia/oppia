@@ -23,7 +23,7 @@ oppia.controller('Base', [
       SidebarStatusService) {
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
-    $scope.siteFeedbackFormURL = GLOBALS.SITE_FEEDBACK_FORM_URL;
+    $scope.siteFeedbackFormUrl = GLOBALS.SITE_FEEDBACK_FORM_URL;
     $scope.promoBarIsEnabled = GLOBALS.PROMO_BAR_IS_ENABLED;
     $scope.promoBarMessage = GLOBALS.PROMO_BAR_MESSAGE;
 

@@ -177,16 +177,16 @@
         </div>
       </div>
 
-        <div ng-if="DEV_MODE" class="oppia-dev-mode">
+      <div ng-if="DEV_MODE" class="oppia-dev-mode">
           Dev Mode
-        </div>
+      </div>
 
-        <a ng-if="siteFeedbackFormURL" ng-href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
+      <a ng-if="siteFeedbackFormUrl" ng-href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
            class="oppia-site-feedback oppia-transition-200">
           <i class="material-icons md-18">&#xE87F;</i>
             <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
           </i>
-        </a>
+      </a>
     {% endif %}
 
     {% include 'pages/footer_js_libs.html' %}
