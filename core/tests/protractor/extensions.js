@@ -26,14 +26,14 @@ var workflow = require('../protractor_utils/workflow.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-describe('rich-text components', function() {
+fdescribe('rich-text components', function() {
   var explorationPlayerPage = null;
 
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display correctly', function() {
+  fit('should display correctly', function() {
     users.createUser('user@richTextComponents.com', 'userRichTextComponents');
     users.login('user@richTextComponents.com');
 
