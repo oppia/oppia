@@ -35,6 +35,7 @@ STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS = 'prerequisite_skill_ids'
 STORY_NODE_PROPERTY_OUTLINE = 'outline'
 STORY_NODE_PROPERTY_EXPLORATION_ID = 'exploration_id'
 
+
 INITIAL_NODE_ID = 'initial_node_id'
 
 CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION = 'migrate_schema_to_latest_version'
@@ -48,6 +49,8 @@ CMD_UPDATE_STORY_CONTENTS_PROPERTY = 'update_story_contents_property'
 # These take node_id as parameter.
 CMD_ADD_STORY_NODE = 'add_story_node'
 CMD_DELETE_STORY_NODE = 'delete_story_node'
+CMD_FINALIZE_STORY_NODE_OUTLINE = 'finalize_story_node_outline'
+CMD_RESET_STORY_NODE_OUTLINE_STATUS = 'reset_story_node_outline_status'
 
 # This takes additional 'title' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -98,6 +101,10 @@ class StoryChange(object):
         if self.cmd == CMD_ADD_STORY_NODE:
             self.node_id = change_dict['node_id']
         elif self.cmd == CMD_DELETE_STORY_NODE:
+            self.node_id = change_dict['node_id']
+        elif self.cmd == CMD_FINALIZE_STORY_NODE_OUTLINE:
+            self.node_id = change_dict['node_id']
+        elif self.cmd == CMD_RESET_STORY_NODE_OUTLINE_STATUS:
             self.node_id = change_dict['node_id']
         elif self.cmd == CMD_UPDATE_STORY_NODE_PROPERTY:
             if (change_dict['property_name'] not in
@@ -152,7 +159,7 @@ class StoryNode(object):
     def __init__(
             self, node_id, destination_node_ids,
             acquired_skill_ids, prerequisite_skill_ids,
-            outline, exploration_id):
+            outline, outlines_are_finalized, exploration_id):
         """Initializes a StoryNode domain object.
 
         Args:
@@ -167,6 +174,8 @@ class StoryNode(object):
                 can use to construct the exploration. It describes the basic
                 theme or template of the story and is to be provided in html
                 form.
+            outlines_are_finalized: bool. Whether the outlines for the story
+                node are finalized or not.
             exploration_id: str or None. The valid exploration id that fits the
                 story node. It can be None initially, when the story creator
                 has just created a story with the basic storyline (by providing
@@ -177,6 +186,7 @@ class StoryNode(object):
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
         self.outline = html_cleaner.clean(outline)
+        self.outlines_are_finalized = outlines_are_finalized
         self.exploration_id = exploration_id
 
     @classmethod
@@ -230,6 +240,7 @@ class StoryNode(object):
             'acquired_skill_ids': self.acquired_skill_ids,
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
             'outline': self.outline,
+            'outlines_are_finalized': self.outlines_are_finalized,
             'exploration_id': self.exploration_id
         }
 
@@ -247,7 +258,7 @@ class StoryNode(object):
             node_dict['id'], node_dict['destination_node_ids'],
             node_dict['acquired_skill_ids'],
             node_dict['prerequisite_skill_ids'], node_dict['outline'],
-            node_dict['exploration_id'])
+            node_dict['outlines_are_finalized'], node_dict['exploration_id'])
 
         return node
 
@@ -262,7 +273,7 @@ class StoryNode(object):
             StoryNode. The StoryNode domain object with default
             value.
         """
-        return cls(node_id, [], [], [], '', None)
+        return cls(node_id, [], [], [], '', False, None)
 
     def validate(self):
         """Validates various properties of the story node.
@@ -281,6 +292,11 @@ class StoryNode(object):
             raise utils.ValidationError(
                 'Expected outline to be a string, received %s' %
                 self.outline)
+
+        if not isinstance(self.outlines_are_finalized, bool):
+            raise utils.ValidationError(
+                'Expected outlines_are_finalized to be a boolean, received %s' %
+                self.outlines_are_finalized)
 
         self.require_valid_node_id(self.id)
 
@@ -769,6 +785,38 @@ class Story(object):
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].outline = new_outline
+
+    def finalize_node_outline(self, node_id):
+        """Marks the outlines_are_finalized fields of the node with the given
+        node_id as True.
+
+        Args:
+            node_id: str. The id of the node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].outlines_are_finalized = True
+
+    def reset_finalized_status(self, node_id):
+        """Marks the outlines_are_finalized fields of the node with the given
+        node_id as False.
+
+        Args:
+            node_id: str. The id of the node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        if node_index is None:
+            raise ValueError(
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].outlines_are_finalized = False
 
     def update_node_acquired_skill_ids(self, node_id, new_acquired_skill_ids):
         """Updates the acquired skill ids field of a given node.

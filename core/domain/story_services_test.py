@@ -128,6 +128,10 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': [self.NODE_ID_1]
             }),
             story_domain.StoryChange({
+                'cmd': story_domain.CMD_FINALIZE_STORY_NODE_OUTLINE,
+                'node_id': self.NODE_ID_2
+            }),
+            story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
                 'property_name': (
                     story_domain.INITIAL_NODE_ID),
@@ -141,6 +145,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             story.story_contents.nodes[1].destination_node_ids,
             [self.NODE_ID_1])
+        self.assertEqual(
+            story.story_contents.nodes[1].outlines_are_finalized, True)
         self.assertEqual(story.story_contents.initial_node_id, self.NODE_ID_2)
         self.assertEqual(story.story_contents.next_node_id, 'node_3')
         self.assertEqual(story.version, 2)
@@ -152,7 +158,11 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_DELETE_STORY_NODE,
                 'node_id': self.NODE_ID_1
-            })
+            }),
+            story_domain.StoryChange({
+                'cmd': story_domain.CMD_RESET_STORY_NODE_OUTLINE_STATUS,
+                'node_id': self.NODE_ID_2
+            }),
         ]
         story_services.update_story(
             self.USER_ID, self.STORY_ID, changelist,
@@ -161,6 +171,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         story = story_services.get_story_by_id(self.STORY_ID)
         self.assertEqual(story_summary.node_count, 1)
         self.assertEqual(story.story_contents.nodes[0].destination_node_ids, [])
+        self.assertEqual(
+            story.story_contents.nodes[0].outlines_are_finalized, False)
 
     def test_delete_story(self):
         story_services.delete_story(self.USER_ID, self.STORY_ID)

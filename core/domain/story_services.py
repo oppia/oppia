@@ -266,6 +266,10 @@ def apply_change_list(story_id, change_list):
                 story.add_node(change.node_id)
             elif change.cmd == story_domain.CMD_DELETE_STORY_NODE:
                 story.delete_node(change.node_id)
+            elif change.cmd == story_domain.CMD_FINALIZE_STORY_NODE_OUTLINE:
+                story.finalize_node_outline(change.node_id)
+            elif change.cmd == story_domain.CMD_RESET_STORY_NODE_OUTLINE_STATUS:
+                story.reset_finalized_status(change.node_id)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
                 if (change.property_name ==
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):
