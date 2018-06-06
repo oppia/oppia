@@ -81,7 +81,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '  audio_translations: {}',
+        text: '  content_id: .*',
         highlighted: false
       },
       4: {
@@ -109,7 +109,7 @@ describe('Exploration history', function() {
         highlighted: true
       },
       10: {
-        text: '        audio_translations: {}',
+        text: '  content_id: .*',
         highlighted: true
       },
       11: {
@@ -220,7 +220,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '  audio_translations: {}',
+        text: '  content_id: .*',
         highlighted: false
       },
       4: {
@@ -258,7 +258,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       12: {
-        text: '      audio_translations: {}',
+        text: '  content_id: .*',
         highlighted: false
       },
       13: {
@@ -302,7 +302,7 @@ describe('Exploration history', function() {
     var STATE_2_STRING =
       'classifier_model_id: null\n' +
       'content:\n' +
-      '  audio_translations: {}\n' +
+      '  content_id: .*\n' +
       '  html: <p>this is card 2</p>\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
@@ -313,7 +313,7 @@ describe('Exploration history', function() {
       '  default_outcome:\n' +
       '    dest: final card\n' +
       '    feedback:\n' +
-      '      audio_translations: {}\n' +
+      '      content_id: .*\n' +
       '      html: \'\'\n' +
       '    labelled_as_correct: false\n' +
       '    param_changes: []\n' +
