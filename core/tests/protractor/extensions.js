@@ -99,7 +99,7 @@ describe('rich-text components', function() {
       'Error parsing header X-XSS-Protection: 1; mode=block; ' +
       'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
 
-      'https://www.youtube.com/youtubei/v1/log_interaction?alt=json&' +
+      'https:\/\/www.youtube.com\/youtubei\/v1\/log_interaction?alt=json&' +
       'key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8 - Failed to load resource:' +
       'the server responded with a status of 401 ()',
     ]);
