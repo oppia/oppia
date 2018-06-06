@@ -23,11 +23,11 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT',
+  'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT', 'ImagePreloaderService',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT) {
+      EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT, ImagePreloaderService) {
     return {
       restrict: 'E',
       scope: {
@@ -44,12 +44,12 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.highlightRegionsOnHover =
             ($attrs.highlightRegionsOnHoverWithValue === 'true');
           $scope.filepath = imageAndRegions.imagePath;
-          $scope.imageUrl = (
-            $scope.filepath ?
-              $sce.trustAsResourceUrl(
-                '/imagehandler/' +
-                ExplorationContextService.getExplorationId() +
-                '/' + encodeURIComponent($scope.filepath)) : null);
+          $scope.imageUrl = '';
+
+          ImagePreloaderService.getImageUrl($scope.filepath)
+            .then(function(objectUrl) {
+              $scope.imageUrl = objectUrl;
+            });
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
