@@ -79,7 +79,7 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         with self.swap(feconf, 'DEV_MODE', False):
             response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
             self.assertIn('DEV_MODE: JSON.parse(\'false\')',
-                             response.body)
+                          response.body)
 
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
