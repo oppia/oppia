@@ -14,6 +14,7 @@
 
 """Domain objects relating to stories."""
 
+import copy
 import re
 
 from constants import constants
@@ -104,21 +105,21 @@ class StoryChange(object):
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.node_id = change_dict['node_id']
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_UPDATE_STORY_PROPERTY:
             if change_dict['property_name'] not in self.STORY_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_UPDATE_STORY_CONTENTS_PROPERTY:
             if change_dict['property_name'] not in (
                     self.STORY_CONTENTS_PROPERTIES):
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION:
             self.from_version = change_dict['from_version']
             self.to_version = change_dict['to_version']
