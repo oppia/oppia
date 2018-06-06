@@ -46,14 +46,24 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.story.validate()
 
+    def _assert_valid_story_id(self, expected_error_substring, story_id):
+        """Checks that the story id is valid."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            story_domain.Story.require_valid_story_id(story_id)
+
+    def test_valid_story_id(self):
+        self._assert_valid_story_id('Story id should be a string', 10)
+        self._assert_valid_story_id('Invalid story id', 'abc')
+
     def test_defaults(self):
         """Test the create_default_story and create_default_story_node
         method of class Story.
         """
-        story = story_domain.Story.create_default_story(self.STORY_ID)
+        story = story_domain.Story.create_default_story(self.STORY_ID, 'Title')
         expected_story_dict = {
             'id': self.STORY_ID,
-            'title': feconf.DEFAULT_STORY_TITLE,
+            'title': 'Title',
             'description': feconf.DEFAULT_STORY_DESCRIPTION,
             'notes': feconf.DEFAULT_STORY_NOTES,
             'story_contents': {
@@ -77,7 +87,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
     def test_title_validation(self):
         self.story.title = 1
         self._assert_validation_error(
-            'Expected title to be a string, received 1')
+            'Title should be a string')
 
     def test_description_validation(self):
         self.story.description = 1
