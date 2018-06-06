@@ -43,8 +43,8 @@ STATUS_RECEIVED = 'received'
 STATUS_CHOICES = [
     STATUS_ACCEPTED,
     STATUS_IN_REVIEW,
-    STATUS_REJECTED,
-    STATUS_RECEIVED
+    STATUS_RECEIVED,
+    STATUS_REJECTED
 ]
 
 # Constants defining various suggestion types.

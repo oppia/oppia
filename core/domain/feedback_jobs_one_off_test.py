@@ -268,7 +268,6 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
     EXP_ID = 'eid1'
     TRANSLATION_LANGUAGE_CODE = 'en'
 
-
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
         job_id = (
@@ -319,8 +318,6 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         rights_manager.assign_role_for_exploration(
             self.editor, self.EXP_ID, self.owner_id,
             rights_manager.ROLE_EDITOR)
-
-
 
     def test_migration_suggestion(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)

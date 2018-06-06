@@ -22,8 +22,8 @@ import logging
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
-from core.domain import feedback_services
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.platform import models
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
@@ -132,9 +132,6 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             exp_services.get_exploration_by_id(
                 suggestion.exploration_id).category)
 
-        old_content = exp_services.get_exploration_by_id(
-            suggestion.exploration_id, version=suggestion.exploration_version)
-
         # For old accepted/rejected suggestions, the audio_translations field
         # below value is not derivable as it is set only when the
         # suggestion is accepted and that exploration version is unknown to us.
@@ -154,7 +151,8 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
         suggestion_models.GeneralSuggestionModel(
             id=suggestion_id,
-            suggestion_type=suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+            suggestion_type=suggestion_models
+            .SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
             target_id=suggestion.exploration_id,
             target_version_at_submission=suggestion.exploration_version,
@@ -163,6 +161,6 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             change_cmd=change_cmd, score_category=score_category,
             created_on=suggestion.created_on, deleted=suggestion.deleted).put()
 
-        @staticmethod
-        def reduce(key, value):
-            pass
+    @staticmethod
+    def reduce(key, value):
+        pass
