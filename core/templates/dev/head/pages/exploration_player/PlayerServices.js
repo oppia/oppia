@@ -342,9 +342,8 @@ oppia.factory('ExplorationPlayerService', [
       getSolution: function(stateName) {
         return exploration.getInteraction(stateName).solution;
       },
-      getContenIdsToAudioTranslations: function(stateName) {
-        return exploration.getInteraction(
-          stateName).contenIdsToAudioTranslations;
+      getContentIdsToAudioTranslations: function(stateName) {
+        return exploration.getState(stateName).contentIdsToAudioTranslations;
       },
       isLoggedIn: function() {
         return _isLoggedIn;

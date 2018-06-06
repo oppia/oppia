@@ -3337,12 +3337,12 @@ class Exploration(object):
                     new_content_id)
 
             if state_dict['interaction']['default_outcome']:
-                dafault_outcome = state_dict['interaction']['default_outcome']
+                default_outcome = state_dict['interaction']['default_outcome']
                 new_content_id = utils.generate_content_id(list(
                     content_ids_to_audio_translations.keys()))
                 content_ids_to_audio_translations[new_content_id] = (
-                    dafault_outcome['feedback'].pop('audio_translations'))
-                dafault_outcome['feedback']['content_id'] = (new_content_id)
+                    default_outcome['feedback'].pop('audio_translations'))
+                default_outcome['feedback']['content_id'] = (new_content_id)
 
             for hint in state_dict['interaction']['hints']:
                 new_content_id = utils.generate_content_id(list(

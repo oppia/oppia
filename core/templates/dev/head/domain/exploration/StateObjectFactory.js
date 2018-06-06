@@ -42,7 +42,7 @@ oppia.factory('StateObjectFactory', [
           return paramChange.toBackendDict();
         }),
         content_ids_to_audio_translations: (
-          contentIdsToAudioTranslations.toBackendDict())
+          this.contentIdsToAudioTranslations.toBackendDict())
       };
     };
 
