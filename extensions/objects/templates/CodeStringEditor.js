@@ -27,11 +27,13 @@ oppia.directive('codeStringEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        getAlwaysEditable: '&',
+        value: '='
+      },
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = $scope.$parent.alwaysEditable;
-
+        $scope.alwaysEditable = $scope.getAlwaysEditable();
         $scope.getWarningText = function() {
           if ($scope.localValue.label.indexOf('\t') !== -1) {
             return 'Code may not contain tab characters.';
@@ -41,14 +43,14 @@ oppia.directive('codeStringEditor', [
 
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('$parent.value', function() {
+        $scope.$watch('value', function() {
           $scope.localValue = {
-            label: $scope.$parent.value || ''
+            label: $scope.value || ''
           };
         }, true);
 
         $scope.$watch('localValue.label', function(newValue) {
-          $scope.$parent.value = newValue;
+          $scope.value = newValue;
         });
       }]
     };
