@@ -34,6 +34,8 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.signup('b@example.com', 'B')
         self.topic = topic_domain.Topic.create_default_topic(
             self.topic_id, 'Name')
+        self.topic.subtopics = [
+            topic_domain.Subtopic('id_1', 'Title', ['skill_id_1'])]
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
@@ -51,29 +53,13 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'description': feconf.DEFAULT_TOPIC_DESCRIPTION,
             'canonical_story_ids': [],
             'additional_story_ids': [],
-            'skill_ids': [],
+            'uncategorized_skill_ids': [],
+            'subtopics': [],
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
+            'schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             'version': 0
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
-
-    def test_add_skill(self):
-        self.topic.skill_ids = ['skill_id_1', 'skill_id_2']
-        self.topic.add_skill('skill_id_3')
-        self.assertEqual(
-            self.topic.skill_ids, ['skill_id_1', 'skill_id_2', 'skill_id_3'])
-        with self.assertRaisesRegexp(
-            Exception, 'The skill id skill_id_3 is already present in '
-            'the topic'):
-            self.topic.add_skill('skill_id_3')
-
-    def test_delete_skill(self):
-        self.topic.skill_ids = ['skill_id', 'skill_id_1', 'skill_id_2']
-        self.topic.delete_skill('skill_id_1')
-        self.assertEqual(self.topic.skill_ids, ['skill_id', 'skill_id_2'])
-        with self.assertRaisesRegexp(
-            Exception, 'The skill id skill_id_5 is not present in the topic'):
-            self.topic.delete_skill('skill_id_5')
 
     def test_delete_story(self):
         self.topic.canonical_story_ids = [
@@ -114,6 +100,21 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_valid_topic_id('Topic id should be a string', 10)
         self._assert_valid_topic_id('Topic id abc is invalid', 'abc')
 
+    def test_subtopic_title_validation(self):
+        self.topic.subtopics[0].title = 1
+        self._assert_validation_error('Expected subtopic title to be a string')
+
+    def test_subtopic_skill_ids_validation(self):
+        self.topic.subtopics[0].skill_ids = 'abc'
+        self._assert_validation_error('Expected skill ids to be a list')
+        self.topic.subtopics[0].skill_ids = ['skill_id', 'skill_id']
+        self._assert_validation_error(
+            'The skill id skill_id is duplicated in the subtopic')
+
+    def test_subtopics_validation(self):
+        self.topic.subtopics = 'abc'
+        self._assert_validation_error('Expected subtopics to be a list')
+
     def test_name_validation(self):
         self.topic.name = 1
         self._assert_validation_error('Name should be a string')
@@ -152,9 +153,33 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'Expected additional story ids list and canonical story '
             'ids list to be mutually exclusive.')
 
-    def test_skill_ids_validation(self):
-        self.topic.skill_ids = 'skill_id'
-        self._assert_validation_error('Expected skill ids to be a list')
+    def test_uncategorized_skill_ids_validation(self):
+        self.topic.uncategorized_skill_ids = 'uncategorized_skill_id'
+        self._assert_validation_error(
+            'Expected uncategorized skill ids to be a list')
+
+    def test_add_uncategorized_skill_id(self):
+        self.topic.subtopics.append(
+            topic_domain.Subtopic('id_2', 'Title2', ['skill_id_2']))
+        with self.assertRaisesRegexp(
+            Exception,
+            'The skill id skill_id_1 already exists in subtopic with id id_1'):
+            self.topic.add_uncategorized_skill_id('skill_id_1')
+        self.topic.add_uncategorized_skill_id('skill_id_3')
+        self.assertEqual(self.topic.uncategorized_skill_ids, ['skill_id_3'])
+
+    def test_remove_uncategorized_skill_id(self):
+        self.topic.uncategorized_skill_ids = ['skill_id_5']
+        with self.assertRaisesRegexp(
+            Exception,
+            'The skill id skill_id_3 is not present in the topic'):
+            self.topic.remove_uncategorized_skill_id('skill_id_3')
+        self.topic.remove_uncategorized_skill_id('skill_id_5')
+        self.assertEqual(self.topic.uncategorized_skill_ids, [])
+
+    def test_get_subtopic_index(self):
+        self.assertIsNone(self.topic.get_subtopic_index('id_2'))
+        self.assertEqual(self.topic.get_subtopic_index('id_1'), 0)
 
     def test_to_dict(self):
         user_ids = [self.user_id_a, self.user_id_b]

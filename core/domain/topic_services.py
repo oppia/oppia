@@ -30,6 +30,37 @@ datastore_services = models.Registry.import_datastore_services()
 memcache_services = models.Registry.import_memcache_services()
 
 
+def _migrate_subtopics_to_latest_schema(versioned_subtopics):
+    """Holds the responsibility of performing a step-by-step, sequential update
+    of the subtopics structure based on the schema version of the input
+    subtopics dictionary. If the current subtopics schema changes, a
+    new conversion function must be added and some code appended to this
+    function to account for that new version.
+
+    Args:
+        versioned_subtopics: A dict with two keys:
+          - schema_version: int. The schema version for the subtopics dict.
+          - subtopics: list(dict). The list of dicts comprising the topic's
+              subtopics.
+
+    Raises:
+        Exception: The schema version of subtopics is outside of what
+            is supported at present.
+    """
+    subtopic_schema_version = versioned_subtopics['schema_version']
+    if not (1 <= subtopic_schema_version
+            <= feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+        raise Exception(
+            'Sorry, we can only process v1-v%d subtopic schemas at '
+            'present.' % feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION)
+
+    while (subtopic_schema_version <
+           feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+        topic_domain.Topic.update_subtopics_from_model(
+            versioned_subtopics, subtopic_schema_version)
+        subtopic_schema_version += 1
+
+
 # Repository GET methods.
 def _get_topic_memcache_key(topic_id, version=None):
     """Returns a memcache key for the topic.
@@ -47,22 +78,38 @@ def _get_topic_memcache_key(topic_id, version=None):
         return 'topic:%s' % topic_id
 
 
-def get_topic_from_model(topic_model):
+def get_topic_from_model(topic_model, run_conversion=True):
     """Returns a topic domain object given a topic model loaded
     from the datastore.
 
     Args:
         topic_model: TopicModel. The topic model loaded from the
             datastore.
+        run_conversion: bool. If true, the the topic's schema version will
+            be checked against the current schema version. If they do not match,
+            the topic will be automatically updated to the latest schema
+            version.
 
     Returns:
         topic. A Topic domain object corresponding to the given
-        topic model.
+            topic model.
     """
+    versioned_subtopics = {
+        'schema_version': topic_model.schema_version,
+        'subtopics': copy.deepcopy(topic_model.subtopics)
+    }
+    if (run_conversion and topic_model.schema_version !=
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+        _migrate_subtopics_to_latest_schema(versioned_subtopics)
     return topic_domain.Topic(
         topic_model.id, topic_model.name,
         topic_model.description, topic_model.canonical_story_ids,
-        topic_model.additional_story_ids, topic_model.skill_ids,
+        topic_model.additional_story_ids, topic_model.uncategorized_skill_ids,
+        [
+            topic_domain.Subtopic.from_dict(subtopic)
+            for subtopic in versioned_subtopics['subtopics']
+        ],
+        versioned_subtopics['schema_version'],
         topic_model.language_code,
         topic_model.version, topic_model.created_on,
         topic_model.last_updated)
@@ -173,7 +220,9 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         language_code=topic.language_code,
         canonical_story_ids=topic.canonical_story_ids,
         additional_story_ids=topic.additional_story_ids,
-        skill_ids=topic.skill_ids
+        uncategorized_skill_ids=topic.uncategorized_skill_ids,
+        schema_version=topic.schema_version,
+        subtopics=[subtopic.to_dict() for subtopic in topic.subtopics]
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -296,7 +345,9 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.name = topic.name
     topic_model.canonical_story_ids = topic.canonical_story_ids
     topic_model.additional_story_ids = topic.additional_story_ids
-    topic_model.skill_ids = topic.skill_ids
+    topic_model.uncategorized_skill_ids = topic.uncategorized_skill_ids
+    topic_model.subtopics = [subtopic.to_dict() for subtopic in topic.subtopics]
+    topic_model.schema_version = topic.schema_version
     topic_model.language_code = topic.language_code
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
@@ -329,46 +380,40 @@ def update_topic(
     create_topic_summary(topic.id)
 
 
-def delete_skill(user_id, topic_id, skill_id):
+def delete_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
     """Removes skill with given id from the topic.
 
     Args:
         user_id: str. The id of the user who is performing the action.
         topic_id: str. The id of the topic from which to remove the skill.
-        skill_id: str. The skill to remove from the topic.
+        uncategorized_skill_id: str. The uncategorized skill to remove from the
+            topic.
     """
-    topic = get_topic_by_id(topic_id)
-    old_skill_ids = copy.deepcopy(topic.skill_ids)
-    topic.delete_skill(skill_id)
     change_list = [topic_domain.TopicChange({
-        'cmd': 'update_topic_property',
-        'property_name': 'skill_ids',
-        'old_value': old_skill_ids,
-        'new_value': topic.skill_ids
+        'cmd': 'remove_uncategorized_skill_id',
+        'uncategorized_skill_id': uncategorized_skill_id
     })]
     update_topic(
-        user_id, topic_id, change_list, 'Removed %s from skill ids' % skill_id)
+        user_id, topic_id, change_list,
+        'Removed %s from uncategorized skill ids' % uncategorized_skill_id)
 
 
-def add_skill(user_id, topic_id, skill_id):
+def add_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
     """Adds a skill with given id to the topic.
 
     Args:
         user_id: str. The id of the user who is performing the action.
         topic_id: str. The id of the topic to which the skill is to be added.
-        skill_id: str. The skill to add to the topic.
+        uncategorized_skill_id: str. The id of the uncategorized skill to add
+            to the topic.
     """
-    topic = get_topic_by_id(topic_id)
-    old_skill_ids = copy.deepcopy(topic.skill_ids)
-    topic.add_skill(skill_id)
     change_list = [topic_domain.TopicChange({
-        'cmd': 'update_topic_property',
-        'property_name': 'skill_ids',
-        'old_value': old_skill_ids,
-        'new_value': topic.skill_ids
+        'cmd': 'add_uncategorized_skill_id',
+        'new_uncategorized_skill_id': uncategorized_skill_id
     })]
     update_topic(
-        user_id, topic_id, change_list, 'Added %s to skill ids' % skill_id)
+        user_id, topic_id, change_list,
+        'Added %s to uncategorized skill ids' % uncategorized_skill_id)
 
 
 def delete_story(user_id, topic_id, story_id):
@@ -516,7 +561,8 @@ def save_topic_summary(topic_summary):
         version=topic_summary.version,
         additional_story_count=topic_summary.additional_story_count,
         canonical_story_count=topic_summary.canonical_story_count,
-        skill_count=topic_summary.skill_count,
+        uncategorized_skill_count=topic_summary.uncategorized_skill_count,
+        subtopic_count=topic_summary.subtopic_count,
         topic_model_last_updated=topic_summary.topic_model_last_updated,
         topic_model_created_on=topic_summary.topic_model_created_on
     )

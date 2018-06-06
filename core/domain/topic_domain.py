@@ -45,7 +45,7 @@ SUBTOPIC_PROPERTY_SKILL_IDS = 'skill_ids'
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
-CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill'
+CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
@@ -213,7 +213,8 @@ class Topic(object):
     def __init__(
             self, topic_id, name, description, canonical_story_ids,
             additional_story_ids, uncategorized_skill_ids, subtopics,
-            language_code, version, created_on=None, last_updated=None):
+            schema_version, language_code, version, created_on=None,
+            last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
@@ -228,6 +229,8 @@ class Topic(object):
                 uncategorized skill ids that are not part of any subtopic.
             subtopics: list(Subtopic). The list of subtopics that are part of
                 the topic.
+            schema_version: int. The current schema version of the subtopics
+                dict.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -243,6 +246,7 @@ class Topic(object):
         self.additional_story_ids = additional_story_ids
         self.uncategorized_skill_ids = uncategorized_skill_ids
         self.subtopics = subtopics
+        self.schema_version = schema_version
         self.language_code = language_code
         self.created_on = created_on
         self.last_updated = last_updated
@@ -261,6 +265,7 @@ class Topic(object):
             'canonical_story_ids': self.canonical_story_ids,
             'additional_story_ids': self.additional_story_ids,
             'language_code': self.language_code,
+            'schema_version': self.schema_version,
             'uncategorized_skill_ids': self.uncategorized_skill_ids,
             'subtopics': [
                 subtopic.to_dict() for subtopic in self.subtopics
@@ -341,8 +346,20 @@ class Topic(object):
                 'Expected subtopics to be a list, received %s'
                 % self.subtopics)
 
+        if not isinstance(self.schema_version, int):
+            raise utils.ValidationError(
+                'Expected schema version to be an integer, received %s'
+                % self.schema_version)
+
         for subtopic in self.subtopics:
+            if not isinstance(subtopic, Subtopic):
+                raise utils.ValidationError(
+                    'Expected each subtopic to be a Subtopic object, '
+                    'received %s' % subtopic)
             subtopic.validate()
+            for skill_id in subtopic.skill_ids:
+                if skill_id in self.uncategorized_skill_ids:
+                    self.uncategorized_skill_ids.remove(skill_id)
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
@@ -397,7 +414,36 @@ class Topic(object):
         return cls(
             topic_id, name,
             feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
+
+    @classmethod
+    def update_subtopics_from_model(
+            cls, versioned_subtopics, current_version):
+        """Converts the subtopics blob contained in the given
+        versioned_subtopics dict from current_version to
+        current_version + 1. Note that the versioned_subtopics being
+        passed in is modified in-place.
+
+        Args:
+            versioned_subtopics: dict. A dict with two keys:
+                - schema_version: str. The schema version for the
+                    subtopics dict.
+                - subtopics: list(dict). The list of dicts comprising the
+                    subtopics of the skill.
+            current_version: int. The current schema version of subtopics.
+        """
+        versioned_subtopics['schema_version'] = current_version + 1
+
+        conversion_fn = getattr(
+            cls, '_convert_subtopic_v%s_dict_to_v%s_dict' % (
+                current_version, current_version + 1))
+
+        updated_subtopics = []
+        for subtopic in versioned_subtopics['subtopics']:
+            updated_subtopics.append(conversion_fn(subtopic))
+
+        versioned_subtopics['subtopics'] = updated_subtopics
 
     def update_name(self, new_name):
         """Updates the name of a topic object.

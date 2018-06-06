@@ -31,15 +31,19 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'
     story_id_3 = 'story_3'
-    skill_id = 'skill'
+    subtopic_id = 'subtopic_1'
+    skill_id_1 = 'skill_1'
+    skill_id_2 = 'skill_2'
 
     def setUp(self):
         super(TopicServicesUnitTests, self).setUp()
         self.TOPIC_ID = topic_services.get_new_topic_id()
+        subtopic = topic_domain.Subtopic(
+            self.subtopic_id, 'Title', [self.skill_id_2])
         self.topic = self.save_new_topic(
             self.TOPIC_ID, self.user_id, 'Name', 'Description',
             [self.story_id_1, self.story_id_2], [self.story_id_3],
-            [self.skill_id], []
+            [self.skill_id_1], [subtopic]
         )
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
@@ -62,7 +66,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.name, 'Name')
         self.assertEqual(topic_summary.canonical_story_count, 2)
         self.assertEqual(topic_summary.additional_story_count, 1)
-        self.assertEqual(topic_summary.skill_count, 1)
+        self.assertEqual(topic_summary.uncategorized_skill_count, 1)
+        self.assertEqual(topic_summary.subtopic_count, 1)
 
     def test_get_new_topic_id(self):
         new_topic_id = topic_services.get_new_topic_id()
@@ -85,7 +90,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.name, 'Name')
         self.assertEqual(topic_summary.canonical_story_count, 2)
         self.assertEqual(topic_summary.additional_story_count, 1)
-        self.assertEqual(topic_summary.skill_count, 1)
+        self.assertEqual(topic_summary.uncategorized_skill_count, 1)
+        self.assertEqual(topic_summary.subtopic_count, 1)
 
     def test_get_topic_by_id(self):
         expected_topic = self.topic.to_dict()
@@ -107,7 +113,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.name, 'Name')
         self.assertEqual(topic_summary.canonical_story_count, 2)
         self.assertEqual(topic_summary.additional_story_count, 1)
-        self.assertEqual(topic_summary.skill_count, 1)
+        self.assertEqual(topic_summary.uncategorized_skill_count, 1)
+        self.assertEqual(topic_summary.subtopic_count, 1)
 
     def test_update_topic(self):
         topic_services.assign_role(
@@ -146,11 +153,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.name, 'New Name')
         self.assertEqual(topic_summary.version, 3)
 
-    def test_add_skill(self):
-        topic_services.add_skill(
-            self.user_id_admin, self.TOPIC_ID, 'skill_id_2')
+    def test_add_uncategorized_skill(self):
+        topic_services.add_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, 'skill_id_3')
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.skill_ids, [self.skill_id, 'skill_id_2'])
+        self.assertEqual(
+            topic.uncategorized_skill_ids, [self.skill_id_1, 'skill_id_3'])
         topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 2)
         )
@@ -159,13 +167,13 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
         self.assertEqual(
             topic_commit_log_entry.commit_message,
-            'Added skill_id_2 to skill ids')
+            'Added skill_id_3 to uncategorized skill ids')
 
-    def test_delete_skill(self):
-        topic_services.delete_skill(
-            self.user_id_admin, self.TOPIC_ID, self.skill_id)
+    def test_delete_uncategorized_skill(self):
+        topic_services.delete_uncategorized_skill(
+            self.user_id_admin, self.TOPIC_ID, self.skill_id_1)
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.skill_ids, [])
+        self.assertEqual(topic.uncategorized_skill_ids, [])
         topic_commit_log_entry = (
             topic_models.TopicCommitLogEntryModel.get_commit(self.TOPIC_ID, 2)
         )
@@ -174,7 +182,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_commit_log_entry.user_id, self.user_id_admin)
         self.assertEqual(
             topic_commit_log_entry.commit_message,
-            'Removed %s from skill ids' % self.skill_id)
+            'Removed %s from uncategorized skill ids' % self.skill_id_1)
 
     def test_delete_story(self):
         topic_services.delete_story(
@@ -216,6 +224,32 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             topic_services.get_topic_summary_by_id(
                 self.TOPIC_ID, strict=False), None)
+
+    def test_delete_subtopic_with_skill_ids(self):
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_DELETE_SUBTOPIC,
+            'subtopic_id': self.subtopic_id
+        })]
+        topic_services.update_topic(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Removed id_1 subtopic.')
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(
+            topic.uncategorized_skill_ids, [self.skill_id_1, self.skill_id_2])
+
+    def test_update_subtopic_skill_ids(self):
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY,
+            'subtopic_id': self.subtopic_id,
+            'property_name': topic_domain.SUBTOPIC_PROPERTY_SKILL_IDS,
+            'old_value': [self.skill_id_2],
+            'new_value': [self.skill_id_2, self.skill_id_1]
+        })]
+        topic_services.update_topic(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.uncategorized_skill_ids, [])
 
     def test_admin_can_manage_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)

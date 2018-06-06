@@ -60,6 +60,8 @@ class TopicModel(base_models.VersionedModel):
     uncategorized_skill_ids = ndb.StringProperty(repeated=True, indexed=True)
     # The list of subtopics that are part of the topic.
     subtopics = ndb.JsonProperty(repeated=True, indexed=False)
+    # The schema version of the subtopic dict.
+    schema_version = ndb.IntegerProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 

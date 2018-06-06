@@ -101,5 +101,5 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
             self.assertIsNotNone(
                 skill_services.get_skill_by_id(skill_id, strict=False))
             topic = topic_services.get_topic_by_id(self.topic_id)
-            self.assertEqual(topic.skill_ids, [skill_id])
+            self.assertEqual(topic.uncategorized_skill_ids, [skill_id])
             self.logout()

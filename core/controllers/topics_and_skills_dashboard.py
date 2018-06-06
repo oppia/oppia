@@ -86,7 +86,8 @@ class NewSkillHandler(base.BaseHandler):
         skill_services.save_new_skill(self.user_id, skill)
 
         if topic_id is not None:
-            topic_services.add_skill(self.user_id, topic_id, new_skill_id)
+            topic_services.add_uncategorized_skill(
+                self.user_id, topic_id, new_skill_id)
 
         self.render_json({
             'skillId': new_skill_id

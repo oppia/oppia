@@ -943,7 +943,7 @@ tags: []
         topic = topic_domain.Topic(
             topic_id, name, description, canonical_story_ids,
             additional_story_ids, uncategorized_skill_ids, subtopics,
-            language_code, 0
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, language_code, 0
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
