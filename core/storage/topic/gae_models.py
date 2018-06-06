@@ -55,8 +55,11 @@ class TopicModel(base_models.VersionedModel):
     # This consists of the list of additional (non-canonical) story ids that
     # are part of this topic.
     additional_story_ids = ndb.StringProperty(repeated=True, indexed=True)
-    # This consists of the full list of skill ids that are part of this topic.
-    skill_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # This consists of the list of uncategorized skill ids that are not part of
+    # any subtopic.
+    uncategorized_skill_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # The list of subtopics that are part of the topic.
+    subtopics = ndb.JsonProperty(repeated=True, indexed=False)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 

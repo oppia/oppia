@@ -210,7 +210,15 @@ def apply_change_list(topic_id, change_list):
     topic = get_topic_by_id(topic_id)
     try:
         for change in change_list:
-            if change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
+            if change.cmd == topic_domamin.CMD_ADD_SUBTOPIC:
+                topic.add_subtopic(change.id, change.title)
+            elif change.cmd == topic_domamin.CMD_DELETE_SUBTOPIC:
+                topic.delete_subtopic(change.id)
+            elif change.cmd == topic_domamin.CMD_ADD_UNCATEGORIZED_SKILL_ID:
+                topic.add_uncategorized_skill_id(change.id)
+            elif change.cmd == topic_domamin.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
+                topic.remove_uncategorized_skill_id(change.id)
+            elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.TOPIC_PROPERTY_NAME):
                     topic.update_name(change.new_value)
@@ -229,6 +237,13 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
+            elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PROPERTY_TITLE):
+                    topic.update_subtopic_title(change.id, change.new_value)
+                elif (change.property_name ==
+                      topic_domain.SUBTOPIC_PROPERTY_SKILL_IDS):
+                    topic.update_subtopic_skill_ids(change.id, change.new_value)
         return topic
 
     except Exception as e:

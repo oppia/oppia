@@ -37,13 +37,19 @@ TOPIC_PROPERTY_NAME = 'name'
 TOPIC_PROPERTY_DESCRIPTION = 'description'
 TOPIC_PROPERTY_CANONICAL_STORY_IDS = 'canonical_story_ids'
 TOPIC_PROPERTY_ADDITIONAL_STORY_IDS = 'additional_story_ids'
-TOPIC_PROPERTY_SKILL_IDS = 'skill_ids'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 
+SUBTOPIC_PROPERTY_TITLE = 'title'
+SUBTOPIC_PROPERTY_SKILL_IDS = 'skill_ids'
 
+CMD_ADD_SUBTOPIC = 'add_subtopic'
+CMD_DELETE_SUBTOPIC = 'delete_subtopic'
+CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
+CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
+CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
 
 
 class TopicChange(object):
@@ -53,8 +59,11 @@ class TopicChange(object):
         TOPIC_PROPERTY_CANONICAL_STORY_IDS, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
         TOPIC_PROPERTY_SKILL_IDS, TOPIC_PROPERTY_LANGUAGE_CODE)
 
+    SUBTOPIC_PROPERTIES = (
+        SUBTOPIC_PROPERTY_TITLE, SUBTOPIC_PROPERTY_SKILL_IDS)
+
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'property_name', 'new_value', 'old_value', 'name'
+        'property_name', 'new_value', 'old_value', 'name', 'id', 'title'
     ]
 
     def __init__(self, change_dict):
@@ -75,9 +84,25 @@ class TopicChange(object):
             raise Exception('Invalid change_dict: %s' % change_dict)
         self.cmd = change_dict['cmd']
 
-        if self.cmd == CMD_UPDATE_TOPIC_PROPERTY:
+        if self.cmd == CMD_ADD_SUBTOPIC:
+            self.id = change_dict['subtopic_id']
+            self.title =  change_dict['title']
+        elif self.cmd == CMD_DELETE_SUBTOPIC:
+            self.id = change_dict['subtopic_id']
+        elif self.cmd == CMD_ADD_UNCATEGORIZED_SKILL_ID:
+            self.id =  change_dict['new_uncategorized_skill_id']
+        elif self.cmd == CMD_DELETE_UNCATEGORIZED_SKILL_ID:
+            self.id = change_dict['uncategorized_skill_id']
+        elif self.cmd == CMD_UPDATE_TOPIC_PROPERTY:
             if change_dict['property_name'] not in self.TOPIC_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
+            self.property_name = change_dict['property_name']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
+        elif self.cmd == CMD_UPDATE_SUBTOPIC_PROPERTY:
+            if change_dict['property_name'] not in self.SUBTOPIC_PROPERTIES:
+                raise Exception('Invalid change_dict: %s' % change_dict)
+            self.id = change_dict['subtopic_id']
             self.property_name = change_dict['property_name']
             self.new_value = copy.deepcopy(change_dict['new_value'])
             self.old_value = copy.deepcopy(change_dict['old_value'])
@@ -102,13 +127,93 @@ class TopicChange(object):
         return topic_change_dict
 
 
+class Subtopic(object):
+    """Domain object for a Subtopic."""
+
+    def __init__(self, subtopic_id, title, skill_ids):
+        """Constructs a Subtopic domain object.
+
+        Args:
+            subtopic_id: str. The unique ID of the subtopic.
+            title: str. The title of the subtopic.
+            skill_ids: list(str). The list of skill ids that are part of this
+                subtopic.
+        """
+        self.id = subtopic_id
+        self.title = title
+        self.skill_ids = skill_ids
+
+    def to_dict(self):
+        """Returns a dict representing this Subtopic domain object.
+
+        Returns:
+            A dict, mapping all fields of Subtopic instance.
+        """
+        return {
+            'id': self.id,
+            'title': self.title,
+            'skill_ids': self.skill_ids
+        }
+
+    @classmethod
+    def from_dict(cls, subtopic_dict):
+        """Returns a Subtopic domain object from a dict.
+
+        Args:
+            subtopic_dict: dict. The dict representation of Subtopic object.
+
+        Returns:
+            Subtopic. The corresponding Subtopic domain object.
+        """
+        subtopic = cls(
+            subtopic_dict['id'], subtopic_dict['title'],
+            subtopic_dict['skill_ids'])
+        return subtopic
+
+    @classmethod
+    def create_default_subtopic(cls, subtopic_id, title):
+        """Creates a Subtopic object with default values.
+
+        Args:
+            subtopic_id: str. ID of the new subtopic.
+            title: str. The title for the new subtopic.
+
+        Returns:
+            Subtopic. A subtopic object with given id, title and empty skill ids
+                list.
+        """
+        return cls(subtopic_id, title, [])
+
+    def validate(self):
+        """Validates various properties of the Subtopic object.
+
+        Raises:
+            ValidationError: One or more attributes of the subtopic are
+                invalid.
+        """
+        if not isinstance(self.title, basestring):
+            raise utils.ValidationError(
+                'Expected subtopic title to be a string, received %s' %
+                self.title)
+        if not isinstance(self.skill_ids, list):
+            raise utils.ValidationError(
+                'Expected skill ids to be a list, received %s' %
+                self.skill_ids)
+
+        for skill_id in self.skill_ids:
+            if self.skill_ids.count(skill_id) > 1:
+                raise utils.ValidationError(
+                    'The skill id %s is duplicated in the subtopic %s.'
+                    % (skill_id, self.id))
+
+
 class Topic(object):
     """Domain object for an Oppia Topic."""
 
     def __init__(
             self, topic_id, name, description, canonical_story_ids,
-            additional_story_ids, skill_ids, language_code, version,
-            created_on=None, last_updated=None):
+            additional_story_ids, uncategorized_skill_ids, subtopics,
+            language_code, version, created_on=None, last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
@@ -119,8 +224,10 @@ class Topic(object):
                 canonical stories that are part of this topic.
             additional_story_ids: list(str). A set of ids representing the
                 additional stories that are part of this topic.
-            skill_ids: list(str). This consists of the full list of skill ids
-                that are part of this topic.
+            uncategorized_skill_ids: list(str). This consists of the list of
+                uncategorized skill ids that are not part of any subtopic.
+            subtopics: list(Subtopic). The list of subtopics that are part of
+                the topic.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -134,7 +241,8 @@ class Topic(object):
         self.description = description
         self.canonical_story_ids = canonical_story_ids
         self.additional_story_ids = additional_story_ids
-        self.skill_ids = skill_ids
+        self.uncategorized_skill_ids = uncategorized_skill_ids
+        self.subtopics = subtopics
         self.language_code = language_code
         self.created_on = created_on
         self.last_updated = last_updated
@@ -153,7 +261,10 @@ class Topic(object):
             'canonical_story_ids': self.canonical_story_ids,
             'additional_story_ids': self.additional_story_ids,
             'language_code': self.language_code,
-            'skill_ids': self.skill_ids,
+            'uncategorized_skill_ids': self.uncategorized_skill_ids,
+            'subtopics': [
+                subtopic.to_dict() for subtopic in self.subtopics
+            ],
             'version': self.version
         }
 
@@ -183,31 +294,6 @@ class Topic(object):
 
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
-
-    def delete_skill(self, skill_id):
-        """Removes a skill from the skill_ids list.
-
-        Args:
-            skill_id: str. The skill id to remove from the list.
-
-        Raises:
-            Exception. The skill_id is not present in the topic.
-        """
-        if skill_id not in self.skill_ids:
-            raise Exception(
-                'The skill id %s is not present in the topic.' % skill_id)
-        self.skill_ids.remove(skill_id)
-
-    def add_skill(self, skill_id):
-        """Adds a skill to the skill_ids list.
-
-        Args:
-            skill_id: str. The skill id to add to the list.
-        """
-        if skill_id in self.skill_ids:
-            raise Exception(
-                'The skill id %s is already present in the topic.' % skill_id)
-        self.skill_ids.append(skill_id)
 
     def delete_story(self, story_id):
         """Removes a story from the canonical_story_ids list.
@@ -250,6 +336,14 @@ class Topic(object):
                 'Expected description to be a string, received %s'
                 % self.description)
 
+        if not isinstance(self.subtopics, list):
+            raise utils.ValidationError(
+                'Expected subtopics to be a list, received %s'
+                % self.subtopics)
+
+        for subtopic in self.subtopics:
+            subtopic.validate()
+
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
                 'Expected language code to be a string, received %s' %
@@ -282,10 +376,10 @@ class Topic(object):
                     'ids list to be mutually exclusive. The story_id %s is '
                     'present in both lists' % story_id)
 
-        if not isinstance(self.skill_ids, list):
+        if not isinstance(self.uncategorized_skill_ids, list):
             raise utils.ValidationError(
-                'Expected skill ids to be a list, received %s'
-                % self.skill_ids)
+                'Expected uncategorized skill ids to be a list, received %s'
+                % self.uncategorized_skill_ids)
 
     @classmethod
     def create_default_topic(cls, topic_id, name):
@@ -302,7 +396,7 @@ class Topic(object):
         """
         return cls(
             topic_id, name,
-            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [],
+            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
     def update_name(self, new_name):
@@ -347,13 +441,123 @@ class Topic(object):
         """
         self.additional_story_ids = new_additional_story_ids
 
-    def update_skill_ids(self, new_skill_ids):
+    def add_uncategorized_skill_id(self, new_uncategorized_skill_id):
         """Updates the skill id list of a topic object.
 
         Args:
-            new_skill_ids: list(str). The updated list of skill ids.
+            new_uncategorized_skill_id: str. The new skill id to add to
+                uncategorized_skill_ids list.
+
+        Raises:
+            Exception. The given skill id is already present in a subtopic.
         """
-        self.skill_ids = new_skill_ids
+        for subtopic in self.subtopics:
+            if new_uncategorized_skill_id in subtopic.skill_ids:
+                raise Exception('The skill id %s already exists in subtopic '
+                    'with id %s.' % (new_uncategorized_skill_id, subtopic.id))
+        self.uncategorized_skill_ids.append(new_uncategorized_skill_id)
+
+    def remove_uncategorized_skill_id(self, uncategorized_skill_id):
+        """Updates the skill id list of a topic object.
+
+        Args:
+            uncategorized_skill_id: str. The skill id to be removed from the
+                uncategorized_skill_ids list.
+
+        Raises:
+            Exception. The given skill id is not present in the
+                uncategorized_skill_ids list.
+        """
+        if uncategorized_skill_id not in self.uncategorized_skill_ids:
+            raise Exception('The skill id %s is not present in the topic.'
+                % uncategorized_skill_id)
+        self.uncategorized_skill_ids.remove(uncategorized_skill_id)
+
+    def get_subtopic_index(self, subtopic_id):
+        """Gets the index of the subtopic with the given id in the subtopics
+        list.
+
+        Args:
+            subtopic_id: str. The id of the subtopic for which the index is to
+                be found.
+
+        Returns:
+            int or None. Returns the index of the subtopic if it exists or else
+                None.
+        """
+        for ind, subtopic in enumerate(self.subtopics):
+            if subtopic.id == subtopic_id:
+                return ind
+        return None
+
+    def add_subtopic(self, subtopic_id, title):
+        """Adds a subtopic with the given id and title.
+
+        Args:
+            subtopic_id: str. The id for the new subtopic.
+            title: str. The title for the new subtopic.
+
+        Raises:
+            Exception. A subtopic with the given id already exists.
+        """
+        if self.get_subtopic_index(subtopic_id) is not None:
+            raise Exception(
+                'A subtopic with id %s already exists. ' % subtopic_id)
+        self.subtopics.append(
+            Subtopic.create_default_subtopic(subtopic_id, title))
+
+    def delete_subtopic(self, subtopic_id):
+        """Deletes the subtopic with the given id and adds all its skills to
+        uncategorized skill ids section.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to remove.
+
+        Raises:
+            Exception. A subtopic with the given id doesn't exists.
+        """
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'A subtopic with id %s doesn\'t exists. ' % subtopic_id)
+        for skill_id in self.subtopics[subtopic_index].skill_ids:
+            self.uncategorized_skill_ids.append(skill_id)
+        del self.subtopics[subtopic_index]
+
+    def update_subtopic_title(self, subtopic_id, new_title):
+        """Updates the title of the new subtopic.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to edit.
+            new_title: str. The new title for the subtopic.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
+        """
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % subtopic_id)
+        self.subtopics[subtopic_index].title = new_title
+
+    def update_subtopic_skill_ids(self, subtopic_id, new_skill_ids):
+        """Updates the title of the new subtopic.
+
+        Args:
+            subtopic_id: str. The id of the subtopic to edit.
+            new_skill_ids: list(str). The new skill id list for the subtopic.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
+        """
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % subtopic_id)
+        for skill_id in new_skill_ids:
+            if skill_id in self.uncategorized_skill_ids:
+                self.uncategorized_skill_ids.remove(skill_id)
+        self.subtopics[subtopic_index].skill_ids = new_skill_ids
 
 
 class TopicSummary(object):
@@ -362,7 +566,7 @@ class TopicSummary(object):
     def __init__(
             self, topic_id, name, language_code, version,
             canonical_story_count, additional_story_count, skill_count,
-            topic_model_created_on, topic_model_last_updated):
+            subtopic_count, topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
         Args:
@@ -374,7 +578,9 @@ class TopicSummary(object):
                 in the topic.
             additional_story_count: int. The number of additional stories
                 present in the topic.
-            skill_count: int. The number of skills the topic teaches.
+            uncategorized_skill_count: int. The number of uncategorized skills
+                in the topic.
+            subtopic_count: int. The number of subtopics in the topic.
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
@@ -386,7 +592,8 @@ class TopicSummary(object):
         self.version = version
         self.canonical_story_count = canonical_story_count
         self.additional_story_count = additional_story_count
-        self.skill_count = skill_count
+        self.uncategorized_skill_count = uncategorized_skill_count
+        self.subtopic_count = subtopic_count
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
 
@@ -403,7 +610,8 @@ class TopicSummary(object):
             'version': self.version,
             'canonical_story_count': self.canonical_story_count,
             'additional_story_count': self.additional_story_count,
-            'skill_count': self.skill_count,
+            'uncategorized_skill_count': self.uncategorized_skill_count,
+            'subtopic_count': self.subtopic_count,
             'topic_model_created_on': self.topic_model_created_on,
             'topic_model_last_updated': self.topic_model_last_updated
         }
