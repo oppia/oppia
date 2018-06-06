@@ -95,6 +95,7 @@
         SITE_NAME: JSON.parse('{{SITE_NAME|js_string}}'),
         SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
         TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
+        SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
         isModerator: JSON.parse('{{is_moderator|js_string}}'),
         isSuperAdmin: JSON.parse('{{is_super_admin|js_string}}'),
@@ -176,20 +177,16 @@
         </div>
       </div>
 
-      {% if DEV_MODE %}
-        <div class="oppia-dev-mode">
+        <div ng-if="DEV_MODE" class="oppia-dev-mode">
           Dev Mode
         </div>
-      {% endif %}
 
-      {% if SITE_FEEDBACK_FORM_URL %}
-        <a href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
+        <a ng-if="siteFeedBackFormURL" ng-href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
            class="oppia-site-feedback oppia-transition-200">
           <i class="material-icons md-18">&#xE87F;</i>
             <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
           </i>
         </a>
-      {% endif %}
     {% endif %}
 
     {% include 'pages/footer_js_libs.html' %}
