@@ -26,14 +26,14 @@ var workflow = require('../protractor_utils/workflow.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-fdescribe('rich-text components', function() {
+describe('rich-text components', function() {
   var explorationPlayerPage = null;
 
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  fit('should display correctly', function() {
+  it('should display correctly', function() {
     users.createUser('user@richTextComponents.com', 'userRichTextComponents');
     users.login('user@richTextComponents.com');
 
@@ -99,7 +99,8 @@ fdescribe('rich-text components', function() {
       'Error parsing header X-XSS-Protection: 1; mode=block; ' +
       'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
 
-      'https:\/\/www.youtube.com\/youtubei\/v1\/log_interaction?alt=json&',
+      'https://www.youtube.com/youtubei/v1/log_interaction?.* Failed to load ' +
+      'resource: the server responded with a status of 401 ()',
     ]);
   });
 });
