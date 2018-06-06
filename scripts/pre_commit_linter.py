@@ -154,6 +154,17 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     }
 ]
 
+BAD_PATTERNS_PYTHON_REGEXP = [
+    {
+        'regexp': r"print \'",
+        'message': "Please do not use print statement.",
+        'excluded_files': (
+            'core/tests/test_utils.py',
+            'core/tests/performance_framework/perf_domain.py'),
+        'excluded_dirs': ('scripts/',)
+    }
+]
+
 REQUIRED_STRINGS_FECONF = {
     'FORCE_PROD_MODE = False': {
         'message': 'Please set the FORCE_PROD_MODE variable in feconf.py'
@@ -697,6 +708,12 @@ def _check_bad_patterns(all_files):
 
             if filename.endswith('.html'):
                 for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
+                    if _check_bad_pattern_in_file(filename, content, regexp):
+                        failed = True
+                        total_error_count += 1
+
+            if filename.endswith('.py'):
+                for regexp in BAD_PATTERNS_PYTHON_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
                         total_error_count += 1
