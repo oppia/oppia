@@ -95,10 +95,10 @@ def get_topic_from_model(topic_model, run_conversion=True):
             topic model.
     """
     versioned_subtopics = {
-        'schema_version': topic_model.schema_version,
+        'schema_version': topic_model.subtopic_schema_version,
         'subtopics': copy.deepcopy(topic_model.subtopics)
     }
-    if (run_conversion and topic_model.schema_version !=
+    if (run_conversion and topic_model.subtopic_schema_version !=
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
         _migrate_subtopics_to_latest_schema(versioned_subtopics)
     return topic_domain.Topic(
@@ -221,7 +221,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         canonical_story_ids=topic.canonical_story_ids,
         additional_story_ids=topic.additional_story_ids,
         uncategorized_skill_ids=topic.uncategorized_skill_ids,
-        schema_version=topic.schema_version,
+        subtopic_schema_version=topic.subtopic_schema_version,
         subtopics=[subtopic.to_dict() for subtopic in topic.subtopics]
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
@@ -268,6 +268,8 @@ def apply_change_list(topic_id, change_list):
                 topic.add_uncategorized_skill_id(change.id)
             elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
                 topic.remove_uncategorized_skill_id(change.id)
+            elif change.cmd == topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
+                topic.move_skill_id_to_subtopic(change.id, change.skill_id)
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.TOPIC_PROPERTY_NAME):
@@ -291,9 +293,6 @@ def apply_change_list(topic_id, change_list):
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_TITLE):
                     topic.update_subtopic_title(change.id, change.new_value)
-                elif (change.property_name ==
-                      topic_domain.SUBTOPIC_PROPERTY_SKILL_IDS):
-                    topic.update_subtopic_skill_ids(change.id, change.new_value)
         return topic
 
     except Exception as e:
@@ -347,7 +346,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.additional_story_ids = topic.additional_story_ids
     topic_model.uncategorized_skill_ids = topic.uncategorized_skill_ids
     topic_model.subtopics = [subtopic.to_dict() for subtopic in topic.subtopics]
-    topic_model.schema_version = topic.schema_version
+    topic_model.subtopic_schema_version = topic.subtopic_schema_version
     topic_model.language_code = topic.language_code
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)

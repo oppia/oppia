@@ -128,8 +128,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'new_value': [self.NODE_ID_1]
             }),
             story_domain.StoryChange({
-                'cmd': story_domain.CMD_FINALIZE_STORY_NODE_OUTLINE,
-                'node_id': self.NODE_ID_2
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
+                'node_id': self.NODE_ID_2,
+                'finalized': True
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
@@ -146,7 +147,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story.story_contents.nodes[1].destination_node_ids,
             [self.NODE_ID_1])
         self.assertEqual(
-            story.story_contents.nodes[1].outlines_are_finalized, True)
+            story.story_contents.nodes[1].outline_is_finalized, True)
         self.assertEqual(story.story_contents.initial_node_id, self.NODE_ID_2)
         self.assertEqual(story.story_contents.next_node_id, 'node_3')
         self.assertEqual(story.version, 2)
@@ -160,8 +161,9 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
                 'node_id': self.NODE_ID_1
             }),
             story_domain.StoryChange({
-                'cmd': story_domain.CMD_RESET_STORY_NODE_OUTLINE_STATUS,
-                'node_id': self.NODE_ID_2
+                'cmd': story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
+                'node_id': self.NODE_ID_2,
+                'finalized': False
             }),
         ]
         story_services.update_story(
@@ -172,7 +174,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(story_summary.node_count, 1)
         self.assertEqual(story.story_contents.nodes[0].destination_node_ids, [])
         self.assertEqual(
-            story.story_contents.nodes[0].outlines_are_finalized, False)
+            story.story_contents.nodes[0].outline_is_finalized, False)
 
     def test_delete_story(self):
         story_services.delete_story(self.USER_ID, self.STORY_ID)

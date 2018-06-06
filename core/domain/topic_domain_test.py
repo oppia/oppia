@@ -56,7 +56,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
             'uncategorized_skill_ids': [],
             'subtopics': [],
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+            'subtopic_schema_version': feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             'version': 0
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)

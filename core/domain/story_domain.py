@@ -49,8 +49,7 @@ CMD_UPDATE_STORY_CONTENTS_PROPERTY = 'update_story_contents_property'
 # These take node_id as parameter.
 CMD_ADD_STORY_NODE = 'add_story_node'
 CMD_DELETE_STORY_NODE = 'delete_story_node'
-CMD_FINALIZE_STORY_NODE_OUTLINE = 'finalize_story_node_outline'
-CMD_RESET_STORY_NODE_OUTLINE_STATUS = 'reset_story_node_outline_status'
+CMD_UPDATE_STORY_NODE_OUTLINE_STATUS = 'update_story_node_outline_status'
 
 # This takes additional 'title' parameters.
 CMD_CREATE_NEW = 'create_new'
@@ -75,7 +74,7 @@ class StoryChange(object):
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'property_name', 'new_value', 'old_value', 'node_id', 'from_version',
-        'to_version', 'title'
+        'to_version', 'title', 'finalized'
     ]
 
     def __init__(self, change_dict):
@@ -102,10 +101,9 @@ class StoryChange(object):
             self.node_id = change_dict['node_id']
         elif self.cmd == CMD_DELETE_STORY_NODE:
             self.node_id = change_dict['node_id']
-        elif self.cmd == CMD_FINALIZE_STORY_NODE_OUTLINE:
+        elif self.cmd == CMD_UPDATE_STORY_NODE_OUTLINE_STATUS:
             self.node_id = change_dict['node_id']
-        elif self.cmd == CMD_RESET_STORY_NODE_OUTLINE_STATUS:
-            self.node_id = change_dict['node_id']
+            self.finalized = change_dict['finalized']
         elif self.cmd == CMD_UPDATE_STORY_NODE_PROPERTY:
             if (change_dict['property_name'] not in
                     self.STORY_NODE_PROPERTIES):
@@ -159,7 +157,7 @@ class StoryNode(object):
     def __init__(
             self, node_id, destination_node_ids,
             acquired_skill_ids, prerequisite_skill_ids,
-            outline, outlines_are_finalized, exploration_id):
+            outline, outline_is_finalized, exploration_id):
         """Initializes a StoryNode domain object.
 
         Args:
@@ -174,7 +172,7 @@ class StoryNode(object):
                 can use to construct the exploration. It describes the basic
                 theme or template of the story and is to be provided in html
                 form.
-            outlines_are_finalized: bool. Whether the outlines for the story
+            outline_is_finalized: bool. Whether the outlines for the story
                 node are finalized or not.
             exploration_id: str or None. The valid exploration id that fits the
                 story node. It can be None initially, when the story creator
@@ -186,7 +184,7 @@ class StoryNode(object):
         self.acquired_skill_ids = acquired_skill_ids
         self.prerequisite_skill_ids = prerequisite_skill_ids
         self.outline = html_cleaner.clean(outline)
-        self.outlines_are_finalized = outlines_are_finalized
+        self.outline_is_finalized = outline_is_finalized
         self.exploration_id = exploration_id
 
     @classmethod
@@ -240,7 +238,7 @@ class StoryNode(object):
             'acquired_skill_ids': self.acquired_skill_ids,
             'prerequisite_skill_ids': self.prerequisite_skill_ids,
             'outline': self.outline,
-            'outlines_are_finalized': self.outlines_are_finalized,
+            'outline_is_finalized': self.outline_is_finalized,
             'exploration_id': self.exploration_id
         }
 
@@ -258,7 +256,7 @@ class StoryNode(object):
             node_dict['id'], node_dict['destination_node_ids'],
             node_dict['acquired_skill_ids'],
             node_dict['prerequisite_skill_ids'], node_dict['outline'],
-            node_dict['outlines_are_finalized'], node_dict['exploration_id'])
+            node_dict['outline_is_finalized'], node_dict['exploration_id'])
 
         return node
 
@@ -293,10 +291,10 @@ class StoryNode(object):
                 'Expected outline to be a string, received %s' %
                 self.outline)
 
-        if not isinstance(self.outlines_are_finalized, bool):
+        if not isinstance(self.outline_is_finalized, bool):
             raise utils.ValidationError(
-                'Expected outlines_are_finalized to be a boolean, received %s' %
-                self.outlines_are_finalized)
+                'Expected outline_is_finalized to be a boolean, received %s' %
+                self.outline_is_finalized)
 
         self.require_valid_node_id(self.id)
 
@@ -786,37 +784,28 @@ class Story(object):
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].outline = new_outline
 
-    def finalize_node_outline(self, node_id):
-        """Marks the outlines_are_finalized fields of the node with the given
-        node_id as True.
+    def update_node_outline_status(self, node_id, outline_finalized):
+        """Updates the outline_is_finalized field of the node with the given
+        node_id with outline_finalized.
 
         Args:
             node_id: str. The id of the node.
+            outline_finalized: bool. The new status of the node outline.
 
         Raises:
             ValueError: The node is not part of the story.
+            ValueError. outline_finalized is not a boolean.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
-        self.story_contents.nodes[node_index].outlines_are_finalized = True
-
-    def reset_finalized_status(self, node_id):
-        """Marks the outlines_are_finalized fields of the node with the given
-        node_id as False.
-
-        Args:
-            node_id: str. The id of the node.
-
-        Raises:
-            ValueError: The node is not part of the story.
-        """
-        node_index = self.story_contents.get_node_index(node_id)
-        if node_index is None:
+        if not isinstance(outline_finalized, bool):
             raise ValueError(
-                'The node with id %s is not part of this story' % node_id)
-        self.story_contents.nodes[node_index].outlines_are_finalized = False
+                'The outline_finalized value should be boolean, received %s'
+                % outline_finalized)
+        self.story_contents.nodes[node_index].outline_is_finalized = (
+            outline_finalized)
 
     def update_node_acquired_skill_ids(self, node_id, new_acquired_skill_ids):
         """Updates the acquired skill ids field of a given node.

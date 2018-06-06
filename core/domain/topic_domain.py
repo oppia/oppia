@@ -40,12 +40,12 @@ TOPIC_PROPERTY_ADDITIONAL_STORY_IDS = 'additional_story_ids'
 TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
-SUBTOPIC_PROPERTY_SKILL_IDS = 'skill_ids'
 
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
+CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
@@ -59,8 +59,7 @@ class TopicChange(object):
         TOPIC_PROPERTY_CANONICAL_STORY_IDS, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
         TOPIC_PROPERTY_LANGUAGE_CODE)
 
-    SUBTOPIC_PROPERTIES = (
-        SUBTOPIC_PROPERTY_TITLE, SUBTOPIC_PROPERTY_SKILL_IDS)
+    SUBTOPIC_PROPERTIES = (SUBTOPIC_PROPERTY_TITLE,)
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'property_name', 'new_value', 'old_value', 'name', 'id', 'title'
@@ -93,6 +92,9 @@ class TopicChange(object):
             self.id = change_dict['new_uncategorized_skill_id']
         elif self.cmd == CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
             self.id = change_dict['uncategorized_skill_id']
+        elif self.cmd == CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
+            self.id = change_dict['subtopic_id']
+            self.skill_id = change_dict['skill_id']
         elif self.cmd == CMD_UPDATE_TOPIC_PROPERTY:
             if change_dict['property_name'] not in self.TOPIC_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
@@ -201,6 +203,12 @@ class Subtopic(object):
                 self.skill_ids)
 
         for skill_id in self.skill_ids:
+            if not isinstance(skill_id, basestring):
+                raise utils.ValidationError(
+                    'Expected each skill id to be a string, received %s' %
+                    skill_id)
+
+        for skill_id in self.skill_ids:
             if self.skill_ids.count(skill_id) > 1:
                 raise utils.ValidationError(
                     'The skill id %s is duplicated in the subtopic %s.'
@@ -213,7 +221,7 @@ class Topic(object):
     def __init__(
             self, topic_id, name, description, canonical_story_ids,
             additional_story_ids, uncategorized_skill_ids, subtopics,
-            schema_version, language_code, version, created_on=None,
+            subtopic_schema_version, language_code, version, created_on=None,
             last_updated=None):
         """Constructs a Topic domain object.
 
@@ -229,8 +237,8 @@ class Topic(object):
                 uncategorized skill ids that are not part of any subtopic.
             subtopics: list(Subtopic). The list of subtopics that are part of
                 the topic.
-            schema_version: int. The current schema version of the subtopics
-                dict.
+            subtopic_schema_version: int. The current schema version of the
+                subtopic dict.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -246,7 +254,7 @@ class Topic(object):
         self.additional_story_ids = additional_story_ids
         self.uncategorized_skill_ids = uncategorized_skill_ids
         self.subtopics = subtopics
-        self.schema_version = schema_version
+        self.subtopic_schema_version = subtopic_schema_version
         self.language_code = language_code
         self.created_on = created_on
         self.last_updated = last_updated
@@ -265,7 +273,7 @@ class Topic(object):
             'canonical_story_ids': self.canonical_story_ids,
             'additional_story_ids': self.additional_story_ids,
             'language_code': self.language_code,
-            'schema_version': self.schema_version,
+            'subtopic_schema_version': self.subtopic_schema_version,
             'uncategorized_skill_ids': self.uncategorized_skill_ids,
             'subtopics': [
                 subtopic.to_dict() for subtopic in self.subtopics
@@ -346,10 +354,18 @@ class Topic(object):
                 'Expected subtopics to be a list, received %s'
                 % self.subtopics)
 
-        if not isinstance(self.schema_version, int):
+        if not isinstance(self.subtopic_schema_version, int):
             raise utils.ValidationError(
                 'Expected schema version to be an integer, received %s'
-                % self.schema_version)
+                % self.subtopic_schema_version)
+
+        if (self.subtopic_schema_version !=
+                feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION):
+            raise utils.ValidationError(
+                'Expected subtopic schema version to be %s, received %s'
+                % (
+                    feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
+                    self.subtopic_schema_version))
 
         for subtopic in self.subtopics:
             if not isinstance(subtopic, Subtopic):
@@ -357,9 +373,6 @@ class Topic(object):
                     'Expected each subtopic to be a Subtopic object, '
                     'received %s' % subtopic)
             subtopic.validate()
-            for skill_id in subtopic.skill_ids:
-                if skill_id in self.uncategorized_skill_ids:
-                    self.uncategorized_skill_ids.remove(skill_id)
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
@@ -567,7 +580,7 @@ class Topic(object):
         subtopic_index = self.get_subtopic_index(subtopic_id)
         if subtopic_index is None:
             raise Exception(
-                'A subtopic with id %s doesn\'t exists. ' % subtopic_id)
+                'A subtopic with id %s doesn\'t exist. ' % subtopic_id)
         for skill_id in self.subtopics[subtopic_index].skill_ids:
             self.uncategorized_skill_ids.append(skill_id)
         del self.subtopics[subtopic_index]
@@ -588,24 +601,47 @@ class Topic(object):
                 'The subtopic with id %s does not exist.' % subtopic_id)
         self.subtopics[subtopic_index].title = new_title
 
-    def update_subtopic_skill_ids(self, subtopic_id, new_skill_ids):
+    def move_skill_id_to_subtopic(self, subtopic_id, new_skill_id):
         """Updates the title of the new subtopic.
 
         Args:
-            subtopic_id: str. The id of the subtopic to edit.
-            new_skill_ids: list(str). The new skill id list for the subtopic.
+            subtopic_id: str. The id of the subtopic to which the skill is to
+                be moved.
+            new_skill_id: str. The new skill id which is to be added to the
+                subtopic.
 
         Raises:
             Exception. The subtopic with the given id doesn't exist.
+            Exception. The skill id should be present in the topic already
+                before moving.
+            Exception. The skill id is already present in the subtopic.
         """
         subtopic_index = self.get_subtopic_index(subtopic_id)
         if subtopic_index is None:
             raise Exception(
                 'The subtopic with id %s does not exist.' % subtopic_id)
-        for skill_id in new_skill_ids:
-            if skill_id in self.uncategorized_skill_ids:
-                self.uncategorized_skill_ids.remove(skill_id)
-        self.subtopics[subtopic_index].skill_ids = new_skill_ids
+        is_new_skill_id_present = False
+
+        for subtopic in self.subtopics:
+            if new_skill_id in subtopic.skill_ids:
+                if subtopic.id == subtopic_id:
+                    raise Exception(
+                        'The skill id is already present in the subtopic.')
+                if is_new_skill_id_present:
+                    raise Exception(
+                        'More than 1 subtopic have the same skill with id %s.'
+                        % new_skill_id)
+                subtopic.skill_ids.remove(new_skill_id)
+                is_new_skill_id_present = True
+
+        if new_skill_id in self.uncategorized_skill_ids:
+            self.uncategorized_skill_ids.remove(new_skill_id)
+            is_new_skill_id_present = True
+
+        if not is_new_skill_id_present:
+            raise Exception(
+                'The skill id should be present in the topic before moving.')
+        self.subtopics[subtopic_index].skill_ids.append(new_skill_id)
 
 
 class TopicSummary(object):
