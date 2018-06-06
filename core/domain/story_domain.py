@@ -705,14 +705,23 @@ class Story(object):
         """
         self.language_code = language_code
 
-    def add_node(self, node_id):
-        """Adds a new default node with the given node_id.
+    def add_node(self, desired_node_id):
+        """Adds a new default node with the id as story_contents.next_node_id.
 
         Args:
-            node_id: str. The id of the node.
+            desired_node_id: str. The node id to be given to the new node in the
+                story.
+
+        Raises:
+            Exception: The desired_node_id differs from
+                story_contents.next_node_id
         """
+        if self.story_contents.next_node_id != desired_node_id:
+            raise Exception(
+                'The node id %s does not match the expected '
+                'next node id for the story.' % desired_node_id)
         self.story_contents.nodes.append(
-            StoryNode.create_default_story_node(node_id))
+            StoryNode.create_default_story_node(desired_node_id))
         self.story_contents.next_node_id = (
             StoryNode.get_incremented_node_id(self.story_contents.next_node_id))
 
