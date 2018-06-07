@@ -370,3 +370,66 @@ def convert_to_text_angular(html_data):
     # should match and <br> and <br/> have same working,
     # so the tag has to be replaced in this way.
     return str(soup).replace('<br/>', '<br>')
+
+
+def validate_textangular_format(html_list, run_migration=False):
+    """This function checks if html strings in a given list are
+    valid for TextAngular RTE.
+
+    Args:
+        html_list: list(str). List of html strings to be validated.
+        run_migration: bool. Specifies if migration is to be performed
+            before validating.
+
+    Returns:
+        dict: Dictionary of all the error relations and strings.
+    """
+    # err_dict is a dictionary to store the invalid tags and the
+    # invalid parent-child relations that we find.
+    err_dict = {}
+
+    # All the invalid html strings will be stored in this.
+    err_dict['strings'] = []
+
+    allowed_parent_list = (
+        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+        ['ALLOWED_PARENT_LIST'])
+    allowed_tag_list = (
+        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+        ['ALLOWED_TAG_LIST'])
+
+    for html_data in html_list:
+        if run_migration:
+            migrated_data = convert_to_text_angular(html_data)
+            soup = bs4.BeautifulSoup(migrated_data, 'html.parser')
+        else:
+            soup = bs4.BeautifulSoup(html_data, 'html.parser')
+        # Text with no parent tag is also invalid.
+        for content in soup.contents:
+            if not content.name:
+                err_dict['strings'].append(html_data)
+                break
+
+        for tag in soup.findAll():
+            # Checking for tags not allowed in RTE.
+            if tag.name not in allowed_tag_list:
+                if 'invalidTags' in err_dict:
+                    err_dict['invalidTags'].append(tag.name)
+                else:
+                    err_dict['invalidTags'] = [tag.name]
+                err_dict['strings'].append(html_data)
+            # Checking for parent-child relation that are not
+            # allowed in RTE.
+            parent = tag.parent.name
+            if (tag.name in allowed_tag_list) and (
+                    parent not in allowed_parent_list[tag.name]):
+                if tag.name in err_dict:
+                    err_dict[tag.name].append(parent)
+                else:
+                    err_dict[tag.name] = [parent]
+                err_dict['strings'].append(html_data)
+
+    for key in err_dict:
+        err_dict[key] = list(set(err_dict[key]))
+
+    return err_dict

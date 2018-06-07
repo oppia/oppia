@@ -180,3 +180,134 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(components), len(expected_components))
         for component in components:
             self.assertIn(component, expected_components)
+
+
+class ContentMigrationToTextAngular(test_utils.GenericTestBase):
+    """ Tests the function associated with the migration of html
+    strings to valid TextAngular format.
+    """
+
+    def test_convert_to_text_angular(self):
+        test_cases = [{
+            'html_content': (
+                '<div><i>hello</i></div> this is<i>test case1</i> for '
+                '<span><i>testing</i></span>'
+            ),
+            'expected_output': (
+                '<p><i>hello</i></p><p> this is<i>test case1</i> for '
+                '<i>testing</i></p>'
+            )
+        }, {
+            'html_content': (
+                '<div><br>hello</div> this is<br>test<pre> case2<br>'
+                '</pre> for <span><br>testing</span>'
+            ),
+            'expected_output': (
+                '<p><br>hello</p><p> this is<br>test</p>'
+                '<pre> case2\n</pre><p> for <br>testing</p>'
+            )
+        }, {
+            'html_content': 'hello <p> this is case3 for </p> testing',
+            'expected_output': (
+                '<p>hello </p><p> this is case3 for </p><p> testing</p>'
+            )
+        }, {
+            'html_content': 'hello <i> this is case4 for </i> testing',
+            'expected_output': '<p>hello <i> this is case4 for </i> testing</p>'
+        }, {
+            'html_content': (
+                '<span>hello</span><code> this is </code><div>'
+                'test </div><div>case4</div> for testing'
+            ),
+            'expected_output': (
+                '<p>hello this is </p><p>test </p><p>case4</p><p> for '
+                'testing</p>'
+            )
+        }, {
+            'html_content': (
+                '<p> Random test</p>case <b>is</b> <i>added</i> here<p>!</p>'
+            ),
+            'expected_output': (
+                '<p> Random test</p><p>case <b>is</b> <i>added</i> '
+                'here</p><p>!</p>'
+            )
+        }, {
+            'html_content': (
+                '<blockquote> Here is another<b>example'
+                '</b></blockquote>'
+            ),
+            'expected_output': (
+                '<blockquote><p> Here is another<b>example</b></p></blockquote>'
+            )
+        }, {
+            'html_content': (
+                '<table><tbody><tr><td>January</td><td>$100</td>'
+                '<td>200</td></tr><tr><td>February</td><td>$80</td><td>400'
+                '</td></tr></tbody></table>'
+            ),
+            'expected_output': (
+                '<p>January\t$100\t200</p><p>February\t$80\t400</p>'
+            )
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                test_case['expected_output'],
+                html_cleaner.convert_to_text_angular(test_case['html_content']))
+
+    def test_validate_text_angular(self):
+        test_cases = [
+            (
+                'This is for <i>testing</i> the validate <b>text</b> '
+                'angular function.'
+            ),
+            (
+                'This is the last test case <a href="https://github.com">hello'
+                '<oppia-noninteractive-link url-with-value="&amp;quot;'
+                'here&amp;quot;" text-with-value="validated">'
+                '</oppia-noninteractive-link></a><p> testing completed</p>'
+            )
+        ]
+        actual_output_with_migration = (
+            html_cleaner.validate_textangular_format(
+                test_cases, True))
+        actual_output_without_migration = (
+            html_cleaner.validate_textangular_format(
+                test_cases))
+
+        expected_output_with_migration = {
+            u'oppia-noninteractive-link': [u'oppia-noninteractive-link'],
+            'strings': [
+                (
+                    'This is the last test case <a href="https://github.com">'
+                    'hello<oppia-noninteractive-link url-with-value="&amp;'
+                    'quot;here&amp;quot;" text-with-value="validated">'
+                    '</oppia-noninteractive-link></a><p> testing completed</p>'
+                )
+            ]
+        }
+        expected_output_without_migration = {
+            u'i': [u'[document]'],
+            'invalidTags': [u'a'],
+            u'oppia-noninteractive-link': [u'a'],
+            u'b': [u'[document]'],
+            'strings': [
+                (
+                    'This is for <i>testing</i> the validate '
+                    '<b>text</b> angular function.'
+                ),
+                (
+                    'This is the last test case <a href="https://github.com">'
+                    'hello<oppia-noninteractive-link url-with-value="&amp;'
+                    'quot;here&amp;quot;" text-with-value="validated">'
+                    '</oppia-noninteractive-link></a><p> testing completed</p>'
+                ),
+            ]
+        }
+
+        self.assertEqual(
+            actual_output_with_migration,
+            expected_output_with_migration)
+        self.assertEqual(
+            actual_output_without_migration,
+            expected_output_without_migration)
