@@ -878,22 +878,22 @@ RTE_CONTENT_SPEC = {
     'RTE_TYPE_TEXTANGULAR': {
         # Valid parent-child relation in TextAngular.
         'ALLOWED_PARENT_LIST': {
-            'p': ['blockquote', 'div', 'pre', '[document]'],
+            'p': ['blockquote', 'div', 'pre', '[document]', 'ol', 'ul', 'li'],
             'b': ['i', 'li', 'p', 'pre'],
             'br': ['b', 'i', 'li', 'p'],
             'div': ['blockquote'],
             'i': ['b', 'li', 'p', 'pre'],
             'li': ['ol', 'ul'],
-            'ol': ['blockquote', 'li', 'pre', 'div', '[document]'],
-            'ul': ['blockquote', 'li', 'pre', 'div', '[document]'],
-            'pre': ['blockquote', '[document]'],
+            'ol': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
+            'ul': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
+            'pre': ['ol', 'ul', 'blockquote', '[document]'],
             'blockquote': ['blockquote', '[document]'],
-            'oppia-noninteractive-link': ['b', 'li', 'i', 'p', 'pre'],
-            'oppia-noninteractive-math': ['b', 'li', 'i', 'p', 'pre'],
-            'oppia-noninteractive-image': ['li', 'p', 'pre'],
-            'oppia-noninteractive-collapsible': ['li', 'p', 'pre'],
-            'oppia-noninteractive-video': ['li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['li', 'p', 'pre']
+            'oppia-noninteractive-link': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-math': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [
