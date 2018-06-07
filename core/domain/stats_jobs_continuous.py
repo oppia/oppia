@@ -246,6 +246,10 @@ class InteractionAnswerSummariesMRJobManager(
             'submitted_answer_list': submitted_answer_list
         }
 
+        # NOTE: The answers stored in submitted_answers_list must be sorted
+        # according to the chronological order of their submission otherwise
+        # TopNUnresolvedAnswersByFrequency calculation will output invalid
+        # results.
         state_answers_models = stats_models.StateAnswersModel.get_multi(
             item_ids)
         for state_answers_model in state_answers_models:
