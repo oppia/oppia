@@ -1331,7 +1331,7 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             visualizations = sorted(
                 self._get_visualizations(exp_id=self.SET_INPUT_EXP_ID),
                 key=operator.itemgetter('data'))
-            self.assertEqual(len(visualizations), 1)
+            self.assertEqual(len(visualizations), 2)
 
             # Use options to distinguish between the two visualizations, since
             # both are FrequencyTable.
