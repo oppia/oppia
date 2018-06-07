@@ -34,86 +34,97 @@ describe('Number with Units rules service', function() {
     };
   };
 
-  var createUnitsDict = function(unitDict) {
-    return {
-      units: unitDict
-    };
-  };
-
   var createNumberWithUnitsDict = function(
-      type, real, fractionDict, unitDict) {
+      type, real, fractionDict, unitList) {
     return {
       type: type,
       real: real,
       fraction: fractionDict,
-      units: unitDict
+      units: unitList
     };
   };
 
   var REAL_RULE_INPUT = {
     f: createNumberWithUnitsDict('real', 2, createFractionDict(
-      false, 0, 0, 1), createUnitsDict({kg: 1, m: -2}))
+      false, 0, 0, 1), [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}])
   };
 
   var FRACTION_RULE_INPUT = {
     f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
-      false, 0, 2, 3), createUnitsDict({kg: 1, m: -2}))
+      false, 0, 2, 3), [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}])
   };
 
   it('should have a correct \'equal to\' rule', function() {
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'real', 2.5, createFractionDict(false, 0, 0, 1), createUnitsDict(
-        {kg: 1, m: -2})), REAL_RULE_INPUT)).toBe(false);
+      'real', 2.5, createFractionDict(false, 0, 0, 1),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}]
+    ), REAL_RULE_INPUT)).toBe(false);
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'real', 2, createFractionDict(false, 0, 0, 1), createUnitsDict(
-        {g: 1, m: -2})), REAL_RULE_INPUT)).toBe(false);
+      'real', 2, createFractionDict(false, 0, 0, 1),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: 2}]
+    ), REAL_RULE_INPUT)).toBe(false);
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 6, 3), createUnitsDict(
-        {kg: 1, m: -2})), REAL_RULE_INPUT)).toBe(false);
+      'fraction', 0, createFractionDict(false, 0, 6, 3),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}]), REAL_RULE_INPUT)
+    ).toBe(false);
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'real', 2, createFractionDict(false, 0, 0, 1), createUnitsDict(
-        {kg: 1, m: 2})), REAL_RULE_INPUT)).toBe(false);
+      'real', 2, createFractionDict(false, 0, 0, 1),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: 2}]), REAL_RULE_INPUT)
+    ).toBe(false);
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'real', 2, createFractionDict(false, 0, 0, 1), createUnitsDict(
-        {kg: 1, m: -2})), REAL_RULE_INPUT)).toBe(true);
+      'real', 2, createFractionDict(false, 0, 0, 1),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}]), REAL_RULE_INPUT)
+    ).toBe(true);
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 2, 3), createUnitsDict(
-        {kg: 1, m: -2})), FRACTION_RULE_INPUT)).toBe(true);
+      'fraction', 0, createFractionDict(false, 0, 2, 3),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}]),
+    FRACTION_RULE_INPUT)).toBe(true);
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 20, 30), createUnitsDict(
-        {kg: 1, m: -2})), FRACTION_RULE_INPUT)).toBe(false);
+      'fraction', 0, createFractionDict(false, 0, 20, 30),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}]),
+    FRACTION_RULE_INPUT)).toBe(false);
     expect(nurs.IsEqualTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 2, 3), createUnitsDict(
-        {kg: 1, m: 2})), FRACTION_RULE_INPUT)).toBe(false);
+      'fraction', 0, createFractionDict(false, 0, 2, 3),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: 2}]),
+    FRACTION_RULE_INPUT)).toBe(false);
   });
 
   it('should have a correct \'equivalent to\' rule', function() {
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
-      'real', 2, createFractionDict(false, 0, 0, 1), createUnitsDict(
-        {kg: 1, m: 2})), REAL_RULE_INPUT)).toBe(false);
+      'real', 2, createFractionDict(false, 0, 0, 1),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: 2}]), REAL_RULE_INPUT)
+    ).toBe(false);
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
-      'real', 2, createFractionDict(false, 0, 0, 1), createUnitsDict(
-        {kg: 1, m: -2})), REAL_RULE_INPUT)).toBe(true);
+      'real', 2, createFractionDict(false, 0, 0, 1),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}]), REAL_RULE_INPUT)
+    ).toBe(true);
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
-      'real', 2000, createFractionDict(false, 0, 0, 1), createUnitsDict(
-        {g: 1, m: -2})), REAL_RULE_INPUT)).toBe(true);
+      'real', 2000, createFractionDict(false, 0, 0, 1),
+      [{unit: 'g', exp: 1}, {unit: 'm', exp: -2}]), REAL_RULE_INPUT)
+    ).toBe(true);
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
-      'real', 0.2, createFractionDict(false, 0, 0, 1), createUnitsDict(
-        {g: 1, cm: -2})), REAL_RULE_INPUT)).toBe(true);
+      'real', 0.2, createFractionDict(false, 0, 0, 1),
+      [{unit: 'g', exp: 1}, {unit: 'cm', exp: -2}]), REAL_RULE_INPUT)
+    ).toBe(true);
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 4, 2), createUnitsDict(
-        {kg: 1, m: -2})), REAL_RULE_INPUT)).toBe(true);
+      'fraction', 0, createFractionDict(false, 0, 4, 2),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}]), REAL_RULE_INPUT)
+    ).toBe(true);
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 20, 30), createUnitsDict(
-        {kg: 1, m: -2})), FRACTION_RULE_INPUT)).toBe(true);
+      'fraction', 0, createFractionDict(false, 0, 20, 30),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}]),
+    FRACTION_RULE_INPUT)).toBe(true);
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 2, 30), createUnitsDict(
-        {g: 1, cm: -2})), FRACTION_RULE_INPUT)).toBe(true);
+      'fraction', 0, createFractionDict(false, 0, 2, 30),
+      [{unit: 'g', exp: 1}, {unit: 'cm', exp: -2}]),
+    FRACTION_RULE_INPUT)).toBe(true);
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 2000, 3), createUnitsDict(
-        {g: 1, m: -2})), FRACTION_RULE_INPUT)).toBe(true);
+      'fraction', 0, createFractionDict(false, 0, 2000, 3),
+      [{unit: 'g', exp: 1}, {unit: 'm', exp: -2}]),
+    FRACTION_RULE_INPUT)).toBe(true);
     expect(nurs.IsEquivalentTo(createNumberWithUnitsDict(
-      'fraction', 0, createFractionDict(false, 0, 200, 30), createUnitsDict(
-        {kg: 1, m: -2})), FRACTION_RULE_INPUT)).toBe(false);
+      'fraction', 0, createFractionDict(false, 0, 200, 30),
+      [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}]),
+    FRACTION_RULE_INPUT)).toBe(false);
   });
 });

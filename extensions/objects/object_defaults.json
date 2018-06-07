@@ -30,15 +30,13 @@
     },
     "NumberWithUnits": {
       "type": "real",
-      "real": 0,
+      "real": 0.0,
       "fraction": {
         "isNegative": false,
         "wholeNumber": 0,
         "numerator": 0,
         "denominator": 1
       },
-      "units": {
-        "units": {}
-      }
+      "units": []
     }
 }

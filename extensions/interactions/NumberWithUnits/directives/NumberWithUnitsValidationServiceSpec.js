@@ -42,12 +42,6 @@ describe('NumberWithUnitsValidationService', function() {
       };
     };
 
-    var createUnitsDict = function(unitDict) {
-      return {
-        units: unitDict
-      };
-    };
-
     var createNumberWithUnitsDict = function(
         type, real, fractionDict, unitDict) {
       return {
@@ -74,7 +68,7 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2, createFractionDict(
-          false, 0, 0, 1), createUnitsDict({kg: 1, m: -2}))
+          false, 0, 0, 1), [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}])
       }
     });
 
@@ -82,7 +76,7 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2000, createFractionDict(
-          false, 0, 0, 1), createUnitsDict({g: 1, m: -2}))
+          false, 0, 0, 1), [{unit: 'g', exp: 1}, {unit: 'm', exp: -2}])
       }
     });
 
@@ -90,7 +84,7 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2, createFractionDict(
-          false, 0, 0, 1), createUnitsDict({kg: 1, m: -2}))
+          false, 0, 0, 1), [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}])
       }
     });
 
@@ -98,7 +92,7 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
-          false, 0, 2, 3), createUnitsDict({kg: 1, m: -2}))
+          false, 0, 2, 3), [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}])
       }
     });
 
@@ -106,7 +100,8 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
-          false, 0, 2000, 3), createUnitsDict({g: 1, m: -2}))
+          false, 0, 2000, 3), [{unit: 'g', exp: 1},
+          {unit: 'm', exp: -2}])
       }
     });
 

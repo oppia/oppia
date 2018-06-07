@@ -35,12 +35,12 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       this.type = type;
       this.real = real;
       this.fraction = fractionObj;
-      this.units = unitsObj;
+      this.units = unitsObj.units;
     };
 
     NumberWithUnits.prototype.toString = function() {
       var numberWithUnitsString = '';
-      var unitsString = this.units.toString();
+      var unitsString = UnitsObjectFactory.fromList(this.units).toString();
       if (unitsString.includes('$')) {
         unitsString = unitsString.replace('$', '');
         numberWithUnitsString += '$' + ' ';
@@ -70,19 +70,19 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         type: this.type,
         real: this.real,
         fraction: this.fraction.toDict(),
-        units: this.units.toDict()
+        units: this.units.toDict().units
       };
     };
 
     NumberWithUnits.fromRawInputString = function(rawInput) {
       rawInput = rawInput.trim();
       var type = '';
-      var real = 0;
+      var real = 0.0;
       // Default fraction value.
       var fractionObj = FractionObjectFactory.fromRawInputString('0/1');
       var units = '';
       var value = '';
-      var unitObj = {};
+      var unitObj = [];
 
       // Allow validation only when rawInput is not null or an empty string.
       if (rawInput !== '' && rawInput !== null) {
@@ -147,7 +147,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         numberWithUnitsDict.type,
         numberWithUnitsDict.real,
         FractionObjectFactory.fromDict(numberWithUnitsDict.fraction),
-        UnitsObjectFactory.fromDict(numberWithUnitsDict.units));
+        UnitsObjectFactory.fromList(numberWithUnitsDict).units);
     };
 
     return NumberWithUnits;
@@ -155,8 +155,8 @@ oppia.factory('NumberWithUnitsObjectFactory', [
 ]);
 
 oppia.factory('UnitsObjectFactory', [function() {
-  var Units = function(unitsDict) {
-    this.units = unitsDict;
+  var Units = function(unitsList) {
+    this.units = unitsList;
   };
 
   var isunit = function(unit) {
@@ -223,12 +223,14 @@ oppia.factory('UnitsObjectFactory', [function() {
     return unitsWithMultiplier;
   };
 
-  var unitToDict = function(unitsWithMultiplier) {
-    var unitDict = {};
+  var unitToList = function(unitsWithMultiplier) {
+    var unitList = [];
+    var flag = 0;
     for (var i = 0; i < unitsWithMultiplier.length; i++) {
       var unit = unitsWithMultiplier[i][0];
       var multiplier = unitsWithMultiplier[i][1];
       var ind = unit.indexOf('^');
+      flag = 0;
       if (ind > -1) {
         var s = unit.substr(0, ind);
         var power = parseInt(unit.substr(ind + 1));
@@ -236,12 +238,17 @@ oppia.factory('UnitsObjectFactory', [function() {
         var s = unit;
         var power = 1;
       }
-      if (!(s in unitDict)) {
-        unitDict[s] = 0;
+      for (var j = 0; j < unitList.length; j++) {
+        if (unitList[j].unit === s) {
+          unitList[j].exp += multiplier * power;
+          flag = 1;
+        }
       }
-      unitDict[s] += multiplier * power;
+      if (flag === 0) {
+        unitList.push({unit: s, exp: multiplier * power});
+      }
     }
-    return unitDict;
+    return unitList;
   };
 
   Units.prototype.toDict = function() {
@@ -250,21 +257,22 @@ oppia.factory('UnitsObjectFactory', [function() {
     };
   };
 
-  Units.fromDict = function(unitsDict) {
-    return new Units(unitsDict.units);
+  Units.fromList = function(unitsList) {
+    return new Units(unitsList);
   };
 
-  Units.fromStringToDict = function(unitsString) {
-    return unitToDict(unitWithMultiplier(Units.stringToLexical(unitsString)));
+  Units.fromStringToList = function(unitsString) {
+    return unitToList(unitWithMultiplier(Units.stringToLexical(unitsString)));
   };
 
   Units.prototype.toString = function() {
     var unit = '';
-    for (var key in this.units) {
-      if (!(key === '$') && !(key === 'Rs') && !(key === '₹')) {
-        unit += key + '^' + this.units[key].toString() + ' ';
+    for (var i = 0; i < this.units.length; i++) {
+      var d = this.units[i];
+      if (d.unit === '$' || d.unit === 'Rs' || d.unit === '₹') {
+        unit += d.unit + ' ';
       } else {
-        unit += key + ' ';
+        unit += d.unit + '^' + d.exp.toString() + ' ';
       }
     }
     return unit.trim();
@@ -282,7 +290,7 @@ oppia.factory('UnitsObjectFactory', [function() {
         throw new Error(err);
       }
     }
-    return new Units(Units.fromStringToDict(units));
+    return new Units(Units.fromStringToList(units));
   };
 
   return Units;

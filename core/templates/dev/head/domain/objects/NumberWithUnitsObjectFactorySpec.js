@@ -31,25 +31,31 @@ describe('NumberWithUnitsObjectFactory', function() {
       errors = $injector.get('NUMBER_WITH_UNITS_PARSING_ERRORS');
     }));
 
-    it('should convert units to dict format', function() {
-      expect(Units.fromStringToDict('kg / kg^2 K mol / (N m s^2) K s')).toEqual(
-        {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
-      expect(Units.fromStringToDict('mol/(kg / (N m / s^2)')).toEqual(
-        {mol: 1, kg: -1, N: 1, m: 1, s: -2});
-      expect(Units.fromStringToDict('kg per kg^2 K mol per (N m s^2) K s'
-      )).toEqual({kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1});
+    it('should convert units to list format', function() {
+      expect(Units.fromStringToList('kg / kg^2 K mol / (N m s^2) K s')).toEqual(
+        [{exp: -1, unit: 'kg'}, {exp: 2, unit: 'K'}, {exp: 1, unit: 'mol'},
+          {exp: -1, unit: 'N'}, {exp: -1, unit: 'm'}, {exp: -1, unit: 's'}]);
+      expect(Units.fromStringToList('mol/(kg / (N m / s^2)')).toEqual(
+        [{exp: 1, unit: 'mol'}, {exp: -1, unit: 'kg'}, {exp: 1, unit: 'N'},
+          {exp: 1, unit: 'm'}, {exp: -2, unit: 's'}]);
+      expect(Units.fromStringToList('kg per kg^2 K mol per (N m s^2) K s'
+      )).toEqual([{exp: -1, unit: 'kg'}, {exp: 2, unit: 'K'},
+        {exp: 1, unit: 'mol'}, {exp: -1, unit: 'N'},
+        {exp: -1, unit: 'm'}, {exp: -1, unit: 's'}]);
     });
 
-    it('should convert units from dict to string format', function() {
+    it('should convert units from list to string format', function() {
       expect(new Units(
-        {kg: -1, K: 2, mol: 1, N: -1, m: -1, s: -1}).toString()).toBe(
-        'kg^-1 K^2 mol^1 N^-1 m^-1 s^-1');
+        [{exp: -1, unit: 'kg'}, {exp: 2, unit: 'K'}, {exp: 1, unit: 'mol'},
+          {exp: -1, unit: 'N'}, {exp: -1, unit: 'm'}, {exp: -1, unit: 's'}]
+      ).toString()).toBe('kg^-1 K^2 mol^1 N^-1 m^-1 s^-1');
       expect(new Units(
-        {mol: 1, kg: -1, N: 1, m: 1, s: -2, K: -1}).toString()).toBe(
-        'mol^1 kg^-1 N^1 m^1 s^-2 K^-1');
+        [{exp: 1, unit: 'mol'}, {exp: -1, unit: 'kg'}, {exp: 1, unit: 'N'},
+          {exp: 1, unit: 'm'}, {exp: -2, unit: 's'}]).toString()).toBe(
+        'mol^1 kg^-1 N^1 m^1 s^-2');
     });
 
-    it('should convert units from string to lexical format', function() {
+  it('should convert units from string to lexical format', function() {
       expect(Units.stringToLexical('kg per kg^2 K mol / (N m s^2) K s'
       )).toEqual(
         ['kg', '/', 'kg^2', '*', 'K', '*', 'mol', '/', '(', 'N', '*', 'm', '*',
@@ -83,9 +89,9 @@ describe('NumberWithUnitsObjectFactory', function() {
 
     it('should parse valid units strings', function() {
       expect(Units.fromRawInputString('kg per (K mol^-2)')).toEqual(
-        new Units(Units.fromStringToDict('kg / (K mol^-2)')));
+        new Units(Units.fromStringToList('kg / (K mol^-2)')));
       expect(Units.fromRawInputString('kg / (K mol^-2) N / m^2')).toEqual(
-        new Units(Units.fromStringToDict('kg / (K mol^-2) N / m^2')));
+        new Units(Units.fromStringToList('kg / (K mol^-2) N / m^2')));
     });
 
     it('should parse valid number with units strings', function() {

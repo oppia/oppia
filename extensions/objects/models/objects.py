@@ -834,18 +834,25 @@ class Units(BaseObject):
     # Validation of the units is performed only in the frontend using math.js.
     # math.js is not available in the backend.
 
-    description = 'A units dict representation.'
-    default_value = {}
+    description = 'A list of unit dict components.'
+    default_value = []
 
     SCHEMA = {
-        'type': 'dict',
-        'properties': [{
-            'name': 'units',
-            'schema': {
-                'type': 'ArbitraryDict',
-                'properties': []
-            }
-        }]
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'unit',
+                'schema': {
+                    'type': 'unicode'
+                }
+            }, {
+                'name': 'exp',
+                'schema': {
+                    'type': 'int'
+                }
+            }]
+        }
     }
 
 
@@ -857,8 +864,8 @@ class NumberWithUnits(BaseObject):
     edit_js_filename = 'NumberWithUnitsEditor'
     default_value = {
         'type': 'real',
-        'fraction': Fraction.default_value,
         'real': 0.0,
+        'fraction': Fraction.default_value,
         'unit': Units.default_value
     }
 
