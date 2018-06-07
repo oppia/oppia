@@ -470,6 +470,11 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
 
     calculation_ids_to_outputs = {}
     for calculation_id in calculation_ids:
+        # Don't show top unresolved answers calculation ouutput in stats of
+        # exploration.
+        if calculation_id == 'TopNUnresolvedAnswersByFrequency':
+            continue
+
         # This is None if the calculation job has not yet been run for this
         # state.
         calc_output_domain_object = _get_calc_output(
@@ -478,11 +483,6 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
         # If the calculation job has not yet been run for this state, we simply
         # exclude the corresponding visualization results.
         if calc_output_domain_object is None:
-            continue
-
-        # Don't show top unresolved answers calculation ouutput in stats of
-        # exploration.
-        if calculation_id == 'TopNUnresolvedAnswersByFrequency':
             continue
 
         # If the output was associated with a different interaction ID, skip the
