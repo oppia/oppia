@@ -21,14 +21,14 @@ oppia.directive('booleanEditor', [
       controller: ['$scope', function($scope) {
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('$parent.value', function(newValue) {
+        $scope.$watch('value', function(newValue) {
           $scope.localValue = {
             label: newValue || false
           };
         }, true);
 
         $scope.$watch('localValue.label', function(newValue) {
-          $scope.$parent.value = newValue;
+          $scope.value = newValue;
         });
       }],
       link: function(scope, element) {
@@ -38,7 +38,9 @@ oppia.directive('booleanEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        value: '='
+      },
       template: '<span ng-include="getTemplateUrl()"></span>'
     };
   }]);

@@ -25,7 +25,9 @@ oppia.directive('musicPhraseEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        value: '='
+      },
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: ['$scope', function($scope) {
         // The maximum number of notes allowed in a music phrase.
@@ -51,8 +53,8 @@ oppia.directive('musicPhraseEditor', [
 
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('$parent.value', function(newValue) {
-          // TODO(sll): Check that $scope.$parent.value is a list.
+        $scope.$watch('value', function(newValue) {
+          // TODO(sll): Check that $scope.value is a list.
           $scope.localValue = [];
           if (newValue) {
             for (var i = 0; i < newValue.length; i++) {
@@ -77,7 +79,7 @@ oppia.directive('musicPhraseEditor', [
                   }
                 });
               }
-              $scope.$parent.value = parentValues;
+              $scope.value = parentValues;
             }
           }
         }, true);

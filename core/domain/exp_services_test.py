@@ -680,6 +680,7 @@ states:
                     needs_update: false
             html: Correct!
           labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -698,6 +699,7 @@ states:
                 needs_update: false
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -735,6 +737,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -890,6 +893,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -915,6 +919,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -962,6 +967,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -987,6 +993,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -1120,6 +1127,7 @@ interaction:
       audio_translations: {}
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -1148,6 +1156,7 @@ interaction:
       audio_translations: {}
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -1177,6 +1186,7 @@ interaction:
       audio_translations: {}
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -1293,8 +1303,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'labelled_as_correct': False,
                 'param_changes': [],
                 'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
             },
-            'training_data': []
+            'training_data': [],
+            'tagged_misconception_id': None
         }]
         # Default outcome specification for an interaction.
         self.interaction_default_outcome = {
@@ -1306,6 +1318,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
         }
 
     def test_add_state_cmd(self):
@@ -2570,6 +2583,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []

@@ -24,14 +24,16 @@ oppia.directive('numberWithUnitsEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        value: '='
+      },
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
         var errorMessage = '';
         var numberWithUnitsString = '';
-        if ($scope.$parent.value !== null) {
+        if ($scope.value !== null) {
           var defaultNumberWithUnits =
-            NumberWithUnitsObjectFactory.fromDict($scope.$parent.value);
+            NumberWithUnitsObjectFactory.fromDict($scope.value);
           numberWithUnitsString = defaultNumberWithUnits.toString();
         }
         $scope.localValue = {
@@ -42,7 +44,7 @@ oppia.directive('numberWithUnitsEditor', [
           try {
             var numberWithUnits =
               NumberWithUnitsObjectFactory.fromRawInputString(newValue);
-            $scope.$parent.value = numberWithUnits;
+            $scope.value = numberWithUnits;
             errorMessage = '';
           } catch (parsingError) {
             errorMessage = parsingError.message;

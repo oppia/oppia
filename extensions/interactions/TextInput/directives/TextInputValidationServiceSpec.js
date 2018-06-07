@@ -44,7 +44,8 @@ describe('TextInputValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
     customizationArguments = {
@@ -56,7 +57,7 @@ describe('TextInputValidationService', function() {
       }
     };
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
   }));
 
   it('should be able to perform basic validation', function() {
