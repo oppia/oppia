@@ -49,12 +49,12 @@ oppia.factory('StatsReportingService', [
   '$http', '$interval', 'StopwatchObjectFactory', 'MessengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
   'STATS_EVENT_TYPES', 'ExplorationContextService', 'PAGE_CONTEXT',
-  'DEFAULT_OUTCOME_CLASSIFICATION', 'PlaythroughService',
+  'DEFAULT_OUTCOME_CLASSIFICATION', 'PlaythroughService', 'ENABLE_PLAYTHROUGHS',
   function(
       $http, $interval, StopwatchObjectFactory, MessengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
       STATS_EVENT_TYPES, ExplorationContextService, PAGE_CONTEXT,
-      DEFAULT_OUTCOME_CLASSIFICATION, PlaythroughService) {
+      DEFAULT_OUTCOME_CLASSIFICATION, PlaythroughService, ENABLE_PLAYTHROUGHS) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;
@@ -172,7 +172,10 @@ oppia.factory('StatsReportingService', [
           state_name: stateName,
           session_id: sessionId
         });
-        PlaythroughService.recordExplorationStartAction(stateName);
+
+        if (ENABLE_PLAYTHROUGHS) {
+          PlaythroughService.recordExplorationStartAction(stateName);
+        }
       },
       recordSolutionHit: function(stateName) {
         if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
@@ -266,11 +269,14 @@ oppia.factory('StatsReportingService', [
 
         siteAnalyticsService.registerFinishExploration();
         explorationIsComplete = true;
-        PlaythroughService.recordExplorationQuitAction(
-          stateName, stateStopwatch.getTimeInSecs());
-        postStatsToBackend();
 
-        PlaythroughService.recordPlaythrough();
+        if (ENABLE_PLAYTHROUGHS) {
+          PlaythroughService.recordExplorationQuitAction(
+            stateName, stateStopwatch.getTimeInSecs());
+          postStatsToBackend();
+
+          PlaythroughService.recordPlaythrough();
+        }
       },
       recordAnswerSubmitted: function(
           stateName, params, answer, answerGroupIndex, ruleIndex,
@@ -307,13 +313,17 @@ oppia.factory('StatsReportingService', [
 
         postStatsToBackend();
 
-        PlaythroughService.recordPlaythrough();
+        if (ENABLE_PLAYTHROUGHS) {
+            PlaythroughService.recordPlaythrough();
+        }
       },
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback) {
-        PlaythroughService.recordAnswerSubmitAction(
-          stateName, destStateName, interactionId, answer, feedback,
-          stateStopwatch.getTimeInSecs());
+        if (ENABLE_PLAYTHROUGHS) {
+          PlaythroughService.recordAnswerSubmitAction(
+            stateName, destStateName, interactionId, answer, feedback,
+            stateStopwatch.getTimeInSecs());
+        }
       }
     };
   }
