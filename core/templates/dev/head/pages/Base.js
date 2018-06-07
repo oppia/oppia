@@ -21,7 +21,6 @@ oppia.controller('Base', [
   'SidebarStatusService',
   function($scope, $rootScope, $document, AlertsService, BackgroundMaskService,
       SidebarStatusService) {
-    $scope.additionalAngularModule = GLOBALS.ADDITIONAL_ANGULAR_MODULES;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
     $scope.siteFeedbackFormUrl = GLOBALS.SITE_FEEDBACK_FORM_URL;
