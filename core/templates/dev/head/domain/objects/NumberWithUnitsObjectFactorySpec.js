@@ -55,7 +55,7 @@ describe('NumberWithUnitsObjectFactory', function() {
         'mol^1 kg^-1 N^1 m^1 s^-2');
     });
 
-  it('should convert units from string to lexical format', function() {
+    it('should convert units from string to lexical format', function() {
       expect(Units.stringToLexical('kg per kg^2 K mol / (N m s^2) K s'
       )).toEqual(
         ['kg', '/', 'kg^2', '*', 'K', '*', 'mol', '/', '(', 'N', '*', 'm', '*',
