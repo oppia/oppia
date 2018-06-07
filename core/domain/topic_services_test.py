@@ -239,7 +239,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_subtopic_skill_ids(self):
         changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_MOVE_SKILL_ID,
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
             'old_subtopic_id': None,
             'new_subtopic_id': self.subtopic_id,
             'skill_id': self.skill_id_1
@@ -251,6 +251,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.uncategorized_skill_ids, [])
         self.assertEqual(
             topic.subtopics[0].skill_ids, [self.skill_id_2, self.skill_id_1])
+
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_REMOVE_SKILL_FROM_SUBTOPIC,
+            'subtopic_id': self.subtopic_id,
+            'skill_id': self.skill_id_2
+        })]
+        topic_services.update_topic(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated subtopic skill ids.')
+        topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        self.assertEqual(topic.uncategorized_skill_ids, [self.skill_id_2])
+        self.assertEqual(topic.subtopics[0].skill_ids, [self.skill_id_1])
 
     def test_admin_can_manage_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)

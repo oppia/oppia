@@ -45,7 +45,8 @@ CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
-CMD_MOVE_SKILL_ID = 'move_skill_id'
+CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
+CMD_REMOVE_SKILL_FROM_SUBTOPIC = 'remove_skill_from_subtopic'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
@@ -63,7 +64,7 @@ class TopicChange(object):
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'property_name', 'new_value', 'old_value', 'name', 'id', 'title',
-        'old_subtopic_id', 'new_subtopic_id'
+        'old_subtopic_id', 'new_subtopic_id', 'subtopic_id'
     ]
 
     def __init__(self, change_dict):
@@ -93,9 +94,12 @@ class TopicChange(object):
             self.id = change_dict['new_uncategorized_skill_id']
         elif self.cmd == CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
             self.id = change_dict['uncategorized_skill_id']
-        elif self.cmd == CMD_MOVE_SKILL_ID:
+        elif self.cmd == CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
             self.old_subtopic_id = change_dict['old_subtopic_id']
             self.new_subtopic_id = change_dict['new_subtopic_id']
+            self.skill_id = change_dict['skill_id']
+        elif self.cmd == CMD_REMOVE_SKILL_FROM_SUBTOPIC:
+            self.subtopic_id = change_dict['subtopic_id']
             self.skill_id = change_dict['skill_id']
         elif self.cmd == CMD_UPDATE_TOPIC_PROPERTY:
             if change_dict['property_name'] not in self.TOPIC_PROPERTIES:
@@ -608,31 +612,24 @@ class Topic(object):
                 'The subtopic with id %s does not exist.' % subtopic_id)
         self.subtopics[subtopic_index].title = new_title
 
-    def move_skill_id(self, old_subtopic_id, new_subtopic_id, skill_id):
+    def move_skill_id_to_subtopic(
+            self, old_subtopic_id, new_subtopic_id, skill_id):
         """Moves the skill_id to a new subtopic or to uncategorized skill ids.
 
         Args:
             old_subtopic_id: str or None. The id of the subtopic in which the
                 skill is present currently (before moving) or None is it is
                 uncategorized.
-            new_subtopic_id: str or None. The new subtopic to which the skill is
-                ro be moved or None if it is to be uncategrized.
+            new_subtopic_id: str. The new subtopic to which the skill is
+                to be moved.
             skill_id: str. The skill id which is to be moved.
 
         Raises:
             Exception. The subtopic with the given id doesn't exist.
             Exception. The skill id should be present in the old subtopic
                 (or uncategorized) already before moving.
-            Exception. The skill id is already present in the subtopic
-                (or already uncategorized).
-            Exception. At least one of origin or target subtopic ids should be
-                not None.
+            Exception. The skill id is already present in the subtopic.
         """
-        if (old_subtopic_id is None) and (new_subtopic_id is None):
-            raise Exception(
-                'At least one of origin or target subtopic ids should be not'
-                ' None.')
-
         if old_subtopic_id is not None:
             old_subtopic_index = self.get_subtopic_index(old_subtopic_id)
             if old_subtopic_index is None:
@@ -648,31 +645,49 @@ class Topic(object):
                 raise Exception(
                     'Skill id %s is not an uncategorized skill id.' % skill_id)
 
-        if new_subtopic_id is not None:
-            new_subtopic_index = self.get_subtopic_index(new_subtopic_id)
-            if new_subtopic_index is None:
-                raise Exception(
-                    'The subtopic with id %s does not exist.' % new_subtopic_id)
-            if skill_id in self.subtopics[new_subtopic_index].skill_ids:
-                raise Exception(
-                    'Skill id %s is already present in the target subtopic'
-                    % skill_id)
-
-        if new_subtopic_id is None:
-            if skill_id in self.uncategorized_skill_ids:
-                raise Exception(
-                    'Skill id %s is already an uncategorized skill id.'
-                    % skill_id)
+        new_subtopic_index = self.get_subtopic_index(new_subtopic_id)
+        if new_subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % new_subtopic_id)
+        if skill_id in self.subtopics[new_subtopic_index].skill_ids:
+            raise Exception(
+                'Skill id %s is already present in the target subtopic'
+                % skill_id)
 
         if old_subtopic_id is None:
             self.uncategorized_skill_ids.remove(skill_id)
         else:
             self.subtopics[old_subtopic_index].skill_ids.remove(skill_id)
 
-        if new_subtopic_id is None:
+        self.subtopics[new_subtopic_index].skill_ids.append(skill_id)
+
+    def remove_skill_from_subtopic(self, subtopic_id, skill_id):
+        """Removes the skill_id from a subtopic and adds it to
+        uncategorized skill ids.
+
+        Args:
+            subtopic_id: str. The subtopic from which the skill is
+                to be removed.
+            skill_id: str. The skill id which is to be removed.
+
+        Raises:
+            Exception. The subtopic with the given id doesn't exist.
+            Exception. The skill id should be present in the old subtopic
+                already before moving.
+        """
+
+        subtopic_index = self.get_subtopic_index(subtopic_id)
+        if subtopic_index is None:
+            raise Exception(
+                'The subtopic with id %s does not exist.' % subtopic_id)
+        if skill_id not in self.subtopics[subtopic_index].skill_ids:
+            raise Exception(
+                'Skill id %s is not present in the old subtopic'
+                % skill_id)
+
+        self.subtopics[subtopic_index].skill_ids.remove(skill_id)
+        if skill_id not in self.uncategorized_skill_ids:
             self.uncategorized_skill_ids.append(skill_id)
-        else:
-            self.subtopics[new_subtopic_index].skill_ids.append(skill_id)
 
 
 class TopicSummary(object):

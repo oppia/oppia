@@ -179,24 +179,10 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self.topic.remove_uncategorized_skill_id('skill_id_5')
         self.assertEqual(self.topic.uncategorized_skill_ids, [])
 
-    def test_move_skill_id(self):
+    def test_move_skill_id_to_subtopic(self):
         self.topic.uncategorized_skill_ids = ['skill_id_1']
         self.topic.subtopics[0].skill_ids = ['skill_id_2']
-        self.topic.move_skill_id('id_1', None, 'skill_id_2')
-        self.assertEqual(
-            self.topic.uncategorized_skill_ids, ['skill_id_1', 'skill_id_2'])
-        self.assertEqual(self.topic.subtopics[0].skill_ids, [])
-
-        self.topic.uncategorized_skill_ids = ['skill_id_1']
-        self.topic.subtopics[0].skill_ids = ['skill_id_2']
-        with self.assertRaisesRegexp(
-            Exception,
-            'Skill id skill_id_1 is not present in the given old subtopic'):
-            self.topic.move_skill_id('id_1', None, 'skill_id_1')
-
-        self.topic.uncategorized_skill_ids = ['skill_id_1']
-        self.topic.subtopics[0].skill_ids = ['skill_id_2']
-        self.topic.move_skill_id(None, 'id_1', 'skill_id_1')
+        self.topic.move_skill_id_to_subtopic(None, 'id_1', 'skill_id_1')
         self.assertEqual(self.topic.uncategorized_skill_ids, [])
         self.assertEqual(
             self.topic.subtopics[0].skill_ids, ['skill_id_2', 'skill_id_1'])
@@ -206,7 +192,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception,
             'Skill id skill_id_3 is not an uncategorized skill id'):
-            self.topic.move_skill_id(None, 'id_1', 'skill_id_3')
+            self.topic.move_skill_id_to_subtopic(None, 'id_1', 'skill_id_3')
 
     def test_get_subtopic_index(self):
         self.assertIsNone(self.topic.get_subtopic_index('id_2'))
