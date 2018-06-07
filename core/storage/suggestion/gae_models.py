@@ -48,16 +48,16 @@ STATUS_CHOICES = [
 ]
 
 # Constants defining various suggestion types.
-SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
 
 SUGGESTION_TYPE_CHOICES = [
-    SUGGESTION_TYPE_EDIT_STATE_CONTENT
+    SUGGESTION_EDIT_STATE_CONTENT
 ]
 
 # Defines what is the minimum role required to review suggestions
 # of a particular type.
 SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
-    SUGGESTION_TYPE_EDIT_STATE_CONTENT: feconf.ROLE_ID_EXPLORATION_EDITOR
+    SUGGESTION_EDIT_STATE_CONTENT: feconf.ROLE_ID_EXPLORATION_EDITOR
 }
 
 # Constants defining various contribution types.
