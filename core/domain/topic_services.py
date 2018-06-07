@@ -268,8 +268,10 @@ def apply_change_list(topic_id, change_list):
                 topic.add_uncategorized_skill_id(change.id)
             elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
                 topic.remove_uncategorized_skill_id(change.id)
-            elif change.cmd == topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC:
-                topic.move_skill_id_to_subtopic(change.id, change.skill_id)
+            elif change.cmd == topic_domain.CMD_MOVE_SKILL_ID:
+                topic.move_skill_id(
+                    change.old_subtopic_id, change.new_subtopic_id,
+                    change.skill_id)
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.TOPIC_PROPERTY_NAME):

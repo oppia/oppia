@@ -103,7 +103,8 @@ class StoryChange(object):
             self.node_id = change_dict['node_id']
         elif self.cmd == CMD_UPDATE_STORY_NODE_OUTLINE_STATUS:
             self.node_id = change_dict['node_id']
-            self.finalized = change_dict['finalized']
+            self.old_value = change_dict['old_value']
+            self.new_value = change_dict['new_value']
         elif self.cmd == CMD_UPDATE_STORY_NODE_PROPERTY:
             if (change_dict['property_name'] not in
                     self.STORY_NODE_PROPERTIES):
@@ -172,8 +173,8 @@ class StoryNode(object):
                 can use to construct the exploration. It describes the basic
                 theme or template of the story and is to be provided in html
                 form.
-            outline_is_finalized: bool. Whether the outlines for the story
-                node are finalized or not.
+            outline_is_finalized: bool. Whether the outline for the story
+                node is finalized or not.
             exploration_id: str or None. The valid exploration id that fits the
                 story node. It can be None initially, when the story creator
                 has just created a story with the basic storyline (by providing
@@ -784,28 +785,37 @@ class Story(object):
                 'The node with id %s is not part of this story' % node_id)
         self.story_contents.nodes[node_index].outline = new_outline
 
-    def update_node_outline_status(self, node_id, outline_finalized):
+    def mark_node_outline_as_finalized(self, node_id):
         """Updates the outline_is_finalized field of the node with the given
-        node_id with outline_finalized.
+        node_id as True.
 
         Args:
             node_id: str. The id of the node.
-            outline_finalized: bool. The new status of the node outline.
 
         Raises:
             ValueError: The node is not part of the story.
-            ValueError. outline_finalized is not a boolean.
         """
         node_index = self.story_contents.get_node_index(node_id)
         if node_index is None:
             raise ValueError(
                 'The node with id %s is not part of this story' % node_id)
-        if not isinstance(outline_finalized, bool):
+        self.story_contents.nodes[node_index].outline_is_finalized = True
+
+    def mark_node_outline_as_unfinalized(self, node_id):
+        """Updates the outline_is_finalized field of the node with the given
+        node_id as False.
+
+        Args:
+            node_id: str. The id of the node.
+
+        Raises:
+            ValueError: The node is not part of the story.
+        """
+        node_index = self.story_contents.get_node_index(node_id)
+        if node_index is None:
             raise ValueError(
-                'The outline_finalized value should be boolean, received %s'
-                % outline_finalized)
-        self.story_contents.nodes[node_index].outline_is_finalized = (
-            outline_finalized)
+                'The node with id %s is not part of this story' % node_id)
+        self.story_contents.nodes[node_index].outline_is_finalized = False
 
     def update_node_acquired_skill_ids(self, node_id, new_acquired_skill_ids):
         """Updates the acquired skill ids field of a given node.

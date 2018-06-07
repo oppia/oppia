@@ -239,8 +239,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
     def test_update_subtopic_skill_ids(self):
         changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-            'subtopic_id': self.subtopic_id,
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID,
+            'old_subtopic_id': None,
+            'new_subtopic_id': self.subtopic_id,
             'skill_id': self.skill_id_1
         })]
         topic_services.update_topic(

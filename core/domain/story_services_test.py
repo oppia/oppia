@@ -130,7 +130,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
                 'node_id': self.NODE_ID_2,
-                'finalized': True
+                'old_value': False,
+                'new_value': True
             }),
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY,
@@ -163,7 +164,8 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
             story_domain.StoryChange({
                 'cmd': story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS,
                 'node_id': self.NODE_ID_2,
-                'finalized': False
+                'old_value': True,
+                'new_value': False
             }),
         ]
         story_services.update_story(
