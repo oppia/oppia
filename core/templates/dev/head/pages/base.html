@@ -78,7 +78,8 @@
           '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
         ACTIVITY_STATUS_PUBLIC: JSON.parse(
           '{{ACTIVITY_STATUS_PUBLIC|js_string}}'),
-        ADDITIONAL_ANGULAR_MODULES: [],
+        ADDITIONAL_ANGULAR_MODULES: JSON.parse(
+          '{{additional_angular_modules|js_string}}'),
         ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
         can_create_collections: JSON.parse(
           '{{can_create_collections|js_string}}'),
@@ -108,11 +109,6 @@
         PROMO_BAR_IS_ENABLED: JSON.parse('{{promo_bar_enabled|js_string}}'),
         PROMO_BAR_MESSAGE: JSON.parse('{{promo_bar_message|js_string}}')
       };
-
-      {% if additional_angular_modules %}
-        GLOBALS.ADDITIONAL_ANGULAR_MODULES = JSON.parse(
-          '{{additional_angular_modules|js_string}}');
-      {% endif %}
     </script>
 
     {% block header_js %}

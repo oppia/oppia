@@ -195,6 +195,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
+        self.values['additional_angular_modules'] = []
         self.values['is_moderator'] = user_services.is_at_least_moderator(
             self.user_id)
         self.values['is_admin'] = user_services.is_admin(self.user_id)
