@@ -123,8 +123,8 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       var imageTagList = dummyElement.getElementsByTagName(
         'oppia-noninteractive-image');
       for (i = 0; i < imageTagList.length; i++) {
-        var filepathObject = JSON.parse((imageTagList[i].getAttribute(
-          'filepath-with-value')));
+        var filepathObject = JSON.parse(
+          imageTagList[i].getAttribute('filepath-with-value'));
         // The images already there in Oppia have image filenames as the value
         // for the attribute 'filepath-with-value'. In explorations the
         // the attribute value is an object of the form --
@@ -206,7 +206,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       }
       var allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {
-        fileDimensions = Object.assign(fileDimensions,
+        Object.assign(fileDimensions,
           _getImageDimensionsFromFilepathValue(htmlStr));
       });
       return fileDimensions;

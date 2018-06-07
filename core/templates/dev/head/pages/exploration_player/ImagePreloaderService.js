@@ -49,11 +49,11 @@ oppia.factory('ImagePreloaderService', [
      */
     var _getDimensionsOfImages = function() {
       _imageDimensions = {};
-      var states = (_states.getStateNames()).map(function(stateName){
+      var states = (_states.getStateNames()).map(function(stateName) {
         return _states.getState(stateName);
       });
       states.forEach(function(state){
-        _imageDimensions = Object.assign(_imageDimensions,
+        Object.assign(_imageDimensions,
           ExtractImageFilenamesFromStateService.getImageDimensionsInState(
             state));
       });

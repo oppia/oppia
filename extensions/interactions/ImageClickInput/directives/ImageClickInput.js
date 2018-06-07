@@ -75,8 +75,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               width: loadingIndicatorSize + 'px'
             };
           }
-          ImagePreloaderService.getImageUrl($scope.filepath.name
-          ).then(function(objectUrl) {
+          ImagePreloaderService.getImageUrl($scope.filepath.name)
+          .then(function(objectUrl) {
             $scope.isLoadingIndicatorShown = false;
             $scope.imageUrl = objectUrl;
           });
