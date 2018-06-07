@@ -15,7 +15,6 @@
 """Tests for suggestion registry classes."""
 
 from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import suggestion_registry
 from core.platform import models
 from core.tests import test_utils
