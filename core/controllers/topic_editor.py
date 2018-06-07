@@ -83,6 +83,69 @@ class TopicEditorPage(base.BaseHandler):
         self.render_template('pages/topic_editor/topic_editor.html')
 
 
+class EdiableSubtopicPageDataHandler(base.BaseHandler):
+    """The editor page for a single topic."""
+
+    @acl_decorators.can_edit_topic
+    def get(self, topic_id, subtopic_id):
+        """Handles GET requests."""
+
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        topic_domain.Topic.require_valid_topic_id(topic_id)
+
+        subtopic_page_id = topic_domain.SubtopicPage.get_subtopic_page_id(
+            topic_id, subtopic_id)
+        subtopic_page = topic_services.get_subtopic_page_by_id(
+            subtopic_page_id, strict=False)
+
+        if subtopic_page is None:
+            raise self.PageNotFoundException(
+                Exception('The subtopic with the given id doesn\'t exist.'))
+
+        self.values.update({
+            'subtopic_page': subtopic_page.to_dict()
+        })
+
+        self.render_json(self.values)
+
+    @acl_decorators.can_edit_topic
+    def put(self, topic_id, subtopic_id):
+        """Updates properties of the given topic."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        subtopic_page_id = topic_domain.SubtopicPage.get_subtopic_page_id(
+            topic_id, subtopic_id)
+        subtopic_page = topic_services.get_subtopic_page_by_id(
+            subtopic_page_id, strict=False)
+
+        if subtopic_page is None:
+            raise self.PageNotFoundException(
+                Exception('The subtopic with the given id doesn\'t exist.'))
+
+        change_dicts = self.payload.get('change_dicts')
+        change_list = [
+            topic_domain.TopicChange(change_dict)
+            for change_dict in change_dicts
+        ]
+        try:
+            topic_services.update_subtopic_page(
+                topic_id, subtopic_id, change_list)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        subtopic_page_dict = topic_services.get_subtopic_page_by_id(
+            subtopic_page_id).to_dict()
+
+        self.values.update({
+            'subtopic_page': subtopic_page_dict
+        })
+
+        self.render_json(self.values)
+
+
 class EditableTopicDataHandler(base.BaseHandler):
     """A data handler for topics which supports writing."""
 

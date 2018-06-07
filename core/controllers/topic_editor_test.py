@@ -48,6 +48,12 @@ class BaseTopicEditorControllerTest(test_utils.GenericTestBase):
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description', [], [], [],
             [], 1)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title'
+        })]
+        topic_services.update_topic(
+            self.admin_id, self.topic_id, changelist, 'Added subtopic.')
 
 
 class NewStoryHandlerTest(BaseTopicEditorControllerTest):
@@ -69,6 +75,71 @@ class NewStoryHandlerTest(BaseTopicEditorControllerTest):
             self.assertIsNotNone(
                 story_services.get_story_by_id(story_id, strict=False))
         self.logout()
+
+
+class SubtopicPageEditorTest(BaseTopicEditorControllerTest):
+
+    def test_editable_subtopic_page_get(self):
+        # Check that non-admins cannot access the editable subtopic data.
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            self.login(self.NEW_USER_EMAIL)
+            response = self.testapp.get(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
+
+            # Check that admins can access the editable subtopic data.
+            self.login(self.ADMIN_EMAIL)
+            json_response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1))
+            subtopic_page_id = topic_domain.SubtopicPage.get_subtopic_page_id(
+                self.topic_id, 1)
+            self.assertEqual(
+                subtopic_page_id, json_response['subtopic_page']['id'])
+            self.logout()
+
+    def test_editable_subtopic_page_put(self):
+        # Check that admins can edit a topic.
+        change_cmd = {
+            'change_dicts': [{
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'html_data',
+                'old_value': '',
+                'new_value': '<p>New Data</p>'
+            }]
+        }
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            csrf_token = self.get_csrf_token_from_response(response)
+
+            json_response = self.put_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1),
+                change_cmd, csrf_token=csrf_token)
+            subtopic_page_id = topic_domain.SubtopicPage.get_subtopic_page_id(
+                self.topic_id, 1)
+            self.assertEqual(
+                subtopic_page_id, json_response['subtopic_page']['id'])
+            self.assertEqual(
+                '<p>New Data</p>', json_response['subtopic_page']['html_data'])
+            self.logout()
+
+            # Check that non-admins cannot edit a topic.
+            json_response = self.put_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1),
+                change_cmd, csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=401)
+            self.assertEqual(json_response['status_code'], 401)
 
 
 class TopicEditorTest(BaseTopicEditorControllerTest):
@@ -167,7 +238,7 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
     def test_editable_topic_handler_put(self):
         # Check that admins can edit a topic.
         change_cmd = {
-            'version': 1,
+            'version': 2,
             'commit_message': 'changed name',
             'change_dicts': [{
                 'cmd': 'update_topic_property',
