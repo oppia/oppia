@@ -88,13 +88,6 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
                 return exp
         return None
 
-
-    def return_true(self):
-        return True
-
-    def return_false(self):
-        return False
-
     def null_function(self):
         pass
 

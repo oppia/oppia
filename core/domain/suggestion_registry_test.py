@@ -23,15 +23,30 @@ from core.tests import test_utils
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
 
-class SuggestionRegistryUnitTests(test_utils.GenericTestBase):
-    """Tests for the suggestion class."""
+class BaseSuggestionUnitTests(test_utils.GenericTestBase):
+    """Tests for the BaseSuggestion class."""
+
+    def test_base_class_methods_raises_error(self):
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseSuggestion should implement __init__.'):
+            suggestion_registry.BaseSuggestion()
+
+        with self.assertRaisesRegexp(
+            NotImplementedError,
+            'Subclasses of BaseSuggestion should implement from_dict.'):
+            suggestion_registry.BaseSuggestion.from_dict()
+
+
+class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
+    """Tests for the SuggestionEditStateContent class."""
 
     AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_EMAIL = 'reviewer@example.com'
     ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
 
     def setUp(self):
-        super(SuggestionRegistryUnitTests, self).setUp()
+        super(SuggestionEditStateContentUnitTests, self).setUp()
 
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
@@ -61,17 +76,6 @@ class SuggestionRegistryUnitTests(test_utils.GenericTestBase):
             'score_category': 'content.Algebra'
         }
 
-    def test_base_class_methods_raises_error(self):
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            'Subclasses of BaseSuggestion should implement __init__.'):
-            suggestion_registry.BaseSuggestion()
-
-        with self.assertRaisesRegexp(
-            NotImplementedError,
-            'Subclasses of BaseSuggestion should implement from_dict.'):
-            suggestion_registry.BaseSuggestion.from_dict()
-
     def test_create_suggestion_edit_state_content(self):
         expected_suggestion_dict = self.suggestion_dict
 
@@ -87,6 +91,29 @@ class SuggestionRegistryUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
 
+    def test_from_dict_suggestion_edit_state_content(self):
+        observed_suggestion = (
+            suggestion_registry.SuggestionEditStateContent.from_dict(
+                self.suggestion_dict))
+        self.assertDictEqual(
+            observed_suggestion.to_dict(), self.suggestion_dict)
+        self.assertIsInstance(
+            observed_suggestion, suggestion_registry.SuggestionEditStateContent)
+
+    def test_validate_suggestion_edit_state_content(self):
+        expected_suggestion_dict = self.suggestion_dict
+
+        suggestion = suggestion_registry.SuggestionEditStateContent(
+            expected_suggestion_dict['suggestion_id'],
+            expected_suggestion_dict['target_id'],
+            expected_suggestion_dict['target_version_at_submission'],
+            expected_suggestion_dict['status'], self.author_id,
+            self.assigned_reviewer_id, self.reviewer_id,
+            expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'])
+
+        suggestion.validate()
+
     def test_get_score_part_helper_methods(self):
         expected_suggestion_dict = self.suggestion_dict
 
@@ -101,47 +128,3 @@ class SuggestionRegistryUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(suggestion.get_score_type(), 'content')
         self.assertEqual(suggestion.get_score_sub_type(), 'Algebra')
-
-
-    def test_from_dict_suggestion_edit_state_content(self):
-        observed_suggestion = (
-            suggestion_registry.SuggestionEditStateContent.from_dict(
-                self.suggestion_dict))
-        self.assertDictEqual(
-            observed_suggestion.to_dict(), self.suggestion_dict)
-        self.assertIsInstance(
-            observed_suggestion, suggestion_registry.SuggestionEditStateContent)
-
-    class MockExploration(object):
-        """Mocks an exploration. To be used only for testing."""
-        def __init__(self, exploration_id, states):
-            self.id = exploration_id
-            self.states = states
-
-    # All mock explorations created for testing.
-    explorations = [
-        MockExploration('exp1', {'state_1': {}, 'state_2': {}})
-    ]
-
-    def mock_get_exploration_by_id(self, exp_id):
-        for exp in self.explorations:
-            if exp.id == exp_id:
-                return exp
-        return None
-
-    def test_validate_suggestion_edit_state_content(self):
-        expected_suggestion_dict = self.suggestion_dict
-
-        suggestion = suggestion_registry.SuggestionEditStateContent(
-            expected_suggestion_dict['suggestion_id'],
-            expected_suggestion_dict['target_id'],
-            expected_suggestion_dict['target_version_at_submission'],
-            expected_suggestion_dict['status'], self.author_id,
-            self.assigned_reviewer_id, self.reviewer_id,
-            expected_suggestion_dict['change_cmd'],
-            expected_suggestion_dict['score_category'])
-
-        with self.swap(
-            exp_services, 'get_exploration_by_id',
-            self.mock_get_exploration_by_id):
-            suggestion.validate()
