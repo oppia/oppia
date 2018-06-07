@@ -110,6 +110,7 @@ def get_topic_from_model(topic_model, run_conversion=True):
             for subtopic in versioned_subtopics['subtopics']
         ],
         versioned_subtopics['schema_version'],
+        topic_model.next_subtopic_id,
         topic_model.language_code,
         topic_model.version, topic_model.created_on,
         topic_model.last_updated)
@@ -136,6 +137,21 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.subtopic_count,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
+    )
+
+
+def get_subtopic_page_from_model(subtopic_page_model):
+    """Returns a domain object for an SubtopicPage given a subtopic page model.
+
+    Args:
+        subtopic_page_model: SubtopicPageModel.
+
+    Returns:
+        SubtopicPage.
+    """
+    return topic_domain.SubtopicPage(
+        subtopic_page_model.id, subtopic_page_model.topic_id,
+        subtopic_page_model.html_data, subtopic_page_model.language_code
     )
 
 
@@ -168,6 +184,27 @@ def get_topic_by_id(topic_id, strict=True, version=None):
             return topic
         else:
             return None
+
+
+def get_subtopic_page_by_id(subtopic_page_id, strict=True):
+    """Returns a domain object representing a topic.
+
+    Args:
+        subtopic_page_id: str. ID of the subtopic page model.
+        strict: bool. Whether to fail noisily if no topic with the given
+            id exists in the datastore.
+
+    Returns:
+        SubtopicPage or None. The domain object representing a subtopic page
+            with the given id, or None if it does not exist.
+    """
+    subtopic_page_model = topic_models.SubtopicPageModel.get(
+        subtopic_page_id, strict=strict)
+    if subtopic_page_model:
+        subtopic_page = get_subtopic_page_from_model(subtopic_page_model)
+        return subtopic_page
+    else:
+        return None
 
 
 def get_topic_summary_by_id(topic_id, strict=True):
@@ -222,6 +259,7 @@ def _create_topic(committer_id, topic, commit_message, commit_cmds):
         additional_story_ids=topic.additional_story_ids,
         uncategorized_skill_ids=topic.uncategorized_skill_ids,
         subtopic_schema_version=topic.subtopic_schema_version,
+        next_subtopic_id=topic.next_subtopic_id,
         subtopics=[subtopic.to_dict() for subtopic in topic.subtopics]
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
@@ -246,6 +284,36 @@ def save_new_topic(committer_id, topic):
         })])
 
 
+def update_subtopic_page(topic_id, subtopic_id, change_list):
+    """Applies a changelist and updates the subtopic page model entry in the
+    datastore.
+
+    Args:
+        topic_id: str. The topic id in which the subtopic is present.
+        subtopic_id: int. The id of the subtopic.
+        change_list: list(TopiChange). The list of changes that are to be
+            applied to the subtopic page object.
+    """
+    subtopic_page_id = topic_domain.SubtopicPage.get_subtopic_page_id(
+        topic_id, subtopic_id)
+    subtopic_page = get_subtopic_page_by_id(subtopic_page_id)
+    try:
+        for change in change_list:
+            if change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY:
+                if (change.property_name ==
+                        topic_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA):
+                    subtopic_page.update_html_data(change.new_value)
+
+    except Exception as e:
+        logging.error(
+            '%s %s %s %s %s' % (
+                e.__class__.__name__, e, topic_id, subtopic_id, change_list)
+        )
+        raise
+
+    save_subtopic_page_model(subtopic_page)
+
+
 def apply_change_list(topic_id, change_list):
     """Applies a changelist to a topic and returns the result.
 
@@ -261,9 +329,13 @@ def apply_change_list(topic_id, change_list):
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
-                topic.add_subtopic(change.id, change.title)
+                subtopic_page = topic.add_subtopic(change.title)
+                save_subtopic_page_model(subtopic_page)
             elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
                 topic.delete_subtopic(change.id)
+                delete_subtopic_page(
+                    topic_domain.SubtopicPage.get_subtopic_page_id(
+                        topic_id, change.id))
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
                 topic.add_uncategorized_skill_id(change.id)
             elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
@@ -352,6 +424,7 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic_model.uncategorized_skill_ids = topic.uncategorized_skill_ids
     topic_model.subtopics = [subtopic.to_dict() for subtopic in topic.subtopics]
     topic_model.subtopic_schema_version = topic.subtopic_schema_version
+    topic_model.next_subtopic_id = topic.next_subtopic_id
     topic_model.language_code = topic.language_code
     change_dicts = [change.to_dict() for change in change_list]
     topic_model.commit(committer_id, commit_message, change_dicts)
@@ -500,6 +573,35 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     # Delete the summary of the topic (regardless of whether
     # force_deletion is True or not).
     delete_topic_summary(topic_id)
+
+
+def save_subtopic_page_model(subtopic_page):
+    """Save a subtopic page domain object as a SubtopicPageModel
+    entity in the datastore.
+
+    Args:
+        subtopic_page: The subtopic page object to be saved in the
+            datastore.
+    """
+    subtopic_page.validate()
+    subtopic_page_model = topic_models.SubtopicPageModel(
+        id=subtopic_page.id,
+        topic_id=subtopic_page.topic_id,
+        html_data=subtopic_page.html_data,
+        language_code=subtopic_page.language_code
+    )
+
+    subtopic_page_model.put()
+
+
+def delete_subtopic_page(subtopic_page_id):
+    """Delete a topic summary model.
+
+    Args:
+        subtopic_page_id: str. ID of the subtopic page to be deleted.
+    """
+
+    topic_models.SubtopicPageModel.get(subtopic_page_id).delete()
 
 
 def delete_topic_summary(topic_id):

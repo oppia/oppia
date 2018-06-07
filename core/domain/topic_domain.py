@@ -19,6 +19,7 @@
 import copy
 
 from constants import constants
+from core.domain import html_cleaner
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -41,6 +42,8 @@ TOPIC_PROPERTY_LANGUAGE_CODE = 'language_code'
 
 SUBTOPIC_PROPERTY_TITLE = 'title'
 
+SUBTOPIC_PAGE_PROPERTY_HTML_DATA = 'html_data'
+
 CMD_ADD_SUBTOPIC = 'add_subtopic'
 CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
@@ -51,6 +54,7 @@ CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'REMOVE_SKILL_ID_FROM_SUBTOPIC'
 # optionally, 'old_value'.
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
 CMD_UPDATE_SUBTOPIC_PROPERTY = 'update_subtopic_property'
+CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
 
 
 class TopicChange(object):
@@ -61,6 +65,8 @@ class TopicChange(object):
         TOPIC_PROPERTY_LANGUAGE_CODE)
 
     SUBTOPIC_PROPERTIES = (SUBTOPIC_PROPERTY_TITLE,)
+
+    SUBTOPIC_PAGE_PROPERTIES = (SUBTOPIC_PAGE_PROPERTY_HTML_DATA,)
 
     OPTIONAL_CMD_ATTRIBUTE_NAMES = [
         'property_name', 'new_value', 'old_value', 'name', 'id', 'title',
@@ -86,7 +92,6 @@ class TopicChange(object):
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_ADD_SUBTOPIC:
-            self.id = change_dict['subtopic_id']
             self.title = change_dict['title']
         elif self.cmd == CMD_DELETE_SUBTOPIC:
             self.id = change_dict['subtopic_id']
@@ -111,6 +116,13 @@ class TopicChange(object):
             if change_dict['property_name'] not in self.SUBTOPIC_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.id = change_dict['subtopic_id']
+            self.property_name = change_dict['property_name']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
+        elif self.cmd == CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY:
+            if (change_dict['property_name'] not in
+                    self.SUBTOPIC_PAGE_PROPERTIES):
+                raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
             self.new_value = copy.deepcopy(change_dict['new_value'])
             self.old_value = copy.deepcopy(change_dict['old_value'])
@@ -142,7 +154,7 @@ class Subtopic(object):
         """Constructs a Subtopic domain object.
 
         Args:
-            subtopic_id: str. The unique ID of the subtopic.
+            subtopic_id: int. The number of the subtopic.
             title: str. The title of the subtopic.
             skill_ids: list(str). The list of skill ids that are part of this
                 subtopic.
@@ -199,6 +211,9 @@ class Subtopic(object):
             ValidationError: One or more attributes of the subtopic are
                 invalid.
         """
+        if not isinstance(self.id, int):
+            raise utils.ValidationError(
+                'Expected subtopic id to be an int, received %s' % self.id)
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected subtopic title to be a string, received %s' %
@@ -221,14 +236,107 @@ class Subtopic(object):
                     % (skill_id, self.id))
 
 
+class SubtopicPage(object):
+    """Domain object for a Subtopic page."""
+
+    def __init__(self, subtopic_page_id, topic_id, html_data, language_code):
+        """Constructs a SubtopicPage domain object.
+
+        Args:
+            subtopic_page_id: str. The unique ID of the subtopic page.
+            topic_id: str. The topic that this subtopic is a part of.
+            html_data: str. The html data that describes this subtopic.
+            language_code: str. The ISO 639-1 code for the language this
+                sub topic page is written in.
+        """
+        self.id = subtopic_page_id
+        self.topic_id = topic_id
+        self.html_data = html_cleaner.clean(html_data)
+        self.language_code = language_code
+
+    def to_dict(self):
+        """Returns a dict representing this SubtopicPage domain object.
+
+        Returns:
+            A dict, mapping all fields of SubtopicPage instance.
+        """
+        return {
+            'id': self.id,
+            'topic_id': self.topic_id,
+            'html_data': self.html_data,
+            'language_code': self.language_code
+        }
+
+    @classmethod
+    def get_subtopic_page_id(cls, topic_id, subtopic_id):
+        """Returns the subtopic page id from the topic is and subtopic_id.
+
+        Args:
+            topic_id: str. The id of the topic that the subtopic is a part of.
+            subtopic_id: int. The id of the subtopic.
+
+        Returns:
+            str. The subtopic_page_id calculated from the given values.
+        """
+        return '%s-%s' % (topic_id, subtopic_id)
+
+    @classmethod
+    def create_default_subtopic_page(cls, subtopic_page_id, topic_id):
+        """Creates a SubtopicPage object with default values.
+
+        Args:
+            subtopic_page_id: str. ID of the new subtopic page.
+            topic_id: str. The topic to which this page is linked with.
+
+        Returns:
+            SubtopicPage. A subtopic object with given id, topic_id and empty
+                html_data field.
+        """
+        return cls(
+            subtopic_page_id, topic_id, '', constants.DEFAULT_LANGUAGE_CODE)
+
+    def update_html_data(self, new_html_data):
+        """The new value for the html data field.
+
+        Args:
+            new_html_data: str. The new html data for the subtopic page.
+        """
+        self.html_data = new_html_data
+
+    def validate(self):
+        """Validates various properties of the SubtopicPage object.
+
+        Raises:
+            ValidationError: One or more attributes of the subtopic page are
+                invalid.
+        """
+        if not isinstance(self.topic_id, basestring):
+            raise utils.ValidationError(
+                'Expected topic_id to be a string, received %s' %
+                self.topic_id)
+        if not isinstance(self.html_data, basestring):
+            raise utils.ValidationError(
+                'Expected html data to be a string, received %s' %
+                self.html_data)
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language code to be a string, received %s' %
+                self.language_code)
+        if not any([self.language_code == lc['code']
+                    for lc in constants.ALL_LANGUAGE_CODES]):
+            raise utils.ValidationError(
+                'Invalid language code: %s' % self.language_code)
+
+
 class Topic(object):
     """Domain object for an Oppia Topic."""
 
     def __init__(
             self, topic_id, name, description, canonical_story_ids,
             additional_story_ids, uncategorized_skill_ids, subtopics,
-            subtopic_schema_version, language_code, version, created_on=None,
-            last_updated=None):
+            subtopic_schema_version, next_subtopic_id, language_code, version,
+            created_on=None, last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
@@ -245,6 +353,7 @@ class Topic(object):
                 the topic.
             subtopic_schema_version: int. The current schema version of the
                 subtopic dict.
+            next_subtopic_id: int. The id for the next subtopic in the topic.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -261,6 +370,7 @@ class Topic(object):
         self.uncategorized_skill_ids = uncategorized_skill_ids
         self.subtopics = subtopics
         self.subtopic_schema_version = subtopic_schema_version
+        self.next_subtopic_id = next_subtopic_id
         self.language_code = language_code
         self.created_on = created_on
         self.last_updated = last_updated
@@ -283,9 +393,15 @@ class Topic(object):
                 subtopic.to_dict() for subtopic in self.subtopics
             ],
             'subtopic_schema_version': self.subtopic_schema_version,
+            'next_subtopic_id': self.next_subtopic_id,
             'language_code': self.language_code,
             'version': self.version
         }
+
+    def get_new_subtopic_page_id(self):
+        """Returns an id for the subtopic page for a newly created subtopic.
+        """
+        return SubtopicPage.get_subtopic_page_id(self.id, self.next_subtopic_id)
 
     @classmethod
     def require_valid_topic_id(cls, topic_id):
@@ -360,6 +476,11 @@ class Topic(object):
                 'Expected subtopics to be a list, received %s'
                 % self.subtopics)
 
+        if not isinstance(self.next_subtopic_id, int):
+            raise utils.ValidationError(
+                'Expected next_subtopic_id to be an int, received %s'
+                % self.next_subtopic_id)
+
         if not isinstance(self.subtopic_schema_version, int):
             raise utils.ValidationError(
                 'Expected schema version to be an integer, received %s'
@@ -379,6 +500,11 @@ class Topic(object):
                     'Expected each subtopic to be a Subtopic object, '
                     'received %s' % subtopic)
             subtopic.validate()
+            if subtopic.id >= self.next_subtopic_id:
+                raise utils.ValidationError(
+                    'The id for subtopic %s is greater than or equal to '
+                    'next_subtopic_id %s'
+                    % (subtopic.id, self.next_subtopic_id))
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
@@ -432,7 +558,7 @@ class Topic(object):
         """
         return cls(
             topic_id, name,
-            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
+            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [], 1,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
@@ -562,21 +688,27 @@ class Topic(object):
                 return ind
         return None
 
-    def add_subtopic(self, subtopic_id, title):
+    def add_subtopic(self, title):
         """Adds a subtopic with the given id and title.
 
         Args:
-            subtopic_id: str. The id for the new subtopic.
             title: str. The title for the new subtopic.
 
         Raises:
             Exception. A subtopic with the given id already exists.
+
+        Returns:
+            SubtopicPage. A SubtopicPage object corresponding the newly created
+                subtopic.
         """
-        if self.get_subtopic_index(subtopic_id) is not None:
-            raise Exception(
-                'A subtopic with id %s already exists. ' % subtopic_id)
+        subtopic_page_id = self.get_new_subtopic_page_id()
+        subtopic_page = SubtopicPage(
+            subtopic_page_id, self.id, '', constants.DEFAULT_LANGUAGE_CODE)
+        subtopic_id = self.next_subtopic_id
+        self.next_subtopic_id = self.next_subtopic_id + 1
         self.subtopics.append(
             Subtopic.create_default_subtopic(subtopic_id, title))
+        return subtopic_page
 
     def delete_subtopic(self, subtopic_id):
         """Deletes the subtopic with the given id and adds all its skills to

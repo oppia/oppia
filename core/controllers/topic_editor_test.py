@@ -46,7 +46,8 @@ class BaseTopicEditorControllerTest(test_utils.GenericTestBase):
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [], [])
+            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [],
+            [], 1)
 
 
 class NewStoryHandlerTest(BaseTopicEditorControllerTest):
@@ -109,7 +110,7 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             topic_id_2 = topic_services.get_new_topic_id()
             self.save_new_topic(
                 topic_id_2, self.admin_id, 'Name', 'Description',
-                [], [], [], [])
+                [], [], [], [], 1)
             self.signup('topicmanager2@example.com', 'topicmanager2')
             topic_manager_id_2 = self.get_user_id_from_email(
                 'topicmanager2@example.com')

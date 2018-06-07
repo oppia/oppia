@@ -62,6 +62,8 @@ class TopicModel(base_models.VersionedModel):
     subtopics = ndb.JsonProperty(repeated=True, indexed=False)
     # The schema version of the subtopic dict.
     subtopic_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    # The id for the next subtopic.
+    next_subtopic_id = ndb.IntegerProperty(required=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
@@ -163,6 +165,27 @@ class TopicSummaryModel(base_models.BaseModel):
     # The number of subtopics of the topic.
     subtopic_count = ndb.IntegerProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
+
+
+class SubtopicPageModel(base_models.BaseModel):
+    """Subtopic model for an Oppia Topic.
+
+    This stores the html data for the subtopic landing page for all subtopics
+    throughout Oppia.
+
+    A SubtopicModel instance stores the following information:
+
+        id, topic_id, html_data, language_code.
+
+    The key of each instance is the topic id.
+    """
+
+    # The topic id that this subtopic is a part of.
+    topic_id = ndb.StringProperty(required=True, indexed=True)
+    # The html data of the subtopic.
+    html_data = ndb.TextProperty(required=True)
+    # The ISO 639-1 code for the language this topic is written in.
+    language_code = ndb.StringProperty(required=True, indexed=True)
 
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):

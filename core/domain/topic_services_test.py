@@ -31,7 +31,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
     story_id_1 = 'story_1'
     story_id_2 = 'story_2'
     story_id_3 = 'story_3'
-    subtopic_id = 'subtopic_1'
+    subtopic_id = 1
     skill_id_1 = 'skill_1'
     skill_id_2 = 'skill_2'
 
@@ -40,11 +40,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.TOPIC_ID = topic_services.get_new_topic_id()
         subtopic = topic_domain.Subtopic(
             self.subtopic_id, 'Title', [self.skill_id_2])
+        subtopic_page = topic_domain.SubtopicPage(
+            self.TOPIC_ID + '-1', self.TOPIC_ID, '', 'en'
+        )
         self.topic = self.save_new_topic(
             self.TOPIC_ID, self.user_id, 'Name', 'Description',
             [self.story_id_1, self.story_id_2], [self.story_id_3],
-            [self.skill_id_1], [subtopic]
+            [self.skill_id_1], [subtopic], 2
         )
+        topic_services.save_subtopic_page_model(subtopic_page)
         self.signup('a@example.com', 'A')
         self.signup('b@example.com', 'B')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
@@ -230,12 +234,34 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             'cmd': topic_domain.CMD_DELETE_SUBTOPIC,
             'subtopic_id': self.subtopic_id
         })]
+        subtopic_page = topic_services.get_subtopic_page_by_id(
+            self.TOPIC_ID + '-1', strict=False)
+        self.assertIsNotNone(subtopic_page)
         topic_services.update_topic(
             self.user_id_admin, self.TOPIC_ID, changelist,
-            'Removed id_1 subtopic.')
+            'Removed 1 subtopic.')
+        subtopic_page = topic_services.get_subtopic_page_by_id(
+            self.TOPIC_ID + '-1', strict=False)
+        self.assertIsNone(subtopic_page)
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(
             topic.uncategorized_skill_ids, [self.skill_id_1, self.skill_id_2])
+
+    def test_update_subtopic_page(self):
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'property_name': topic_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA,
+            'old_value': '',
+            'new_value': '<p>New Value</p>'
+        })]
+        topic_services.update_subtopic_page(self.TOPIC_ID, 1, changelist)
+        subtopic_page = topic_services.get_subtopic_page_by_id(
+            self.TOPIC_ID + '-1', strict=False)
+        self.assertEqual(subtopic_page.html_data, '<p>New Value</p>')
+        self.assertEqual(subtopic_page.topic_id, self.TOPIC_ID)
+        self.assertEqual(
+            subtopic_page.id, topic_domain.SubtopicPage.get_subtopic_page_id(
+                self.TOPIC_ID, 1))
 
     def test_update_subtopic_skill_ids(self):
         # Adds a subtopic and moves skill id from one to another.
@@ -248,13 +274,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': 'id_2',
                 'title': 'Title2'
             }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
                 'old_subtopic_id': self.subtopic_id,
-                'new_subtopic_id': 'id_2',
+                'new_subtopic_id': 2,
                 'skill_id': self.skill_id_2
             })
         ]
@@ -262,16 +287,22 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
+        subtopic_id = topic_domain.SubtopicPage.get_subtopic_page_id(
+            topic.id, 2)
+        subtopic_page = topic_services.get_subtopic_page_by_id(subtopic_id)
         self.assertEqual(topic.uncategorized_skill_ids, [])
         self.assertEqual(topic.subtopics[0].skill_ids, [self.skill_id_1])
         self.assertEqual(topic.subtopics[1].skill_ids, [self.skill_id_2])
+        self.assertEqual(topic.subtopics[1].id, 2)
+        self.assertEqual(topic.next_subtopic_id, 3)
+        self.assertEqual(subtopic_page.topic_id, topic.id)
 
         # Tests invalid case where skill id is not present in the old subtopic.
         changelist = [
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
                 'old_subtopic_id': self.subtopic_id,
-                'new_subtopic_id': 'id_2',
+                'new_subtopic_id': 2,
                 'skill_id': self.skill_id_2
             })
         ]
@@ -288,7 +319,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
                 'old_subtopic_id': None,
-                'new_subtopic_id': 'id_2',
+                'new_subtopic_id': 2,
                 'skill_id': 'skill_10'
             })
         ]
@@ -316,7 +347,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         changelist = [
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
-                'subtopic_id': 'id_2',
+                'subtopic_id': 2,
                 'skill_id': self.skill_id_2
             }),
             topic_domain.TopicChange({
