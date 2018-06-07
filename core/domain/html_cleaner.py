@@ -239,34 +239,37 @@ def convert_to_text_angular(html_data):
         # There are cases where there is no href attribute of a tag.
         # In such cases a tag is simply removed.
         elif tag.name == 'a':
-            if tag.has_attr('href'):
-                link = soup.new_tag('oppia-noninteractive-link')
-                url = tag['href']
-                text = tag.get_text()
-                link['url-with-value'] = url
-                link['text-with-value'] = text
-                tag.wrap(link)
-                # If any part of text in a tag is wrapped in b or i tag
-                # link tag is also wrapped in those tags to maintain
-                # almost similar appearance.
-                children = tag.findChildren()
-                count_of_b_parent = 0
-                count_of_i_parent = 0
-                for child in children:
-                    if child.name == 'b' and not count_of_b_parent:
-                        link.wrap(soup.new_tag('b'))
-                        count_of_b_parent = 1
-                    if child.name == 'i' and not count_of_i_parent:
-                        link.wrap(soup.new_tag('i'))
-                        count_of_i_parent = 1
-                    # This part is to ensure that oppia-noninteractive-link
-                    # within a tag is preserved to obtain test case. This
-                    # has to be removed after finding invalid case.
-                    if child.name == 'oppia-noninteractive-link':
-                        link.append(child)
-                tag.extract()
-            else:
-                tag.unwrap()
+            try:
+                if tag.has_attr('href'):
+                    link = soup.new_tag('oppia-noninteractive-link')
+                    url = tag['href']
+                    text = tag.get_text()
+                    link['url-with-value'] = url
+                    link['text-with-value'] = text
+                    tag.wrap(link)
+                    # If any part of text in a tag is wrapped in b or i tag
+                    # link tag is also wrapped in those tags to maintain
+                    # almost similar appearance.
+                    children = tag.findChildren()
+                    count_of_b_parent = 0
+                    count_of_i_parent = 0
+                    for child in children:
+                        if child.name == 'b' and not count_of_b_parent:
+                            link.wrap(soup.new_tag('b'))
+                            count_of_b_parent = 1
+                        if child.name == 'i' and not count_of_i_parent:
+                            link.wrap(soup.new_tag('i'))
+                            count_of_i_parent = 1
+                        # This part is to ensure that oppia-noninteractive-link
+                        # within a tag is preserved to obtain test case. This
+                        # has to be removed after finding invalid case.
+                        if child.name == 'oppia-noninteractive-link':
+                            link.append(child)
+                    tag.extract()
+                else:
+                    tag.unwrap()
+            except Exception:
+                pass
         # To maintain the appearance of table, tab is added after
         # each element in row. In one of the cases the elements were
         # p tags with some text and line breaks. In such case td.string
@@ -275,14 +278,20 @@ def convert_to_text_angular(html_data):
         elif tag.name == 'td' and tag.next_sibling:
             if tag.string:
                 tag.string = tag.string + "\t"
-            tag.unwrap()
+            try:
+                tag.unwrap()
+            except Exception:
+                pass
         # div and table rows both are replaced with p tag
         # to maintain almost same apperance.
         elif tag.name == 'div' or tag.name == 'tr':
             tag.name = 'p'
         # All other invalid tags are simply removed.
         elif tag.name not in allowed_tag_list:
-            tag.unwrap()
+            try:
+                tag.unwrap()
+            except Exception:
+                pass
 
     # Removal of tags can break the soup into parts which are continuous
     # and not wrapped in any tag. This part recombines the continuous
