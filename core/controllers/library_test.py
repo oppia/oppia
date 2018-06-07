@@ -57,6 +57,7 @@ class LibraryPageTest(test_utils.GenericTestBase):
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
+            'additional_angular_modules': [],
             'search_cursor': None,
             'profile_picture_data_url': None,
         }, response_dict)
