@@ -272,8 +272,8 @@ def apply_change_list(topic_id, change_list):
                 topic.move_skill_id_to_subtopic(
                     change.old_subtopic_id, change.new_subtopic_id,
                     change.skill_id)
-            elif change.cmd == topic_domain.CMD_REMOVE_SKILL_FROM_SUBTOPIC:
-                topic.remove_skill_from_subtopic(
+            elif change.cmd == topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC:
+                topic.remove_skill_id_from_subtopic(
                     change.subtopic_id, change.skill_id)
             elif change.cmd == topic_domain.CMD_UPDATE_TOPIC_PROPERTY:
                 if (change.property_name ==

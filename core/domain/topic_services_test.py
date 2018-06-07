@@ -238,31 +238,115 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic.uncategorized_skill_ids, [self.skill_id_1, self.skill_id_2])
 
     def test_update_subtopic_skill_ids(self):
-        changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
-            'old_subtopic_id': None,
-            'new_subtopic_id': self.subtopic_id,
-            'skill_id': self.skill_id_1
-        })]
+        # Adds a subtopic and moves skill id from one to another.
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': None,
+                'new_subtopic_id': self.subtopic_id,
+                'skill_id': self.skill_id_1
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 'id_2',
+                'title': 'Title2'
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': self.subtopic_id,
+                'new_subtopic_id': 'id_2',
+                'skill_id': self.skill_id_2
+            })
+        ]
         topic_services.update_topic(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
         self.assertEqual(topic.uncategorized_skill_ids, [])
-        self.assertEqual(
-            topic.subtopics[0].skill_ids, [self.skill_id_2, self.skill_id_1])
+        self.assertEqual(topic.subtopics[0].skill_ids, [self.skill_id_1])
+        self.assertEqual(topic.subtopics[1].skill_ids, [self.skill_id_2])
 
+        # Tests invalid case where skill id is not present in the old subtopic.
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': self.subtopic_id,
+                'new_subtopic_id': 'id_2',
+                'skill_id': self.skill_id_2
+            })
+        ]
+        with self.assertRaisesRegexp(
+            Exception,
+            'Skill id %s is not present in the given old subtopic'
+            % self.skill_id_2):
+            topic_services.update_topic(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Updated subtopic skill ids.')
+
+        # Tests invalid case where skill id is not an uncategorized skill id.
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+                'old_subtopic_id': None,
+                'new_subtopic_id': 'id_2',
+                'skill_id': 'skill_10'
+            })
+        ]
+        with self.assertRaisesRegexp(
+            Exception,
+            'Skill id skill_10 is not an uncategorized skill id'):
+            topic_services.update_topic(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Updated subtopic skill ids.')
+
+        # Tests invalid case where target subtopic doesn't exist.
         changelist = [topic_domain.TopicChange({
-            'cmd': topic_domain.CMD_REMOVE_SKILL_FROM_SUBTOPIC,
-            'subtopic_id': self.subtopic_id,
-            'skill_id': self.skill_id_2
+            'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,
+            'old_subtopic_id': self.subtopic_id,
+            'new_subtopic_id': None,
+            'skill_id': self.skill_id_1
         })]
+        with self.assertRaisesRegexp(
+            Exception, 'The subtopic with id None does not exist.'):
+            topic_services.update_topic(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Updated subtopic skill ids.')
+
+        # Tests valid case skill id removal case.
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+                'subtopic_id': 'id_2',
+                'skill_id': self.skill_id_2
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+                'subtopic_id': self.subtopic_id,
+                'skill_id': self.skill_id_1
+            })
+        ]
         topic_services.update_topic(
             self.user_id_admin, self.TOPIC_ID, changelist,
             'Updated subtopic skill ids.')
         topic = topic_services.get_topic_by_id(self.TOPIC_ID)
-        self.assertEqual(topic.uncategorized_skill_ids, [self.skill_id_2])
-        self.assertEqual(topic.subtopics[0].skill_ids, [self.skill_id_1])
+        self.assertEqual(
+            topic.uncategorized_skill_ids, [self.skill_id_2, self.skill_id_1])
+        self.assertEqual(topic.subtopics[1].skill_ids, [])
+        self.assertEqual(topic.subtopics[0].skill_ids, [])
+
+        # Tests invalid case where skill id is not present in the subtopic
+        # from which it is to be removed.
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
+            'subtopic_id': self.subtopic_id,
+            'skill_id': 'skill_10'
+        })]
+        with self.assertRaisesRegexp(
+            Exception,
+            'Skill id skill_10 is not present in the old subtopic'):
+            topic_services.update_topic(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Updated subtopic skill ids.')
 
     def test_admin_can_manage_topic(self):
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)

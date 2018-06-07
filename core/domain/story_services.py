@@ -270,12 +270,8 @@ def apply_change_list(story_id, change_list):
                   story_domain.CMD_UPDATE_STORY_NODE_OUTLINE_STATUS):
                 if change.new_value:
                     story.mark_node_outline_as_finalized(change.node_id)
-                elif not change.new_value:
-                    story.mark_node_outline_as_unfinalized(change.node_id)
                 else:
-                    raise Exception(
-                        'The new value for the node outline status can only be '
-                        'a boolean value, received: %s' % change.new_value)
+                    story.mark_node_outline_as_unfinalized(change.node_id)
             elif change.cmd == story_domain.CMD_UPDATE_STORY_NODE_PROPERTY:
                 if (change.property_name ==
                         story_domain.STORY_NODE_PROPERTY_OUTLINE):
