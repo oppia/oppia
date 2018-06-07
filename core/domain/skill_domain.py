@@ -211,7 +211,7 @@ class Misconception(object):
 
         Raises:
             ValidationError: One or more attributes of the misconception are
-            invalid.
+                invalid.
         """
         if not isinstance(self.name, basestring):
             raise utils.ValidationError(
