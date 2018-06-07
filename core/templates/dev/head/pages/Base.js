@@ -31,6 +31,7 @@ oppia.controller('Base', [
     // If this is nonempty, the whole page goes into 'Loading...' mode.
     $rootScope.loadingMessage = '';
 
+    $scope.isIframed = GLOBALS.iframed;
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
 

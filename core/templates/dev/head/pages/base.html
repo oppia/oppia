@@ -97,6 +97,7 @@
         SITE_NAME: JSON.parse('{{SITE_NAME|js_string}}'),
         SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
         TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
+        isIframed: JSON.parse('{{iframed|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
         isModerator: JSON.parse('{{is_moderator|js_string}}'),
         isSuperAdmin: JSON.parse('{{is_super_admin|js_string}}'),
@@ -119,71 +120,68 @@
   </head>
 
   <body>
-    {% if iframed %}
-      {{ warnings_and_loader() }}
-    {% else %}
-      <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
-      <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
-      </promo-bar>
-      <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
-      </div>
+    <span ng-if="isIframed" translate="{{ warnings_and_loader() }}"></span>
+    <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
+    <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
+    </promo-bar>
+    <div ng-if="isBackgroundMaskActive()" class="ng-cloak oppia-background-mask">
+    </div>
 
-      <div class="oppia-base-container"
-           ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
-           ng-swipe-left="closeSidebarOnSwipe()">
-        <div class="oppia-content-container">
-          <div id="wrapper">
-            <div class="oppia-main-body">
-              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="0" offset="0">
-                <div class="navbar-container">
-                  <top-navigation-bar></top-navigation-bar>
-                  <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
-                    {% block navbar_breadcrumb %}
-                    {% endblock navbar_breadcrumb %}
+    <div class="oppia-base-container"
+         ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
+         ng-swipe-left="closeSidebarOnSwipe()">
+      <div class="oppia-content-container">
+        <div id="wrapper">
+          <div class="oppia-main-body">
+            <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation" headroom tolerance="0" offset="0">
+              <div class="navbar-container">
+                <top-navigation-bar></top-navigation-bar>
+                <div class="collapse navbar-collapse oppia-navbar-collapse ng-cloak">
+                  {% block navbar_breadcrumb %}
+                  {% endblock navbar_breadcrumb %}
 
-                    {% block local_top_nav_options %}
-                    {% endblock local_top_nav_options %}
-                  </div>
+                  {% block local_top_nav_options %}
+                  {% endblock local_top_nav_options %}
                 </div>
-              </nav>
-
-              <div class="oppia-top-of-page-padding">
               </div>
+            </nav>
 
-              {{ warnings_and_loader() }}
+            <div class="oppia-top-of-page-padding">
             </div>
 
-            <noscript>
-              <div class="oppia-page-cards-container">
-                <div class="md-default-theme oppia-page-card oppia-long-text">
-                  <!-- Note to developers: We replicate the translated text inline because, without JavaScript enabled, the translation engine doesn't kick in.-->
-                  <h2>
-                    <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
-                    <i class="material-icons">&#xE811;</i>
-                  </h2>
-                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
-                     translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com"/>click here.</a></p>
-                  <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
-                </div>
-              </div>
-            </noscript>
-
-            <side-navigation-bar></side-navigation-bar>
+            {{ warnings_and_loader() }}
           </div>
+
+          <noscript>
+            <div class="oppia-page-cards-container">
+              <div class="md-default-theme oppia-page-card oppia-long-text">
+                <!-- Note to developers: We replicate the translated text inline because, without JavaScript enabled, the translation engine doesn't kick in.-->
+                <h2>
+                  <span translate="I18N_SPLASH_JAVASCRIPT_ERROR_TITLE">We Need JavaScript in Your Browser</span>
+                  <i class="material-icons">&#xE811;</i>
+                </h2>
+                <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
+                   translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com"/>click here.</a></p>
+                <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
+              </div>
+            </div>
+          </noscript>
+
+          <side-navigation-bar></side-navigation-bar>
         </div>
       </div>
+    </div>
 
-      <div ng-if="DEV_MODE" class="oppia-dev-mode">
-        Dev Mode
-      </div>
+    <div ng-if="DEV_MODE" class="oppia-dev-mode">
+      Dev Mode
+    </div>
 
-      <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
-         class="oppia-site-feedback oppia-transition-200">
-        <i class="material-icons md-18">&#xE87F;</i>
-          <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
-        </i>
-      </a>
-    {% endif %}
+    <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
+       class="oppia-site-feedback oppia-transition-200">
+      <i class="material-icons md-18">&#xE87F;</i>
+        <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
+      </i>
+    </a>
 
     {% include 'pages/footer_js_libs.html' %}
 
