@@ -941,8 +941,8 @@ tags: []
 
     def save_new_topic(
             self, topic_id, owner_id, name, description,
-            canonical_story_ids, additional_story_ids, skill_ids,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            canonical_story_ids, additional_story_ids, uncategorized_skill_ids,
+            subtopics, language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -954,8 +954,10 @@ tags: []
                 that are part of the topic.
             additional_story_ids: list(str). The list of ids of additional
                 stories that are part of the topic.
-            skill_ids: list(str). The list of ids of skills that are part of the
-                topic.
+            uncategorized_skill_ids: list(str). The list of ids of skills that
+                are not part of any subtopic.
+            subtopics: list(Subtopic). The different subtopics that are part of
+                this topic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
 
@@ -964,7 +966,8 @@ tags: []
         """
         topic = topic_domain.Topic(
             topic_id, name, description, canonical_story_ids,
-            additional_story_ids, skill_ids, language_code, 0
+            additional_story_ids, uncategorized_skill_ids, subtopics,
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, language_code, 0
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
