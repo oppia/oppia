@@ -76,10 +76,10 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             };
           }
           ImagePreloaderService.getImageUrl($scope.filepath.name)
-          .then(function(objectUrl) {
-            $scope.isLoadingIndicatorShown = false;
-            $scope.imageUrl = objectUrl;
-          });
+            .then(function(objectUrl) {
+              $scope.isLoadingIndicatorShown = false;
+              $scope.imageUrl = objectUrl;
+            });
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
