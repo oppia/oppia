@@ -385,6 +385,10 @@ oppia.factory('ExplorationPlayerService', [
         var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
 
+        StatsReportingService.recordAnswerSubmitAction(
+          stateName, newStateName, oldState.interaction.id, answer,
+          outcome.feedback);
+
         // Compute the data for the next state.
         var oldParams = LearnerParamsService.getAllParams();
         oldParams.answer = answer;

@@ -300,7 +300,9 @@ class ExplorationHandler(base.BaseHandler):
 
 
 class StorePlaythroughHandler(base.BaseHandler):
-    """Handles a useful playthrough coming in from the frontend to store it."""
+    """Handles a useful playthrough coming in from the frontend to store it. If
+    the playthrough already exists, it is updated in the datastore.
+    """
 
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
@@ -310,18 +312,12 @@ class StorePlaythroughHandler(base.BaseHandler):
         Args:
             exploration_id: str. The ID of the exploration.
         """
-        exp_issue_dict = self.payload.get('exp_issue_dict')
-        try:
-            unused_exp_issue = stats_domain.ExplorationIssue.from_backend_dict(
-                exp_issue_dict)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
         playthrough_data = self.payload.get('playthrough_data')
         try:
             unused_playthrough = stats_domain.Playthrough.from_backend_dict(
                 playthrough_data)
-        except utils.ValidationError as e:
+            issue_schema_version = self.payload['issue_schema_version']
+        except (utils.ValidationError, KeyError) as e:
             raise self.InvalidInputException(e)
 
         exp_version = playthrough_data['exp_version']
@@ -330,11 +326,20 @@ class StorePlaythroughHandler(base.BaseHandler):
             exploration_id, exp_version)
         exp_issues = stats_services.get_exp_issues_from_model(exp_issues_model)
 
-        customization_args = exp_issue_dict['issue_customization_args']
+        customization_args = playthrough_data['issue_customization_args']
+
+        # If playthrough already exists, update it in the datastore.
+        if 'id' in playthrough_data:
+            playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
+            stats_services.update_playthroughs_multi(
+                [playthrough_data['id']], [playthrough])
+            self.render_json({})
+            return
 
         issue_found = False
+        playthrough_id = None
         for index, issue in enumerate(exp_issues.unresolved_issues):
-            if issue.issue_type == exp_issue_dict['issue_type']:
+            if issue.issue_type == playthrough_data['issue_type']:
                 issue_customization_args = issue.issue_customization_args
                 # In case issue_keyname is 'state_names', the ordering of the
                 # list is important i.e. [a,b,c] is different from [b,c,a].
@@ -363,15 +368,14 @@ class StorePlaythroughHandler(base.BaseHandler):
                 playthrough_data['issue_customization_args'],
                 playthrough_data['actions'])
             issue = stats_domain.ExplorationIssue(
-                exp_issue_dict['issue_type'],
-                exp_issue_dict['issue_customization_args'],
-                [playthrough_id], exp_issue_dict['schema_version'],
-                exp_issue_dict['is_valid'])
+                playthrough_data['issue_type'],
+                playthrough_data['issue_customization_args'],
+                [playthrough_id], issue_schema_version, True)
 
             exp_issues.unresolved_issues.append(issue)
 
         stats_services.save_exp_issues_model_transactional(exp_issues)
-        self.render_json({})
+        self.render_json({'playthrough_id': playthrough_id})
 
 
 class StatsEventsHandler(base.BaseHandler):

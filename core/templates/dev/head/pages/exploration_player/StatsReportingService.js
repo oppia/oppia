@@ -49,12 +49,12 @@ oppia.factory('StatsReportingService', [
   '$http', '$interval', 'StopwatchObjectFactory', 'MessengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
   'STATS_EVENT_TYPES', 'ExplorationContextService', 'PAGE_CONTEXT',
-  'DEFAULT_OUTCOME_CLASSIFICATION',
+  'DEFAULT_OUTCOME_CLASSIFICATION', 'PlaythroughService',
   function(
       $http, $interval, StopwatchObjectFactory, MessengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
       STATS_EVENT_TYPES, ExplorationContextService, PAGE_CONTEXT,
-      DEFAULT_OUTCOME_CLASSIFICATION) {
+      DEFAULT_OUTCOME_CLASSIFICATION, PlaythroughService) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;
@@ -172,6 +172,7 @@ oppia.factory('StatsReportingService', [
           state_name: stateName,
           session_id: sessionId
         });
+        PlaythroughService.recordExplorationStartAction(stateName);
       },
       recordSolutionHit: function(stateName) {
         if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
@@ -265,7 +266,11 @@ oppia.factory('StatsReportingService', [
 
         siteAnalyticsService.registerFinishExploration();
         explorationIsComplete = true;
+        PlaythroughService.recordExplorationQuitAction(
+          stateName, stateStopwatch.getTimeInSecs());
         postStatsToBackend();
+
+        PlaythroughService.recordPlaythrough();
       },
       recordAnswerSubmitted: function(
           stateName, params, answer, answerGroupIndex, ruleIndex,
@@ -301,6 +306,14 @@ oppia.factory('StatsReportingService', [
         });
 
         postStatsToBackend();
+
+        PlaythroughService.recordPlaythrough();
+      },
+      recordAnswerSubmitAction: function(
+          stateName, destStateName, interactionId, answer, feedback) {
+        PlaythroughService.recordAnswerSubmitAction(
+          stateName, destStateName, interactionId, answer, feedback,
+          stateStopwatch.getTimeInSecs());
       }
     };
   }
