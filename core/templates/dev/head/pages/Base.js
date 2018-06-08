@@ -23,6 +23,7 @@ oppia.controller('Base', [
       SidebarStatusService) {
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
+    $scope.iframed = GLOBALS.iframed;
     $scope.siteFeedbackFormUrl = GLOBALS.SITE_FEEDBACK_FORM_URL;
     $scope.promoBarIsEnabled = GLOBALS.PROMO_BAR_IS_ENABLED;
     $scope.promoBarMessage = GLOBALS.PROMO_BAR_MESSAGE;
@@ -31,7 +32,6 @@ oppia.controller('Base', [
     // If this is nonempty, the whole page goes into 'Loading...' mode.
     $rootScope.loadingMessage = '';
 
-    $scope.isIframed = GLOBALS.iframed;
     $scope.isSidebarShown = SidebarStatusService.isSidebarShown;
     $scope.closeSidebarOnSwipe = SidebarStatusService.closeSidebar;
 
