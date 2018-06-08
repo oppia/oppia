@@ -302,6 +302,8 @@ def apply_change_list(skill_id, change_list):
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
                     skill.update_language_code(change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
@@ -309,6 +311,8 @@ def apply_change_list(skill_id, change_list):
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     skill.update_worked_examples(change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 skill.add_misconception(change.misconception_id)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
@@ -327,6 +331,8 @@ def apply_change_list(skill_id, change_list):
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
                         change.misconception_id, change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif (change.cmd ==
                   skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
                   or change.cmd ==
@@ -336,6 +342,8 @@ def apply_change_list(skill_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # skill is sufficient to apply the schema migration.
                 continue
+            else:
+                raise Exception('Invalid change dict.')
         return skill
 
     except Exception as e:

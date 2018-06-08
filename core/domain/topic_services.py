@@ -296,12 +296,16 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_TITLE):
                     topic.update_subtopic_title(change.id, change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             else:
-                raise Exception('Invalid change command.')
+                raise Exception('Invalid change dict.')
         return topic
 
     except Exception as e:

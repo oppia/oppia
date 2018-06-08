@@ -87,8 +87,10 @@ def apply_change_list(topic_id, subtopic_id, change_list):
                 if (change.property_name ==
                         subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA):
                     subtopic_page.update_html_data(change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             else:
-                raise Exception('Invalid change command.')
+                raise Exception('Invalid change dict.')
 
     except Exception as e:
         logging.error(
@@ -130,8 +132,8 @@ def _create_subtopic_page(
         committer_id: str. ID of the committer.
         subtopic_page: SubtopicPage. The subtopic page domain object.
         commit_message: str. A description of changes made to the topic.
-        commit_cmds: list(TopicChange). A list of TopicChange objects that
-            represent change commands made to the given topic.
+        commit_cmds: list(SubtopicPageChange). A list of change commands made
+            to the given subtopic page.
     """
     subtopic_page.validate()
     model = topic_models.SubtopicPageModel(

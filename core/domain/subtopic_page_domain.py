@@ -46,7 +46,7 @@ class SubtopicPageChange(object):
     ]
 
     def __init__(self, change_dict):
-        """Initialize a TopicChange object from a dict.
+        """Initialize a SubtopicPageChange object from a dict.
 
         Args:
             change_dict: dict. Represents a command. It should have a 'cmd'
