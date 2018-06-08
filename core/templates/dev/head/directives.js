@@ -21,12 +21,12 @@
 // custom directive tags in the provided value.
 oppia.directive('angularHtmlBind', ['$compile', function($compile) {
   return {
-    restrict: 'A',
+    restrict: 'E',
     link: function(scope, elm, attrs) {
       // Clean up old scopes if the html changes.
       // Reference: https://stackoverflow.com/a/42927814
       var newScope;
-      scope.$watch(attrs.angularHtmlBind, function(newValue) {
+      scope.$watch(attrs.htmlData, function(newValue) {
         if (newScope) {
           newScope.$destroy();
         }

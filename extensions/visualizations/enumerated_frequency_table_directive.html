@@ -15,7 +15,8 @@
       <a class="answer-rank" ng-click="toggleAnswerVisibility($index)">Answer Set #<[$index + 1]></a>
       <table class="item table" ng-show="answerVisible[$index]">
         <tr ng-repeat="item in row.answer">
-          <td angular-html-bind="item"></td>
+          <!--DOUBT-->
+          <td><angular-html-bind html-data="item"></angular-html-bind></td>
         </tr>
       </table>
     </td>
