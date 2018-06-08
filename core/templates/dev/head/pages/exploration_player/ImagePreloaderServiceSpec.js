@@ -353,17 +353,17 @@ describe('Image preloader service', function() {
   });
 
   it('should maintain the filenames of image which failed to download',
-  function() {
-    $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
-    $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
-    $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
-    $httpBackend.expect('GET', requestUrl4).respond(408, 'image data 4');
-    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
-    $httpBackend.flush(3);
-    expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
-    $httpBackend.flush(1);
-    expect(ips.isInFailedDownload('s6Hint1.png')).toBe(true);
-    ips.restartImagePreloader('State 6');
-    expect(ips.isInFailedDownload('s6Hint1.png')).toBe(false);
-  });
+    function() {
+      $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
+      $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
+      $httpBackend.expect('GET', requestUrl3).respond(201, 'image data 3');
+      $httpBackend.expect('GET', requestUrl4).respond(408, 'image data 4');
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+      $httpBackend.flush(3);
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
+      $httpBackend.flush(1);
+      expect(ips.isInFailedDownload('s6Hint1.png')).toBe(true);
+      ips.restartImagePreloader('State 6');
+      expect(ips.isInFailedDownload('s6Hint1.png')).toBe(false);
+    });
 });
