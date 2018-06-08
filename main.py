@@ -41,6 +41,7 @@ from core.controllers import resources
 from core.controllers import skill_editor
 from core.controllers import story_editor
 from core.controllers import subscriptions
+from core.controllers import suggestion
 from core.controllers import topic_editor
 from core.controllers import topics_and_skills_dashboard
 from core.domain import acl_decorators
@@ -160,6 +161,27 @@ for path, handler_class in mapreduce_main.create_handlers_map():
 
 # Tell map/reduce internals that this is now the base path to use.
 mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
+
+if constants.USE_NEW_SUGGESTION_FRAMEWORK == True:
+    suggestionHandlerRoute = get_redirect_route(
+        r'%s/' % feconf.SUGGESTION_URL_PREFIX,
+        suggestion.SuggestionHandler)
+    suggestionActionHandlerRoute = get_redirect_route(
+        r'%s/<suggestion_id>' % feconf.SUGGESTION_ACTION_URL_PREFIX,
+        suggestion.SuggestionActionHandler)
+    suggestionListHandlerRoute = get_redirect_route(
+        r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
+        suggestion.SuggestionListHandler)
+else:
+    suggestionHandlerRoute = get_redirect_route(
+        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
+        feedback.SuggestionHandler)
+    suggestionActionHandlerRoute = get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' %
+        feconf.SUGGESTION_ACTION_URL_PREFIX, feedback.SuggestionActionHandler)
+    suggestionListHandlerRoute = get_redirect_route(
+        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
+        feedback.SuggestionListHandler)
 
 # Register the URLs with the classes responsible for handling them.
 URLS = MAPREDUCE_HANDLERS + [
@@ -440,9 +462,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
         feedback.FeedbackStatsHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
-        feedback.SuggestionHandler),
+    suggestionHandlerRoute,
     get_redirect_route(
         r'%s' % feconf.SUBSCRIBE_URL_PREFIX,
         subscriptions.SubscribeHandler),
@@ -452,13 +472,7 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>' %
-        feconf.SUGGESTION_ACTION_URL_PREFIX,
-        feedback.SuggestionActionHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
-        feedback.SuggestionListHandler),
+    suggestionActionHandlerRoute, suggestionListHandlerRoute,
 
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
