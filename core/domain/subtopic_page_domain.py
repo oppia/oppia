@@ -20,9 +20,7 @@ import copy
 
 from constants import constants
 from core.domain import html_cleaner
-from core.domain import user_services
 from core.platform import models
-import feconf
 import utils
 
 (topic_models,) = models.Registry.import_models([models.NAMES.topic])
@@ -35,6 +33,7 @@ CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY = 'update_subtopic_page_property'
+
 
 class SubtopicPageChange(object):
     """Domain object for changes made to subtopic_page object."""
@@ -110,7 +109,7 @@ class SubtopicPage(object):
             topic_id: str. The ID of the topic that this subtopic is a part of.
             html_data: str. The HTML content of the subtopic page.
             language_code: str. The ISO 639-1 code for the language this
-                sub topic page is written in.
+                subtopic page is written in.
             version: int. The current version of the subtopic.
         """
         self.id = subtopic_page_id

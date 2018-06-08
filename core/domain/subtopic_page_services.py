@@ -16,10 +16,8 @@
 
 """Commands for operations on subtopic pages, and related models."""
 
-import copy
 import logging
 
-from core.domain import role_services
 from core.domain import subtopic_page_domain
 from core.platform import models
 import feconf
@@ -100,6 +98,7 @@ def apply_change_list(topic_id, subtopic_id, change_list):
         raise
     return subtopic_page
 
+
 def update_subtopic_page(
         committer_id, topic_id, subtopic_id, change_list, commit_message):
     """Updates a topic. Commits changes.
@@ -129,7 +128,7 @@ def _create_subtopic_page(
 
     Args:
         committer_id: str. ID of the committer.
-        topic: Topic. topic domain object.
+        subtopic_page: SubtopicPage. The subtopic page domain object.
         commit_message: str. A description of changes made to the topic.
         commit_cmds: list(TopicChange). A list of TopicChange objects that
             represent change commands made to the given topic.

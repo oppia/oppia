@@ -18,9 +18,7 @@
 
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
-from core.domain import topic_domain
 from core.domain import topic_services
-from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 

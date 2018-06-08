@@ -19,7 +19,6 @@
 from constants import constants
 from core.domain import subtopic_page_domain
 from core.tests import test_utils
-import feconf
 import utils
 
 
@@ -60,13 +59,13 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.subtopic_page.validate()
 
-    def test_subtopic_title_validation(self):
-            self.subtopic_page.topic_id = 1
-            self._assert_validation_error('Expected topic_id to be a string')
+    def test_subtopic_topic_id_validation(self):
+        self.subtopic_page.topic_id = 1
+        self._assert_validation_error('Expected topic_id to be a string')
 
-    def test_subtopic_title_validation(self):
-            self.subtopic_page.html_data = 1
-            self._assert_validation_error('Expected html data to be a string')
+    def test_subtopic_html_data_validation(self):
+        self.subtopic_page.html_data = 1
+        self._assert_validation_error('Expected html data to be a string')
 
     def test_language_code_validation(self):
         self.subtopic_page.language_code = 0
