@@ -43,12 +43,12 @@ describe('NumberWithUnitsValidationService', function() {
     };
 
     var createNumberWithUnitsDict = function(
-        type, real, fractionDict, unitDict) {
+        type, real, fractionDict, unitList) {
       return {
         type: type,
         real: real,
         fraction: fractionDict,
-        units: unitDict
+        units: unitList
       };
     };
 
@@ -68,7 +68,8 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2, createFractionDict(
-          false, 0, 0, 1), [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}])
+          false, 0, 0, 1), [{unit: 'kg', exponent: 1},
+          {unit: 'm', exponent: -2}])
       }
     });
 
@@ -76,7 +77,8 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2000, createFractionDict(
-          false, 0, 0, 1), [{unit: 'g', exp: 1}, {unit: 'm', exp: -2}])
+          false, 0, 0, 1), [{unit: 'g', exponent: 1},
+          {unit: 'm', exponent: -2}])
       }
     });
 
@@ -84,7 +86,8 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('real', 2, createFractionDict(
-          false, 0, 0, 1), [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}])
+          false, 0, 0, 1), [{unit: 'kg', exponent: 1},
+          {unit: 'm', exponent: -2}])
       }
     });
 
@@ -92,7 +95,8 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEqualTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
-          false, 0, 2, 3), [{unit: 'kg', exp: 1}, {unit: 'm', exp: -2}])
+          false, 0, 2, 3), [{unit: 'kg', exponent: 1},
+          {unit: 'm', exponent: -2}])
       }
     });
 
@@ -100,8 +104,8 @@ describe('NumberWithUnitsValidationService', function() {
       rule_type: 'IsEquivalentTo',
       inputs: {
         f: createNumberWithUnitsDict('fraction', 0, createFractionDict(
-          false, 0, 2000, 3), [{unit: 'g', exp: 1},
-          {unit: 'm', exp: -2}])
+          false, 0, 2000, 3), [{unit: 'g', exponent: 1},
+          {unit: 'm', exponent: -2}])
       }
     });
 

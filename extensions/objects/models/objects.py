@@ -847,7 +847,7 @@ class Units(BaseObject):
                     'type': 'unicode'
                 }
             }, {
-                'name': 'exp',
+                'name': 'exponent',
                 'schema': {
                     'type': 'int'
                 }
@@ -866,7 +866,7 @@ class NumberWithUnits(BaseObject):
         'type': 'real',
         'real': 0.0,
         'fraction': Fraction.default_value,
-        'unit': Units.default_value
+        'units': Units.default_value
     }
 
     SCHEMA = {

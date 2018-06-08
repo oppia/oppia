@@ -33,25 +33,29 @@ describe('NumberWithUnitsObjectFactory', function() {
 
     it('should convert units to list format', function() {
       expect(Units.fromStringToList('kg / kg^2 K mol / (N m s^2) K s')).toEqual(
-        [{exp: -1, unit: 'kg'}, {exp: 2, unit: 'K'}, {exp: 1, unit: 'mol'},
-          {exp: -1, unit: 'N'}, {exp: -1, unit: 'm'}, {exp: -1, unit: 's'}]);
+        [{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
+          {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
+          {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]);
       expect(Units.fromStringToList('mol/(kg / (N m / s^2)')).toEqual(
-        [{exp: 1, unit: 'mol'}, {exp: -1, unit: 'kg'}, {exp: 1, unit: 'N'},
-          {exp: 1, unit: 'm'}, {exp: -2, unit: 's'}]);
+        [{exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'kg'},
+          {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
+          {exponent: -2, unit: 's'}]);
       expect(Units.fromStringToList('kg per kg^2 K mol per (N m s^2) K s'
-      )).toEqual([{exp: -1, unit: 'kg'}, {exp: 2, unit: 'K'},
-        {exp: 1, unit: 'mol'}, {exp: -1, unit: 'N'},
-        {exp: -1, unit: 'm'}, {exp: -1, unit: 's'}]);
+      )).toEqual([{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
+        {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
+        {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]);
     });
 
     it('should convert units from list to string format', function() {
       expect(new Units(
-        [{exp: -1, unit: 'kg'}, {exp: 2, unit: 'K'}, {exp: 1, unit: 'mol'},
-          {exp: -1, unit: 'N'}, {exp: -1, unit: 'm'}, {exp: -1, unit: 's'}]
+        [{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
+          {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
+          {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]
       ).toString()).toBe('kg^-1 K^2 mol^1 N^-1 m^-1 s^-1');
       expect(new Units(
-        [{exp: 1, unit: 'mol'}, {exp: -1, unit: 'kg'}, {exp: 1, unit: 'N'},
-          {exp: 1, unit: 'm'}, {exp: -2, unit: 's'}]).toString()).toBe(
+        [{exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'kg'},
+          {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
+          {exponent: -2, unit: 's'}]).toString()).toBe(
         'mol^1 kg^-1 N^1 m^1 s^-2');
     });
 
@@ -70,7 +74,7 @@ describe('NumberWithUnitsObjectFactory', function() {
           'K', ')']);
     });
 
-    it('should convert itself to a string', function() {
+    it('should convert number with units object to a string', function() {
       expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
       ), Units.fromRawInputString('m / s^2')).toString()).toBe('2.02 m^1 s^-2');
       expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1

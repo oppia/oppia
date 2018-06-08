@@ -70,7 +70,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         type: this.type,
         real: this.real,
         fraction: this.fraction.toDict(),
-        units: this.units.toDict().units
+        units: this.units
       };
     };
 
@@ -223,14 +223,20 @@ oppia.factory('UnitsObjectFactory', [function() {
     return unitsWithMultiplier;
   };
 
-  var unitToList = function(unitsWithMultiplier) {
+  var convertUnitDictToList = function(unitDict) {
     var unitList = [];
-    var flag = 0;
+    for (var key in unitDict) {
+      unitList.push({unit: key, exponent: unitDict[key]});
+    }
+    return unitList;
+  };
+
+  var unitToList = function(unitsWithMultiplier) {
+    var unitDict = {};
     for (var i = 0; i < unitsWithMultiplier.length; i++) {
       var unit = unitsWithMultiplier[i][0];
       var multiplier = unitsWithMultiplier[i][1];
       var ind = unit.indexOf('^');
-      flag = 0;
       if (ind > -1) {
         var s = unit.substr(0, ind);
         var power = parseInt(unit.substr(ind + 1));
@@ -238,17 +244,12 @@ oppia.factory('UnitsObjectFactory', [function() {
         var s = unit;
         var power = 1;
       }
-      for (var j = 0; j < unitList.length; j++) {
-        if (unitList[j].unit === s) {
-          unitList[j].exp += multiplier * power;
-          flag = 1;
-        }
+      if (!(s in unitDict)) {
+        unitDict[s] = 0;
       }
-      if (flag === 0) {
-        unitList.push({unit: s, exp: multiplier * power});
-      }
+      unitDict[s] += multiplier * power;
     }
-    return unitList;
+    return convertUnitDictToList(unitDict);
   };
 
   Units.prototype.toDict = function() {
@@ -272,7 +273,7 @@ oppia.factory('UnitsObjectFactory', [function() {
       if (d.unit === '$' || d.unit === 'Rs' || d.unit === '₹') {
         unit += d.unit + ' ';
       } else {
-        unit += d.unit + '^' + d.exp.toString() + ' ';
+        unit += d.unit + '^' + d.exponent.toString() + ' ';
       }
     }
     return unit.trim();
