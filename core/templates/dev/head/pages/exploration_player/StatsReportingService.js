@@ -314,7 +314,7 @@ oppia.factory('StatsReportingService', [
         postStatsToBackend();
 
         if (ENABLE_PLAYTHROUGHS) {
-            PlaythroughService.recordPlaythrough();
+          PlaythroughService.recordPlaythrough();
         }
       },
       recordAnswerSubmitAction: function(

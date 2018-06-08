@@ -64,7 +64,7 @@ oppia.factory('PlaythroughService', [
 
       // Check for multiple incorrect submissions issue.
       if (multipleIncorrectStateName.num_times_incorrect >= (
-          NUM_INCORRECT_ANSWERS_THRESHOLD)) {
+        NUM_INCORRECT_ANSWERS_THRESHOLD)) {
         playthrough.issueType = ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS;
         playthrough.issueCustomizationArgs = {
           state_name: {
@@ -114,7 +114,7 @@ oppia.factory('PlaythroughService', [
         };
 
         cycleIdentifier = {
-          cycle: "",
+          cycle: '',
           num_cycles: 0
         };
         visitedStates.push(initStateName);
@@ -146,11 +146,11 @@ oppia.factory('PlaythroughService', [
           }
         ));
 
-        if (destStateName == stateName) {
+        if (destStateName === stateName) {
           multipleIncorrectStateName.num_times_incorrect += 1;
         } else {
           if (multipleIncorrectStateName.num_times_incorrect < (
-              NUM_INCORRECT_ANSWERS_THRESHOLD)) {
+            NUM_INCORRECT_ANSWERS_THRESHOLD)) {
             multipleIncorrectStateName.state_name = destStateName;
             multipleIncorrectStateName.num_times_incorrect = 0;
           }
@@ -164,7 +164,7 @@ oppia.factory('PlaythroughService', [
                 visitedStates.slice(
                   cycleStartIndex,
                   visitedStates.length - cycleStartIndex).toString();
-              if (cycleIdentifier.cycle == cycleString) {
+              if (cycleIdentifier.cycle === cycleString) {
                 cycleIdentifier.num_cycles += 1;
               } else {
                 cycleIdentifier.cycle = cycleString;
