@@ -27,6 +27,7 @@ oppia.factory('ImagePreloaderService', [
 
     var _filenamesOfImageCurrentlyDownloading = [];
     var _filenamesOfImageToBeDownloaded = [];
+    var _filenamesOfImageFailedToDownload = [];
     var _exploration = null;
     // imageLoadedCallback is an object of objects (identified by the filenames
     // which are being downloaded at the time they are required by the
@@ -34,7 +35,7 @@ oppia.factory('ImagePreloaderService', [
     // attached with getInImageUrl method.
     var _imageLoadedCallback = {};
     var _hasImagePreloaderServiceStarted = false;
-    var _failedDownload = [];
+
     var _init = function(exploration) {
       _exploration = exploration;
       _states = exploration.states;
@@ -61,15 +62,25 @@ oppia.factory('ImagePreloaderService', [
     };
 
     /**
-     * Removes the given filename from the _failedDownload.
+     * Checks if the given filename is in _filenamesOfImageFailedToDownload or
+     * not.
+     * @param {string} filename - The filename of the image which is to be
+     *                            removed from the
+     *                            _filenamesOfImageFailedToDownload array.
+     */
+    var _isInFailedDownload = function(filename) {
+      return _filenamesOfImageFailedToDownload.indexOf(filename) >= 0;
+    };
+
+    /**
+     * Removes the given filename from the _filenamesOfImageFailedToDownload.
      * @param {string} filename - The filename of the file which is to be
-     *                            removed from the _failedDownload array.
+     *                            removed from the
+     *                            _filenamesOfImageFailedToDownload array.
      */
     var _removeFromFailedDownload = function(filename) {
-      var index = _failedDownload.indexOf(loadedImageFile.filename);
-      if (index >= 0) {
-        _failedDownload.splice(index, 1);
-      }
+      var index = _filenamesOfImageFailedToDownload.indexOf(filename);
+      _filenamesOfImageFailedToDownload.splice(index, 1);
     };
 
     /**
@@ -133,18 +144,9 @@ oppia.factory('ImagePreloaderService', [
             _imageLoadedCallback[loadedImage.filename] = null;
           }
         }, function(filename) {
-          _failedDownload.push(filename);
+          _filenamesOfImageFailedToDownload.push(filename);
           _removeCurrentAndLoadNextImage(filename);
         });
-    };
-
-    /**
-     * Checks if the given filename is in _failedDownload or not.
-     * @param {string} filename - The filename of the image which is to be
-     *                            removed from the _failedDownload array.
-     */
-    var _isInFailedDownload = function(filename) {
-      return _failedDownload.indexOf(filename) >= 0;
     };
 
     /**
@@ -202,6 +204,14 @@ oppia.factory('ImagePreloaderService', [
         });
         if (noOfImagesNeitherInCacheNorDownloading > 0 &&
             noOfImageFilesCurrentlyDownloading <= 1) {
+          var imageFilesInGivenState = ExtractImageFilenamesFromStateService
+            .getImageFilenamesInState(_states.getState(stateName));
+          _filenamesOfImageFailedToDownload = _filenamesOfImageFailedToDownload
+            .map(function(filename) {
+              if (imageFilesInGivenState.indexOf(filename) === -1) {
+                return filename;
+              }
+            });
           _cancelPreloading();
           _kickOffImagePreloader(stateName);
         }
