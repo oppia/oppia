@@ -64,7 +64,6 @@ ISSUE_TYPE_KEYNAME_MAPPING = {
 }
 
 
-
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
 
@@ -982,9 +981,9 @@ class ExplorationIssuesModel(base_models.BaseModel):
     issues.
     """
     # ID of exploration.
-    exp_id = ndb.StringProperty(indexed=True)
+    exp_id = ndb.StringProperty(indexed=True, required=True)
     # Version of exploration.
-    exp_version = ndb.IntegerProperty(indexed=True)
+    exp_version = ndb.IntegerProperty(indexed=True, required=True)
     # The unresolved issues for this exploration. This will be a list of dicts
     # where each dict represents an issue along with the associated
     # playthroughs.
@@ -1061,7 +1060,7 @@ class PlaythroughModel(base_models.BaseModel):
     # The playthrough actions for this playthrough. This will be a list of dicts
     # where each dict represents a single playthrough action. The list is
     # ordered by the time of occurence of the action.
-    playthrough_actions = ndb.JsonProperty(repeated=True)
+    actions = ndb.JsonProperty(repeated=True)
 
     @classmethod
     def _generate_id(cls, exp_id):
@@ -1095,7 +1094,7 @@ class PlaythroughModel(base_models.BaseModel):
     @classmethod
     def create(
             cls, exp_id, exp_version, issue_type, issue_customization_args,
-            playthrough_actions):
+            actions):
         """Creates a PlaythroughModel instance and writes it to the
         datastore.
 
@@ -1105,10 +1104,10 @@ class PlaythroughModel(base_models.BaseModel):
             issue_type: str. Type of the issue.
             issue_customization_args: dict. The customization args dict for the
                 given issue_type.
-            playthrough_actions: list(dict). The playthrough actions for this
-                playthrough. This will be a list of dicts where each dict
-                represents a single playthrough action. The list is ordered by
-                the time of occurence of the action.
+            actions: list(dict). The playthrough actions for this playthrough.
+                This will be a list of dicts where each dict represents a single
+                playthrough action. The list is ordered by the time of occurence
+                of the action.
 
         Returns:
             str. ID of the new PlaythroughModel instance.
@@ -1118,9 +1117,19 @@ class PlaythroughModel(base_models.BaseModel):
             id=instance_id, exp_id=exp_id, exp_version=exp_version,
             issue_type=issue_type,
             issue_customization_args=issue_customization_args,
-            playthrough_actions=playthrough_actions)
+            actions=actions)
         playthrough_instance.put()
         return instance_id
+
+    @classmethod
+    def delete_playthroughs_multi(cls, playthrough_ids):
+        """Deltes multiple playthrough instances.
+
+        Args:
+            playthrough_ids: list(str). List of playthrough IDs to be deleted.
+        """
+        instances = cls.get_multi(playthrough_ids)
+        cls.delete_multi(instances)
 
 
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
@@ -1244,6 +1253,10 @@ class StateAnswersModel(base_models.BaseModel):
 
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
+    # NOTE: The answers stored in submitted_answers_list must be sorted
+    # according to the chronological order of their submission otherwise
+    # TopNUnresolvedAnswersByFrequency calculation in
+    # InteractionAnswerSummariesAggregator will output invalid results.
     submitted_answer_list = ndb.JsonProperty(repeated=True, indexed=False)
     # The version of the submitted_answer_list currently supported by Oppia. If
     # the internal JSON structure of submitted_answer_list changes,
@@ -1337,6 +1350,11 @@ class StateAnswersModel(base_models.BaseModel):
         """See the insert_submitted_answers for general documentation of what
         this method does. It's only safe to call this method from within a
         transaction.
+
+        NOTE: The answers stored in submitted_answers_list must be sorted
+        according to the chronological order of their submission otherwise
+        TopNUnresolvedAnswersByFrequency calculation in
+        InteractionAnswerSummariesAggregator will output invalid results.
 
         Args:
             exploration_id: str. ID of the exploration currently being played.

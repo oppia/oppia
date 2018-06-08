@@ -497,7 +497,7 @@ class Playthrough(object):
 
     def __init__(
             self, playthrough_id, exp_id, exp_version, issue_type,
-            issue_customization_args, playthrough_actions):
+            issue_customization_args, actions):
         """Constructs a Playthrough domain object.
 
         Args:
@@ -507,15 +507,14 @@ class Playthrough(object):
             issue_type: str. Type of the issue.
             issue_customization_args: dict. The customization args dict for the
                 given issue_type.
-            playthrough_actions: list(LearnerAction). List of playthrough
-                learner actions.
+            actions: list(LearnerAction). List of playthrough learner actions.
         """
         self.id = playthrough_id
         self.exp_id = exp_id
         self.exp_version = exp_version
         self.issue_type = issue_type
         self.issue_customization_args = issue_customization_args
-        self.playthrough_actions = playthrough_actions
+        self.actions = actions
 
     def to_dict(self):
         """Returns a dict representation of the Playthrough domain object.
@@ -523,16 +522,14 @@ class Playthrough(object):
         Returns:
             dict. A dict mapping of all fields of Playthrough object.
         """
-        playthrough_actions_dicts = [
-            playthrough_action.to_dict()
-            for playthrough_action in self.playthrough_actions]
+        action_dicts = [action.to_dict() for action in self.actions]
         return {
             'id': self.id,
             'exp_id': self.exp_id,
             'exp_version': self.exp_version,
             'issue_type': self.issue_type,
             'issue_customization_args': self.issue_customization_args,
-            'playthrough_actions': playthrough_actions_dicts,
+            'actions': action_dicts,
         }
 
     @classmethod
@@ -546,17 +543,52 @@ class Playthrough(object):
         Returns:
             Playthrough. The corresponding Playthrough domain object.
         """
-        playthrough_actions = [
-            LearnerAction.from_dict(playthrough_action_dict)
-            for playthrough_action_dict in playthrough_dict[
-                'playthrough_actions']]
+        actions = [
+            LearnerAction.from_dict(action_dict)
+            for action_dict in playthrough_dict['actions']]
         return cls(
             playthrough_dict['id'],
             playthrough_dict['exp_id'],
             playthrough_dict['exp_version'],
             playthrough_dict['issue_type'],
             playthrough_dict['issue_customization_args'],
-            playthrough_actions)
+            actions)
+
+    @classmethod
+    def from_backend_dict(cls, playthrough_data):
+        """Checks whether the playthrough dict has the correct keys and then
+        returns a domain object instance.
+
+        Args:
+            playthrough_data: dict. Dict representing a playthrough.
+
+        Returns:
+            Playthrough. A playthrough domain object.
+        """
+        playthrough_properties = [
+            'exp_id', 'exp_version', 'issue_type',
+            'issue_customization_args', 'actions']
+
+        for playthrough_property in playthrough_properties:
+            if playthrough_property not in playthrough_data:
+                raise utils.ValidationError(
+                    '%s not in playthrough data dict.' % (
+                        playthrough_property))
+
+        actions = [
+            LearnerAction.from_dict(action_dict)
+            for action_dict in playthrough_data['actions']]
+
+        dummy_playthrough = cls(
+            'dummy_playthrough_id',
+            playthrough_data['exp_id'],
+            playthrough_data['exp_version'],
+            playthrough_data['issue_type'],
+            playthrough_data['issue_customization_args'],
+            actions)
+
+        dummy_playthrough.validate()
+        return dummy_playthrough
 
     def validate(self):
         """Validates the Playthrough domain object."""
@@ -596,12 +628,12 @@ class Playthrough(object):
             'issue', self.issue_type, self.issue_customization_args,
             issue.customization_arg_specs)
 
-        if not isinstance(self.playthrough_actions, list):
+        if not isinstance(self.actions, list):
             raise utils.ValidationError(
-                'Expected playthrough_actions to be a list, received %s' % (
-                    type(self.playthrough_actions)))
+                'Expected actions to be a list, received %s' % (
+                    type(self.actions)))
 
-        for action in self.playthrough_actions:
+        for action in self.actions:
             action.validate()
 
 
@@ -664,6 +696,34 @@ class ExplorationIssue(object):
             issue_dict['playthrough_ids'],
             issue_dict['schema_version'],
             issue_dict['is_valid'])
+
+    @classmethod
+    def from_backend_dict(cls, exp_issue_dict):
+        """Checks whether the exploration issue dict has the correct keys and
+        then returns a domain object instance.
+
+        Args:
+            exp_issue_dict: dict. Dict representing an exploration issue.
+
+        Returns:
+            ExplorationIssue. The exploration issue domain object.
+        """
+        exp_issue_properties = [
+            'issue_type', 'schema_version', 'issue_customization_args',
+            'playthrough_ids', 'is_valid']
+
+        for exp_issue_property in exp_issue_properties:
+            if exp_issue_property not in exp_issue_dict:
+                raise utils.ValidationError(
+                    '%s not in exploration issue dict.' % (exp_issue_property))
+
+        dummy_exp_issue = cls(
+            exp_issue_dict['issue_type'],
+            exp_issue_dict['issue_customization_args'], [],
+            exp_issue_dict['schema_version'], exp_issue_dict['is_valid'])
+
+        dummy_exp_issue.validate()
+        return dummy_exp_issue
 
     @classmethod
     def update_exp_issue_from_model(cls, issue_dict):

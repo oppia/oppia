@@ -19,28 +19,28 @@ oppia.directive('copier', ['$compile', function($compile) {
   return {
     link: function(scope, element) {
       scope.getTemplateUrl = function() {
-        return '/value_generator_handler/' + scope.$parent.generatorId;
+        return '/value_generator_handler/' + scope.generatorId;
       };
       $compile(element.contents())(scope);
     },
     restrict: 'E',
-    scope: true,
+    scope: {
+      customizationArgs: '=',
+      getGeneratorId: '&',
+      getInitArgs: '&',
+      getObjType: '&',
+    },
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function($scope) {
-      $scope.$watch('$parent.initArgs', function() {
-        $scope.initArgs = $scope.$parent.initArgs;
+      $scope.generatorId = $scope.getGeneratorId();
+      $scope.initArgs = $scope.getInitArgs();
+      $scope.objType = $scope.getObjType();
+      $scope.$watch('initArgs', function() {
+        $scope.initArgs = $scope.getInitArgs();
       }, true);
 
-      $scope.$watch('$parent.objType', function() {
-        $scope.objType = $scope.$parent.objType;
-      }, true);
-
-      $scope.$watch('$parent.customizationArgs', function() {
-        $scope.customizationArgs = $scope.$parent.customizationArgs;
-      }, true);
-
-      $scope.$watch('customizationArgs', function() {
-        $scope.$parent.customizationArgs = $scope.customizationArgs;
+      $scope.$watch('objType', function() {
+        $scope.objType = $scope.getObjType();
       }, true);
     }
   };

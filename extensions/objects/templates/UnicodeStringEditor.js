@@ -27,13 +27,18 @@ oppia.directive('unicodeStringEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        getAlwaysEditable: '&',
+        getInitArgs: '&',
+        value: '='
+      },
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
-        $scope.alwaysEditable = $scope.$parent.alwaysEditable;
+        $scope.alwaysEditable = $scope.getAlwaysEditable();
+        $scope.initArgs = $scope.getInitArgs();
         $scope.largeInput = false;
 
-        $scope.$watch('$parent.initArgs', function(newValue) {
+        $scope.$watch('initArgs', function(newValue) {
           $scope.largeInput = false;
           if (newValue && newValue.largeInput) {
             $scope.largeInput = newValue.largeInput;
@@ -42,15 +47,15 @@ oppia.directive('unicodeStringEditor', [
 
         // Reset the component each time the value changes (e.g. if this is part
         // of an editable list).
-        $scope.$watch('$parent.value', function() {
+        $scope.$watch('value', function() {
           $scope.localValue = {
-            label: $scope.$parent.value || ''
+            label: $scope.value || ''
           };
         }, true);
 
         if ($scope.alwaysEditable) {
           $scope.$watch('localValue.label', function(newValue) {
-            $scope.$parent.value = newValue;
+            $scope.value = newValue;
           });
         } else {
           $scope.openEditor = function() {
@@ -65,7 +70,7 @@ oppia.directive('unicodeStringEditor', [
             $scope.localValue = {
               label: newValue
             };
-            $scope.$parent.value = newValue;
+            $scope.value = newValue;
             $scope.closeEditor();
           };
 

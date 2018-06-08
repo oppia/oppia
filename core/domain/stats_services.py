@@ -296,21 +296,15 @@ def update_exp_issues_for_new_exp_version(
         revert_to_version: int|None. If the change is a revert, the version.
             Otherwise, None.
     """
-    # TODO(pranavsid98): Convert below two lines to use get_by_id() instead.
-    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
-        exploration.id, exploration.version - 1)
-    if exp_issues_model is None:
+    exp_issues = get_exp_issues(exploration.id, exploration.version - 1)
+    if exp_issues is None:
         create_exp_issues_for_new_exploration(
             exploration.id, exploration.version - 1)
         return
-    exp_issues = get_exp_issues_from_model(exp_issues_model)
 
     # Handling reverts.
     if revert_to_version:
-        # TODO(pranavsid98): Convert below two lines to use get_by_id() instead.
-        old_exp_issues_instance = stats_models.ExplorationIssuesModel.get_model(
-            exploration.id, revert_to_version)
-        old_exp_issues = get_exp_issues_from_model(old_exp_issues_instance)
+        old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
         exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
         exp_issues.exp_version += 1
         create_exp_issues_model(exp_issues)
@@ -318,38 +312,40 @@ def update_exp_issues_for_new_exp_version(
 
     playthrough_ids_by_state_name = collections.defaultdict(list)
 
-    for idx, exp_issue in enumerate(exp_issues.unresolved_issues):
+    for i_idx, exp_issue in enumerate(exp_issues.unresolved_issues):
         keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[exp_issue.issue_type]
         if keyname == 'state_names':
             state_names = exp_issue.issue_customization_args[keyname]['value']
             for state_name in state_names:
                 # Handle exp issues changes for deleted states.
-                exp_issues.unresolved_issues[idx] = (
+                exp_issues.unresolved_issues[i_idx] = (
                     _handle_exp_issues_after_state_deletion(
                         state_name, exp_issue,
                         exp_versions_diff.deleted_state_names))
 
                 # Handle exp issues changes for renamed states.
-                exp_issues.unresolved_issues[idx], playthrough_ids_by_state_name = ( # pylint: disable=line-too-long
-                    _handle_exp_issues_after_state_rename(
-                        state_name, exp_issue,
-                        exp_versions_diff.old_to_new_state_names,
-                        playthrough_ids_by_state_name))
+                exp_issues.unresolved_issues[
+                    i_idx], playthrough_ids_by_state_name = (
+                        _handle_exp_issues_after_state_rename(
+                            state_name, exp_issue,
+                            exp_versions_diff.old_to_new_state_names,
+                            playthrough_ids_by_state_name))
         else:
             state_name = exp_issue.issue_customization_args[keyname]['value']
 
             # Handle exp issues changes for deleted states.
-            exp_issues.unresolved_issues[idx] = (
+            exp_issues.unresolved_issues[i_idx] = (
                 _handle_exp_issues_after_state_deletion(
                     state_name, exp_issue,
                     exp_versions_diff.deleted_state_names))
 
             # Handle exp issues changes for renamed states.
-            exp_issues.unresolved_issues[idx], playthrough_ids_by_state_name = (
-                _handle_exp_issues_after_state_rename(
-                    state_name, exp_issue,
-                    exp_versions_diff.old_to_new_state_names,
-                    playthrough_ids_by_state_name))
+            exp_issues.unresolved_issues[
+                i_idx], playthrough_ids_by_state_name = (
+                    _handle_exp_issues_after_state_rename(
+                        state_name, exp_issue,
+                        exp_versions_diff.old_to_new_state_names,
+                        playthrough_ids_by_state_name))
 
     # Handling changes to playthrough instances.
     all_playthrough_ids = []
@@ -360,7 +356,7 @@ def update_exp_issues_for_new_exp_version(
         playthrough_ids = playthrough_ids_by_state_name[old_state_name]
 
         playthroughs = get_playthroughs_multi(playthrough_ids)
-        for idx, playthrough in enumerate(playthroughs):
+        for p_idx, playthrough in enumerate(playthroughs):
             if stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
                     playthrough.issue_type] == 'state_names':
                 state_names = playthrough.issue_customization_args[
@@ -372,11 +368,11 @@ def update_exp_issues_for_new_exp_version(
             else:
                 playthrough.issue_customization_args['state_name']['value'] = (
                     new_state_name)
-            for idx1, action in enumerate(playthrough.playthrough_actions):
+            for a_idx, action in enumerate(playthrough.actions):
                 if action.action_customization_args['state_name']['value'] == (
                         old_state_name):
-                    playthroughs[idx].playthrough_actions[
-                        idx1].action_customization_args['state_name'][
+                    playthroughs[p_idx].actions[
+                        a_idx].action_customization_args['state_name'][
                             'value'] = new_state_name
 
         all_playthrough_ids.extend(playthrough_ids)
@@ -387,6 +383,43 @@ def update_exp_issues_for_new_exp_version(
     exp_issues.exp_version += 1
 
     create_exp_issues_model(exp_issues)
+
+
+def get_exp_issues(exp_id, exp_version):
+    """Retrieves the ExplorationIssues domain object.
+
+    Args:
+        exp_id: str. ID of the exploration.
+        exp_version: int. Version of the exploration.
+
+    Returns:
+        ExplorationIssues|None: The domain object for exploration issues or
+            None if the exp_id is invalid.
+    """
+    exp_issues = None
+    exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+        exp_id, exp_version)
+    if exp_issues_model is not None:
+        exp_issues = get_exp_issues_from_model(exp_issues_model)
+    return exp_issues
+
+
+def get_playthrough_by_id(playthrough_id):
+    """Retrieves the Playthrough domain object.
+
+    Args:
+        playthrough_id: str. ID of the playthrough.
+
+    Returns:
+        Playthrough|None: The domain object for the playthrough or None if the
+            playthrough_id is invalid.
+    """
+    playthrough = None
+    playthrough_model = stats_models.PlaythroughModel.get(
+        playthrough_id, strict=False)
+    if playthrough_model is not None:
+        playthrough = get_playthrough_from_model(playthrough_model)
+    return playthrough
 
 
 def get_playthroughs_multi(playthrough_ids):
@@ -400,21 +433,9 @@ def get_playthroughs_multi(playthrough_ids):
     """
     playthrough_instances = stats_models.PlaythroughModel.get_multi(
         playthrough_ids)
-    # TODO(pranavsid98): Replace below lines with get_from_model.
-    playthroughs = []
-    for playthrough_instance in playthrough_instances:
-        playthrough_actions = []
-        for action in playthrough_instance.playthrough_actions:
-            playthrough_actions.append(
-                stats_domain.LearnerAction.from_dict(action))
-        playthroughs.append(
-            stats_domain.Playthrough(
-                playthrough_instance.id,
-                playthrough_instance.exp_id,
-                playthrough_instance.exp_version,
-                playthrough_instance.issue_type,
-                playthrough_instance.issue_customization_args,
-                playthrough_actions))
+    playthroughs = [
+        get_playthrough_from_model(playthrough_instance)
+        for playthrough_instance in playthrough_instances]
     return playthroughs
 
 
@@ -433,8 +454,7 @@ def update_playthroughs_multi(playthrough_ids, playthroughs):
         playthrough_instance.issue_type = playthrough_dict['issue_type']
         playthrough_instance.issue_customization_args = (
             playthrough_dict['issue_customization_args'])
-        playthrough_instance.playthrough_actions = (
-            playthrough_dict['playthrough_actions'])
+        playthrough_instance.actions = playthrough_dict['actions']
         updated_instances.append(playthrough_instance)
     stats_models.PlaythroughModel.put_multi(updated_instances)
 
@@ -533,6 +553,25 @@ def get_exploration_stats_from_model(exploration_stats_model):
         exploration_stats_model.num_completions_v1,
         exploration_stats_model.num_completions_v2,
         new_state_stats_mapping)
+
+
+def get_playthrough_from_model(playthrough_model):
+    """Gets a PlaythroughModel domain object from a PlaythroughModel instance.
+
+    Args:
+        playthrough_model: PlaythroughModel. Playthrough model in datastore.
+
+    Returns:
+        Playthrough. The domain object for a playthrough.
+    """
+    actions = []
+    for action_dict in playthrough_model.actions:
+        _migrate_to_latest_action_schema(action_dict)
+        actions.append(stats_domain.LearnerAction.from_dict(action_dict))
+    return stats_domain.Playthrough(
+        playthrough_model.id, playthrough_model.exp_id,
+        playthrough_model.exp_version, playthrough_model.issue_type,
+        playthrough_model.issue_customization_args, actions)
 
 
 def create_stats_model(exploration_stats):
@@ -680,6 +719,15 @@ def get_exploration_stats_multi(exp_version_references):
     return exploration_stats_list
 
 
+def delete_playthroughs_multi(playthrough_ids):
+    """Deletes multiple playthrough instances.
+
+    Args:
+        playthrough_ids: list(str). List of playthrough IDs to be deleted.
+    """
+    stats_models.PlaythroughModel.delete_playthroughs_multi(playthrough_ids)
+
+
 def get_visualizations_info(exp_id, state_name, interaction_id):
     """Returns a list of visualization info. Each item in the list is a dict
     with keys 'data' and 'options'.
@@ -711,6 +759,11 @@ def get_visualizations_info(exp_id, state_name, interaction_id):
 
     calculation_ids_to_outputs = {}
     for calculation_id in calculation_ids:
+        # Don't show top unresolved answers calculation ouutput in stats of
+        # exploration.
+        if calculation_id == 'TopNUnresolvedAnswersByFrequency':
+            continue
+
         # This is None if the calculation job has not yet been run for this
         # state.
         calc_output_domain_object = _get_calc_output(
@@ -856,6 +909,29 @@ def get_top_state_answer_stats(exploration_id, state_name):
     """
     calculation_output = (
         _get_calc_output(exploration_id, state_name, 'Top10AnswerFrequencies')
+        .calculation_output.to_raw_type())
+    return [
+        {'answer': output['answer'], 'frequency': output['frequency']}
+        for output in calculation_output
+        if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
+    ]
+
+
+def get_top_state_unresolved_answers(exploration_id, state_name):
+    """Fetches the top unresolved answers for the given state_name in the
+    corresponding exploration. Only answers that occur with frequency >=
+    STATE_ANSWER_STATS_MIN_FREQUENCY are returned.
+
+    Args:
+        exploration_id: str. The exploration ID.
+        state_name: str. The name of the state to fetch answers for.
+
+    Returns:
+        list(*). A list of the top 10 answers, sorted by decreasing frequency.
+    """
+    calculation_output = (
+        _get_calc_output(
+            exploration_id, state_name, 'TopNUnresolvedAnswersByFrequency')
         .calculation_output.to_raw_type())
     return [
         {'answer': output['answer'], 'frequency': output['frequency']}

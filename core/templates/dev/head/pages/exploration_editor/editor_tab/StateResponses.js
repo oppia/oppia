@@ -424,7 +424,7 @@ oppia.controller('StateResponses', [
       }).result.then(function(result) {
         // Create a new answer group.
         $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-          [result.tmpRule], result.tmpOutcome, []));
+          [result.tmpRule], result.tmpOutcome, [], null));
         ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
         stateContentIdsToAudioTranslationsService.displayed.addContentId(
           result.tmpOutcome.feedback.getContentId());

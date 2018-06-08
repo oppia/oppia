@@ -92,7 +92,7 @@ class StoryModel(base_models.VersionedModel):
             feconf.ACTIVITY_STATUS_PUBLIC, False
         )
         story_commit_log_entry.story_id = self.id
-        story_commit_log_entry.put_async()
+        story_commit_log_entry.put()
 
 
 class StoryCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

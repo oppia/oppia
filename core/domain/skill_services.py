@@ -41,7 +41,7 @@ def _migrate_skill_contents_to_latest_schema(versioned_skill_contents):
 
     Raises:
         Exception: The schema version of the skill_contents is outside of what
-        is supported at present.
+            is supported at present.
     """
     skill_contents_schema_version = versioned_skill_contents['schema_version']
     if not (1 <= skill_contents_schema_version
@@ -72,7 +72,7 @@ def _migrate_misconceptions_to_latest_schema(versioned_misconceptions):
 
     Raises:
         Exception: The schema version of misconceptions is outside of what
-        is supported at present.
+            is supported at present.
     """
     misconception_schema_version = versioned_misconceptions['schema_version']
     if not (1 <= misconception_schema_version
