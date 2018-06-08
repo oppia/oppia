@@ -157,6 +157,12 @@ oppia.factory('ImagePreloaderService', [
     var _kickOffImagePreloader = function(sourceStateName) {
       _filenamesOfImageToBeDownloaded = (
         _getImageFilenamesInBfsOrder(sourceStateName));
+      var imageFilesInGivenState = ExtractImageFilenamesFromStateService
+        .getImageFilenamesInState(_states.getState(sourceStateName));
+      _filenamesOfImageFailedToDownload = _filenamesOfImageFailedToDownload
+        .filter(function(filename) {
+          return imageFilesInGivenState.indexOf(filename) === -1;
+        });
       while (_filenamesOfImageCurrentlyDownloading.length <
           MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY &&
           _filenamesOfImageToBeDownloaded.length > 0) {
@@ -204,14 +210,6 @@ oppia.factory('ImagePreloaderService', [
         });
         if (noOfImagesNeitherInCacheNorDownloading > 0 &&
             noOfImageFilesCurrentlyDownloading <= 1) {
-          var imageFilesInGivenState = ExtractImageFilenamesFromStateService
-            .getImageFilenamesInState(_states.getState(stateName));
-          _filenamesOfImageFailedToDownload = _filenamesOfImageFailedToDownload
-            .map(function(filename) {
-              if (imageFilesInGivenState.indexOf(filename) === -1) {
-                return filename;
-              }
-            });
           _cancelPreloading();
           _kickOffImagePreloader(stateName);
         }
