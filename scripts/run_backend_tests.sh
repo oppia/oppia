@@ -78,10 +78,9 @@ bash scripts/install_third_party.sh
 for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then
     echo Checking whether coverage is installed in $TOOLS_DIR
-    if [ ! -d "$TOOLS_DIR/coverage-4.0" ]; then
+    if [ ! -d "$TOOLS_DIR/coverage-4.5.1" ]; then
       echo Installing coverage
-      rm -rf $TOOLS_DIR/coverage
-      curl -o coverage.tar.gz https://pypi.python.org/packages/source/c/coverage/coverage-4.0.tar.gz#md5=13e119b1f111c22b613c3d5cd19a95ac
+      curl -o coverage.tar.gz https://files.pythonhosted.org/packages/35/fe/e7df7289d717426093c68d156e0fd9117c8f4872b6588e8a8928a0f68424/coverage-4.5.1.tar.gz
       tar xvzf coverage.tar.gz -C $TOOLS_DIR
       rm coverage.tar.gz
     fi
