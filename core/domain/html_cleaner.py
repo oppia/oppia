@@ -279,7 +279,7 @@ def convert_to_text_angular(html_data):
             try:
                 tag.unwrap()
             except Exception:
-                return "exception: " + html_data
+                raise Exception('Invalid unwrapping for string.')
 
     # Removal of tags can break the soup into parts which are continuous
     # and not wrapped in any tag. This part recombines the continuous
@@ -396,11 +396,19 @@ def validate_textangular_format(html_list, run_migration=False):
         ['ALLOWED_TAG_LIST'])
 
     for html_data in html_list:
-        if run_migration:
-            migrated_data = convert_to_text_angular(html_data)
-            soup = bs4.BeautifulSoup(migrated_data, 'html.parser')
-        else:
-            soup = bs4.BeautifulSoup(html_data, 'html.parser')
+        try:
+            if run_migration:
+                migrated_data = convert_to_text_angular(html_data)
+                soup = bs4.BeautifulSoup(migrated_data, 'html.parser')
+            else:
+                soup = bs4.BeautifulSoup(html_data, 'html.parser')
+        except Exception as e:
+            if e in err_dict:
+                err_dict[e] += [html_data]
+            else:
+                err_dict[e] = [html_data]
+            continue
+
         # Text with no parent tag is also invalid.
         for content in soup.contents:
             if not content.name:
