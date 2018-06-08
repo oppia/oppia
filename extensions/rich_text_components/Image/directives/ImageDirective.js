@@ -22,10 +22,9 @@
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'UrlInterpolationService', 'ImagePreloaderService',
-  'AssetsBackendApiService', function(
+  function(
       $rootScope, $sce, HtmlEscaperService, ExplorationContextService,
-      UrlInterpolationService, ImagePreloaderService,
-      AssetsBackendApiService) {
+      UrlInterpolationService, ImagePreloaderService) {
     return {
       restrict: 'E',
       scope: {},
@@ -35,6 +34,7 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
         $scope.imageUrl = '';
+
         ImagePreloaderService.getImageUrl($scope.filepath)
           .then(function(objectUrl) {
             $scope.imageUrl = objectUrl;

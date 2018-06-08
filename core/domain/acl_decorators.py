@@ -21,6 +21,7 @@ from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import topic_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -819,12 +820,216 @@ def can_edit_topic(handler):
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if topic_services.check_can_edit_topic(
-                self.user, topic_rights):
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, topic_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
+            raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this topic.')
     test_can_edit.__wrapped__ = True
 
     return test_can_edit
+
+
+def can_add_new_story_to_topic(handler):
+    """Decorator to check whether the user can add a story to a given topic."""
+    def test_can_add_story(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to add a story to this topic.')
+    test_can_add_story.__wrapped__ = True
+
+    return test_can_add_story
+
+
+def can_edit_story(handler):
+    """Decorator to check whether the user can edit a story belonging to a given
+    topic.
+    """
+    def test_can_edit_story(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this story.')
+    test_can_edit_story.__wrapped__ = True
+
+    return test_can_edit_story
+
+
+def can_edit_skill(handler):
+    """Decorator to check whether the user can edit a skill, which can be
+    independent or belong to a topic.
+    """
+    def test_can_edit_skill(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        if role_services.ACTION_EDIT_ANY_SKILL in user_actions_info.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this skill.')
+
+    test_can_edit_skill.__wrapped__ = True
+    return test_can_edit_skill
+
+
+def can_delete_skill(handler):
+    """Decorator to check whether the user can delete a skill.
+    """
+    def test_can_delete_skill(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        if role_services.ACTION_DELETE_ANY_SKILL in user_actions_info.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to delete the skill.')
+
+    test_can_delete_skill.__wrapped__ = True
+    return test_can_delete_skill
+
+
+def can_create_skill(handler):
+    """Decorator to check whether the user can create a skill, which can be
+    independent or added to a topic.
+    """
+    def test_can_create_skill(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        if role_services.ACTION_CREATE_NEW_SKILL in user_actions_info.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to create a skill.')
+
+    test_can_create_skill.__wrapped__ = True
+    return test_can_create_skill
+
+
+def can_delete_story(handler):
+    """Decorator to check whether the user can delete a story in a given topic.
+    """
+    def test_can_delete_story(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to delete this story.')
+    test_can_delete_story.__wrapped__ = True
+
+    return test_can_delete_story
+
+
+def can_delete_topic(handler):
+    """Decorator to check whether the user can delete a topic."""
+
+    def test_can_delete_topic(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to delete the'
+                ' topic.' % self.user_id)
+    test_can_delete_topic.__wrapped__ = True
+
+    return test_can_delete_topic
+
+
+def can_create_topic(handler):
+    """Decorator to check whether the user can create a topic."""
+
+    def test_can_create_topic(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if role_services.ACTION_CREATE_NEW_TOPIC in user_actions_info.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to create a'
+                ' topic.' % self.user_id)
+    test_can_create_topic.__wrapped__ = True
+
+    return test_can_create_topic
+
+
+def can_access_topics_and_skills_dashboard(handler):
+    """Decorator to check whether the user can access the topics and skills
+    dashboard.
+    """
+
+    def test_can_access_topics_and_skills_dashboard(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if (
+                role_services.ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD in
+                user_actions_info.actions):
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to access the topics and skills'
+                ' dashboard.' % self.user_id)
+    test_can_access_topics_and_skills_dashboard.__wrapped__ = True
+
+    return test_can_access_topics_and_skills_dashboard
+
+
+def can_manage_rights_for_topic(handler):
+    """Decorator to check whether the user can manage a topic's rights."""
+
+    def test_can_manage_topic_rights(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if (
+                role_services.ACTION_MANAGE_TOPIC_RIGHTS in
+                user_actions_info.actions):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to assign roles for the '
+                'topic.' % self.user_id)
+    test_can_manage_topic_rights.__wrapped__ = True
+
+    return test_can_manage_topic_rights

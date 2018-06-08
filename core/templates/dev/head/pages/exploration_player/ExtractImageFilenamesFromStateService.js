@@ -144,7 +144,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       // The Image Click Input interaction has an image whose filename is
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath
-      if (state.interaction.id === 'INTERACTION_TYPE_IMAGE_CLICK_INPUT') {
+      if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
         filenamesInState.push(
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
       }

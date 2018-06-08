@@ -250,6 +250,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'labelled_as_correct': False,
                     'param_changes': [],
                     'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
                 },
                 'rule_specs': [{
                     'inputs': {
@@ -257,7 +258,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'rule_type': 'Contains'
                 }],
-                'training_data': []
+                'training_data': [],
+                'tagged_misconception_id': None
             })
         )
         exploration.validate()
@@ -357,6 +359,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         outcome.refresher_exploration_id = 'valid_string'
+        exploration.validate()
+
+        outcome.missing_prerequisite_skill_id = 12345
+        self._assert_validation_error(
+            exploration,
+            'Expected outcome missing_prerequisite_skill_id to be a string')
+
+        outcome.missing_prerequisite_skill_id = None
+        exploration.validate()
+
+        outcome.missing_prerequisite_skill_id = 'valid_string'
         exploration.validate()
 
         # Test that refresher_exploration_id must be None for non-self-loops.
@@ -892,6 +905,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     'labelled_as_correct': False,
                     'param_changes': [],
                     'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
                 'id': None,
@@ -2938,14 +2952,16 @@ states:
           dest: END
           feedback:
             audio_translations: {}
-            html: <p>Correct!</p>
+            html: Correct!
           labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: InputString
           rule_type: Equals
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -2959,6 +2975,107 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 20
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V26 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 26
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -3000,18 +3117,19 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
       id: TextInput
       solution: null
     param_changes: []
-states_schema_version: 20
+states_schema_version: 21
 tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V24_TEXTANGULAR = ("""author_notes: ''
+    YAML_CONTENT_V25_TEXTANGULAR = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -3021,7 +3139,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 24
+schema_version: 25
 states:
   Introduction:
     classifier_model_id: null
@@ -3038,6 +3156,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -3063,6 +3182,7 @@ states:
           audio_translations: {}
           html: Default <p>outcome</p> for state1
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -3087,6 +3207,7 @@ states:
             audio_translations: {}
             html: <div>Outcome1 for state2</div>
           labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -3096,6 +3217,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: state3
@@ -3103,12 +3225,14 @@ states:
             audio_translations: {}
             html: <pre>Outcome2 <br>for state2</pre>
           labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -3122,6 +3246,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -3156,6 +3281,7 @@ states:
                 amp;quot;startBlue.png&amp;quot;">
                 </oppia-noninteractive-image></div>
           labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -3167,6 +3293,7 @@ states:
             x:
             - This is value3 for ItemSelectionInput
           rule_type: Equals
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -3185,19 +3312,20 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution: null
     param_changes: []
-states_schema_version: 19
+states_schema_version: 20
 tags: []
 title: title
 """)
 
 # pylint: disable=line-too-long
-    YAML_CONTENT_V25_TEXTANGULAR = ("""author_notes: ''
+    YAML_CONTENT_V26_TEXTANGULAR = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -3207,7 +3335,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 25
+schema_version: 26
 states:
   Introduction:
     classifier_model_id: null
@@ -3224,6 +3352,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -3249,6 +3378,7 @@ states:
           audio_translations: {}
           html: <p>Default </p><p>outcome</p><p> for state1</p>
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -3273,6 +3403,7 @@ states:
             audio_translations: {}
             html: <p>Outcome1 for state2</p>
           labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -3282,6 +3413,7 @@ states:
         - inputs:
             x: 1
           rule_type: Equals
+        tagged_misconception_id: null
         training_data: []
       - outcome:
           dest: state3
@@ -3289,12 +3421,14 @@ states:
             audio_translations: {}
             html: \"<pre>Outcome2 \\nfor state2</pre>\"
           labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
         - inputs:
             x: 0
           rule_type: Equals
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -3308,6 +3442,7 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -3337,6 +3472,7 @@ states:
               </oppia-noninteractive-image></i>Here is the image2 </p><p><oppia-noninteractive-image
               filepath-with-value=" amp;quot;startBlue.png&amp;quot;"> </oppia-noninteractive-image></p>
           labelled_as_correct: false
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -3348,6 +3484,7 @@ states:
             x:
             - <p>This is value3 for ItemSelectionInput</p>
           rule_type: Equals
+        tagged_misconception_id: null
         training_data: []
       confirmed_unclassified_answers: []
       customization_args:
@@ -3366,18 +3503,20 @@ states:
           audio_translations: {}
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
       id: ItemSelectionInput
       solution: null
     param_changes: []
-states_schema_version: 20
+states_schema_version: 21
 tags: []
 title: title
 """)
 # pylint: enable=line-too-long
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V25
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V26
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -3529,12 +3668,18 @@ title: title
             'eid', self.YAML_CONTENT_V25)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
-    def test_load_from_v24_textangular(self):
+    def test_load_from_v26(self):
         """Test direct loading from a v25 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V24_TEXTANGULAR)
+            'eid', self.YAML_CONTENT_V26)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v25_textangular(self):
+        """Test direct loading from a v25 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V25_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V25_TEXTANGULAR)
+            exploration.to_yaml(), self.YAML_CONTENT_V26_TEXTANGULAR)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -3567,6 +3712,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'labelled_as_correct': False,
                         'param_changes': [],
                         'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
                     },
                     'hints': [],
                     'id': None,
@@ -4276,7 +4422,8 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'labelled_as_correct': False,
-            'refresher_exploration_id': None
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
         }
         state1.update_interaction_default_outcome(default_outcome_dict1)
 
@@ -4321,9 +4468,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 },
                 'param_changes': [],
                 'labelled_as_correct': False,
-                'refresher_exploration_id': None
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
             },
             'training_data': [],
+            'tagged_misconception_id': None
         }, {
             'rule_specs': [{
                 'rule_type': 'Equals',
@@ -4337,9 +4486,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 },
                 'param_changes': [],
                 'labelled_as_correct': False,
-                'refresher_exploration_id': None
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
             },
-            'training_data': []
+            'training_data': [],
+            'tagged_misconception_id': None
         }]
         answer_group_list3 = [{
             'rule_specs': [{
@@ -4361,9 +4512,11 @@ class HtmlCollectionTests(test_utils.GenericTestBase):
                 },
                 'param_changes': [],
                 'labelled_as_correct': False,
-                'refresher_exploration_id': None
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
             },
             'training_data': [],
+            'tagged_misconception_id': None
         }]
         state2.update_interaction_answer_groups(answer_group_list2)
         state3.update_interaction_answer_groups(answer_group_list3)

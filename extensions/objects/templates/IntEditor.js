@@ -27,7 +27,9 @@ oppia.directive('intEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        value: '='
+      },
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
         $scope.SCHEMA = {
@@ -37,8 +39,8 @@ oppia.directive('intEditor', [
           }]
         };
 
-        if (!$scope.$parent.value) {
-          $scope.$parent.value = 0;
+        if (!$scope.value) {
+          $scope.value = 0;
         }
       }]
     };
