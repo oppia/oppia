@@ -16,9 +16,6 @@
 
 """Tests for Exploration-related jobs."""
 
-import json
-import os
-
 from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
@@ -839,9 +836,9 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
                 'audio_translations': {}
             },
             'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
             'param_changes': [],
-            'refresher_exploration_id': None
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
         }
 
         state1.update_interaction_default_outcome(default_outcome_dict)
@@ -908,9 +905,9 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         }
         content2_dict = {
             'html': (
-                'Here is test case <a href="https://github.com">hello'
+                'Here is test case <a href="https://github.com">'
                 '<oppia-noninteractive-link url-with-value="&amp;quot;'
-                'here&amp;quot;" text-with-value="abc">'
+                'https://github.com&amp;quot;" text-with-value="abc">'
                 '</oppia-noninteractive-link><p> testing in progress</p>'
             ),
             'audio_translations': {}
@@ -933,9 +930,9 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                 'audio_translations': {}
             },
             'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
             'param_changes': [],
-            'refresher_exploration_id': None
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
         }
         default_outcome_dict2 = {
             'dest': 'State1',
@@ -948,9 +945,9 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                 'audio_translations': {}
             },
             'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
             'param_changes': [],
-            'refresher_exploration_id': None
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
         }
 
         state1.update_interaction_default_outcome(default_outcome_dict1)
@@ -967,17 +964,11 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                 job_id))
         expected_output = [
             "[u'oppia-noninteractive-image', [u'ol']]",
-            "[u'oppia-noninteractive-link', [u'oppia-noninteractive-link']]",
             (
                 '[u\'strings\', '
                 '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
                 'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
-                '</oppia-noninteractive-image></ol>\', '
-                'u\'Here is test case <a href="https://github.com">'
-                'hello<oppia-noninteractive-link text-with-value="abc" '
-                'url-with-value="&amp;quot;here&amp;quot;">'
-                '</oppia-noninteractive-link>'
-                '<p> testing in progress</p></a>\']]'
+                '</oppia-noninteractive-image></ol>\']]'
             )
         ]
 

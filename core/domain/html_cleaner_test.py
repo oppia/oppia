@@ -316,17 +316,7 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
             html_cleaner.validate_textangular_format(
                 test_cases))
 
-        expected_output_with_migration = {
-            u'oppia-noninteractive-link': [u'oppia-noninteractive-link'],
-            'strings': [
-                (
-                    'This is the last test case <a href="https://github.com">'
-                    'hello<oppia-noninteractive-link url-with-value="&amp;'
-                    'quot;here&amp;quot;" text-with-value="validated">'
-                    '</oppia-noninteractive-link></a><p> testing completed</p>'
-                )
-            ]
-        }
+        expected_output_with_migration = {'strings': []}
         expected_output_without_migration = {
             u'i': [u'[document]'],
             'invalidTags': [u'a'],
