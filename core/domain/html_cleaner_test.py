@@ -16,6 +16,7 @@
 
 """Tests for the HTML sanitizer."""
 
+import bs4
 from core.domain import html_cleaner
 from core.tests import test_utils
 
@@ -186,6 +187,46 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
     """ Tests the function associated with the migration of html
     strings to valid TextAngular format.
     """
+
+    def test_wrap_with_siblings(self):
+        test_cases = [{
+            'html_content': (
+                '<p><i>hello</i></p> this is<i>test case1</i> for '
+                '<ol><li><i>testing</i></li></ol>'
+            ),
+            'expected_output': (
+                '<p><i>hello</i></p><p> this is<i>test case1</i> for </p>'
+                '<ol><li><i>testing</i></li></ol>'
+            )
+        }, {
+            'html_content': (
+                '<br/>hello this is<br/>test<p> case2<br/>'
+                '</p> for <p><br/>testing</p>'
+            ),
+            'expected_output': (
+                '<p><br/>hello this is<br/>test</p>'
+                '<p> case2<br/></p> for <p><br/>testing</p>'
+            )
+        }, {
+            'html_content': (
+                '<p>hello</p>this is case <b>3</b> for <i>'
+                'testing</i> the <p>function</p>'
+            ),
+            'expected_output': (
+                '<p>hello</p><p>this is case <b>3</b> for <i>'
+                'testing</i> the </p><p>function</p>'
+            )
+        }]
+        for index, test_case in enumerate(test_cases):
+            soup = bs4.BeautifulSoup(test_case['html_content'], 'html.parser')
+            if index == 0:
+                tag = soup.findAll('i')[1]
+            elif index == 1:
+                tag = soup.find('br')
+            elif index == 2:
+                tag = soup.find('b')
+            html_cleaner.wrap_with_siblings(tag, soup.new_tag('p'))
+            self.assertEqual(str(soup), test_case['expected_output'])
 
     def test_convert_to_text_angular(self):
         test_cases = [{
