@@ -658,18 +658,15 @@ class SkillSummary(object):
 class UserSkillMastery(object):
     """Domain object for a user's mastery of a particular skill."""
 
-    def __init__(self, model_id, user_id, skill_id, degree_of_mastery):
-        """Constructs a SkillMastery domain object.
+    def __init__(self, user_id, skill_id, degree_of_mastery):
+        """Constructs a SkillMastery domain object for a user.
 
         Args:
-            model_id: str. The model id corresponding to the user and
-                the skill.
-            user_id: str. The user id of the logged in user.
+            user_id: str. The user id of the user.
             skill_id: str. The id of the skill.
             degree_of_mastery: float. The progress of user for the
                 corresponding skill.
         """
-        self.id = model_id
         self.user_id = user_id
         self.skill_id = skill_id
         self.degree_of_mastery = degree_of_mastery
@@ -681,7 +678,6 @@ class UserSkillMastery(object):
             dict. A dict representing this SkillMastery object.
         """
         return {
-            'id': self.id,
             'user_id': self.user_id,
             'skill_id': self.skill_id,
             'degree_of_mastery': self.degree_of_mastery

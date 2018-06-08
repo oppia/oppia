@@ -653,6 +653,8 @@ class UserSkillMasteryModel(base_models.BaseModel):
     The id for this model is of form '{{USER_ID}}:{{SKILL_ID}}'
     """
 
+    # The model id for the user and the skill.
+    id = ndb.StringProperty(required=True)
     # The user id of the user.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The skill id for which the degree of mastery is stored.
@@ -661,28 +663,43 @@ class UserSkillMasteryModel(base_models.BaseModel):
     degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
 
     @classmethod
-    def get_model_id(cls, user_id, skill_id):
+    def construct_model_id(cls, user_id, skill_id):
         """Returns model id corresponding to user and skill.
 
         Args:
-            user_id: str. The user id of the logged in user.
+            user_id: str. The user ID of the user.
             skill_id: str. The unique id of the skill.
 
         Returns:
             str. The model id corresponding to user and skill.
         """
-        return '%s:%s' % (user_id, skill_id)
+        return '%s.%s' % (user_id, skill_id)
 
     @classmethod
-    def get_all_skill_mastery_models_for_user(cls, user_id):
-        """Returns all skill mastery models of a particular user.
+    def get(cls, model_id):
+        """Returns all skill mastery models of a user and a skill.
 
         Args:
-            user_id: str. The user id corresponding to a user.
+            model_id: str. The model id of the user and the skill.
 
         Returns:
             list. All skill mastery models where user_id belongs to the
                 entered user are returned as a list where each element
                 is one skill mastery model.
         """
-        return cls.query(cls.user_id == user_id).fetch()
+        return cls.query(cls.id == model_id).fetch()
+
+    @classmethod
+    def get_multi(cls, model_ids):
+        """Returns all skill mastery models of a different model ids.
+
+        Args:
+            model_ids: list. List containing model ids of users and
+                skills.
+
+        Returns:
+            list. All skill mastery models for all model_id in the list
+                model_ids are returned as a list where each element
+                is one skill mastery model.
+        """
+        return cls.query(cls.id.IN(model_ids)).fetch()
