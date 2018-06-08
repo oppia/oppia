@@ -34,7 +34,7 @@ oppia.factory('ImagePreloaderService', [
     // attached with getInImageUrl method.
     var _imageLoadedCallback = {};
     var _hasImagePreloaderServiceStarted = false;
-
+    var _failedDownload = [];
     var _init = function(exploration) {
       _exploration = exploration;
       _states = exploration.states;
@@ -52,9 +52,24 @@ oppia.factory('ImagePreloaderService', [
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), filename)
         .then(function(loadedImageFile) {
+          if (_isInFailedDownload(loadedImageFile.filename)) {
+            _removeFromFailedDownload(loadedImageFile.filename);
+          }
           var objectUrl = URL.createObjectURL(loadedImageFile.data);
           onLoadCallback(objectUrl);
         });
+    };
+
+    /**
+     * Removes the given filename from the _failedDownload.
+     * @param {string} filename - The filename of the file which is to be
+     *                            removed from the _failedDownload array.
+     */
+    var _removeFromFailedDownload = function(filename) {
+      var index = _failedDownload.indexOf(loadedImageFile.filename);
+      if (index >= 0) {
+        _failedDownload.splice(index, 1);
+      }
     };
 
     /**
@@ -82,6 +97,26 @@ oppia.factory('ImagePreloaderService', [
     };
 
     /**
+     * Removes the filename from the _filenamesOfImageCurrentlyDownloading and
+     * initiates the loading of the next image file.
+     * @param {string} filename - The filename which is to be removed from the
+     *                            _filenamesOfImageCurrentlyDownloading array.
+     */
+    var _removeCurrentAndLoadNextImage = function(filename) {
+      _filenamesOfImageCurrentlyDownloading = (
+        _filenamesOfImageCurrentlyDownloading.filter(
+          function(imageFilename) {
+            return filename !== imageFilename;
+          })
+      );
+      if (_filenamesOfImageToBeDownloaded.length > 0) {
+        var nextImageFilename = _filenamesOfImageToBeDownloaded.shift();
+        _filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
+        _loadImage(nextImageFilename);
+      }
+    };
+
+    /**
      * Handles the loading of the image file.
      * @param {string} imageFilename - The filename of the image to be loaded.
      */
@@ -89,17 +124,7 @@ oppia.factory('ImagePreloaderService', [
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), imageFilename)
         .then(function(loadedImage) {
-          _filenamesOfImageCurrentlyDownloading = (
-            _filenamesOfImageCurrentlyDownloading.filter(
-              function(imageFilename) {
-                return loadedImage.filename !== imageFilename;
-              })
-          );
-          if (_filenamesOfImageToBeDownloaded.length > 0) {
-            var nextImageFilename = _filenamesOfImageToBeDownloaded.shift();
-            _filenamesOfImageCurrentlyDownloading.push(nextImageFilename);
-            _loadImage(nextImageFilename);
-          }
+          _removeCurrentAndLoadNextImage(loadedImage.filename);
           if (_imageLoadedCallback[loadedImage.filename]) {
             var onLoadImageResolve = (
               (_imageLoadedCallback[loadedImage.filename]).resolveMethod);
@@ -107,7 +132,19 @@ oppia.factory('ImagePreloaderService', [
             onLoadImageResolve(objectUrl);
             _imageLoadedCallback[loadedImage.filename] = null;
           }
+        }, function(filename) {
+          _failedDownload.push(filename);
+          _removeCurrentAndLoadNextImage(filename);
         });
+    };
+
+    /**
+     * Checks if the given filename is in _failedDownload or not.
+     * @param {string} filename - The filename of the image which is to be
+     *                            removed from the _failedDownload array.
+     */
+    var _isInFailedDownload = function(filename) {
+      return _failedDownload.indexOf(filename) >= 0;
     };
 
     /**
@@ -188,7 +225,8 @@ oppia.factory('ImagePreloaderService', [
       getImageUrl: function(filename) {
         return $q(function(resolve, reject){
           if (AssetsBackendApiService.isCached(filename) ||
-              !_hasImagePreloaderServiceStarted) {
+              !_hasImagePreloaderServiceStarted ||
+              _isInFailedDownload(filename)) {
             _getImageUrl(filename, resolve);
           } else {
             _imageLoadedCallback[filename] = {
