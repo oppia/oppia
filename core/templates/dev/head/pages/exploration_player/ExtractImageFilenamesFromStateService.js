@@ -225,15 +225,8 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
         var filepathObject = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
-        if (!filepathObject.width) {
-          var filename = filepathObject;
-          filepathObject = {
-            name: filename,
-            width: 500,
-            height: 200
-          };
-        }
-        filenamesInState.push(filepathObject.name);
+        filenamesInState.push(!filepathObject.name ? filepathObject :
+          filepathObject.name);
       }
       allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {
