@@ -16,6 +16,8 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+/* eslint-disable angular/directive-restrict */
+
 oppia.directive('stateGraphViz', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
