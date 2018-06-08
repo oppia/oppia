@@ -1544,6 +1544,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer('Answer A')
             self._run_answer_summaries_aggregator()
             visualizations = self._get_visualizations()
+            # There are two visualizations for TextInput. One for top answers
+            # and second is for top unresolved answers but top unresolved
+            # answers visualization is not shown as part of exploration stats.
             self.assertEqual(len(visualizations), 1)
 
             visualization = visualizations[0]
@@ -1556,6 +1559,10 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer('Answer A')
             self._run_answer_summaries_aggregator()
             visualizations = self._get_visualizations()
+
+            # There are two visualizations for TextInput. One for top answers
+            # and second is for top unresolved answers but top unresolved
+            # answers visualization is not shown as part of exploration stats.
             self.assertEqual(len(visualizations), 1)
 
             visualization = visualizations[0]
@@ -1575,6 +1582,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer('Answer A')
             self._run_answer_summaries_aggregator()
             visualizations = self._get_visualizations()
+            # There are two visualizations for TextInput. One for top answers
+            # and second is for top unresolved answers but top unresolved
+            # answers visualization is not shown as part of exploration stats.
             self.assertEqual(len(visualizations), 1)
 
             visualization = visualizations[0]
@@ -1656,6 +1666,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
             self._record_answer('Answer A')
             self._rerun_answer_summaries_aggregator()
             visualizations = self._get_visualizations()
+            # There are two visualizations for TextInput. One for top answers
+            # and second is for top unresolved answers but top unresolved
+            # answers visualization is not shown as part of exploration stats.
             self.assertEqual(len(visualizations), 1)
 
             visualization = visualizations[0]
@@ -1680,6 +1693,9 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
 
             self._run_answer_summaries_aggregator()
             visualizations = self._get_visualizations()
+            # There are two visualizations for TextInput. One for top answers
+            # and second is for top unresolved answers but top unresolved
+            # answers visualization is not shown as part of exploration stats.
             self.assertEqual(len(visualizations), 1)
 
             visualization = visualizations[0]
@@ -1747,6 +1763,11 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
         return stats_services.get_top_state_answer_stats(exp_id, state_name)
 
+    def _get_top_state_unresolved_answer_stats(
+            self, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
+        return stats_services.get_top_state_unresolved_answers(
+            exp_id, state_name)
+
     def _get_top_state_answer_stats_multi(
             self, exp_id=EXP_ID, state_names=None):
         if not state_names:
@@ -1755,12 +1776,13 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             exp_id, state_names)
 
     def _record_answer(
-            self, answer, exp_id=EXP_ID, state_name=STATE_NAMES[0]):
+            self, answer, exp_id=EXP_ID, state_name=STATE_NAMES[0],
+            classification_category=exp_domain.EXPLICIT_CLASSIFICATION):
         exploration = exp_services.get_exploration_by_id(exp_id)
         interaction_id = exploration.states[state_name].interaction.id
         event_services.AnswerSubmissionEventHandler.record(
             exp_id, exploration.version, state_name, interaction_id, 0, 0,
-            exp_domain.EXPLICIT_CLASSIFICATION, 'sid1', 10.0, {}, answer)
+            classification_category, 'sid1', 10.0, {}, answer)
 
     def _run_answer_summaries_aggregator(self):
         ModifiedInteractionAnswerSummariesAggregator.start_computation()
@@ -1771,6 +1793,8 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.assertEqual(
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
+        ModifiedInteractionAnswerSummariesAggregator.stop_computation(
+            feconf.SYSTEM_COMMITTER_ID)
 
     def setUp(self):
         super(StateAnswersStatisticsTest, self).setUp()
@@ -1779,6 +1803,49 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.save_new_linear_exp_with_state_names_and_interactions(
             self.EXP_ID, self.owner_id, self.STATE_NAMES, ['TextInput'])
+
+    def test_get_top_state_unresolved_answer_stats(self):
+        self._record_answer(
+            'A', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
+        self._record_answer(
+            'B', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
+        self._record_answer(
+            'C', classification_category=exp_domain.STATISTICAL_CLASSIFICATION)
+        self._record_answer(
+            'A', classification_category=exp_domain.STATISTICAL_CLASSIFICATION)
+        self._record_answer(
+            'D',
+            classification_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+        self._record_answer(
+            'E',
+            classification_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION)
+        self._record_answer(
+            'D', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
+        self._run_answer_summaries_aggregator()
+
+        with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 1):
+            state_answers_stats = self._get_top_state_unresolved_answer_stats()
+
+        self.assertEqual(
+            state_answers_stats, [
+                {'answer': 'A', 'frequency': 2},
+                {'answer': 'C', 'frequency': 1},
+                {'answer': 'E', 'frequency': 1}
+            ])
+
+        self._record_answer(
+            'A', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
+        self._record_answer(
+            'E', classification_category=exp_domain.EXPLICIT_CLASSIFICATION)
+        self._run_answer_summaries_aggregator()
+
+        with self.swap(feconf, 'STATE_ANSWER_STATS_MIN_FREQUENCY', 1):
+            state_answers_stats = self._get_top_state_unresolved_answer_stats()
+
+        self.assertEqual(
+            state_answers_stats, [
+                {'answer': 'C', 'frequency': 1}
+            ])
 
     def test_get_top_state_answer_stats(self):
         self._record_answer('A')

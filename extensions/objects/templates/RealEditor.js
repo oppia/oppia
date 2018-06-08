@@ -23,22 +23,24 @@ oppia.directive('realEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        value: '='
+      },
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
         $scope.schema = {
           type: 'float'
         };
 
-        $scope.$watch('$parent.value', function() {
-          if ($scope.$parent.value === '') {
+        $scope.$watch('value', function() {
+          if ($scope.value === '') {
             // A new rule
-            $scope.$parent.value = 0.0;
+            $scope.value = 0.0;
           }
         });
 
-        if ($scope.$parent.value === '') {
-          $scope.$parent.value = 0.0;
+        if ($scope.value === '') {
+          $scope.value = 0.0;
         }
       }]
     };

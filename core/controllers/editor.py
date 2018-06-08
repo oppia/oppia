@@ -1059,3 +1059,23 @@ class StateAnswerStatisticsHandler(EditorHandler):
             'answers': stats_services.get_top_state_answer_stats_multi(
                 exploration_id, current_exploration.states)
         })
+
+
+class TopUnresolvedAnswersHandler(EditorHandler):
+    """Returns a list of top N unresolved answers."""
+
+    @acl_decorators.can_edit_exploration
+    def get(self, exploration_id):
+        """Handles GET requests for unresolved answers."""
+        try:
+            state_name = self.payload.get('state_name')
+        except Exception:
+            raise self.PageNotFoundException
+
+        unresolved_answers_with_frequency = (
+            stats_services.get_top_state_unresolved_answers(
+                exploration_id, state_name))
+
+        self.render_json({
+            'unresolved_answers': unresolved_answers_with_frequency
+        })

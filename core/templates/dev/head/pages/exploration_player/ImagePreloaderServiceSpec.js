@@ -154,7 +154,8 @@ describe('Image preloader service', function() {
                           '</oppia-noninteractive-image></p>'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [
                   {
@@ -174,7 +175,8 @@ describe('Image preloader service', function() {
                     html: "Let's go to state 1 ImageAndRegion"
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [
                   {
@@ -205,7 +207,8 @@ describe('Image preloader service', function() {
               ],
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -230,7 +233,8 @@ describe('Image preloader service', function() {
                 ],
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               }
             }, {
               rule_specs: [{
@@ -246,7 +250,8 @@ describe('Image preloader service', function() {
                 ],
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               }
             }],
             hints: [{
