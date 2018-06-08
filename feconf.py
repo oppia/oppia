@@ -157,7 +157,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 19
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 20
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -173,6 +173,9 @@ CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
 
 # The current version of misconceptions dict in the skill schema.
 CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
+
+# The current version of subtopics dict in the topic schema.
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
 
 # The current version of the question schema.
 CURRENT_QUESTION_SCHEMA_VERSION = 1
@@ -192,6 +195,10 @@ COMMIT_LIST_PAGE_SIZE = 50
 # The default number of items to show on a page in the exploration feedback
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
+
+# The maximum number of top unresolved answers which should be aggregated
+# from all of the submitted answers.
+TOP_UNRESOLVED_ANSWERS_LIMIT = 20
 
 # Default title for a newly-minted exploration.
 DEFAULT_EXPLORATION_TITLE = ''
@@ -216,15 +223,11 @@ DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
 
-# Default title for a newly-minted story.
-DEFAULT_STORY_TITLE = ''
 # Default description for a newly-minted story.
 DEFAULT_STORY_DESCRIPTION = ''
 # Default notes for a newly-minted story.
 DEFAULT_STORY_NOTES = ''
 
-# Default description for a newly-minted skill.
-DEFAULT_SKILL_DESCRIPTION = ''
 # Default explanation for a newly-minted skill.
 DEFAULT_SKILL_EXPLANATION = ''
 # Default name for a newly-minted misconception.
@@ -234,8 +237,6 @@ DEFAULT_MISCONCEPTION_NOTES = ''
 # Default feedback for a newly-minted misconception.
 DEFAULT_MISCONCEPTION_FEEDBACK = ''
 
-# Default name for a newly-minted topic.
-DEFAULT_TOPIC_NAME = ''
 # Default description for a newly-minted topic.
 DEFAULT_TOPIC_DESCRIPTION = ''
 
@@ -362,6 +363,9 @@ ENABLE_PROMO_BAR = True
 # determines whether the site is in maintenance mode to avoid queries to the
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
+
+# Disables all the new structures' pages, till they are completed.
+ENABLE_NEW_STRUCTURES = False
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -564,16 +568,16 @@ TASK_URL_SUGGESTION_EMAILS = (
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
+COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
-EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
+CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
-CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
@@ -604,6 +608,9 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+NEW_SKILL_URL = '/skill_editor_handler/create_new'
+NEW_STORY_URL = '/story_editor_handler/create_new'
+NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_DATA_URL = '/questionhandler'
 QUESTION_MANAGER_URL = '/questionmanagerhandler'
@@ -615,11 +622,19 @@ SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
+SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SPLASH_URL = '/splash'
+STORY_EDITOR_URL_PREFIX = '/story_editor'
+STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
+TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
+TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
+TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
+TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
@@ -640,6 +655,7 @@ NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
+NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -869,22 +885,22 @@ RTE_CONTENT_SPEC = {
     'RTE_TYPE_TEXTANGULAR': {
         # Valid parent-child relation in TextAngular.
         'ALLOWED_PARENT_LIST': {
-            'p': ['blockquote', 'div', 'pre', '[document]'],
+            'p': ['blockquote', 'div', 'pre', '[document]', 'ol', 'ul', 'li'],
             'b': ['i', 'li', 'p', 'pre'],
             'br': ['b', 'i', 'li', 'p'],
             'div': ['blockquote'],
             'i': ['b', 'li', 'p', 'pre'],
             'li': ['ol', 'ul'],
-            'ol': ['blockquote', 'li', 'pre', 'div', '[document]'],
-            'ul': ['blockquote', 'li', 'pre', 'div', '[document]'],
-            'pre': ['blockquote', '[document]'],
+            'ol': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
+            'ul': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
+            'pre': ['ol', 'ul', 'blockquote', '[document]'],
             'blockquote': ['blockquote', '[document]'],
-            'oppia-noninteractive-link': ['b', 'li', 'i', 'p', 'pre'],
-            'oppia-noninteractive-math': ['b', 'li', 'i', 'p', 'pre'],
-            'oppia-noninteractive-image': ['li', 'p', 'pre'],
-            'oppia-noninteractive-collapsible': ['li', 'p', 'pre'],
-            'oppia-noninteractive-video': ['li', 'p', 'pre'],
-            'oppia-noninteractive-tabs': ['li', 'p', 'pre']
+            'oppia-noninteractive-link': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-math': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
         },
         # Valid html tags in TextAngular.
         'ALLOWED_TAG_LIST': [

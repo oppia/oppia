@@ -73,7 +73,7 @@ SCORE_TYPE_CHOICES = [
 SCORE_CATEGORY_DELIMITER = '.'
 
 
-class SuggestionModel(base_models.BaseModel):
+class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
 
     The ID of the suggestions are created is the same as the ID of the thread

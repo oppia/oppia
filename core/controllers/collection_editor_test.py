@@ -106,7 +106,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         # This is due to them not being whitelisted.
         response = self.testapp.get(
             '%s/%s' % (
-                feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
                 self.COLLECTION_ID))
         self.assertEqual(response.status_int, 302)
 
@@ -116,7 +116,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         json_response = self.get_json(
             '%s/%s' % (
-                feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
                 self.COLLECTION_ID))
         self.assertEqual(self.COLLECTION_ID, json_response['collection']['id'])
         self.logout()
@@ -146,7 +146,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
         # Ensure viewers do not have access to the PUT Handler.
         json_response = self.put_json(
             '%s/%s' % (
-                feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
                 self.COLLECTION_ID),
             self.json_dict, expect_errors=True,
             csrf_token=csrf_token, expected_status_int=401)
@@ -177,7 +177,7 @@ class CollectionEditorTest(BaseCollectionEditorControllerTest):
 
         json_response = self.put_json(
             '%s/%s' % (
-                feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+                feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
                 self.COLLECTION_ID),
             self.json_dict, csrf_token=csrf_token)
 

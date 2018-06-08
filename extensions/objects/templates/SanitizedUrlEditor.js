@@ -26,17 +26,21 @@ oppia.directive('sanitizedUrlEditor', [
         $compile(element.contents())(scope);
       },
       restrict: 'E',
-      scope: true,
+      scope: {
+        getInitArgs: '&',
+        value: '='
+      },
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
-        $scope.$watch('$parent.initArgs', function(newValue) {
+        $scope.initArgs = $scope.getInitArgs();
+        $scope.$watch('initArgs', function(newValue) {
           $scope.largeInput = false;
           if (newValue && newValue.largeInput) {
             $scope.largeInput = newValue.largeInput;
           }
         });
 
-        $scope.$watch('$parent.value', function(newValue) {
+        $scope.$watch('value', function(newValue) {
           $scope.localValue = {
             label: String(newValue) || ''
           };
@@ -45,7 +49,7 @@ oppia.directive('sanitizedUrlEditor', [
         $scope.alwaysEditable = true;
 
         $scope.$watch('localValue.label', function(newValue) {
-          $scope.$parent.value = newValue;
+          $scope.value = newValue;
         });
 
         $scope.$on('externalSave', function() {
