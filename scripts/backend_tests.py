@@ -34,7 +34,7 @@ import time
 
 
 COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.0', 'coverage')
+    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.1', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
