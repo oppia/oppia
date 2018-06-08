@@ -18,28 +18,35 @@
  */
 
 oppia.factory('GenerateContentIdService', [
-  'stateContentIdsToAudioTranslationsService', function(
-      stateContentIdsToAudioTranslationsService) {
-    var generateRandomString = function() {
-      randomString = '';
-      while (randomString.length !== 6){
-        randomString = Math.random().toString(36).substring(2, 8);
-      }
-      return randomString;
-    };
-    var _generateUniqueId = function() {
-      var ContentIdList = stateContentIdsToAudioTranslationsService
+  'stateContentIdsToAudioTranslationsService', 'COMPONENT_NAME_FEEDBACK',
+   'COMPONENT_NAME_HINT', function(
+      stateContentIdsToAudioTranslationsService, COMPONENT_NAME_FEEDBACK,
+      COMPONENT_NAME_HINT) {
+    var generateIdForHintOrFeedback = function(componentName) {
+      var contentIdList = stateContentIdsToAudioTranslationsService
         .displayed.getAllContentId();
-      var uniqueId = generateRandomString();
-      while (ContentIdList.indexOf(uniqueId) >= 0) {
-        uniqueId = generateRandomString();
+      var searchKey = componentName + '_';
+      var count = 0;
+      for (contentId in contentIdList) {
+        if(contentIdList[contentId].indexOf(searchKey) == 0) {
+          var tempCount = parseInt(contentIdList[contentId].split("_")[1]);
+          if (tempCount > count) {
+            count = tempCount;
+          }
+        }
       }
-      return uniqueId;
-    };
+      return (searchKey + String(count + 1))
+    }
 
+    var _generateUniqueId = function(componentName) {
+      if (componentName == COMPONENT_NAME_FEEDBACK ||
+          componentName == COMPONENT_NAME_HINT) {
+        return generateIdForHintOrFeedback(componentName);
+      }
+    };
     return {
-      generateUniqueId: function() {
-        return _generateUniqueId();
+      generateUniqueId: function(componentName) {
+        return _generateUniqueId(componentName);
       }
     };
   }]);

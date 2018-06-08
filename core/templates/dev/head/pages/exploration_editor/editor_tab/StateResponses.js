@@ -375,10 +375,10 @@ oppia.controller('StateResponses', [
           '$scope', '$uibModalInstance', 'ResponsesService',
           'EditorStateService', 'EditorFirstTimeEventsService',
           'RuleObjectFactory', 'OutcomeObjectFactory',
-          'GenerateContentIdService', function(
+          'COMPONENT_NAME_FEEDBACK', 'GenerateContentIdService', function(
               $scope, $uibModalInstance, ResponsesService,
               EditorStateService, EditorFirstTimeEventsService,
-              RuleObjectFactory, OutcomeObjectFactory,
+              RuleObjectFactory, OutcomeObjectFactory, COMPONENT_NAME_FEEDBACK,
               GenerateContentIdService) {
             $scope.feedbackEditorIsOpen = false;
 
@@ -386,7 +386,8 @@ oppia.controller('StateResponses', [
               $scope.feedbackEditorIsOpen = true;
             };
             $scope.tmpRule = RuleObjectFactory.createNew(null, {});
-            var feedbackContentId = GenerateContentIdService.generateUniqueId();
+            var feedbackContentId = GenerateContentIdService.generateUniqueId(
+              COMPONENT_NAME_FEEDBACK);
 
             $scope.tmpOutcome = OutcomeObjectFactory.createNew(
               EditorStateService.getActiveStateName(), feedbackContentId, '',

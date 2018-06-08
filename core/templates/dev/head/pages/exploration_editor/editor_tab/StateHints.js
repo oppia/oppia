@@ -19,14 +19,14 @@
 oppia.controller('StateHints', [
   '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
   'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',
-  'stateHintsService', 'ExplorationStatesService',
+  'stateHintsService', 'ExplorationStatesService', 'COMPONENT_NAME_HINT',
   'stateContentIdsToAudioTranslationsService', 'stateInteractionIdService',
   'UrlInterpolationService', 'HintObjectFactory', 'ExplorationPlayerService',
   'stateSolutionService',
   function(
       $scope, $rootScope, $uibModal, $filter, EditorStateService,
       GenerateContentIdService, AlertsService, INTERACTION_SPECS,
-      stateHintsService, ExplorationStatesService,
+      stateHintsService, ExplorationStatesService, COMPONENT_NAME_HINT,
       stateContentIdsToAudioTranslationsService, stateInteractionIdService,
       UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
       stateSolutionService) {
@@ -117,7 +117,8 @@ oppia.controller('StateHints', [
             $scope.hintIndex = stateHintsService.displayed.length + 1;
 
             $scope.saveHint = function() {
-              var contentId = GenerateContentIdService.generateUniqueId();
+              var contentId = GenerateContentIdService.generateUniqueId(
+                COMPONENT_NAME_HINT);
               // Close the modal and save it afterwards.
               $uibModalInstance.close({
                 hint: angular.copy(

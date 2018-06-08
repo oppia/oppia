@@ -3321,43 +3321,38 @@ class Exploration(object):
         """
         for state_dict in states_dict.values():
             content_ids_to_audio_translations = {}
-            new_content_id = utils.generate_content_id(list(
-                content_ids_to_audio_translations.keys()))
-            content_ids_to_audio_translations[new_content_id] = (
+            content_id = 'content'
+            content_ids_to_audio_translations[content_id] = (
                 state_dict['content'].pop('audio_translations'))
-            state_dict['content']['content_id'] = new_content_id
+            state_dict['content']['content_id'] = content_id
 
-            for answer_group in state_dict['interaction']['answer_groups']:
-                new_content_id = utils.generate_content_id(list(
-                    content_ids_to_audio_translations.keys()))
-                content_ids_to_audio_translations[new_content_id] = (
+            for index, answer_group in enumerate(
+                state_dict['interaction']['answer_groups']):
+                content_id = 'feedback' + str(index)
+                content_ids_to_audio_translations[content_id] = (
                     answer_group['outcome']['feedback'].pop(
                         'audio_translations'))
-                answer_group['outcome']['feedback']['content_id'] = (
-                    new_content_id)
+                answer_group['outcome']['feedback']['content_id'] = content_id
 
             if state_dict['interaction']['default_outcome']:
                 default_outcome = state_dict['interaction']['default_outcome']
-                new_content_id = utils.generate_content_id(list(
-                    content_ids_to_audio_translations.keys()))
-                content_ids_to_audio_translations[new_content_id] = (
+                content_id = 'default_outcome'
+                content_ids_to_audio_translations[content_id] = (
                     default_outcome['feedback'].pop('audio_translations'))
-                default_outcome['feedback']['content_id'] = (new_content_id)
+                default_outcome['feedback']['content_id'] = (content_id)
 
-            for hint in state_dict['interaction']['hints']:
-                new_content_id = utils.generate_content_id(list(
-                    content_ids_to_audio_translations.keys()))
-                content_ids_to_audio_translations[new_content_id] = (
+            for index, hint in enumerate(state_dict['interaction']['hints']):
+                content_id = 'hint' + str(index)
+                content_ids_to_audio_translations[content_id] = (
                     hint['hint_content'].pop('audio_translations'))
-                hint['hint_content']['content_id'] = new_content_id
+                hint['hint_content']['content_id'] = content_id
 
             if state_dict['interaction']['solution']:
                 solution = state_dict['interaction']['solution']
-                new_content_id = utils.generate_content_id(list(
-                    content_ids_to_audio_translations.keys()))
-                content_ids_to_audio_translations[new_content_id] = (
+                content_id = 'solution'
+                content_ids_to_audio_translations[content_id] = (
                     solution['explanation'].pop('audio_translations'))
-                solution['explanation']['content_id'] = (new_content_id)
+                solution['explanation']['content_id'] = content_id
 
             state_dict['content_ids_to_audio_translations'] = (
                 content_ids_to_audio_translations)
@@ -3395,7 +3390,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 24
+    CURRENT_EXP_SCHEMA_VERSION = 25
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod

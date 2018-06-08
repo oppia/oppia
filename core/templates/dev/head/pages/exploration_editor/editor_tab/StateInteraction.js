@@ -255,6 +255,10 @@ oppia.controller('StateInteraction', [
                       value: angular.copy(caSpec.default_value)
                     };
                   });
+                  stateContentIdsToAudioTranslationsService.displayed.
+                    deleteAllFeedbackContentId();
+                  stateContentIdsToAudioTranslationsService
+                    .saveDisplayedValue();
                 }
 
                 if (Object.keys(
@@ -327,6 +331,7 @@ oppia.controller('StateInteraction', [
         }).result.then($scope.onCustomizationModalSavePostHook, function() {
           stateInteractionIdService.restoreFromMemento();
           stateCustomizationArgsService.restoreFromMemento();
+          stateContentIdsToAudioTranslationsService.restoreFromMemento();
         });
       }
     };
@@ -350,13 +355,15 @@ oppia.controller('StateInteraction', [
           }
         ]
       }).result.then(function() {
-        // TODO(SD): Clean Hints and Responses to resolve #4634.
         stateInteractionIdService.displayed = null;
         stateCustomizationArgsService.displayed = {};
+        if (stateSolutionService.displayed) {
+          var solutionContentId = stateSolutionService.displayed.explanation
+            .getContentId();
+          stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+            solutionContentId);
+        }
         stateSolutionService.displayed = null;
-        stateContentIdsToAudioTranslationsService.displayed
-          .deleteAllexceptThisContentId(
-            stateContentService.displayed.getContentId());
         InteractionDetailsCacheService.removeDetails(
           stateInteractionIdService.savedMemento);
         stateInteractionIdService.saveDisplayedValue();

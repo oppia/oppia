@@ -19,7 +19,8 @@
 
 oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
   'AudioTranslationObjectFactory', 'LanguageUtilService',
-  function(AudioTranslationObjectFactory, LanguageUtilService) {
+  'COMPONENT_NAME_FEEDBACK', function(AudioTranslationObjectFactory,
+      LanguageUtilService, COMPONENT_NAME_FEEDBACK) {
     var ContentIdsToAudioTranslations = function(
         contentIdsToAudioTranslations) {
       this._contentIdsToAudioTranslations = contentIdsToAudioTranslations;
@@ -91,14 +92,12 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
       delete this._contentIdsToAudioTranslations[contentId];
     };
 
-    ContentIdsToAudioTranslations.prototype.deleteAllexceptThisContentId =
+    ContentIdsToAudioTranslations.prototype.deleteAllFeedbackContentId =
       function(contentId) {
         var ContentIdList = this.getAllContentId();
-        if (ContentIdList.indexOf(contentId) < 0) {
-          throw Error('Unable to find the given content id.');
-        }
+        var searchKey = COMPONENT_NAME_FEEDBACK + '_';
         for (index in ContentIdList) {
-          if (ContentIdList[index] !== contentId) {
+          if (ContentIdList[index].indexOf(searchKey) == 0) {
             this.deleteContentId(ContentIdList[index]);
           }
         }

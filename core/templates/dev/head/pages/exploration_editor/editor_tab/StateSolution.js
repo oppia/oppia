@@ -91,10 +91,10 @@ oppia.controller('StateSolution', [
         controller: [
           '$scope', '$uibModalInstance', 'stateSolutionService',
           'EVENT_PROGRESS_NAV_SUBMITTED', 'INTERACTION_SPECS',
-          'GenerateContentIdService', function(
+          'COMPONENT_NAME_SOLUTION', 'GenerateContentIdService', function(
               $scope, $uibModalInstance, stateSolutionService,
               EVENT_PROGRESS_NAV_SUBMITTED, INTERACTION_SPECS,
-              GenerateContentIdService) {
+              COMPONENT_NAME_SOLUTION, GenerateContentIdService) {
             $scope.stateSolutionService = stateSolutionService;
             $scope.correctAnswerEditorHtml = (
               ExplorationHtmlFormatterService.getInteractionHtml(
@@ -114,7 +114,7 @@ oppia.controller('StateSolution', [
               answerIsExclusive: false,
               correctAnswer: null,
               explanationHtml: '',
-              explanationContentId: GenerateContentIdService.generateUniqueId()
+              explanationContentId: COMPONENT_NAME_SOLUTION
             };
 
             $scope.data = stateSolutionService.savedMemento ? {
