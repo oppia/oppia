@@ -1,0 +1,95 @@
+# coding: utf-8
+#
+# Copyright 2018 The Oppia Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+"""Tests for subtopic page domain objects."""
+
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
+from core.domain import topic_domain
+from core.domain import topic_services
+from core.domain import user_services
+from core.platform import models
+from core.tests import test_utils
+
+(topic_models,) = models.Registry.import_models([models.NAMES.topic])
+
+
+class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
+    """Tests for topic domain objects."""
+    user_id = 'user_id'
+    story_id_1 = 'story_1'
+    story_id_2 = 'story_2'
+    story_id_3 = 'story_3'
+    subtopic_id = 1
+    skill_id_1 = 'skill_1'
+    skill_id_2 = 'skill_2'
+
+    def setUp(self):
+        super(SubtopicPageServicesUnitTests, self).setUp()
+        self.TOPIC_ID = topic_services.get_new_topic_id()
+        subtopic_page_services.save_new_subtopic_page(
+            self.user_id, self.TOPIC_ID, self.subtopic_id)
+        self.subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                self.subtopic_id, self.TOPIC_ID))
+        self.subtopic_page.version += 1
+        self.subtopic_page_id = (
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                self.TOPIC_ID, 1))
+
+    def test_get_subtopic_page_from_model(self):
+        subtopic_page_model = topic_models.SubtopicPageModel.get(
+            self.subtopic_page_id)
+        subtopic_page = subtopic_page_services.get_subtopic_page_from_model(
+            subtopic_page_model)
+        self.assertEqual(subtopic_page.to_dict(), self.subtopic_page.to_dict())
+
+    def test_get_subtopic_page_by_id(self):
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, self.subtopic_id)
+        self.assertEqual(subtopic_page.to_dict(), self.subtopic_page.to_dict())
+
+    def test_commit_log_entry(self):
+        subtopic_page_commit_log_entry = (
+            topic_models.SubtopicPageCommitLogEntryModel.get_commit(
+                self.subtopic_page_id, 1)
+        )
+        self.assertEqual(subtopic_page_commit_log_entry.commit_type, 'create')
+        self.assertEqual(
+            subtopic_page_commit_log_entry.subtopic_page_id,
+            self.subtopic_page_id)
+        self.assertEqual(subtopic_page_commit_log_entry.user_id, self.user_id)
+
+    def test_update_subtopic_page(self):
+        changelist = [subtopic_page_domain.SubtopicPageChange({
+            'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'property_name': (
+                subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA),
+            'topic_id': self.TOPIC_ID,
+            'subtopic_id': 1,
+            'old_value': '',
+            'new_value': '<p>New Value</p>'
+        })]
+        subtopic_page_services.update_subtopic_page(
+            self.user_id, self.TOPIC_ID, 1, changelist, 'Updated html data')
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 1, strict=False)
+        self.assertEqual(subtopic_page.html_data, '<p>New Value</p>')
+        self.assertEqual(subtopic_page.topic_id, self.TOPIC_ID)
+        self.assertEqual(
+            subtopic_page.id,
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                self.TOPIC_ID, 1))

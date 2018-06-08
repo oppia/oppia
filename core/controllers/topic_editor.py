@@ -20,6 +20,8 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -83,8 +85,23 @@ class TopicEditorPage(base.BaseHandler):
         self.render_template('pages/topic_editor/topic_editor.html')
 
 
-class EdiableSubtopicPageDataHandler(base.BaseHandler):
+class EditableSubtopicPageDataHandler(base.BaseHandler):
     """The editor page for a single topic."""
+
+    def _require_valid_version(
+            self, version_from_payload, subtopic_page_version):
+        """Check that the payload version matches the given subtopic page
+        version.
+        """
+        if version_from_payload is None:
+            raise base.BaseHandler.InvalidInputException(
+                'Invalid POST request: a version must be specified.')
+
+        if version_from_payload != subtopic_page_version:
+            raise base.BaseHandler.InvalidInputException(
+                'Trying to update version %s of subtopic page from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (subtopic_page_version, version_from_payload))
 
     @acl_decorators.can_edit_topic
     def get(self, topic_id, subtopic_id):
@@ -95,10 +112,8 @@ class EdiableSubtopicPageDataHandler(base.BaseHandler):
 
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
-        subtopic_page_id = topic_domain.SubtopicPage.get_subtopic_page_id(
-            topic_id, subtopic_id)
-        subtopic_page = topic_services.get_subtopic_page_by_id(
-            subtopic_page_id, strict=False)
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic_id, subtopic_id, strict=False)
 
         if subtopic_page is None:
             raise self.PageNotFoundException(
@@ -116,31 +131,31 @@ class EdiableSubtopicPageDataHandler(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        subtopic_page_id = topic_domain.SubtopicPage.get_subtopic_page_id(
-            topic_id, subtopic_id)
-        subtopic_page = topic_services.get_subtopic_page_by_id(
-            subtopic_page_id, strict=False)
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic_id, subtopic_id, strict=False)
 
         if subtopic_page is None:
             raise self.PageNotFoundException(
                 Exception('The subtopic with the given id doesn\'t exist.'))
 
+        version = self.payload.get('version')
+        self._require_valid_version(version, subtopic_page.version)
+
+        commit_message = self.payload.get('commit_message')
         change_dicts = self.payload.get('change_dicts')
         change_list = [
-            topic_domain.TopicChange(change_dict)
+            subtopic_page_domain.SubtopicPageChange(change_dict)
             for change_dict in change_dicts
         ]
         try:
-            topic_services.update_subtopic_page(
-                topic_id, subtopic_id, change_list)
+            subtopic_page_services.update_subtopic_page(
+                self.user_id, topic_id, subtopic_id, change_list,
+                commit_message)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        subtopic_page_dict = topic_services.get_subtopic_page_by_id(
-            subtopic_page_id).to_dict()
-
         self.values.update({
-            'subtopic_page': subtopic_page_dict
+            'updated_subtopic_page': True
         })
 
         self.render_json(self.values)
