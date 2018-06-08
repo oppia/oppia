@@ -126,11 +126,20 @@ oppia.factory('NumberWithUnitsObjectFactory', [
     };
 
     NumberWithUnits.fromDict = function(numberWithUnitsDict) {
-      return new NumberWithUnits(
-        numberWithUnitsDict.type,
-        numberWithUnitsDict.real,
-        numberWithUnitsDict.fraction,
-        numberWithUnitsDict.units);
+      if (numberWithUnitsDict.type === 'fraction') {
+        return new NumberWithUnits(
+          numberWithUnitsDict.type,
+          numberWithUnitsDict.real,
+          FractionObjectFactory.fromRawInputString(
+            numberWithUnitsDict.fraction),
+          UnitsObjectFactory.fromRawInputString(numberWithUnitsDict.units));
+      } else {
+        return new NumberWithUnits(
+          numberWithUnitsDict.type,
+          numberWithUnitsDict.real,
+          numberWithUnitsDict.fraction,
+          UnitsObjectFactory.fromRawInputString(numberWithUnitsDict.units));
+      }
     };
 
     return NumberWithUnits;

@@ -137,6 +137,22 @@ var NormalizedStringEditor = function(elem) {
   };
 };
 
+var NumberWithUnitsEditor = function(elem) {
+  return {
+    setValue: function(value) {
+      elem.element(by.tagName('input')).clear();
+      elem.element(by.tagName('input')).sendKeys(value);
+    },
+    expectValueToBe: function(expectedValue) {
+      elem.element(by.tagName('input')).getAttribute('value').then(
+        function(value) {
+          expect(value).toEqual(expectedValue);
+        }
+      );
+    }
+  };
+};
+
 var ParameterNameEditor = function(elem) {
   return {
     setValue: function(text) {
@@ -186,6 +202,7 @@ var OBJECT_EDITORS = {
   MathLatexString: MathLatexStringEditor,
   NonnegativeInt: NonnegativeIntEditor,
   NormalizedString: NormalizedStringEditor,
+  NumberWithUnits: NumberWithUnitsEditor,
   ParameterName: ParameterNameEditor,
   SanitizedUrl: SanitizedUrlEditor,
   UnicodeString: UnicodeStringEditor
@@ -199,6 +216,7 @@ exports.IntEditor = IntEditor;
 exports.MathLatexStringEditor = MathLatexStringEditor;
 exports.NonnegativeIntEditor = NonnegativeIntEditor;
 exports.NormalizedStringEditor = NormalizedStringEditor;
+exports.NumberWithUnitsEditor = NumberWithUnitsEditor;
 exports.ParameterNameEditor = ParameterNameEditor;
 exports.SanitizedUrlEditor = SanitizedUrlEditor;
 exports.UnicodeStringEditor = UnicodeStringEditor;
