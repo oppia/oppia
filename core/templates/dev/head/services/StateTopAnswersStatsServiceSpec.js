@@ -108,7 +108,7 @@ describe('StateTopAnswersStatsService', function() {
     });
   });
 
-  describe('.refreshStateStats', function() {
+  describe('.onStateChangeAnswerGroups', function() {
     it('correctly updates addressed info', function() {
       this.$httpBackend.expectGET(
         '/createhandler/state_answer_stats/7'
@@ -131,7 +131,7 @@ describe('StateTopAnswersStatsService', function() {
         outcome: {dest: 'Hola'}
       });
       // Now, 'adios' is addressed by the Hola state.
-      this.StateTopAnswersStatsService.refreshStateStats('Hola');
+      this.StateTopAnswersStatsService.onStateChangeAnswerGroups('Hola');
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
         joC({answer: 'adios', isAddressed: true}),

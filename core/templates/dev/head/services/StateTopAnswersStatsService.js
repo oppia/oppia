@@ -100,15 +100,6 @@ oppia.factory('StateTopAnswersStatsService', [
         return angular.copy(stateTopAnswerStatsCache[stateName]);
       },
 
-      /**
-       * Update all answers of the given state to reflect any changes in the
-       * state's structure.
-       * @param {string} stateName
-       */
-      refreshStateStats: function(stateName) {
-        refreshAddressedInfo(stateName);
-      },
-
       onStateDelete: function(stateName) {
         deleteState(stateName);
       },
@@ -117,6 +108,11 @@ oppia.factory('StateTopAnswersStatsService', [
         addState(stateName);
       },
 
+      /**
+       * Update all answers of the given state to reflect any changes in the
+       * state's structure.
+       * @param {string} stateName
+       */
       onStateChangeAnswerGroups: function(stateName) {
         refreshAddressedInfo(stateName);
       },
