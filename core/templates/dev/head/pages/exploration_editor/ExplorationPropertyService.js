@@ -313,14 +313,14 @@ oppia.factory('ExplorationStatesService', [
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'ExplorationContextService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'StateTopAnswersStatsService',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
       AnswerClassificationService, ExplorationContextService,
-      UrlInterpolationService) {
+      UrlInterpolationService, StateTopAnswersStatsService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -441,6 +441,8 @@ oppia.factory('ExplorationStatesService', [
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
         // Initialize the solutionValidityService.
         SolutionValidityService.init(_states.getStateNames());
+        // Initialize the StateTopAnswersStatsService.
+        StateTopAnswersStatsService.init(_states.getStateNames());
         _states.getStateNames().forEach(function(stateName) {
           var solution = _states.getState(stateName).interaction.solution;
           if (solution) {
@@ -524,6 +526,7 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
+        StateTopAnswersStatsService.onStateChangeAnswerGroups(stateName);
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(
@@ -569,6 +572,7 @@ oppia.factory('ExplorationStatesService', [
 
         ChangeListService.addState(newStateName);
         $rootScope.$broadcast('refreshGraph');
+        StateTopAnswersStatsService.addState(newStateName);
         if (successCallback) {
           successCallback(newStateName);
         }
@@ -616,6 +620,7 @@ oppia.factory('ExplorationStatesService', [
         }).result.then(function(deleteStateName) {
           _states.deleteState(deleteStateName);
 
+          StateTopAnswersStatsService.onStateDelete(deleteStateName);
           ChangeListService.deleteState(deleteStateName);
 
           if (EditorStateService.getActiveStateName() === deleteStateName) {
@@ -656,6 +661,7 @@ oppia.factory('ExplorationStatesService', [
           ExplorationInitStateNameService.displayed = newStateName;
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
         }
+        StateTopAnswersStatsService.renameState(oldStateName, newStateName);
         $rootScope.$broadcast('refreshGraph');
       }
     };
