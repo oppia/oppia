@@ -676,6 +676,8 @@ class SkillSummary(object):
             'language_code': self.language_code,
             'version': self.version,
             'misconception_count': self.misconception_count,
-            'skill_model_created_on': self.skill_model_created_on,
-            'skill_model_last_updated': self.skill_model_last_updated
+            'created_on': utils.get_time_in_millisecs(
+                self.skill_model_created_on),
+            'last_updated': utils.get_time_in_millisecs(
+                self.skill_model_last_updated)
         }

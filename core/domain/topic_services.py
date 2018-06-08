@@ -116,6 +116,19 @@ def get_topic_from_model(topic_model, run_conversion=True):
 
 
 
+def get_all_topic_summaries():
+    """Returns the summaries of all topics present in the datastore.
+
+    Returns:
+        list(TopicSummary). The list of summaries of all topics present in the
+            datastore.
+    """
+    topic_summaries_models = topic_models.TopicSummaryModel.get_all()
+    topic_summaries = [
+        get_topic_summary_from_model(summary)
+        for summary in topic_summaries_models]
+    return topic_summaries
+
 def get_topic_summary_from_model(topic_summary_model):
     """Returns a domain object for an Oppia topic summary given a
     topic summary model.
