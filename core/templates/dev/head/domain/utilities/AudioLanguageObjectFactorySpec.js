@@ -18,8 +18,8 @@
  */
 
 describe('AudioLanguage object factory', function() {
-  var audioLanguage;
-  var alof;
+  var audioLanguage = null;
+  var alof = null;
   beforeEach(module('oppia'));
   beforeEach(inject(function($injector) {
     alof = $injector.get('AudioLanguageObjectFactory');
