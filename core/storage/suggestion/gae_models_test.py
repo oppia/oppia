@@ -36,35 +36,35 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SuggestionModelUnitTests, self).setUp()
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_1',
             'reviewer_1', 'reviewer_1', self.change_cmd, self.score_category,
             'exploration.exp1.thread_1')
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_2',
             'reviewer_2', 'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_2')
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_2',
             'reviewer_3', 'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_3')
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_2',
             'reviewer_2', 'reviewer_3', self.change_cmd, self.score_category,
             'exploration.exp1.thread_4')
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_3',
@@ -78,7 +78,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_new_object_succesfully(self):
         suggestion_models.GeneralSuggestionModel.create(
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
@@ -93,7 +93,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             observed_suggestion_model.suggestion_type,
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
         self.assertEqual(
             observed_suggestion_model.target_type,
             suggestion_models.TARGET_TYPE_EXPLORATION)
@@ -119,7 +119,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             Exception, 'There is already a suggestion with the given id: '
                        'exploration.exp1.thread_1'):
             suggestion_models.GeneralSuggestionModel.create(
-                suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 suggestion_models.STATUS_IN_REVIEW, 'author_3',
@@ -131,7 +131,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(
                 suggestion_models.GeneralSuggestionModel
                 .get_suggestions_by_type(
-                    suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)), 5)
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)), 5)
         with self.assertRaisesRegexp(
             Exception, 'Value \'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
@@ -206,11 +206,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 suggestion_models.GeneralSuggestionModel
                 .get_suggestions_by_status(
                     suggestion_models.STATUS_ACCEPTED)), 2)
-        self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_status(
-                    suggestion_models.STATUS_INVALID)), 0)
 
     def test_get_suggestions_by_target_id(self):
         self.assertEqual(
