@@ -16,22 +16,17 @@
 
 oppia.directive('filepathEditor', [
   '$compile', '$http', '$sce', 'AlertsService', 'ExplorationContextService',
-  'OBJECT_EDITOR_URL_PREFIX',
+  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(
       $compile, $http, $sce, AlertsService, ExplorationContextService,
-      OBJECT_EDITOR_URL_PREFIX) {
+      UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'Filepath';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         value: '='
       },
-      template: '<div ng-include="getTemplateUrl()"></div>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/filepath_editor_directive.html'),
       controller: ['$scope', function($scope) {
         var MODE_EMPTY = 1;
         var MODE_UPLOADED = 2;
