@@ -16,8 +16,6 @@
 
 import copy
 import datetime
-import json
-import os
 
 # pylint: disable=relative-import
 from core.tests import test_utils
@@ -253,14 +251,3 @@ class UtilsTests(test_utils.GenericTestBase):
                 utils.get_hashable_value(json1_deepcopy),
                 utils.get_hashable_value(json2_deepcopy),
             })
-
-    def test_convert_to_text_angular(self):
-        test_file = os.path.join(
-            feconf.TESTS_DATA_DIR, 'test_cases_for_rte.json')
-        with open(test_file, 'r') as f:
-            json_data = json.load(f)
-        test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
-        for test_case in test_cases:
-            actual_output = utils.convert_to_text_angular(
-                test_case['html_content'])
-            self.assertEqual(actual_output, test_case['expected_output'])

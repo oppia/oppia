@@ -839,9 +839,9 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
                 'audio_translations': {}
             },
             'labelled_as_correct': False,
+            'missing_prerequisite_skill_id': None,
             'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'refresher_exploration_id': None
         }
 
         state1.update_interaction_default_outcome(default_outcome_dict)
@@ -933,9 +933,9 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                 'audio_translations': {}
             },
             'labelled_as_correct': False,
+            'missing_prerequisite_skill_id': None,
             'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'refresher_exploration_id': None
         }
         default_outcome_dict2 = {
             'dest': 'State1',
@@ -948,9 +948,9 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                 'audio_translations': {}
             },
             'labelled_as_correct': False,
+            'missing_prerequisite_skill_id': None,
             'param_changes': [],
-            'refresher_exploration_id': None,
-            'missing_prerequisite_skill_id': None
+            'refresher_exploration_id': None
         }
 
         state1.update_interaction_default_outcome(default_outcome_dict1)
@@ -1044,6 +1044,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'labelled_as_correct': False,
+            'missing_prerequisite_skill_id': None,
             'refresher_exploration_id': None
         }
         default_outcome_dict2 = {
@@ -1054,6 +1055,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'labelled_as_correct': False,
+            'missing_prerequisite_skill_id': None,
             'refresher_exploration_id': None
         }
         default_outcome_dict3 = {
@@ -1064,6 +1066,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             },
             'param_changes': [],
             'labelled_as_correct': False,
+            'missing_prerequisite_skill_id': None,
             'refresher_exploration_id': None
         }
         state1.update_interaction_default_outcome(default_outcome_dict1)
@@ -1191,7 +1194,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
         exploration_dict = exploration.to_dict()
-        updated_dict = exp_domain.Exploration._convert_v24_dict_to_v25_dict( # pylint: disable=protected-access
+        updated_dict = exp_domain.Exploration._convert_v25_dict_to_v26_dict( # pylint: disable=protected-access
             exploration_dict)
         updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
 
