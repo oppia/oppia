@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for object factory for creating audio languages
+ * @fileoverview Unit tests for AudioLanguageObjectFactory
  *
  */
 
