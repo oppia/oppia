@@ -220,6 +220,7 @@ oppia.factory('ImagePreloaderService', [
       init: _init,
       kickOffImagePreloader: _kickOffImagePreloader,
       onStateChange: _onStateChange,
+      isInFailedDownload: _isInFailedDownload,
       isLoadingImageFile: function(filename) {
         return _filenamesOfImageCurrentlyDownloading.indexOf(filename) !== -1;
       },
