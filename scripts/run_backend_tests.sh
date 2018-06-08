@@ -80,9 +80,7 @@ for arg in "$@"; do
     echo Checking whether coverage is installed in $TOOLS_DIR
     if [ ! -d "$TOOLS_DIR/coverage-4.5.1" ]; then
       echo Installing coverage
-      curl -o coverage.tar.gz https://files.pythonhosted.org/packages/35/fe/e7df7289d717426093c68d156e0fd9117c8f4872b6588e8a8928a0f68424/coverage-4.5.1.tar.gz
-      tar xvzf coverage.tar.gz -C $TOOLS_DIR
-      rm coverage.tar.gz
+      pip install coverage==4.5.1 --target="$TOOLS_DIR/coverage-4.5.1"
     fi
   fi
 done
