@@ -232,6 +232,12 @@ def convert_to_text_angular(html_data):
         # the same appearance.
         elif tag.name == 'hr':
             tag.name = 'br'
+        # a tag is to be replaced with oppia-noninteractive-link.
+        # For this the attributes and text within a tag is used to
+        # create new link tag which is wrapped as parent of a and then
+        # a tag is removed.
+        # There are cases where there is no href attribute of a tag.
+        # In such cases a tag is simply removed.
         elif tag.name == 'a':
             if tag.has_attr('href'):
                 link = soup.new_tag('oppia-noninteractive-link')
