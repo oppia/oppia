@@ -287,7 +287,25 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
                 '</td></tr></tbody></table>'
             ),
             'expected_output': (
-                '<p>January\t$100\t200</p><p>February\t$80\t400</p>'
+                '<p>January  $100  200</p><p>February  $80  400</p>'
+            )
+        }, {
+            'html_content': (
+                '<p><p><p>Hello <br/> this<p> is <br> test case <p>'
+                'for </p> migration <b>testing</b> </p></p></p></p>'
+            ),
+            'expected_output': (
+                '<p>Hello <br> this</p><p> is <br> test case </p><p>'
+                'for </p><p> migration <b>testing</b> </p>'
+            )
+        }, {
+            'html_content': (
+                '<p>Hello this is <p>test case </p> for <p> <p>migration</p>'
+                'testing </p> for <p> invalid cases </p></p>'
+            ),
+            'expected_output': (
+                '<p>Hello this is </p><p>test case </p><p> for </p><p> </p><p>'
+                'migration</p><p>testing </p><p> for </p><p> invalid cases </p>'
             )
         }]
 
@@ -316,17 +334,7 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
             html_cleaner.validate_textangular_format(
                 test_cases))
 
-        expected_output_with_migration = {
-            u'oppia-noninteractive-link': [u'oppia-noninteractive-link'],
-            'strings': [
-                (
-                    'This is the last test case <a href="https://github.com">'
-                    'hello<oppia-noninteractive-link url-with-value="&amp;'
-                    'quot;here&amp;quot;" text-with-value="validated">'
-                    '</oppia-noninteractive-link></a><p> testing completed</p>'
-                )
-            ]
-        }
+        expected_output_with_migration = {'strings': []}
         expected_output_without_migration = {
             u'i': [u'[document]'],
             'invalidTags': [u'a'],
