@@ -18,14 +18,13 @@
  */
 
 describe('ExplorationStatesService', function() {
+  beforeEach(module('oppia'));
+
+  beforeEach(inject(function($injector) {
+    this.ExplorationStatesService = $injector.get('ExplorationStatesService');
+  }));
+
   describe('Top Answer Statistics Management', function() {
-    beforeEach(module('oppia'));
-
-    beforeEach(inject(function($injector) {
-      this.StateTopAnswersStatsService =
-        $injector.get('StateTopAnswersStatsService');
-    }));
-
     beforeEach(inject(function($injector) {
       this.$httpBackend = $injector.get('$httpBackend');
     }));
@@ -38,7 +37,7 @@ describe('ExplorationStatesService', function() {
       spyOn(ExplorationContextService, 'getExplorationId').and.returnValue('7');
     }));
 
-    beforeEach(inject(function(ExplorationStatesService) {
+    beforeEach(function() {
       this.EXP_STATES = {
         Hola: {
           name: 'Hola',
@@ -54,11 +53,11 @@ describe('ExplorationStatesService', function() {
       };
 
       var that = this;
-      spyOn(ExplorationStatesService, 'getState').and.callFake(
+      spyOn(this.ExplorationStatesService, 'getState').and.callFake(
         function(stateName) {
           return that.EXP_STATES[stateName];
         });
-    }));
+    });
 
     describe('.init', function() {
       it('correctly identifies unaddressed issues', function() {
@@ -74,10 +73,10 @@ describe('ExplorationStatesService', function() {
           }
         });
 
-        this.StateTopAnswersStatsService.init();
+        this.ExplorationStatesService.init();
         this.$httpBackend.flush();
 
-        var stateStats = this.StateTopAnswersStatsService.getStateStats('Hola');
+        var stateStats = this.ExplorationStatesService.getStateStats('Hola');
         expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
         expect(stateStats).toContain(joC({answer: 'adios', isAddressed: false}));
         expect(stateStats).toContain(joC({answer: 'que?', isAddressed: false}));
@@ -96,10 +95,10 @@ describe('ExplorationStatesService', function() {
           }
         });
 
-        this.StateTopAnswersStatsService.init();
+        this.ExplorationStatesService.init();
         this.$httpBackend.flush();
 
-        expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
+        expect(this.ExplorationStatesService.getStateStats('Hola')).toEqual([
           joC({answer: 'hola', frequency: 7}),
           joC({answer: 'adios', frequency: 4}),
           joC({answer: 'que?', frequency: 2}),
@@ -118,10 +117,10 @@ describe('ExplorationStatesService', function() {
         });
 
         // Initially, 'adios' isn't addressed by the Hola state.
-        this.StateTopAnswersStatsService.init();
+        this.ExplorationStatesService.init();
         this.$httpBackend.flush();
 
-        expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
+        expect(this.ExplorationStatesService.getStateStats('Hola')).toEqual([
           joC({answer: 'adios', isAddressed: false})
         ]);
 
@@ -130,9 +129,9 @@ describe('ExplorationStatesService', function() {
           outcome: {dest: 'Hola'}
         });
         // Now, 'adios' is addressed by the Hola state.
-        this.StateTopAnswersStatsService.refreshStateStats('Hola');
+        this.ExplorationStatesService.refreshStateStats('Hola');
 
-        expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
+        expect(this.ExplorationStatesService.getStateStats('Hola')).toEqual([
           joC({answer: 'adios', isAddressed: true}),
         ]);
       });
