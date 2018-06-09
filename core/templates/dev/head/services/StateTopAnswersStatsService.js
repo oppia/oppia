@@ -58,10 +58,10 @@ oppia.factory('StateTopAnswersStatsService', [
       init: function(stateTopAnswersStatsBackendDict) {
         stateTopAnswerStatsCache = {};
         Object.keys(
-          stateTopAnswersStatsBackendDict
+          stateTopAnswersStatsBackendDict.answers
         ).forEach(function(stateName) {
           stateTopAnswerStatsCache[stateName] =
-            stateTopAnswersStatsBackendDict[stateName].map(
+            stateTopAnswersStatsBackendDict.answers[stateName].map(
               AnswerStatsFactory.createFromBackendDict
             );
           // Still need to manually refresh the addressed information.

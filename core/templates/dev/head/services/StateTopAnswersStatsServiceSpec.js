@@ -21,7 +21,6 @@ var joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', function() {
   beforeEach(module('oppia'));
-
   beforeEach(inject(function($injector) {
     this.StateTopAnswersStatsService =
       $injector.get('StateTopAnswersStatsService');
@@ -53,25 +52,27 @@ describe('StateTopAnswersStatsService', function() {
       });
   }));
 
-  it('starts uninitialized', function() {
-    expect(this.StateTopAnswersStatsService.isInitialized()).toBe(false);
+  describe('.isInitialized', function() {
+    it('begins uninitialized', function() {
+      expect(this.StateTopAnswersStatsService.isInitialized()).toBe(false);
+    });
+
+    it('is true after call to .init', function() {
+      this.StateTopAnswersStatsService.init({answers: {}});
+      expect(this.StateTopAnswersStatsService.isInitialized()).toBe(true);
+    });
   });
 
   describe('.init', function() {
-
-    it('shows as initialized', function() {
-      this.StateTopAnswersStatsService.init({});
-
-    expect(this.StateTopAnswersStatsService.isInitialized()).toBe(true);
-    });
-
     it('correctly identifies unaddressed issues', function() {
       this.StateTopAnswersStatsService.init({
-        Hola: [
-          {answer: 'hola', frequency: 7},
-          {answer: 'adios', frequency: 4},
-          {answer: 'que?', frequency: 2},
-        ]
+        answers: {
+          Hola: [
+            {answer: 'hola', frequency: 7},
+            {answer: 'adios', frequency: 4},
+            {answer: 'que?', frequency: 2},
+          ]
+        }
       });
 
       var stateStats = this.StateTopAnswersStatsService.getStateStats('Hola');
@@ -82,11 +83,13 @@ describe('StateTopAnswersStatsService', function() {
 
     it('maintains frequency in order', function() {
       this.StateTopAnswersStatsService.init({
-        Hola: [
-          {answer: 'hola', frequency: 7},
-          {answer: 'adios', frequency: 4},
-          {answer: 'que?', frequency: 2},
-        ]
+        answers: {
+          Hola: [
+            {answer: 'hola', frequency: 7},
+            {answer: 'adios', frequency: 4},
+            {answer: 'que?', frequency: 2},
+          ]
+        }
       });
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
@@ -101,7 +104,9 @@ describe('StateTopAnswersStatsService', function() {
     it('correctly updates addressed info', function() {
       // Initially, 'adios' isn't addressed by the Hola state.
       this.StateTopAnswersStatsService.init({
-        Hola: [{answer: 'adios', frequency: 4}]
+        answers: {
+          Hola: [{answer: 'adios', frequency: 4}]
+        }
       });
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
