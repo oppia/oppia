@@ -154,8 +154,7 @@ oppia.factory('ExplorationStatesService', [
      * to reflect any changes in the state's answer groups.
      * @param {string} stateName
      */
-    var refreshAddressedInfo = function(state) {
-      var explorationId = ExplorationContextService.getExplorationId();
+    var refreshAddressedInfo = function(explorationId, state) {
       var interactionRulesService = $injector.get(
         AngularNameService.getNameOfInteractionRulesService(
           state.interaction.id));
@@ -171,11 +170,11 @@ oppia.factory('ExplorationStatesService', [
      * Calls the backend asynchronously to setup the answer statistics of each
      * state this exploration contains.
      */
-    var initStateTopAnswersStats = function() {
+    var initStateTopAnswersStats = function(explorationId) {
       $http.get(
         UrlInterpolationService.interpolateUrl(
           '/createhandler/state_answer_stats/<exploration_id>',
-          {exploration_id: ExplorationContextService.getExplorationId()})
+          {exploration_id: explorationId})
       ).then(function(response) {
         _stateTopAnswerStatsCache = {};
         Object.keys(response.data.answers).forEach(function(stateName) {
@@ -183,7 +182,7 @@ oppia.factory('ExplorationStatesService', [
           _stateTopAnswerStatsCache[stateName] = answerStatsBackendDicts.map(
             AnswerStatsFactory.createFromBackendDict);
           // Still need to manually refresh the addressed information.
-          refreshAddressedInfo(stateName);
+          refreshAddressedInfo(explorationId, stateName);
         });
       });
     };
@@ -211,7 +210,7 @@ oppia.factory('ExplorationStatesService', [
               stateName, solutionIsValid);
           }
         });
-        initStateTopAnswersStats();
+        initStateTopAnswersStats(ExplorationContextService.getExplorationId());
       },
 
       getStates: function() {
