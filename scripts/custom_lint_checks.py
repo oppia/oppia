@@ -18,8 +18,8 @@ import astroid
 import docstrings_checker  # pylint: disable=relative-import
 
 from pylint import checkers
-from pylint.checkers import utils as checker_utils
 from pylint import interfaces
+from pylint.checkers import utils as checker_utils
 
 
 class ExplicitKwargsChecker(checkers.BaseChecker):
