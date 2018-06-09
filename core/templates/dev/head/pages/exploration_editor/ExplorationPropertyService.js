@@ -115,22 +115,3 @@ oppia.factory('ExplorationPropertyService', [
     };
   }
 ]);
-
-// A data service that stores the current exploration title so that it can be
-// displayed and edited in multiple places in the UI.
-oppia.factory('ExplorationTitleService', [
-  'ExplorationPropertyService', '$filter', 'ValidatorsService',
-  'ExplorationRightsService',
-  function(
-      ExplorationPropertyService, $filter, ValidatorsService,
-      ExplorationRightsService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'title';
-    child._normalize = $filter('normalizeWhitespace');
-    child._isValid = function(value) {
-      return ValidatorsService.isValidEntityName(
-        value, true, ExplorationRightsService.isPrivate());
-    };
-    return child;
-  }
-]);
