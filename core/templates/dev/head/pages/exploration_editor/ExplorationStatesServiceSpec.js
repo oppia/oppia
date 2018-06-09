@@ -51,12 +51,6 @@ describe('ExplorationStatesService', function() {
           }
         }
       };
-
-      var that = this;
-      spyOn(this.ExplorationStatesService, 'getState').and.callFake(
-        function(stateName) {
-          return that.EXP_STATES[stateName];
-        });
     });
 
     describe('.init', function() {
@@ -73,7 +67,7 @@ describe('ExplorationStatesService', function() {
           }
         });
 
-        this.ExplorationStatesService.init();
+        this.ExplorationStatesService.init(this.EXP_STATES);
         this.$httpBackend.flush();
 
         var stateStats = this.ExplorationStatesService.getStateStats('Hola');
@@ -95,7 +89,7 @@ describe('ExplorationStatesService', function() {
           }
         });
 
-        this.ExplorationStatesService.init();
+        this.ExplorationStatesService.init(this.EXP_STATES);
         this.$httpBackend.flush();
 
         expect(this.ExplorationStatesService.getStateStats('Hola')).toEqual([
@@ -117,7 +111,7 @@ describe('ExplorationStatesService', function() {
         });
 
         // Initially, 'adios' isn't addressed by the Hola state.
-        this.ExplorationStatesService.init();
+        this.ExplorationStatesService.init(this.EXP_STATES);
         this.$httpBackend.flush();
 
         expect(this.ExplorationStatesService.getStateStats('Hola')).toEqual([
