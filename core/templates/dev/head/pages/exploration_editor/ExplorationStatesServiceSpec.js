@@ -48,6 +48,12 @@ describe('ExplorationStatesService', function() {
   });
 
   describe('Top Answer Statistics Management', function() {
+    beforeEach(function() {
+      spyOn(this.ExplorationStatesService, 'getStates').and.returnValue(
+        this.EXP_STATES
+      );
+    });
+
     beforeEach(inject(function($injector) {
       this.$httpBackend = $injector.get('$httpBackend');
     }));
