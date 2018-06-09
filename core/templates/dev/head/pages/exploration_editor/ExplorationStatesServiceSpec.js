@@ -17,11 +17,17 @@
  * exploration.
  */
 
+var joC = jasmine.objectContaining;
+
 describe('ExplorationStatesService', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
     this.ExplorationStatesService = $injector.get('ExplorationStatesService');
+    this.StatesObjectFactory = $injector.get('StatesObjectFactory');
+    this.OutcomeObjectFactory = $injector.get('OutcomeObjectFactory');
+    this.AnswerGroupObjectFactory = $injector.get('AnswerGroupObjectFactory');
+
   }));
 
   beforeEach(inject(function(ExplorationContextService) {
@@ -30,25 +36,13 @@ describe('ExplorationStatesService', function() {
 
   describe('Top Answer Statistics Management', function() {
     beforeEach(function() {
-      this.EXP_STATES = {
-        Hola: {
-          name: 'Hola',
-          interaction: {
-            answerGroups: [{
-              rules: [{type: 'Contains', inputs: {x: 'hola'}}],
-              outcome: {dest: 'Me Llamo'}
-            }],
-            defaultOutcome: {dest: 'Hola'},
-            id: 'TextInput'
-          }
-        }
-      };
-
-      spyOn(
-        this.ExplorationStatesService, 'getState'
-      ).and.callFake(function(stateName) {
-        return this.EXP_STATES[stateName];
-      });
+      this.EXP_STATES =
+        this.StatesObjectFactory.createSampleBackendDict(['Hola']);
+      this.EXP_STATES.Hola.interaction.id = 'TextInput';
+      this.EXP_STATES.Hola.interaction.answer_groups = [{
+        rule_specs: [{type: 'Contains', inputs: {x: 'hola'}}],
+        outcome: this.OutcomeObjectFactory.createSampleBackendDict()
+      }];
     });
 
     beforeEach(inject(function($injector) {
@@ -106,7 +100,7 @@ describe('ExplorationStatesService', function() {
       });
     });
 
-    describe('.refreshStateStats', function() {
+    describe('.saveInteractionAnswerGroups', function() {
       it('correctly updates addressed info', function() {
         this.$httpBackend.expectGET(
           '/createhandler/state_answer_stats/7'
@@ -124,12 +118,12 @@ describe('ExplorationStatesService', function() {
           joC({answer: 'adios', isAddressed: false})
         ]);
 
-        this.EXP_STATES.Hola.interaction.answerGroups.push({
-          rules: [{type: 'Equals', inputs: {x: 'adios'}}],
-          outcome: {dest: 'Hola'}
-        });
-        // Now, 'adios' is addressed by the Hola state.
-        this.ExplorationStatesService.refreshStateStats('Hola');
+        this.ExplorationStatesService.saveInteractionAnswerGroups('Hola', [
+          this.AnswerGroupObjectFactory.createFromBackendDict({
+            rule_specs: [{type: 'Equals', inputs: {x: 'adios'}}],
+            outcome: this.OutcomeObjectFactory.createSampleBackendDict()
+          })
+        ]);
 
         expect(this.ExplorationStatesService.getStateStats('Hola')).toEqual([
           joC({answer: 'adios', isAddressed: true}),

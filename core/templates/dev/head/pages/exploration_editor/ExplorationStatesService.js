@@ -154,7 +154,9 @@ oppia.factory('ExplorationStatesService', [
      * to reflect any changes in the state's answer groups.
      * @param {string} stateName
      */
-    var refreshAddressedInfo = function(explorationId, state) {
+    var refreshAddressedInfo = function(explorationId, stateName) {
+      var state = _states.getState(stateName);
+
       var interactionRulesService = $injector.get(
         AngularNameService.getNameOfInteractionRulesService(
           state.interaction.id));
@@ -181,8 +183,6 @@ oppia.factory('ExplorationStatesService', [
           var answerStatsBackendDicts = response.data.answers[stateName];
           _stateTopAnswerStatsCache[stateName] = answerStatsBackendDicts.map(
             AnswerStatsFactory.createFromBackendDict);
-          // Still need to manually refresh the addressed information.
-          refreshAddressedInfo(explorationId, stateName);
         });
       });
     };
@@ -190,13 +190,14 @@ oppia.factory('ExplorationStatesService', [
     // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(statesBackendDict) {
-        var explorationId = ExplorationContextService.getExplorationId();
+        var explorationId;
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
         // Initialize the solutionValidityService.
         SolutionValidityService.init(_states.getStateNames());
         _states.getStateNames().forEach(function(stateName) {
           var solution = _states.getState(stateName).interaction.solution;
           if (solution) {
+            explorationId = ExplorationContextService.getExplorationId();
             var result = (
               AnswerClassificationService.getMatchingClassificationResult(
                 explorationId,
@@ -207,11 +208,10 @@ oppia.factory('ExplorationStatesService', [
                   AngularNameService.getNameOfInteractionRulesService(
                     _states.getState(stateName).interaction.id))));
             var solutionIsValid = stateName !== result.outcome.dest;
-            SolutionValidityService.updateValidity(
-              stateName, solutionIsValid);
+            SolutionValidityService.updateValidity(stateName, solutionIsValid);
           }
         });
-        initStateTopAnswersStats(explorationId);
+        if (explorationId) initStateTopAnswersStats(explorationId);
       },
 
       getStates: function() {
@@ -450,15 +450,6 @@ oppia.factory('ExplorationStatesService', [
        */
       getStateStats: function(stateName) {
         return angular.copy(_stateTopAnswerStatsCache[stateName]);
-      },
-
-      /**
-       * Update all answers of the given state to reflect any changes in the
-       * state's structure.
-       * @param {string} stateName
-       */
-      refreshStateStats: function(stateName) {
-        refreshAddressedInfo(stateName);
       },
     };
   }
