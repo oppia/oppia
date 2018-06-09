@@ -19,12 +19,10 @@
 
 oppia.factory('StateTopAnswersStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsFactory', 'ExplorationContextService', 'ExplorationStatesService',
-  'UrlInterpolationService',
+  'AnswerStatsFactory', 'ExplorationContextService', 'UrlInterpolationService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsFactory, ExplorationContextService, ExplorationStatesService,
-      UrlInterpolationService) {
+      AnswerStatsFactory, ExplorationContextService, UrlInterpolationService) {
     /** @type {Object.<string, AnswerStats[]>} */
     var stateTopAnswerStatsCache = {};
 
