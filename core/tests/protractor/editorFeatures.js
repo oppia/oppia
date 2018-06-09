@@ -36,14 +36,14 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
-describe('Exploration history', function() {
+fdescribe('Exploration history', function() {
   var explorationPlayerPage = null;
 
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should display the history', function() {
+  fit('should display the history', function() {
     users.createUser('user@historyTab.com', 'userHistoryTab');
     users.login('user@historyTab.com');
     workflow.createExploration();
@@ -340,7 +340,7 @@ describe('Exploration history', function() {
       '  solution: null\n' +
       'param_changes: []\n' +
       ' ';
-
+    browser.pause();
     editor.expectGraphComparisonOf(1, 2).toBe([{
       label: 'first (was: Introd...',
       color: COLOR_CHANGED
@@ -369,6 +369,7 @@ describe('Exploration history', function() {
       color: COLOR_ADDED
     }], [2, 2, 0]);
 
+
     // Check deleting a state
     editor.deleteState('second');
     editor.moveToState('first');
@@ -387,7 +388,7 @@ describe('Exploration history', function() {
     }], [3, 1, 2]);
     editor.expectTextComparisonOf(2, 3, 'second')
       .toBe(' ', STATE_2_STRING);
-
+    browser.pause();
     // Check renaming a state
     editor.moveToState('first');
     editor.setStateName('third');
@@ -420,6 +421,7 @@ describe('Exploration history', function() {
       color: COLOR_UNCHANGED
     }], [2, 0, 0]);
 
+    browser.pause();
     // Check that reverting works
     editor.revertToVersion(2);
     general.moveToPlayer();
@@ -444,7 +446,7 @@ describe('Exploration history', function() {
       label: 'final card',
       color: COLOR_UNCHANGED
     }], [3, 2, 1]);
-
+    browser.pause();
     users.logout();
   });
 

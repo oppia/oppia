@@ -62,8 +62,8 @@ describe('Compare versions service', function() {
             html: statesDetails[stateName].contentStr
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {}
+            content: {},
+            default_outcome: {}
           },
           interaction: {
             answer_groups: [],

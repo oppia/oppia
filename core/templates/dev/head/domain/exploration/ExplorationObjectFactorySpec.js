@@ -34,8 +34,8 @@ describe('Exploration object factory', function() {
             html: 'content'
           },
           content_ids_to_audio_translations: {
-            'content': {
-              'en': {
+            content: {
+              en: {
                 filename: 'myfile1.mp3',
                 file_size_bytes: 210000,
                 needs_update: false
@@ -46,7 +46,7 @@ describe('Exploration object factory', function() {
                 needs_update: false
               }
             },
-            'default_outcome': {}
+            default_outcome: {}
           },
           interaction: {
             answer_groups: [],
@@ -69,14 +69,14 @@ describe('Exploration object factory', function() {
             html: 'more content'
           },
           content_ids_to_audio_translations: {
-            'content': {
+            content: {
               'hi-en': {
                 filename: 'myfile2.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
               }
             },
-            'default_outcome': {}
+            default_outcome: {}
           },
           interaction: {
             answer_groups: [],

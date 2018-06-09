@@ -19,7 +19,7 @@
 
 oppia.factory('GenerateContentIdService', [
   'stateContentIdsToAudioTranslationsService', 'COMPONENT_NAME_FEEDBACK',
-   'COMPONENT_NAME_HINT', function(
+  'COMPONENT_NAME_HINT', function(
       stateContentIdsToAudioTranslationsService, COMPONENT_NAME_FEEDBACK,
       COMPONENT_NAME_HINT) {
     var generateIdForHintOrFeedback = function(componentName) {
@@ -28,15 +28,15 @@ oppia.factory('GenerateContentIdService', [
       var searchKey = componentName + '_';
       var count = 0;
       for (contentId in contentIdList) {
-        if(contentIdList[contentId].indexOf(searchKey) == 0) {
-          var tempCount = parseInt(contentIdList[contentId].split("_")[1]);
+        if (contentIdList[contentId].indexOf(searchKey) == 0) {
+          var tempCount = parseInt(contentIdList[contentId].split('_')[1]);
           if (tempCount > count) {
             count = tempCount;
           }
         }
       }
-      return (searchKey + String(count + 1))
-    }
+      return (searchKey + String(count + 1));
+    };
 
     var _generateUniqueId = function(componentName) {
       if (componentName == COMPONENT_NAME_FEEDBACK ||

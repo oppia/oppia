@@ -72,9 +72,9 @@ describe('State Interaction controller', function() {
             html: 'First State Content'
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'TextInput',
@@ -111,9 +111,9 @@ describe('State Interaction controller', function() {
             html: ''
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'TextInput',

@@ -34,9 +34,9 @@ describe('State Editor controller', function() {
             html: 'First State Content'
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'TextInput',
@@ -56,9 +56,9 @@ describe('State Editor controller', function() {
             default_outcome: {
               dest: 'default',
               feedback: {
-                  content_id: 'default_outcome',
-                  html: ''
-                },
+                content_id: 'default_outcome',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -73,9 +73,9 @@ describe('State Editor controller', function() {
             html: 'Second State Content'
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'TextInput',
@@ -112,9 +112,9 @@ describe('State Editor controller', function() {
             html: 'This is some content.'
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'TextInput',

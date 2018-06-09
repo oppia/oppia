@@ -61,8 +61,8 @@ describe('Sidebar state name controller', function() {
             html: 'First State Content'
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {}
+            content: {},
+            default_outcome: {}
           },
           interaction: {
             answer_groups: [],
@@ -70,7 +70,7 @@ describe('Sidebar state name controller', function() {
               dest: 'Second State',
               feedback: {
                 content_id: 'default_outcome',
-                html:''
+                html: ''
               },
               param_changes: []
             },
@@ -84,8 +84,8 @@ describe('Sidebar state name controller', function() {
             html: 'Second State Content'
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {}
+            content: {},
+            default_outcome: {}
           },
           interaction: {
             answer_groups: [],
@@ -93,7 +93,7 @@ describe('Sidebar state name controller', function() {
               dest: 'Second State',
               feedback: {
                 content_id: 'default_outcome',
-                html:''
+                html: ''
               },
               param_changes: []
             },
@@ -107,8 +107,8 @@ describe('Sidebar state name controller', function() {
             html: 'This is some content.'
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {}
+            content: {},
+            default_outcome: {}
           },
           interaction: {
             answer_groups: [],
@@ -116,7 +116,7 @@ describe('Sidebar state name controller', function() {
               dest: 'Second State',
               feedback: {
                 content_id: 'default_outcome',
-                html:''
+                html: ''
               },
               param_changes: []
             },

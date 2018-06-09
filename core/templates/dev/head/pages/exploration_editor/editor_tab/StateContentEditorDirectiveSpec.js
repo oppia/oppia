@@ -53,9 +53,9 @@ describe('State content editor directive', function() {
     ess = $injector.get('ExplorationStatesService');
 
     var citatDict = {
-      'content': {},
-      'default_outcome': {},
-      'feedback_1':{}
+      content: {},
+      default_outcome: {},
+      feedback_1: {}
     };
 
     scs.init('Third State', _getContent('content', 'This is some content.'));
@@ -68,9 +68,9 @@ describe('State content editor directive', function() {
           html: 'First State Content'
         },
         content_ids_to_audio_translations: {
-          'content': {},
-          'default_outcome': {},
-          'feedback_1':{}
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
         },
         interaction: {
           id: 'TextInput',
@@ -107,9 +107,9 @@ describe('State content editor directive', function() {
           html: 'Second State Content'
         },
         content_ids_to_audio_translations: {
-          'content': {},
-          'default_outcome': {},
-          'feedback_1':{}
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
         },
         interaction: {
           id: 'TextInput',
@@ -146,9 +146,9 @@ describe('State content editor directive', function() {
           html: 'This is some content.'
         },
         content_ids_to_audio_translations: {
-          'content': {},
-          'default_outcome': {},
-          'feedback_1':{}
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
         },
         interaction: {
           id: 'TextInput',

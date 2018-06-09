@@ -51,10 +51,10 @@ describe('Answer classification service with string classifier disabled',
           html: 'content'
         },
         content_ids_to_audio_translations: {
-          'content': {},
-          'default_outcome': {},
-          'feedback_1': {},
-          'feedback_2': {}
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -146,7 +146,7 @@ describe('Answer classification service with string classifier disabled',
           explorationId, stateName, state, 10, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
-          EXPLICIT_CLASSIFICATION)
+        EXPLICIT_CLASSIFICATION)
       );
 
       expect(
@@ -154,7 +154,7 @@ describe('Answer classification service with string classifier disabled',
           explorationId, stateName, state, 5, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
-          EXPLICIT_CLASSIFICATION)
+        EXPLICIT_CLASSIFICATION)
       );
 
       expect(
@@ -162,7 +162,7 @@ describe('Answer classification service with string classifier disabled',
           explorationId, stateName, state, 6, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
-          EXPLICIT_CLASSIFICATION)
+        EXPLICIT_CLASSIFICATION)
       );
     });
 
@@ -172,7 +172,7 @@ describe('Answer classification service with string classifier disabled',
           explorationId, stateName, state, 7, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('default', 'default_outcome', '', []), 2, 0,
-          DEFAULT_OUTCOME_CLASSIFICATION)
+        DEFAULT_OUTCOME_CLASSIFICATION)
       );
     });
 
@@ -184,9 +184,9 @@ describe('Answer classification service with string classifier disabled',
           html: 'content'
         },
         content_ids_to_audio_translations: {
-          'content': {},
-          'default_outcome': {},
-          'feedback_1': {}
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -282,10 +282,10 @@ describe('Answer classification service with string classifier enabled',
           html: 'content'
         },
         content_ids_to_audio_translations: {
-          'content': {},
-          'default_outcome': {},
-          'feedback_1': {},
-          'feedback_2': {}
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
         },
         interaction: {
           id: 'TrainableInteraction',
@@ -398,7 +398,7 @@ describe('Answer classification service with string classifier enabled',
           explorationId, stateName, state2, 0, rules)
       ).toEqual(acrof.createNew(
         oof.createNew('default', 'default_outcome', '', []), 2, 0,
-          DEFAULT_OUTCOME_CLASSIFICATION)
+        DEFAULT_OUTCOME_CLASSIFICATION)
       );
     });
   }
@@ -441,10 +441,10 @@ describe('Answer classification service with training data classification',
           html: 'content'
         },
         content_ids_to_audio_translations: {
-          'content': {},
-          'default_outcome': {},
-          'feedback_1': {},
-          'feedback_2': {}
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
         },
         interaction: {
           id: 'TrainableInteraction',

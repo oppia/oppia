@@ -73,8 +73,8 @@ describe('Image preloader service', function() {
             audio_translations: {}
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {}
+            content: {},
+            default_outcome: {}
           },
           interaction: {
             id: 'Continue',
@@ -105,7 +105,7 @@ describe('Image preloader service', function() {
             html: 'Congratulations, you have finished!'
           },
           content_ids_to_audio_translations: {
-            'content': {}
+            content: {}
           },
           interaction: {
             id: 'EndExploration',
@@ -130,10 +130,10 @@ describe('Image preloader service', function() {
             html: 'Multiple Choice'
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {},
-            'feedback_2': {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
           },
           interaction: {
             id: 'MultipleChoiceInput',
@@ -215,11 +215,11 @@ describe('Image preloader service', function() {
             html: '<p>Text Input Content</p>'
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {},
-            'feedback_2': {},
-            'hint_1': {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {},
+            hint_1: {}
           },
           interaction: {
             id: 'TextInput',

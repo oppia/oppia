@@ -33,8 +33,8 @@ describe('States object factory', function() {
           html: ''
         },
         content_ids_to_audio_translations: {
-          'content': {},
-          'default_outcome': {}
+          content: {},
+          default_outcome: {}
         },
         interaction: {
           answer_groups: [],
@@ -68,9 +68,9 @@ describe('States object factory', function() {
             html: 'content'
           },
           content_ids_to_audio_translations: {
-            'content': {},
-            'default_outcome': {},
-            'feedback_1': {}
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'RuleTest',
@@ -97,7 +97,7 @@ describe('States object factory', function() {
               feedback: {
                 content_id: 'default_outcome',
                 html: ''
-             },
+              },
               labelled_as_correct: false,
               param_changes: []
             },
@@ -115,7 +115,7 @@ describe('States object factory', function() {
             html: 'content'
           },
           content_ids_to_audio_translations: {
-            'content': {
+            content: {
               en: {
                 filename: 'myfile1.mp3',
                 file_size_bytes: 0.5,
@@ -127,21 +127,21 @@ describe('States object factory', function() {
                 needs_update: false
               }
             },
-            'default_outcome': {
+            default_outcome: {
               he: {
                 filename: 'myfile10.mp3',
                 file_size_bytes: 0.5,
                 needs_update: false
               }
             },
-            'feedback_1': {
+            feedback_1: {
               zh: {
                 filename: 'myfile4.mp3',
                 file_size_bytes: 1.1,
                 needs_update: false
               }
             },
-            'hint_1': {
+            hint_1: {
               es: {
                 filename: 'myfile5.mp3',
                 file_size_bytes: 0.7,
@@ -158,7 +158,7 @@ describe('States object factory', function() {
                 needs_update: false
               }
             },
-            'hint_2': {
+            hint_2: {
               cs: {
                 filename: 'myfile7.mp3',
                 file_size_bytes: 0.2,
@@ -217,15 +217,15 @@ describe('States object factory', function() {
             html: 'more content'
           },
           content_ids_to_audio_translations: {
-            'content': {
+            content: {
               'hi-en': {
                 filename: 'myfile2.mp3',
                 file_size_bytes: 0.8,
                 needs_update: false
               }
             },
-            'default_outcome': {},
-            'solution': {
+            default_outcome: {},
+            solution: {
               de: {
                 filename: 'myfile9.mp3',
                 file_size_bytes: 0.5,
@@ -273,9 +273,9 @@ describe('States object factory', function() {
             html: ''
           },
           content_ids_to_audio_translations: {
-          'content': {},
-          'default_outcome': {}
-        },
+            content: {},
+            default_outcome: {}
+          },
           interaction: {
             answer_groups: [],
             confirmed_unclassified_answers: [],

@@ -114,15 +114,9 @@ oppia.controller('StateInteraction', [
       if (!previousContent.isEmpty()) {
         return;
       }
-
-      var contentId = GenerateContentIdService.generateUniqueId();
       // Update the state's content.
-      stateContentService.displayed = SubtitledHtmlObjectFactory.createDefault(
-        DEFAULT_TERMINAL_STATE_CONTENT, contentId);
+      stateContentService.displayed.setHtml(DEFAULT_TERMINAL_STATE_CONTENT);
       stateContentService.saveDisplayedValue();
-      stateContentIdsToAudioTranslationsService.displayed.addContentId(
-        contentId);
-      stateContentIdsToAudioTranslationsService.saveDisplayedValue();
     };
 
     $scope.onCustomizationModalSavePostHook = function() {
@@ -360,7 +354,7 @@ oppia.controller('StateInteraction', [
             solutionContentId);
         }
         stateContentIdsToAudioTranslationsService.displayed.
-                    deleteAllFeedbackContentId();
+          deleteAllFeedbackContentId();
         stateSolutionService.displayed = null;
         InteractionDetailsCacheService.removeDetails(
           stateInteractionIdService.savedMemento);

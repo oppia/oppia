@@ -67,14 +67,14 @@ describe('Audio preloader service', function() {
             html: '<p>State 1 Content</p>'
           },
           content_ids_to_audio_translations: {
-            'content': {
+            content: {
               en: {
                 filename: 'en-1.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
               }
             },
-            'default_outcome': {}
+            default_outcome: {}
           },
           interaction: {
             id: 'Continue',
@@ -105,7 +105,7 @@ describe('Audio preloader service', function() {
             html: 'Congratulations, you have finished!',
           },
           content_ids_to_audio_translations: {
-            'content': {
+            content: {
               en: {
                 filename: 'en-3.mp3',
                 file_size_bytes: 120000,
@@ -135,14 +135,14 @@ describe('Audio preloader service', function() {
             html: '<p>State 2 Content</p>'
           },
           content_ids_to_audio_translations: {
-            'content': {
+            content: {
               en: {
                 filename: 'en-2.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
               }
             },
-            'default_outcome': {}
+            default_outcome: {}
           },
           interaction: {
             id: 'Continue',
@@ -173,15 +173,15 @@ describe('Audio preloader service', function() {
             html: '<p>Introduction Content</p>',
           },
           content_ids_to_audio_translations: {
-            'content': {
+            content: {
               en: {
                 filename: 'en-0.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
               }
             },
-            'default_outcome':{},
-            'feedback_1': {}
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'TextInput',
