@@ -257,7 +257,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'title': 'Title2'
+                'title': 'Title2',
+                'subtopic_id': 2
             }),
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_MOVE_SKILL_ID_TO_SUBTOPIC,

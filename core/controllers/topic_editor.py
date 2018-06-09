@@ -86,7 +86,7 @@ class TopicEditorPage(base.BaseHandler):
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):
-    """The editor page for a single topic."""
+    """The data handler for subtopic pages."""
 
     def _require_valid_version(
             self, version_from_payload, subtopic_page_version):
@@ -121,41 +121,6 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
 
         self.values.update({
             'subtopic_page': subtopic_page.to_dict()
-        })
-
-        self.render_json(self.values)
-
-    @acl_decorators.can_edit_topic
-    def put(self, topic_id, subtopic_id):
-        """Updates properties of the given topic."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
-        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-            topic_id, subtopic_id, strict=False)
-
-        if subtopic_page is None:
-            raise self.PageNotFoundException(
-                Exception('The subtopic with the given id doesn\'t exist.'))
-
-        version = self.payload.get('version')
-        self._require_valid_version(version, subtopic_page.version)
-
-        commit_message = self.payload.get('commit_message')
-        change_dicts = self.payload.get('change_dicts')
-        change_list = [
-            subtopic_page_domain.SubtopicPageChange(change_dict)
-            for change_dict in change_dicts
-        ]
-        try:
-            subtopic_page_services.update_subtopic_page(
-                self.user_id, topic_id, subtopic_id, change_list,
-                commit_message)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
-        self.values.update({
-            'updated_subtopic_page': True
         })
 
         self.render_json(self.values)

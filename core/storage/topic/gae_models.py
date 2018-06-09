@@ -190,7 +190,7 @@ class SubtopicPageModel(base_models.VersionedModel):
     topic_id = ndb.StringProperty(required=True, indexed=True)
     # The html data of the subtopic.
     html_data = ndb.TextProperty(required=True)
-    # The ISO 639-1 code for the language this topic is written in.
+    # The ISO 639-1 code for the language this subtopic page is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
     def _trusted_commit(
@@ -253,7 +253,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
         Returns:
             str. The commit id with the subtopic page id and version number.
         """
-        return 'subtopic_page-%s-%s' % (subtopic_page_id, version)
+        return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
 
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):

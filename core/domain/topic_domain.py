@@ -89,6 +89,7 @@ class TopicChange(object):
 
         if self.cmd == CMD_ADD_SUBTOPIC:
             self.title = change_dict['title']
+            self.subtopic_id = change_dict['subtopic_id']
         elif self.cmd == CMD_DELETE_SUBTOPIC:
             self.id = change_dict['subtopic_id']
         elif self.cmd == CMD_ADD_UNCATEGORIZED_SKILL_ID:
@@ -579,20 +580,26 @@ class Topic(object):
                 return ind
         return None
 
-    def add_subtopic(self, title):
+    def add_subtopic(self, new_subtopic_id, title):
         """Adds a subtopic with the given id and title.
 
         Args:
+            new_subtopic_id: int. The id of the new subtopic.
             title: str. The title for the new subtopic.
 
+        Raises:
+            Exception. The new_subtopic_id and the expected next subtopic id
+                differs.
         Returns:
             int. The id of the newly created subtopic.
         """
-        subtopic_id = self.next_subtopic_id
+        if self.next_subtopic_id != new_subtopic_id:
+            raise Exception('The given new subtopic id (%s) is not equal to '
+                'the expected next subtopic id: %s'
+                %(new_subtopic_id, self.next_subtopic_id))
         self.next_subtopic_id = self.next_subtopic_id + 1
         self.subtopics.append(
-            Subtopic.create_default_subtopic(subtopic_id, title))
-        return subtopic_id
+            Subtopic.create_default_subtopic(new_subtopic_id, title))
 
     def delete_subtopic(self, subtopic_id):
         """Deletes the subtopic with the given id and adds all its skills to

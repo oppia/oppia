@@ -151,7 +151,8 @@ class SubtopicPage(object):
 
         Args:
             subtopic_id: str. ID of the subtopic.
-            topic_id: str. The topic to which this page is linked with.
+            topic_id: str. The Id of the topic to which this page is linked
+                with.
 
         Returns:
             SubtopicPage. A subtopic object with given id, topic_id and empty

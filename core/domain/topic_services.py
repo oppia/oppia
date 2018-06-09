@@ -263,7 +263,7 @@ def apply_change_list(topic_id, change_list):
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
-                change.subtopic_id = topic.add_subtopic(change.title)
+                topic.add_subtopic(change.subtopic_id, change.title)
             elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
                 topic.delete_subtopic(change.id)
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:

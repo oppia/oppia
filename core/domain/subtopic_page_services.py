@@ -228,7 +228,7 @@ def delete_subtopic_page(
     Args:
         committer_id: str. The user who is deleting the subtopic page.
         subtopic_id: int. ID of the subtopic which was removed.
-        topic_id: str. The topic, this subtopic belonged to.
+        topic_id: str. The ID of the topic that this subtopic belongs to.
         force_deletion: bool. If true, the subtopic page and its history are
             fully deleted and are unrecoverable. Otherwise, the subtopic page
             and all its history are marked as deleted, but the corresponding
