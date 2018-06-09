@@ -259,25 +259,3 @@ oppia.factory('ExplorationParamChangesService', [
     return child;
   }
 ]);
-
-oppia.factory('ExplorationAutomaticTextToSpeechService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'auto_tts_enabled';
-
-    child._isValid = function(value) {
-      return (typeof value === 'boolean');
-    };
-
-    child.isAutomaticTextToSpeechEnabled = function() {
-      return child.savedMemento;
-    };
-
-    child.toggleAutomaticTextToSpeech = function() {
-      child.displayed = !child.displayed;
-      child.saveDisplayedValue();
-    };
-
-    return child;
-  }
-]);
