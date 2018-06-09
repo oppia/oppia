@@ -24,6 +24,29 @@ describe('ExplorationStatesService', function() {
     this.ExplorationStatesService = $injector.get('ExplorationStatesService');
   }));
 
+  beforeEach(inject(function(ExplorationContextService) {
+    spyOn(ExplorationContextService, 'getExplorationId').and.returnValue('7');
+  }));
+
+  beforeEach(function() {
+    this.EXP_STATES = {
+      Hola: {
+        name: 'Hola',
+        interaction: {
+          answerGroups: [{
+            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
+            outcome: {dest: 'Me Llamo'}
+          }],
+          defaultOutcome: {dest: 'Hola'},
+          id: 'TextInput'
+        },
+        classifier_model_id: 0,
+        content: 'Say Hola!',
+        param_changes: [],
+      }
+    };
+  });
+
   describe('Top Answer Statistics Management', function() {
     beforeEach(inject(function($injector) {
       this.$httpBackend = $injector.get('$httpBackend');
@@ -31,29 +54,6 @@ describe('ExplorationStatesService', function() {
     afterEach(function() {
       this.$httpBackend.verifyNoOutstandingExpectation();
       this.$httpBackend.verifyNoOutstandingRequest();
-    });
-
-    beforeEach(inject(function(ExplorationContextService) {
-      spyOn(ExplorationContextService, 'getExplorationId').and.returnValue('7');
-    }));
-
-    beforeEach(function() {
-      this.EXP_STATES = {
-        Hola: {
-          name: 'Hola',
-          interaction: {
-            answerGroups: [{
-              rules: [{type: 'Contains', inputs: {x: 'hola'}}],
-              outcome: {dest: 'Me Llamo'}
-            }],
-            defaultOutcome: {dest: 'Hola'},
-            id: 'TextInput'
-          },
-          classifier_model_id: 0,
-          content: 'Say Hola!',
-          param_changes: [],
-        }
-      };
     });
 
     describe('.init', function() {
