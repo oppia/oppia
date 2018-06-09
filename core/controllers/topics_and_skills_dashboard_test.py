@@ -30,7 +30,7 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [])
+            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [], [])
 
 
 class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):
@@ -101,5 +101,5 @@ class NewSkillHandlerTest(BaseTopicsAndSkillsDashboardTest):
             self.assertIsNotNone(
                 skill_services.get_skill_by_id(skill_id, strict=False))
             topic = topic_services.get_topic_by_id(self.topic_id)
-            self.assertEqual(topic.skill_ids, [skill_id])
+            self.assertEqual(topic.uncategorized_skill_ids, [skill_id])
             self.logout()

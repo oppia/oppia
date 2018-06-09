@@ -1580,12 +1580,13 @@ pre.oppia-pre-wrapped-text {
   opacity: 0;
 }
 
-/* Styles for the loading indicator shown while image is loading*/
+/* Styles for the loading indicator shown while image is loading */
 .oppia-image-loading-indicator-container {
   background-color: rgba(224,242,241,1);
 }
 
-.oppia-image-loading-indicator {
+/* Style to center an image */
+.center-image-horizontally {
   display: block;
   margin-left: auto;
   margin-right: auto;
