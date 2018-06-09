@@ -24,14 +24,14 @@ oppia.factory('ExplorationStatesService', [
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'ExplorationContextService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'AnswerStatsFactory',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
       AnswerClassificationService, ExplorationContextService,
-      UrlInterpolationService) {
+      UrlInterpolationService, AnswerStatsFactory) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -146,6 +146,48 @@ oppia.factory('ExplorationStatesService', [
       return conversionFunction(frontendValue);
     };
 
+    /** @type {Object.<string, AnswerStats[]>} */
+    var _stateTopAnswerStatsCache = {};
+
+    /**
+     * Updates the addressed info of all the answers cached for the given state
+     * to reflect any changes in the state's answer groups.
+     * @param {string} stateName
+     */
+    var refreshAddressedInfo = function(state) {
+      var explorationId = ExplorationContextService.getExplorationId();
+      var interactionRulesService = $injector.get(
+        AngularNameService.getNameOfInteractionRulesService(
+          state.interaction.id));
+      _stateTopAnswerStatsCache[state.name].forEach(function(answerStats) {
+        answerStats.isAddressed =
+          AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+            explorationId, state.name, state, answerStats.answer,
+            interactionRulesService);
+      });
+    };
+
+    /**
+     * Calls the backend asynchronously to setup the answer statistics of each
+     * state this exploration contains.
+     */
+    var initStateTopAnswersStats = function() {
+      $http.get(
+        UrlInterpolationService.interpolateUrl(
+          '/createhandler/state_answer_stats/<exploration_id>',
+          {exploration_id: ExplorationContextService.getExplorationId()})
+      ).then(function(response) {
+        _stateTopAnswerStatsCache = {};
+        Object.keys(response.data.answers).forEach(function(stateName) {
+          var answerStatsBackendDicts = response.data.answers[stateName];
+          _stateTopAnswerStatsCache[stateName] = answerStatsBackendDicts.map(
+            AnswerStatsFactory.createFromBackendDict);
+          // Still need to manually refresh the addressed information.
+          refreshAddressedInfo(stateName);
+        });
+      });
+    };
+
     // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(statesBackendDict) {
@@ -169,6 +211,7 @@ oppia.factory('ExplorationStatesService', [
               stateName, solutionIsValid);
           }
         });
+        initStateTopAnswersStats(_states);
       },
 
       getStates: function() {
@@ -399,7 +442,24 @@ oppia.factory('ExplorationStatesService', [
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
         }
         $rootScope.$broadcast('refreshGraph');
-      }
+      },
+
+      /**
+       * @param {string} stateName
+       * @returns {AnswerStats[]} - list of the statistics for the top answers.
+       */
+      getStateStats: function(stateName) {
+        return angular.copy(_stateTopAnswerStatsCache[stateName]);
+      },
+
+      /**
+       * Update all answers of the given state to reflect any changes in the
+       * state's structure.
+       * @param {string} stateName
+       */
+      refreshStateStats: function(stateName) {
+        refreshAddressedInfo(stateName);
+      },
     };
   }
 ]);
