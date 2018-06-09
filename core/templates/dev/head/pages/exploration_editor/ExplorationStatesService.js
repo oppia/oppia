@@ -172,11 +172,11 @@ oppia.factory('ExplorationStatesService', [
      * Calls the backend asynchronously to setup the answer statistics of each
      * state this exploration contains.
      */
-    var initStateTopAnswersStats = function(explorationId) {
+    var initStateTopAnswersStats = function() {
       $http.get(
         UrlInterpolationService.interpolateUrl(
           '/createhandler/state_answer_stats/<exploration_id>',
-          {exploration_id: explorationId})
+          {exploration_id: ExplorationContextService.getExplorationId()})
       ).then(function(response) {
         _stateTopAnswerStatsCache = {};
         Object.keys(response.data.answers).forEach(function(stateName) {
@@ -190,17 +190,15 @@ oppia.factory('ExplorationStatesService', [
     // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(statesBackendDict) {
-        var explorationId;
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
         // Initialize the solutionValidityService.
         SolutionValidityService.init(_states.getStateNames());
         _states.getStateNames().forEach(function(stateName) {
           var solution = _states.getState(stateName).interaction.solution;
           if (solution) {
-            explorationId = ExplorationContextService.getExplorationId();
             var result = (
               AnswerClassificationService.getMatchingClassificationResult(
-                explorationId,
+                ExplorationContextService.getExplorationId(),
                 stateName,
                 _states.getState(stateName),
                 solution.correctAnswer,
@@ -211,7 +209,7 @@ oppia.factory('ExplorationStatesService', [
             SolutionValidityService.updateValidity(stateName, solutionIsValid);
           }
         });
-        if (explorationId) initStateTopAnswersStats(explorationId);
+        initStateTopAnswersStats();
       },
 
       getStates: function() {
