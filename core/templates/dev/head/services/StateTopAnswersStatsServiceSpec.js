@@ -63,20 +63,13 @@ describe('StateTopAnswersStatsService', function() {
 
   describe('.init', function() {
     it('correctly identifies unaddressed issues', function() {
-      this.$httpBackend.expectGET(
-        '/createhandler/state_answer_stats/7'
-      ).respond({
-        answers: {
-          Hola: [
-            {answer: 'hola', frequency: 7},
-            {answer: 'adios', frequency: 4},
-            {answer: 'que?', frequency: 2},
-          ]
-        }
+      this.StateTopAnswersStatsService.init({
+        Hola: [
+          {answer: 'hola', frequency: 7},
+          {answer: 'adios', frequency: 4},
+          {answer: 'que?', frequency: 2},
+        ]
       });
-
-      this.StateTopAnswersStatsService.init();
-      this.$httpBackend.flush();
 
       var stateStats = this.StateTopAnswersStatsService.getStateStats('Hola');
       expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
@@ -85,20 +78,13 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     it('maintains frequency in order', function() {
-      this.$httpBackend.expectGET(
-        '/createhandler/state_answer_stats/7'
-      ).respond({
-        answers: {
-          Hola: [
-            {answer: 'hola', frequency: 7},
-            {answer: 'adios', frequency: 4},
-            {answer: 'que?', frequency: 2},
-          ]
-        }
+      this.StateTopAnswersStatsService.init({
+        Hola: [
+          {answer: 'hola', frequency: 7},
+          {answer: 'adios', frequency: 4},
+          {answer: 'que?', frequency: 2},
+        ]
       });
-
-      this.StateTopAnswersStatsService.init();
-      this.$httpBackend.flush();
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
         joC({answer: 'hola', frequency: 7}),
@@ -110,17 +96,10 @@ describe('StateTopAnswersStatsService', function() {
 
   describe('.refreshStateStats', function() {
     it('correctly updates addressed info', function() {
-      this.$httpBackend.expectGET(
-        '/createhandler/state_answer_stats/7'
-      ).respond({
-        answers: {
-          Hola: [{answer: 'adios', frequency: 4}]
-        }
-      });
-
       // Initially, 'adios' isn't addressed by the Hola state.
-      this.StateTopAnswersStatsService.init();
-      this.$httpBackend.flush();
+      this.StateTopAnswersStatsService.init({
+        Hola: [{answer: 'adios', frequency: 4}]
+      });
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
         joC({answer: 'adios', isAddressed: false})

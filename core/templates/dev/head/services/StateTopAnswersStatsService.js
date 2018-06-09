@@ -18,11 +18,11 @@
  */
 
 oppia.factory('StateTopAnswersStatsService', [
-  '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
+  '$injector', 'AngularNameService', 'AnswerClassificationService',
   'AnswerStatsFactory', 'ExplorationContextService', 'ExplorationStatesService',
   'UrlInterpolationService',
   function(
-      $http, $injector, AngularNameService, AnswerClassificationService,
+      $injector, AngularNameService, AnswerClassificationService,
       AnswerStatsFactory, ExplorationContextService, ExplorationStatesService,
       UrlInterpolationService) {
     /** @type {Object.<string, AnswerStats[]>} */
@@ -52,20 +52,17 @@ oppia.factory('StateTopAnswersStatsService', [
        * Calls the backend asynchronously to setup the answer statistics of each
        * state this exploration contains.
        */
-      init: function() {
-        $http.get(
-          UrlInterpolationService.interpolateUrl(
-            '/createhandler/state_answer_stats/<exploration_id>',
-            {exploration_id: ExplorationContextService.getExplorationId()})
-        ).then(function(response) {
-          stateTopAnswerStatsCache = {};
-          Object.keys(response.data.answers).forEach(function(stateName) {
-            var answerStatsBackendDicts = response.data.answers[stateName];
-            stateTopAnswerStatsCache[stateName] = answerStatsBackendDicts.map(
-              AnswerStatsFactory.createFromBackendDict);
-            // Still need to manually refresh the addressed information.
-            refreshAddressedInfo(stateName);
-          });
+      init: function(stateTopAnswersStatsBackendDict) {
+        stateTopAnswerStatsCache = {};
+        Object.keys(
+          stateTopAnswersStatsBackendDict
+        ).forEach(function(stateName) {
+          stateTopAnswerStatsCache[stateName] =
+            stateTopAnswersStatsBackendDict[stateName].map(
+              AnswerStatsFactory.createFromBackendDict
+            );
+          // Still need to manually refresh the addressed information.
+          refreshAddressedInfo(stateName);
         });
       },
 
