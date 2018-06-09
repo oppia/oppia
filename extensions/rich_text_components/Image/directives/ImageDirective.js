@@ -34,10 +34,8 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
         $scope.imageUrl = '';
-        $scope.loadingIndicatorUrl = (
-          UrlInterpolationService.getStaticImageUrl(
-            '/activity/loadingIndicator.gif')
-        );
+        $scope.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
+          LOADING_INDICATOR_URL);
         $scope.isLoadingIndicatorShown = false;
         if (ImagePreloaderService.inExplorationPlayer()) {
           $scope.isLoadingIndicatorShown = true;

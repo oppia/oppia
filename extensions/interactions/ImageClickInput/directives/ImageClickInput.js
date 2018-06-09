@@ -45,10 +45,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             ($attrs.highlightRegionsOnHoverWithValue === 'true');
           $scope.filepath = imageAndRegions.imagePath;
           $scope.imageUrl = '';
-          $scope.loadingIndicatorUrl = (
-            UrlInterpolationService.getStaticImageUrl(
-              '/activity/loadingIndicator.gif')
-          );
+          $scope.loadingIndicatorUrl = UrlInterpolationService
+            .getStaticImageUrl(LOADING_INDICATOR_URL);
           $scope.isLoadingIndicatorShown = false;
           if (ImagePreloaderService.inExplorationPlayer()) {
             $scope.isLoadingIndicatorShown = true;
