@@ -42,6 +42,12 @@ var testSuite = [{
   expectedInteractionDetails: [],
   wrongAnswers: ['2000 m / hr'],
   correctAnswers: ['2 km / hr']
+}, {
+  interactionArguments: [],
+  ruleArguments: ['IsEquivalentTo', '2 km / hr'],
+  expectedInteractionDetails: [],
+  wrongAnswers: ['2 m / s'],
+  correctAnswers: ['2000 m / hr']
 }];
 
 exports.customizeInteraction = customizeInteraction;

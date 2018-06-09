@@ -147,7 +147,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         numberWithUnitsDict.type,
         numberWithUnitsDict.real,
         FractionObjectFactory.fromDict(numberWithUnitsDict.fraction),
-        UnitsObjectFactory.fromList(numberWithUnitsDict).units);
+        UnitsObjectFactory.fromList(numberWithUnitsDict.units));
     };
 
     return NumberWithUnits;
