@@ -150,3 +150,31 @@ class DocstringParameterCheckerTest(unittest.TestCase):
         """)
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_functiondef(func_node)
+
+
+class ImportOnlyModulesCheckerTest(unittest.TestCase):
+
+    def test_finds_import_from(self):
+        checker_test_object = testutils.CheckerTestCase()
+        checker_test_object.CHECKER_CLASS = (
+            custom_lint_checks.ImportOnlyModulesChecker)
+        checker_test_object.setup_method()
+        importfrom_node1 = astroid.extract_node("""
+            from os import path #@
+            import sys
+        """)
+        with checker_test_object.assertNoMessages():
+            checker_test_object.checker.visit_importfrom(importfrom_node1)
+
+        importfrom_node2 = astroid.extract_node("""
+            from os import error #@
+            import sys
+        """)
+        with checker_test_object.assertAddsMessages(
+            testutils.Message(
+                msg_id='import-only-modules',
+                node=importfrom_node2,
+            ),
+        ):
+            checker_test_object.checker.visit_importfrom(
+                importfrom_node2)
