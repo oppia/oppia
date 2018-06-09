@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AudioLanguageObjectFactory
- *
+ * @fileoverview Unit tests for AudioLanguageObjectFactory.
  */
 
 describe('AudioLanguage object factory', function() {
