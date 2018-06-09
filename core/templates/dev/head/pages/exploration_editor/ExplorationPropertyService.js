@@ -281,25 +281,3 @@ oppia.factory('ExplorationAutomaticTextToSpeechService', [
     return child;
   }
 ]);
-
-oppia.factory('ExplorationCorrectnessFeedbackService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'correctness_feedback_enabled';
-
-    child._isValid = function(value) {
-      return (typeof value === 'boolean');
-    };
-
-    child.isEnabled = function() {
-      return child.savedMemento;
-    };
-
-    child.toggleCorrectnessFeedback = function() {
-      child.displayed = !child.displayed;
-      child.saveDisplayedValue();
-    };
-
-    return child;
-  }
-]);
