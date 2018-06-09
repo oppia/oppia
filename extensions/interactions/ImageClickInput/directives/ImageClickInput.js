@@ -24,10 +24,12 @@ oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
   'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT', 'ImagePreloaderService',
+  'LOADING_INDICATOR_URL',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT, ImagePreloaderService) {
+      EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT, ImagePreloaderService,
+      LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {

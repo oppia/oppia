@@ -21,10 +21,10 @@
  */
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'HtmlEscaperService', 'ExplorationContextService',
-  'UrlInterpolationService', 'ImagePreloaderService',
+  'UrlInterpolationService', 'ImagePreloaderService', 'LOADING_INDICATOR_URL',
   function(
       $rootScope, $sce, HtmlEscaperService, ExplorationContextService,
-      UrlInterpolationService, ImagePreloaderService) {
+      UrlInterpolationService, ImagePreloaderService, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
