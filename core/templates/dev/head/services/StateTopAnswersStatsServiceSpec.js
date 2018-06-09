@@ -59,6 +59,7 @@ describe('StateTopAnswersStatsService', function() {
 
     it('is true after call to .init', function() {
       this.StateTopAnswersStatsService.init({answers: {}});
+
       expect(this.StateTopAnswersStatsService.isInitialized()).toBe(true);
     });
   });
