@@ -190,6 +190,7 @@ oppia.factory('ExplorationStatesService', [
     // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(statesBackendDict) {
+        var explorationId = ExplorationContextService.getExplorationId();
         _states = StatesObjectFactory.createFromBackendDict(statesBackendDict);
         // Initialize the solutionValidityService.
         SolutionValidityService.init(_states.getStateNames());
@@ -198,7 +199,7 @@ oppia.factory('ExplorationStatesService', [
           if (solution) {
             var result = (
               AnswerClassificationService.getMatchingClassificationResult(
-                ExplorationContextService.getExplorationId(),
+                explorationId,
                 stateName,
                 _states.getState(stateName),
                 solution.correctAnswer,
@@ -210,7 +211,7 @@ oppia.factory('ExplorationStatesService', [
               stateName, solutionIsValid);
           }
         });
-        initStateTopAnswersStats(ExplorationContextService.getExplorationId());
+        initStateTopAnswersStats(explorationId);
       },
 
       getStates: function() {
