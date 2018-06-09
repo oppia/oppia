@@ -153,23 +153,3 @@ oppia.factory('ExplorationCategoryService', [
     return child;
   }
 ]);
-
-// A data service that stores the current exploration objective so that it can
-// be displayed and edited in multiple places in the UI.
-oppia.factory('ExplorationObjectiveService', [
-  'ExplorationPropertyService', '$filter', 'ValidatorsService',
-  'ExplorationRightsService',
-  function(
-      ExplorationPropertyService, $filter, ValidatorsService,
-      ExplorationRightsService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'objective';
-    child._normalize = $filter('normalizeWhitespace');
-    child._isValid = function(value) {
-      return (
-        ExplorationRightsService.isPrivate() ||
-        ValidatorsService.isNonempty(value, false));
-    };
-    return child;
-  }
-]);
