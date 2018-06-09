@@ -28,28 +28,27 @@ describe('ExplorationStatesService', function() {
     spyOn(ExplorationContextService, 'getExplorationId').and.returnValue('7');
   }));
 
-  beforeEach(function() {
-    this.EXP_STATES = {
-      Hola: {
-        name: 'Hola',
-        interaction: {
-          answerGroups: [{
-            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Me Llamo'}
-          }],
-          defaultOutcome: {dest: 'Hola'},
-          id: 'TextInput'
-        }
-      }
-    };
-  });
-
   describe('Top Answer Statistics Management', function() {
     beforeEach(function() {
-      spyOn(this.ExplorationStatesService, 'getState').and.callFake(
-        function(stateName) {
-          return this.EXP_STATES[stateName];
-        });
+      this.EXP_STATES = {
+        Hola: {
+          name: 'Hola',
+          interaction: {
+            answerGroups: [{
+              rules: [{type: 'Contains', inputs: {x: 'hola'}}],
+              outcome: {dest: 'Me Llamo'}
+            }],
+            defaultOutcome: {dest: 'Hola'},
+            id: 'TextInput'
+          }
+        }
+      };
+
+      spyOn(
+        this.ExplorationStatesService, 'getState'
+      ).and.callFake(function(stateName) {
+        return this.EXP_STATES[stateName];
+      });
     });
 
     beforeEach(inject(function($injector) {
