@@ -28,6 +28,9 @@ oppia.factory('StateTopAnswersStatsService', [
     /** @type {Object.<string, AnswerStats[]>} */
     var stateTopAnswerStatsCache = {};
 
+    /** @type {boolean} */
+    var isInitialized = false;
+
     /**
      * Updates the addressed info of all the answers cached for the given state
      * to reflect any changes in the state's answer groups.
@@ -64,6 +67,7 @@ oppia.factory('StateTopAnswersStatsService', [
           // Still need to manually refresh the addressed information.
           refreshAddressedInfo(stateName);
         });
+        isInitialized = true;
       },
 
       /**
