@@ -55,6 +55,15 @@ oppia.factory('StateObjectFactory', [
           stateDict.param_changes));
     };
 
+    State.createSampleBackendDict = function(stateName) {
+      return {
+        classifier_model_id: 0,
+        SubtitledHtmlObjectFactory.createSampleBackendDict(),
+        InteractionObjectFactory.createSampleBackendDict(),
+        ParamChangesObjectFactory.createSampleBackendList()
+      };
+    };
+
     return State;
   }
 ]);

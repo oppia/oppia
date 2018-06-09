@@ -133,6 +133,13 @@ oppia.factory('SubtitledHtmlObjectFactory', [
         subtitledHtmlBackendDict.html, audioTranslations);
     };
 
+    SubtitledHtml.createSampleBackendDict = function() {
+      return {
+        audio_translations: {},
+        html: ''
+      };
+    };
+
     SubtitledHtml.createDefault = function(html) {
       return new SubtitledHtml(html, {});
     };

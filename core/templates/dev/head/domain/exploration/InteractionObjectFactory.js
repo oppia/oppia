@@ -71,6 +71,16 @@ oppia.factory('InteractionObjectFactory', [
           generateSolutionFromBackend(interactionDict.solution)) : null);
     };
 
+    Interaction.createSampleBackendDict = function() {
+      return {
+        id: 'TextInput',
+        answer_groups: {},
+        confirmed_unclassified_answers: [],
+        customization_args: [],
+        hints: [],
+      };
+    };
+
     var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
       return answerGroupBackendDicts.map(function(
           answerGroupBackendDict) {
