@@ -19,19 +19,19 @@
  */
 
 oppia.factory('ExplorationStatesService', [
-  '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
-  'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
-  'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
-  'SolutionValidityService', 'AngularNameService',
-  'AnswerClassificationService', 'ExplorationContextService',
-  'UrlInterpolationService', 'AnswerStatsFactory',
+  '$filter', '$http', '$injector', '$location', '$log', '$q', '$rootScope',
+  '$uibModal', 'AlertsService', 'AngularNameService',
+  'AnswerClassificationService', 'AnswerStatsFactory', 'ChangeListService',
+  'EditorStateService', 'ExplorationContextService',
+  'ExplorationInitStateNameService', 'SolutionValidityService',
+  'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
   function(
-      $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
-      ExplorationInitStateNameService, AlertsService, ChangeListService,
-      EditorStateService, ValidatorsService, StatesObjectFactory,
-      SolutionValidityService, AngularNameService,
-      AnswerClassificationService, ExplorationContextService,
-      UrlInterpolationService, AnswerStatsFactory) {
+      $filter, $injector, $location, $log, $q, $rootScope, $uibModal,
+      AlertsService, AngularNameService, AnswerClassificationService,
+      AnswerStatsFactory ChangeListService, EditorStateService,
+      ExplorationContextService, ExplorationInitStateNameService,
+      SolutionValidityService, StatesObjectFactory, UrlInterpolationService,
+      ValidatorsService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -211,7 +211,7 @@ oppia.factory('ExplorationStatesService', [
               stateName, solutionIsValid);
           }
         });
-        initStateTopAnswersStats(_states);
+        initStateTopAnswersStats();
       },
 
       getStates: function() {
