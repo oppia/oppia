@@ -41,6 +41,12 @@ oppia.factory('HintObjectFactory', [
         SubtitledHtmlObjectFactory.createDefault(hintContent));
     };
 
+    Hint.createSampleBackendDict = function() {
+      return {
+        hint_content: SubtitledHtmlObjectFactory.createSampleBackendDict()
+      };
+    };
+
     return Hint;
   }
 ]);
