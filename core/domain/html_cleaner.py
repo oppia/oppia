@@ -198,6 +198,11 @@ def convert_to_text_angular(html_data):
     if not len(html_data):
         return html_data
 
+    # <br> is replaced with <br/> before conversion because BeautifulSoup
+    # in some cases adds </br> closing tag and br is reported as parent
+    # of other tags which produces issues in migration.
+    html_data = html_data.replace('<br>', '<br/>')
+
     soup = bs4.BeautifulSoup(html_data, 'html.parser')
 
     allowed_tag_list = (
@@ -239,32 +244,33 @@ def convert_to_text_angular(html_data):
         # There are cases where there is no href attribute of a tag.
         # In such cases a tag is simply removed.
         elif tag.name == 'a':
+            replace_with_link = True
             if tag.has_attr('href'):
-                link = soup.new_tag('oppia-noninteractive-link')
-                url = tag['href']
-                text = tag.get_text()
-                link['url-with-value'] = url
-                link['text-with-value'] = text
-                tag.wrap(link)
-                # If any part of text in a tag is wrapped in b or i tag
-                # link tag is also wrapped in those tags to maintain
-                # almost similar appearance.
                 children = tag.findChildren()
-                count_of_b_parent = 0
-                count_of_i_parent = 0
                 for child in children:
-                    if child.name == 'b' and not count_of_b_parent:
-                        link.wrap(soup.new_tag('b'))
-                        count_of_b_parent = 1
-                    if child.name == 'i' and not count_of_i_parent:
-                        link.wrap(soup.new_tag('i'))
-                        count_of_i_parent = 1
-                    # This part is to ensure that oppia-noninteractive-link
-                    # within a tag is preserved to obtain test case. This
-                    # has to be removed after finding invalid case.
                     if child.name == 'oppia-noninteractive-link':
-                        link.append(child)
-                tag.extract()
+                        tag.unwrap()
+                        replace_with_link = False
+                if replace_with_link:
+                    link = soup.new_tag('oppia-noninteractive-link')
+                    url = tag['href']
+                    text = tag.get_text()
+                    link['url-with-value'] = url
+                    link['text-with-value'] = text
+                    tag.wrap(link)
+                    # If any part of text in a tag is wrapped in b or i tag
+                    # link tag is also wrapped in those tags to maintain
+                    # almost similar appearance.
+                    count_of_b_parent = 0
+                    count_of_i_parent = 0
+                    for child in children:
+                        if child.name == 'b' and not count_of_b_parent:
+                            link.wrap(soup.new_tag('b'))
+                            count_of_b_parent = 1
+                        if child.name == 'i' and not count_of_i_parent:
+                            link.wrap(soup.new_tag('i'))
+                            count_of_i_parent = 1
+                    tag.extract()
             else:
                 tag.unwrap()
         # To maintain the appearance of table, tab is added after
@@ -273,8 +279,7 @@ def convert_to_text_angular(html_data):
         # is None and there is no need to add tabs since linebreak is
         # already present.
         elif tag.name == 'td' and tag.next_sibling:
-            if tag.string:
-                tag.string = tag.string + "\t"
+            tag.insert_after('  ')
             tag.unwrap()
         # div and table rows both are replaced with p tag
         # to maintain almost same apperance.
@@ -306,6 +311,11 @@ def convert_to_text_angular(html_data):
         while blockquote.parent.name not in allowed_parent_list['blockquote']:
             blockquote.parent.unwrap()
 
+    # Ensure that pre tag is not wrapped p tags.
+    for pre in soup.findAll('pre'):
+        while pre.parent.name == 'p':
+            pre.parent.unwrap()
+
     # Ensure that ol and ul are not wrapped in p tags.
     for tag_name in ['ol', 'ul']:
         for tag in soup.findAll(tag_name):
@@ -329,20 +339,22 @@ def convert_to_text_angular(html_data):
                 tag.unwrap()
                 tag = parent
             if tag.parent.name == tag_name:
-                tag.parent.unwrap()
+                parent = tag.parent
+                tag.unwrap()
+                tag = parent
             if tag.parent.name in ['blockquote', '[document]']:
                 wrap_with_siblings(tag, soup.new_tag('p'))
-
-    # Ensure that pre tag is not wrapped p tags.
-    for pre in soup.findAll('pre'):
-        while pre.parent.name == 'p':
-            pre.parent.unwrap()
 
     # Ensure that oppia inline components are wrapped in an allowed parent.
     for tag_name in oppia_inline_components:
         for tag in soup.findAll(tag_name):
             if tag.parent.name in ['blockquote', '[document]']:
                 wrap_with_siblings(tag, soup.new_tag('p'))
+
+    # Ensure oppia link component is not a child of another link component.
+    for link in soup.findAll('oppia-noninteractive-link'):
+        if link.parent.name == 'oppia-noninteractive-link':
+            link.unwrap()
 
     # Ensure that oppia block components are wrapped in an allowed parent.
     for tag_name in oppia_block_components:
@@ -364,9 +376,24 @@ def convert_to_text_angular(html_data):
     # Ensure that p tag is not wrapped in p tag.
     for p in soup.findAll('p'):
         if p.parent.name == 'p':
-            p.unwrap()
+            contents = p.parent.contents
+            length_of_contents = len(contents)
+            index = 0
+            while index < length_of_contents:
+                content = contents[index]
+                new_p = soup.new_tag('p')
+                if content.name != 'p':
+                    while content.name != 'p':
+                        content = content.wrap(new_p)
+                        index = contents.index(content) + 1
+                        length_of_contents = len(contents)
+                        if index >= length_of_contents:
+                            break
+                        content = contents[index]
+                index += 1
+            p.parent.unwrap()
 
-    # Beautiful soup automatically changes <br> to <br/>,
+    # Beautiful soup automatically changes some <br> to <br/>,
     # so it has to be replaced directly in the string.
     # Also, when any html string with <br/> is stored in exploration
     # html strings they are stored as <br>. Since both of these
@@ -404,10 +431,16 @@ def validate_textangular_format(html_list, run_migration=False):
     for html_data in html_list:
         try:
             if run_migration:
-                migrated_data = convert_to_text_angular(html_data)
+                # <br> is replaced with <br/> before conversion because
+                # BeautifulSoup in some cases adds </br> closing tag
+                # and br is reported as parent of other tags which
+                # produces issues in validation.
+                migrated_data = convert_to_text_angular(html_data).replace(
+                    '<br>', '<br/>')
                 soup = bs4.BeautifulSoup(migrated_data, 'html.parser')
             else:
-                soup = bs4.BeautifulSoup(html_data, 'html.parser')
+                soup = bs4.BeautifulSoup(
+                    html_data.replace('<br>', '<br/>'), 'html.parser')
         except Exception as e:
             if e in err_dict:
                 err_dict[e] += [html_data]
