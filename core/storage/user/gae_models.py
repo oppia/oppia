@@ -672,32 +672,3 @@ class UserSkillMasteryModel(base_models.BaseModel):
             str. The model id corresponding to the given user and skill.
         """
         return '%s.%s' % (user_id, skill_id)
-
-    @classmethod
-    def get(cls, model_id):
-        """Returns all skill mastery models of a user and a skill.
-
-        Args:
-            model_id: str. The model id of the user and the skill.
-
-        Returns:
-            UserSkillMasteryModel. Skill mastery model with id
-                equal to model_id.
-        """
-        return cls.get_by_id(model_id)
-
-    @classmethod
-    def get_multi(cls, model_ids):
-        """Returns all skill mastery models for the given model ids.
-
-        Args:
-            model_ids: list(str). List containing model ids of users and
-                skills.
-
-        Returns:
-            list(UserSkillMasteryModel). All skill mastery models for
-                all model_id in the list model_ids are returned as a
-                list where each element is one skill mastery model.
-        """
-        model_id_keys = [ndb.Key(cls, model_id) for model_id in model_ids]
-        return ndb.get_multi(model_id_keys)

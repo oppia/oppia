@@ -216,7 +216,7 @@ class UserSkillMasteryModelTests(test_utils.GenericTestBase):
 
     def test_get_failure(self):
         retrieved_object = user_models.UserSkillMasteryModel.get(
-            'unknown_model_id')
+            'unknown_model_id', False)
 
         self.assertEqual(retrieved_object, None)
 
