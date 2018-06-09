@@ -287,7 +287,25 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
                 '</td></tr></tbody></table>'
             ),
             'expected_output': (
-                '<p>January\t$100\t200</p><p>February\t$80\t400</p>'
+                '<p>January  $100  200</p><p>February  $80  400</p>'
+            )
+        }, {
+            'html_content': (
+                '<p><p><p>Hello <br/> this<p> is <br> test case <p>'
+                'for </p> migration <b>testing</b> </p></p></p></p>'
+            ),
+            'expected_output': (
+                '<p>Hello <br> this</p><p> is <br> test case </p><p>'
+                'for </p><p> migration <b>testing</b> </p>'
+            )
+        }, {
+            'html_content': (
+                '<p>Hello this is <p>test case </p> for <p> <p>migration</p>'
+                'testing </p> for <p> invalid cases </p></p>'
+            ),
+            'expected_output': (
+                '<p>Hello this is </p><p>test case </p><p> for </p><p> </p><p>'
+                'migration</p><p>testing </p><p> for </p><p> invalid cases </p>'
             )
         }]
 

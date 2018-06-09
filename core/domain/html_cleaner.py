@@ -279,7 +279,7 @@ def convert_to_text_angular(html_data):
         # is None and there is no need to add tabs since linebreak is
         # already present.
         elif tag.name == 'td' and tag.next_sibling:
-            tag.insert_after('\t')
+            tag.insert_after('  ')
             tag.unwrap()
         # div and table rows both are replaced with p tag
         # to maintain almost same apperance.
