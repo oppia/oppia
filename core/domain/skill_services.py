@@ -562,7 +562,7 @@ def get_skill_mastery(user_id, skill_id):
     model_id = user_models.UserSkillMasteryModel.construct_model_id(
         user_id, skill_id)
     degree_of_mastery = user_models.UserSkillMasteryModel.get(
-        model_id)[0].degree_of_mastery
+        model_id).degree_of_mastery
 
     return degree_of_mastery
 
@@ -583,9 +583,8 @@ def get_multi_skill_mastery(user_id, skill_ids):
     model_ids = []
 
     for skill_id in skill_ids:
-        model_ids.append(
-            user_models.UserSkillMasteryModel.construct_model_id(
-                user_id, skill_id))
+        model_ids.append(user_models.UserSkillMasteryModel.construct_model_id(
+            user_id, skill_id))
 
     skill_mastery_models = user_models.UserSkillMasteryModel.get_multi(
         model_ids)

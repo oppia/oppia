@@ -664,7 +664,7 @@ class UserSkillMastery(object):
         Args:
             user_id: str. The user id of the user.
             skill_id: str. The id of the skill.
-            degree_of_mastery: float. The progress of user for the
+            degree_of_mastery: float. The user's mastery of the
                 corresponding skill.
         """
         self.user_id = user_id
@@ -682,3 +682,20 @@ class UserSkillMastery(object):
             'skill_id': self.skill_id,
             'degree_of_mastery': self.degree_of_mastery
         }
+
+    @classmethod
+    def from_dict(cls, skill_mastery_dict):
+        """Returns a UserSkillMastery domain object from the given dict.
+
+        Args:
+            skill_mastery_dict. dict. A dict mapping all the fields of
+                UserSkillMastery object.
+
+        Returns:
+            SkillMastery. The SkillMastery domain object.
+        """
+        return cls(
+            skill_mastery_dict['user_id'],
+            skill_mastery_dict['skill_id'],
+            skill_mastery_dict['degree_of_mastery']
+        )

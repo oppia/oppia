@@ -650,11 +650,9 @@ class UserSkillMasteryModel(base_models.BaseModel):
 
     This model stores the degree of mastery of each skill for a given user.
 
-    The id for this model is of form '{{USER_ID}}:{{SKILL_ID}}'
+    The id for this model is of form '{{USER_ID}}.{{SKILL_ID}}'
     """
 
-    # The model id for the user and the skill.
-    id = ndb.StringProperty(required=True)
     # The user id of the user.
     user_id = ndb.StringProperty(required=True, indexed=True)
     # The skill id for which the degree of mastery is stored.
@@ -671,7 +669,7 @@ class UserSkillMasteryModel(base_models.BaseModel):
             skill_id: str. The unique id of the skill.
 
         Returns:
-            str. The model id corresponding to user and skill.
+            str. The model id corresponding to the given user and skill.
         """
         return '%s.%s' % (user_id, skill_id)
 
@@ -683,23 +681,22 @@ class UserSkillMasteryModel(base_models.BaseModel):
             model_id: str. The model id of the user and the skill.
 
         Returns:
-            list. All skill mastery models where user_id belongs to the
-                entered user are returned as a list where each element
-                is one skill mastery model.
+            dict. Skill mastery model with id equal to model_id.
         """
-        return cls.query(cls.id == model_id).fetch()
+        return cls.get_by_id(model_id)
 
     @classmethod
     def get_multi(cls, model_ids):
-        """Returns all skill mastery models of a different model ids.
+        """Returns all skill mastery models for the given model ids.
 
         Args:
-            model_ids: list. List containing model ids of users and
+            model_ids: list(str). List containing model ids of users and
                 skills.
 
         Returns:
-            list. All skill mastery models for all model_id in the list
+            list(dict). All skill mastery models for all model_id in the list
                 model_ids are returned as a list where each element
                 is one skill mastery model.
         """
-        return cls.query(cls.id.IN(model_ids)).fetch()
+        model_id_keys = [ndb.Key(cls, model_id) for model_id in model_ids]
+        return ndb.get_multi(model_id_keys)
