@@ -70,6 +70,10 @@ oppia.factory('StateTopAnswersStatsService', [
         isInitialized = true;
       },
 
+      isInitialized: function() {
+        return isInitialized;
+      },
+
       /**
        * @param {string} stateName
        * @returns {AnswerStats[]} - list of the statistics for the top answers.

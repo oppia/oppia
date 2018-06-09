@@ -53,7 +53,18 @@ describe('StateTopAnswersStatsService', function() {
       });
   }));
 
+  it('starts uninitialized', function() {
+    expect(this.StateTopAnswersStatsService.isInitialized()).toBe(false);
+  });
+
   describe('.init', function() {
+
+    it('shows as initialized', function() {
+      this.StateTopAnswersStatsService.init({});
+
+    expect(this.StateTopAnswersStatsService.isInitialized()).toBe(true);
+    });
+
     it('correctly identifies unaddressed issues', function() {
       this.StateTopAnswersStatsService.init({
         Hola: [
