@@ -12,10 +12,12 @@
       </select> <strong>solution is...</strong>
       <br>
       <br>
-      <angular-html-bind class="protractor-test-interaction-html"
+      <div>
+        <angular-html-bind class="protractor-test-interaction-html"
                          html-data="correctAnswerEditorHtml">
-      </angular-html-bind>
-      <br>
+        </angular-html-bind>
+      </div>
+        <br>
       <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
                  ng-click="onSubmitFromSubmitButton()"
                  ng-if="data.correctAnswer === null && shouldAdditionalSubmitButtonBeShown()"

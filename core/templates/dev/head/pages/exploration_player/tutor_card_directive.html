@@ -9,9 +9,11 @@
       <div class="rte-viewer conversation-skin-tutor-card-top-content"
            ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">
-        <angular-html-bind class="protractor-test-conversation-content"
-                           html-data="activeCard.contentHtml">
-        </angular-html-bind>
+        <div>
+          <angular-html-bind class="protractor-test-conversation-content"
+                             html-data="activeCard.contentHtml">
+          </angular-html-bind>
+        </div>
         <div ng-if="isContentAudioTranslationAvailable()"
              class="conversation-skin-audio-controls">
         </div>

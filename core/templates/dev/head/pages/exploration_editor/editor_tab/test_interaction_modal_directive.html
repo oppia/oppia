@@ -17,7 +17,7 @@
             <img class="preview-conversation-skin-row-avatar-img img-circle" ng-src="<[userBlueImgUrl]>" >
           </td>
           <td class="preview-conversation-skin-learner-input">
-            <angular-html-bind html-data="inputTemplate()"></angular-html-bind>
+            <div><angular-html-bind html-data="inputTemplate()"></angular-html-bind></div>
           </td>
         </tr>
       </table>
@@ -26,8 +26,10 @@
   <div class="preview-conversation-skin-supplemental-interaction" ng-if="!interactionIsInline">
     <div>
       <md-card class="preview-conversation-skin-supplemental-card">
-        <angular-html-bind html-data="inputTemplate()">
-        </angular-html-bind>
+        <div>
+          <angular-html-bind html-data="inputTemplate()">
+          </angular-html-bind>
+        </div>
       </md-card>
     </div>
   </div>

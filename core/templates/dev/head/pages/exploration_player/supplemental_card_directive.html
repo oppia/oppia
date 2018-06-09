@@ -7,8 +7,10 @@
             ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
-    <angular-html-bind class="rte-viewer conversation-skin-help-card-content" html-data="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()"></angular-html-bind>
-    <br>
+    <div>
+      <angular-html-bind class="rte-viewer conversation-skin-help-card-content" html-data="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()"></angular-html-bind>
+    </div>
+      <br>
     <continue-button ng-if="helpCardHasContinueButton"
                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
                      is-learn-again-button="isLearnAgainButton()"
@@ -16,9 +18,11 @@
     </continue-button>
   </div>
 
-  <angular-html-data class="protractor-test-conversation-input"
-                     html-data="activeCard.interactionHtml">
-  </angular-html-data>
+  <div>
+    <angular-html-data class="protractor-test-conversation-input"
+                       html-data="activeCard.interactionHtml">
+    </angular-html-data>
+  </div>
 </div>
 
 <style>
