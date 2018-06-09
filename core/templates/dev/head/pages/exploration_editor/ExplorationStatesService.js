@@ -19,19 +19,19 @@
  */
 
 oppia.factory('ExplorationStatesService', [
-  '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
-  'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
-  'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
-  'SolutionValidityService', 'AngularNameService',
-  'AnswerClassificationService', 'ExplorationContextService',
-  'UrlInterpolationService',
+  '$filter', '$http', '$injector', '$location', '$log', '$q', '$rootScope',
+  '$uibModal', 'AlertsService', 'AngularNameService',
+  'AnswerClassificationService', 'AnswerStatsFactory', 'ChangeListService',
+  'EditorStateService', 'ExplorationContextService',
+  'ExplorationInitStateNameService', 'SolutionValidityService',
+  'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
   function(
-      $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
-      ExplorationInitStateNameService, AlertsService, ChangeListService,
-      EditorStateService, ValidatorsService, StatesObjectFactory,
-      SolutionValidityService, AngularNameService,
-      AnswerClassificationService, ExplorationContextService,
-      UrlInterpolationService) {
+      $filter, $http, $injector, $location, $log, $q, $rootScope, $uibModal,
+      AlertsService, AngularNameService, AnswerClassificationService,
+      AnswerStatsFactory, ChangeListService, EditorStateService,
+      ExplorationContextService, ExplorationInitStateNameService,
+      SolutionValidityService, StatesObjectFactory, UrlInterpolationService,
+      ValidatorsService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -146,6 +146,47 @@ oppia.factory('ExplorationStatesService', [
       return conversionFunction(frontendValue);
     };
 
+    /** @type {Object.<string, AnswerStats[]>} */
+    var _stateTopAnswerStatsCache = {};
+
+    /**
+     * Updates the addressed info of all the answers cached for the given state
+     * to reflect any changes in the state's answer groups.
+     * @param {string} stateName
+     */
+    var refreshAddressedInfo = function(explorationId, stateName) {
+      var state = _states.getState(stateName);
+
+      var interactionRulesService = $injector.get(
+        AngularNameService.getNameOfInteractionRulesService(
+          state.interaction.id));
+      _stateTopAnswerStatsCache[state.name].forEach(function(answerStats) {
+        answerStats.isAddressed =
+          AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
+            explorationId, state.name, state, answerStats.answer,
+            interactionRulesService);
+      });
+    };
+
+    /**
+     * Calls the backend asynchronously to setup the answer statistics of each
+     * state this exploration contains.
+     */
+    var initStateTopAnswersStats = function() {
+      $http.get(
+        UrlInterpolationService.interpolateUrl(
+          '/createhandler/state_answer_stats/<exploration_id>',
+          {exploration_id: ExplorationContextService.getExplorationId()})
+      ).then(function(response) {
+        _stateTopAnswerStatsCache = {};
+        Object.keys(response.data.answers).forEach(function(stateName) {
+          var answerStatsBackendDicts = response.data.answers[stateName];
+          _stateTopAnswerStatsCache[stateName] = answerStatsBackendDicts.map(
+            AnswerStatsFactory.createFromBackendDict);
+        });
+      });
+    };
+
     // TODO(sll): Add unit tests for all get/save methods.
     return {
       init: function(statesBackendDict) {
@@ -165,26 +206,32 @@ oppia.factory('ExplorationStatesService', [
                   AngularNameService.getNameOfInteractionRulesService(
                     _states.getState(stateName).interaction.id))));
             var solutionIsValid = stateName !== result.outcome.dest;
-            SolutionValidityService.updateValidity(
-              stateName, solutionIsValid);
+            SolutionValidityService.updateValidity(stateName, solutionIsValid);
           }
         });
+        initStateTopAnswersStats();
       },
+
       getStates: function() {
         return angular.copy(_states);
       },
+
       getStateNames: function() {
         return _states.getStateNames();
       },
+
       hasState: function(stateName) {
         return _states.hasState(stateName);
       },
+
       getState: function(stateName) {
         return angular.copy(_states.getState(stateName));
       },
+
       setState: function(stateName, stateData) {
         _setState(stateName, stateData, true);
       },
+
       isNewStateNameValid: function(newStateName, showWarnings) {
         if (_states.hasState(newStateName)) {
           if (showWarnings) {
@@ -195,76 +242,99 @@ oppia.factory('ExplorationStatesService', [
         return (
           ValidatorsService.isValidStateName(newStateName, showWarnings));
       },
+
       isSolutionValid: function(stateName) {
         return SolutionValidityService.isSolutionValid(stateName);
       },
+
       updateSolutionValidity: function(stateName, solutionIsValid) {
         SolutionValidityService.updateValidity(stateName, solutionIsValid);
       },
+
       deleteSolutionValidity: function(stateName) {
         SolutionValidityService.deleteSolutionValidity(stateName);
       },
+
       getStateContentMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'content');
       },
+
       saveStateContent: function(stateName, newContent) {
         saveStateProperty(stateName, 'content', newContent);
       },
+
       getStateParamChangesMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'param_changes');
       },
+
       saveStateParamChanges: function(stateName, newParamChanges) {
         saveStateProperty(stateName, 'param_changes', newParamChanges);
       },
+
       getInteractionIdMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_id');
       },
+
       saveInteractionId: function(stateName, newInteractionId) {
         saveStateProperty(stateName, 'widget_id', newInteractionId);
       },
+
       getInteractionCustomizationArgsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'widget_customization_args');
       },
+
       saveInteractionCustomizationArgs: function(
           stateName, newCustomizationArgs) {
         saveStateProperty(
           stateName, 'widget_customization_args', newCustomizationArgs);
       },
+
       getInteractionAnswerGroupsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'answer_groups');
       },
+
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
       },
+
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(
           stateName, 'confirmed_unclassified_answers');
       },
+
       saveConfirmedUnclassifiedAnswers: function(stateName, newAnswers) {
         saveStateProperty(
           stateName, 'confirmed_unclassified_answers', newAnswers);
       },
+
       getInteractionDefaultOutcomeMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'default_outcome');
       },
+
       saveInteractionDefaultOutcome: function(stateName, newDefaultOutcome) {
         saveStateProperty(stateName, 'default_outcome', newDefaultOutcome);
       },
+
       getHintsMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'hints');
       },
+
       saveHints: function(stateName, newHints) {
         saveStateProperty(stateName, 'hints', newHints);
       },
+
       getSolutionMemento: function(stateName) {
         return getStatePropertyMemento(stateName, 'solution');
       },
+
       saveSolution: function(stateName, newSolution) {
         saveStateProperty(stateName, 'solution', newSolution);
       },
+
       isInitialized: function() {
         return _states !== null;
       },
+
       addState: function(newStateName, successCallback) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
         if (!ValidatorsService.isValidStateName(newStateName, true)) {
@@ -284,6 +354,7 @@ oppia.factory('ExplorationStatesService', [
           successCallback(newStateName);
         }
       },
+
       deleteState: function(deleteStateName) {
         AlertsService.clearWarnings();
 
@@ -341,6 +412,7 @@ oppia.factory('ExplorationStatesService', [
           $rootScope.$broadcast('refreshStateEditor');
         });
       },
+
       renameState: function(oldStateName, newStateName) {
         newStateName = $filter('normalizeWhitespace')(newStateName);
         if (!ValidatorsService.isValidStateName(newStateName, true)) {
@@ -368,7 +440,15 @@ oppia.factory('ExplorationStatesService', [
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
         }
         $rootScope.$broadcast('refreshGraph');
-      }
+      },
+
+      /**
+       * @param {string} stateName
+       * @returns {AnswerStats[]} - list of the statistics for the top answers.
+       */
+      getStateStats: function(stateName) {
+        return angular.copy(_stateTopAnswerStatsCache[stateName]);
+      },
     };
   }
 ]);
