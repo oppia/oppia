@@ -251,11 +251,3 @@ oppia.factory('ExplorationParamSpecsService', [
     return child;
   }
 ]);
-
-oppia.factory('ExplorationParamChangesService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'param_changes';
-    return child;
-  }
-]);
