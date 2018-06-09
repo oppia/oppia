@@ -120,7 +120,9 @@
   </head>
 
   <body>
-    <span ng-if="iframed" translate="{{ warnings_and_loader() }}"></span>
+    <span ng-if="iframed">
+      {{ warnings_and_loader() }}
+    </span>
     <div ng-if="!iframed">
       <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
       <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
