@@ -47,38 +47,38 @@ oppia.directive('unresolvedAnswersOverview', [
               StateRulesStatsService.computeStateRulesStats(
                 state
               ).then(function(stats) {
-                var calculatedUnresolvedAnswersData = [];
-
-                for (var i = 0; i < stats.visualizations_info.length; ++i) {
-                  var vizInfo = stats.visualizations_info[i];
-                  if (!vizInfo.addressed_info_is_supported) {
-                    continue;
-                  }
-
-                  // NOTE: vizInfo.data is already sorted in descending order by
-                  // frequency.
-                  for (var j = 0; j < vizInfo.data.length; ++j) {
-                    var answer = vizInfo.data[j];
-                    if (answer.is_addressed ||
-                        answer.frequency <
-                          MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
+                if (stats != null) {
+                  for (var i = 0; i < stats.visualizations_info.length; ++i) {
+                    var vizInfo = stats.visualizations_info[i];
+                    if (!vizInfo.addressed_info_is_supported) {
                       continue;
                     }
 
-                    calculatedUnresolvedAnswersData.push(answer);
-                    if (calculatedUnresolvedAnswersData.length >=
-                          MAXIMUM_UNRESOLVED_ANSWERS) {
-                      break;
+                    // NOTE: vizInfo.data is already sorted in descending order by
+                    // frequency.
+                    for (var j = 0; j < vizInfo.data.length; ++j) {
+                      var answer = vizInfo.data[j];
+                      if (answer.is_addressed ||
+                          answer.frequency <
+                            MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
+                        continue;
+                      }
+
+                      calculatedUnresolvedAnswersData.push(answer);
+                      if (calculatedUnresolvedAnswersData.length >=
+                            MAXIMUM_UNRESOLVED_ANSWERS) {
+                        break;
+                      }
                     }
+
+                    // Will only take the answers from first eligible
+                    // visualization.
+                    break;
                   }
 
-                  // Will only take the answers from first eligible
-                  // visualization.
-                  break;
+                  $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
+                  $scope.latestRefreshDate = new Date();
                 }
-
-                $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
-                $scope.latestRefreshDate = new Date();
               });
             }
           };
