@@ -46,9 +46,10 @@ describe('ExplorationStatesService', function() {
 
   describe('Top Answer Statistics Management', function() {
     beforeEach(function() {
-      spyOn(this.ExplorationStatesService, 'getStates').and.returnValue(
-        this.EXP_STATES
-      );
+      spyOn(this.ExplorationStatesService, 'getState').and.callFake(
+        function(stateName) {
+          return this.EXP_STATES[stateName];
+        });
     });
 
     beforeEach(inject(function($injector) {
