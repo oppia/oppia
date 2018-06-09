@@ -90,8 +90,6 @@ oppia.directive('trainingPanel', [
       restrict: 'E',
       scope: {
         answer: '=',
-        answerFeedback: '=',
-        answerOutcomeDest: '=',
         // The classification input is an object with two keys:
         //   -answerGroupIndex: This refers to which answer group the answer
         //      being trained has been classified to (for displaying feedback

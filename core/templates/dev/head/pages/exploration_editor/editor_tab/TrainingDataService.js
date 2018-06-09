@@ -23,7 +23,6 @@ oppia.factory('TrainingDataService', [
   function(
       $rootScope, $http, ResponsesService, RuleObjectFactory) {
     var _trainingDataAnswers = [];
-    var _trainingDataFrequencies = [];
 
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
@@ -102,10 +101,6 @@ oppia.factory('TrainingDataService', [
         return _trainingDataAnswers;
       },
 
-      getTrainingDataFrequencies: function() {
-        return _trainingDataFrequencies;
-      },
-
       getAllPotentialOutcomes: function(state) {
         var potentialOutcomes = [];
         var interaction = state.interaction;
@@ -123,7 +118,7 @@ oppia.factory('TrainingDataService', [
       },
 
       trainAnswerGroup: function(answerGroupIndex, answer) {
-        _removeAnswer(answer);
+        _removeAnswer(answer);        
 
         var answerGroup = ResponsesService.getAnswerGroup(answerGroupIndex);
         var trainingData = answerGroup.trainingData;

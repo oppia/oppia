@@ -10,35 +10,6 @@
 
   <br>
 
-  <div>
-    <span><strong>it will reply with:</strong></span>
-  </div>
-
-  <div>
-    <div angular-html-bind="answerFeedback">
-    </div>
-  </div>
-
-  <br>
-
-  <div>
-    <span><strong>and then direct the learner to: </strong></span>
-    <span angular-html-bind="answerOutcomeDest"></span>
-  </div>
-
-  <br>
-
-  <div>
-    <span><strong>Is this right?</strong></span>
-  </div>
-
-  <div>
-    <button class="btn btn-default" ng-disabled="changingAnswerGroupIndex" ng-click="beginChangingAnswerGroupIndex()">No</button>
-    <button class="btn btn-default" ng-disabled="changingAnswerGroupIndex" ng-click="confirmAnswerGroupIndex(classification.answerGroupIndex)">Yes</button>
-  </div>
-
-  <br>
-
   <div ng-if="changingAnswerGroupIndex">
     <span><strong>Select correct feedback or type a new response:</strong></span>
 

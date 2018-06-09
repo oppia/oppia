@@ -258,98 +258,64 @@ oppia.controller('StateResponses', [
           'teach_oppia_modal_directive.html'),
         backdrop: false,
         controller: [
-          '$scope', '$injector', '$uibModalInstance',
-          'ExplorationHtmlFormatterService',
+          '$scope', '$injector', '$uibModalInstance', '$http',
+          'ExplorationHtmlFormatterService', 'TrainingModalService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
           'ExplorationContextService', 'EditorStateService',
           'ExplorationStatesService', 'TrainingDataService',
-          'AnswerClassificationService', 'FocusManagerService',
-          'AngularNameService', 'EXPLICIT_CLASSIFICATION',
+          'AnswerClassificationService', 'EXPLICIT_CLASSIFICATION',
           function(
-              $scope, $injector, $uibModalInstance,
-              ExplorationHtmlFormatterService,
+              $scope, $injector, $uibModalInstance, $http
+              ExplorationHtmlFormatterService, TrainingModalService,
               stateInteractionIdService, stateCustomizationArgsService,
               ExplorationContextService, EditorStateService,
               ExplorationStatesService, TrainingDataService,
-              AnswerClassificationService, FocusManagerService,
-              AngularNameService, EXPLICIT_CLASSIFICATION) {
+              AnswerClassificationService, EXPLICIT_CLASSIFICATION) {
             var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
             var _state = ExplorationStatesService.getState(_stateName);
 
-            $scope.stateContent = _state.content.getHtml();
-            $scope.inputTemplate = (
-              ExplorationHtmlFormatterService.getInteractionHtml(
-                stateInteractionIdService.savedMemento,
-                stateCustomizationArgsService.savedMemento,
-                false,
-                'testInteractionInput'));
-            $scope.answerTemplate = '';
+            var _get_unresolved_answers = function(expId, stateName) {
 
-            $scope.trainingData = [];
-            $scope.trainingDataAnswer = '';
-            $scope.trainingDataFeedback = '';
-            $scope.trainingDataOutcomeDest = '';
-
-            // Retrieve the interaction ID.
-            var interactionId = stateInteractionIdService.savedMemento;
-
-            var rulesServiceName =
-              AngularNameService.getNameOfInteractionRulesService(
-                interactionId);
-
-            // Inject RulesService dynamically.
-            var rulesService = $injector.get(rulesServiceName);
-
-            // See the training panel directive in StateEditor for an
-            // explanation on the structure of this object.
-            $scope.classification = {
-              answerGroupIndex: 0,
-              newOutcome: null
             };
 
-            FocusManagerService.setFocus('testInteractionInput');
+            $scope.unresolvedAnswersFromBackend = _get_unresolved_answers(
+              _explorationId, _stateName);
+            $scope.unresolvedAnswers = [];
+            $scope.unresolvedAnswersFromBackend.forEach(function(item) {
+              answer = item.answer;
+              answerTemplate = (
+                ExplorationHtmlFormatterService.getAnswerHtml(
+                  answer, stateInteractionIdService.savedMemento,
+                  stateCustomizationArgsService.savedMemento));
+              classificationResult = (
+                AnswerClassificationService.getMatchingClassificationResult(
+                  _explorationId, _stateName, _state, answer, rulesService));
+              feedbackHtml = classificationResult.outcome.feedback.getHtml()
+              $scope.unresolvedAnswers.push({
+                answer: answer,
+                answerTemplate: answerTemplate,
+                classificationResult: classificationResult,
+                feedbackHtml: feedbackHtml
+              });
+            });
+
+            $scope.confirmToTrainingData = function(answerIndex) {
+              answer = $scope.unresolvedAnswers[answerIndex];
+              TrainingDataService.trainAnswerGroup(
+                answer.classificationResult.answerGroupIndex, answer.answer);
+            };
+
+            $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
+              answer = $scope.unresolvedAnswers[answerIndex].answer.
+              return TrainingModalService.openTrainUnresolvedAnswerModal(
+                answer, true);
+            };
 
             $scope.finishTeaching = function(reopen) {
               $uibModalInstance.close({
                 reopen: reopen
               });
-            };
-
-            $scope.submitAnswer = function(answer) {
-              $scope.answerTemplate = (
-                ExplorationHtmlFormatterService.getAnswerHtml(
-                  answer, stateInteractionIdService.savedMemento,
-                  stateCustomizationArgsService.savedMemento));
-
-              var classificationResult = (
-                AnswerClassificationService.getMatchingClassificationResult(
-                  _explorationId, _stateName, _state, answer, rulesService));
-              var feedbackHtml = 'Nothing';
-              var dest = classificationResult.outcome.dest;
-              if (classificationResult.outcome.hasNonemptyFeedback()) {
-                feedbackHtml = classificationResult.outcome.feedback.getHtml();
-              }
-              if (dest === _stateName) {
-                dest = '<em>(try again)</em>';
-              }
-              $scope.trainingDataAnswer = answer;
-              $scope.trainingDataFeedback = feedbackHtml;
-              $scope.trainingDataOutcomeDest = dest;
-
-              var classificationCategorization = (
-                classificationResult.classificationCategorization);
-
-              // If answer is classified using explicit rules then we don't show
-              // yes / no option to creator. Otherwise we ask whether the
-              // response it satisfactory and assign a different response
-              // if response is not satisfactory.
-              if (classificationCategorization === EXPLICIT_CLASSIFICATION) {
-                $scope.classification.answerGroupIndex = -1;
-              } else {
-                $scope.classification.answerGroupIndex = (
-                  classificationResult.answerGroupIndex);
-              }
             };
           }]
       }).result.then(function(result) {
