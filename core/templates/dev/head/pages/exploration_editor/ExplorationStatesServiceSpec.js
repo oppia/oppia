@@ -48,7 +48,10 @@ describe('ExplorationStatesService', function() {
             }],
             defaultOutcome: {dest: 'Hola'},
             id: 'TextInput'
-          }
+          },
+          classifier_model_id: 0,
+          content: 'Say Hola!',
+          param_changes: [],
         }
       };
     });
