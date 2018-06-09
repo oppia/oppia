@@ -66,9 +66,27 @@ oppia.factory('PlaythroughObjectFactory', [
         LearnerActionObjectFactory.createFromBackendDict);
 
       return new Playthrough(
-        playthroughBackendDict.playthroughId, playthroughBackendDict.expId,
-        playthroughBackendDict.expVersion, playthroughBackendDict.issueType,
-        playthroughBackendDict.issueCustomizationArgs, actions);
+        playthroughBackendDict.playthrough_id, playthroughBackendDict.exp_id,
+        playthroughBackendDict.exp_version, playthroughBackendDict.issue_type,
+        playthroughBackendDict.issue_customization_args, actions);
+    };
+
+    /**
+     * @returns {PlaythroughBackendDict}
+     */
+    Playthrough.prototype.convertToBackendDict = function() {
+      var actionDicts = [], i;
+      for (i = 0; i < this.actions.length; i++) {
+        actionDicts.push(this.actions[i].convertToBackendDict());
+      }
+      return {
+        playthrough_id: this.playthroughId,
+        exp_id: this.expId,
+        exp_version: this.expVersion,
+        issue_type: this.issueType,
+        issue_customization_args: this.issueCustomizationArgs,
+        actions: actionDicts
+      };
     };
 
     return Playthrough;

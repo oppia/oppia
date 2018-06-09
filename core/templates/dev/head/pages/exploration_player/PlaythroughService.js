@@ -48,20 +48,7 @@ oppia.factory('PlaythroughService', [
     var visitedStates = [];
 
     var analyzePlaythrough = function() {
-      // Check for early quit issue.
-      if (expStopwatch.getTimeInSecs() < EARLY_QUIT_THRESHOLD_IN_SECS) {
-        playthrough.issueType = ISSUE_TYPE_EARLY_QUIT;
-        playthrough.issueCustomizationArgs = {
-          state_name: {
-            value:
-              playthrough.actions[-1].actionCustomizationArgs.state_name.value
-          },
-          time_spent_in_exp_in_msecs: {
-            value: expStopwatch.getTimeInSecs()
-          }
-        };
-      }
-
+      var timeSpentInExpInSecs = expStopwatch.getTimeInSecs();
       // Check for multiple incorrect submissions issue.
       if (multipleIncorrectStateName.num_times_incorrect >= (
         NUM_INCORRECT_ANSWERS_THRESHOLD)) {
@@ -74,21 +61,42 @@ oppia.factory('PlaythroughService', [
             value: multipleIncorrectStateName.num_times_incorrect
           }
         };
+        return;
       }
 
       // Check for cyclic state transitions issue.
       if (cycleIdentifier.num_cycles >= NUM_REPEATED_CYCLES_THRESHOLD) {
         playthrough.issueType = ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS;
         playthrough.issueCustomizationArgs = {
-          state_names: cycleIdentifier.cycle.split(',')
+          state_names: {
+            value: cycleIdentifier.cycle.split(',')
+          }
         };
+        return;
+      }
+
+      // Check for early quit issue.
+      if (timeSpentInExpInSecs < EARLY_QUIT_THRESHOLD_IN_SECS) {
+        playthrough.issueType = ISSUE_TYPE_EARLY_QUIT;
+        playthrough.issueCustomizationArgs = {
+          state_name: {
+            value:
+              playthrough.actions[
+                playthrough.actions.length - 1].actionCustomizationArgs
+                .state_name.value
+          },
+          time_spent_in_exp_in_secs: {
+            value: expStopwatch.getTimeInSecs()
+          }
+        };
+        return;
       }
     };
 
     var getFullPlaythroughUrl = function() {
       return UrlInterpolationService.interpolateUrl(
         STORE_PLAYTHROUGH_URL, {
-          exploration_id: playthrough.explorationId
+          exploration_id: playthrough.expId
         });
     };
 
@@ -98,14 +106,18 @@ oppia.factory('PlaythroughService', [
           null, newExplorationId, newExplorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
       },
+      getPlaythrough: function() {
+        return playthrough;
+      },
       recordExplorationStartAction: function(initStateName) {
         playthrough.actions.push(new LearnerActionObjectFactory(
-          ACTION_TYPE_EXPLORATION_START, CURRENT_LEARNER_ACTION_SCHEMA_VERSION,
+          ACTION_TYPE_EXPLORATION_START,
           {
             state_name: {
               value: initStateName
             }
-          }
+          },
+          CURRENT_ACTION_SCHEMA_VERSION
         ));
 
         multipleIncorrectStateName = {
@@ -123,7 +135,7 @@ oppia.factory('PlaythroughService', [
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
         playthrough.actions.push(new LearnerActionObjectFactory(
-          ACTION_TYPE_ANSWER_SUBMIT, CURRENT_LEARNER_ACTION_SCHEMA_VERSION,
+          ACTION_TYPE_ANSWER_SUBMIT,
           {
             state_name: {
               value: stateName
@@ -143,7 +155,8 @@ oppia.factory('PlaythroughService', [
             time_spent_in_state_secs: {
               value: timeSpentInStateSecs
             }
-          }
+          },
+          CURRENT_ACTION_SCHEMA_VERSION
         ));
 
         if (destStateName === stateName) {
@@ -162,15 +175,14 @@ oppia.factory('PlaythroughService', [
               visitedStates.push(destStateName);
               var cycleString =
                 visitedStates.slice(
-                  cycleStartIndex,
-                  visitedStates.length - cycleStartIndex).toString();
+                  cycleStartIndex, visitedStates.length).toString();
               if (cycleIdentifier.cycle === cycleString) {
                 cycleIdentifier.num_cycles += 1;
               } else {
                 cycleIdentifier.cycle = cycleString;
                 cycleIdentifier.num_cycles = 1;
               }
-              visitedStates = [];
+              visitedStates = [destStateName];
             } else {
               visitedStates.push(destStateName);
             }
@@ -179,8 +191,8 @@ oppia.factory('PlaythroughService', [
       },
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
-        playthrough.actions.push(new LearnerAction(
-          ACTION_TYPE_EXPLORATION_QUIT, CURRENT_LEARNER_ACTION_SCHEMA_VERSION,
+        playthrough.actions.push(new LearnerActionObjectFactory(
+          ACTION_TYPE_EXPLORATION_QUIT,
           {
             state_name: {
               value: stateName
@@ -188,14 +200,15 @@ oppia.factory('PlaythroughService', [
             time_spent_in_state_secs: {
               value: timeSpentInStateSecs
             }
-          }
+          },
+          CURRENT_ACTION_SCHEMA_VERSION
         ));
       },
       recordPlaythrough: function() {
         if (playthrough.playthroughId) {
           $http.post(getFullPlaythroughUrl(), {
             playthrough_data: playthrough.convertToBackendDict(),
-            issue_schema_version: CURRENT_EXPLORATION_ISSUE_SCHEMA_VERSION
+            issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
           });
           return;
         }
@@ -203,7 +216,7 @@ oppia.factory('PlaythroughService', [
         if (playthrough.issueType) {
           $http.post(getFullPlaythroughUrl(), {
             playthrough_data: playthrough.convertToBackendDict(),
-            issue_schema_version: CURRENT_EXPLORATION_ISSUE_SCHEMA_VERSION
+            issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
           }).then(function(response) {
             playthrough.playthroughId = response.playthroughId;
           });
