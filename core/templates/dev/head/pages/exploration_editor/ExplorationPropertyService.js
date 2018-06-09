@@ -203,15 +203,3 @@ oppia.factory('ExplorationLanguageCodeService', [
     return child;
   }
 ]);
-
-// A data service that stores the name of the exploration's initial state.
-// NOTE: This service does not perform validation. Users of this service
-// should ensure that new initial state names passed to the service are
-// valid.
-oppia.factory('ExplorationInitStateNameService', [
-  'ExplorationPropertyService', function(ExplorationPropertyService) {
-    var child = Object.create(ExplorationPropertyService);
-    child.propertyName = 'init_state_name';
-    return child;
-  }
-]);
