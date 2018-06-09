@@ -16,7 +16,7 @@
 
 """Tests for user dashboard computations."""
 
-from collections import defaultdict
+import collections
 
 from core import jobs_registry
 from core.domain import collection_services
@@ -594,8 +594,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserStatsAggregatorTest, self).setUp()
-        self.num_completions = defaultdict(int)
-        self.num_starts = defaultdict(int)
+        self.num_completions = collections.defaultdict(int)
+        self.num_starts = collections.defaultdict(int)
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
 
