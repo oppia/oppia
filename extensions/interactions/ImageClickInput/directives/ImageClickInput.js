@@ -23,12 +23,12 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT', 'ImagePreloaderService',
+  'ImagePreloaderService', 'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT',
   'LOADING_INDICATOR_URL',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT, ImagePreloaderService,
+      ImagePreloaderService, EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT,
       LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
@@ -63,15 +63,11 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               (loadingIndicatorSize * 0.5)));
             $scope.loadingIndicatorContainerStyle =
             {
-              'background-color': 'rgba(224,242,241,1)',
               'padding-top': paddingTop + 'px',
               height: $scope.dimensions.height + 'px'
             };
             $scope.loadingIndicatorStyle = {
-              display: 'block',
               height: loadingIndicatorSize + 'px',
-              'margin-left': 'auto',
-              'margin-right': 'auto',
               width: loadingIndicatorSize + 'px'
             };
           }

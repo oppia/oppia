@@ -50,24 +50,20 @@ oppia.directive('oppiaNoninteractiveImage', [
             (loadingIndicatorSize * 0.5)));
           $scope.loadingIndicatorContainerStyle =
           {
-            'background-color': 'rgba(224,242,241,1)',
             'padding-top': paddingTop + 'px',
             height: $scope.dimensions.height + 'px'
           };
           $scope.loadingIndicatorStyle = {
-            display: 'block',
             height: loadingIndicatorSize + 'px',
-            'margin-left': 'auto',
-            'margin-right': 'auto',
             width: loadingIndicatorSize + 'px'
           };
         }
 
-        ImagePreloaderService.getImageUrl($scope.filepath.name
-        ).then(function(objectUrl) {
-          $scope.isLoadingIndicatorShown = false;
-          $scope.imageUrl = objectUrl;
-        });
+        ImagePreloaderService.getImageUrl($scope.filepath.name)
+          .then(function(objectUrl) {
+            $scope.isLoadingIndicatorShown = false;
+            $scope.imageUrl = objectUrl;
+          });
 
         $scope.imageCaption = '';
         if ($attrs.captionWithValue) {
