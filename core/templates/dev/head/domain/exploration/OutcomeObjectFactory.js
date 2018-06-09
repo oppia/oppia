@@ -77,6 +77,17 @@ oppia.factory('OutcomeObjectFactory', [
         outcomeDict.missing_prerequisite_skill_id);
     };
 
+    Outcome.createSampleBackendDict = function() {
+      return {
+        dest: 'END',
+        feedback: SubtitledHtmlObjectFactory.createSampleBackendDict(),
+        labelled_as_correct: false,
+        param_changes: [],
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
+      };
+    };
+
     return Outcome;
   }
 ]);
