@@ -19,7 +19,7 @@
 oppia.factory('StateTopAnswersStatsBackendApiService', [
   '$http', 'UrlInterpolationService', function($http, UrlInterpolationService) {
     return {
-      fetchExploration: function(explorationId) {
+      fetchStats: function(explorationId) {
         return $http.get(
           UrlInterpolationService.interpolateUrl(
             '/createhandler/state_answer_stats/<exploration_id>', {

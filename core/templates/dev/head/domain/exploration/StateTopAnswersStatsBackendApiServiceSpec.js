@@ -31,7 +31,7 @@ describe('StateTopAnswersStatsBackendApiService', function() {
     this.$httpBackend.verifyNoOutstandingRequest();
   });
 
-  describe('.fetchExploration', function() {
+  describe('.fetchStats', function() {
     beforeEach(function() {
       this.sampleData = {
         answers: {
@@ -51,7 +51,7 @@ describe('StateTopAnswersStatsBackendApiService', function() {
         '/createhandler/state_answer_stats/7'
       ).respond(this.sampleData);
 
-      this.StateTopAnswersStatsBackendApiService.fetchExploration('7').then(
+      this.StateTopAnswersStatsBackendApiService.fetchStats('7').then(
         successHandler, failureHandler);
       this.$httpBackend.flush();
 

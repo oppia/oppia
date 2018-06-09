@@ -211,7 +211,7 @@ oppia.controller('ExplorationEditor', [
 
           if (ExplorationRightsService.isPublic()) {
             // Don't make user wait on stats to begin editing the exploration.
-            StateTopAnswersStatsBackendApiService.fetchExploration(
+            StateTopAnswersStatsBackendApiService.fetchStats(
               $scope.explorationId
             ).then(StateTopAnswersStatsService.init);
           }
