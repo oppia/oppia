@@ -104,118 +104,116 @@ oppia.controller('ExplorationEditor', [
     // Initializes the exploration page using data from the backend. Called on
     // page load.
     $scope.initExplorationPage = function(successCallback) {
-      Promise.join(
-        ExplorationDataService.getData(function(explorationId, lostChanges) {
-          if (!AutosaveInfoModalsService.isModalOpen()) {
-            AutosaveInfoModalsService.showLostChangesModal(
-              lostChanges, explorationId);
-          }
-        }),
-        function(data) {
-          ExplorationStatesService.init(data.states);
+      ExplorationDataService.getData(function(explorationId, lostChanges) {
+        if (!AutosaveInfoModalsService.isModalOpen()) {
+          AutosaveInfoModalsService.showLostChangesModal(
+            lostChanges, explorationId);
+        }
+      }).then(function(data) {
+        ExplorationStatesService.init(data.states);
 
-          ExplorationTitleService.init(data.title);
-          ExplorationCategoryService.init(data.category);
-          ExplorationObjectiveService.init(data.objective);
-          ExplorationLanguageCodeService.init(data.language_code);
-          ExplorationInitStateNameService.init(data.init_state_name);
-          ExplorationTagsService.init(data.tags);
-          ExplorationParamSpecsService.init(
-            ParamSpecsObjectFactory.createFromBackendDict(data.param_specs));
-          ExplorationParamChangesService.init(
-            ParamChangesObjectFactory.createFromBackendList(
-              data.param_changes));
-          ExplorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
-          ExplorationCorrectnessFeedbackService.init(
-            data.correctness_feedback_enabled);
+        ExplorationTitleService.init(data.title);
+        ExplorationCategoryService.init(data.category);
+        ExplorationObjectiveService.init(data.objective);
+        ExplorationLanguageCodeService.init(data.language_code);
+        ExplorationInitStateNameService.init(data.init_state_name);
+        ExplorationTagsService.init(data.tags);
+        ExplorationParamSpecsService.init(
+          ParamSpecsObjectFactory.createFromBackendDict(data.param_specs));
+        ExplorationParamChangesService.init(
+          ParamChangesObjectFactory.createFromBackendList(
+            data.param_changes));
+        ExplorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
+        ExplorationCorrectnessFeedbackService.init(
+          data.correctness_feedback_enabled);
 
-          $scope.explorationTitleService = ExplorationTitleService;
-          $scope.explorationCategoryService = ExplorationCategoryService;
-          $scope.explorationObjectiveService = ExplorationObjectiveService;
-          $scope.ExplorationRightsService = ExplorationRightsService;
-          $scope.explorationInitStateNameService = (
-            ExplorationInitStateNameService);
+        $scope.explorationTitleService = ExplorationTitleService;
+        $scope.explorationCategoryService = ExplorationCategoryService;
+        $scope.explorationObjectiveService = ExplorationObjectiveService;
+        $scope.ExplorationRightsService = ExplorationRightsService;
+        $scope.explorationInitStateNameService = (
+          ExplorationInitStateNameService);
 
-          $scope.currentUserIsAdmin = data.is_admin;
-          $scope.currentUserIsModerator = data.is_moderator;
+        $scope.currentUserIsAdmin = data.is_admin;
+        $scope.currentUserIsModerator = data.is_moderator;
 
-          $scope.currentUser = data.user;
-          $scope.currentVersion = data.version;
+        $scope.currentUser = data.user;
+        $scope.currentVersion = data.version;
 
-          ExplorationAdvancedFeaturesService.init(data);
-          ExplorationRightsService.init(
-            data.rights.owner_names, data.rights.editor_names,
-            data.rights.viewer_names, data.rights.status,
-            data.rights.cloned_from, data.rights.community_owned,
-            data.rights.viewable_if_private);
-          UserEmailPreferencesService.init(
-            data.email_preferences.mute_feedback_notifications,
-            data.email_preferences.mute_suggestion_notifications);
+        ExplorationAdvancedFeaturesService.init(data);
+        ExplorationRightsService.init(
+          data.rights.owner_names, data.rights.editor_names,
+          data.rights.viewer_names, data.rights.status,
+          data.rights.cloned_from, data.rights.community_owned,
+          data.rights.viewable_if_private);
+        UserEmailPreferencesService.init(
+          data.email_preferences.mute_feedback_notifications,
+          data.email_preferences.mute_suggestion_notifications);
 
-          if (GLOBALS.can_edit) {
-            EditabilityService.markEditable();
-          }
+        if (GLOBALS.can_edit) {
+          EditabilityService.markEditable();
+        }
 
-          GraphDataService.recompute();
+        GraphDataService.recompute();
 
-          if (!EditorStateService.getActiveStateName() ||
-            !ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName())) {
-            EditorStateService.setActiveStateName(
-              ExplorationInitStateNameService.displayed);
-          }
-
-          if (!RouterService.isLocationSetToNonStateEditorTab() &&
-            !data.states.hasOwnProperty(
-              RouterService.getCurrentStateFromLocationPath('gui'))) {
-            if (ThreadDataService.getOpenThreadsCount() > 0) {
-              RouterService.navigateToFeedbackTab();
-            } else {
-              RouterService.navigateToMainTab();
-            }
-          }
-
-          ExplorationWarningsService.updateWarnings();
-
-          // Initialize changeList by draft changes if they exist.
-          if (data.draft_changes !== null) {
-            ChangeListService.loadAutosavedChangeList(data.draft_changes);
-          }
-
-          if (data.is_version_of_draft_valid === false &&
-            data.draft_changes !== null &&
-            data.draft_changes.length > 0) {
-            // Show modal displaying lost changes if the version of draft
-            // changes is invalid, and draft_changes is not `null`.
-            AutosaveInfoModalsService.showVersionMismatchModal(
-              ChangeListService.getChangeList());
-            return;
-          }
-
-          $scope.$broadcast('refreshStatisticsTab');
-          $scope.$broadcast('refreshVersionHistory', {
-            forceRefresh: true
-          });
-
-          if (ExplorationStatesService.getState(
+        if (!EditorStateService.getActiveStateName() ||
+          !ExplorationStatesService.getState(
             EditorStateService.getActiveStateName())) {
-            $scope.$broadcast('refreshStateEditor');
-          }
+          EditorStateService.setActiveStateName(
+            ExplorationInitStateNameService.displayed);
+        }
 
-          if (successCallback) {
-            successCallback();
+        if (!RouterService.isLocationSetToNonStateEditorTab() &&
+          !data.states.hasOwnProperty(
+            RouterService.getCurrentStateFromLocationPath('gui'))) {
+          if (ThreadDataService.getOpenThreadsCount() > 0) {
+            RouterService.navigateToFeedbackTab();
+          } else {
+            RouterService.navigateToMainTab();
           }
+        }
 
-          StateEditorTutorialFirstTimeService.init(
-            data.show_state_editor_tutorial_on_load, $scope.explorationId);
+        ExplorationWarningsService.updateWarnings();
 
-          if (ExplorationRightsService.isPublic()) {
-            // Don't make user wait on stats to begin editing the exploration.
-            StateTopAnswersStatsBackendApiService.fetchStats(
-              $scope.explorationId
-            ).then(StateTopAnswersStatsService.init);
-          }
+        // Initialize changeList by draft changes if they exist.
+        if (data.draft_changes !== null) {
+          ChangeListService.loadAutosavedChangeList(data.draft_changes);
+        }
+
+        if (data.is_version_of_draft_valid === false &&
+          data.draft_changes !== null &&
+          data.draft_changes.length > 0) {
+          // Show modal displaying lost changes if the version of draft
+          // changes is invalid, and draft_changes is not `null`.
+          AutosaveInfoModalsService.showVersionMismatchModal(
+            ChangeListService.getChangeList());
+          return;
+        }
+
+        $scope.$broadcast('refreshStatisticsTab');
+        $scope.$broadcast('refreshVersionHistory', {
+          forceRefresh: true
         });
+
+        if (ExplorationStatesService.getState(
+          EditorStateService.getActiveStateName())) {
+          $scope.$broadcast('refreshStateEditor');
+        }
+
+        if (successCallback) {
+          successCallback();
+        }
+
+        StateEditorTutorialFirstTimeService.init(
+          data.show_state_editor_tutorial_on_load, $scope.explorationId);
+
+        if (ExplorationRightsService.isPublic()) {
+          // Don't make user wait on stats to begin editing the exploration.
+          StateTopAnswersStatsBackendApiService.fetchStats(
+            $scope.explorationId
+          ).then(StateTopAnswersStatsService.init);
+        }
+      });
     };
 
     $scope.initExplorationPage();
