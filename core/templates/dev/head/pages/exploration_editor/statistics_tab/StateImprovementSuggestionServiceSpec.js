@@ -32,15 +32,23 @@ describe('StateImprovementSuggestionService', function() {
     var statesDict1 = {
       state: {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          'content': {},
+          'default_outcome': {},
+          'feedback_1': {}
         },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
             outcome: {
               dest: 'unused',
-              feedback: [''],
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -54,7 +62,10 @@ describe('StateImprovementSuggestionService', function() {
           }],
           default_outcome: {
             dest: 'state',
-            feedback: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             param_changes: []
           },
           hints: []
@@ -67,15 +78,23 @@ describe('StateImprovementSuggestionService', function() {
     var statesDict2 = {
       initial: {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          'content': {},
+          'default_outcome': {},
+          'feedback_1': {}
         },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
             outcome: {
               dest: 'unused',
-              feedback: [''],
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -89,7 +108,10 @@ describe('StateImprovementSuggestionService', function() {
           }],
           default_outcome: {
             dest: 'end',
-            feedback: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             param_changes: []
           },
           hints: []
@@ -98,15 +120,23 @@ describe('StateImprovementSuggestionService', function() {
       },
       end: {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          'content': {},
+          'default_outcome': {},
+          'feedback_1': {}
         },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
             outcome: {
               dest: 'unused',
-              feedback: [''],
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -120,7 +150,10 @@ describe('StateImprovementSuggestionService', function() {
           }],
           default_outcome: {
             dest: null,
-            feedback: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             param_changes: []
           },
           hints: []
@@ -133,15 +166,23 @@ describe('StateImprovementSuggestionService', function() {
     var statesDict3 = {
       'State 1': {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          'content': {},
+          'default_outcome': {},
+          'feedback_1': {}
         },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
             outcome: {
               dest: 'next state',
-              feedback: [''],
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -155,7 +196,10 @@ describe('StateImprovementSuggestionService', function() {
           }],
           default_outcome: {
             dest: 'State 1',
-            feedback: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             param_changes: []
           },
           hints: []
@@ -164,15 +208,23 @@ describe('StateImprovementSuggestionService', function() {
       },
       'State 2': {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          'content': {},
+          'default_outcome': {},
+          'feedback_1': {}
         },
         interaction: {
           id: 'RuleTest',
           answer_groups: [{
             outcome: {
               dest: 'next state',
-              feedback: [''],
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -186,7 +238,10 @@ describe('StateImprovementSuggestionService', function() {
           }],
           default_outcome: {
             dest: 'State 2',
-            feedback: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             param_changes: []
           },
           hints: []

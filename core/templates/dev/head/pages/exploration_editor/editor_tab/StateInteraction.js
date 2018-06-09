@@ -255,10 +255,6 @@ oppia.controller('StateInteraction', [
                       value: angular.copy(caSpec.default_value)
                     };
                   });
-                  stateContentIdsToAudioTranslationsService.displayed.
-                    deleteAllFeedbackContentId();
-                  stateContentIdsToAudioTranslationsService
-                    .saveDisplayedValue();
                 }
 
                 if (Object.keys(
@@ -363,6 +359,8 @@ oppia.controller('StateInteraction', [
           stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
             solutionContentId);
         }
+        stateContentIdsToAudioTranslationsService.displayed.
+                    deleteAllFeedbackContentId();
         stateSolutionService.displayed = null;
         InteractionDetailsCacheService.removeDetails(
           stateInteractionIdService.savedMemento);

@@ -66,13 +66,20 @@ describe('Extracting Image file names in the state service', function() {
         'State 1': {
           param_changes: [],
           content: {
-            html: '',
-            audio_translations: {}
+            content_id: 'content',
+            html: ''
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {}
           },
           interaction: {
             id: 'Continue',
             default_outcome: {
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               dest: 'State 3',
               param_changes: []
             },
@@ -91,8 +98,12 @@ describe('Extracting Image file names in the state service', function() {
         'State 3': {
           param_changes: [],
           content: {
-            html: 'Congratulations, you have finished!',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'Congratulations, you have finished!'
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {}
           },
           interaction: {
             id: 'EndExploration',
@@ -113,15 +124,21 @@ describe('Extracting Image file names in the state service', function() {
           classifier_model_id: null,
           param_changes: [],
           content: {
-            html: 'Multiple Choice',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'Multiple Choice'
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {},
+            'feedback_1': {},
+            'feedback_2': {}
           },
           interaction: {
             id: 'MultipleChoiceInput',
             default_outcome: {
               dest: 'Introduction',
               feedback: {
-                audio_translation: {},
+                content_id: 'default_outcome',
                 html: 'Try Again!'
               }
             },
@@ -144,7 +161,7 @@ describe('Extracting Image file names in the state service', function() {
                 outcome: {
                   dest: 'State 4',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feedback_1',
                     html: '<p>We are going to ItemSelection' +
                           '<oppia-noninteractive-image filepath-with-value=' +
                           '"&amp;quot;sIOutcomeFeedback.png&amp;quot;">' +
@@ -167,7 +184,7 @@ describe('Extracting Image file names in the state service', function() {
                 outcome: {
                   dest: 'State 5',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feedback_2',
                     html: "Let's go to state 5 ImageAndRegion"
                   },
                   param_changes: [],
@@ -190,20 +207,26 @@ describe('Extracting Image file names in the state service', function() {
         'State 4': {
           param_changes: [],
           content: {
+            content_id: 'content',
             html: '<p><oppia-noninteractive-image filepath-with-value="&amp;' +
                   'quot;s4Content.png&amp;quot;">' +
-                  '</oppia-noninteractive-image></p>',
-            audio_translations: {}
+                  '</oppia-noninteractive-image></p>'
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {},
+            'feedback_1': {},
+            'feedback_2': {}
           },
           interaction: {
             id: 'ItemSelectionInput',
             default_outcome: {
               feedback: {
+                content_id: 'content',
                 html: '<p>Try Again! <oppia-noninteractive-image' +
                       'filepath-with-value="&amp;quot;' +
                       's4DefaultOutcomeFeedback.png&amp;quot;">' +
-                      '</oppia-noninteractive-image></p>',
-                audio_translation: {}
+                      '</oppia-noninteractive-image></p>'
               },
               dest: 'State 4',
               param_changes: []
@@ -234,7 +257,7 @@ describe('Extracting Image file names in the state service', function() {
                 outcome: {
                   dest: 'State 6',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feedback_1',
                     html: "It is choice number 1. Let's go to the Text Input"
                   },
                   param_changes: [],
@@ -258,7 +281,7 @@ describe('Extracting Image file names in the state service', function() {
                 outcome: {
                   dest: 'State 1',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feedback_2',
                     html: 'It is choice number 2'
                   },
                   param_changes: [],
@@ -284,8 +307,17 @@ describe('Extracting Image file names in the state service', function() {
           classifier_model_id: null,
           param_changes: [],
           content: {
-            html: '',
-            audio_translation: {}
+            content_id: 'content',
+            html: ''
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {},
+            'feedback_1': {},
+            'feedback_2': {},
+            'feedback_3': {},
+            'feedback_4': {},
+            'feedback_5': {}
           },
           interaction: {
             id: 'ImageClickInput',
@@ -293,8 +325,8 @@ describe('Extracting Image file names in the state service', function() {
             default_outcome: {
               dest: 'State 5',
               feedback: {
-                html: 'Try Again!',
-                audio_translation: {}
+                content_id: 'content',
+                html: 'Try Again!'
               }
             },
             answer_groups: [
@@ -303,7 +335,7 @@ describe('Extracting Image file names in the state service', function() {
                 outcome: {
                   dest: 'State 5',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feeedback_1',
                     html: '<p>That is the class definition. Try again.</p>'
                   },
                   param_changes: [],
@@ -321,7 +353,7 @@ describe('Extracting Image file names in the state service', function() {
                 outcome: {
                   dest: 'State 5',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feeedback_2',
                     html: '<p>That is a function, which is close to what you' +
                           'are looking for. Try again!</p>'
                   },
@@ -340,7 +372,7 @@ describe('Extracting Image file names in the state service', function() {
                 outcome: {
                   dest: 'State 5',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feeedback_3',
                     html: '<p>That is the class docstring. Try again.</p>'
                   },
                   param_changes: [],
@@ -358,7 +390,7 @@ describe('Extracting Image file names in the state service', function() {
                 outcome: {
                   dest: 'State 5',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feeedback_4',
                     html: "<p>That's a classmethod. It does execute code," +
                           "but it doesn't construct anything. Try again!</p>"
                   },
@@ -377,7 +409,7 @@ describe('Extracting Image file names in the state service', function() {
                 outcome: {
                   dest: 'State 1',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feeedback_5',
                     html: '<p>You found it! This is the code responsible for' +
                           'constructing a new class object.</p>'
                   },
@@ -459,16 +491,25 @@ describe('Extracting Image file names in the state service', function() {
         'State 6': {
           param_changes: [],
           content: {
-            html: '<p>Text Input Content</p>',
-            audio_translations: {}
+            content_id: 'content',
+            html: '<p>Text Input Content</p>'
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {},
+            'feedback_1': {},
+            'feedback_2': {},
+            'hint_1': {},
+            'solution': {}
           },
           interaction: {
             id: 'TextInput',
             default_outcome: {
               dest: 'State 6',
-              feedback: [
-                '<p>Try again.</p>'
-              ],
+              feedback: {
+                content_id: 'default_outcome',
+                html: '<p>Try again.</p>'
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -491,9 +532,10 @@ describe('Extracting Image file names in the state service', function() {
               }],
               outcome: {
                 dest: 'State 1',
-                feedback: [
-                  "<p>Let's go to State 1</p>"
-                ],
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: "<p>Let's go to State 1</p>"
+                },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null
@@ -507,9 +549,10 @@ describe('Extracting Image file names in the state service', function() {
               }],
               outcome: {
                 dest: 'State 1',
-                feedback: [
-                  "<p>Let's go to State 1</p>"
-                ],
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: "<p>Let's go to State 1</p>"
+                },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null
@@ -517,17 +560,17 @@ describe('Extracting Image file names in the state service', function() {
             }],
             hints: [{
               hint_content: {
+                content_id: 'hint_1',
                 html: '<p><oppia-noninteractive-image filepath-with-value="' +
                       '&amp;quot;s6Hint1.png&amp;quot;">' +
-                      '</oppia-noninteractive-image></p>',
-                audio_translations: {}
+                      '</oppia-noninteractive-image></p>'
               }
             }],
             solution: {
               answer_is_exclusive: false,
               correct_answer: 'cat',
               explanation: {
-                audio_translations: {},
+                content_id: 'solution',
                 html: '<p><oppia-noninteractive-image filepath-with-value="' +
                       '&amp;quot;s6SolutionExplanation.png&amp;quot;">' +
                       '</oppia-noninteractive-image></p>'

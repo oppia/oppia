@@ -47,8 +47,14 @@ describe('Answer classification service with string classifier disabled',
       stateName = 'stateName';
       state = sof.createFromBackendDict(stateName, {
         content: {
-          html: 'content',
-          audio_translations: {}
+          contnet_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          'content': {},
+          'default_outcome': {},
+          'feedback_1': {},
+          'feedback_2': {}
         },
         interaction: {
           id: 'RuleTest',
@@ -56,8 +62,8 @@ describe('Answer classification service with string classifier disabled',
             outcome: {
               dest: 'outcome 1',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_1',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -74,8 +80,8 @@ describe('Answer classification service with string classifier disabled',
             outcome: {
               dest: 'outcome 2',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_2',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -102,8 +108,8 @@ describe('Answer classification service with string classifier disabled',
           default_outcome: {
             dest: 'default',
             feedback: {
-              html: '',
-              audio_translations: {}
+              content_id: 'default_outcome',
+              html: ''
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -139,22 +145,25 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 10, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 1', '', []), 0, 0, EXPLICIT_CLASSIFICATION
-      ));
+        oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
+          EXPLICIT_CLASSIFICATION)
+      );
 
       expect(
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 5, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 2', '', []), 1, 0, EXPLICIT_CLASSIFICATION
-      ));
+        oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
+          EXPLICIT_CLASSIFICATION)
+      );
 
       expect(
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 6, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 2', '', []), 1, 1, EXPLICIT_CLASSIFICATION
-      ));
+        oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
+          EXPLICIT_CLASSIFICATION)
+      );
     });
 
     it('should return the default rule if no answer group matches', function() {
@@ -162,16 +171,22 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 7, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
-      ));
+        oof.createNew('default', 'default_outcome', '', []), 2, 0,
+          DEFAULT_OUTCOME_CLASSIFICATION)
+      );
     });
 
     it('should fail if no answer group matches and no default rule is ' +
        'provided', function() {
       var state2 = sof.createFromBackendDict(stateName, {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          'content': {},
+          'default_outcome': {},
+          'feedback_1': {}
         },
         interaction: {
           id: 'RuleTest',
@@ -179,8 +194,8 @@ describe('Answer classification service with string classifier disabled',
             outcome: {
               dest: 'outcome 1',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_1',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -197,8 +212,8 @@ describe('Answer classification service with string classifier disabled',
           default_outcome: {
             dest: 'default',
             feedback: {
-              html: '',
-              audio_translations: {}
+              content_id: 'default_outcome',
+              html: ''
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -263,8 +278,14 @@ describe('Answer classification service with string classifier enabled',
       stateName = 'stateName';
       state = sof.createFromBackendDict(stateName, {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          'content': {},
+          'default_outcome': {},
+          'feedback_1': {},
+          'feedback_2': {}
         },
         interaction: {
           id: 'TrainableInteraction',
@@ -272,8 +293,8 @@ describe('Answer classification service with string classifier enabled',
             outcome: {
               dest: 'outcome 1',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_1',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -290,8 +311,8 @@ describe('Answer classification service with string classifier enabled',
             outcome: {
               dest: 'outcome 2',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_2',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -313,8 +334,8 @@ describe('Answer classification service with string classifier enabled',
           default_outcome: {
             dest: 'default',
             feedback: {
-              html: '',
-              audio_translations: {}
+              content_id: 'default_outcome',
+              html: ''
             },
             labelled_as_correct: false,
             param_changes: [],
@@ -376,8 +397,9 @@ describe('Answer classification service with string classifier enabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state2, 0, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
-      ));
+        oof.createNew('default', 'default_outcome', '', []), 2, 0,
+          DEFAULT_OUTCOME_CLASSIFICATION)
+      );
     });
   }
 );
@@ -415,8 +437,14 @@ describe('Answer classification service with training data classification',
       stateName = 'stateName';
       state = sof.createFromBackendDict(stateName, {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          'content': {},
+          'default_outcome': {},
+          'feedback_1': {},
+          'feedback_2': {}
         },
         interaction: {
           id: 'TrainableInteraction',
@@ -424,8 +452,8 @@ describe('Answer classification service with training data classification',
             outcome: {
               dest: 'outcome 1',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_1',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -443,8 +471,8 @@ describe('Answer classification service with training data classification',
             outcome: {
               dest: 'outcome 2',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_2',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -462,8 +490,8 @@ describe('Answer classification service with training data classification',
           default_outcome: {
             dest: 'default',
             feedback: {
-              html: '',
-              audio_translations: {}
+              content_id: 'default_outcome',
+              html: ''
             },
             labelled_as_correct: false,
             param_changes: [],

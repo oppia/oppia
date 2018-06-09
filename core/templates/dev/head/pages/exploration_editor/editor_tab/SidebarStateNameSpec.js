@@ -57,14 +57,21 @@ describe('Sidebar state name controller', function() {
       ess.init({
         'First State': {
           content: {
-            html: 'First State Content',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'First State Content'
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {}
           },
           interaction: {
             answer_groups: [],
             default_outcome: {
               dest: 'Second State',
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html:''
+              },
               param_changes: []
             },
             hints: []
@@ -73,14 +80,21 @@ describe('Sidebar state name controller', function() {
         },
         'Second State': {
           content: {
-            html: 'Second State Content',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'Second State Content'
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {}
           },
           interaction: {
             answer_groups: [],
             default_outcome: {
               dest: 'Second State',
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html:''
+              },
               param_changes: []
             },
             hints: []
@@ -89,14 +103,21 @@ describe('Sidebar state name controller', function() {
         },
         'Third State': {
           content: {
-            html: 'This is some content.',
-            audio_translations: {}
+            contnet_id: 'content',
+            html: 'This is some content.'
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {}
           },
           interaction: {
             answer_groups: [],
             default_outcome: {
               dest: 'Second State',
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html:''
+              },
               param_changes: []
             },
             hints: []

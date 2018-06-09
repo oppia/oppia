@@ -63,19 +63,26 @@ describe('Audio preloader service', function() {
         'State 1': {
           param_changes: [],
           content: {
-            html: '<p>State 1 Content</p>',
-            audio_translations: {
+            content_id: 'content',
+            html: '<p>State 1 Content</p>'
+          },
+          content_ids_to_audio_translations: {
+            'content': {
               en: {
                 filename: 'en-1.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
               }
-            }
+            },
+            'default_outcome': {}
           },
           interaction: {
             id: 'Continue',
             default_outcome: {
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               dest: 'State 3',
               param_changes: []
             },
@@ -94,8 +101,11 @@ describe('Audio preloader service', function() {
         'State 3': {
           param_changes: [],
           content: {
+            content_id: 'content',
             html: 'Congratulations, you have finished!',
-            audio_translations: {
+          },
+          content_ids_to_audio_translations: {
+            'content': {
               en: {
                 filename: 'en-3.mp3',
                 file_size_bytes: 120000,
@@ -121,19 +131,26 @@ describe('Audio preloader service', function() {
         'State 2': {
           param_changes: [],
           content: {
-            html: '<p>State 2 Content</p>',
-            audio_translations: {
+            content_id: 'content',
+            html: '<p>State 2 Content</p>'
+          },
+          content_ids_to_audio_translations: {
+            'content': {
               en: {
                 filename: 'en-2.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
               }
-            }
+            },
+            'default_outcome': {}
           },
           interaction: {
             id: 'Continue',
             default_outcome: {
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               dest: 'State 3',
               param_changes: []
             },
@@ -152,22 +169,28 @@ describe('Audio preloader service', function() {
         Introduction: {
           param_changes: [],
           content: {
+            content_id: 'contnet',
             html: '<p>Introduction Content</p>',
-            audio_translations: {
+          },
+          content_ids_to_audio_translations: {
+            'content': {
               en: {
                 filename: 'en-0.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
               }
-            }
+            },
+            'default_outcome':{},
+            'feedback_1': {}
           },
           interaction: {
             id: 'TextInput',
             default_outcome: {
               dest: 'Introduction',
-              feedback: [
-                '<p>Try again.</p>'
-              ],
+              feedback: {
+                content_id: 'default_outcome',
+                html: '<p>Try again.</p>'
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -191,9 +214,10 @@ describe('Audio preloader service', function() {
               }],
               outcome: {
                 dest: 'State 1',
-                feedback: [
-                  "<p>Let's go to State 1</p>"
-                ],
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: "<p>Let's go to State 1</p>"
+                },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null
@@ -207,9 +231,10 @@ describe('Audio preloader service', function() {
               }],
               outcome: {
                 dest: 'State 2',
-                feedback: [
-                  "<p>Let's go to State 2</p>"
-                ],
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: "<p>Let's go to State 2</p>"
+                },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null

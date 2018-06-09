@@ -68,8 +68,13 @@ describe('State Interaction controller', function() {
       ess.init({
         'First State': {
           content: {
-            html: 'First State Content',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'First State Content'
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {},
+            'feedback_1': {}
           },
           interaction: {
             id: 'TextInput',
@@ -78,8 +83,8 @@ describe('State Interaction controller', function() {
               outcome: {
                 dest: 'default',
                 feedback: {
-                  html: '',
-                  audio_translations: {}
+                  content_id: 'feedback_1',
+                  html: ''
                 },
                 labelled_as_correct: false,
                 param_changes: [],
@@ -89,8 +94,8 @@ describe('State Interaction controller', function() {
             default_outcome: {
               dest: 'default',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'default_outcome',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
@@ -102,8 +107,13 @@ describe('State Interaction controller', function() {
         },
         'End State': {
           content: {
-            html: '',
-            audio_translations: {}
+            content_id: 'content',
+            html: ''
+          },
+          content_ids_to_audio_translations: {
+            'content': {},
+            'default_outcome': {},
+            'feedback_1': {}
           },
           interaction: {
             id: 'TextInput',
@@ -112,8 +122,8 @@ describe('State Interaction controller', function() {
               outcome: {
                 dest: 'default',
                 feedback: {
-                  html: '',
-                  audio_translations: {}
+                  content_id: 'feedback_1',
+                  html: ''
                 },
                 labelled_as_correct: false,
                 param_changes: [],
@@ -123,8 +133,8 @@ describe('State Interaction controller', function() {
             default_outcome: {
               dest: 'default',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'default_outcome',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
