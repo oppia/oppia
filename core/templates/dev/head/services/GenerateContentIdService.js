@@ -28,7 +28,7 @@ oppia.factory('GenerateContentIdService', [
       var searchKey = componentName + '_';
       var count = 0;
       for (contentId in contentIdList) {
-        if (contentIdList[contentId].indexOf(searchKey) == 0) {
+        if (contentIdList[contentId].indexOf(searchKey) === 0) {
           var tempCount = parseInt(contentIdList[contentId].split('_')[1]);
           if (tempCount > count) {
             count = tempCount;
@@ -39,8 +39,8 @@ oppia.factory('GenerateContentIdService', [
     };
 
     var _generateUniqueId = function(componentName) {
-      if (componentName == COMPONENT_NAME_FEEDBACK ||
-          componentName == COMPONENT_NAME_HINT) {
+      if (componentName === COMPONENT_NAME_FEEDBACK ||
+          componentName === COMPONENT_NAME_HINT) {
         return generateIdForHintOrFeedback(componentName);
       }
     };

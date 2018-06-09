@@ -36,14 +36,14 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
-fdescribe('Exploration history', function() {
+describe('Exploration history', function() {
   var explorationPlayerPage = null;
 
   beforeEach(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  fit('should display the history', function() {
+  it('should display the history', function() {
     users.createUser('user@historyTab.com', 'userHistoryTab');
     users.login('user@historyTab.com');
     workflow.createExploration();

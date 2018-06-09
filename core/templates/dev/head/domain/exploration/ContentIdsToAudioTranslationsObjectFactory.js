@@ -97,7 +97,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
         var ContentIdList = this.getAllContentId();
         var searchKey = COMPONENT_NAME_FEEDBACK + '_';
         for (index in ContentIdList) {
-          if (ContentIdList[index].indexOf(searchKey) == 0) {
+          if (ContentIdList[index].indexOf(searchKey) === 0) {
             this.deleteContentId(ContentIdList[index]);
           }
         }

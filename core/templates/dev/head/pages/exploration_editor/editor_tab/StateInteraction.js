@@ -353,8 +353,6 @@ oppia.controller('StateInteraction', [
           stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
             solutionContentId);
         }
-        stateContentIdsToAudioTranslationsService.displayed.
-          deleteAllFeedbackContentId();
         stateSolutionService.displayed = null;
         InteractionDetailsCacheService.removeDetails(
           stateInteractionIdService.savedMemento);

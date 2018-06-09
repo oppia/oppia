@@ -178,7 +178,6 @@ oppia.factory('ChangeListService', [
           AlertsService.addWarning('Invalid state property: ' + backendName);
           return;
         }
-        console.log(stateName, backendName, newValue, oldValue);
         addChange({
           cmd: CMD_EDIT_STATE_PROPERTY,
           new_value: angular.copy(newValue),
