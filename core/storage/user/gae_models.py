@@ -681,7 +681,8 @@ class UserSkillMasteryModel(base_models.BaseModel):
             model_id: str. The model id of the user and the skill.
 
         Returns:
-            dict. Skill mastery model with id equal to model_id.
+            UserSkillMasteryModel. Skill mastery model with id
+                equal to model_id.
         """
         return cls.get_by_id(model_id)
 
@@ -694,9 +695,9 @@ class UserSkillMasteryModel(base_models.BaseModel):
                 skills.
 
         Returns:
-            list(dict). All skill mastery models for all model_id in the list
-                model_ids are returned as a list where each element
-                is one skill mastery model.
+            list(UserSkillMasteryModel). All skill mastery models for
+                all model_id in the list model_ids are returned as a
+                list where each element is one skill mastery model.
         """
         model_id_keys = [ndb.Key(cls, model_id) for model_id in model_ids]
         return ndb.get_multi(model_id_keys)
