@@ -26,7 +26,7 @@ oppia.factory('ExplorationStatesService', [
   'ExplorationInitStateNameService', 'SolutionValidityService',
   'StatesObjectFactory', 'UrlInterpolationService', 'ValidatorsService',
   function(
-      $filter, $injector, $location, $log, $q, $rootScope, $uibModal,
+      $filter, $http, $injector, $location, $log, $q, $rootScope, $uibModal,
       AlertsService, AngularNameService, AnswerClassificationService,
       AnswerStatsFactory ChangeListService, EditorStateService,
       ExplorationContextService, ExplorationInitStateNameService,
