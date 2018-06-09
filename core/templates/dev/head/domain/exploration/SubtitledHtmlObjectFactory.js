@@ -133,10 +133,10 @@ oppia.factory('SubtitledHtmlObjectFactory', [
         subtitledHtmlBackendDict.html, audioTranslations);
     };
 
-    SubtitledHtml.createSampleBackendDict = function() {
+    SubtitledHtml.createSampleBackendDict = function(html) {
       return {
         audio_translations: {},
-        html: ''
+        html: html || ''
       };
     };
 
