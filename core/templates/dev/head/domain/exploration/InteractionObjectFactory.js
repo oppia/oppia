@@ -52,48 +52,41 @@ oppia.factory('InteractionObjectFactory', [
       };
     };
 
-    Interaction.createFromBackendDict = function(backendDict) {
+    Interaction.createFromBackendDict = function(interactionDict) {
+      var defaultOutcome;
+      if (interactionDict.default_outcome) {
+        defaultOutcome = OutcomeObjectFactory.createFromBackendDict(
+          interactionDict.default_outcome);
+      } else {
+        defaultOutcome = null;
+      }
       return new Interaction(
-        backendDict.answer_groups.map(function(answerGroupBackendDict) {
-          return AnswerGroupObjectFactory.createFromBackendDict(
-            answerGroupBackendDict);
-        }),
-        backendDict.confirmed_unclassified_answers,
-        backendDict.customization_args,
-        backendDict.default_outcome ?
-          OutcomeObjectFactory.createFromBackendDict(
-            backendDict.default_outcome) : null,
-        backendDict.hints.map(function(hintBackendDict) {
-          return HintObjectFactory.createFromBackendDict(hintBackendDict);
-        }),
-        backendDict.id,
-        backendDict.solution ?
-          SolutionObjectFactory.createFromBackendDict(backendDict.solution) :
-          null
-      );
-    };
-
-    /** Use this function to create fake data for testing. */
-    Interaction.createSampleBackendDict = function() {
-      return {
-        answer_groups: [
-          AnswerGroupObjectFactory.createSampleBackendDict()
-        ],
-        confirmed_unclassified_answers: [
-        ],
-        customization_args: [
-        ],
-        default_outcome: OutcomeObjectFactory.createSampleBackendDict(),
-        hints: [
-          HintObjectFactory.createSampleBackendDict()
-        ],
-        id: 'TextInput',
-        solution: SolutionObjectFactory.createSampleBackendDict()
-      };
+        generateAnswerGroupsFromBackend(interactionDict.answer_groups),
+        interactionDict.confirmed_unclassified_answers,
+        interactionDict.customization_args,
+        defaultOutcome,
+        generateHintsFromBackend(interactionDict.hints),
+        interactionDict.id,
+        interactionDict.solution ? (
+          generateSolutionFromBackend(interactionDict.solution)) : null);
     };
 
     var generateAnswerGroupsFromBackend = function(answerGroupBackendDicts) {
-      return answerGroupBackendDicts;
+      return answerGroupBackendDicts.map(function(
+          answerGroupBackendDict) {
+        return AnswerGroupObjectFactory.createFromBackendDict(
+          answerGroupBackendDict);
+      });
+    };
+
+    var generateHintsFromBackend = function(hintBackendDicts) {
+      return hintBackendDicts.map(function(hintBackendDict) {
+        return HintObjectFactory.createFromBackendDict(hintBackendDict);
+      });
+    };
+
+    var generateSolutionFromBackend = function(solutionBackendDict) {
+      return SolutionObjectFactory.createFromBackendDict(solutionBackendDict);
     };
 
     return Interaction;

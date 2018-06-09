@@ -47,24 +47,19 @@ oppia.factory('AnswerGroupObjectFactory', [
         rules, outcome, trainingData, taggedMisconceptionId);
     };
 
-    AnswerGroup.createFromBackendDict = function(backendDict) {
+    AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
       return new AnswerGroup(
-        backendDict.rule_specs.map(function(ruleBackendDict) {
-          return RuleObjectFactory.createFromBackendDict(ruleBackendDict);
-        }),
-        OutcomeObjectFactory.createFromBackendDict(backendDict.outcome),
-        backendDict.training_data,
-        backendDict.tagged_misconception_id);
+        generateRulesFromBackend(answerGroupBackendDict.rule_specs),
+        OutcomeObjectFactory.createFromBackendDict(
+          answerGroupBackendDict.outcome),
+        answerGroupBackendDict.training_data,
+        answerGroupBackendDict.tagged_misconception_id);
     };
 
-    AnswerGroup.createSampleBackendDict = function() {
-      return {
-        rule_specs: [
-        ],
-        outcome: OutcomeObjectFactory.createSampleBackendDict(),
-        training_data: null, // TODO(brianrodri): Give proper value.
-        tagged_misconception_id: null // TODO(brianrodri): Give proper value.
-      };
+    var generateRulesFromBackend = function(ruleBackendDicts) {
+      return ruleBackendDicts.map(function(ruleBackendDict) {
+        return RuleObjectFactory.createFromBackendDict(ruleBackendDict);
+      });
     };
 
     return AnswerGroup;

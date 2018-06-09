@@ -76,15 +76,5 @@ describe('Solution object factory', function() {
       expect(solution.getSummary('FractionInput')).toEqual(
         'One solution is "1/6". This is the explanation to the answer.');
     });
-
-    describe('.createSampleBackendDict', function() {
-      it('is accepted by .createFromBackendDict', function() {
-        var sampleBackendDict = sof.createSampleBackendDict();
-
-        expect(function() {
-          sof(sampleBackendDict);
-        }).not.toThrow();
-      });
-    })
   });
 });

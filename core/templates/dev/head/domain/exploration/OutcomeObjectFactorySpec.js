@@ -51,14 +51,4 @@ describe('Outcome object factory', function() {
       expect(testOutcome3.hasNonemptyFeedback()).toBe(false);
     }
   );
-
-  describe('.createSampleBackendDict', function() {
-    it('is accepted by .createFromBackendDict', function() {
-      var sampleBackendDict = oof.createSampleBackendDict();
-
-      expect(function() {
-        oof.createFromBackendDict(sampleBackendDict);
-      }).not.toThrow();
-    });
-  });
 });

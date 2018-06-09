@@ -44,14 +44,6 @@ oppia.factory('SolutionObjectFactory', [
           solutionBackendDict.explanation));
     };
 
-    Solution.createSampleBackendDict = function() {
-      return {
-        answer_is_exclusive: true,
-        correct_answer: 'this is the correct answer',
-        explanation: SubtitledHtmlObjectFactory.createSampleBackendDict()
-      };
-    };
-
     Solution.createNew = function(
         answerIsExclusive, correctAnswer, explanationHtml) {
       return new Solution(

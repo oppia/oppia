@@ -214,15 +214,6 @@ oppia.factory('StatesObjectFactory', [
       return new States(stateObjectsDict);
     };
 
-    States.createSampleBackendDict = function(stateNames) {
-      var sampleBackendDict = {};
-      stateNames.forEach(function(stateName) {
-        sampleBackendDict[stateName] =
-          StateObjectFactory.createSampleBackendDict(stateName);
-      });
-      return sampleBackendDict;
-    };
-
     var getNewStateTemplate = function(newStateName) {
       var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
       var newState = StateObjectFactory.createFromBackendDict(newStateName, {

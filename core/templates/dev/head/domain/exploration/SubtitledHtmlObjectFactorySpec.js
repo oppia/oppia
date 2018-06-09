@@ -170,16 +170,5 @@ describe('SubtitledHtml object factory', function() {
       expect(defaultSubtitledHtml.getHtml()).toEqual('test html');
       expect(defaultSubtitledHtml.getBindableAudioTranslations()).toEqual({});
     }));
-
-    describe('.createSampleBackendDict', function() {
-      it('is accepted by .createFromBackendDict', function() {
-        var sampleBackendDict = shof.createSampleBackendDict();
-
-        var that = this;
-        expect(function() {
-          shof.createFromBackendDict(sampleBackendDict);
-        }).not.toThrow();
-      });
-    })
   });
 });

@@ -18,18 +18,17 @@
  */
 
 oppia.factory('ParamChangesObjectFactory', [
-  'ParamChangeObjectFactory', function(ParamChangeObjectFactory) {
-    return {
-      createFromBackendList: function(paramChangeBackendList) {
-        return paramChangeBackendList.map(function(paramChangeBackendDict) {
-          return ParamChangeObjectFactory.createFromBackendDict(
-            paramChangeBackendDict);
-        });
-      },
+  'ParamChangeObjectFactory',
+  function(ParamChangeObjectFactory) {
+    var createFromBackendList = function(paramChangeBackendList) {
+      return paramChangeBackendList.map(function(paramChangeBackendDict) {
+        return ParamChangeObjectFactory.createFromBackendDict(
+          paramChangeBackendDict);
+      });
+    };
 
-      createSampleBackendList: function() {
-        return [];
-      },
+    return {
+      createFromBackendList: createFromBackendList
     };
   }
 ]);

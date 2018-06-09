@@ -288,15 +288,5 @@ describe('States object factory', function() {
           })]
         });
     });
-
-    describe('.createSampleBackendDict', function() {
-      it('is accepted by .createFromBackendDict', function() {
-        var sampleBackendDict = ssof.createSampleBackendDict(['Hola']);
-
-        expect(function() {
-          ssof.createFromBackendDict(sampleBackendDict);
-        }).not.toThrow();
-      });
-    })
   });
 });
