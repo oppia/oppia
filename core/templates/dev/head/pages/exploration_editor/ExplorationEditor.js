@@ -121,8 +121,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationParamSpecsService.init(
           ParamSpecsObjectFactory.createFromBackendDict(data.param_specs));
         ExplorationParamChangesService.init(
-          ParamChangesObjectFactory.createFromBackendList(
-            data.param_changes));
+          ParamChangesObjectFactory.createFromBackendList(data.param_changes));
         ExplorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
         ExplorationCorrectnessFeedbackService.init(
           data.correctness_feedback_enabled);
@@ -157,15 +156,15 @@ oppia.controller('ExplorationEditor', [
         GraphDataService.recompute();
 
         if (!EditorStateService.getActiveStateName() ||
-          !ExplorationStatesService.getState(
-            EditorStateService.getActiveStateName())) {
+            !ExplorationStatesService.getState(
+              EditorStateService.getActiveStateName())) {
           EditorStateService.setActiveStateName(
             ExplorationInitStateNameService.displayed);
         }
 
         if (!RouterService.isLocationSetToNonStateEditorTab() &&
-          !data.states.hasOwnProperty(
-            RouterService.getCurrentStateFromLocationPath('gui'))) {
+            !data.states.hasOwnProperty(
+              RouterService.getCurrentStateFromLocationPath('gui'))) {
           if (ThreadDataService.getOpenThreadsCount() > 0) {
             RouterService.navigateToFeedbackTab();
           } else {
@@ -181,8 +180,8 @@ oppia.controller('ExplorationEditor', [
         }
 
         if (data.is_version_of_draft_valid === false &&
-          data.draft_changes !== null &&
-          data.draft_changes.length > 0) {
+            data.draft_changes !== null &&
+            data.draft_changes.length > 0) {
           // Show modal displaying lost changes if the version of draft
           // changes is invalid, and draft_changes is not `null`.
           AutosaveInfoModalsService.showVersionMismatchModal(
