@@ -73,6 +73,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                     'acquired_skill_ids': [],
                     'prerequisite_skill_ids': [],
                     'outline': '',
+                    'outline_is_finalized': False,
                     'exploration_id': None
                 }],
                 'initial_node_id': self.NODE_ID_1,
@@ -119,9 +120,20 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 self.story.schema_version)
         )
 
+    def test_add_node_validation(self):
+        with self.assertRaisesRegexp(
+            Exception, 'The node id node_3 does not match the expected '
+            'next node id for the story'):
+            self.story.add_node('node_3')
+
     def test_get_number_from_node_id(self):
         self.assertEqual(
             story_domain.StoryNode.get_number_from_node_id('node_10'), 10)
+
+    def test_node_outline_finalized_validation(self):
+        self.story.story_contents.nodes[0].outline_is_finalized = 'abs'
+        self._assert_validation_error(
+            'Expected outline_is_finalized to be a boolean')
 
     def test_nodes_validation(self):
         self.story.story_contents.initial_node_id = 'node_10'
@@ -147,6 +159,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
                 'prerequisite_skill_ids': [],
                 'acquired_skill_ids': [],
                 'outline': 'Outline',
+                'outline_is_finalized': False,
                 'exploration_id': 'exploration_id'
             })
         ]
@@ -197,6 +210,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_2 = {
@@ -205,6 +219,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_3 = {
@@ -213,6 +228,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         self.story.story_contents.initial_node_id = 'node_1'
@@ -232,6 +248,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_2 = {
@@ -240,6 +257,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_3 = {
@@ -248,6 +266,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         self.story.story_contents.nodes = [
@@ -264,6 +283,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_2 = {
@@ -272,6 +292,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_3 = {
@@ -280,6 +301,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         self.story.story_contents.nodes = [
@@ -297,6 +319,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_2 = {
@@ -305,6 +328,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_3'],
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_3 = {
@@ -313,6 +337,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_4'],
             'prerequisite_skill_ids': ['skill_3'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         self.story.story_contents.nodes = [
@@ -331,6 +356,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_2'],
             'prerequisite_skill_ids': ['skill_1', 'skill_0'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_2 = {
@@ -339,6 +365,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': ['skill_3', 'skill_4'],
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_3 = {
@@ -347,6 +374,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': ['skill_4'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         node_4 = {
@@ -355,6 +383,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             'acquired_skill_ids': [],
             'prerequisite_skill_ids': ['skill_2'],
             'outline': '',
+            'outline_is_finalized': False,
             'exploration_id': None
         }
         self.story.story_contents.nodes = [
@@ -372,7 +401,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
         story_node = story_domain.StoryNode(
             self.NODE_ID_1, [self.NODE_ID_2],
             [self.SKILL_ID_1], [self.SKILL_ID_2],
-            'Outline', self.EXP_ID)
+            'Outline', False, self.EXP_ID)
         story_contents = story_domain.StoryContents(
             [story_node], self.NODE_ID_1, 2)
         story_contents_dict = story_contents.to_dict()

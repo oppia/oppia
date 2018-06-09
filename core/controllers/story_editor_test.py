@@ -41,7 +41,7 @@ class BaseStoryEditorControllerTest(test_utils.GenericTestBase):
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description',
-            [self.story_id], [], [])
+            [self.story_id], [], [], [])
 
 
 class StoryEditorTest(BaseStoryEditorControllerTest):

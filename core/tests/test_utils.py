@@ -421,6 +421,15 @@ tags: []
         json_response = self.testapp.get(
             url, params, expect_errors=expect_errors,
             status=expected_status_int)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
@@ -434,6 +443,14 @@ tags: []
         json_response = self._send_post_request(
             self.testapp, url, data, expect_errors, expected_status_int,
             upload_files)
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        self.assertEqual(json_response.status_int, expected_status_int)
 
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
@@ -443,8 +460,8 @@ tags: []
             upload_files=None, headers=None):
         json_response = app.post(
             str(url), data, expect_errors=expect_errors,
-            upload_files=upload_files, headers=headers)
-        self.assertEqual(json_response.status_int, expected_status_int)
+            upload_files=upload_files, headers=headers,
+            status=expected_status_int)
         return json_response
 
     def post_email(
@@ -492,6 +509,13 @@ tags: []
         json_response = self.testapp.put(
             str(url), data, expect_errors=expect_errors)
 
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
@@ -917,8 +941,8 @@ tags: []
 
     def save_new_topic(
             self, topic_id, owner_id, name, description,
-            canonical_story_ids, additional_story_ids, skill_ids,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            canonical_story_ids, additional_story_ids, uncategorized_skill_ids,
+            subtopics, language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -930,8 +954,10 @@ tags: []
                 that are part of the topic.
             additional_story_ids: list(str). The list of ids of additional
                 stories that are part of the topic.
-            skill_ids: list(str). The list of ids of skills that are part of the
-                topic.
+            uncategorized_skill_ids: list(str). The list of ids of skills that
+                are not part of any subtopic.
+            subtopics: list(Subtopic). The different subtopics that are part of
+                this topic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
 
@@ -940,7 +966,8 @@ tags: []
         """
         topic = topic_domain.Topic(
             topic_id, name, description, canonical_story_ids,
-            additional_story_ids, skill_ids, language_code, 0
+            additional_story_ids, uncategorized_skill_ids, subtopics,
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, language_code, 0
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
