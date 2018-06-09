@@ -369,3 +369,5 @@ oppia.directive('stateGraphViz', [
       ]
     };
   }]);
+
+/* eslint-enable angular/directive-restrict */
