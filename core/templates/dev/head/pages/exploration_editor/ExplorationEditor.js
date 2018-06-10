@@ -49,6 +49,7 @@ oppia.controller('ExplorationEditor', [
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
+  'StateTopAnswersStatsService', 'StateTopAnswersStatsBackendApiService',
   'ThreadDataService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
@@ -65,6 +66,7 @@ oppia.controller('ExplorationEditor', [
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
       UrlInterpolationService, ExplorationCorrectnessFeedbackService,
+      StateTopAnswersStatsService, StateTopAnswersStatsBackendApiService,
       ThreadDataService) {
     $scope.EditabilityService = EditabilityService;
     $scope.EditorStateService = EditorStateService;
