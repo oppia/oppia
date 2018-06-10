@@ -1,3 +1,4 @@
+
 # coding: utf-8
 #
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
@@ -15,6 +16,9 @@
 # limitations under the License.
 
 """Tests for Exploration-related jobs."""
+
+import json
+import os
 
 from core import jobs_registry
 from core.domain import exp_domain
@@ -1002,231 +1006,53 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             json_data = json.load(f)
         test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
 
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.VALID_EXP_ID, title='title', category='category')
-
-        exploration.add_states([
-            'State1', 'State2', 'State3'])
-        state1 = exploration.states['State1']
-        state2 = exploration.states['State2']
-        state3 = exploration.states['State3']
-
-        content1_dict = {
-            'html': test_cases[0]['html_content'],
-            'audio_translations': {}
-        }
-        content2_dict = {
-            'html': test_cases[1]['html_content'],
-            'audio_translations': {}
-        }
-        content3_dict = {
-            'html': test_cases[2]['html_content'],
-            'audio_translations': {}
-        }
-        state1.update_content(content1_dict)
-        state2.update_content(content2_dict)
-        state3.update_content(content3_dict)
-
-        default_outcome_dict1 = {
-            'dest': 'State2',
-            'feedback': {
-                'html': test_cases[3]['html_content'],
-                'audio_translations': {}
-            },
-            'param_changes': [],
-            'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
-            'refresher_exploration_id': None
-        }
-        default_outcome_dict2 = {
-            'dest': 'State3',
-            'feedback': {
-                'html': test_cases[4]['html_content'],
-                'audio_translations': {}
-            },
-            'param_changes': [],
-            'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
-            'refresher_exploration_id': None
-        }
-        default_outcome_dict3 = {
-            'dest': 'State1',
-            'feedback': {
-                'html': test_cases[5]['html_content'],
-                'audio_translations': {}
-            },
-            'param_changes': [],
-            'labelled_as_correct': False,
-            'missing_prerequisite_skill_id': None,
-            'refresher_exploration_id': None
-        }
-        state1.update_interaction_default_outcome(default_outcome_dict1)
-        state2.update_interaction_default_outcome(default_outcome_dict2)
-        state3.update_interaction_default_outcome(default_outcome_dict3)
-
-        hint_list1 = [{
-            'hint_content': {
-                'html': test_cases[6]['html_content'],
+        for index, test_case in enumerate(test_cases):
+            exp_id = self.VALID_EXP_ID + str(index)
+            exploration = exp_domain.Exploration.create_default_exploration(
+                exp_id, title='title', category='category')
+            exploration.add_states(['State1'])
+            state1 = exploration.states['State1']
+            content1_dict = {
+                'html': test_case['html_content'],
                 'audio_translations': {}
             }
-        }]
-        hint_list2 = [{
-            'hint_content': {
-                'html': test_cases[7]['html_content'],
-                'audio_translations': {}
-            }
-        }]
-        hint_list3 = [{
-            'hint_content': {
-                'html': test_cases[8]['html_content'],
-                'audio_translations': {}
-            }
-        }]
-        state1.update_interaction_hints(hint_list1)
-        state2.update_interaction_hints(hint_list2)
-        state3.update_interaction_hints(hint_list3)
+            state1.update_content(content1_dict)
+            exp_services.save_new_exploration(self.albert_id, exploration)
 
-        exp_services.save_new_exploration(self.albert_id, exploration)
+            # Start validation job on exploration.
+            job_id = (
+                exp_jobs_one_off.ExplorationContentValidationJob.create_new())
+            exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
-        # Start validation job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationContentValidationJob.create_new()
-        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
+            actual_output = (
+                exp_jobs_one_off.ExplorationContentValidationJob.get_output(
+                    job_id))
 
-        actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
+            # Test that validation fails before migration.
+            self.assertTrue(actual_output != [])
 
-        expected_output = [
-            "[u'br', [u'pre', u'div', u'span', u'[document]']]",
-            "[u'i', [u'div', u'span', u'[document]']]",
-            "[u'b', [u'span']]",
-            (
-                "[u'invalidTags', "
-                "[u'code', u'span', u'tr', u'tbody', u'table', u'div', u'td']]"
-            ),
-            "[u'oppia-noninteractive-image', [u'div', u'span', u'[document]']]",
-            "[u'oppia-noninteractive-link', [u'div', u'[document]']]",
-            (
-                '[u\'strings\', '
-                '[u\'There are number of ways by which we can give our share '
-                'to <blockquote><div><p>the open source community. It is not '
-                'just always opening the PRs.</p></div></blockquote><div> You '
-                'can help <br> fellow members, <br>open issues, <br><span> '
-                'review PRs </span>etc. </div>\', '
-                'u\'<span>hello</span><code> this is </code><div>test '
-                '</div><div>case4</div> for testing\', '
-                'u\'That is a quick <div>sample of Oppia. For more sample '
-                'explorations check out the Library.</div> You can also create '
-                'new explorations, like this one, by clicking on "Create" '
-                'button in the top right of the page.<br><div>We hope '
-                'you enjoy using Oppia. If you have feedback, please '
-                'let us know at our <oppia-noninteractive-link text-'
-                'with-value="&amp;quot;discussion forum&amp;quot;" url-'
-                'with-value="&amp;quot;https://groups.google.com/forum/?'
-                'fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-'
-                'link>!</div>Here is link 2 <oppia-noninteractive-link '
-                'text-with-value="&amp;quot;discussion forum&amp;quot;" '
-                'url-with-value="&amp;quot;https://groups.google.com/forum/?'
-                'fromgroups#!forum/oppia&amp;quot;">'
-                '</oppia-noninteractive-link>\', '
-                'u\'<div><i>hello</i></div> this is<i>test case1</i> for'
-                ' <span><i>testing</i></span>\', '
-                'u\'<div><br>hello</div> this is<br>test<pre> case2<br></pre>'
-                ' for <span><br>testing</span>\', '
-                'u\'So: <br><br>There is 1 way to arrange 1 ball. <br>There '
-                'are 2 ways to arrange 2 balls.<br>There are 6 ways to '
-                'arrange 3 balls.<br><br>Lets give these names. We will '
-                'say F1 = 1, F2 = 2, F3 = 6. So, if you have n balls where n '
-                'is 1, 2, 3, ..., then Fn is the number of ways to arrange '
-                'them. <br><oppia-noninteractive-image filepath-with-value='
-                '"&amp;quot;patterns.png&amp;quot;">'
-                '</oppia-noninteractive-image><br><br>Can you see a pattern, '
-                'or a systematic way to count them? Let us have a look at the '
-                '3-ball case.<br><br><br><br>First you pick the ball on the '
-                'left. This could be red, blue or yellow. There are three '
-                'cases to consider:<br><br>If first ball is red, '
-                'two balls are left to arrange in the other two slots. '
-                'And there are F2 ways to do this.<div>'
-                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
-                'startRed.png&amp;quot;"></oppia-noninteractive-image><br>'
-                '<span><br></span></div><div><span>If the first ball is blue, '
-                'then there are two balls left to ... hey, this is the same '
-                'thing, it is just F2. </span></div><div>'
-                '<oppia-noninteractive-image filepath-with-value="amp;quot;'
-                'startBlue.png&amp;quot;"></oppia-noninteractive-image><br>'
-                '</div><div><br><span>And, if first ball is yellow, then ... '
-                'yada, yada, F2. </span><br><oppia-noninteractive-image '
-                'filepath-with-value="&amp;quot;startYellow.png&amp;quot;">'
-                '</oppia-noninteractive-image> <br><br>So total number of '
-                'ways to arrange 3 balls, F3, is equal to 3 * F2. All this '
-                'works out correctly, because F2 = 2, and F3 = 3 * 2 = 6.<br>'
-                '<br><br><br>Now, can you write out a similar expression for '
-                'F2, in terms of F1? Then we"ll move on to figuring out F4, '
-                'which starts to become hard to compute manually.</div>Here '
-                'is the image1 <i><oppia-noninteractive-image '
-                'filepath-with-value="amp;quot;startBlue.png&amp;quot;">'
-                '</oppia-noninteractive-image></i>Here is the image2 '
-                '<span><oppia-noninteractive-image filepath-with-value='
-                '"amp;quot;startBlue.png&amp;quot;">'
-                '</oppia-noninteractive-image></span>\', '
-                'u\'<table><tbody><tr><td>January</td><td>$100</td>'
-                '<td>200</td></tr><tr><td>February</td><td>$80</td><td>400'
-                '</td></tr></tbody></table>\', '
-                'u\'Hello, <span><b>How can I help You?</b></span><br><p>'
-                'I am quite fluent in python can you guide me how can I '
-                'start</p><span>contribtuing <div>in Oppia.</div>Ya Sure!'
-                'visit,the oppia documentation, sign the CLA,</span><pre>'
-                'and <br>have your first PR to go.</pre>\', '
-                'u\'hello <p> this is case3 for </p> testing\']]'
-            )
-        ]
+            exploration_dict = exploration.to_dict()
+            updated_dict = exp_domain.Exploration._convert_v25_dict_to_v26_dict( # pylint: disable=protected-access
+                exploration_dict)
+            updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
+            updated_html = updated_dict['states']['State1']['content']['html']
 
-        # Test that invalid html fails validation before migration.
-        self.assertEqual(actual_output, expected_output)
+            # Test that html matches the expected format after migration.
+            self.assertEqual(updated_html, test_case['expected_output'])
 
-        exploration_dict = exploration.to_dict()
-        updated_dict = exp_domain.Exploration._convert_v25_dict_to_v26_dict( # pylint: disable=protected-access
-            exploration_dict)
-        updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
+            exp_services.save_new_exploration(
+                self.albert_id, updated_exploration)
 
-        state1 = updated_exploration.states['State1']
-        state2 = updated_exploration.states['State2']
-        state3 = updated_exploration.states['State3']
+            # Start validation job on updated exploration.
+            job_id = (
+                exp_jobs_one_off.ExplorationContentValidationJob.create_new())
+            exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+            self.process_and_flush_pending_tasks()
 
-        # Test that html matches the expected format after migration.
-        self.assertEqual(state1.content.html, test_cases[0]['expected_output'])
-        self.assertEqual(state2.content.html, test_cases[1]['expected_output'])
-        self.assertEqual(state3.content.html, test_cases[2]['expected_output'])
+            actual_output = (
+                exp_jobs_one_off.ExplorationContentValidationJob.get_output(
+                    job_id))
 
-        self.assertEqual(
-            state1.interaction.default_outcome.feedback.html,
-            test_cases[3]['expected_output'])
-        self.assertEqual(
-            state2.interaction.default_outcome.feedback.html,
-            test_cases[4]['expected_output'])
-        self.assertEqual(
-            state3.interaction.default_outcome.feedback.html,
-            test_cases[5]['expected_output'])
-
-        self.assertEqual(
-            state1.interaction.hints[0].hint_content.html,
-            test_cases[6]['expected_output'])
-        self.assertEqual(
-            state2.interaction.hints[0].hint_content.html,
-            test_cases[7]['expected_output'])
-        self.assertEqual(
-            state3.interaction.hints[0].hint_content.html,
-            test_cases[8]['expected_output'])
-
-        exp_services.save_new_exploration(self.albert_id, updated_exploration)
-
-        # Start validation job on updated exploration.
-        job_id = exp_jobs_one_off.ExplorationContentValidationJob.create_new()
-        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
-
-        # Test that html after migration passes validation.
-        self.assertEqual(actual_output, [])
+            # Test that validation passes after migration.
+            self.assertEqual(actual_output, [])

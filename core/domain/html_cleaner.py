@@ -225,6 +225,13 @@ def convert_to_text_angular(html_data):
             blockquote.parent.parent.wrap(soup.new_tag('blockquote'))
             blockquote.unwrap()
 
+    # If p tag is wrapped within a td tag, the final output will
+    # span to multiple paragraphs instead of all items being in
+    # a row as in table. So, any p tag within td tag is unwrapped.
+    for p in soup.findAll('p'):
+        if p.parent.name == 'td':
+            p.unwrap()
+
     # To remove all tags except those in allowed tag list.
     all_tags = soup.findAll()
     for tag in all_tags:
@@ -279,7 +286,7 @@ def convert_to_text_angular(html_data):
         # is None and there is no need to add tabs since linebreak is
         # already present.
         elif tag.name == 'td' and tag.next_sibling:
-            tag.insert_after('  ')
+            tag.insert_after(' ')
             tag.unwrap()
         # div and table rows both are replaced with p tag
         # to maintain almost same apperance.
@@ -287,10 +294,7 @@ def convert_to_text_angular(html_data):
             tag.name = 'p'
         # All other invalid tags are simply removed.
         elif tag.name not in allowed_tag_list:
-            try:
-                tag.unwrap()
-            except Exception:
-                raise Exception('Invalid unwrapping for string.')
+            tag.unwrap()
 
     # Removal of tags can break the soup into parts which are continuous
     # and not wrapped in any tag. This part recombines the continuous
@@ -429,24 +433,17 @@ def validate_textangular_format(html_list, run_migration=False):
         ['ALLOWED_TAG_LIST'])
 
     for html_data in html_list:
-        try:
-            if run_migration:
-                # <br> is replaced with <br/> before conversion because
-                # BeautifulSoup in some cases adds </br> closing tag
-                # and br is reported as parent of other tags which
-                # produces issues in validation.
-                migrated_data = convert_to_text_angular(html_data).replace(
-                    '<br>', '<br/>')
-                soup = bs4.BeautifulSoup(migrated_data, 'html.parser')
-            else:
-                soup = bs4.BeautifulSoup(
-                    html_data.replace('<br>', '<br/>'), 'html.parser')
-        except Exception as e:
-            if e in err_dict:
-                err_dict[e] += [html_data]
-            else:
-                err_dict[e] = [html_data]
-            continue
+        if run_migration:
+            # <br> is replaced with <br/> before conversion because
+            # BeautifulSoup in some cases adds </br> closing tag
+            # and br is reported as parent of other tags which
+            # produces issues in validation.
+            migrated_data = convert_to_text_angular(html_data).replace(
+                '<br>', '<br/>')
+            soup = bs4.BeautifulSoup(migrated_data, 'html.parser')
+        else:
+            soup = bs4.BeautifulSoup(
+                html_data.replace('<br>', '<br/>'), 'html.parser')
 
         # Text with no parent tag is also invalid.
         for content in soup.contents:

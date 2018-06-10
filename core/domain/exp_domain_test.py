@@ -3448,7 +3448,7 @@ states:
       hints:
       - hint_content:
           audio_translations: {}
-          html: <p>Hello, this is html1<b> for </b>state2</p>
+          html: <p>Hello, this is</p><p> html1<b> for </b></p><p>state2</p>
       - hint_content:
           audio_translations: {}
           html: <p>Here is link 2 <oppia-noninteractive-link text-with-value="&amp;quot;discussion
