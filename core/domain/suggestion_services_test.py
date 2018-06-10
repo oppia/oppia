@@ -484,13 +484,18 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2'],
                 ['TextInput'], category='Algebra'))
 
-        self.old_content = exp_domain.SubtitledHtml('old content', {
-            self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
-                'filename.mp3', 20, False)
-        }).to_dict()
-
+        self.old_content = exp_domain.SubtitledHtml(
+            'content', 'old content').to_dict()
+        self.old_content_ids_to_audio_translations = {
+            'content': {
+                self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
+                    'filename.mp3', 20, False).to_dict()
+            }
+        }
         # Create content in State A with a single audio subtitle.
         exploration.states['State 1'].update_content(self.old_content)
+        exploration.states['State 1'].update_content_ids_to_audio_translations(
+            self.old_content_ids_to_audio_translations)
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
 
         rights_manager.publish_exploration(self.editor, self.EXP_ID)
@@ -498,10 +503,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             self.editor, self.EXP_ID, self.owner_id,
             rights_manager.ROLE_EDITOR)
 
-        self.new_content = exp_domain.SubtitledHtml('new content', {
-            self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
-                'filename.mp3', 20, False)
-        }).to_dict()
+        self.new_content = exp_domain.SubtitledHtml(
+            'content', 'new content').to_dict()
 
         self.change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

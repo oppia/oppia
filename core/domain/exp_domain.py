@@ -3390,7 +3390,7 @@ class Exploration(object):
 
             for index, answer_group in enumerate(
                     state_dict['interaction']['answer_groups']):
-                content_id = 'feedback' + str(index)
+                content_id = 'feedback_' + str(index + 1)
                 content_ids_to_audio_translations[content_id] = (
                     answer_group['outcome']['feedback'].pop(
                         'audio_translations'))
@@ -3404,7 +3404,7 @@ class Exploration(object):
                 default_outcome['feedback']['content_id'] = (content_id)
 
             for index, hint in enumerate(state_dict['interaction']['hints']):
-                content_id = 'hint' + str(index)
+                content_id = 'hint_' + str(index + 1)
                 content_ids_to_audio_translations[content_id] = (
                     hint['hint_content'].pop('audio_translations'))
                 hint['hint_content']['content_id'] = content_id

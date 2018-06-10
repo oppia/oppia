@@ -1781,11 +1781,22 @@ def _create_change_list_from_suggestion(
         for _, translation in old_content_ids_to_audio_translations[
                 old_content.content_id].iteritems():
             translation.needs_update = True
+
+        content_ids_to_audio_translations_dict = {}
+        for content_id, audio_translations in (
+                old_content_ids_to_audio_translations.iteritems()):
+            audio_translations_dict = {}
+            for lang_code, audio_translation in audio_translations.iteritems():
+                audio_translations_dict[lang_code] = (
+                    exp_domain.AudioTranslation.to_dict(audio_translation))
+            content_ids_to_audio_translations_dict[content_id] = (
+                audio_translations_dict)
+
         change_list.append(exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'state_name': suggestion.state_name,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS, # pylint: disable=line-too-long
-            'new_value': old_content_ids_to_audio_translations
+            'new_value': content_ids_to_audio_translations_dict
         }))
 
     return change_list
