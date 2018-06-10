@@ -376,20 +376,21 @@ def convert_to_text_angular(html_data):
     # Ensure that p tag is not wrapped in p tag.
     for p in soup.findAll('p'):
         if p.parent.name == 'p':
-            contents = p.parent.contents
-            length_of_contents = len(contents)
+            child_tags = p.parent.contents
             index = 0
-            while index < length_of_contents:
-                content = contents[index]
+            while index < len(child_tags):
+                current_tag = child_tags[index]
+
+                # If the current tag is not a paragraph tag, wrap it and all
+                # consecutive non-p tags after it into a single p-tag.
                 new_p = soup.new_tag('p')
-                if content.name != 'p':
-                    while content.name != 'p':
-                        content = content.wrap(new_p)
-                        index = contents.index(content) + 1
-                        length_of_contents = len(contents)
-                        if index >= length_of_contents:
-                            break
-                        content = contents[index]
+                while current_tag.name != 'p':
+                    current_tag = current_tag.wrap(new_p)
+                    index = child_tags.index(current_tag) + 1
+                    if index >= len(child_tags):
+                        break
+                    current_tag = child_tags[index]
+
                 index += 1
             p.parent.unwrap()
 
