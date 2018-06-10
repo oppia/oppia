@@ -18,13 +18,15 @@
  */
 
 oppia.factory('StateTopAnswersStatsService', [
-  '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsObjectFactory', 'ExplorationContextService',
-  'ExplorationStatesService', 'UrlInterpolationService',
+  '$injector', '$rootScope', 'AngularNameService',
+  'AnswerClassificationService', 'AnswerStatsObjectFactory',
+  'ExplorationContextService', 'ExplorationStatesService',
+  'UrlInterpolationService',
   function(
-      $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsObjectFactory, ExplorationContextService,
-      ExplorationStatesService, UrlInterpolationService) {
+      $injector, $rootScope, AngularNameService,
+      AnswerClassificationService, AnswerStatsObjectFactory,
+      ExplorationContextService, ExplorationStatesService,
+      UrlInterpolationService) {
     /** @type {Object.<string, AnswerStats[]>} */
     var stateTopAnswerStatsCache = {};
 
@@ -49,6 +51,29 @@ oppia.factory('StateTopAnswersStatsService', [
             interactionRulesService);
       });
     };
+
+    $rootScope.$on('addState', function(event, args) {
+      if (stateTopAnswerStatsCache.hasOwnProperty(args.state_name)) {
+        // No action required, we already have data for that state.
+        return;
+      } else {
+        // Give the cache an empty list of answers.
+        stateTopAnswerStatsCache[args.state_name] = [];
+      }
+    });
+
+    $rootScope.$on('deleteState', function(event, args) {
+      // Take no action, we'll hold onto the stats in the cache.
+    });
+
+    $rootScope.$on('renameState', function(event, args) {
+      stateTopAnswerStatsCache[args.new_state_name] =
+        stateTopAnswerStatsCache[args.old_state_name];
+    });
+
+    $rootScope.$on('saveInteractionAnswerGroups', function(event, args) {
+      refreshAddressedInfo(stateName);
+    });
 
     return {
       /**
