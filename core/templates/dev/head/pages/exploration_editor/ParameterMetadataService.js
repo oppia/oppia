@@ -19,9 +19,11 @@
 oppia.factory('ParameterMetadataService', [
   'ExplorationStatesService', 'ExpressionInterpolationService',
   'ExplorationParamChangesService', 'GraphDataService',
+  'ParamMetadataObjectFactory',
   function(
       ExplorationStatesService, ExpressionInterpolationService,
-      ExplorationParamChangesService, GraphDataService) {
+      ExplorationParamChangesService, GraphDataService,
+      ParamMetadataObjectFactory) {
     var PARAM_ACTION_GET = 'get';
     var PARAM_ACTION_SET = 'set';
 
@@ -36,41 +38,41 @@ oppia.factory('ParameterMetadataService', [
         var pc = paramChanges[i];
         if (pc.generatorId === 'Copier') {
           if (!pc.customizationArgs.parse_with_jinja) {
-            result.push({
+            result.push(ParamMetadataObjectFactory.createFromBackendDict({
               action: PARAM_ACTION_SET,
               paramName: pc.name,
               source: PARAM_SOURCE_PARAM_CHANGES,
               sourceInd: i
-            });
+            }));
           } else {
             var paramsReferenced = (
               ExpressionInterpolationService.getParamsFromString(
                 pc.customizationArgs.value));
             for (var j = 0; j < paramsReferenced.length; j++) {
-              result.push({
+              result.push(ParamMetadataObjectFactory.createFromBackendDict({
                 action: PARAM_ACTION_GET,
                 paramName: paramsReferenced[j],
                 source: PARAM_SOURCE_PARAM_CHANGES,
                 sourceInd: i
-              });
+              }));
             }
 
-            result.push({
+            result.push(ParamMetadataObjectFactory.createFromBackendDict({
               action: PARAM_ACTION_SET,
               paramName: pc.name,
               source: PARAM_SOURCE_PARAM_CHANGES,
               sourceInd: i
-            });
+            }));
           }
         } else {
           // RandomSelector. Elements in the list of possibilities are treated
           // as raw unicode strings, not expressions.
-          result.push({
+          result.push(ParamMetadataObjectFactory.createFromBackendDict({
             action: PARAM_ACTION_SET,
             paramName: pc.name,
             source: PARAM_SOURCE_PARAM_CHANGES,
             sourceInd: i
-          });
+          }));
         }
       }
 
@@ -90,20 +92,20 @@ oppia.factory('ParameterMetadataService', [
       ExpressionInterpolationService.getParamsFromString(
         state.content.getHtml()).forEach(
         function(paramName) {
-          result.push({
+          result.push(ParamMetadataObjectFactory.createFromBackendDict({
             action: PARAM_ACTION_GET,
             paramName: paramName,
             source: PARAM_SOURCE_CONTENT
-          });
+          }));
         }
       );
 
       // Next, the answer is received.
-      result.push({
+      result.push(ParamMetadataObjectFactory.createFromBackendDict({
         action: PARAM_ACTION_SET,
         paramName: 'answer',
         source: PARAM_SOURCE_ANSWER
-      });
+      }));
 
       // Finally, the rule feedback strings are evaluated.
       state.interaction.answerGroups.forEach(function(group) {
@@ -111,12 +113,12 @@ oppia.factory('ParameterMetadataService', [
           ExpressionInterpolationService.getParamsFromString(
             group.outcome.feedback[k]).forEach(
             function(paramName) {
-              result.push({
+              result.push(ParamMetadataObjectFactory.createFromBackendDict({
                 action: PARAM_ACTION_GET,
                 paramName: paramName,
                 source: PARAM_SOURCE_FEEDBACK,
                 sourceInd: k
-              });
+              }));
             }
           );
         }
