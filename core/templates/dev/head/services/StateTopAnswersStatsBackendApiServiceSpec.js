@@ -34,7 +34,7 @@ describe('StateTopAnswersStatsBackendApiService', function() {
 
     it('returns the data provided by the backend.', function() {
       var backendDict = {
-        answers {
+        answers: {
           Hola: [
             {answer: 'hola', frequency: 7},
             {answer: 'adios', frequency: 5},
@@ -46,7 +46,7 @@ describe('StateTopAnswersStatsBackendApiService', function() {
       var failureHandler = jasmine.createSpy('failure');
       this.$httpBackend.expectGET(
         '/createhandler/state_answer_stats/7'
-      ).respond({answers: backendDict});
+      ).respond(backendDict);
 
       this.StateTopAnswersStatsBackendApiService.fetchStats('7').then(
         successHandler, failureHandler);
