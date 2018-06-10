@@ -263,8 +263,8 @@ def convert_to_text_angular(html_data):
                     link = soup.new_tag('oppia-noninteractive-link')
                     url = tag['href']
                     text = tag.get_text()
-                    link['url-with-value'] = "&quot;" + url + "&quot;"
-                    link['text-with-value'] = "&quot;" + text + "&quot;"
+                    link['url-with-value'] = '&quot;' + url + '&quot;'
+                    link['text-with-value'] = '&quot;' + text + '&quot;'
                     tag.wrap(link)
                     # If any part of text in a tag is wrapped in b or i tag
                     # link tag is also wrapped in those tags to maintain
