@@ -32,4 +32,3 @@ oppia.factory('StateTopAnswersStatsBackendApiService', [
     };
   }
 ]);
-
