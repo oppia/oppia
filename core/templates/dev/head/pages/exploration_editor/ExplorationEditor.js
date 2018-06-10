@@ -209,7 +209,8 @@ oppia.controller('ExplorationEditor', [
           data.show_state_editor_tutorial_on_load, $scope.explorationId);
 
         if (ExplorationRightsService.isPublic()) {
-          // Don't make user wait on stats to begin editing the exploration.
+          // Stats are loaded asynchronously after the exploration data because
+          // they are not needed to interact with the editor.
           StateTopAnswersStatsBackendApiService.fetchStats(
             $scope.explorationId
           ).then(StateTopAnswersStatsService.init);
