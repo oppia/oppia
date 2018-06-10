@@ -18,14 +18,13 @@
 
 describe('StateTopAnswersStatsBackendApiService', function() {
   beforeEach(module('oppia'));
+
   beforeEach(inject(function($injector) {
     this.StateTopAnswersStatsBackendApiService =
       $injector.get('StateTopAnswersStatsBackendApiService');
-  }));
-
-  beforeEach(inject(function($injector) {
     this.$httpBackend = $injector.get('$httpBackend');
   }));
+
   afterEach(function() {
     this.$httpBackend.verifyNoOutstandingExpectation();
     this.$httpBackend.verifyNoOutstandingRequest();
