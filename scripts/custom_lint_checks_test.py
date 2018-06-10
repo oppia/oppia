@@ -174,6 +174,7 @@ class ImportOnlyModulesCheckerTest(unittest.TestCase):
             testutils.Message(
                 msg_id='import-only-modules',
                 node=importfrom_node2,
+                args=('error', 'os')
             ),
         ):
             checker_test_object.checker.visit_importfrom(
