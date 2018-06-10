@@ -26,15 +26,16 @@ oppia.directive('unresolvedAnswersOverview', [
         'unresolved_answers_overview_directive.html'),
       controller: [
         '$scope', 'EditorStateService', 'ExplorationStatesService',
-        'StateRulesStatsService',
+        'StateRulesStatsService', 'ExplorationRightsService',
         function(
             $scope, EditorStateService, ExplorationStatesService,
-            StateRulesStatsService) {
+            StateRulesStatsService, ExplorationRightsService) {
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
           $scope.unresolvedAnswersData = null;
           $scope.latestRefreshDate = new Date();
+          $scope.unresolvedAnswersOverviewIsShown = false;
 
           $scope.computeUnresolvedAnswers = function() {
             var state = ExplorationStatesService.getState(
@@ -83,7 +84,13 @@ oppia.directive('unresolvedAnswersOverview', [
             }
           };
 
-          $scope.$on('refreshStateEditor', $scope.computeUnresolvedAnswers);
+          $scope.$on('refreshStateEditor', function() {
+            $scope.unresolvedAnswersOverviewIsShown = (
+              ExplorationRightsService.isPublic());
+            if ($scope.unresolvedAnswersOverviewIsShown) {
+              $scope.computeUnresolvedAnswers();
+            }
+          });
         }
       ]
     };
