@@ -164,3 +164,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_contents_from_dict.to_dict(), skill_contents_dict)
         self.assertEqual(
             misconceptions_from_dict.to_dict(), misconceptions_dict)
+
+    def test_to_dict(self):
+        expected_skill_mastery_dict = {
+            'user_id': 'user',
+            'skill_id': 'skill_id',
+            'degree_of_mastery': '0.5'
+        }
+        observed_skill_mastery = skill_domain.UserSkillMastery.from_dict(
+            expected_skill_mastery_dict)
+        self.assertDictEqual(
+            expected_skill_mastery_dict,
+            observed_skill_mastery.to_dict())

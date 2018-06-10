@@ -29,6 +29,8 @@ oppia.factory('ImagePreloaderService', [
     var _filenamesOfImageToBeDownloaded = [];
     var _filenamesOfImageFailedToDownload = [];
     var _exploration = null;
+    var _imageDimensions = null;
+    var _hasImagePreloaderServiceStarted = false;
     // imageLoadedCallback is an object of objects (identified by the filenames
     // which are being downloaded at the time they are required by the
     // directive).The object contains the resolve method of the promise
@@ -39,9 +41,24 @@ oppia.factory('ImagePreloaderService', [
     var _init = function(exploration) {
       _exploration = exploration;
       _states = exploration.states;
+      _getDimensionsOfImages();
       _hasImagePreloaderServiceStarted = true;
     };
 
+    /**
+     * Gets the dimensions of the images in the exploration.
+     */
+    var _getDimensionsOfImages = function() {
+      _imageDimensions = {};
+      var states = (_states.getStateNames()).map(function(stateName) {
+        return _states.getState(stateName);
+      });
+      states.forEach(function(state){
+        Object.assign(_imageDimensions,
+          ExtractImageFilenamesFromStateService.getImageDimensionsInState(
+            state));
+      });
+    };
     /**
      * Gets the Url for the image file.
      * @param {string} filename - Filename of the image whose Url is to be
@@ -86,8 +103,8 @@ oppia.factory('ImagePreloaderService', [
     /**
      * Gets image files names in Bfs order from the state.
      * @param {string} sourceStateName - The name of the starting state
-     *                                        from which the filenames should
-     *                                        be obtained.
+     *                                   from which the filenames should
+     *                                   be obtained.
      */
     var _getImageFilenamesInBfsOrder = function(sourceStateName) {
       var stateNamesInBfsOrder = (
@@ -219,6 +236,9 @@ oppia.factory('ImagePreloaderService', [
     return {
       init: _init,
       kickOffImagePreloader: _kickOffImagePreloader,
+      getDimensionsOfImage: function(filename) {
+        return _imageDimensions[filename];
+      },
       onStateChange: _onStateChange,
       isInFailedDownload: _isInFailedDownload,
       isLoadingImageFile: function(filename) {
@@ -244,6 +264,9 @@ oppia.factory('ImagePreloaderService', [
             };
           }
         });
+      },
+      inExplorationPlayer: function() {
+        return _hasImagePreloaderServiceStarted;
       }
     };
   }
