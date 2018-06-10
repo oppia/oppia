@@ -25,71 +25,22 @@ oppia.directive('unresolvedAnswersOverview', [
         '/pages/exploration_editor/editor_tab/' +
         'unresolved_answers_overview_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'ExplorationStatesService',
-        'StateRulesStatsService', 'ExplorationRightsService',
+        '$rootScope', '$scope', 'EditorStateService',
+        'StateTopAnswersStatsService',
         function(
-            $scope, EditorStateService, ExplorationStatesService,
-            StateRulesStatsService, ExplorationRightsService) {
-          var MAXIMUM_UNRESOLVED_ANSWERS = 5;
-          var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
-
-          $scope.unresolvedAnswersData = null;
-          $scope.latestRefreshDate = new Date();
+            $rootScope, $scope, EditorStateService,
+            StateTopAnswersStatsService) {
+          $scope.stateStats = [];
           $scope.unresolvedAnswersOverviewIsShown = false;
 
-          $scope.computeUnresolvedAnswers = function() {
-            var state = ExplorationStatesService.getState(
+          $rootScope.$on('stateStatsUpdate', function() {
+            $scope.unresolvedAnswersOverviewIsShown =
+              StateTopAnswersStatsService.isInitialized();
+            $scope.stateStats = StateTopAnswersStatsService.getStateStats(
               EditorStateService.getActiveStateName()
+            ).filter(
+              function(answerStats) { return !answerStats.isAddressed; }
             );
-
-            if (!StateRulesStatsService.stateSupportsIssuesOverview(state)) {
-              $scope.unresolvedAnswersData = [];
-            } else {
-              StateRulesStatsService.computeStateRulesStats(
-                state
-              ).then(function(stats) {
-                var calculatedUnresolvedAnswersData = [];
-
-                for (var i = 0; i < stats.visualizations_info.length; ++i) {
-                  var vizInfo = stats.visualizations_info[i];
-                  if (!vizInfo.addressed_info_is_supported) {
-                    continue;
-                  }
-
-                  // NOTE: vizInfo.data is already sorted in descending order by
-                  // frequency.
-                  for (var j = 0; j < vizInfo.data.length; ++j) {
-                    var answer = vizInfo.data[j];
-                    if (answer.is_addressed ||
-                        answer.frequency <
-                          MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
-                      continue;
-                    }
-
-                    calculatedUnresolvedAnswersData.push(answer);
-                    if (calculatedUnresolvedAnswersData.length >=
-                          MAXIMUM_UNRESOLVED_ANSWERS) {
-                      break;
-                    }
-                  }
-
-                  // Will only take the answers from first eligible
-                  // visualization.
-                  break;
-                }
-
-                $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
-                $scope.latestRefreshDate = new Date();
-              });
-            }
-          };
-
-          $scope.$on('refreshStateEditor', function() {
-            $scope.unresolvedAnswersOverviewIsShown = (
-              ExplorationRightsService.isPublic());
-            if ($scope.unresolvedAnswersOverviewIsShown) {
-              $scope.computeUnresolvedAnswers();
-            }
           });
         }
       ]
