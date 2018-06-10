@@ -907,12 +907,14 @@ def get_top_state_answer_stats(exploration_id, state_name):
     Returns:
         list(*). A list of the top 10 answers, sorted by decreasing frequency.
     """
-    calculation_output = (
-        _get_calc_output(exploration_id, state_name, 'Top10AnswerFrequencies')
-        .calculation_output.to_raw_type())
+    calc_output = _get_calc_output(
+        exploration_id, state_name, 'TopNUnresolvedAnswersByFrequency')
+    raw_calc_output = (
+        [] if calc_output is None else
+        calc_output.calculation_output.to_raw_type())
     return [
         {'answer': output['answer'], 'frequency': output['frequency']}
-        for output in calculation_output
+        for output in raw_calc_output
         if output['frequency'] >= feconf.STATE_ANSWER_STATS_MIN_FREQUENCY
     ]
 
