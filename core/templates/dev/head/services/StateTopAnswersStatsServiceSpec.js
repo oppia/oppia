@@ -21,6 +21,7 @@ var joC = jasmine.objectContaining;
 
 describe('StateTopAnswersStatsService', function() {
   beforeEach(module('oppia'));
+
   beforeEach(inject(function($injector) {
     this.StateTopAnswersStatsService =
       $injector.get('StateTopAnswersStatsService');
