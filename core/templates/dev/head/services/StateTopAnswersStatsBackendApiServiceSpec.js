@@ -31,9 +31,10 @@ describe('StateTopAnswersStatsBackendApiService', function() {
   });
 
   describe('.fetchStats', function() {
-    beforeEach(function() {
-      this.sampleData = {
-        answers: {
+
+    it('returns the data provided by the backend.', function() {
+      var backendDict = {
+        answers {
           Hola: [
             {answer: 'hola', frequency: 7},
             {answer: 'adios', frequency: 5},
@@ -41,20 +42,17 @@ describe('StateTopAnswersStatsBackendApiService', function() {
           ]
         }
       };
-    });
-
-    it('returns frequency data in order.', function() {
       var successHandler = jasmine.createSpy('success');
       var failureHandler = jasmine.createSpy('failure');
       this.$httpBackend.expectGET(
         '/createhandler/state_answer_stats/7'
-      ).respond(this.sampleData);
+      ).respond({answers: backendDict});
 
       this.StateTopAnswersStatsBackendApiService.fetchStats('7').then(
         successHandler, failureHandler);
       this.$httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(this.sampleData);
+      expect(successHandler).toHaveBeenCalledWith(backendDict);
       expect(failureHandler).not.toHaveBeenCalled();
     });
   });
