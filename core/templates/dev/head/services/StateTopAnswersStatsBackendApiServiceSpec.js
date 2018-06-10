@@ -31,7 +31,6 @@ describe('StateTopAnswersStatsBackendApiService', function() {
   });
 
   describe('.fetchStats', function() {
-
     it('returns the data provided by the backend.', function() {
       var backendDict = {
         answers: {
