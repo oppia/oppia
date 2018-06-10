@@ -19,12 +19,12 @@
 
 oppia.factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsFactory', 'ExplorationContextService', 'ExplorationStatesService',
-  'UrlInterpolationService',
+  'AnswerStatsObjectFactory', 'ExplorationContextService',
+  'ExplorationStatesService', 'UrlInterpolationService',
   function(
       $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsFactory, ExplorationContextService, ExplorationStatesService,
-      UrlInterpolationService) {
+      AnswerStatsObjectFactory, ExplorationContextService,
+      ExplorationStatesService, UrlInterpolationService) {
     /** @type {Object.<string, AnswerStats[]>} */
     var stateTopAnswerStatsCache = {};
 
@@ -60,7 +60,7 @@ oppia.factory('StateTopAnswersStatsService', [
         for (var stateName in stateTopAnswersStatsBackendDict.answers) {
           stateTopAnswerStatsCache[stateName] =
             stateTopAnswersStatsBackendDict.answers[stateName].map(
-              AnswerStatsFactory.createFromBackendDict
+              AnswerStatsObjectFactory.createFromBackendDict
             );
           // Still need to manually refresh the addressed information.
           refreshAddressedInfo(stateName);
