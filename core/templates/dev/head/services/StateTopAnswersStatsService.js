@@ -57,16 +57,14 @@ oppia.factory('StateTopAnswersStatsService', [
        */
       init: function(stateTopAnswersStatsBackendDict) {
         stateTopAnswerStatsCache = {};
-        Object.keys(
-          stateTopAnswersStatsBackendDict.answers
-        ).forEach(function(stateName) {
+        for (var stateName in stateTopAnswersStatsBackendDict.answers) {
           stateTopAnswerStatsCache[stateName] =
             stateTopAnswersStatsBackendDict.answers[stateName].map(
               AnswerStatsFactory.createFromBackendDict
             );
           // Still need to manually refresh the addressed information.
           refreshAddressedInfo(stateName);
-        });
+        }
         isInitialized = true;
       },
 
