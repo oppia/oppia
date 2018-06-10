@@ -22,9 +22,8 @@ oppia.factory('StateTopAnswersStatsBackendApiService', [
       fetchStats: function(explorationId) {
         return $http.get(
           UrlInterpolationService.interpolateUrl(
-            '/createhandler/state_answer_stats/<exploration_id>', {
-              exploration_id: explorationId
-            })
+            '/createhandler/state_answer_stats/<exploration_id>',
+            {exploration_id: explorationId})
         ).then(function(response) {
           return response.data;
         });
