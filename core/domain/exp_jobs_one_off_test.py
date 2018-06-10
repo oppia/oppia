@@ -1000,9 +1000,9 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
         """Tests that the exploration validation and migration job for
         TextAngular RTE.
         """
-        test_file = os.path.join(
+        test_file_path = os.path.join(
             feconf.TESTS_DATA_DIR, 'test_cases_for_rte.json')
-        with open(test_file, 'r') as f:
+        with open(test_file_path, 'r') as f:
             json_data = json.load(f)
         test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
 
@@ -1011,7 +1011,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
 
         state_list = []
         for index in range(len(test_cases)):
-            state_list += ['State' + str(index)]
+            state_list.append('State%d' % index)
 
         exploration.add_states(state_list)
 
@@ -1036,7 +1036,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 job_id))
 
         # Test that validation fails before migration.
-        self.assertTrue(actual_output != [])
+        self.assertTrue(actual_output)
 
         exploration_dict = exploration.to_dict()
         updated_dict = exp_domain.Exploration._convert_v25_dict_to_v26_dict( # pylint: disable=protected-access

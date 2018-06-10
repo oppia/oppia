@@ -37,7 +37,7 @@
     "case": "general"
     }, {
     "html_content": "<p>Hello</p><p><b><a href=\"http://link.com\">What is a link?</a></b><br></p><p><b><a href=\"http://link.com\">What is a link?</a></b><br></p><p></p><p><a href=\"http://link.com\"><b>What is a link?</b></a></p>",
-    "expected_output": "<p>Hello</p><p><b><oppia-noninteractive-link text-with-value=\"What is a link?\" url-with-value=\"http://link.com\"></oppia-noninteractive-link></b><br></p><p><b><oppia-noninteractive-link text-with-value=\"What is a link?\" url-with-value=\"http://link.com\"></oppia-noninteractive-link></b><br></p><p></p><p><b><oppia-noninteractive-link text-with-value=\"What is a link?\" url-with-value=\"http://link.com\"></oppia-noninteractive-link></b></p>",
+    "expected_output": "<p>Hello</p><p><b><oppia-noninteractive-link text-with-value=\"&amp;quot;What is a link?&amp;quot;\" url-with-value=\"&amp;quot;http://link.com&amp;quot;\"></oppia-noninteractive-link></b><br></p><p><b><oppia-noninteractive-link text-with-value=\"&amp;quot;What is a link?&amp;quot;\" url-with-value=\"&amp;quot;http://link.com&amp;quot;\"></oppia-noninteractive-link></b><br></p><p></p><p><b><oppia-noninteractive-link text-with-value=\"&amp;quot;What is a link?&amp;quot;\" url-with-value=\"&amp;quot;http://link.com&amp;quot;\"></oppia-noninteractive-link></b></p>",
     "case": "b-a"
     }, {
     "html_content": "<table border=\"1\"><tbody><tr><td><b>Lorem</b></td><td><b>ipsum</b></td></tr><tr><td>lorem</td><td>ipsum</td></tr></tbody></table><br><div>lorem ipsum</div>",
@@ -229,7 +229,7 @@
     "case": "oppia-noninteractive-video-div"
     }, {
     "html_content": "Hello<div><br></div><div>this is </div><div><br></div><div><a href=\"https://link.com/\" target=\"_blank\">test</a><br></div><div><br></div><div>case </div><br><div>for migration <a href=\"https://groups.google.com/forum/?fromgroups#!forum/oppia\" target=\"_blank\">testing</a>.</div><div><br></div>",
-    "expected_output": "<p>Hello</p><p><br></p><p>this is </p><p><br></p><p><oppia-noninteractive-link text-with-value=\"test\" url-with-value=\"https://link.com/\"></oppia-noninteractive-link><br></p><p><br></p><p>case </p><p><br></p><p>for migration <oppia-noninteractive-link text-with-value=\"testing\" url-with-value=\"https://groups.google.com/forum/?fromgroups#!forum/oppia\"></oppia-noninteractive-link>.</p><p><br></p>",
+    "expected_output": "<p>Hello</p><p><br></p><p>this is </p><p><br></p><p><oppia-noninteractive-link text-with-value=\"&amp;quot;test&amp;quot;\" url-with-value=\"&amp;quot;https://link.com/&amp;quot;\"></oppia-noninteractive-link><br></p><p><br></p><p>case </p><p><br></p><p>for migration <oppia-noninteractive-link text-with-value=\"&amp;quot;testing&amp;quot;\" url-with-value=\"&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;\"></oppia-noninteractive-link>.</p><p><br></p>",
     "case": "a"
     }, {
     "html_content": "<table border=\"1\"><tbody><tr><td>Lorem ipsum</td><td>Lorem ipsum</td><td>Lorem ipsum</td></tr><tr><td>Lorem ipsum</td><td>Lorem ipsum</td><td>Lorem ipsum</td></tr><tr><td>Lorem ipsum</td><td>Lorem ipsum</td><td>Lorem ipsum</td></tr></tbody></table>",

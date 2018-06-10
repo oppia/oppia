@@ -225,9 +225,10 @@ def convert_to_text_angular(html_data):
             blockquote.parent.parent.wrap(soup.new_tag('blockquote'))
             blockquote.unwrap()
 
-    # If p tag is wrapped within a td tag, the final output will
-    # span to multiple paragraphs instead of all items being in
-    # a row as in table. So, any p tag within td tag is unwrapped.
+    # If p tags are left within a td tag, the contents of a table row
+    # in final output will span to multiple lines instead of all
+    # items being in a single line. So, any p tag within
+    # td tag is unwrapped.
     for p in soup.findAll('p'):
         if p.parent.name == 'td':
             p.unwrap()
@@ -262,8 +263,8 @@ def convert_to_text_angular(html_data):
                     link = soup.new_tag('oppia-noninteractive-link')
                     url = tag['href']
                     text = tag.get_text()
-                    link['url-with-value'] = url
-                    link['text-with-value'] = text
+                    link['url-with-value'] = "&quot;" + url + "&quot;"
+                    link['text-with-value'] = "&quot;" + text + "&quot;"
                     tag.wrap(link)
                     # If any part of text in a tag is wrapped in b or i tag
                     # link tag is also wrapped in those tags to maintain
@@ -434,16 +435,16 @@ def validate_textangular_format(html_list, run_migration=False):
 
     for html_data in html_list:
         if run_migration:
-            # <br> is replaced with <br/> before conversion because
-            # BeautifulSoup in some cases adds </br> closing tag
-            # and br is reported as parent of other tags which
-            # produces issues in validation.
-            migrated_data = convert_to_text_angular(html_data).replace(
-                '<br>', '<br/>')
-            soup = bs4.BeautifulSoup(migrated_data, 'html.parser')
+            soup_data = convert_to_text_angular(html_data)
         else:
-            soup = bs4.BeautifulSoup(
-                html_data.replace('<br>', '<br/>'), 'html.parser')
+            soup_data = html_data
+
+        # <br> is replaced with <br/> before conversion because
+        # otherwise BeautifulSoup in some cases adds </br> closing tag
+        # and br is reported as parent of other tags which
+        # produces issues in validation.
+        soup = bs4.BeautifulSoup(
+            soup_data.replace('<br>', '<br/>'), 'html.parser')
 
         # Text with no parent tag is also invalid.
         for content in soup.contents:
