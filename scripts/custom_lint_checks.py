@@ -619,8 +619,8 @@ class DocstringParameterChecker(checkers.BaseChecker):
 
 
 class ImportOnlyModulesChecker(checkers.BaseChecker):
-    """Checker for import from statements. It checks whether
-    modules are imported only.
+    """Checker for import-from statements. It checks that
+    modules are only imported.
     """
 
     __implements__ = interfaces.IAstroidChecker
@@ -631,14 +631,14 @@ class ImportOnlyModulesChecker(checkers.BaseChecker):
         'C0003': (
             'Import \"%s\" from \"%s\" is not a module.',
             'import-only-modules',
-            'Only modules should be imported.',
+            'Modules should only be imported.',
         ),
     }
 
     @checker_utils.check_messages('import-only-modules')
     def visit_importfrom(self, node):
-        """Visits all import from statements in a python file and checks whether
-        modules are imported only. It then adds a message accordingly.
+        """Visits all import-from statements in a python file and checks that
+        modules are imported. It then adds a message accordingly.
 
         Args:
             node. astroid.scoped_nodes.Function. Node for a function or method
