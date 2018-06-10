@@ -594,9 +594,10 @@ class Topic(object):
             int. The id of the newly created subtopic.
         """
         if self.next_subtopic_id != new_subtopic_id:
-            raise Exception('The given new subtopic id (%s) is not equal to '
-                'the expected next subtopic id: %s'
-                %(new_subtopic_id, self.next_subtopic_id))
+            raise Exception(
+                'The given new subtopic id %s is not equal to the expected '
+                'next subtopic id: %s'
+                % (new_subtopic_id, self.next_subtopic_id))
         self.next_subtopic_id = self.next_subtopic_id + 1
         self.subtopics.append(
             Subtopic.create_default_subtopic(new_subtopic_id, title))

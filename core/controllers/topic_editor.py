@@ -165,7 +165,13 @@ class EditableTopicDataHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_topic
     def put(self, topic_id):
-        """Updates properties of the given topic."""
+        """Updates properties of the given topic.
+        Also, each change_dict given for editing should have an additional
+        property called is_topic_change, which would be a boolean. If True, it
+        means that change is for a topic, while False would mean it is for a
+        Subtopic Page (this includes adding, removing subtopics and editing its
+        html data).
+        """
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
@@ -179,14 +185,20 @@ class EditableTopicDataHandler(base.BaseHandler):
         self._require_valid_version(version, topic.version)
 
         commit_message = self.payload.get('commit_message')
-        change_dicts = self.payload.get('change_dicts')
-        change_list = [
-            topic_domain.TopicChange(change_dict)
-            for change_dict in change_dicts
-        ]
+        topic_and_subtopic_page_change_dicts = self.payload.get(
+            'topic_and_subtopic_page_change_dicts')
+        topic_and_subtopic_page_change_list = []
+        for change in topic_and_subtopic_page_change_dicts:
+            if change['is_topic_change']:
+                topic_and_subtopic_page_change_list.append(
+                    topic_domain.TopicChange(change))
+            else:
+                topic_and_subtopic_page_change_list.append(
+                    subtopic_page_domain.SubtopicPageChange(change))
         try:
-            topic_services.update_topic(
-                self.user_id, topic_id, change_list, commit_message)
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, topic_and_subtopic_page_change_list,
+                commit_message)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

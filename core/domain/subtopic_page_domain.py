@@ -12,7 +12,7 @@
 # distributed under the License is distributed on an "AS-IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
-# limitations under the License.]
+# limitations under the License.
 
 """Domain objects for the pages for subtopics, and related models."""
 
@@ -63,18 +63,14 @@ class SubtopicPageChange(object):
             raise Exception('Invalid change_dict: %s' % change_dict)
         self.cmd = change_dict['cmd']
 
-        if self.cmd == CMD_ADD_SUBTOPIC:
-            self.subtopic_id = change_dict['subtopic_id']
-            self.topic_id = change_dict['topic_id']
-        elif self.cmd == CMD_DELETE_SUBTOPIC:
-            self.subtopic_id = change_dict['subtopic_id']
-        elif self.cmd == CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY:
+        if self.cmd == CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY:
             if (change_dict['property_name'] not in
                     self.SUBTOPIC_PAGE_PROPERTIES):
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
             self.new_value = copy.deepcopy(change_dict['new_value'])
             self.old_value = copy.deepcopy(change_dict['old_value'])
+            self.id = change_dict['subtopic_id']
         elif self.cmd == CMD_CREATE_NEW:
             self.topic_id = change_dict['topic_id']
         else:
@@ -161,6 +157,14 @@ class SubtopicPage(object):
         subtopic_page_id = cls.get_subtopic_page_id(topic_id, subtopic_id)
         return cls(
             subtopic_page_id, topic_id, '', constants.DEFAULT_LANGUAGE_CODE, 0)
+
+    def get_subtopic_id_from_subtopic_page_id(self):
+        """Returns the subtopic id from the subtopic page id of the object.
+
+        Returns:
+            int. The subtopic_id of the object.
+        """
+        return int(self.id[len(self.topic_id) + 1:])
 
     def update_html_data(self, new_html_data):
         """The new value for the html data field.

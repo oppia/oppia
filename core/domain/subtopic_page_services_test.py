@@ -18,6 +18,7 @@
 
 from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
+from core.domain import topic_domain
 from core.domain import topic_services
 from core.platform import models
 from core.tests import test_utils
@@ -38,12 +39,17 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
     def setUp(self):
         super(SubtopicPageServicesUnitTests, self).setUp()
         self.TOPIC_ID = topic_services.get_new_topic_id()
-        subtopic_page_services.save_new_subtopic_page(
-            self.user_id, self.TOPIC_ID, self.subtopic_id)
         self.subtopic_page = (
             subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
                 self.subtopic_id, self.TOPIC_ID))
-        self.subtopic_page.version += 1
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, self.subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 1,
+                'title': 'Sample'
+            })]
+        )
         self.subtopic_page_id = (
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                 self.TOPIC_ID, 1))
@@ -60,6 +66,24 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.subtopic_id)
         self.assertEqual(subtopic_page.to_dict(), self.subtopic_page.to_dict())
 
+    def test_get_all_subtopic_pages_in_topic(self):
+        subtopic_page = (
+            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
+                4, self.TOPIC_ID))
+        subtopic_page_services.save_subtopic_page(
+            self.user_id, subtopic_page, 'Added subtopic',
+            [topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'subtopic_id': 4,
+                'title': 'Sample'
+            })]
+        )
+        subtopic_pages = subtopic_page_services.get_all_subtopic_pages_in_topic(
+            self.TOPIC_ID)
+        self.assertEqual(len(subtopic_pages), 2)
+        self.assertEqual(subtopic_pages[0].id, self.TOPIC_ID + '-1')
+        self.assertEqual(subtopic_pages[1].id, self.TOPIC_ID + '-4')
+
     def test_commit_log_entry(self):
         subtopic_page_commit_log_entry = (
             topic_models.SubtopicPageCommitLogEntryModel.get_commit(
@@ -70,24 +94,3 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             subtopic_page_commit_log_entry.subtopic_page_id,
             self.subtopic_page_id)
         self.assertEqual(subtopic_page_commit_log_entry.user_id, self.user_id)
-
-    def test_update_subtopic_page(self):
-        changelist = [subtopic_page_domain.SubtopicPageChange({
-            'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
-            'property_name': (
-                subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA),
-            'topic_id': self.TOPIC_ID,
-            'subtopic_id': 1,
-            'old_value': '',
-            'new_value': '<p>New Value</p>'
-        })]
-        subtopic_page_services.update_subtopic_page(
-            self.user_id, self.TOPIC_ID, 1, changelist, 'Updated html data')
-        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
-            self.TOPIC_ID, 1, strict=False)
-        self.assertEqual(subtopic_page.html_data, '<p>New Value</p>')
-        self.assertEqual(subtopic_page.topic_id, self.TOPIC_ID)
-        self.assertEqual(
-            subtopic_page.id,
-            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                self.TOPIC_ID, 1))

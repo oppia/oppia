@@ -53,6 +53,10 @@ class SubtopicPageDomainUnitTests(test_utils.GenericTestBase):
             subtopic_page_domain.SubtopicPage.get_subtopic_page_id('abc', 1),
             'abc-1')
 
+    def test_get_subtopic_id_from_subtopic_page_id(self):
+        self.assertEqual(
+            self.subtopic_page.get_subtopic_id_from_subtopic_page_id(), 1)
+
     def _assert_validation_error(self, expected_error_substring):
         """Checks that the topic passes strict validation."""
         with self.assertRaisesRegexp(

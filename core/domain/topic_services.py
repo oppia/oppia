@@ -20,6 +20,7 @@ import copy
 import logging
 
 from core.domain import role_services
+from core.domain import subtopic_page_domain
 from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import user_services
@@ -257,15 +258,29 @@ def apply_change_list(topic_id, change_list):
             topic.
 
     Returns:
-        Topic. The resulting topic domain object.
+        dict, list(int), list(int). A dict with two fields: topic and
+            subtopic_pages containing the updated domain objects of each one,
+            a list of ids of the deleted subtopics and a list of ids of the
+            newly created subtopics.
     """
     topic = get_topic_by_id(topic_id)
+    subtopic_pages = subtopic_page_services.get_all_subtopic_pages_in_topic(
+        topic_id)
+    newly_created_subtopic_ids = []
+    deleted_subtopic_ids = []
+    return_dict = {}
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
                 topic.add_subtopic(change.subtopic_id, change.title)
+                subtopic_pages.append(
+                    subtopic_page_domain.SubtopicPage.create_default_subtopic_page( #pylint: disable=line-too-long
+                        change.subtopic_id, topic_id)
+                )
+                newly_created_subtopic_ids.append(change.subtopic_id)
             elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
                 topic.delete_subtopic(change.id)
+                deleted_subtopic_ids.append(change.id)
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
                 topic.add_uncategorized_skill_id(change.id)
             elif change.cmd == topic_domain.CMD_REMOVE_UNCATEGORIZED_SKILL_ID:
@@ -298,6 +313,15 @@ def apply_change_list(topic_id, change_list):
                     topic.update_language_code(change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
+            elif (change.cmd ==
+                  subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
+                if (change.property_name ==
+                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA):
+                    subtopic_pages = subtopic_page_services.update_html_data(
+                        subtopic_pages, change.id, deleted_subtopic_ids,
+                        change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
                 if (change.property_name ==
                         topic_domain.SUBTOPIC_PROPERTY_TITLE):
@@ -306,7 +330,10 @@ def apply_change_list(topic_id, change_list):
                     raise Exception('Invalid change dict.')
             else:
                 raise Exception('Invalid change dict.')
-        return topic
+        return_dict['topic'] = topic
+        return_dict['subtopic_pages'] = subtopic_pages
+        return (
+            return_dict, deleted_subtopic_ids, newly_created_subtopic_ids)
 
     except Exception as e:
         logging.error(
@@ -368,16 +395,16 @@ def _save_topic(committer_id, topic, commit_message, change_list):
     topic.version += 1
 
 
-def update_topic(
+def update_topic_and_subtopic_pages(
         committer_id, topic_id, change_list, commit_message):
-    """Updates a topic. Commits changes.
+    """Updates a topic and its subtopic pages. Commits changes.
 
     Args:
     - committer_id: str. The id of the user who is performing the update
         action.
     - topic_id: str. The topic id.
-    - change_list: list(TopicChange). These changes are applied in sequence to
-        produce the resulting topic.
+    - change_list: list(TopicChange and SubtopicPageChange). These changes are
+        applied in sequence to produce the resulting topic.
     - commit_message: str or None. A description of changes made to the
         topic.
 
@@ -388,16 +415,26 @@ def update_topic(
         raise ValueError(
             'Expected a commit message, received none.')
 
-    topic = apply_change_list(topic_id, change_list)
-    _save_topic(committer_id, topic, commit_message, change_list)
-    for change in change_list:
-        if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
-            subtopic_page_services.save_new_subtopic_page(
-                committer_id, topic.id, change.subtopic_id)
-        elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
+    (
+        updated_topic_and_subtopic_pages_dict,
+        deleted_subtopic_ids, newly_created_subtopic_ids
+    ) = apply_change_list(topic_id, change_list)
+
+    _save_topic(
+        committer_id, updated_topic_and_subtopic_pages_dict['topic'],
+        commit_message, change_list
+    )
+    subtopic_pages = updated_topic_and_subtopic_pages_dict['subtopic_pages']
+    for subtopic_page in subtopic_pages:
+        subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
+        if ((subtopic_id in deleted_subtopic_ids) and
+                (subtopic_id not in newly_created_subtopic_ids)):
             subtopic_page_services.delete_subtopic_page(
-                committer_id, change.id, topic.id)
-    create_topic_summary(topic.id)
+                committer_id, subtopic_id, topic_id)
+        else:
+            subtopic_page_services.save_subtopic_page(
+                committer_id, subtopic_page, commit_message, change_list)
+    create_topic_summary(topic_id)
 
 
 def delete_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
@@ -413,7 +450,7 @@ def delete_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
         'cmd': 'remove_uncategorized_skill_id',
         'uncategorized_skill_id': uncategorized_skill_id
     })]
-    update_topic(
+    update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
         'Removed %s from uncategorized skill ids' % uncategorized_skill_id)
 
@@ -431,7 +468,7 @@ def add_uncategorized_skill(user_id, topic_id, uncategorized_skill_id):
         'cmd': 'add_uncategorized_skill_id',
         'new_uncategorized_skill_id': uncategorized_skill_id
     })]
-    update_topic(
+    update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
         'Added %s to uncategorized skill ids' % uncategorized_skill_id)
 
@@ -456,7 +493,7 @@ def delete_story(user_id, topic_id, story_id):
         'old_value': old_canonical_story_ids,
         'new_value': topic.canonical_story_ids
     })]
-    update_topic(
+    update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
         'Removed %s from canonical story ids' % story_id)
 
@@ -478,7 +515,7 @@ def add_canonical_story(user_id, topic_id, story_id):
         'old_value': old_canonical_story_ids,
         'new_value': topic.canonical_story_ids
     })]
-    update_topic(
+    update_topic_and_subtopic_pages(
         user_id, topic_id, change_list,
         'Added %s to canonical story ids' % story_id)
 
@@ -504,6 +541,9 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
         force_deletion=force_deletion)
 
     topic_model = topic_models.TopicModel.get(topic_id)
+    for subtopic in topic_model.subtopics:
+        subtopic_page_services.delete_subtopic_page(
+            committer_id, subtopic['id'], topic_id)
     topic_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)

@@ -16,8 +16,6 @@
 
 """Commands for operations on subtopic pages, and related models."""
 
-import logging
-
 from core.domain import subtopic_page_domain
 from core.platform import models
 import feconf
@@ -49,7 +47,7 @@ def get_subtopic_page_by_id(topic_id, subtopic_id, strict=True):
     Args:
         topic_id: str. ID of the topic that the subtopic is a part of.
         subtopic_id: int. The id of the subtopic.
-        strict: bool. Whether to fail noisily if no topic with the given
+        strict: bool. Whether to fail noisily if no subtopic page with the given
             id exists in the datastore.
 
     Returns:
@@ -67,111 +65,30 @@ def get_subtopic_page_by_id(topic_id, subtopic_id, strict=True):
         return None
 
 
-def apply_change_list(topic_id, subtopic_id, change_list):
-    """Applies a changelist to a topic and returns the result.
+def get_all_subtopic_pages_in_topic(topic_id, include_deleted=False):
+    """Returns all subtopic pages linked to a topic.
 
     Args:
-        topic_id: str. ID of the topic, the subtopic is a part of.
-        subtopic_id: int. The id of the subtopic.
-        change_list: list(SubtopicPageChange). A change list to be applied to
-            the given subtopic page.
+        topic_id: str. The id of the topic to which the subtopic pages are
+            linked.
+        include_deleted: bool. Whether to include the subtopic pages that
+            were not strictly deleted.
 
     Returns:
-        SubtopicPage. The resulting subtopic page domain object.
+        list(SubtopicPage). The list of subtopic pages linked to the given topic
+            id.
     """
-    subtopic_page = get_subtopic_page_by_id(topic_id, subtopic_id)
-    try:
-        for change in change_list:
-            if (change.cmd ==
-                    subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
-                if (change.property_name ==
-                        subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA):
-                    subtopic_page.update_html_data(change.new_value)
-                else:
-                    raise Exception('Invalid change dict.')
-            else:
-                raise Exception('Invalid change dict.')
-
-    except Exception as e:
-        logging.error(
-            '%s %s %s %s %s' % (
-                e.__class__.__name__, e, topic_id, subtopic_id, change_list)
-        )
-        raise
-    return subtopic_page
+    subtopic_page_models = topic_models.SubtopicPageModel.query().filter(
+        (topic_models.SubtopicPageModel.topic_id == topic_id) and
+        (topic_models.SubtopicPageModel.deleted == include_deleted))
+    subtopic_pages = [
+        get_subtopic_page_from_model(subtopic_page_model)
+        for subtopic_page_model in subtopic_page_models
+    ]
+    return subtopic_pages
 
 
-def update_subtopic_page(
-        committer_id, topic_id, subtopic_id, change_list, commit_message):
-    """Updates a topic. Commits changes.
-
-    Args:
-    - committer_id: str. The id of the user who is performing the update
-        action.
-    - topic_id: str. The id of the  topic, the subtopic is a part of.
-    - subtopic_id: int. Id of the subtopic.
-    - change_list: list(SubtopicPageChange). These changes are applied in
-        sequence to produce the resulting subtopic change.
-    - commit_message: str or None. A description of changes made to the
-        subtopic page.
-    """
-    if not commit_message:
-        raise ValueError(
-            'Expected a commit message, received none.')
-
-    subtopic_page = apply_change_list(topic_id, subtopic_id, change_list)
-    _save_subtopic_page(
-        committer_id, subtopic_page, commit_message, change_list)
-
-
-def _create_subtopic_page(
-        committer_id, subtopic_page, commit_message, commit_cmds):
-    """Creates a new subtopic_page.
-
-    Args:
-        committer_id: str. ID of the committer.
-        subtopic_page: SubtopicPage. The subtopic page domain object.
-        commit_message: str. A description of changes made to the topic.
-        commit_cmds: list(SubtopicPageChange). A list of change commands made
-            to the given subtopic page.
-    """
-    subtopic_page.validate()
-    model = topic_models.SubtopicPageModel(
-        id=subtopic_page.id,
-        topic_id=subtopic_page.topic_id,
-        html_data=subtopic_page.html_data,
-        language_code=subtopic_page.language_code,
-    )
-    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    model.commit(committer_id, commit_message, commit_cmd_dicts)
-    subtopic_page.version += 1
-
-
-def save_new_subtopic_page(committer_id, topic_id, subtopic_id):
-    """Saves a new topic.
-
-    Args:
-        committer_id: str. ID of the committer.
-        topic_id: str. The id of the topic the subtopic is a part of..
-        subtopic_id: int. The id of the subtopic.
-    """
-    subtopic_page = (
-        subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-            subtopic_id, topic_id))
-    commit_message = (
-        'New subtopic page created for topic with id \'%s\'.'
-        % subtopic_page.topic_id)
-    _create_subtopic_page(
-        committer_id, subtopic_page, commit_message, [
-            subtopic_page_domain.SubtopicPageChange({
-                'cmd': subtopic_page_domain.CMD_CREATE_NEW,
-                'topic_id': subtopic_page.id
-            })
-        ]
-    )
-
-
-def _save_subtopic_page(
+def save_subtopic_page(
         committer_id, subtopic_page, commit_message, change_list):
     """Validates a subtopic page and commits it to persistent storage. If
     successful, increments the version number of the incoming subtopic page
@@ -219,6 +136,42 @@ def _save_subtopic_page(
     change_dicts = [change.to_dict() for change in change_list]
     subtopic_page_model.commit(committer_id, commit_message, change_dicts)
     subtopic_page.version += 1
+
+
+def update_html_data(
+        subtopic_pages, subtopic_id, deleted_subtopic_ids, new_html_data):
+    """Updates the html_data fields of the subtopic page with the given id in
+    the list (if present), provided the id is not in deleted_subtopic_page_ids
+    list.
+
+    Args:
+        subtopic_pages: list(SubtopicPage). The list of subtopic pages that are
+            part of the topic being edited.
+        subtopic_id: str. The id of the subtopic page to edit.
+        deleted_subtopic_ids: list(int). The ids of the subtopics whose pages
+            were deleted in the present change_list (i.e those that are not
+            updated in the datastore yet).
+        new_html_data: str. The new html data for the given subtopic id.
+
+    Raises:
+        Exception. The subtopic page doesn't exist.
+
+    Returns:
+        list(SubtopicPage). The modified list of subtopic pages.
+    """
+    if subtopic_id in deleted_subtopic_ids:
+        raise Exception(
+            'The subtopic with id %s doesn\'t exist' % subtopic_id)
+    for subtopic_page in subtopic_pages:
+        if (
+                subtopic_page.id ==
+                subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                    subtopic_page.topic_id, subtopic_id)):
+            subtopic_page.update_html_data(new_html_data)
+            return subtopic_pages
+
+    raise Exception(
+        'The subtopic with id %s doesn\'t exist' % subtopic_id)
 
 
 def delete_subtopic_page(
