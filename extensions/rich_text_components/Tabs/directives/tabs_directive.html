@@ -1,7 +1,7 @@
 <uib-tabset>
   <uib-tab ng-repeat="tabContent in tabContents" heading="<[tabContent.title]>">
     <br>
-    <angular-html-bind html-data="tabContent.content"></angular-html-bind>
+    <span><angular-html-bind html-data="tabContent.content"></angular-html-bind></span>
   </uib-tab>
 </uib-tabset>
 

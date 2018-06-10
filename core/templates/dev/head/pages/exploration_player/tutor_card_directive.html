@@ -74,9 +74,9 @@
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
         <div ng-if="isInteractionInline && activeCard.interactionHtml && !activeCard.destStateName">
-          <angular-html-bind class="protractor-test-conversation-input"
+          <div><angular-html-bind class="protractor-test-conversation-input"
                              html-data="activeCard.interactionHtml">
-          </angular-html-bind>
+          </angular-html-bind></div>
         </div>
       </div>
     </div>

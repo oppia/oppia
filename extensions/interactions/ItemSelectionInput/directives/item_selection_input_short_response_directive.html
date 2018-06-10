@@ -3,11 +3,11 @@
 </div>
 
 <div ng-if="answer.length === 1">
-  <angular-html-bind html-data="answer[0]"></angular-html-bind>
+  <span><angular-html-bind html-data="answer[0]"></angular-html-bind></span>
 </div>
 
 <ul ng-if="answer.length > 1">
   <li ng-repeat="response in answer track by $index">
-    <angular-html-bind html-data="response"></angular-html-bind>
+    <span><angular-html-bind html-data="response"></angular-html-bind></span>
   </li>
 </ul>

@@ -9,8 +9,8 @@
   <div>
     <textarea ng-model="localValue.label" placeholder="\frac{x}{y}"></textarea>
   </div>
-  Preview: <mathjax-bind ng-if="localValue.label" mathjax-data="localValue.label"></mathjax-bind>
-          <mathjax-bind ng-if="!localValue.label" mathjax-data="placeholderText" style="color: #808080;"></mathjax-bind>
+  Preview: <span><mathjax-bind ng-if="localValue.label" mathjax-data="localValue.label"></mathjax-bind></span>
+          <span><mathjax-bind ng-if="!localValue.label" mathjax-data="placeholderText" style="color: #808080;"></mathjax-bind></span>
   <button type="button" class="btn btn-default"  ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
     Close
   </button>

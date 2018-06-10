@@ -1,19 +1,19 @@
 <div class="oppia-learner-hint-and-solution-modal-title"><[isHint ? "Hint" : "Solution"]></div>
 
 <div class="modal-body">
-  <angular-html-bind ng-if="isHint" class="oppia-learner-hint-and-solution-modal-body"
+  <span><angular-html-bind ng-if="isHint" class="oppia-learner-hint-and-solution-modal-body"
                      html-data="hint.getHtml()">
-  </angular-html-bind>
+  </angular-html-bind></span>
   <div ng-if="!isHint">
     <label><[shortAnswerHtml.prefix]> solution is: &nbsp; </label>
-    <angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
+    <span><angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
                        html-data="shortAnswerHtml.answer">
-    </angular-html-bind>
+    </angular-html-bind></span>
     <br><br>
     <label>Explanation: </label>
-    <angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
+    <span><angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
                        html-data="solutionExplanationHtml">
-    </angular-html-bind>
+    </angular-html-bind></span>
   </div>
 </div>
 
