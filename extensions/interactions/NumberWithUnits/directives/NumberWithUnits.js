@@ -136,12 +136,13 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
   }
 ]);
 
-// Rule evaluation for number with units.
+// Rules service for number with units interaction.
 oppia.factory('numberWithUnitsRulesService', [
   'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
   function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
     return {
       IsEqualTo: function(answer, inputs) {
+        // Returns true only if input is exactly equal to answer.
         return angular.equals(answer, inputs.f);
       },
       IsEquivalentTo: function(answer, inputs) {
