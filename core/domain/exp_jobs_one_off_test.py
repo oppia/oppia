@@ -1006,53 +1006,63 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
             json_data = json.load(f)
         test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
 
-        for index, test_case in enumerate(test_cases):
-            exp_id = self.VALID_EXP_ID + str(index)
-            exploration = exp_domain.Exploration.create_default_exploration(
-                exp_id, title='title', category='category')
-            exploration.add_states(['State1'])
-            state1 = exploration.states['State1']
-            content1_dict = {
-                'html': test_case['html_content'],
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        state_list = []
+        for index in range(len(test_cases)):
+            state_list += ['State' + str(index)]
+
+        exploration.add_states(state_list)
+
+        for index, state_name in enumerate(state_list):
+            state = exploration.states[state_name]
+            content_dict = {
+                'html': test_cases[index]['html_content'],
                 'audio_translations': {}
             }
-            state1.update_content(content1_dict)
-            exp_services.save_new_exploration(self.albert_id, exploration)
+            state.update_content(content_dict)
 
-            # Start validation job on exploration.
-            job_id = (
-                exp_jobs_one_off.ExplorationContentValidationJob.create_new())
-            exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        exp_services.save_new_exploration(self.albert_id, exploration)
 
-            actual_output = (
-                exp_jobs_one_off.ExplorationContentValidationJob.get_output(
-                    job_id))
+        # Start validation job on exploration.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJob.create_new())
+        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
-            # Test that validation fails before migration.
-            self.assertTrue(actual_output != [])
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJob.get_output(
+                job_id))
 
-            exploration_dict = exploration.to_dict()
-            updated_dict = exp_domain.Exploration._convert_v25_dict_to_v26_dict( # pylint: disable=protected-access
-                exploration_dict)
-            updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
-            updated_html = updated_dict['states']['State1']['content']['html']
+        # Test that validation fails before migration.
+        self.assertTrue(actual_output != [])
+
+        exploration_dict = exploration.to_dict()
+        updated_dict = exp_domain.Exploration._convert_v25_dict_to_v26_dict( # pylint: disable=protected-access
+            exploration_dict)
+        updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
+        updated_states = updated_dict['states']
+
+        for index, state_name in enumerate(state_list):
+            updated_html = updated_states[state_name]['content']['html']
 
             # Test that html matches the expected format after migration.
-            self.assertEqual(updated_html, test_case['expected_output'])
+            self.assertEqual(
+                updated_html, test_cases[index]['expected_output'])
 
-            exp_services.save_new_exploration(
-                self.albert_id, updated_exploration)
+        exp_services.save_new_exploration(
+            self.albert_id, updated_exploration)
 
-            # Start validation job on updated exploration.
-            job_id = (
-                exp_jobs_one_off.ExplorationContentValidationJob.create_new())
-            exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
-            self.process_and_flush_pending_tasks()
+        # Start validation job on updated exploration.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJob.create_new())
+        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
 
-            actual_output = (
-                exp_jobs_one_off.ExplorationContentValidationJob.get_output(
-                    job_id))
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJob.get_output(
+                job_id))
 
-            # Test that validation passes after migration.
-            self.assertEqual(actual_output, [])
+        # Test that validation passes after migration.
+        self.assertEqual(actual_output, [])
