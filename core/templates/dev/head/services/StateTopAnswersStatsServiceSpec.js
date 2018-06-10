@@ -101,30 +101,4 @@ describe('StateTopAnswersStatsService', function() {
       ]);
     });
   });
-
-  describe('.refreshStateStats', function() {
-    it('correctly updates addressed info', function() {
-      // Initially, 'adios' isn't addressed by the Hola state.
-      this.StateTopAnswersStatsService.init({
-        answers: {
-          Hola: [{answer: 'adios', frequency: 4}]
-        }
-      });
-
-      expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
-        joC({answer: 'adios', isAddressed: false})
-      ]);
-
-      this.EXP_STATES.Hola.interaction.answerGroups.push({
-        rules: [{type: 'Equals', inputs: {x: 'adios'}}],
-        outcome: {dest: 'Hola'}
-      });
-      // Now, 'adios' is addressed by the Hola state.
-      this.StateTopAnswersStatsService.refreshStateStats('Hola');
-
-      expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
-        joC({answer: 'adios', isAddressed: true}),
-      ]);
-    });
-  });
 });
