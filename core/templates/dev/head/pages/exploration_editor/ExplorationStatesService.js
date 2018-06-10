@@ -235,6 +235,9 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
+        $rootScope.$broadcast('saveInteractionAnswerGroups', {
+          state_name: stateName
+        });
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(
@@ -279,6 +282,7 @@ oppia.factory('ExplorationStatesService', [
         _states.addState(newStateName);
 
         ChangeListService.addState(newStateName);
+        $rootScope.$broadcast('addState', {state_name: newStateName});
         $rootScope.$broadcast('refreshGraph');
         if (successCallback) {
           successCallback(newStateName);
@@ -335,6 +339,7 @@ oppia.factory('ExplorationStatesService', [
           }
 
           $location.path('/gui/' + EditorStateService.getActiveStateName());
+          $rootScope.$broadcast('deleteState', {state_name: deleteStateName});
           $rootScope.$broadcast('refreshGraph');
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
@@ -367,6 +372,10 @@ oppia.factory('ExplorationStatesService', [
           ExplorationInitStateNameService.displayed = newStateName;
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
         }
+        $rootScope.$broadcast('renameState', {
+          old_state_name: oldStateName,
+          new_state_name: newStateName
+        });
         $rootScope.$broadcast('refreshGraph');
       }
     };
