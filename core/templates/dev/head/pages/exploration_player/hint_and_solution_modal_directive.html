@@ -2,17 +2,17 @@
 
 <div class="modal-body">
   <span><angular-html-bind ng-if="isHint" class="oppia-learner-hint-and-solution-modal-body"
-                     html-data="hint.getHtml()">
+                           html-data="hint.getHtml()">
   </angular-html-bind></span>
   <div ng-if="!isHint">
     <label><[shortAnswerHtml.prefix]> solution is: &nbsp; </label>
     <span><angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
-                       html-data="shortAnswerHtml.answer">
+                             html-data="shortAnswerHtml.answer">
     </angular-html-bind></span>
     <br><br>
     <label>Explanation: </label>
     <span><angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
-                       html-data="solutionExplanationHtml">
+                             html-data="solutionExplanationHtml">
     </angular-html-bind></span>
   </div>
 </div>
