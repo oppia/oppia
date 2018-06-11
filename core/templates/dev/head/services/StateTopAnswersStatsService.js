@@ -61,18 +61,18 @@ oppia.factory('StateTopAnswersStatsService', [
 
       // Clear the unresolved answers array since many answers may now have
       // different values.
-      unresolvedAnswers.splice(0, unresolvedAnswers.length);
+      unresolvedAnswersCacheEntry.splice(0, unresolvedAnswersCacheEntry.length);
 
       // Update the isAddressed data of each answer and put any unaddressed
       // answers into the unresolvedAnswers array.
-      allAnswers.forEach(function(answerStats) {
+      allAnswersCacheEntry.forEach(function(answerStats) {
         answerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
             explorationId, stateName, state, answerStats.answer,
             interactionRulesService);
 
         if (!answerStats.isAddressed) {
-          unresolvedAnswers.push(answerStats);
+          unresolvedAnswersCacheEntry.push(answerStats);
         }
       });
     };
