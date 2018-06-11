@@ -42,6 +42,8 @@ oppia.factory('GenerateContentIdService', [
       if (componentName === COMPONENT_NAME_FEEDBACK ||
           componentName === COMPONENT_NAME_HINT) {
         return generateIdForHintOrFeedback(componentName);
+      } else {
+        throw Error('Unknown component name provided.');
       }
     };
     return {
