@@ -345,7 +345,7 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion.id.split('.')[1], self.EXP_ID)
         self.assertEqual(
             suggestion.suggestion_type,
-            suggestion_models.SUGGESTION_EDIT_STATE_CONTENT)
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)
         self.assertEqual(
             suggestion.target_type, suggestion_models.TARGET_TYPE_EXPLORATION)
         self.assertEqual(suggestion.target_id, self.EXP_ID)

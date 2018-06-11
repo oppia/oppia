@@ -116,7 +116,7 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(suggestion):
-        suggestion_id = (
+        new_suggestion_id = (
             suggestion_models.TARGET_TYPE_EXPLORATION + '.' + suggestion.id)
         thread = feedback_models.FeedbackThreadModel.get_by_id(suggestion.id)
         if thread.status == feedback_models.STATUS_CHOICES_OPEN:
@@ -150,8 +150,9 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         }
 
         suggestion_models.GeneralSuggestionModel(
-            id=suggestion_id,
-            suggestion_type=suggestion_models.SUGGESTION_EDIT_STATE_CONTENT,
+            id=new_suggestion_id,
+            suggestion_type=
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
             target_id=suggestion.exploration_id,
             target_version_at_submission=suggestion.exploration_version,
