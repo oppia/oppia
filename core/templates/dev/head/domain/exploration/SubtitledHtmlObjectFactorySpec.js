@@ -17,13 +17,7 @@
  */
 
 describe('SubtitledHtml object factory', function() {
-  beforeEach(module('oppia', function($provide) {
-    $provide.value('LanguageUtilService', {
-      getAudioLanguagesCount: function() {
-        return 2;
-      }
-    });
-  }));
+  beforeEach(module('oppia'));
 
   describe('SubtitledHtmlObjectFactory', function() {
     var scope, shof, lus, subtitledHtml;
