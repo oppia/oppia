@@ -34,8 +34,9 @@ oppia.directive('unresolvedAnswersOverview', [
            * TODO(brianrodri): Move this into an appropriate service.
            * @returns {boolean}
            */
-          var isStateInteractionIdSupported = function(stateName) {
-            var state = ExplorationStatesService.getState(stateName);
+          var isStateInteractionIdSupported = function() {
+            var state = ExplorationStatesService.getState(
+              EditorStateService.getActiveStateName());
             if (!state) {
               return false;
             } else {
@@ -45,14 +46,13 @@ oppia.directive('unresolvedAnswersOverview', [
           };
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
-            var stateName = EditorStateService.getActiveStateName();
-            return isStateInteractionIdSupported(stateName) &&
-              StateTopAnswersStatsService.isInitialized();
+            return StateTopAnswersStatsService.isInitialized() &&
+              isStateInteractionIdSupported();
           };
+
           $scope.getUnresolvedStateStats = function() {
-            var stateName = EditorStateService.getActiveStateName();
-            return
-              StateTopAnswersStatsService.getUnresolvedStateStats(stateName);
+            return StateTopAnswersStatsService.getUnresolvedStateStats(
+              EditorStateService.getActiveStateName());
           };
         }
       ]
