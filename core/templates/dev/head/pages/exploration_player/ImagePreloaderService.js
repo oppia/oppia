@@ -66,7 +66,7 @@ oppia.factory('ImagePreloaderService', [
      * @param {function} onLoadCallback - Function that is called when the
      *                                    Url of the loaded image is obtained.
      */
-    var _getImageUrl = function(filename, onLoadCallback) {
+    var _getImageUrl = function(filename, onLoadCallback, onErrorCallback) {
       AssetsBackendApiService.loadImage(
         ExplorationContextService.getExplorationId(), filename)
         .then(function(loadedImageFile) {
@@ -75,6 +75,8 @@ oppia.factory('ImagePreloaderService', [
           }
           var objectUrl = URL.createObjectURL(loadedImageFile.data);
           onLoadCallback(objectUrl);
+        }, function(filename) {
+          onErrorCallback();
         });
     };
 
@@ -254,9 +256,8 @@ oppia.factory('ImagePreloaderService', [
       getImageUrl: function(filename) {
         return $q(function(resolve, reject){
           if (AssetsBackendApiService.isCached(filename) ||
-              !_hasImagePreloaderServiceStarted ||
               _isInFailedDownload(filename)) {
-            _getImageUrl(filename, resolve);
+            _getImageUrl(filename, resolve, reject);
           } else {
             _imageLoadedCallback[filename] = {
               resolveMethod: resolve,

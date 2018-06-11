@@ -1580,8 +1580,8 @@ pre.oppia-pre-wrapped-text {
   opacity: 0;
 }
 
-/* Styles for the loading indicator shown while image is loading */
-.oppia-image-loading-indicator-container {
+/* Styles for the loading indicator or try again shown while image is loading or failed to load respectively */
+.oppia-image-loadingIndicator-or-tryAgain-container {
   background-color: rgba(224,242,241,1);
 }
 
