@@ -59,7 +59,7 @@ oppia.factory('AssetsBackendApiService', [
         method: 'GET',
         responseType: 'blob',
         url: _getDownloadUrl(explorationId, filename, assetType),
-        timeout: 1000
+        timeout: canceler.promise
       }).success(function(data) {
         try {
           var assetBlob = new Blob([data]);
