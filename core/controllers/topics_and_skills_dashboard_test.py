@@ -47,8 +47,8 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
     def test_get(self):
         # Check that non-admins oror non-topic managers cannot access the
         # topics and skills dashboard data.
-        self.skill_id = skill_services.get_new_skill_id()
-        self.save_new_skill(self.skill_id, self.admin_id, 'Description')
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, 'Description')
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.NEW_USER_EMAIL)
             response = self.testapp.get(
@@ -66,7 +66,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
                 json_response['topics_list'][0]['id'], self.topic_id)
             self.assertEqual(len(json_response['skills_list']), 1)
             self.assertEqual(
-                json_response['skills_list'][0]['id'], self.skill_id)
+                json_response['skills_list'][0]['id'], skill_id)
             self.logout()
 
             # Check that topic managers can access the topics and skills
@@ -79,7 +79,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
                 json_response['topics_list'][0]['id'], self.topic_id)
             self.assertEqual(len(json_response['skills_list']), 1)
             self.assertEqual(
-                json_response['skills_list'][0]['id'], self.skill_id)
+                json_response['skills_list'][0]['id'], skill_id)
             self.logout()
 
 

@@ -20,7 +20,7 @@ oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
   'UrlInterpolationService',
   function($http, $q, EDITABLE_TOPIC_DATA_URL_TEMPLATE,
-    UrlInterpolationService) {
+      UrlInterpolationService) {
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(

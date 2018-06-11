@@ -152,19 +152,19 @@ oppia.factory('TopicUpdateService', [
        * Changes the description of a topic and records the change in the
        * undo/redo service.
        */
-       setTopicDescription: function(topic, description) {
-         var oldDescription = angular.copy(topic.getDescription());
-         _applyTopicPropertyChange(
-           topic, TOPIC_PROPERTY_DESCRIPTION, description, oldDescription,
-           function(changeDict, topic) {
-             // Apply
-             var description = _getNewPropertyValueFromChangeDict(changeDict);
-             topic.setDescription(description);
-           }, function(changeDict, topic) {
-             // Undo.
-             topic.setDescription(oldDescription);
-           });
-       },
+      setTopicDescription: function(topic, description) {
+        var oldDescription = angular.copy(topic.getDescription());
+        _applyTopicPropertyChange(
+          topic, TOPIC_PROPERTY_DESCRIPTION, description, oldDescription,
+          function(changeDict, topic) {
+            // Apply
+            var description = _getNewPropertyValueFromChangeDict(changeDict);
+            topic.setDescription(description);
+          }, function(changeDict, topic) {
+            // Undo.
+            topic.setDescription(oldDescription);
+          });
+      },
 
       /**
        * Changes the language code of a topic and records the change in
@@ -191,9 +191,9 @@ oppia.factory('TopicUpdateService', [
        */
       addAdditionalStoryId: function(topic, storyId) {
         var oldAdditionalStoryIdsList = angular.copy(
-            topic.getAdditionalStoryIds());
+          topic.getAdditionalStoryIds());
         var newAdditionalStoryIdsList = [];
-        if (oldAdditionalStoryIdsList.indexOf(storyId) == -1) {
+        if (oldAdditionalStoryIdsList.indexOf(storyId) === -1) {
           newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
           newAdditionalStoryIdsList.push(storyId);
         } else {
@@ -219,9 +219,9 @@ oppia.factory('TopicUpdateService', [
        */
       removeAdditionalStoryId: function(topic, storyId) {
         var oldAdditionalStoryIdsList = angular.copy(
-            topic.getAdditionalStoryIds());
+          topic.getAdditionalStoryIds());
         var newAdditionalStoryIdsList = [];
-        if (oldAdditionalStoryIdsList.indexOf(storyId) != -1) {
+        if (oldAdditionalStoryIdsList.indexOf(storyId) !== -1) {
           newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
           var index = newAdditionalStoryIdsList.indexOf(storyId);
           newAdditionalStoryIdsList.splice(index, 1);
@@ -248,8 +248,8 @@ oppia.factory('TopicUpdateService', [
        */
       addCanonicalStoryId: function(topic, storyId) {
         var oldCanonicalStoryIdsList = angular.copy(
-            topic.getCanonicalStoryIds());
-        if (oldCanonicalStoryIdsList.indexOf(storyId) == -1) {
+          topic.getCanonicalStoryIds());
+        if (oldCanonicalStoryIdsList.indexOf(storyId) === -1) {
           newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
           newCanonicalStoryIdsList.push(storyId);
         } else {
@@ -275,9 +275,9 @@ oppia.factory('TopicUpdateService', [
        */
       removeCanonicalStoryId: function(topic, storyId) {
         var oldCanonicalStoryIdsList = angular.copy(
-            topic.getCanonicalStoryIds());
+          topic.getCanonicalStoryIds());
         var newCanonicalStoryIdsList = [];
-        if (oldCanonicalStoryIdsList.indexOf(storyId) != -1) {
+        if (oldCanonicalStoryIdsList.indexOf(storyId) !== -1) {
           newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
           var index = newCanonicalStoryIdsList.indexOf(storyId);
           newCanonicalStoryIdsList.splice(index, 1);
@@ -302,40 +302,40 @@ oppia.factory('TopicUpdateService', [
        * Adds an uncategorized skill id to a topic and records the change
        * in the undo/redo service.
        */
-       addUncategorizedSkillId: function(topic, skillId) {
-         _applyChange(topic, CMD_ADD_UNCATEGORIZED_SKILL_ID, {
-           new_uncategorized_skill_id: skillId
-         }, function(changeDict, topic) {
-           // Apply.
-           var newSkillId = _getParameterFromChangeDict(
-             changeDict, 'new_uncategorized_skill_id')
-           topic.addUncategorizedSkillId(newSkillId);
-         }, function(changeDict, topic) {
-           // Undo.
-           var newSkillId = _getParameterFromChangeDict(
-             changeDict, 'new_uncategorized_skill_id')
-           topic.removeUncategorizedSkillId(newSkillId);
-         });
-       },
+      addUncategorizedSkillId: function(topic, skillId) {
+        _applyChange(topic, CMD_ADD_UNCATEGORIZED_SKILL_ID, {
+          new_uncategorized_skill_id: skillId
+        }, function(changeDict, topic) {
+          // Apply.
+          var newSkillId = _getParameterFromChangeDict(
+            changeDict, 'new_uncategorized_skill_id');
+          topic.addUncategorizedSkillId(newSkillId);
+        }, function(changeDict, topic) {
+          // Undo.
+          var newSkillId = _getParameterFromChangeDict(
+            changeDict, 'new_uncategorized_skill_id');
+          topic.removeUncategorizedSkillId(newSkillId);
+        });
+      },
 
-       /**
-        * Removes an uncategorized skill id to a topic and records the change
-        * in the undo/redo service.
-        */
-        removeUncategorizedSkillId: function(topic, skillId) {
-          _applyChange(topic, CMD_REMOVE_UNCATEGORIZED_SKILL_ID, {
-            uncategorized_skill_id: skillId
-          }, function(changeDict, topic) {
-            // Apply.
-            var newSkillId = _getParameterFromChangeDict(
-              changeDict, 'uncategorized_skill_id')
-            topic.removeUncategorizedSkillId(newSkillId);
-          }, function(changeDict, topic) {
-            // Undo.
-            var newSkillId = _getParameterFromChangeDict(
-              changeDict, 'uncategorized_skill_id')
-            topic.addUncategorizedSkillId(newSkillId);
-          });
-        }
+      /**
+       * Removes an uncategorized skill id to a topic and records the change
+       * in the undo/redo service.
+       */
+      removeUncategorizedSkillId: function(topic, skillId) {
+        _applyChange(topic, CMD_REMOVE_UNCATEGORIZED_SKILL_ID, {
+          uncategorized_skill_id: skillId
+        }, function(changeDict, topic) {
+          // Apply.
+          var newSkillId = _getParameterFromChangeDict(
+            changeDict, 'uncategorized_skill_id');
+          topic.removeUncategorizedSkillId(newSkillId);
+        }, function(changeDict, topic) {
+          // Undo.
+          var newSkillId = _getParameterFromChangeDict(
+            changeDict, 'uncategorized_skill_id');
+          topic.addUncategorizedSkillId(newSkillId);
+        });
+      }
     };
   }]);

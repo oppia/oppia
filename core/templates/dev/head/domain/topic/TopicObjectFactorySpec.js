@@ -54,7 +54,7 @@ describe('Topic object factory', function() {
   it('should not add duplicate elements to any of the arrays', function() {
     expect(_sampleTopic.addAdditionalStoryId('story_2')).toEqual(false);
     expect(_sampleTopic.addCanonicalStoryId('story_1')).toEqual(false);
-    expect(_sampleTopic.addUncategorizedSkillId('skill_1')).toEqual(false)
+    expect(_sampleTopic.addUncategorizedSkillId('skill_1')).toEqual(false);
   });
 
   it('should correctly remove the various array elements', function() {

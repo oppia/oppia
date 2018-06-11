@@ -34,7 +34,7 @@ describe('Topic update service', function() {
       name: 'Topic name',
       description: 'Topic description',
       version: 1,
-      uncategorized_skill_ids: ['skill_1',],
+      uncategorized_skill_ids: ['skill_1'],
       canonical_story_ids: ['story_1'],
       additional_story_ids: ['story_2'],
       subtopics: [],
@@ -58,16 +58,15 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict for adding an additional ' +
     'story id',
-    function() {
-      TopicUpdateService.addAdditionalStoryId(_sampleTopic, 'story_3');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_topic_property',
-        property_name: 'additional_story_ids',
-        new_value: ['story_2', 'story_3'],
-        old_value: ['story_2']
-      }]);
-    }
-  );
+  function() {
+    TopicUpdateService.addAdditionalStoryId(_sampleTopic, 'story_3');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'additional_story_ids',
+      new_value: ['story_2', 'story_3'],
+      old_value: ['story_2']
+    }]);
+  });
 
   it('should remove/add an additional story id from/to a topic',
     function() {
@@ -82,16 +81,15 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict for removing an additional ' +
     'story id',
-    function() {
-      TopicUpdateService.removeAdditionalStoryId(_sampleTopic, 'story_2');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_topic_property',
-        property_name: 'additional_story_ids',
-        new_value: [],
-        old_value: ['story_2']
-      }]);
-    }
-  );
+  function() {
+    TopicUpdateService.removeAdditionalStoryId(_sampleTopic, 'story_2');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'additional_story_ids',
+      new_value: [],
+      old_value: ['story_2']
+    }]);
+  });
 
   it('should add/remove a canonical story id to/from a topic',
     function() {
@@ -108,16 +106,15 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict for adding a canonical ' +
     'story id',
-    function() {
-      TopicUpdateService.addCanonicalStoryId(_sampleTopic, 'story_3');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_topic_property',
-        property_name: 'canonical_story_ids',
-        new_value: ['story_1', 'story_3'],
-        old_value: ['story_1']
-      }]);
-    }
-  );
+  function() {
+    TopicUpdateService.addCanonicalStoryId(_sampleTopic, 'story_3');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'canonical_story_ids',
+      new_value: ['story_1', 'story_3'],
+      old_value: ['story_1']
+    }]);
+  });
 
   it('should remove/add a canonical story id from/to a topic',
     function() {
@@ -132,16 +129,15 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict for removing a canonical ' +
     'story id',
-    function() {
-      TopicUpdateService.removeCanonicalStoryId(_sampleTopic, 'story_1');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'update_topic_property',
-        property_name: 'canonical_story_ids',
-        new_value: [],
-        old_value: ['story_1']
-      }]);
-    }
-  );
+  function() {
+    TopicUpdateService.removeCanonicalStoryId(_sampleTopic, 'story_1');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'update_topic_property',
+      property_name: 'canonical_story_ids',
+      new_value: [],
+      old_value: ['story_1']
+    }]);
+  });
 
   it('should add/remove an uncategorized skill id to/from a topic',
     function() {
@@ -158,14 +154,13 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict for adding an uncategorized ' +
     'skill id',
-    function() {
-      TopicUpdateService.addUncategorizedSkillId(_sampleTopic, 'skill_2');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'add_uncategorized_skill_id',
-        new_uncategorized_skill_id: 'skill_2'
-      }]);
-    }
-  );
+  function() {
+    TopicUpdateService.addUncategorizedSkillId(_sampleTopic, 'skill_2');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'add_uncategorized_skill_id',
+      new_uncategorized_skill_id: 'skill_2'
+    }]);
+  });
 
   it('should remove/add an uncategorized skill id from/to a topic',
     function() {
@@ -180,14 +175,13 @@ describe('Topic update service', function() {
 
   it('should create a proper backend change dict for removing an ' +
     'uncategorized skill id',
-    function() {
-      TopicUpdateService.removeUncategorizedSkillId(_sampleTopic, 'skill_1');
-      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
-        cmd: 'remove_uncategorized_skill_id',
-        uncategorized_skill_id: 'skill_1'
-      }]);
-    }
-  );
+  function() {
+    TopicUpdateService.removeUncategorizedSkillId(_sampleTopic, 'skill_1');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'remove_uncategorized_skill_id',
+      uncategorized_skill_id: 'skill_1'
+    }]);
+  });
 
   it('should set/unset changes to a topic\'s name', function() {
     expect(_sampleTopic.getName()).toEqual('Topic name');

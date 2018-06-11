@@ -58,20 +58,19 @@ describe('Topics and Skills Dashboard backend API service', function() {
 
   it('should successfully fetch topics and skills dashboard data from the ' +
       'backend',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
-        sampleDataResults);
-      TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
-        successHandler, failHandler);
-      $httpBackend.flush();
+    $httpBackend.expect('GET', TOPICS_AND_SKILLS_DASHBOARD_DATA_URL).respond(
+      sampleDataResults);
+    TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+      successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalled();
-      expect(failHandler).not.toHaveBeenCalled();
-    }
-  );
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+  });
 
   it('should use rejection handler if dashboard data backend request failed',
     function() {
