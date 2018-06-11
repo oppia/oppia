@@ -18,20 +18,31 @@
  * keeps no mementos.
  */
 
+oppia.constant('STATE_ADDED_EVENT_NAME', 'stateAdded');
+oppia.constant('STATE_DELETED_EVENT_NAME', 'stateDeleted');
+oppia.constant('STATE_RENAMED_EVENT_NAME', 'stateRenamed');
+oppia.constant(
+  'STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME',
+  'stateInteractionAnswerGroupsSaved');
+
 oppia.factory('ExplorationStatesService', [
   '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'ExplorationContextService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'STATE_ADDED_EVENT_NAME',
+  'STATE_DELETED_EVENT_NAME', 'STATE_RENAMED_EVENT_NAME',
+  'STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
       AnswerClassificationService, ExplorationContextService,
-      UrlInterpolationService) {
+      UrlInterpolationService, STATE_ADDED_EVENT_NAME,
+      STATE_DELETED_EVENT_NAME, STATE_RENAMED_EVENT_NAME,
+      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -236,7 +247,9 @@ oppia.factory('ExplorationStatesService', [
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
         $rootScope.$broadcast(
-          'saveInteractionAnswerGroups', {state_name: stateName});
+          STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME, {
+            state_name: stateName
+          });
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(
@@ -281,7 +294,9 @@ oppia.factory('ExplorationStatesService', [
         _states.addState(newStateName);
 
         ChangeListService.addState(newStateName);
-        $rootScope.$broadcast('addState', {state_name: newStateName});
+        $rootScope.$broadcast(STATE_ADDED_EVENT_NAME, {
+          state_name: newStateName
+        });
         $rootScope.$broadcast('refreshGraph');
         if (successCallback) {
           successCallback(newStateName);
@@ -338,7 +353,9 @@ oppia.factory('ExplorationStatesService', [
           }
 
           $location.path('/gui/' + EditorStateService.getActiveStateName());
-          $rootScope.$broadcast('deleteState', {state_name: deleteStateName});
+          $rootScope.$broadcast(STATE_DELETED_EVENT_NAME, {
+            state_name: deleteStateName
+          });
           $rootScope.$broadcast('refreshGraph');
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
@@ -371,7 +388,7 @@ oppia.factory('ExplorationStatesService', [
           ExplorationInitStateNameService.displayed = newStateName;
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
         }
-        $rootScope.$broadcast('renameState', {
+        $rootScope.$broadcast(STATE_RENAMED_EVENT_NAME, {
           old_state_name: oldStateName,
           new_state_name: newStateName
         });

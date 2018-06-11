@@ -21,12 +21,16 @@ oppia.factory('StateTopAnswersStatsService', [
   '$injector', '$rootScope', 'AngularNameService',
   'AnswerClassificationService', 'AnswerStatsObjectFactory',
   'ExplorationContextService', 'ExplorationStatesService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'STATE_ADDED_EVENT_NAME',
+  'STATE_DELETED_EVENT_NAME', 'STATE_RENAMED_EVENT_NAME',
+  'STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME',
   function(
       $injector, $rootScope, AngularNameService,
       AnswerClassificationService, AnswerStatsObjectFactory,
       ExplorationContextService, ExplorationStatesService,
-      UrlInterpolationService) {
+      UrlInterpolationService, STATE_ADDED_EVENT_NAME,
+      STATE_DELETED_EVENT_NAME, STATE_RENAMED_EVENT_NAME,
+      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME) {
     /** @type {Object.<string, AnswerStats[]>} */
     var stateTopAnswerStatsCache = {};
 
@@ -70,25 +74,26 @@ oppia.factory('StateTopAnswersStatsService', [
       refreshAddressedInfo(args.state_name);
     };
 
-    $rootScope.$on('addState', function(event, args) {
+    $rootScope.$on(STATE_ADDED_EVENT_NAME, function(event, args) {
       if (!isInitialized) return;
       onAddState(args.state_name);
     });
 
-    $rootScope.$on('deleteState', function(event, args) {
+    $rootScope.$on(STATE_DELETED_EVENT_NAME, function(event, args) {
       if (!isInitialized) return;
       onDeleteState(args.state_name);
     });
 
-    $rootScope.$on('renameState', function(event, args) {
+    $rootScope.$on(STATE_RENAMED_EVENT_NAME, function(event, args) {
       if (!isInitialized) return;
       onRenameState(args.old_state_name, args.new_state_name);
     });
 
-    $rootScope.$on('saveInteractionAnswerGroups', function(event, args) {
-      if (!isInitialized) return;
-      onSaveInteractionAnswerGroups(args.state_name);
-    });
+    $rootScope.$on(
+      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME, function(event, args) {
+        if (!isInitialized) return;
+        onSaveInteractionAnswerGroups(args.state_name);
+      });
 
     return {
       /**
