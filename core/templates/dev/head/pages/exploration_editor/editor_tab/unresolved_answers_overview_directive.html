@@ -18,10 +18,10 @@
   <md-card style="background-color: white; margin: 20px 0; padding: 8px;">
     <strong>Unresolved Student Answers</strong>
     <ul>
-      <li ng-repeat="data in getStateStats()" class="answer-container">
+      <li ng-repeat="data in getUnresolvedStateStats()" class="answer-container">
         <strong>(<[data.frequency]> times)</strong>: <span ng-bind-html="data.answerHtml"></span>
       </li>
-      <li ng-if="getStateStats().length === 0">
+      <li ng-if="getUnresolvedStateStats().length === 0">
         <em>No outstanding answers require attention.</em>
       </li>
     </ul>

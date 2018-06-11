@@ -31,7 +31,13 @@ oppia.factory('StateTopAnswersStatsService', [
       UrlInterpolationService, STATE_ADDED_EVENT_NAME,
       STATE_DELETED_EVENT_NAME, STATE_RENAMED_EVENT_NAME,
       STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME) {
-    /** @type {Object.<string, AnswerStats[]>} */
+    /**
+     * @typedef AnswerStatsCache
+     * @property {AnswerStats[]} allAnswers
+     * @property {AnswerStats[]} unresolvedAnswers
+     */
+
+    /** @type {Object.<string, AnswerStatsCache[]>} */
     var stateTopAnswersStatsCache = {};
 
     /** @type {boolean} */
@@ -48,16 +54,34 @@ oppia.factory('StateTopAnswersStatsService', [
       var interactionRulesService = $injector.get(
         AngularNameService.getNameOfInteractionRulesService(
           state.interaction.id));
-      stateTopAnswersStatsCache[stateName].forEach(function(answerStats) {
+      var allAnswersCacheEntry =
+        stateTopAnswersStatsCache[stateName].allAnswers;
+      var unresolvedAnswersCacheEntry =
+        stateTopAnswersStatsCache[stateName].unresolvedAnswers;
+
+      // Clear the unresolved answers array since many answers may now have
+      // different values.
+      unresolvedAnswers.splice(0, unresolvedAnswers.length);
+
+      // Update the isAddressed data of each answer and put any unaddressed
+      // answers into the unresolvedAnswers array.
+      allAnswers.forEach(function(answerStats) {
         answerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
             explorationId, stateName, state, answerStats.answer,
             interactionRulesService);
+
+        if (!answerStats.isAddressed) {
+          unresolvedAnswers.push(answerStats);
+        }
       });
     };
 
     var onStateAdded = function(stateName) {
-      stateTopAnswersStatsCache[stateName] = [];
+      stateTopAnswersStatsCache[stateName] = {
+        allAnswers: [],
+        unresolvedAnswers: []
+      };
     };
 
     var onStateDeleted = function(stateName) {
@@ -114,9 +138,11 @@ oppia.factory('StateTopAnswersStatsService', [
       init: function(stateTopAnswersStatsBackendDict) {
         stateTopAnswersStatsCache = {};
         for (var stateName in stateTopAnswersStatsBackendDict.answers) {
-          stateTopAnswersStatsCache[stateName] =
-            stateTopAnswersStatsBackendDict.answers[stateName].map(
-              AnswerStatsObjectFactory.createFromBackendDict);
+          stateTopAnswersStatsCache[stateName] = {
+            allAnswers: stateTopAnswersStatsBackendDict.answers[stateName].map(
+              AnswerStatsObjectFactory.createFromBackendDict),
+            unresolvedAnswers: []
+          };
           // Still need to manually refresh the addressed information.
           refreshAddressedInfo(stateName);
         }
@@ -133,7 +159,16 @@ oppia.factory('StateTopAnswersStatsService', [
        * @returns {AnswerStats[]} - list of the statistics for the top answers.
        */
       getStateStats: function(stateName) {
-        return stateTopAnswersStatsCache[stateName] || [];
+        return stateTopAnswersStatsCache[stateName].allAnswers || [];
+      },
+
+      /**
+       * @param {string} stateName
+       * @returns {AnswerStats[]} - list of stats for answers that are
+       *    unresolved.
+       */
+      getUnresolvedStateStats: function(stateName) {
+        return stateTopAnswersStatsCache[stateName].unresolvedAnswers || [];
       },
     };
   }

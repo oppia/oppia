@@ -27,12 +27,9 @@ oppia.directive('unresolvedAnswersOverview', [
       controller: [
         '$scope', 'EditorStateService', 'StateTopAnswersStatsService',
         function($scope, EditorStateService, StateTopAnswersStatsService) {
-          $scope.getStateStats = function() {
-            return StateTopAnswersStatsService.getStateStats(
-              EditorStateService.getActiveStateName()
-            ).filter(function(answerStats) {
-              return !answerStats.isAddressed;
-            });
+          $scope.getUnresolvedStateStats = function() {
+            return StateTopAnswersStatsService.getUnresolvedStateStats(
+              EditorStateService.getActiveStateName());
           };
           $scope.isUnresolvedAnswersOverviewShown = function() {
             return StateTopAnswersStatsService.isInitialized();
