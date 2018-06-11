@@ -3288,7 +3288,6 @@ title: Title
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 
-
 class RTEMigrationUnitTests(test_utils.GenericTestBase):
     """Test content migration for RTE."""
 
