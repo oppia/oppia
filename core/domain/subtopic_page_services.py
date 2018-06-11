@@ -42,7 +42,7 @@ def get_subtopic_page_from_model(subtopic_page_model):
 
 
 def get_subtopic_page_by_id(topic_id, subtopic_id, strict=True):
-    """Returns a domain object representing a topic.
+    """Returns a domain object representing a subtopic page.
 
     Args:
         topic_id: str. ID of the topic that the subtopic is a part of.
@@ -63,6 +63,32 @@ def get_subtopic_page_by_id(topic_id, subtopic_id, strict=True):
         return subtopic_page
     else:
         return None
+
+
+def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
+    """Returns a list of domain objects with given ids.
+
+    Args:
+        topic_id: str. ID of the topic that the subtopics belong to.
+        subtopic_ids: list(int). The ids of the subtopics.
+
+    Returns:
+        list(SubtopicPage) or None. The list of domain objects representing the
+            subtopic pages corresponding to given ids list or None if none
+            exist.
+    """
+    subtopic_page_ids = []
+    for subtopic_id in subtopic_ids:
+        subtopic_page_ids.append(
+            subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                topic_id, subtopic_id))
+    subtopic_page_models = topic_models.SubtopicPageModel.get_multi(
+        subtopic_page_ids)
+    subtopic_pages = []
+    for subtopic_page_model in subtopic_page_models:
+        subtopic_pages.append(
+            get_subtopic_page_from_model(subtopic_page_model))
+    return subtopic_pages
 
 
 def get_all_subtopic_pages_in_topic(topic_id, include_deleted=False):

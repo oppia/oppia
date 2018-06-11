@@ -265,9 +265,19 @@ def apply_change_list(topic_id, change_list):
     """
     topic = get_topic_by_id(topic_id)
     newly_created_subtopic_ids = []
+    existing_subtopics_to_be_modified = []
     deleted_subtopic_ids = []
     modified_subtopic_pages = []
     return_dict = {}
+
+    for change in change_list:
+        if (change.cmd ==
+                subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
+            if change.id < topic.next_subtopic_id:
+                existing_subtopics_to_be_modified.append(change.id)
+    modified_subtopic_pages = (
+        subtopic_page_services.get_subtopic_pages_with_ids(
+            topic_id, existing_subtopics_to_be_modified))
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
@@ -321,23 +331,14 @@ def apply_change_list(topic_id, change_list):
                     (index for index, subtopic_page in enumerate(
                         modified_subtopic_pages)
                      if subtopic_page.id == subtopic_page_id), None)
-                if index is None:
-                    subtopic_page = (
-                        subtopic_page_services.get_subtopic_page_by_id(
-                            topic_id, change.id, strict=False))
-                else:
-                    subtopic_page = modified_subtopic_pages[index]
-                if (
-                        (subtopic_page is None) or
-                        (change.id in deleted_subtopic_ids)):
+                if (index is None) or (change.id in deleted_subtopic_ids):
                     raise Exception(
                         'The subtopic with id %s doesn\'t exist' % change.id)
 
                 if (change.property_name ==
                         subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA):
-                    subtopic_page.update_html_data(change.new_value)
-                    if index is None:
-                        modified_subtopic_pages.append(subtopic_page)
+                    modified_subtopic_pages[index].update_html_data(
+                        change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
@@ -738,6 +739,30 @@ def check_can_edit_topic(user, topic_rights):
         user: UserActionsInfo. Object having user_id, role and actions for
             given user.
         topic_rights: TopicRights or None. Rights object for the given topic.
+
+    Returns:
+        bool. Whether the given user can edit the given topic.
+    """
+    if topic_rights is None:
+        return False
+    if role_services.ACTION_EDIT_ANY_TOPIC in user.actions:
+        return True
+    if role_services.ACTION_EDIT_OWNED_TOPIC not in user.actions:
+        return False
+    if topic_rights.is_manager(user.user_id):
+        return True
+
+    return False
+
+
+def check_can_edit_subtopic_page(user, topic_rights):
+    """Checks whether the user can edit the subtopic pages for a topic.
+
+    Args:
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        topic_rights: TopicRights or None. Rights object of the topic, the
+            subtopic page is a part of.
 
     Returns:
         bool. Whether the given user can edit the given topic.
