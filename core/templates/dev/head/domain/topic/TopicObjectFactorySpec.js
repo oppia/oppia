@@ -34,6 +34,7 @@ describe('Topic object factory', function() {
       canonical_story_ids: ['story_1', 'story_4'],
       additional_story_ids: ['story_2', 'story_3'],
       subtopics: [],
+      next_subtopic_id: 1,
       language_code: 'en'
     };
     _sampleTopic = TopicObjectFactory.create(sampleTopicBackendObject);
@@ -76,6 +77,7 @@ describe('Topic object factory', function() {
       additional_story_ids: ['story_10'],
       canonical_story_ids: ['story_5'],
       uncategorized_skill_ids: ['skill_2', 'skill_3'],
+      next_subtopic_id: 1,
       subtopics: []
     });
 

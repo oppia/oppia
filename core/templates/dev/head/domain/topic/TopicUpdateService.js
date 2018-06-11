@@ -21,7 +21,7 @@
 
 // These should match the constants defined in core.domain.topic_domain.
 
-oppia.constant('CMD_ADD_SUBTOPIC', 'add_collection_node');
+oppia.constant('CMD_ADD_SUBTOPIC', 'add_subtopic');
 oppia.constant('CMD_DELETE_SUBTOPIC', 'delete_subtopic');
 oppia.constant('CMD_ADD_UNCATEGORIZED_SKILL_ID', 'add_uncategorized_skill_id');
 oppia.constant(
@@ -182,6 +182,134 @@ oppia.factory('TopicUpdateService', [
           }, function(changeDict, topic) {
             // Undo.
             topic.setLanguageCode(oldLanguageCode);
+          });
+      },
+
+      /**
+       * Creates a subtopic and adds it to the topic and records the change in
+       * the undo/redo service.
+       */
+      addSubtopic: function(topic, title) {
+        var nextSubtopicId = topic.getNextSubtopicId();
+        _applyChange(topic, CMD_ADD_SUBTOPIC, {
+          subtopic_id: nextSubtopicId,
+          title: title
+        }, function(changeDict, topic) {
+          // Apply.
+          topic.addSubtopic(title);
+        }, function(changeDict, topic) {
+          // Undo.
+          var subtopicId = _getParameterFromChangeDict(
+            changeDict, 'subtopic_id');
+          topic.deleteSubtopic(subtopicId);
+        });
+      },
+
+      /**
+       * Deletes a subtopic from the topic and records the change in
+       * the undo/redo service.
+       */
+      deleteSubtopic: function(topic, subtopicId) {
+        var subtopic = topic.getSubtopicById(subtopicId);
+        var title = subtopic.getTitle();
+        var skillIds = subtopic.getSkillIds();
+        _applyChange(topic, CMD_DELETE_SUBTOPIC, {
+          subtopic_id: subtopicId,
+        }, function(changeDict, topic) {
+          // Apply.
+          topic.deleteSubtopic(subtopicId);
+        }, function(changeDict, topic) {
+          // Undo.
+          var subtopicId = _getParameterFromChangeDict(
+            changeDict, 'subtopic_id');
+          topic.undoDeleteSubtopic(subtopicId, title, skillIds);
+          for (var i = 0; i < skillIds.length; i++) {
+            topic.removeUncategorizedSkillId(skillIds[i]);
+          }
+        });
+      },
+
+      /**
+       * Moves a skill id to a subtopic from either another subtopic or
+       * uncategorized skill ids and records the change in
+       * the undo/redo service.
+       */
+      moveSkillIdToSubtopic: function(
+          topic, oldSubtopicId, newSubtopicId, skillId) {
+        if (newSubtopicId === null) {
+          return false;
+        }
+        if (oldSubtopicId !== null) {
+          var oldSubtopic = topic.getSubtopicById(oldSubtopicId);
+        }
+        var newSubtopic = topic.getSubtopicById(newSubtopicId);
+
+        _applyChange(topic, CMD_MOVE_SKILL_ID_TO_SUBTOPIC, {
+          old_subtopic_id: oldSubtopicId,
+          new_subtopic_id: newSubtopicId,
+          skill_id: skillId
+        }, function(changeDict, topic) {
+          // Apply.
+          if (oldSubtopicId === null) {
+            topic.removeUncategorizedSkillId(skillId);
+          } else {
+            oldSubtopic.removeSkillId(skillId);
+          }
+          newSubtopic.addSkillId(skillId);
+        }, function(changeDict, topic) {
+          // Undo.
+          newSubtopic.removeSkillId(skillId);
+          if (oldSubtopicId === null) {
+            topic.addUncategorizedSkillId(skillId);
+          } else {
+            oldSubtopic.addSkillId(skillId);
+          }
+        });
+      },
+
+      /**
+       * Moves a skill id from a subtopic to uncategorized skill ids and records
+       * the change in the undo/redo service.
+       */
+      removeSkillIdFromSubtopic: function(topic, subtopicId, skillId) {
+        if (subtopicId === null) {
+          return false;
+        }
+        var subtopic = topic.getSubtopicById(subtopicId);
+
+        _applyChange(topic, CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC, {
+          subtopic_id: subtopicId,
+          skill_id: skillId
+        }, function(changeDict, topic) {
+          // Apply.
+          subtopic.removeSkillId(skillId);
+          topic.addUncategorizedSkillId(skillId);
+        }, function(changeDict, topic) {
+          // Undo.
+          subtopic.addSkillId(skillId);
+          topic.removeUncategorizedSkillId(skillId);
+        });
+      },
+
+      /**
+       * Changes the title of a subtopic and records the change in
+       * the undo/redo service.
+       */
+      setSubtopicTitle: function(topic, subtopicId, title) {
+        var subtopic = topic.getSubtopicById(subtopicId);
+        if (!subtopic) {
+          return false;
+        }
+        var oldTitle = angular.copy(subtopic.getTitle());
+        _applySubtopicPropertyChange(
+          topic, SUBTOPIC_PROPERTY_TITLE, subtopicId, title, oldTitle,
+          function(changeDict, topic) {
+            // Apply.
+            var title = _getNewPropertyValueFromChangeDict(changeDict);
+            subtopic.setTitle(title);
+          }, function(changeDict, topic) {
+            // Undo.
+            subtopic.setTitle(oldTitle);
           });
       },
 

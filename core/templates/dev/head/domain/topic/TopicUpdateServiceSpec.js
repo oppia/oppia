@@ -19,6 +19,7 @@
 describe('Topic update service', function() {
   var TopicUpdateService = null;
   var TopicObjectFactory = null;
+  var SubtopicObjectFactory = null;
   var UndoRedoService = null;
   var _sampleTopic = null;
 
@@ -27,6 +28,7 @@ describe('Topic update service', function() {
   beforeEach(inject(function($injector) {
     TopicUpdateService = $injector.get('TopicUpdateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
+    SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
 
     var sampleTopicBackendObject = {
@@ -37,7 +39,12 @@ describe('Topic update service', function() {
       uncategorized_skill_ids: ['skill_1'],
       canonical_story_ids: ['story_1'],
       additional_story_ids: ['story_2'],
-      subtopics: [],
+      subtopics: [{
+        id: 1,
+        title: 'Title',
+        skill_ids: ['skill_2']
+      }],
+      next_subtopic_id: 2,
       language_code: 'en'
     };
     _sampleTopic = TopicObjectFactory.create(sampleTopicBackendObject);
@@ -142,9 +149,9 @@ describe('Topic update service', function() {
   it('should add/remove an uncategorized skill id to/from a topic',
     function() {
       expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-      TopicUpdateService.addUncategorizedSkillId(_sampleTopic, 'skill_2');
+      TopicUpdateService.addUncategorizedSkillId(_sampleTopic, 'skill_3');
       expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([
-        'skill_1', 'skill_2'
+        'skill_1', 'skill_3'
       ]);
 
       UndoRedoService.undoChange(_sampleTopic);
@@ -155,10 +162,10 @@ describe('Topic update service', function() {
   it('should create a proper backend change dict for adding an uncategorized ' +
     'skill id',
   function() {
-    TopicUpdateService.addUncategorizedSkillId(_sampleTopic, 'skill_2');
+    TopicUpdateService.addUncategorizedSkillId(_sampleTopic, 'skill_3');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_uncategorized_skill_id',
-      new_uncategorized_skill_id: 'skill_2'
+      new_uncategorized_skill_id: 'skill_3'
     }]);
   });
 
@@ -224,6 +231,127 @@ describe('Topic update service', function() {
       }]);
     }
   );
+
+  it('should set/unset changes to a subtopic\'s title', function() {
+    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('Title');
+    TopicUpdateService.setSubtopicTitle(_sampleTopic, 1, 'new title');
+    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('new title');
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('Title');
+  });
+
+  it('should create a proper backend change dict for changing subtopic title',
+    function() {
+      TopicUpdateService.setSubtopicTitle(_sampleTopic, 1, 'new title');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'update_subtopic_property',
+        subtopic_id: 1,
+        property_name: 'title',
+        new_value: 'new title',
+        old_value: 'Title'
+      }]);
+    }
+  );
+
+  it('should add/remove a subtopic', function() {
+    expect(_sampleTopic.getSubtopics().length).toEqual(1);
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title2');
+    expect(_sampleTopic.getSubtopics().length).toEqual(2);
+    expect(_sampleTopic.getNextSubtopicId()).toEqual(3);
+    expect(_sampleTopic.getSubtopics()[1].getTitle()).toEqual('Title2');
+    expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics().length).toEqual(1);
+  });
+
+  it('should create a proper backend change dict for adding a subtopic',
+    function() {
+      TopicUpdateService.addSubtopic(_sampleTopic, 'Title2');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'add_subtopic',
+        subtopic_id: 2,
+        title: 'Title2'
+      }]);
+    }
+  );
+
+  it('should remove/add a subtopic', function() {
+    expect(_sampleTopic.getSubtopics().length).toEqual(1);
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 1);
+    expect(_sampleTopic.getSubtopics()).toEqual([]);
+    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([
+      'skill_1', 'skill_2'
+    ]);
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getSubtopics().length).toEqual(1);
+    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('Title');
+    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
+    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
+  });
+
+  it('should create a proper backend change dict for deleting a subtopic',
+    function() {
+      TopicUpdateService.deleteSubtopic(_sampleTopic, 1);
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'delete_subtopic',
+        subtopic_id: 1
+      }]);
+    }
+  );
+
+  it('should move a skill id to a subtopic', function() {
+    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
+    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
+    TopicUpdateService.moveSkillIdToSubtopic(_sampleTopic, null, 1, 'skill_1');
+    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual([
+      'skill_2', 'skill_1'
+    ]);
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
+    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
+  });
+
+  it('should create a proper backend change dict for moving a skill id to a ' +
+    'subtopic',
+  function() {
+    TopicUpdateService.moveSkillIdToSubtopic(_sampleTopic, null, 1, 'skill_1');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'move_skill_id_to_subtopic',
+      old_subtopic_id: null,
+      new_subtopic_id: 1,
+      skill_id: 'skill_1'
+    }]);
+  });
+
+  it('should remove a skill id from a subtopic', function() {
+    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
+    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
+    TopicUpdateService.removeSkillIdFromSubtopic(_sampleTopic, 1, 'skill_2');
+    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([
+      'skill_1', 'skill_2'
+    ]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual([]);
+
+    UndoRedoService.undoChange(_sampleTopic);
+    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
+    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
+  });
+
+  it('should create a proper backend change dict for removing a skill id ' +
+    'from a subtopic',
+  function() {
+    TopicUpdateService.removeSkillIdFromSubtopic(_sampleTopic, 1, 'skill_2');
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'remove_skill_id_from_subtopic',
+      subtopic_id: 1,
+      skill_id: 'skill_2'
+    }]);
+  });
 
   it('should set/unset changes to a topic\'s language code', function() {
     expect(_sampleTopic.getLanguageCode()).toEqual('en');

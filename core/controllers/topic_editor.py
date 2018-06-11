@@ -77,7 +77,7 @@ class TopicEditorPage(base.BaseHandler):
                 Exception('The topic with the given id doesn\'t exist.'))
 
         self.values.update({
-            'topicId': topic.id
+            'topic_id': topic.id
         })
 
         self.render_template('pages/topic_editor/topic_editor.html')

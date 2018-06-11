@@ -17,8 +17,8 @@
  * topic domain objects.
  */
 
-oppia.factory('TopicObjectFactory', [
-  function() {
+oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
+  function(SubtopicObjectFactory) {
     var Topic = function(topicBackendObject) {
       this._id = topicBackendObject.id;
       this._name = topicBackendObject.name;
@@ -27,8 +27,13 @@ oppia.factory('TopicObjectFactory', [
       this._canonicalStoryIds = topicBackendObject.canonical_story_ids;
       this._additionalStoryIds = topicBackendObject.additional_story_ids;
       this._uncategorizedSkillIds = topicBackendObject.uncategorized_skill_ids;
-      this._subtopics = topicBackendObject.subtopics;
+      this._nextSubtopicId = topicBackendObject.next_subtopic_id;
       this._version = topicBackendObject.version;
+      this._subtopics = [];
+      for (var i = 0; i < topicBackendObject.subtopics.length; i++) {
+        this._subtopics.push(
+          SubtopicObjectFactory.create(topicBackendObject.subtopics[i]));
+      }
     };
 
     // Instance methods
@@ -49,6 +54,10 @@ oppia.factory('TopicObjectFactory', [
       return this._description;
     };
 
+    Topic.prototype.getNextSubtopicId = function() {
+      return this._nextSubtopicId;
+    };
+
     Topic.prototype.setDescription = function(description) {
       this._description = description;
     };
@@ -63,6 +72,65 @@ oppia.factory('TopicObjectFactory', [
 
     Topic.prototype.getVersion = function() {
       return this._version;
+    };
+
+    Topic.prototype.getSubtopicById = function(subtopicId) {
+      for (var i = 0; i < this._subtopics.length; i++) {
+        var id = this._subtopics[i].getId();
+        if (id === subtopicId) {
+          return this._subtopics[i];
+        }
+      }
+      return false;
+    };
+
+    // The following function is only meant to be called from the undo of
+    // a delete subtopic operation and not anywhere else. For adding subtopics
+    // in general, use topic.addSubtopic()
+    Topic.prototype.undoDeleteSubtopic = function(id, title, skillIds) {
+      var newSubtopic = SubtopicObjectFactory.createFromTitle(id, title);
+      for (var i = 0; i < skillIds.length; i++) {
+        newSubtopic.addSkillId(skillIds[i]);
+      }
+      this._subtopics.push(newSubtopic);
+      this._nextSubtopicId++;
+    };
+
+    // Adds a new frontend subtopic domain object to this topic.
+    Topic.prototype.addSubtopic = function(title) {
+      var newSubtopic = SubtopicObjectFactory.createFromTitle(
+        this._nextSubtopicId, title);
+      this._subtopics.push(newSubtopic);
+      this._nextSubtopicId++;
+    };
+
+    // Attempts to remove a subtopic from this topic given the
+    // subtopic ID.
+    Topic.prototype.deleteSubtopic = function(subtopicId) {
+      for (var i = 0; i < this._subtopics.length; i++) {
+        if (this._subtopics[i].getId() === subtopicId) {
+          // When a subtopic is deleted, all the skills in it are moved to
+          // uncategorized skill ids.
+          var skillIds = this._subtopics[i].getSkillIds();
+          for (var j = 0; j < skillIds.length; j++) {
+            var skillId = skillIds[j];
+            if (this._uncategorizedSkillIds.indexOf(skillId) === -1) {
+              this._uncategorizedSkillIds.push(skillId);
+            }
+          }
+          this._subtopics.splice(i, 1);
+          return true;
+        }
+      }
+      return false;
+    };
+
+    Topic.prototype.clearSubtopics = function() {
+      this._subtopics.length = 0;
+    };
+
+    Topic.prototype.getSubtopics = function() {
+      return this._subtopics.slice();
     };
 
     Topic.prototype.addCanonicalStoryId = function(storyId) {
@@ -113,8 +181,19 @@ oppia.factory('TopicObjectFactory', [
 
     Topic.prototype.addUncategorizedSkillId = function(skillId) {
       if (this._uncategorizedSkillIds.indexOf(skillId) === -1) {
-        this._uncategorizedSkillIds.push(skillId);
-        return true;
+        var isSkillPresentInSubtopics = false;
+        for (var i = 0; i < this._subtopics.length; i++) {
+          var skillIds = this._subtopics[i].getSkillIds();
+          if (skillIds.indexOf(skillId) !== -1) {
+            isSkillPresentInSubtopics = true;
+            break;
+          }
+        }
+        if (!isSkillPresentInSubtopics) {
+          this._uncategorizedSkillIds.push(skillId);
+          return true;
+        }
+        return false;
       }
       return false;
     };
@@ -133,15 +212,6 @@ oppia.factory('TopicObjectFactory', [
     Topic.prototype.getUncategorizedSkillIds = function() {
       return this._uncategorizedSkillIds.slice();
     };
-
-    Topic.prototype.clearSubtopics = function() {
-      this._subtopics.length = 0;
-    };
-
-    Topic.prototype.getSubtopics = function() {
-      return this._subtopics.slice();
-    };
-
 
     // Reassigns all values within this topic to match the existing
     // topic. This is performed as a deep copy such that none of the
