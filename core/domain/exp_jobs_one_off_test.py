@@ -905,9 +905,9 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         }
         content2_dict = {
             'html': (
-                'Here is test case <a href="https://github.com">hello'
+                'Here is test case <a href="https://github.com">'
                 '<oppia-noninteractive-link url-with-value="&amp;quot;'
-                'here&amp;quot;" text-with-value="abc">'
+                'https://github.com&amp;quot;" text-with-value="abc">'
                 '</oppia-noninteractive-link><p> testing in progress</p>'
             ),
             'audio_translations': {}
@@ -964,17 +964,11 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                 job_id))
         expected_output = [
             "[u'oppia-noninteractive-image', [u'ol']]",
-            "[u'oppia-noninteractive-link', [u'oppia-noninteractive-link']]",
             (
                 '[u\'strings\', '
                 '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
                 'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
-                '</oppia-noninteractive-image></ol>\', '
-                'u\'Here is test case <a href="https://github.com">'
-                'hello<oppia-noninteractive-link text-with-value="abc" '
-                'url-with-value="&amp;quot;here&amp;quot;">'
-                '</oppia-noninteractive-link>'
-                '<p> testing in progress</p></a>\']]'
+                '</oppia-noninteractive-image></ol>\']]'
             )
         ]
 
