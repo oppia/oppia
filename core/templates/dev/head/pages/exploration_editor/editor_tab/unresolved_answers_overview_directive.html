@@ -11,17 +11,17 @@
   }
 </style>
 
-<div ng-if="unresolvedAnswersOverviewIsShown">
+<div ng-if="unresolvedAnswersOverviewIsShown()">
   <span style="font-size: 16px;">
     <strong>Issues Overview</strong>
   </span>
   <md-card style="background-color: white; margin: 20px 0; padding: 8px;">
     <strong>Unresolved Student Answers</strong>
     <ul>
-      <li ng-repeat="data in stateStats" class="answer-container">
+      <li ng-repeat="data in getStateStats()" class="answer-container">
         <strong>(<[data.frequency]> times)</strong>: <span ng-bind-html="data.answerHtml"></span>
       </li>
-      <li ng-if="stateStats.length === 0">
+      <li ng-if="getStateStats().length === 0">
         <em>No outstanding answers require attention.</em>
       </li>
     </ul>

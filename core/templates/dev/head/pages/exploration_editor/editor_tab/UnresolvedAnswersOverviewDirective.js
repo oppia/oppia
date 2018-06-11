@@ -25,23 +25,18 @@ oppia.directive('unresolvedAnswersOverview', [
         '/pages/exploration_editor/editor_tab/' +
         'unresolved_answers_overview_directive.html'),
       controller: [
-        '$rootScope', '$scope', 'EditorStateService',
-        'StateTopAnswersStatsService',
-        function(
-            $rootScope, $scope, EditorStateService,
-            StateTopAnswersStatsService) {
-          $scope.stateStats = [];
-          $scope.unresolvedAnswersOverviewIsShown = false;
-
-          $rootScope.$on('stateStatsUpdate', function() {
-            $scope.unresolvedAnswersOverviewIsShown =
-              StateTopAnswersStatsService.isInitialized();
-            $scope.stateStats = StateTopAnswersStatsService.getStateStats(
+        '$scope', 'EditorStateService', 'StateTopAnswersStatsService',
+        function($scope, EditorStateService, StateTopAnswersStatsService) {
+          $scope.getStateStats = function() {
+            return StateTopAnswersStatsService.getStateStats(
               EditorStateService.getActiveStateName()
             ).filter(function(answerStats) {
               return !answerStats.isAddressed;
-            });
-          });
+            })
+          };
+          $scope.unresolvedAnswersOverviewIsShown = function() {
+            return StateTopAnswersStatsService.isInitialized();
+          };
         }
       ]
     };
