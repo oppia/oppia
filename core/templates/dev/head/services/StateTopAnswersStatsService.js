@@ -56,21 +56,21 @@ oppia.factory('StateTopAnswersStatsService', [
       });
     };
 
-    var onAddState = function(stateName) {
+    var onStateAdded = function(stateName) {
       stateTopAnswersStatsCache[stateName] = [];
     };
 
-    var onDeleteState = function(stateName) {
+    var onStateDeleted = function(stateName) {
       delete stateTopAnswersStatsCache[stateName];
     };
 
-    var onRenameState = function(oldStateName, newStateName) {
+    var onStateRenamed = function(oldStateName, newStateName) {
       stateTopAnswersStatsCache[newStateName] =
         angular.copy(stateTopAnswersStatsCache[oldStateName]);
       delete stateTopAnswersStatsCache[oldStateName];
     };
 
-    var onSaveInteractionAnswerGroups = function(stateName) {
+    var onStateInteractionAnswerGroupsSaved = function(stateName) {
       refreshAddressedInfo(args.state_name);
     };
 
@@ -78,21 +78,21 @@ oppia.factory('StateTopAnswersStatsService', [
       if (!isInitialized) {
         return;
       }
-      onAddState(args.state_name);
+      onStateAdded(args.state_name);
     });
 
     $rootScope.$on(STATE_DELETED_EVENT_NAME, function(event, args) {
       if (!isInitialized) {
         return;
       }
-      onDeleteState(args.state_name);
+      onStateDeleted(args.state_name);
     });
 
     $rootScope.$on(STATE_RENAMED_EVENT_NAME, function(event, args) {
       if (!isInitialized) {
         return;
       }
-      onRenameState(args.old_state_name, args.new_state_name);
+      onStateRenamed(args.old_state_name, args.new_state_name);
     });
 
     $rootScope.$on(
@@ -100,7 +100,7 @@ oppia.factory('StateTopAnswersStatsService', [
         if (!isInitialized) {
           return;
         }
-        onSaveInteractionAnswerGroups(args.state_name);
+        onStateInteractionAnswerGroupsSaved(args.state_name);
       });
 
     return {
