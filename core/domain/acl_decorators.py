@@ -17,9 +17,11 @@
 """Decorators to provide authorization across the site."""
 
 from core.controllers import base
+from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import topic_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -45,6 +47,10 @@ def can_play_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can play the given exploration.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise self.PageNotFoundException
@@ -70,6 +76,10 @@ def can_play_collection(handler):
 
         Args:
             collection_id: str. The collection id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can play the given collection.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
@@ -94,6 +104,10 @@ def can_download_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can download the given exploration.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -120,6 +134,10 @@ def can_view_exploration_stats(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can view the exploration stats.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -144,6 +162,10 @@ def can_edit_collection(handler):
 
         Args:
             collection_id: str. The collection id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can edit the collection.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -323,19 +345,92 @@ def can_access_creator_dashboard(handler):
     return test_can_access
 
 
-def can_comment_on_feedback_thread(handler):
-    """Decorator to check whether the user can view feedback for a given
-    exploration.
+def can_create_feedback_thread(handler):
+    """Decorator to check whether the user can create a feedback thread.
     """
 
     def test_can_access(self, exploration_id, **kwargs):
-        """Checks if the user can view the exploration feedback.
+        """Checks if the user can create a feedback thread.
 
         Args:
-            exploration_id: str. The exploration id.
+            exploration_id: str. The ID of the exploration where the thread will
+                be created.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if rights_manager.check_can_access_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to create exploration feedback.')
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def can_view_feedback_thread(handler):
+    """Decorator to check whether the user can view a feedback thread."""
+
+    def test_can_access(self, thread_id, **kwargs):
+        """Checks if the user can view a feedback thread.
+
+        Args:
+            thread_id: str. The feedback thread id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if '.' not in thread_id:
+            raise self.InvalidInputException('Thread ID must contain a .')
+
+        exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
+
+        if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id, strict=False)
+        if rights_manager.check_can_access_activity(
+                self.user, exploration_rights):
+            return handler(self, thread_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to view exploration feedback.')
+    test_can_access.__wrapped__ = True
+
+    return test_can_access
+
+
+def can_comment_on_feedback_thread(handler):
+    """Decorator to check whether the user can comment on feedback thread.
+    """
+
+    def test_can_access(self, thread_id, **kwargs):
+        """Checks if the user can comment on the feedback thread.
+
+        Args:
+            thread_id: str. The feedback thread id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
+
+        if '.' not in thread_id:
+            raise self.InvalidInputException('Thread ID must contain a .')
+
+        exploration_id = feedback_services.get_exp_id_from_thread_id(thread_id)
 
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -345,10 +440,11 @@ def can_comment_on_feedback_thread(handler):
 
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
-            return handler(self, exploration_id, **kwargs)
+            return handler(self, thread_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                'You do not have credentials to view exploration feedback.')
+                'You do not have credentials to comment on exploration'
+                ' feedback.')
     test_can_access.__wrapped__ = True
 
     return test_can_access
@@ -364,6 +460,10 @@ def can_rate_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can rate the exploration.
         """
         if (role_services.ACTION_RATE_ANY_PUBLIC_EXPLORATION in
                 self.user.actions):
@@ -384,6 +484,10 @@ def can_flag_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can flag the exploration.
         """
         if role_services.ACTION_FLAG_EXPLORATION in self.user.actions:
             return handler(self, exploration_id, **kwargs)
@@ -418,6 +522,10 @@ def can_edit_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can edit the exploration.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -438,6 +546,38 @@ def can_edit_exploration(handler):
     return test_can_edit
 
 
+def can_translate_exploration(handler):
+    """Decorator to check whether the user can translate given exploration."""
+
+    def test_can_translate(self, exploration_id, **kwargs):
+        """Checks if the user can translate the exploration.
+
+        Args:
+            exploration_id: str. The exploration id.
+            **kwargs: dict(str: *). Keyword arguments.
+
+        Returns:
+            Return value of decorated function.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        exploration_rights = rights_manager.get_exploration_rights(
+            exploration_id)
+        if exploration_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if rights_manager.check_can_translate_activity(
+                self.user, exploration_rights):
+            return handler(self, exploration_id, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to translate this exploration.')
+    test_can_translate.__wrapped__ = True
+
+    return test_can_translate
+
+
 def can_delete_exploration(handler):
     """Decorator to check whether user can delete exploration."""
 
@@ -446,6 +586,10 @@ def can_delete_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can delete the exploration.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -475,6 +619,11 @@ def can_suggest_changes_to_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can make suggestions to an
+                exploration.
         """
         if (role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in
                 self.user.actions):
@@ -496,6 +645,11 @@ def can_publish_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            *args: arguments.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can publish the exploration.
         """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -522,6 +676,10 @@ def can_publish_collection(handler):
 
         Args:
             collection_id: str. The collection id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can publish the collection.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id)
@@ -547,6 +705,10 @@ def can_unpublish_collection(handler):
 
         Args:
             collection_id: str. The collection id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can unpublish the collection.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id)
@@ -574,6 +736,11 @@ def can_modify_exploration_roles(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can modify the rights related to
+                an exploration.
         """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -653,12 +820,216 @@ def can_edit_topic(handler):
         if topic_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if topic_services.check_can_edit_topic(
-                self.user, topic_rights):
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
             return handler(self, topic_id, **kwargs)
         else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
+            raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this topic.')
     test_can_edit.__wrapped__ = True
 
     return test_can_edit
+
+
+def can_add_new_story_to_topic(handler):
+    """Decorator to check whether the user can add a story to a given topic."""
+    def test_can_add_story(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to add a story to this topic.')
+    test_can_add_story.__wrapped__ = True
+
+    return test_can_add_story
+
+
+def can_edit_story(handler):
+    """Decorator to check whether the user can edit a story belonging to a given
+    topic.
+    """
+    def test_can_edit_story(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this story.')
+    test_can_edit_story.__wrapped__ = True
+
+    return test_can_edit_story
+
+
+def can_edit_skill(handler):
+    """Decorator to check whether the user can edit a skill, which can be
+    independent or belong to a topic.
+    """
+    def test_can_edit_skill(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        if role_services.ACTION_EDIT_ANY_SKILL in user_actions_info.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this skill.')
+
+    test_can_edit_skill.__wrapped__ = True
+    return test_can_edit_skill
+
+
+def can_delete_skill(handler):
+    """Decorator to check whether the user can delete a skill.
+    """
+    def test_can_delete_skill(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        if role_services.ACTION_DELETE_ANY_SKILL in user_actions_info.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to delete the skill.')
+
+    test_can_delete_skill.__wrapped__ = True
+    return test_can_delete_skill
+
+
+def can_create_skill(handler):
+    """Decorator to check whether the user can create a skill, which can be
+    independent or added to a topic.
+    """
+    def test_can_create_skill(self, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        if role_services.ACTION_CREATE_NEW_SKILL in user_actions_info.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to create a skill.')
+
+    test_can_create_skill.__wrapped__ = True
+    return test_can_create_skill
+
+
+def can_delete_story(handler):
+    """Decorator to check whether the user can delete a story in a given topic.
+    """
+    def test_can_delete_story(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to delete this story.')
+    test_can_delete_story.__wrapped__ = True
+
+    return test_can_delete_story
+
+
+def can_delete_topic(handler):
+    """Decorator to check whether the user can delete a topic."""
+
+    def test_can_delete_topic(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to delete the'
+                ' topic.' % self.user_id)
+    test_can_delete_topic.__wrapped__ = True
+
+    return test_can_delete_topic
+
+
+def can_create_topic(handler):
+    """Decorator to check whether the user can create a topic."""
+
+    def test_can_create_topic(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if role_services.ACTION_CREATE_NEW_TOPIC in user_actions_info.actions:
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to create a'
+                ' topic.' % self.user_id)
+    test_can_create_topic.__wrapped__ = True
+
+    return test_can_create_topic
+
+
+def can_access_topics_and_skills_dashboard(handler):
+    """Decorator to check whether the user can access the topics and skills
+    dashboard.
+    """
+
+    def test_can_access_topics_and_skills_dashboard(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if (
+                role_services.ACTION_ACCESS_TOPICS_AND_SKILLS_DASHBOARD in
+                user_actions_info.actions):
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to access the topics and skills'
+                ' dashboard.' % self.user_id)
+    test_can_access_topics_and_skills_dashboard.__wrapped__ = True
+
+    return test_can_access_topics_and_skills_dashboard
+
+
+def can_manage_rights_for_topic(handler):
+    """Decorator to check whether the user can manage a topic's rights."""
+
+    def test_can_manage_topic_rights(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if (
+                role_services.ACTION_MANAGE_TOPIC_RIGHTS in
+                user_actions_info.actions):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to assign roles for the '
+                'topic.' % self.user_id)
+    test_can_manage_topic_rights.__wrapped__ = True
+
+    return test_can_manage_topic_rights

@@ -60,6 +60,8 @@ STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 GADGET_PROPERTY_VISIBILITY = 'gadget_visibility'
 GADGET_PROPERTY_CUST_ARGS = 'gadget_customization_args'
 
+# This takes additional 'title' and 'category' parameters.
+CMD_CREATE_NEW = 'create_new'
 # This takes an additional 'state_name' parameter.
 CMD_ADD_STATE = 'add_state'
 # This takes additional 'old_state_name' and 'new_state_name' parameters.
@@ -223,6 +225,12 @@ class ExplorationChange(object):
         'blurb', 'author_notes', 'param_specs', 'param_changes',
         'init_state_name', 'auto_tts_enabled', 'correctness_feedback_enabled')
 
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'state_name', 'old_state_name', 'new_state_name',
+        'property_name', 'new_value', 'old_value', 'name', 'from_version',
+        'to_version', 'title', 'category'
+    ]
+
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
 
@@ -274,8 +282,29 @@ class ExplorationChange(object):
         elif self.cmd == CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION:
             self.from_version = change_dict['from_version']
             self.to_version = change_dict['to_version']
+        elif self.cmd == CMD_CREATE_NEW:
+            self.title = change_dict['title']
+            self.category = change_dict['category']
+        elif self.cmd.endswith('revert_version_number'):
+            # If commit is an exploration version revert commit.
+            self.version_number = change_dict['version_number']
         else:
             raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the ExplorationChange domain object.
+
+        Returns:
+            A dict, mapping all fields of ExplorationChange instance.
+        """
+        exploration_change_dict = {}
+        exploration_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                exploration_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return exploration_change_dict
 
 
 class ExplorationCommitLogEntry(object):
@@ -573,6 +602,10 @@ class SubtitledHtml(object):
 
         Raises:
             Exception: 'params' is not a dict.
+
+        Returns:
+            str. The HTML string that results after stripping
+                out unrecognized tags and attributes.
         """
         if not isinstance(params, dict):
             raise Exception(
@@ -721,6 +754,7 @@ class Outcome(object):
             'param_changes': [
                 param_change.to_dict() for param_change in self.param_changes],
             'refresher_exploration_id': self.refresher_exploration_id,
+            'missing_prerequisite_skill_id': self.missing_prerequisite_skill_id
         }
 
     @classmethod
@@ -742,11 +776,12 @@ class Outcome(object):
                 param_change['customization_args'])
              for param_change in outcome_dict['param_changes']],
             outcome_dict['refresher_exploration_id'],
+            outcome_dict['missing_prerequisite_skill_id']
         )
 
     def __init__(
             self, dest, feedback, labelled_as_correct, param_changes,
-            refresher_exploration_id):
+            refresher_exploration_id, missing_prerequisite_skill_id):
         """Initializes a Outcome domain object.
 
         Args:
@@ -761,6 +796,10 @@ class Outcome(object):
                 to redirect the learner to if they seem to lack understanding
                 of a prerequisite concept. This should only exist if the
                 destination state for this outcome is a self-loop.
+            missing_prerequisite_skill_id: str or None. The id of the skill that
+                this answer group tests. If this is not None, the exploration
+                player would redirect to this skill when a learner receives this
+                outcome.
         """
         # Id of the destination state.
         # TODO(sll): Check that this state actually exists.
@@ -777,6 +816,9 @@ class Outcome(object):
         # understanding of a prerequisite concept. This should only exist if
         # the destination state for this outcome is a self-loop.
         self.refresher_exploration_id = refresher_exploration_id
+        # An optional skill id whose concept card would be shown to the learner
+        # when the learner receives this outcome.
+        self.missing_prerequisite_skill_id = missing_prerequisite_skill_id
 
     def validate(self):
         """Validates various properties of the Outcome.
@@ -784,20 +826,18 @@ class Outcome(object):
         Raises:
             ValidationError: One or more attributes of the Outcome are invalid.
         """
-        if not self.dest:
-            raise utils.ValidationError(
-                'Every outcome should have a destination.')
-        if not isinstance(self.dest, basestring):
-            raise utils.ValidationError(
-                'Expected outcome dest to be a string, received %s'
-                % self.dest)
-
         self.feedback.validate()
 
         if not isinstance(self.labelled_as_correct, bool):
             raise utils.ValidationError(
                 'The "labelled_as_correct" field should be a boolean, received '
                 '%s' % self.labelled_as_correct)
+
+        if self.missing_prerequisite_skill_id is not None:
+            if not isinstance(self.missing_prerequisite_skill_id, basestring):
+                raise utils.ValidationError(
+                    'Expected outcome missing_prerequisite_skill_id to be a '
+                    'string, received %s' % self.missing_prerequisite_skill_id)
 
         if not isinstance(self.param_changes, list):
             raise utils.ValidationError(
@@ -831,7 +871,8 @@ class AnswerGroup(object):
             'rule_specs': [rule_spec.to_dict()
                            for rule_spec in self.rule_specs],
             'outcome': self.outcome.to_dict(),
-            'training_data': self.training_data
+            'training_data': self.training_data,
+            'tagged_misconception_id': self.tagged_misconception_id
         }
 
     @classmethod
@@ -848,10 +889,12 @@ class AnswerGroup(object):
         return cls(
             Outcome.from_dict(answer_group_dict['outcome']),
             [RuleSpec.from_dict(rs) for rs in answer_group_dict['rule_specs']],
-            answer_group_dict['training_data']
+            answer_group_dict['training_data'],
+            answer_group_dict['tagged_misconception_id']
         )
 
-    def __init__(self, outcome, rule_specs, training_data):
+    def __init__(
+            self, outcome, rule_specs, training_data, tagged_misconception_id):
         """Initializes a AnswerGroup domain object.
 
         Args:
@@ -859,6 +902,9 @@ class AnswerGroup(object):
             rule_specs: list(RuleSpec). List of rule specifications.
             training_data: list(*). List of answers belonging to training
                 data of this answer group.
+            tagged_misconception_id: str or None. The id of the tagged
+                misconception for the answer group, when a state is part of a
+                Question object that tests a particular skill.
         """
         self.rule_specs = [RuleSpec(
             rule_spec.rule_type, rule_spec.inputs
@@ -866,6 +912,7 @@ class AnswerGroup(object):
 
         self.outcome = outcome
         self.training_data = training_data
+        self.tagged_misconception_id = tagged_misconception_id
 
     def validate(self, interaction, exp_param_specs_dict):
         """Verifies that all rule classes are valid, and that the AnswerGroup
@@ -875,6 +922,7 @@ class AnswerGroup(object):
             exp_param_specs_dict: dict. A dict of all parameters used in the
                 exploration. Keys are parameter names and values are ParamSpec
                 value objects with an object type property (obj_type).
+            interaction: InteractionInstance. The interaction object.
 
         Raises:
             ValidationError: One or more attributes of the AnswerGroup are
@@ -886,6 +934,12 @@ class AnswerGroup(object):
             raise utils.ValidationError(
                 'Expected answer group rules to be a list, received %s'
                 % self.rule_specs)
+
+        if self.tagged_misconception_id is not None:
+            if not isinstance(self.tagged_misconception_id, basestring):
+                raise utils.ValidationError(
+                    'Expected tagged misconception id to be a string, '
+                    'received %s' % self.tagged_misconception_id)
 
         if len(self.rule_specs) == 0 and len(self.training_data) == 0:
             raise utils.ValidationError(
@@ -1222,9 +1276,50 @@ class InteractionInstance(object):
         """
         default_outcome = Outcome(
             default_dest_state_name,
-            SubtitledHtml.create_default_subtitled_html(), False, {}, None)
+            SubtitledHtml.create_default_subtitled_html(), False, {}, None,
+            None)
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
+
+
+    def get_all_html_content_strings(self):
+        """Get all html content strings in the interaction.
+
+        Returns:
+            list(str): The list of all html content strings in the interaction.
+        """
+        html_list = []
+
+        for answer_group in self.answer_groups:
+            outcome_html = answer_group.outcome.feedback.html
+            html_list = html_list + [outcome_html]
+
+        # Note that ItemSelectionInput replicates the customization arg HTML
+        # in its answer groups.
+        if self.id == 'ItemSelectionInput':
+            for answer_group in self.answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec_html = rule_spec.inputs['x']
+                    html_list = html_list + rule_spec_html
+
+        if self.default_outcome:
+            default_outcome_html = self.default_outcome.feedback.html
+            html_list = html_list + [default_outcome_html]
+
+        for hint in self.hints:
+            hint_html = hint.hint_content.html
+            html_list = html_list + [hint_html]
+
+        if self.solution:
+            solution_html = self.solution.explanation.html
+            html_list = html_list + [solution_html]
+
+        if self.id in ('ItemSelectionInput', 'MultipleChoiceInput'):
+            customization_args_html_list = (
+                self.customization_args['choices']['value'])
+            html_list = html_list + customization_args_html_list
+
+        return html_list
 
 
 class State(object):
@@ -1240,6 +1335,7 @@ class State(object):
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
         },
         'confirmed_unclassified_answers': [],
         'hints': [],
@@ -1404,7 +1500,8 @@ class State(object):
 
             answer_group = AnswerGroup(
                 Outcome.from_dict(answer_group_dict['outcome']), [],
-                answer_group_dict['training_data'])
+                answer_group_dict['training_data'],
+                answer_group_dict['tagged_misconception_id'])
             for rule_dict in rule_specs_list:
                 rule_spec = RuleSpec.from_dict(rule_dict)
 
@@ -1480,11 +1577,11 @@ class State(object):
         """Update the list of hints.
 
         Args:
-            hint_list: list(dict). A list of dict; each dict represents a Hint
+            hints_list: list(dict). A list of dict; each dict represents a Hint
                 object.
 
         Raises:
-            Exception: 'hint_list' is not a list.
+            Exception: 'hints_list' is not a list.
         """
         if not isinstance(hints_list, list):
             raise Exception(
@@ -1610,19 +1707,20 @@ class ExplorationVersionsDiff(object):
         """Constructs an ExplorationVersionsDiff domain object.
 
         Args:
-            change_list: list(dict). A list of all of the commit cmds from the
-                old version of the exploration up to the next version.
+            change_list: list(ExplorationChange). A list of all of the commit
+                cmds from the old version of the exploration up to the next
+                version.
         """
 
         added_state_names = []
         deleted_state_names = []
         new_to_old_state_names = {}
 
-        for change_dict in change_list:
-            if change_dict['cmd'] == CMD_ADD_STATE:
-                added_state_names.append(change_dict['state_name'])
-            elif change_dict['cmd'] == CMD_DELETE_STATE:
-                state_name = change_dict['state_name']
+        for change in change_list:
+            if change.cmd == CMD_ADD_STATE:
+                added_state_names.append(change.state_name)
+            elif change.cmd == CMD_DELETE_STATE:
+                state_name = change.state_name
                 if state_name in added_state_names:
                     added_state_names.remove(state_name)
                 else:
@@ -1631,9 +1729,9 @@ class ExplorationVersionsDiff(object):
                         original_state_name = new_to_old_state_names.pop(
                             original_state_name)
                     deleted_state_names.append(original_state_name)
-            elif change_dict['cmd'] == CMD_RENAME_STATE:
-                old_state_name = change_dict['old_state_name']
-                new_state_name = change_dict['new_state_name']
+            elif change.cmd == CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
                 if old_state_name in added_state_names:
                     added_state_names.remove(old_state_name)
                     added_state_names.append(new_state_name)
@@ -1725,20 +1823,23 @@ class Exploration(object):
     @classmethod
     def create_default_exploration(
             cls, exploration_id, title=feconf.DEFAULT_EXPLORATION_TITLE,
+            init_state_name=feconf.DEFAULT_INIT_STATE_NAME,
             category=feconf.DEFAULT_EXPLORATION_CATEGORY,
             objective=feconf.DEFAULT_EXPLORATION_OBJECTIVE,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Returns a Exploration domain object with default values.
-            'title', 'category', 'objective' if not provided are taken from
-            feconf; 'tags' and 'param_changes_list' are initialized to empty
-            list; 'states_schema_version' and 'init_state_name' are taken from
-            feconf; 'states_dict' is derived from feconf; 'param_specs_dict' is
-            an empty dict; 'blurb' and 'author_notes' are initialized to empty
-            empty string; 'version' is initializated to 0.
+
+        'title', 'init_state_name', 'category', 'objective' if not provided are
+        taken from feconf; 'tags' and 'param_changes_list' are initialized to
+        empty list; 'states_schema_version' is taken from feconf; 'states_dict'
+        is derived from feconf; 'param_specs_dict' is an empty dict; 'blurb' and
+        'author_notes' are initialized to empty string; 'version' is
+        initializated to 0.
 
         Args:
             exploration_id: str. The id of the exploration.
             title: str. The exploration title.
+            init_state_name: str. The name of the initial state.
             category: str. The category of the exploration.
             objective: str. The objective of the exploration.
             language_code: str. The language code of the exploration.
@@ -1748,16 +1849,16 @@ class Exploration(object):
             values.
         """
         init_state_dict = State.create_default_state(
-            feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+            init_state_name, is_initial_state=True).to_dict()
 
         states_dict = {
-            feconf.DEFAULT_INIT_STATE_NAME: init_state_dict
+            init_state_name: init_state_dict
         }
 
         return cls(
             exploration_id, title, category, objective, language_code, [], '',
             '', feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
-            feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [], 0,
+            init_state_name, states_dict, {}, [], 0,
             feconf.DEFAULT_AUTO_TTS_ENABLED, False)
 
     @classmethod
@@ -1958,9 +2059,32 @@ class Exploration(object):
             raise utils.ValidationError('This exploration has no states.')
         for state_name in self.states:
             self._require_valid_state_name(state_name)
-            self.states[state_name].validate(
+            state = self.states[state_name]
+            state.validate(
                 self.param_specs,
                 allow_null_interaction=not strict)
+            # The checks below perform validation on the Outcome domain object
+            # that is specific to answer groups in explorations, but not
+            # questions. This logic is here because the validation checks in
+            # the Outcome domain object are used by both explorations and
+            # questions.
+            for answer_group in state.interaction.answer_groups:
+                if not answer_group.outcome.dest:
+                    raise utils.ValidationError(
+                        'Every outcome should have a destination.')
+                if not isinstance(answer_group.outcome.dest, basestring):
+                    raise utils.ValidationError(
+                        'Expected outcome dest to be a string, received %s'
+                        % answer_group.outcome.dest)
+            if state.interaction.default_outcome is not None:
+                if not state.interaction.default_outcome.dest:
+                    raise utils.ValidationError(
+                        'Every outcome should have a destination.')
+                if not isinstance(
+                        state.interaction.default_outcome.dest, basestring):
+                    raise utils.ValidationError(
+                        'Expected outcome dest to be a string, received %s'
+                        % state.interaction.default_outcome.dest)
 
         if self.states_schema_version is None:
             raise utils.ValidationError(
@@ -2406,8 +2530,8 @@ class Exploration(object):
         """Renames the given state.
 
         Args:
-            old_state_names: str. The old name of state to rename.
-            new_state_names: str. The new state name.
+            old_state_name: str. The old name of state to rename.
+            new_state_name: str. The new state name.
 
         Raises:
             ValueError: The old state name does not exist or the new state name
@@ -2444,7 +2568,7 @@ class Exploration(object):
         """Deletes the given state.
 
         Args:
-            state_names: str. The state name to be deleted.
+            state_name: str. The state name to be deleted.
 
         Raises:
             ValueError: The state does not exist or is the initial state of the
@@ -3158,6 +3282,31 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v19_dict_to_v20_dict(cls, states_dict):
+        """Converts from version 19 to 20. Version 20 adds
+        tagged_misconception field to answer groups and
+        missing_prerequisite_skill_id field to outcomes.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            answer_groups = state_dict['interaction']['answer_groups']
+            for answer_group in answer_groups:
+                answer_group['outcome']['missing_prerequisite_skill_id'] = None
+                answer_group['tagged_misconception_id'] = None
+
+            default_outcome = state_dict['interaction']['default_outcome']
+            if default_outcome is not None:
+                default_outcome['missing_prerequisite_skill_id'] = None
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3188,7 +3337,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 24
+    CURRENT_EXP_SCHEMA_VERSION = 25
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3649,6 +3798,22 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v24_dict_to_v25_dict(cls, exploration_dict):
+        """ Converts a v24 exploration dict into a v25 exploration dict.
+
+        Adds additional tagged_misconception_id and
+        missing_prerequisite_skill_id fields to answer groups and outcomes
+        respectively.
+        """
+        exploration_dict['schema_version'] = 25
+
+        exploration_dict['states'] = cls._convert_states_v19_dict_to_v20_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 20
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3800,6 +3965,11 @@ class Exploration(object):
                 exploration_dict)
             exploration_schema_version = 24
 
+        if exploration_schema_version == 24:
+            exploration_dict = cls._convert_v24_dict_to_v25_dict(
+                exploration_dict)
+            exploration_schema_version = 25
+
         return (exploration_dict, initial_schema_version)
 
     @classmethod
@@ -3948,6 +4118,21 @@ class Exploration(object):
             state.interaction.id for state in self.states.itervalues()
             if state.interaction.id is not None]))
 
+    def get_all_html_content_strings(self):
+        """Gets all html content strings used in this exploration.
+
+        Returns:
+            list(str). The list of html content strings.
+        """
+        html_list = []
+        for state in self.states.itervalues():
+            content_html = state.content.html
+            interaction_html_list = (
+                state.interaction.get_all_html_content_strings())
+            html_list = html_list + [content_html] + interaction_html_list
+
+        return html_list
+
 
 class ExplorationSummary(object):
     """Domain object for an Oppia exploration summary."""
@@ -3955,7 +4140,7 @@ class ExplorationSummary(object):
     def __init__(
             self, exploration_id, title, category, objective,
             language_code, tags, ratings, scaled_average_rating, status,
-            community_owned, owner_ids, editor_ids,
+            community_owned, owner_ids, editor_ids, translator_ids,
             viewer_ids, contributor_ids, contributors_summary, version,
             exploration_model_created_on,
             exploration_model_last_updated,
@@ -3981,6 +4166,8 @@ class ExplorationSummary(object):
                 this exploration.
             editor_ids: list(str). List of the users ids who have access to
                 edit this exploration.
+            translator_ids: list(str). List of the users ids who have access to
+                translate this exploration.
             viewer_ids: list(str). List of the users ids who have access to
                 view this exploration.
             contributor_ids: list(str). List of the users ids of the user who
@@ -4008,6 +4195,7 @@ class ExplorationSummary(object):
         self.community_owned = community_owned
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
+        self.translator_ids = translator_ids
         self.viewer_ids = viewer_ids
         self.contributor_ids = contributor_ids
         self.contributors_summary = contributors_summary
@@ -4081,8 +4269,8 @@ class StateIdMapping(object):
         Args:
             old_exploration: Exploration. Old version of the exploration.
             new_exploration: Exploration. New version of the exploration.
-            change_list: list(dict). List of changes between old and new
-                exploration.
+            change_list: list(ExplorationChange). List of changes between old
+                and new exploration.
 
         Returns:
             StateIdMapping. Domain object for state id mapping.
@@ -4098,32 +4286,13 @@ class StateIdMapping(object):
 
         # Analyse each command in change list one by one to create state id
         # mapping for new exploration.
-        for change_dict in change_list:
-            # During v1 -> v2 migration of states, all pseudo END states were
-            # replaced by an explicit END state through this migration.
-            # We account for that change in the state id mapping too.
-            if change_dict['cmd'] == 'migrate_states_schema_to_latest_version':
-                pseudo_end_state_name = 'END'
-                if int(change_dict['from_version']) < 2 <= int(
-                        change_dict['to_version']):
-                    # The explicit end state is created only if there is some
-                    # state that used to refer to an implicit 'END' state.
-                    # This is confirmed by checking that there is a state
-                    # called 'END' in the immediate version of the exploration
-                    # after migration and no state called 'END' is present
-                    # in previous version of exploration.
-                    if (pseudo_end_state_name in (
-                            new_exploration.states) and (
-                                pseudo_end_state_name not in (
-                                    self.state_names_to_ids))):
-                        new_state_names.append(pseudo_end_state_name)
-            elif change_dict['cmd'] == CMD_ADD_STATE:
-                new_state_names.append(change_dict['state_name'])
-                assert change_dict['state_name'] not in (
-                    state_ids_to_names.values())
+        for change in change_list:
+            if change.cmd == CMD_ADD_STATE:
+                new_state_names.append(change.state_name)
+                assert change.state_name not in state_ids_to_names.values()
 
-            elif change_dict['cmd'] == CMD_DELETE_STATE:
-                removed_state_name = change_dict['state_name']
+            elif change.cmd == CMD_DELETE_STATE:
+                removed_state_name = change.state_name
 
                 # Find state name in state id mapping. If it exists then
                 # remove it from mapping.
@@ -4142,9 +4311,9 @@ class StateIdMapping(object):
                     # remove it from new state names list.
                     new_state_names.remove(removed_state_name)
 
-            elif change_dict['cmd'] == CMD_RENAME_STATE:
-                old_state_name = change_dict['old_state_name']
-                new_state_name = change_dict['new_state_name']
+            elif change.cmd == CMD_RENAME_STATE:
+                old_state_name = change.old_state_name
+                new_state_name = change.new_state_name
 
                 # Find whether old state name is present in state id mapping.
                 # If it is then replace the old state name to new state name.
@@ -4173,6 +4342,30 @@ class StateIdMapping(object):
         # with its corresponding old state to find whether significant
         # change has happened or not.
         for (state_id, state_name) in state_ids_to_names.iteritems():
+            if state_name == 'END' and state_name not in new_exploration.states:
+                # If previous version of exploration has END state but new
+                # version does not have END state then exception will be raised
+                # below when comparing old state and corresponding new state.
+                # The exception is raised because there is no commit in change
+                # list corresponding to removal or renaming of END state.
+
+                # This problem arises when following scenario occurrs:
+                # Consider an exploration with two versions a and b (a < b).
+                # Both of these versions have their states dict schema version
+                # set to less than 2.
+                # Now version 'a' has explicit references to END
+                # state and thus when its states dict schema version will be
+                # upgraded to latest version, an 'END' state will be added.
+                # These explicit END references are not present in version 'b',
+                # however, and so no END state will be added during states dict
+                # schema migration.
+
+                # Thus we have no command of END state's removal or renaming
+                # in change_list and there is no END state present in later
+                # version of exploration.
+                new_state_names_to_ids.pop(state_name)
+                continue
+
             new_state = new_exploration.states[state_name]
             old_state = old_exploration.states[old_state_ids_to_names[state_id]]
 
@@ -4182,11 +4375,23 @@ class StateIdMapping(object):
                 new_state_names_to_ids.pop(state_name)
                 new_state_names.append(state_name)
 
+        # This may happen in exactly opposite scenario as the one written in
+        # comment above. Previous version of exploration may not have any rule
+        # having END state as its destination and hence during states schema
+        # migration END state won't be added. But next version of exploration
+        # might have END references and, hence, END state might be added
+        # to exploration during states schema migration.
+        # So we check whether such siatuation exists or not. If it exists then
+        # we consider END as a new state to which id will be assigned.
+        if 'END' in new_exploration.states and (
+                'END' not in new_state_names_to_ids and (
+                    'END' not in new_state_names)):
+            new_state_names.append('END')
+
         # Assign new ids to each state in new state names list.
         largest_state_id_used = self.largest_state_id_used
         for state_name in sorted(new_state_names):
             largest_state_id_used += 1
-
             # Check that the state name being assigned is not present in
             # mapping.
             assert state_name not in new_state_names_to_ids.keys()
@@ -4195,6 +4400,23 @@ class StateIdMapping(object):
         state_id_map = StateIdMapping(
             new_exploration.id, new_exploration.version, new_state_names_to_ids,
             largest_state_id_used)
+
+        # Do one final check that all state names in new exploration are present
+        # in generated state names to id mapping.
+        if set(new_state_names_to_ids.keys()) != set(
+                new_exploration.states.keys()):
+            unknown_state_names = ((
+                set(new_exploration.states.keys()) -
+                set(new_state_names_to_ids.keys())) + (
+                    set(new_state_names_to_ids.keys()) -
+                    set(new_exploration.states.keys())))
+            raise Exception(
+                'State names to ids mapping does not contain '
+                'state names (%s) which are present in corresponding '
+                'exploration %s, version %d' % (
+                    unknown_state_names,
+                    new_exploration.id, new_exploration.version))
+
         state_id_map.validate()
         return state_id_map
 
@@ -4229,9 +4451,15 @@ class StateIdMapping(object):
         if len(set(state_ids)) != len(state_ids):
             raise Exception('Assigned state ids should be unique.')
 
-        if not all(state_ids) <= self.largest_state_id_used:
+        if not all(x <= self.largest_state_id_used for x in state_ids):
             raise Exception(
                 'Assigned state ids should be smaller than last state id used.')
+
+        if not all(isinstance(x, int) for x in state_ids):
+            raise Exception(
+                'Assigned state ids should be integer values in '
+                'exploration %s, version %d' % (
+                    self.exploration_id, self.exploration_version))
 
     def get_state_id(self, state_name):
         """Get state id for given state name.

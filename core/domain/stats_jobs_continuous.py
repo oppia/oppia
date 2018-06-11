@@ -103,6 +103,21 @@ class InteractionAnswerSummariesMRJobManager(
                 <exploration_id>:<exploration_version>:<state_name>
             stringified_values: list(str). A list of stringified_values of the
                 submitted answers.
+
+        Yields:
+            str. One of the following strings:
+                - Expected a single version when aggregating answers for:
+                    Occurs when the versions list contains multiple versions
+                    instead of a specific version.
+                - Expected exactly one interaction ID for exploration:
+                    Occurs when there is not exactly one interaction ID
+                    for each exploration and version.
+                - Expected at least one item ID for exploration:
+                    Occurs when there is not at least one Item ID for
+                    each exploration and version.
+                - Ignoring answers submitted to version:
+                    Occurs when version mismatches and the new
+                    version has a different interaction ID.
         """
         exploration_id, exploration_version, state_name = key.split(':')
 
@@ -231,6 +246,10 @@ class InteractionAnswerSummariesMRJobManager(
             'submitted_answer_list': submitted_answer_list
         }
 
+        # NOTE: The answers stored in submitted_answers_list must be sorted
+        # according to the chronological order of their submission otherwise
+        # TopNUnresolvedAnswersByFrequency calculation will output invalid
+        # results.
         state_answers_models = stats_models.StateAnswersModel.get_multi(
             item_ids)
         for state_answers_model in state_answers_models:

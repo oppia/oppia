@@ -31,6 +31,9 @@ import utils
         models.NAMES.feedback, models.NAMES.user]))
 
 
+_LANGUAGES_TO_RESET = ['hu', 'mk', 'sv', 'tr', 'de', 'fr', 'nl', 'pt']
+
+
 class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for creating and populating UserContributionsModels for
     all registered users that have contributed.
@@ -71,6 +74,73 @@ class UserContributionsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             user_services.create_user_contributions(
                 key, list(created_exploration_ids), list(
                     edited_exploration_ids))
+
+
+class UserLanguageAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for auditing the default language preferences of users."""
+
+    _LANGUAGE_TO_RESET_KEY = 'WOULD_RESET'
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function for this job."""
+        if item.preferred_site_language_code in _LANGUAGES_TO_RESET:
+            affected_users_key = '%s.%s' % (
+                UserLanguageAuditOneOffJob._LANGUAGE_TO_RESET_KEY,
+                item.preferred_site_language_code)
+            yield (
+                affected_users_key, {
+                    'language_code': item.preferred_site_language_code,
+                    'user_id': item.id
+                })
+        yield (item.preferred_site_language_code, 1)
+
+    @staticmethod
+    def reduce(key_or_language_code, stringified_values):
+        """Implements the reduce function for this job."""
+        if key_or_language_code.startswith(
+                UserLanguageAuditOneOffJob._LANGUAGE_TO_RESET_KEY):
+            affected_users = [
+                ast.literal_eval(stringified_affected_user)
+                for stringified_affected_user in stringified_values]
+            language_code = affected_users[0]['language_code']
+            yield 'Users affected by a reset of %s: %s' % (
+                language_code,
+                [affected_user['user_id'] for affected_user in affected_users])
+        else:
+            yield '%d users are using language: %s' % (
+                len(stringified_values), key_or_language_code)
+
+
+class UserLanguageResetOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for resetting the default language preferences of users."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        """Return a list of datastore class references to map over."""
+        return [user_models.UserSettingsModel]
+
+    @staticmethod
+    def map(item):
+        """Implements the map function for this job."""
+        if item.preferred_site_language_code in _LANGUAGES_TO_RESET:
+            # Reset the preferred site language for this user to None, which in
+            # turn defaults to English.
+            reset_language_code = item.preferred_site_language_code
+            item.preferred_site_language_code = None
+            item.put()
+            yield ('%s' % reset_language_code, 1)
+
+    @staticmethod
+    def reduce(reset_language_code, language_reset_indicators):
+        """Implements the reduce function for this job."""
+        yield 'Reset %d users for language: %s' % (
+            len(language_reset_indicators), reset_language_code)
 
 
 class UserDefaultDashboardOneOffJob(jobs.BaseMapReduceOneOffJobManager):

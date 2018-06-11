@@ -48,11 +48,11 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
     def test_correct_creation_of_version_diffs(self):
         # Rename a state.
         self.exploration.rename_state('Home', 'Renamed state')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Home',
             'new_state_name': 'Renamed state'
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -68,10 +68,10 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.exploration.add_states(['New state'])
         self.exploration.states['New state'] = copy.deepcopy(
             self.exploration.states['Renamed state'])
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -82,10 +82,10 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
 
         # Delete state.
         self.exploration.delete_state('New state')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'New state'
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -100,18 +100,18 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
             self.exploration.states['Renamed state'])
         self.exploration.rename_state('New state', 'New state2')
         self.exploration.rename_state('New state2', 'New state3')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state',
             'new_state_name': 'New state2'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state2',
             'new_state_name': 'New state3'
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -124,17 +124,17 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.exploration.add_states(['New state 2'])
         self.exploration.rename_state('New state 2', 'Renamed state 2')
         self.exploration.delete_state('Renamed state 2')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state 2'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state 2',
             'new_state_name': 'Renamed state 2'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'Renamed state 2'
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -147,18 +147,18 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         self.exploration.rename_state('New state3', 'Renamed state 3')
         self.exploration.rename_state('Renamed state 3', 'Renamed state 4')
         self.exploration.delete_state('Renamed state 4')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state3',
             'new_state_name': 'Renamed state 3'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Renamed state 3',
             'new_state_name': 'Renamed state 4'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'Renamed state 4'
-        }]
+        })]
 
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
 
@@ -250,6 +250,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     'labelled_as_correct': False,
                     'param_changes': [],
                     'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
                 },
                 'rule_specs': [{
                     'inputs': {
@@ -257,7 +258,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                     },
                     'rule_type': 'Contains'
                 }],
-                'training_data': []
+                'training_data': [],
+                'tagged_misconception_id': None
             })
         )
         exploration.validate()
@@ -357,6 +359,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.validate()
 
         outcome.refresher_exploration_id = 'valid_string'
+        exploration.validate()
+
+        outcome.missing_prerequisite_skill_id = 12345
+        self._assert_validation_error(
+            exploration,
+            'Expected outcome missing_prerequisite_skill_id to be a string')
+
+        outcome.missing_prerequisite_skill_id = None
+        exploration.validate()
+
+        outcome.missing_prerequisite_skill_id = 'valid_string'
         exploration.validate()
 
         # Test that refresher_exploration_id must be None for non-self-loops.
@@ -731,11 +744,11 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Rename a state to add it in unchanged answer group.
         exploration.rename_state('Home', 'Renamed state')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'Home',
             'new_state_name': 'Renamed state'
-        }]
+        })]
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [],
@@ -753,12 +766,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         answer_groups = []
         for answer_group in state.interaction.answer_groups:
             answer_groups.append(answer_group.to_dict())
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'state_name': 'Renamed state',
             'property_name': 'answer_groups',
             'new_value': answer_groups
-        }]
+        })]
 
         expected_dict = {
             'state_names_with_changed_answer_groups': ['Renamed state'],
@@ -773,10 +786,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.add_states(['New state'])
         exploration.states['New state'] = copy.deepcopy(
             exploration.states['Renamed state'])
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
-        }]
+        })]
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [
@@ -790,10 +803,10 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         # Delete state.
         exploration.delete_state('New state')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'delete_state',
             'state_name': 'New state'
-        }]
+        })]
 
         expected_dict = {
             'state_names_with_changed_answer_groups': ['Renamed state'],
@@ -810,18 +823,18 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             exploration.states['Renamed state'])
         exploration.rename_state('New state', 'New state2')
         exploration.rename_state('New state2', 'New state3')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': 'add_state',
             'state_name': 'New state',
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state',
             'new_state_name': 'New state2'
-        }, {
+        }), exp_domain.ExplorationChange({
             'cmd': 'rename_state',
             'old_state_name': 'New state2',
             'new_state_name': 'New state3'
-        }]
+        })]
 
         expected_dict = {
             'state_names_with_changed_answer_groups': [
@@ -892,6 +905,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     'labelled_as_correct': False,
                     'param_changes': [],
                     'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None
                 },
                 'hints': [],
                 'id': None,
@@ -2914,7 +2928,107 @@ states_schema_version: 19
 tags: []
 title: Title
 """)
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V24
+
+    YAML_CONTENT_V25 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 25
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            audio_translations: {}
+            html: Correct!
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: Congratulations, you have finished!
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: ''
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          audio_translations: {}
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 20
+tags: []
+title: Title
+""")
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V25
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -3060,6 +3174,12 @@ title: Title
             'eid', self.YAML_CONTENT_V24)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v25(self):
+        """Test direct loading from a v25 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V25)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class ConversionUnitTests(test_utils.GenericTestBase):
     """Test conversion methods."""
@@ -3091,6 +3211,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         'labelled_as_correct': False,
                         'param_changes': [],
                         'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None
                     },
                     'hints': [],
                     'id': None,
@@ -3269,6 +3390,106 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
     EXP_ID = 'eid'
 
+    EXPLORATION_CONTENT_1 = ("""default_skin: conversation_v1
+param_changes: []
+param_specs: {}
+schema_version: 1
+states:
+- content:
+  - type: text
+    value: ''
+  name: (untitled state)
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            x: InputString
+          name: Equals
+          rule_type: atomic
+        dest: END
+        feedback:
+          - Correct!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: TextInput
+- content:
+  - type: text
+    value: ''
+  name: New state
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          rule_type: default
+        dest: END
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: TextInput
+""")
+
+    EXPLORATION_CONTENT_2 = ("""default_skin: conversation_v1
+param_changes: []
+param_specs: {}
+schema_version: 1
+states:
+- content:
+  - type: text
+    value: ''
+  name: (untitled state)
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          inputs:
+            x: InputString
+          name: Equals
+          rule_type: atomic
+        dest: New state
+        feedback:
+          - Correct!
+        param_changes: []
+      - definition:
+          rule_type: default
+        dest: (untitled state)
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: TextInput
+- content:
+  - type: text
+    value: ''
+  name: New state
+  param_changes: []
+  widget:
+    customization_args: {}
+    handlers:
+    - name: submit
+      rule_specs:
+      - definition:
+          rule_type: default
+        dest: New state
+        feedback: []
+        param_changes: []
+    sticky: false
+    widget_id: TextInput
+""")
+
     def setUp(self):
         """Initialize owner and store default exploration before each
         test case.
@@ -3303,11 +3524,11 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': 'edit_exploration_property',
                     'property_name': 'title',
                     'new_value': 'New title'
-                }], 'Changes.')
+                })], 'Changes.')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3318,7 +3539,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 0)
 
     def test_that_mapping_is_correct_when_new_state_is_added(self):
@@ -3327,10 +3548,10 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }], 'Add state name')
+                })], 'Add state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3342,7 +3563,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_is_correct_when_old_state_is_deleted(self):
@@ -3351,16 +3572,16 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }], 'Add state name')
+                })], 'Add state name')
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'new state',
-                }], 'delete state')
+                })], 'delete state')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3371,7 +3592,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_remains_when_state_is_renamed(self):
@@ -3380,17 +3601,17 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }], 'Add state name')
+                })], 'Add state name')
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
                     'old_state_name': 'new state',
                     'new_state_name': 'state',
-                }], 'Change state name')
+                })], 'Change state name')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3402,7 +3623,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_is_changed_when_interaction_id_is_changed(self):
@@ -3411,12 +3632,12 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': self.exploration.init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput'
-                }], 'Update interaction.')
+                })], 'Update interaction.')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3428,7 +3649,7 @@ class StateIdMappingTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 1)
 
     def test_that_mapping_is_correct_for_series_of_changes(self):
@@ -3437,35 +3658,35 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         """
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
                     'old_state_name': 'new state',
                     'new_state_name': 'state'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'extra state'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'state',
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'extra state',
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'TextInput'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'new state',
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'TextInput'
-                }], 'Heavy changes')
+                })], 'Heavy changes')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3479,36 +3700,36 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 3)
 
         with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'state',
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
                     'old_state_name': 'extra state',
                     'new_state_name': 'state'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'state',
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'MultipleChoiceInput'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'extra state'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                     'state_name': 'extra state',
                     'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
                     'new_value': 'TextInput'
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_RENAME_STATE,
                     'old_state_name': 'new state',
                     'new_state_name': 'other state'
-                }], 'Heavy changes 2')
+                })], 'Heavy changes 2')
 
         new_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         new_mapping = exp_services.get_state_id_mapping(
@@ -3522,5 +3743,307 @@ class StateIdMappingTests(test_utils.GenericTestBase):
         }
         self.assertEqual(
             new_mapping.exploration_version, new_exploration.version)
-        self.assertEqual(new_mapping.state_names_to_ids, expected_mapping)
+        self.assertDictEqual(new_mapping.state_names_to_ids, expected_mapping)
         self.assertEqual(new_mapping.largest_state_id_used, 5)
+
+    def test_correct_mapping_is_generated_for_exp_with_old_states_schema(self):
+        """Test that correct state id mapping is generated for explorations
+        having old states schema version.
+        """
+
+        # Make sure that END is present in generated state id mapping if
+        # exploration contains rules which have END as their destination state
+        # but exploration itself does not have END state.
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
+        expected_mapping = {
+            '(untitled state)': 0,
+            'New state': 1,
+            'END': 2
+        }
+        state_id_map = (
+            exp_domain.StateIdMapping.create_mapping_for_new_exploration(
+                exploration))
+        self.assertDictEqual(state_id_map.state_names_to_ids, expected_mapping)
+        self.assertEqual(state_id_map.largest_state_id_used, 2)
+
+    def test_mapping_for_exp_with_no_end_reference(self):
+        """Test that correct mapping is generated when old exploration has
+        END state references but new exploration does not have END
+        references.
+        """
+
+        old_exploration = exp_domain.Exploration.from_untitled_yaml(
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
+        state_id_map = (
+            exp_domain.StateIdMapping.create_mapping_for_new_exploration(
+                old_exploration))
+
+        # Make sure that END is not present in generated state id mapping, even
+        # though END state may be present in state id mapping of previous
+        # version, if exploration does not contain any rule which has END
+        # as its destination state.
+        new_exploration = exp_domain.Exploration.from_untitled_yaml(
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_2)
+        expected_mapping = {
+            '(untitled state)': 0,
+            'New state': 1
+        }
+        state_id_map = state_id_map.create_mapping_for_new_version(
+            old_exploration, new_exploration, [])
+        self.assertDictEqual(
+            state_id_map.state_names_to_ids, expected_mapping)
+        self.assertEqual(state_id_map.largest_state_id_used, 2)
+
+    def test_mapping_for_exploration_with_end_references(self):
+        """Test that correct mapping is generated when old exploration does not
+        have END state reference but new exploration does.
+        """
+
+        old_exploration = exp_domain.Exploration.from_untitled_yaml(
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_2)
+        state_id_map = (
+            exp_domain.StateIdMapping.create_mapping_for_new_exploration(
+                old_exploration))
+
+        # Make sure that END is not present in generated state id mapping, even
+        # though END state may be present in state id mapping of previous
+        # version, if exploration does not contain any rule which has END
+        # as its destination state.
+        new_exploration = exp_domain.Exploration.from_untitled_yaml(
+            self.EXP_ID, 'Title', 'Category', self.EXPLORATION_CONTENT_1)
+        expected_mapping = {
+            '(untitled state)': 0,
+            'New state': 1,
+            'END': 2
+        }
+        state_id_map = state_id_map.create_mapping_for_new_version(
+            old_exploration, new_exploration, [])
+        self.assertDictEqual(
+            state_id_map.state_names_to_ids, expected_mapping)
+        self.assertEqual(state_id_map.largest_state_id_used, 2)
+
+    def test_validation(self):
+        """Test validation checks for state id mapping domain object."""
+
+        state_names_to_ids = {
+            'first': 0,
+            'second': 0
+        }
+        largest_state_id_used = 0
+        state_id_mapping = exp_domain.StateIdMapping(
+            'exp_id', 0, state_names_to_ids, largest_state_id_used)
+        with self.assertRaisesRegexp(
+            Exception, 'Assigned state ids should be unique.'):
+            state_id_mapping.validate()
+
+        state_names_to_ids = {
+            'first': 0,
+            'second': 1
+        }
+        largest_state_id_used = 0
+        state_id_mapping = exp_domain.StateIdMapping(
+            'exp_id', 0, state_names_to_ids, largest_state_id_used)
+        with self.assertRaisesRegexp(
+            Exception,
+            'Assigned state ids should be smaller than last state id used.'):
+            state_id_mapping.validate()
+
+        state_names_to_ids = {
+            'first': 0,
+            'second': None
+        }
+        largest_state_id_used = 0
+        state_id_mapping = exp_domain.StateIdMapping(
+            'exp_id', 0, state_names_to_ids, largest_state_id_used)
+        with self.assertRaisesRegexp(
+            Exception, 'Assigned state ids should be integer values'):
+            state_id_mapping.validate()
+
+
+class HtmlCollectionTests(test_utils.GenericTestBase):
+    """Test method to obtain all html strings."""
+
+    def test_all_html_strings_are_collected(self):
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'eid', title='title', category='category')
+        exploration.add_states(['state1', 'state2', 'state3'])
+        state1 = exploration.states['state1']
+        state2 = exploration.states['state2']
+        state3 = exploration.states['state3']
+        content1_dict = {
+            'html': '<blockquote>Hello, this is state1</blockquote>',
+            'audio_translations': {}
+        }
+        content2_dict = {
+            'html': '<pre>Hello, this is state2</pre>',
+            'audio_translations': {}
+        }
+        content3_dict = {
+            'html': '<p>Hello, this is state3</p>',
+            'audio_translations': {}
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+        state3.update_content(content3_dict)
+
+        state1.update_interaction_id('TextInput')
+        state2.update_interaction_id('MultipleChoiceInput')
+        state3.update_interaction_id('ItemSelectionInput')
+
+        customization_args_dict1 = {
+            'placeholder': {'value': ''},
+            'rows': {'value': 1}
+        }
+        customization_args_dict2 = {
+            'choices': {'value': [
+                '<p>This is value1 for MultipleChoice</p>',
+                '<p>This is value2 for MultipleChoice</p>'
+            ]}
+        }
+        customization_args_dict3 = {
+            'choices': {'value': [
+                '<p>This is value1 for ItemSelection</p>',
+                '<p>This is value2 for ItemSelection</p>',
+                '<p>This is value3 for ItemSelection</p>'
+            ]}
+        }
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state3.update_interaction_customization_args(customization_args_dict3)
+
+        default_outcome_dict1 = {
+            'dest': 'state2',
+            'feedback': {
+                'html': '<p>Default outcome for state1</p>',
+                'audio_translations': {}
+            },
+            'param_changes': [],
+            'labelled_as_correct': False,
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+
+        hint_list2 = [{
+            'hint_content': {
+                'html': '<p>Hello, this is html1 for state2</p>',
+                'audio_translations': {}
+            }
+        }, {
+            'hint_content': {
+                'html': '<p>Hello, this is html2 for state2</p>',
+                'audio_translations': {}
+            }
+        }]
+        state2.update_interaction_hints(hint_list2)
+
+        solution_dict1 = {
+            'interaction_id': '',
+            'answer_is_exclusive': True,
+            'correct_answer': 'Answer1',
+            'explanation': {
+                'html': '<p>This is solution for state1</p>',
+                'audio_translations': {}
+            }
+        }
+
+        state1.update_interaction_solution(solution_dict1)
+
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': 1}
+            }],
+            'outcome': {
+                'dest': 'state1',
+                'feedback': {
+                    'html': '<p>Outcome1 for state2</p>',
+                    'audio_translations': {}
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_misconception_id': None
+        }, {
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }],
+            'outcome': {
+                'dest': 'state3',
+                'feedback': {
+                    'html': '<p>Outcome2 for state2</p>',
+                    'audio_translations': {}
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+        answer_group_list3 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value1 for ItemSelectionInput</p>'
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    '<p>This is value3 for ItemSelectionInput</p>'
+                ]}
+            }],
+            'outcome': {
+                'dest': 'state1',
+                'feedback': {
+                    'html': '<p>Outcome for state3</p>',
+                    'audio_translations': {}
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+        state2.update_interaction_answer_groups(answer_group_list2)
+        state3.update_interaction_answer_groups(answer_group_list3)
+
+        expected_html_list = [
+            '',
+            '',
+            '<pre>Hello, this is state2</pre>',
+            '<p>Outcome1 for state2</p>',
+            '<p>Outcome2 for state2</p>',
+            '',
+            '<p>Hello, this is html1 for state2</p>',
+            '<p>Hello, this is html2 for state2</p>',
+            '<p>This is value1 for MultipleChoice</p>',
+            '<p>This is value2 for MultipleChoice</p>',
+            '<blockquote>Hello, this is state1</blockquote>',
+            '<p>Default outcome for state1</p>',
+            '<p>This is solution for state1</p>',
+            '<p>Hello, this is state3</p>',
+            '<p>Outcome for state3</p>',
+            '<p>This is value1 for ItemSelectionInput</p>',
+            '<p>This is value3 for ItemSelectionInput</p>',
+            '',
+            '<p>This is value1 for ItemSelection</p>',
+            '<p>This is value2 for ItemSelection</p>',
+            '<p>This is value3 for ItemSelection</p>'
+        ]
+
+        actual_outcome_list = exploration.get_all_html_content_strings()
+
+        self.assertEqual(actual_outcome_list, expected_html_list)

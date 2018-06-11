@@ -74,7 +74,7 @@ describe('Assets Backend API Service', function() {
     var failHandler = jasmine.createSpy('fail');
 
     var requestUrl = UrlInterpolationService.interpolateUrl(
-      '/imagehandler/<exploration_id>/image/<filename>', {
+      '/imagehandler/<exploration_id>/<filename>', {
         exploration_id: '0',
         filename: 'myfile.png'
       });
@@ -123,7 +123,7 @@ describe('Assets Backend API Service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       var requestUrl = UrlInterpolationService.interpolateUrl(
-        '/imagehandler/<exploration_id>/image/<filename>', {
+        '/imagehandler/<exploration_id>/<filename>', {
           exploration_id: '0',
           filename: 'myfile.png'
         });

@@ -88,15 +88,14 @@
             <label class="col-lg-2 col-md-2 col-sm-2" translate="I18N_PREFERENCES_SUBJECT_INTERESTS"></label>
             <div class="col-lg-10 col-md-10 col-sm-10">
               <div ng-if="hasPageLoaded && select2DropdownIsShown">
-                <select2-dropdown
-                  item="$parent.subjectInterests"
-                  choices="$parent.subjectInterests"
-                  allow-multiple-choices="true"
-                  new-choice-regex="<[::TAG_REGEX_STRING]>"
-                  width="100%"
-                  placeholder="<['I18N_PREFERENCES_SUBJECT_INTERESTS_PLACEHOLDER' | translate]>"
-                  invalid-search-term-message="<['I18N_PREFERENCES_SUBJECT_INTERESTS_INVALID_SEARCH' | translate]>"
-                  on-selection-change="onSubjectInterestsSelectionChange($parent.subjectInterests)">
+                <select2-dropdown item="$parent.subjectInterests"
+                                  choices="$parent.subjectInterests"
+                                  allow-multiple-choices="true"
+                                  new-choice-regex="<[::TAG_REGEX_STRING]>"
+                                  width="100%"
+                                  placeholder="<['I18N_PREFERENCES_SUBJECT_INTERESTS_PLACEHOLDER' | translate]>"
+                                  invalid-search-term-message="<['I18N_PREFERENCES_SUBJECT_INTERESTS_INVALID_SEARCH' | translate]>"
+                                  on-selection-change="onSubjectInterestsSelectionChange($parent.subjectInterests)">
                 </select2-dropdown>
               </div>
               <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_SUBJECT_INTERESTS_HELP_BLOCK"></span>
@@ -149,13 +148,12 @@
                 updated after the initial page load.
               -->
               <div ng-if="hasPageLoaded">
-                <select2-dropdown
-                  choices="LANGUAGE_CHOICES"
-                  item="$parent.preferredLanguageCodes"
-                  allow-multiple-choices="true"
-                  width="100%"
-                  placeholder="<['I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE' | translate]>"
-                  on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
+                <select2-dropdown choices="LANGUAGE_CHOICES"
+                                  item="$parent.preferredLanguageCodes"
+                                  allow-multiple-choices="true"
+                                  width="100%"
+                                  placeholder="<['I18N_PREFERENCES_SELECT_EXPLORATION_LANGUAGE' | translate]>"
+                                  on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
                 </select2-dropdown>
               </div>
               <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_EXPLORATION_LANGUAGE_EXPLAIN">
@@ -173,14 +171,13 @@
                 updated after the initial page load.
               -->
               <div ng-if="hasPageLoaded && select2DropdownIsShown">
-                <select2-dropdown
-                  class="protractor-test-system-language-selector"
-                  choices="SITE_LANGUAGE_CHOICES"
-                  item="$parent.preferredSiteLanguageCode"
-                  allow-multiple-choices="false"
-                  width="100%"
-                  placeholder="<['I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_PLACEHOLDER' | translate]>"
-                  on-selection-change="savePreferredSiteLanguageCodes($parent.preferredSiteLanguageCode)">
+                <select2-dropdown class="protractor-test-system-language-selector"
+                                  choices="SITE_LANGUAGE_CHOICES"
+                                  item="$parent.preferredSiteLanguageCode"
+                                  allow-multiple-choices="false"
+                                  width="100%"
+                                  placeholder="<['I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_PLACEHOLDER' | translate]>"
+                                  on-selection-change="savePreferredSiteLanguageCodes($parent.preferredSiteLanguageCode)">
                 </select2-dropdown>
               </div>
               <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_SITE_LANGUAGE_EXPLAIN"></span>
@@ -197,14 +194,13 @@
                 updated after the initial page load.
               -->
               <div ng-if="hasPageLoaded && select2DropdownIsShown">
-                <select2-dropdown
-                  class="protractor-test-system-language-selector"
-                  choices="AUDIO_LANGUAGE_CHOICES"
-                  item="$parent.preferredAudioLanguageCode"
-                  allow-multiple-choices="false"
-                  width="100%"
-                  placeholder="<['I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_PLACEHOLDER' | translate]>"
-                  on-selection-change="savePreferredAudioLanguageCode($parent.preferredAudioLanguageCode)">
+                <select2-dropdown class="protractor-test-system-language-selector"
+                                  choices="AUDIO_LANGUAGE_CHOICES"
+                                  item="$parent.preferredAudioLanguageCode"
+                                  allow-multiple-choices="false"
+                                  width="100%"
+                                  placeholder="<['I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_PLACEHOLDER' | translate]>"
+                                  on-selection-change="savePreferredAudioLanguageCode($parent.preferredAudioLanguageCode)">
                 </select2-dropdown>
               </div>
               <span class="help-block" style="font-size: smaller" translate="I18N_PREFERENCES_PREFERRED_AUDIO_LANGUAGE_EXPLAIN"></span>
@@ -260,6 +256,26 @@
 
     </md-card>
   </div>
+  <style>
+    .oppia-preferences-page-heading {
+      color: #01645c;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 3em;
+      margin-top: 0;
+      margin-bottom: 10px;
+      padding-top: 45px;
+      position: relative;
+      text-align: center;
+    }
+
+    .oppia-preferences-page-heading-subtext {
+      color: #01645c;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 1.2em;
+      position: relative;
+      text-align: center;
+    }
+  </style>
 {% endblock %}
 
 {% block footer %}

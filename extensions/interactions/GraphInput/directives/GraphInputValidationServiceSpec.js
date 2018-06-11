@@ -35,7 +35,8 @@ describe('GraphInputValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
     customizationArguments = {
@@ -71,7 +72,8 @@ describe('GraphInputValidationService', function() {
         rule_type: 'IsIsomorphicTo'
       })],
       goodDefaultOutcome,
-      false
+      false,
+      null
     );
     answerGroups = [answerGroup, angular.copy(answerGroup)];
   }));

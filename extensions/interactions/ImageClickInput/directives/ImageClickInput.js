@@ -23,11 +23,13 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT',
+  'ImagePreloaderService', 'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT',
+  'LOADING_INDICATOR_URL',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT) {
+      ImagePreloaderService, EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT,
+      LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {
@@ -44,12 +46,36 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.highlightRegionsOnHover =
             ($attrs.highlightRegionsOnHoverWithValue === 'true');
           $scope.filepath = imageAndRegions.imagePath;
-          $scope.imageUrl = (
-            $scope.filepath ?
-              $sce.trustAsResourceUrl(
-                '/imagehandler/' +
-                ExplorationContextService.getExplorationId() +
-                '/' + encodeURIComponent($scope.filepath)) : null);
+          $scope.imageUrl = '';
+          $scope.loadingIndicatorUrl = UrlInterpolationService
+            .getStaticImageUrl(LOADING_INDICATOR_URL);
+          $scope.isLoadingIndicatorShown = false;
+          if (ImagePreloaderService.inExplorationPlayer()) {
+            $scope.isLoadingIndicatorShown = true;
+            $scope.dimensions = (
+              ImagePreloaderService.getDimensionsOfImage($scope.filepath.name));
+            // For aligning the gif to the center of it's container
+            var loadingIndicatorSize = 120;
+            if ($scope.dimensions.height < 124) {
+              loadingIndicatorSize = 24;
+            }
+            var paddingTop = Math.max(0, (($scope.dimensions.height * 0.5) -
+              (loadingIndicatorSize * 0.5)));
+            $scope.loadingIndicatorContainerStyle =
+            {
+              'padding-top': paddingTop + 'px',
+              height: $scope.dimensions.height + 'px'
+            };
+            $scope.loadingIndicatorStyle = {
+              height: loadingIndicatorSize + 'px',
+              width: loadingIndicatorSize + 'px'
+            };
+          }
+          ImagePreloaderService.getImageUrl($scope.filepath.name)
+            .then(function(objectUrl) {
+              $scope.isLoadingIndicatorShown = false;
+              $scope.imageUrl = objectUrl;
+            });
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);

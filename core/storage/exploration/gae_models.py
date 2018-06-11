@@ -39,8 +39,8 @@ class ExplorationSnapshotContentModel(base_models.BaseSnapshotContentModel):
 class ExplorationModel(base_models.VersionedModel):
     """Versioned storage model for an Oppia exploration.
 
-    This class should only be imported by the exploration domain file, the
-    exploration services file, and the Exploration model test file.
+    This class should only be imported by the exploration services file
+    and the exploration model test file.
     """
     SNAPSHOT_METADATA_CLASS = ExplorationSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = ExplorationSnapshotContentModel
@@ -134,20 +134,13 @@ class ExplorationModel(base_models.VersionedModel):
         # TODO(msl): test if put_async() leads to any problems (make
         # sure summary dicts get updated correctly when explorations
         # are changed).
-        ExplorationCommitLogEntryModel(
-            id=('exploration-%s-%s' % (self.id, self.version)),
-            user_id=committer_id,
-            username=committer_username,
-            exploration_id=self.id,
-            commit_type=commit_type,
-            commit_message=commit_message,
-            commit_cmds=commit_cmds,
-            version=self.version,
-            post_commit_status=exp_rights.status,
-            post_commit_community_owned=exp_rights.community_owned,
-            post_commit_is_private=(
-                exp_rights.status == feconf.ACTIVITY_STATUS_PRIVATE)
-        ).put_async()
+        exploration_commit_log = ExplorationCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds, exp_rights.status,
+            exp_rights.community_owned
+        )
+        exploration_commit_log.exploration_id = self.id
+        exploration_commit_log.put()
 
 
 class ExplorationRightsSnapshotMetadataModel(
@@ -176,6 +169,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to translate this exploration.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
 
@@ -269,7 +264,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ).put_async()
 
 
-class ExplorationCommitLogEntryModel(base_models.BaseModel):
+class ExplorationCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     """Log of commits to explorations.
 
     A new instance of this model is created and saved every time a commit to
@@ -278,35 +273,8 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     The id for this model is of the form
     'exploration-{{EXP_ID}}-{{EXP_VERSION}}'.
     """
-    # Update superclass model to make these properties indexed.
-    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
-    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
-
-    # The id of the user.
-    user_id = ndb.StringProperty(indexed=True, required=True)
-    # The username of the user, at the time of the edit.
-    username = ndb.StringProperty(indexed=True, required=True)
     # The id of the exploration being edited.
     exploration_id = ndb.StringProperty(indexed=True, required=True)
-    # The type of the commit: 'create', 'revert', 'edit', 'delete'.
-    commit_type = ndb.StringProperty(indexed=True, required=True)
-    # The commit message.
-    commit_message = ndb.TextProperty(indexed=False)
-    # The commit_cmds dict for this commit.
-    commit_cmds = ndb.JsonProperty(indexed=False, required=True)
-    # The version number of the exploration after this commit. Only populated
-    # for commits to an exploration (as opposed to its rights, etc.).
-    version = ndb.IntegerProperty()
-
-    # The status of the exploration after the edit event ('private', 'public').
-    post_commit_status = ndb.StringProperty(indexed=True, required=True)
-    # Whether the exploration is community-owned after the edit event.
-    post_commit_community_owned = ndb.BooleanProperty(indexed=True)
-    # Whether the exploration is private after the edit event. Having a
-    # separate field for this makes queries faster, since an equality query
-    # on this property is faster than an inequality query on
-    # post_commit_status.
-    post_commit_is_private = ndb.BooleanProperty(indexed=True)
 
     @classmethod
     def _get_instance_id(cls, exp_id, exp_version):
@@ -315,35 +283,12 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
         Args:
             exp_id: str. The exploration id whose states are mapped.
             exp_version: int. The version of the exploration.
-        """
-        return 'exploration-%s-%s' % (exp_id, exp_version)
-
-    @classmethod
-    def get_all_commits(cls, page_size, urlsafe_start_cursor):
-        """Fetches a list of all the commits sorted by their last updated
-        attribute.
-
-        Args:
-            page_size: int. The maximum number of entities to be returned.
-            urlsafe_start_cursor: str or None. If provided, the list of
-                returned entities starts from this datastore cursor.
-                Otherwise, the returned entities start from the beginning
-                of the full list of entities.
 
         Returns:
-            3-tuple of (results, cursor, more) as described in fetch_page() at:
-            https://developers.google.com/appengine/docs/python/ndb/queryclass,
-            where:
-                results: List of query results.
-                cursor: str or None. A query cursor pointing to the next
-                    batch of results. If there are no more results, this will
-                    be None.
-                more: bool. If True, there are (probably) more results after
-                    this batch. If False, there are no further results after
-                    this batch.
+            str. A string containing exploration ID and
+                exploration version.
         """
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(), page_size, urlsafe_start_cursor)
+        return 'exploration-%s-%s' % (exp_id, exp_version)
 
     @classmethod
     def get_all_non_private_commits(
@@ -464,6 +409,8 @@ class ExpSummaryModel(base_models.BaseModel):
     owner_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to edit this exploration.
     editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to translate this exploration.
+    translator_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who are allowed to view this exploration.
     viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
     # The user_ids of users who have contributed (humans who have made a
@@ -527,6 +474,7 @@ class ExpSummaryModel(base_models.BaseModel):
         ).filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
                    ExpSummaryModel.editor_ids == user_id,
+                   ExpSummaryModel.translator_ids == user_id,
                    ExpSummaryModel.viewer_ids == user_id)
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
@@ -603,6 +551,10 @@ class StateIdMappingModel(base_models.BaseModel):
         Args:
             exp_id: str. The exploration id whose states are mapped.
             exp_version: int. The version of the exploration.
+
+        Returns:
+            str. A string containing exploration ID and
+                exploration version.
         """
         return '%s.%d' % (exp_id, exp_version)
 
@@ -645,8 +597,7 @@ class StateIdMappingModel(base_models.BaseModel):
         Args:
             exp_id: str. The exploration id.
             exp_version: int. The exploration version.
-            strict: bool. Whether to raise an error if no StateIdMappingModel
-                entry is found for the given exploration id and version.
+
 
         Returns:
             StateIdMappingModel. The model retrieved from the datastore.
@@ -660,7 +611,7 @@ class StateIdMappingModel(base_models.BaseModel):
         """Removes state id mapping models present in state_id_mapping_models.
 
         Args:
-            exp_id: The id of the exploration.
+            exp_id: str. The id of the exploration.
             exp_versions: list(int). A list of exploration versions for which
                 the state id mapping model is to be deleted.
         """

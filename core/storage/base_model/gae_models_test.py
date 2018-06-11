@@ -81,6 +81,27 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(result, [model1, None, None, model3, None, None])
 
+    def test_delete_multi(self):
+        model1 = base_models.BaseModel()
+        model2 = base_models.BaseModel()
+        model3 = base_models.BaseModel()
+        model2.deleted = True
+
+        model1.put()
+        model2.put()
+        model3.put()
+
+        model1_id = model1.id
+        model2_id = model2.id
+        model3_id = model3.id
+
+        base_models.BaseModel.delete_multi([model1, model2, model3])
+
+        result = base_models.BaseModel.get_multi([
+            model1_id, model2_id, model3_id])
+
+        self.assertEqual(result, [None, None, None])
+
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])
         for _ in range(100):
@@ -109,6 +130,68 @@ class TestVersionedModel(base_models.VersionedModel):
     """Model that inherits the VersionedModel for testing."""
     SNAPSHOT_METADATA_CLASS = TestSnapshotMetadataModel
     SNAPSHOT_CONTENT_CLASS = TestSnapshotContentModel
+
+
+class TestCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    @classmethod
+    def _get_instance_id(cls, target_entity_id, version):
+        """A function that returns the id of the log in BaseCommitLogEntryModel.
+
+        Args:
+            target_entity_id: str. The id of the mock entity used.
+            version: int. The version of the model after the commit.
+
+        Returns:
+            str. The commit id with the target entity id and version number.
+        """
+        return 'entity-%s-%s' % (target_entity_id, version)
+
+
+class CommitLogEntryModelTests(test_utils.GenericTestBase):
+    """Test methods for CommitLogEntryModel."""
+
+    def test_get_commit(self):
+        model1 = TestCommitLogEntryModel.create(
+            entity_id='id', committer_id='user',
+            committer_username='username',
+            commit_cmds={}, commit_type='create',
+            commit_message='New commit created.', version=1,
+            status=feconf.ACTIVITY_STATUS_PUBLIC, community_owned=False
+        )
+        model1.put()
+
+        test_model = TestCommitLogEntryModel.get_commit('id', 1)
+        self.assertEqual(test_model.version, 1)
+        self.assertEqual(test_model.user_id, 'user')
+        self.assertEqual(test_model.commit_type, 'create')
+        self.assertEqual(
+            test_model.post_commit_status, feconf.ACTIVITY_STATUS_PUBLIC)
+        self.assertEqual(test_model.post_commit_community_owned, False)
+        self.assertEqual(test_model.post_commit_is_private, False)
+
+    def test_get_all_commits(self):
+        model1 = TestCommitLogEntryModel.create(
+            entity_id='id', committer_id='user',
+            committer_username='username',
+            commit_cmds={}, commit_type='create',
+            commit_message='New commit created.', version=1,
+            status=feconf.ACTIVITY_STATUS_PUBLIC, community_owned=False
+        )
+        model2 = TestCommitLogEntryModel.create(
+            entity_id='id', committer_id='user',
+            committer_username='username',
+            commit_cmds={}, commit_type='edit',
+            commit_message='New commit created.', version=2,
+            status=feconf.ACTIVITY_STATUS_PUBLIC, community_owned=False
+        )
+        model1.put()
+        model2.put()
+
+        test_models = TestCommitLogEntryModel.get_all_commits(2, None)
+        self.assertEqual(test_models[0][0].version, 2)
+        self.assertEqual(test_models[0][1].version, 1)
+        self.assertEqual(test_models[0][0].commit_type, 'edit')
+        self.assertEqual(test_models[0][1].commit_type, 'create')
 
 
 class VersionedModelTests(test_utils.GenericTestBase):

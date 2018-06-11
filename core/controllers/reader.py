@@ -34,12 +34,17 @@ from core.domain import moderator_services
 from core.domain import rating_services
 from core.domain import recommendations_services
 from core.domain import rights_manager
+from core.domain import stats_domain
+from core.domain import stats_services
 from core.domain import summary_services
 from core.domain import user_services
+from core.platform import models
 import feconf
 import utils
 
 import jinja2
+
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 MAX_SYSTEM_RECOMMENDATIONS = 4
 
@@ -292,6 +297,81 @@ class ExplorationHandler(base.BaseHandler):
                 exploration.correctness_feedback_enabled),
         })
         self.render_json(self.values)
+
+
+class StorePlaythroughHandler(base.BaseHandler):
+    """Handles a useful playthrough coming in from the frontend to store it."""
+
+    @acl_decorators.can_play_exploration
+    def post(self, exploration_id):
+        """Handles POST requests. Appends to existing list of playthroughs or
+        deletes it if already full.
+
+        Args:
+            exploration_id: str. The ID of the exploration.
+        """
+        exp_issue_dict = self.payload.get('exp_issue_dict')
+        try:
+            unused_exp_issue = stats_domain.ExplorationIssue.from_backend_dict(
+                exp_issue_dict)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        playthrough_data = self.payload.get('playthrough_data')
+        try:
+            unused_playthrough = stats_domain.Playthrough.from_backend_dict(
+                playthrough_data)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        exp_version = playthrough_data['exp_version']
+
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            exploration_id, exp_version)
+        exp_issues = stats_services.get_exp_issues_from_model(exp_issues_model)
+
+        customization_args = exp_issue_dict['issue_customization_args']
+
+        issue_found = False
+        for index, issue in enumerate(exp_issues.unresolved_issues):
+            if issue.issue_type == exp_issue_dict['issue_type']:
+                issue_customization_args = issue.issue_customization_args
+                # In case issue_keyname is 'state_names', the ordering of the
+                # list is important i.e. [a,b,c] is different from [b,c,a].
+                issue_keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+                    issue.issue_type]
+                if (issue_customization_args[issue_keyname] ==
+                        customization_args[issue_keyname]):
+                    issue_found = True
+                    if (len(issue.playthrough_ids) <
+                            feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
+                        playthrough_id = stats_models.PlaythroughModel.create(
+                            playthrough_data['exp_id'],
+                            playthrough_data['exp_version'],
+                            playthrough_data['issue_type'],
+                            playthrough_data['issue_customization_args'],
+                            playthrough_data['actions'])
+                        exp_issues.unresolved_issues[
+                            index].playthrough_ids.append(playthrough_id)
+                    break
+
+        if not issue_found:
+            playthrough_id = stats_models.PlaythroughModel.create(
+                playthrough_data['exp_id'],
+                playthrough_data['exp_version'],
+                playthrough_data['issue_type'],
+                playthrough_data['issue_customization_args'],
+                playthrough_data['actions'])
+            issue = stats_domain.ExplorationIssue(
+                exp_issue_dict['issue_type'],
+                exp_issue_dict['issue_customization_args'],
+                [playthrough_id], exp_issue_dict['schema_version'],
+                exp_issue_dict['is_valid'])
+
+            exp_issues.unresolved_issues.append(issue)
+
+        stats_services.save_exp_issues_model_transactional(exp_issues)
+        self.render_json({})
 
 
 class StatsEventsHandler(base.BaseHandler):

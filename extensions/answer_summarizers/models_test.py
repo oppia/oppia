@@ -379,3 +379,83 @@ class TopAnswersByCategorizationUnitTestCase(CalculationUnitTestBase):
             ],
         }
         self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
+
+
+class TopNUnresolvedAnswersByFrequency(CalculationUnitTestBase):
+    CALCULATION_ID = 'TopNUnresolvedAnswersByFrequency'
+
+    def test_empty_state_answers_dict(self):
+        state_answers_dict = self._create_state_answers_dict([])
+        actual_calc_output = self._perform_calculation(state_answers_dict)
+        expected_calc_output = []
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
+
+    def test_unresolved_answers_list(self):
+        answer_dicts_list = [
+            # EXPLICIT.
+            self._create_answer_dict(
+                'Explicit A',
+                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_answer_dict(
+                'Explicit B',
+                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+            self._create_answer_dict(
+                'Explicit A',
+                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+            # TRAINING DATA.
+            self._create_answer_dict(
+                'Trained data A',
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
+            self._create_answer_dict(
+                'Trained data B',
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
+            self._create_answer_dict(
+                'Trained data B',
+                classify_category=exp_domain.TRAINING_DATA_CLASSIFICATION),
+            # STATS CLASSIFIER.
+            self._create_answer_dict(
+                'Stats B',
+                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_answer_dict(
+                'Stats C',
+                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_answer_dict(
+                'Stats C',
+                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+            self._create_answer_dict(
+                'Explicit B',
+                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+            # EXPLICIT.
+            self._create_answer_dict(
+                'Trained data B',
+                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+            # DEFAULT OUTCOMES.
+            self._create_answer_dict(
+                'Default C',
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            self._create_answer_dict(
+                'Default C',
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            self._create_answer_dict(
+                'Default B',
+                classify_category=exp_domain.DEFAULT_OUTCOME_CLASSIFICATION),
+            # EXPLICIT.
+            self._create_answer_dict(
+                'Default B',
+                classify_category=exp_domain.EXPLICIT_CLASSIFICATION),
+            # STATS CLASSIFIER.
+            self._create_answer_dict(
+                'Default B',
+                classify_category=exp_domain.STATISTICAL_CLASSIFICATION),
+        ]
+        state_answers_dict = self._create_state_answers_dict(answer_dicts_list)
+
+        actual_calc_output = self._perform_calculation(state_answers_dict)
+        expected_calc_output = [
+            {'answer': 'Default B', 'frequency': 3},
+            {'answer': 'Explicit B', 'frequency': 2},
+            {'answer': 'Stats C', 'frequency': 2},
+            {'answer': 'Default C', 'frequency': 2},
+            {'answer': 'Stats B', 'frequency': 1},
+        ]
+        self.assertEqual(actual_calc_output.to_raw_type(), expected_calc_output)
