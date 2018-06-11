@@ -85,8 +85,7 @@ oppia.factory('StateTopAnswersStatsService', [
         for (var stateName in stateTopAnswersStatsBackendDict.answers) {
           stateTopAnswerStatsCache[stateName] =
             stateTopAnswersStatsBackendDict.answers[stateName].map(
-              AnswerStatsObjectFactory.createFromBackendDict
-            );
+              AnswerStatsObjectFactory.createFromBackendDict);
           // Still need to manually refresh the addressed information.
           refreshAddressedInfo(stateName);
         }
