@@ -25,14 +25,26 @@ oppia.directive('unresolvedAnswersOverview', [
         '/pages/exploration_editor/editor_tab/' +
         'unresolved_answers_overview_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'StateTopAnswersStatsService',
-        function($scope, EditorStateService, StateTopAnswersStatsService) {
+        '$scope', 'EditorStateService', 'ExplorationStatesService',
+        'StateTopAnswersStatsService',
+        function(
+            $scope, EditorStateService, ExplorationStatesService,
+            StateTopAnswersStatsService) {
+          /**
+           * TODO(brianrodri): Move this into an appropriate service.
+           * @returns {boolean}
+           */
+          var isStateInteractionIdSupported = function(stateName) {
+            return ExplorationStatesService.getState(stateName) === 'TextInput';
+          };
+
+          $scope.isUnresolvedAnswersOverviewShown = function() {
+            return isStateInteractionIdSupported &&
+              StateTopAnswersStatsService.isInitialized();
+          };
           $scope.getUnresolvedStateStats = function() {
             return StateTopAnswersStatsService.getUnresolvedStateStats(
               EditorStateService.getActiveStateName());
-          };
-          $scope.isUnresolvedAnswersOverviewShown = function() {
-            return StateTopAnswersStatsService.isInitialized();
           };
         }
       ]
