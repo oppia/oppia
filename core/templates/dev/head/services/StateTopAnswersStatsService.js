@@ -52,30 +52,47 @@ oppia.factory('StateTopAnswersStatsService', [
       });
     };
 
-    $rootScope.$on('addState', function(event, args) {
-      if (stateTopAnswerStatsCache.hasOwnProperty(args.state_name)) {
+    var onAddState = function(stateName) {
+      if (stateTopAnswerStatsCache.hasOwnProperty(stateName)) {
         // No action required, we already have data for that state.
         return;
       } else {
         // Give the cache an empty list of answers.
-        stateTopAnswerStatsCache[args.state_name] = [];
+        stateTopAnswerStatsCache[stateName] = [];
       }
+    };
+
+    var onDeleteState = function(stateName) {
+      // Take no action, we'll hold onto the stats in the cache.
+    };
+
+    var onRenameState = function(oldStateName, newStateName) {
+      stateTopAnswerStatsCache[newStateName] =
+        angular.copy(stateTopAnswerStatsCache[oldStateName]);
+    };
+
+    var onSaveInteractionAnswerGroups = function(stateName) {
+      refreshAddressedInfo(args.state_name);
+    };
+
+    $rootScope.$on('addState', function(event, args) {
+      if (!isInitialized) return;
+      onAddState(args.state_name);
     });
 
     $rootScope.$on('deleteState', function(event, args) {
-      // Take no action, we'll hold onto the stats in the cache.
+      if (!isInitialized) return;
+      onDeleteState(args.state_name);
     });
 
     $rootScope.$on('renameState', function(event, args) {
-      stateTopAnswerStatsCache[args.new_state_name] =
-        angular.copy(stateTopAnswerStatsCache[args.old_state_name]);
+      if (!isInitialized) return;
+      onRenameState(args.old_state_name, args.new_state_name);
     });
 
     $rootScope.$on('saveInteractionAnswerGroups', function(event, args) {
-      if (stateTopAnswerStatsCache.hasOwnProperty(args.state_name)) {
-        // Only refresh states for which we have answers.
-        refreshAddressedInfo(args.state_name);
-      }
+      if (!isInitialized) return;
+      onSaveInteractionAnswerGroups(args.state_name);
     });
 
     return {
