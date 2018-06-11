@@ -77,7 +77,6 @@ describe('Editable topic backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      // Loading a topic the first time should fetch it from the backend.
       $httpBackend.expect('GET', '/topic_editor_handler/data/1').respond(
         500, 'Error loading topic 1.');
       EditableTopicBackendApiService.fetchTopic('1').then(
@@ -121,6 +120,26 @@ describe('Editable topic backend API service', function() {
 
       expect(successHandler).toHaveBeenCalledWith(topic);
       expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
+
+  it('should use the rejection handler if the topic to update doesn\'t exist',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      // Loading a topic the first time should fetch it from the backend.
+      $httpBackend.expect('PUT', '/topic_editor_handler/data/1').respond(
+        404, 'Topic with given id doesn\'t exist.');
+
+      EditableTopicBackendApiService.updateTopic(
+        '1', '1', 'Update an invalid topic.', []
+      ).then(successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).not.toHaveBeenCalled();
+      expect(failHandler).toHaveBeenCalledWith(
+        'Topic with given id doesn\'t exist.');
     }
   );
 });

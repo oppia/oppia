@@ -17,7 +17,7 @@
  * topic domain objects.
  */
 
-oppia.factory('TopicObjectFactory',
+oppia.factory('TopicObjectFactory', [
   function() {
     var Topic = function(topicBackendObject) {
       this._id = topicBackendObject.id;
@@ -37,7 +37,7 @@ oppia.factory('TopicObjectFactory',
       return this._id;
     };
 
-    Topic.prototype.getName= function() {
+    Topic.prototype.getName = function() {
       return this._name;
     };
 
@@ -66,7 +66,7 @@ oppia.factory('TopicObjectFactory',
     };
 
     Topic.prototype.addCanonicalStoryId = function(storyId) {
-      if (this._canonicalStoryIds.indexOf(storyId) == -1) {
+      if (this._canonicalStoryIds.indexOf(storyId) === -1) {
         this._canonicalStoryIds.push(storyId);
         return true;
       }
@@ -76,7 +76,7 @@ oppia.factory('TopicObjectFactory',
     Topic.prototype.removeCanonicalStoryId = function(storyId) {
       var index = this._canonicalStoryIds.indexOf(storyId);
       if (index > -1) {
-        this._canonicalStoryIds.splice(index);
+        this._canonicalStoryIds.splice(index, 1);
       }
     };
 
@@ -89,7 +89,7 @@ oppia.factory('TopicObjectFactory',
     };
 
     Topic.prototype.addAdditionalStoryId = function(storyId) {
-      if (this._additionalStoryIds.indexOf(storyId) == -1) {
+      if (this._additionalStoryIds.indexOf(storyId) === -1) {
         this._additionalStoryIds.push(storyId);
         return true;
       }
@@ -99,7 +99,7 @@ oppia.factory('TopicObjectFactory',
     Topic.prototype.removeAdditionalStoryId = function(storyId) {
       var index = this._additionalStoryIds.indexOf(storyId);
       if (index > -1) {
-        this._additionalStoryIds.splice(index);
+        this._additionalStoryIds.splice(index, 1);
       }
     };
 
@@ -112,7 +112,7 @@ oppia.factory('TopicObjectFactory',
     };
 
     Topic.prototype.addUncategorizedSkillId = function(skillId) {
-      if (this._uncategorizedSkillIds.indexOf(skillId) == -1) {
+      if (this._uncategorizedSkillIds.indexOf(skillId) === -1) {
         this._uncategorizedSkillIds.push(skillId);
         return true;
       }
@@ -122,7 +122,7 @@ oppia.factory('TopicObjectFactory',
     Topic.prototype.removeUncategorizedSkillId = function(skillId) {
       var index = this._uncategorizedSkillIds.indexOf(skillId);
       if (index > -1) {
-        this._uncategorizedSkillIds.splice(index);
+        this._uncategorizedSkillIds.splice(index, 1);
       }
     };
 
@@ -133,6 +133,15 @@ oppia.factory('TopicObjectFactory',
     Topic.prototype.getUncategorizedSkillIds = function() {
       return this._uncategorizedSkillIds.slice();
     };
+
+    Topic.prototype.clearSubtopics = function() {
+      this._subtopics.length = 0;
+    };
+
+    Topic.prototype.getSubtopics = function() {
+      return this._subtopics.slice();
+    };
+
 
     // Reassigns all values within this topic to match the existing
     // topic. This is performed as a deep copy such that none of the
@@ -146,6 +155,7 @@ oppia.factory('TopicObjectFactory',
       this.clearAdditionalStoryIds();
       this.clearCanonicalStoryIds();
       this.clearUncategorizedSkillIds();
+      this.clearSubtopics();
 
       var canonicalStoryIds = otherTopic.getCanonicalStoryIds();
       for (var i = 0; i < canonicalStoryIds.length; i++) {
@@ -183,4 +193,4 @@ oppia.factory('TopicObjectFactory',
 
     return Topic;
   }
-);
+]);

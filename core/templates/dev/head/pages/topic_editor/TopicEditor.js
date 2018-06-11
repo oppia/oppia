@@ -23,9 +23,6 @@ oppia.constant(
   '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');
 
 oppia.controller('TopicEditor', [
-  'TopicEditorStateService',
-  function(TopicEditorStateService) {
-    // Load the topic to be edited.
-    TopicEditorStateService.loadTopic(GLOBALS.topicId);
+  function() {
   }
 ]);

@@ -115,7 +115,6 @@ def get_topic_from_model(topic_model, run_conversion=True):
         topic_model.last_updated)
 
 
-
 def get_all_topic_summaries():
     """Returns the summaries of all topics present in the datastore.
 
@@ -128,6 +127,7 @@ def get_all_topic_summaries():
         get_topic_summary_from_model(summary)
         for summary in topic_summaries_models]
     return topic_summaries
+
 
 def get_topic_summary_from_model(topic_summary_model):
     """Returns a domain object for an Oppia topic summary given a
@@ -301,9 +301,6 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS):
                     topic.update_additional_story_ids(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_SKILL_IDS):
-                    topic.update_skill_ids(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
