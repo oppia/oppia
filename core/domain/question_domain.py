@@ -273,13 +273,10 @@ class QuestionSkillLink(object):
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
-            review_status: int. Status of the review:
-                           Pending(0)/Approved(1)/Rejected(-1)
             difficulty: int. Level of difficulty of the question.
         """
         self.question_id = question_id
         self.skill_id = skill_id
-        self.review_status = review_status
         self.difficulty = difficulty
 
     def to_dict(self):
@@ -291,6 +288,5 @@ class QuestionSkillLink(object):
         return {
             'question_id': self.question_id,
             'skill_id': self.skill_id,
-            'review_status': self.review_status,
             'difficulty': self.difficulty
         }

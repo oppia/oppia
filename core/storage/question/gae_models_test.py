@@ -46,14 +46,10 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     def test_create_question_skill_link(self):
         question_id = 'A Test Question Id'
         skill_id = 'A Test Skill Id'
-        review_status = 0
         difficulty = 1
         questionskilllink_model = question_models.QuestionSkillLinkModel.create(
-            question_id, skill_id, review_status, difficulty)
+            question_id, skill_id, difficulty)
 
         self.assertEqual(questionskilllink_model.question_id, question_id)
         self.assertEqual(questionskilllink_model.skill_id, skill_id)
-        self.assertEqual(
-            questionskilllink_model.review_status,
-            review_status)
         self.assertEqual(questionskilllink_model.difficulty, difficulty)

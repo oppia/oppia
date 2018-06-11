@@ -117,10 +117,8 @@ class QuestionSkillLinkModel(base_models.VersionedModel):
     question_id = ndb.StringProperty(required=True, indexed=True)
     # The ID of the skill to which the question is linked.
     skill_id = ndb.StringProperty(required=True, indexed=True)
-    # Status of the review: Pending(0)/Approved(1)/Rejected(-1)
-    review_status = ndb.IntegerProperty(required=True, choices=[-1, 0, 1])
     # Level of difficulty of the question.
-    difficulty = ndb.IntegerProperty(required=False)
+    difficulty = ndb.IntegerProperty(required=False, indexed=True)
 
     @classmethod
     def create(
