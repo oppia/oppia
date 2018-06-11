@@ -38,9 +38,9 @@ oppia.directive('unresolvedAnswersOverview', [
               StateTopAnswersStatsService.isInitialized();
             $scope.stateStats = StateTopAnswersStatsService.getStateStats(
               EditorStateService.getActiveStateName()
-            ).filter(
-              function(answerStats) { return !answerStats.isAddressed; }
-            );
+            ).filter(function(answerStats) {
+              return !answerStats.isAddressed;
+            });
           });
         }
       ]
