@@ -32,7 +32,7 @@ oppia.directive('unresolvedAnswersOverview', [
               EditorStateService.getActiveStateName()
             ).filter(function(answerStats) {
               return !answerStats.isAddressed;
-            })
+            });
           };
           $scope.unresolvedAnswersOverviewIsShown = function() {
             return StateTopAnswersStatsService.isInitialized();
