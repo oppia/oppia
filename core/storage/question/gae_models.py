@@ -106,7 +106,7 @@ class QuestionSkillLinkModel(base_models.VersionedModel):
     """Model for storing Question-Skill Links.
 
     The ID of instances of this class has the form
-    {{random_hash_of_16_chars}}
+    {{random_hash_of_12_chars}}
     """
     ALLOW_REVERT = True
 

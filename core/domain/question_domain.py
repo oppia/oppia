@@ -274,8 +274,6 @@ class QuestionSkillLink(object):
         question_id: str. The ID of the question.
         skill_id: str. The ID of the skill to which the
                   question is linked.
-        review_status: int. Status of the review:
-                       Pending(0)/Approved(1)/Rejected(-1)
         difficulty: int. Level of difficulty of the question.
     """
 
