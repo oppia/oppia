@@ -163,6 +163,12 @@ oppia.factory('ImagePreloaderService', [
             _imageLoadedCallback[loadedImage.filename] = null;
           }
         }, function(filename) {
+          if (_imageLoadedCallback[filename]) {
+            var onFailedDownload = (
+              (_imageLoadedCallback[filename]).rejectMethod);
+            onFailedDownload();
+            _imageLoadedCallback[filename] = null;
+          }
           _filenamesOfImageFailedToDownload.push(filename);
           _removeCurrentAndLoadNextImage(filename);
         });

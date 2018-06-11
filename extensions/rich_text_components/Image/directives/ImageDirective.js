@@ -73,6 +73,8 @@ oppia.directive('oppiaNoninteractiveImage', [
           };
 
           $scope.loadImage = function() {
+            $scope.isLoadingIndicatorShown = true;
+            $scope.isTryAgainShown = false;
             ImagePreloaderService.getImageUrl($scope.filepath.name)
               .then(function(objectUrl) {
                 $scope.isTryAgainShown = false;
