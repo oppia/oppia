@@ -152,7 +152,7 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         suggestion_models.GeneralSuggestionModel(
             id=new_suggestion_id,
             suggestion_type=(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
             target_type=suggestion_models.TARGET_TYPE_EXPLORATION,
             target_id=suggestion.exploration_id,
             target_version_at_submission=suggestion.exploration_version,
