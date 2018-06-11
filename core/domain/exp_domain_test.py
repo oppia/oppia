@@ -3129,6 +3129,169 @@ tags: []
 title: Title
 """)
 
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V26
+
+    def test_load_from_v1(self):
+        """Test direct loading from a v1 yaml file."""
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V1)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v2(self):
+        """Test direct loading from a v2 yaml file."""
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V2)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v3(self):
+        """Test direct loading from a v3 yaml file."""
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V3)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v4(self):
+        """Test direct loading from a v4 yaml file."""
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V4)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v5(self):
+        """Test direct loading from a v5 yaml file."""
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V5)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v6(self):
+        """Test direct loading from a v6 yaml file."""
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V6)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v7(self):
+        """Test direct loading from a v7 yaml file."""
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V7)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v8(self):
+        """Test direct loading from a v8 yaml file."""
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V8)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v9(self):
+        """Test direct loading from a v9 yaml file."""
+        exploration = exp_domain.Exploration.from_untitled_yaml(
+            'eid', 'Title', 'Category', self.YAML_CONTENT_V9)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v10(self):
+        """Test direct loading from a v10 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V10)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v11(self):
+        """Test direct loading from a v11 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V11)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v12(self):
+        """Test direct loading from a v12 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V12)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v13(self):
+        """Test direct loading from a v13 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V13)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v14(self):
+        """Test direct loading from a v14 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V14)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v15(self):
+        """Test direct loading from a v15 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V15)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v16(self):
+        """Test direct loading from a v16 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V16)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v17(self):
+        """Test direct loading from a v17 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V17)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v18(self):
+        """Test direct loading from a v18 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V18)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v19(self):
+        """Test direct loading from a v19 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V19)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v20(self):
+        """Test direct loading from a v20 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V20)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v21(self):
+        """Test direct loading from a v21 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V21)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v22(self):
+        """Test direct loading from a v22 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V22)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v23(self):
+        """Test direct loading from a v23 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V23)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v24(self):
+        """Test direct loading from a v24 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V24)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v25(self):
+        """Test direct loading from a v25 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V25)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v26(self):
+        """Test direct loading from a v25 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V26)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+
+
+class RTEMigrationUnitTests(test_utils.GenericTestBase):
+    """Test content migration for RTE."""
+
     YAML_CONTENT_V25_TEXTANGULAR = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
@@ -3516,170 +3679,13 @@ title: title
 """)
 # pylint: enable=line-too-long
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V26
-
-    def test_load_from_v1(self):
-        """Test direct loading from a v1 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V1)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v2(self):
-        """Test direct loading from a v2 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V2)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v3(self):
-        """Test direct loading from a v3 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V3)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v4(self):
-        """Test direct loading from a v4 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V4)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v5(self):
-        """Test direct loading from a v5 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V5)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v6(self):
-        """Test direct loading from a v6 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V6)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v7(self):
-        """Test direct loading from a v7 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V7)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v8(self):
-        """Test direct loading from a v8 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V8)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v9(self):
-        """Test direct loading from a v9 yaml file."""
-        exploration = exp_domain.Exploration.from_untitled_yaml(
-            'eid', 'Title', 'Category', self.YAML_CONTENT_V9)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v10(self):
-        """Test direct loading from a v10 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V10)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v11(self):
-        """Test direct loading from a v11 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V11)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v12(self):
-        """Test direct loading from a v12 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V12)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v13(self):
-        """Test direct loading from a v13 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V13)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v14(self):
-        """Test direct loading from a v14 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V14)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v15(self):
-        """Test direct loading from a v15 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V15)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v16(self):
-        """Test direct loading from a v16 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V16)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v17(self):
-        """Test direct loading from a v17 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V17)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v18(self):
-        """Test direct loading from a v18 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V18)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v19(self):
-        """Test direct loading from a v19 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V19)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v20(self):
-        """Test direct loading from a v20 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V20)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v21(self):
-        """Test direct loading from a v21 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V21)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v22(self):
-        """Test direct loading from a v22 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V22)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v23(self):
-        """Test direct loading from a v23 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V23)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v24(self):
-        """Test direct loading from a v24 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V24)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v25(self):
-        """Test direct loading from a v25 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V25)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
-    def test_load_from_v26(self):
-        """Test direct loading from a v25 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V26)
-        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
-
     def test_load_from_v25_textangular(self):
         """Test direct loading from a v25 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V25_TEXTANGULAR)
         self.assertEqual(
             exploration.to_yaml(), self.YAML_CONTENT_V26_TEXTANGULAR)
+
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):

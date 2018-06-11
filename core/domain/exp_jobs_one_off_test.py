@@ -1036,7 +1036,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
                 job_id))
 
         # Test that validation fails before migration.
-        self.assertTrue(actual_output)
+        self.assertGreater(len(actual_output), 0)
 
         exploration_dict = exploration.to_dict()
         updated_dict = exp_domain.Exploration._convert_v25_dict_to_v26_dict( # pylint: disable=protected-access

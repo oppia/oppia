@@ -253,7 +253,7 @@ def convert_to_text_angular(html_data):
         # In such cases a tag is simply removed.
         elif tag.name == 'a':
             replace_with_link = True
-            if tag.has_attr('href'):
+            if tag.has_attr('href') and tag.get_text():
                 children = tag.findChildren()
                 for child in children:
                     if child.name == 'oppia-noninteractive-link':
