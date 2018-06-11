@@ -259,21 +259,20 @@ def apply_change_list(topic_id, change_list):
 
     Returns:
         dict, list(int), list(int). A dict with two fields: topic and
-            subtopic_pages containing the updated domain objects of each one,
-            a list of ids of the deleted subtopics and a list of ids of the
-            newly created subtopics.
+            modified_subtopic_pages containing the updated domain objects of
+            each one, a list of ids of the deleted subtopics and a list of ids
+            of the newly created subtopics.
     """
     topic = get_topic_by_id(topic_id)
-    subtopic_pages = subtopic_page_services.get_all_subtopic_pages_in_topic(
-        topic_id)
     newly_created_subtopic_ids = []
     deleted_subtopic_ids = []
+    modified_subtopic_pages = []
     return_dict = {}
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
                 topic.add_subtopic(change.subtopic_id, change.title)
-                subtopic_pages.append(
+                modified_subtopic_pages.append(
                     subtopic_page_domain.SubtopicPage.create_default_subtopic_page( #pylint: disable=line-too-long
                         change.subtopic_id, topic_id)
                 )
@@ -315,11 +314,30 @@ def apply_change_list(topic_id, change_list):
                     raise Exception('Invalid change dict.')
             elif (change.cmd ==
                   subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
+                subtopic_page_id = (
+                    subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                        topic_id, change.id))
+                index = next(
+                    (index for index, subtopic_page in enumerate(
+                        modified_subtopic_pages)
+                     if subtopic_page.id == subtopic_page_id), None)
+                if index is None:
+                    subtopic_page = (
+                        subtopic_page_services.get_subtopic_page_by_id(
+                            topic_id, change.id, strict=False))
+                else:
+                    subtopic_page = modified_subtopic_pages[index]
+                if (
+                        (subtopic_page is None) or
+                        (change.id in deleted_subtopic_ids)):
+                    raise Exception(
+                        'The subtopic with id %s doesn\'t exist' % change.id)
+
                 if (change.property_name ==
                         subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA):
-                    subtopic_pages = subtopic_page_services.update_html_data(
-                        subtopic_pages, change.id, deleted_subtopic_ids,
-                        change.new_value)
+                    subtopic_page.update_html_data(change.new_value)
+                    if index is None:
+                        modified_subtopic_pages.append(subtopic_page)
                 else:
                     raise Exception('Invalid change dict.')
             elif change.cmd == topic_domain.CMD_UPDATE_SUBTOPIC_PROPERTY:
@@ -331,7 +349,7 @@ def apply_change_list(topic_id, change_list):
             else:
                 raise Exception('Invalid change dict.')
         return_dict['topic'] = topic
-        return_dict['subtopic_pages'] = subtopic_pages
+        return_dict['modified_subtopic_pages'] = modified_subtopic_pages
         return (
             return_dict, deleted_subtopic_ids, newly_created_subtopic_ids)
 
@@ -424,16 +442,16 @@ def update_topic_and_subtopic_pages(
         committer_id, updated_topic_and_subtopic_pages_dict['topic'],
         commit_message, change_list
     )
-    subtopic_pages = updated_topic_and_subtopic_pages_dict['subtopic_pages']
-    for subtopic_page in subtopic_pages:
-        subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
-        if ((subtopic_id in deleted_subtopic_ids) and
-                (subtopic_id not in newly_created_subtopic_ids)):
+    modified_subtopic_pages = updated_topic_and_subtopic_pages_dict[
+        'modified_subtopic_pages']
+    for subtopic_id in deleted_subtopic_ids:
+        if subtopic_id not in newly_created_subtopic_ids:
             subtopic_page_services.delete_subtopic_page(
-                committer_id, subtopic_id, topic_id)
-        else:
-            subtopic_page_services.save_subtopic_page(
-                committer_id, subtopic_page, commit_message, change_list)
+                committer_id, topic_id, subtopic_id)
+
+    for subtopic_page in modified_subtopic_pages:
+        subtopic_page_services.save_subtopic_page(
+            committer_id, subtopic_page, commit_message, change_list)
     create_topic_summary(topic_id)
 
 
@@ -543,7 +561,7 @@ def delete_topic(committer_id, topic_id, force_deletion=False):
     topic_model = topic_models.TopicModel.get(topic_id)
     for subtopic in topic_model.subtopics:
         subtopic_page_services.delete_subtopic_page(
-            committer_id, subtopic['id'], topic_id)
+            committer_id, topic_id, subtopic['id'])
     topic_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_TOPIC_DELETED,
         force_deletion=force_deletion)

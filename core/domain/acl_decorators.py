@@ -830,6 +830,28 @@ def can_edit_topic(handler):
     return test_can_edit
 
 
+def can_edit_subtopic_page(handler):
+    """Decorator to check whether the user can edit a subtopic page of a topic.
+    """
+    def test_can_edit(self, topic_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        topic_rights = topic_services.get_topic_rights(topic_id)
+        if topic_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if topic_services.check_can_edit_topic(self.user, topic_rights):
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit the subtopic pages for '
+                'this topic.')
+    test_can_edit.__wrapped__ = True
+
+    return test_can_edit
+
+
 def can_add_new_story_to_topic(handler):
     """Decorator to check whether the user can add a story to a given topic."""
     def test_can_add_story(self, topic_id, **kwargs):

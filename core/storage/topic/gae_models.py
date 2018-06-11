@@ -235,7 +235,7 @@ class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     SubtopicPageModel occurs.
 
     The id for this model is of the form
-    'subtopic_page-{{SUBTOPIC_PAGE_ID}}-{{SUBTOPIC_PAGE_VERSION}}'.
+    'subtopicpage-{{SUBTOPIC_PAGE_ID}}-{{SUBTOPIC_PAGE_VERSION}}'.
     """
     # The id of the subtopic page being edited.
     subtopic_page_id = ndb.StringProperty(indexed=True, required=True)

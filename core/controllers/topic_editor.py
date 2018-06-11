@@ -103,7 +103,7 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
                 'which is too old. Please reload the page and try again.'
                 % (subtopic_page_version, version_from_payload))
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_edit_subtopic_page
     def get(self, topic_id, subtopic_id):
         """Handles GET requests."""
 
@@ -168,9 +168,9 @@ class EditableTopicDataHandler(base.BaseHandler):
         """Updates properties of the given topic.
         Also, each change_dict given for editing should have an additional
         property called is_topic_change, which would be a boolean. If True, it
-        means that change is for a topic, while False would mean it is for a
-        Subtopic Page (this includes adding, removing subtopics and editing its
-        html data).
+        means that change is for a topic (includes adding and removing
+        subtopics), while False would mean it is for a Subtopic Page (this
+        includes editing its html data as of now).
         """
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
@@ -189,12 +189,12 @@ class EditableTopicDataHandler(base.BaseHandler):
             'topic_and_subtopic_page_change_dicts')
         topic_and_subtopic_page_change_list = []
         for change in topic_and_subtopic_page_change_dicts:
-            if change['is_topic_change']:
-                topic_and_subtopic_page_change_list.append(
-                    topic_domain.TopicChange(change))
-            else:
+            if change['change_affects_subtopic_page']:
                 topic_and_subtopic_page_change_list.append(
                     subtopic_page_domain.SubtopicPageChange(change))
+            else:
+                topic_and_subtopic_page_change_list.append(
+                    topic_domain.TopicChange(change))
         try:
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id, topic_id, topic_and_subtopic_page_change_list,

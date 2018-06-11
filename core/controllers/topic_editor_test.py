@@ -227,25 +227,25 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             'version': 2,
             'commit_message': 'Some changes and added a subtopic.',
             'topic_and_subtopic_page_change_dicts': [{
-                'is_topic_change': True,
+                'change_affects_subtopic_page': False,
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
                 'old_value': '',
                 'new_value': 'A new name'
             }, {
-                'is_topic_change': False,
+                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'html_data',
                 'old_value': '',
                 'subtopic_id': 1,
                 'new_value': '<p>New Data</p>'
             }, {
-                'is_topic_change': True,
+                'change_affects_subtopic_page': False,
                 'cmd': 'add_subtopic',
                 'subtopic_id': 2,
                 'title': 'Title2'
             }, {
-                'is_topic_change': False,
+                'change_affects_subtopic_page': True,
                 'cmd': 'update_subtopic_page_property',
                 'property_name': 'html_data',
                 'old_value': '',

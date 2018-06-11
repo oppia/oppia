@@ -173,12 +173,31 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.update_topic_and_subtopic_pages(
                 self.user_id_admin, self.TOPIC_ID, changelist,
                 'Added subtopic.')
+
         # Test whether the subtopic page was created for the above failed
         # attempt.
         subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
             self.TOPIC_ID, 3, strict=False)
         self.assertIsNone(subtopic_page)
 
+        # Test whether a subtopic page already existing in datastore can be
+        # edited.
+        changelist = [subtopic_page_domain.SubtopicPageChange({
+            'cmd': subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY,
+            'property_name': (
+                subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA),
+            'old_value': '',
+            'subtopic_id': 1,
+            'new_value': '<p>New Value</p>'
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.user_id_admin, self.TOPIC_ID, changelist,
+            'Updated html data')
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 1)
+        self.assertEqual(subtopic_page.html_data, '<p>New Value</p>')
+
+        # Test a sequence of changes with both topic and subtopic page changes.
         changelist = [
             topic_domain.TopicChange({
                 'cmd': topic_domain.CMD_ADD_SUBTOPIC,

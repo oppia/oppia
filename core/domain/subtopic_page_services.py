@@ -79,8 +79,8 @@ def get_all_subtopic_pages_in_topic(topic_id, include_deleted=False):
             id.
     """
     subtopic_page_models = topic_models.SubtopicPageModel.query().filter(
-        (topic_models.SubtopicPageModel.topic_id == topic_id) and
-        (topic_models.SubtopicPageModel.deleted == include_deleted))
+        topic_models.SubtopicPageModel.topic_id == topic_id,
+        topic_models.SubtopicPageModel.deleted == include_deleted)
     subtopic_pages = [
         get_subtopic_page_from_model(subtopic_page_model)
         for subtopic_page_model in subtopic_page_models
@@ -138,50 +138,14 @@ def save_subtopic_page(
     subtopic_page.version += 1
 
 
-def update_html_data(
-        subtopic_pages, subtopic_id, deleted_subtopic_ids, new_html_data):
-    """Updates the html_data fields of the subtopic page with the given id in
-    the list (if present), provided the id is not in deleted_subtopic_page_ids
-    list.
-
-    Args:
-        subtopic_pages: list(SubtopicPage). The list of subtopic pages that are
-            part of the topic being edited.
-        subtopic_id: str. The id of the subtopic page to edit.
-        deleted_subtopic_ids: list(int). The ids of the subtopics whose pages
-            were deleted in the present change_list (i.e those that are not
-            updated in the datastore yet).
-        new_html_data: str. The new html data for the given subtopic id.
-
-    Raises:
-        Exception. The subtopic page doesn't exist.
-
-    Returns:
-        list(SubtopicPage). The modified list of subtopic pages.
-    """
-    if subtopic_id in deleted_subtopic_ids:
-        raise Exception(
-            'The subtopic with id %s doesn\'t exist' % subtopic_id)
-    for subtopic_page in subtopic_pages:
-        if (
-                subtopic_page.id ==
-                subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
-                    subtopic_page.topic_id, subtopic_id)):
-            subtopic_page.update_html_data(new_html_data)
-            return subtopic_pages
-
-    raise Exception(
-        'The subtopic with id %s doesn\'t exist' % subtopic_id)
-
-
 def delete_subtopic_page(
-        committer_id, subtopic_id, topic_id, force_deletion=False):
+        committer_id, topic_id, subtopic_id, force_deletion=False):
     """Delete a topic summary model.
 
     Args:
         committer_id: str. The user who is deleting the subtopic page.
-        subtopic_id: int. ID of the subtopic which was removed.
         topic_id: str. The ID of the topic that this subtopic belongs to.
+        subtopic_id: int. ID of the subtopic which was removed.
         force_deletion: bool. If true, the subtopic page and its history are
             fully deleted and are unrecoverable. Otherwise, the subtopic page
             and all its history are marked as deleted, but the corresponding
