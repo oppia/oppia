@@ -65,6 +65,18 @@ oppia.directive('audioTranslationsEditor', [
                 explorationId, filename));
           };
 
+          $scope.getNeedsUpdateTooltipMessage = function (needUpdate) {
+            if (needUpdate) {
+              return ($scope.isEditable() ? 'Audio might not match text.' +
+                ' Reupload the file, or click to unflag.' :
+                'Audio might not match text.');
+            } else {
+              return ($scope.isEditable() ? 'Click to mark this audio ' +
+                'translation as not matching text.' :
+                'Audio is matching text.');
+            }
+          };
+
           $scope.toggleNeedsUpdateAttribute = function(languageCode) {
             $scope.getOnStartEditFn()();
             $scope.subtitledHtml.toggleNeedsUpdateAttribute(languageCode);
