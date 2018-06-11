@@ -235,9 +235,8 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
-        $rootScope.$broadcast('saveInteractionAnswerGroups', {
-          state_name: stateName
-        });
+        $rootScope.$broadcast(
+          'saveInteractionAnswerGroups', {state_name: stateName});
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(
