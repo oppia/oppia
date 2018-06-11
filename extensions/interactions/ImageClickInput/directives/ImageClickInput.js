@@ -63,8 +63,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             if ($scope.dimensions.height < 124) {
               loadingIndicatorSize = 24;
             }
-            var paddingTopForLoadingIndicator = Math.max(0,
-              (($scope.dimensions.height * 0.5) - (loadingIndicatorSize * 0.5)));
+            var paddingTopForLoadingIndicator = Math.max(0, ((
+              $scope.dimensions.height * 0.5) - (loadingIndicatorSize * 0.5)));
             $scope.loadingIndicatorContainerStyle =
             {
               'padding-top': paddingTopForLoadingIndicator + 'px',
@@ -85,30 +85,31 @@ oppia.directive('oppiaInteractiveImageClickInput', [
 
             $scope.loadImage = function() {
               ImagePreloaderService.getImageUrl($scope.filepath.name)
-              .then(function(objectUrl) {
-                $scope.isTryAgainShown = false;
-                $scope.isLoadingIndicatorShown = false;
-                $scope.imageUrl = objectUrl;
-              }, function() {
-                $scope.isTryAgainShown = true;
-                $scope.isLoadingIndicatorShown = false;
-              });
-            }
+                .then(function(objectUrl) {
+                  $scope.isTryAgainShown = false;
+                  $scope.isLoadingIndicatorShown = false;
+                  $scope.imageUrl = objectUrl;
+                }, function() {
+                  $scope.isTryAgainShown = true;
+                  $scope.isLoadingIndicatorShown = false;
+                });
+            };
             $scope.loadImage();
           } else {
-            // This is the case when user is in exploration editor. We don't have
-            // loading indicator or try again button for showing images in the
+            // This is the case when user is in exploration editor. We don't
+            // have loading indicator or try again for showing images in the
             // exploration editor. So we directly fetch the images from the
             // AssetsBackendApiService's cache.
             AssetsBackendApiService.loadImage(
-              ExplorationContextService.getExplorationId(), $scope.filepath.name)
+              ExplorationContextService.getExplorationId(),
+              $scope.filepath.name)
               .then(function(loadedImageFile) {
                 $scope.isLoadingIndicatorShown = false;
                 $scope.isTryAgainShown = false;
                 var objectUrl = URL.createObjectURL(loadedImageFile.data);
                 $scope.imageUrl = objectUrl;
               });
-            }
+          }
 
           $scope.mouseX = 0;
           $scope.mouseY = 0;
