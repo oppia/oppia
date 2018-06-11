@@ -95,7 +95,7 @@ oppia.factory('StateTopAnswersStatsService', [
     };
 
     var onStateInteractionAnswerGroupsSaved = function(stateName) {
-      refreshAddressedInfo(args.state_name);
+      refreshAddressedInfo(stateName);
     };
 
     $rootScope.$on(STATE_ADDED_EVENT_NAME, function(event, args) {
