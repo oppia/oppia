@@ -72,7 +72,10 @@ oppia.factory('StateTopAnswersStatsService', [
     });
 
     $rootScope.$on('saveInteractionAnswerGroups', function(event, args) {
-      refreshAddressedInfo(args.state_name);
+      if (stateTopAnswerStatsCache.hasOwnProperty(args.state_name)) {
+        // Only refresh states for which we have answers.
+        refreshAddressedInfo(args.state_name);
+      }
     });
 
     return {
@@ -105,7 +108,7 @@ oppia.factory('StateTopAnswersStatsService', [
        * @returns {AnswerStats[]} - list of the statistics for the top answers.
        */
       getStateStats: function(stateName) {
-        return stateTopAnswerStatsCache[stateName];
+        return stateTopAnswerStatsCache[stateName] || [];
       },
     };
   }
