@@ -34,14 +34,19 @@ oppia.directive('unresolvedAnswersOverview', [
            * TODO(brianrodri): Move this into an appropriate service.
            * @returns {boolean}
            */
-          var isStateInteractionIdSupported = function(stateName) {
-            var interactionId =
-              ExplorationStatesService.getState(stateName).interaction.id;
-            return (interactionId === 'TextInput');
+          var isStateInteractionIdSupported = function() {
+            var state = ExplorationStatesService.getState(
+              EditorStateService.getActiveStateName());
+            if (!state) {
+              return false;
+            } else {
+              var interactionId = state.interaction.id;
+              return (interactionId === 'TextInput');
+            }
           };
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
-            return isStateInteractionIdSupported &&
+            return isStateInteractionIdSupported() &&
               StateTopAnswersStatsService.isInitialized();
           };
           $scope.getUnresolvedStateStats = function() {
