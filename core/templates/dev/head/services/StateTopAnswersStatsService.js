@@ -83,7 +83,7 @@ oppia.factory('StateTopAnswersStatsService', [
        * Calls the backend asynchronously to setup the answer statistics of each
        * state this exploration contains.
        *
-       * @param {Object<string, *>} stateTopAnswersStatsBackendDict - The
+       * @param {Object.<string, *>} stateTopAnswersStatsBackendDict - The
        *    backend representation of the state top answers statistics.
        */
       init: function(stateTopAnswersStatsBackendDict) {
