@@ -35,7 +35,9 @@ oppia.directive('unresolvedAnswersOverview', [
            * @returns {boolean}
            */
           var isStateInteractionIdSupported = function(stateName) {
-            return ExplorationStatesService.getState(stateName) === 'TextInput';
+            var interactionId =
+              ExplorationStatesService.getState(stateName).interaction.id;
+            return (interactionId === 'TextInput');
           };
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
