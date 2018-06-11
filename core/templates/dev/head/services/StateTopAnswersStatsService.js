@@ -32,7 +32,7 @@ oppia.factory('StateTopAnswersStatsService', [
       STATE_DELETED_EVENT_NAME, STATE_RENAMED_EVENT_NAME,
       STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME) {
     /** @type {Object.<string, AnswerStats[]>} */
-    var stateTopAnswerStatsCache = {};
+    var stateTopAnswersStatsCache = {};
 
     /** @type {boolean} */
     var isInitialized = false;
@@ -48,7 +48,7 @@ oppia.factory('StateTopAnswersStatsService', [
       var interactionRulesService = $injector.get(
         AngularNameService.getNameOfInteractionRulesService(
           state.interaction.id));
-      stateTopAnswerStatsCache[stateName].forEach(function(answerStats) {
+      stateTopAnswersStatsCache[stateName].forEach(function(answerStats) {
         answerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
             explorationId, stateName, state, answerStats.answer,
@@ -57,17 +57,17 @@ oppia.factory('StateTopAnswersStatsService', [
     };
 
     var onAddState = function(stateName) {
-      stateTopAnswerStatsCache[stateName] = [];
+      stateTopAnswersStatsCache[stateName] = [];
     };
 
     var onDeleteState = function(stateName) {
-      delete stateTopAnswerStatsCache[stateName];
+      delete stateTopAnswersStatsCache[stateName];
     };
 
     var onRenameState = function(oldStateName, newStateName) {
-      stateTopAnswerStatsCache[newStateName] =
-        angular.copy(stateTopAnswerStatsCache[oldStateName]);
-      delete stateTopAnswerStatsCache[oldStateName];
+      stateTopAnswersStatsCache[newStateName] =
+        angular.copy(stateTopAnswersStatsCache[oldStateName]);
+      delete stateTopAnswersStatsCache[oldStateName];
     };
 
     var onSaveInteractionAnswerGroups = function(stateName) {
@@ -112,9 +112,9 @@ oppia.factory('StateTopAnswersStatsService', [
        *    backend representation of the state top answers statistics.
        */
       init: function(stateTopAnswersStatsBackendDict) {
-        stateTopAnswerStatsCache = {};
+        stateTopAnswersStatsCache = {};
         for (var stateName in stateTopAnswersStatsBackendDict.answers) {
-          stateTopAnswerStatsCache[stateName] =
+          stateTopAnswersStatsCache[stateName] =
             stateTopAnswersStatsBackendDict.answers[stateName].map(
               AnswerStatsObjectFactory.createFromBackendDict);
           // Still need to manually refresh the addressed information.
@@ -133,7 +133,7 @@ oppia.factory('StateTopAnswersStatsService', [
        * @returns {AnswerStats[]} - list of the statistics for the top answers.
        */
       getStateStats: function(stateName) {
-        return stateTopAnswerStatsCache[stateName] || [];
+        return stateTopAnswersStatsCache[stateName] || [];
       },
     };
   }
