@@ -63,6 +63,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             if ($scope.dimensions.height < 124) {
               loadingIndicatorSize = 24;
             }
+
             var paddingTopForLoadingIndicator = Math.max(0, ((
               $scope.dimensions.height * 0.5) - (loadingIndicatorSize * 0.5)));
             $scope.loadingIndicatorContainerStyle =
