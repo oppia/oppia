@@ -279,7 +279,7 @@ class QuestionSkillLink(object):
         difficulty: int. Level of difficulty of the question.
     """
 
-    def __init__(self, question_id, skill_id, review_status, difficulty):
+    def __init__(self, question_id, skill_id, difficulty):
         """Constructs a Question Skill Link domain object.
 
         Args:

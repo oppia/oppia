@@ -119,14 +119,12 @@ class QuestionSkillLinkModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-            cls, question_id, skill_id, review_status, difficulty):
+            cls, question_id, skill_id, difficulty):
         """Creates a new QuestionSkillLinkModel entry.
 
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
-            review_status: int. Status of the review:
-                           Pending(0)/Approved(1)/Rejected(-1)
             difficulty: int. Level of difficulty of the question.
 
         Returns:
@@ -136,7 +134,6 @@ class QuestionSkillLinkModel(base_models.VersionedModel):
 
         question_skill_link_model_instance = cls(
             question_id=question_id, skill_id=skill_id,
-            review_status=review_status,
             difficulty=difficulty)
 
         return question_skill_link_model_instance
