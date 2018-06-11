@@ -53,22 +53,17 @@ oppia.factory('StateTopAnswersStatsService', [
     };
 
     var onAddState = function(stateName) {
-      if (stateTopAnswerStatsCache.hasOwnProperty(stateName)) {
-        // No action required, we already have data for that state.
-        return;
-      } else {
-        // Give the cache an empty list of answers.
-        stateTopAnswerStatsCache[stateName] = [];
-      }
+      stateTopAnswerStatsCache[stateName] = [];
     };
 
     var onDeleteState = function(stateName) {
-      // Take no action, we'll hold onto the stats in the cache.
+      delete stateTopAnswerStatsCache[stateName];
     };
 
     var onRenameState = function(oldStateName, newStateName) {
       stateTopAnswerStatsCache[newStateName] =
         angular.copy(stateTopAnswerStatsCache[oldStateName]);
+      delete stateTopAnswerStatsCache[oldStateName];
     };
 
     var onSaveInteractionAnswerGroups = function(stateName) {
