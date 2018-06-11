@@ -75,23 +75,31 @@ oppia.factory('StateTopAnswersStatsService', [
     };
 
     $rootScope.$on(STATE_ADDED_EVENT_NAME, function(event, args) {
-      if (!isInitialized) return;
+      if (!isInitialized) {
+        return;
+      }
       onAddState(args.state_name);
     });
 
     $rootScope.$on(STATE_DELETED_EVENT_NAME, function(event, args) {
-      if (!isInitialized) return;
+      if (!isInitialized) {
+        return;
+      }
       onDeleteState(args.state_name);
     });
 
     $rootScope.$on(STATE_RENAMED_EVENT_NAME, function(event, args) {
-      if (!isInitialized) return;
+      if (!isInitialized) {
+        return;
+      }
       onRenameState(args.old_state_name, args.new_state_name);
     });
 
     $rootScope.$on(
       STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME, function(event, args) {
-        if (!isInitialized) return;
+        if (!isInitialized) {
+          return;
+        }
         onSaveInteractionAnswerGroups(args.state_name);
       });
 
