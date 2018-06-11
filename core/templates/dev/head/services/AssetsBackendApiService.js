@@ -85,7 +85,7 @@ oppia.factory('AssetsBackendApiService', [
             ImageFileObjectFactory.createNew(filename, assetBlob));
         }
       }).error(function() {
-        errorCallback();
+        errorCallback(filename);
       })['finally'](function() {
         _removeFromFilesCurrentlyBeingRequested(filename, assetType);
       });
