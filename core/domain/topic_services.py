@@ -444,14 +444,21 @@ def update_topic_and_subtopic_pages(
     )
     modified_subtopic_pages = updated_topic_and_subtopic_pages_dict[
         'modified_subtopic_pages']
+
+    # The following loop deletes those subtopic pages that are already in the
+    # datastore, which are supposed to be deleted in the current changelist.
     for subtopic_id in deleted_subtopic_ids:
         if subtopic_id not in newly_created_subtopic_ids:
             subtopic_page_services.delete_subtopic_page(
                 committer_id, topic_id, subtopic_id)
 
     for subtopic_page in modified_subtopic_pages:
-        subtopic_page_services.save_subtopic_page(
-            committer_id, subtopic_page, commit_message, change_list)
+        subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
+        # The following condition prevents the creation of subtopic pages that
+        # were deleted above.
+        if subtopic_id not in deleted_subtopic_ids:
+            subtopic_page_services.save_subtopic_page(
+                committer_id, subtopic_page, commit_message, change_list)
     create_topic_summary(topic_id)
 
 
