@@ -68,7 +68,7 @@ oppia.factory('StateTopAnswersStatsService', [
 
     $rootScope.$on('renameState', function(event, args) {
       stateTopAnswerStatsCache[args.new_state_name] =
-        stateTopAnswerStatsCache[args.old_state_name];
+        angular.copy(stateTopAnswerStatsCache[args.old_state_name]);
     });
 
     $rootScope.$on('saveInteractionAnswerGroups', function(event, args) {
