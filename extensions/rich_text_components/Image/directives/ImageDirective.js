@@ -74,15 +74,15 @@ oppia.directive('oppiaNoninteractiveImage', [
 
           $scope.loadImage = function() {
             ImagePreloaderService.getImageUrl($scope.filepath.name)
-            .then(function(objectUrl) {
-              $scope.isTryAgainShown = false;
-              $scope.isLoadingIndicatorShown = false;
-              $scope.imageUrl = objectUrl;
-            }, function() {
-              $scope.isTryAgainShown = true;
-              $scope.isLoadingIndicatorShown = false;
-            });
-          }
+              .then(function(objectUrl) {
+                $scope.isTryAgainShown = false;
+                $scope.isLoadingIndicatorShown = false;
+                $scope.imageUrl = objectUrl;
+              }, function() {
+                $scope.isTryAgainShown = true;
+                $scope.isLoadingIndicatorShown = false;
+              });
+          };
           $scope.loadImage();
         } else {
           // This is the case when user is in exploration editor. We don't have
