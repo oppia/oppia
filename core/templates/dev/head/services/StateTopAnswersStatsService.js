@@ -90,7 +90,7 @@ oppia.factory('StateTopAnswersStatsService', [
 
     var onStateRenamed = function(oldStateName, newStateName) {
       stateTopAnswersStatsCache[newStateName] =
-        angular.copy(stateTopAnswersStatsCache[oldStateName]);
+        stateTopAnswersStatsCache[oldStateName];
       delete stateTopAnswersStatsCache[oldStateName];
     };
 
