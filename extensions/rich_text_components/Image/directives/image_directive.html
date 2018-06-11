@@ -1,5 +1,9 @@
 <figure>
-  <img ng-src="<[imageUrl]>" alt="<[imageAltText]>"
-       style="display: block; margin-left: auto; margin-right: auto;">
-  <figcaption style="text-align:center;"><[imageCaption]></figcaption>
+  <div ng-if="!isLoadingIndicatorShown">
+    <img ng-src="<[imageUrl]>" alt="<[imageAltText]>" class="center-image-horizontally">
+    <figcaption style="text-align:center;"><[imageCaption]></figcaption>
+  </div>
+  <div ng-if="isLoadingIndicatorShown" class="oppia-image-loading-indicator-container" ng-style="loadingIndicatorContainerStyle">
+    <img ng-src="<[loadingIndicatorUrl]>" class="center-image-horizontally" ng-style="loadingIndicatorStyle" alt="Loading...">
+  </div>
 </figure>

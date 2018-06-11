@@ -154,7 +154,8 @@ describe('Image preloader service', function() {
                           '</oppia-noninteractive-image></p>'
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [
                   {
@@ -174,7 +175,8 @@ describe('Image preloader service', function() {
                     html: "Let's go to state 1 ImageAndRegion"
                   },
                   param_changes: [],
-                  refresher_exploration_id: null
+                  refresher_exploration_id: null,
+                  missing_prerequisite_skill_id: null
                 },
                 rule_specs: [
                   {
@@ -205,7 +207,8 @@ describe('Image preloader service', function() {
               ],
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             confirmed_unclassified_answers: [],
             customization_args: {
@@ -230,7 +233,8 @@ describe('Image preloader service', function() {
                 ],
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               }
             }, {
               rule_specs: [{
@@ -246,7 +250,8 @@ describe('Image preloader service', function() {
                 ],
                 labelled_as_correct: false,
                 param_changes: [],
-                refresher_exploration_id: null
+                refresher_exploration_id: null,
+                missing_prerequisite_skill_id: null
               }
             }],
             hints: [{
@@ -346,4 +351,20 @@ describe('Image preloader service', function() {
         imageFilesCurrentlyBeingRequested[x].filename);
     }
   });
+
+  it('should maintain the filenames of image which failed to download',
+    function() {
+      $httpBackend.expect('GET', requestUrl1).respond(201, 'image data 1');
+      $httpBackend.expect('GET', requestUrl2).respond(201, 'image data 2');
+      $httpBackend.expect('GET', requestUrl3).respond(404);
+      $httpBackend.expect('GET', requestUrl4).respond(408);
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(3);
+      $httpBackend.flush(3);
+      expect(ips.isInFailedDownload('sIOFeedback.png')).toBe(true);
+      expect(ips.getFilenamesOfImageCurrentlyDownloading().length).toBe(1);
+      $httpBackend.flush(1);
+      expect(ips.isInFailedDownload('s6Hint1.png')).toBe(true);
+      ips.restartImagePreloader('State 6');
+      expect(ips.isInFailedDownload('s6Hint1.png')).toBe(false);
+    });
 });

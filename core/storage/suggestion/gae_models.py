@@ -37,8 +37,8 @@ TARGET_TYPE_CHOICES = [
 # Constants defining the different possible statuses of a suggestion.
 STATUS_ACCEPTED = 'accepted'
 STATUS_IN_REVIEW = 'review'
-STATUS_REJECTED = 'rejected'
 STATUS_RECEIVED = 'received'
+STATUS_REJECTED = 'rejected'
 
 STATUS_CHOICES = [
     STATUS_ACCEPTED,
@@ -48,16 +48,16 @@ STATUS_CHOICES = [
 ]
 
 # Constants defining various suggestion types.
-SUGGESTION_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
 
 SUGGESTION_TYPE_CHOICES = [
-    SUGGESTION_EDIT_STATE_CONTENT
+    SUGGESTION_TYPE_EDIT_STATE_CONTENT
 ]
 
 # Defines what is the minimum role required to review suggestions
 # of a particular type.
 SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
-    SUGGESTION_EDIT_STATE_CONTENT: feconf.ROLE_ID_EXPLORATION_EDITOR
+    SUGGESTION_TYPE_EDIT_STATE_CONTENT: feconf.ROLE_ID_EXPLORATION_EDITOR
 }
 
 # Constants defining various contribution types.

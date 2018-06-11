@@ -55,8 +55,13 @@ class TopicModel(base_models.VersionedModel):
     # This consists of the list of additional (non-canonical) story ids that
     # are part of this topic.
     additional_story_ids = ndb.StringProperty(repeated=True, indexed=True)
-    # This consists of the full list of skill ids that are part of this topic.
-    skill_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # This consists of the list of uncategorized skill ids that are not part of
+    # any subtopic.
+    uncategorized_skill_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # The list of subtopics that are part of the topic.
+    subtopics = ndb.JsonProperty(repeated=True, indexed=False)
+    # The schema version of the subtopic dict.
+    subtopic_schema_version = ndb.IntegerProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
@@ -153,8 +158,10 @@ class TopicSummaryModel(base_models.BaseModel):
     canonical_story_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of additional stories that are part of this topic.
     additional_story_count = ndb.IntegerProperty(required=True, indexed=True)
-    # The number of skills that are part of this topic.
-    skill_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The number of skills that are not part of any subtopic.
+    uncategorized_skill_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The number of subtopics of the topic.
+    subtopic_count = ndb.IntegerProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
 
 

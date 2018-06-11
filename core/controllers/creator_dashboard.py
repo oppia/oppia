@@ -280,7 +280,7 @@ class NotificationsHandler(base.BaseHandler):
         })
 
 
-class NewExploration(base.BaseHandler):
+class NewExplorationHandler(base.BaseHandler):
     """Creates a new exploration."""
 
     @acl_decorators.can_create_exploration
@@ -298,7 +298,7 @@ class NewExploration(base.BaseHandler):
         })
 
 
-class NewCollection(base.BaseHandler):
+class NewCollectionHandler(base.BaseHandler):
     """Creates a new collection."""
 
     @acl_decorators.can_create_collection

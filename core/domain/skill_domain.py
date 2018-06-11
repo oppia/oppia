@@ -14,6 +14,8 @@
 
 """Domain objects relating to skills."""
 
+import copy
+
 from constants import constants
 from core.domain import html_cleaner
 import feconf
@@ -105,15 +107,15 @@ class SkillChange(object):
             if change_dict['property_name'] not in self.SKILL_PROPERTIES:
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
             if (change_dict['property_name'] not in
                     self.SKILL_CONTENTS_PROPERTIES):
                 raise Exception('Invalid change_dict: %s' % change_dict)
             self.property_name = change_dict['property_name']
-            self.new_value = change_dict['new_value']
-            self.old_value = change_dict['old_value']
+            self.new_value = copy.deepcopy(change_dict['new_value'])
+            self.old_value = copy.deepcopy(change_dict['old_value'])
         elif self.cmd == CMD_CREATE_NEW:
             return
         else:
@@ -209,7 +211,7 @@ class Misconception(object):
 
         Raises:
             ValidationError: One or more attributes of the misconception are
-            invalid.
+                invalid.
         """
         if not isinstance(self.name, basestring):
             raise utils.ValidationError(
@@ -331,16 +333,39 @@ class Skill(object):
         self.last_updated = last_updated
         self.version = version
 
+    @classmethod
+    def require_valid_skill_id(cls, skill_id):
+        """Checks whether the skill id is a valid one.
+
+        Args:
+            skill_id: str. The skill id to validate.
+        """
+        if not isinstance(skill_id, basestring):
+            raise utils.ValidationError('Skill id should be a string.')
+
+        if len(skill_id) != 12:
+            raise utils.ValidationError('Invalid skill id.')
+
+    @classmethod
+    def require_valid_description(cls, description):
+        """Checks whether the description of the skill is a valid one.
+
+        Args:
+            description: str. The description to validate.
+        """
+        if not isinstance(description, basestring):
+            raise utils.ValidationError('Description should be a string.')
+
+        if description == '':
+            raise utils.ValidationError('Description field should not be empty')
+
     def validate(self):
         """Validates various properties of the Skill object.
 
         Raises:
             ValidationError: One or more attributes of skill are invalid.
         """
-        if not isinstance(self.description, basestring):
-            raise utils.ValidationError(
-                'Expected description to be a string, received %s'
-                % self.description)
+        self.require_valid_description(self.description)
 
         if not isinstance(self.misconceptions_schema_version, int):
             raise utils.ValidationError(
@@ -416,20 +441,21 @@ class Skill(object):
         }
 
     @classmethod
-    def create_default_skill(cls, skill_id):
+    def create_default_skill(cls, skill_id, description):
         """Returns a skill domain object with default values. This is for
         the frontend where a default blank skill would be shown to the user
         when the skill is created for the first time.
 
         Args:
             skill_id: str. The unique id of the skill.
+            description: str. The initial description for the skill.
 
         Returns:
             Skill. The Skill domain object with the default values.
         """
         skill_contents = SkillContents(feconf.DEFAULT_SKILL_EXPLANATION, [])
         return cls(
-            skill_id, feconf.DEFAULT_SKILL_DESCRIPTION, [], skill_contents,
+            skill_id, description, [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
@@ -653,3 +679,49 @@ class SkillSummary(object):
             'skill_model_created_on': self.skill_model_created_on,
             'skill_model_last_updated': self.skill_model_last_updated
         }
+
+
+class UserSkillMastery(object):
+    """Domain object for a user's mastery of a particular skill."""
+
+    def __init__(self, user_id, skill_id, degree_of_mastery):
+        """Constructs a SkillMastery domain object for a user.
+
+        Args:
+            user_id: str. The user id of the user.
+            skill_id: str. The id of the skill.
+            degree_of_mastery: float. The user's mastery of the
+                corresponding skill.
+        """
+        self.user_id = user_id
+        self.skill_id = skill_id
+        self.degree_of_mastery = degree_of_mastery
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this SkillMastery object.
+        """
+        return {
+            'user_id': self.user_id,
+            'skill_id': self.skill_id,
+            'degree_of_mastery': self.degree_of_mastery
+        }
+
+    @classmethod
+    def from_dict(cls, skill_mastery_dict):
+        """Returns a UserSkillMastery domain object from the given dict.
+
+        Args:
+            skill_mastery_dict. dict. A dict mapping all the fields of
+                UserSkillMastery object.
+
+        Returns:
+            SkillMastery. The SkillMastery domain object.
+        """
+        return cls(
+            skill_mastery_dict['user_id'],
+            skill_mastery_dict['skill_id'],
+            skill_mastery_dict['degree_of_mastery']
+        )

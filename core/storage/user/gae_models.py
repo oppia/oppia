@@ -643,3 +643,32 @@ class UserBulkEmailsModel(base_models.BaseModel):
     # IDs of all BulkEmailModels that correspond to bulk emails sent to this
     # user.
     sent_email_model_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+
+class UserSkillMasteryModel(base_models.BaseModel):
+    """Model for storing a user's degree of mastery of a skill in Oppia.
+
+    This model stores the degree of mastery of each skill for a given user.
+
+    The id for this model is of form '{{USER_ID}}.{{SKILL_ID}}'
+    """
+
+    # The user id of the user.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The skill id for which the degree of mastery is stored.
+    skill_id = ndb.StringProperty(required=True, indexed=True)
+    # The degree of mastery of the user in the skill.
+    degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
+
+    @classmethod
+    def construct_model_id(cls, user_id, skill_id):
+        """Returns model id corresponding to user and skill.
+
+        Args:
+            user_id: str. The user ID of the user.
+            skill_id: str. The unique id of the skill.
+
+        Returns:
+            str. The model id corresponding to the given user and skill.
+        """
+        return '%s.%s' % (user_id, skill_id)
