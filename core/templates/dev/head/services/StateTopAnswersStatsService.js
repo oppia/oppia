@@ -59,7 +59,6 @@ oppia.factory('StateTopAnswersStatsService', [
       } else {
         // Give the cache an empty list of answers.
         stateTopAnswerStatsCache[args.state_name] = [];
-        $rootScope.$broadcast('stateStatsUpdate');
       }
     });
 
@@ -70,12 +69,10 @@ oppia.factory('StateTopAnswersStatsService', [
     $rootScope.$on('renameState', function(event, args) {
       stateTopAnswerStatsCache[args.new_state_name] =
         stateTopAnswerStatsCache[args.old_state_name];
-      $rootScope.$broadcast('stateStatsUpdate');
     });
 
     $rootScope.$on('saveInteractionAnswerGroups', function(event, args) {
       refreshAddressedInfo(args.state_name);
-      $rootScope.$broadcast('stateStatsUpdate');
     });
 
     return {
@@ -94,7 +91,6 @@ oppia.factory('StateTopAnswersStatsService', [
           refreshAddressedInfo(stateName);
         }
         isInitialized = true;
-        $rootScope.$broadcast('stateStatsUpdate');
       },
 
       isInitialized: function() {
