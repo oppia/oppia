@@ -26,11 +26,11 @@ oppia.factory('StateTopAnswersStatsService', [
   'STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME',
   function(
       $injector, $scope, AngularNameService, AnswerClassificationService,
-    AnswerStatsObjectFactory, ExplorationContextService,
-    ExplorationStatesService, UrlInterpolationService,
-    STATE_ADDED_EVENT_NAME, STATE_DELETED_EVENT_NAME,
-    STATE_RENAMED_EVENT_NAME,
-    STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME) {
+      AnswerStatsObjectFactory, ExplorationContextService,
+      ExplorationStatesService, UrlInterpolationService,
+      STATE_ADDED_EVENT_NAME, STATE_DELETED_EVENT_NAME,
+      STATE_RENAMED_EVENT_NAME,
+      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME) {
     /**
      * @typedef AnswerStatsCache
      * @property {AnswerStats[]} allAnswers
