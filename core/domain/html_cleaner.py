@@ -146,8 +146,53 @@ def get_rte_components(html_string):
     return components
 
 
+def html_escaper(html_data):
+    """This functions converts html to escaped format.
+
+    Args:
+        html_data: str. HTML string to be escaped.
+
+    Returns:
+        str. Escaped HTML string
+    """
+    replace_list = [
+        ('&', '&amp;'),
+        ('"', '&quot;'),
+        ('\'', '&#39;'),
+        ('<', '&lt;'),
+        ('>', '&gt;')
+    ]
+    for replace_tuple in replace_list:
+        html_data = html_data.replace(replace_tuple[0], replace_tuple[1])
+
+    return html_data
+
+
+def html_unescaper(html_data):
+    """This functions converts html to unescaped format.
+
+    Args:
+        html_data: str. HTML string to be unescaped.
+
+    Returns:
+        str. Unescaped HTML string
+    """
+    replace_list = [
+        ('&', '&amp;'),
+        ('"', '&quot;'),
+        ('\'', '&#39;'),
+        ('<', '&lt;'),
+        ('>', '&gt;')
+    ]
+    for replace_tuple in replace_list:
+        html_data = html_data.replace(replace_tuple[1], replace_tuple[0])
+
+    return html_data
+
+
 def wrap_with_siblings(tag, p):
     """This function wraps a tag and its unwrapped sibling in p tag.
+
     Args:
         tag: bs4.element.Tag. The tag which is to be wrapped in p tag
             along with its unwrapped siblings.
@@ -203,7 +248,7 @@ def convert_to_text_angular(html_data):
     # of other tags which produces issues in migration.
     html_data = html_data.replace('<br>', '<br/>')
 
-    soup = bs4.BeautifulSoup(html_data, 'html.parser')
+    soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
 
     allowed_tag_list = (
         feconf.RTE_CONTENT_SPEC[
@@ -300,7 +345,7 @@ def convert_to_text_angular(html_data):
     # Removal of tags can break the soup into parts which are continuous
     # and not wrapped in any tag. This part recombines the continuous
     # parts not wrapped in any tag.
-    soup = bs4.BeautifulSoup(str(soup), 'html.parser')
+    soup = bs4.BeautifulSoup(unicode(soup).encode('utf-8'), 'html.parser')
 
     oppia_inline_components = [
         'oppia-noninteractive-link', 'oppia-noninteractive-math']
@@ -405,7 +450,38 @@ def convert_to_text_angular(html_data):
     # html strings they are stored as <br>. Since both of these
     # should match and <br> and <br/> have same working,
     # so the tag has to be replaced in this way.
-    return str(soup).replace('<br/>', '<br>')
+    return unicode(soup).replace('<br/>', '<br>')
+
+
+def tag_content_to_textangular(html_data):
+    """This functions converts content with tabs and collapsible
+    components to textangular format.
+
+    Args:
+        html_data: str. The HTML string whose content is to be converted.
+
+    Returns:
+        str. The HTML string with converted content within tag.
+    """
+    soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
+
+    for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
+        content_html = html_unescaper(collapsible['content-with-value'])
+        # This is done to ensure that &quot; is not escaped as &quot;
+        # is not escaped as &amp;amp;quot;.
+        collapsible['content-with-value'] = '&quot;' + html_escaper(
+            convert_to_text_angular(content_html[1:-1])) + '&quot;'
+
+    for tabs in soup.findAll('oppia-noninteractive-tabs'):
+        tab_content_json = html_unescaper(tabs['tab_contents-with-value'])
+        tab_content_list = json.loads(tab_content_json)
+        for index, tab_content in enumerate(tab_content_list):
+            tab_content_list[index]['content'] = convert_to_text_angular(
+                tab_content['content'])
+        tabs['tab_contents-with-value'] = html_escaper(
+            json.dumps(tab_content_list))
+
+    return unicode(soup)
 
 
 def validate_textangular_format(html_list, run_migration=False):
@@ -427,16 +503,10 @@ def validate_textangular_format(html_list, run_migration=False):
     # All the invalid html strings will be stored in this.
     err_dict['strings'] = []
 
-    allowed_parent_list = (
-        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
-        ['ALLOWED_PARENT_LIST'])
-    allowed_tag_list = (
-        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
-        ['ALLOWED_TAG_LIST'])
-
     for html_data in html_list:
         if run_migration:
-            soup_data = convert_to_text_angular(html_data)
+            soup_data = convert_to_text_angular(
+                tag_content_to_textangular(html_data))
         else:
             soup_data = html_data
 
@@ -447,32 +517,81 @@ def validate_textangular_format(html_list, run_migration=False):
         soup = bs4.BeautifulSoup(
             soup_data.replace('<br>', '<br/>'), 'html.parser')
 
-        # Text with no parent tag is also invalid.
-        for content in soup.contents:
-            if not content.name:
-                err_dict['strings'].append(html_data)
-                break
+        is_invalid = validate_soup_for_textangular(soup, err_dict)
 
-        for tag in soup.findAll():
-            # Checking for tags not allowed in RTE.
-            if tag.name not in allowed_tag_list:
-                if 'invalidTags' in err_dict:
-                    err_dict['invalidTags'].append(tag.name)
-                else:
-                    err_dict['invalidTags'] = [tag.name]
+        if is_invalid:
+            err_dict['strings'].append(html_data)
+
+        for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
+            # content is taken from [-1:1] since quotes are unescaped
+            # and are treated as part of html content.
+            content_html = html_unescaper(
+                collapsible['content-with-value'])[1:-1]
+            soup_for_collapsible = bs4.BeautifulSoup(
+                content_html.replace('<br>', '<br/>'), 'html.parser')
+            is_invalid = validate_soup_for_textangular(
+                soup_for_collapsible, err_dict)
+            if is_invalid:
                 err_dict['strings'].append(html_data)
-            # Checking for parent-child relation that are not
-            # allowed in RTE.
-            parent = tag.parent.name
-            if (tag.name in allowed_tag_list) and (
-                    parent not in allowed_parent_list[tag.name]):
-                if tag.name in err_dict:
-                    err_dict[tag.name].append(parent)
-                else:
-                    err_dict[tag.name] = [parent]
-                err_dict['strings'].append(html_data)
+
+        for tabs in soup.findAll('oppia-noninteractive-tabs'):
+            tab_content_json = html_unescaper(tabs['tab_contents-with-value'])
+            tab_content_list = json.loads(tab_content_json)
+            for tab_content in tab_content_list:
+                content_html = tab_content['content']
+                soup_for_tabs = bs4.BeautifulSoup(
+                    content_html.replace('<br>', '<br/>'), 'html.parser')
+                is_invalid = validate_soup_for_textangular(
+                    soup_for_tabs, err_dict)
+                if is_invalid:
+                    err_dict['strings'].append(html_data)
 
     for key in err_dict:
         err_dict[key] = list(set(err_dict[key]))
 
     return err_dict
+
+
+def validate_soup_for_textangular(soup, err_dict):
+    """Validate content in given soup for textangular format.
+
+    Args:
+        soup: bs4.BeautifulSoup. The html soup whose content is to be validated.
+        err_dict: dict. The dictionary which stores invalid tags and strings.
+
+    Returns:
+        bool. Boolean indicating whether a html string is valid for textangular.
+    """
+    allowed_parent_list = (
+        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+        ['ALLOWED_PARENT_LIST'])
+    allowed_tag_list = (
+        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+        ['ALLOWED_TAG_LIST'])
+    is_invalid = False
+
+    # Text with no parent tag is also invalid.
+    for content in soup.contents:
+        if not content.name:
+            is_invalid = True
+
+    for tag in soup.findAll():
+        # Checking for tags not allowed in RTE.
+        if tag.name not in allowed_tag_list:
+            if 'invalidTags' in err_dict:
+                err_dict['invalidTags'].append(tag.name)
+            else:
+                err_dict['invalidTags'] = [tag.name]
+            is_invalid = True
+        # Checking for parent-child relation that are not
+        # allowed in RTE.
+        parent = tag.parent.name
+        if (tag.name in allowed_tag_list) and (
+                parent not in allowed_parent_list[tag.name]):
+            if tag.name in err_dict:
+                err_dict[tag.name].append(parent)
+            else:
+                err_dict[tag.name] = [parent]
+            is_invalid = True
+
+    return is_invalid

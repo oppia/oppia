@@ -360,3 +360,65 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
         self.assertEqual(
             actual_output_without_migration,
             expected_output_without_migration)
+
+    def test_validate_soup_text_angular(self):
+        test_cases = [
+            (
+                '<p>Hello <b>this </b>is </p><p><br></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;Hello oppia&amp;quot;\" '
+                'heading-with-value=\"&amp;quot;Learn more about APIs&'
+                'amp;quot;\"></oppia-noninteractive-collapsible><br></p><p>'
+                'for migration testing</p>'
+            ),
+            (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            ),
+            (
+                '<p>Hello</p><p>oppia</p><p>testing <i>in progress</i>!</p>'
+            )
+        ]
+
+        expected_output = [False, True, False]
+        err_dict = {}
+
+        for index, test_case in enumerate(test_cases):
+            actual_output = (
+                html_cleaner.validate_soup_for_textangular(
+                    bs4.BeautifulSoup(test_case, 'html.parser'),
+                    err_dict))
+
+            self.assertEqual(actual_output, expected_output[index])
+
+    def test_tag_content_to_textangular(self):
+        test_cases = [{
+            'html_content': (
+                '<div>Hello <b>this </b>is </div><p><br></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;Hello oppia&amp;quot;\" '
+                'heading-with-value=\"&amp;quot;Learn more about APIs&amp;'
+                'quot;\"></oppia-noninteractive-collapsible><br></p><p>'
+                'for migration testing</p>'
+            ),
+            'expected_output': (
+                '<div>Hello <b>this </b>is </div><p><br/></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;Hello oppia'
+                '&amp;lt;/p&amp;gt;&amp;quot;\" heading-with-value=\"'
+                '&amp;quot;Learn more about APIs&amp;quot;\">'
+                '</oppia-noninteractive-collapsible><br/></p><p>'
+                'for migration testing</p>'
+            )
+        }, {
+            'html_content': (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            ),
+            'expected_output': (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            )
+        }]
+
+        for test_case in test_cases:
+            actual_output = html_cleaner.tag_content_to_textangular(
+                test_case['html_content'])
+            self.assertEqual(actual_output, test_case['expected_output'])
