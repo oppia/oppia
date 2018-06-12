@@ -316,7 +316,7 @@ var MultiSelectEditor = function(elem) {
 // <div>
 //   plain
 //   <b>bold</b>
-//   <oppia-nointeractive-math> ... </oppia-noninteractive-math>
+//   <oppia-noninteractive-math> ... </oppia-noninteractive-math>
 // <div>
 // The richTextInstructions function will be supplied with a 'handler' argument
 // which it should then use to read through the rich-text area using the
