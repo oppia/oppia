@@ -483,7 +483,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 class InteractionDemoExplorationUnitTests(test_utils.GenericTestBase):
     """Test that the interaction demo exploration covers all interactions."""
 
-    _DEMO_EXPLORATION_ID = '17'
+    _DEMO_EXPLORATION_ID = '16'
 
     def test_interactions_demo_exploration(self):
         exp_services.load_demo(self._DEMO_EXPLORATION_ID)
