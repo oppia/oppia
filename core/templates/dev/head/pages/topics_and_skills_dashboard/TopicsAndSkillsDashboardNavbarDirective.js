@@ -21,7 +21,8 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
     return {
       restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics_and_skills_dashboard/topics_and_skills_dashboard_navbar_directive.html'),
+        '/pages/topics_and_skills_dashboard/' +
+        'topics_and_skills_dashboard_navbar_directive.html'),
       controller: [
         function() {}
       ]

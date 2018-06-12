@@ -38,6 +38,6 @@ oppia.controller('TopicsAndSkillsDashboard', [
 
     $scope.setActiveTab = function(tabName) {
       $scope.activeTab = tabName;
-    }
+    };
   }
 ]);
