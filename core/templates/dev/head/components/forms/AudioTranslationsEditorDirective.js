@@ -65,8 +65,8 @@ oppia.directive('audioTranslationsEditor', [
                 explorationId, filename));
           };
 
-          $scope.getNeedsUpdateTooltipMessage = function (needUpdate) {
-            if (needUpdate) {
+          $scope.getNeedsUpdateTooltipMessage = function(needsUpdate) {
+            if (needsUpdate) {
               return ($scope.isEditable() ? 'Audio might not match text.' +
                 ' Reupload the file, or click to unflag.' :
                 'Audio might not match text.');
