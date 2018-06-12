@@ -42,7 +42,7 @@ describe('State content editor directive', function() {
   beforeEach(inject(function($compile, $injector, $rootScope, $templateCache) {
     shof = $injector.get('SubtitledHtmlObjectFactory');
     cls = $injector.get('ChangeListService');
-    scs = $injector.get('stateContentService');
+    scs = $injector.get('StateContentService');
     es = $injector.get('EditabilityService');
     ess = $injector.get('ExplorationStatesService');
 

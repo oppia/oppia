@@ -53,8 +53,8 @@ describe('Solution Verification Service', function() {
 
   beforeEach(inject(function($injector) {
     ess = $injector.get('ExplorationStatesService');
-    siis = $injector.get('stateInteractionIdService');
-    scas = $injector.get('stateCustomizationArgsService');
+    siis = $injector.get('StateInteractionIdService');
+    scas = $injector.get('StateCustomizationArgsService');
     idc = $injector.get('InteractionDetailsCacheService');
     sof = $injector.get('SolutionObjectFactory');
     svs = $injector.get('SolutionVerificationService');

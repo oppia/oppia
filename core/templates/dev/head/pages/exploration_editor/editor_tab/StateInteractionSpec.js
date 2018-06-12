@@ -56,13 +56,13 @@ describe('State Interaction controller', function() {
       ecs = $injector.get('EditorStateService');
       cls = $injector.get('ChangeListService');
       ess = $injector.get('ExplorationStatesService');
-      siis = $injector.get('stateInteractionIdService');
-      scas = $injector.get('stateCustomizationArgsService');
+      siis = $injector.get('StateInteractionIdService');
+      scas = $injector.get('StateCustomizationArgsService');
       idc = $injector.get('InteractionDetailsCacheService');
       IS = $injector.get('INTERACTION_SPECS');
       $httpBackend = $injector.get('$httpBackend');
-      scope.stateInteractionIdService = siis;
-      scope.stateCustomizationArgsService = scas;
+      scope.StateInteractionIdService = siis;
+      scope.StateCustomizationArgsService = scas;
       scope.InteractionDetailsCacheService = idc;
 
       ess.init({
@@ -159,8 +159,8 @@ describe('State Interaction controller', function() {
             return true;
           }
         },
-        stateInteractionIdService: siis,
-        stateCustomizationArgsService: scas,
+        StateInteractionIdService: siis,
+        StateCustomizationArgsService: scas,
         InteractionDetailsCacheService: idc,
         INTERACTION_SPECS: IS
       });

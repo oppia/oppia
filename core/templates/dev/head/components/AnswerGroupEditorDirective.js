@@ -35,11 +35,11 @@ oppia.directive('answerGroupEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/answer_group_editor_directive.html'),
       controller: [
-        '$scope', 'stateInteractionIdService', 'ResponsesService',
+        '$scope', 'StateInteractionIdService', 'ResponsesService',
         'EditorStateService', 'AlertsService', 'INTERACTION_SPECS',
         'RuleObjectFactory',
         function(
-            $scope, stateInteractionIdService, ResponsesService,
+            $scope, StateInteractionIdService, ResponsesService,
             EditorStateService, AlertsService, INTERACTION_SPECS,
             RuleObjectFactory) {
           $scope.rulesMemento = null;
@@ -61,7 +61,7 @@ oppia.directive('answerGroupEditor', [
           });
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           $scope.$on('externalSave', function() {

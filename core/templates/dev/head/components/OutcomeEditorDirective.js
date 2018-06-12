@@ -33,11 +33,11 @@ oppia.directive('outcomeEditor', [
         '/components/outcome_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'EditorStateService',
-        'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
+        'StateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
         'ExplorationCorrectnessFeedbackService', 'INTERACTION_SPECS',
         function(
             $scope, $uibModal, EditorStateService,
-            stateInteractionIdService, COMPONENT_NAME_FEEDBACK,
+            StateInteractionIdService, COMPONENT_NAME_FEEDBACK,
             ExplorationCorrectnessFeedbackService, INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
           $scope.feedbackEditorIsOpen = false;
@@ -50,7 +50,7 @@ oppia.directive('outcomeEditor', [
           $scope.COMPONENT_NAME_FEEDBACK = COMPONENT_NAME_FEEDBACK;
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           // This returns false if the current interaction ID is null.
@@ -123,7 +123,7 @@ oppia.directive('outcomeEditor', [
           };
 
           $scope.getCurrentInteractionId = function() {
-            return stateInteractionIdService.savedMemento;
+            return StateInteractionIdService.savedMemento;
           };
 
           $scope.isSelfLoopWithNoFeedback = function(outcome) {

@@ -28,12 +28,12 @@ oppia.directive('hintEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/hint_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditabilityService', 'stateHintsService',
+        '$scope', '$uibModal', 'EditabilityService', 'StateHintsService',
         'COMPONENT_NAME_HINT',
-        function($scope, $uibModal, EditabilityService, stateHintsService,
+        function($scope, $uibModal, EditabilityService, StateHintsService,
             COMPONENT_NAME_HINT) {
           $scope.isEditable = EditabilityService.isEditable();
-          $scope.stateHintsService = stateHintsService;
+          $scope.StateHintsService = StateHintsService;
           $scope.editHintForm = {};
           $scope.hintEditorIsOpen = false;
 
@@ -101,7 +101,7 @@ oppia.directive('hintEditor', [
               controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
               $scope.hint.hintContent.markAllAudioAsNeedingUpdate();
-              stateHintsService.displayed[$scope.getIndexPlusOne() - 1]
+              StateHintsService.displayed[$scope.getIndexPlusOne() - 1]
                 .hintContent = angular.copy($scope.hint.hintContent);
               $scope.getOnSaveFn()();
             });

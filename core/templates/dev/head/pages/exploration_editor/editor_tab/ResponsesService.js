@@ -18,18 +18,18 @@
  */
 
 oppia.factory('ResponsesService', [
-  '$rootScope', 'stateInteractionIdService', 'INTERACTION_SPECS',
+  '$rootScope', 'StateInteractionIdService', 'INTERACTION_SPECS',
   'AnswerGroupsCacheService', 'EditorStateService', 'ChangeListService',
   'ExplorationStatesService', 'GraphDataService', 'OutcomeObjectFactory',
-  'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
+  'StateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ExplorationContextService', 'ExplorationWarningsService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
-      $rootScope, stateInteractionIdService, INTERACTION_SPECS,
+      $rootScope, StateInteractionIdService, INTERACTION_SPECS,
       AnswerGroupsCacheService, EditorStateService, ChangeListService,
       ExplorationStatesService, GraphDataService, OutcomeObjectFactory,
-      stateSolutionService, SolutionVerificationService, AlertsService,
+      StateSolutionService, SolutionVerificationService, AlertsService,
       ExplorationContextService, ExplorationWarningsService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
@@ -58,13 +58,13 @@ oppia.factory('ResponsesService', [
 
         // To check if the solution is valid once a rule has been changed or
         // added.
-        var currentInteractionId = stateInteractionIdService.savedMemento;
+        var currentInteractionId = StateInteractionIdService.savedMemento;
         var interactionCanHaveSolution = (
           currentInteractionId &&
           INTERACTION_SPECS[currentInteractionId].can_have_solution);
         var solutionExists = (
-          stateSolutionService.savedMemento &&
-          stateSolutionService.savedMemento.correctAnswer !== null);
+          StateSolutionService.savedMemento &&
+          StateSolutionService.savedMemento.correctAnswer !== null);
 
         if (interactionCanHaveSolution && solutionExists) {
           var currentStateName = EditorStateService.getActiveStateName();
@@ -75,7 +75,7 @@ oppia.factory('ResponsesService', [
             SolutionVerificationService.verifySolution(
               ExplorationContextService.getExplorationId(),
               ExplorationStatesService.getState(currentStateName),
-              stateSolutionService.savedMemento.correctAnswer));
+              StateSolutionService.savedMemento.correctAnswer));
 
           ExplorationStatesService.updateSolutionValidity(
             currentStateName, solutionIsCurrentlyValid);
@@ -162,7 +162,7 @@ oppia.factory('ResponsesService', [
         _confirmedUnclassifiedAnswers = angular.copy(
           data.confirmedUnclassifiedAnswers);
         AnswerGroupsCacheService.set(
-          stateInteractionIdService.savedMemento, _answerGroups);
+          StateInteractionIdService.savedMemento, _answerGroups);
 
         _answerGroupsMemento = angular.copy(_answerGroups);
         _defaultOutcomeMemento = angular.copy(_defaultOutcome);
@@ -271,7 +271,7 @@ oppia.factory('ResponsesService', [
 
         // If the interaction is ItemSelectionInput, update the answer groups
         // to refer to the new answer options.
-        if (stateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
+        if (StateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
             oldAnswerChoices) {
           // We use an approximate algorithm here. If the length of the answer
           // choices array remains the same, and no choice is replicated at

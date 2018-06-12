@@ -16,7 +16,7 @@
  * @fileoverview Standalone services for the exploration editor page.
  */
 
-oppia.factory('statePropertyService', [
+oppia.factory('StatePropertyService', [
   '$log', 'ChangeListService', 'AlertsService', 'ExplorationStatesService',
   function($log, ChangeListService, AlertsService, ExplorationStatesService) {
     // Public base API for data services corresponding to state properties
@@ -93,9 +93,9 @@ oppia.factory('statePropertyService', [
 
 // A data service that stores the current state content.
 // TODO(sll): Add validation.
-oppia.factory('stateContentService', [
-  'statePropertyService', function(statePropertyService) {
-    var child = Object.create(statePropertyService);
+oppia.factory('StateContentService', [
+  'StatePropertyService', function(StatePropertyService) {
+    var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveStateContent';
     return child;
   }
@@ -103,9 +103,9 @@ oppia.factory('stateContentService', [
 
 // A data service that stores the current list of state parameter changes.
 // TODO(sll): Add validation.
-oppia.factory('stateParamChangesService', [
-  'statePropertyService', function(statePropertyService) {
-    var child = Object.create(statePropertyService);
+oppia.factory('StateParamChangesService', [
+  'StatePropertyService', function(StatePropertyService) {
+    var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveStateParamChanges';
     return child;
   }
@@ -113,9 +113,9 @@ oppia.factory('stateParamChangesService', [
 
 // A data service that stores the current interaction id.
 // TODO(sll): Add validation.
-oppia.factory('stateInteractionIdService', [
-  'statePropertyService', function(statePropertyService) {
-    var child = Object.create(statePropertyService);
+oppia.factory('StateInteractionIdService', [
+  'StatePropertyService', function(StatePropertyService) {
+    var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveInteractionId';
     return child;
   }
@@ -125,27 +125,27 @@ oppia.factory('stateInteractionIdService', [
 // interaction. This is a dict mapping customization arg names to dicts of the
 // form {value: customization_arg_value}.
 // TODO(sll): Add validation.
-oppia.factory('stateCustomizationArgsService', [
-  'statePropertyService', function(statePropertyService) {
-    var child = Object.create(statePropertyService);
+oppia.factory('StateCustomizationArgsService', [
+  'StatePropertyService', function(StatePropertyService) {
+    var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveInteractionCustomizationArgs';
     return child;
   }
 ]);
 
 // A data service that stores the current interaction hints.
-oppia.factory('stateHintsService', [
-  'statePropertyService', function(statePropertyService) {
-    var child = Object.create(statePropertyService);
+oppia.factory('StateHintsService', [
+  'StatePropertyService', function(StatePropertyService) {
+    var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveHints';
     return child;
   }
 ]);
 
 // A data service that stores the current interaction solution.
-oppia.factory('stateSolutionService', [
-  'statePropertyService', function(statePropertyService) {
-    var child = Object.create(statePropertyService);
+oppia.factory('StateSolutionService', [
+  'StatePropertyService', function(StatePropertyService) {
+    var child = Object.create(StatePropertyService);
     child.setterMethodKey = 'saveSolution';
     return child;
   }
