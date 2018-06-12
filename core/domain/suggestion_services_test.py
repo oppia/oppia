@@ -490,7 +490,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'content': {
                 self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
                     'filename.mp3', 20, False).to_dict()
-            }
+            },
+            'default_outcome': {}
         }
         # Create content in State A with a single audio subtitle.
         exploration.states['State 1'].update_content(self.old_content)

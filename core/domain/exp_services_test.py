@@ -1353,6 +1353,12 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'missing_prerequisite_skill_id': None
         }
 
+        self.content_ids_to_audio_translations = {
+            'content': {},
+            'default_outcome': {},
+            'feedback_1': {}
+        }
+
     def test_add_state_cmd(self):
         """ Test adding of states."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -1523,7 +1529,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
-                    self.interaction_answer_groups),
+                    self.interaction_answer_groups) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                    self.content_ids_to_audio_translations),
                 '')
 
     def test_update_interaction_answer_groups(self):
@@ -1548,7 +1558,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                self.interaction_default_outcome),
+                self.interaction_default_outcome) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                    self.content_ids_to_audio_translations),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -1582,7 +1596,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome),
+                    self.interaction_default_outcome) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                    self.content_ids_to_audio_translations),
                 '')
 
     def test_update_state_missing_keys(self):
@@ -1603,7 +1621,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome),
+                    self.interaction_default_outcome) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                    self.content_ids_to_audio_translations),
                 '')
 
     def test_update_state_variable_types(self):
@@ -1624,7 +1646,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome),
+                    self.interaction_default_outcome) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                    self.content_ids_to_audio_translations),
                 '')
 
     def test_update_content(self):

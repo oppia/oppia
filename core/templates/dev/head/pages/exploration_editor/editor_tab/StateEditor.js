@@ -119,12 +119,14 @@ oppia.directive('trainingPanel', [
         'EditorStateService', 'ExplorationStatesService',
         'TrainingDataService', 'ResponsesService', 'stateInteractionIdService',
         'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
-        'OutcomeObjectFactory',
-        function($scope, ExplorationHtmlFormatterService,
+        'OutcomeObjectFactory', 'GenerateContentIdService',
+        'COMPONENT_NAME_FEEDBACK', function(
+            $scope, ExplorationHtmlFormatterService,
             EditorStateService, ExplorationStatesService,
             TrainingDataService, ResponsesService, stateInteractionIdService,
             stateCustomizationArgsService, AnswerGroupObjectFactory,
-            OutcomeObjectFactory) {
+            OutcomeObjectFactory, GenerateContentIdService,
+            COMPONENT_NAME_FEEDBACK) {
           $scope.changingAnswerGroupIndex = false;
           $scope.addingNewResponse = false;
 
@@ -152,8 +154,10 @@ oppia.directive('trainingPanel', [
           };
 
           $scope.beginAddingNewResponse = function() {
+            var contentId = GenerateContentIdService.generateUniqueId(
+              COMPONENT_NAME_FEEDBACK);
             $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(), '', []);
+              EditorStateService.getActiveStateName(), contentId, '', []);
             $scope.addingNewResponse = true;
           };
 

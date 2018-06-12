@@ -532,7 +532,8 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             content_id: {
                 self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
                     'filename.mp3', 20, False).to_dict()
-            }
+            },
+            'default_outcome': {}
         })
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')

@@ -16,6 +16,7 @@
 
 """Tests for classifier services."""
 
+import copy
 import datetime
 import os
 
@@ -74,8 +75,10 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         self.assertEqual(all_mappings.count(), 1)
 
         # Modify such that job creation is triggered.
-        state.interaction.answer_groups.insert(
-            3, state.interaction.answer_groups[1])
+        new_answer_group = copy.deepcopy(state.interaction.answer_groups[1])
+        new_answer_group.outcome.feedback.content_id = 'new_feedback'
+        state.content_ids_to_audio_translations['new_feedback'] = {}
+        state.interaction.answer_groups.insert(3, new_answer_group)
         answer_groups = []
         for answer_group in state.interaction.answer_groups:
             answer_groups.append(answer_group.to_dict())
@@ -84,6 +87,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'state_name': 'Home',
             'property_name': 'answer_groups',
             'new_value': answer_groups
+        }),
+            exp_domain.ExplorationChange({
+            'cmd': 'edit_state_property',
+            'state_name': 'Home',
+            'property_name': 'content_ids_to_audio_translations',
+            'new_value': state.content_ids_to_audio_translations
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(

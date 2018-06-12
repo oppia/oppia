@@ -1386,12 +1386,47 @@ class State(object):
         elif self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
 
+        content_id_list = []
+        content_id_list.append(self.content.content_id)
+        for answer_group in self.interaction.answer_groups:
+            feedback_content_id = answer_group.outcome.feedback.content_id
+            if feedback_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % feedback_content_id)
+            content_id_list.append(feedback_content_id)
+        if self.interaction.default_outcome:
+            default_outcome_content_id = (
+                self.interaction.default_outcome.feedback.content_id)
+            if default_outcome_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s'
+                    % default_outcome_content_id)
+            content_id_list.append(default_outcome_content_id)
+        for hint in self.interaction.hints:
+            hint_content_id = hint.hint_content.content_id
+            if hint_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % hint_content_id)
+            content_id_list.append(hint_content_id)
+        if self.interaction.solution:
+            solution_content_id = (
+                self.interaction.solution.explanation.content_id)
+            if solution_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % solution_content_id)
+            content_id_list.append(solution_content_id)
+        available_content_ids = self.content_ids_to_audio_translations.keys()
+        if not (set(content_id_list) <= set(available_content_ids)):
+            raise utils.ValidationError(
+                'Expected state content_ids_to_audio_translations to have all'
+                'of the listed content ids %s' % content_id_list, available_content_ids)
         if not isinstance(self.content_ids_to_audio_translations, dict):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to be a dict,'
                 'received %s' % self.param_changes)
         for (content_id, audio_translations) in (
                 self.content_ids_to_audio_translations.iteritems()):
+
             if not isinstance(content_id, basestring):
                 raise utils.ValidationError(
                     'Expected content_id to be a string, received: %s' %

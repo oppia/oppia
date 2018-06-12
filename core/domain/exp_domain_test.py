@@ -262,6 +262,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'tagged_misconception_id': None
             })
         )
+
+        init_state.update_content_ids_to_audio_translations({
+            'content': {},
+            'default_outcome': {},
+            'feedback_1': {}
+        })
         exploration.validate()
 
         interaction = init_state.interaction
@@ -323,7 +329,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         outcome.dest = destination
 
-        outcome.feedback = exp_domain.SubtitledHtml('Feedback', {})
+        outcome.feedback = exp_domain.SubtitledHtml('feedback_1', {})
         exploration.validate()
 
         outcome.labelled_as_correct = 'hello'
@@ -514,6 +520,14 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 'html': 'hello_world is a string'
             },
         }
+
+        init_state.update_content_ids_to_audio_translations({
+            'content': {},
+            'default_outcome': {},
+            'hint_1': {},
+            'solution': {}
+        })
+
         init_state.interaction.solution = (
             exp_domain.Solution.from_dict(init_state.interaction.id, solution))
         exploration.validate()
@@ -526,6 +540,13 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         init_state.add_hint(
             exp_domain.SubtitledHtml('hint_3', 'hint three'))
         init_state.delete_hint(1)
+        init_state.update_content_ids_to_audio_translations({
+            'content': {},
+            'default_outcome': {},
+            'hint_1': {},
+            'hint_3': {},
+            'solution': {}
+        })
         self.assertEquals(len(init_state.interaction.hints), 2)
         exploration.validate()
 
@@ -540,7 +561,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         # Solution should be set to None as default.
         self.assertEquals(init_state.interaction.solution, None)
 
-        init_state.add_hint(exp_domain.SubtitledHtml('hint #1', {}))
+        init_state.add_hint(exp_domain.SubtitledHtml('hint_1', {}))
         solution = {
             'answer_is_exclusive': False,
             'correct_answer': [0, 0],
@@ -566,6 +587,12 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         init_state.interaction.solution = (
             exp_domain.Solution.from_dict(init_state.interaction.id, solution))
+        init_state.update_content_ids_to_audio_translations({
+            'content': {},
+            'default_outcome': {},
+            'hint_1': {},
+            'solution': {}
+        })
         exploration.validate()
 
     def test_tag_validation(self):
