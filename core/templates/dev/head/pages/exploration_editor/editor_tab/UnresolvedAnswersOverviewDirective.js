@@ -29,7 +29,7 @@ oppia.directive('unresolvedAnswersOverview', [
       controller: [
         '$scope', 'EditorStateService', 'ExplorationStatesService',
         'StateTopAnswersStatsService',
-        'SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS'
+        'SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS',
         function(
             $scope, EditorStateService, ExplorationStatesService,
             StateTopAnswersStatsService,
