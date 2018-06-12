@@ -250,13 +250,18 @@ def save_new_topic(committer_id, topic):
 
 
 def apply_change_list(topic_id, change_list):
-    """Applies a changelist to a topic and returns the result.
+    """Applies a changelist to a topic and returns the result. The incoming
+    changelist should not have simultaneuous creations and deletion of
+    subtopics.
 
     Args:
         topic_id: str. ID of the given topic.
         change_list: list(TopicChange). A change list to be applied to the given
             topic.
 
+    Raises:
+        Exception. The incoming changelist had simultaneuous creation and
+            deletion of subtopics.
     Returns:
         dict, list(int), list(int). A dict with two fields: topic and
             modified_subtopic_pages containing the updated domain objects of
@@ -265,7 +270,7 @@ def apply_change_list(topic_id, change_list):
     """
     topic = get_topic_by_id(topic_id)
     newly_created_subtopic_ids = []
-    existing_subtopics_to_be_modified = []
+    existing_subtopic_page_ids_to_be_modified = []
     deleted_subtopic_ids = []
     modified_subtopic_pages = []
     return_dict = {}
@@ -274,10 +279,10 @@ def apply_change_list(topic_id, change_list):
         if (change.cmd ==
                 subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
             if change.id < topic.next_subtopic_id:
-                existing_subtopics_to_be_modified.append(change.id)
+                existing_subtopic_page_ids_to_be_modified.append(change.id)
     modified_subtopic_pages = (
         subtopic_page_services.get_subtopic_pages_with_ids(
-            topic_id, existing_subtopics_to_be_modified))
+            topic_id, existing_subtopic_page_ids_to_be_modified))
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
@@ -289,6 +294,10 @@ def apply_change_list(topic_id, change_list):
                 newly_created_subtopic_ids.append(change.subtopic_id)
             elif change.cmd == topic_domain.CMD_DELETE_SUBTOPIC:
                 topic.delete_subtopic(change.id)
+                if change.id in newly_created_subtopic_ids:
+                    raise Exception(
+                        'The incoming changelist had simultaneuous'
+                        ' creation and deletion of subtopics.')
                 deleted_subtopic_ids.append(change.id)
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
                 topic.add_uncategorized_skill_id(change.id)
@@ -765,15 +774,11 @@ def check_can_edit_subtopic_page(user, topic_rights):
             subtopic page is a part of.
 
     Returns:
-        bool. Whether the given user can edit the given topic.
+        bool. Whether the given user can edit the given subtopic page.
     """
     if topic_rights is None:
         return False
-    if role_services.ACTION_EDIT_ANY_TOPIC in user.actions:
-        return True
-    if role_services.ACTION_EDIT_OWNED_TOPIC not in user.actions:
-        return False
-    if topic_rights.is_manager(user.user_id):
+    if role_services.ACTION_EDIT_ANY_SUBTOPIC_PAGE in user.actions:
         return True
 
     return False
