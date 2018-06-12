@@ -3336,9 +3336,10 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'customization_args': {},
                     'default_outcome': {
                         'dest': dest_name,
-                        'feedback': copy.deepcopy(
-                            exp_domain.
-                            SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT),
+                        'feedback': {
+                            'content_id': 'default_outcome',
+                            'html': ''
+                        },
                         'labelled_as_correct': False,
                         'param_changes': [],
                         'refresher_exploration_id': None,

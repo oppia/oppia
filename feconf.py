@@ -209,11 +209,9 @@ DEFAULT_EXPLORATION_OBJECTIVE = ''
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'Introduction'
-
+# Default content id for the state's content.
 DEFAULT_NEW_STATE_CONTENT_ID = 'content'
-
-DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
-
+# Default content_ids_to_audio_translations dict for a default state template.
 DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
     'content': {},
     'default_outcome': {}

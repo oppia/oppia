@@ -509,11 +509,6 @@ class ExpVersionReference(object):
 class SubtitledHtml(object):
     """Value object representing subtitled HTML."""
 
-    DEFAULT_SUBTITLED_HTML_DICT = {
-        'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
-        'html': ''
-    }
-
     def __init__(self, content_id, html):
         """Initializes a SubtitledHtml domain object.
 
@@ -1311,7 +1306,10 @@ class State(object):
         'answer_groups': [],
         'default_outcome': {
             'dest': feconf.DEFAULT_INIT_STATE_NAME,
-            'feedback': SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT,
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': ''
+            },
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
