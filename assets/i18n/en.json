@@ -93,6 +93,7 @@
     "I18N_DASHBOARD_EXPLORATIONS_SORT_BY_TOTAL_PLAYS": "Total Plays",
     "I18N_DASHBOARD_EXPLORATIONS_SORT_BY_UNRESOLVED_ANSWERS": "Unresolved Answers",
     "I18N_DASHBOARD_OPEN_FEEDBACK": "Open Feedback",
+    "I18N_DASHBOARD_SKILLS": "Skills",
     "I18N_DASHBOARD_STATS_AVERAGE_RATING": "Average Rating",
     "I18N_DASHBOARD_STATS_OPEN_FEEDBACK": "Open Feedback",
     "I18N_DASHBOARD_STATS_TOTAL_PLAYS": "Total Plays",
@@ -104,6 +105,8 @@
     "I18N_DASHBOARD_TABLE_HEADING_PLAYS": "Plays",
     "I18N_DASHBOARD_TABLE_HEADING_RATING": "Rating",
     "I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Unresolved Answers",
+    "I18N_DASHBOARD_TOPICS": "Topics",
+    "I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD": "Topics and Skills Dashboard",
     "I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Drag an image into this area",
     "I18N_DIRECTIVES_UPLOAD_A_FILE": "Upload a file",
     "I18N_ERROR_DISABLED_EXPLORATION": "Disabled Exploration",
@@ -504,6 +507,8 @@
     "I18N_TOPNAV_BLOG": "Blog",
     "I18N_TOPNAV_CONTACT_US": "Contact Us",
     "I18N_TOPNAV_CREATOR_DASHBOARD": "Creator Dashboard",
+    "I18N_TOPNAV_CREATE_SKILL": "Create Skill",
+    "I18N_TOPNAV_CREATE_TOPIC": "Create Topic",
     "I18N_TOPNAV_DONATE": "Donate",
     "I18N_TOPNAV_FORUM": "Forum",
     "I18N_TOPNAV_GET_INVOLVED": "Get Involved",
@@ -519,6 +524,7 @@
     "I18N_TOPNAV_SIGN_IN": "Sign in",
     "I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Sign in with Google",
     "I18N_TOPNAV_TEACH_WITH_OPPIA": "Teach with Oppia",
+    "I18N_TOPNAV_TOPICS_AND_SKILLS_DASHBOARD": "Topics and Skills Dashboard",
     "I18N_TOTAL_SUBSCRIBERS_TEXT": "You have a total of <[totalSubscribers]> subscribers.",
     "I18N_UNSUBSCRIBE_BUTTON_TEXT": "Unsubscribe"
 }

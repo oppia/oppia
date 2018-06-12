@@ -75,6 +75,9 @@ oppia.directive('topNavigationBar', [
           $scope.userMenuIsShown = ($scope.NAV_MODE !== NAV_MODE_SIGNUP);
           $scope.standardNavIsShown = (
             NAV_MODES_WITH_CUSTOM_LOCAL_NAV.indexOf($scope.NAV_MODE) === -1);
+          if ($scope.NAV_MODE === 'topics_and_skills_dashboard') {
+            $scope.standardNavIsShown = false;
+          }
 
           $scope.onLoginButtonClicked = function() {
             siteAnalyticsService.registerStartLoginEvent('loginButton');
