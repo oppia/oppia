@@ -27,8 +27,8 @@ describe('Answer Groups Cache Service', function() {
       outcome: {
         dest: 'default',
         feedback: {
-          html: '',
-          audio_translations: {}
+          content_id: 'feedback_1',
+          html: ''
         },
         labelled_as_correct: false,
         param_changes: [],

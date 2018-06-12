@@ -39,10 +39,13 @@ oppia.factory('HintAndSolutionModalService', [
             function($scope, $rootScope, $uibModalInstance) {
               $scope.isHint = true;
               $scope.hint = HintsAndSolutionManagerService.displayHint(index);
+              var contentIdsToAudioTranslations =
+                ExplorationPlayerService.getContentIdsToAudioTranslations(
+                  PlayerPositionService.getCurrentStateName());
+              var hintContentId = $scope.hint.getContentId();
               AudioTranslationManagerService.setSecondaryAudioTranslations(
-                $scope.hint.getBindableAudioTranslations(),
-                $scope.hint.getHtml(),
-                COMPONENT_NAME_HINT);
+                contentIdsToAudioTranslations.getBindableAudioTranslations(
+                  hintContentId), $scope.hint.getHtml(), COMPONENT_NAME_HINT);
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               $scope.closeModal = function() {
                 AudioPlayerService.stop();
@@ -65,9 +68,13 @@ oppia.factory('HintAndSolutionModalService', [
             function($scope, $rootScope, $uibModalInstance) {
               $scope.isHint = false;
               var solution = HintsAndSolutionManagerService.displaySolution();
+              var solutionContentId = solution.explanation.getContentId();
+              var contentIdsToAudioTranslations =
+                ExplorationPlayerService.getContentIdsToAudioTranslations(
+                  PlayerPositionService.getCurrentStateName());
               AudioTranslationManagerService.setSecondaryAudioTranslations(
-                solution.explanation.getBindableAudioTranslations(),
-                solution.explanation.getHtml(),
+                contentIdsToAudioTranslations.getBindableAudioTranslations(
+                  solutionContentId), solution.explanation.getHtml(),
                 COMPONENT_NAME_SOLUTION);
               $rootScope.$broadcast(EVENT_AUTOPLAY_AUDIO);
               var interaction = ExplorationPlayerService.getInteraction(
