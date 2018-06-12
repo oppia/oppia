@@ -18,19 +18,19 @@
  */
 
 oppia.factory('StateTopAnswersStatsService', [
-  '$injector', '$rootScope', 'AngularNameService',
-  'AnswerClassificationService', 'AnswerStatsObjectFactory',
-  'ExplorationContextService', 'ExplorationStatesService',
-  'UrlInterpolationService', 'STATE_ADDED_EVENT_NAME',
-  'STATE_DELETED_EVENT_NAME', 'STATE_RENAMED_EVENT_NAME',
+  '$injector', '$scope', 'AngularNameService', 'AnswerClassificationService',
+  'AnswerStatsObjectFactory', 'ExplorationContextService',
+  'ExplorationStatesService', 'UrlInterpolationService',
+  'STATE_ADDED_EVENT_NAME', 'STATE_DELETED_EVENT_NAME',
+  'STATE_RENAMED_EVENT_NAME',
   'STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME',
   function(
-      $injector, $rootScope, AngularNameService,
-      AnswerClassificationService, AnswerStatsObjectFactory,
-      ExplorationContextService, ExplorationStatesService,
-      UrlInterpolationService, STATE_ADDED_EVENT_NAME,
-      STATE_DELETED_EVENT_NAME, STATE_RENAMED_EVENT_NAME,
-      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME) {
+      $injector, $scope, AngularNameService, AnswerClassificationService,
+    AnswerStatsObjectFactory, ExplorationContextService,
+    ExplorationStatesService, UrlInterpolationService,
+    STATE_ADDED_EVENT_NAME, STATE_DELETED_EVENT_NAME,
+    STATE_RENAMED_EVENT_NAME,
+    STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME) {
     /**
      * @typedef AnswerStatsCache
      * @property {AnswerStats[]} allAnswers
@@ -60,8 +60,8 @@ oppia.factory('StateTopAnswersStatsService', [
         stateTopAnswersStatsCache[stateName].unresolvedAnswers;
 
       // Clear the unresolved answers array since many answers may now have
-      // different values.
-      unresolvedAnswersCacheEntry.splice(0, unresolvedAnswersCacheEntry.length);
+      // different "addressed" values.
+      unresolvedAnswersCacheEntry.length = 0;
 
       // Update the isAddressed data of each answer and put any unaddressed
       // answers into the unresolvedAnswers array.
@@ -98,28 +98,28 @@ oppia.factory('StateTopAnswersStatsService', [
       refreshAddressedInfo(stateName);
     };
 
-    $rootScope.$on(STATE_ADDED_EVENT_NAME, function(event, args) {
+    $scope.$on(STATE_ADDED_EVENT_NAME, function(event, args) {
       if (!isInitialized) {
         return;
       }
       onStateAdded(args.state_name);
     });
 
-    $rootScope.$on(STATE_DELETED_EVENT_NAME, function(event, args) {
+    $scope.$on(STATE_DELETED_EVENT_NAME, function(event, args) {
       if (!isInitialized) {
         return;
       }
       onStateDeleted(args.state_name);
     });
 
-    $rootScope.$on(STATE_RENAMED_EVENT_NAME, function(event, args) {
+    $scope.$on(STATE_RENAMED_EVENT_NAME, function(event, args) {
       if (!isInitialized) {
         return;
       }
       onStateRenamed(args.old_state_name, args.new_state_name);
     });
 
-    $rootScope.$on(
+    $scope.$on(
       STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME, function(event, args) {
         if (!isInitialized) {
           return;
