@@ -98,21 +98,21 @@ oppia.factory('StateTopAnswersStatsService', [
       refreshAddressedInfo(stateName);
     };
 
-    $scope.$on(STATE_ADDED_EVENT_NAME, function(event, args) {
+    $scope.$on(STATE_ADDED_EVENT_NAME, function(evt, args) {
       if (!isInitialized) {
         return;
       }
       onStateAdded(args.state_name);
     });
 
-    $scope.$on(STATE_DELETED_EVENT_NAME, function(event, args) {
+    $scope.$on(STATE_DELETED_EVENT_NAME, function(evt, args) {
       if (!isInitialized) {
         return;
       }
       onStateDeleted(args.state_name);
     });
 
-    $scope.$on(STATE_RENAMED_EVENT_NAME, function(event, args) {
+    $scope.$on(STATE_RENAMED_EVENT_NAME, function(evt, args) {
       if (!isInitialized) {
         return;
       }
@@ -120,7 +120,7 @@ oppia.factory('StateTopAnswersStatsService', [
     });
 
     $scope.$on(
-      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME, function(event, args) {
+      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME, function(evt, args) {
         if (!isInitialized) {
           return;
         }
