@@ -292,6 +292,8 @@ def apply_change_list(story_id, change_list):
                       story_domain.STORY_NODE_PROPERTY_EXPLORATION_ID):
                     story.update_node_exploration_id(
                         change.node_id, change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif change.cmd == story_domain.CMD_UPDATE_STORY_PROPERTY:
                 if (change.property_name ==
                         story_domain.STORY_PROPERTY_TITLE):
@@ -305,10 +307,14 @@ def apply_change_list(story_id, change_list):
                 elif (change.property_name ==
                       story_domain.STORY_PROPERTY_LANGUAGE_CODE):
                     story.update_language_code(change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif change.cmd == story_domain.CMD_UPDATE_STORY_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         story_domain.INITIAL_NODE_ID):
                     story.update_initial_node(change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif (
                     change.cmd ==
                     story_domain.CMD_MIGRATE_SCHEMA_TO_LATEST_VERSION):
@@ -317,6 +323,8 @@ def apply_change_list(story_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # story is sufficient to apply the schema migration.
                 continue
+            else:
+                raise Exception('Invalid change dict.')
         return story
 
     except Exception as e:
