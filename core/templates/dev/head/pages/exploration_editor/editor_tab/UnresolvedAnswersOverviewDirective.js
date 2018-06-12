@@ -29,9 +29,11 @@ oppia.directive('unresolvedAnswersOverview', [
       controller: [
         '$scope', 'EditorStateService', 'ExplorationStatesService',
         'StateTopAnswersStatsService',
+        'SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS'
         function(
             $scope, EditorStateService, ExplorationStatesService,
-            StateTopAnswersStatsService) {
+            StateTopAnswersStatsService,
+            SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS) {
           /**
            * Returns whether the answers for the current state are from an
            * interaction ID which can be rendered as HTML.
