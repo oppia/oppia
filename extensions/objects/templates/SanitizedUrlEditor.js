@@ -15,22 +15,17 @@
 // This directive is based on the unicodeStringEditor one.
 
 oppia.directive('sanitizedUrlEditor', [
-  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     // Editable URL directive.
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'SanitizedUrl';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         getInitArgs: '&',
         value: '='
       },
-      template: '<span ng-include="getTemplateUrl()"></span>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/unicode_string_editor_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.initArgs = $scope.getInitArgs();
         $scope.$watch('initArgs', function(newValue) {

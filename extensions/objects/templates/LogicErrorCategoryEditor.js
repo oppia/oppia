@@ -17,20 +17,15 @@
 // in via initArgs.
 
 oppia.directive('logicErrorCategoryEditor', [
-  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'LogicErrorCategory';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         value: '='
       },
-      template: '<span ng-include="getTemplateUrl()"></span>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/logic_error_category_editor_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.alwaysEditable = true;
         $scope.errorCategories = [{

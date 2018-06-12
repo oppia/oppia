@@ -19,18 +19,15 @@
 // This directive is based on the UnicodeString directive.
 
 oppia.directive('htmlEditor', [
-  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'Html';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
-      scope: {},
-      template: '<div ng-include="getTemplateUrl()"></div>',
+      scope: {
+        value: '='
+      },
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/html_editor_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.schema = {
           type: 'html'

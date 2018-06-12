@@ -15,8 +15,8 @@
 // The value for this editor is always editable.
 
 oppia.directive('booleanEditor', [
-  '$compile', 'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       controller: ['$scope', function($scope) {
         // Reset the component each time the value changes (e.g. if this is part

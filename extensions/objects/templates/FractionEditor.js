@@ -14,20 +14,17 @@
 
 
 oppia.directive('fractionEditor', [
-  '$compile', 'FractionObjectFactory', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, FractionObjectFactory, OBJECT_EDITOR_URL_PREFIX) {
+  'FractionObjectFactory', 'UrlInterpolationService',
+  'OBJECT_EDITOR_URL_PREFIX',
+  function(FractionObjectFactory, UrlInterpolationService,
+           OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'Fraction';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         value: '='
       },
-      template: '<span ng-include="getTemplateUrl()"></span>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/fraction_editor_directive.html'),
       controller: ['$scope', function($scope) {
         var errorMessage = '';
         var fractionString = '0';

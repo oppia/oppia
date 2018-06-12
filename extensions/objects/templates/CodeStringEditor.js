@@ -17,8 +17,8 @@
 // in via initArgs.
 
 oppia.directive('codeStringEditor', [
-  '$compile', 'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
       scope: {
