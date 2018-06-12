@@ -79,7 +79,6 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
           return this._subtopics[i];
         }
       }
-      return false;
     };
 
     // The following function is only meant to be called from the undo of
@@ -143,9 +142,6 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     };
 
     Topic.prototype.addCanonicalStoryId = function(storyId) {
-      if (this._canonicalStoryIds.indexOf(storyId) !== -1) {
-        return false;
-      }
       this._canonicalStoryIds.push(storyId);
     };
 
@@ -165,9 +161,6 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     };
 
     Topic.prototype.addAdditionalStoryId = function(storyId) {
-      if (this._additionalStoryIds.indexOf(storyId) !== -1) {
-        return false;
-      }
       this._additionalStoryIds.push(storyId);
     };
 

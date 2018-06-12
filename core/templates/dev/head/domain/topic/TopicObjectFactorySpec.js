@@ -56,15 +56,13 @@ describe('Topic object factory', function() {
     expect(topic.getUncategorizedSkillIds()).toEqual([]);
   });
 
-  it('should not add duplicate elements to any of the arrays', function() {
-    expect(_sampleTopic.addAdditionalStoryId('story_2')).toEqual(false);
-    expect(_sampleTopic.addCanonicalStoryId('story_1')).toEqual(false);
+  it('should not add duplicate skills to uncategorized skills', function() {
     expect(_sampleTopic.addUncategorizedSkillId('skill_1')).toEqual(false);
     expect(_sampleTopic.addUncategorizedSkillId('skill_3')).toEqual(false);
   });
 
   it('should return false when working with invalid subtopics', function() {
-    expect(_sampleTopic.getSubtopicById(2)).toEqual(false);
+    expect(_sampleTopic.getSubtopicById(2)).toEqual(undefined);
     expect(_sampleTopic.deleteSubtopic(2)).toEqual(false);
   });
 

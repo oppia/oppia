@@ -61,7 +61,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.login(self.ADMIN_EMAIL)
             json_response = self.get_json(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
-            self.assertEqual(len(json_response['topics_list']), 1)
+            self.assertEqual(len(json_response['topic_summaries']), 1)
             self.assertEqual(
                 json_response['topic_summaries'][0]['id'], self.topic_id)
             self.assertEqual(len(json_response['skill_summaries']), 1)

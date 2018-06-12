@@ -321,12 +321,11 @@ oppia.factory('TopicUpdateService', [
         var oldAdditionalStoryIdsList = angular.copy(
           topic.getAdditionalStoryIds());
         var newAdditionalStoryIdsList = [];
-        if (oldAdditionalStoryIdsList.indexOf(storyId) === -1) {
-          newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
-          newAdditionalStoryIdsList.push(storyId);
-        } else {
+        if (oldAdditionalStoryIdsList.indexOf(storyId) !== -1) {
           return false;
         }
+        newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
+        newAdditionalStoryIdsList.push(storyId);
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS, newAdditionalStoryIdsList,
           oldAdditionalStoryIdsList,
@@ -349,13 +348,12 @@ oppia.factory('TopicUpdateService', [
         var oldAdditionalStoryIdsList = angular.copy(
           topic.getAdditionalStoryIds());
         var newAdditionalStoryIdsList = [];
-        if (oldAdditionalStoryIdsList.indexOf(storyId) !== -1) {
-          newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
-          var index = newAdditionalStoryIdsList.indexOf(storyId);
-          newAdditionalStoryIdsList.splice(index, 1);
-        } else {
+        if (oldAdditionalStoryIdsList.indexOf(storyId) === -1) {
           return false;
         }
+        newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
+        var index = newAdditionalStoryIdsList.indexOf(storyId);
+        newAdditionalStoryIdsList.splice(index, 1);
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS, newAdditionalStoryIdsList,
           oldAdditionalStoryIdsList,
@@ -377,12 +375,11 @@ oppia.factory('TopicUpdateService', [
       addCanonicalStoryId: function(topic, storyId) {
         var oldCanonicalStoryIdsList = angular.copy(
           topic.getCanonicalStoryIds());
-        if (oldCanonicalStoryIdsList.indexOf(storyId) === -1) {
-          newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
-          newCanonicalStoryIdsList.push(storyId);
-        } else {
+        if (oldCanonicalStoryIdsList.indexOf(storyId) !== -1) {
           return false;
         }
+        newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
+        newCanonicalStoryIdsList.push(storyId);
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_CANONICAL_STORY_IDS, newCanonicalStoryIdsList,
           oldCanonicalStoryIdsList,
@@ -405,13 +402,12 @@ oppia.factory('TopicUpdateService', [
         var oldCanonicalStoryIdsList = angular.copy(
           topic.getCanonicalStoryIds());
         var newCanonicalStoryIdsList = [];
-        if (oldCanonicalStoryIdsList.indexOf(storyId) !== -1) {
-          newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
-          var index = newCanonicalStoryIdsList.indexOf(storyId);
-          newCanonicalStoryIdsList.splice(index, 1);
-        } else {
+        if (oldCanonicalStoryIdsList.indexOf(storyId) === -1) {
           return false;
         }
+        newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
+        var index = newCanonicalStoryIdsList.indexOf(storyId);
+        newCanonicalStoryIdsList.splice(index, 1);
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_CANONICAL_STORY_IDS, newCanonicalStoryIdsList,
           oldCanonicalStoryIdsList,
