@@ -39,8 +39,6 @@ oppia.controller('StateResponses', [
     var _initializeTrainingData = function() {
       var explorationId = ExplorationContextService.getExplorationId();
       var currentStateName = EditorStateService.getActiveStateName();
-      TrainingDataService.initializeTrainingData(
-        explorationId, currentStateName);
     };
 
     $scope.suppressDefaultAnswerGroupWarnings = function() {
@@ -226,14 +224,7 @@ oppia.controller('StateResponses', [
       if (newInteractionId &&
           !INTERACTION_SPECS[newInteractionId].is_linear &&
           !INTERACTION_SPECS[newInteractionId].is_terminal) {
-        // Open the training interface if the interaction is trainable,
-        // otherwise open the answer group modal.
-        if (GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS &&
-            $scope.isCurrentInteractionTrainable()) {
-          $scope.openTeachOppiaModal();
-        } else {
-          $scope.openAddAnswerGroupModal();
-        }
+        $scope.openAddAnswerGroupModal();
       }
     });
 
@@ -264,52 +255,97 @@ oppia.controller('StateResponses', [
           'ExplorationContextService', 'EditorStateService',
           'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'EXPLICIT_CLASSIFICATION',
+          'UrlInterpolationService', 'TRAINING_DATA_CLASSIFICATION',
+          'AngularNameService', 'DEFAULT_OUTCOME_CLASSIFICATION',
           function(
-              $scope, $injector, $uibModalInstance, $http
+              $scope, $injector, $uibModalInstance, $http,
               ExplorationHtmlFormatterService, TrainingModalService,
               stateInteractionIdService, stateCustomizationArgsService,
               ExplorationContextService, EditorStateService,
               ExplorationStatesService, TrainingDataService,
-              AnswerClassificationService, EXPLICIT_CLASSIFICATION) {
+              AnswerClassificationService, EXPLICIT_CLASSIFICATION,
+              UrlInterpolationService, TRAINING_DATA_CLASSIFICATION,
+              AngularNameService, DEFAULT_OUTCOME_CLASSIFICATION) {
             var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
             var _state = ExplorationStatesService.getState(_stateName);
+            var interactionId = stateInteractionIdService.savedMemento;
 
-            var _get_unresolved_answers = function(expId, stateName) {
+            var rulesServiceName = (
+              AngularNameService.getNameOfInteractionRulesService(
+                interactionId));
 
+            // Inject RulesService dynamically.
+            var rulesService = $injector.get(rulesServiceName);
+
+            var fetchAndShowUnresolvedAnswers = function(expId, stateName) {
+              var unresolvedAnswersUrl = UrlInterpolationService.interpolateUrl(
+                '/createhandler/get_top_unresolved_answers/<exploration_id>', {
+                  exploration_id: expId
+                });
+              $http.get(unresolvedAnswersUrl, {
+                params: {
+                  state_name: _stateName
+                }
+              }).success(function(response) {
+                $scope.showUnresolvedAnswers(response.unresolved_answers);
+              }).error(function(response) {
+                $scope.showUnresolvedAnswers([]);
+              });
             };
 
-            $scope.unresolvedAnswersFromBackend = _get_unresolved_answers(
-              _explorationId, _stateName);
-            $scope.unresolvedAnswers = [];
-            $scope.unresolvedAnswersFromBackend.forEach(function(item) {
-              answer = item.answer;
-              answerTemplate = (
-                ExplorationHtmlFormatterService.getAnswerHtml(
-                  answer, stateInteractionIdService.savedMemento,
-                  stateCustomizationArgsService.savedMemento));
-              classificationResult = (
-                AnswerClassificationService.getMatchingClassificationResult(
-                  _explorationId, _stateName, _state, answer, rulesService));
-              feedbackHtml = classificationResult.outcome.feedback.getHtml()
-              $scope.unresolvedAnswers.push({
-                answer: answer,
-                answerTemplate: answerTemplate,
-                classificationResult: classificationResult,
-                feedbackHtml: feedbackHtml
+            $scope.showUnresolvedAnswers = function(unresolvedAnswers) {
+              $scope.showLoadingDots = false;
+              $scope.unresolvedAnswers = [];
+
+              unresolvedAnswers.forEach(function(item) {
+                var answer = item.answer;
+                var answerTemplate = (
+                  ExplorationHtmlFormatterService.getAnswerHtml(
+                    answer, stateInteractionIdService.savedMemento,
+                    stateCustomizationArgsService.savedMemento));
+                var classificationResult = (
+                  AnswerClassificationService.getMatchingClassificationResult(
+                    _explorationId, _stateName, _state, answer, rulesService));
+                var feedbackHtml = (
+                  classificationResult.outcome.feedback.getHtml());
+                var classificationType = (
+                  classificationResult.classificationCategorization);
+                if (classificationType !== EXPLICIT_CLASSIFICATION &&
+                  classificationType !== TRAINING_DATA_CLASSIFICATION &&
+                  !TrainingDataService.isConfirmedUnclassifiedAnswer(answer)) {
+                  $scope.unresolvedAnswers.push({
+                    answer: answer,
+                    answerTemplate: answerTemplate,
+                    classificationResult: classificationResult,
+                    feedbackHtml: feedbackHtml
+                  });
+                }
               });
-            });
+            };
 
             $scope.confirmToTrainingData = function(answerIndex) {
               answer = $scope.unresolvedAnswers[answerIndex];
+              $scope.unresolvedAnswers.splice(answerIndex, 1);
+              if (answer.classificationResult.classificationCategorization ===
+                  DEFAULT_OUTCOME_CLASSIFICATION) {
+                TrainingDataService.trainDefaultResponse(answer.answer);
+                return;
+              }
+
               TrainingDataService.trainAnswerGroup(
                 answer.classificationResult.answerGroupIndex, answer.answer);
             };
 
+            $scope.finishTrainingAnswer = function() {
+              $scope.unresolvedAnswers.splice($scope.selectedAnswerIndex, 1);
+            };
+
             $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
-              answer = $scope.unresolvedAnswers[answerIndex].answer.
+              $scope.selectedAnswerIndex = answerIndex;
+              answer = $scope.unresolvedAnswers[answerIndex].answer;
               return TrainingModalService.openTrainUnresolvedAnswerModal(
-                answer, true);
+                answer, true, $scope.finishTrainingAnswer);
             };
 
             $scope.finishTeaching = function(reopen) {
@@ -317,6 +353,9 @@ oppia.controller('StateResponses', [
                 reopen: reopen
               });
             };
+
+            $scope.showLoadingDots = true;
+            fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
           }]
       }).result.then(function(result) {
         // Check if the modal should be reopened right away.

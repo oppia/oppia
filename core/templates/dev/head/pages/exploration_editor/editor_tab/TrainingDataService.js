@@ -22,8 +22,6 @@ oppia.factory('TrainingDataService', [
   '$rootScope', '$http', 'ResponsesService', 'RuleObjectFactory',
   function(
       $rootScope, $http, ResponsesService, RuleObjectFactory) {
-    var _trainingDataAnswers = [];
-
     var _getIndexOfTrainingData = function(answer, trainingData) {
       var index = -1;
       for (var i = 0; i < trainingData.length; i++) {
@@ -81,72 +79,65 @@ oppia.factory('TrainingDataService', [
         ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
       }
-
-      var index = _removeAnswerFromTrainingData(answer, _trainingDataAnswers);
-      if (index !== -1) {
-        _trainingDataFrequencies.splice(index, 1);
-        $rootScope.$broadcast('updatedTrainingData');
-      }
     };
 
     return {
-      initializeTrainingData: function(explorationId, stateName) {
-        var answerGroups = ResponsesService.getAnswerGroups();
-        for (var i = 0; i < answerGroups.length; i++) {
-          _trainingDataAnswers.push(answerGroups[i].training_data);
-        }
-      },
-
       getTrainingDataAnswers: function() {
-        return _trainingDataAnswers;
+        var trainingDataAnswers = [];
+        var answerGroups = ResponsesService.getAnswerGroups();
+
+        // Remove the answer from all answer groups.
+        for (var i = 0; i < answerGroups.length; i++) {
+          var answerGroup = answerGroups[i];
+          trainingDataAnswers.push(answerGroup.trainingData)
+        }
+        return trainingDataAnswers;
       },
 
-      getAllPotentialOutcomes: function(state) {
-        var potentialOutcomes = [];
-        var interaction = state.interaction;
-
-        for (var i = 0; i < interaction.answerGroups.length; i++) {
-          potentialOutcomes.push(interaction.answerGroups[i].outcome);
-        }
-
-        if (interaction.defaultOutcome) {
-          var outcome = interaction.defaultOutcome;
-          potentialOutcomes.push(interaction.defaultOutcome);
-        }
-
-        return potentialOutcomes;
+      getTrainingDataOfAnswerGroup: function(answerGroupIndex) {
+        return ResponsesService.getAnswerGroup(answerGroupIndex).trainingData;
       },
 
       trainAnswerGroup: function(answerGroupIndex, answer) {
-        _removeAnswer(answer);        
+        // Remove answer from traning data of any answer group or
+        // confirmed unclassified answers.
+        _removeAnswer(answer);
 
         var answerGroup = ResponsesService.getAnswerGroup(answerGroupIndex);
         var trainingData = answerGroup.trainingData;
 
-        // Train the rule to include this answer, but only if it's not already
-        // in the training data.
-        if (_getIndexOfTrainingData(answer, trainingData) === -1) {
-          trainingData.push(answer);
-        }
-
+        // Train the rule to include this answer.
+        trainingData.push(answer);
         ResponsesService.updateAnswerGroup(answerGroupIndex, {
           trainingData: trainingData
         });
       },
 
       trainDefaultResponse: function(answer) {
+        // Remove answer from traning data of any answer group or
+        // confirmed unclassified answers.
         _removeAnswer(answer);
 
         var confirmedUnclassifiedAnswers = (
           ResponsesService.getConfirmedUnclassifiedAnswers());
-
-        if (_getIndexOfTrainingData(
-          answer, confirmedUnclassifiedAnswers) === -1) {
-          confirmedUnclassifiedAnswers.push(answer);
-        }
-
+        confirmedUnclassifiedAnswers.push(answer);
         ResponsesService.updateConfirmedUnclassifiedAnswers(
           confirmedUnclassifiedAnswers);
+      },
+
+      isConfirmedUnclassifiedAnswer: function(answer) {
+        return (_getIndexOfTrainingData(
+          answer, ResponsesService.getConfirmedUnclassifiedAnswers()) !== -1);
+      },
+
+      removeAnswerFromAnswerGroupTrainingData: function(
+          answer, answerGroupIndex) {
+        var trainingData = ResponsesService.getAnswerGroup(
+          answerGroupIndex).trainingData;
+        _removeAnswerFromTrainingData(answer, trainingData);
+        ResponsesService.updateAnswerGroup(answerGroupIndex, {
+          trainingData: trainingData
+        });
       }
     };
   }

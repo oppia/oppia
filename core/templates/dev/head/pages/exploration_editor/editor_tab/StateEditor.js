@@ -118,7 +118,6 @@ oppia.directive('trainingPanel', [
             TrainingDataService, ResponsesService, stateInteractionIdService,
             stateCustomizationArgsService, AnswerGroupObjectFactory,
             OutcomeObjectFactory) {
-          $scope.changingAnswerGroupIndex = false;
           $scope.addingNewResponse = false;
 
           var _stateName = EditorStateService.getActiveStateName();
@@ -140,10 +139,6 @@ oppia.directive('trainingPanel', [
             return EditorStateService.getActiveStateName();
           };
 
-          $scope.beginChangingAnswerGroupIndex = function() {
-            $scope.changingAnswerGroupIndex = true;
-          };
-
           $scope.beginAddingNewResponse = function() {
             $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
               EditorStateService.getActiveStateName(), '', []);
@@ -161,6 +156,7 @@ oppia.directive('trainingPanel', [
 
             $scope.onFinishTraining();
           };
+
           $scope.confirmNewFeedback = function() {
             if ($scope.classification.newOutcome) {
               // Create a new answer group with the given feedback.

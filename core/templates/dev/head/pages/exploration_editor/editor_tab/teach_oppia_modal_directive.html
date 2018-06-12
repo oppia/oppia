@@ -1,31 +1,66 @@
+<style>
+.unresolved-answers-loading-text {
+  font-size: 1.17em;
+  text-align: center;
+}
+
+.unresolved-answer {
+  border: black solid 1px;
+  border-radius: 5px;
+  padding: 1%;
+  margin-top: 1%;
+}
+
+.unresolved-answer-feedback {
+  display: inline-block;
+  color: #00897B;
+}
+
+.unresolved-answer-response {
+  display: inline-block;
+  width: 75%;
+}
+
+.unresolved-answer-btn {
+  display: inline-block;
+  text-align: right;
+}
+</style>
+
 <div class="modal-header">
-  <h3>Enter a Sample Answer</h3>
+  <h3>Unresolved Answer</h3>
 </div>
 
 <div class="modal-body">
-  <div class="oppia-rule-details-header">
-    <div ng-if="unresolvedAnswers.length > 0" style="padding-top: 10px; border-top: 1px solid #e5e5e5;">
-      <div ng-repeat="answer in unresolvedAnswers track by $index">
+  <div class="unresolved-answers-list oppia-rule-details-header">
+    <p class='unresolved-answers-loading-text' ng-show="showLoadingDots">Loading <loading-dots></loading-dots></p>
+    <div ng-show="unresolvedAnswers.length > 0" style="padding-top: 10px; border-top: 1px solid #e5e5e5;">
+      <div class='unresolved-answer' ng-repeat="answer in unresolvedAnswers track by $index">
         <div angular-html-bind="answer.answerTemplate">
         </div>
-        <div>
+        <div class='unresolved-answer-response'>
           <span><strong>Response</strong></span>
           <span class='glyphicon glyphicon-arrow-right'></span>
-          <span angular-html-bind="answer.feedbackHtml"></span>
+          <span class='unresolved-answer-feedback' angular-html-bind="answer.feedbackHtml"></span>
         </div>
-        <div>
-          <button type='button' class='btn btn-default' ng-click="confirmToTrainingData($idnex)">
+        <div class='unresolved-answer-btn'>
+          <button type='button' class='btn btn-success' ng-click="confirmToTrainingData($index)">
             Confirm
           </button>
-          <button type='button' class='btn btn-default' ng-click="openTrainUnresolvedAnswerModal($index)">
+          <button type='button' class='btn btn-warning' ng-click="openTrainUnresolvedAnswerModal($index)">
             Fix
           </button>
         </div>
       </div>
     </div>
-  <div>
+    <div ng-show="unresolvedAnswers.length === 0">
+      <span>Congratulations! You've finished addressing important unresolved answers.</span>
+      <br/>
+      <span>Please visit this page later for more unresolved answers.</span>
+    </div>
+  </div>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-default" ng-click="finishTeaching(false)">Exit</button>
+  <button class="btn btn-success" ng-click="finishTeaching(false)">Exit</button>
 </div>

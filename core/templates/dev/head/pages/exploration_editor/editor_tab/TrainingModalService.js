@@ -14,15 +14,14 @@
 
 /**
  * @fileoverview Service which handles opening and closing
- * the training modal used for both unresolved answers
- * and answers within the training data of a classifier.
+ * the training modal used for both unresolved answers.
  */
 
 oppia.factory('TrainingModalService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
     return {
-      openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
+      openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave, finishTrainingCallback) {
         AlertsService.clearWarnings();
         if (externalSave) {
           $rootScope.$broadcast('externalSave');
@@ -53,6 +52,11 @@ oppia.factory('TrainingModalService', [
               };
 
               $scope.finishTraining = function() {
+                $uibModalInstance.close();
+                finishTrainingCallback();
+              };
+
+              $scope.exitTrainer = function() {
                 $uibModalInstance.close();
               };
 

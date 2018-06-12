@@ -1,14 +1,14 @@
+<style>
+.submit-answer-btn {
+  text-align: right;
+}
+</style>
+
 <div class="form-inline" style="margin-bottom: 20px;">
-  <table class="preview-conversation-skin-card-row-container">
-    <tr class="preview-conversation-skin-card-row">
-      <td class="preview-conversation-skin-row-avatar" valign="top">
-        <img class="preview-conversation-skin-row-avatar-img" ng-src="<[userBlackImgUrl]>">
-      </td>
-      <td class="preview-conversation-skin-oppia-content">
-        <div angular-html-bind="stateContent()"></div>
-      </td>
-    </tr>
-  </table>
+  <div>
+    <h3> Enter a sample answer </h3>
+  </div>
+  <br>
   <div ng-if="interactionIsInline">
     <div class="preview-conversation-skin-inline-interaction">
       <table class="preview-conversation-skin-card-row-container" style="margin-bottom: 0;">
@@ -29,5 +29,9 @@
         </div>
       </md-card>
     </div>
+  </div>
+  <br>
+  <div class='submit-answer-btn'>
+    <button class="btn btn-success" ng-click="submitAnswerFromButton()">Submit</button>
   </div>
 </div>

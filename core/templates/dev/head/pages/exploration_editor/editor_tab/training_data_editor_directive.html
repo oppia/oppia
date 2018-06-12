@@ -1,0 +1,83 @@
+<style>
+.training-data-answer {
+  border: black solid 1px;
+  border-radius: 5px;
+  padding: 1%;
+  margin-top: 1%;
+}
+
+.training-data-answer-html {
+  width: 95%;
+  display: inline-block;
+}
+</style>
+<div class="modal-header">
+  <h3>Training Data</h3>
+</div>
+
+<div class="modal-body">
+  <ul class="nav nav-tabs">
+    <li class='active'><a data-toggle="tab" href="#trainingData">Training Data</a></li>
+    <li><a data-toggle="tab" href="#addNewAnswer">Add New Answer</a></li>
+  </ul>
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="trainingData">
+      <div ng-show="trainingData.length > 0">
+        <div ng-repeat="answer in trainingData track by $index" class='training-data-answer'>
+          <div class='training-data-answer-html' angular-html-bind="answer.answerTemplate"></div>
+          <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response" ng-click="removeAnswerFromTrainingData($index)">
+            <i class="material-icons md-18"></i>
+          </span>
+        </div>
+      </div>
+      <div ng-show="trainingData.length === 0">
+        Try adding answers to training data to see them here.
+      </div>
+    </div>
+    <div role='tabpanel' class='tab-pane' id='addNewAnswer'>
+      <test-interaction-panel state-content="stateContent" input-template="inputTemplate" on-submit-answer="submitAnswer(answer)">
+      </test-interaction-panel>
+      <div ng-show="newAnswerIsResolved">
+        <div>
+          <span><strong>If Oppia encounters the answer:</strong></span>
+        </div>
+
+        <div>
+          <div angular-html-bind="newAnswerTemplate">
+          </div>
+        </div>
+
+        <br>
+
+        <div>
+          <span><strong>it will reply with:</strong></span>
+        </div>
+
+        <div>
+          <div angular-html-bind="newAnswerFeedbackHtml">
+          </div>
+        </div>
+
+        <br>
+
+        <div>
+          <span><strong>and then direct the learner to: </strong></span>
+          <span angular-html-bind="newAnswerOutcomeDest"></span>
+        </div>
+
+        <br>
+
+        <div>
+          <span><strong>This is due to a specific rule and therefore cannot be trained. If you do not think this is right, you should change the rule directly referring to this answer.</strong></span>
+        </div>
+      </div>
+      <div ng-show='answerSuccessfullyAdded'>
+        <span><strong>The answer is successfully added to training data.</strong></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-success" ng-click="exit()">Exit</button>
+</div>

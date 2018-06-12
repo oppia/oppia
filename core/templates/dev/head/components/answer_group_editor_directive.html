@@ -81,6 +81,13 @@
     <button type="button" ng-if="isEditable" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="addNewRule()">
       + Add Another Possible Answer
     </button>
+
+    <div ng-if="isInteractionTrainable">
+      <br>
+      <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="openTrainingDataEditor()">
+        <i class="glyphicon glyphicon-align-justify"></i> Modify Training Data
+      </button>
+    </div>
   </div>
 
   <br ng-if="rules">

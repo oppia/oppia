@@ -421,8 +421,10 @@ oppia.directive('testInteractionPanel', [
       controller: [
         '$scope', 'EditorStateService', 'ExplorationStatesService',
         'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
         function($scope, EditorStateService, ExplorationStatesService,
-            INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
+            INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           var _stateName = EditorStateService.getActiveStateName();
           var _state = ExplorationStatesService.getState(_stateName);
           $scope.interactionIsInline = (
@@ -432,6 +434,10 @@ oppia.directive('testInteractionPanel', [
             $scope.onSubmitAnswer({
               answer: answer
             });
+          };
+
+          $scope.submitAnswerFromButton = function() {
+            $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
           };
         }
       ]
