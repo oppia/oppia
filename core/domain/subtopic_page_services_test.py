@@ -66,24 +66,6 @@ class SubtopicPageServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, self.subtopic_id)
         self.assertEqual(subtopic_page.to_dict(), self.subtopic_page.to_dict())
 
-    def test_get_all_subtopic_pages_in_topic(self):
-        subtopic_page = (
-            subtopic_page_domain.SubtopicPage.create_default_subtopic_page(
-                4, self.TOPIC_ID))
-        subtopic_page_services.save_subtopic_page(
-            self.user_id, subtopic_page, 'Added subtopic',
-            [topic_domain.TopicChange({
-                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
-                'subtopic_id': 4,
-                'title': 'Sample'
-            })]
-        )
-        subtopic_pages = subtopic_page_services.get_all_subtopic_pages_in_topic(
-            self.TOPIC_ID)
-        self.assertEqual(len(subtopic_pages), 2)
-        self.assertEqual(subtopic_pages[0].id, self.TOPIC_ID + '-1')
-        self.assertEqual(subtopic_pages[1].id, self.TOPIC_ID + '-4')
-
     def test_commit_log_entry(self):
         subtopic_page_commit_log_entry = (
             topic_models.SubtopicPageCommitLogEntryModel.get_commit(

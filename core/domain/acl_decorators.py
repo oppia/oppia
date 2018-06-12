@@ -837,11 +837,7 @@ def can_edit_subtopic_page(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        topic_rights = topic_services.get_topic_rights(topic_id)
-        if topic_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
-        if topic_services.check_can_edit_subtopic_page(self.user, topic_rights):
+        if topic_services.check_can_edit_subtopic_page(self.user):
             return handler(self, topic_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(

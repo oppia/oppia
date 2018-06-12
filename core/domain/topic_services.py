@@ -263,31 +263,37 @@ def apply_change_list(topic_id, change_list):
         Exception. The incoming changelist had simultaneuous creation and
             deletion of subtopics.
     Returns:
-        dict, list(int), list(int). A dict with two fields: topic and
-            modified_subtopic_pages containing the updated domain objects of
-            each one, a list of ids of the deleted subtopics and a list of ids
-            of the newly created subtopics.
+        Topic, dict, list(int), list(int). The modified topic
+            object, the modified subtopic pages dict keyed by subtopic page id
+            containing the updated domain objects of each subtopic page, a list
+            of ids of the deleted subtopics and a list of ids of the newly
+            created subtopics.
     """
     topic = get_topic_by_id(topic_id)
     newly_created_subtopic_ids = []
     existing_subtopic_page_ids_to_be_modified = []
     deleted_subtopic_ids = []
-    modified_subtopic_pages = []
-    return_dict = {}
+    modified_subtopic_pages_list = []
+    modified_subtopic_pages = {}
 
     for change in change_list:
         if (change.cmd ==
                 subtopic_page_domain.CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY):
             if change.id < topic.next_subtopic_id:
                 existing_subtopic_page_ids_to_be_modified.append(change.id)
-    modified_subtopic_pages = (
+    modified_subtopic_pages_list = (
         subtopic_page_services.get_subtopic_pages_with_ids(
             topic_id, existing_subtopic_page_ids_to_be_modified))
+    for subtopic_page in modified_subtopic_pages_list:
+        modified_subtopic_pages[subtopic_page.id] = subtopic_page
     try:
         for change in change_list:
             if change.cmd == topic_domain.CMD_ADD_SUBTOPIC:
                 topic.add_subtopic(change.subtopic_id, change.title)
-                modified_subtopic_pages.append(
+                subtopic_page_id = (
+                    subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
+                        topic_id, change.subtopic_id))
+                modified_subtopic_pages[subtopic_page_id] = (
                     subtopic_page_domain.SubtopicPage.create_default_subtopic_page( #pylint: disable=line-too-long
                         change.subtopic_id, topic_id)
                 )
@@ -296,7 +302,7 @@ def apply_change_list(topic_id, change_list):
                 topic.delete_subtopic(change.id)
                 if change.id in newly_created_subtopic_ids:
                     raise Exception(
-                        'The incoming changelist had simultaneuous'
+                        'The incoming changelist had simultaneous'
                         ' creation and deletion of subtopics.')
                 deleted_subtopic_ids.append(change.id)
             elif change.cmd == topic_domain.CMD_ADD_UNCATEGORIZED_SKILL_ID:
@@ -336,17 +342,14 @@ def apply_change_list(topic_id, change_list):
                 subtopic_page_id = (
                     subtopic_page_domain.SubtopicPage.get_subtopic_page_id(
                         topic_id, change.id))
-                index = next(
-                    (index for index, subtopic_page in enumerate(
-                        modified_subtopic_pages)
-                     if subtopic_page.id == subtopic_page_id), None)
-                if (index is None) or (change.id in deleted_subtopic_ids):
+                if ((modified_subtopic_pages[subtopic_page_id] is None) or
+                        (change.id in deleted_subtopic_ids)):
                     raise Exception(
                         'The subtopic with id %s doesn\'t exist' % change.id)
 
                 if (change.property_name ==
                         subtopic_page_domain.SUBTOPIC_PAGE_PROPERTY_HTML_DATA):
-                    modified_subtopic_pages[index].update_html_data(
+                    modified_subtopic_pages[subtopic_page_id].update_html_data(
                         change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
@@ -358,10 +361,9 @@ def apply_change_list(topic_id, change_list):
                     raise Exception('Invalid change dict.')
             else:
                 raise Exception('Invalid change dict.')
-        return_dict['topic'] = topic
-        return_dict['modified_subtopic_pages'] = modified_subtopic_pages
         return (
-            return_dict, deleted_subtopic_ids, newly_created_subtopic_ids)
+            topic, modified_subtopic_pages, deleted_subtopic_ids,
+            newly_created_subtopic_ids)
 
     except Exception as e:
         logging.error(
@@ -444,17 +446,13 @@ def update_topic_and_subtopic_pages(
             'Expected a commit message, received none.')
 
     (
-        updated_topic_and_subtopic_pages_dict,
+        updated_topic, updated_subtopic_pages_dict,
         deleted_subtopic_ids, newly_created_subtopic_ids
     ) = apply_change_list(topic_id, change_list)
 
     _save_topic(
-        committer_id, updated_topic_and_subtopic_pages_dict['topic'],
-        commit_message, change_list
+        committer_id, updated_topic, commit_message, change_list
     )
-    modified_subtopic_pages = updated_topic_and_subtopic_pages_dict[
-        'modified_subtopic_pages']
-
     # The following loop deletes those subtopic pages that are already in the
     # datastore, which are supposed to be deleted in the current changelist.
     for subtopic_id in deleted_subtopic_ids:
@@ -462,7 +460,8 @@ def update_topic_and_subtopic_pages(
             subtopic_page_services.delete_subtopic_page(
                 committer_id, topic_id, subtopic_id)
 
-    for subtopic_page in modified_subtopic_pages:
+    for subtopic_page_id in updated_subtopic_pages_dict:
+        subtopic_page = updated_subtopic_pages_dict[subtopic_page_id]
         subtopic_id = subtopic_page.get_subtopic_id_from_subtopic_page_id()
         # The following condition prevents the creation of subtopic pages that
         # were deleted above.
@@ -764,20 +763,16 @@ def check_can_edit_topic(user, topic_rights):
     return False
 
 
-def check_can_edit_subtopic_page(user, topic_rights):
+def check_can_edit_subtopic_page(user):
     """Checks whether the user can edit the subtopic pages for a topic.
 
     Args:
         user: UserActionsInfo. Object having user_id, role and actions for
             given user.
-        topic_rights: TopicRights or None. Rights object of the topic, the
-            subtopic page is a part of.
 
     Returns:
-        bool. Whether the given user can edit the given subtopic page.
+        bool. Whether the given user can edit a subtopic page.
     """
-    if topic_rights is None:
-        return False
     if role_services.ACTION_EDIT_ANY_SUBTOPIC_PAGE in user.actions:
         return True
 

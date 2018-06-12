@@ -91,29 +91,6 @@ def get_subtopic_pages_with_ids(topic_id, subtopic_ids):
     return subtopic_pages
 
 
-def get_all_subtopic_pages_in_topic(topic_id, include_deleted=False):
-    """Returns all subtopic pages linked to a topic.
-
-    Args:
-        topic_id: str. The id of the topic to which the subtopic pages are
-            linked.
-        include_deleted: bool. Whether to include the subtopic pages that
-            were not strictly deleted.
-
-    Returns:
-        list(SubtopicPage). The list of subtopic pages linked to the given topic
-            id.
-    """
-    subtopic_page_models = topic_models.SubtopicPageModel.query().filter(
-        topic_models.SubtopicPageModel.topic_id == topic_id,
-        topic_models.SubtopicPageModel.deleted == include_deleted)
-    subtopic_pages = [
-        get_subtopic_page_from_model(subtopic_page_model)
-        for subtopic_page_model in subtopic_page_models
-    ]
-    return subtopic_pages
-
-
 def save_subtopic_page(
         committer_id, subtopic_page, commit_message, change_list):
     """Validates a subtopic page and commits it to persistent storage. If

@@ -180,6 +180,26 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             self.TOPIC_ID, 3, strict=False)
         self.assertIsNone(subtopic_page)
 
+        # Test exception raised for simultaneous adding and removing of
+        # subtopics.
+        changelist = [
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+                'title': 'Title2',
+                'subtopic_id': 2
+            }),
+            topic_domain.TopicChange({
+                'cmd': topic_domain.CMD_DELETE_SUBTOPIC,
+                'subtopic_id': 2
+            })
+        ]
+        with self.assertRaisesRegexp(
+            Exception, 'The incoming changelist had simultaneous'
+            ' creation and deletion of subtopics.'):
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id_admin, self.TOPIC_ID, changelist,
+                'Added and deleted a subtopic.')
+
         # Test whether a subtopic page already existing in datastore can be
         # edited.
         changelist = [subtopic_page_domain.SubtopicPageChange({
@@ -282,12 +302,15 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic.subtopics[0].title, 'Title2')
         self.assertEqual(topic.subtopics[0].skill_ids, [self.skill_id_1])
 
-        subtopic_pages = subtopic_page_services.get_all_subtopic_pages_in_topic(
-            self.TOPIC_ID)
-        for page in subtopic_pages:
-            print page.to_dict()
-        self.assertEqual(len(subtopic_pages), 1)
-        self.assertEqual(subtopic_pages[0].id, self.TOPIC_ID + '-2')
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 3, strict=False)
+        self.assertIsNone(subtopic_page)
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 4, strict=False)
+        self.assertIsNone(subtopic_page)
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            self.TOPIC_ID, 2, strict=False)
+        self.assertIsNotNone(subtopic_page)
 
 
     def test_add_uncategorized_skill(self):
@@ -361,9 +384,9 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             topic_services.get_topic_by_id(self.TOPIC_ID, strict=False))
         self.assertIsNone(
             topic_services.get_topic_summary_by_id(self.TOPIC_ID, strict=False))
-        self.assertEqual(
-            subtopic_page_services.get_all_subtopic_pages_in_topic(
-                self.TOPIC_ID), [])
+        self.assertIsNone(
+            subtopic_page_services.get_subtopic_page_by_id(
+                self.TOPIC_ID, 1, strict=False))
 
     def test_delete_subtopic_with_skill_ids(self):
         changelist = [topic_domain.TopicChange({

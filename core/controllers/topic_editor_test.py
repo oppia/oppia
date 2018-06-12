@@ -93,6 +93,20 @@ class SubtopicPageEditorTest(BaseTopicEditorControllerTest):
             self.assertEqual(response.status_int, 401)
             self.logout()
 
+            # Check that topic managers not assigned to this topic can
+            # access its subtopic pages.
+            self.login(self.TOPIC_MANAGER_EMAIL)
+            json_response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1))
+            self.assertEqual('', json_response['subtopic_page']['html_data'])
+            self.logout()
+
+            topic_services.assign_role(
+                self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
+                self.topic_id)
+
             # Check that topic managers can access the subtopic page.
             self.login(self.TOPIC_MANAGER_EMAIL)
             json_response = self.get_json(
