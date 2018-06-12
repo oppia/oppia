@@ -58,9 +58,6 @@ oppia.factory('StateTopAnswersStatsService', [
         stateTopAnswersStatsCache[stateName].allAnswers;
       var unresolvedAnswersCacheEntry =
         stateTopAnswersStatsCache[stateName].unresolvedAnswers;
-      if (!allAnswersCacheEntry || !unresolvedAnswersCacheEntry) {
-        return;
-      }
 
       // Clear the unresolved answers array since many answers may now have
       // different "addressed" values.
@@ -68,7 +65,6 @@ oppia.factory('StateTopAnswersStatsService', [
 
       // Update the isAddressed data of each answer and put any unaddressed
       // answers into the unresolvedAnswers array.
-      console.log(typeof allAnswersCacheEntry);
       allAnswersCacheEntry.forEach(function(answerStats) {
         answerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
