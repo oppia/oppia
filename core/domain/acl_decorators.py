@@ -627,7 +627,7 @@ def can_suggest_changes_to_exploration(handler):
             bool. Whether the user can make suggestions to an
                 exploration.
         """
-        if (role_services.ACTION_SUGGEST_CHANGES in self.user.actions):
+        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -636,6 +636,7 @@ def can_suggest_changes_to_exploration(handler):
     test_can_suggest.__wrapped__ = True
 
     return test_can_suggest
+
 
 def can_suggest_changes(handler):
     """Decorator to check whether a user can make suggestions."""
@@ -657,6 +658,7 @@ def can_suggest_changes(handler):
     test_can_suggest.__wrapped__ = True
 
     return test_can_suggest
+
 
 def can_publish_exploration(handler):
     """Decorator to check whether user can publish exploration."""
@@ -1083,7 +1085,7 @@ def can_accept_suggestion(handler):
             exploration_rights = rights_manager.get_exploration_rights(
                 exploration_id)
             if rights_manager.check_can_edit_activity(
-                self.user, exploration_rights):
+                    self.user, exploration_rights):
                 return handler(self, suggestion_id, **kwargs)
             else:
                 raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -1092,4 +1094,3 @@ def can_accept_suggestion(handler):
     test_can_accept.__wrapped__ = True
 
     return test_can_accept
-

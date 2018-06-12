@@ -162,7 +162,7 @@ for path, handler_class in mapreduce_main.create_handlers_map():
 # Tell map/reduce internals that this is now the base path to use.
 mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 
-if constants.USE_NEW_SUGGESTION_FRAMEWORK == True:
+if constants.USE_NEW_SUGGESTION_FRAMEWORK:
     suggestionHandlerRoute = get_redirect_route(
         r'%s/' % feconf.SUGGESTION_URL_PREFIX,
         suggestion.SuggestionHandler)

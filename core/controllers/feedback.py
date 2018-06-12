@@ -14,13 +14,13 @@
 
 """Controllers for the feedback thread page."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import suggestion_services
 from core.platform import models
-from constants import constants
 import feconf
 
 transaction_services = models.Registry.import_transaction_services()

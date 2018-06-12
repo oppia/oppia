@@ -74,7 +74,7 @@ class SuggestionListHandler(base.BaseHandler):
     LIST_TYPE_ID = 'id'
     LIST_TYPE_REVIEWER = 'reviewer'
     LIST_TYPE_STATUS = 'status'
-    LIST_TYPE_SUGGESTION_TYPE= 'type'
+    LIST_TYPE_SUGGESTION_TYPE = 'type'
     LIST_TYPE_TARGET_ID = 'target'
 
     @acl_decorators.open_access

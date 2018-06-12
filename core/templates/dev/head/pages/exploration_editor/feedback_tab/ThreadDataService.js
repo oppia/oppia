@@ -34,8 +34,8 @@ oppia.factory('ThreadDataService', [
     var _THREAD_STATUS_OPEN = 'open';
 
     if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-      _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler'
-      _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/'
+      _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
+      _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/';
     }
 
     // All the threads for this exploration. This is a list whose entries are
@@ -71,7 +71,7 @@ oppia.factory('ThreadDataService', [
 
       $q.all([fPromise, sPromise]).then(function(res) {
         _data.feedbackThreads = res[0].data.threads;
-        _data.suggestionThreads = []
+        _data.suggestionThreads = [];
         if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
           for (var i = 0; i < res[1].data.suggestions.length; i++) {
             suggestion = res[1].data.suggestions[i];
@@ -84,9 +84,9 @@ oppia.factory('ThreadDataService', [
               if (_data.suggestionThreads[i].thread_id ===
                 _data.feedbackThreads[j].thread_id) {
                 _data.suggestionThreads[i].subject = (
-                  _data.feedbackThreads[j].subject)
+                  _data.feedbackThreads[j].subject);
                 _data.suggestionThreads[i].description = (
-                  _data.feedbackThreads[j].description)
+                  _data.feedbackThreads[j].description);
                 _data.feedbackThreads.splice(j, 1);
                 // As only one feedback thread can link to one suggestion thread
                 // We can stop the inner loop when we find a match and move on
@@ -95,8 +95,7 @@ oppia.factory('ThreadDataService', [
               }
             }
           }
-        }
-        else {
+        } else {
           _data.suggestionThreads = res[1].data.threads;
         }
         if (successCallback) {
@@ -223,11 +222,12 @@ oppia.factory('ThreadDataService', [
           // feedback threads are migrated and threadId matches suggestionId.
           suggestionId = 'exploration.' + threadId;
           payload.review_message = 'Reviewed';
-          if (action == ACTION_ACCEPT_SUGGESTION) {
+          if (action === ACTION_ACCEPT_SUGGESTION) {
             payload.commit_message = commitMsg;
           }
           _openThreadsCount -= 1;
-          $http.put(_SUGGESTION_ACTION_HANDLER_URL + suggestionId, payload).then(
+          $http.put(
+            _SUGGESTION_ACTION_HANDLER_URL + suggestionId, payload).then(
             onSuccess, function() {
               _openThreadsCount += 1;
               if (onFailure) {

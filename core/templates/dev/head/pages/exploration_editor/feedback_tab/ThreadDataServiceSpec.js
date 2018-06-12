@@ -102,7 +102,7 @@ describe('retrieving threads service', function() {
         target_type: 'exploration',
         target_version_at_submission: 1
       }
-    ]
+    ];
 
     httpBackend.whenGET('/threadlisthandler/' + expId).respond({
       threads: mockFeedbackThreads
@@ -115,7 +115,7 @@ describe('retrieving threads service', function() {
         threads: mockGeneralSuggestionThreads
       });
     } else {
-       httpBackend.whenGET(
+      httpBackend.whenGET(
         '/suggestionlisthandler/' + expId + '?has_suggestion=true&list_type=all'
       ).respond({
         threads: mockOpenSuggestionThreads

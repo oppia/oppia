@@ -17,7 +17,6 @@
 """Tests for suggestion controllers."""
 
 from constants import constants
-from core.controllers import suggestion
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -25,11 +24,10 @@ from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
-import main
-
 
 (suggestion_models, feedback_models) = models.Registry.import_models([
     models.NAMES.suggestion, models.NAMES.feedback])
+
 
 class SuggestionUnitTests(test_utils.GenericTestBase):
 
@@ -199,14 +197,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     self.author_id))['suggestions'][0]
 
             response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            self.csrf_token = self.get_csrf_token_from_response(response)
+            csrf_token = self.get_csrf_token_from_response(response)
             self.put_json('%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX,
-                suggestion_to_accept['suggestion_id']),{
-                'action': u'accept',
-                'commit_message': u'commit message',
-                'review_message': u'Accepted'
-            }, csrf_token)
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token)
             suggestion_post_accept = self.get_json(
                 '%s?list_type=id&suggestion_id=%s' % (
                     feconf.SUGGESTION_LIST_URL_PREFIX,

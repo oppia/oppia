@@ -79,7 +79,7 @@ def create_suggestion(
     if suggestion_type == suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
-            suggestion_models.SCORE_CATEGORY_DELIMITER +  exploration.category)
+            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,

@@ -1173,14 +1173,13 @@ class SuggestChangesTest(test_utils.GenericTestBase):
     def test_banned_user_cannot_suggest_changes(self):
         self.login(self.banned_user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json(
-                '/mock', expect_errors=True, expected_status_int=401)
+            self.get_json('/mock', expect_errors=True, expected_status_int=401)
         self.logout()
 
     def test_normal_user_can_suggest_changes(self):
         self.login(self.user_email)
         with self.swap(self, 'testapp', self.mock_testapp):
-            response = self.get_json('/mock', expected_status_int=200)
+            self.get_json('/mock', expected_status_int=200)
         self.logout()
 
 
