@@ -47,7 +47,7 @@ describe('Answer classification service with string classifier disabled',
       stateName = 'stateName';
       state = sof.createFromBackendDict(stateName, {
         content: {
-          contnet_id: 'content',
+          content_id: 'content',
           html: 'content'
         },
         content_ids_to_audio_translations: {

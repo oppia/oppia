@@ -79,7 +79,7 @@ describe('State content editor directive', function() {
             outcome: {
               dest: 'unused',
               feedback: {
-                contnet_id: 'feedback_1',
+                content_id: 'feedback_1',
                 html: ''
               },
               labelled_as_correct: false,
@@ -90,7 +90,7 @@ describe('State content editor directive', function() {
           default_outcome: {
             dest: 'default',
             feedback: {
-              contnet_id: 'default_outcome',
+              content_id: 'default_outcome',
               html: ''
             },
             labelled_as_correct: false,
@@ -118,7 +118,7 @@ describe('State content editor directive', function() {
             outcome: {
               dest: 'unused',
               feedback: {
-                contnet_id: 'feedback_1',
+                content_id: 'feedback_1',
                 html: ''
               },
               labelled_as_correct: false,
@@ -129,7 +129,7 @@ describe('State content editor directive', function() {
           default_outcome: {
             dest: 'default',
             feedback: {
-              contnet_id: 'default_outcome',
+              content_id: 'default_outcome',
               html: ''
             },
             labelled_as_correct: false,
@@ -157,7 +157,7 @@ describe('State content editor directive', function() {
             outcome: {
               dest: 'unused',
               feedback: {
-                contnet_id: 'feedback_1',
+                content_id: 'feedback_1',
                 html: ''
               },
               labelled_as_correct: false,
@@ -168,7 +168,7 @@ describe('State content editor directive', function() {
           default_outcome: {
             dest: 'default',
             feedback: {
-              contnet_id: 'default_outcome',
+              content_id: 'default_outcome',
               html: ''
             },
             labelled_as_correct: false,

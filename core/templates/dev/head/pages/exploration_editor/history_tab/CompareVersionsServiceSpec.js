@@ -58,7 +58,7 @@ describe('Compare versions service', function() {
       for (var stateName in statesDetails) {
         var newStateData = {
           content: {
-            contnet_id: 'content',
+            content_id: 'content',
             html: statesDetails[stateName].contentStr
           },
           content_ids_to_audio_translations: {
@@ -112,11 +112,11 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'A',
         new_value: {
-          contnet_id: 'content',
+          content_id: 'content',
           html: 'Some text'
         },
         old_value: {
-          contnet_id: 'content',
+          content_id: 'content',
           html: ''
         }
       }],
@@ -158,11 +158,11 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'C',
         new_value: {
-          contnet_id: 'content',
+          content_id: 'content',
           html: 'More text'
         },
         old_value: {
-          contnet_id: 'content',
+          content_id: 'content',
           html: ''
         }
       }],
@@ -194,11 +194,11 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'A',
         new_value: {
-          contnet_id: 'content',
+          content_id: 'content',
           html: ''
         },
         old_value: {
-          contnet_id: 'content',
+          content_id: 'content',
           html: 'Some text'
         }
       }],
@@ -621,11 +621,11 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'D',
         new_value: {
-          contnet_id: 'content',
+          content_id: 'content',
           html: 'Some text'
         },
         old_value: {
-          contnet_id: 'content',
+          content_id: 'content',
           html: ''
         }
       }],

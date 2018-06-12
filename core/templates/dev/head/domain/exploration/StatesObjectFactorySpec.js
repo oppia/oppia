@@ -190,7 +190,7 @@ describe('States object factory', function() {
             default_outcome: {
               dest: 'new state',
               feedback: {
-                contnet_id: 'default_outcome',
+                content_id: 'default_outcome',
                 html: '<p>Feedback</p>'
               },
               labelled_as_correct: false,
@@ -203,7 +203,7 @@ describe('States object factory', function() {
               }
             }, {
               hint_content: {
-                contnet_id: 'hint_2',
+                content_id: 'hint_2',
                 html: '<p>Here is another hint.</p>'
               }
             }],
@@ -213,7 +213,7 @@ describe('States object factory', function() {
         },
         'second state': {
           content: {
-            content_id: 'contnet',
+            content_id: 'content',
             html: 'more content'
           },
           content_ids_to_audio_translations: {
@@ -240,7 +240,7 @@ describe('States object factory', function() {
             default_outcome: {
               dest: 'new state',
               feedback: {
-                contnet_id: 'default_outcome',
+                content_id: 'default_outcome',
                 html: ''
               },
               labelled_as_correct: false,
@@ -251,7 +251,7 @@ describe('States object factory', function() {
               answer_is_exclusive: false,
               correct_answer: 'answer',
               explanation: {
-                contnet_id: 'solution',
+                content_id: 'solution',
                 html: '<p>This is an explanation.</p>'
               }
             },

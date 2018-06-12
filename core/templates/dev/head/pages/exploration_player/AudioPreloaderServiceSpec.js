@@ -169,7 +169,7 @@ describe('Audio preloader service', function() {
         Introduction: {
           param_changes: [],
           content: {
-            content_id: 'contnet',
+            content_id: 'content',
             html: '<p>Introduction Content</p>',
           },
           content_ids_to_audio_translations: {

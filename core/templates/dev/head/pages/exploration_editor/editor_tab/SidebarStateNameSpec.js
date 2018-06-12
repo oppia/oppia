@@ -103,7 +103,7 @@ describe('Sidebar state name controller', function() {
         },
         'Third State': {
           content: {
-            contnet_id: 'content',
+            content_id: 'content',
             html: 'This is some content.'
           },
           content_ids_to_audio_translations: {
