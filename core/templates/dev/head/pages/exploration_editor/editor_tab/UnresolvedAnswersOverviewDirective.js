@@ -38,8 +38,8 @@ oppia.directive('unresolvedAnswersOverview', [
            * Returns whether the answers for the current state are from an
            * interaction ID which can be rendered as HTML.
            *
-           * TODO(brianrodri): This would be more helpful/flexible in its own
-           * service, maybe a InteractionAnswerRenderingService?
+           * TODO(brianrodri): Add all other interaction IDs to this list, then
+           * remove the list altogether.
            * @returns {boolean}
            */
           var isStateInteractionIdHtmlRenderable = function() {
