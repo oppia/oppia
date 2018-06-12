@@ -34,10 +34,10 @@ oppia.factory('ExplorationStatesService', [
       UrlInterpolationService) {
     var _states = null;
 
-    var onStateAddedCallbacks = [];
-    var onStateDeletedCallbacks = [];
-    var onStateRenamedCallbacks = [];
-    var onStateInteractionAnswerGroupsSavedCallbacks = [];
+    var stateAddedCallbacks = [];
+    var stateDeletedCallbacks = [];
+    var stateRenamedCallbacks = [];
+    var stateInteractionAnswerGroupsSavedCallbacks = [];
 
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -240,10 +240,9 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
-        onStateInteractionAnswerGroupsSavedCallbacks.forEach(
-          function(callback) {
-            callback(stateName);
-          });
+        stateInteractionAnswerGroupsSavedCallbacks.forEach(function(callback) {
+          callback(stateName);
+        });
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(
@@ -288,7 +287,7 @@ oppia.factory('ExplorationStatesService', [
         _states.addState(newStateName);
 
         ChangeListService.addState(newStateName);
-        onStateAddedCallbacks.forEach(function(callback) {
+        stateAddedCallbacks.forEach(function(callback) {
           callback(newStateName);
         });
         $rootScope.$broadcast('refreshGraph');
@@ -347,7 +346,7 @@ oppia.factory('ExplorationStatesService', [
           }
 
           $location.path('/gui/' + EditorStateService.getActiveStateName());
-          onStateDeletedCallbacks.forEach(function(callback) {
+          stateDeletedCallbacks.forEach(function(callback) {
             callback(deleteStateName);
           });
           $rootScope.$broadcast('refreshGraph');
@@ -382,22 +381,22 @@ oppia.factory('ExplorationStatesService', [
           ExplorationInitStateNameService.displayed = newStateName;
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
         }
-        onStateRenamedCallbacks.forEach(function(callback) {
+        stateRenamedCallbacks.forEach(function(callback) {
           callback(oldStateName, newStateName);
         });
         $rootScope.$broadcast('refreshGraph');
       },
       registerOnStateAddedCallback: function(callback) {
-        onStateAddedCallbacks.push(callback);
+        stateAddedCallbacks.push(callback);
       },
       registerOnStateDeletedCallback: function(callback) {
-        onStateDeletedCallbacks.push(callback);
+        stateDeletedCallbacks.push(callback);
       },
       registerOnStateRenamedCallback: function(callback) {
-        onStateRenamedCallbacks.push(callback);
+        stateRenamedCallbacks.push(callback);
       },
       registerOnStateInteractionAnswerGroupsSaved: function(callback) {
-        onStateInteractionAnswerGroupsSavedCallbacks.push(callback);
+        stateInteractionAnswerGroupsSavedCallbacks.push(callback);
       },
     };
   }
