@@ -1559,10 +1559,10 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
                 self.interaction_default_outcome) +
-                _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
-                    self.content_ids_to_audio_translations),
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                self.content_ids_to_audio_translations),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)

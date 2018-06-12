@@ -1416,10 +1416,10 @@ class State(object):
                     'Found a duplicate content id %s' % solution_content_id)
             content_id_list.append(solution_content_id)
         available_content_ids = self.content_ids_to_audio_translations.keys()
-        if not (set(content_id_list) <= set(available_content_ids)):
+        if not set(content_id_list) <= set(available_content_ids):
             raise utils.ValidationError(
-                'Expected state content_ids_to_audio_translations to have all'
-                'of the listed content ids %s' % content_id_list, available_content_ids)
+                'Expected state content_ids_to_audio_translations to have all '
+                'of the listed content ids %s' % content_id_list)
         if not isinstance(self.content_ids_to_audio_translations, dict):
             raise utils.ValidationError(
                 'Expected state content_ids_to_audio_translations to be a dict,'

@@ -87,8 +87,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             'state_name': 'Home',
             'property_name': 'answer_groups',
             'new_value': answer_groups
-        }),
-            exp_domain.ExplorationChange({
+        }), exp_domain.ExplorationChange({
             'cmd': 'edit_state_property',
             'state_name': 'Home',
             'property_name': 'content_ids_to_audio_translations',
