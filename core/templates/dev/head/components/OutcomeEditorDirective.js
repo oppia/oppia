@@ -33,10 +33,12 @@ oppia.directive('outcomeEditor', [
         '/components/outcome_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'EditorStateService',
+        'stateContentIdsToAudioTranslationsService',
         'stateInteractionIdService', 'COMPONENT_NAME_FEEDBACK',
         'ExplorationCorrectnessFeedbackService', 'INTERACTION_SPECS',
         function(
             $scope, $uibModal, EditorStateService,
+            stateContentIdsToAudioTranslationsService,
             stateInteractionIdService, COMPONENT_NAME_FEEDBACK,
             ExplorationCorrectnessFeedbackService, INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
@@ -46,7 +48,8 @@ oppia.directive('outcomeEditor', [
           // TODO(sll): Investigate whether this line can be removed, due to
           // $scope.savedOutcome now being set in onExternalSave().
           $scope.savedOutcome = angular.copy($scope.outcome);
-
+          $scope.stateContentIdsToAudioTranslationsService =
+            stateContentIdsToAudioTranslationsService;
           $scope.COMPONENT_NAME_FEEDBACK = COMPONENT_NAME_FEEDBACK;
 
           $scope.getCurrentInteractionId = function() {
@@ -72,10 +75,10 @@ oppia.directive('outcomeEditor', [
               resolve: {},
               controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
-              $scope.outcome.feedback.markAllAudioAsNeedingUpdate();
-              $scope.savedOutcome.feedback = angular.copy(
-                $scope.outcome.feedback);
-              $scope.getOnSaveFeedbackFn()($scope.savedOutcome);
+              var feedbackContentId = $scope.outcome.feedback.getContentId();
+              stateContentIdsToAudioTranslationsService.displayed
+                .markAllAudioAsNeedingUpdate(feedbackContentId);
+              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
             });
           };
 
@@ -164,8 +167,10 @@ oppia.directive('outcomeEditor', [
               $scope.outcome.feedback.getHtml());
             $scope.savedOutcome.feedback = angular.copy(
               $scope.outcome.feedback);
-            if ($scope.savedOutcome.feedback.hasUnflaggedAudioTranslations() &&
-                fromClickSaveFeedbackButton && contentHasChanged) {
+            var feedbackContentId = $scope.savedOutcome.feedback.getContentId();
+            if (stateContentIdsToAudioTranslationsService.displayed
+              .hasUnflaggedAudioTranslations(feedbackContentId) &&
+              fromClickSaveFeedbackButton && contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
             $scope.getOnSaveFeedbackFn()($scope.savedOutcome);
@@ -211,10 +216,6 @@ oppia.directive('outcomeEditor', [
             if ($scope.feedbackEditorIsOpen) {
               $scope.saveThisFeedback(false);
             }
-          };
-
-          $scope.onAudioTranslationsEdited = function() {
-            $scope.saveThisFeedback(false);
           };
         }
       ]
