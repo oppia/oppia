@@ -715,6 +715,29 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
             with self.swap(audio_translation, 'needs_update', 'hello'):
                 audio_translation.validate()
 
+    def test_content_ids_to_audio_translations_validation(self):
+        """Test validation of content_ids_to_audio_translations """
+        exploration = exp_domain.Exploration.create_default_exploration('eid')
+        exploration.objective = 'Objective'
+        init_state = exploration.states[exploration.init_state_name]
+        init_state.update_interaction_id('TextInput')
+        exploration.validate()
+
+        init_state.add_hint(exp_domain.SubtitledHtml('hint_1', {}))
+        self._assert_validation_error(
+            exploration,
+            r'Expected state content_ids_to_audio_translations to have all '
+            r'of the listed content ids \[\'content\', \'default_outcome\', '
+            r'\'hint_1\'\]')
+        init_state.add_hint(exp_domain.SubtitledHtml('hint_1', {}))
+        self._assert_validation_error(
+            exploration, 'Found a duplicate content id hint_1')
+
+        init_state.interaction.hints[1].hint_content.content_id = 'hint_2'
+        init_state.content_ids_to_audio_translations['hint_1'] = {}
+        init_state.content_ids_to_audio_translations['hint_2'] = {}
+        exploration.validate()
+
     def test_subtitled_html_validation(self):
         """Test validation of subtitled HTML."""
         subtitled_html = exp_domain.SubtitledHtml('content_id', 'some html')

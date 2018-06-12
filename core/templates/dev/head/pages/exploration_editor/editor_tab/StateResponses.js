@@ -386,7 +386,7 @@ oppia.controller('StateResponses', [
               $scope.feedbackEditorIsOpen = true;
             };
             $scope.tmpRule = RuleObjectFactory.createNew(null, {});
-            var feedbackContentId = GenerateContentIdService.generateUniqueId(
+            var feedbackContentId = GenerateContentIdService.getNextId(
               COMPONENT_NAME_FEEDBACK);
 
             $scope.tmpOutcome = OutcomeObjectFactory.createNew(

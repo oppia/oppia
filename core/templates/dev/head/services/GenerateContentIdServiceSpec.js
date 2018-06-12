@@ -38,16 +38,16 @@ describe('GenerateContentIdService', function() {
   }));
 
   it('should generate content id for new feedbacks', function(){
-    expect(gcis.generateUniqueId('feedback')).toEqual('feedback_2');
+    expect(gcis.getNextId('feedback')).toEqual('feedback_2');
   });
 
   it('should generate content id for new hint', function(){
-    expect(gcis.generateUniqueId('hint')).toEqual('hint_2');
+    expect(gcis.getNextId('hint')).toEqual('hint_2');
   });
 
   it('should throw error for unknown content id', function(){
     expect(function() {
-      gcis.generateUniqueId('xyz');
+      gcis.getNextId('xyz');
     }).toThrowError('Unknown component name provided.');
   });
 });

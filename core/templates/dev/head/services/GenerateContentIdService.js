@@ -38,7 +38,7 @@ oppia.factory('GenerateContentIdService', [
       return (searchKey + String(count + 1));
     };
 
-    var _generateUniqueId = function(componentName) {
+    var _getNextId = function(componentName) {
       if (componentName === COMPONENT_NAME_FEEDBACK ||
           componentName === COMPONENT_NAME_HINT) {
         return generateIdForHintOrFeedback(componentName);
@@ -47,8 +47,8 @@ oppia.factory('GenerateContentIdService', [
       }
     };
     return {
-      generateUniqueId: function(componentName) {
-        return _generateUniqueId(componentName);
+      getNextId: function(componentName) {
+        return _getNextId(componentName);
       }
     };
   }]);

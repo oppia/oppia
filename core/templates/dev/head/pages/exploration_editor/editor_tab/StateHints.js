@@ -117,7 +117,7 @@ oppia.controller('StateHints', [
             $scope.hintIndex = stateHintsService.displayed.length + 1;
 
             $scope.saveHint = function() {
-              var contentId = GenerateContentIdService.generateUniqueId(
+              var contentId = GenerateContentIdService.getNextId(
                 COMPONENT_NAME_HINT);
               // Close the modal and save it afterwards.
               $uibModalInstance.close({

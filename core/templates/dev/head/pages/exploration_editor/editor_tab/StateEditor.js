@@ -154,7 +154,7 @@ oppia.directive('trainingPanel', [
           };
 
           $scope.beginAddingNewResponse = function() {
-            var contentId = GenerateContentIdService.generateUniqueId(
+            var contentId = GenerateContentIdService.getNextId(
               COMPONENT_NAME_FEEDBACK);
             $scope.classification.newOutcome = OutcomeObjectFactory.createNew(
               EditorStateService.getActiveStateName(), contentId, '', []);
