@@ -716,7 +716,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
                 audio_translation.validate()
 
     def test_content_ids_to_audio_translations_validation(self):
-        """Test validation of content_ids_to_audio_translations """
+        """Test validation of content_ids_to_audio_translations."""
         exploration = exp_domain.Exploration.create_default_exploration('eid')
         exploration.objective = 'Objective'
         init_state = exploration.states[exploration.init_state_name]
