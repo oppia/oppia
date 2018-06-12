@@ -42,6 +42,28 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
             'topics_and_skills_dashboard.html', redirect_url_on_logout='/')
 
 
+class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
+    """Provides data for the user's topics and skills dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self):
+        """Handles GET requests."""
+
+        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summary_dicts = [summary.to_dict() for summary in topic_summaries]
+
+        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
+
+        self.values.update({
+            'skill_summaries': skill_summary_dicts,
+            'topic_summaries': topic_summary_dicts
+        })
+        self.render_json(self.values)
+
+
 class NewTopicHandler(base.BaseHandler):
     """Creates a new topic."""
 
