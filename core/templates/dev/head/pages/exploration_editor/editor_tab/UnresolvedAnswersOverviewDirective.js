@@ -33,11 +33,14 @@ oppia.directive('unresolvedAnswersOverview', [
             $scope, EditorStateService, ExplorationStatesService,
             StateTopAnswersStatsService) {
           /**
+           * Returns whether the answers for the current state are from an
+           * interaction ID which can be rendered as HTML.
+           *
            * TODO(brianrodri): This would be more helpful/flexible in its own
            * service, maybe a InteractionAnswerRenderingService?
            * @returns {boolean}
            */
-          var isStateInteractionIdSupported = function() {
+          var isStateInteractionIdHtmlRenderable = function() {
             var state = ExplorationStatesService.getState(
               EditorStateService.getActiveStateName());
             return (!!state &&
@@ -47,7 +50,7 @@ oppia.directive('unresolvedAnswersOverview', [
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
             return StateTopAnswersStatsService.isInitialized() &&
-              isStateInteractionIdSupported();
+              isStateInteractionIdHtmlRenderable();
           };
 
           $scope.getUnresolvedStateStats = function() {
