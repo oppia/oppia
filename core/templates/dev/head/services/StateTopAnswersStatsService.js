@@ -18,19 +18,20 @@
  */
 
 oppia.factory('StateTopAnswersStatsService', [
-  '$injector', '$scope', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsObjectFactory', 'ExplorationContextService',
-  'ExplorationStatesService', 'UrlInterpolationService',
-  'STATE_ADDED_EVENT_NAME', 'STATE_DELETED_EVENT_NAME',
-  'STATE_RENAMED_EVENT_NAME',
+  '$injector', '$rootScope', 'AngularNameService',
+  'AnswerClassificationService', 'AnswerStatsObjectFactory',
+  'ExplorationContextService', 'ExplorationStatesService',
+  'UrlInterpolationService', 'STATE_ADDED_EVENT_NAME',
+  'STATE_DELETED_EVENT_NAME', 'STATE_RENAMED_EVENT_NAME',
   'STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME',
   function(
-      $injector, $scope, AngularNameService, AnswerClassificationService,
-      AnswerStatsObjectFactory, ExplorationContextService,
-      ExplorationStatesService, UrlInterpolationService,
-      STATE_ADDED_EVENT_NAME, STATE_DELETED_EVENT_NAME,
-      STATE_RENAMED_EVENT_NAME,
-      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME) {
+      $injector, $rootScope, AngularNameService,
+      AnswerClassificationService, AnswerStatsObjectFactory,
+      ExplorationContextService, ExplorationStatesService,
+      UrlInterpolationService, STATE_ADDED_EVENT_NAME,
+      STATE_DELETED_EVENT_NAME, STATE_RENAMED_EVENT_NAME,
+      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME)
+  {
     /**
      * @typedef AnswerStatsCache
      * @property {AnswerStats[]} allAnswers
@@ -98,28 +99,28 @@ oppia.factory('StateTopAnswersStatsService', [
       refreshAddressedInfo(stateName);
     };
 
-    $scope.$on(STATE_ADDED_EVENT_NAME, function(evt, args) {
+    $rootScope.$on(STATE_ADDED_EVENT_NAME, function(evt, args) {
       if (!isInitialized) {
         return;
       }
       onStateAdded(args.state_name);
     });
 
-    $scope.$on(STATE_DELETED_EVENT_NAME, function(evt, args) {
+    $rootScope.$on(STATE_DELETED_EVENT_NAME, function(evt, args) {
       if (!isInitialized) {
         return;
       }
       onStateDeleted(args.state_name);
     });
 
-    $scope.$on(STATE_RENAMED_EVENT_NAME, function(evt, args) {
+    $rootScope.$on(STATE_RENAMED_EVENT_NAME, function(evt, args) {
       if (!isInitialized) {
         return;
       }
       onStateRenamed(args.old_state_name, args.new_state_name);
     });
 
-    $scope.$on(
+    $rootScope.$on(
       STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME, function(evt, args) {
         if (!isInitialized) {
           return;
