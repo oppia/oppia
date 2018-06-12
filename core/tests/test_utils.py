@@ -143,6 +143,8 @@ class TestBase(unittest.TestCase):
     OWNER_USERNAME = 'owner'
     EDITOR_EMAIL = 'editor@example.com'
     EDITOR_USERNAME = 'editor'
+    TOPIC_MANAGER_EMAIL = 'topicmanager@example.com'
+    TOPIC_MANAGER_USERNAME = 'topicmanager'
     TRANSLATOR_EMAIL = 'translator@example.com'
     TRANSLATOR_USERNAME = 'translator'
     VIEWER_EMAIL = 'viewer@example.com'
@@ -192,8 +194,11 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -201,7 +206,7 @@ states:
       default_outcome:
         dest: %s
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -214,8 +219,11 @@ states:
   New state:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -223,7 +231,7 @@ states:
       default_outcome:
         dest: New state
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -419,6 +427,15 @@ tags: []
         json_response = self.testapp.get(
             url, params, expect_errors=expect_errors,
             status=expected_status_int)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
@@ -432,6 +449,14 @@ tags: []
         json_response = self._send_post_request(
             self.testapp, url, data, expect_errors, expected_status_int,
             upload_files)
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        self.assertEqual(json_response.status_int, expected_status_int)
 
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
@@ -441,8 +466,8 @@ tags: []
             upload_files=None, headers=None):
         json_response = app.post(
             str(url), data, expect_errors=expect_errors,
-            upload_files=upload_files, headers=headers)
-        self.assertEqual(json_response.status_int, expected_status_int)
+            upload_files=upload_files, headers=headers,
+            status=expected_status_int)
         return json_response
 
     def post_email(
@@ -490,6 +515,13 @@ tags: []
         json_response = self.testapp.put(
             str(url), data, expect_errors=expect_errors)
 
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
@@ -576,6 +608,15 @@ tags: []
         for name in admin_usernames:
             self.set_user_role(name, feconf.ROLE_ID_ADMIN)
 
+    def set_topic_managers(self, topic_manager_usernames):
+        """Sets role of given users as TOPIC_MANAGER.
+
+        Args:
+            topic_manager_usernames: list(str). List of usernames.
+        """
+        for name in topic_manager_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
+
     def set_moderators(self, moderator_usernames):
         """Sets role of given users as MODERATOR.
 
@@ -602,15 +643,6 @@ tags: []
         """
         for name in collection_editor_usernames:
             self.set_user_role(name, feconf.ROLE_ID_COLLECTION_EDITOR)
-
-    def set_topic_managers(self, topic_manager_usernames):
-        """Sets role of given users as TOPIC_MANAGER.
-
-        Args:
-            topic_manager_usernames: list(str). List of usernames.
-        """
-        for name in topic_manager_usernames:
-            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
 
     def get_current_logged_in_user_id(self):
         """Gets the user_id of the current logged-in user.
@@ -905,7 +937,7 @@ tags: []
         Returns:
             Story. A newly-created story.
         """
-        story = story_domain.Story.create_default_story(story_id)
+        story = story_domain.Story.create_default_story(story_id, title)
         story.title = title
         story.description = description
         story.notes = notes
@@ -915,8 +947,8 @@ tags: []
 
     def save_new_topic(
             self, topic_id, owner_id, name, description,
-            canonical_story_ids, additional_story_ids, skill_ids,
-            language_code=constants.DEFAULT_LANGUAGE_CODE):
+            canonical_story_ids, additional_story_ids, uncategorized_skill_ids,
+            subtopics, language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Topic and saves it.
 
         Args:
@@ -928,8 +960,10 @@ tags: []
                 that are part of the topic.
             additional_story_ids: list(str). The list of ids of additional
                 stories that are part of the topic.
-            skill_ids: list(str). The list of ids of skills that are part of the
-                topic.
+            uncategorized_skill_ids: list(str). The list of ids of skills that
+                are not part of any subtopic.
+            subtopics: list(Subtopic). The different subtopics that are part of
+                this topic.
             language_code: str. The ISO 639-1 code for the language this
                 topic is written in.
 
@@ -938,14 +972,15 @@ tags: []
         """
         topic = topic_domain.Topic(
             topic_id, name, description, canonical_story_ids,
-            additional_story_ids, skill_ids, language_code, 0
+            additional_story_ids, uncategorized_skill_ids, subtopics,
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, language_code, 0
         )
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
     def save_new_skill(
             self, skill_id, owner_id,
-            description, misconceptions, skill_contents,
+            description, misconceptions=None, skill_contents=None,
             language_code=constants.DEFAULT_LANGUAGE_CODE):
         """Creates an Oppia Skill and saves it.
 
@@ -963,11 +998,13 @@ tags: []
         Returns:
             Skill. A newly-created skill.
         """
-        skill = skill_domain.Skill(
-            skill_id, description, misconceptions, skill_contents,
-            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, language_code, 0
-        )
+        skill = skill_domain.Skill.create_default_skill(skill_id, description)
+        if misconceptions:
+            skill.misconceptions = misconceptions
+        if skill_contents:
+            skill.skill_contents = skill_contents
+        skill.language_code = language_code
+        skill.version = 0
         skill_services.save_new_skill(owner_id, skill)
         return skill
 
@@ -1207,10 +1244,10 @@ class AppEngineTestBase(TestBase):
         """
         state = exp_domain.State.create_default_state(default_dest_state_name)
         solution_explanation = exp_domain.SubtitledHtml(
-            'Solution explanation', {})
+            'solution', 'Solution explanation')
         solution = exp_domain.Solution(
             'TextInput', False, 'Solution', solution_explanation)
-        hint_content = exp_domain.SubtitledHtml('Hint 1', {})
+        hint_content = exp_domain.SubtitledHtml('hint_1', 'Hint 1')
         hint = exp_domain.Hint(hint_content)
         state.interaction.id = 'TextInput'
         state.interaction.customization_args = {
@@ -1220,7 +1257,9 @@ class AppEngineTestBase(TestBase):
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         state.interaction.hints.append(hint)
+        state.content_ids_to_audio_translations['hint_1'] = {}
         state.interaction.solution = solution
+        state.content_ids_to_audio_translations['solution'] = {}
         state = state.to_dict()
         return state
 

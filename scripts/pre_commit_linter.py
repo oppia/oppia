@@ -127,6 +127,15 @@ BAD_PATTERNS_JS_REGEXP = [
             'extensions/objects/',
             'extensions/value_generators/',
             'extensions/visualizations/')
+    },
+    {
+        'regexp': r"\$parent",
+        'message': "Please do not access parent properties " +
+                   "using $parent. Use the scope object" +
+                   "for this purpose.",
+        'excluded_files': (
+            'core/templates/dev/head/app.js'),
+        'excluded_dirs': ()
     }
 ]
 
@@ -154,6 +163,17 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     }
 ]
 
+BAD_PATTERNS_PYTHON_REGEXP = [
+    {
+        'regexp': r"print \'",
+        'message': "Please do not use print statement.",
+        'excluded_files': (
+            'core/tests/test_utils.py',
+            'core/tests/performance_framework/perf_domain.py'),
+        'excluded_dirs': ('scripts/',)
+    }
+]
+
 REQUIRED_STRINGS_FECONF = {
     'FORCE_PROD_MODE = False': {
         'message': 'Please set the FORCE_PROD_MODE variable in feconf.py'
@@ -169,7 +189,7 @@ EXCLUDED_PHRASES = [
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
@@ -781,6 +801,12 @@ def _check_bad_patterns(all_files):
                         failed = True
                         total_error_count += 1
 
+            if filename.endswith('.py'):
+                for regexp in BAD_PATTERNS_PYTHON_REGEXP:
+                    if _check_bad_pattern_in_file(filename, content, regexp):
+                        failed = True
+                        total_error_count += 1
+
             if filename == 'feconf.py':
                 for pattern in REQUIRED_STRINGS_FECONF:
                     if pattern not in content:
@@ -1274,8 +1300,7 @@ def _check_html_indent(all_files):
 
 def main():
     all_files = _get_all_files()
-    # TODO(apb7): Enable the _check_directive_scope function.
-    directive_scope_messages = []
+    directive_scope_messages = _check_directive_scope(all_files)
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)

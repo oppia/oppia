@@ -45,9 +45,19 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.skill.validate()
 
+    def _assert_valid_skill_id(self, expected_error_substring, skill_id):
+        """Checks that the skill passes strict validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            skill_domain.Skill.require_valid_skill_id(skill_id)
+
+    def test_valid_skill_id(self):
+        self._assert_valid_skill_id('Skill id should be a string', 10)
+        self._assert_valid_skill_id('Invalid skill id', 'abc')
+
     def test_description_validation(self):
         self.skill.description = 0
-        self._assert_validation_error('Expected description to be a string')
+        self._assert_validation_error('Description should be a string')
 
     def test_language_code_validation(self):
         self.skill.language_code = 0
@@ -114,10 +124,11 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     def test_create_default_skill(self):
         """Test the create_default_skill function.
         """
-        skill = skill_domain.Skill.create_default_skill(self.SKILL_ID)
+        skill = skill_domain.Skill.create_default_skill(
+            self.SKILL_ID, 'Description')
         expected_skill_dict = {
             'id': self.SKILL_ID,
-            'description': feconf.DEFAULT_SKILL_DESCRIPTION,
+            'description': 'Description',
             'misconceptions': [],
             'skill_contents': {
                 'explanation': feconf.DEFAULT_SKILL_EXPLANATION,
@@ -153,3 +164,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_contents_from_dict.to_dict(), skill_contents_dict)
         self.assertEqual(
             misconceptions_from_dict.to_dict(), misconceptions_dict)
+
+    def test_to_dict(self):
+        expected_skill_mastery_dict = {
+            'user_id': 'user',
+            'skill_id': 'skill_id',
+            'degree_of_mastery': '0.5'
+        }
+        observed_skill_mastery = skill_domain.UserSkillMastery.from_dict(
+            expected_skill_mastery_dict)
+        self.assertDictEqual(
+            expected_skill_mastery_dict,
+            observed_skill_mastery.to_dict())

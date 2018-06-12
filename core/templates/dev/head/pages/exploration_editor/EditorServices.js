@@ -151,6 +151,14 @@ oppia.factory('stateSolutionService', [
   }
 ]);
 
+oppia.factory('stateContentIdsToAudioTranslationsService', [
+  'statePropertyService', function(statePropertyService) {
+    var child = Object.create(statePropertyService);
+    child.setterMethodKey = 'saveContentIdsToAudioTranslations';
+    return child;
+  }
+]);
+
 oppia.constant('WARNING_TYPES', {
   // These must be fixed before the exploration can be saved.
   CRITICAL: 'critical',

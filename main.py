@@ -38,7 +38,11 @@ from core.controllers import question
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
+from core.controllers import skill_editor
+from core.controllers import story_editor
 from core.controllers import subscriptions
+from core.controllers import topic_editor
+from core.controllers import topics_and_skills_dashboard
 from core.domain import acl_decorators
 from core.domain import user_services
 from core.platform import models
@@ -47,7 +51,7 @@ import feconf
 from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
-from webapp2_extras.routes import RedirectRoute
+from webapp2_extras import routes
 
 # pylint: enable=relative-import
 
@@ -105,7 +109,7 @@ def get_redirect_route(regex_route, handler, defaults=None):
     if defaults is None:
         defaults = {}
     name = regex_route.replace('/', '_')
-    return RedirectRoute(
+    return routes.RedirectRoute(
         regex_route, handler, name, strict_slash=True, defaults=defaults)
 
 
@@ -202,9 +206,19 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.CREATOR_DASHBOARD_DATA_URL,
         creator_dashboard.CreatorDashboardHandler),
     get_redirect_route(
-        r'%s' % feconf.NEW_EXPLORATION_URL, creator_dashboard.NewExploration),
+        r'%s' % feconf.NEW_EXPLORATION_URL,
+        creator_dashboard.NewExplorationHandler),
     get_redirect_route(
-        r'%s' % feconf.NEW_COLLECTION_URL, creator_dashboard.NewCollection),
+        r'%s' % feconf.NEW_COLLECTION_URL,
+        creator_dashboard.NewCollectionHandler),
+    get_redirect_route(
+        r'%s' % feconf.NEW_SKILL_URL,
+        topics_and_skills_dashboard.NewSkillHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.NEW_STORY_URL, topic_editor.NewStoryHandler),
+    get_redirect_route(
+        r'%s' % feconf.NEW_TOPIC_URL,
+        topics_and_skills_dashboard.NewTopicHandler),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExploration),
@@ -221,6 +235,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<thread_id>' %
         feconf.LEARNER_DASHBOARD_FEEDBACK_THREAD_DATA_URL,
         learner_dashboard.LearnerDashboardFeedbackThreadHandler),
+    get_redirect_route(
+        r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
+        topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
 
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' %
@@ -400,6 +417,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),
+    get_redirect_route(
+        r'/createhandler/get_top_unresolved_answers/<exploration_id>',
+        editor.TopUnresolvedAnswersHandler),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
@@ -451,7 +471,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_URL_PREFIX,
         collection_editor.CollectionEditorPage),
     get_redirect_route(
-        r'%s/<collection_id>' % feconf.EDITABLE_COLLECTION_DATA_URL_PREFIX,
+        r'%s/<collection_id>' % feconf.COLLECTION_EDITOR_DATA_URL_PREFIX,
         collection_editor.EditableCollectionDataHandler),
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_RIGHTS_PREFIX,
@@ -469,6 +489,30 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_DATA_URL,
         question.QuestionsHandler),
+
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,
+        topic_editor.TopicEditorPage),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
+        topic_editor.EditableTopicDataHandler),
+    get_redirect_route(
+        r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX,
+        topic_editor.TopicManagerRightsHandler),
+
+    get_redirect_route(
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
+        skill_editor.SkillEditorPage),
+    get_redirect_route(
+        r'%s/<skill_id>' % feconf.SKILL_EDITOR_DATA_URL_PREFIX,
+        skill_editor.EditableSkillDataHandler),
+
+    get_redirect_route(
+        r'%s/<topic_id>/<story_id>' % feconf.STORY_EDITOR_URL_PREFIX,
+        story_editor.StoryEditorPage),
+    get_redirect_route(
+        r'%s/<topic_id>/<story_id>' % feconf.STORY_EDITOR_DATA_URL_PREFIX,
+        story_editor.EditableStoryDataHandler),
 
     get_redirect_route(r'/emaildashboard', email_dashboard.EmailDashboardPage),
     get_redirect_route(
