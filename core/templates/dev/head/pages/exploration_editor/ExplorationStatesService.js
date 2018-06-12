@@ -18,34 +18,28 @@
  * keeps no mementos.
  */
 
-oppia.constant('STATE_ADDED_EVENT_NAME', 'stateAdded');
-oppia.constant('STATE_DELETED_EVENT_NAME', 'stateDeleted');
-oppia.constant('STATE_RENAMED_EVENT_NAME', 'stateRenamed');
-oppia.constant(
-  'STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME',
-  'stateInteractionAnswerGroupsSaved');
-
 oppia.factory('ExplorationStatesService', [
   '$log', '$uibModal', '$filter', '$location', '$rootScope', '$injector', '$q',
   'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
   'AnswerClassificationService', 'ExplorationContextService',
-  'UrlInterpolationService', 'STATE_ADDED_EVENT_NAME',
-  'STATE_DELETED_EVENT_NAME', 'STATE_RENAMED_EVENT_NAME',
-  'STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME',
+  'UrlInterpolationService',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
       AnswerClassificationService, ExplorationContextService,
-      UrlInterpolationService, STATE_ADDED_EVENT_NAME,
-      STATE_DELETED_EVENT_NAME, STATE_RENAMED_EVENT_NAME,
-      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME) {
+      UrlInterpolationService) {
     var _states = null;
     // Properties that have a different backend representation from the
     // frontend and must be converted.
+
+		var onStateAddedCallbacks = [];
+		var onStateDeletedCallbacks = [];
+		var onStateRenamedCallbacks = [];
+		var onStateInteractionAnswerGroupsSavedCallbacks = [];
 
     var BACKEND_CONVERSIONS = {
       answer_groups: function(answerGroups) {
@@ -246,10 +240,10 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
-        $rootScope.$broadcast(
-          STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME, {
-            state_name: stateName
-          });
+				onStateInteractionAnswerGroupsSavedCallbacks.forEach(
+					function(callback) {
+						callback(stateName);
+					});
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(
@@ -294,9 +288,9 @@ oppia.factory('ExplorationStatesService', [
         _states.addState(newStateName);
 
         ChangeListService.addState(newStateName);
-        $rootScope.$broadcast(STATE_ADDED_EVENT_NAME, {
-          state_name: newStateName
-        });
+				onStateAddedCallbacks.forEach(function(callback) {
+					callback(newStateName);
+				});
         $rootScope.$broadcast('refreshGraph');
         if (successCallback) {
           successCallback(newStateName);
@@ -353,9 +347,9 @@ oppia.factory('ExplorationStatesService', [
           }
 
           $location.path('/gui/' + EditorStateService.getActiveStateName());
-          $rootScope.$broadcast(STATE_DELETED_EVENT_NAME, {
-            state_name: deleteStateName
-          });
+					onStateDeletedCallbacks.forEach(function(callback) {
+						callback(deleteStateName);
+					});
           $rootScope.$broadcast('refreshGraph');
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
@@ -388,12 +382,23 @@ oppia.factory('ExplorationStatesService', [
           ExplorationInitStateNameService.displayed = newStateName;
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
         }
-        $rootScope.$broadcast(STATE_RENAMED_EVENT_NAME, {
-          old_state_name: oldStateName,
-          new_state_name: newStateName
-        });
+				onStateRenamedCallbacks.forEach(function(callback) {
+					callback(oldStateName, newStateName);
+				});
         $rootScope.$broadcast('refreshGraph');
-      }
+      },
+			registerOnStateAddedCallback: function(callback) {
+				onStateAddedCallbacks.push(callback);
+			},
+			registerOnStateDeletedCallback: function(callback) {
+				onStateDeletedCallbacks.push(callback);
+			},
+			registerOnStateRenamedCallback: function(callback) {
+				onStateRenamedCallbacks.push(callback);
+			},
+			registerOnStateInteractionAnswerGroupsSaved: function(callback) {
+				onStateInteractionAnswerGroupsSavedCallbacks.push(callback);
+			},
     };
   }
 ]);

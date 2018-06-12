@@ -98,34 +98,11 @@ oppia.factory('StateTopAnswersStatsService', [
       refreshAddressedInfo(stateName);
     };
 
-    $rootScope.$on(STATE_ADDED_EVENT_NAME, function(evt, args) {
-      if (!isInitialized) {
-        return;
-      }
-      onStateAdded(args.state_name);
-    });
-
-    $rootScope.$on(STATE_DELETED_EVENT_NAME, function(evt, args) {
-      if (!isInitialized) {
-        return;
-      }
-      onStateDeleted(args.state_name);
-    });
-
-    $rootScope.$on(STATE_RENAMED_EVENT_NAME, function(evt, args) {
-      if (!isInitialized) {
-        return;
-      }
-      onStateRenamed(args.old_state_name, args.new_state_name);
-    });
-
-    $rootScope.$on(
-      STATE_INTERACTION_ANSWER_GROUPS_SAVED_EVENT_NAME, function(evt, args) {
-        if (!isInitialized) {
-          return;
-        }
-        onStateInteractionAnswerGroupsSaved(args.state_name);
-      });
+		ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
+		ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
+		ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
+		ExplorationStatesService.registerOnStateInteractionAnswerGroupsSaved(
+			onStateInteractionAnswerGroupsSaved);
 
     return {
       /**
