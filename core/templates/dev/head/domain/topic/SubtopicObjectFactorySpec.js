@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for TopicObjectFactory.
+ * @fileoverview Tests for SubtopicObjectFactory.
  */
 
 describe('Subtopic object factory', function() {

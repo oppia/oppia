@@ -58,8 +58,8 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
 
         self.values.update({
-            'skills_list': skill_summary_dicts,
-            'topics_list': topic_summary_dicts
+            'skill_summaries': skill_summary_dicts,
+            'topic_summaries': topic_summary_dicts
         })
         self.render_json(self.values)
 

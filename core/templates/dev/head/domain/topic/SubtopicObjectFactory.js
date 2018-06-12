@@ -32,6 +32,10 @@ oppia.factory('SubtopicObjectFactory', [
       return this._id;
     };
 
+    Subtopic.prototype.decrementId = function() {
+      return --this._id;
+    };
+
     // Returns the title of the subtopic.
     Subtopic.prototype.getTitle = function() {
       return this._title;
@@ -65,8 +69,6 @@ oppia.factory('SubtopicObjectFactory', [
       return new Subtopic(subtopicBackendObject);
     };
 
-    // TODO(bhenning): Ensure this matches the backend dict elements for
-    // collection nodes.
     Subtopic.createFromTitle = function(subtopicId, title) {
       return Subtopic.create({
         id: subtopicId,

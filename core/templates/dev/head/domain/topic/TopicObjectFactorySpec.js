@@ -33,7 +33,11 @@ describe('Topic object factory', function() {
       uncategorized_skill_ids: ['skill_1', 'skill_2'],
       canonical_story_ids: ['story_1', 'story_4'],
       additional_story_ids: ['story_2', 'story_3'],
-      subtopics: [],
+      subtopics: [{
+        id: 1,
+        title: 'Title',
+        skill_ids: ['skill_3']
+      }],
       next_subtopic_id: 1,
       language_code: 'en'
     };
@@ -56,6 +60,12 @@ describe('Topic object factory', function() {
     expect(_sampleTopic.addAdditionalStoryId('story_2')).toEqual(false);
     expect(_sampleTopic.addCanonicalStoryId('story_1')).toEqual(false);
     expect(_sampleTopic.addUncategorizedSkillId('skill_1')).toEqual(false);
+    expect(_sampleTopic.addUncategorizedSkillId('skill_3')).toEqual(false);
+  });
+
+  it('should return false when working with invalid subtopics', function() {
+    expect(_sampleTopic.getSubtopicById(2)).toEqual(false);
+    expect(_sampleTopic.deleteSubtopic(2)).toEqual(false);
   });
 
   it('should correctly remove the various array elements', function() {
@@ -77,8 +87,12 @@ describe('Topic object factory', function() {
       additional_story_ids: ['story_10'],
       canonical_story_ids: ['story_5'],
       uncategorized_skill_ids: ['skill_2', 'skill_3'],
-      next_subtopic_id: 1,
-      subtopics: []
+      next_subtopic_id: 2,
+      subtopics: [{
+        id: 1,
+        title: 'Title',
+        skill_ids: ['skill_1']
+      }]
     });
 
     expect(_sampleTopic).not.toBe(secondTopic);

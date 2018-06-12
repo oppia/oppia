@@ -741,9 +741,9 @@ class TopicSummary(object):
             'additional_story_count': self.additional_story_count,
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
-            'created_on': utils.get_time_in_millisecs(
+            'topic_model_created_on': utils.get_time_in_millisecs(
                 self.topic_model_created_on),
-            'last_updated': utils.get_time_in_millisecs(
+            'topic_model_last_updated': utils.get_time_in_millisecs(
                 self.topic_model_last_updated)
         }
 

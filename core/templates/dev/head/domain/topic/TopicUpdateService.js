@@ -199,17 +199,18 @@ oppia.factory('TopicUpdateService', [
           topic.addSubtopic(title);
         }, function(changeDict, topic) {
           // Undo.
-          var subtopicId = _getParameterFromChangeDict(
-            changeDict, 'subtopic_id');
+          var subtopicId = _getSubtopicIdFromChangeDict(changeDict);
           topic.deleteSubtopic(subtopicId);
         });
       },
 
       /**
        * Deletes a subtopic from the topic and records the change in
-       * the undo/redo service.
+       * the undo/redo service.The argument isNewlyCreated should be passed from
+       * the calling function, after checking the changelist to see if this
+       * subtopic was created in the same changelist.
        */
-      deleteSubtopic: function(topic, subtopicId) {
+      deleteSubtopic: function(topic, subtopicId, isNewlyCreated) {
         var subtopic = topic.getSubtopicById(subtopicId);
         var title = subtopic.getTitle();
         var skillIds = subtopic.getSkillIds();
@@ -217,12 +218,11 @@ oppia.factory('TopicUpdateService', [
           subtopic_id: subtopicId,
         }, function(changeDict, topic) {
           // Apply.
-          topic.deleteSubtopic(subtopicId);
+          topic.deleteSubtopic(subtopicId, isNewlyCreated);
         }, function(changeDict, topic) {
           // Undo.
-          var subtopicId = _getParameterFromChangeDict(
-            changeDict, 'subtopic_id');
-          topic.undoDeleteSubtopic(subtopicId, title, skillIds);
+          var subtopicId = _getSubtopicIdFromChangeDict(changeDict);
+          topic.undoDeleteSubtopic(subtopicId, title, skillIds, isNewlyCreated);
           for (var i = 0; i < skillIds.length; i++) {
             topic.removeUncategorizedSkillId(skillIds[i]);
           }

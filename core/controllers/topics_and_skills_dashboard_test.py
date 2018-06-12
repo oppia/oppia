@@ -45,7 +45,7 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
         BaseTopicsAndSkillsDashboardTest):
 
     def test_get(self):
-        # Check that non-admins oror non-topic managers cannot access the
+        # Check that non-admins or non-topic managers cannot access the
         # topics and skills dashboard data.
         skill_id = skill_services.get_new_skill_id()
         self.save_new_skill(skill_id, self.admin_id, 'Description')
@@ -63,10 +63,10 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
             self.assertEqual(len(json_response['topics_list']), 1)
             self.assertEqual(
-                json_response['topics_list'][0]['id'], self.topic_id)
-            self.assertEqual(len(json_response['skills_list']), 1)
+                json_response['topic_summaries'][0]['id'], self.topic_id)
+            self.assertEqual(len(json_response['skill_summaries']), 1)
             self.assertEqual(
-                json_response['skills_list'][0]['id'], skill_id)
+                json_response['skill_summaries'][0]['id'], skill_id)
             self.logout()
 
             # Check that topic managers can access the topics and skills
@@ -74,12 +74,12 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.login(self.ADMIN_EMAIL)
             json_response = self.get_json(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
-            self.assertEqual(len(json_response['topics_list']), 1)
+            self.assertEqual(len(json_response['topic_summaries']), 1)
             self.assertEqual(
-                json_response['topics_list'][0]['id'], self.topic_id)
-            self.assertEqual(len(json_response['skills_list']), 1)
+                json_response['topic_summaries'][0]['id'], self.topic_id)
+            self.assertEqual(len(json_response['skill_summaries']), 1)
             self.assertEqual(
-                json_response['skills_list'][0]['id'], skill_id)
+                json_response['skill_summaries'][0]['id'], skill_id)
             self.logout()
 
 

@@ -22,7 +22,7 @@ describe('Topics and Skills Dashboard backend API service', function() {
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
 
   var sampleDataResults = {
-    topics_list: [{
+    topic_summaries: [{
       id: SAMPLE_TOPIC_ID,
       name: 'Sample Name',
       language_code: 'en',
@@ -31,10 +31,10 @@ describe('Topics and Skills Dashboard backend API service', function() {
       additional_story_count: 0,
       uncategorized_skill_count: 3,
       subtopic_count: 3,
-      created_on_msec: 1466178691847.67,
-      last_updated_msec: 1466178759209.839
+      topic_model_created_on: 1466178691847.67,
+      topic_model_last_updated: 1466178759209.839
     }],
-    skills_list: []
+    skill_summaries: []
   };
 
   var TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
