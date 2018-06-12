@@ -33,14 +33,14 @@ oppia.factory('ExplorationStatesService', [
       AnswerClassificationService, ExplorationContextService,
       UrlInterpolationService) {
     var _states = null;
-    // Properties that have a different backend representation from the
-    // frontend and must be converted.
 
     var onStateAddedCallbacks = [];
     var onStateDeletedCallbacks = [];
     var onStateRenamedCallbacks = [];
     var onStateInteractionAnswerGroupsSavedCallbacks = [];
 
+    // Properties that have a different backend representation from the
+    // frontend and must be converted.
     var BACKEND_CONVERSIONS = {
       answer_groups: function(answerGroups) {
         return answerGroups.map(function(answerGroup) {
