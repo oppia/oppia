@@ -33,8 +33,8 @@ class SuggestionHandler(base.BaseHandler):
             self.payload.get('suggestion_type'),
             self.payload.get('target_type'), self.payload.get('target_id'),
             self.payload.get('target_version_at_submission'),
-            self.payload.get('author_id'), self.payload.get('change_cmd'),
-            self.payload.get('score_category'), self.payload.get('description'),
+            self.user_id, self.payload.get('change_cmd'),
+            self.payload.get('description'),
             self.payload.get('assigned_reviewer_id'),
             self.payload.get('final_reviewer_id'))
         self.render_json(self.values)
@@ -49,17 +49,17 @@ class SuggestionActionHandler(base.BaseHandler):
     @acl_decorators.can_accept_suggestion
     def put(self, suggestion_id):
         action = self.payload.get('action')
-        if action == ACTION_TYPE_ACCEPT:
+        if action == self.ACTION_TYPE_ACCEPT:
             suggestion = suggestion_services.get_suggestion_by_id(
                 suggestion_id)
             suggestion_services.accept_suggestion(
-                suggestion, self.payload.get('reviewer_id'),
-                self.payload.get('commit_message'))
-        elif action == ACTION_TYPE_REJECT:
+                suggestion, self.user_id, self.payload.get('commit_message'),
+                self.payload.get('review_message'))
+        elif action == self.ACTION_TYPE_REJECT:
             suggestion = suggestion_services.get_suggestion_by_id(
                 suggestion_id)
             suggestion_services.reject_suggestion(
-                suggestion, self.payload.get('reviewer_id'))
+                suggestion, self.user_id, self.payload.get('review_message'))
         else:
             raise self.InvalidInputException('Invalid action.')
 
@@ -85,30 +85,23 @@ class SuggestionListHandler(base.BaseHandler):
                 suggestion_services.get_suggestions_assigned_to_reviewer(
                     self.request.get('assigned_reviewer_id')))
         elif list_type == self.LIST_TYPE_AUTHOR:
-            suggestions = (
-                suggestion_services.get_suggestions_by_author(
-                    self.request.get('author_id')))
+            suggestions = suggestion_services.get_suggestions_by_author(
+                self.request.get('author_id'))
         elif list_type == self.LIST_TYPE_ID:
-            suggestions = (
-                suggestion_services.get_suggestions_by_id(
-                    self.request.get('suggestion_id')))
+            suggestions = [suggestion_services.get_suggestion_by_id(
+                self.request.get('suggestion_id'))]
         elif list_type == self.LIST_TYPE_REVIEWER:
-            suggestions = (
-                suggestion_services.get_suggestions_reviewed_by(
-                    self.request.get('reviewer_id')))
+            suggestions = suggestion_services.get_suggestions_reviewed_by(
+                self.request.get('reviewer_id'))
         elif list_type == self.LIST_TYPE_STATUS:
-            suggestions = (
-                suggestion_services.get_suggestions_by_status(
-                    self.request.get('status')))
+            suggestions = suggestion_services.get_suggestions_by_status(
+                self.request.get('status'))
         elif list_type == self.LIST_TYPE_SUGGESTION_TYPE:
-            suggestions = (
-                suggestion_services.get_suggestions_by_type(
-                    self.request.get('suggestion_type')))
+            suggestions = suggestion_services.get_suggestions_by_type(
+                self.request.get('suggestion_type'))
         elif list_type == self.LIST_TYPE_TARGET_ID:
-            suggestions = (
-                suggestion_services.get_suggestions_by_target_id(
-                    self.request.get('target_type'),
-                    self.request.get('target_id')))
+            suggestions = suggestion_services.get_suggestions_by_target_id(
+                self.request.get('target_type'), self.request.get('target_id'))
         else:
             raise self.InvalidInputException('Invalid list type.')
 

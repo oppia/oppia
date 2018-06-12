@@ -27,6 +27,8 @@ import feconf
 
 current_user_services = models.Registry.import_current_user_services()
 
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+
 
 def open_access(handler):
     """Decorator to give access to everyone."""
@@ -625,8 +627,7 @@ def can_suggest_changes_to_exploration(handler):
             bool. Whether the user can make suggestions to an
                 exploration.
         """
-        if (role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in
-                self.user.actions):
+        if (role_services.ACTION_SUGGEST_CHANGES in self.user.actions):
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
@@ -636,6 +637,26 @@ def can_suggest_changes_to_exploration(handler):
 
     return test_can_suggest
 
+def can_suggest_changes(handler):
+    """Decorator to check whether a user can make suggestions."""
+
+    def test_can_suggest(self, **kwargs):
+        """Checks if the user can make suggestions to an exploration.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+            return handler(self, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to make suggestions.')
+    test_can_suggest.__wrapped__ = True
+
+    return test_can_suggest
 
 def can_publish_exploration(handler):
     """Decorator to check whether user can publish exploration."""
@@ -1033,3 +1054,42 @@ def can_manage_rights_for_topic(handler):
     test_can_manage_topic_rights.__wrapped__ = True
 
     return test_can_manage_topic_rights
+
+
+def can_accept_suggestion(handler):
+    """Decorator to check if user can accept the given suggestion."""
+    def test_can_accept(self, suggestion_id, **kwargs):
+        """Checks if the user can accept the suggestion.
+
+        Args:
+            suggestion_id: str. The suggestion id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        print self.user
+        if len(suggestion_id.split('.')) != 3:
+            raise self.InvalidInputException('Invalid format for suggestion_id.'
+                                             ' It must contain 3 parts'
+                                             ' separated by \'.\'')
+        target_type = suggestion_id.split('.')[0]
+
+        if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+            exploration_id = suggestion_id.split('.')[1]
+            exploration_rights = rights_manager.get_exploration_rights(
+                exploration_id)
+            if rights_manager.check_can_edit_activity(
+                self.user, exploration_rights):
+                return handler(self, suggestion_id, **kwargs)
+            else:
+                raise base.UserFacingExceptions.UnauthorizedUserException(
+                    'You do not have credentials to accept or reject this '
+                    'suggestion.')
+    test_can_accept.__wrapped__ = True
+
+    return test_can_accept
+
