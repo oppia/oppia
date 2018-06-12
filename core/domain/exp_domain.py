@@ -1307,7 +1307,7 @@ class State(object):
         'default_outcome': {
             'dest': feconf.DEFAULT_INIT_STATE_NAME,
             'feedback': {
-                'content_id': 'default_outcome',
+                'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
                 'html': ''
             },
             'labelled_as_correct': False,

@@ -3337,7 +3337,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'default_outcome': {
                         'dest': dest_name,
                         'feedback': {
-                            'content_id': 'default_outcome',
+                            'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
                             'html': ''
                         },
                         'labelled_as_correct': False,
