@@ -59,6 +59,7 @@ oppia.factory('ChangeListService', [
       answer_groups: true,
       confirmed_unclassified_answers: true,
       content: true,
+      content_ids_to_audio_translations: true,
       default_outcome: true,
       hints: true,
       param_changes: true,

@@ -194,8 +194,11 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -203,7 +206,7 @@ states:
       default_outcome:
         dest: %s
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -216,8 +219,11 @@ states:
   New state:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -225,7 +231,7 @@ states:
       default_outcome:
         dest: New state
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1238,10 +1244,10 @@ class AppEngineTestBase(TestBase):
         """
         state = exp_domain.State.create_default_state(default_dest_state_name)
         solution_explanation = exp_domain.SubtitledHtml(
-            'Solution explanation', {})
+            'solution', 'Solution explanation')
         solution = exp_domain.Solution(
             'TextInput', False, 'Solution', solution_explanation)
-        hint_content = exp_domain.SubtitledHtml('Hint 1', {})
+        hint_content = exp_domain.SubtitledHtml('hint_1', 'Hint 1')
         hint = exp_domain.Hint(hint_content)
         state.interaction.id = 'TextInput'
         state.interaction.customization_args = {
@@ -1251,7 +1257,9 @@ class AppEngineTestBase(TestBase):
         state.interaction.default_outcome.labelled_as_correct = True
         state.interaction.default_outcome.dest = None
         state.interaction.hints.append(hint)
+        state.content_ids_to_audio_translations['hint_1'] = {}
         state.interaction.solution = solution
+        state.content_ids_to_audio_translations['solution'] = {}
         state = state.to_dict()
         return state
 

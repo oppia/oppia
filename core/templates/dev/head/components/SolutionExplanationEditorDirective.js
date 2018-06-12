@@ -25,9 +25,11 @@ oppia.directive('solutionExplanationEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/solution_explanation_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'EditabilityService', 'stateSolutionService',
+        '$scope', '$uibModal', 'EditabilityService',
+        'stateContentIdsToAudioTranslationsService', 'stateSolutionService',
         'COMPONENT_NAME_SOLUTION',
-        function($scope, $uibModal, EditabilityService, stateSolutionService,
+        function($scope, $uibModal, EditabilityService,
+            stateContentIdsToAudioTranslationsService, stateSolutionService,
             COMPONENT_NAME_SOLUTION) {
           $scope.isEditable = EditabilityService.isEditable();
 
@@ -35,6 +37,8 @@ oppia.directive('solutionExplanationEditor', [
           $scope.explanationEditorIsOpen = false;
 
           $scope.stateSolutionService = stateSolutionService;
+          $scope.stateContentIdsToAudioTranslationsService =
+            stateContentIdsToAudioTranslationsService;
           $scope.COMPONENT_NAME_SOLUTION = COMPONENT_NAME_SOLUTION;
 
           $scope.EXPLANATION_FORM_SCHEMA = {
@@ -52,8 +56,11 @@ oppia.directive('solutionExplanationEditor', [
             var contentHasChanged = (
               stateSolutionService.displayed.explanation.getHtml() !==
               stateSolutionService.savedMemento.explanation.getHtml());
-            if (stateSolutionService.displayed.explanation
-              .hasUnflaggedAudioTranslations() && contentHasChanged) {
+            var solutionContentId = stateSolutionService.displayed.explanation
+              .getContentId();
+            if (stateContentIdsToAudioTranslationsService.displayed
+              .hasUnflaggedAudioTranslations(solutionContentId) &&
+              contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
             stateSolutionService.saveDisplayedValue();
@@ -73,7 +80,7 @@ oppia.directive('solutionExplanationEditor', [
           };
 
           $scope.onAudioTranslationsEdited = function() {
-            stateSolutionService.saveDisplayedValue();
+            stateContentIdsToAudioTranslationsService.saveDisplayedValue();
           };
 
           $scope.$on('externalSave', function() {
@@ -92,9 +99,11 @@ oppia.directive('solutionExplanationEditor', [
               resolve: {},
               controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
-              stateSolutionService.displayed.explanation
-                .markAllAudioAsNeedingUpdate();
-              stateSolutionService.saveDisplayedValue();
+              var solutionContentId = stateSolutionService.displayed.explanation
+                .getContentId();
+              stateContentIdsToAudioTranslationsService.displayed
+                .markAllAudioAsNeedingUpdate(solutionContentId);
+              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
             });
           };
         }
