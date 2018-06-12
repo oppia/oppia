@@ -159,7 +159,7 @@ oppia.factory('StateTopAnswersStatsService', [
        * @returns {AnswerStats[]} - list of the statistics for the top answers.
        */
       getStateStats: function(stateName) {
-        return stateTopAnswersStatsCache[stateName].allAnswers || [];
+        return stateTopAnswersStatsCache[stateName].allAnswers;
       },
 
       /**
@@ -168,7 +168,7 @@ oppia.factory('StateTopAnswersStatsService', [
        *    unresolved.
        */
       getUnresolvedStateStats: function(stateName) {
-        return stateTopAnswersStatsCache[stateName].unresolvedAnswers || [];
+        return stateTopAnswersStatsCache[stateName].unresolvedAnswers;
       },
     };
   }
