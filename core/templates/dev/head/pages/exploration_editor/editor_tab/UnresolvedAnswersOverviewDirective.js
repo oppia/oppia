@@ -16,6 +16,8 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+// TODO(brianrodri): Add all other interaction IDs to this list, then remove
+// the list altogether.
 oppia.constant('SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS', ['TextInput']);
 
 oppia.directive('unresolvedAnswersOverview', [
@@ -35,12 +37,8 @@ oppia.directive('unresolvedAnswersOverview', [
             StateTopAnswersStatsService,
             SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS) {
           /**
-           * Returns whether the answers for the current state are from an
-           * interaction ID which can be rendered as HTML.
-           *
-           * TODO(brianrodri): Add all other interaction IDs to this list, then
-           * remove the list altogether.
-           * @returns {boolean}
+           * @returns {boolean} - answers from this state can be rendered with
+           * HTML.
            */
           var isStateInteractionIdHtmlRenderable = function() {
             var state = ExplorationStatesService.getState(
