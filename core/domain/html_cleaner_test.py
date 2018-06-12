@@ -384,13 +384,13 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
 
         for index, test_case in enumerate(test_cases):
             actual_output = (
-                html_cleaner.validate_soup_for_textangular(
+                html_cleaner._validate_soup_for_textangular( # pylint: disable=protected-access
                     bs4.BeautifulSoup(test_case, 'html.parser'),
                     err_dict))
 
             self.assertEqual(actual_output, expected_output[index])
 
-    def test_tag_content_to_textangular(self):
+    def test_convert_tag_contents_to_text_angular(self):
         test_cases = [{
             'html_content': (
                 '<div>Hello <b>this </b>is </div><p><br></p><p>test <b>case '
@@ -419,6 +419,6 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
         }]
 
         for test_case in test_cases:
-            actual_output = html_cleaner.tag_content_to_textangular(
+            actual_output = html_cleaner.convert_tag_contents_to_text_angular(
                 test_case['html_content'])
             self.assertEqual(actual_output, test_case['expected_output'])

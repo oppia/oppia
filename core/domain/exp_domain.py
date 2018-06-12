@@ -3323,14 +3323,14 @@ class Exploration(object):
         for state_dict in states_dict.values():
             state_dict['content']['html'] = (
                 html_cleaner.convert_to_text_angular(
-                    html_cleaner.tag_content_to_textangular(
+                    html_cleaner.convert_tag_contents_to_text_angular(
                         state_dict['content']['html'])))
             if state_dict['interaction']['default_outcome']:
                 interaction_feedback_html = state_dict[
                     'interaction']['default_outcome']['feedback']['html']
                 state_dict['interaction']['default_outcome']['feedback'][
                     'html'] = html_cleaner.convert_to_text_angular(
-                        html_cleaner.tag_content_to_textangular(
+                        html_cleaner.convert_tag_contents_to_text_angular(
                             interaction_feedback_html))
 
             for answer_group_index, answer_group in enumerate(
@@ -3339,7 +3339,7 @@ class Exploration(object):
                 state_dict['interaction']['answer_groups'][
                     answer_group_index]['outcome']['feedback']['html'] = (
                         html_cleaner.convert_to_text_angular(
-                            html_cleaner.tag_content_to_textangular(
+                            html_cleaner.convert_tag_contents_to_text_angular(
                                 answer_group_html)))
                 if state_dict['interaction']['id'] == 'ItemSelectionInput':
                     for rule_spec_index, rule_spec in enumerate(
@@ -3350,7 +3350,7 @@ class Exploration(object):
                                     rule_spec_index]['inputs']['x'][x_index] = (
                                         html_cleaner.convert_to_text_angular(
                                             html_cleaner.
-                                            tag_content_to_textangular(x)))
+                                            convert_tag_contents_to_text_angular(x))) # pylint: disable=line-too-long
 
             for hint_index, hint in enumerate(
                     state_dict['interaction']['hints']):
@@ -3358,14 +3358,15 @@ class Exploration(object):
                 state_dict['interaction']['hints'][hint_index][
                     'hint_content']['html'] = (
                         html_cleaner.convert_to_text_angular(
-                            html_cleaner.tag_content_to_textangular(hint_html)))
+                            html_cleaner.convert_tag_contents_to_text_angular(
+                                hint_html)))
 
             if state_dict['interaction']['solution']:
                 solution_html = state_dict[
                     'interaction']['solution']['explanation']['html']
                 state_dict['interaction']['solution']['explanation']['html'] = (
                     html_cleaner.convert_to_text_angular(
-                        html_cleaner.tag_content_to_textangular(
+                        html_cleaner.convert_tag_contents_to_text_angular(
                             solution_html)))
 
             if state_dict['interaction']['id'] in (
@@ -3376,7 +3377,9 @@ class Exploration(object):
                     state_dict['interaction']['customization_args'][
                         'choices']['value'][value_index] = (
                             html_cleaner.convert_to_text_angular(
-                                html_cleaner.tag_content_to_textangular(value)))
+                                html_cleaner.
+                                convert_tag_contents_to_text_angular(
+                                    value)))
 
         return states_dict
 
