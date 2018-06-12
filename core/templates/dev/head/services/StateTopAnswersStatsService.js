@@ -94,12 +94,6 @@ oppia.factory('StateTopAnswersStatsService', [
       refreshAddressedInfo(stateName);
     };
 
-    ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
-    ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
-    ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
-    ExplorationStatesService.registerOnStateInteractionAnswerGroupsSaved(
-      onStateInteractionAnswerGroupsSaved);
-
     return {
       /**
        * Calls the backend asynchronously to setup the answer statistics of each
@@ -119,6 +113,11 @@ oppia.factory('StateTopAnswersStatsService', [
           // Still need to manually refresh the addressed information.
           refreshAddressedInfo(stateName);
         }
+        ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
+        ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
+        ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
+        ExplorationStatesService.registerOnStateInteractionAnswerGroupsSaved(
+          onStateInteractionAnswerGroupsSaved);
         isInitialized = true;
       },
 
