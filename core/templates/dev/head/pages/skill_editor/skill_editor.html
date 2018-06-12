@@ -1,1 +1,25 @@
 {% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Skill Editor
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+  </script>
+{% endblock header_js %}
+
+{% block content %}
+<!--   <div ng-controller="SkillEditor">
+    <div ng-if="getTabStatuses().active === 'main'">
+      <skill-editor-main-tab></skill-editor-main-tab>
+    </div>
+  </div> -->
+  Testttt!
+{% endblock content %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillEditorMainTabDirective.js"></script>
+{% endblock footer_js %}
