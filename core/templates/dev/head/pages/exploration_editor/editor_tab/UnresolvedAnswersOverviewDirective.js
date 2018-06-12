@@ -16,6 +16,8 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+oppia.constant('SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS', ['TextInput']);
+
 oppia.directive('unresolvedAnswersOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -31,18 +33,16 @@ oppia.directive('unresolvedAnswersOverview', [
             $scope, EditorStateService, ExplorationStatesService,
             StateTopAnswersStatsService) {
           /**
-           * TODO(brianrodri): Move this into an appropriate service.
+           * TODO(brianrodri): This would be more helpful/flexible in its own
+           * service, maybe a InteractionAnswerRenderingService?
            * @returns {boolean}
            */
           var isStateInteractionIdSupported = function() {
             var state = ExplorationStatesService.getState(
               EditorStateService.getActiveStateName());
-            if (!state) {
-              return false;
-            } else {
-              var interactionId = state.interaction.id;
-              return (interactionId === 'TextInput');
-            }
+            return (!!state &&
+              SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS.indexOf(
+                state.interaction.id) !== -1);
           };
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
