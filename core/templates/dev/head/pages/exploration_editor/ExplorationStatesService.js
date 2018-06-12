@@ -36,10 +36,10 @@ oppia.factory('ExplorationStatesService', [
     // Properties that have a different backend representation from the
     // frontend and must be converted.
 
-		var onStateAddedCallbacks = [];
-		var onStateDeletedCallbacks = [];
-		var onStateRenamedCallbacks = [];
-		var onStateInteractionAnswerGroupsSavedCallbacks = [];
+    var onStateAddedCallbacks = [];
+    var onStateDeletedCallbacks = [];
+    var onStateRenamedCallbacks = [];
+    var onStateInteractionAnswerGroupsSavedCallbacks = [];
 
     var BACKEND_CONVERSIONS = {
       answer_groups: function(answerGroups) {
@@ -240,10 +240,10 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
-				onStateInteractionAnswerGroupsSavedCallbacks.forEach(
-					function(callback) {
-						callback(stateName);
-					});
+        onStateInteractionAnswerGroupsSavedCallbacks.forEach(
+          function(callback) {
+            callback(stateName);
+          });
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(
@@ -288,9 +288,9 @@ oppia.factory('ExplorationStatesService', [
         _states.addState(newStateName);
 
         ChangeListService.addState(newStateName);
-				onStateAddedCallbacks.forEach(function(callback) {
-					callback(newStateName);
-				});
+        onStateAddedCallbacks.forEach(function(callback) {
+          callback(newStateName);
+        });
         $rootScope.$broadcast('refreshGraph');
         if (successCallback) {
           successCallback(newStateName);
@@ -347,9 +347,9 @@ oppia.factory('ExplorationStatesService', [
           }
 
           $location.path('/gui/' + EditorStateService.getActiveStateName());
-					onStateDeletedCallbacks.forEach(function(callback) {
-						callback(deleteStateName);
-					});
+          onStateDeletedCallbacks.forEach(function(callback) {
+            callback(deleteStateName);
+          });
           $rootScope.$broadcast('refreshGraph');
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
@@ -382,23 +382,23 @@ oppia.factory('ExplorationStatesService', [
           ExplorationInitStateNameService.displayed = newStateName;
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
         }
-				onStateRenamedCallbacks.forEach(function(callback) {
-					callback(oldStateName, newStateName);
-				});
+        onStateRenamedCallbacks.forEach(function(callback) {
+          callback(oldStateName, newStateName);
+        });
         $rootScope.$broadcast('refreshGraph');
       },
-			registerOnStateAddedCallback: function(callback) {
-				onStateAddedCallbacks.push(callback);
-			},
-			registerOnStateDeletedCallback: function(callback) {
-				onStateDeletedCallbacks.push(callback);
-			},
-			registerOnStateRenamedCallback: function(callback) {
-				onStateRenamedCallbacks.push(callback);
-			},
-			registerOnStateInteractionAnswerGroupsSaved: function(callback) {
-				onStateInteractionAnswerGroupsSavedCallbacks.push(callback);
-			},
+      registerOnStateAddedCallback: function(callback) {
+        onStateAddedCallbacks.push(callback);
+      },
+      registerOnStateDeletedCallback: function(callback) {
+        onStateDeletedCallbacks.push(callback);
+      },
+      registerOnStateRenamedCallback: function(callback) {
+        onStateRenamedCallbacks.push(callback);
+      },
+      registerOnStateInteractionAnswerGroupsSaved: function(callback) {
+        onStateInteractionAnswerGroupsSavedCallbacks.push(callback);
+      },
     };
   }
 ]);

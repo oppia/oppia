@@ -98,11 +98,11 @@ oppia.factory('StateTopAnswersStatsService', [
       refreshAddressedInfo(stateName);
     };
 
-		ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
-		ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
-		ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
-		ExplorationStatesService.registerOnStateInteractionAnswerGroupsSaved(
-			onStateInteractionAnswerGroupsSaved);
+    ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
+    ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
+    ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
+    ExplorationStatesService.registerOnStateInteractionAnswerGroupsSaved(
+      onStateInteractionAnswerGroupsSaved);
 
     return {
       /**
