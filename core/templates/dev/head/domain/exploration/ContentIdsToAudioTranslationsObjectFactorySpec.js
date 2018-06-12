@@ -170,8 +170,9 @@ describe('ContentIdsToAudioTranslations object factory', function() {
 
     it('should correctly check content id has unflagged audio translations',
       function(){
-        expect(citat.hasUnflaggedAudioTranslations('content')).toBe(false);
-        expect(citat.hasUnflaggedAudioTranslations('hint_1')).toBe(true);
+        expect(citat.hasUnflaggedAudioTranslations('content')).toBe(true);
+        citat.markAllAudioAsNeedingUpdate('solution');
+        expect(citat.hasUnflaggedAudioTranslations('solution')).toBe(false);
       });
 
     it('should add a given content id', function(){

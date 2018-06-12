@@ -63,7 +63,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
       function(contentId) {
         var audioTranslations = this._contentIdsToAudioTranslations[contentId];
         for (var languageCode in audioTranslations) {
-          if (audioTranslations[languageCode].needsUpdate) {
+          if (!audioTranslations[languageCode].needsUpdate) {
             return true;
           }
         }
