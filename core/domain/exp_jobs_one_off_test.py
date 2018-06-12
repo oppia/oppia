@@ -1048,7 +1048,7 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
 
             # Test that html matches the expected format after migration.
             self.assertEqual(
-                updated_html, test_cases[index]['expected_output'])
+                updated_html, unicode(test_cases[index]['expected_output']))
 
         exp_services.save_new_exploration(
             self.albert_id, updated_exploration)

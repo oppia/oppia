@@ -527,7 +527,7 @@ def validate_textangular_format(html_list, run_migration=False):
             err_dict['strings'].append(html_data)
 
         for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
-            # content is taken from [-1:1] since quotes are unescaped
+            # content is taken from [1:-1] since quotes are unescaped
             # and are treated as part of html content.
             content_html = unescape_html(
                 collapsible['content-with-value'])[1:-1]

@@ -416,6 +416,40 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
             'expected_output': (
                 'Hello<div>oppia</div>testing <i>in progess</i>!'
             )
+        }, {
+            'html_content': (
+                '<span><b>Hello </b></span><div><b><span>this is '
+                'test case</span></b></div><div><b><br></b></div>'
+                '<div><oppia-noninteractive-tabs tab_contents-with-value'
+                '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;span '
+                'style=\\&amp;quot;line-height: 21px; background-color: '
+                'rgb(255, 255, 255);\\&amp;quot;&amp;gt;lorem ipsum&amp;lt;'
+                '/span&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;'
+                'quot;hello&amp;quot;},{&amp;quot;content&amp;quot;:&amp;'
+                'quot;&amp;lt;span style=\\&amp;quot;color: rgb(0, 0, 0); '
+                'font-family: &amp;#39;Times New Roman&amp;#39;; font-size: '
+                'medium; line-height: normal;\\&amp;quot;&amp;gt;&amp;lt;'
+                'font size=\\&amp;quot;3\\&amp;quot; face=\\&amp;quot;Times '
+                'New Roman CE\\&amp;quot;&amp;gt;oppia&amp;lt;/font&amp;gt;'
+                '&amp;lt;/span&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:'
+                '&amp;quot;Savjet 1&amp;quot;}]\"></oppia-noninteractive-tabs>'
+                '<b><br></b></div><div><span></span><b><br></b><div>'
+                '<span><b><br></b></span></div></div>'
+            ),
+            'expected_output': (
+                '<span><b>Hello </b></span><div><b><span>this is '
+                'test case</span></b></div><div><b><br/></b></div>'
+                '<div><oppia-noninteractive-tabs tab_contents-with-value='
+                '\"[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;'
+                'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, '
+                '&amp;quot;title&amp;quot;: &amp;quot;hello&amp;quot;}, '
+                '{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;'
+                'quot;: &amp;quot;Savjet 1&amp;quot;}]\">'
+                '</oppia-noninteractive-tabs><b><br/></b></div>'
+                '<div><span></span><b><br/></b><div>'
+                '<span><b><br/></b></span></div></div>'
+            )
         }]
 
         for test_case in test_cases:
