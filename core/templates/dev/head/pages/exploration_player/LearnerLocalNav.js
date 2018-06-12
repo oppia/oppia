@@ -64,7 +64,7 @@ oppia.controller('LearnerLocalNav', [
                 stateName: stateName,
                 description: $scope.description,
                 suggestionHtml: $scope.suggestionHtml
-              }
+              };
               if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
                 data = {
                   target_id: ExplorationPlayerService.getExplorationId(),
@@ -74,7 +74,7 @@ oppia.controller('LearnerLocalNav', [
                   target_type: 'exploration',
                   description: $scope.description,
                   suggestionHtml: $scope.suggestionHtml,
-                }
+                };
               }
               $uibModalInstance.close(data);
             };
@@ -85,8 +85,8 @@ oppia.controller('LearnerLocalNav', [
           state_name: result.stateName,
           description: result.description,
           suggestion_html: result.suggestionHtml
-        }
-        url = '/suggestionhandler/' + result.id
+        };
+        url = '/suggestionhandler/' + result.id;
         if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
           data = {
             suggestion_type: result.suggestion_type,
@@ -105,11 +105,11 @@ oppia.controller('LearnerLocalNav', [
                 audio_translation: {}
               }
             }
-          }
-          url = '/suggestionhandler/'
+          };
+          url = '/suggestionhandler/';
         }
         $http.post(url, data).error(function(res) {
-            AlertsService.addWarning(res);
+          AlertsService.addWarning(res);
         });
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
