@@ -39,45 +39,121 @@
       </ul>
     </div>
 
-    <div class="oppia-card-view-wrap" ng-if="activeTab === TAB_NAME_TOPICS">
-      <md-card ng-repeat="topic in topicSummaries"
-               class="oppia-activity-summary-tile oppia-dashboard-card-view-item">
-        <a ng-href="/topic_editor/<[topic.id]>">
-          <div class="title-section">
-            <h2 class="activity-title">
-              <span><[(topic.name | truncate:40)]></span>
-            </h2>
-          </div>
-          <div class="content-section">
-              Uncategorized Skills: <[topic.uncategorized_skill_count]>
-          </div>
-          <div class="content-section">
-              Canonical Stories: <[topic.canonical_story_count]>
-          </div>
-          <div class="content-section">
-              Additional Stories: <[topic.additional_story_count]>
-          </div>
-        </a>
+    <div class="oppia-dashboard-container" ng-if="activeTab === TAB_NAME_TOPICS">
+      <md-card layout="row"
+               class="oppia-dashboard-list-view-item">
+        <table class="oppia-dashboard-table">
+            <colgroup>
+              <col style="width: 28%;">
+              <col style="width: 24%;">
+              <col style="width: 24%;">
+              <col style="width: 24%;">
+            </colgroup>
+          <tr>
+            <th ng-repeat="key in TOPIC_HEADINGS"
+                class="oppia-dashboard-table-headings">
+              <p ng-if="key === 'name'" translate="I18N_DASHBOARD_TABLE_HEADING_TOPIC_NAME"></p>
+              <p ng-if="key === 'subtopic_count'" translate="I18N_DASHBOARD_TABLE_HEADING_SUBTOPICS"></p>
+              <p ng-if="key === 'skill_count'" translate="I18N_DASHBOARD_TABLE_HEADING_SKILLS"></p>
+              <p ng-if="key === 'canonical_story_count'" translate="I18N_DASHBOARD_TABLE_HEADING_CANONICAL_STORIES"></p>
+            </th>
+          </tr>
+          <tr ng-repeat="topic in topicSummaries"
+              class="list-item">
+            <td>
+              <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="oppia-dashboard-list-summary">
+                <span> <[topic.name]> </span>
+              </a>
+            </td>
+            <td>
+              <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="oppia-dashboard-list-summary">
+                <span> <[topic.subtopic_count]> </span>
+              </a>
+            </td>
+            <td>
+              <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="oppia-dashboard-list-summary">
+                <span> <[topic.total_skill_count]> </span>
+                <span ng-if="topic.uncategorized_skill_count > 0"> ( <[topic.uncategorized_skill_count]> uncategorized ) </span>
+              </a>
+            </td>
+            <td>
+              <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="oppia-dashboard-list-summary">
+                <span> <[topic.canonical_story_count]> </span>
+              </a>
+            </td>
+          </tr>
+        </table>
       </md-card>
     </div>
 
-    <div class="oppia-card-view-wrap" ng-if="activeTab === TAB_NAME_SKILLS">
-      <md-card ng-repeat="skill in skillSummaries"
-               class="oppia-activity-summary-tile oppia-dashboard-card-view-item">
-        <a ng-href="/skill_editor/<[skill.id]>">
-          <div class="title-section">
-            <h2 class="activity-title">
-              <span><[(skill.description | truncate:40)]></span>
-            </h2>
-          </div>
-          <div class="content-section" style="margin-top: 25%; font-size: 0.9em;">
-              Misconceptions: <[skill.misconception_count]>
-          </div>
-        </a>
+    <div class="oppia-dashboard-container" ng-if="activeTab === TAB_NAME_SKILLS">
+      <md-card layout="row"
+               class="oppia-dashboard-list-view-item">
+        <table class="oppia-dashboard-table">
+            <colgroup>
+              <col style="width: 50%;">
+              <col style="width: 25%;">
+              <col style="width: 25%;">
+            </colgroup>
+          <tr>
+            <th ng-repeat="key in SKILL_HEADINGS"
+                class="oppia-dashboard-table-headings">
+              <p ng-if="key === 'description'" translate="I18N_DASHBOARD_TABLE_HEADING_SKILL_DESCRIPTION"></p>
+              <p ng-if="key === 'worked_examples_count'" translate="I18N_DASHBOARD_TABLE_HEADING_WORKED_EXAMPLES"></p>
+              <p ng-if="key === 'misconception_count'" translate="I18N_DASHBOARD_TABLE_HEADING_MISCONCEPTIONS"></p>
+            </th>
+          </tr>
+          <tr ng-repeat="skill in skillSummaries"
+              class="list-item">
+            <td>
+              <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="oppia-dashboard-list-summary">
+                <span> <[skill.description]> </span>
+              </a>
+            </td>
+            <td>
+              <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="oppia-dashboard-list-summary">
+                <span> <[skill.worked_examples_count]> </span>
+              </a>
+            </td>
+            <td>
+              <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="oppia-dashboard-list-summary">
+                <span> <[skill.misconception_count]> </span>
+              </a>
+            </td>
+          </tr>
+        </table>
       </md-card>
+    </div>
+
+
+    <div class="col-sm-8" ng-if="topicSummaries.length === 0 && skillSummaries.length === 0">
+      <blockquote class="oppia-dashboard-intro-card">
+        <p class="oppia-dashboard-intro-card-message" style="padding-top: 6px;"
+           translate="I18N_TOPICS_AND_SKILLS_DASHBOARD_INTRO_MESSAGE_PART_ONE">
+        </p>
+        <p class="oppia-dashboard-intro-card-message" style="padding-top: 15px;"
+           translate="I18N_TOPICS_AND_SKILLS_DASHBOARD_INTRO_MESSAGE_PART_TWO">
+        </p>
+        <a class="btn oppia-dashboard-intro-button oppia-transition-200"
+           style="color: white; text-decoration: none;"
+           translate="I18N_TOPNAV_CREATE_TOPIC"
+           ng-href="/">
+        </a>
+      </blockquote>
     </div>
   </div>
   <style>
+    .oppia-dashboard-list-view-item {
+      background: #fff;
+      margin: 20px 7.5px 0px 7.5px;
+      padding: 10px 20px;
+    }
+
+    .oppia-dashboard-table {
+      width: 100%;
+      font-size: 15px;
+    }
+
     .oppia-dashboard-tabs {
       border-bottom: 1px solid #eee;
       display: -webkit-flex;
@@ -88,6 +164,39 @@
       padding-top: 7%;
       text-align: center;
     }
+
+    .oppia-dashboard-table .oppia-dashboard-table-headings {
+        padding-bottom: 0.7em;
+        border-bottom: 2px solid #bbb;
+    }
+
+    .oppia-dashboard-table .oppia-dashboard-table-headings p {
+      display: inline;
+    }
+
+    .oppia-dashboard-container .oppia-dashboard-list-summary,
+    .oppia-dashboard-container .oppia-dashboard-list-summary:active,
+    .oppia-dashboard-container .oppia-dashboard-list-summary:visited {
+      color: inherit;
+      display: block;
+      height: 2em;
+      text-decoration: none;
+    }
+
+    .list-item:not(:last-child) {
+      border-bottom: 1px solid #bbb;
+    }
+
+    .oppia-dashboard-container .list-item:hover {
+      background-color: #ededed;
+    }
+
+    .oppia-dashboard-list-summary span {
+      display: inline-block;
+      vertical-align: middle;
+      line-height: normal;
+    }
+
     .oppia-dashboard-tabs li {
       display: -webkit-flex;
       display: flex;
@@ -103,43 +212,45 @@
       padding-top: 78.5px;
       text-align: center;
     }
-    .oppia-card-view-wrap {
-      position: relative;
+
+    .oppia-dashboard-intro-card {
+      background: #fff;
+      border-left: none;
+      border-radius: 5px;
+      margin: 1em 0 0;
+      padding: 37px 30px;
+      text-align: center;
+      width: 150%;
     }
 
-    .oppia-dashboard-card-view-item {
-      height: 250px;
-      margin-left: 10px;
-      margin-right: 10px;
-      position: static;
-      width: 184px;
+    .oppia-dashboard-intro-card:before {
+      background: #fff;
+      border-bottom-right-radius: 80px 50px;
+      bottom: -1.7em;
+      content: "";
+      display: block;
+      height: 30px;
+      position: absolute;
+      width: 50px;
+      z-index: 10;
     }
 
-    .oppia-card-view-wrap a:hover {
-      text-decoration: none !important;
+    .oppia-dashboard-intro-card:after {
+      background: #eee;
+      border-bottom-right-radius: 40px 50px;
+      bottom: -1.7em;
+      content: "";
+      display: block;
+      height: 30px;
+      position: absolute;
+      width: 20px;
+      z-index: 10;
     }
 
-    .oppia-dashboard-card-view-item .title-section {
-      background-color: #aa1414;
-      height: 50%;
-      margin-bottom: 10%;
-    }
-
-    .oppia-dashboard-card-view-item .content-section {
+    .oppia-dashboard-intro-card-message {
       font-family: 'Capriola', 'Roboto', Arial, sans-serif;
-      font-size: 0.8em;
-      margin-left: 7.5px;
-      margin-top: 5%;
-    }
-
-    .oppia-dashboard-card-view-item:hover {
-      opacity: 0.7;
-    }
-
-    .oppia-dashboard-card-view-item .activity-title {
-      max-width: 75%;
-      position: relative;
-      top: 100px;
+      font-size: 18px;
+      text-align: center;
     }
 
     .oppia-dashboard-tabs .oppia-dashboard-tabs-text {
@@ -150,12 +261,14 @@
       text-transform: uppercase;
       width: 100%;
     }
+
     .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text,
     .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text:hover {
       border-bottom: 4px solid #009688;
       color: #009688;
       margin-left: 7.5px;
     }
+
     .oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover {
       color: #009688;
       font-size: 1em;
@@ -164,10 +277,12 @@
       text-transform: uppercase;
       width: 100%;
     }
+
     .oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover,
     .oppia-dashboard-tabs .oppia-dashboard-tabs-text:focus {
       text-decoration: none;
     }
+
     .oppia-dashboard-tabs .list-card-view-toggle {
       margin-left: auto;
       margin-right: 7.5px;
@@ -186,30 +301,6 @@
       .oppia-dashboard-container .oppia-dashboard-tabs .sort-explorations-select {
         margin-top: 8px;
         width: 100%;
-      }
-
-      .oppia-dashboard-card-view-item {
-        display: block;
-        height: auto;
-        min-height: 125px;
-        width: auto;
-      }
-
-      .oppia-dashboard-card-view-item .activity-title {
-        max-width: 75%;
-        position: relative;
-        top: 45px;
-      }
-
-      .oppia-dashboard-card-view-item .title-section {
-        background-color: #aa1414;
-        height: 70px;
-        margin-bottom: 10%;
-      }
-
-      .oppia-dashboard-container .oppia-dashboard-tabs .list-card-view-toggle,
-      .oppia-dashboard-container .oppia-dashboard-card-view-item .oppia-sharing-links {
-        display: none;
       }
     }
   </style>

@@ -48,6 +48,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
+        self.assertEqual(skill_summary.worked_examples_count, 1)
 
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()
@@ -69,6 +70,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
+        self.assertEqual(skill_summary.worked_examples_count, 1)
 
     def test_get_all_skill_summaries(self):
         skill_summaries = skill_services.get_all_skill_summaries()
@@ -77,6 +79,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].id, self.SKILL_ID)
         self.assertEqual(skill_summaries[0].description, 'Description')
         self.assertEqual(skill_summaries[0].misconception_count, 1)
+        self.assertEqual(skill_summaries[0].worked_examples_count, 1)
 
     def test_get_skill_by_id(self):
         expected_skill = self.skill.to_dict()

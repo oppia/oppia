@@ -718,8 +718,8 @@ class TopicSummary(object):
     def __init__(
             self, topic_id, name, language_code, version,
             canonical_story_count, additional_story_count,
-            uncategorized_skill_count, subtopic_count, topic_model_created_on,
-            topic_model_last_updated):
+            uncategorized_skill_count, subtopic_count, total_skill_count,
+            topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
         Args:
@@ -734,6 +734,8 @@ class TopicSummary(object):
             uncategorized_skill_count: int. The number of uncategorized skills
                 in the topic.
             subtopic_count: int. The number of subtopics in the topic.
+            total_skill_count: int. The total number of skills in the topic
+                (including those that are uncategorized).
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
@@ -747,6 +749,7 @@ class TopicSummary(object):
         self.additional_story_count = additional_story_count
         self.uncategorized_skill_count = uncategorized_skill_count
         self.subtopic_count = subtopic_count
+        self.total_skill_count = total_skill_count
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
 
@@ -765,6 +768,7 @@ class TopicSummary(object):
             'additional_story_count': self.additional_story_count,
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
+            'total_skill_count': self.total_skill_count,
             'topic_model_created_on': utils.get_time_in_millisecs(
                 self.topic_model_created_on),
             'topic_model_last_updated': utils.get_time_in_millisecs(

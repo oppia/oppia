@@ -150,6 +150,7 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.additional_story_count,
         topic_summary_model.uncategorized_skill_count,
         topic_summary_model.subtopic_count,
+        topic_summary_model.total_skill_count,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
@@ -640,12 +641,16 @@ def compute_summary_of_topic(topic):
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
+    total_skill_count = topic_model_uncategorized_skill_count
+    for subtopic in topic.subtopics:
+        total_skill_count = total_skill_count + len(subtopic.skill_ids)
+
     topic_summary = topic_domain.TopicSummary(
         topic.id, topic.name, topic.language_code,
         topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        topic.created_on, topic.last_updated
+        total_skill_count, topic.created_on, topic.last_updated
     )
 
     return topic_summary
@@ -668,6 +673,7 @@ def save_topic_summary(topic_summary):
         canonical_story_count=topic_summary.canonical_story_count,
         uncategorized_skill_count=topic_summary.uncategorized_skill_count,
         subtopic_count=topic_summary.subtopic_count,
+        total_skill_count=topic_summary.total_skill_count,
         topic_model_last_updated=topic_summary.topic_model_last_updated,
         topic_model_created_on=topic_summary.topic_model_created_on
     )

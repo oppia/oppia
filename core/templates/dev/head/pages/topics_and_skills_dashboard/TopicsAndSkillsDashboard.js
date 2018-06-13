@@ -25,11 +25,24 @@ oppia.controller('TopicsAndSkillsDashboard', [
       UrlInterpolationService, FATAL_ERROR_CODES) {
     $scope.TAB_NAME_TOPICS = 'topics';
     $scope.TAB_NAME_SKILLS = 'skills';
+    // As additional stories are not supported initially, it's not being shown,
+    // for now.
+    $scope.TOPIC_HEADINGS = [
+      'name', 'subtopic_count', 'skill_count',
+      'canonical_story_count'
+    ];
+    $scope.SKILL_HEADINGS = [
+      'description', 'misconception_count', 'worked_examples_count'
+    ];
     TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
       function(response) {
         $scope.topicSummaries = response.data.topic_summaries;
         $scope.skillSummaries = response.data.skill_summaries;
         $scope.activeTab = $scope.TAB_NAME_TOPICS;
+        if ($scope.topicSummaries.length === 0 &&
+            $scope.skillSummaries.length !== 0) {
+          $scope.activeTab = $scope.TAB_NAME_SKILLS;
+        }
       },
       function(errorResponse) {
         if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
@@ -40,6 +53,14 @@ oppia.controller('TopicsAndSkillsDashboard', [
 
     $scope.setActiveTab = function(tabName) {
       $scope.activeTab = tabName;
+    };
+
+    $scope.getTopicEditorUrl = function(topicId) {
+      return '/topic_editor/' + topicId;
+    };
+
+    $scope.getSkillEditorUrl = function(skillId) {
+      return '/skill_editor/' + skillId;
     };
   }
 ]);

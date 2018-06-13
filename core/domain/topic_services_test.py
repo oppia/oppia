@@ -76,6 +76,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.additional_story_count, 1)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
+        self.assertEqual(topic_summary.total_skill_count, 2)
 
     def test_get_all_summaries(self):
         topic_summaries = topic_services.get_all_topic_summaries()
@@ -84,7 +85,8 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summaries[0].name, 'Name')
         self.assertEqual(topic_summaries[0].canonical_story_count, 2)
         self.assertEqual(topic_summaries[0].additional_story_count, 1)
-        self.assertEqual(topic_summaries[0].uncategorized_skill_count, 1)
+        self.assertEqual(topic_summaries[0].total_skill_count, 2)
+        self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
 
     def test_get_new_topic_id(self):
@@ -109,6 +111,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.canonical_story_count, 2)
         self.assertEqual(topic_summary.additional_story_count, 1)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
+        self.assertEqual(topic_summary.total_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
 
     def test_get_topic_by_id(self):
