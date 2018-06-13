@@ -23,7 +23,7 @@
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="trainingData">
       <div ng-show="trainingData.length > 0">
-        <div ng-repeat="answer in trainingData track by $index" class='training-data-answer'>
+        <div ng-repeat="answer in trainingData track by $index" class='training-data-answer' ng-click="openTrainUnresolvedAnswerModal($index)">
           <div class='training-data-answer-html' angular-html-bind="answer.answerTemplate"></div>
           <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response" ng-click="removeAnswerFromTrainingData($index)">
             <i class="material-icons md-18"></i>

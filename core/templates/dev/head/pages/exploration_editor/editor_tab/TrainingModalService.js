@@ -21,7 +21,8 @@ oppia.factory('TrainingModalService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
     return {
-      openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave, finishTrainingCallback) {
+      openTrainUnresolvedAnswerModal: function(
+          unhandledAnswer, externalSave, finishTrainingCallback) {
         AlertsService.clearWarnings();
         if (externalSave) {
           $rootScope.$broadcast('externalSave');

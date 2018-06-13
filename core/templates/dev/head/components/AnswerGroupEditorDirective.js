@@ -235,7 +235,7 @@ oppia.directive('answerGroupEditor', [
             return $scope.activeRuleIndex !== -1;
           };
 
-          $scope.isInteractionTrainable = function() {
+          $scope.isCurrentInteractionTrainable = function() {
             var interactionId = $scope.getCurrentInteractionId();
             return INTERACTION_SPECS[interactionId].is_trainable;
           };

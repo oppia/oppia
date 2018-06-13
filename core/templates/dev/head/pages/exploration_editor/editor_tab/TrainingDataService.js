@@ -98,6 +98,22 @@ oppia.factory('TrainingDataService', [
         return ResponsesService.getAnswerGroup(answerGroupIndex).trainingData;
       },
 
+      getAllPotentialOutcomes: function(state) {
+        var potentialOutcomes = [];
+        var interaction = state.interaction;
+
+        for (var i = 0; i < interaction.answerGroups.length; i++) {
+          potentialOutcomes.push(interaction.answerGroups[i].outcome);
+        }
+
+        if (interaction.defaultOutcome) {
+          var outcome = interaction.defaultOutcome;
+          potentialOutcomes.push(interaction.defaultOutcome);
+        }
+
+        return potentialOutcomes;
+      },
+
       trainAnswerGroup: function(answerGroupIndex, answer) {
         // Remove answer from traning data of any answer group or
         // confirmed unclassified answers.

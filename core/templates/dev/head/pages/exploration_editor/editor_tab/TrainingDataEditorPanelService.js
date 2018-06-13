@@ -39,13 +39,15 @@ oppia.factory('TrainingDataEditorPanelService', [
             'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
             'ExplorationHtmlFormatterService', 'ResponsesService',
             'stateCustomizationArgsService', 'TrainingDataService',
+            'TrainingModalService',
             function($scope, $injector, $uibModalInstance,
                 ExplorationStatesService, EditorStateService,
                 AnswerClassificationService, ExplorationContextService,
                 stateInteractionIdService, AngularNameService,
                 EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION,
                 ExplorationHtmlFormatterService, ResponsesService,
-                stateCustomizationArgsService, TrainingDataService) {
+                stateCustomizationArgsService, TrainingDataService,
+                TrainingModalService) {
               var _explorationId = ExplorationContextService.getExplorationId();
               var _stateName = EditorStateService.getActiveStateName();
               var _state = ExplorationStatesService.getState(_stateName);
@@ -142,6 +144,16 @@ oppia.factory('TrainingDataEditorPanelService', [
                   _rebuildTrainingData();
                   $scope.answerSuccessfullyAdded = true;
                 }
+              };
+
+              $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
+                answer = $scope.trainingData[answerIndex].answer;
+                return TrainingModalService.openTrainUnresolvedAnswerModal(
+                  answer, true, $scope.finishTrainingAnswer);
+              };
+
+              $scope.finishTrainingAnswer = function() {
+                _rebuildTrainingData();
               };
 
               $scope.init();
