@@ -71,12 +71,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.misconception_count, 1)
 
     def test_get_all_skill_summaries(self):
-        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_summary_dicts = skill_services.get_all_skill_summaries()
 
-        self.assertEqual(len(skill_summaries), 1)
-        self.assertEqual(skill_summaries[0].id, self.SKILL_ID)
-        self.assertEqual(skill_summaries[0].description, 'Description')
-        self.assertEqual(skill_summaries[0].misconception_count, 1)
+        self.assertEqual(len(skill_summary_dicts), 1)
+        self.assertEqual(skill_summary_dicts[0].id, self.SKILL_ID)
+        self.assertEqual(skill_summary_dicts[0].description, 'Description')
+        self.assertEqual(skill_summary_dicts[0].misconception_count, 1)
 
     def test_get_skill_by_id(self):
         expected_skill = self.skill.to_dict()

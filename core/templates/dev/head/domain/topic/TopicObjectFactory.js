@@ -85,12 +85,20 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     // a delete subtopic operation and not anywhere else. For adding subtopics
     // in general, use topic.addSubtopic()
     Topic.prototype.undoDeleteSubtopic = function(
-        id, title, skillIdsForSubtopic, isNewlyCreated) {
+        id, title, skillIdsForSubtopic, isNewlyCreated, subtopicIndex) {
       var newSubtopic = SubtopicObjectFactory.createFromTitle(id, title);
       for (var i = 0; i < skillIdsForSubtopic.length; i++) {
         newSubtopic.addSkillId(skillIdsForSubtopic[i]);
       }
+      for (var i = subtopicIndex; i < this._subtopics.length; i++) {
+        this._subtopics[i].incrementId();
+      }
       this._subtopics.push(newSubtopic);
+      this._subtopics.sort(
+        function(subtopic1, subtopic2) {
+          return subtopic1.getId() - subtopic2.getId();
+        }
+      );
       if (isNewlyCreated) {
         this._nextSubtopicId++;
       }
@@ -112,7 +120,7 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
         if (isNewlyCreated && subtopicDeleted) {
           this._subtopics[i].decrementId();
         }
-        if (this._subtopics[i].getId() === subtopicId) {
+        if ((this._subtopics[i].getId() === subtopicId) && (!subtopicDeleted)) {
           // When a subtopic is deleted, all the skills in it are moved to
           // uncategorized skill ids.
           var skillIds = this._subtopics[i].getSkillIds();
@@ -139,6 +147,12 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
 
     Topic.prototype.getSubtopics = function() {
       return this._subtopics.slice();
+    };
+
+    Topic.prototype.getSubtopicIndex = function(subtopicId) {
+      return this._subtopics.findIndex(function(subtopic) {
+        return subtopic.getId() === subtopicId;
+      });
     };
 
     Topic.prototype.addCanonicalStoryId = function(storyId) {
@@ -252,18 +266,6 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     Topic.create = function(topicBackendObject) {
       return new Topic(topicBackendObject);
     };
-
-    // Create a new, empty topic. This is not guaranteed to pass validation
-    // tests.
-    Topic.createEmptyTopic = function() {
-      return new Topic({
-        additional_story_ids: [],
-        canonical_story_ids: [],
-        uncategorized_skill_ids: [],
-        subtopics: []
-      });
-    };
-
     return Topic;
   }
 ]);

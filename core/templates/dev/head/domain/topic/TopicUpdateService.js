@@ -205,15 +205,17 @@ oppia.factory('TopicUpdateService', [
       },
 
       /**
-       * Deletes a subtopic from the topic and records the change in
-       * the undo/redo service.The argument isNewlyCreated should be passed from
-       * the calling function, after checking the changelist to see if this
-       * subtopic was created in the same changelist.
+       * @param {Topic} topic - The topic object to be edited.
+       * @param {number} subtopicId - The id of the subtopic to delete.
+       * @param {boolean} isNewlyCreated - Whether the subtopic to delete was
+       *    created in the current draft of the topic. (i.e, the subtopic to
+       *    delete hasn't been saved in the datastore yet.)
        */
       deleteSubtopic: function(topic, subtopicId, isNewlyCreated) {
         var subtopic = topic.getSubtopicById(subtopicId);
         var title = subtopic.getTitle();
         var skillIds = subtopic.getSkillIds();
+        var subtopicIndex = topic.getSubtopicIndex(subtopicId);
         _applyChange(topic, CMD_DELETE_SUBTOPIC, {
           subtopic_id: subtopicId,
         }, function(changeDict, topic) {
@@ -222,7 +224,8 @@ oppia.factory('TopicUpdateService', [
         }, function(changeDict, topic) {
           // Undo.
           var subtopicId = _getSubtopicIdFromChangeDict(changeDict);
-          topic.undoDeleteSubtopic(subtopicId, title, skillIds, isNewlyCreated);
+          topic.undoDeleteSubtopic(
+            subtopicId, title, skillIds, isNewlyCreated, subtopicIndex);
           for (var i = 0; i < skillIds.length; i++) {
             topic.removeUncategorizedSkillId(skillIds[i]);
           }

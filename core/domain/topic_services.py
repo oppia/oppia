@@ -125,11 +125,11 @@ def get_all_topic_summaries():
         list(TopicSummary). The list of summaries of all topics present in the
             datastore.
     """
-    topic_summaries_models = topic_models.TopicSummaryModel.get_all()
-    topic_summaries = [
+    topic_summary_dicts_models = topic_models.TopicSummaryModel.get_all()
+    topic_summary_dicts = [
         get_topic_summary_from_model(summary)
-        for summary in topic_summaries_models]
-    return topic_summaries
+        for summary in topic_summary_dicts_models]
+    return topic_summary_dicts
 
 
 def get_topic_summary_from_model(topic_summary_model):

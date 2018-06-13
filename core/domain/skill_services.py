@@ -164,11 +164,11 @@ def get_all_skill_summaries():
         list(SkillSummary). The list of summaries of all skills present in the
             datastore.
     """
-    skill_summaries_models = skill_models.SkillSummaryModel.get_all()
-    skill_summaries = [
+    skill_summary_dicts_models = skill_models.SkillSummaryModel.get_all()
+    skill_summary_dicts = [
         get_skill_summary_from_model(summary)
-        for summary in skill_summaries_models]
-    return skill_summaries
+        for summary in skill_summary_dicts_models]
+    return skill_summary_dicts
 
 
 def get_skill_summary_from_model(skill_summary_model):
