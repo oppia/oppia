@@ -22,11 +22,11 @@
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'UrlInterpolationService', 'ImagePreloaderService',
-  'AssetsBackendApiService', 'LOADING_INDICATOR_URL', 'TRY_AGAIN_URL',
+  'AssetsBackendApiService', 'LOADING_INDICATOR_URL',
   function(
       $rootScope, $sce, HtmlEscaperService, ExplorationContextService,
       UrlInterpolationService, ImagePreloaderService, AssetsBackendApiService,
-      LOADING_INDICATOR_URL, TRY_AGAIN_URL) {
+      LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -38,8 +38,6 @@ oppia.directive('oppiaNoninteractiveImage', [
         $scope.imageUrl = '';
         $scope.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
           LOADING_INDICATOR_URL);
-        $scope.tryAgainUrl = UrlInterpolationService.getStaticImageUrl(
-          TRY_AGAIN_URL);
         $scope.isLoadingIndicatorShown = false;
         $scope.isTryAgainShown = false;
 

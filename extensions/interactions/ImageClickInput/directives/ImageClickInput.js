@@ -24,12 +24,12 @@ oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
   'ImagePreloaderService', 'AssetsBackendApiService', 'EDITOR_TAB_CONTEXT',
-  'EVENT_NEW_CARD_AVAILABLE', 'LOADING_INDICATOR_URL', 'TRY_AGAIN_URL',
+  'EVENT_NEW_CARD_AVAILABLE', 'LOADING_INDICATOR_URL',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
       ImagePreloaderService, AssetsBackendApiService, EDITOR_TAB_CONTEXT,
-      EVENT_NEW_CARD_AVAILABLE, LOADING_INDICATOR_URL, TRY_AGAIN_URL) {
+      EVENT_NEW_CARD_AVAILABLE, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {
@@ -49,8 +49,6 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.imageUrl = '';
           $scope.loadingIndicatorUrl = UrlInterpolationService
             .getStaticImageUrl(LOADING_INDICATOR_URL);
-          $scope.tryAgainUrl = UrlInterpolationService.getStaticImageUrl(
-            TRY_AGAIN_URL);
           $scope.isLoadingIndicatorShown = false;
           $scope.isTryAgainShown = false;
 
