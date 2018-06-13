@@ -46,7 +46,15 @@ class BaseTopicEditorControllerTest(test_utils.GenericTestBase):
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [], [])
+            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [],
+            [], 1)
+        changelist = [topic_domain.TopicChange({
+            'cmd': topic_domain.CMD_ADD_SUBTOPIC,
+            'title': 'Title',
+            'subtopic_id': 1
+        })]
+        topic_services.update_topic_and_subtopic_pages(
+            self.admin_id, self.topic_id, changelist, 'Added subtopic.')
 
 
 class NewStoryHandlerTest(BaseTopicEditorControllerTest):
@@ -68,6 +76,54 @@ class NewStoryHandlerTest(BaseTopicEditorControllerTest):
             self.assertIsNotNone(
                 story_services.get_story_by_id(story_id, strict=False))
         self.logout()
+
+
+class SubtopicPageEditorTest(BaseTopicEditorControllerTest):
+
+    def test_editable_subtopic_page_get(self):
+        # Check that non-admins and non-topic managers cannot access the
+        # editable subtopic data.
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            self.login(self.NEW_USER_EMAIL)
+            response = self.testapp.get(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
+
+            # Check that topic managers not assigned to this topic can
+            # access its subtopic pages.
+            self.login(self.TOPIC_MANAGER_EMAIL)
+            json_response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1))
+            self.assertEqual('', json_response['subtopic_page']['html_data'])
+            self.logout()
+
+            topic_services.assign_role(
+                self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
+                self.topic_id)
+
+            # Check that topic managers can access the subtopic page.
+            self.login(self.TOPIC_MANAGER_EMAIL)
+            json_response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1))
+            self.assertEqual('', json_response['subtopic_page']['html_data'])
+            self.logout()
+
+            # Check that admins can access the editable subtopic data.
+            self.login(self.ADMIN_EMAIL)
+            json_response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1))
+            self.assertEqual('', json_response['subtopic_page']['html_data'])
+            self.logout()
 
 
 class TopicEditorTest(BaseTopicEditorControllerTest):
@@ -109,7 +165,7 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             topic_id_2 = topic_services.get_new_topic_id()
             self.save_new_topic(
                 topic_id_2, self.admin_id, 'Name', 'Description',
-                [], [], [], [])
+                [], [], [], [], 1)
             self.signup('topicmanager2@example.com', 'topicmanager2')
             topic_manager_id_2 = self.get_user_id_from_email(
                 'topicmanager2@example.com')
@@ -166,13 +222,33 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
     def test_editable_topic_handler_put(self):
         # Check that admins can edit a topic.
         change_cmd = {
-            'version': 1,
-            'commit_message': 'changed name',
-            'change_dicts': [{
+            'version': 2,
+            'commit_message': 'Some changes and added a subtopic.',
+            'topic_and_subtopic_page_change_dicts': [{
+                'change_affects_subtopic_page': False,
                 'cmd': 'update_topic_property',
                 'property_name': 'name',
                 'old_value': '',
                 'new_value': 'A new name'
+            }, {
+                'change_affects_subtopic_page': True,
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'html_data',
+                'old_value': '',
+                'subtopic_id': 1,
+                'new_value': '<p>New Data</p>'
+            }, {
+                'change_affects_subtopic_page': False,
+                'cmd': 'add_subtopic',
+                'subtopic_id': 2,
+                'title': 'Title2'
+            }, {
+                'change_affects_subtopic_page': True,
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'html_data',
+                'old_value': '',
+                'new_value': '<p>New Value</p>',
+                'subtopic_id': 2
             }]
         }
         self.login(self.ADMIN_EMAIL)
@@ -187,6 +263,21 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
                 change_cmd, csrf_token=csrf_token)
             self.assertEqual(self.topic_id, json_response['topic']['id'])
             self.assertEqual('A new name', json_response['topic']['name'])
+            self.assertEqual(2, len(json_response['topic']['subtopics']))
+
+            # Test if the corresponding subtopic pages were created.
+            json_response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 1))
+            self.assertEqual(
+                '<p>New Data</p>', json_response['subtopic_page']['html_data'])
+            json_response = self.get_json(
+                '%s/%s/%s' % (
+                    feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+                    self.topic_id, 2))
+            self.assertEqual(
+                '<p>New Value</p>', json_response['subtopic_page']['html_data'])
             self.logout()
 
             # Check that non-admins cannot edit a topic.

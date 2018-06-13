@@ -23,11 +23,13 @@ oppia.controller('TopicsAndSkillsDashboard', [
       $scope, $rootScope, $http, $window,
       AlertsService, TopicsAndSkillsDashboardBackendApiService,
       UrlInterpolationService, FATAL_ERROR_CODES) {
+    $scope.TAB_NAME_TOPICS = 'topics';
+    $scope.TAB_NAME_SKILLS = 'skills';
     TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
       function(response) {
         $scope.topicSummaries = response.data.topic_summaries;
         $scope.skillSummaries = response.data.skill_summaries;
-        $scope.activeTab = 'topics';
+        $scope.activeTab = $scope.TAB_NAME_TOPICS;
       },
       function(errorResponse) {
         if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {

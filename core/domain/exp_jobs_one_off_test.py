@@ -785,6 +785,7 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         content1_dict = {
+            'content_id': 'content',
             'html': (
                 '<blockquote><p>Hello, this <i>is</i> state1 '
                 '</p></blockquote><pre>I\'m looking for a particular '
@@ -793,18 +794,17 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
                 '<oppia-noninteractive-link url-with-value="&amp;quot;'
                 'https://www.example.com&amp;quot;" text-with-value="&amp;quot;'
                 'here&amp;quot;"></oppia-noninteractive-link></p>'
-            ),
-            'audio_translations': {}
+            )
         }
         content2_dict = {
+            'content_id': 'content',
             'html': (
                 '<pre>Hello, this is state2.</pre><blockquote>'
                 '<ol><li>item1</li><li>item2</li></ol></blockquote><p>'
                 'You can see this equation <b><oppia-noninteractive-math'
                 'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;'
                 'quot;"></oppia-noninteractive-math></b></p>'
-            ),
-            'audio_translations': {}
+            )
         }
         state1.update_content(content1_dict)
         state2.update_content(content2_dict)
@@ -824,6 +824,7 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         default_outcome_dict = {
             'dest': 'State2',
             'feedback': {
+                'content_id': 'default_outcome',
                 'html': (
                     '<p>Sorry, it doesn\'t look like your <span>program '
                     '</span>prints output</p>.<blockquote><p> Could you get '
@@ -832,8 +833,7 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
                     'have<oppia-noninteractive-link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
                     '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
-                ),
-                'audio_translations': {}
+                )
             },
             'labelled_as_correct': False,
             'param_changes': [],
@@ -897,20 +897,20 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         content1_dict = {
+            'content_id': 'content',
             'html': (
                 'Here is test case <a href="https://github.com">hello<b><i>'
                 'testing</i></b>in <b>progress</b><p>for migration</p>'
-            ),
-            'audio_translations': {}
+            )
         }
         content2_dict = {
+            'content_id': 'content',
             'html': (
                 'Here is test case <a href="https://github.com">'
                 '<oppia-noninteractive-link url-with-value="&amp;quot;'
                 'https://github.com&amp;quot;" text-with-value="abc">'
                 '</oppia-noninteractive-link><p> testing in progress</p>'
-            ),
-            'audio_translations': {}
+            )
         }
         state1.update_content(content1_dict)
         state2.update_content(content2_dict)
@@ -918,6 +918,7 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         default_outcome_dict1 = {
             'dest': 'State2',
             'feedback': {
+                'content_id': 'default_outcome',
                 'html': (
                     '<p>Sorry, it doesn\'t look like your <span>program '
                     '</span>prints output</p>.<blockquote><p> Could you get '
@@ -926,8 +927,7 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                     'have<oppia-noninteractive-link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
                     '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
-                ),
-                'audio_translations': {}
+                )
             },
             'labelled_as_correct': False,
             'param_changes': [],
@@ -937,12 +937,12 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         default_outcome_dict2 = {
             'dest': 'State1',
             'feedback': {
+                'content_id': 'default_outcome',
                 'html': (
                     '<ol><li>This is last case</li><oppia-noninteractive-image '
                     'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
                     '</oppia-noninteractive-image></ol>'
-                ),
-                'audio_translations': {}
+                )
             },
             'labelled_as_correct': False,
             'param_changes': [],
