@@ -897,7 +897,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     if feconf.ENABLE_PLAYTHROUGHS:
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         revert_to_version = None
-        if change_list[0]['cmd'] == 'AUTO_revert_version_number':
+        if change_list[0]['cmd'] == exp_models.REVERT_COMMIT_CMD:
             revert_to_version = change_list[0]['version_number']
         stats_services.update_exp_issues_for_new_exp_version(
             exploration, exp_versions_diff, revert_to_version)
