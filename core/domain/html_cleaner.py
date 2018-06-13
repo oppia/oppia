@@ -156,19 +156,21 @@ REPLACE_LIST = [
 ]
 
 
-def escape_html(html_data):
-    """This functions converts html to escaped format.
+def escape_html(unescaped_html_data):
+    """This functions escapes an unescaped HTML string.
 
     Args:
-        html_data: str. HTML string to be escaped.
+        unescaped_html_data: str. Unescaped HTML string to be escaped.
 
     Returns:
         str. Escaped HTML string.
     """
+    escaped_html_data = unescaped_html_data
     for replace_tuple in REPLACE_LIST:
-        html_data = html_data.replace(replace_tuple[0], replace_tuple[1])
+        escaped_html_data = escaped_html_data.replace(
+            replace_tuple[0], replace_tuple[1])
 
-    return html_data
+    return escaped_html_data
 
 
 def unescape_html(escaped_html_data):
@@ -246,12 +248,10 @@ def convert_to_text_angular(html_data):
     # of other tags which produces issues in migration.
     html_data = html_data.replace('<br>', '<br/>')
 
-    # This is to check whether a collapsible or tabs component is present
-    # in html_data. If that is the case migrate the content inside those
-    # components using convert_tag_contents_to_text_angular().
-    if any(component in html_data for component in [
-            'oppia-noninteractive-collapsible', 'oppia-noninteractive-tabs']):
-        html_data = convert_tag_contents_to_text_angular(html_data)
+    # To convert the rich text content within tabs and collapsible components
+    # to valid Textangular format. If there is no tabs or collapsible component
+    # convert_tag_contents_to_text_angular will make no change to html_data.
+    html_data = convert_tag_contents_to_text_angular(html_data)
 
     soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
 
@@ -299,8 +299,8 @@ def convert_to_text_angular(html_data):
         # For this the attributes and text within a tag is used to
         # create new link tag which is wrapped as parent of a and then
         # a tag is removed.
-        # There are cases where there is no href attribute of a tag.
-        # In such cases a tag is simply removed.
+        # In case where there is no href attribute or no text within the
+        # a tag, the tag is simply removed.
         elif tag.name == 'a':
             replace_with_link = True
             if tag.has_attr('href') and tag.get_text():
@@ -459,8 +459,9 @@ def convert_to_text_angular(html_data):
 
 
 def convert_tag_contents_to_text_angular(html_data):
-    """This functions converts content with tabs and collapsible
-    components to textangular format.
+    """This function converts the rich text content within tabs and
+    collapsible components to textangular format. If the html_data
+    does not contain tab or collapsible components it will do nothing.
 
     Args:
         html_data: str. The HTML string whose content is to be converted.
