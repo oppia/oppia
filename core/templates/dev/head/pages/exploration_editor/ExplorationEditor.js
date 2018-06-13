@@ -144,15 +144,19 @@ oppia.controller('ExplorationEditor', [
         ExplorationAdvancedFeaturesService.init(data);
         ExplorationRightsService.init(
           data.rights.owner_names, data.rights.editor_names,
-          data.rights.viewer_names, data.rights.status,
-          data.rights.cloned_from, data.rights.community_owned,
-          data.rights.viewable_if_private);
+          data.rights.translator_names, data.rights.viewer_names,
+          data.rights.status, data.rights.cloned_from,
+          data.rights.community_owned, data.rights.viewable_if_private);
         UserEmailPreferencesService.init(
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
 
         if (GLOBALS.can_edit) {
           EditabilityService.markEditable();
+        }
+
+        if (GLOBALS.can_translate || GLOBALS.can_edit) {
+          EditabilityService.markTranslatable();
         }
 
         GraphDataService.recompute();
