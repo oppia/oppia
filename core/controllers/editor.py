@@ -760,10 +760,13 @@ class StateRulesStatsHandler(EditorHandler):
 
         state_name = utils.unescape_encoded_uri_component(escaped_state_name)
         if state_name not in current_exploration.states:
-            logging.error('Could not find state: %s' % state_name)
-            logging.error('Available states: %s' % (
+            logging.warning('Could not find state: %s' % state_name)
+            logging.warning('Available states: %s' % (
                 current_exploration.states.keys()))
-            raise self.PageNotFoundException
+            # TODO(brianrodri): This should raise a PageNotFound exception, but
+            # can't yet because breaks exploration flow. This will be fixed once
+            # StateTopAnswerStatistics is finished.
+            self.render_json({'visualizations_info': []})
 
         self.render_json({
             'visualizations_info': stats_services.get_visualizations_info(
