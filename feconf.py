@@ -930,3 +930,12 @@ RTE_CONTENT_SPEC = {
         ]
     }
 }
+
+# Replace list to escape and unescape html strings.
+REPLACE_LIST = [
+    ('&', '&amp;'),
+    ('"', '&quot;'),
+    ('\'', '&#39;'),
+    ('<', '&lt;'),
+    ('>', '&gt;')
+]

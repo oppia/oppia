@@ -153,15 +153,9 @@ def escape_html(html_data):
         html_data: str. HTML string to be escaped.
 
     Returns:
-        str. Escaped HTML string
+        str. Escaped HTML string.
     """
-    replace_list = [
-        ('&', '&amp;'),
-        ('"', '&quot;'),
-        ('\'', '&#39;'),
-        ('<', '&lt;'),
-        ('>', '&gt;')
-    ]
+    replace_list = feconf.REPLACE_LIST
     for replace_tuple in replace_list:
         html_data = html_data.replace(replace_tuple[0], replace_tuple[1])
 
@@ -169,21 +163,15 @@ def escape_html(html_data):
 
 
 def unescape_html(escaped_html_data):
-    """This functions converts html to unescaped format.
+    """This function unescapes an escaped HTML string.
 
     Args:
-        escaped_html_data: str. HTML string to be unescaped.
+        escaped_html_data: str. Escaped HTML string to be unescaped.
 
     Returns:
-        str. Unescaped HTML string
+        str. Unescaped HTML string.
     """
-    replace_list = [
-        ('&', '&amp;'),
-        ('"', '&quot;'),
-        ('\'', '&#39;'),
-        ('<', '&lt;'),
-        ('>', '&gt;')
-    ]
+    replace_list = feconf.REPLACE_LIST
     unescaped_html_data = escaped_html_data
     for replace_tuple in replace_list:
         unescaped_html_data = unescaped_html_data.replace(
@@ -250,6 +238,13 @@ def convert_to_text_angular(html_data):
     # of other tags which produces issues in migration.
     html_data = html_data.replace('<br>', '<br/>')
 
+    # This is to check whether a collapsible or tabs component is present
+    # in html_data. If that is the case migrate the content inside those
+    # components using convert_tag_contents_to_text_angular().
+    if any(component in html_data for component in [
+            'oppia-noninteractive-collapsible', 'oppia-noninteractive-tabs']):
+        html_data = convert_tag_contents_to_text_angular(html_data)
+
     soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
 
     allowed_tag_list = (
@@ -310,8 +305,8 @@ def convert_to_text_angular(html_data):
                     link = soup.new_tag('oppia-noninteractive-link')
                     url = tag['href']
                     text = tag.get_text()
-                    link['url-with-value'] = '&quot;' + url + '&quot;'
-                    link['text-with-value'] = '&quot;' + text + '&quot;'
+                    link['url-with-value'] = escape_html(json.dumps(url))
+                    link['text-with-value'] = escape_html(json.dumps(text))
                     tag.wrap(link)
                     # If any part of text in a tag is wrapped in b or i tag
                     # link tag is also wrapped in those tags to maintain
@@ -469,12 +464,8 @@ def convert_tag_contents_to_text_angular(html_data):
 
     for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
         content_html = unescape_html(collapsible['content-with-value'])
-        # This is done because the quotes are a part of content at position 0
-        # and -1. When content is converted to textangular, the quotes get
-        # wrapped within a p tag. To avoid this these first and last quotes
-        # removed before conversion to Textangular and then added back.
-        collapsible['content-with-value'] = '&quot;' + escape_html(
-            convert_to_text_angular(content_html[1:-1])) + '&quot;'
+        collapsible['content-with-value'] = escape_html(
+            json.dumps(convert_to_text_angular(json.loads(content_html))))
 
     for tabs in soup.findAll('oppia-noninteractive-tabs'):
         tab_content_json = unescape_html(tabs['tab_contents-with-value'])
@@ -527,10 +518,8 @@ def validate_textangular_format(html_list, run_migration=False):
             err_dict['strings'].append(html_data)
 
         for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
-            # content is taken from [1:-1] since quotes are unescaped
-            # and are treated as part of html content.
-            content_html = unescape_html(
-                collapsible['content-with-value'])[1:-1]
+            content_html = json.loads(
+                unescape_html(collapsible['content-with-value']))
             soup_for_collapsible = bs4.BeautifulSoup(
                 content_html.replace('<br>', '<br/>'), 'html.parser')
             is_invalid = _validate_soup_for_textangular(
