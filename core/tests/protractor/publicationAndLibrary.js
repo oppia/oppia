@@ -218,6 +218,35 @@ describe('Permissions for private explorations', function() {
     });
   });
 
+  it('should be correct for translators', function() {
+    users.createUser('expOwner@oppia.tests', 'expOwner');
+    users.createUser('translator@oppia.tests', 'translator');
+    users.createUser('guestUser@oppia.tests', 'guestUser');
+
+    users.login('expOwner@oppia.tests');
+    workflow.createExploration();
+    editor.setContent(forms.toRichText('this is card 1'));
+    editor.saveChanges('Added content to first card.');
+    workflow.addExplorationTranslator('translator');
+    expect(workflow.getExplorationManagers()).toEqual(['expOwner']);
+    expect(workflow.getExplorationCollaborators()).toEqual([]);
+    expect(workflow.getExplorationTranslators()).toEqual(['translator']);
+    expect(workflow.getExplorationPlaytesters()).toEqual([]);
+    general.getExplorationIdFromEditor().then(function(explorationId) {
+      users.logout();
+
+      users.login('translator@oppia.tests');
+      general.openEditor(explorationId);
+      editor.expectContentToMatch(forms.toRichText('this is card 1'));
+      users.logout();
+
+      users.login('guestUser@oppia.tests');
+      general.openEditor(explorationId);
+      general.expect404Error();
+      users.logout();
+    });
+  });
+
   afterEach(function() {
     general.checkForConsoleErrors([
       'Failed to load resource: the server responded with a status of 404'

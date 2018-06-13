@@ -156,7 +156,7 @@ class TranslatorAutosaveHandler(base.BaseHandler):
             version = self.payload.get('version')
             exp_services.create_or_update_draft(
                 exploration_id, self.user_id, change_list, version,
-                datetime.datetime.utcnow(), is_translation_change=True)
+                datetime.datetime.utcnow(), is_by_translator=True)
         except utils.ValidationError as e:
             # We leave any pre-existing draft changes in the datastore.
             raise self.InvalidInputException(e)
@@ -249,7 +249,7 @@ class ExplorationTranslationHandler(base.BaseHandler):
         try:
             exp_services.update_exploration(
                 self.user_id, exploration_id, change_list, commit_message,
-                is_translation_change=True)
+                is_by_translator=True)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
