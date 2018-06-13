@@ -53,10 +53,12 @@ class LibraryPageTest(test_utils.GenericTestBase):
         """Test the library data handler on demo explorations."""
         response_dict = self.get_json(feconf.LIBRARY_SEARCH_DATA_URL)
         self.assertEqual({
+            'iframed': False,
             'is_admin': False,
             'is_moderator': False,
             'is_super_admin': False,
             'activity_list': [],
+            'additional_angular_modules': [],
             'search_cursor': None,
             'profile_picture_data_url': None,
         }, response_dict)

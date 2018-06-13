@@ -51,7 +51,7 @@ import feconf
 from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
-from webapp2_extras.routes import RedirectRoute
+from webapp2_extras import routes
 
 # pylint: enable=relative-import
 
@@ -109,7 +109,7 @@ def get_redirect_route(regex_route, handler, defaults=None):
     if defaults is None:
         defaults = {}
     name = regex_route.replace('/', '_')
-    return RedirectRoute(
+    return routes.RedirectRoute(
         regex_route, handler, name, strict_slash=True, defaults=defaults)
 
 
@@ -496,6 +496,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_DATA_URL_PREFIX,
         topic_editor.EditableTopicDataHandler),
+    get_redirect_route(
+        r'%s/<topic_id>/<subtopic_id>' %
+        feconf.SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX,
+        topic_editor.EditableSubtopicPageDataHandler),
     get_redirect_route(
         r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX,
         topic_editor.TopicManagerRightsHandler),

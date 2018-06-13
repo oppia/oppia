@@ -29,8 +29,12 @@ describe('States object factory', function() {
       GLOBALS.NEW_STATE_TEMPLATE = {
         classifier_model_id: null,
         content: {
-          html: '',
-          audio_translations: {}
+          content_id: 'content',
+          html: ''
+        },
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {}
         },
         interaction: {
           answer_groups: [],
@@ -45,7 +49,10 @@ describe('States object factory', function() {
           },
           default_outcome: {
             dest: '(untitled state)',
-            feedback: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             param_changes: []
           },
           hints: [],
@@ -57,15 +64,23 @@ describe('States object factory', function() {
       statesDict = {
         'first state': {
           content: {
-            html: 'content',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'content'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'RuleTest',
             answer_groups: [{
               outcome: {
                 dest: 'outcome 1',
-                feedback: [''],
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null
@@ -79,7 +94,10 @@ describe('States object factory', function() {
             }],
             default_outcome: {
               dest: 'default',
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: []
             },
@@ -93,8 +111,11 @@ describe('States object factory', function() {
       statesWithAudioDict = {
         'first state': {
           content: {
-            html: 'content',
-            audio_translations: {
+            content_id: 'content',
+            html: 'content'
+          },
+          content_ids_to_audio_translations: {
+            content: {
               en: {
                 filename: 'myfile1.mp3',
                 file_size_bytes: 0.5,
@@ -105,6 +126,44 @@ describe('States object factory', function() {
                 file_size_bytes: 0.8,
                 needs_update: false
               }
+            },
+            default_outcome: {
+              he: {
+                filename: 'myfile10.mp3',
+                file_size_bytes: 0.5,
+                needs_update: false
+              }
+            },
+            feedback_1: {
+              zh: {
+                filename: 'myfile4.mp3',
+                file_size_bytes: 1.1,
+                needs_update: false
+              }
+            },
+            hint_1: {
+              es: {
+                filename: 'myfile5.mp3',
+                file_size_bytes: 0.7,
+                needs_update: false
+              },
+              zh: {
+                filename: 'myfile6.mp3',
+                file_size_bytes: 0.9,
+                needs_update: false
+              },
+              'hi-en': {
+                filename: 'myfile8.mp3',
+                file_size_bytes: 1.2,
+                needs_update: false
+              }
+            },
+            hint_2: {
+              cs: {
+                filename: 'myfile7.mp3',
+                file_size_bytes: 0.2,
+                needs_update: false
+              }
             }
           },
           interaction: {
@@ -112,14 +171,8 @@ describe('States object factory', function() {
               outcome: {
                 dest: 'second state',
                 feedback: {
-                  html: '<p>Good.</p>',
-                  audio_translations: {
-                    zh: {
-                      filename: 'myfile4.mp3',
-                      file_size_bytes: 1.1,
-                      needs_update: false
-                    }
-                  }
+                  content_id: 'feedback_1',
+                  html: '<p>Good.</p>'
                 },
                 labelled_as_correct: false,
                 param_changes: [],
@@ -137,49 +190,21 @@ describe('States object factory', function() {
             default_outcome: {
               dest: 'new state',
               feedback: {
-                html: '<p>Feedback</p>',
-                audio_translations: {
-                  he: {
-                    filename: 'myfile10.mp3',
-                    file_size_bytes: 0.5,
-                    needs_update: false
-                  }
-                }
+                content_id: 'default_outcome',
+                html: '<p>Feedback</p>'
               },
               labelled_as_correct: false,
               param_changes: []
             },
             hints: [{
               hint_content: {
-                html: '<p>Here is a hint.</p>',
-                audio_translations: {
-                  es: {
-                    filename: 'myfile5.mp3',
-                    file_size_bytes: 0.7,
-                    needs_update: false
-                  },
-                  zh: {
-                    filename: 'myfile6.mp3',
-                    file_size_bytes: 0.9,
-                    needs_update: false
-                  },
-                  'hi-en': {
-                    filename: 'myfile8.mp3',
-                    file_size_bytes: 1.2,
-                    needs_update: false
-                  }
-                }
+                content_id: 'hint_1',
+                html: '<p>Here is a hint.</p>'
               }
             }, {
               hint_content: {
-                html: '<p>Here is another hint.</p>',
-                audio_translations: {
-                  cs: {
-                    filename: 'myfile7.mp3',
-                    file_size_bytes: 0.2,
-                    needs_update: false
-                  }
-                }
+                content_id: 'hint_2',
+                html: '<p>Here is another hint.</p>'
               }
             }],
             id: 'TextInput'
@@ -188,11 +213,22 @@ describe('States object factory', function() {
         },
         'second state': {
           content: {
-            html: 'more content',
-            audio_translations: {
+            content_id: 'content',
+            html: 'more content'
+          },
+          content_ids_to_audio_translations: {
+            content: {
               'hi-en': {
                 filename: 'myfile2.mp3',
                 file_size_bytes: 0.8,
+                needs_update: false
+              }
+            },
+            default_outcome: {},
+            solution: {
+              de: {
+                filename: 'myfile9.mp3',
+                file_size_bytes: 0.5,
                 needs_update: false
               }
             }
@@ -203,7 +239,10 @@ describe('States object factory', function() {
             customization_args: {},
             default_outcome: {
               dest: 'new state',
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: []
             },
@@ -212,14 +251,8 @@ describe('States object factory', function() {
               answer_is_exclusive: false,
               correct_answer: 'answer',
               explanation: {
-                html: '<p>This is an explanation.</p>',
-                audio_translations: {
-                  de: {
-                    filename: 'myfile9.mp3',
-                    file_size_bytes: 0.5,
-                    needs_update: false
-                  }
-                }
+                content_id: 'solution',
+                html: '<p>This is an explanation.</p>'
               }
             },
             id: 'TextInput'
@@ -236,8 +269,12 @@ describe('States object factory', function() {
         sof.createFromBackendDict('new state', {
           classifier_model_id: null,
           content: {
-            html: '',
-            audio_translations: {}
+            content_id: 'content',
+            html: ''
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {}
           },
           interaction: {
             answer_groups: [],
@@ -252,7 +289,10 @@ describe('States object factory', function() {
             },
             default_outcome: {
               dest: 'new state',
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               param_changes: []
             },
             hints: [],
@@ -265,7 +305,7 @@ describe('States object factory', function() {
     it('should correctly get all audio language codes in states', function() {
       var statesWithAudio = ssof.createFromBackendDict(statesWithAudioDict);
       expect(statesWithAudio.getAllAudioLanguageCodes())
-        .toEqual(['en', 'hi-en', 'zh', 'he', 'es', 'cs', 'de']);
+        .toEqual(['en', 'hi-en', 'he', 'zh', 'es', 'cs', 'de']);
     });
 
     it('should correctly get all audio translations in states', function() {
