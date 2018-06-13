@@ -57,7 +57,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             $scope.dimensions = (
               ImagePreloaderService.getDimensionsOfImage($scope.filepath.name));
             // For aligning the gif to the center of it's container
-            var loadingIndicatorSize = ($scope.dimensions.height < 124) ? 24 : 120;
+            var loadingIndicatorSize = (
+              ($scope.dimensions.height < 124) ? 24: 120);
             $scope.imageContainerStyle =
             {
               height: $scope.dimensions.height + 'px'
