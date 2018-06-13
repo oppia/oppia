@@ -47,11 +47,36 @@ oppia.factory('PlaythroughService', [
     var cycleIdentifier = {};
     var visitedStates = [];
 
-    var analyzePlaythrough = function() {
-      var timeSpentInExpInSecs = expStopwatch.getTimeInSecs();
-      // Check for multiple incorrect submissions issue.
+    var isMultipleIncorrectSubmissionsIssue = function() {
       if (multipleIncorrectStateName.num_times_incorrect >= (
         NUM_INCORRECT_ANSWERS_THRESHOLD)) {
+        return true;
+      }
+      return false;
+    };
+
+    var isCyclicStateTransitionsIssue = function() {
+      if (cycleIdentifier.num_cycles >= NUM_REPEATED_CYCLES_THRESHOLD) {
+        return true;
+      }
+      return false;
+    };
+
+    var isEarlyQuitIssue = function(timeSpentInExpInSecs) {
+      if (timeSpentInExpInSecs < EARLY_QUIT_THRESHOLD_IN_SECS) {
+        return true;
+      }
+      return false;
+    };
+
+    var analyzePlaythrough = function() {
+      // The ordering of checks in this method is such that the priority of
+      // issues to be recorded in case of multiple issues is captured. This
+      // follows MultipleIncorrectSubmissionsIssue ->
+      // CyclicStateTransitionsIssue -> EarlyQuitIssue.
+      var timeSpentInExpInSecs = expStopwatch.getTimeInSecs();
+      // Check for multiple incorrect submissions issue.
+      if (isMultipleIncorrectSubmissionsIssue()) {
         playthrough.issueType = ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS;
         playthrough.issueCustomizationArgs = {
           state_name: {
@@ -65,7 +90,7 @@ oppia.factory('PlaythroughService', [
       }
 
       // Check for cyclic state transitions issue.
-      if (cycleIdentifier.num_cycles >= NUM_REPEATED_CYCLES_THRESHOLD) {
+      if (isCyclicStateTransitionsIssue()) {
         playthrough.issueType = ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS;
         playthrough.issueCustomizationArgs = {
           state_names: {
@@ -76,7 +101,7 @@ oppia.factory('PlaythroughService', [
       }
 
       // Check for early quit issue.
-      if (timeSpentInExpInSecs < EARLY_QUIT_THRESHOLD_IN_SECS) {
+      if (isEarlyQuitIssue(timeSpentInExpInSecs)) {
         playthrough.issueType = ISSUE_TYPE_EARLY_QUIT;
         playthrough.issueCustomizationArgs = {
           state_name: {
@@ -210,16 +235,16 @@ oppia.factory('PlaythroughService', [
             playthrough_data: playthrough.convertToBackendDict(),
             issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
           });
-          return;
-        }
-        analyzePlaythrough();
-        if (playthrough.issueType) {
-          $http.post(getFullPlaythroughUrl(), {
-            playthrough_data: playthrough.convertToBackendDict(),
-            issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
-          }).then(function(response) {
-            playthrough.playthroughId = response.playthroughId;
-          });
+        } else {
+          analyzePlaythrough();
+          if (playthrough.issueType) {
+            $http.post(getFullPlaythroughUrl(), {
+              playthrough_data: playthrough.convertToBackendDict(),
+              issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
+            }).then(function(response) {
+              playthrough.playthroughId = response.playthroughId;
+            });
+          }
         }
       }
     };

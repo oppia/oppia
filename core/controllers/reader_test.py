@@ -1476,7 +1476,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'issue_schema_version': 1
             }, self.csrf_token, expect_errors=True, expected_status_int=400)
 
-    def test_playthrough_id_is_returned_and_subsequently_updated(self):
+    def test_playthrough_id_is_returned(self):
         """Test that playthrough ID is returned when it is stored for the first
         time and the playthrough is updated from the next time.
         """
@@ -1494,6 +1494,19 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         playthrough_id = model.unresolved_issues[0]['playthrough_ids'][1]
         self.assertEqual(response['playthrough_id'], playthrough_id)
 
+    def test_playthrough_is_subsequently_updated(self):
+        """Test that a playthrough is updated if the controller is called for
+        the second time.
+        """
+        response = self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
+                'playthrough_data': self.playthrough_data,
+                'issue_schema_version': 1
+            }, self.csrf_token)
+        self.process_and_flush_pending_tasks()
+
+        playthrough_id = response['playthrough_id']
         self.playthrough_data['id'] = playthrough_id
         self.playthrough_data['issue_customization_args'][
             'time_spent_in_exp_in_msecs']['value'] = 150

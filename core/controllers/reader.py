@@ -316,8 +316,12 @@ class StorePlaythroughHandler(base.BaseHandler):
         try:
             unused_playthrough = stats_domain.Playthrough.from_backend_dict(
                 playthrough_data)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        try:
             issue_schema_version = self.payload['issue_schema_version']
-        except (utils.ValidationError, KeyError) as e:
+        except KeyError as e:
             raise self.InvalidInputException(e)
 
         exp_version = playthrough_data['exp_version']

@@ -264,6 +264,11 @@ oppia.factory('ExplorationPlayerService', [
             StatsReportingService.initSession(
               _explorationId, exploration.title,
               version, data.session_id, GLOBALS.collectionId);
+
+            if (ENABLE_PLAYTHROUGHS) {
+              PlaythroughService.initSession(_explorationId, version);
+            }
+
             AudioTranslationLanguageService.init(
               exploration.getAllAudioLanguageCodes(),
               data.preferred_audio_language_code,

@@ -75,8 +75,8 @@ oppia.factory('PlaythroughObjectFactory', [
      * @returns {PlaythroughBackendDict}
      */
     Playthrough.prototype.convertToBackendDict = function() {
-      var actionDicts = [], i;
-      for (i = 0; i < this.actions.length; i++) {
+      var actionDicts = [];
+      for (var i = 0; i < this.actions.length; i++) {
         actionDicts.push(this.actions[i].convertToBackendDict());
       }
       return {
