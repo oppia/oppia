@@ -62,6 +62,8 @@ class TopicModel(base_models.VersionedModel):
     subtopics = ndb.JsonProperty(repeated=True, indexed=False)
     # The schema version of the subtopic dict.
     subtopic_schema_version = ndb.IntegerProperty(required=True, indexed=True)
+    # The id for the next subtopic.
+    next_subtopic_id = ndb.IntegerProperty(required=True)
     # The ISO 639-1 code for the language this topic is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
@@ -163,6 +165,95 @@ class TopicSummaryModel(base_models.BaseModel):
     # The number of subtopics of the topic.
     subtopic_count = ndb.IntegerProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
+
+
+class SubtopicPageSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a subtopic page snapshot."""
+    pass
+
+
+class SubtopicPageSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content of a subtopic page snapshot."""
+    pass
+
+
+class SubtopicPageModel(base_models.VersionedModel):
+    """Model for storing Subtopic pages.
+
+    This stores the HTML data for a subtopic page.
+    """
+    SNAPSHOT_METADATA_CLASS = SubtopicPageSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = SubtopicPageSnapshotContentModel
+    ALLOW_REVERT = False
+
+    # The topic id that this subtopic is a part of.
+    topic_id = ndb.StringProperty(required=True, indexed=True)
+    # The html data of the subtopic.
+    html_data = ndb.TextProperty(required=True)
+    # The ISO 639-1 code for the language this subtopic page is written in.
+    language_code = ndb.StringProperty(required=True, indexed=True)
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(SubtopicPageModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+        committer_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(committer_id))
+        committer_username = (
+            committer_user_settings_model.username
+            if committer_user_settings_model else '')
+
+        subtopic_page_commit_log_entry = SubtopicPageCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds,
+            feconf.ACTIVITY_STATUS_PUBLIC, False
+        )
+        subtopic_page_commit_log_entry.subtopic_page_id = self.id
+        subtopic_page_commit_log_entry.put()
+
+
+class SubtopicPageCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to subtopic pages.
+
+    A new instance of this model is created and saved every time a commit to
+    SubtopicPageModel occurs.
+
+    The id for this model is of the form
+    'subtopicpage-{{SUBTOPIC_PAGE_ID}}-{{SUBTOPIC_PAGE_VERSION}}'.
+    """
+    # The id of the subtopic page being edited.
+    subtopic_page_id = ndb.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def _get_instance_id(cls, subtopic_page_id, version):
+        """This function returns the generated id for the get_commit function
+        in the parent class.
+
+        Args:
+            subtopic_page_id: str. The id of the subtopic page being edited.
+            version: int. The version number of the subtopic page after the
+                commit.
+
+        Returns:
+            str. The commit id with the subtopic page id and version number.
+        """
+        return 'subtopicpage-%s-%s' % (subtopic_page_id, version)
 
 
 class TopicRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):

@@ -302,8 +302,7 @@ class SuggestionEditStateContent(BaseSuggestion):
             exploration.states[self.change_cmd.state_name].content.to_dict())
 
         change_cmd.old_value = old_content
-        change_cmd.new_value['audio_translations'] = (
-            old_content['audio_translations'])
+        change_cmd.new_value['content_id'] = old_content['content_id']
 
         return [change_cmd]
 

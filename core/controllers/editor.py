@@ -62,10 +62,12 @@ NEW_STATE_TEMPLATE = {
     'classifier_model_id': None,
     'content': {
         'html': '',
-        'audio_translations': {},
+        'content_id': feconf.DEFAULT_NEW_STATE_CONTENT_ID,
     },
     'interaction': exp_domain.State.NULL_INTERACTION_DICT,
     'param_changes': [],
+    'content_ids_to_audio_translations': (
+        feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
 }
 
 DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = config_domain.ConfigProperty(

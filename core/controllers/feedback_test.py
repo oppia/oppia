@@ -525,12 +525,16 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         exploration.add_states(['State A', 'State 2', 'State 3'])
         exploration.states['State A'].update_interaction_id('TextInput')
         # Create content in State A with a single audio subtitle.
+        content_id = exploration.states['State A'].content.content_id
         exploration.states['State A'].update_content(
-            exp_domain.SubtitledHtml('old content', {
+            exp_domain.SubtitledHtml(content_id, 'old content').to_dict())
+        exploration.states['State A'].update_content_ids_to_audio_translations({
+            content_id: {
                 self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
-                    'filename.mp3', 20, False)
-            }).to_dict()
-        )
+                    'filename.mp3', 20, False).to_dict()
+            },
+            'default_outcome': {}
+        })
         exploration.states['State 2'].update_interaction_id('TextInput')
         exploration.states['State 3'].update_interaction_id('TextInput')
         exp_services._save_exploration(self.editor_id, exploration, '', [])  # pylint: disable=protected-access
@@ -802,8 +806,10 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self._accept_suggestion(
             accepted_suggestion_thread_id, False, csrf_token)
         updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        content_id = updated_exploration.states['State A'].content.content_id
         audio_translations = (
-            updated_exploration.states['State A'].content.audio_translations)
+            updated_exploration.states['State A']
+            .content_ids_to_audio_translations[content_id])
         self.assertEqual(
             audio_translations.keys(), [self.TRANSLATION_LANGUAGE_CODE])
         self.assertFalse(
@@ -824,8 +830,10 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         self._accept_suggestion(
             accepted_suggestion_thread_id, True, csrf_token)
         updated_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        content_id = updated_exploration.states['State A'].content.content_id
         audio_translations = (
-            updated_exploration.states['State A'].content.audio_translations)
+            updated_exploration.states['State A']
+            .content_ids_to_audio_translations[content_id])
         self.assertEqual(
             audio_translations.keys(), [self.TRANSLATION_LANGUAGE_CODE])
         self.assertTrue(
