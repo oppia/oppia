@@ -14,24 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-
 import astroid
-import docstrings_checker
+import docstrings_checker  # pylint: disable=relative-import
 
-from pylint.checkers import BaseChecker
+from pylint import checkers
+from pylint import interfaces
 from pylint.checkers import utils as checker_utils
-from pylint.interfaces import IAstroidChecker
-from pylint.interfaces import IRawChecker
 
 
-class ExplicitKwargsChecker(BaseChecker):
+class ExplicitKwargsChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for explicit keyword arguments
     in any function call.
     """
-    __implements__ = IAstroidChecker
+    __implements__ = interfaces.IAstroidChecker
 
     name = 'explicit-kwargs'
     priority = -1
@@ -87,11 +82,11 @@ class ExplicitKwargsChecker(BaseChecker):
                 self.add_message('non-explicit-kwargs', node=node)
 
 
-class HangingIndentChecker(BaseChecker):
+class HangingIndentChecker(checkers.BaseChecker):
     """Custom pylint checker which checks for break after parenthesis in case
     of hanging indentation.
     """
-    __implements__ = IRawChecker
+    __implements__ = interfaces.IRawChecker
 
     name = 'hanging-indent'
     priority = -1
@@ -151,7 +146,7 @@ class HangingIndentChecker(BaseChecker):
 
 # The following class was derived from
 # https://github.com/PyCQA/pylint/blob/377cc42f9e3116ff97cddd4567d53e9a3e24ebf9/pylint/extensions/docparams.py#L26
-class DocstringParameterChecker(BaseChecker):
+class DocstringParameterChecker(checkers.BaseChecker):
     """Checker for Sphinx, Google, or Numpy style docstrings
 
     * Check that all function, method and constructor parameters are mentioned
@@ -168,7 +163,7 @@ class DocstringParameterChecker(BaseChecker):
     Args:
         linter: Pylinter. The linter object.
     """
-    __implements__ = IAstroidChecker
+    __implements__ = interfaces.IAstroidChecker
 
     name = 'parameter_documentation'
     msgs = {
@@ -623,6 +618,58 @@ class DocstringParameterChecker(BaseChecker):
             node=node)
 
 
+class ImportOnlyModulesChecker(checkers.BaseChecker):
+    """Checker for import-from statements. It checks that
+    modules are only imported.
+    """
+
+    __implements__ = interfaces.IAstroidChecker
+
+    name = 'import-only-modules'
+    priority = -1
+    msgs = {
+        'C0003': (
+            'Import \"%s\" from \"%s\" is not a module.',
+            'import-only-modules',
+            'Modules should only be imported.',
+        ),
+    }
+
+    @checker_utils.check_messages('import-only-modules')
+    def visit_importfrom(self, node):
+        """Visits all import-from statements in a python file and checks that
+        modules are imported. It then adds a message accordingly.
+
+        Args:
+            node. astroid.scoped_nodes.Function. Node for a function or method
+                definition in AST
+        """
+
+        try:
+            imported_module = node.do_import_module(node.modname)
+        except astroid.AstroidBuildingException:
+            return
+
+        if node.level is None:
+            modname = node.modname
+        else:
+            modname = '.' * node.level + node.modname
+
+        for (name, _) in node.names:
+            if name == 'constants':
+                continue
+            try:
+                imported_module.import_module(name, True)
+            except astroid.AstroidImportError:
+                self.add_message(
+                    'import-only-modules',
+                    node=node,
+                    args=(name, modname),
+                )
+            except astroid.AstroidBuildingException:
+                pass
+
+
 def register(linter):
     """Registers the checker with pylint.
 
@@ -632,3 +679,4 @@ def register(linter):
     linter.register_checker(ExplicitKwargsChecker(linter))
     linter.register_checker(HangingIndentChecker(linter))
     linter.register_checker(DocstringParameterChecker(linter))
+    linter.register_checker(ImportOnlyModulesChecker(linter))

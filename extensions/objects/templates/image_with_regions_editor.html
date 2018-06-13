@@ -3,7 +3,7 @@
                        schema="{type: 'custom', obj_type: 'Filepath'}">
   </schema-based-editor>
 </div>
-<div style="position: relative" ng-if="$parent.value.imagePath !== ''">
+<div style="position: relative" ng-if="$parent.value.imagePath.name !== ''">
   <div>Add new regions by clicking on the image and dragging:</div>
   <svg class="oppia-image-with-regions-editor-svg"
        width="100%"
@@ -12,7 +12,7 @@
        ng-mousedown="onSvgMouseDown($event)"
        ng-mousemove="onSvgMouseMove($event)"
        ng-mouseup="onSvgMouseUp($event)">
-    <image ng-href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
+    <image ng-href="<[getPreviewUrl($parent.$parent.value.imagePath.name)]>"
            xlink:href=""
            x="0"
            y="0"

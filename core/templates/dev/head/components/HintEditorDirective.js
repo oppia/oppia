@@ -29,9 +29,9 @@ oppia.directive('hintEditor', [
         '/components/hint_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'EditabilityService', 'stateHintsService',
-        'COMPONENT_NAME_HINT',
+        'stateContentIdsToAudioTranslationsService', 'COMPONENT_NAME_HINT',
         function($scope, $uibModal, EditabilityService, stateHintsService,
-            COMPONENT_NAME_HINT) {
+            stateContentIdsToAudioTranslationsService, COMPONENT_NAME_HINT) {
           $scope.isEditable = EditabilityService.isEditable();
           $scope.stateHintsService = stateHintsService;
           $scope.editHintForm = {};
@@ -58,8 +58,10 @@ oppia.directive('hintEditor', [
             var contentHasChanged = (
               $scope.hintMemento.hintContent.getHtml() !==
               $scope.hint.hintContent.getHtml());
+            var hintContentId = $scope.hint.hintContent.getContentId();
             $scope.hintMemento = null;
-            if ($scope.hint.hintContent.hasUnflaggedAudioTranslations() &&
+            if (stateContentIdsToAudioTranslationsService.displayed
+              .hasUnflaggedAudioTranslations(hintContentId) &&
               contentHasChanged) {
               openMarkAllAudioAsNeedingUpdateModal();
             }
@@ -80,10 +82,6 @@ oppia.directive('hintEditor', [
             }
           };
 
-          $scope.onAudioTranslationsEdited = function() {
-            $scope.getOnSaveFn()();
-          };
-
           $scope.$on('externalSave', function() {
             if ($scope.hintEditorIsOpen &&
                 $scope.editHintForm.$valid) {
@@ -100,10 +98,10 @@ oppia.directive('hintEditor', [
               resolve: {},
               controller: 'MarkAllAudioAsNeedingUpdateController'
             }).result.then(function() {
-              $scope.hint.hintContent.markAllAudioAsNeedingUpdate();
-              stateHintsService.displayed[$scope.getIndexPlusOne() - 1]
-                .hintContent = angular.copy($scope.hint.hintContent);
-              $scope.getOnSaveFn()();
+              var hintContentId = $scope.hint.hintContent.getContentId();
+              stateContentIdsToAudioTranslationsService.displayed
+                .markAllAudioAsNeedingUpdate(hintContentId);
+              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
             });
           };
         }

@@ -45,11 +45,12 @@ oppia.factory('SolutionObjectFactory', [
     };
 
     Solution.createNew = function(
-        answerIsExclusive, correctAnswer, explanationHtml) {
+        answerIsExclusive, correctAnswer, explanationHtml, explanationId) {
       return new Solution(
         answerIsExclusive,
         correctAnswer,
-        SubtitledHtmlObjectFactory.createDefault(explanationHtml));
+        SubtitledHtmlObjectFactory.createDefault(explanationHtml,
+          explanationId));
     };
 
     Solution.prototype.getSummary = function(interactionId) {

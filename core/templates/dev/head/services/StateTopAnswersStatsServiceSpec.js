@@ -27,14 +27,6 @@ describe('StateTopAnswersStatsService', function() {
       $injector.get('StateTopAnswersStatsService');
   }));
 
-  beforeEach(inject(function($injector) {
-    this.$httpBackend = $injector.get('$httpBackend');
-  }));
-  afterEach(function() {
-    this.$httpBackend.verifyNoOutstandingExpectation();
-    this.$httpBackend.verifyNoOutstandingRequest();
-  });
-
   beforeEach(inject(function(ExplorationContextService) {
     spyOn(ExplorationContextService, 'getExplorationId').and.returnValue('7');
   }));
@@ -61,11 +53,21 @@ describe('StateTopAnswersStatsService', function() {
       });
   }));
 
+  describe('.isInitialized', function() {
+    it('begins uninitialized', function() {
+      expect(this.StateTopAnswersStatsService.isInitialized()).toBe(false);
+    });
+
+    it('is true after call to .init', function() {
+      this.StateTopAnswersStatsService.init({answers: {}});
+
+      expect(this.StateTopAnswersStatsService.isInitialized()).toBe(true);
+    });
+  });
+
   describe('.init', function() {
     it('correctly identifies unaddressed issues', function() {
-      this.$httpBackend.expectGET(
-        '/createhandler/state_answer_stats/7'
-      ).respond({
+      this.StateTopAnswersStatsService.init({
         answers: {
           Hola: [
             {answer: 'hola', frequency: 7},
@@ -74,9 +76,6 @@ describe('StateTopAnswersStatsService', function() {
           ]
         }
       });
-
-      this.StateTopAnswersStatsService.init();
-      this.$httpBackend.flush();
 
       var stateStats = this.StateTopAnswersStatsService.getStateStats('Hola');
       expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
@@ -85,9 +84,7 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     it('maintains frequency in order', function() {
-      this.$httpBackend.expectGET(
-        '/createhandler/state_answer_stats/7'
-      ).respond({
+      this.StateTopAnswersStatsService.init({
         answers: {
           Hola: [
             {answer: 'hola', frequency: 7},
@@ -96,9 +93,6 @@ describe('StateTopAnswersStatsService', function() {
           ]
         }
       });
-
-      this.StateTopAnswersStatsService.init();
-      this.$httpBackend.flush();
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
         joC({answer: 'hola', frequency: 7}),
@@ -110,17 +104,12 @@ describe('StateTopAnswersStatsService', function() {
 
   describe('.refreshStateStats', function() {
     it('correctly updates addressed info', function() {
-      this.$httpBackend.expectGET(
-        '/createhandler/state_answer_stats/7'
-      ).respond({
+      // Initially, 'adios' isn't addressed by the Hola state.
+      this.StateTopAnswersStatsService.init({
         answers: {
           Hola: [{answer: 'adios', frequency: 4}]
         }
       });
-
-      // Initially, 'adios' isn't addressed by the Hola state.
-      this.StateTopAnswersStatsService.init();
-      this.$httpBackend.flush();
 
       expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
         joC({answer: 'adios', isAddressed: false})
