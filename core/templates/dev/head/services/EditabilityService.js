@@ -27,7 +27,7 @@ oppia.factory('EditabilityService', [function() {
 
   return {
     isEditable: function() {
-      return true;
+      return isEditable && !inTutorialMode;
     },
     isTranslatable: function() {
       return isTranslatable && !inTutorialMode;
