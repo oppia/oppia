@@ -101,7 +101,7 @@ states:
       answer_groups:
       - labelled_as_correct: false
         outcome:
-          dest: Set Input
+          dest: Number With Units
           feedback:
             audio_translations: {}
             html: <p>Yes, well done!</p>
@@ -895,7 +895,7 @@ states:
       answer_groups:
       - labelled_as_correct: false
         outcome:
-          dest: Fraction Input
+          dest: Set Input
           feedback:
             audio_translations: {}
             html: <p>Yes, well done!</p>
