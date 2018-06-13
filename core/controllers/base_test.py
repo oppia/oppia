@@ -73,11 +73,17 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'DEV_MODE', True):
             response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('<div class="oppia-dev-mode">', response.body)
+            self.assertIn('DEV_MODE: JSON.parse(\'true\')',
+                          response.body)
+            self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
+                          response.body)
 
         with self.swap(feconf, 'DEV_MODE', False):
             response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-            self.assertNotIn('<div class="oppia-dev-mode">', response.body)
+            self.assertIn('DEV_MODE: JSON.parse(\'false\')',
+                          response.body)
+            self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
+                          response.body)
 
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""

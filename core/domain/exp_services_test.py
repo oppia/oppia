@@ -812,14 +812,20 @@ title: Title
 
         state = exp.states[exp.init_state_name]
         interaction = state.interaction
-        content_translations = state.content.audio_translations
+        content_id = state.content.content_id
+        content_translations = (
+            state.content_ids_to_audio_translations[content_id])
+        feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
         answer_group_translations = (
-            interaction.answer_groups[0].outcome.feedback.audio_translations)
+            state.content_ids_to_audio_translations[feedback_id])
+        default_outcome_id = interaction.default_outcome.feedback.content_id
         default_outcome_translations = (
-            interaction.default_outcome.feedback.audio_translations)
-        hint_translations = interaction.hints[0].hint_content.audio_translations
+            state.content_ids_to_audio_translations[default_outcome_id])
+        hint_id = interaction.hints[0].hint_content.content_id
+        hint_translations = state.content_ids_to_audio_translations[hint_id]
+        solution_id = interaction.solution.explanation.content_id
         solution_translations = (
-            interaction.solution.explanation.audio_translations)
+            state.content_ids_to_audio_translations[solution_id])
 
         self.assertEqual(
             content_translations['en'].filename, self.INTRO_AUDIO_FILE)
@@ -842,15 +848,20 @@ title: Title
 
         state = exp.states[exp.init_state_name]
         interaction = state.interaction
-        content_translations = state.content.audio_translations
+        content_id = state.content.content_id
+        content_translations = (
+            state.content_ids_to_audio_translations[content_id])
+        feedback_id = interaction.answer_groups[0].outcome.feedback.content_id
         answer_group_translations = (
-            interaction.answer_groups[0].outcome.feedback.audio_translations)
+            state.content_ids_to_audio_translations[feedback_id])
+        default_outcome_id = interaction.default_outcome.feedback.content_id
         default_outcome_translations = (
-            interaction.default_outcome.feedback.audio_translations)
-        hint_translations = interaction.hints[0].hint_content.audio_translations
+            state.content_ids_to_audio_translations[default_outcome_id])
+        hint_id = interaction.hints[0].hint_content.content_id
+        hint_translations = state.content_ids_to_audio_translations[hint_id]
+        solution_id = interaction.solution.explanation.content_id
         solution_translations = (
-            interaction.solution.explanation.audio_translations)
-
+            state.content_ids_to_audio_translations[solution_id])
         self.assertEqual(content_translations, {})
         self.assertEqual(answer_group_translations, {})
         self.assertEqual(default_outcome_translations, {})
@@ -877,8 +888,11 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -890,7 +904,7 @@ states:
       default_outcome:
         dest: %s
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -903,8 +917,11 @@ states:
   New state:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -916,7 +933,7 @@ states:
       default_outcome:
         dest: New state
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -951,8 +968,11 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -964,7 +984,7 @@ states:
       default_outcome:
         dest: %s
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -977,8 +997,11 @@ states:
   Renamed state:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -990,7 +1013,7 @@ states:
       default_outcome:
         dest: Renamed state
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null
@@ -1111,8 +1134,11 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """
     _SAMPLE_INIT_STATE_CONTENT = ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1124,7 +1150,7 @@ interaction:
   default_outcome:
     dest: %s
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -1140,8 +1166,11 @@ param_changes: []
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'New state': ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1153,7 +1182,7 @@ interaction:
   default_outcome:
     dest: New state
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -1170,8 +1199,11 @@ param_changes: []
         feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'Renamed state': ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -1183,7 +1215,7 @@ interaction:
   default_outcome:
     dest: Renamed state
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -1297,7 +1329,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             'outcome': {
                 'dest': self.init_state_name,
                 'feedback': {
-                    'audio_translations': {},
+                    'content_id': 'feedback_1',
                     'html': 'Try again'
                 },
                 'labelled_as_correct': False,
@@ -1312,13 +1344,19 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.interaction_default_outcome = {
             'dest': self.init_state_name,
             'feedback': {
-                'audio_translations': {},
+                'content_id': 'default_outcome',
                 'html': '<b>Incorrect</b>'
             },
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
             'missing_prerequisite_skill_id': None
+        }
+
+        self.content_ids_to_audio_translations = {
+            'content': {},
+            'default_outcome': {},
+            'feedback_1': {}
         }
 
     def test_add_state_cmd(self):
@@ -1491,7 +1529,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
-                    self.interaction_answer_groups),
+                    self.interaction_answer_groups) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                    self.content_ids_to_audio_translations),
                 '')
 
     def test_update_interaction_answer_groups(self):
@@ -1516,7 +1558,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             _get_change_list(
                 self.init_state_name,
                 exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                self.interaction_default_outcome),
+                self.interaction_default_outcome) +
+            _get_change_list(
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                self.content_ids_to_audio_translations),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -1550,7 +1596,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome),
+                    self.interaction_default_outcome) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                    self.content_ids_to_audio_translations),
                 '')
 
     def test_update_state_missing_keys(self):
@@ -1571,7 +1621,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome),
+                    self.interaction_default_outcome) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                    self.content_ids_to_audio_translations),
                 '')
 
     def test_update_state_variable_types(self):
@@ -1592,7 +1646,11 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 _get_change_list(
                     self.init_state_name,
                     exp_domain.STATE_PROPERTY_INTERACTION_DEFAULT_OUTCOME,
-                    self.interaction_default_outcome),
+                    self.interaction_default_outcome) +
+                _get_change_list(
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
+                    self.content_ids_to_audio_translations),
                 '')
 
     def test_update_content(self):
@@ -1601,7 +1659,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             self.owner_id, self.EXP_ID, _get_change_list(
                 self.init_state_name, 'content', {
                     'html': '<b>Test content</b>',
-                    'audio_translations': {},
+                    'content_id': 'content',
                 }),
             '')
 
@@ -1611,7 +1669,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_content_missing_key(self):
         """Test that missing keys in content yield an error."""
-        with self.assertRaisesRegexp(KeyError, 'audio_translations'):
+        with self.assertRaisesRegexp(KeyError, 'content_id'):
             exp_services.update_exploration(
                 self.owner_id, self.EXP_ID, _get_change_list(
                     self.init_state_name, 'content', {
@@ -2553,8 +2611,10 @@ states:
   END:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: Congratulations, you have finished!
+    content_ids_to_audio_translations:
+      content: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2569,8 +2629,11 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -2580,7 +2643,7 @@ states:
       default_outcome:
         dest: END
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
         missing_prerequisite_skill_id: null

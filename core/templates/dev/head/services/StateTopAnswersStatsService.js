@@ -18,15 +18,18 @@
  */
 
 oppia.factory('StateTopAnswersStatsService', [
-  '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsFactory', 'ExplorationContextService', 'ExplorationStatesService',
-  'UrlInterpolationService',
+  '$injector', 'AngularNameService', 'AnswerClassificationService',
+  'AnswerStatsObjectFactory', 'ExplorationContextService',
+  'ExplorationStatesService', 'UrlInterpolationService',
   function(
-      $http, $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsFactory, ExplorationContextService, ExplorationStatesService,
-      UrlInterpolationService) {
+      $injector, AngularNameService, AnswerClassificationService,
+      AnswerStatsObjectFactory, ExplorationContextService,
+      ExplorationStatesService, UrlInterpolationService) {
     /** @type {Object.<string, AnswerStats[]>} */
     var stateTopAnswerStatsCache = {};
+
+    /** @type {boolean} */
+    var isInitialized = false;
 
     /**
      * Updates the addressed info of all the answers cached for the given state
@@ -52,21 +55,21 @@ oppia.factory('StateTopAnswersStatsService', [
        * Calls the backend asynchronously to setup the answer statistics of each
        * state this exploration contains.
        */
-      init: function() {
-        $http.get(
-          UrlInterpolationService.interpolateUrl(
-            '/createhandler/state_answer_stats/<exploration_id>',
-            {exploration_id: ExplorationContextService.getExplorationId()})
-        ).then(function(response) {
-          stateTopAnswerStatsCache = {};
-          Object.keys(response.data.answers).forEach(function(stateName) {
-            var answerStatsBackendDicts = response.data.answers[stateName];
-            stateTopAnswerStatsCache[stateName] = answerStatsBackendDicts.map(
-              AnswerStatsFactory.createFromBackendDict);
-            // Still need to manually refresh the addressed information.
-            refreshAddressedInfo(stateName);
-          });
-        });
+      init: function(stateTopAnswersStatsBackendDict) {
+        stateTopAnswerStatsCache = {};
+        for (var stateName in stateTopAnswersStatsBackendDict.answers) {
+          stateTopAnswerStatsCache[stateName] =
+            stateTopAnswersStatsBackendDict.answers[stateName].map(
+              AnswerStatsObjectFactory.createFromBackendDict
+            );
+          // Still need to manually refresh the addressed information.
+          refreshAddressedInfo(stateName);
+        }
+        isInitialized = true;
+      },
+
+      isInitialized: function() {
+        return isInitialized;
       },
 
       /**

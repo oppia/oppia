@@ -579,8 +579,11 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     SAMPLE_JSON_CONTENT = {
         'State A': ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -592,7 +595,7 @@ interaction:
   default_outcome:
     dest: State A
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -605,8 +608,11 @@ param_changes: []
 """),
         'State B': ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -618,7 +624,7 @@ interaction:
   default_outcome:
     dest: State B
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -631,8 +637,11 @@ param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -644,7 +653,7 @@ interaction:
   default_outcome:
     dest: %s
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -659,8 +668,11 @@ param_changes: []
 
     SAMPLE_STATE_STRING = ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -672,7 +684,7 @@ interaction:
   default_outcome:
     dest: State A
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
     missing_prerequisite_skill_id: null
@@ -964,8 +976,8 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
                 'property_name': 'content',
                 'state_name': exploration.init_state_name,
                 'new_value': {
-                    'html': 'ABC',
-                    'audio_translations': {},
+                    'content_id': 'content',
+                    'html': 'ABC'
                 },
             })], 'Change objective and init state content')
 

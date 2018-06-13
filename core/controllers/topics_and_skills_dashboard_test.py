@@ -38,7 +38,8 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
         self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [], [])
+            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [],
+            [], 1)
 
 
 class TopicsAndSkillsDashboardPageDataHandlerTest(

@@ -36,9 +36,9 @@ oppia.factory('HintObjectFactory', [
           hintBackendDict.hint_content));
     };
 
-    Hint.createNew = function(hintContent) {
+    Hint.createNew = function(hintContentId, hintContent) {
       return new Hint(
-        SubtitledHtmlObjectFactory.createDefault(hintContent));
+        SubtitledHtmlObjectFactory.createDefault(hintContent, hintContentId));
     };
 
     return Hint;
