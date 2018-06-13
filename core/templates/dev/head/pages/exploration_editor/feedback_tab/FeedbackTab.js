@@ -256,7 +256,8 @@ oppia.controller('FeedbackTab', [
                 state.content.setHtml(suggestion.suggestion.suggestion_html);
               }
               if (result.audioUpdateRequired) {
-                state.content.markAllAudioAsNeedingUpdate();
+                state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
+                  state.content.getContentId());
               }
               ExplorationDataService.data.version += 1;
               ExplorationStatesService.setState(stateName, state);

@@ -17,7 +17,7 @@
  * particular answer from some particular state.
  */
 
-oppia.factory('AnswerStatsFactory', [function() {
+oppia.factory('AnswerStatsObjectFactory', [function() {
   /**
    * @constructor
    * @param {*} answer - raw answer object.

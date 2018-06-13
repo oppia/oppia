@@ -121,3 +121,35 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             skill_services.get_skill_by_id(self.SKILL_ID, False), None)
         self.assertEqual(
             skill_services.get_skill_summary_by_id(self.SKILL_ID, False), None)
+
+
+class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
+    """Test the skill mastery services module."""
+
+    SKILL_IDS = []
+    USER_ID = 'user'
+    DEGREE_OF_MASTERY_1 = 0.0
+    DEGREE_OF_MASTERY_2 = 0.5
+
+    def setUp(self):
+        super(SkillMasteryServicesUnitTests, self).setUp()
+        self.SKILL_ID_1 = skill_services.get_new_skill_id()
+        self.SKILL_ID_2 = skill_services.get_new_skill_id()
+        self.SKILL_IDS = [self.SKILL_ID_1, self.SKILL_ID_2]
+        skill_services.create_user_skill_mastery(
+            self.USER_ID, self.SKILL_ID_1, self.DEGREE_OF_MASTERY_1)
+        skill_services.create_user_skill_mastery(
+            self.USER_ID, self.SKILL_ID_2, self.DEGREE_OF_MASTERY_2)
+
+    def test_get_skill_mastery(self):
+        degree_of_mastery = skill_services.get_skill_mastery(
+            self.USER_ID, self.SKILL_ID_1)
+
+        self.assertEqual(degree_of_mastery, self.DEGREE_OF_MASTERY_1)
+
+    def test_get_multi_skill_mastery(self):
+        degree_of_mastery = skill_services.get_multi_skill_mastery(
+            self.USER_ID, self.SKILL_IDS)
+
+        self.assertEqual(degree_of_mastery, ([
+            self.DEGREE_OF_MASTERY_1, self.DEGREE_OF_MASTERY_2]))

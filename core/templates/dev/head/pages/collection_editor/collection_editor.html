@@ -85,6 +85,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/InteractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/objects/FractionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/AnswerGroupObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ContentIdsToAudioTranslationsObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/EditableExplorationBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ReadOnlyExplorationBackendApiService.js"></script>
@@ -117,6 +118,17 @@
 
   {# TODO(bhenning): Remove these once RouterServices is decoupled from the exploration editor #}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationPropertyService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationAutomaticTextToSpeechService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationCategoryService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationCorrectnessFeedbackService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationInitStateNameService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationLanguageCodeService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationObjectiveService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationParamChangesService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationParamSpecsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationStatesService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationTagsService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationTitleService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ChangeListService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/AutosaveInfoModalsService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ExplorationDataService.js"></script>
@@ -127,6 +139,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/ChangesInHumanReadableFormService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/ExplorationHtmlFormatterService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/GenerateContentIdService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/LocalStorageService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionVerificationService.js"></script>
