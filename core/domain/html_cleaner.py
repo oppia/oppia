@@ -146,6 +146,16 @@ def get_rte_components(html_string):
     return components
 
 
+# Replace list to escape and unescape html strings.
+REPLACE_LIST = [
+    ('&', '&amp;'),
+    ('"', '&quot;'),
+    ('\'', '&#39;'),
+    ('<', '&lt;'),
+    ('>', '&gt;')
+]
+
+
 def escape_html(html_data):
     """This functions converts html to escaped format.
 
@@ -155,8 +165,7 @@ def escape_html(html_data):
     Returns:
         str. Escaped HTML string.
     """
-    replace_list = feconf.REPLACE_LIST
-    for replace_tuple in replace_list:
+    for replace_tuple in REPLACE_LIST:
         html_data = html_data.replace(replace_tuple[0], replace_tuple[1])
 
     return html_data
@@ -171,9 +180,8 @@ def unescape_html(escaped_html_data):
     Returns:
         str. Unescaped HTML string.
     """
-    replace_list = feconf.REPLACE_LIST
     unescaped_html_data = escaped_html_data
-    for replace_tuple in replace_list:
+    for replace_tuple in REPLACE_LIST:
         unescaped_html_data = unescaped_html_data.replace(
             replace_tuple[1], replace_tuple[0])
 
