@@ -1585,7 +1585,9 @@ pre.oppia-pre-wrapped-text {
 
 /* Styles for the loading indicator or try again shown while image is loading or failed to load respectively */
 .oppia-image-container {
+  align-items: center;
   background-color: rgba(224,242,241,1);
+  display: flex;
 }
 
 /* Style to center an element */

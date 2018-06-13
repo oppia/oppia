@@ -62,11 +62,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               loadingIndicatorSize = 24;
             }
 
-            var paddingTopForLoadingIndicator = Math.max(0, ((
-              $scope.dimensions.height * 0.5) - (loadingIndicatorSize * 0.5)));
             $scope.loadingIndicatorContainerStyle =
             {
-              'padding-top': paddingTopForLoadingIndicator + 'px',
               height: $scope.dimensions.height + 'px'
             };
             $scope.loadingIndicatorStyle = {
@@ -74,11 +71,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               width: loadingIndicatorSize + 'px'
             };
 
-            var paddingTopForTryAgain = Math.max(0,
-              (($scope.dimensions.height * 0.5) - (45 * 0.5)));
             $scope.tryAgainContainerStyle =
             {
-              'padding-top': paddingTopForTryAgain + 'px',
               height: $scope.dimensions.height + 'px'
             };
 
