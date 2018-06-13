@@ -554,7 +554,7 @@ describe('ExplorationFeedback', function() {
 });
 
 
-describe('Suggestions on Explorations', function() {
+ddescribe('Suggestions on Explorations', function() {
   var EXPLORATION_TITLE = 'Sample Exploration';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
@@ -581,7 +581,7 @@ describe('Suggestions on Explorations', function() {
       'studentExplorationSuggestions');
   });
 
-  it('accepts a suggestion on a published exploration', function() {
+  iit('accepts a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,

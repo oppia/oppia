@@ -33,7 +33,7 @@ oppia.factory('EditabilityService', [function() {
       return isTranslatable && !inTutorialMode;
     },
     isEditableOutsideTutorialMode: function() {
-      return isEditable || isTranslatable;
+      return isEditable;
     },
     markEditable: function() {
       isEditable = true;
