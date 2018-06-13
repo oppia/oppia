@@ -1,12 +1,14 @@
 <figure>
   <div ng-if="!isLoadingIndicatorShown && !isTryAgainShown">
-    <img ng-src="<[imageUrl]>" alt="<[imageAltText]>" class="center-image-horizontally">
+    <img ng-src="<[imageUrl]>" alt="<[imageAltText]>" class="center-element-horizontally">
     <figcaption style="text-align:center;"><[imageCaption]></figcaption>
   </div>
-  <div ng-if="isLoadingIndicatorShown" class="oppia-image-loadingIndicator-or-tryAgain-container" ng-style="loadingIndicatorContainerStyle">
-    <img ng-src="<[loadingIndicatorUrl]>" class="center-image-horizontally" ng-style="loadingIndicatorStyle" alt="Loading...">
+  <div ng-if="isLoadingIndicatorShown" class="oppia-image-container" ng-style="loadingIndicatorContainerStyle">
+    <img ng-src="<[loadingIndicatorUrl]>" class="center-element-horizontally" ng-style="loadingIndicatorStyle" alt="Loading...">
   </div>
-  <div ng-if="isTryAgainShown" class="oppia-image-loadingIndicator-or-tryAgain-container" ng-style="tryAgainContainerStyle">
-    <img ng-click="loadImage()" ng-src="<[tryAgainUrl]>" class="center-image-horizontally" alt="Loading...">
+  <div ng-if="isTryAgainShown" class="oppia-image-container" ng-style="tryAgainContainerStyle">
+    <md-button ng-click="loadImage()" class="oppia-learner-try-again-button center-element-horizontally">
+      <span>Try Again</span>
+    </md-button>
   </div>
 </figure>
