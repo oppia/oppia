@@ -47,6 +47,8 @@ oppia.controller('TopicsAndSkillsDashboard', [
       function(errorResponse) {
         if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
           AlertsService.addWarning('Failed to get dashboard data');
+        } else {
+          AlertsService.addWarning('Unexpected error code from the server.');
         }
       }
     );
