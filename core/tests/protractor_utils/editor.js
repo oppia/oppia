@@ -91,7 +91,19 @@ var navigateToSettingsTab = function() {
   element(by.css('.protractor-test-settings-tab')).click();
 };
 
+var navigateToStatsTab = function() {
+  element(by.css('.protractor-test-stats-tab')).click();
+};
+
 // UTILITIES
+
+var _getNumPassersby = function() {
+  return element(by.css('.protractor-test-num-passersby')).getText();
+};
+
+var expectNumPassersbyToBe = function(numPassersby) {
+  expect(_getNumPassersby()).toMatch(numPassersby);
+};
 
 var setStateName = function(name) {
   var nameElement = element(by.css('.protractor-test-state-name-container'));
@@ -1292,6 +1304,9 @@ exports.finishTutorial = finishTutorial;
 exports.navigateToMainTab = navigateToMainTab;
 exports.navigateToPreviewTab = navigateToPreviewTab;
 exports.navigateToSettingsTab = navigateToSettingsTab;
+exports.navigateToStatsTab = navigateToStatsTab;
+
+exports.expectNumPassersbyToBe = expectNumPassersbyToBe;
 
 exports.setStateName = setStateName;
 exports.expectCurrentStateToBe = expectCurrentStateToBe;

@@ -77,28 +77,31 @@ class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Posting a list that includes private activities results in an error.
-        self.post_json('/moderatorhandler/featured', {
-            'featured_activity_reference_dicts': [{
-                'type': 'exploration',
-                'id': self.EXP_ID_2,
-            }],
-        }, csrf_token, expect_errors=True, expected_status_int=400)
-        self.post_json('/moderatorhandler/featured', {
-            'featured_activity_reference_dicts': [{
-                'type': 'exploration',
-                'id': self.EXP_ID_1,
-            }, {
-                'type': 'exploration',
-                'id': self.EXP_ID_2,
-            }],
-        }, csrf_token, expect_errors=True, expected_status_int=400)
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_2,
+                }],
+            }, csrf_token, expect_errors=True, expected_status_int=400)
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_1,
+                }, {
+                    'type': 'exploration',
+                    'id': self.EXP_ID_2,
+                }],
+            }, csrf_token, expect_errors=True, expected_status_int=400)
 
         # Posting a list that only contains public activities succeeds.
-        self.post_json('/moderatorhandler/featured', {
-            'featured_activity_reference_dicts': [{
-                'type': 'exploration',
-                'id': self.EXP_ID_1,
-            }],
-        }, csrf_token)
+        self.post_json(
+            '/moderatorhandler/featured', {
+                'featured_activity_reference_dicts': [{
+                    'type': 'exploration',
+                    'id': self.EXP_ID_1,
+                }],
+            }, csrf_token)
 
         self.logout()

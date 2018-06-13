@@ -78,6 +78,7 @@ class UserSettings(object):
         preferred_site_language_code: str or None. System language preference.
         preferred_audio_language_code: str or None. Audio language preference.
     """
+
     def __init__(
             self, user_id, email, role, username=None,
             last_agreed_to_terms=None, last_started_state_editor_tutorial=None,
@@ -109,6 +110,9 @@ class UserSettings(object):
                 user last edited an exploration.
             profile_picture_data_url: str or None. User uploaded profile
                 picture as a dataURI string.
+            default_dashboard: str|None. The default dashboard of the user.
+            creator_dashboard_display_pref: str. The creator dashboard
+            dashboard of the user.
             user_bio: str. User-specified biography.
             subject_interests: list(str) or None. Subject interests specified by
                 the user.
@@ -1344,8 +1348,8 @@ def create_user_contributions(
     return user_contributions
 
 
-def update_user_contributions(user_id, created_exploration_ids,
-                              edited_exploration_ids):
+def update_user_contributions(
+        user_id, created_exploration_ids, edited_exploration_ids):
     """Updates an existing UserContributionsModel with new calculated
     contributions.
 

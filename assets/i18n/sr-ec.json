@@ -16,7 +16,7 @@
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE_TEXT": "Ваши доприноси у заједници.",
 	"I18N_ABOUT_PAGE_CREDITS_TAB_HEADING": "Заслуге",
 	"I18N_ABOUT_PAGE_CREDITS_TAB_TEXT": "Сарадници Опије долазе из целог света &mdash; већина нас су учетници, бивши ученици и предавачи. Желели бисмо се захвалити следећим сарадницима који су допринели изградњи платформе. Ако бисте Ви желели да помогнете, <a href=\"/contact\">ево како се можете укључити</a>!",
-	"I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM": "Развојни тим Опије је такође захвалан за повратне информације, идеје, помоћ и сугестије сарадника",
+	"I18N_ABOUT_PAGE_CREDITS_TAB_TEXT_BOTTOM": "Развојни тим Опије је такође захвалан за повратне информације, идеје, помоћ и сугестије из <[listOfNames]>.",
 	"I18N_ABOUT_PAGE_CREDITS_THANK_TRANSLATEWIKI": "Такође бисмо се желели захвалити сајту <a href=\"https://translatewiki.net/wiki/Translating:Oppia\">translatewiki.net</a> за омогућавање краудсорсованих превода.",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_DONATE_BUTTON": "Прилози",
 	"I18N_ABOUT_PAGE_FOUNDATION_TAB_GET_INVOLVED_BUTTON": "Укључите се",

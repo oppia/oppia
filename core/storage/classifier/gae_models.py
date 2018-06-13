@@ -285,18 +285,22 @@ class TrainingJobExplorationMappingModel(base_models.BaseModel):
 
     @classmethod
     def create_multi(cls, job_exploration_mappings):
-        """Creates multiple new  TrainingJobExplorationMappingModel entries.
+        """Creates multiple new TrainingJobExplorationMappingModel entries.
 
         Args:
             job_exploration_mappings: list(TrainingJobExplorationMapping). The
                 list of TrainingJobExplorationMapping Domain objects.
+
+        Returns:
+            list(int). The list of mapping IDs.
         """
         mapping_models = []
         mapping_ids = []
         for job_exploration_mapping in job_exploration_mappings:
-            instance_id = cls._generate_id(job_exploration_mapping.exp_id,
-                                           job_exploration_mapping.exp_version,
-                                           job_exploration_mapping.state_name)
+            instance_id = cls._generate_id(
+                job_exploration_mapping.exp_id,
+                job_exploration_mapping.exp_version,
+                job_exploration_mapping.state_name)
             mapping_instance = cls(
                 id=instance_id, exp_id=job_exploration_mapping.exp_id,
                 exp_version=job_exploration_mapping.exp_version,

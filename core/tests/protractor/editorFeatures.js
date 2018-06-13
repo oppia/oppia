@@ -81,7 +81,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '  audio_translations: {}',
+        text: '  content_id: content',
         highlighted: false
       },
       4: {
@@ -89,122 +89,150 @@ describe('Exploration history', function() {
         highlighted: true
       },
       5: {
-        text: 'interaction:',
+        text: 'content_ids_to_audio_translations:',
         highlighted: false
       },
       6: {
-        text: '  answer_groups:',
-        highlighted: true
+        text: '  content: {}',
+        highlighted: false
       },
       7: {
-        text: '  - outcome:',
-        highlighted: true
+        text: '  default_outcome: {}',
+        highlighted: false
       },
       8: {
-        text: '      dest: second',
+        text: '  feedback_1: {}',
         highlighted: true
       },
       9: {
-        text: '      feedback:',
-        highlighted: true
+        text: 'interaction:',
+        highlighted: false
       },
       10: {
-        text: '        audio_translations: {}',
+        text: '  answer_groups:',
         highlighted: true
       },
       11: {
-        text: '        html: \'\'',
+        text: '  - outcome:',
         highlighted: true
       },
       12: {
-        text: '      labelled_as_correct: false',
+        text: '      dest: second',
         highlighted: true
       },
       13: {
-        text: '      param_changes: []',
+        text: '      feedback:',
         highlighted: true
       },
       14: {
-        text: '      refresher_exploration_id: null',
+        text: '        content_id: feedback_1',
         highlighted: true
       },
       15: {
-        text: '    rule_specs:',
+        text: '        html: \'\'',
         highlighted: true
       },
       16: {
-        text: '    - inputs:',
+        text: '      labelled_as_correct: false',
         highlighted: true
       },
       17: {
-        text: '        x: 6',
+        text: '      missing_prerequisite_skill_id: null',
         highlighted: true
       },
       18: {
-        text: '      rule_type: Equals',
+        text: '      param_changes: []',
         highlighted: true
       },
       19: {
-        text: '    training_data: []',
+        text: '      refresher_exploration_id: null',
         highlighted: true
       },
       20: {
-        text: '  confirmed_unclassified_answers: []',
-        highlighted: false
+        text: '    rule_specs:',
+        highlighted: true
       },
       21: {
-        text: '  customization_args: {}',
-        highlighted: false
+        text: '    - inputs:',
+        highlighted: true
       },
       22: {
-        text: '  default_outcome:',
-        highlighted: false
+        text: '        x: 6',
+        highlighted: true
       },
       23: {
-        text: '    dest: first',
+        text: '      rule_type: Equals',
         highlighted: true
       },
       24: {
-        text: '    feedback:',
-        highlighted: false
+        text: '    tagged_misconception_id: null',
+        highlighted: true
       },
       25: {
-        text: '      audio_translations: {}',
-        highlighted: false
+        text: '    training_data: []',
+        highlighted: true
       },
       26: {
-        text: '      html: \'\'',
+        text: '  confirmed_unclassified_answers: []',
         highlighted: false
       },
       27: {
-        text: '    labelled_as_correct: false',
+        text: '  customization_args: {}',
         highlighted: false
       },
       28: {
-        text: '    param_changes: []',
+        text: '  default_outcome:',
         highlighted: false
       },
       29: {
-        text: '    refresher_exploration_id: null',
-        highlighted: false
+        text: '    dest: first',
+        highlighted: true
       },
       30: {
-        text: '  hints: []',
+        text: '    feedback:',
         highlighted: false
       },
       31: {
-        text: '  id: NumericInput',
-        highlighted: true
+        text: '      content_id: default_outcome',
+        highlighted: false
       },
       32: {
-        text: '  solution: null',
+        text: '      html: \'\'',
         highlighted: false
       },
       33: {
-        text: 'param_changes: []',
+        text: '    labelled_as_correct: false',
         highlighted: false
       },
       34: {
+        text: '    missing_prerequisite_skill_id: null',
+        highlighted: false
+      },
+      35: {
+        text: '    param_changes: []',
+        highlighted: false
+      },
+      36: {
+        text: '    refresher_exploration_id: null',
+        highlighted: false
+      },
+      37: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      38: {
+        text: '  id: NumericInput',
+        highlighted: true
+      },
+      39: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      40: {
+        text: 'param_changes: []',
+        highlighted: false
+      },
+      41: {
         text: ' ',
         highlighted: false
       }
@@ -220,7 +248,7 @@ describe('Exploration history', function() {
         highlighted: false
       },
       3: {
-        text: '  audio_translations: {}',
+        text: '  content_id: content',
         highlighted: false
       },
       4: {
@@ -228,72 +256,88 @@ describe('Exploration history', function() {
         highlighted: true
       },
       5: {
-        text: 'interaction:',
+        text: 'content_ids_to_audio_translations:',
         highlighted: false
       },
       6: {
-        text: '  answer_groups: []',
-        highlighted: true
-      },
-      7: {
-        text: '  confirmed_unclassified_answers: []',
+        text: '  content: {}',
         highlighted: false
       },
+      7: {
+        text: '  default_outcome: {}',
+        highlighted: true
+      },
       8: {
-        text: '  customization_args: {}',
+        text: 'interaction:',
         highlighted: false
       },
       9: {
+        text: '  answer_groups: []',
+        highlighted: true
+      },
+      10: {
+        text: '  confirmed_unclassified_answers: []',
+        highlighted: false
+      },
+      11: {
+        text: '  customization_args: {}',
+        highlighted: false
+      },
+      12: {
         text: '  default_outcome:',
         highlighted: false
       },
       // Note that highlighting *underneath* a line is still considered a
       // highlight.
-      10: {
+      13: {
         text: '    dest: ' + general.FIRST_STATE_DEFAULT_NAME,
         highlighted: true
       },
-      11: {
+      14: {
         text: '    feedback:',
         highlighted: false
       },
-      12: {
-        text: '      audio_translations: {}',
-        highlighted: false
-      },
-      13: {
-        text: '      html: \'\'',
-        highlighted: false
-      },
-      14: {
-        text: '    labelled_as_correct: false',
-        highlighted: false
-      },
       15: {
-        text: '    param_changes: []',
+        text: '      content_id: default_outcome',
         highlighted: false
       },
       16: {
-        text: '    refresher_exploration_id: null',
+        text: '      html: \'\'',
         highlighted: false
       },
       17: {
-        text: '  hints: []',
+        text: '    labelled_as_correct: false',
         highlighted: false
       },
       18: {
-        text: '  id: null',
-        highlighted: true
+        text: '    missing_prerequisite_skill_id: null',
+        highlighted: false
       },
       19: {
-        text: '  solution: null',
+        text: '    param_changes: []',
         highlighted: false
       },
       20: {
-        text: 'param_changes: []',
+        text: '    refresher_exploration_id: null',
         highlighted: false
       },
       21: {
+        text: '  hints: []',
+        highlighted: false
+      },
+      22: {
+        text: '  id: null',
+        highlighted: true
+      },
+      23: {
+        text: '  solution: null',
+        highlighted: false
+      },
+      24: {
+        text: 'param_changes: []',
+        highlighted: false
+      },
+      25: {
         text: ' ',
         highlighted: false
       }
@@ -302,8 +346,11 @@ describe('Exploration history', function() {
     var STATE_2_STRING =
       'classifier_model_id: null\n' +
       'content:\n' +
-      '  audio_translations: {}\n' +
+      '  content_id: content\n' +
       '  html: <p>this is card 2</p>\n' +
+      'content_ids_to_audio_translations:\n' +
+      '  content: {}\n' +
+      '  default_outcome: {}\n' +
       'interaction:\n' +
       '  answer_groups: []\n' +
       '  confirmed_unclassified_answers: []\n' +
@@ -313,9 +360,10 @@ describe('Exploration history', function() {
       '  default_outcome:\n' +
       '    dest: final card\n' +
       '    feedback:\n' +
-      '      audio_translations: {}\n' +
+      '      content_id: default_outcome\n' +
       '      html: \'\'\n' +
       '    labelled_as_correct: false\n' +
+      '    missing_prerequisite_skill_id: null\n' +
       '    param_changes: []\n' +
       '    refresher_exploration_id: null\n' +
       '  hints: []\n' +
@@ -323,7 +371,6 @@ describe('Exploration history', function() {
       '  solution: null\n' +
       'param_changes: []\n' +
       ' ';
-
     editor.expectGraphComparisonOf(1, 2).toBe([{
       label: 'first (was: Introd...',
       color: COLOR_CHANGED
@@ -352,6 +399,7 @@ describe('Exploration history', function() {
       color: COLOR_ADDED
     }], [2, 2, 0]);
 
+
     // Check deleting a state
     editor.deleteState('second');
     editor.moveToState('first');
@@ -370,7 +418,6 @@ describe('Exploration history', function() {
     }], [3, 1, 2]);
     editor.expectTextComparisonOf(2, 3, 'second')
       .toBe(' ', STATE_2_STRING);
-
     // Check renaming a state
     editor.moveToState('first');
     editor.setStateName('third');
@@ -427,7 +474,6 @@ describe('Exploration history', function() {
       label: 'final card',
       color: COLOR_UNCHANGED
     }], [3, 2, 1]);
-
     users.logout();
   });
 
@@ -560,6 +606,7 @@ describe('Suggestions on Explorations', function() {
     users.login('user1@ExplorationSuggestions.com');
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
+    general.waitForSystem();
     editor.getSuggestionThreads().then(function(threads) {
       expect(threads.length).toEqual(1);
       expect(threads[0]).toMatch(suggestionDescription);

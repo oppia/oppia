@@ -48,8 +48,9 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if item.deleted:
-            yield (CollectionMigrationJob._DELETED_KEY,
-                   'Encountered deleted collection.')
+            yield (
+                CollectionMigrationJob._DELETED_KEY,
+                'Encountered deleted collection.')
             return
 
         # Note: the read will bring the collection up to the newest version.
@@ -59,8 +60,9 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         except Exception as e:
             logging.error(
                 'Collection %s failed validation: %s' % (item.id, e))
-            yield (CollectionMigrationJob._ERROR_KEY,
-                   'Collection %s failed validation: %s' % (item.id, e))
+            yield (
+                CollectionMigrationJob._ERROR_KEY,
+                'Collection %s failed validation: %s' % (item.id, e))
             return
 
         # Write the new collection into the datastore if it's different from
@@ -76,8 +78,9 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update collection schema version to %d.' % (
                     feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
-            yield (CollectionMigrationJob._MIGRATED_KEY,
-                   'Collection successfully migrated.')
+            yield (
+                CollectionMigrationJob._MIGRATED_KEY,
+                'Collection successfully migrated.')
 
     @staticmethod
     def reduce(key, values):

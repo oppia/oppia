@@ -49,6 +49,7 @@ oppia.controller('ExplorationEditor', [
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
+  'StateTopAnswersStatsService', 'StateTopAnswersStatsBackendApiService',
   'ThreadDataService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
@@ -65,11 +66,12 @@ oppia.controller('ExplorationEditor', [
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
       UrlInterpolationService, ExplorationCorrectnessFeedbackService,
+      StateTopAnswersStatsService, StateTopAnswersStatsBackendApiService,
       ThreadDataService) {
     $scope.EditabilityService = EditabilityService;
     $scope.EditorStateService = EditorStateService;
 
-    /**********************************************************
+    /** ********************************************************
      * Called on initial load of the exploration editor page.
      *********************************************************/
     $rootScope.loadingMessage = 'Loading';
@@ -83,7 +85,7 @@ oppia.controller('ExplorationEditor', [
 
     $scope.getTabStatuses = RouterService.getTabStatuses;
 
-    /********************************************
+    /** ******************************************
     * Methods affecting the graph visualization.
     ********************************************/
     $scope.areExplorationWarningsVisible = false;
@@ -205,6 +207,14 @@ oppia.controller('ExplorationEditor', [
 
         StateEditorTutorialFirstTimeService.init(
           data.show_state_editor_tutorial_on_load, $scope.explorationId);
+
+        if (ExplorationRightsService.isPublic()) {
+          // Stats are loaded asynchronously after the exploration data because
+          // they are not needed to interact with the editor.
+          StateTopAnswersStatsBackendApiService.fetchStats(
+            $scope.explorationId
+          ).then(StateTopAnswersStatsService.init);
+        }
       });
     };
 

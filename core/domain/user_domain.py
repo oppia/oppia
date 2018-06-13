@@ -38,7 +38,8 @@ class UserGlobalPrefs(object):
 
     def __init__(
             self, can_receive_email_updates, can_receive_editor_role_email,
-            can_receive_feedback_message_email, can_receive_subscription_email):
+            can_receive_feedback_message_email,
+            can_receive_subscription_email):
         """Constructs a UserGlobalPrefs domain object.
 
         Args:
@@ -77,8 +78,8 @@ class UserExplorationPrefs(object):
             muted suggestion emails.
     """
 
-    def __init__(self, mute_feedback_notifications,
-                 mute_suggestion_notifications):
+    def __init__(
+            self, mute_feedback_notifications, mute_suggestion_notifications):
         """Constructs a UserExplorationPrefs domain object.
 
         Args:
@@ -116,8 +117,9 @@ class UserExplorationPrefs(object):
 class ExpUserLastPlaythrough(object):
     """Domain object for an exploration last playthrough model."""
 
-    def __init__(self, user_id, exploration_id, last_played_exp_version,
-                 last_updated, last_played_state_name):
+    def __init__(
+            self, user_id, exploration_id, last_played_exp_version,
+            last_updated, last_played_state_name):
         self.id = '%s.%s' % (user_id, exploration_id)
         self.user_id = user_id
         self.exploration_id = exploration_id
@@ -125,8 +127,8 @@ class ExpUserLastPlaythrough(object):
         self.last_updated = last_updated
         self.last_played_state_name = last_played_state_name
 
-    def update_last_played_information(self, last_played_exp_version,
-                                       last_played_state_name):
+    def update_last_played_information(
+            self, last_played_exp_version, last_played_state_name):
         """Updates the last playthrough information of the user.
 
         Args:
@@ -142,8 +144,8 @@ class ExpUserLastPlaythrough(object):
 class IncompleteActivities(object):
     """Domain object for the incomplete activities model."""
 
-    def __init__(self, user_id, exploration_ids,
-                 collection_ids):
+    def __init__(
+            self, user_id, exploration_ids, collection_ids):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
@@ -172,8 +174,8 @@ class IncompleteActivities(object):
 class CompletedActivities(object):
     """Domain object for the activities completed by learner model."""
 
-    def __init__(self, user_id, exploration_ids,
-                 collection_ids):
+    def __init__(
+            self, user_id, exploration_ids, collection_ids):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
@@ -202,8 +204,8 @@ class CompletedActivities(object):
 class LearnerPlaylist(object):
     """Domain object for the learner playlist model."""
 
-    def __init__(self, user_id, exploration_ids,
-                 collection_ids):
+    def __init__(
+            self, user_id, exploration_ids, collection_ids):
         self.id = user_id
         self.exploration_ids = exploration_ids
         self.collection_ids = collection_ids
@@ -215,9 +217,11 @@ class LearnerPlaylist(object):
         Args:
             exploration_id: str. The exploration id to be inserted into the
                 play later list.
-            position_to_be_inserted: The position at which it is to be inserted.
+            position_to_be_inserted: int. The position at which it
+                is to be inserted.
         """
-        self.exploration_ids.insert(position_to_be_inserted, exploration_id)
+        self.exploration_ids.insert(
+            position_to_be_inserted, exploration_id)
 
     def add_exploration_id_to_list(self, exploration_id):
         """Inserts the exploration id at the end of the list.
@@ -235,7 +239,8 @@ class LearnerPlaylist(object):
         Args:
             collection_id: str. The collection id to be inserted into the
                 play later list.
-            position_to_be_inserted: The position at which it is to be inserted.
+            position_to_be_inserted: int. The position at which it
+                is to be inserted.
         """
         self.collection_ids.insert(position_to_be_inserted, collection_id)
 

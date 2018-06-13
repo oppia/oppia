@@ -103,6 +103,21 @@ class InteractionAnswerSummariesMRJobManager(
                 <exploration_id>:<exploration_version>:<state_name>
             stringified_values: list(str). A list of stringified_values of the
                 submitted answers.
+
+        Yields:
+            str. One of the following strings:
+                - Expected a single version when aggregating answers for:
+                    Occurs when the versions list contains multiple versions
+                    instead of a specific version.
+                - Expected exactly one interaction ID for exploration:
+                    Occurs when there is not exactly one interaction ID
+                    for each exploration and version.
+                - Expected at least one item ID for exploration:
+                    Occurs when there is not at least one Item ID for
+                    each exploration and version.
+                - Ignoring answers submitted to version:
+                    Occurs when version mismatches and the new
+                    version has a different interaction ID.
         """
         exploration_id, exploration_version, state_name = key.split(':')
 
@@ -208,7 +223,7 @@ class InteractionAnswerSummariesMRJobManager(
             for ignored_version in ignored_versions:
                 del versioned_interaction_ids[ignored_version]
                 del versioned_item_ids[ignored_version]
-            versions = versions[:earliest_acceptable_version_index+1]
+            versions = versions[:earliest_acceptable_version_index + 1]
 
         # Retrieve all StateAnswerModel entities associated with the remaining
         # item IDs which correspond to a single interaction ID shared among all
@@ -231,6 +246,10 @@ class InteractionAnswerSummariesMRJobManager(
             'submitted_answer_list': submitted_answer_list
         }
 
+        # NOTE: The answers stored in submitted_answers_list must be sorted
+        # according to the chronological order of their submission otherwise
+        # TopNUnresolvedAnswersByFrequency calculation will output invalid
+        # results.
         state_answers_models = stats_models.StateAnswersModel.get_multi(
             item_ids)
         for state_answers_model in state_answers_models:

@@ -42,8 +42,6 @@ class QuestionModel(base_models.VersionedModel):
     SNAPSHOT_CONTENT_CLASS = QuestionSnapshotContentModel
     ALLOW_REVERT = True
 
-    # The title of the question.
-    title = ndb.StringProperty(required=True, indexed=True)
     # A dict representing the question data.
     question_data = ndb.JsonProperty(indexed=False)
     # The schema version for the data.
@@ -78,12 +76,11 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-            cls, title, question_data, question_data_schema_version,
+            cls, question_data, question_data_schema_version,
             language_code):
         """Creates a new QuestionModel entry.
 
         Args:
-            title: str. The title of the question.
             question_data: dict. A dict representing the question data.
             question_data_schema_version: int. The schema version for the data.
             language_code: str. The ISO 639-1 code for the language this
@@ -97,9 +94,41 @@ class QuestionModel(base_models.VersionedModel):
         """
         instance_id = cls._get_new_id()
         question_model_instance = cls(
-            id=instance_id, title=title,
+            id=instance_id,
             question_data=question_data,
             question_data_schema_version=question_data_schema_version,
             language_code=language_code)
 
         return question_model_instance
+
+
+class QuestionSkillLinkModel(base_models.BaseModel):
+    """Model for storing Question-Skill Links.
+
+    The ID of instances of this class has the form
+    {{random_hash_of_12_chars}}
+    """
+
+    # The ID of the question.
+    question_id = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the skill to which the question is linked.
+    skill_id = ndb.StringProperty(required=True, indexed=True)
+
+    @classmethod
+    def create(
+            cls, question_id, skill_id):
+        """Creates a new QuestionSkillLinkModel entry.
+
+        Args:
+            question_id: str. The ID of the question.
+            skill_id: str. The ID of the skill to which the question is linked.
+
+        Returns:
+            QuestionSkillLinkModel. Instance of the new
+            QuestionSkillLinkModel entry.
+        """
+
+        question_skill_link_model_instance = cls(
+            question_id=question_id, skill_id=skill_id)
+
+        return question_skill_link_model_instance

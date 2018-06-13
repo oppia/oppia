@@ -9,8 +9,8 @@
           </span>
         </div>
         <input type="text" class="form-control oppia-search-bar-input oppia-search-bar-text-input protractor-test-search-input"
-             ng-attr-placeholder="<[searchBarPlaceholder]>" ng-model="searchQuery"
-             ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }" aria-label="Search bar">
+               ng-attr-placeholder="<[searchBarPlaceholder]>" ng-model="searchQuery"
+               ng-model-options="{ updateOn: 'default blur', debounce: { 'default': 1000, 'blur': 0 } }" aria-label="Search bar">
       </div>
     </div>
   </form>
@@ -19,15 +19,15 @@
 <div class="oppia-same-row-container">
   <div uib-dropdown class="navbar-left oppia-navbar-button-container oppia-search-bar-category-selector protractor-test-search-bar-category-selector">
     <button uib-dropdown-toggle type="button" class="btn protractor-test-search-bar-dropdown-toggle oppia-search-bar-input ng-cloak"
-          title="<[selectionDetails.categories.description | translate]>"
-          style="max-width: 130px;">
+            title="<[selectionDetails.categories.description | translate]>"
+            style="max-width: 130px;">
       <[categoryButtonText|truncate:14]>
       <span class="caret"></span>
     </button>
     <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
     <ul uib-dropdown-menu class="protractor-test-search-bar-dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
       <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-        ng-if="selectionDetails.categories.selections[item.id]">
+          ng-if="selectionDetails.categories.selections[item.id]">
         <a href="" ng-click="toggleSelection('categories', item.id)">
           <span translate="<[item.text]>" class="protractor-test-selected"></span>
           <i ng-if="selectionDetails.categories.selections[item.id]" class="material-icons md-18 pull-right oppia-search-bar-category-selection-symbol">&#xE876;</i>
@@ -108,10 +108,10 @@
   .oppia-search-bar-input::-webkit-input-placeholder {
     color: rgba(255,255,255,0.7);
   }
-  .oppia-search-bar-input:-moz-placeholder {
+  .oppia-search-bar-input::-moz-placeholder {
     color: rgba(255,255,255,0.7);
   }
-  .oppia-search-bar-input::-moz-placeholder {
+  .oppia-search-bar-input:-moz-placeholder {
     color: rgba(255,255,255,0.7);
   }
   .oppia-search-bar-input:-ms-input-placeholder {
@@ -142,10 +142,10 @@
     .oppia-search-bar-input::-webkit-input-placeholder {
       color: #04857c;
     }
-    .oppia-search-bar-input:-moz-placeholder {
+    .oppia-search-bar-input::-moz-placeholder {
       color: #04857c;
     }
-    .oppia-search-bar-input::-moz-placeholder {
+    .oppia-search-bar-input:-moz-placeholder {
       color: #04857c;
     }
     .oppia-search-bar-input:-ms-input-placeholder {

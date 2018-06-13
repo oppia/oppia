@@ -171,10 +171,11 @@ class ConfigProperty(object):
             model_instance = config_models.ConfigPropertyModel(
                 id=self.name)
         model_instance.value = value
-        model_instance.commit(committer_id, [{
-            'cmd': CMD_CHANGE_PROPERTY_VALUE,
-            'new_value': value
-        }])
+        model_instance.commit(
+            committer_id, [{
+                'cmd': CMD_CHANGE_PROPERTY_VALUE,
+                'new_value': value
+            }])
 
         # Set value in memcache.
         memcache_services.set_multi({
@@ -207,6 +208,7 @@ class Registry(object):
 
         Args:
             name: str. The name of the configuration property.
+            instance: *. The instance of the configuration property.
         """
         cls._config_registry[name] = instance
 

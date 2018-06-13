@@ -21,7 +21,7 @@ describe('State Editor controller', function() {
     var scope, ecs, ess, scs;
 
     beforeEach(module('oppia'));
-    beforeEach(inject(function($rootScope, $controller, $injector) {
+    beforeEach(inject(function($controller, $injector, $rootScope) {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
       ess = $injector.get('ExplorationStatesService');
@@ -30,8 +30,13 @@ describe('State Editor controller', function() {
       ess.init({
         'First State': {
           content: {
-            html: 'First State Content',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'First State Content'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'TextInput',
@@ -39,7 +44,10 @@ describe('State Editor controller', function() {
               rule_specs: [],
               outcome: {
                 dest: 'unused',
-                feedback: [],
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null
@@ -47,7 +55,10 @@ describe('State Editor controller', function() {
             }],
             default_outcome: {
               dest: 'default',
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -58,8 +69,13 @@ describe('State Editor controller', function() {
         },
         'Second State': {
           content: {
-            html: 'Second State Content',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'Second State Content'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'TextInput',
@@ -67,7 +83,10 @@ describe('State Editor controller', function() {
               rule_specs: [],
               outcome: {
                 dest: 'unused',
-                feedback: [],
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null
@@ -75,7 +94,10 @@ describe('State Editor controller', function() {
             }],
             default_outcome: {
               dest: 'default',
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -86,8 +108,13 @@ describe('State Editor controller', function() {
         },
         'Third State': {
           content: {
-            html: 'This is some content.',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'This is some content.'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {}
           },
           interaction: {
             id: 'TextInput',
@@ -95,7 +122,10 @@ describe('State Editor controller', function() {
               rule_specs: [],
               outcome: {
                 dest: 'unused',
-                feedback: [],
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: ''
+                },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null
@@ -103,7 +133,10 @@ describe('State Editor controller', function() {
             }],
             default_outcome: {
               dest: 'default',
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null

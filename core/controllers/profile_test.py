@@ -15,6 +15,7 @@
 """Tests for the profile page."""
 
 from constants import constants
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import subscription_services
@@ -166,16 +167,18 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
         response_dict = self.post_json(
             feconf.USERNAME_CHECK_DATA_URL, {'username': 'abc'},
             csrf_token=csrf_token)
-        self.assertEqual(response_dict, {
-            'username_is_taken': True
-        })
+        self.assertEqual(
+            response_dict, {
+                'username_is_taken': True
+            })
 
         response_dict = self.post_json(
             feconf.USERNAME_CHECK_DATA_URL, {'username': 'def'},
             csrf_token=csrf_token)
-        self.assertEqual(response_dict, {
-            'username_is_taken': False
-        })
+        self.assertEqual(
+            response_dict, {
+                'username_is_taken': False
+            })
 
         response_dict = self.post_json(
             feconf.USERNAME_CHECK_DATA_URL, {'username': '!!!INVALID!!!'},
@@ -595,11 +598,12 @@ class UserContributionsTests(test_utils.GenericTestBase):
             self.EXP_ID_1, user_a_id, end_state_name='End')
         rights_manager.publish_exploration(user_a, self.EXP_ID_1)
 
-        exp_services.update_exploration(user_b_id, self.EXP_ID_1, [{
-            'cmd': 'edit_exploration_property',
-            'property_name': 'objective',
-            'new_value': 'the objective'
-        }], 'Test edit')
+        exp_services.update_exploration(
+            user_b_id, self.EXP_ID_1, [exp_domain.ExplorationChange({
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective'
+            })], 'Test edit')
 
         response_dict = self.get_json(
             '/profilehandler/data/%s' % self.USERNAME_B)
@@ -627,10 +631,11 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
         response = self.testapp.get('/preferences')
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-        self.put_json('/preferenceshandler/data', {
-            'update_type': 'preferred_site_language_code',
-            'data': language_code,
-        }, csrf_token)
+        self.put_json(
+            '/preferenceshandler/data', {
+                'update_type': 'preferred_site_language_code',
+                'data': language_code,
+            }, csrf_token)
 
         preferences = self.get_json('/preferenceshandler/data')
         self.assertIsNotNone(preferences)
@@ -652,10 +657,11 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
         response = self.testapp.get('/preferences')
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-        self.put_json('/preferenceshandler/data', {
-            'update_type': 'user_bio',
-            'data': 'I am within 2000 char limit',
-        }, csrf_token)
+        self.put_json(
+            '/preferenceshandler/data', {
+                'update_type': 'user_bio',
+                'data': 'I am within 2000 char limit',
+            }, csrf_token)
         preferences = self.get_json('/preferenceshandler/data')
         self.assertIsNotNone(preferences)
         self.assertEqual(

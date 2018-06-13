@@ -73,13 +73,13 @@ describe('Collection editor state service', function() {
       new FakeEditableCollectionBackendApiService());
     $provide.value(
       'EditableCollectionBackendApiService',
-      fakeEditableCollectionBackendApiService);
+      [fakeEditableCollectionBackendApiService][0]);
 
     fakeCollectionRightsBackendApiService = (
       new FakeCollectionRightsBackendApiService());
     $provide.value(
       'CollectionRightsBackendApiService',
-      fakeCollectionRightsBackendApiService);
+      [fakeCollectionRightsBackendApiService][0]);
   }));
 
   beforeEach(inject(function($injector) {

@@ -195,6 +195,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.is_super_admin = (
             current_user_services.is_current_user_super_admin())
 
+        self.values['additional_angular_modules'] = []
+        self.values['iframed'] = False
         self.values['is_moderator'] = user_services.is_at_least_moderator(
             self.user_id)
         self.values['is_admin'] = user_services.is_admin(self.user_id)
@@ -244,7 +246,8 @@ class BaseHandler(webapp2.RequestHandler):
                     '%s: payload %s',
                     e, self.payload)
 
-                return self.handle_exception(e, self.app.debug)
+                self.handle_exception(e, self.app.debug)
+                return
 
         super(BaseHandler, self).dispatch()
 
@@ -440,7 +443,7 @@ class BaseHandler(webapp2.RequestHandler):
         """Overwrites the default exception handler.
 
         Args:
-            exception: The exception that was thrown.
+            exception: Exception. The exception that was thrown.
             unused_debug_mode: bool. True if the web application is running
                 in debug mode.
         """
@@ -455,8 +458,9 @@ class BaseHandler(webapp2.RequestHandler):
         if isinstance(exception, self.PageNotFoundException):
             logging.error('Invalid URL requested: %s', self.request.uri)
             self.error(404)
-            self._render_exception(404, {
-                'error': 'Could not find the page %s.' % self.request.uri})
+            self._render_exception(
+                404, {
+                    'error': 'Could not find the page %s.' % self.request.uri})
             return
 
         if isinstance(exception, self.UnauthorizedUserException):
@@ -571,6 +575,9 @@ class CsrfTokenManager(object):
         Args:
             user_id: str. The user_id to validate the CSRF token against.
             token: str. The CSRF token to validate.
+
+        Returns:
+            bool. Whether the given CSRF token is valid.
         """
         try:
             parts = token.split('/')

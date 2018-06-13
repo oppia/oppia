@@ -243,8 +243,9 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
         completion_model = self._get_progress_model(
             self.owner_id, self.COL_ID_0)
         self.assertIsNotNone(completion_model)
-        self.assertEqual(completion_model.completed_explorations, [
-            self.EXP_ID_0])
+        self.assertEqual(
+            completion_model.completed_explorations, [
+                self.EXP_ID_0])
 
         # If the same exploration is completed again within the context of this
         # collection, it should not be duplicated.
@@ -252,8 +253,9 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
             self.owner_id, self.COL_ID_0, self.EXP_ID_0)
         completion_model = self._get_progress_model(
             self.owner_id, self.COL_ID_0)
-        self.assertEqual(completion_model.completed_explorations, [
-            self.EXP_ID_0])
+        self.assertEqual(
+            completion_model.completed_explorations, [
+                self.EXP_ID_0])
 
         # If the same exploration and another are completed within the context
         # of a different collection, it shouldn't affect this one.
@@ -264,8 +266,9 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
             self.owner_id, self.COL_ID_1, self.EXP_ID_1)
         completion_model = self._get_progress_model(
             self.owner_id, self.COL_ID_0)
-        self.assertEqual(completion_model.completed_explorations, [
-            self.EXP_ID_0])
+        self.assertEqual(
+            completion_model.completed_explorations, [
+                self.EXP_ID_0])
 
         # If two more explorations are completed, they are recorded in the
         # order they are completed.
@@ -275,8 +278,9 @@ class CollectionProgressUnitTests(CollectionServicesUnitTests):
             self.owner_id, self.COL_ID_0, self.EXP_ID_1)
         completion_model = self._get_progress_model(
             self.owner_id, self.COL_ID_0)
-        self.assertEqual(completion_model.completed_explorations, [
-            self.EXP_ID_0, self.EXP_ID_2, self.EXP_ID_1])
+        self.assertEqual(
+            completion_model.completed_explorations, [
+                self.EXP_ID_0, self.EXP_ID_2, self.EXP_ID_1])
 
 
 class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
@@ -506,16 +510,19 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             _count_at_least_editable_collection_summaries(self.owner_id), 0)
 
         # But the models still exist in the backend.
-        self.assertIn(self.COLLECTION_ID, [
-            collection.id
-            for collection in collection_models.CollectionModel.get_all(
-                include_deleted=True)])
+        self.assertIn(
+            self.COLLECTION_ID, [
+                collection.id
+                for collection in collection_models.CollectionModel.get_all(
+                    include_deleted=True)])
 
         # The collection summary is deleted, however.
-        self.assertNotIn(self.COLLECTION_ID, [
-            collection.id
-            for collection in collection_models.CollectionSummaryModel.get_all(
-                include_deleted=True)])
+        self.assertNotIn(
+            self.COLLECTION_ID, [
+                collection.id
+                for collection in
+                collection_models.CollectionSummaryModel.get_all(
+                    include_deleted=True)])
 
     def test_hard_deletion_of_collections(self):
         """Test that hard deletion of collections works correctly."""
@@ -534,10 +541,11 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             _count_at_least_editable_collection_summaries(self.owner_id), 0)
 
         # The collection model has been purged from the backend.
-        self.assertNotIn(self.COLLECTION_ID, [
-            collection.id
-            for collection in collection_models.CollectionModel.get_all(
-                include_deleted=True)])
+        self.assertNotIn(
+            self.COLLECTION_ID, [
+                collection.id
+                for collection in collection_models.CollectionModel.get_all(
+                    include_deleted=True)])
 
     def test_summaries_of_hard_deleted_collections(self):
         """Test that summaries of hard deleted collections are
@@ -555,10 +563,12 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             _count_at_least_editable_collection_summaries(self.owner_id), 0)
 
         # The collection summary model has been purged from the backend.
-        self.assertNotIn(self.COLLECTION_ID, [
-            collection.id
-            for collection in collection_models.CollectionSummaryModel.get_all(
-                include_deleted=True)])
+        self.assertNotIn(
+            self.COLLECTION_ID, [
+                collection.id
+                for collection in
+                collection_models.CollectionSummaryModel.get_all(
+                    include_deleted=True)])
 
     def test_collections_are_removed_from_index_when_deleted(self):
         """Tests that deleted collections are removed from the search index."""
@@ -623,8 +633,9 @@ class CollectionCreateAndDeleteUnitTests(CollectionServicesUnitTests):
             collection_services.get_collection_summary_by_id(
                 self.COLLECTION_ID))
 
-        self.assertEqual(retrieved_collection_summary.contributor_ids,
-                         [self.owner_id])
+        self.assertEqual(
+            retrieved_collection_summary.contributor_ids,
+            [self.owner_id])
         self.assertEqual(retrieved_collection_summary.title, 'A new title')
         self.assertEqual(
             retrieved_collection_summary.category, 'A new category')
@@ -1394,9 +1405,10 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             return ids
 
         add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(gae_search_services,
-                                  'add_documents_to_index',
-                                  add_docs_counter)
+        add_docs_swap = self.swap(
+            gae_search_services,
+            'add_documents_to_index',
+            add_docs_counter)
 
         for ind in xrange(5):
             self.save_new_valid_collection(
@@ -1512,22 +1524,25 @@ class CollectionSummaryTests(CollectionServicesUnitTests):
             'property_name': 'title',
             'new_value': 'Collection Bob title'
         }]
-         # Have Bob update that collection. Version 2.
+        # Have Bob update that collection. Version 2.
         collection_services.update_collection(
             bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
-        self._check_contributors_summary(self.COLLECTION_ID,
-                                         {albert_id: 1, bob_id: 1})
+        self._check_contributors_summary(
+            self.COLLECTION_ID,
+            {albert_id: 1, bob_id: 1})
         # Have Bob update that collection. Version 3.
         collection_services.update_collection(
             bob_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
-        self._check_contributors_summary(self.COLLECTION_ID,
-                                         {albert_id: 1, bob_id: 2})
+        self._check_contributors_summary(
+            self.COLLECTION_ID,
+            {albert_id: 1, bob_id: 2})
 
         # Have Albert update that collection. Version 4.
         collection_services.update_collection(
             albert_id, self.COLLECTION_ID, changelist_cmds, 'Changed title.')
-        self._check_contributors_summary(self.COLLECTION_ID,
-                                         {albert_id: 2, bob_id: 2})
+        self._check_contributors_summary(
+            self.COLLECTION_ID,
+            {albert_id: 2, bob_id: 2})
 
         # TODO(madiyar): uncomment after revert_collection implementation
         # Have Albert revert to version 3. Version 5

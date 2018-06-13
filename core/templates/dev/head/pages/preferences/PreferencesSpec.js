@@ -22,7 +22,7 @@ describe('Preferences Controller', function() {
 
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
-    beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller) {
+    beforeEach(inject(function($controller, $http, _$httpBackend_, $rootScope) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/preferenceshandler/data').respond({
         can_receive_email_updates: false,

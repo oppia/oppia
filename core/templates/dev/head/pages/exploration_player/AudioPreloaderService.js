@@ -93,7 +93,7 @@ oppia.factory('AudioPreloaderService', [
     };
 
     var _cancelPreloading = function() {
-      AssetsBackendApiService.abortAllCurrentDownloads();
+      AssetsBackendApiService.abortAllCurrentAudioDownloads();
       _filenamesOfAudioCurrentlyDownloading = [];
     };
 

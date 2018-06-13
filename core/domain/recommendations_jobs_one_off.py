@@ -72,10 +72,11 @@ class ExplorationRecommendationsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                         compared_exp_summary.owner_ids,
                         compared_exp_summary.status))
                 if similarity_score >= SIMILARITY_SCORE_THRESHOLD:
-                    yield (exp_summary_id, {
-                        'similarity_score': similarity_score,
-                        'exp_id': compared_exp_id
-                    })
+                    yield (
+                        exp_summary_id, {
+                            'similarity_score': similarity_score,
+                            'exp_id': compared_exp_id
+                        })
 
     @staticmethod
     def reduce(key, stringified_values):

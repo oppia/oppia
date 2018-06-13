@@ -19,11 +19,15 @@
 describe('State content editor directive', function() {
   var outerScope, ctrlScope, shof, cls, scs, es, ess;
 
-  var _getContent = function(contentString) {
+  var _getContent = function(contentId, contentString) {
     return shof.createFromBackendDict({
-      html: contentString,
-      audio_translations: {}
+      content_id: contentId,
+      html: contentString
     });
+  };
+
+  var _getContentIdsToAUdioTranslations = function(citatDict) {
+    return citat.createFromBackendDict(citatDict);
   };
 
   beforeEach(module('directiveTemplates'));
@@ -35,24 +39,38 @@ describe('State content editor directive', function() {
       autosaveChangeList: function() {}
     };
     module(function($provide) {
-      $provide.value('ExplorationDataService', mockExplorationData);
+      $provide.value('ExplorationDataService', [mockExplorationData][0]);
     });
   });
 
-  beforeEach(inject(function($compile, $rootScope, $templateCache, $injector) {
+  beforeEach(inject(function($compile, $injector, $rootScope, $templateCache) {
     shof = $injector.get('SubtitledHtmlObjectFactory');
     cls = $injector.get('ChangeListService');
+    citat = $injector.get('ContentIdsToAudioTranslationsObjectFactory');
+    scitat = $injector.get('stateContentIdsToAudioTranslationsService');
     scs = $injector.get('stateContentService');
     es = $injector.get('EditabilityService');
     ess = $injector.get('ExplorationStatesService');
 
-    scs.init('Third State', _getContent('This is some content.'));
+    var citatDict = {
+      content: {},
+      default_outcome: {},
+      feedback_1: {}
+    };
+
+    scs.init('Third State', _getContent('content', 'This is some content.'));
+    scitat.init('Third State', _getContentIdsToAUdioTranslations(citatDict));
     es.markEditable();
     ess.init({
       'First State': {
         content: {
-          html: 'First State Content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'First State Content'
+        },
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
         },
         interaction: {
           id: 'TextInput',
@@ -60,7 +78,10 @@ describe('State content editor directive', function() {
             rule_specs: [],
             outcome: {
               dest: 'unused',
-              feedback: [],
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -68,7 +89,10 @@ describe('State content editor directive', function() {
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null
@@ -79,8 +103,13 @@ describe('State content editor directive', function() {
       },
       'Second State': {
         content: {
-          html: 'Second State Content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'Second State Content'
+        },
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
         },
         interaction: {
           id: 'TextInput',
@@ -88,7 +117,10 @@ describe('State content editor directive', function() {
             rule_specs: [],
             outcome: {
               dest: 'unused',
-              feedback: [],
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -96,7 +128,10 @@ describe('State content editor directive', function() {
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null
@@ -107,8 +142,13 @@ describe('State content editor directive', function() {
       },
       'Third State': {
         content: {
-          html: 'This is some content.',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'This is some content.'
+        },
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
         },
         interaction: {
           id: 'TextInput',
@@ -116,7 +156,10 @@ describe('State content editor directive', function() {
             rule_specs: [],
             outcome: {
               dest: 'unused',
-              feedback: [],
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -124,7 +167,10 @@ describe('State content editor directive', function() {
           }],
           default_outcome: {
             dest: 'default',
-            feedback: [],
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
             labelled_as_correct: false,
             param_changes: [],
             refresher_exploration_id: null
@@ -164,10 +210,11 @@ describe('State content editor directive', function() {
 
   it('should correctly handle no-op edits', function() {
     expect(ctrlScope.contentEditorIsOpen).toBe(false);
-    expect(scs.savedMemento).toEqual(_getContent('This is some content.'));
+    expect(scs.savedMemento).toEqual(_getContent(
+      'content', 'This is some content.'));
     ctrlScope.openStateContentEditor();
     expect(ctrlScope.contentEditorIsOpen).toBe(true);
-    scs.displayed = _getContent('This is some content.');
+    scs.displayed = _getContent('content', 'This is some content.');
     ctrlScope.onSaveContentButtonClicked();
 
     expect(ctrlScope.contentEditorIsOpen).toBe(false);
@@ -178,7 +225,7 @@ describe('State content editor directive', function() {
     expect(cls.getChangeList()).toEqual([]);
 
     ctrlScope.openStateContentEditor();
-    scs.displayed = _getContent('babababa');
+    scs.displayed = _getContent('content', 'babababa');
     ctrlScope.onSaveContentButtonClicked();
     expect(cls.getChangeList().length).toBe(1);
     expect(cls.getChangeList()[0].new_value.html).toEqual('babababa');
@@ -187,7 +234,7 @@ describe('State content editor directive', function() {
 
     ctrlScope.openStateContentEditor();
     scs.displayed = _getContent(
-      'And now for something completely different.');
+      'content', 'And now for something completely different.');
     ctrlScope.onSaveContentButtonClicked();
     expect(cls.getChangeList().length).toBe(2);
     expect(cls.getChangeList()[1].new_value.html)
@@ -198,7 +245,7 @@ describe('State content editor directive', function() {
   it('should not save changes to content when edit is cancelled', function() {
     var contentBeforeEdit = angular.copy(scs.savedMemento);
 
-    scs.displayed = _getContent('Test Content');
+    scs.displayed = _getContent('content', 'Test Content');
     ctrlScope.cancelEdit();
     expect(ctrlScope.contentEditorIsOpen).toBe(false);
     expect(scs.savedMemento).toEqual(contentBeforeEdit);

@@ -21,10 +21,10 @@
  */
 oppia.directive('oppiaNoninteractiveImage', [
   '$rootScope', '$sce', 'HtmlEscaperService', 'ExplorationContextService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'ImagePreloaderService', 'LOADING_INDICATOR_URL',
   function(
       $rootScope, $sce, HtmlEscaperService, ExplorationContextService,
-      UrlInterpolationService) {
+      UrlInterpolationService, ImagePreloaderService, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {},
@@ -33,9 +33,38 @@ oppia.directive('oppiaNoninteractiveImage', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.filepath = HtmlEscaperService.escapedJsonToObj(
           $attrs.filepathWithValue);
-        $scope.imageUrl = $sce.trustAsResourceUrl(
-          '/imagehandler/' + ExplorationContextService.getExplorationId() +
-          '/' + encodeURIComponent($scope.filepath));
+        $scope.imageUrl = '';
+        $scope.loadingIndicatorUrl = UrlInterpolationService.getStaticImageUrl(
+          LOADING_INDICATOR_URL);
+        $scope.isLoadingIndicatorShown = false;
+        if (ImagePreloaderService.inExplorationPlayer()) {
+          $scope.isLoadingIndicatorShown = true;
+          $scope.dimensions = (
+            ImagePreloaderService.getDimensionsOfImage($scope.filepath.name));
+          // For aligning the gif to the center of it's container
+          var loadingIndicatorSize = 120;
+          if ($scope.dimensions.height < 124) {
+            loadingIndicatorSize = 24;
+          }
+          var paddingTop = Math.max(0, (($scope.dimensions.height * 0.5) -
+            (loadingIndicatorSize * 0.5)));
+          $scope.loadingIndicatorContainerStyle =
+          {
+            'padding-top': paddingTop + 'px',
+            height: $scope.dimensions.height + 'px'
+          };
+          $scope.loadingIndicatorStyle = {
+            height: loadingIndicatorSize + 'px',
+            width: loadingIndicatorSize + 'px'
+          };
+        }
+
+        ImagePreloaderService.getImageUrl($scope.filepath.name)
+          .then(function(objectUrl) {
+            $scope.isLoadingIndicatorShown = false;
+            $scope.imageUrl = objectUrl;
+          });
+
         $scope.imageCaption = '';
         if ($attrs.captionWithValue) {
           $scope.imageCaption = HtmlEscaperService.escapedJsonToObj(

@@ -25,6 +25,7 @@ import feconf
 # TODO(bhenning): Convert this over to using action-based ACLs.
 def require_maintenance_mode(handler):
     """Decorator that checks whether maintenance mode is enabled in feconf."""
+
     def test_maintenance_mode(self, **kwargs):
         """Checks whether the site is in maintenance mode."""
         if not feconf.ENABLE_MAINTENANCE_MODE:

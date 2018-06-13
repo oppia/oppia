@@ -40,12 +40,12 @@ describe('TrainingDataService', function() {
       autosaveChangeList: function() {}
     };
     module(function($provide) {
-      $provide.value('ExplorationDataService', mockExplorationData);
+      $provide.value('ExplorationDataService', [mockExplorationData][0]);
     });
     spyOn(mockExplorationData, 'autosaveChangeList');
   });
 
-  beforeEach(inject(function($rootScope, $injector) {
+  beforeEach(inject(function($injector, $rootScope) {
     scope = $rootScope.$new();
     $httpBackend = $injector.get('$httpBackend');
     siis = $injector.get('stateInteractionIdService');
@@ -63,8 +63,13 @@ describe('TrainingDataService', function() {
     ess.init({
       State: {
         content: {
-          html: 'State Content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'State Content'
+        },
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
         },
         interaction: {
           id: 'TextInput',
@@ -78,24 +83,27 @@ describe('TrainingDataService', function() {
             outcome: {
               dest: 'State',
               feedback: {
-                html: 'Feedback',
-                audio_translations: {}
+                content_id: 'feedback_1',
+                html: 'Feedback'
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
-            training_data: []
+            training_data: [],
+            tagged_misconception_id: null
           }],
           default_outcome: {
             dest: 'State',
             feedback: {
-              html: 'Default',
-              audio_translations: {}
+              content_id: 'default_outcome',
+              html: 'Default'
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           hints: [],
           confirmed_unclassified_answers: []
@@ -222,7 +230,7 @@ describe('TrainingDataService', function() {
   it('should get all potential outcomes of an interaction', function() {
     // First the answer group's outcome is listed, then the default.
     expect(tds.getAllPotentialOutcomes(ess.getState('State'))).toEqual([
-      oof.createNew('State', 'Feedback', []),
-      oof.createNew('State', 'Default', [])]);
+      oof.createNew('State', 'feedback_1', 'Feedback', []),
+      oof.createNew('State', 'default_outcome', 'Default', [])]);
   });
 });

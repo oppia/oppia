@@ -86,20 +86,21 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
             first_state_name = exp.init_state_name
             second_state_name = 'State 2'
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': first_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput',
-            }, {
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': second_state_name,
-            }, {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': second_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput',
-            }], 'Add new state')
+            exp_services.update_exploration('fake@user.com', exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'MultipleChoiceInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': second_state_name,
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'MultipleChoiceInput',
+                })], 'Add new state')
             exp = exp_services.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
@@ -187,12 +188,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             exp_id = 'eid'
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
             first_state_name = exp.init_state_name
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': first_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput',
-            }], 'Update interaction type')
+            exp_services.update_exploration('fake@user.com', exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'MultipleChoiceInput',
+                })], 'Update interaction type')
             exp = exp_services.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
@@ -240,20 +242,21 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
             first_state_name = exp.init_state_name
             second_state_name = 'State 2'
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': first_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput',
-            }, {
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': second_state_name,
-            }, {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': second_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'MultipleChoiceInput',
-            }], 'Add new state')
+            exp_services.update_exploration('fake@user.com', exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'MultipleChoiceInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': second_state_name,
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'MultipleChoiceInput',
+                })], 'Add new state')
             exp = exp_services.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
@@ -306,10 +309,11 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 expected_calculation_output_first_answer)
 
             # Try modifying the exploration and adding another answer.
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': 'third state',
-            }], 'Adding yet another state')
+            exp_services.update_exploration('fake@user.com', exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': 'third state',
+                })], 'Adding yet another state')
             exp = exp_services.get_exploration_by_id(exp_id)
             self.assertNotEqual(exp.version, exp_version)
 
@@ -408,12 +412,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 params, 'verb')
 
             # Change the interaction ID.
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': init_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'NumericInput',
-            }], 'Change to NumericInput')
+            exp_services.update_exploration('fake@user.com', exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'NumericInput',
+                })], 'Change to NumericInput')
 
             exp = exp_services.get_exploration_by_id(exp_id)
             self.assertEqual(exp.version, 2)
@@ -501,15 +506,16 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 params, 'verb')
 
             # Change something other than the interaction ID.
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': init_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'new_value': {
-                    'html': 'New content',
-                    'audio_translations': {}
-                },
-            }], 'Change state content')
+            exp_services.update_exploration('fake@user.com', exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': 'New content'
+                    },
+                })], 'Change state content')
 
             exp = exp_services.get_exploration_by_id(exp_id)
             self.assertEqual(exp.version, 2)
@@ -586,12 +592,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 params, 'verb')
 
             # Change the interaction ID.
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': init_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'NumericInput',
-            }], 'Change to NumericInput')
+            exp_services.update_exploration('fake@user.com', exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'NumericInput',
+                })], 'Change to NumericInput')
 
             # Submit an answer to the numeric interaction.
             event_services.AnswerSubmissionEventHandler.record(
@@ -600,12 +607,13 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 params, 2)
 
             # Change back the interaction ID.
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': init_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'TextInput',
-            }], 'Change to TextInput')
+            exp_services.update_exploration('fake@user.com', exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'TextInput',
+                })], 'Change to TextInput')
 
             # Submit another number-like answer.
             event_services.AnswerSubmissionEventHandler.record(
@@ -614,15 +622,16 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                 params, '2')
 
             # Create a 4th exploration version by changing the state's content.
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': init_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                'new_value': {
-                    'html': 'New content description',
-                    'audio_translations': {},
-                }
-            }], 'Change content description')
+            exp_services.update_exploration('fake@user.com', exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': init_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                    'new_value': {
+                        'content_id': 'content',
+                        'html': 'New content description'
+                    }
+                })], 'Change content description')
 
             # Submit some more answers to the latest exploration version.
             event_services.AnswerSubmissionEventHandler.record(
@@ -708,20 +717,21 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             exp = self.save_new_valid_exploration(exp_id, 'fake@user.com')
             first_state_name = exp.init_state_name
             second_state_name = 'State 2'
-            exp_services.update_exploration('fake@user.com', exp_id, [{
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': first_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'SetInput',
-            }, {
-                'cmd': exp_domain.CMD_ADD_STATE,
-                'state_name': second_state_name,
-            }, {
-                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                'state_name': second_state_name,
-                'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
-                'new_value': 'SetInput',
-            }], 'Add new state')
+            exp_services.update_exploration('fake@user.com', exp_id, [
+                exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': first_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'SetInput',
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_ADD_STATE,
+                    'state_name': second_state_name,
+                }), exp_domain.ExplorationChange({
+                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                    'state_name': second_state_name,
+                    'property_name': exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'new_value': 'SetInput',
+                })], 'Add new state')
             exp = exp_services.get_exploration_by_id(exp_id)
             exp_version = exp.version
 
@@ -763,14 +773,16 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
             calculation_output_second = (
                 common_elements_calc_output_model.calculation_output)
 
-            self.assertEqual(calculation_output_first, [{
-                'answer': ['answer1', 'answer2'],
-                'frequency': 1
-            }])
-            self.assertEqual(calculation_output_second, [{
-                'answer': 'answer1',
-                'frequency': 1
-            }, {
-                'answer': 'answer2',
-                'frequency': 1
-            }])
+            self.assertEqual(
+                calculation_output_first, [{
+                    'answer': ['answer1', 'answer2'],
+                    'frequency': 1
+                }])
+            self.assertEqual(
+                calculation_output_second, [{
+                    'answer': 'answer1',
+                    'frequency': 1
+                }, {
+                    'answer': 'answer2',
+                    'frequency': 1
+                }])

@@ -92,28 +92,26 @@ class EmailDashboardDataHandlerTests(test_utils.GenericTestBase):
         self.login(self.SUBMITTER_EMAIL)
         csrf_token = self.get_csrf_token_from_response(
             self.testapp.get('/emaildashboard'))
-        with self.assertRaisesRegexp(Exception, '400 Invalid input for query.'):
-            self.post_json(
-                '/emaildashboarddatahandler', {
-                    'data': {
-                        'has_not_logged_in_for_n_days': 2,
-                        'inactive_in_last_n_days': 5,
-                        'created_at_least_n_exps': 1,
-                        'created_fewer_than_n_exps': None,
-                        'edited_at_least_n_exps': None,
-                        'fake_key': 2
-                    }}, csrf_token)
+        self.post_json(
+            '/emaildashboarddatahandler', {
+                'data': {
+                    'has_not_logged_in_for_n_days': 2,
+                    'inactive_in_last_n_days': 5,
+                    'created_at_least_n_exps': 1,
+                    'created_fewer_than_n_exps': 'None',
+                    'edited_at_least_n_exps': None,
+                    'fake_key': 2
+                }}, csrf_token, expect_errors=True, expected_status_int=400)
 
-        with self.assertRaisesRegexp(Exception, '400 Invalid input for query.'):
-            self.post_json(
-                '/emaildashboarddatahandler', {
-                    'data': {
-                        'has_not_logged_in_for_n_days': 2,
-                        'inactive_in_last_n_days': 5,
-                        'created_at_least_n_exps': 'invalid_value',
-                        'created_fewer_than_n_exps': 'None',
-                        'edited_at_least_n_exps': None
-                    }}, csrf_token)
+        self.post_json(
+            '/emaildashboarddatahandler', {
+                'data': {
+                    'has_not_logged_in_for_n_days': 2,
+                    'inactive_in_last_n_days': 5,
+                    'created_at_least_n_exps': 'invalid_value',
+                    'created_fewer_than_n_exps': 'None',
+                    'edited_at_least_n_exps': None
+                }}, csrf_token, expect_errors=True, expected_status_int=400)
         self.logout()
 
 

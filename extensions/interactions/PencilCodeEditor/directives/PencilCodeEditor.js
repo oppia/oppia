@@ -163,12 +163,15 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             errorIsHappening = true;
             hasSubmittedAnswer = true;
 
-            $scope.$parent.submitAnswer({
-              code: normalizedCode,
-              output: '',
-              evaluation: '',
-              error: error.message
-            }, pencilCodeEditorRulesService);
+            $scope.onSubmit({
+              answer: {
+                code: normalizedCode,
+                output: '',
+                evaluation: '',
+                error: error.message
+              },
+              rulesService: pencilCodeEditorRulesService
+            });
 
             $timeout(function() {
               errorIsHappening = false;

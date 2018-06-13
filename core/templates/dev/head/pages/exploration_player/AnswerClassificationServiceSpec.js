@@ -47,8 +47,14 @@ describe('Answer classification service with string classifier disabled',
       stateName = 'stateName';
       state = sof.createFromBackendDict(stateName, {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -56,12 +62,13 @@ describe('Answer classification service with string classifier disabled',
             outcome: {
               dest: 'outcome 1',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_1',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -73,12 +80,13 @@ describe('Answer classification service with string classifier disabled',
             outcome: {
               dest: 'outcome 2',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_2',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -100,12 +108,13 @@ describe('Answer classification service with string classifier disabled',
           default_outcome: {
             dest: 'default',
             feedback: {
-              html: '',
-              audio_translations: {}
+              content_id: 'default_outcome',
+              html: ''
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           hints: []
         },
@@ -136,22 +145,25 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 10, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 1', '', []), 0, 0, EXPLICIT_CLASSIFICATION
-      ));
+        oof.createNew('outcome 1', 'feedback_1', '', []), 0, 0,
+        EXPLICIT_CLASSIFICATION)
+      );
 
       expect(
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 5, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 2', '', []), 1, 0, EXPLICIT_CLASSIFICATION
-      ));
+        oof.createNew('outcome 2', 'feedback_2', '', []), 1, 0,
+        EXPLICIT_CLASSIFICATION)
+      );
 
       expect(
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 6, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('outcome 2', '', []), 1, 1, EXPLICIT_CLASSIFICATION
-      ));
+        oof.createNew('outcome 2', 'feedback_2', '', []), 1, 1,
+        EXPLICIT_CLASSIFICATION)
+      );
     });
 
     it('should return the default rule if no answer group matches', function() {
@@ -159,16 +171,22 @@ describe('Answer classification service with string classifier disabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state, 7, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
-      ));
+        oof.createNew('default', 'default_outcome', '', []), 2, 0,
+        DEFAULT_OUTCOME_CLASSIFICATION)
+      );
     });
 
     it('should fail if no answer group matches and no default rule is ' +
        'provided', function() {
       var state2 = sof.createFromBackendDict(stateName, {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {}
         },
         interaction: {
           id: 'RuleTest',
@@ -176,12 +194,13 @@ describe('Answer classification service with string classifier disabled',
             outcome: {
               dest: 'outcome 1',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_1',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -193,12 +212,13 @@ describe('Answer classification service with string classifier disabled',
           default_outcome: {
             dest: 'default',
             feedback: {
-              html: '',
-              audio_translations: {}
+              content_id: 'default_outcome',
+              html: ''
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           hints: []
         },
@@ -258,8 +278,14 @@ describe('Answer classification service with string classifier enabled',
       stateName = 'stateName';
       state = sof.createFromBackendDict(stateName, {
         content: {
-          html: 'content',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
         },
         interaction: {
           id: 'TrainableInteraction',
@@ -267,12 +293,13 @@ describe('Answer classification service with string classifier enabled',
             outcome: {
               dest: 'outcome 1',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_1',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -284,12 +311,13 @@ describe('Answer classification service with string classifier enabled',
             outcome: {
               dest: 'outcome 2',
               feedback: {
-                html: '',
-                audio_translations: {}
+                content_id: 'feedback_2',
+                html: ''
               },
               labelled_as_correct: false,
               param_changes: [],
-              refresher_exploration_id: null
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
             },
             rule_specs: [{
               inputs: {
@@ -306,12 +334,13 @@ describe('Answer classification service with string classifier enabled',
           default_outcome: {
             dest: 'default',
             feedback: {
-              html: '',
-              audio_translations: {}
+              content_id: 'default_outcome',
+              html: ''
             },
             labelled_as_correct: false,
             param_changes: [],
-            refresher_exploration_id: null
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
           },
           hints: []
         },
@@ -368,8 +397,156 @@ describe('Answer classification service with string classifier enabled',
         acs.getMatchingClassificationResult(
           explorationId, stateName, state2, 0, rules)
       ).toEqual(acrof.createNew(
-        oof.createNew('default', '', []), 2, 0, DEFAULT_OUTCOME_CLASSIFICATION
-      ));
+        oof.createNew('default', 'default_outcome', '', []), 2, 0,
+        DEFAULT_OUTCOME_CLASSIFICATION)
+      );
+    });
+  }
+);
+
+describe('Answer classification service with training data classification',
+  function() {
+    beforeEach(module('oppia'));
+
+    beforeEach(function() {
+      module(function($provide) {
+        $provide.constant('INTERACTION_SPECS', {
+          TrainableInteraction: {
+            is_trainable: true
+          }
+        });
+        $provide.constant('ENABLE_ML_CLASSIFIERS', true);
+        $provide.constant('ENABLE_TRAINING_DATA_CLASSIFICATION', true);
+      });
+    });
+
+    beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+
+    var EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION;
+    var acs, sof, oof, acrof, $stateName, state, state2,
+      registryService, stateClassifierMapping;
+    beforeEach(inject(function($injector) {
+      acs = $injector.get('AnswerClassificationService');
+      sof = $injector.get('StateObjectFactory');
+      oof = $injector.get('OutcomeObjectFactory');
+      acrof = $injector.get('AnswerClassificationResultObjectFactory');
+      TRAINING_DATA_CLASSIFICATION = $injector.get(
+        'TRAINING_DATA_CLASSIFICATION');
+      EXPLICIT_CLASSIFICATION = $injector.get('EXPLICIT_CLASSIFICATION');
+
+      stateName = 'stateName';
+      state = sof.createFromBackendDict(stateName, {
+        content: {
+          content_id: 'content',
+          html: 'content'
+        },
+        content_ids_to_audio_translations: {
+          content: {},
+          default_outcome: {},
+          feedback_1: {},
+          feedback_2: {}
+        },
+        interaction: {
+          id: 'TrainableInteraction',
+          answer_groups: [{
+            outcome: {
+              dest: 'outcome 1',
+              feedback: {
+                content_id: 'feedback_1',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            training_data: ['abc', 'input'],
+            rule_specs: [{
+              inputs: {
+                x: 'equal'
+              },
+              rule_type: 'Equals'
+            }]
+          }, {
+            outcome: {
+              dest: 'outcome 2',
+              feedback: {
+                content_id: 'feedback_2',
+                html: ''
+              },
+              labelled_as_correct: false,
+              param_changes: [],
+              refresher_exploration_id: null,
+              missing_prerequisite_skill_id: null
+            },
+            training_data: ['xyz'],
+            rule_specs: [{
+              inputs: {
+                x: 'npu'
+              },
+              rule_type: 'Contains'
+            }]
+          }],
+          default_outcome: {
+            dest: 'default',
+            feedback: {
+              content_id: 'default_outcome',
+              html: ''
+            },
+            labelled_as_correct: false,
+            param_changes: [],
+            refresher_exploration_id: null,
+            missing_prerequisite_skill_id: null
+          },
+          hints: []
+        },
+        param_changes: []
+      });
+    }));
+
+    var explorationId = 'exploration';
+
+    var rules = {
+      Equals: function(answer, input) {
+        return answer === input;
+      },
+      Contains: function(answer, input) {
+        return answer.toLowerCase().indexOf(
+          input.x.toLowerCase()) !== -1;
+      }
+    };
+
+    it('should use training data classification if no answer group matches ' +
+       'and interaction is trainable', function() {
+      expect(
+        acs.getMatchingClassificationResult(
+          explorationId, stateName, state, 'abc', rules)
+      ).toEqual(
+        acrof.createNew(
+          state.interaction.answerGroups[0].outcome, 0, null,
+          TRAINING_DATA_CLASSIFICATION)
+      );
+
+      expect(
+        acs.getMatchingClassificationResult(
+          explorationId, stateName, state, 'xyz', rules)
+      ).toEqual(
+        acrof.createNew(
+          state.interaction.answerGroups[1].outcome, 1, null,
+          TRAINING_DATA_CLASSIFICATION)
+      );
+    });
+
+    it('should perform explicit classification before doing training data ' +
+      'classification', function() {
+      expect(
+        acs.getMatchingClassificationResult(
+          explorationId, stateName, state, 'input', rules)
+      ).toEqual(
+        acrof.createNew(
+          state.interaction.answerGroups[1].outcome, 1, 0,
+          EXPLICIT_CLASSIFICATION)
+      );
     });
   }
 );
