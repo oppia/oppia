@@ -1934,6 +1934,59 @@ def is_version_of_draft_valid(exp_id, version):
     return get_exploration_by_id(exp_id).version == version
 
 
+def get_user_exploration_data(
+      user_id, exploration_id, apply_draft=False, version=None):
+    """Returns a description of the given exploration."""
+    if apply_draft:
+        exploration = get_exp_with_draft_applied(exploration_id, user_id)
+    else:
+        exploration = get_exploration_by_id(exploration_id, version=version)
+
+    states = {}
+    for state_name in exploration.states:
+        state_dict = exploration.states[state_name].to_dict()
+        states[state_name] = state_dict
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    draft_changes = (exp_user_data.draft_change_list if exp_user_data
+                     and exp_user_data.draft_change_list else None)
+    is_valid_draft_version = (
+        is_version_of_draft_valid(
+            exploration_id, exp_user_data.draft_change_list_exp_version)
+        if exp_user_data and exp_user_data.draft_change_list_exp_version
+        else None)
+    draft_change_list_id = (exp_user_data.draft_change_list_id
+                            if exp_user_data else 0)
+    exploration_email_preferences = (
+        user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id))
+    editor_dict = {
+        'auto_tts_enabled': exploration.auto_tts_enabled,
+        'category': exploration.category,
+        'correctness_feedback_enabled': (
+            exploration.correctness_feedback_enabled),
+        'draft_change_list_id': draft_change_list_id,
+        'exploration_id': exploration_id,
+        'init_state_name': exploration.init_state_name,
+        'language_code': exploration.language_code,
+        'objective': exploration.objective,
+        'param_changes': exploration.param_change_dicts,
+        'param_specs': exploration.param_specs_dict,
+        'rights': rights_manager.get_exploration_rights(
+            exploration_id).to_dict(),
+        'show_state_editor_tutorial_on_load': None,
+        'states': states,
+        'tags': exploration.tags,
+        'title': exploration.title,
+        'version': exploration.version,
+        'is_version_of_draft_valid': is_valid_draft_version,
+        'draft_changes': draft_changes,
+        'email_preferences': exploration_email_preferences.to_dict()
+    }
+
+    return editor_dict
+
+
 def create_or_update_draft(
         exp_id, user_id, change_list, exp_version, current_datetime,
         is_by_translator=False):

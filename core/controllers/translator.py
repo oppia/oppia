@@ -182,59 +182,6 @@ class ExplorationTranslationHandler(base.BaseHandler):
 
     GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
 
-    def _get_exploration_data(self, exploration_id):
-        """Returns a description of the given exploration."""
-        try:
-            exploration = exp_services.get_exploration_by_id(
-                exploration_id, None)
-        except:
-            raise self.PageNotFoundException
-
-        states = {}
-        for state_name in exploration.states:
-            state_dict = exploration.states[state_name].to_dict()
-            states[state_name] = state_dict
-        exp_user_data = user_models.ExplorationUserDataModel.get(
-            self.user_id, exploration_id)
-        draft_changes = (exp_user_data.draft_change_list if exp_user_data
-                         and exp_user_data.draft_change_list else None)
-        is_version_of_draft_valid = (
-            exp_services.is_version_of_draft_valid(
-                exploration_id, exp_user_data.draft_change_list_exp_version)
-            if exp_user_data and exp_user_data.draft_change_list_exp_version
-            else None)
-        draft_change_list_id = (exp_user_data.draft_change_list_id
-                                if exp_user_data else 0)
-        exploration_email_preferences = (
-            user_services.get_email_preferences_for_exploration(
-                self.user_id, exploration_id))
-        translator_dict = {
-            'auto_tts_enabled': exploration.auto_tts_enabled,
-            'category': exploration.category,
-            'correctness_feedback_enabled': (
-                exploration.correctness_feedback_enabled),
-            'draft_change_list_id': draft_change_list_id,
-            'exploration_id': exploration_id,
-            'init_state_name': exploration.init_state_name,
-            'language_code': exploration.language_code,
-            'objective': exploration.objective,
-            'param_changes': exploration.param_change_dicts,
-            'param_specs': exploration.param_specs_dict,
-            'rights': rights_manager.get_exploration_rights(
-                exploration_id).to_dict(),
-            'show_state_editor_tutorial_on_load': (
-                self.user_id and not self.has_seen_editor_tutorial),
-            'states': states,
-            'tags': exploration.tags,
-            'title': exploration.title,
-            'version': exploration.version,
-            'is_version_of_draft_valid': is_version_of_draft_valid,
-            'draft_changes': draft_changes,
-            'email_preferences': exploration_email_preferences.to_dict()
-        }
-
-        return translator_dict
-
     @acl_decorators.can_translate_exploration
     def put(self, exploration_id):
         """Updates properties of the given exploration."""
@@ -253,5 +200,12 @@ class ExplorationTranslationHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        self.values.update(self._get_exploration_data(exploration_id))
+        try:
+            exploration_data = exp_services.get_user_exploration_data(
+                self.user_id, exploration_id, apply_draft=apply_draft,
+                version=version)
+        except:
+            raise self.PageNotFoundException
+
+        self.values.update(exploration_data)
         self.render_json(self.values)
