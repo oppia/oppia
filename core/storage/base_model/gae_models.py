@@ -629,7 +629,7 @@ class VersionedModel(BaseModel):
                 % model.__class__.__name__)
 
         commit_cmds = [{
-            'cmd': cls.REVERT_COMMIT_CMD,
+            'cmd': model.REVERT_COMMIT_CMD,
             'version_number': version_number
         }]
 
@@ -778,7 +778,7 @@ class VersionedModel(BaseModel):
                         cmd: str. Unique command.
                     And then additional arguments for that command. For example:
 
-                    {'cmd': 'AUTO_revert_version_number',
+                    {'cmd': 'AUTO_revert_version_number'
                      'version_number': 4}
 
                 commit_type: str. Unique identifier of commit type. Possible
