@@ -307,7 +307,7 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         exploration.add_states(['State 1'])
 
         self.old_content = exp_domain.SubtitledHtml(
-            'content','old content').to_dict()
+            'content', 'old content').to_dict()
 
         # Create content in State A with a single audio subtitle.
         exploration.states['State 1'].update_content(self.old_content)
