@@ -701,6 +701,7 @@ def apply_change_list(exploration_id, change_list):
         Exception: Any entries in the changelist are invalid.
     """
     exploration = get_exploration_by_id(exploration_id)
+    print change_list
     try:
         for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
@@ -1125,7 +1126,7 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
 
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
-        is_suggestion=False):
+        is_suggestion=False, is_translation_change=False):
     """Update an exploration. Commits changes.
 
     Args:
@@ -1141,6 +1142,8 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX.
         is_suggestion: bool. Whether the update is due to a suggestion being
             accepted.
+        is_translation_change: bool. Wheter the changes are made by a
+            translator.
 
     Raises:
         ValueError: No commit message is supplied and the exploration is public.
@@ -1150,6 +1153,9 @@ def update_exploration(
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
+    if is_translation_change and not is_translation_change_list(change_list):
+        raise Exception('Unable to save draft: Incorrect change_list.')
+
     is_public = rights_manager.is_exploration_public(exploration_id)
     if is_public and not commit_message:
         raise ValueError(
@@ -1721,6 +1727,25 @@ def _is_suggestion_valid(thread_id, exploration_id):
     return suggestion.state_name in states
 
 
+def is_translation_change_list(change_list):
+    """Checks whetehr the change list contains only the changes which are
+    allowed for translator to do.
+
+    Args:
+        change_list: list(ExplorationChange). A list that contains the changes
+            to be made to the ExplorationUserDataModel object.
+
+    Returns:
+        bool. Whether the change_list only the changes which are allowed for
+        translator to do.
+    """
+    for change in change_list:
+        if (change.property_name !=
+                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS):
+            return False
+    return True
+
+
 def _is_suggestion_handled(thread_id):
     """Checks if the current suggestion has already been accepted/rejected.
 
@@ -1909,7 +1934,8 @@ def is_version_of_draft_valid(exp_id, version):
 
 
 def create_or_update_draft(
-        exp_id, user_id, change_list, exp_version, current_datetime):
+        exp_id, user_id, change_list, exp_version, current_datetime,
+        is_translation_change=False):
     """Create a draft with the given change list, or update the change list
     of the draft if it already exists. A draft is updated only if the change
     list timestamp of the new change list is greater than the change list
@@ -1924,7 +1950,12 @@ def create_or_update_draft(
             to be made to the ExplorationUserDataModel object.
         exp_version: int. The current version of the exploration.
         current_datetime: datetime.datetime. The current date and time.
+        is_translation_change: bool. Wheter the changes are made by a
+            translator.
     """
+    if is_translation_change and not is_translation_change_list(change_list):
+        raise Exception('Unable to save draft: Incorrect change_list.')
+
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     if (exp_user_data and exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):
