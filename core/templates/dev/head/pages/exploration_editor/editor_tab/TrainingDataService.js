@@ -89,7 +89,7 @@ oppia.factory('TrainingDataService', [
         // Remove the answer from all answer groups.
         for (var i = 0; i < answerGroups.length; i++) {
           var answerGroup = answerGroups[i];
-          trainingDataAnswers.push(answerGroup.trainingData)
+          trainingDataAnswers.push(answerGroup.trainingData);
         }
         return trainingDataAnswers;
       },

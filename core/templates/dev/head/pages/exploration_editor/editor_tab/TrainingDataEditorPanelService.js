@@ -66,21 +66,21 @@ oppia.factory('TrainingDataEditorPanelService', [
                 $scope.trainingData = [];
                 TrainingDataService.getTrainingDataOfAnswerGroup(
                   answerGroupIndex).forEach(function(answer) {
-                    answerTemplate = (
-                      ExplorationHtmlFormatterService.getAnswerHtml(
-                        answer, stateInteractionIdService.savedMemento,
-                        stateCustomizationArgsService.savedMemento));
-                    $scope.trainingData.push({
-                      answer: answer,
-                      answerTemplate: answerTemplate
-                    });
+                  answerTemplate = (
+                    ExplorationHtmlFormatterService.getAnswerHtml(
+                      answer, stateInteractionIdService.savedMemento,
+                      stateCustomizationArgsService.savedMemento));
+                  $scope.trainingData.push({
+                    answer: answer,
+                    answerTemplate: answerTemplate
                   });
+                });
               };
 
               $scope.init = function() {
                 _rebuildTrainingData();
-                  $scope.newAnswerIsResolved = false;
-                  $scope.answerSuccessfullyAdded = false;
+                $scope.newAnswerIsResolved = false;
+                $scope.answerSuccessfullyAdded = false;
               };
 
               $scope.removeAnswerFromTrainingData = function(answerIndex) {
