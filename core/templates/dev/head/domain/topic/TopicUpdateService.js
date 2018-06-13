@@ -123,6 +123,15 @@ oppia.factory('TopicUpdateService', [
       return newId[0];
     };
 
+    var _checkIfSkillIdInList = function(skillId, skillList) {
+      for (var i = 0; i < skillList.length; i++) {
+        if (skillList[i] === skillId) {
+          return true;
+        }
+      }
+      return false;
+    };
+
     var _getSubtopicIdFromChangeDict = function(changeDict) {
       return _getParameterFromChangeDict(changeDict, 'subtopic_id');
     };
@@ -213,6 +222,9 @@ oppia.factory('TopicUpdateService', [
        */
       deleteSubtopic: function(topic, subtopicId, isNewlyCreated) {
         var subtopic = topic.getSubtopicById(subtopicId);
+        if (!subtopic) {
+          return false;
+        }
         var title = subtopic.getTitle();
         var skillIds = subtopic.getSkillIds();
         var subtopicIndex = topic.getSubtopicIndex(subtopicId);
@@ -244,9 +256,26 @@ oppia.factory('TopicUpdateService', [
         }
         if (oldSubtopicId !== null) {
           var oldSubtopic = topic.getSubtopicById(oldSubtopicId);
+          if (!oldSubtopic) {
+            return false;
+          }
+          if (!_checkIfSkillIdInList(skillId, oldSubtopic.getSkillIds())) {
+            return false;
+          }
+        } else {
+          if (!_checkIfSkillIdInList(
+            skillId, topic.getUncategorizedSkillIds())) {
+            return false;
+          }
         }
-        var newSubtopic = topic.getSubtopicById(newSubtopicId);
 
+        var newSubtopic = topic.getSubtopicById(newSubtopicId);
+        if (!newSubtopic) {
+          return false;
+        }
+        if (_checkIfSkillIdInList(skillId, newSubtopic.getSkillIds())) {
+          return false;
+        }
         _applyChange(topic, CMD_MOVE_SKILL_ID_TO_SUBTOPIC, {
           old_subtopic_id: oldSubtopicId,
           new_subtopic_id: newSubtopicId,
@@ -279,14 +308,21 @@ oppia.factory('TopicUpdateService', [
           return false;
         }
         var subtopic = topic.getSubtopicById(subtopicId);
-
+        if (!subtopic) {
+          return false;
+        }
+        if (!_checkIfSkillIdInList(skillId, subtopic.getSkillIds())) {
+          return false;
+        }
         _applyChange(topic, CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC, {
           subtopic_id: subtopicId,
           skill_id: skillId
         }, function(changeDict, topic) {
           // Apply.
           subtopic.removeSkillId(skillId);
-          topic.addUncategorizedSkillId(skillId);
+          if (!_checkIfSkillIdInList(skillId, subtopic.getSkillIds())) {
+            topic.addUncategorizedSkillId(skillId);
+          }
         }, function(changeDict, topic) {
           // Undo.
           subtopic.addSkillId(skillId);
@@ -430,6 +466,18 @@ oppia.factory('TopicUpdateService', [
        * in the undo/redo service.
        */
       addUncategorizedSkillId: function(topic, skillId) {
+        var skillIsPresentInSomeSubtopic = false;
+        for (var i = 0; i < topic.getSubtopics().length; i++) {
+          var skillIds = topic.getSubtopics()[i].getSkillIds();
+          if (skillIds.indexOf(skillId) !== -1) {
+            skillIsPresentInSomeSubtopic = true;
+            break;
+          }
+        }
+        if (topic.getUncategorizedSkillIds().indexOf(skillId) !== -1 ||
+            skillIsPresentInSomeSubtopic) {
+          return false;
+        }
         _applyChange(topic, CMD_ADD_UNCATEGORIZED_SKILL_ID, {
           new_uncategorized_skill_id: skillId
         }, function(changeDict, topic) {
@@ -450,6 +498,9 @@ oppia.factory('TopicUpdateService', [
        * in the undo/redo service.
        */
       removeUncategorizedSkillId: function(topic, skillId) {
+        if (topic.getUncategorizedSkillIds().indexOf(skillId) === -1) {
+          return false;
+        }
         _applyChange(topic, CMD_REMOVE_UNCATEGORIZED_SKILL_ID, {
           uncategorized_skill_id: skillId
         }, function(changeDict, topic) {

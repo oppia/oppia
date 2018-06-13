@@ -79,6 +79,7 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
           return this._subtopics[i];
         }
       }
+      return false;
     };
 
     // The following function is only meant to be called from the undo of
@@ -138,7 +139,6 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
       if (isNewlyCreated && subtopicDeleted) {
         this._nextSubtopicId--;
       }
-      return subtopicDeleted;
     };
 
     Topic.prototype.clearSubtopics = function() {
@@ -161,9 +161,7 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
 
     Topic.prototype.removeCanonicalStoryId = function(storyId) {
       var index = this._canonicalStoryIds.indexOf(storyId);
-      if (index > -1) {
-        this._canonicalStoryIds.splice(index, 1);
-      }
+      this._canonicalStoryIds.splice(index, 1);
     };
 
     Topic.prototype.clearCanonicalStoryIds = function() {
@@ -180,9 +178,7 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
 
     Topic.prototype.removeAdditionalStoryId = function(storyId) {
       var index = this._additionalStoryIds.indexOf(storyId);
-      if (index > -1) {
-        this._additionalStoryIds.splice(index, 1);
-      }
+      this._additionalStoryIds.splice(index, 1);
     };
 
     Topic.prototype.clearAdditionalStoryIds = function() {
@@ -194,29 +190,12 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     };
 
     Topic.prototype.addUncategorizedSkillId = function(skillId) {
-      if (this._uncategorizedSkillIds.indexOf(skillId) !== -1) {
-        return false;
-      }
-      var skillIsPresentInSomeSubtopic = false;
-      for (var i = 0; i < this._subtopics.length; i++) {
-        var skillIds = this._subtopics[i].getSkillIds();
-        if (skillIds.indexOf(skillId) !== -1) {
-          skillIsPresentInSomeSubtopic = true;
-          break;
-        }
-      }
-      if (!skillIsPresentInSomeSubtopic) {
-        this._uncategorizedSkillIds.push(skillId);
-        return;
-      }
-      return false;
+      this._uncategorizedSkillIds.push(skillId);
     };
 
     Topic.prototype.removeUncategorizedSkillId = function(skillId) {
       var index = this._uncategorizedSkillIds.indexOf(skillId);
-      if (index > -1) {
-        this._uncategorizedSkillIds.splice(index, 1);
-      }
+      this._uncategorizedSkillIds.splice(index, 1);
     };
 
     Topic.prototype.clearUncategorizedSkillIds = function() {
