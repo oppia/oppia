@@ -133,8 +133,8 @@ oppia.factory('TrainingDataEditorPanelService', [
                 var classificationType = (
                   classificationResult.classificationCategorization);
 
-                // yes / no option to creator. Otherwise we ask whether the
-                // add answer to training data.
+                // If answer is explicitly classified then show the
+                // classification results to the creator.
                 if (classificationType === EXPLICIT_CLASSIFICATION ||
                     classificationType === TRAINING_DATA_CLASSIFICATION) {
                   $scope.newAnswerIsResolved = true;
