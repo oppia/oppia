@@ -47,7 +47,7 @@ oppia.factory('ExplorationDataService', [
     var explorationDraftAutosaveUrl = '';
     if (GLOBALS.can_edit) {
       explorationDraftAutosaveUrl = (
-        '/createhandler/editor_autosave_draft/' + explorationId);
+        '/createhandler/autosave_draft/' + explorationId);
     } else {
       explorationDraftAutosaveUrl = (
         '/createhandler/autosave_translation_draft/' + explorationId);
