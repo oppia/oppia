@@ -512,8 +512,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'new_value': {
-                        'html': 'New content',
-                        'audio_translations': {}
+                        'content_id': 'content',
+                        'html': 'New content'
                     },
                 })], 'Change state content')
 
@@ -628,8 +628,8 @@ class InteractionAnswerSummariesAggregatorTests(test_utils.GenericTestBase):
                     'state_name': init_state_name,
                     'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                     'new_value': {
-                        'html': 'New content description',
-                        'audio_translations': {},
+                        'content_id': 'content',
+                        'html': 'New content description'
                     }
                 })], 'Change content description')
 
