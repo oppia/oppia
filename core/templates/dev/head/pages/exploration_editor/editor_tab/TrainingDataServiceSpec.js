@@ -217,16 +217,6 @@ describe('TrainingDataService', function() {
     ]);
   });
 
-  it('should remove unresolved answers after training', function() {
-    // Training an answer group should remove an unresolved answer.
-    tds.trainAnswerGroup(0, 'answer1');
-    expect(tds.getTrainingDataAnswers()).toEqual([]);
-
-    // Training the default response should also remove an answer.
-    tds.trainDefaultResponse('answer2');
-    expect(tds.getTrainingDataAnswers()).toEqual([]);
-  });
-
   it('should get all potential outcomes of an interaction', function() {
     // First the answer group's outcome is listed, then the default.
     expect(tds.getAllPotentialOutcomes(ess.getState('State'))).toEqual([
