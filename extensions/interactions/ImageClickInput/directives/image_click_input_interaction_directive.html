@@ -23,10 +23,10 @@
   }
 </style>
 
-<div ng-if="isLoadingIndicatorShown" class="oppia-image-container" ng-style="loadingIndicatorContainerStyle">
+<div ng-if="isLoadingIndicatorShown" class="oppia-image-container" ng-style="imageContainerStyle">
   <img ng-src="<[loadingIndicatorUrl]>" class="center-element-horizontally" ng-style="loadingIndicatorStyle" alt="Loading...">
 </div>
-<div ng-if="isTryAgainShown" class="oppia-image-container" ng-style="tryAgainContainerStyle">
+<div ng-if="isTryAgainShown" class="oppia-image-container" ng-style="imageContainerStyle">
   <md-button ng-click="loadImage()" class="oppia-learner-try-again-button center-element-horizontally">
     <span>Try Again</span>
   </md-button>

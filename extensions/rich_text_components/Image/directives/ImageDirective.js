@@ -50,18 +50,13 @@ oppia.directive('oppiaNoninteractiveImage', [
           if ($scope.dimensions.height < 124) {
             loadingIndicatorSize = 24;
           }
-          $scope.loadingIndicatorContainerStyle =
+          $scope.imageContainerStyle =
           {
             height: $scope.dimensions.height + 'px'
           };
           $scope.loadingIndicatorStyle = {
             height: loadingIndicatorSize + 'px',
             width: loadingIndicatorSize + 'px'
-          };
-
-          $scope.tryAgainContainerStyle =
-          {
-            height: $scope.dimensions.height + 'px'
           };
 
           $scope.loadImage = function() {
