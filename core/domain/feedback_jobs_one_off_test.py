@@ -306,10 +306,8 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         init_interaction.default_outcome.dest = exploration.init_state_name
         exploration.add_states(['State 1'])
 
-        self.old_content = exp_domain.SubtitledHtml('old content', {
-            self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
-                'filename.mp3', 20, False)
-        }).to_dict()
+        self.old_content = exp_domain.SubtitledHtml(
+            'content','old content').to_dict()
 
         # Create content in State A with a single audio subtitle.
         exploration.states['State 1'].update_content(self.old_content)
@@ -337,7 +335,7 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
             'state_name': 'State 1',
             'new_value': {
                 'html': 'new_value',
-                'audio_translations': {}
+                'content_id': 'content'
             }
         }
 

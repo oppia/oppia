@@ -132,20 +132,20 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             exp_services.get_exploration_by_id(
                 suggestion.exploration_id).category)
 
-        # For old accepted/rejected suggestions, the audio_translations field
-        # below value is not derivable as it is set only when the
-        # suggestion is accepted and that exploration version is unknown to us.
-        # We will never need to access the change_cmd parameter for these
-        # suggestions. For suggestions still in review, when the suggestion is
-        # accepted the audio_translations field will be updated. So while
-        # migrating we can set it to {} without losing required data.
+        # The change_cmd has an old value field which will be set at the time of
+        # accepting the suggestion. For already accepted suggestions of the old
+        # system, this value cannot be determined now. As the suggestions will
+        # be editing only the state content HTML, the translations will not be
+        # affected. The translations are retrieved before accepting. So while
+        # migrating, we can set the translations field as {} without losing any
+        # data.
         change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,
             'state_name': suggestion.state_name,
             'new_value': {
                 'html': suggestion.get_suggestion_html(),
-                'audio_translations': {}
+                'content_id': 'content'
             }
         }
 
