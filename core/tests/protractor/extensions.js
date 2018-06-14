@@ -48,7 +48,7 @@ describe('rich-text components', function() {
       richTextEditor.addRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
-      richTextEditor.addRteComponent(
+      /* richTextEditor.addRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       richTextEditor.addRteComponent('Tabs', [{
         title: 'title 1',
@@ -56,7 +56,7 @@ describe('rich-text components', function() {
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
-      }]);
+      }]); */
     });
 
     editor.navigateToPreviewTab();
@@ -67,7 +67,7 @@ describe('rich-text components', function() {
       richTextChecker.readRteComponent('Link', 'http://google.com/', true);
       richTextChecker.readRteComponent('Math', 'abc');
       richTextChecker.readRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
-      richTextChecker.readRteComponent(
+      /* richTextChecker.readRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       richTextChecker.readRteComponent('Tabs', [{
         title: 'title 1',
@@ -75,8 +75,7 @@ describe('rich-text components', function() {
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
-      }]
-      );
+      }]); */
     });
 
     editor.discardChanges();
