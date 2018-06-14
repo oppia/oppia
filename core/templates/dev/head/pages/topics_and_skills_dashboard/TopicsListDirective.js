@@ -15,16 +15,27 @@
 /**
  * @fileoverview Controller for the navbar breadcrumb of the collection editor.
  */
-oppia.directive('topicsAndSkillsDashboardNavbarBreadcrumb', [
+oppia.directive('topicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        topicSummaries: '&'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics_and_skills_dashboard/' +
-        'topics_and_skills_dashboard_navbar_breadcrumb_directive.html'),
-      controller: [
-        function() {}
+        '/pages/topics_and_skills_dashboard/topics_list_directive.html'),
+      controller: ['$scope',
+        function($scope) {
+          // As additional stories are not supported initially, it's not being shown,
+          // for now.
+          $scope.TOPIC_HEADINGS = [
+            'name', 'subtopic_count', 'skill_count',
+            'canonical_story_count'
+          ];
+          $scope.getTopicEditorUrl = function(topicId) {
+            return '/topic_editor/' + topicId;
+          };
+        }
       ]
     };
   }]);
