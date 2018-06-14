@@ -126,10 +126,10 @@ def get_all_topic_summaries():
             datastore.
     """
     topic_summary_dicts_models = topic_models.TopicSummaryModel.get_all()
-    topic_summary_dicts = [
+    topic_summaries = [
         get_topic_summary_from_model(summary)
         for summary in topic_summary_dicts_models]
-    return topic_summary_dicts
+    return topic_summaries
 
 
 def get_topic_summary_from_model(topic_summary_model):

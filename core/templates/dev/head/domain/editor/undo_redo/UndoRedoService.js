@@ -52,8 +52,8 @@ oppia.factory('UndoRedoService', [
      * constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
     UndoRedoService.applyChange = function(changeObject, domainObject) {
-      _appliedChanges.push(changeObject);
       _applyChange(changeObject, domainObject);
+      _appliedChanges.push(changeObject);
       _undoneChanges = [];
     };
 

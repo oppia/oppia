@@ -79,20 +79,27 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
           return this._subtopics[i];
         }
       }
-      return false;
+      return null;
     };
 
-    // The following function is only meant to be called from the undo of
-    // a delete subtopic operation and not anywhere else. For adding subtopics
-    // in general, use topic.addSubtopic()
+    /**
+     * @param {number} id - The id of the subtopic that was deleted.
+     * @param {string} title - The title of the subtopic that w as deleted.
+     * @param {array(String)} skillIdsForSubtopic - The skillIds array of the
+     * deleted subtopic.
+     * @param {boolean} isNewlyCreated - Whether the subtopic to be deleted was
+     * created in the same changelist as it was deleted.
+     */
     Topic.prototype.undoDeleteSubtopic = function(
-        id, title, skillIdsForSubtopic, isNewlyCreated, subtopicIndex) {
+        id, title, skillIdsForSubtopic, isNewlyCreated) {
       var newSubtopic = SubtopicObjectFactory.createFromTitle(id, title);
       for (var i = 0; i < skillIdsForSubtopic.length; i++) {
         newSubtopic.addSkillId(skillIdsForSubtopic[i]);
       }
-      for (var i = subtopicIndex; i < this._subtopics.length; i++) {
-        this._subtopics[i].incrementId();
+      for (var i = 0; i < this._subtopics.length; i++) {
+        if (this._subtopics[i].getId() >= id) {
+          this._subtopics[i].incrementId();
+        }
       }
       this._subtopics.push(newSubtopic);
       this._subtopics.sort(
@@ -118,10 +125,7 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     Topic.prototype.deleteSubtopic = function(subtopicId, isNewlyCreated) {
       var subtopicDeleted = false;
       for (var i = 0; i < this._subtopics.length; i++) {
-        if (isNewlyCreated && subtopicDeleted) {
-          this._subtopics[i].decrementId();
-        }
-        if ((this._subtopics[i].getId() === subtopicId) && (!subtopicDeleted)) {
+        if ((this._subtopics[i].getId() === subtopicId)) {
           // When a subtopic is deleted, all the skills in it are moved to
           // uncategorized skill ids.
           var skillIds = this._subtopics[i].getSkillIds();
@@ -132,12 +136,20 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
             }
           }
           this._subtopics.splice(i, 1);
-          i--;
           subtopicDeleted = true;
+          break;
         }
       }
       if (isNewlyCreated && subtopicDeleted) {
+        for (var i = 0; i < this._subtopics.length; i++) {
+          if (this._subtopics[i].getId() > subtopicId) {
+            this._subtopics[i].decrementId();
+          }
+        }
         this._nextSubtopicId--;
+      }
+      if (!subtopicDeleted) {
+        throw Error('Subtopic to delete does not exist');
       }
     };
 
@@ -156,11 +168,19 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     };
 
     Topic.prototype.addCanonicalStoryId = function(storyId) {
+      if (this._canonicalStoryIds.indexOf(storyId) !== -1) {
+        throw Error(
+          'Given story id already present in canonical story ids.');
+      }
       this._canonicalStoryIds.push(storyId);
     };
 
     Topic.prototype.removeCanonicalStoryId = function(storyId) {
       var index = this._canonicalStoryIds.indexOf(storyId);
+      if (index === -1) {
+        throw Error(
+          'Given story id not present in canonical story ids.');
+      }
       this._canonicalStoryIds.splice(index, 1);
     };
 
@@ -173,11 +193,19 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     };
 
     Topic.prototype.addAdditionalStoryId = function(storyId) {
+      if (this._additionalStoryIds.indexOf(storyId) !== -1) {
+        throw Error(
+          'Given story id already present in additional story ids.');
+      }
       this._additionalStoryIds.push(storyId);
     };
 
     Topic.prototype.removeAdditionalStoryId = function(storyId) {
       var index = this._additionalStoryIds.indexOf(storyId);
+      if (index === -1) {
+        throw Error(
+          'Given story id not present in additional story ids.');
+      }
       this._additionalStoryIds.splice(index, 1);
     };
 
@@ -190,11 +218,26 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     };
 
     Topic.prototype.addUncategorizedSkillId = function(skillId) {
+      var skillIsPresentInSomeSubtopic = false;
+      for (var i = 0; i < this._subtopics.length; i++) {
+        var skillIds = this._subtopics[i].getSkillIds();
+        if (skillIds.indexOf(skillId) !== -1) {
+          skillIsPresentInSomeSubtopic = true;
+          break;
+        }
+      }
+      if (this._uncategorizedSkillIds.indexOf(skillId) !== -1 ||
+          skillIsPresentInSomeSubtopic) {
+        throw Error('Given skillId is already present in a subtopic.');
+      }
       this._uncategorizedSkillIds.push(skillId);
     };
 
     Topic.prototype.removeUncategorizedSkillId = function(skillId) {
       var index = this._uncategorizedSkillIds.indexOf(skillId);
+      if (index === -1) {
+        throw Error('Given skillId is not an uncategorized skill.');
+      }
       this._uncategorizedSkillIds.splice(index, 1);
     };
 
