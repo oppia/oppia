@@ -49,3 +49,20 @@ class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(questionskilllink_model.question_id, question_id)
         self.assertEqual(questionskilllink_model.skill_id, skill_id)
+
+
+class QuestionCommitLogEntryModel(test_utils.GenericTestBase):
+    """Tests the QuestionCommitLogEntryModel class."""
+
+    def test_get_instance_id(self):
+        question_id = 'question_id'
+        version = 'v1'
+        typed_instance_id = 'question-question_id-v1'
+
+        generated_instance_id = (
+            #pylint: disable=W0212
+            question_models.QuestionCommitLogEntryModel._get_instance_id(
+                question_id, version))
+            #pylint: enable=W0212
+
+        self.assertEqual(typed_instance_id, generated_instance_id)

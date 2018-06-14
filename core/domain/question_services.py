@@ -231,12 +231,11 @@ def save_new_question(committer_id, question):
         ('New question created with title \'%s\'.' % question.title)
         if question.title else 'New question created.')
     _save_question(
-        committer_id, question, [
-            question_domain.QuestionChange({
-                'cmd': question_domain.CMD_CREATE_NEW,
-                'title': question.title,
-                'category': question.category,
-            })], commit_message)
+        committer_id, question, [{
+            'cmd': question_domain.CMD_CREATE_NEW,
+            'title': question.title,
+            'category': question.category,
+        }], commit_message)
     user_services.add_created_question_id(committer_id, question.id)
     user_services.add_edited_question_id(committer_id, question.id)
     user_services.record_user_created_an_question(committer_id)

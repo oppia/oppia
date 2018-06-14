@@ -39,6 +39,9 @@ CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
 CMD_ADD_QUESTION_SKILL = 'add_question_skill'
 CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
 
+# This takes additional 'title' and 'category' parameters.
+CMD_CREATE_NEW = 'create_new'
+
 
 class QuestionChange(object):
     """Domain object for changes made to question object."""

@@ -15,12 +15,12 @@
 """Models for storing the question data models."""
 
 from core.platform import models
+import core.storage.user.gae_models as user_models
 import utils
 
 from google.appengine.ext import ndb
 
-(base_models, user_models) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.user_model])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -176,7 +176,7 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
     QuestionModel occurs.
 
     The id for this model is of the form
-    'question.{{QUESTION_ID}}.{{QUESTION_VERSION}}'.
+    'question-{{QUESTION_ID}}-{{QUESTION_VERSION}}'.
     """
     # The id of the question being edited.
     question_id = ndb.StringProperty(indexed=True, required=True)
@@ -193,24 +193,4 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
             str. A string containing question ID and
                 question version.
         """
-        return 'question.%s.%s' % (question_id, question_version)
-
-    @classmethod
-    def get_all_question_commits(cls, question_id, latest_version):
-        """Fetches all the commits made on a particular question up to latest
-        version of question.
-
-        Args:
-            question_id: str. The question id.
-            latest_version: int. Latest version of the question.
-
-        Returns:
-            list(QuestionCommitLogEntryModel). Commit log entry model
-            for each version of the given question.
-        """
-        model_ids = []
-        for version in range(1, latest_version + 1):
-            model_ids.append(cls._get_instance_id(question_id, version))
-
-        models = cls.get_multi(model_ids)
-        return models
+        return 'question-%s-%s' % (question_id, question_version)
