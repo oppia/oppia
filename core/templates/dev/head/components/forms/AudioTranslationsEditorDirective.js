@@ -83,7 +83,7 @@ oppia.directive('audioTranslationsEditor', [
             } else {
               return ($scope.isEditable() ? 'Click to mark this audio ' +
                 'translation as not matching text.' :
-                'Audio is matching text.');
+                'Audio translation matches text.');
             }
           };
 
