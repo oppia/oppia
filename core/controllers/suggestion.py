@@ -16,6 +16,7 @@
 
 """Controllers for suggestions."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import suggestion_services
@@ -29,6 +30,9 @@ class SuggestionHandler(base.BaseHandler):
 
     @acl_decorators.can_suggest_changes
     def post(self):
+        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
+            raise self.PageNotFoundException
+
         suggestion_services.create_suggestion(
             self.payload.get('suggestion_type'),
             self.payload.get('target_type'), self.payload.get('target_id'),
@@ -48,6 +52,9 @@ class SuggestionActionHandler(base.BaseHandler):
 
     @acl_decorators.can_accept_suggestion
     def put(self, suggestion_id):
+        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
+            raise self.PageNotFoundException
+
         action = self.payload.get('action')
         if action == self.ACTION_TYPE_ACCEPT:
             suggestion = suggestion_services.get_suggestion_by_id(
@@ -79,6 +86,9 @@ class SuggestionListHandler(base.BaseHandler):
 
     @acl_decorators.open_access
     def get(self):
+        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
+            raise self.PageNotFoundException
+
         list_type = self.request.get('list_type')
         if list_type == self.LIST_TYPE_ASSIGNED_REVIEWER:
             suggestions = (

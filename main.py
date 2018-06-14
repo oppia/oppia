@@ -172,16 +172,6 @@ if constants.USE_NEW_SUGGESTION_FRAMEWORK:
     suggestionListHandlerRoute = get_redirect_route(
         r'%s' % feconf.SUGGESTION_LIST_URL_PREFIX,
         suggestion.SuggestionListHandler)
-else:
-    suggestionHandlerRoute = get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
-        feedback.SuggestionHandler)
-    suggestionActionHandlerRoute = get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>' %
-        feconf.SUGGESTION_ACTION_URL_PREFIX, feedback.SuggestionActionHandler)
-    suggestionListHandlerRoute = get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
-        feedback.SuggestionListHandler)
 
 # Register the URLs with the classes responsible for handling them.
 URLS = MAPREDUCE_HANDLERS + [
@@ -462,7 +452,24 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_STATS_URL_PREFIX,
         feedback.FeedbackStatsHandler),
-    suggestionHandlerRoute,
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
+        feedback.SuggestionHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' %
+        feconf.SUGGESTION_ACTION_URL_PREFIX, feedback.SuggestionActionHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+        feedback.SuggestionListHandler),
+    get_redirect_route(
+        r'%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX,
+        suggestion.SuggestionHandler),
+    get_redirect_route(
+        r'%s/<suggestion_id>' % feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        suggestion.SuggestionActionHandler),
+    get_redirect_route(
+        r'%s' % feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+        suggestion.SuggestionListHandler),
     get_redirect_route(
         r'%s' % feconf.SUBSCRIBE_URL_PREFIX,
         subscriptions.SubscribeHandler),
@@ -472,8 +479,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),
-    suggestionActionHandlerRoute, suggestionListHandlerRoute,
-
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
         collection_viewer.CollectionPage),

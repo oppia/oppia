@@ -63,10 +63,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 self.EXP_ID, self.editor_id, ['State 1', 'State 2', 'State 3'],
                 ['TextInput'], category='Algebra'))
 
-        self.old_content = exp_domain.SubtitledHtml('old content', {
-            self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
-                'filename.mp3', 20, False)
-        }).to_dict()
+        self.old_content = exp_domain.SubtitledHtml(
+            'content', 'old content html').to_dict()
 
         exploration.states['State 1'].update_content(self.old_content)
         exploration.states['State 2'].update_content(self.old_content)
@@ -78,19 +76,18 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             self.editor, self.EXP_ID, self.owner_id,
             rights_manager.ROLE_EDITOR)
 
-        self.new_content = exp_domain.SubtitledHtml('new content', {
-            self.TRANSLATION_LANGUAGE_CODE: exp_domain.AudioTranslation(
-                'filename.mp3', 20, False)
-        }).to_dict()
+        self.new_content = exp_domain.SubtitledHtml(
+            'content','new content html').to_dict()
 
         self.logout()
 
-        if constants.USE_NEW_SUGGESTION_FRAMEWORK:
+        with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
             self.login(self.AUTHOR_EMAIL)
             response = self.testapp.get('/explore/%s' % self.EXP_ID)
             csrf_token = self.get_csrf_token_from_response(response)
+
             self.post_json(
-                '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
                     'suggestion_type': (
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
                     'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -114,7 +111,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(response)
 
             self.post_json(
-                '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
                     'suggestion_type': (
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
                     'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -133,7 +130,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 }, csrf_token)
 
             self.post_json(
-                '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
                     'suggestion_type': (
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
                     'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -153,15 +150,14 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             self.logout()
 
     def test_create_suggestion(self):
-        self.login(self.AUTHOR_EMAIL_2)
-        if constants.USE_NEW_SUGGESTION_FRAMEWORK:
-
+        with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
+            self.login(self.AUTHOR_EMAIL_2)
             response = self.testapp.get('/explore/%s' % self.EXP_ID)
             csrf_token = self.get_csrf_token_from_response(response)
-
             exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+
             self.post_json(
-                '%s/' % feconf.SUGGESTION_URL_PREFIX, {
+                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
                     'suggestion_type': (
                         suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
                     'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
@@ -171,35 +167,33 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                         'state_name': 'State 3',
-                        'old_value': self.old_content,
                         'new_value': self.new_content
                     },
                     'description': 'change again to state 3',
                 }, csrf_token)
             suggestions = self.get_json(
                 '%s?list_type=author&author_id=%s' % (
-                    feconf.SUGGESTION_LIST_URL_PREFIX,
+                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
                     self.author_id_2))['suggestions']
             self.assertEqual(len(suggestions), 3)
-        self.logout()
+            self.logout()
 
     def test_accept_suggestion(self):
-        if constants.USE_NEW_SUGGESTION_FRAMEWORK:
+        with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
             exploration = exp_services.get_exploration_by_id(self.EXP_ID)
             self.login(self.EDITOR_EMAIL)
-
             response = self.testapp.get('/explore/%s' % self.EXP_ID)
             csrf_token = self.get_csrf_token_from_response(response)
 
             suggestion_to_accept = self.get_json(
                 '%s?list_type=author&author_id=%s' % (
-                    feconf.SUGGESTION_LIST_URL_PREFIX,
+                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
                     self.author_id))['suggestions'][0]
 
             response = self.testapp.get('/explore/%s' % self.EXP_ID)
             csrf_token = self.get_csrf_token_from_response(response)
             self.put_json('%s/%s' % (
-                feconf.SUGGESTION_ACTION_URL_PREFIX,
+                feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
                 suggestion_to_accept['suggestion_id']), {
                     'action': u'accept',
                     'commit_message': u'commit message',
@@ -207,7 +201,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 }, csrf_token)
             suggestion_post_accept = self.get_json(
                 '%s?list_type=id&suggestion_id=%s' % (
-                    feconf.SUGGESTION_LIST_URL_PREFIX,
+                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
                     suggestion_to_accept['suggestion_id']))['suggestions'][0]
             self.assertEqual(
                 suggestion_post_accept['status'],
