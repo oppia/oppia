@@ -77,7 +77,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
 
         self.new_content = exp_domain.SubtitledHtml(
-            'content','new content html').to_dict()
+            'content', 'new content html').to_dict()
 
         self.logout()
 
