@@ -1144,7 +1144,7 @@ class SuggestChangesToExplorationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class SuggestChangesTest(test_utils.GenericTestBase):
+class SuggestChangesDecoratorsTest(test_utils.GenericTestBase):
     """Tests for can_suggest_changes decorator."""
     username = 'user'
     user_email = 'user@example.com'
@@ -1161,7 +1161,7 @@ class SuggestChangesTest(test_utils.GenericTestBase):
             self.render_json({})
 
     def setUp(self):
-        super(SuggestChangesTest, self).setUp()
+        super(SuggestChangesDecoratorsTest, self).setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.set_banned_users([self.banned_username])

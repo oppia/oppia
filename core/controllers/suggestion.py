@@ -45,7 +45,7 @@ class SuggestionHandler(base.BaseHandler):
 
 
 class SuggestionActionHandler(base.BaseHandler):
-    """Handles actions performed to suggestions."""
+    """Handles actions performed on suggestions."""
 
     ACTION_TYPE_ACCEPT = 'accept'
     ACTION_TYPE_REJECT = 'reject'

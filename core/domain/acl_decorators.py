@@ -1093,6 +1093,10 @@ def can_accept_suggestion(handler):
         Returns:
             *. The return value of the decorated function.
         """
+
+        # TODO (nithesh): Add permissions for users with enough scores to review
+        # Will be added as part of milestone 2 of the generalized review system
+        # project.
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
