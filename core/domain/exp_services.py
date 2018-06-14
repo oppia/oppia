@@ -1153,7 +1153,7 @@ def update_exploration(
             accepted suggestions.
     """
     if is_by_translator and not is_translation_change_list(change_list):
-        raise Exception(
+        raise utils.ValidationError(
             'Translator does not have permission to make some '
             'changes in the change list.')
 
@@ -1935,7 +1935,7 @@ def is_version_of_draft_valid(exp_id, version):
 
 
 def get_user_exploration_data(
-      user_id, exploration_id, apply_draft=False, version=None):
+        user_id, exploration_id, apply_draft=False, version=None):
     """Returns a description of the given exploration."""
     if apply_draft:
         exploration = get_exp_with_draft_applied(exploration_id, user_id)
@@ -2008,7 +2008,7 @@ def create_or_update_draft(
             translator.
     """
     if is_by_translator and not is_translation_change_list(change_list):
-        raise Exception(
+        raise utils.ValidationError(
             'Translator does not have permission to make some '
             'changes in the change list.')
 

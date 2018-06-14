@@ -24,8 +24,6 @@ from core.domain import acl_decorators
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
-from core.domain import rights_manager
-from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
@@ -202,8 +200,7 @@ class ExplorationTranslationHandler(base.BaseHandler):
 
         try:
             exploration_data = exp_services.get_user_exploration_data(
-                self.user_id, exploration_id, apply_draft=apply_draft,
-                version=version)
+                self.user_id, exploration_id)
         except:
             raise self.PageNotFoundException
 
