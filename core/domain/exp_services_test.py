@@ -2612,7 +2612,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: Congratulations, you have finished!
+      html: <p>Congratulations, you have finished!</p>
     content_ids_to_audio_translations:
       content: {}
     interaction:

@@ -3399,6 +3399,7 @@ class Exploration(object):
             default_outcome = state_dict['interaction']['default_outcome']
             if default_outcome is not None:
                 default_outcome['missing_prerequisite_skill_id'] = None
+
         return states_dict
 
     @classmethod
@@ -3454,6 +3455,69 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v21_dict_to_v22_dict(cls, states_dict):
+        """Converts from version 21 to 22. Version 22 converts all Rich Text
+        Editor content to be compatible with the textAngular format.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            state_dict['content']['html'] = (
+                html_cleaner.convert_to_text_angular(
+                    state_dict['content']['html']))
+            if state_dict['interaction']['default_outcome']:
+                interaction_feedback_html = state_dict[
+                    'interaction']['default_outcome']['feedback']['html']
+                state_dict['interaction']['default_outcome']['feedback'][
+                    'html'] = html_cleaner.convert_to_text_angular(
+                        interaction_feedback_html)
+
+            for answer_group_index, answer_group in enumerate(
+                    state_dict['interaction']['answer_groups']):
+                answer_group_html = answer_group['outcome']['feedback']['html']
+                state_dict['interaction']['answer_groups'][
+                    answer_group_index]['outcome']['feedback']['html'] = (
+                        html_cleaner.convert_to_text_angular(
+                            answer_group_html))
+                if state_dict['interaction']['id'] == 'ItemSelectionInput':
+                    for rule_spec_index, rule_spec in enumerate(
+                            answer_group['rule_specs']):
+                        for x_index, x in enumerate(rule_spec['inputs']['x']):
+                            state_dict['interaction']['answer_groups'][
+                                answer_group_index]['rule_specs'][
+                                    rule_spec_index]['inputs']['x'][x_index] = (
+                                        html_cleaner.convert_to_text_angular(x))
+            for hint_index, hint in enumerate(
+                    state_dict['interaction']['hints']):
+                hint_html = hint['hint_content']['html']
+                state_dict['interaction']['hints'][hint_index][
+                    'hint_content']['html'] = (
+                        html_cleaner.convert_to_text_angular(hint_html))
+
+            if state_dict['interaction']['solution']:
+                solution_html = state_dict[
+                    'interaction']['solution']['explanation']['html']
+                state_dict['interaction']['solution']['explanation']['html'] = (
+                    html_cleaner.convert_to_text_angular(solution_html))
+
+            if state_dict['interaction']['id'] in (
+                    'ItemSelectionInput', 'MultipleChoiceInput'):
+                for value_index, value in enumerate(
+                        state_dict['interaction']['customization_args'][
+                            'choices']['value']):
+                    state_dict['interaction']['customization_args'][
+                        'choices']['value'][value_index] = (
+                            html_cleaner.convert_to_text_angular(value))
+
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3484,7 +3548,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 26
+    CURRENT_EXP_SCHEMA_VERSION = 27
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3975,6 +4039,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v26_dict_to_v27_dict(cls, exploration_dict):
+        """Converts a v26 exploration dict into a v27 exploration dict.
+
+        Converts all Rich Text Editor content to be compatible with the
+        textAngular format.
+        """
+        exploration_dict['schema_version'] = 27
+
+        exploration_dict['states'] = cls._convert_states_v21_dict_to_v22_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 22
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4135,6 +4214,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v25_dict_to_v26_dict(
                 exploration_dict)
             exploration_schema_version = 26
+
+        if exploration_schema_version == 26:
+            exploration_dict = cls._convert_v26_dict_to_v27_dict(
+                exploration_dict)
+            exploration_schema_version = 27
 
         return (exploration_dict, initial_schema_version)
 
