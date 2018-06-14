@@ -443,7 +443,7 @@ oppia.directive('testInteractionPanel', [
             });
           };
 
-          $scope.submitAnswerFromButton = function() {
+          $scope.onSubmitAnswerFromButton = function() {
             $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
           };
         }
