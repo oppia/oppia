@@ -238,6 +238,8 @@ describe('Permissions for private explorations', function() {
       users.login('translator@oppia.tests');
       general.openEditor(explorationId);
       editor.expectContentToMatch(forms.toRichText('this is card 1'));
+      expect(element(by.css(
+        '.protractor-test-save-changes')).isPresent()).toBeTruthy();
       users.logout();
 
       users.login('guestUser@oppia.tests');

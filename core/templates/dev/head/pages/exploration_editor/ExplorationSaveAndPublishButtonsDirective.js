@@ -47,7 +47,8 @@ oppia.directive('explorationSaveAndPublishButtons', [
           };
 
           $scope.isEditableOutsideTutorialMode = function() {
-            return EditabilityService.isEditableOutsideTutorialMode();
+            return EditabilityService.isEditableOutsideTutorialMode() ||
+              EditabilityService.isTranslatable();
           };
 
           $scope.countWarnings = function() {

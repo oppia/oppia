@@ -83,12 +83,12 @@ class TranslatorTest(BaseTranslatorControllerTest):
                 'commit_message': 'Translated first state content',
                 'version': 1
             }, self.csrf_token)
-        # Checking the response to have audio tarnslations.
+        # Checking the response to have audio translations.
         self.assertEqual(
             response['states'][state_name]['content_ids_to_audio_translations'],
             self.CONTENT_IDS_TO_AUDIO_TRANSLATION)
 
-    def test_transator_cannot_save_invalid_change_list(self):
+    def test_translator_cannot_save_invalid_change_list(self):
         # Trying to change exploration objective.
         response = self.put_json(
             '/createhandler/translate/%s' % self.EXP_ID, {
@@ -97,7 +97,7 @@ class TranslatorTest(BaseTranslatorControllerTest):
                     'property_name': 'objective',
                     'new_value': 'the objective',
                 }],
-                'commit_message': 'Chnaged exp objective',
+                'commit_message': 'Changed exp objective',
                 'version': 1
             }, self.csrf_token, expect_errors=True, expected_status_int=400)
         # Checking the response to have error.
