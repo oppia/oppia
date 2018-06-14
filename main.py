@@ -238,6 +238,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
+    get_redirect_route(
+        r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
+        topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
 
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' %
