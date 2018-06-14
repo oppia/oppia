@@ -1080,7 +1080,7 @@ def can_accept_suggestion(handler):
     """Decorator to check if user can accept the given suggestion."""
 
     @can_edit_exploration
-    def test_can_accept_suggestion_to_exploration(self, exploration_id):
+    def test_can_accept_suggestion_to_exploration(unused_self, unused_exp_id):
         pass
 
     def test_can_accept(self, suggestion_id, **kwargs):

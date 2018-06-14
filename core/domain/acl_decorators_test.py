@@ -1508,7 +1508,7 @@ class AcceptSuggestionDecoratorTest(test_utils.GenericTestBase):
 
         @acl_decorators.can_accept_suggestion
         def get(self, suggestion_id):
-            self.render_json({})
+            self.render_json({'suggestion_id': suggestion_id})
 
     def setUp(self):
         super(AcceptSuggestionDecoratorTest, self).setUp()
@@ -1568,5 +1568,3 @@ class AcceptSuggestionDecoratorTest(test_utils.GenericTestBase):
                 '/mock/exploration.%s.1234' % self.exp_id,
                 expected_status_int=200)
         self.logout()
-
-
