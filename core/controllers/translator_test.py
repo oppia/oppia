@@ -14,7 +14,6 @@
 
 """Tests for the exploration translator work."""
 
-
 import datetime
 
 from core.domain import rights_manager
@@ -189,7 +188,6 @@ class TranslatorAutosaveTest(BaseTranslatorControllerTest):
             '%s.%s' % (self.translator_id, self.EXP_ID))
         self.assertEqual(
             exp_user_data.draft_change_list, self.VALID_DRAFT_CHANGELIST)
-        # id is incremented the first time but not the second.
         self.assertEqual(exp_user_data.draft_change_list_id, 1)
         self.assertEqual(
             response, {'status_code': 400,

@@ -240,13 +240,14 @@ class ExplorationHandler(EditorHandler):
         version = self.request.get('v', default_value=None)
         apply_draft = self.request.get('apply_draft', default_value=False)
 
-
-        exploration_data = exp_services.get_user_exploration_data(
-            self.user_id, exploration_id, apply_draft=apply_draft,
-            version=version)
-        exploration_data['show_state_editor_tutorial_on_load'] = (
-            self.user_id and not self.has_seen_editor_tutorial)
-
+        try:
+            exploration_data = exp_services.get_user_exploration_data(
+                self.user_id, exploration_id, apply_draft=apply_draft,
+                version=version)
+            exploration_data['show_state_editor_tutorial_on_load'] = (
+                self.user_id and not self.has_seen_editor_tutorial)
+        except:
+            raise self.PageNotFoundException
 
         self.values.update(exploration_data)
         self.render_json(self.values)
