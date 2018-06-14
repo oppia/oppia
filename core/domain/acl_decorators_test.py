@@ -1492,3 +1492,81 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
                 '/mock/%s' % self.topic_id, expect_errors=True,
                 expected_status_int=401)
         self.logout()
+
+
+class AcceptSuggestionDecoratorTest(test_utils.GenericTestBase):
+    """Tests for can_accept_suggestion decorator."""
+    username = 'user'
+    user_email = 'user@example.com'
+    banned_username = 'banneduser'
+    banned_user_email = 'banned@example.com'
+    exp_id = 'exp_0'
+
+    class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_accept_suggestion
+        def get(self, suggestion_id):
+            self.render_json({})
+
+    def setUp(self):
+        super(AcceptSuggestionDecoratorTest, self).setUp()
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.banned_user_email, self.banned_username)
+        self.signup(self.user_email, self.username)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_moderators([self.MODERATOR_USERNAME])
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_banned_users([self.banned_username])
+        self.owner = user_services.UserActionsInfo(self.owner_id)
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<suggestion_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        self.save_new_valid_exploration(self.exp_id, self.owner_id)
+        rights_manager.publish_exploration(self.owner, self.exp_id)
+
+    def test_banned_user_cannot_accept_changes(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.1234' % self.exp_id,
+                expect_errors=True, expected_status_int=401)
+        self.logout()
+
+    def test_normal_user_cannot_accept_changes(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.1234' % self.exp_id,
+                expect_errors=True, expected_status_int=401)
+        self.logout()
+
+    def test_owner_can_accept_changes(self):
+        self.login(self.OWNER_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.1234' % self.exp_id,
+                expected_status_int=200)
+        self.logout()
+
+    def test_admin_can_accept_changes(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.1234' % self.exp_id,
+                expected_status_int=200)
+        self.logout()
+
+    def test_moderator_can_accept_changes(self):
+        self.login(self.MODERATOR_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/exploration.%s.1234' % self.exp_id,
+                expected_status_int=200)
+        self.logout()
+
+

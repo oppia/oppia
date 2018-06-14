@@ -459,7 +459,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>/<thread_id>' %
         feconf.SUGGESTION_ACTION_URL_PREFIX, feedback.SuggestionActionHandler),
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
         feedback.SuggestionListHandler),
     get_redirect_route(
         r'%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX,

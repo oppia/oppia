@@ -1078,6 +1078,11 @@ def can_manage_rights_for_topic(handler):
 
 def can_accept_suggestion(handler):
     """Decorator to check if user can accept the given suggestion."""
+
+    @can_edit_exploration
+    def test_can_accept_suggestion_to_exploration(self, exploration_id):
+        pass
+
     def test_can_accept(self, suggestion_id, **kwargs):
         """Checks if the user can accept the suggestion.
 
@@ -1091,24 +1096,17 @@ def can_accept_suggestion(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        print self.user
         if len(suggestion_id.split('.')) != 3:
             raise self.InvalidInputException('Invalid format for suggestion_id.'
                                              ' It must contain 3 parts'
                                              ' separated by \'.\'')
         target_type = suggestion_id.split('.')[0]
+        target_id = suggestion_id.split('.')[1]
 
         if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
-            exploration_id = suggestion_id.split('.')[1]
-            exploration_rights = rights_manager.get_exploration_rights(
-                exploration_id)
-            if rights_manager.check_can_edit_activity(
-                    self.user, exploration_rights):
-                return handler(self, suggestion_id, **kwargs)
-            else:
-                raise base.UserFacingExceptions.UnauthorizedUserException(
-                    'You do not have credentials to accept or reject this '
-                    'suggestion.')
+            test_can_accept_suggestion_to_exploration(self, target_id)
+        return handler(self, suggestion_id, **kwargs)
+
     test_can_accept.__wrapped__ = True
 
     return test_can_accept
