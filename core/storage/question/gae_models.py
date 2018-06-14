@@ -19,7 +19,8 @@ import utils
 
 from google.appengine.ext import ndb
 
-(base_models,) = models.Registry.import_models([models.NAMES.base_model])
+(base_models, user_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.user_model])
 
 
 class QuestionSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -73,6 +74,40 @@ class QuestionModel(base_models.VersionedModel):
         raise Exception(
             'The id generator for QuestionModel is producing too many '
             'collisions.')
+
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(QuestionModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+
+        committer_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(committer_id))
+        committer_username = (
+            committer_user_settings_model.username
+            if committer_user_settings_model else '')
+
+        question_commit_log = QuestionCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds
+        )
+        question_commit_log.question_id = self.id
+        question_commit_log.put()
 
     @classmethod
     def create(
@@ -132,3 +167,50 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_id=question_id, skill_id=skill_id)
 
         return question_skill_link_model_instance
+
+
+class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to questions.
+
+    A new instance of this model is created and saved every time a commit to
+    QuestionModel occurs.
+
+    The id for this model is of the form
+    'question.{{QUESTION_ID}}.{{QUESTION_VERSION}}'.
+    """
+    # The id of the question being edited.
+    question_id = ndb.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def _get_instance_id(cls, question_id, question_version):
+        """Returns ID of the question commit log entry model.
+
+        Args:
+            question_id: str. The question id whose states are mapped.
+            question_version: int. The version of the question.
+
+        Returns:
+            str. A string containing question ID and
+                question version.
+        """
+        return 'question.%s.%s' % (question_id, question_version)
+
+    @classmethod
+    def get_all_question_commits(cls, question_id, latest_version):
+        """Fetches all the commits made on a particular question up to latest
+        version of question.
+
+        Args:
+            question_id: str. The question id.
+            latest_version: int. Latest version of the question.
+
+        Returns:
+            list(QuestionCommitLogEntryModel). Commit log entry model
+            for each version of the given question.
+        """
+        model_ids = []
+        for version in range(1, latest_version + 1):
+            model_ids.append(cls._get_instance_id(question_id, version))
+
+        models = cls.get_multi(model_ids)
+        return models
