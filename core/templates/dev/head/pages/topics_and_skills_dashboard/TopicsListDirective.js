@@ -26,8 +26,8 @@ oppia.directive('topicsList', [
         '/pages/topics_and_skills_dashboard/topics_list_directive.html'),
       controller: ['$scope',
         function($scope) {
-          // As additional stories are not supported initially, it's not being shown,
-          // for now.
+          // As additional stories are not supported initially, it's not
+          // being shown, for now.
           $scope.TOPIC_HEADINGS = [
             'name', 'subtopic_count', 'skill_count',
             'canonical_story_count'
