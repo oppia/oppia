@@ -19,6 +19,8 @@
     </div>
   </section>
   <div style="margin-top: 20px; margin-left: 10px;" ng-show="canAccept">
+    Review message (required if rejecting):
+    <input type="text" ng-model="reviewMessage" style="width: 100%">
     Brief Description of Changes (required if accepting):
     <input type="text" ng-model="commitMessage" style="width: 100%">
   </div>

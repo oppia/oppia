@@ -101,12 +101,11 @@ oppia.controller('LearnerLocalNav', [
               property_name: 'content',
               state_name: result.stateName,
               new_value: {
-                html: result.suggestionHtml,
-                audio_translation: {}
+                html: result.suggestionHtml
               }
             }
           };
-          url = '/suggestionhandler/';
+          url = '/generalsuggestionhandler/';
         }
         $http.post(url, data).error(function(res) {
           AlertsService.addWarning(res);

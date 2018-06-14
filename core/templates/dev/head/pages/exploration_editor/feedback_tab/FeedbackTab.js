@@ -202,12 +202,13 @@ oppia.controller('FeedbackTab', [
             $scope.currentContent = currentContent;
             $scope.newContent = newContent;
             $scope.commitMessage = description;
+            $scope.reviewMessage = null;
 
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
                 commitMessage: $scope.commitMessage,
-                reviewMessage: 'Accepted',
+                reviewMessage: $scope.reviewMessage,
                 // TODO(sll): If audio files exist for the content being
                 // replaced, implement functionality in the modal for the
                 // exploration creator to indicate whether this change
@@ -221,7 +222,7 @@ oppia.controller('FeedbackTab', [
             $scope.rejectSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_REJECT_SUGGESTION,
-                reviewMessage: 'Rejected'
+                reviewMessage: $scope.reviewMessage
               });
             };
 
@@ -233,8 +234,7 @@ oppia.controller('FeedbackTab', [
       }).result.then(function(result) {
         ThreadDataService.resolveSuggestion(
           $scope.activeThread.thread_id, result.action, result.commitMessage,
-          result.audioUpdateRequired,
-          function() {
+          result.reviewMessage, result.audioUpdateRequired, function() {
             ThreadDataService.fetchThreads(function() {
               $scope.setActiveThread($scope.activeThread.thread_id);
             });

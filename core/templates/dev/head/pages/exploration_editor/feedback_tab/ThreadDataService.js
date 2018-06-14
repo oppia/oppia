@@ -34,8 +34,8 @@ oppia.factory('ThreadDataService', [
     var _THREAD_STATUS_OPEN = 'open';
 
     if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-      _SUGGESTION_LIST_HANDLER_URL = '/suggestionlisthandler';
-      _SUGGESTION_ACTION_HANDLER_URL = '/suggestionactionhandler/';
+      _SUGGESTION_LIST_HANDLER_URL = '/generalsuggestionlisthandler';
+      _SUGGESTION_ACTION_HANDLER_URL = '/generalsuggestionactionhandler/';
     }
 
     // All the threads for this exploration. This is a list whose entries are
@@ -211,7 +211,7 @@ oppia.factory('ThreadDataService', [
         });
       },
       resolveSuggestion: function(
-          threadId, action, commitMsg, audioUpdateRequired, onSuccess,
+          threadId, action, commitMsg, reviewMsg, audioUpdateRequired, onSuccess,
           onFailure) {
         var payload = {
           action: action
@@ -221,7 +221,7 @@ oppia.factory('ThreadDataService', [
           // TODO(nithesh): Remove manual construction of suggestion ID once the
           // feedback threads are migrated and threadId matches suggestionId.
           suggestionId = 'exploration.' + threadId;
-          payload.review_message = 'Reviewed';
+          payload.review_message = reviewMsg;
           if (action === ACTION_ACCEPT_SUGGESTION) {
             payload.commit_message = commitMsg;
           }
