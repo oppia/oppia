@@ -211,8 +211,8 @@ oppia.factory('ThreadDataService', [
         });
       },
       resolveSuggestion: function(
-          threadId, action, commitMsg, reviewMsg, audioUpdateRequired, onSuccess,
-          onFailure) {
+          threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
+          onSuccess, onFailure) {
         var payload = {
           action: action
         };
