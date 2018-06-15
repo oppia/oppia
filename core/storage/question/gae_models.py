@@ -17,6 +17,7 @@
 from core.platform import models
 import core.storage.user.gae_models as user_models
 import utils
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -104,7 +105,8 @@ class QuestionModel(base_models.VersionedModel):
 
         question_commit_log = QuestionCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
-            commit_type, commit_message, commit_cmds
+            commit_type, commit_message, commit_cmds,
+            feconf.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
         question_commit_log.put()
