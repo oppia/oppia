@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the navbar breadcrumb of the collection editor.
+ * @fileoverview Controller for the skills list viewer.
  */
 oppia.directive('skillsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
-        skillSummaries: '&'
+        getSkillSummaries: '&skillSummaries'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/skills_list_directive.html'),

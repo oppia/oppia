@@ -52,14 +52,16 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         """Handles GET requests."""
 
         topic_summaries = topic_services.get_all_topic_summaries()
-        topic_summary_dicts = [summary.to_dict() for summary in topic_summaries]
+        topic_summary_dicts = [
+            summary.to_dict() for summary in topic_summaries]
 
         skill_summaries = skill_services.get_all_skill_summaries()
-        skill_summary_dicts = [summary.to_dict() for summary in skill_summaries]
+        skill_summary_dicts = [
+            summary.to_dict() for summary in skill_summaries]
 
         self.values.update({
-            'skill_summaries': skill_summary_dicts,
-            'topic_summaries': topic_summary_dicts
+            'skill_summary_dicts': skill_summary_dicts,
+            'topic_summary_dicts': topic_summary_dicts
         })
         self.render_json(self.values)
 

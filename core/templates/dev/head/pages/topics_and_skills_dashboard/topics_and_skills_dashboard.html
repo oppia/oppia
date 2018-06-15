@@ -25,38 +25,35 @@
         <li ng-if="topicSummaries.length > 0"
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
           <a class="dashboard-tabs-text"
-             ng-click="setActiveTab(TAB_NAME_TOPICS)"
-             translate="I18N_DASHBOARD_TOPICS">
+             ng-click="setActiveTab(TAB_NAME_TOPICS)"> Topics
           </a>
         </li>
         <li ng-if="skillSummaries.length > 0"
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_SKILLS}">
           <a class="dashboard-tabs-text"
-             ng-click="setActiveTab(TAB_NAME_SKILLS)"
-             translate="I18N_DASHBOARD_SKILLS">
+             ng-click="setActiveTab(TAB_NAME_SKILLS)"> Skills
           </a>
         </li>
       </ul>
 
-    <div ng-if="activeTab === TAB_NAME_TOPICS">
-      <topics-list topic-summaries="topicSummaries"></topics-list>
-    </div>
+      <div ng-if="activeTab === TAB_NAME_TOPICS">
+        <topics-list topic-summaries="topicSummaries"></topics-list>
+      </div>
 
-    <div ng-if="activeTab === TAB_NAME_SKILLS">
-      <skills-list skill-summaries="skillSummaries"></skills-list>
+      <div ng-if="activeTab === TAB_NAME_SKILLS">
+        <skills-list skill-summaries="skillSummaries"></skills-list>
+      </div>
     </div>
-  </div>
 
 
     <div class="col-sm-8" ng-if="topicSummaries.length === 0 && skillSummaries.length === 0">
       <blockquote class="intro-card">
-        <p class="intro-card-message" style="padding-top: 6px;"
-           translate="I18N_TOPICS_AND_SKILLS_DASHBOARD_INTRO_MESSAGE">
+        <p class="intro-card-message" style="padding-top: 6px;"> No topics or skills have been created yet.
         </p>
         <a class="btn oppia-dashboard-intro-button oppia-transition-200"
            style="color: white; text-decoration: none;"
-           translate="I18N_TOPNAV_CREATE_TOPIC"
            ng-href="/">
+           Create Topic
         </a>
       </blockquote>
     </div>
@@ -197,11 +194,12 @@
 {% block footer_js %}
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/SkillsListDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboard.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsListDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/SkillsListDirective.js"></script>
 
-  <script   src="{{TEMPLATE_DIR_PREFIX}}/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboard.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
 {% endblock footer_js %}

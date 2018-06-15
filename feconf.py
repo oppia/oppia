@@ -157,7 +157,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 21
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 22
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -374,7 +374,7 @@ ENABLE_PROMO_BAR = True
 ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = False
+ENABLE_NEW_STRUCTURES = True
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -900,7 +900,6 @@ RTE_CONTENT_SPEC = {
             'p': ['blockquote', 'div', 'pre', '[document]', 'ol', 'ul', 'li'],
             'b': ['i', 'li', 'p', 'pre'],
             'br': ['b', 'i', 'li', 'p'],
-            'div': ['blockquote'],
             'i': ['b', 'li', 'p', 'pre'],
             'li': ['ol', 'ul'],
             'ol': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
@@ -919,7 +918,6 @@ RTE_CONTENT_SPEC = {
             'p',
             'b',
             'br',
-            'div',
             'i',
             'li',
             'ol',

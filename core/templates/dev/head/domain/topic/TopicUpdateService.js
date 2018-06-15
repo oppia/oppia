@@ -97,30 +97,13 @@ oppia.factory('TopicUpdateService', [
       return _getParameterFromChangeDict(changeDict, 'new_value');
     };
 
-    /* For additionalStoryIds, canonicalStoryIds and uncategorizedSkillIds,
-    * the new_value is the updated list, so this function extracts the newly
-    * added id from the new_value list, compared to the old_value list.
-    */
-    var _getNewlyAddedIdFromChangeDict = function(changeDict) {
-      oldIdList = _getParameterFromChangeDict(changeDict, 'old_value');
-      newIdList = _getParameterFromChangeDict(changeDict, 'new_value');
-      newId = newIdList.filter(function(item){
-        return oldIdList.indexOf(item) === -1;
-      });
-      return newId[0];
-    };
-
-    /* For additionalStoryIds, canonicalStoryIds and uncategorizedSkillIds,
-    * the new_value is the updated list, so this function extracts the removed
-    * id from the old_value list, compared to the new_value list.
-    */
-    var _getNewlyRemovedIdFromChangeDict = function(changeDict) {
-      oldIdList = _getParameterFromChangeDict(changeDict, 'old_value');
-      newIdList = _getParameterFromChangeDict(changeDict, 'new_value');
-      newId = oldIdList.filter(function(item){
-        return newIdList.indexOf(item) === -1;
-      });
-      return newId[0];
+    var _checkIfSkillIdInList = function(skillId, skillList) {
+      for (var i = 0; i < skillList.length; i++) {
+        if (skillList[i] === skillId) {
+          return true;
+        }
+      }
+      return false;
     };
 
     var _getSubtopicIdFromChangeDict = function(changeDict) {
@@ -205,13 +188,17 @@ oppia.factory('TopicUpdateService', [
       },
 
       /**
-       * Deletes a subtopic from the topic and records the change in
-       * the undo/redo service.The argument isNewlyCreated should be passed from
-       * the calling function, after checking the changelist to see if this
-       * subtopic was created in the same changelist.
+       * @param {Topic} topic - The topic object to be edited.
+       * @param {number} subtopicId - The id of the subtopic to delete.
+       * @param {boolean} isNewlyCreated - Whether the subtopic to delete was
+       *    created in the current draft of the topic. (i.e, the subtopic to
+       *    delete hasn't been saved in the datastore yet.)
        */
       deleteSubtopic: function(topic, subtopicId, isNewlyCreated) {
         var subtopic = topic.getSubtopicById(subtopicId);
+        if (!subtopic) {
+          throw Error('Subtopic doesn\'t exist');
+        }
         var title = subtopic.getTitle();
         var skillIds = subtopic.getSkillIds();
         _applyChange(topic, CMD_DELETE_SUBTOPIC, {
@@ -222,7 +209,8 @@ oppia.factory('TopicUpdateService', [
         }, function(changeDict, topic) {
           // Undo.
           var subtopicId = _getSubtopicIdFromChangeDict(changeDict);
-          topic.undoDeleteSubtopic(subtopicId, title, skillIds, isNewlyCreated);
+          topic.undoDeleteSubtopic(
+            subtopicId, title, skillIds, isNewlyCreated);
           for (var i = 0; i < skillIds.length; i++) {
             topic.removeUncategorizedSkillId(skillIds[i]);
           }
@@ -237,13 +225,12 @@ oppia.factory('TopicUpdateService', [
       moveSkillIdToSubtopic: function(
           topic, oldSubtopicId, newSubtopicId, skillId) {
         if (newSubtopicId === null) {
-          return false;
+          throw Error('New subtopic cannot be null');
         }
         if (oldSubtopicId !== null) {
           var oldSubtopic = topic.getSubtopicById(oldSubtopicId);
         }
         var newSubtopic = topic.getSubtopicById(newSubtopicId);
-
         _applyChange(topic, CMD_MOVE_SKILL_ID_TO_SUBTOPIC, {
           old_subtopic_id: oldSubtopicId,
           new_subtopic_id: newSubtopicId,
@@ -272,18 +259,16 @@ oppia.factory('TopicUpdateService', [
        * the change in the undo/redo service.
        */
       removeSkillIdFromSubtopic: function(topic, subtopicId, skillId) {
-        if (subtopicId === null) {
-          return false;
-        }
         var subtopic = topic.getSubtopicById(subtopicId);
-
         _applyChange(topic, CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC, {
           subtopic_id: subtopicId,
           skill_id: skillId
         }, function(changeDict, topic) {
           // Apply.
           subtopic.removeSkillId(skillId);
-          topic.addUncategorizedSkillId(skillId);
+          if (!_checkIfSkillIdInList(skillId, subtopic.getSkillIds())) {
+            topic.addUncategorizedSkillId(skillId);
+          }
         }, function(changeDict, topic) {
           // Undo.
           subtopic.addSkillId(skillId);
@@ -298,7 +283,7 @@ oppia.factory('TopicUpdateService', [
       setSubtopicTitle: function(topic, subtopicId, title) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
-          return false;
+          throw Error('Subtopic doesn\'t exist');
         }
         var oldTitle = angular.copy(subtopic.getTitle());
         _applySubtopicPropertyChange(
@@ -320,23 +305,17 @@ oppia.factory('TopicUpdateService', [
       addAdditionalStoryId: function(topic, storyId) {
         var oldAdditionalStoryIdsList = angular.copy(
           topic.getAdditionalStoryIds());
-        var newAdditionalStoryIdsList = [];
-        if (oldAdditionalStoryIdsList.indexOf(storyId) !== -1) {
-          return false;
-        }
-        newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
+        var newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
         newAdditionalStoryIdsList.push(storyId);
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS, newAdditionalStoryIdsList,
           oldAdditionalStoryIdsList,
           function(changeDict, topic) {
             // Apply.
-            var newStoryId = _getNewlyAddedIdFromChangeDict(changeDict);
-            topic.addAdditionalStoryId(newStoryId);
+            topic.addAdditionalStoryId(storyId);
           }, function(changeDict, topic) {
             // Undo.
-            var newStoryId = _getNewlyAddedIdFromChangeDict(changeDict);
-            topic.removeAdditionalStoryId(newStoryId);
+            topic.removeAdditionalStoryId(storyId);
           });
       },
 
@@ -347,23 +326,21 @@ oppia.factory('TopicUpdateService', [
       removeAdditionalStoryId: function(topic, storyId) {
         var oldAdditionalStoryIdsList = angular.copy(
           topic.getAdditionalStoryIds());
-        var newAdditionalStoryIdsList = [];
-        if (oldAdditionalStoryIdsList.indexOf(storyId) === -1) {
-          return false;
-        }
-        newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
+        var newAdditionalStoryIdsList = angular.copy(oldAdditionalStoryIdsList);
         var index = newAdditionalStoryIdsList.indexOf(storyId);
+        if (index === -1) {
+          throw Error(
+            'Given story id is not present in additional stories of topic.');
+        }
         newAdditionalStoryIdsList.splice(index, 1);
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS, newAdditionalStoryIdsList,
           oldAdditionalStoryIdsList,
           function(changeDict, topic) {
             // Apply.
-            var storyId = _getNewlyRemovedIdFromChangeDict(changeDict);
             topic.removeAdditionalStoryId(storyId);
           }, function(changeDict, topic) {
             // Undo.
-            var storyId = _getNewlyRemovedIdFromChangeDict(changeDict);
             topic.addAdditionalStoryId(storyId);
           });
       },
@@ -375,9 +352,6 @@ oppia.factory('TopicUpdateService', [
       addCanonicalStoryId: function(topic, storyId) {
         var oldCanonicalStoryIdsList = angular.copy(
           topic.getCanonicalStoryIds());
-        if (oldCanonicalStoryIdsList.indexOf(storyId) !== -1) {
-          return false;
-        }
         newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
         newCanonicalStoryIdsList.push(storyId);
         _applyTopicPropertyChange(
@@ -385,12 +359,10 @@ oppia.factory('TopicUpdateService', [
           oldCanonicalStoryIdsList,
           function(changeDict, topic) {
             // Apply.
-            var newStoryId = _getNewlyAddedIdFromChangeDict(changeDict);
-            topic.addCanonicalStoryId(newStoryId);
+            topic.addCanonicalStoryId(storyId);
           }, function(changeDict, topic) {
             // Undo.
-            var newStoryId = _getNewlyAddedIdFromChangeDict(changeDict);
-            topic.removeCanonicalStoryId(newStoryId);
+            topic.removeCanonicalStoryId(storyId);
           });
       },
 
@@ -401,23 +373,21 @@ oppia.factory('TopicUpdateService', [
       removeCanonicalStoryId: function(topic, storyId) {
         var oldCanonicalStoryIdsList = angular.copy(
           topic.getCanonicalStoryIds());
-        var newCanonicalStoryIdsList = [];
-        if (oldCanonicalStoryIdsList.indexOf(storyId) === -1) {
-          return false;
-        }
-        newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
+        var newCanonicalStoryIdsList = angular.copy(oldCanonicalStoryIdsList);
         var index = newCanonicalStoryIdsList.indexOf(storyId);
+        if (index === -1) {
+          throw Error(
+            'Given story id is not present in additional stories of topic.');
+        }
         newCanonicalStoryIdsList.splice(index, 1);
         _applyTopicPropertyChange(
           topic, TOPIC_PROPERTY_CANONICAL_STORY_IDS, newCanonicalStoryIdsList,
           oldCanonicalStoryIdsList,
           function(changeDict, topic) {
             // Apply.
-            var storyId = _getNewlyRemovedIdFromChangeDict(changeDict);
             topic.removeCanonicalStoryId(storyId);
           }, function(changeDict, topic) {
             // Undo.
-            var storyId = _getNewlyRemovedIdFromChangeDict(changeDict);
             topic.addCanonicalStoryId(storyId);
           });
       },

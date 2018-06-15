@@ -22,7 +22,7 @@ describe('Topics and Skills Dashboard backend API service', function() {
   var SAMPLE_TOPIC_ID = 'hyuy4GUlvTqJ';
 
   var sampleDataResults = {
-    topic_summaries: [{
+    topic_summary_dicts: [{
       id: SAMPLE_TOPIC_ID,
       name: 'Sample Name',
       language_code: 'en',
@@ -34,7 +34,7 @@ describe('Topics and Skills Dashboard backend API service', function() {
       topic_model_created_on: 1466178691847.67,
       topic_model_last_updated: 1466178759209.839
     }],
-    skill_summaries: []
+    skill_summary_dicts: []
   };
 
   var TOPICS_AND_SKILLS_DASHBOARD_DATA_URL =
