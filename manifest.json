@@ -451,6 +451,17 @@
           "js": ["src/sortable.js"]
         }
       },
+      "uiTree": {
+        "version": "2.22.6",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular-ui-tree/angular-ui-tree/archive/master.zip",
+        "rootDirPrefix": "ui-tree-",
+        "targetDirPrefix": "ui-tree-",
+        "bundle": {
+          "css": ["dist/angular-ui-tree.min.css"],
+          "js": ["dist/angular-ui-tree.js"]
+        }
+      },
       "uiUtils": {
         "version": "0.1.1",
         "downloadFormat": "zip",
