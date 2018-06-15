@@ -26,6 +26,7 @@ describe('retrieving threads service', function() {
       $provide.value('ExplorationDataService', {
         explorationId: expId
       });
+      $provide.constant('USE_NEW_SUGGESTION_FRAMEWORK', false);
     });
   });
 
@@ -78,6 +79,71 @@ describe('retrieving threads service', function() {
       }
     ];
 
+    httpBackend.whenGET('/threadlisthandler/' + expId).respond({
+      threads: mockFeedbackThreads
+    });
+
+    httpBackend.whenGET(
+      '/suggestionlisthandler/' + expId + '?has_suggestion=true&list_type=all'
+    ).respond({
+      threads: mockOpenSuggestionThreads
+    });
+
+    ThreadDataService.fetchThreads(function() {
+      for (var i = 0; i < mockFeedbackThreads.length; i++) {
+        expect(ThreadDataService.data.feedbackThreads).toContain(
+          mockFeedbackThreads[i]);
+      }
+      for (var i = 0; i < mockOpenSuggestionThreads.length; i++) {
+        expect(ThreadDataService.data.suggestionThreads).toContain(
+          mockOpenSuggestionThreads[i]);
+      }
+    });
+    httpBackend.flush();
+  });
+});
+
+describe('retrieving threads service new framework', function() {
+  var expId = '12345';
+  beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
+  beforeEach(function() {
+    module('oppia');
+    module(function($provide) {
+      $provide.value('ExplorationDataService', {
+        explorationId: expId
+      });
+      $provide.constant('USE_NEW_SUGGESTION_FRAMEWORK', true);
+    });
+  });
+
+  var ThreadDataService, httpBackend;
+  beforeEach(inject(function($httpBackend, _ThreadDataService_) {
+    ThreadDataService = _ThreadDataService_;
+    httpBackend = $httpBackend;
+  }));
+
+  it('should retrieve feedback threads', function() {
+    var mockFeedbackThreads = [
+      {
+        last_updated: 1441870501230.642,
+        original_author_username: 'test_learner',
+        state_name: null,
+        status: 'open',
+        subject: 'Feedback from a learner',
+        summary: null,
+        thread_id: 'abc1'
+      },
+      {
+        last_updated: 1441870501231.642,
+        original_author_username: 'test_learner',
+        state_name: null,
+        status: 'open',
+        subject: 'Feedback from a learner',
+        summary: null,
+        thread_id: 'abc2'
+      }
+    ];
+
     var mockGeneralSuggestionThreads = [
       {
         assigned_reviewer_id: null,
@@ -100,44 +166,43 @@ describe('retrieving threads service', function() {
         suggestion_type: 'edit_exploration_state_content',
         target_id: 'exp_1',
         target_type: 'exploration',
-        target_version_at_submission: 1
+        target_version_at_submission: 1,
+        thread_id: 'exp_1.1234'
       }
     ];
-
+    var feedbackThreadsForSuggestionThreads = [
+      {
+        description: 'Suggestion',
+        last_updated: 1441870501231.642,
+        original_author_username: 'test_learner',
+        state_name: null,
+        status: 'open',
+        subject: 'Suggestion from a learner',
+        summary: null,
+        thread_id: 'exp_1.1234'
+      }
+    ];
     httpBackend.whenGET('/threadlisthandler/' + expId).respond({
-      threads: mockFeedbackThreads
+      threads: mockFeedbackThreads.join(feedbackThreadsForSuggestionThreads)
     });
 
-    if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-      httpBackend.whenGET(
-        '/suggestionlisthandler/?list_type=target&target_type=exploration&' +
-        'target_id=' + expId).respond({
-        threads: mockGeneralSuggestionThreads
-      });
-    } else {
-      httpBackend.whenGET(
-        '/suggestionlisthandler/' + expId + '?has_suggestion=true&list_type=all'
-      ).respond({
-        threads: mockOpenSuggestionThreads
-      });
-    }
-    ThreadDataService.fetchThreads();
-    httpBackend.flush();
+    httpBackend.whenGET(
+      '/generalsuggestionlisthandler?list_type=target&' +
+      'target_type=exploration&target_id=' + expId).respond({
+      suggestions: mockGeneralSuggestionThreads
+    });
 
-    for (var i = 0; i < mockFeedbackThreads.length; i++) {
-      expect(ThreadDataService.data.feedbackThreads).toContain(
-        mockFeedbackThreads[i]);
-    }
-    if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+    ThreadDataService.fetchThreads(function() {
+      for (var i = 0; i < mockFeedbackThreads.length; i++) {
+        expect(ThreadDataService.data.feedbackThreads).toContain(
+          mockFeedbackThreads[i]);
+      }
+
       for (var i = 0; i < mockGeneralSuggestionThreads.length; i++) {
         expect(ThreadDataService.data.suggestionThreads).toContain(
           mockGeneralSuggestionThreads[i]);
       }
-    } else {
-      for (var i = 0; i < mockOpenSuggestionThreads.length; i++) {
-        expect(ThreadDataService.data.suggestionThreads).toContain(
-          mockOpenSuggestionThreads[i]);
-      }
-    }
+    });
+    httpBackend.flush();
   });
 });
