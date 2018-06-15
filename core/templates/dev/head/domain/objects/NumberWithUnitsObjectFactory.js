@@ -35,92 +35,109 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       this.type = type;
       this.real = real;
       this.fraction = fractionObj;
-      this.units = unitsObj;
+      this.units = unitsObj.units;
     };
 
     NumberWithUnits.prototype.toString = function() {
       var numberWithUnitsString = '';
-      if (this.units.toString().includes('$')) {
-        this.units.units = this.units.toString().replace('$', '');
+      var unitsString = UnitsObjectFactory.fromList(this.units).toString();
+      if (unitsString.includes('$')) {
+        unitsString = unitsString.replace('$', '');
         numberWithUnitsString += '$' + ' ';
       }
-      if (this.units.toString().includes('Rs')) {
-        this.units.units = this.units.toString().replace('Rs', '');
+      if (unitsString.includes('Rs')) {
+        unitsString = unitsString.replace('Rs', '');
         numberWithUnitsString += 'Rs' + ' ';
       }
-      if (this.units.toString().includes('₹')) {
-        this.units.units = this.units.toString().replace('₹', '');
+      if (unitsString.includes('₹')) {
+        unitsString = unitsString.replace('₹', '');
         numberWithUnitsString += '₹' + ' ';
       }
 
       if (this.type === 'real') {
         numberWithUnitsString += this.real + ' ';
-      } else {
+      } else if (this.type === 'fraction') {
         numberWithUnitsString += this.fraction.toString() + ' ';
       }
-      numberWithUnitsString += this.units.toString();
+      numberWithUnitsString += unitsString.trim();
       numberWithUnitsString = numberWithUnitsString.trim();
 
       return numberWithUnitsString;
     };
 
+    NumberWithUnits.prototype.toDict = function() {
+      return {
+        type: this.type,
+        real: this.real,
+        fraction: this.fraction.toDict(),
+        units: this.units
+      };
+    };
+
     NumberWithUnits.fromRawInputString = function(rawInput) {
       rawInput = rawInput.trim();
       var type = '';
-      var real = '';
-      var fractionObj = '';
+      var real = 0.0;
+      // Default fraction value.
+      var fractionObj = FractionObjectFactory.fromRawInputString('0/1');
       var units = '';
-      var value = 0;
-      var unitObj = '';
+      var value = '';
+      var unitObj = [];
 
-      // Start with digit when there is no currency unit.
-      if (rawInput.match(/^\d/)) {
-        var ind = rawInput.indexOf(rawInput.match(/[a-z(]/i));
-        if (ind === -1) {
-          // There is value with no units.
-          value = rawInput;
-          units = '';
+      // Allow validation only when rawInput is not null or an empty string.
+      if (rawInput !== '' && rawInput !== null) {
+        // Start with digit when there is no currency unit.
+        if (rawInput.match(/^\d/)) {
+          var ind = rawInput.indexOf(rawInput.match(/[a-z(]/i));
+          if (ind === -1) {
+            // There is value with no units.
+            value = rawInput;
+            units = '';
+          } else {
+            value = rawInput.substr(0, ind).trim();
+            units = rawInput.substr(ind).trim();
+          }
         } else {
-          value = rawInput.substr(0, ind).trim();
-          units = rawInput.substr(ind).trim();
+          if (!rawInput.startsWith('$ ') && !rawInput.startsWith('Rs ') &&
+            !rawInput.startsWith('₹ ')) {
+            throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+          }
+          var ind = rawInput.indexOf(' ');
+          if (ind === -1) {
+            throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+          }
+          units = rawInput.substr(0, ind) + ' ';
+          var ind2 = rawInput.indexOf(
+            rawInput.substr(ind + 1).match(/[a-z(]/i));
+          if (ind2 !== -1) {
+            value = rawInput.substr(ind + 1, ind2 - ind - 1).trim();
+            units += rawInput.substr(ind2).trim();
+          } else {
+            value = rawInput.substr(ind + 1).trim();
+            units = units.trim();
+          }
         }
-      } else {
-        if (!rawInput.startsWith('$ ') && !rawInput.startsWith('Rs ') &&
-          !rawInput.startsWith('₹ ')) {
-          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+        // Checking invalid characters in value.
+        if (value.match(/[a-z]/i) || value.match(/[*^$₹()#@]/)) {
+          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_VALUE);
         }
-        var ind = rawInput.indexOf(' ');
-        if (ind === -1) {
-          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
-        }
-        units = rawInput.substr(0, ind) + ' ';
-        var ind2 = rawInput.indexOf(rawInput.substr(ind + 1).match(/[a-z(]/i));
-        if (ind2 !== -1) {
-          value = rawInput.substr(ind + 1, ind2 - ind - 1).trim();
-          units += rawInput.substr(ind2).trim();
+
+        if (value.includes('/')) {
+          type = 'fraction';
+          fractionObj = FractionObjectFactory.fromRawInputString(value);
         } else {
-          value = rawInput.substr(ind + 1).trim();
-          units = units.trim();
+          type = 'real';
+          real = parseFloat(value);
         }
-      }
-      // Checking invalid characters in value.
-      if (value.match(/[a-z]/i) || value.match(/[*^$₹()#@]/)) {
-        throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_VALUE);
+        if (units !== '') {
+          // Checking invalid characters in units.
+          if (units.match(/[^0-9a-z/* ^()₹$-]/i)) {
+            throw new Error(
+              NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
+          }
+        }
       }
 
-      if (value.includes('/')) {
-        type = 'fraction';
-        fractionObj = FractionObjectFactory.fromRawInputString(value);
-      } else {
-        type = 'real';
-        real = parseFloat(value);
-      }
-      if (units !== '') {
-        // Checking invalid characters in units.
-        if (units.match(/[^0-9a-z/* ^()₹$-]/i)) {
-          throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_UNIT_CHARS);
-        }
-      }
       unitsObj = UnitsObjectFactory.fromRawInputString(units);
       return new NumberWithUnits(type, real, fractionObj, unitsObj);
     };
@@ -129,8 +146,8 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       return new NumberWithUnits(
         numberWithUnitsDict.type,
         numberWithUnitsDict.real,
-        numberWithUnitsDict.fraction,
-        numberWithUnitsDict.units);
+        FractionObjectFactory.fromDict(numberWithUnitsDict.fraction),
+        UnitsObjectFactory.fromList(numberWithUnitsDict.units));
     };
 
     return NumberWithUnits;
@@ -138,8 +155,8 @@ oppia.factory('NumberWithUnitsObjectFactory', [
 ]);
 
 oppia.factory('UnitsObjectFactory', [function() {
-  var Units = function(units) {
-    this.units = units;
+  var Units = function(unitsList) {
+    this.units = unitsList;
   };
 
   var isunit = function(unit) {
@@ -206,7 +223,15 @@ oppia.factory('UnitsObjectFactory', [function() {
     return unitsWithMultiplier;
   };
 
-  var unitToDict = function(unitsWithMultiplier) {
+  var convertUnitDictToList = function(unitDict) {
+    var unitList = [];
+    for (var key in unitDict) {
+      unitList.push({unit: key, exponent: unitDict[key]});
+    }
+    return unitList;
+  };
+
+  var unitToList = function(unitsWithMultiplier) {
     var unitDict = {};
     for (var i = 0; i < unitsWithMultiplier.length; i++) {
       var unit = unitsWithMultiplier[i][0];
@@ -224,23 +249,34 @@ oppia.factory('UnitsObjectFactory', [function() {
       }
       unitDict[s] += multiplier * power;
     }
-    return unitDict;
+    return convertUnitDictToList(unitDict);
   };
 
   Units.prototype.toDict = function() {
-    return unitToDict(unitWithMultiplier(Units.stringToLexical(this.units)));
+    return {
+      units: this.units
+    };
+  };
+
+  Units.fromList = function(unitsList) {
+    return new Units(unitsList);
+  };
+
+  Units.fromStringToList = function(unitsString) {
+    return unitToList(unitWithMultiplier(Units.stringToLexical(unitsString)));
   };
 
   Units.prototype.toString = function() {
-    return this.units.trim();
-  };
-
-  Units.fromDictToString = function(unitDict) {
-    var units = '';
-    for (var key in unitDict) {
-      units += key + '^' + unitDict[key].toString() + ' ';
+    var unit = '';
+    for (var i = 0; i < this.units.length; i++) {
+      var d = this.units[i];
+      if (d.unit === '$' || d.unit === 'Rs' || d.unit === '₹') {
+        unit += d.unit + ' ';
+      } else {
+        unit += d.unit + '^' + d.exponent.toString() + ' ';
+      }
     }
-    return units.trim();
+    return unit.trim();
   };
 
   Units.fromRawInputString = function(units) {
@@ -255,7 +291,7 @@ oppia.factory('UnitsObjectFactory', [function() {
         throw new Error(err);
       }
     }
-    return new Units(units);
+    return new Units(Units.fromStringToList(units));
   };
 
   return Units;

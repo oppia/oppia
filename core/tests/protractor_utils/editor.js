@@ -213,6 +213,7 @@ var openInteraction = function(interactionId) {
     GraphInput: 'Math',
     LogicProof: 'Math',
     NumericInput: 'Math',
+    NumberWithUnits: 'Math',
     SetInput: 'Math',
     CodeRepl: 'Programming',
     MusicNotesInput: 'Music',

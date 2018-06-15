@@ -484,6 +484,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'NumericInput',
         'SetInput',
         'MathExpressionInput',
+        'NumberWithUnits',
     ]
 }, {
     'name': 'Programming',
