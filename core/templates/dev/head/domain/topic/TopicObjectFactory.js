@@ -257,6 +257,7 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     // tests.
     Topic.createEmptyTopic = function() {
       return new Topic({
+        next_subtopic_id: 1,
         additional_story_ids: [],
         canonical_story_ids: [],
         uncategorized_skill_ids: [],

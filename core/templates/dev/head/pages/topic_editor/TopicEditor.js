@@ -22,7 +22,11 @@ oppia.constant(
   'TOPIC_MANAGER_RIGHTS_URL_TEMPLATE',
   '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');
 
-oppia.controller('TopicEditor', [
-  function() {
+oppia.constant(
+  'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
+
+oppia.controller('TopicEditor', ['TopicEditorStateService',
+  function(TopicEditorStateService) {
+    TopicEditorStateService.loadTopic(GLOBALS.topicId);
   }
 ]);

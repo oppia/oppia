@@ -1,5 +1,41 @@
 {% extends 'pages/base.html' %}
-<script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/EditableTopicBackendApiService.js"></script>
-<script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicUpdateService.js"></script>
-<script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicObjectFactory.js"></script>
-<script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/SubtopicObjectFactory.js"></script>
+
+{% block maintitle %}
+  Untitled Topic - Oppia Editor
+{% endblock maintitle %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.topicId = JSON.parse('{{topic_id|js_string}}');
+  </script>
+{% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <topic-editor-navbar-breadcrumb>
+  </topic-editor-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block content %}
+<div ng-controller="TopicEditor">
+  <div>
+    <topic-main-editor></topic-main-editor>
+  </div>
+</div>
+{% endblock content%}
+
+{% block footer_js %}
+  {{ super() }}
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/main_editor/TopicEditorTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditor.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/EditableTopicBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicUpdateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/SubtopicObjectFactory.js"></script>
+{% endblock footer_js %}

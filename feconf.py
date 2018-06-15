@@ -374,7 +374,7 @@ ENABLE_PROMO_BAR = True
 ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = False
+ENABLE_NEW_STRUCTURES = True
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -667,6 +667,7 @@ NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
 NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
+NAV_MODE_TOPIC_EDITOR = 'topic_editor'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

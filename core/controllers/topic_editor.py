@@ -79,10 +79,12 @@ class TopicEditorPage(base.BaseHandler):
                 Exception('The topic with the given id doesn\'t exist.'))
 
         self.values.update({
-            'topic_id': topic.id
+            'topic_id': topic.id,
+            'nav_mode': feconf.NAV_MODE_TOPIC_EDITOR
         })
 
-        self.render_template('pages/topic_editor/topic_editor.html')
+        self.render_template(
+            'pages/topic_editor/topic_editor.html', redirect_url_on_logout='/')
 
 
 class EditableSubtopicPageDataHandler(base.BaseHandler):
