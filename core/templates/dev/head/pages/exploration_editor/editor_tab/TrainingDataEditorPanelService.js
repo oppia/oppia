@@ -73,7 +73,7 @@ oppia.factory('TrainingDataEditorPanelService', [
                 $scope.trainingData = [];
                 TrainingDataService.getTrainingDataOfAnswerGroup(
                   answerGroupIndex).forEach(function(answer) {
-                  answerTemplate = (
+                  var answerTemplate = (
                     ExplorationHtmlFormatterService.getAnswerHtml(
                       answer, stateInteractionIdService.savedMemento,
                       stateCustomizationArgsService.savedMemento));
