@@ -140,16 +140,16 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
           break;
         }
       }
-      if (isNewlyCreated && subtopicDeleted) {
+      if (!subtopicDeleted) {
+        throw Error('Subtopic to delete does not exist');
+      }
+      if (isNewlyCreated) {
         for (var i = 0; i < this._subtopics.length; i++) {
           if (this._subtopics[i].getId() > subtopicId) {
             this._subtopics[i].decrementId();
           }
         }
         this._nextSubtopicId--;
-      }
-      if (!subtopicDeleted) {
-        throw Error('Subtopic to delete does not exist');
       }
     };
 
@@ -226,9 +226,11 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
           break;
         }
       }
-      if (this._uncategorizedSkillIds.indexOf(skillId) !== -1 ||
-          skillIsPresentInSomeSubtopic) {
+      if (skillIsPresentInSomeSubtopic) {
         throw Error('Given skillId is already present in a subtopic.');
+      }
+      if (this._uncategorizedSkillIds.indexOf(skillId) !== -1) {
+        throw Error('Given skillId is already an uncategorized skill.');
       }
       this._uncategorizedSkillIds.push(skillId);
     };
