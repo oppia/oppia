@@ -35,14 +35,14 @@ describe('Topic rights object factory', function() {
 
   it('should be able to publish and unpublish topic when user can edit it',
     function() {
-    expect(sampleTopicRights.getIsPublished()).toBe(false);
+      expect(sampleTopicRights.getIsPublished()).toBe(false);
 
-    sampleTopicRights.publishTopic();
-    expect(sampleTopicRights.getIsPublished()).toBe(true);
+      sampleTopicRights.publishTopic();
+      expect(sampleTopicRights.getIsPublished()).toBe(true);
 
-    sampleTopicRights.unpublishTopic();
-    expect(sampleTopicRights.getIsPublished()).toBe(false);
-  });
+      sampleTopicRights.unpublishTopic();
+      expect(sampleTopicRights.getIsPublished()).toBe(false);
+    });
 
   it('should throw error and not be able to publish or unpublish topic when ' +
     'user cannot edit topic',
