@@ -143,7 +143,11 @@ oppia.controller('FeedbackTab', [
             return $scope.activeThread.status;
           },
           description: function() {
-            return $scope.activeThread.description;
+            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+              return $scope.activeThread.description;
+            } else {
+              return $scope.activeThread.suggestion.description;
+            }
           },
           currentContent: function() {
             var stateName;
