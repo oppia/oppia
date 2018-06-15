@@ -217,3 +217,11 @@ def update_question(
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)
+
+def get_new_question_id():
+    """Returns a new question id.
+
+    Returns:
+        str. A new question id.
+    """
+    return question_models.QuestionModel.get_new_id('')

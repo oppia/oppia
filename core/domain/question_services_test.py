@@ -118,3 +118,19 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             model.question_data_schema_version, question_data_schema_version)
         self.assertEqual(model.language_code, language_code)
+
+    def test_commit_log_entry(self):
+        question = question_domain.Question(
+            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
+
+        self.QUESTION_ID = question_services.add_question(
+            self.owner_id, question)
+
+        question_commit_log_entry = (
+            question_models.QuestionCommitLogEntryModel.get_commit(
+                self.QUESTION_ID, 1)
+        )
+        self.assertEqual(question_commit_log_entry.commit_type, 'create')
+        self.assertEqual(
+            question_commit_log_entry.question_id, self.QUESTION_ID)
+        self.assertEqual(question_commit_log_entry.user_id, self.owner_id)
