@@ -38,12 +38,6 @@ var answerObjectType = 'NumberWithUnits';
 
 var testSuite = [{
   interactionArguments: [],
-  ruleArguments: ['IsEqualTo', '2 km / hr'],
-  expectedInteractionDetails: [],
-  wrongAnswers: ['2000 m / hr'],
-  correctAnswers: ['2 km / hr']
-}, {
-  interactionArguments: [],
   ruleArguments: ['IsEquivalentTo', '2 km / hr'],
   expectedInteractionDetails: [],
   wrongAnswers: ['2 m / s'],
