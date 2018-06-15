@@ -62,12 +62,12 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.login(self.ADMIN_EMAIL)
             json_response = self.get_json(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
-            self.assertEqual(len(json_response['topic_summaries']), 1)
+            self.assertEqual(len(json_response['topic_summary_dicts']), 1)
             self.assertEqual(
-                json_response['topic_summaries'][0]['id'], self.topic_id)
-            self.assertEqual(len(json_response['skill_summaries']), 1)
+                json_response['topic_summary_dicts'][0]['id'], self.topic_id)
+            self.assertEqual(len(json_response['skill_summary_dicts']), 1)
             self.assertEqual(
-                json_response['skill_summaries'][0]['id'], skill_id)
+                json_response['skill_summary_dicts'][0]['id'], skill_id)
             self.logout()
 
             # Check that topic managers can access the topics and skills
@@ -75,14 +75,13 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.login(self.ADMIN_EMAIL)
             json_response = self.get_json(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
-            self.assertEqual(len(json_response['topic_summaries']), 1)
+            self.assertEqual(len(json_response['topic_summary_dicts']), 1)
             self.assertEqual(
-                json_response['topic_summaries'][0]['id'], self.topic_id)
-            self.assertEqual(len(json_response['skill_summaries']), 1)
+                json_response['topic_summary_dicts'][0]['id'], self.topic_id)
+            self.assertEqual(len(json_response['skill_summary_dicts']), 1)
             self.assertEqual(
-                json_response['skill_summaries'][0]['id'], skill_id)
+                json_response['skill_summary_dicts'][0]['id'], skill_id)
             self.logout()
-
 
 
 class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):

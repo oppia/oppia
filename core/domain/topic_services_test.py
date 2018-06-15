@@ -89,6 +89,16 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
         self.assertEqual(topic_summaries[0].subtopic_count, 1)
 
+    def test_get_all_summaries(self):
+        topic_summaries = topic_services.get_all_topic_summaries()
+
+        self.assertEqual(len(topic_summaries), 1)
+        self.assertEqual(topic_summaries[0].name, 'Name')
+        self.assertEqual(topic_summaries[0].canonical_story_count, 2)
+        self.assertEqual(topic_summaries[0].additional_story_count, 1)
+        self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
+        self.assertEqual(topic_summaries[0].subtopic_count, 1)
+
     def test_get_new_topic_id(self):
         new_topic_id = topic_services.get_new_topic_id()
 

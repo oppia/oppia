@@ -36,6 +36,10 @@ oppia.factory('SubtopicObjectFactory', [
       return --this._id;
     };
 
+    Subtopic.prototype.incrementId = function() {
+      return ++this._id;
+    };
+
     // Returns the title of the subtopic.
     Subtopic.prototype.getTitle = function() {
       return this._title;
