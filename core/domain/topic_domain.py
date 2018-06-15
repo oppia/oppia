@@ -46,7 +46,7 @@ CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
-CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'REMOVE_SKILL_ID_FROM_SUBTOPIC'
+CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
@@ -765,8 +765,10 @@ class TopicSummary(object):
             'additional_story_count': self.additional_story_count,
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
-            'topic_model_created_on': self.topic_model_created_on,
-            'topic_model_last_updated': self.topic_model_last_updated
+            'topic_model_created_on': utils.get_time_in_millisecs(
+                self.topic_model_created_on),
+            'topic_model_last_updated': utils.get_time_in_millisecs(
+                self.topic_model_last_updated)
         }
 
 
