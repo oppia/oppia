@@ -452,11 +452,11 @@
         }
       },
       "uiTree": {
-        "version": "2.22.6",
+        "version": "",
         "downloadFormat": "zip",
         "url": "https://github.com/angular-ui-tree/angular-ui-tree/archive/master.zip",
-        "rootDirPrefix": "ui-tree-",
-        "targetDirPrefix": "ui-tree-",
+        "rootDirPrefix": "angular-ui-tree-master",
+        "targetDirPrefix": "ui-tree-2.22.6",
         "bundle": {
           "css": ["dist/angular-ui-tree.min.css"],
           "js": ["dist/angular-ui-tree.js"]
