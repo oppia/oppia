@@ -1,6 +1,5 @@
 <div role="form" class="form-horizontal topic-editor">
   <md-card class="oppia-page-card oppia-long-text">
-
     <div class="topic-name">
       <span ng-if="!topicNameEditorIsShown" ng-click="switchTopicNameEditor()"
             class="oppia-editable-section">
@@ -20,16 +19,15 @@
 
     <div class="topic-description" ng-class="{'has-error': !displayedTopicDescription}">
       <label for="topicDescription" style="font-size: 1.2em;">Description</label>
-        <textarea type="text" class="form-control"
-               ng-model="editableDescription"
-               ng-change="displayedTopicDescription = (editableDescription !== '')"
-               ng-blur="updateTopicDescription(editableDescription)"
-               placeholder="Enter the description of the topic"></textarea>
-        <span ng-if="!displayedTopicDescription" class="help-block" style="font-size: smaller">
-          What does this topic contain?
-        </span>
+      <textarea type="text" class="form-control"
+                ng-model="editableDescription"
+                ng-change="displayedTopicDescription = (editableDescription !== '')"
+                ng-blur="updateTopicDescription(editableDescription)"
+                placeholder="Enter the description of the topic"></textarea>
+      <span ng-if="!displayedTopicDescription" class="help-block" style="font-size: smaller">
+        What does this topic contain?
+      </span>
     </div>
-    
   </md-card>
 </div>
 
