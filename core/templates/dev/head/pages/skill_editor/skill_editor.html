@@ -4,22 +4,32 @@
   Skill Editor
 {% endblock maintitle %}
 
+{% block local_top_nav_options %}
+<!--   <skill-editor-navbar>
+  </skill-editor-navbar> -->
+{% endblock local_top_nav_options %}
+
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
+    GLOBALS.skillId = JSON.parse('{{skill_id|js_string}}');
   </script>
 {% endblock header_js %}
 
 {% block content %}
-<!--   <div ng-controller="SkillEditor">
-    <div ng-if="getTabStatuses().active === 'main'">
+  <div ng-controller="SkillEditor">
+    <!-- <div ng-if="getTabStatuses().active === 'main'"> -->
       <skill-editor-main-tab></skill-editor-main-tab>
-    </div>
-  </div> -->
-  Testttt!
+    <!--</div>-->
+  </div>
 {% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillEditorMainTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditorStateService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/SkillObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/EditableSkillBackendApiService.js"></script>
 {% endblock footer_js %}

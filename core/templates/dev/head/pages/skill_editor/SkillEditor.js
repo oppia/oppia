@@ -13,22 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the main tab of the skill editor.
+ * @fileoverview Primary controller for the skill editor page.
  */
 
-oppia.directive('skillEditorMainTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
-    return {
-      restrict: 'E',
-      scope: {},
-      templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/skill_editor/editor_tab/' +
-        'skill_editor_main_tab_directive.html'),
-      controller: [
-        '$scope',
-        function($scope) {
-          
-        }
-      ]
-    }
-  }]);
+oppia.constant(
+  'EDITABLE_SKILL_DATA_URL_TEMPLATE',
+  '/skill_editor_handler/data/<skill_id>')
+
+oppia.controller('SkillEditor', [
+  'SkillEditorStateService',
+  function(SkillEditorStateService) {
+    SkillEditorStateService.loadSkill(GLOBALS.skillId);
+  }
+]);

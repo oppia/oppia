@@ -28,7 +28,7 @@ oppia.factory('SkillObjectFactory', [
     };
 
     Skill.prototype.toBackendDict = function() {
-
+      console.log("Not implemented.");
     };
 
     Skill.createFromBackendDict = function(skillBackendDict) {
@@ -38,6 +38,10 @@ oppia.factory('SkillObjectFactory', [
         generateMisconceptionsFromBackendDict(skillBackendDict.misconceptions),
         ConceptCardObjectFactory.createFromBackendDict(skillBackendDict.skill_contents),
         skillBackendDict.language_code);
+    };
+
+    Skill.createEmptySkill = function() {
+      return new Skill(null, '', [], null, null);
     };
 
     var generateMisconceptionsFromBackendDict = function(
@@ -52,4 +56,7 @@ oppia.factory('SkillObjectFactory', [
     Skill.prototype.setDescription = function(description) {
       this._description = description;
     };
-  }]);
+
+    return Skill;
+  }
+]);

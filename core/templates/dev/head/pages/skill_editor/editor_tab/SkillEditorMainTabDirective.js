@@ -17,12 +17,21 @@
  */
 
 oppia.directive('skillEditorMainTab', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'SkillEditorStateService',
+  function(UrlInterpolationService, SkillEditorStateService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill_editor/editor_tab/' +
-        'skill_editor_main_tab_directive.html')
+        'skill_editor_main_tab_directive.html'),
+      controller: [
+        '$scope', 'SkillEditorStateService',
+        function($scope, SkillEditorStateService) {
+          $scope.hasLoadedSkill = SkillEditorStateService.hasLoadedSkill;
+          $scope.skill = SkillEditorStateService.getSkill();
+        }
+      ]
     }
-  }]);
+  }
+]);
