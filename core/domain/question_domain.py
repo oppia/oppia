@@ -39,9 +39,6 @@ CMD_UPDATE_QUESTION_PROPERTY = 'update_question_property'
 CMD_ADD_QUESTION_SKILL = 'add_question_skill'
 CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
 
-# This takes additional 'title' and 'category' parameters.
-CMD_CREATE_NEW = 'create_new'
-
 
 class QuestionChange(object):
     """Domain object for changes made to question object."""
@@ -344,22 +341,3 @@ class QuestionCommitLogEntry(object):
         self.version = version
         self.post_commit_status = post_commit_status
         self.post_commit_is_private = post_commit_is_private
-
-    def to_dict(self):
-        """Returns a dict representing this QuestionCommitLogEntry domain
-        object. This omits created_on, user_id and commit_cmds.
-
-        Returns:
-            dict. A dict, mapping all fields of QuestionCommitLogEntry
-            instance, except created_on, user_id and commit_cmds fields.
-        """
-        return {
-            'last_updated': utils.get_time_in_millisecs(self.last_updated),
-            'username': self.username,
-            'question_id': self.question_id,
-            'commit_type': self.commit_type,
-            'commit_message': self.commit_message,
-            'version': self.version,
-            'post_commit_status': self.post_commit_status,
-            'post_commit_is_private': self.post_commit_is_private,
-        }

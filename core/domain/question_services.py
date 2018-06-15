@@ -20,7 +20,6 @@ import logging
 
 from core.domain import question_domain
 from core.platform import models
-from core.domain import user_services
 import feconf
 
 (question_models,) = models.Registry.import_models([models.NAMES.question])
@@ -218,24 +217,3 @@ def update_question(
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)
-
-
-def save_new_question(committer_id, question):
-    """Saves a newly created question.
-
-    Args:
-        committer_id: str. The id of the user who made the commit.
-        question: Question. The question domain object to be saved.
-    """
-    commit_message = (
-        ('New question created with title \'%s\'.' % question.title)
-        if question.title else 'New question created.')
-    _save_question(
-        committer_id, question, [{
-            'cmd': question_domain.CMD_CREATE_NEW,
-            'title': question.title,
-            'category': question.category,
-        }], commit_message)
-    user_services.add_created_question_id(committer_id, question.id)
-    user_services.add_edited_question_id(committer_id, question.id)
-    user_services.record_user_created_an_question(committer_id)
