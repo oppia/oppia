@@ -86,10 +86,12 @@ oppia.factory('TrainingDataService', [
         var trainingDataAnswers = [];
         var answerGroups = ResponsesService.getAnswerGroups();
 
-        // Remove the answer from all answer groups.
         for (var i = 0; i < answerGroups.length; i++) {
           var answerGroup = answerGroups[i];
-          trainingDataAnswers.push(answerGroup.trainingData);
+          trainingDataAnswers.push({
+            answerGroupIndex: i,
+            answers: answerGroup.trainingData
+          });
         }
         return trainingDataAnswers;
       },
@@ -114,7 +116,7 @@ oppia.factory('TrainingDataService', [
         return potentialOutcomes;
       },
 
-      trainAnswerGroup: function(answerGroupIndex, answer) {
+      associateWithAnswerGroup: function(answerGroupIndex, answer) {
         // Remove answer from traning data of any answer group or
         // confirmed unclassified answers.
         _removeAnswer(answer);
@@ -129,7 +131,7 @@ oppia.factory('TrainingDataService', [
         });
       },
 
-      trainDefaultResponse: function(answer) {
+      associateWithDefaultResponse: function(answer) {
         // Remove answer from traning data of any answer group or
         // confirmed unclassified answers.
         _removeAnswer(answer);

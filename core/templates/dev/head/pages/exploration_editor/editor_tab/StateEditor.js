@@ -158,9 +158,10 @@ oppia.directive('trainingPanel', [
             $scope.classification.answerGroupIndex = index;
 
             if (index === ResponsesService.getAnswerGroupCount()) {
-              TrainingDataService.trainDefaultResponse($scope.answer);
+              TrainingDataService.associateWithDefaultResponse($scope.answer);
             } else {
-              TrainingDataService.trainAnswerGroup(index, $scope.answer);
+              TrainingDataService.associateWithAnswerGroup(
+                index, $scope.answer);
             }
 
             $scope.onFinishTraining();
@@ -177,7 +178,8 @@ oppia.directive('trainingPanel', [
 
               // Train the group with the answer.
               var index = ResponsesService.getAnswerGroupCount() - 1;
-              TrainingDataService.trainAnswerGroup(index, $scope.answer);
+              TrainingDataService.associateWithAnswerGroup(
+                index, $scope.answer);
             }
 
             $scope.onFinishTraining();

@@ -291,30 +291,34 @@ oppia.controller('StateResponses', [
               }).success(function(response) {
                 $scope.showUnresolvedAnswers(response.unresolved_answers);
               }).error(function(response) {
+                $log.error(
+                  'Error occurred while fetching unresolved answers ' +
+                  'for exploration ' + _explorationId + 'state ' + _stateName +
+                  ': ' + response);
                 $scope.showUnresolvedAnswers([]);
               });
             };
 
             $scope.showUnresolvedAnswers = function(unresolvedAnswers) {
-              $scope.showLoadingDots = false;
+              $scope.loadingDotsAreShown = false;
               $scope.unresolvedAnswers = [];
 
               unresolvedAnswers.forEach(function(item) {
                 var answer = item.answer;
-                var answerTemplate = (
-                  ExplorationHtmlFormatterService.getAnswerHtml(
-                    answer, stateInteractionIdService.savedMemento,
-                    stateCustomizationArgsService.savedMemento));
                 var classificationResult = (
                   AnswerClassificationService.getMatchingClassificationResult(
                     _explorationId, _stateName, _state, answer, rulesService));
-                var feedbackHtml = (
-                  classificationResult.outcome.feedback.getHtml());
                 var classificationType = (
                   classificationResult.classificationCategorization);
                 if (classificationType !== EXPLICIT_CLASSIFICATION &&
                   classificationType !== TRAINING_DATA_CLASSIFICATION &&
                   !TrainingDataService.isConfirmedUnclassifiedAnswer(answer)) {
+                  var answerTemplate = (
+                    ExplorationHtmlFormatterService.getAnswerHtml(
+                      answer, stateInteractionIdService.savedMemento,
+                      stateCustomizationArgsService.savedMemento));
+                  var feedbackHtml = (
+                    classificationResult.outcome.feedback.getHtml());
                   $scope.unresolvedAnswers.push({
                     answer: answer,
                     answerTemplate: answerTemplate,
@@ -325,28 +329,26 @@ oppia.controller('StateResponses', [
               });
             };
 
-            $scope.confirmToTrainingData = function(answerIndex) {
+            $scope.confirmAnswerAssignment = function(answerIndex) {
               answer = $scope.unresolvedAnswers[answerIndex];
               $scope.unresolvedAnswers.splice(answerIndex, 1);
               if (answer.classificationResult.classificationCategorization ===
                   DEFAULT_OUTCOME_CLASSIFICATION) {
-                TrainingDataService.trainDefaultResponse(answer.answer);
+                TrainingDataService.associateWithDefaultResponse(answer.answer);
                 return;
               }
 
-              TrainingDataService.trainAnswerGroup(
+              TrainingDataService.associateWithAnswerGroup(
                 answer.classificationResult.answerGroupIndex, answer.answer);
             };
 
-            $scope.finishTrainingAnswer = function() {
-              $scope.unresolvedAnswers.splice($scope.selectedAnswerIndex, 1);
-            };
-
             $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
-              $scope.selectedAnswerIndex = answerIndex;
+              var selectedAnswerIndex = answerIndex;
               answer = $scope.unresolvedAnswers[answerIndex].answer;
               return TrainingModalService.openTrainUnresolvedAnswerModal(
-                answer, true, $scope.finishTrainingAnswer);
+                answer, true, function() {
+                  $scope.unresolvedAnswers.splice(selectedAnswerIndex, 1);
+                });
             };
 
             $scope.finishTeaching = function(reopen) {
@@ -355,7 +357,7 @@ oppia.controller('StateResponses', [
               });
             };
 
-            $scope.showLoadingDots = true;
+            $scope.loadingDotsAreShown = true;
             fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
           }]
       }).result.then(function(result) {

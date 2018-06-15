@@ -14,16 +14,22 @@
 
 /**
  * @fileoverview Service which handles opening and closing
- * the training data of an answer group.
+ * the training data editor of an answer group.
  */
 
 oppia.factory('TrainingDataEditorPanelService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
     return {
+      /**
+      * Opens training data editor for currently selected answer group.
+      * @param {boolean} externalSave - Whether to save the modified training
+           data externally in state.
+      */
       openTrainingDataEditor: function(externalSave) {
         AlertsService.clearWarnings();
         if (externalSave) {
+          // Save the modified training data externally in state's content.
           $rootScope.$broadcast('externalSave');
         }
         $uibModal.open({
@@ -39,7 +45,7 @@ oppia.factory('TrainingDataEditorPanelService', [
             'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
             'ExplorationHtmlFormatterService', 'ResponsesService',
             'stateCustomizationArgsService', 'TrainingDataService',
-            'TrainingModalService',
+            'TrainingModalService', 'FocusManagerService',
             function($scope, $injector, $uibModalInstance,
                 ExplorationStatesService, EditorStateService,
                 AnswerClassificationService, ExplorationContextService,
@@ -47,19 +53,20 @@ oppia.factory('TrainingDataEditorPanelService', [
                 EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION,
                 ExplorationHtmlFormatterService, ResponsesService,
                 stateCustomizationArgsService, TrainingDataService,
-                TrainingModalService) {
+                TrainingModalService, FocusManagerService) {
               var _explorationId = ExplorationContextService.getExplorationId();
               var _stateName = EditorStateService.getActiveStateName();
               var _state = ExplorationStatesService.getState(_stateName);
               var answerGroupIndex = (
                 ResponsesService.getActiveAnswerGroupIndex());
 
+              var TEST_INTERACTION_INPUT = 'testInteractionInput';
               $scope.stateContent = _state.content.getHtml();
               $scope.inputTemplate = (
                 ExplorationHtmlFormatterService.getInteractionHtml(
                   stateInteractionIdService.savedMemento,
                   stateCustomizationArgsService.savedMemento,
-                  false, 'testInteractionInput'));
+                  false, TEST_INTERACTION_INPUT));
               $scope.trainingData = [];
 
               var _rebuildTrainingData = function() {
@@ -79,12 +86,13 @@ oppia.factory('TrainingDataEditorPanelService', [
 
               $scope.init = function() {
                 _rebuildTrainingData();
-                $scope.newAnswerIsResolved = false;
+                $scope.newAnswerIsAlreadyResolved = false;
                 $scope.answerSuccessfullyAdded = false;
+                FocusManagerService.setFocus(TEST_INTERACTION_INPUT);
               };
 
               $scope.removeAnswerFromTrainingData = function(answerIndex) {
-                answer = $scope.trainingData[answerIndex].answer;
+                var answer = $scope.trainingData[answerIndex].answer;
                 TrainingDataService.removeAnswerFromAnswerGroupTrainingData(
                   answer, answerGroupIndex);
                 $scope.trainingData.splice(answerIndex, 1);
@@ -95,7 +103,7 @@ oppia.factory('TrainingDataEditorPanelService', [
               };
 
               $scope.submitAnswer = function(newAnswer) {
-                $scope.newAnswerIsResolved = false;
+                $scope.newAnswerIsAlreadyResolved = false;
                 $scope.answerSuccessfullyAdded = false;
 
                 var interactionId = stateInteractionIdService.savedMemento;
@@ -116,14 +124,14 @@ oppia.factory('TrainingDataEditorPanelService', [
                   AnswerClassificationService.getMatchingClassificationResult(
                     _explorationId, _stateName, _state,
                     newAnswer, rulesService));
-                var newAnswerFeedbackHtml = 'Nothing';
+                var newAnswerFeedbackHtml = '';
                 var newAnswerOutcomeDest = classificationResult.outcome.dest;
                 if (classificationResult.outcome.hasNonemptyFeedback()) {
                   newAnswerFeedbackHtml = (
                     classificationResult.outcome.feedback.getHtml());
                 }
                 if (newAnswerOutcomeDest === _stateName) {
-                  dest = '<em>(try again)</em>';
+                  newAnswerOutcomeDest = '(try again)';
                 }
 
                 $scope.newAnswerTemplate = newAnswerTemplate;
@@ -137,9 +145,9 @@ oppia.factory('TrainingDataEditorPanelService', [
                 // classification results to the creator.
                 if (classificationType === EXPLICIT_CLASSIFICATION ||
                     classificationType === TRAINING_DATA_CLASSIFICATION) {
-                  $scope.newAnswerIsResolved = true;
+                  $scope.newAnswerIsAlreadyResolved = true;
                 } else {
-                  TrainingDataService.trainAnswerGroup(
+                  TrainingDataService.associateWithAnswerGroup(
                     answerGroupIndex, newAnswer);
                   _rebuildTrainingData();
                   $scope.answerSuccessfullyAdded = true;
@@ -147,13 +155,9 @@ oppia.factory('TrainingDataEditorPanelService', [
               };
 
               $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
-                answer = $scope.trainingData[answerIndex].answer;
+                var answer = $scope.trainingData[answerIndex].answer;
                 return TrainingModalService.openTrainUnresolvedAnswerModal(
-                  answer, true, $scope.finishTrainingAnswer);
-              };
-
-              $scope.finishTrainingAnswer = function() {
-                _rebuildTrainingData();
+                  answer, true, _rebuildTrainingData());
               };
 
               $scope.init();
