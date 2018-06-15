@@ -6,8 +6,8 @@
       <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-3 audio-language-description">
           <span class="needs-update-marker"
-                ng-attr-uib-tooltip="<[audioTranslation.needsUpdate ? 'Audio might not match text. Reupload the file, or click to unflag.' : 'Click to mark this audio translation as not matching text.']>"
-                ng-click="toggleNeedsUpdateAttribute(languageCode)">
+                ng-attr-uib-tooltip="<[getNeedsUpdateTooltipMessage(audioTranslation.needsUpdate)]>"
+                ng-click="isEditable() && toggleNeedsUpdateAttribute(languageCode)">
             <i ng-if="audioTranslation.needsUpdate" class="material-icons needs-update">&#xE002;</i>
             <i ng-if="!audioTranslation.needsUpdate" class="material-icons is-current">&#xE876;</i>
           </span>
