@@ -65,6 +65,23 @@ oppia.directive('audioTranslationsEditor', [
                 explorationId, filename));
           };
 
+          $scope.isFullyTranslated = function() {
+            stateContentIdsToAudioTranslationsService.displayed
+              .isFullyTranslated($scope.contentId);
+          };
+
+          $scope.getNeedsUpdateTooltipMessage = function(needsUpdate) {
+            if (needsUpdate) {
+              return ($scope.isEditable() ? 'Audio might not match text.' +
+                ' Reupload the file, or click to unflag.' :
+                'Audio might not match text.');
+            } else {
+              return ($scope.isEditable() ? 'Click to mark this audio ' +
+                'translation as not matching text.' :
+                'Audio translation matches text.');
+            }
+          };
+
           $scope.toggleNeedsUpdateAttribute = function(languageCode) {
             $scope.getOnStartEditFn()();
             $scope.subtitledHtml.toggleNeedsUpdateAttribute(languageCode);
