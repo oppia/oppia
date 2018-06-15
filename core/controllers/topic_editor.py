@@ -80,6 +80,7 @@ class TopicEditorPage(base.BaseHandler):
 
         self.values.update({
             'topic_id': topic.id,
+            'topic_name': topic.name,
             'nav_mode': feconf.NAV_MODE_TOPIC_EDITOR
         })
 
@@ -226,6 +227,37 @@ class EditableTopicDataHandler(base.BaseHandler):
         topic_services.delete_topic(self.user_id, topic_id)
 
 
+class TopicRightsHandler(base.BaseHandler):
+    """A handler for returning topic rights."""
+
+    @acl_decorators.can_manage_rights_for_topic
+    def get(self, topic_id):
+        """Returns the TopicRights object of a topic.
+        """
+        topic_domain.Topic.require_valid_topic_id(topic_id)
+
+        try:
+            topic_rights = topic_services.get_topic_rights(topic_id)
+            user_actions_info = user_services.UserActionsInfo(self.user_id)
+            can_edit_topic = False
+            if topic_services.check_can_edit_topic(
+                    user_actions_info, topic_rights):
+                can_edit_topic = True
+        except Exception as e:
+            raise self.PageNotFoundException(e)
+
+        topic_rights_to_return = {
+            'topic_id': topic_id,
+            'can_edit_topic': can_edit_topic,
+            'is_published': topic_rights.topic_is_published
+        }
+        self.values.update({
+            'topic_rights': topic_rights_to_return
+        })
+
+        self.render_json(self.values)
+
+
 class TopicManagerRightsHandler(base.BaseHandler):
     """A handler for assigning topic manager rights."""
 
@@ -250,6 +282,36 @@ class TopicManagerRightsHandler(base.BaseHandler):
 
         self.values.update({
             'role_updated': True
+        })
+
+        self.render_json(self.values)
+
+
+class TopicPublishHandler(base.BaseHandler):
+    """A handler for publishing and unpublishing topics."""
+
+    @acl_decorators.can_manage_rights_for_topic
+    def put(self, topic_id):
+        """Publishes or unpublishes a topic.
+        """
+        topic_domain.Topic.require_valid_topic_id(topic_id)
+
+        publish_status = self.payload.get('publish_status')
+
+        if not isinstance(publish_status, bool):
+            raise self.InvalidInputException(
+                Exception('Publish status should only be true or false.'))
+
+        try:
+            if publish_status:
+                topic_services.publish_topic(topic_id, self.user_id)
+            else:
+                topic_services.unpublish_topic(topic_id, self.user_id)
+        except Exception as e:
+            raise self.UnauthorizedUserException(e)
+
+        self.values.update({
+            'topic_status_updated': True
         })
 
         self.render_json(self.values)

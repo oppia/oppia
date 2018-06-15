@@ -348,3 +348,71 @@ class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
                 {}, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=401)
             self.assertEqual(json_response['status_code'], 401)
+
+
+class TopicRightsHandlerTest(BaseTopicEditorControllerTest):
+
+    def test_get_topic_rights(self):
+        """Test the get topic rights functionality.
+        """
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            # Test whether admin can access topic rights.
+            json_response = self.get_json(
+                '%s/%s' % (
+                    feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id))
+            self.assertEqual(
+                json_response['topic_rights']['topic_id'], self.topic_id)
+            self.assertEqual(
+                json_response['topic_rights']['is_published'], False)
+            self.logout()
+
+
+            self.login(self.NEW_USER_EMAIL)
+            # Test that other users cannot access topic rights.
+            response = self.testapp.get(
+                '%s/%s' % (
+                    feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
+
+
+class TopicPublishHandlerTest(BaseTopicEditorControllerTest):
+
+    def test_publish_and_unpublish_topic(self):
+        """Test the publish and unpublish functionality.
+        """
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            csrf_token = self.get_csrf_token_from_response(response)
+            # Test whether admin can publish and unpublish a topic.
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+                {'publish_status': True}, csrf_token=csrf_token)
+            self.assertTrue(json_response['topic_status_updated'])
+            topic_rights = topic_services.get_topic_rights(self.topic_id)
+            self.assertTrue(topic_rights.topic_is_published)
+
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+                {'publish_status': False}, csrf_token=csrf_token)
+            self.assertTrue(json_response['topic_status_updated'])
+            topic_rights = topic_services.get_topic_rights(self.topic_id)
+            self.assertFalse(topic_rights.topic_is_published)
+            self.logout()
+
+
+            self.login(self.NEW_USER_EMAIL)
+            # Test that other users cannot access topic rights.
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
+                {'publish_status': False}, csrf_token=csrf_token,
+                expect_errors=True, expected_status_int=401)
+            self.assertEqual(json_response['status_code'], 401)
+            self.logout()

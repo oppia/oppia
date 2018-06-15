@@ -1,7 +1,7 @@
 {% extends 'pages/base.html' %}
 
 {% block maintitle %}
-  Untitled Topic - Oppia Editor
+  {{ topic_name }} - Oppia
 {% endblock maintitle %}
 
 {% block header_js %}
@@ -16,26 +16,34 @@
   </topic-editor-navbar-breadcrumb>
 {% endblock navbar_breadcrumb %}
 
+{% block local_top_nav_options %}
+  <topic-editor-navbar>
+  </topic-editor-navbar>
+{% endblock local_top_nav_options %}
+
 {% block content %}
 <div ng-controller="TopicEditor">
   <div>
     <topic-main-editor></topic-main-editor>
   </div>
 </div>
-{% endblock content%}
+{% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
 
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/main_editor/TopicEditorTabDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorStateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorStateService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/EditableTopicBackendApiService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicUpdateService.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/SubtopicObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicRightsBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicRightsObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicUpdateService.js"></script>
 {% endblock footer_js %}

@@ -694,8 +694,63 @@ def get_topic_rights_from_model(topic_rights_model):
 
     return topic_domain.TopicRights(
         topic_rights_model.id,
-        topic_rights_model.manager_ids
+        topic_rights_model.manager_ids,
+        topic_rights_model.topic_is_published
     )
+
+
+def publish_topic(topic_id, committer_id):
+    """Marks the given topic as published.
+
+    Args:
+        topic_id: str. The id of the given topic.
+        committer_id: str. ID of the committer.
+
+    Raises:
+        Exception. The given topic does not exist.
+        Exception. The user does not have enought rights to publish the topic.
+    """
+    topic_rights = get_topic_rights(topic_id, strict=False)
+    if topic_rights is None:
+        raise Exception('The given topic does not exist')
+    user_actions_info = user_services.UserActionsInfo(committer_id)
+    if not check_can_edit_topic(user_actions_info, topic_rights):
+        raise Exception(
+            'The user does not have enought rights to publish the topic.')
+
+    topic_rights.topic_is_published = True
+    commit_cmds = [{
+        'cmd': topic_domain.CMD_PUBLISH_TOPIC
+    }]
+    save_topic_rights(
+        topic_rights, committer_id, 'Published the topic', commit_cmds)
+
+
+def unpublish_topic(topic_id, committer_id):
+    """Marks the given topic as unpublished.
+
+    Args:
+        topic_id: str. The id of the given topic.
+        committer_id: str. ID of the committer.
+
+    Raises:
+        Exception. The given topic does not exist.
+        Exception. The user does not have enought rights to unpublish the topic.
+    """
+    topic_rights = get_topic_rights(topic_id, strict=False)
+    if topic_rights is None:
+        raise Exception('The given topic does not exist')
+    user_actions_info = user_services.UserActionsInfo(committer_id)
+    if not check_can_edit_topic(user_actions_info, topic_rights):
+        raise Exception(
+            'The user does not have enought rights to unpublish the topic.')
+
+    topic_rights.topic_is_published = False
+    commit_cmds = [{
+        'cmd': topic_domain.CMD_UNPUBLISH_TOPIC
+    }]
+    save_topic_rights(
+        topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
 
 
 def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
@@ -713,6 +768,7 @@ def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
     model = topic_models.TopicRightsModel.get(topic_rights.id, strict=False)
 
     model.manager_ids = topic_rights.manager_ids
+    model.topic_is_published = topic_rights.topic_is_published
 
     model.commit(committer_id, commit_message, commit_cmds)
 
@@ -724,12 +780,13 @@ def create_new_topic_rights(topic_id, committer_id):
         topic_id: str. ID of the topic.
         committer_id: str. ID of the committer.
     """
-    topic_rights = topic_domain.TopicRights(topic_id, [])
+    topic_rights = topic_domain.TopicRights(topic_id, [], False)
     commit_cmds = [{'cmd': topic_domain.CMD_CREATE_NEW}]
 
     topic_models.TopicRightsModel(
         id=topic_rights.id,
-        manager_ids=topic_rights.manager_ids
+        manager_ids=topic_rights.manager_ids,
+        topic_is_published=topic_rights.topic_is_published
     ).commit(committer_id, 'Created new topic rights', commit_cmds)
 
 

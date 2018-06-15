@@ -506,6 +506,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX,
         topic_editor.TopicManagerRightsHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
+        topic_editor.TopicRightsHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_STATUS_URL_PREFIX,
+        topic_editor.TopicPublishHandler),
 
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,

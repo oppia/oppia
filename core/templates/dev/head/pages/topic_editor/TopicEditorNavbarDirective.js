@@ -25,17 +25,33 @@ oppia.directive('topicEditorNavbar', [
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'TopicEditorStateService',
-        'EditableTopicBackendApiService',
+        'TopicRightsBackendApiService',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $uibModal, AlertsService, UndoRedoService,
-            TopicEditorStateService,
-            EditableTopicBackendApiService,
+            TopicEditorStateService, TopicRightsBackendApiService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.topicId = GLOBALS.topicId;
           $scope.topic = TopicEditorStateService.getTopic();
+          $scope.topicRights = TopicEditorStateService.getTopicRights();
+
+          $scope.publishTopic = function() {
+            TopicRightsBackendApiService.publishTopic($scope.topicId).then(
+              function() {
+                $scope.topicRights.publishTopic();
+                TopicEditorStateService.setTopicRights($scope.topicRights);
+              });
+          };
+
+          $scope.unpublishTopic = function() {
+            TopicRightsBackendApiService.unpublishTopic($scope.topicId).then(
+              function() {
+                $scope.topicRights.unpublishTopic();
+                TopicEditorStateService.setTopicRights($scope.topicRights);
+              });
+          };
         }
       ]
     };

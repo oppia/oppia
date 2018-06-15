@@ -1,2 +1,16 @@
-<ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" style="margin-left: 20px;">
+<ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" style="margin-top: 1.5vh; margin-right: 2vw;"
+    ng-if="topicRights.getCanEditTopic()">
+  <button type="button" ng-if="!topicRights.getIsPublished()"
+          class="btn btn-success oppia-editor-publish-button"
+          ng-click="publishTopic()">
+    <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+       alt="Publish to Oppia Library">&#xE2C3;</i>
+    <span class="oppia-save-publish-button-label">Publish Topic</span>
+  </button>
+
+  <button type="button" ng-click="unpublishTopic()"
+          ng-if="topicRights.getIsPublished()"
+          class="btn btn-default">
+    Unpublish Topic
+  </button>
 </ul>

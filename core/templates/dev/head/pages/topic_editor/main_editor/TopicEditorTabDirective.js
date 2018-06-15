@@ -30,6 +30,7 @@ oppia.directive('topicMainEditor', [
             $scope, TopicEditorStateService, TopicUpdateService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
           $scope.topic = TopicEditorStateService.getTopic();
+          $scope.topicRights = TopicEditorStateService.getTopicRights();
           $scope.canEditName = GLOBALS.isAdmin;
 
           var _initEditor = function() {

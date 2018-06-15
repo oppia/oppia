@@ -27,8 +27,8 @@ oppia.controller('TopicsAndSkillsDashboard', [
     $scope.TAB_NAME_SKILLS = 'skills';
     TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
       function(response) {
-        $scope.topicSummaries = response.data.topic_summaries;
-        $scope.skillSummaries = response.data.skill_summaries;
+        $scope.topicSummaries = response.data.topic_summary_dicts;
+        $scope.skillSummaries = response.data.skill_summary_dicts;
         $scope.activeTab = $scope.TAB_NAME_TOPICS;
         if ($scope.topicSummaries.length === 0 &&
             $scope.skillSummaries.length !== 0) {

@@ -23,13 +23,16 @@ oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
 
 oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService', 'TopicObjectFactory',
+  'TopicRightsObjectFactory', 'TopicRightsBackendApiService',
   'UndoRedoService', 'EditableTopicBackendApiService',
   'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
   function(
       $rootScope, AlertsService, TopicObjectFactory,
+      TopicRightsObjectFactory, TopicRightsBackendApiService,
       UndoRedoService, EditableTopicBackendApiService,
       EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
     var _topic = TopicObjectFactory.createEmptyTopic();
+    var _topicRights = TopicRightsObjectFactory.createEmptyTopicRights();
     var _topicIsInitialized = false;
     var _isLoadingTopic = false;
     var _isSavingTopic = false;
@@ -45,6 +48,13 @@ oppia.factory('TopicEditorStateService', [
     };
     var _updateTopic = function(newBackendTopicObject) {
       _setTopic(TopicObjectFactory.create(newBackendTopicObject));
+    };
+    var _setTopicRights = function(topicRights) {
+      _topicRights.copyFromTopicRights(topicRights);
+    };
+    var _updateTopicRights = function(newBackendTopicRightsObject) {
+      _setTopicRights(TopicRightsObjectFactory.create(
+        newBackendTopicRightsObject));
     };
 
     return {
@@ -65,6 +75,16 @@ oppia.factory('TopicEditorStateService', [
               error || 'There was an error when loading the topic.');
             _isLoadingTopic = false;
           });
+        TopicRightsBackendApiService.fetchTopicRights(
+          topicId).then(function(newBackendTopicRightsObject) {
+          _updateTopicRights(newBackendTopicRightsObject);
+          _isLoadingTopic = false;
+        }, function(error) {
+          AlertsService.addWarning(
+            error ||
+            'There was an error when loading the topic rights.');
+          _isLoadingTopic = false;
+        });
       },
 
       /**
@@ -96,6 +116,19 @@ oppia.factory('TopicEditorStateService', [
       },
 
       /**
+       * Returns the current topic rights to be shared among the topic
+       * editor. Please note any changes to this topic rights will be
+       * propogated to all bindings to it. This topic rights object will
+       * be retained for the lifetime of the editor. This function never returns
+       * null, though it may return an empty topic rights object if the
+       * topic rights has not yet been loaded for this editor instance.
+       */
+      getTopicRights: function() {
+        return _topicRights;
+      },
+
+
+      /**
        * Sets the topic stored within this service, propogating changes to
        * all bindings to the topic returned by getTopic(). The first
        * time this is called it will fire a global event based on the
@@ -104,6 +137,15 @@ oppia.factory('TopicEditorStateService', [
        */
       setTopic: function(topic) {
         _setTopic(topic);
+      },
+
+      /**
+       * Sets the topic rights stored within this service, propogating
+       * changes to all bindings to the topic returned by
+       * getTopicRights().
+       */
+      setTopicRights: function(topicRights) {
+        _setTopicRights(topicRights);
       },
 
 

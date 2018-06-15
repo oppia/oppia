@@ -28,6 +28,8 @@ import utils
 
 CMD_CREATE_NEW = 'create_new'
 CMD_CHANGE_ROLE = 'change_role'
+CMD_PUBLISH_TOPIC = 'publish_topic'
+CMD_UNPUBLISH_TOPIC = 'unpublish_topic'
 
 ROLE_MANAGER = 'manager'
 ROLE_NONE = 'none'
@@ -779,9 +781,18 @@ class TopicSummary(object):
 class TopicRights(object):
     """Domain object for topic rights."""
 
-    def __init__(self, topic_id, manager_ids):
+    def __init__(self, topic_id, manager_ids, topic_is_published):
+        """Constructs a TopicRights domain object.
+
+        Args:
+            topic_id: str. The id of the topic.
+            manager_ids: list(str). The id of the users who have been assigned
+                as managers for the topic.
+            topic_is_published: boo. Whether the topic is playable by a learner.
+        """
         self.id = topic_id
         self.manager_ids = manager_ids
+        self.topic_is_published = topic_is_published
 
     def to_dict(self):
         """Returns a dict suitable for use by the frontend.
@@ -793,7 +804,8 @@ class TopicRights(object):
         return {
             'topic_id': self.id,
             'manager_names': user_services.get_human_readable_user_ids(
-                self.manager_ids)
+                self.manager_ids),
+            'topic_is_published': self.topic_is_published
         }
 
     def is_manager(self, user_id):
