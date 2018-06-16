@@ -164,10 +164,10 @@ def get_all_skill_summaries():
         list(SkillSummary). The list of summaries of all skills present in the
             datastore.
     """
-    skill_summary_dicts_models = skill_models.SkillSummaryModel.get_all()
+    skill_summaries_models = skill_models.SkillSummaryModel.get_all()
     skill_summaries = [
         get_skill_summary_from_model(summary)
-        for summary in skill_summary_dicts_models]
+        for summary in skill_summaries_models]
     return skill_summaries
 
 
@@ -186,6 +186,7 @@ def get_skill_summary_from_model(skill_summary_model):
         skill_summary_model.language_code,
         skill_summary_model.version,
         skill_summary_model.misconception_count,
+        skill_summary_model.worked_examples_count,
         skill_summary_model.skill_model_created_on,
         skill_summary_model.skill_model_last_updated
     )
@@ -496,9 +497,13 @@ def compute_summary_of_skill(skill):
         SkillSummary. The computed summary for the given skill.
     """
     skill_model_misconception_count = len(skill.misconceptions)
+    skill_model_worked_examples_count = len(
+        skill.skill_contents.worked_examples)
+
     skill_summary = skill_domain.SkillSummary(
         skill.id, skill.description, skill.language_code,
         skill.version, skill_model_misconception_count,
+        skill_model_worked_examples_count,
         skill.created_on, skill.last_updated
     )
 
@@ -530,6 +535,7 @@ def save_skill_summary(skill_summary):
         language_code=skill_summary.language_code,
         version=skill_summary.version,
         misconception_count=skill_summary.misconception_count,
+        worked_examples_count=skill_summary.worked_examples_count,
         skill_model_last_updated=(
             skill_summary.skill_model_last_updated),
         skill_model_created_on=(

@@ -44,6 +44,18 @@ describe('Topic object factory', function() {
     _sampleTopic = TopicObjectFactory.create(sampleTopicBackendObject);
   }));
 
+  it('should be able to create an empty topic object', function() {
+    var topic = TopicObjectFactory.createEmptyTopic();
+    expect(topic.getId()).toBeUndefined();
+    expect(topic.getName()).toBeUndefined();
+    expect(topic.getDescription()).toBeUndefined();
+    expect(topic.getLanguageCode()).toBeUndefined();
+    expect(topic.getSubtopics()).toEqual([]);
+    expect(topic.getAdditionalStoryIds()).toEqual([]);
+    expect(topic.getCanonicalStoryIds()).toEqual([]);
+    expect(topic.getUncategorizedSkillIds()).toEqual([]);
+  });
+
   it('should correctly remove the various array elements', function() {
     _sampleTopic.removeCanonicalStoryId('story_1');
     _sampleTopic.removeAdditionalStoryId('story_2');

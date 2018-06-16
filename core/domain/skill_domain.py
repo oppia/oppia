@@ -640,7 +640,7 @@ class SkillSummary(object):
 
     def __init__(
             self, skill_id, description, language_code, version,
-            misconception_count, skill_model_created_on,
+            misconception_count, worked_examples_count, skill_model_created_on,
             skill_model_last_updated):
         """Constructs a SkillSummary domain object.
 
@@ -651,6 +651,8 @@ class SkillSummary(object):
             version: int. The version of the skill.
             misconception_count: int. The number of misconceptions associated
                 with the skill.
+            worked_examples_count: int. The number of worked examples in the
+                skill.
             skill_model_created_on: datetime.datetime. Date and time when
                 the skill model is created.
             skill_model_last_updated: datetime.datetime. Date and time
@@ -661,6 +663,7 @@ class SkillSummary(object):
         self.language_code = language_code
         self.version = version
         self.misconception_count = misconception_count
+        self.worked_examples_count = worked_examples_count
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
 
@@ -676,6 +679,7 @@ class SkillSummary(object):
             'language_code': self.language_code,
             'version': self.version,
             'misconception_count': self.misconception_count,
+            'worked_examples_count': self.worked_examples_count,
             'skill_model_created_on': utils.get_time_in_millisecs(
                 self.skill_model_created_on),
             'skill_model_last_updated': utils.get_time_in_millisecs(
