@@ -44,6 +44,8 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
     CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
     CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
+    CAN_TRANSLATE_STR = 'GLOBALS.can_translate = JSON.parse(\'true\');'
+    CANNOT_TRANSLATE_STR = 'GLOBALS.can_translate = JSON.parse(\'false\');'
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
@@ -53,12 +55,14 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -80,6 +84,20 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         """
         self.assertIn(self.CANNOT_EDIT_STR, response_body)
         self.assertNotIn(self.CAN_EDIT_STR, response_body)
+
+    def assert_can_translate(self, response_body):
+        """Returns True if the response body indicates that the exploration is
+        translatable.
+        """
+        self.assertIn(self.CAN_TRANSLATE_STR, response_body)
+        self.assertNotIn(self.CANNOT_TRANSLATE_STR, response_body)
+
+    def assert_cannot_translate(self, response_body):
+        """Returns True if the response body indicates that the exploration is
+        not translatable.
+        """
+        self.assertIn(self.CANNOT_TRANSLATE_STR, response_body)
+        self.assertNotIn(self.CAN_TRANSLATE_STR, response_body)
 
 
 class EditorTest(BaseEditorControllerTest):
@@ -810,6 +828,10 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             self.owner, unpublished_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
+        rights_manager.assign_role_for_exploration(
+            self.owner, unpublished_exp_id, self.translator_id,
+            rights_manager.ROLE_TRANSLATOR)
+
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
@@ -817,6 +839,12 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
+        response = self.testapp.delete(
+            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+        self.login(self.TRANSLATOR_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
@@ -838,6 +866,9 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
+        rights_manager.assign_role_for_exploration(
+            self.owner, published_exp_id, self.translator_id,
+            rights_manager.ROLE_TRANSLATOR)
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
@@ -847,6 +878,12 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
+        response = self.testapp.delete(
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+        self.login(self.TRANSLATOR_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % published_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
@@ -1167,6 +1204,12 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.put_json(
             rights_url, {
                 'version': exploration.version,
+                'new_member_username': self.TRANSLATOR_USERNAME,
+                'new_member_role': rights_manager.ROLE_TRANSLATOR
+            }, csrf_token)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR
             }, csrf_token)
@@ -1184,6 +1227,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response = self.testapp.get('/create/%s' % exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.assert_cannot_edit(response.body)
+        self.assert_cannot_translate(response.body)
         self.logout()
 
         # Check that collaborator can access editor page and can edit.
@@ -1191,6 +1235,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response = self.testapp.get('/create/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
+        self.assert_can_translate(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Check that collaborator can add a new state called 'State 4'.
@@ -1258,6 +1303,27 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.assertIn('State 5', response_dict['states'])
 
         # Check that collaborator2 cannot add new members.
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        response_dict = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR3_USERNAME,
+                'new_member_role': rights_manager.ROLE_EDITOR,
+                }, csrf_token, expect_errors=True, expected_status_int=401)
+        self.assertEqual(response_dict['status_code'], 401)
+
+        self.logout()
+
+        # Check that translator can access editor page and can only translate.
+        self.login(self.TRANSLATOR_EMAIL)
+        response = self.testapp.get('/create/%s' % exp_id)
+        self.assertEqual(response.status_int, 200)
+        self.assert_cannot_edit(response.body)
+        self.assert_can_translate(response.body)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Check that translator cannot add new members.
         exploration = exp_services.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         response_dict = self.put_json(

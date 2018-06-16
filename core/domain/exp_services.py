@@ -1126,7 +1126,7 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
 
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
-        is_suggestion=False):
+        is_suggestion=False, is_by_translator=False):
     """Update an exploration. Commits changes.
 
     Args:
@@ -1142,6 +1142,8 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX.
         is_suggestion: bool. Whether the update is due to a suggestion being
             accepted.
+        is_by_translator: bool. Whether the changes are made by a
+            translator.
 
     Raises:
         ValueError: No commit message is supplied and the exploration is public.
@@ -1151,6 +1153,11 @@ def update_exploration(
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
+    if is_by_translator and not is_translation_change_list(change_list):
+        raise utils.ValidationError(
+            'Translator does not have permission to make some '
+            'changes in the change list.')
+
     is_public = rights_manager.is_exploration_public(exploration_id)
     if is_public and not commit_message:
         raise ValueError(
@@ -1722,6 +1729,25 @@ def _is_suggestion_valid(thread_id, exploration_id):
     return suggestion.state_name in states
 
 
+def is_translation_change_list(change_list):
+    """Checks whether the change list contains only the changes which are
+    allowed for translator to do.
+
+    Args:
+        change_list: list(ExplorationChange). A list that contains the changes
+            to be made to the ExplorationUserDataModel object.
+
+    Returns:
+        bool. Whether the change_list contains only the changes which are
+        allowed for translator to do.
+    """
+    for change in change_list:
+        if (change.property_name !=
+                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS):
+            return False
+    return True
+
+
 def _is_suggestion_handled(thread_id):
     """Checks if the current suggestion has already been accepted/rejected.
 
@@ -1909,8 +1935,62 @@ def is_version_of_draft_valid(exp_id, version):
     return get_exploration_by_id(exp_id).version == version
 
 
+def get_user_exploration_data(
+        user_id, exploration_id, apply_draft=False, version=None):
+    """Returns a description of the given exploration."""
+    if apply_draft:
+        exploration = get_exp_with_draft_applied(exploration_id, user_id)
+    else:
+        exploration = get_exploration_by_id(exploration_id, version=version)
+
+    states = {}
+    for state_name in exploration.states:
+        state_dict = exploration.states[state_name].to_dict()
+        states[state_name] = state_dict
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    draft_changes = (exp_user_data.draft_change_list if exp_user_data
+                     and exp_user_data.draft_change_list else None)
+    is_valid_draft_version = (
+        is_version_of_draft_valid(
+            exploration_id, exp_user_data.draft_change_list_exp_version)
+        if exp_user_data and exp_user_data.draft_change_list_exp_version
+        else None)
+    draft_change_list_id = (exp_user_data.draft_change_list_id
+                            if exp_user_data else 0)
+    exploration_email_preferences = (
+        user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id))
+    editor_dict = {
+        'auto_tts_enabled': exploration.auto_tts_enabled,
+        'category': exploration.category,
+        'correctness_feedback_enabled': (
+            exploration.correctness_feedback_enabled),
+        'draft_change_list_id': draft_change_list_id,
+        'exploration_id': exploration_id,
+        'init_state_name': exploration.init_state_name,
+        'language_code': exploration.language_code,
+        'objective': exploration.objective,
+        'param_changes': exploration.param_change_dicts,
+        'param_specs': exploration.param_specs_dict,
+        'rights': rights_manager.get_exploration_rights(
+            exploration_id).to_dict(),
+        'show_state_editor_tutorial_on_load': None,
+        'states': states,
+        'tags': exploration.tags,
+        'title': exploration.title,
+        'version': exploration.version,
+        'is_version_of_draft_valid': is_valid_draft_version,
+        'draft_changes': draft_changes,
+        'email_preferences': exploration_email_preferences.to_dict()
+    }
+
+    return editor_dict
+
+
 def create_or_update_draft(
-        exp_id, user_id, change_list, exp_version, current_datetime):
+        exp_id, user_id, change_list, exp_version, current_datetime,
+        is_by_translator=False):
     """Create a draft with the given change list, or update the change list
     of the draft if it already exists. A draft is updated only if the change
     list timestamp of the new change list is greater than the change list
@@ -1925,7 +2005,14 @@ def create_or_update_draft(
             to be made to the ExplorationUserDataModel object.
         exp_version: int. The current version of the exploration.
         current_datetime: datetime.datetime. The current date and time.
+        is_by_translator: bool. Whether the changes are made by a
+            translator.
     """
+    if is_by_translator and not is_translation_change_list(change_list):
+        raise utils.ValidationError(
+            'Translator does not have permission to make some '
+            'changes in the change list.')
+
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     if (exp_user_data and exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):

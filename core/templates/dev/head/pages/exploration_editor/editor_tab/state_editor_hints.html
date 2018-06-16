@@ -1,7 +1,7 @@
 <div ng-controller="StateHints">
   <div ng-if="!isCurrentInteractionLinear()">
     <div class="oppia-editor-header">
-      <strong ng-if="stateHintsService.displayed.length > 0 || isLoggedIn">Hints</strong>
+      <strong ng-if="stateHintsService.displayed.length > 0 || canEdit">Hints</strong>
     </div>
 
     <md-card class="oppia-editor-card-with-avatar">
