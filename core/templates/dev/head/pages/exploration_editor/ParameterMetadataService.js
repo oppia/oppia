@@ -77,13 +77,13 @@ oppia.factory('ParameterMetadataService', [
         state.content.getHtml()).forEach(
         function(paramName) {
           result.push(ParamMetadataObjectFactory.createWithGetAction(
-            paramName, PARAM_SOURCE_CONTENT));
+            paramName, PARAM_SOURCE_CONTENT, null));
         }
       );
 
       // Next, the answer is received.
       result.push(ParamMetadataObjectFactory.createWithSetAction(
-        'answer', PARAM_SOURCE_ANSWER));
+        'answer', PARAM_SOURCE_ANSWER, null));
 
       // Finally, the rule feedback strings are evaluated.
       state.interaction.answerGroups.forEach(function(group) {
