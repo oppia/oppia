@@ -118,7 +118,7 @@ describe('Topic editor state service', function() {
           id: 1,
           title: 'Title',
           skill_ids: 'skill_2'
-        },{
+        }, {
           id: 2,
           title: 'Title 2',
           skill_ids: 'skill_3'
