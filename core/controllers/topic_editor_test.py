@@ -142,62 +142,20 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             self.assertEqual(response.status_int, 401)
             self.logout()
 
-            # Check that admins can access and edit in the editor page.
+            # Check that admins can access the editor page.
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             self.assertEqual(response.status_int, 200)
             self.logout()
 
-            # Assign TOPIC_MANAGER_USERNAME as a topic_manager for topic_id.
-            topic_services.assign_role(
-                self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
-                self.topic_id)
-            # Check that a topic manager for a topic can access and edit in the
-            # editor page.
+            # Check that any topic manager can access the editor page.
             self.login(self.TOPIC_MANAGER_EMAIL)
             response = self.testapp.get(
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             self.assertEqual(response.status_int, 200)
             self.logout()
 
-            # Create a new topic, and assign another user as its topic manager.
-            topic_id_2 = topic_services.get_new_topic_id()
-            self.save_new_topic(
-                topic_id_2, self.admin_id, 'Name', 'Description',
-                [], [], [], [], 1)
-            self.signup('topicmanager2@example.com', 'topicmanager2')
-            topic_manager_id_2 = self.get_user_id_from_email(
-                'topicmanager2@example.com')
-            self.set_topic_managers(['topicmanager2'])
-            topic_manager_2 = user_services.UserActionsInfo(
-                topic_manager_id_2)
-            topic_services.assign_role(
-                self.admin, topic_manager_2, topic_domain.ROLE_MANAGER,
-                topic_id_2)
-
-            # Verify that the second topic manager can edit their
-            # assigned topic.
-            self.login('topicmanager2@example.com')
-            response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id_2))
-            self.assertEqual(response.status_int, 200)
-            self.logout()
-
-            # Check that a topic manager for one topic cannot edit the other
-            # one and vice-versa.
-            self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, topic_id_2),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
-            self.logout()
-            self.login('topicmanager2@example.com')
-            response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id),
-                expect_errors=True)
-            self.assertEqual(response.status_int, 401)
-            self.logout()
 
     def test_editable_topic_handler_get(self):
         # Check that non-admins cannot access the editable topic data.
@@ -280,13 +238,74 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
                 '<p>New Value</p>', json_response['subtopic_page']['html_data'])
             self.logout()
 
-            # Check that non-admins cannot edit a topic.
+            # Test that any topic manager cannot edit the topic.
+            self.login(self.TOPIC_MANAGER_EMAIL)
             json_response = self.put_json(
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
                 change_cmd, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=401)
             self.assertEqual(json_response['status_code'], 401)
+            self.logout()
+
+            # Check that non-admins and non-topic managers cannot edit a topic.
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                change_cmd, csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=401)
+            self.assertEqual(json_response['status_code'], 401)
+
+    def test_editable_topic_handler_put_for_assigned_topic_manager(self):
+        change_cmd = {
+            'version': 2,
+            'commit_message': 'Some changes and added a subtopic.',
+            'topic_and_subtopic_page_change_dicts': [{
+                'change_affects_subtopic_page': False,
+                'cmd': 'update_topic_property',
+                'property_name': 'name',
+                'old_value': '',
+                'new_value': 'A new name'
+            }, {
+                'change_affects_subtopic_page': True,
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'html_data',
+                'old_value': '',
+                'subtopic_id': 1,
+                'new_value': '<p>New Data</p>'
+            }, {
+                'change_affects_subtopic_page': False,
+                'cmd': 'add_subtopic',
+                'subtopic_id': 2,
+                'title': 'Title2'
+            }, {
+                'change_affects_subtopic_page': True,
+                'cmd': 'update_subtopic_page_property',
+                'property_name': 'html_data',
+                'old_value': '',
+                'new_value': '<p>New Value</p>',
+                'subtopic_id': 2
+            }]
+        }
+        # Assign the topic manager to the topic.
+        topic_services.assign_role(
+            self.admin, self.topic_manager, topic_domain.ROLE_MANAGER,
+            self.topic_id)
+
+        self.login(self.TOPIC_MANAGER_EMAIL)
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            csrf_token = self.get_csrf_token_from_response(response)
+            # Check that the topic manager can edit the topic now.
+            json_response = self.put_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
+                change_cmd, csrf_token=csrf_token)
+            self.assertEqual(self.topic_id, json_response['topic']['id'])
+            self.assertEqual('A new name', json_response['topic']['name'])
+            self.assertEqual(2, len(json_response['topic']['subtopics']))
+            self.logout()
 
     def test_editable_topic_handler_delete(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):

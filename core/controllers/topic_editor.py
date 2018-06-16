@@ -64,7 +64,7 @@ class NewStoryHandler(base.BaseHandler):
 class TopicEditorPage(base.BaseHandler):
     """The editor page for a single topic."""
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_visit_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
 
@@ -147,7 +147,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                 'which is too old. Please reload the page and try again.'
                 % (topic_version, version_from_payload))
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_visit_any_topic_editor
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
         if not feconf.ENABLE_NEW_STRUCTURES:
@@ -231,7 +231,7 @@ class EditableTopicDataHandler(base.BaseHandler):
 class TopicRightsHandler(base.BaseHandler):
     """A handler for returning topic rights."""
 
-    @acl_decorators.can_edit_topic
+    @acl_decorators.can_visit_any_topic_editor
     def get(self, topic_id):
         """Returns the TopicRights object of a topic."""
         topic_domain.Topic.require_valid_topic_id(topic_id)
