@@ -40,8 +40,8 @@ describe('rich-text components', function() {
     workflow.createExploration();
 
     editor.setContent(function(richTextEditor) {
-      // richTextEditor.appendBoldText('bold');
-      // richTextEditor.appendPlainText(' ');
+      richTextEditor.appendBoldText('bold');
+      richTextEditor.appendPlainText(' ');
       // TODO (Jacob) add test for image RTE component
       // richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       // richTextEditor.addRteComponent('Math', 'abc');
@@ -62,8 +62,8 @@ describe('rich-text components', function() {
     editor.navigateToPreviewTab();
 
     explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
-      // richTextChecker.readBoldText('bold');
-      // richTextChecker.readPlainText(' ');
+      richTextChecker.readBoldText('bold');
+      richTextChecker.readPlainText(' ');
       // richTextChecker.readRteComponent('Link', 'http://google.com/', true);
       // richTextChecker.readRteComponent('Math', 'abc');
       // richTextChecker.readRteComponent(
