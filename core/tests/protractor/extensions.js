@@ -40,15 +40,15 @@ describe('rich-text components', function() {
     workflow.createExploration();
 
     editor.setContent(function(richTextEditor) {
-      richTextEditor.appendBoldText('bold');
-      richTextEditor.appendPlainText(' ');
+      // richTextEditor.appendBoldText('bold');
+      // richTextEditor.appendPlainText(' ');
       // TODO (Jacob) add test for image RTE component
-      richTextEditor.addRteComponent('Link', 'http://google.com/', true);
-      richTextEditor.addRteComponent('Math', 'abc');
-      richTextEditor.addRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
+      // richTextEditor.addRteComponent('Link', 'http://google.com/', true);
+      // richTextEditor.addRteComponent('Math', 'abc');
+      // richTextEditor.addRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
-      /* richTextEditor.addRteComponent(
+      richTextEditor.addRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       richTextEditor.addRteComponent('Tabs', [{
         title: 'title 1',
@@ -56,18 +56,19 @@ describe('rich-text components', function() {
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
-      }]); */
+      }]);
     });
 
     editor.navigateToPreviewTab();
 
     explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
-      richTextChecker.readBoldText('bold');
-      richTextChecker.readPlainText(' ');
-      richTextChecker.readRteComponent('Link', 'http://google.com/', true);
-      richTextChecker.readRteComponent('Math', 'abc');
-      richTextChecker.readRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
-      /* richTextChecker.readRteComponent(
+      // richTextChecker.readBoldText('bold');
+      // richTextChecker.readPlainText(' ');
+      // richTextChecker.readRteComponent('Link', 'http://google.com/', true);
+      // richTextChecker.readRteComponent('Math', 'abc');
+      // richTextChecker.readRteComponent(
+      //    'Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextChecker.readRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       richTextChecker.readRteComponent('Tabs', [{
         title: 'title 1',
@@ -75,7 +76,7 @@ describe('rich-text components', function() {
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
-      }]); */
+      }]);
     });
 
     editor.discardChanges();

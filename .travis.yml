@@ -16,24 +16,24 @@ branches:
 
 env:
   matrix:
-    - RUN_LINT=true
-    - RUN_FRONTEND_TESTS=true
-    - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
+    - RUN_LINT=false
+    - RUN_FRONTEND_TESTS=false
+    - RUN_BACKEND_TESTS=false REPORT_BACKEND_COVERAGE=false EXCLUDE_LOAD_TESTS=true
     # TODO(sll): Reinstate this when we can get it to run in reasonable time.
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true
     # TODO(sll): Reinstate this when the load tests are more reliable.
     # - RUN_BACKEND_TESTS=true REPORT_BACKEND_COVERAGE=true EXCLUDE_LOAD_TESTS=false
-    - RUN_E2E_TESTS_ACCESSIBILITY=true
-    - RUN_E2E_TESTS_COLLECTIONS=true
-    - RUN_E2E_TESTS_EDITOR_AND_PLAYER=true
-    - RUN_E2E_TESTS_STATE_EDITOR=true
-    - RUN_E2E_TESTS_EDITOR_FEATURES=true
-    - RUN_E2E_TESTS_EMBEDDING=true
+    - RUN_E2E_TESTS_ACCESSIBILITY=false
+    - RUN_E2E_TESTS_COLLECTIONS=false
+    - RUN_E2E_TESTS_EDITOR_AND_PLAYER=false
+    - RUN_E2E_TESTS_STATE_EDITOR=false
+    - RUN_E2E_TESTS_EDITOR_FEATURES=false
+    - RUN_E2E_TESTS_EMBEDDING=false
     - RUN_E2E_TESTS_EXTENSIONS=true
     # TODO(sll): Reinstate this once the tests for the learner dashboard are fixed.
     # - RUN_E2E_TESTS_LEARNER_DASHBOARD=true
-    - RUN_E2E_TESTS_LIBRARY=true
-    - RUN_E2E_TESTS_USERS=true
+    - RUN_E2E_TESTS_LIBRARY=false
+    - RUN_E2E_TESTS_USERS=false
 
 matrix:
   allow_failures: []
