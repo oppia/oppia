@@ -66,8 +66,7 @@ describe('rich-text components', function() {
       richTextChecker.readPlainText(' ');
       richTextChecker.readRteComponent('Link', 'http://google.com/', true);
       richTextChecker.readRteComponent('Math', 'abc');
-      richTextChecker.readRteComponent(
-        'Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextChecker.readRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
       richTextChecker.readRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       richTextChecker.readRteComponent('Tabs', [{
