@@ -21,6 +21,7 @@ var constants = {
     "Statistics", "Trigonometry", "Welcome"],
   "ACTIVITY_TYPE_EXPLORATION": "exploration",
   "ACTIVITY_TYPE_COLLECTION": "collection",
+  "ACTIVITY_TYPE_QUESTION": "question",
   "DISABLED_EXPLORATION_IDS": ["5"],
   "TESTING_CONSTANT": "test",
   "LIBRARY_TILE_WIDTH_PX": 208,
@@ -86,7 +87,12 @@ var constants = {
     "Education": "#942e20",
     "Puzzles": "#a8554a",
     "Sport": "#893327",
-    "Welcome": "#992a2b"
+    "Welcome": "#992a2b",
+
+    "private": "#36748e",
+    "approved": "#619912",
+    "pending": "#d0cf00",
+    "rejected": "#990400"
   },
 
   "//": [

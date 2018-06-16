@@ -30,11 +30,14 @@ from core.domain import subscription_services
 from core.domain import summary_services
 from core.domain import user_jobs_continuous
 from core.domain import user_services
+from core.domain import question_services
+from core.domain import question_domain
 import feconf
 import utils
 
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
+QUESTION_ID_KEY = 'questionId'
 
 DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = config_domain.ConfigProperty(
     'default_twitter_share_message_dashboard', {
@@ -166,6 +169,17 @@ class CreatorDashboardHandler(base.BaseHandler):
             feedback_services.get_thread_analytics_multi(
                 exploration_ids_subscribed_to))
 
+        # new_question_id = question_services.get_new_question_id()
+        # question = question_domain.Question.create_default_question(
+        #     new_question_id, constants.DEFAULT_LANGUAGE_CODE)
+        # question_services.add_question(self.user_id, question)
+
+        question_summaries = question_services.get_question_summaries_by_creator_id(self.user_id)
+
+        question_summary_dicts = (
+            summary_services.get_displayable_question_summary_dicts(
+                question_summaries))
+
         # TODO(bhenning): Update this to use unresolved answers from
         # stats_services once the training interface is enabled and it's cheaper
         # to retrieve top answers from stats_services.
@@ -245,6 +259,7 @@ class CreatorDashboardHandler(base.BaseHandler):
             'last_week_stats': last_week_stats,
             'subscribers_list': subscribers_list,
             'display_preference': creator_dashboard_display_pref,
+            'questions_list': question_summary_dicts,
         })
         self.render_json(self.values)
 
@@ -311,6 +326,22 @@ class NewCollectionHandler(base.BaseHandler):
 
         self.render_json({
             COLLECTION_ID_KEY: new_collection_id
+        })
+
+
+class NewQuestionHandler(base.BaseHandler):
+    """Creates a new question."""
+
+    @acl_decorators.can_create_question
+    def post(self):
+        """Handles POST requests."""
+        new_question_id = question_services.get_new_question_id()
+        question = question_domain.Question.create_default_question(
+            new_question_id, constants.DEFAULT_LANGUAGE_CODE)
+        question_services.add_question(self.user_id, question)
+
+        self.render_json({
+            QUESTION_ID_KEY: new_question_id
         })
 
 

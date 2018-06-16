@@ -327,6 +327,25 @@ def can_create_collection(handler):
     return test_can_create
 
 
+
+def can_create_question(handler):
+    """Decorator to check whether the user can create a question."""
+
+    def test_can_create(self, **kwargs):
+        """Checks if the user can create a question."""
+        if self.user_id is None:
+            raise self.NotLoggedInException
+
+        if role_services.ACTION_CREATE_QUESTION in self.user.actions:
+            return handler(self, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to create a question.')
+    test_can_create.__wrapped__ = True
+
+    return test_can_create
+
+
 def can_access_creator_dashboard(handler):
     """Decorator to check whether the user can access creator dashboard page."""
 

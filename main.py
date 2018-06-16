@@ -220,6 +220,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),
     get_redirect_route(
+        r'%s' % feconf.QUESTION_CREATION_URL,
+        creator_dashboard.NewQuestionHandler),
+    get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExploration),
     get_redirect_route(
@@ -489,6 +492,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_DATA_URL,
         question.QuestionsHandler),
+    get_redirect_route(
+        r'%s/<question_id>' % feconf.QUESTION_EDITOR_URL_PREFIX,
+        topic_editor.TopicEditorPage),
 
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,

@@ -220,7 +220,7 @@ class Question(object):
         """
         return cls(
             question_id, exp_domain.State.create_default_state(
-                feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True),
+                feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict(),
             feconf.CURRENT_QUESTION_SCHEMA_VERSION, language_code)
 
     def update_language_code(self, language_code):
@@ -244,15 +244,31 @@ class Question(object):
 class QuestionSummary(object):
     """Domain object for Question Summary.
     """
-    def __init__(self, question_id, question_content):
+    def __init__(
+            self, question_id, creator_id, language_code, status,
+            question_content, question_model_last_updated=None,
+            question_model_created_on=None):
         """Constructs a Question Summary domain object.
 
         Args:
             question_id: str. The ID of the question.
+            creator_id: str. The user ID of the creator of the question.
+            language_code: str. The code that represents the question
+                language.
+            status: str. The status of the question.
+            question_model_last_updated: datetime.datetime. Date and time
+                when the question model was last updated.
+            question_model_created_on: datetime.datetime. Date and time when
+                the question model is created.
             question_content: str. The static HTML of the question shown to
                 the learner.
         """
-        self.question_id = question_id
+        self.id = question_id
+        self.creator_id = 'creator_id'
+        self.language_code = language_code
+        self.status = status
+        self.last_updated = question_model_last_updated
+        self.created_on = question_model_created_on
         self.question_content = question_content
 
     def to_dict(self):
@@ -262,7 +278,12 @@ class QuestionSummary(object):
             dict. A dict representing this QuestionSummary object.
         """
         return {
-            'question_id': self.question_id,
+            'id': self.id,
+            'creator_id': self.creator_id,
+            'language_code': self.language_code,
+            'status': self.status,
+            'last_updated': self.last_updated,
+            'created_on': self.created_on,
             'question_content': self.question_content
         }
 

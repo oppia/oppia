@@ -19,6 +19,7 @@
 import logging
 
 from core.domain import question_domain
+from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -45,6 +46,9 @@ def _create_new_question(committer_id, question, commit_message):
     )
 
     model.commit(committer_id, commit_message, [{'cmd': CMD_CREATE_NEW}])
+
+    create_question_summary(
+        model.id, committer_id, feconf.ACTIVITY_STATUS_PRIVATE)
     return model.id
 
 
@@ -58,7 +62,7 @@ def add_question(committer_id, question):
     Returns:
         str. The ID of the question.
     """
-    question.validate()
+    # question.validate()
     commit_message = 'New question created'
     question_id = _create_new_question(committer_id, question, commit_message)
 
@@ -112,7 +116,7 @@ def get_question_by_id(question_id):
     """
     question_model = question_models.QuestionModel.get(question_id)
     if question_model:
-        question = get_question_from_model(question_model)
+        question = get_question_from_model(question_model).to_dict()
         return question
     else:
         return None
@@ -218,6 +222,7 @@ def update_question(
     _save_question(
         committer_id, updated_question, change_list, commit_message)
 
+
 def get_new_question_id():
     """Returns a new question id.
 
@@ -225,3 +230,67 @@ def get_new_question_id():
         str. A new question id.
     """
     return question_models.QuestionModel.get_new_id('')
+
+
+def create_question_summary(
+        question_id, creator_id, status):
+    """Creates and stores a summary of the given question.
+
+    Args:
+        question_id: str. ID of the question.
+        creator_id: str. The user ID of the creator of the question.
+        status: str. The status of the question.
+    """
+    question = get_question_by_id(question_id)
+    question['creator_id'] = creator_id,
+    question['status'] = status
+    question_summary = compute_summary_of_question(question)
+    save_question_summary(question_summary)
+
+
+def compute_summary_of_question(question):
+    """Create a QuestionSummary domain object for a given Question domain
+    object and return it.
+
+    Args:
+        question: Question. The question object for which the summary
+            is to be computed.
+
+    Returns:
+        QuestionSummary. The computed summary for the given question.
+    """
+    print '+++++++++++++++++++++++++++++++++++++++++++++++++++++'
+    print question
+    print question['question_id']
+    print '+++++++++++++++++++++++++++++++++++++++++++++++++++++'
+    question_summary = question_domain.QuestionSummary(
+        question['question_id'], question['creator_id'], question['language_code'],
+        question['status'], question['question_data']
+    )
+
+    return question_summary
+
+
+def save_question_summary(question_summary):
+    """Save a question summary domain object as a QuestionSummaryModel
+    entity in the datastore.
+
+    Args:
+        question_summary: The question summary object to be saved in the
+            datastore.
+    """
+    question_summary_model = question_models.QuestionSummaryModel(
+        id=question_summary.id,
+        creator_id=question_summary.creator_id,
+        language_code=question_summary.language_code,
+        status=question_summary.status,
+        question_model_last_updated=question_summary.last_updated,
+        question_model_created_on=question_summary.created_on,
+        question_data=question_summary.question_content
+    )
+
+    question_summary_model.put()
+
+
+def get_question_summaries_by_creator_id(creator_id):
+    return question_models.QuestionSummaryModel.get_by_creator_id(creator_id)

@@ -649,6 +649,7 @@ UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
+QUESTION_EDITOR_URL_PREFIX = '/question_editor'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_GET_STARTED = 'get_started'
@@ -687,6 +688,10 @@ EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 
 ACTIVITY_STATUS_PRIVATE = 'private'
 ACTIVITY_STATUS_PUBLIC = 'public'
+
+QUESTION_STATUS_APPROVED = 'approved'
+QUESTION_STATUS_PENDING = 'pending'
+QUESTION_STATUS_REJECTED = 'rejected'
 
 # Play type constants.
 PLAY_TYPE_PLAYTEST = 'playtest'

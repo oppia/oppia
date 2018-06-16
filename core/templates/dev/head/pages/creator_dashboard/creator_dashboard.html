@@ -57,7 +57,13 @@
       </md-card>
     </div>
 
-    <div ng-if="explorationsList.length > 0 || collectionsList.length > 0">
+    <button type="button"
+            class="btn oppia-dashboard-intro-button oppia-transition-200"
+            ng-click="createNewQuestion()"
+            translate="I18N_CREATE_EXPLORATION">
+    </button>
+
+    <div ng-if="explorationsList.length > 0 || collectionsList.length > 0 || questionsList.length > 0">
       <ul class="oppia-dashboard-tabs">
         <li ng-if="explorationsList.length > 0"
             ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
@@ -81,6 +87,13 @@
           <a class="oppia-dashboard-tabs-text"
              ng-click="setActiveTab('mySubscribers')"
              translate="I18N_DASHBOARD_SUBSCRIBERS">
+          </a>
+        </li>
+        <li ng-if="questionsList.length > 0"
+            ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myQuestions'}">
+          <a class="oppia-dashboard-tabs-text"
+             ng-click="setActiveTab('myQuestions')"
+             translate="I18N_DASHBOARD_QUESTIONS">
           </a>
         </li>
 
@@ -107,7 +120,7 @@
     </div>
 
     <div ng-if="activeTab === 'myExplorations'">
-      <div ng-if="explorationsList.length === 0 && collectionsList.length === 0" class="oppia-dashboard-empty-text">
+      <div ng-if="explorationsList.length === 0 && collectionsList.length === 0 && questionsList.length === 0" class="oppia-dashboard-empty-text">
         <md-card layout="row"
                  class="oppia-page-card oppia-dashboard-intro-card"
                  style="margin-top: 0;">
@@ -372,6 +385,23 @@
                                    thumbnail-bg-color="collection.thumbnail_bg_color"
                                    is-linked-to-editor-page="true">
           </collection-summary-tile>
+        </span>
+      </ul>
+    </div>
+
+    <div ng-if="activeTab === 'myQuestions'">
+      <div ng-if="questionsList.length === 0" class="oppia-dashboard-empty-text">
+        <em>There are no questions to display.</em>
+      </div>
+
+      <ul class="oppia-dashboard-tiles"
+          ng-if="activeTab === 'myQuestions' && questionsList.length > 0">
+        <span ng-repeat="question in questionsList">
+          <question-summary-tile question-id="question.id"
+                                   description="question.id"
+                                   last-updated-msec="question.last_updated"
+                                   status="question.status">
+          </question-summary-tile>
         </span>
       </ul>
     </div>
@@ -749,6 +779,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintAndSolutionButtonsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/QuestionSummaryTileDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/creator_dashboard/CreatorDashboardBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/creator_dashboard/CreatorDashboard.js"></script>

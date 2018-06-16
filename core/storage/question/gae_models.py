@@ -196,3 +196,48 @@ class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
                 question version.
         """
         return 'question-%s-%s' % (question_id, question_version)
+
+
+class QuestionSummaryModel(base_models.BaseModel):
+    """Summary model for an Oppia question.
+
+    This should be used whenever the content blob of the question is not
+    needed (e.g. in search results, etc).
+
+    A QuestionSummaryModel instance stores the following information:
+
+
+
+    The key of each instance is the question id.
+    """
+    # The user ID of the creator of the question.
+    creator_id = ndb.StringProperty(required=True)
+    # The ISO 639-1 code for the language this exploration is written in.
+    language_code = ndb.StringProperty(required=True, indexed=True)
+    # The status of the question. It can be 'private', 'approved',
+    # 'rejected' and 'pending'.
+    status = ndb.StringProperty(
+        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
+        choices=[
+            feconf.ACTIVITY_STATUS_PRIVATE,
+            feconf.QUESTION_STATUS_APPROVED,
+            feconf.QUESTION_STATUS_REJECTED,
+            feconf.QUESTION_STATUS_PENDING
+        ]
+    )
+    # Time when the question model was last updated (not to be
+    # confused with last_updated, which is the time when the
+    # question *summary* model was last updated).
+    question_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    # Time when the question model was created (not to be confused
+    # with created_on, which is the time when the question *summary*
+    # model was created).
+    question_model_created_on = ndb.DateTimeProperty(indexed=True)
+    # A dict representing the question data.
+    question_data = ndb.JsonProperty(indexed=False)
+
+    @classmethod
+    def get_by_creator_id(cls, creator_id):
+        print '+++++++++++ Needed docstring ++++++++++++++++++++++'
+        return QuestionSummaryModel.query().filter(
+            cls.creator_id == 'creator_id').fetch()

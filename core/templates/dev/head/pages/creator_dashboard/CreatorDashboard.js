@@ -50,7 +50,7 @@ oppia.controller('CreatorDashboard', [
   '$scope', '$rootScope', '$http', '$window', 'DateTimeFormatService',
   'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
-  'UrlInterpolationService', 'FATAL_ERROR_CODES',
+  'UrlInterpolationService', 'QuestionCreationService', 'FATAL_ERROR_CODES',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
@@ -58,7 +58,7 @@ oppia.controller('CreatorDashboard', [
       $scope, $rootScope, $http, $window, DateTimeFormatService,
       AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
-      UrlInterpolationService, FATAL_ERROR_CODES,
+      UrlInterpolationService, QuestionCreationService, FATAL_ERROR_CODES,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
@@ -83,6 +83,8 @@ oppia.controller('CreatorDashboard', [
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
+    $scope.createNewQuestion = (
+      QuestionCreationService.createNewQuestion);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
@@ -203,16 +205,20 @@ oppia.controller('CreatorDashboard', [
         $scope.dashboardStats = responseData.dashboard_stats;
         $scope.lastWeekStats = responseData.last_week_stats;
         $scope.myExplorationsView = responseData.display_preference;
+        $scope.questionsList = responseData.questions_list;
         if ($scope.dashboardStats && $scope.lastWeekStats) {
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
           );
         }
         if ($scope.explorationsList.length === 0 &&
+          $scope.questionsList.length === 0 &&
           $scope.collectionsList.length > 0) {
           $scope.activeTab = 'myCollections';
-        } else {
+        } else if ($scope.explorationsList.length > 0) {
           $scope.activeTab = 'myExplorations';
+        } else {
+          $scope.activeTab = 'myQuestions';
         }
         $rootScope.loadingMessage = '';
       },

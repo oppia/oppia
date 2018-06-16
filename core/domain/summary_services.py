@@ -743,3 +743,58 @@ def get_recently_published_exp_summary_dicts(limit):
         reverse=True)
 
     return get_displayable_exp_summary_dicts(summaries)
+
+
+def get_displayable_question_summary_dicts(question_summaries):
+    """Gets a summary of questions in human readable form.
+
+    Given a list of question summary domain objects, returns a list,
+    with the same number of elements, of the corresponding human-readable
+    question summary dicts.
+    This assumes that all the question summary domain objects passed in are
+    valid (i.e., none of them are None).
+
+    Args:
+        question_summaries: list(ExplorationSummary). List of question
+        summary objects.
+
+    Return:
+        list(dict). A list of question summary dicts in human readable form.
+        Example:
+
+        [ {
+            'category': u'A category',
+            'community_owned': False,
+            'id': 'eid2',
+            'language_code': 'en',
+            'num_views': 0,
+            'objective': u'An objective',
+            'status': 'public',
+            'tags': [],
+            'thumbnail_bg_color': '#a33f40',
+            'thumbnail_icon_url': self.get_static_asset_url(
+                '/images/subjects/Lightbulb.svg'),
+            'title': u'Exploration 2 Albert title',
+        }, ]
+    """
+    displayable_question_summaries = []
+
+    for ind, question_summary in enumerate(question_summaries):
+        if not question_summary:
+            continue
+
+        summary_dict = {
+            'id': question_summary.id,
+            'creator_id': question_summary.creator_id,
+            'created_on': utils.get_time_in_millisecs(
+                question_summary.created_on),
+            'language_code': question_summary.language_code,
+            'last_updated': utils.get_time_in_millisecs(
+                question_summary.last_updated),
+            'question_data': question_summary.question_data,
+            'status': question_summary.status,
+        }
+
+        displayable_question_summaries.append(summary_dict)
+
+    return displayable_question_summaries
