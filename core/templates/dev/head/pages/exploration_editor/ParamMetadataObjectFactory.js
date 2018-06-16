@@ -36,6 +36,10 @@ oppia.factory('ParamMetadataObjectFactory', [function() {
 
   /**
    * Metadata about the SET action of a parameter
+   * @param {String} paramName - parameter's name
+   * @param {String} source - location where the parameter was defined
+   * e.g. answer, content, feedback or param_changes (changing value of param)
+   * @param {String} sourceInd - index of this parameter in a set of changes
    * @returns {ParamMetadata} - A new ParamMetadata instance
    */
   ParamMetadata.createWithSetAction = function(paramName, source, sourceInd) {
@@ -44,6 +48,10 @@ oppia.factory('ParamMetadataObjectFactory', [function() {
 
   /**
    * Metadata about the GET action of a parameter
+   * @param {String} paramName - parameter's name
+   * @param {String} source - location where the parameter was defined
+   * e.g. answer, content, feedback or param_changes (changing value of param)
+   * @param {String} sourceInd - index of this parameter in a set of changes
    * @returns {ParamMetadata} - A new ParamMetadata instance
    */
   ParamMetadata.createWithGetAction = function(paramMetadataDict) {
