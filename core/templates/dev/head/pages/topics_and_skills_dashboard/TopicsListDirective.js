@@ -30,7 +30,7 @@ oppia.directive('topicsList', [
           // being shown, for now.
           $scope.TOPIC_HEADINGS = [
             'name', 'subtopic_count', 'skill_count',
-            'canonical_story_count'
+            'canonical_story_count', 'topic_status'
           ];
           $scope.getTopicEditorUrl = function(topicId) {
             return '/topic_editor/' + topicId;

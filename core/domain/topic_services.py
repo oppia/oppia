@@ -814,6 +814,20 @@ def get_topic_rights(topic_id, strict=True):
     return get_topic_rights_from_model(model)
 
 
+def get_all_topic_rights():
+    """Returns the rights object of all topics present in the datastore.
+
+    Returns:
+        list(TopicRights). The list of right objects of all topics present in
+            the datastore.
+    """
+    topic_rights_models = topic_models.TopicRightsModel.get_all()
+    topic_rights = [
+        get_topic_rights_from_model(model)
+        for model in topic_rights_models]
+    return topic_rights
+
+
 def check_can_edit_topic(user, topic_rights):
     """Checks whether the user can edit the given topic.
 
