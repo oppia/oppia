@@ -127,6 +127,9 @@ oppia.controller('SettingsTab', [
       name: 'Collaborator (can make changes)',
       value: 'editor'
     }, {
+      name: 'Translator (can do audio translations)',
+      value: 'translator'
+    }, {
       name: 'Playtester (can give feedback)',
       value: 'viewer'
     }];

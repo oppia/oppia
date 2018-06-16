@@ -31,6 +31,9 @@ oppia.constant(
   'EDITABLE_EXPLORATION_DATA_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>');
 oppia.constant(
+  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/translate/<exploration_id>');
+oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
 
@@ -49,6 +52,7 @@ oppia.controller('ExplorationEditor', [
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
+  'StateTopAnswersStatsService', 'StateTopAnswersStatsBackendApiService',
   'ThreadDataService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
@@ -65,6 +69,7 @@ oppia.controller('ExplorationEditor', [
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
       UrlInterpolationService, ExplorationCorrectnessFeedbackService,
+      StateTopAnswersStatsService, StateTopAnswersStatsBackendApiService,
       ThreadDataService) {
     $scope.EditabilityService = EditabilityService;
     $scope.EditorStateService = EditorStateService;
@@ -142,15 +147,19 @@ oppia.controller('ExplorationEditor', [
         ExplorationAdvancedFeaturesService.init(data);
         ExplorationRightsService.init(
           data.rights.owner_names, data.rights.editor_names,
-          data.rights.viewer_names, data.rights.status,
-          data.rights.cloned_from, data.rights.community_owned,
-          data.rights.viewable_if_private);
+          data.rights.translator_names, data.rights.viewer_names,
+          data.rights.status, data.rights.cloned_from,
+          data.rights.community_owned, data.rights.viewable_if_private);
         UserEmailPreferencesService.init(
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
 
         if (GLOBALS.can_edit) {
           EditabilityService.markEditable();
+        }
+
+        if (GLOBALS.can_translate || GLOBALS.can_edit) {
+          EditabilityService.markTranslatable();
         }
 
         GraphDataService.recompute();
@@ -205,6 +214,14 @@ oppia.controller('ExplorationEditor', [
 
         StateEditorTutorialFirstTimeService.init(
           data.show_state_editor_tutorial_on_load, $scope.explorationId);
+
+        if (ExplorationRightsService.isPublic()) {
+          // Stats are loaded asynchronously after the exploration data because
+          // they are not needed to interact with the editor.
+          StateTopAnswersStatsBackendApiService.fetchStats(
+            $scope.explorationId
+          ).then(StateTopAnswersStatsService.init);
+        }
       });
     };
 

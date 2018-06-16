@@ -18,20 +18,22 @@
 
 oppia.controller('StateHints', [
   '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
-  'AlertsService', 'INTERACTION_SPECS', 'stateHintsService',
-  'ExplorationStatesService', 'stateInteractionIdService',
+  'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',
+  'stateHintsService', 'ExplorationStatesService', 'COMPONENT_NAME_HINT',
+  'stateContentIdsToAudioTranslationsService', 'stateInteractionIdService',
   'UrlInterpolationService', 'HintObjectFactory', 'ExplorationPlayerService',
   'stateSolutionService',
   function(
       $scope, $rootScope, $uibModal, $filter, EditorStateService,
-      AlertsService, INTERACTION_SPECS, stateHintsService,
-      ExplorationStatesService, stateInteractionIdService,
+      GenerateContentIdService, AlertsService, INTERACTION_SPECS,
+      stateHintsService, ExplorationStatesService, COMPONENT_NAME_HINT,
+      stateContentIdsToAudioTranslationsService, stateInteractionIdService,
       UrlInterpolationService, HintObjectFactory, ExplorationPlayerService,
       stateSolutionService) {
     $scope.EditorStateService = EditorStateService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
-    $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
+    $scope.canEdit = GLOBALS.can_edit;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/drag_dots.png');
@@ -115,10 +117,13 @@ oppia.controller('StateHints', [
             $scope.hintIndex = stateHintsService.displayed.length + 1;
 
             $scope.saveHint = function() {
+              var contentId = GenerateContentIdService.getNextId(
+                COMPONENT_NAME_HINT);
               // Close the modal and save it afterwards.
               $uibModalInstance.close({
                 hint: angular.copy(
-                  HintObjectFactory.createNew($scope.tmpHint))
+                  HintObjectFactory.createNew(contentId, $scope.tmpHint)),
+                contentId: contentId
               });
             };
 
@@ -130,7 +135,10 @@ oppia.controller('StateHints', [
         ]
       }).result.then(function(result) {
         stateHintsService.displayed.push(result.hint);
+        stateContentIdsToAudioTranslationsService.displayed.addContentId(
+          result.contentId);
         stateHintsService.saveDisplayedValue();
+        stateContentIdsToAudioTranslationsService.saveDisplayedValue();
       });
     };
 
@@ -177,10 +185,21 @@ oppia.controller('StateHints', [
           }
         ]
       }).result.then(function() {
+        var solutionContentId = stateSolutionService.displayed
+          .explanation.getContentId();
         stateSolutionService.displayed = null;
         stateSolutionService.saveDisplayedValue();
+
+        var hintContentId = stateHintsService.displayed[0]
+          .hintContent.getContentId();
         stateHintsService.displayed = [];
         stateHintsService.saveDisplayedValue();
+
+        stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+          solutionContentId);
+        stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+          hintContentId);
+        stateContentIdsToAudioTranslationsService.saveDisplayedValue();
       });
     };
 
@@ -212,8 +231,13 @@ oppia.controller('StateHints', [
           stateHintsService.savedMemento.length === 1) {
           openDeleteLastHintModal();
         } else {
+          var hintContentId = stateHintsService.displayed[index]
+            .hintContent.getContentId();
           stateHintsService.displayed.splice(index, 1);
           stateHintsService.saveDisplayedValue();
+          stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+            hintContentId);
+          stateContentIdsToAudioTranslationsService.saveDisplayedValue();
         }
       });
     };

@@ -157,7 +157,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 20
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 22
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -209,6 +209,15 @@ DEFAULT_EXPLORATION_OBJECTIVE = ''
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'Introduction'
+# Default content id for the state's content.
+DEFAULT_NEW_STATE_CONTENT_ID = 'content'
+# Default content id for the interaction's default outcome.
+DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
+# Default content_ids_to_audio_translations dict for a default state template.
+DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
+    'content': {},
+    'default_outcome': {}
+}
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -475,6 +484,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'NumericInput',
         'SetInput',
         'MathExpressionInput',
+        'NumberWithUnits',
     ]
 }, {
     'name': 'Programming',
@@ -631,10 +641,13 @@ SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
+SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
+TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
+TRANSLATION_DATA_PREFIX = '/createhandler/translate'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
@@ -688,6 +701,7 @@ COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
 COMMIT_MESSAGE_SKILL_DELETED = 'Skill deleted.'
 COMMIT_MESSAGE_STORY_DELETED = 'Story deleted.'
+COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
 COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
@@ -888,7 +902,6 @@ RTE_CONTENT_SPEC = {
             'p': ['blockquote', 'div', 'pre', '[document]', 'ol', 'ul', 'li'],
             'b': ['i', 'li', 'p', 'pre'],
             'br': ['b', 'i', 'li', 'p'],
-            'div': ['blockquote'],
             'i': ['b', 'li', 'p', 'pre'],
             'li': ['ol', 'ul'],
             'ol': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
@@ -907,7 +920,6 @@ RTE_CONTENT_SPEC = {
             'p',
             'b',
             'br',
-            'div',
             'i',
             'li',
             'ol',

@@ -347,6 +347,9 @@ oppia.factory('ExplorationPlayerService', [
       getSolution: function(stateName) {
         return exploration.getInteraction(stateName).solution;
       },
+      getContentIdsToAudioTranslations: function(stateName) {
+        return exploration.getState(stateName).contentIdsToAudioTranslations;
+      },
       isLoggedIn: function() {
         return _isLoggedIn;
       },
@@ -361,6 +364,8 @@ oppia.factory('ExplorationPlayerService', [
         answerIsBeingProcessed = true;
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
+        var contentIdsToAudioTranslations =
+          oldState.contentIdsToAudioTranslations;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             _explorationId, oldStateName, oldState, answer,
@@ -399,8 +404,10 @@ oppia.factory('ExplorationPlayerService', [
         oldParams.answer = answer;
         var feedbackHtml =
           makeFeedback(outcome.feedback.getHtml(), [oldParams]);
+        var feedbackContentId = outcome.feedback.getContentId();
         var feedbackAudioTranslations =
-          outcome.feedback.getBindableAudioTranslations();
+          contentIdsToAudioTranslations.getBindableAudioTranslations(
+            feedbackContentId);
         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');
