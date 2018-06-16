@@ -23,18 +23,22 @@ describe('ParameterMetadata object factory', function() {
   beforeEach(inject(function($injector) {
     pmof = $injector.get('ParamMetadataObjectFactory');
 
-    parameterMetadata = pmof.createFromDict({
-      action: 'set',
-      paramName: 'answer',
-      source: 'param_changes',
-      sourceInd: 1
-    });
+    parameterMetadata = pmof.createWithSetAction('answer', 'param_changes', 1);
 
-    it('should set attributes correctly', function() {
+    it('should have correct metadata for SET action', function() {
       expect(parameterMetadata.action).toEqual('set');
       expect(parameterMetadata.paramName).toEqual('answer');
       expect(parameterMetadata.source).toEqual('param_changes');
       expect(parameterMetadata.sourceInd).toEqual(1);
+    });
+
+    parameterMetadata = pmof.createWithGetAction('x', 'content', 5);
+
+    it('should have correct metadata for GET action', function() {
+      expect(parameterMetadata.action).toEqual('get');
+      expect(parameterMetadata.paramName).toEqual('x');
+      expect(parameterMetadata.source).toEqual('content');
+      expect(parameterMetadata.sourceInd).toEqual(5);
     });
   }));
 });
