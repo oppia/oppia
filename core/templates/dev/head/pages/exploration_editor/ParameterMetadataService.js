@@ -38,37 +38,25 @@ oppia.factory('ParameterMetadataService', [
         var pc = paramChanges[i];
         if (pc.generatorId === 'Copier') {
           if (!pc.customizationArgs.parse_with_jinja) {
-            result.push(ParamMetadataObjectFactory.actionSet({
-              paramName: pc.name,
-              source: PARAM_SOURCE_PARAM_CHANGES,
-              sourceInd: i
-            }));
+            result.push(ParamMetadataObjectFactory.createWithSetAction(
+              pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
           } else {
             var paramsReferenced = (
               ExpressionInterpolationService.getParamsFromString(
                 pc.customizationArgs.value));
             for (var j = 0; j < paramsReferenced.length; j++) {
-              result.push(ParamMetadataObjectFactory.actionGet({
-                paramName: paramsReferenced[j],
-                source: PARAM_SOURCE_PARAM_CHANGES,
-                sourceInd: i
-              }));
+              result.push(ParamMetadataObjectFactory.createWithGetAction(
+                paramsReferenced[j], PARAM_SOURCE_PARAM_CHANGES, i));
             }
 
-            result.push(ParamMetadataObjectFactory.actionSet({
-              paramName: pc.name,
-              source: PARAM_SOURCE_PARAM_CHANGES,
-              sourceInd: i
-            }));
+            result.push(ParamMetadataObjectFactory.createWithSetAction(
+              pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
           }
         } else {
           // RandomSelector. Elements in the list of possibilities are treated
           // as raw unicode strings, not expressions.
-          result.push(ParamMetadataObjectFactory.actionSet({
-            paramName: pc.name,
-            source: PARAM_SOURCE_PARAM_CHANGES,
-            sourceInd: i
-          }));
+          result.push(ParamMetadataObjectFactory.createWithSetAction(
+            pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
         }
       }
 
@@ -88,15 +76,13 @@ oppia.factory('ParameterMetadataService', [
       ExpressionInterpolationService.getParamsFromString(
         state.content.getHtml()).forEach(
         function(paramName) {
-          result.push(ParamMetadataObjectFactory.actionGet({
-            paramName: paramName,
-            source: PARAM_SOURCE_CONTENT
-          }));
+          result.push(ParamMetadataObjectFactory.createWithGetAction(
+            paramName, PARAM_SOURCE_CONTENT));
         }
       );
 
       // Next, the answer is received.
-      result.push(ParamMetadataObjectFactory.actionSet({
+      result.push(ParamMetadataObjectFactory.createWithSetAction({
         paramName: 'answer',
         source: PARAM_SOURCE_ANSWER
       }));
@@ -107,11 +93,8 @@ oppia.factory('ParameterMetadataService', [
           ExpressionInterpolationService.getParamsFromString(
             group.outcome.feedback[k]).forEach(
             function(paramName) {
-              result.push(ParamMetadataObjectFactory.actionGet({
-                paramName: paramName,
-                source: PARAM_SOURCE_FEEDBACK,
-                sourceInd: k
-              }));
+              result.push(ParamMetadataObjectFactory.createWithGetAction(
+                paramName, PARAM_SOURCE_FEEDBACK, k));
             }
           );
         }
