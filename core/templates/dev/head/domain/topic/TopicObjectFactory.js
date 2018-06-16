@@ -84,7 +84,7 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
 
     /**
      * @param {number} id - The id of the subtopic that was deleted.
-     * @param {string} title - The title of the subtopic that w as deleted.
+     * @param {string} title - The title of the subtopic that was deleted.
      * @param {array(String)} skillIdsForSubtopic - The skillIds array of the
      * deleted subtopic.
      * @param {boolean} isNewlyCreated - Whether the subtopic to be deleted was
@@ -291,8 +291,9 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
       return new Topic(topicBackendObject);
     };
 
-    // Create a new, empty topic. This is not guaranteed to pass validation
-    // tests.
+    // Create a new, empty topic that is not guaranteed to pass validation
+    // tests. This should only be used when initializing the topic editor
+    // (prior to setting it with data from the backend).
     Topic.createEmptyTopic = function() {
       return new Topic({
         additional_story_ids: [],

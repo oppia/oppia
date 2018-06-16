@@ -97,13 +97,11 @@ oppia.factory('TopicUpdateService', [
       return _getParameterFromChangeDict(changeDict, 'new_value');
     };
 
-    var _checkIfSkillIdInList = function(skillId, skillList) {
-      for (var i = 0; i < skillList.length; i++) {
-        if (skillList[i] === skillId) {
-          return true;
-        }
+    var _checkIfSkillIdInList = function(skillId, skillIdList) {
+      if (skillIdList.indexOf(skillId) === -1) {
+        return false;
       }
-      return false;
+      return true;
     };
 
     var _getSubtopicIdFromChangeDict = function(changeDict) {

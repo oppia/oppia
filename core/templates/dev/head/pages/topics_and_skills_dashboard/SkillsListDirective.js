@@ -27,7 +27,7 @@ oppia.directive('skillsList', [
       controller: ['$scope',
         function($scope) {
           $scope.SKILL_HEADINGS = [
-            'description', 'misconception_count', 'worked_examples_count'
+            'description', 'worked_examples_count', 'misconception_count'
           ];
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;

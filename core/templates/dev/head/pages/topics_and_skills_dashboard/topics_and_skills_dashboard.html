@@ -25,13 +25,15 @@
         <li ng-if="topicSummaries.length > 0"
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
           <a class="dashboard-tabs-text"
-             ng-click="setActiveTab(TAB_NAME_TOPICS)"> Topics
+             ng-click="setActiveTab(TAB_NAME_TOPICS)">
+             Topics
           </a>
         </li>
         <li ng-if="skillSummaries.length > 0"
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_SKILLS}">
           <a class="dashboard-tabs-text"
-             ng-click="setActiveTab(TAB_NAME_SKILLS)"> Skills
+             ng-click="setActiveTab(TAB_NAME_SKILLS)">
+             Skills
           </a>
         </li>
       </ul>
@@ -48,7 +50,8 @@
 
     <div class="col-sm-8" ng-if="topicSummaries.length === 0 && skillSummaries.length === 0">
       <blockquote class="intro-card">
-        <p class="intro-card-message" style="padding-top: 6px;"> No topics or skills have been created yet.
+        <p class="intro-card-message" style="padding-top: 6px;">
+          No topics or skills have been created yet.
         </p>
         <a class="btn oppia-dashboard-intro-button oppia-transition-200"
            style="color: white; text-decoration: none;"
