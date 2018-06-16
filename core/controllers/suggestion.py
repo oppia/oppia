@@ -123,7 +123,7 @@ class SuggestionListHandler(base.BaseHandler):
         suggestions = self.LIST_TYPES_TO_SERVICES_MAPPING[list_type](*params)
 
         # When querying by ID, only a single suggestion is retrieved, so we make
-        # it a list
+        # it a list.
         if list_type == self.LIST_TYPE_ID:
             suggestions = [suggestions]
 
