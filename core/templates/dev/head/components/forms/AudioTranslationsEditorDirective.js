@@ -40,7 +40,7 @@ oppia.directive('audioTranslationsEditor', [
             stateContentIdsToAudioTranslationsService, EditabilityService,
             LanguageUtilService, AlertsService, ExplorationContextService,
             AssetsBackendApiService) {
-          $scope.isEditable = EditabilityService.isEditable;
+          $scope.isTranslatable = EditabilityService.isTranslatable;
 
           $scope.stateContentIdsToAudioTranslationsService =
               stateContentIdsToAudioTranslationsService;
@@ -73,6 +73,18 @@ oppia.directive('audioTranslationsEditor', [
           $scope.isFullyTranslated = function() {
             stateContentIdsToAudioTranslationsService.displayed
               .isFullyTranslated($scope.contentId);
+          };
+
+          $scope.getNeedsUpdateTooltipMessage = function(needsUpdate) {
+            if (needsUpdate) {
+              return ($scope.isEditable() ? 'Audio might not match text.' +
+                ' Reupload the file, or click to unflag.' :
+                'Audio might not match text.');
+            } else {
+              return ($scope.isEditable() ? 'Click to mark this audio ' +
+                'translation as not matching text.' :
+                'Audio translation matches text.');
+            }
           };
 
           $scope.toggleNeedsUpdateAttribute = function(languageCode) {

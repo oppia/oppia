@@ -13,21 +13,21 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the navbar breadcrumb of the collection editor.
+ * @fileoverview Controller for the skills list viewer.
  */
 oppia.directive('skillsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
-        skillSummaries: '&'
+        getSkillSummaries: '&skillSummaries'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/skills_list_directive.html'),
       controller: ['$scope',
         function($scope) {
           $scope.SKILL_HEADINGS = [
-            'description', 'misconception_count', 'worked_examples_count'
+            'description', 'worked_examples_count', 'misconception_count'
           ];
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;

@@ -30,7 +30,7 @@ oppia.directive('numberWithUnitsEditor', [
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
         var errorMessage = '';
-        var numberWithUnitsString = '0';
+        var numberWithUnitsString = '';
         if ($scope.value !== null) {
           var defaultNumberWithUnits =
             NumberWithUnitsObjectFactory.fromDict($scope.value);

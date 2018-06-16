@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the navbar breadcrumb of the collection editor.
+ * @fileoverview Controller for the topics list viewer.
  */
 oppia.directive('topicsList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {
-        topicSummaries: '&'
+        getTopicSummaries: '&topicSummaries'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/topics_list_directive.html'),

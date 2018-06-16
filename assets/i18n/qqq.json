@@ -112,8 +112,6 @@
 	"I18N_DASHBOARD_TABLE_HEADING_SUBTOPICS": "Text shown as heading for the subtopic count column in the topics list in topics and skills dashboard.",
 	"I18N_DASHBOARD_TABLE_HEADING_TOPIC_NAME": "Text shown as heading for the topic name column in the topics list in topics and skills dashboard.",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Text shown as table header in list view for explorations on the creator's dashboard - This is the table header for the Unresolved Answers column.",
-	"I18N_DASHBOARD_TABLE_HEADING_WORKED_EXAMPLES": "Text shown as heading for the worked examples column in the skills list in topics and skills dashboard.",
-	"I18N_DASHBOARD_TOPICS": "The title for the topics tab in topics and skills dashboard",
 	"I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD": "The name to be displayed for the topics and skills dashboard.",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Text displayed in the preferences page. - Text shown in the dialog shown to upload a profile picture. The user can upload the picture by dragging a file to the area with this text.",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Text displayed in the preferences page, or everywhere there's image upload to instruct the user to 'Upload a file' from their computer.",

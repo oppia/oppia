@@ -101,7 +101,7 @@ states:
       answer_groups:
       - labelled_as_correct: false
         outcome:
-          dest: Set Input
+          dest: Number With Units
           feedback:
             audio_translations: {}
             html: <p>Yes, well done!</p>
@@ -884,6 +884,48 @@ states:
         refresher_exploration_id: null
       hints: []
       id: NumericInput
+      solution: null
+    param_changes: []
+  Number With Units:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <p>Write 2 km/s in terms of m/s.</p>
+    interaction:
+      answer_groups:
+      - labelled_as_correct: false
+        outcome:
+          dest: Set Input
+          feedback:
+            audio_translations: {}
+            html: <p>Yes, well done!</p>
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              type: 'real'
+              real: 2000
+              fraction:
+                isNegative: false
+                wholeNumber: 0
+                numerator: 0
+                denominator: 1
+              units: [{'unit': 'm', 'exponent': 1}, {'unit': 's', 'exponent': -1}]
+          rule_type: IsEqualTo
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Number With Units
+        feedback:
+          audio_translations: {}
+          html: <p>No, that's not right. The answer is 2000 m/s.</p>
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumberWithUnits
       solution: null
     param_changes: []
   Pencil Code Editor:
