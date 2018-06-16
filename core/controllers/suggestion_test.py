@@ -36,7 +36,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL = 'author@example.com'
     AUTHOR_EMAIL_2 = 'author2@example.com'
-    REVIEWER_EMAIL = 'reviewer@example.com'
     ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
 
     def setUp(self):

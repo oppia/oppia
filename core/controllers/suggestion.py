@@ -84,36 +84,48 @@ class SuggestionListHandler(base.BaseHandler):
     LIST_TYPE_SUGGESTION_TYPE = 'type'
     LIST_TYPE_TARGET_ID = 'target'
 
+    LIST_TYPES_TO_SERVICES_MAPPING = {
+        LIST_TYPE_ASSIGNED_REVIEWER: (
+            suggestion_services.get_suggestions_assigned_to_reviewer),
+        LIST_TYPE_AUTHOR: suggestion_services.get_suggestions_by_author,
+        LIST_TYPE_ID: suggestion_services.get_suggestion_by_id,
+        LIST_TYPE_REVIEWER: suggestion_services.get_suggestions_reviewed_by,
+        LIST_TYPE_STATUS: suggestion_services.get_suggestions_by_status,
+        LIST_TYPE_SUGGESTION_TYPE: suggestion_services.get_suggestion_by_type,
+        LIST_TYPE_TARGET_ID: suggestion_services.get_suggestions_by_target_id
+    }
+
+    PARAMS_FOR_LIST_TYPES = {
+        LIST_TYPE_ASSIGNED_REVIEWER: ['assigned_reviewer_id'],
+        LIST_TYPE_AUTHOR: ['author_id'],
+        LIST_TYPE_ID: ['suggestion_id'],
+        LIST_TYPE_REVIEWER: ['reviewer_id'],
+        LIST_TYPE_STATUS: ['status'],
+        LIST_TYPE_SUGGESTION_TYPE: ['suggestion_type'],
+        LIST_TYPE_TARGET_ID: ['target_type', 'target_id']
+    }
+
+    def get_params_from_request(self, request, list_type):
+        return [request.get(param_name)
+                for param_name in self.PARAMS_FOR_LIST_TYPES[list_type]]
+
     @acl_decorators.open_access
     def get(self):
         if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
             raise self.PageNotFoundException
 
         list_type = self.request.get('list_type')
-        if list_type == self.LIST_TYPE_ASSIGNED_REVIEWER:
-            suggestions = (
-                suggestion_services.get_suggestions_assigned_to_reviewer(
-                    self.request.get('assigned_reviewer_id')))
-        elif list_type == self.LIST_TYPE_AUTHOR:
-            suggestions = suggestion_services.get_suggestions_by_author(
-                self.request.get('author_id'))
-        elif list_type == self.LIST_TYPE_ID:
-            suggestions = [suggestion_services.get_suggestion_by_id(
-                self.request.get('suggestion_id'))]
-        elif list_type == self.LIST_TYPE_REVIEWER:
-            suggestions = suggestion_services.get_suggestions_reviewed_by(
-                self.request.get('reviewer_id'))
-        elif list_type == self.LIST_TYPE_STATUS:
-            suggestions = suggestion_services.get_suggestions_by_status(
-                self.request.get('status'))
-        elif list_type == self.LIST_TYPE_SUGGESTION_TYPE:
-            suggestions = suggestion_services.get_suggestions_by_type(
-                self.request.get('suggestion_type'))
-        elif list_type == self.LIST_TYPE_TARGET_ID:
-            suggestions = suggestion_services.get_suggestions_by_target_id(
-                self.request.get('target_type'), self.request.get('target_id'))
-        else:
+
+        if list_type not in self.LIST_TYPES_TO_SERVICES_MAPPING:
             raise self.InvalidInputException('Invalid list type.')
+
+        params = self.get_params_from_request(self.request, list_type)
+        suggestions = self.LIST_TYPES_TO_SERVICES_MAPPING[list_type](*params)
+
+        # When querying by ID, only a single suggestion is retrieved, so we make
+        # it a list
+        if list_type == self.LIST_TYPE_ID:
+            suggestions = [suggestions]
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
