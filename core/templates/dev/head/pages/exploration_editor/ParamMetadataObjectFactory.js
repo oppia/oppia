@@ -18,6 +18,15 @@
  */
 
 oppia.factory('ParamMetadataObjectFactory', [function() {
+  /**
+   * @private @constructor
+   * Provide metadata when a parameter is changed by a GET or SET action
+   * @param {String} action - set or get
+   * @param {String} paramName - parameter's name
+   * @param {String} source - location where the parameter was defined
+   * e.g. answer, content, feedback or param_changes(changing value of param)
+   * @param {String} sourceInd - index for multiple actions with the same source
+   */
   var ParamMetadata = function(action, paramName, source, sourceInd) {
     this.action = action;
     this.paramName = paramName;
@@ -25,9 +34,25 @@ oppia.factory('ParamMetadataObjectFactory', [function() {
     this.sourceInd = sourceInd;
   };
 
-  ParamMetadata.createFromBackendDict = function(paramMetadataDict) {
-    return new ParamMetadata(paramMetadataDict.action,
-      paramMetadataDict.paramName, paramMetadataDict.source,
+  /**
+   * Metadata about the SET action of a parameter
+   * @param {!{obj_type: String}} paramMetadataDict - Basic dict
+   * @returns {ParamMetadata} - A new ParamMetadata instance
+   */
+  ParamMetadata.actionSet = function(paramMetadataDict) {
+    return new ParamMetadata(
+      'set', paramMetadataDict.paramName, paramMetadataDict.source,
+      paramMetadataDict.sourceInd);
+  };
+
+  /**
+   * Metadata about the GET action of a parameter
+   * @param {!{obj_type: String}} paramMetadataDict - Basic dict
+   * @returns {ParamMetadata} - A new ParamMetadata instance
+   */
+  ParamMetadata.actionGet = function(paramMetadataDict) {
+    return new ParamMetadata(
+      'get', paramMetadataDict.paramName, paramMetadataDict.source,
       paramMetadataDict.sourceInd);
   };
 

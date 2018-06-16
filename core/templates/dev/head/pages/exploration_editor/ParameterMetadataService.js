@@ -38,8 +38,7 @@ oppia.factory('ParameterMetadataService', [
         var pc = paramChanges[i];
         if (pc.generatorId === 'Copier') {
           if (!pc.customizationArgs.parse_with_jinja) {
-            result.push(ParamMetadataObjectFactory.createFromBackendDict({
-              action: PARAM_ACTION_SET,
+            result.push(ParamMetadataObjectFactory.actionSet({
               paramName: pc.name,
               source: PARAM_SOURCE_PARAM_CHANGES,
               sourceInd: i
@@ -49,16 +48,14 @@ oppia.factory('ParameterMetadataService', [
               ExpressionInterpolationService.getParamsFromString(
                 pc.customizationArgs.value));
             for (var j = 0; j < paramsReferenced.length; j++) {
-              result.push(ParamMetadataObjectFactory.createFromBackendDict({
-                action: PARAM_ACTION_GET,
+              result.push(ParamMetadataObjectFactory.actionGet({
                 paramName: paramsReferenced[j],
                 source: PARAM_SOURCE_PARAM_CHANGES,
                 sourceInd: i
               }));
             }
 
-            result.push(ParamMetadataObjectFactory.createFromBackendDict({
-              action: PARAM_ACTION_SET,
+            result.push(ParamMetadataObjectFactory.actionSet({
               paramName: pc.name,
               source: PARAM_SOURCE_PARAM_CHANGES,
               sourceInd: i
@@ -67,8 +64,7 @@ oppia.factory('ParameterMetadataService', [
         } else {
           // RandomSelector. Elements in the list of possibilities are treated
           // as raw unicode strings, not expressions.
-          result.push(ParamMetadataObjectFactory.createFromBackendDict({
-            action: PARAM_ACTION_SET,
+          result.push(ParamMetadataObjectFactory.actionSet({
             paramName: pc.name,
             source: PARAM_SOURCE_PARAM_CHANGES,
             sourceInd: i
@@ -92,8 +88,7 @@ oppia.factory('ParameterMetadataService', [
       ExpressionInterpolationService.getParamsFromString(
         state.content.getHtml()).forEach(
         function(paramName) {
-          result.push(ParamMetadataObjectFactory.createFromBackendDict({
-            action: PARAM_ACTION_GET,
+          result.push(ParamMetadataObjectFactory.actionGet({
             paramName: paramName,
             source: PARAM_SOURCE_CONTENT
           }));
@@ -101,8 +96,7 @@ oppia.factory('ParameterMetadataService', [
       );
 
       // Next, the answer is received.
-      result.push(ParamMetadataObjectFactory.createFromBackendDict({
-        action: PARAM_ACTION_SET,
+      result.push(ParamMetadataObjectFactory.actionSet({
         paramName: 'answer',
         source: PARAM_SOURCE_ANSWER
       }));
@@ -113,8 +107,7 @@ oppia.factory('ParameterMetadataService', [
           ExpressionInterpolationService.getParamsFromString(
             group.outcome.feedback[k]).forEach(
             function(paramName) {
-              result.push(ParamMetadataObjectFactory.createFromBackendDict({
-                action: PARAM_ACTION_GET,
+              result.push(ParamMetadataObjectFactory.actionGet({
                 paramName: paramName,
                 source: PARAM_SOURCE_FEEDBACK,
                 sourceInd: k
