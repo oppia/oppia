@@ -191,8 +191,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
             response = self.testapp.get('/explore/%s' % self.EXP_ID)
             csrf_token = self.get_csrf_token_from_response(response)
-            self.put_json('%s/%s' % (
+            self.put_json('%s/exploration/%s/%s' % (
                 feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
                 suggestion_to_accept['suggestion_id']), {
                     'action': u'accept',
                     'commit_message': u'commit message',

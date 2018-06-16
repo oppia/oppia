@@ -35,7 +35,8 @@ oppia.factory('ThreadDataService', [
 
     if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
       _SUGGESTION_LIST_HANDLER_URL = '/generalsuggestionlisthandler';
-      _SUGGESTION_ACTION_HANDLER_URL = '/generalsuggestionactionhandler/';
+      _SUGGESTION_ACTION_HANDLER_URL = ('/generalsuggestionactionhandler/' +
+        'exploration/' + _expId + '/');
     }
 
     // All the threads for this exploration. This is a list whose entries are

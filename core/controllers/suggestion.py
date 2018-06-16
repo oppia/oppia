@@ -44,27 +44,33 @@ class SuggestionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class SuggestionActionHandler(base.BaseHandler):
-    """Handles actions performed on suggestions."""
+class SuggestionToExplorationActionHandler(base.BaseHandler):
+    """Handles actions performed on suggestions to explorations."""
 
     ACTION_TYPE_ACCEPT = 'accept'
     ACTION_TYPE_REJECT = 'reject'
 
-    @acl_decorators.can_accept_suggestion
-    def put(self, suggestion_id):
+
+    # TODO (nithesh): Add permissions for users with enough scores to review
+    # Will be added as part of milestone 2 of the generalized review system
+    # project.
+    @acl_decorators.can_edit_exploration
+    def put(self, exploration_id, suggestion_id):
         if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
             raise self.PageNotFoundException
 
+        if len(suggestion_id.split('.')) != 3:
+            raise self.InvalidInputException('Invalid format for suggestion_id.'
+                                             ' It must contain 3 parts'
+                                             ' separated by \'.\'')
         action = self.payload.get('action')
         if action == self.ACTION_TYPE_ACCEPT:
-            suggestion = suggestion_services.get_suggestion_by_id(
-                suggestion_id)
+            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))
         elif action == self.ACTION_TYPE_REJECT:
-            suggestion = suggestion_services.get_suggestion_by_id(
-                suggestion_id)
+            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
             suggestion_services.reject_suggestion(
                 suggestion, self.user_id, self.payload.get('review_message'))
         else:
