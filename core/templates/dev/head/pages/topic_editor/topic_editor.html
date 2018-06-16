@@ -23,20 +23,13 @@
 
 {% block content %}
 <div ng-controller="TopicEditor">
-  <div>
-    <topic-main-editor></topic-main-editor>
-  </div>
+  <topic-main-editor></topic-main-editor>
 </div>
 {% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
-
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/main_editor/TopicEditorTabDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditor.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarDirective.js"></script>
-  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
@@ -46,4 +39,10 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicRightsBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicRightsObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicUpdateService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/main_editor/TopicEditorTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorStateService.js"></script>
 {% endblock footer_js %}

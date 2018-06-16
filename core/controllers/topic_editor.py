@@ -18,6 +18,7 @@ are created.
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import role_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -230,29 +231,27 @@ class EditableTopicDataHandler(base.BaseHandler):
 class TopicRightsHandler(base.BaseHandler):
     """A handler for returning topic rights."""
 
-    @acl_decorators.can_manage_rights_for_topic
+    @acl_decorators.can_edit_topic
     def get(self, topic_id):
-        """Returns the TopicRights object of a topic.
-        """
+        """Returns the TopicRights object of a topic."""
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
-        try:
-            topic_rights = topic_services.get_topic_rights(topic_id)
-            user_actions_info = user_services.UserActionsInfo(self.user_id)
-            can_edit_topic = False
-            if topic_services.check_can_edit_topic(
-                    user_actions_info, topic_rights):
-                can_edit_topic = True
-        except Exception as e:
-            raise self.PageNotFoundException(e)
+        topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
+        if topic_rights is None:
+            raise self.InvalidInputException(
+                Exception('Expected a valid topic id to be provided.'))
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        can_edit_topic = topic_services.check_can_edit_topic(
+            user_actions_info, topic_rights)
 
-        topic_rights_to_return = {
-            'topic_id': topic_id,
-            'can_edit_topic': can_edit_topic,
-            'is_published': topic_rights.topic_is_published
-        }
+        can_publish_topic = False
+        if role_services.ACTION_PUBLISH_TOPIC in user_actions_info.actions:
+            can_publish_topic = True
+
         self.values.update({
-            'topic_rights': topic_rights_to_return
+            'can_edit_topic': can_edit_topic,
+            'is_published': topic_rights.topic_is_published,
+            'can_publish_topic': can_publish_topic
         })
 
         self.render_json(self.values)
@@ -280,17 +279,13 @@ class TopicManagerRightsHandler(base.BaseHandler):
         except Exception as e:
             raise self.UnauthorizedUserException(e)
 
-        self.values.update({
-            'role_updated': True
-        })
-
         self.render_json(self.values)
 
 
 class TopicPublishHandler(base.BaseHandler):
     """A handler for publishing and unpublishing topics."""
 
-    @acl_decorators.can_manage_rights_for_topic
+    @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id):
         """Publishes or unpublishes a topic.
         """
@@ -309,9 +304,5 @@ class TopicPublishHandler(base.BaseHandler):
                 topic_services.unpublish_topic(topic_id, self.user_id)
         except Exception as e:
             raise self.UnauthorizedUserException(e)
-
-        self.values.update({
-            'topic_status_updated': True
-        })
 
         self.render_json(self.values)

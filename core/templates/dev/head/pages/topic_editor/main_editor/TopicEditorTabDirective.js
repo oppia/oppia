@@ -25,13 +25,14 @@ oppia.directive('topicMainEditor', [
         '/pages/topic_editor/main_editor/topic_editor_tab_directive.html'),
       controller: [
         '$scope', 'TopicEditorStateService', 'TopicUpdateService',
+        'UndoRedoService',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         function(
             $scope, TopicEditorStateService, TopicUpdateService,
+            UndoRedoService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
           $scope.topic = TopicEditorStateService.getTopic();
           $scope.topicRights = TopicEditorStateService.getTopicRights();
-          $scope.canEditName = GLOBALS.isAdmin;
 
           var _initEditor = function() {
             $scope.topicNameEditorIsShown = false;
@@ -44,11 +45,19 @@ oppia.directive('topicMainEditor', [
           $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
           $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
 
-          $scope.switchTopicNameEditor = function() {
-            if (!$scope.canEditName) {
+          $scope.openTopicNameEditor = function() {
+            if (!$scope.topicRights.getCanEditName()) {
               return;
             }
-            $scope.topicNameEditorIsShown = !$scope.topicNameEditorIsShown;
+            $scope.topicNameEditorIsShown = true;
+            $scope.editableName = $scope.topic.getName();
+          };
+
+          $scope.closeTopicNameEditor = function() {
+            if (!$scope.topicRights.getCanEditName()) {
+              return;
+            }
+            $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
           };
 
@@ -58,8 +67,10 @@ oppia.directive('topicMainEditor', [
           };
 
           $scope.updateTopicDescription = function(newDescription) {
-            TopicUpdateService.setTopicDescription(
-              $scope.topic, newDescription);
+            if (newDescription !== $scope.topic.getDescription()) {
+              TopicUpdateService.setTopicDescription(
+                $scope.topic, newDescription);
+            }
           };
         }
       ]

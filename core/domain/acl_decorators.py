@@ -1051,3 +1051,25 @@ def can_manage_rights_for_topic(handler):
     test_can_manage_topic_rights.__wrapped__ = True
 
     return test_can_manage_topic_rights
+
+
+def can_change_topic_publication_status(handler):
+    """Decorator to check whether the user can publish or unpublish a topic."""
+
+    def test_can_change_topic_publication_status(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if (
+                role_services.ACTION_PUBLISH_TOPIC in
+                user_actions_info.actions):
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to publish or unpublish the '
+                'topic.' % self.user_id)
+    test_can_change_topic_publication_status.__wrapped__ = True
+
+    return test_can_change_topic_publication_status

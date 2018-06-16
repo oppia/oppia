@@ -563,12 +563,12 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
             Exception,
-            'The user does not have enought rights to publish the topic.'):
+            'The user does not have enough rights to publish the topic.'):
             topic_services.publish_topic(self.TOPIC_ID, self.user_id_a)
 
         with self.assertRaisesRegexp(
             Exception,
-            'The user does not have enought rights to unpublish the topic.'):
+            'The user does not have enough rights to unpublish the topic.'):
             topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_a)
 
     def test_create_new_topic_rights(self):

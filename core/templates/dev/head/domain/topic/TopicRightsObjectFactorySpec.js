@@ -24,9 +24,9 @@ describe('Topic rights object factory', function() {
   beforeEach(inject(function($injector) {
     TopicRightsObjectFactory = $injector.get('TopicRightsObjectFactory');
     var initialTopicRightsBackendObject = {
-      topic_id: 'topic_id',
       is_published: false,
-      can_edit_topic: true
+      can_edit_topic: true,
+      can_publish_topic: true
     };
 
     sampleTopicRights = TopicRightsObjectFactory.create(
@@ -35,24 +35,24 @@ describe('Topic rights object factory', function() {
 
   it('should be able to publish and unpublish topic when user can edit it',
     function() {
-      expect(sampleTopicRights.getIsPublished()).toBe(false);
+      expect(sampleTopicRights.isPublished()).toBe(false);
 
       sampleTopicRights.publishTopic();
-      expect(sampleTopicRights.getIsPublished()).toBe(true);
+      expect(sampleTopicRights.isPublished()).toBe(true);
 
       sampleTopicRights.unpublishTopic();
-      expect(sampleTopicRights.getIsPublished()).toBe(false);
+      expect(sampleTopicRights.isPublished()).toBe(false);
     });
 
   it('should throw error and not be able to publish or unpublish topic when ' +
     'user cannot edit topic',
   function() {
-    expect(sampleTopicRights.getIsPublished()).toBe(false);
+    expect(sampleTopicRights.isPublished()).toBe(false);
 
     var exampleTopicRightsBackendObject = {
-      topic_id: 'topic_id',
       is_published: false,
-      can_edit_topic: false
+      can_edit_topic: true,
+      can_publish_topic: false
     };
 
     exampleTopicRights = TopicRightsObjectFactory.create(
@@ -71,10 +71,9 @@ describe('Topic rights object factory', function() {
     var emptyTopicRightsBackendObject = (
       TopicRightsObjectFactory.createEmptyTopicRights());
 
-    expect(
-      emptyTopicRightsBackendObject.getTopicId()).toBeUndefined();
-    expect(emptyTopicRightsBackendObject.getIsPublished()).toBeUndefined();
-    expect(emptyTopicRightsBackendObject.getCanEditTopic()).toBeUndefined();
+    expect(emptyTopicRightsBackendObject.isPublished()).toBeUndefined();
+    expect(emptyTopicRightsBackendObject.canEditTopic()).toBeUndefined();
+    expect(emptyTopicRightsBackendObject.getCanPublishTopic()).toBeUndefined();
   });
 
   it('should make a copy from another topic rights', function() {
@@ -82,9 +81,9 @@ describe('Topic rights object factory', function() {
       TopicRightsObjectFactory.createEmptyTopicRights());
 
     emptyTopicRightsBackendObject.copyFromTopicRights(sampleTopicRights);
-    expect(
-      emptyTopicRightsBackendObject.getTopicId()).toEqual('topic_id');
-    expect(emptyTopicRightsBackendObject.getIsPublished()).toEqual(false);
-    expect(emptyTopicRightsBackendObject.getCanEditTopic()).toEqual(true);
+
+    expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
+    expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(true);
+    expect(emptyTopicRightsBackendObject.getCanPublishTopic()).toEqual(true);
   });
 });

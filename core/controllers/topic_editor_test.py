@@ -311,8 +311,7 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
 class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
 
     def test_assign_topic_manager_role(self):
-        """Test the assign topic manager role for a topic functionality.
-        """
+        """Test the assign topic manager role for a topic functionality."""
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
@@ -336,7 +335,6 @@ class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
                     self.topic_manager_id),
                 {}, csrf_token=csrf_token, expect_errors=True,
                 expected_status_int=200)
-            self.assertEqual(json_response['role_updated'], True)
             self.logout()
 
             # Test for when committer doesn't have sufficient rights to assign
@@ -353,18 +351,15 @@ class TopicManagerRightsHandlerTest(BaseTopicEditorControllerTest):
 class TopicRightsHandlerTest(BaseTopicEditorControllerTest):
 
     def test_get_topic_rights(self):
-        """Test the get topic rights functionality.
-        """
+        """Test the get topic rights functionality."""
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             # Test whether admin can access topic rights.
             json_response = self.get_json(
                 '%s/%s' % (
                     feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id))
-            self.assertEqual(
-                json_response['topic_rights']['topic_id'], self.topic_id)
-            self.assertEqual(
-                json_response['topic_rights']['is_published'], False)
+            self.assertEqual(json_response['is_published'], False)
+            self.assertEqual(json_response['can_publish_topic'], True)
             self.logout()
 
 
@@ -381,8 +376,7 @@ class TopicRightsHandlerTest(BaseTopicEditorControllerTest):
 class TopicPublishHandlerTest(BaseTopicEditorControllerTest):
 
     def test_publish_and_unpublish_topic(self):
-        """Test the publish and unpublish functionality.
-        """
+        """Test the publish and unpublish functionality."""
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get(
@@ -393,7 +387,6 @@ class TopicPublishHandlerTest(BaseTopicEditorControllerTest):
                 '%s/%s' % (
                     feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
                 {'publish_status': True}, csrf_token=csrf_token)
-            self.assertTrue(json_response['topic_status_updated'])
             topic_rights = topic_services.get_topic_rights(self.topic_id)
             self.assertTrue(topic_rights.topic_is_published)
 
@@ -401,11 +394,9 @@ class TopicPublishHandlerTest(BaseTopicEditorControllerTest):
                 '%s/%s' % (
                     feconf.TOPIC_STATUS_URL_PREFIX, self.topic_id),
                 {'publish_status': False}, csrf_token=csrf_token)
-            self.assertTrue(json_response['topic_status_updated'])
             topic_rights = topic_services.get_topic_rights(self.topic_id)
             self.assertFalse(topic_rights.topic_is_published)
             self.logout()
-
 
             self.login(self.NEW_USER_EMAIL)
             # Test that other users cannot access topic rights.

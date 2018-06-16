@@ -36,8 +36,12 @@ oppia.directive('topicEditorNavbar', [
           $scope.topicId = GLOBALS.topicId;
           $scope.topic = TopicEditorStateService.getTopic();
           $scope.topicRights = TopicEditorStateService.getTopicRights();
+          $scope.isSaveInProgress = TopicEditorStateService.isSavingTopic;
 
           $scope.publishTopic = function() {
+            if (!$scope.topicRights.getCanPublishTopic()) {
+              return false;
+            }
             TopicRightsBackendApiService.publishTopic($scope.topicId).then(
               function() {
                 $scope.topicRights.publishTopic();
@@ -45,7 +49,44 @@ oppia.directive('topicEditorNavbar', [
               });
           };
 
+          $scope.getChangeListCount = function() {
+            return UndoRedoService.getChangeCount();
+          };
+
+          $scope.isTopicSaveable = function() {
+            return $scope.getChangeListCount() > 0;
+          };
+
+          $scope.saveChanges = function() {
+            var isPublished = $scope.topicRights.isPublished();
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic_editor/topic_editor_save_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.isTopicPublished = isPublished;
+
+                  $scope.save = function(commitMessage) {
+                    $uibModalInstance.close(commitMessage);
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(commitMessage) {
+              TopicEditorStateService.saveTopic(commitMessage);
+            });
+          };
+
           $scope.unpublishTopic = function() {
+            if (!$scope.topicRights.getCanPublishTopic()) {
+              return false;
+            }
             TopicRightsBackendApiService.unpublishTopic($scope.topicId).then(
               function() {
                 $scope.topicRights.unpublishTopic();

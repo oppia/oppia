@@ -34,8 +34,8 @@ oppia.factory('TopicEditorStateService', [
     var _topic = TopicObjectFactory.createEmptyTopic();
     var _topicRights = TopicRightsObjectFactory.createEmptyTopicRights();
     var _topicIsInitialized = false;
-    var _isLoadingTopic = false;
-    var _isSavingTopic = false;
+    var _topicIsLoading = false;
+    var _topicIsBeingSaved = false;
 
     var _setTopic = function(topic) {
       _topic.copyFromTopic(topic);
@@ -64,7 +64,7 @@ oppia.factory('TopicEditorStateService', [
        * additional behavior of this function.
        */
       loadTopic: function(topicId) {
-        _isLoadingTopic = true;
+        _topicIsLoading = true;
         EditableTopicBackendApiService.fetchTopic(
           topicId).then(
           function(newBackendTopicObject) {
@@ -73,17 +73,17 @@ oppia.factory('TopicEditorStateService', [
           function(error) {
             AlertsService.addWarning(
               error || 'There was an error when loading the topic.');
-            _isLoadingTopic = false;
+            _topicIsLoading = false;
           });
         TopicRightsBackendApiService.fetchTopicRights(
           topicId).then(function(newBackendTopicRightsObject) {
           _updateTopicRights(newBackendTopicRightsObject);
-          _isLoadingTopic = false;
+          _topicIsLoading = false;
         }, function(error) {
           AlertsService.addWarning(
             error ||
             'There was an error when loading the topic rights.');
-          _isLoadingTopic = false;
+          _topicIsLoading = false;
         });
       },
 
@@ -92,7 +92,7 @@ oppia.factory('TopicEditorStateService', [
        * topic maintained by this service.
        */
       isLoadingTopic: function() {
-        return _isLoadingTopic;
+        return _topicIsLoading;
       },
 
       /**
@@ -167,21 +167,21 @@ oppia.factory('TopicEditorStateService', [
         if (!UndoRedoService.hasChanges()) {
           return false;
         }
-        _isSavingTopic = true;
+        _topicIsBeingSaved = true;
         EditableTopicBackendApiService.updateTopic(
           _topic.getId(), _topic.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(topicBackendObject) {
             _updateTopic(topicBackendObject);
             UndoRedoService.clearChanges();
-            _isSavingtopic = false;
+            _topicIsBeingSaved = false;
             if (successCallback) {
               successCallback();
             }
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the topic.');
-            _isSavingTopic = false;
+            _topicIsBeingSaved = false;
           });
         return true;
       },
@@ -191,7 +191,7 @@ oppia.factory('TopicEditorStateService', [
        * topic maintained by this service.
        */
       isSavingTopic: function() {
-        return _isSavingTopic;
+        return _topicIsBeingSaved;
       }
     };
   }

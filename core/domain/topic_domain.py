@@ -139,6 +139,63 @@ class TopicChange(object):
         return topic_change_dict
 
 
+class TopicRightsChange(object):
+    """Domain object for changes made to a topic rights object."""
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'assignee_id', 'new_role', 'old_role'
+    ]
+
+    def __init__(self, change_dict):
+        """Initialize a TopicRightsChange object from a dict.
+
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd'
+                key, and one or more other keys. The keys depend on what the
+                value for 'cmd' is. The possible values for 'cmd' are listed
+                below, together with the other keys in the dict:
+                - 'change_role' (with assignee_id, new_role
+                and old_role)
+                - 'create_new'
+                - 'publish_topic'
+                - 'unpublish_topic'
+
+        Raises:
+            Exception: The given change dict is not valid.
+        """
+        if 'cmd' not in change_dict:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == CMD_CHANGE_ROLE:
+            self.assignee_id = change_dict['assignee_id']
+            self.new_role = change_dict['new_role']
+            self.old_role = change_dict['old_role']
+        elif self.cmd == CMD_CREATE_NEW:
+            pass
+        elif self.cmd == CMD_PUBLISH_TOPIC:
+            pass
+        elif self.cmd == CMD_UNPUBLISH_TOPIC:
+            pass
+        else:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the TopicRightsChange domain object.
+
+        Returns:
+            A dict, mapping all fields of TopicRightsChange instance.
+        """
+        topic_rights_change_dict = {}
+        topic_rights_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                topic_rights_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return topic_rights_change_dict
+
+
 class Subtopic(object):
     """Domain object for a Subtopic."""
 
@@ -788,7 +845,8 @@ class TopicRights(object):
             topic_id: str. The id of the topic.
             manager_ids: list(str). The id of the users who have been assigned
                 as managers for the topic.
-            topic_is_published: boo. Whether the topic is playable by a learner.
+            topic_is_published: bool. Whether the topic is viewable by a
+                learner.
         """
         self.id = topic_id
         self.manager_ids = manager_ids

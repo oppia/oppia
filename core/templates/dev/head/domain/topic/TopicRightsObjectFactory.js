@@ -20,30 +20,35 @@
 oppia.factory('TopicRightsObjectFactory', [
   function() {
     var TopicRights = function(topicRightsObject) {
-      this._topicId = topicRightsObject.topic_id;
-      this._isPublished = topicRightsObject.is_published;
+      this._published = topicRightsObject.is_published;
+      this._canPublishTopic = topicRightsObject.can_publish_topic;
       this._canEditTopic = topicRightsObject.can_edit_topic;
     };
 
     // Instance methods
 
-    TopicRights.prototype.getTopicId = function() {
-      return this._topicId;
-    };
-
-    TopicRights.prototype.getCanEditTopic = function() {
+    TopicRights.prototype.canEditTopic = function() {
       return this._canEditTopic;
     };
 
-    TopicRights.prototype.getIsPublished = function() {
-      return this._isPublished;
+    TopicRights.prototype.isPublished = function() {
+      return this._published;
+    };
+
+    TopicRights.prototype.getCanPublishTopic = function() {
+      return this._canPublishTopic;
+    };
+
+    // Currently only admins can publish/unpublish a topic or edit it's name.
+    TopicRights.prototype.getCanEditName = function() {
+      return this._canPublishTopic;
     };
 
     // Sets _isPublished to true only if the user can edit the
     // corresponding topic.
     TopicRights.prototype.publishTopic = function() {
-      if (this._canEditTopic) {
-        this._isPublished = true;
+      if (this._canPublishTopic) {
+        this._published = true;
       } else {
         throw new Error('User is not allowed to edit this topic.');
       }
@@ -51,8 +56,8 @@ oppia.factory('TopicRightsObjectFactory', [
 
     // Sets _isPublished to false if user can edit the topic.
     TopicRights.prototype.unpublishTopic = function() {
-      if (this._canEditTopic) {
-        this._isPublished = false;
+      if (this._canPublishTopic) {
+        this._published = false;
       } else {
         throw new Error('User is not allowed to edit this topic.');
       }
@@ -68,9 +73,9 @@ oppia.factory('TopicRightsObjectFactory', [
     // topic rights. This is performed as a deep copy such that none of the
     // internal, bindable objects are changed within this topic rights.
     TopicRights.prototype.copyFromTopicRights = function(otherTopicRights) {
-      this._topicId = otherTopicRights.getTopicId();
-      this._isPublished = otherTopicRights.getIsPublished();
-      this._canEditTopic = otherTopicRights.getCanEditTopic();
+      this._published = otherTopicRights.isPublished();
+      this._canEditTopic = otherTopicRights.canEditTopic();
+      this._canPublishTopic = otherTopicRights.getCanPublishTopic();
     };
 
     // Create a new, empty topic rights object. This is not guaranteed to

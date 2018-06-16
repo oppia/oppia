@@ -1,10 +1,10 @@
 <div role="form" class="form-horizontal topic-editor">
   <md-card class="oppia-page-card oppia-long-text">
     <div class="topic-name">
-      <span ng-if="!topicNameEditorIsShown" ng-click="switchTopicNameEditor()"
+      <span ng-if="!topicNameEditorIsShown" ng-click="openTopicNameEditor()"
             class="oppia-editable-section">
         <strong style="font-size: 1.2em;"><[topic.getName()]></strong>
-        <i ng-if="canEditName" class="material-icons oppia-editor-edit-icon"
+        <i ng-if="topicRights.getCanEditName()" class="material-icons oppia-editor-edit-icon"
            title="Edit Topic Name">&#xE254;
         </i>
       </span>
@@ -12,7 +12,7 @@
         <form class="form-horizontal" role="form" ng-submit="updateTopicName(editableName)">
           <input type="text" ng-model="editableName">
           <button type="submit" class="btn btn-success btn-sm">Save</button>
-          <button class="btn btn-default btn-sm" ng-click="switchTopicNameEditor()">Cancel</button>
+          <button class="btn btn-default btn-sm" ng-click="closeTopicNameEditor()">Cancel</button>
         </form>
       </span>
     </div>

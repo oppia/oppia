@@ -33,7 +33,7 @@ oppia.factory('TopicRightsBackendApiService', [
 
       $http.get(topicRightsUrl).then(function(response) {
         if (successCallback) {
-          successCallback(response.data.topic_rights);
+          successCallback(response.data);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -66,7 +66,7 @@ oppia.factory('TopicRightsBackendApiService', [
     };
 
     var _isCached = function(topicId) {
-      return topicId in topicRightsCache;
+      return topicRightsCache.hasOwnProperty(topicId);
     };
 
     return {
