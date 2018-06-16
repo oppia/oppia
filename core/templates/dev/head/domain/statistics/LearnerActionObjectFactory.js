@@ -36,6 +36,19 @@ oppia.factory('LearnerActionObjectFactory', [function() {
   };
 
   /**
+   * @property {string} actionType - type of an action
+   * @property {Object.<string, *>} actionCustomizationArgs - customization dict
+   *   for an action
+   * @property {number} schemaVersion - schema version of the class instance
+   * @returns {LearnerAction}
+   */
+  LearnerAction.createNew = function(
+      actionType, actionCustomizationArgs, schemaVersion) {
+    return new LearnerAction(
+      actionType, actionCustomizationArgs, schemaVersion);
+  };
+
+  /**
    * @typedef LearnerActionBackendDict
    * @property {string} actionType - type of an action.
    * @property {Object.<string, *>} actionCustomizationArgs - customization dict

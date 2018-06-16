@@ -270,10 +270,10 @@ oppia.factory('StatsReportingService', [
         siteAnalyticsService.registerFinishExploration();
         explorationIsComplete = true;
 
+        postStatsToBackend();
         if (ENABLE_PLAYTHROUGHS) {
           PlaythroughService.recordExplorationQuitAction(
             stateName, stateStopwatch.getTimeInSecs());
-          postStatsToBackend();
 
           PlaythroughService.recordPlaythrough();
         }

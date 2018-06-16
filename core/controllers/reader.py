@@ -374,7 +374,7 @@ class StorePlaythroughHandler(base.BaseHandler):
             issue = stats_domain.ExplorationIssue(
                 playthrough_data['issue_type'],
                 playthrough_data['issue_customization_args'],
-                [playthrough_id], issue_schema_version, True)
+                [playthrough_id], issue_schema_version, is_valid=True)
 
             exp_issues.unresolved_issues.append(issue)
 

@@ -25,8 +25,8 @@ describe('Playthrough Object Factory', function() {
   }));
 
   it('should create a new playthrough', function() {
-    var actions = [new this.laof('AnswerSubmit', {}, 1)];
-    var playthroughObject = new this.pof(
+    var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
+    var playthroughObject = this.pof.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
     expect(playthroughObject.playthroughId).toEqual('playthroughId1');

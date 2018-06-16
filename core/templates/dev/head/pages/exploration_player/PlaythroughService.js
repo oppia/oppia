@@ -47,6 +47,41 @@ oppia.factory('PlaythroughService', [
     var cycleIdentifier = {};
     var visitedStates = [];
 
+    var incrementIncorrectAnswerInMultipleIncorrectIssueTracker = function() {
+      multipleIncorrectStateName.num_times_incorrect += 1;
+    };
+
+    var handleStateTransitionInMultipleIncorrectIssueTracker = function(
+        destStateName) {
+      if (multipleIncorrectStateName.num_times_incorrect < (
+        NUM_INCORRECT_ANSWERS_THRESHOLD)) {
+        multipleIncorrectStateName.state_name = destStateName;
+        multipleIncorrectStateName.num_times_incorrect = 0;
+      }
+    };
+
+    var handleStateTransitionInCyclicIssueTracker = function(destStateName) {
+      if (cycleIdentifier.num_cycles < NUM_REPEATED_CYCLES_THRESHOLD) {
+        if (visitedStates.indexOf(destStateName) !== -1) {
+          // Cycle identified.
+          var cycleStartIndex = visitedStates.indexOf(destStateName);
+          visitedStates.push(destStateName);
+          var cycleString =
+            visitedStates.slice(
+              cycleStartIndex, visitedStates.length).toString();
+          if (cycleIdentifier.cycle === cycleString) {
+            cycleIdentifier.num_cycles += 1;
+          } else {
+            cycleIdentifier.cycle = cycleString;
+            cycleIdentifier.num_cycles = 1;
+          }
+          visitedStates = [destStateName];
+        } else {
+          visitedStates.push(destStateName);
+        }
+      }
+    };
+
     var isMultipleIncorrectSubmissionsIssue = function() {
       if (multipleIncorrectStateName.num_times_incorrect >= (
         NUM_INCORRECT_ANSWERS_THRESHOLD)) {
@@ -118,6 +153,22 @@ oppia.factory('PlaythroughService', [
       }
     };
 
+    var storePlaythrough = function(updatePlaythrough) {
+      if (updatePlaythrough) {
+        $http.post(getFullPlaythroughUrl(), {
+          playthrough_data: playthrough.convertToBackendDict(),
+          issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
+        });
+      } else {
+        $http.post(getFullPlaythroughUrl(), {
+          playthrough_data: playthrough.convertToBackendDict(),
+          issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
+        }).then(function(response) {
+          playthrough.playthroughId = response.playthroughId;
+        });
+      }
+    };
+
     var getFullPlaythroughUrl = function() {
       return UrlInterpolationService.interpolateUrl(
         STORE_PLAYTHROUGH_URL, {
@@ -127,7 +178,7 @@ oppia.factory('PlaythroughService', [
 
     return {
       initSession: function(newExplorationId, newExplorationVersion) {
-        playthrough = new PlaythroughObjectFactory(
+        playthrough = PlaythroughObjectFactory.createNew(
           null, newExplorationId, newExplorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
       },
@@ -135,7 +186,7 @@ oppia.factory('PlaythroughService', [
         return playthrough;
       },
       recordExplorationStartAction: function(initStateName) {
-        playthrough.actions.push(new LearnerActionObjectFactory(
+        playthrough.actions.push(LearnerActionObjectFactory.createNew(
           ACTION_TYPE_EXPLORATION_START,
           {
             state_name: {
@@ -159,7 +210,7 @@ oppia.factory('PlaythroughService', [
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
-        playthrough.actions.push(new LearnerActionObjectFactory(
+        playthrough.actions.push(LearnerActionObjectFactory.createNew(
           ACTION_TYPE_ANSWER_SUBMIT,
           {
             state_name: {
@@ -185,38 +236,16 @@ oppia.factory('PlaythroughService', [
         ));
 
         if (destStateName === stateName) {
-          multipleIncorrectStateName.num_times_incorrect += 1;
+          incrementIncorrectAnswerInMultipleIncorrectIssueTracker();
         } else {
-          if (multipleIncorrectStateName.num_times_incorrect < (
-            NUM_INCORRECT_ANSWERS_THRESHOLD)) {
-            multipleIncorrectStateName.state_name = destStateName;
-            multipleIncorrectStateName.num_times_incorrect = 0;
-          }
+          handleStateTransitionInMultipleIncorrectIssueTracker(destStateName);
 
-          if (cycleIdentifier.num_cycles < NUM_REPEATED_CYCLES_THRESHOLD) {
-            // Cycle identified.
-            if (visitedStates.indexOf(destStateName) !== -1) {
-              var cycleStartIndex = visitedStates.indexOf(destStateName);
-              visitedStates.push(destStateName);
-              var cycleString =
-                visitedStates.slice(
-                  cycleStartIndex, visitedStates.length).toString();
-              if (cycleIdentifier.cycle === cycleString) {
-                cycleIdentifier.num_cycles += 1;
-              } else {
-                cycleIdentifier.cycle = cycleString;
-                cycleIdentifier.num_cycles = 1;
-              }
-              visitedStates = [destStateName];
-            } else {
-              visitedStates.push(destStateName);
-            }
-          }
+          handleStateTransitionInCyclicIssueTracker(destStateName);
         }
       },
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
-        playthrough.actions.push(new LearnerActionObjectFactory(
+        playthrough.actions.push(LearnerActionObjectFactory.createNew(
           ACTION_TYPE_EXPLORATION_QUIT,
           {
             state_name: {
@@ -230,20 +259,15 @@ oppia.factory('PlaythroughService', [
         ));
       },
       recordPlaythrough: function() {
+        // If playthrough ID exists, issue has already been identified and the
+        // playthrough is updated. Otherwise, check whether an issue exists and
+        // store playthrough if true.
         if (playthrough.playthroughId) {
-          $http.post(getFullPlaythroughUrl(), {
-            playthrough_data: playthrough.convertToBackendDict(),
-            issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
-          });
+          storePlaythrough(true);
         } else {
           analyzePlaythrough();
           if (playthrough.issueType) {
-            $http.post(getFullPlaythroughUrl(), {
-              playthrough_data: playthrough.convertToBackendDict(),
-              issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
-            }).then(function(response) {
-              playthrough.playthroughId = response.playthroughId;
-            });
+            storePlaythrough();
           }
         }
       }

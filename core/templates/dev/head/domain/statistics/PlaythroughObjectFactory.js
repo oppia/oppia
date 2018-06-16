@@ -47,6 +47,24 @@ oppia.factory('PlaythroughObjectFactory', [
     };
 
     /**
+     * @param {string} playthroughId - ID of a playthrough.
+     * @param {string} expId - ID of an exploration.
+     * @param {number} expVersion - Version of an exploration.
+     * @param {string} issueType - type of an issue.
+     * @param {Object.<string, *>} issueCustomizationArgs - customization dict
+     *   for an issue.
+     * @param {LearnerAction[]} actions - list of learner actions.
+     * @returns {Playthrough}
+     */
+    Playthrough.createNew = function(
+        playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
+        actions) {
+      return new Playthrough(
+        playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
+        actions);
+    };
+
+    /**
      * @typedef PlaythroughBackendDict
      * @property {string} playthroughId - ID of a playthrough.
      * @property {string} expId - ID of an exploration.

@@ -20,20 +20,19 @@ describe('Playthrough service', function() {
   beforeEach(module('oppia'));
 
   describe('Test playthrough service functions', function() {
-    var expId = 'expId1';
-    var expVersion = 1;
-
     beforeEach(inject(function($injector) {
+      this.expId = 'expId1';
+      this.expVersion = 1;
       this.ps = $injector.get('PlaythroughService');
       this.laof = $injector.get('LearnerActionObjectFactory');
-      this.ps.initSession(expId, expVersion);
+      this.ps.initSession(this.expId, this.expVersion);
     }));
 
     it('should initialize a session with correct values.', function() {
       var playthrough = this.ps.getPlaythrough();
 
-      expect(playthrough.expId, expId);
-      expect(playthrough.expVersion, expVersion);
+      expect(playthrough.expId, this.expId);
+      expect(playthrough.expVersion, this.expVersion);
     });
 
     it('should record exploration start action.', function() {
@@ -229,7 +228,7 @@ describe('Playthrough service', function() {
           'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', '30');
         this.ps.recordAnswerSubmitAction(
           'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', '30');
-        this.ps.recordExplorationQuitAction('stateName2', '60')
+        this.ps.recordExplorationQuitAction('stateName2', '60');
 
         var playthrough = this.ps.getPlaythrough();
 

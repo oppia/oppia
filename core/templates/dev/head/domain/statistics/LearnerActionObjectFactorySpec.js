@@ -24,7 +24,7 @@ describe('Learner Action Object Factory', function() {
   }));
 
   it('should create a new learner action', function() {
-    var learnerActionObject = new this.laof('AnswerSubmit', {}, 1);
+    var learnerActionObject = this.laof.createNew('AnswerSubmit', {}, 1);
 
     expect(learnerActionObject.actionType).toEqual('AnswerSubmit');
     expect(learnerActionObject.actionCustomizationArgs).toEqual({});
