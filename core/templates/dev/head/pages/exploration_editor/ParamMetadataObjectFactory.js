@@ -54,7 +54,7 @@ oppia.factory('ParamMetadataObjectFactory', [function() {
    * @param {String} sourceInd - index of this parameter in a set of changes
    * @returns {ParamMetadata} - A new ParamMetadata instance
    */
-  ParamMetadata.createWithGetAction = function(paramMetadataDict) {
+  ParamMetadata.createWithGetAction = function(paramName, source, sourceInd) {
     return new ParamMetadata('get', paramName, source, sourceInd);
   };
 
