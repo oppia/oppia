@@ -1162,6 +1162,7 @@ var revertToVersion = function(version) {
 // Wrapper for functions involving the feedback tab
 var _runFromFeedbackTab = function(callbackFunction) {
   element(by.css('.protractor-test-feedback-tab')).click();
+  general.waitForSystem();
   var result = callbackFunction();
   general.waitForSystem();
   element(by.css('.protractor-test-main-tab')).click();
