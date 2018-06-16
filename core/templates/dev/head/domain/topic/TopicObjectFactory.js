@@ -161,12 +161,6 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
       return this._subtopics.slice();
     };
 
-    Topic.prototype.getSubtopicIndex = function(subtopicId) {
-      return this._subtopics.findIndex(function(subtopic) {
-        return subtopic.getId() === subtopicId;
-      });
-    };
-
     Topic.prototype.addCanonicalStoryId = function(storyId) {
       if (this._canonicalStoryIds.indexOf(storyId) !== -1) {
         throw Error(

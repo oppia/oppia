@@ -39,13 +39,23 @@ describe('Topic rights backend API service', function() {
     $httpBackend.verifyNoOutstandingRequest();
   });
 
-  it('should successfully publish a topic', function() {
+  it('should successfully publish and unpublish a topic', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     $httpBackend.expect(
       'PUT', '/rightshandler/change_topic_status/0').respond(200);
     TopicRightsBackendApiService.publishTopic('0').then(
+      successHandler, failHandler);
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+
+    $httpBackend.expect(
+      'PUT', '/rightshandler/change_topic_status/0').respond(200);
+    TopicRightsBackendApiService.unpublishTopic('0').then(
       successHandler, failHandler);
     $httpBackend.flush();
     $rootScope.$digest();
@@ -68,6 +78,33 @@ describe('Topic rights backend API service', function() {
 
     expect(successHandler).not.toHaveBeenCalled();
     expect(failHandler).toHaveBeenCalled();
+  });
+
+  it('should report an uncached topic rights after caching it', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
+
+    $httpBackend.expect(
+      'GET', '/rightshandler/get_topic_rights/0').respond(200, {
+      topic_id: 0,
+      topic_is_published: true,
+      manager_ids: ['user_id']
+    });
+    // The topic should not currently be cached.
+    expect(TopicRightsBackendApiService.isCached('0')).toBe(false);
+
+    // A new topic should be fetched from the backend. Also,
+    // the returned topic should match the expected topic object.
+    TopicRightsBackendApiService.loadTopicRights('0').then(
+      successHandler, failHandler);
+
+    $httpBackend.flush();
+    $rootScope.$digest();
+
+    expect(successHandler).toHaveBeenCalled();
+    expect(failHandler).not.toHaveBeenCalled();
+    // It should now be cached.
+    expect(TopicRightsBackendApiService.isCached('0')).toBe(true);
   });
 
   it('should report a cached topic rights after caching it', function() {

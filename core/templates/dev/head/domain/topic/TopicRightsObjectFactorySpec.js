@@ -85,5 +85,6 @@ describe('Topic rights object factory', function() {
     expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
     expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(true);
     expect(emptyTopicRightsBackendObject.getCanPublishTopic()).toEqual(true);
+    expect(emptyTopicRightsBackendObject.getCanEditName()).toEqual(true);
   });
 });
