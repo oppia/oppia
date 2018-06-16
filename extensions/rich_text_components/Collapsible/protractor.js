@@ -39,7 +39,8 @@ var expectComponentDetailsToMatch = function(
   headerElement.click();
   general.waitForSystem();
   forms.expectRichText(
-    elem.element(by.css('.panel-body')).element(by.xpath('./div'))
+    elem.element(by.css('.panel-body')).element(by.xpath(
+      './div/angular-html-bind'))
   ).toMatch(contentInstructions);
 };
 
