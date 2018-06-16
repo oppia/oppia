@@ -331,8 +331,10 @@ var expectRichText = function(elem) {
     // of paragraph elements. (Note that it is possible for <p> elements to
     // surround, e.g., <i> tags, so we can't just ignore the <p> elements
     // altogether.)
-    var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
-
+    var XPATH_SELECTOR = (
+      './p/*|./*[not(self::p)]|' +
+      './span/angular-html-bind/*|' +
+      './div/angular-html-bind/*');
     elem.all(by.xpath(XPATH_SELECTOR)).map(function(entry) {
       // It is necessary to obtain the texts of the elements in advance since
       // applying .getText() while the RichTextChecker is running would be
