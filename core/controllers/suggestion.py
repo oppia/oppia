@@ -63,6 +63,17 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
             raise self.InvalidInputException('Invalid format for suggestion_id.'
                                              ' It must contain 3 parts'
                                              ' separated by \'.\'')
+
+        if suggestion_id.split('.')[0] != 'exploration':
+            raise self.InvalidInputException('This handler allows actions only'
+                                             ' on suggestions to explorations.')
+
+        if suggestion_id.split('.')[1] != exploration_id:
+            raise self.InvalidInputException('The exploration id provided does '
+                                             'not match the exploration id '
+                                             'present as part of the '
+                                             'suggestion_id')
+
         action = self.payload.get('action')
         if action == self.ACTION_TYPE_ACCEPT:
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
