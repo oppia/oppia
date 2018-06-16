@@ -82,10 +82,8 @@ oppia.factory('ParameterMetadataService', [
       );
 
       // Next, the answer is received.
-      result.push(ParamMetadataObjectFactory.createWithSetAction({
-        paramName: 'answer',
-        source: PARAM_SOURCE_ANSWER
-      }));
+      result.push(ParamMetadataObjectFactory.createWithSetAction(
+        'answer', PARAM_SOURCE_ANSWER));
 
       // Finally, the rule feedback strings are evaluated.
       state.interaction.answerGroups.forEach(function(group) {
