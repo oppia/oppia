@@ -21,9 +21,12 @@ describe('ExplorationStatesService', function() {
 
   beforeEach(inject(function($injector) {
     this.ess = $injector.get('ExplorationStatesService');
+    this.ecs = $injector.get('ExplorationContextService');
+    spyOn(this.ecs, 'getExplorationId').and.returnValue('7');
   }));
 
   describe('.init', function() {
+    // TODO.
   });
 
   describe('post-init functions', function() {
@@ -42,7 +45,7 @@ describe('ExplorationStatesService', function() {
             }],
             defaultOutcome: {dest: 'Hola'},
             hints: [],
-            id: 'TextInput'
+            id: 'TextInput',
           },
           classifier_model_id: 0,
           content_ids_to_audio_translations: {}
@@ -51,19 +54,47 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateAddedCallback', function() {
+      beforeEach(inject(function($injector) {
+        this.cls = $injector.get('ChangeListService');
+        // Don't let ChangeListService.addState run in this unit-test since it
+        // the service is not configured properly in this describe block.
+        spyOn(this.cls, 'addState');
+      }));
+
       it('callsback when a new state is added', function() {
-        /*
         var callbackSpy = jasmine.createSpy('callback');
 
         this.ess.registerOnStateAddedCallback(callbackSpy);
         this.ess.addState('foo');
 
         expect(callbackSpy).toHaveBeenCalledWith('foo');
-      */
       });
     });
 
     describe('.registerOnStateDeletedCallback', function() {
+      beforeEach(inject(function($injector) {
+        // Don't let ChangeListService.deleteState run in this unit-test since
+        // it the service is not configured properly in this describe block.
+        this.cls = $injector.get('ChangeListService');
+        spyOn(this.cls, 'deleteState');
+        // When ExplorationStatesService tries to show the confirm-delete modal,
+        // have it immediately confirm.
+        this.$uibModal = $injector.get('$uibModal');
+        spyOn(this.$uibModal, 'open').and.callFake(function(stateName) {
+          return {result: Promise.resolve(stateName)};
+        });
+      }));
+
+      it('callsback when a new state is deleted', function() {
+        var callbackSpy = jasmine.createSpy('callback');
+
+        this.ess.registerOnStateDeletedCallback(callbackSpy);
+        promise = this.ess.deleteState('Hola');
+
+        promise.then(function() {
+          expect(callbackSpy).toHaveBeenCalledWith('Hola');
+        });
+      });
     });
 
     describe('.registerOnStateRenamedCallback', function() {
