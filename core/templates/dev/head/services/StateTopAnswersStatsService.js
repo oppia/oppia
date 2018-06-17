@@ -66,7 +66,6 @@ oppia.factory('StateTopAnswersStatsService', [
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
             explorationId, stateName, state, answerStats.answer,
             interactionRulesService);
-
         if (!answerStats.isAddressed) {
           unresolvedAnswersCacheEntry.push(answerStats);
         }
