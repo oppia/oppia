@@ -157,7 +157,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 21
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 22
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -484,6 +484,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'NumericInput',
         'SetInput',
         'MathExpressionInput',
+        'NumberWithUnits',
     ]
 }, {
     'name': 'Programming',
@@ -644,7 +645,9 @@ SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
+TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
+TRANSLATION_DATA_PREFIX = '/createhandler/translate'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
@@ -899,7 +902,6 @@ RTE_CONTENT_SPEC = {
             'p': ['blockquote', 'div', 'pre', '[document]', 'ol', 'ul', 'li'],
             'b': ['i', 'li', 'p', 'pre'],
             'br': ['b', 'i', 'li', 'p'],
-            'div': ['blockquote'],
             'i': ['b', 'li', 'p', 'pre'],
             'li': ['ol', 'ul'],
             'ol': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
@@ -918,7 +920,6 @@ RTE_CONTENT_SPEC = {
             'p',
             'b',
             'br',
-            'div',
             'i',
             'li',
             'ol',

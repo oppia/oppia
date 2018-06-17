@@ -118,6 +118,20 @@ def get_topic_from_model(topic_model, run_conversion=True):
         topic_model.last_updated)
 
 
+def get_all_topic_summaries():
+    """Returns the summaries of all topics present in the datastore.
+
+    Returns:
+        list(TopicSummary). The list of summaries of all topics present in the
+            datastore.
+    """
+    topic_summaries_models = topic_models.TopicSummaryModel.get_all()
+    topic_summaries = [
+        get_topic_summary_from_model(summary)
+        for summary in topic_summaries_models]
+    return topic_summaries
+
+
 def get_topic_summary_from_model(topic_summary_model):
     """Returns a domain object for an Oppia topic summary given a
     topic summary model.
@@ -136,6 +150,7 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.additional_story_count,
         topic_summary_model.uncategorized_skill_count,
         topic_summary_model.subtopic_count,
+        topic_summary_model.total_skill_count,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
@@ -329,9 +344,6 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS):
                     topic.update_additional_story_ids(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_SKILL_IDS):
-                    topic.update_skill_ids(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
@@ -629,12 +641,16 @@ def compute_summary_of_topic(topic):
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
+    total_skill_count = topic_model_uncategorized_skill_count
+    for subtopic in topic.subtopics:
+        total_skill_count = total_skill_count + len(subtopic.skill_ids)
+
     topic_summary = topic_domain.TopicSummary(
         topic.id, topic.name, topic.language_code,
         topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        topic.created_on, topic.last_updated
+        total_skill_count, topic.created_on, topic.last_updated
     )
 
     return topic_summary
@@ -657,6 +673,7 @@ def save_topic_summary(topic_summary):
         canonical_story_count=topic_summary.canonical_story_count,
         uncategorized_skill_count=topic_summary.uncategorized_skill_count,
         subtopic_count=topic_summary.subtopic_count,
+        total_skill_count=topic_summary.total_skill_count,
         topic_model_last_updated=topic_summary.topic_model_last_updated,
         topic_model_created_on=topic_summary.topic_model_created_on
     )

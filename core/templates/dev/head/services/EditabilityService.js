@@ -18,19 +18,28 @@
 
 // TODO(sll): Should this depend on a versioning service that keeps track of
 // the current active version? Previous versions should not be editable.
+// TODO(SD): Remove translatable part from this service after translation tab
+// will get implemented.
 oppia.factory('EditabilityService', [function() {
   var isEditable = false;
+  var isTranslatable = false;
   var inTutorialMode = false;
 
   return {
     isEditable: function() {
       return isEditable && !inTutorialMode;
     },
+    isTranslatable: function() {
+      return isTranslatable && !inTutorialMode;
+    },
     isEditableOutsideTutorialMode: function() {
       return isEditable;
     },
     markEditable: function() {
       isEditable = true;
+    },
+    markTranslatable: function() {
+      isTranslatable = true;
     },
     markNotEditable: function() {
       isEditable = false;
