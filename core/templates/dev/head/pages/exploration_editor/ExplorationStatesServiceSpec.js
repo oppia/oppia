@@ -25,11 +25,7 @@ describe('ExplorationStatesService', function() {
     spyOn(this.ecs, 'getExplorationId').and.returnValue('7');
   }));
 
-  describe('.init', function() {
-    // TODO.
-  });
-
-  describe('post-init functions', function() {
+  describe('Callback Registration', function() {
     beforeEach(function() {
       this.ess.init({
         Hola: {
@@ -52,74 +48,70 @@ describe('ExplorationStatesService', function() {
         }
       });
     });
+    beforeEach(inject(function($injector) {
+      this.cls = $injector.get('ChangeListService');
+      // Mock all calls to ChangeListService since it isn't configured
+      // correctly in or interesting to the tests of this describe block.
+      spyOn(this.cls, 'addState');
+      spyOn(this.cls, 'deleteState');
+      spyOn(this.cls, 'renameState');
+      spyOn(this.cls, 'editStateProperty');
+    }));
 
-    describe('Callbacks', function() {
+    describe('.registerOnStateAddedCallback', function() {
+      it('callsback when a new state is added', function() {
+        var callbackSpy = jasmine.createSpy('callback');
+
+        this.ess.registerOnStateAddedCallback(callbackSpy);
+        this.ess.addState('Me Llamo');
+
+        expect(callbackSpy).toHaveBeenCalledWith('Me Llamo');
+      });
+    });
+
+    describe('.registerOnStateDeletedCallback', function() {
       beforeEach(inject(function($injector) {
-        this.cls = $injector.get('ChangeListService');
-        // Mock all calls to ChangeListService since it isn't configured
-        // correctly in or interesting to the tests of this describe block.
-        spyOn(this.cls, 'addState');
-        spyOn(this.cls, 'deleteState');
-        spyOn(this.cls, 'renameState');
-        spyOn(this.cls, 'editStateProperty');
+        // When ExplorationStatesService tries to show the confirm-delete
+        // modal, have it immediately confirm.
+        spyOn($injector.get('$uibModal'), 'open').and.callFake(
+          function(stateName) {
+            return {result: Promise.resolve(stateName)};
+          });
       }));
 
-      describe('.registerOnStateAddedCallback', function() {
-        it('callsback when a new state is added', function() {
-          var callbackSpy = jasmine.createSpy('callback');
+      it('callsback when a new state is deleted', function() {
+        var callbackSpy = jasmine.createSpy('callback');
 
-          this.ess.registerOnStateAddedCallback(callbackSpy);
-          this.ess.addState('Me Llamo');
+        this.ess.registerOnStateDeletedCallback(callbackSpy);
 
-          expect(callbackSpy).toHaveBeenCalledWith('Me Llamo');
+        this.ess.deleteState('Hola').then(function() {
+          expect(callbackSpy).toHaveBeenCalledWith('Hola');
         });
       });
+    });
 
-      describe('.registerOnStateDeletedCallback', function() {
-        beforeEach(inject(function($injector) {
-          // When ExplorationStatesService tries to show the confirm-delete
-          // modal, have it immediately confirm.
-          spyOn($injector.get('$uibModal'), 'open').and.callFake(
-            function(stateName) {
-              return {result: Promise.resolve(stateName)};
-            });
-        }));
+    describe('.registerOnStateRenamedCallback', function() {
+      it('callsback when a state is renamed', function() {
+        var callbackSpy = jasmine.createSpy('callback');
 
-        it('callsback when a new state is deleted', function() {
+        this.ess.registerOnStateRenamedCallback(callbackSpy);
+        this.ess.renameState('Hola', 'Bonjour');
+
+        expect(callbackSpy).toHaveBeenCalledWith('Hola', 'Bonjour');
+      });
+    });
+
+    describe('.registerOnStateInteractionAnswerGroupsSaved', function() {
+      it('callsback when interaction answer groups of a state are saved',
+        function() {
           var callbackSpy = jasmine.createSpy('callback');
 
-          this.ess.registerOnStateDeletedCallback(callbackSpy);
-          promise = this.ess.deleteState('Hola');
+          this.ess.registerOnStateInteractionAnswerGroupsSavedCallback(
+            callbackSpy);
+          this.ess.saveInteractionAnswerGroups('Hola', []);
 
-          promise.then(function() {
-            expect(callbackSpy).toHaveBeenCalledWith('Hola');
-          });
+          expect(callbackSpy).toHaveBeenCalledWith('Hola');
         });
-      });
-
-      describe('.registerOnStateRenamedCallback', function() {
-        it('callsback when a state is renamed', function() {
-          var callbackSpy = jasmine.createSpy('callback');
-
-          this.ess.registerOnStateRenamedCallback(callbackSpy);
-          this.ess.renameState('Hola', 'Bonjour');
-
-          expect(callbackSpy).toHaveBeenCalledWith('Hola', 'Bonjour');
-        });
-      });
-
-      describe('.registerOnStateInteractionAnswerGroupsSaved', function() {
-        it('callsback when interaction answer groups of a state are saved',
-          function() {
-            var callbackSpy = jasmine.createSpy('callback');
-
-            this.ess.registerOnStateInteractionAnswerGroupsSavedCallback(
-              callbackSpy);
-            this.ess.saveInteractionAnswerGroups('Hola', []);
-
-            expect(callbackSpy).toHaveBeenCalledWith('Hola');
-          });
-      });
     });
   });
 });
