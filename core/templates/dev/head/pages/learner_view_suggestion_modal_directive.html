@@ -7,7 +7,10 @@
     <div class="oppia-suggestion-review-panel-container" style="float: left;">
       <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_CURRENT_STATE_CONTENT_HEADER"></strong>
       <div class="oppia-suggestion-review-panel">
-        <div><angular-html-bind ng-if="oldContent" html-data="oldContent"></angular-html-bind></div>
+        <div>
+          <angular-html-bind ng-if="oldContent" html-data="oldContent">
+          </angular-html-bind>
+        </div>
         <div ng-if="!oldContent" style="color: red;" translate="I18N_LEARNER_DASHBOARD_SUGGESTION_NO_CURRENT_STATE"></div>
       </div>
     </div>
