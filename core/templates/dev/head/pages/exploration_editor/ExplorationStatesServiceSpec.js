@@ -21,6 +21,7 @@ describe('ExplorationStatesService', function() {
 
   beforeEach(inject(function($injector) {
     this.ess = $injector.get('ExplorationStatesService');
+
     spyOn($injector.get('ExplorationContextService'), 'getExplorationId')
       .and.returnValue('7');
   }));
