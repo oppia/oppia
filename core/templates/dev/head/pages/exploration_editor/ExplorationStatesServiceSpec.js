@@ -50,9 +50,9 @@ describe('ExplorationStatesService', function() {
       });
     });
     beforeEach(inject(function($injector) {
+      // Mock calls to ChangeListService since it isn't configured correctly in,
+      // or interesting to, the tests of this block.
       this.cls = $injector.get('ChangeListService');
-      // Mock all calls to ChangeListService since it isn't configured
-      // correctly in, or interesting to, the tests of this describe block.
       spyOn(this.cls, 'addState');
       spyOn(this.cls, 'deleteState');
       spyOn(this.cls, 'renameState');
@@ -68,6 +68,16 @@ describe('ExplorationStatesService', function() {
 
         expect(callbackSpy).toHaveBeenCalledWith('Me Llamo');
       });
+
+      it('does not accept duplicate callbacks', function() {
+        var callbackSpy = jasmine.createSpy('callback');
+
+        this.ess.registerOnStateAddedCallback(callbackSpy);
+        this.ess.registerOnStateAddedCallback(callbackSpy);
+        this.ess.addState('Me Llamo');
+
+        expect(callbackSpy.calls.count()).toEqual(1);
+      });
     });
 
     describe('.registerOnStateDeletedCallback', function() {
@@ -80,7 +90,7 @@ describe('ExplorationStatesService', function() {
           });
       }));
 
-      it('callsback when a new state is deleted', function() {
+      it('callsback when a state is deleted', function() {
         var callbackSpy = jasmine.createSpy('callback');
 
         this.ess.registerOnStateDeletedCallback(callbackSpy);
@@ -89,6 +99,17 @@ describe('ExplorationStatesService', function() {
           expect(callbackSpy).toHaveBeenCalledWith('Hola');
         });
       });
+
+      it('callsback when a new state is added', function() {
+        var callbackSpy = jasmine.createSpy('callback');
+
+        this.ess.registerOnStateDeletedCallback(callbackSpy);
+        this.ess.registerOnStateDeletedCallback(callbackSpy);
+
+        this.ess.deleteState('Hola').then(function() {
+          expect(callbackSpy.calls.count()).toEqual(1);
+        });
+      }}
     });
 
     describe('.registerOnStateRenamedCallback', function() {
