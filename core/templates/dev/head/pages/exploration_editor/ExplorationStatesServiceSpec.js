@@ -109,7 +109,7 @@ describe('ExplorationStatesService', function() {
         this.ess.deleteState('Hola').then(function() {
           expect(callbackSpy.calls.count()).toEqual(1);
         });
-      }}
+      });
     });
 
     describe('.registerOnStateRenamedCallback', function() {
