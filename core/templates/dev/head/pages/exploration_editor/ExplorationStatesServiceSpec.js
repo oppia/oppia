@@ -50,16 +50,16 @@ describe('ExplorationStatesService', function() {
       });
     });
     beforeEach(inject(function($injector) {
-      // Mock calls to ChangeListService since it isn't configured correctly in,
-      // or interesting to, the tests of this block.
+      // ChangeListService will need its calls mocked out since it isn't
+      // configured correctly in, or interesting to, the tests of this block.
       this.cls = $injector.get('ChangeListService');
-      spyOn(this.cls, 'addState');
-      spyOn(this.cls, 'deleteState');
-      spyOn(this.cls, 'renameState');
-      spyOn(this.cls, 'editStateProperty');
     }));
 
     describe('.registerOnStateAddedCallback', function() {
+      beforeEach(function() {
+        spyOn(this.cls, 'addState');
+      });
+
       it('callsback when a new state is added', function() {
         var callbackSpy = jasmine.createSpy('callback');
 
@@ -82,6 +82,7 @@ describe('ExplorationStatesService', function() {
 
     describe('.registerOnStateDeletedCallback', function() {
       beforeEach(inject(function($injector) {
+        spyOn(this.cls, 'deleteState');
         // When ExplorationStatesService tries to show the confirm-delete
         // modal, have it immediately confirm.
         spyOn($injector.get('$uibModal'), 'open').and.callFake(
@@ -113,6 +114,10 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateRenamedCallback', function() {
+      beforeEach(function() {
+        spyOn(this.cls, 'renameState');
+      });
+
       it('callsback when a state is renamed', function() {
         var callbackSpy = jasmine.createSpy('callback');
 
@@ -134,12 +139,16 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateInteractionAnswerGroupsSaved', function() {
+      beforeEach(function() {
+        spyOn(this.cls, 'editStateProperty');
+      });
+
       it('callsback when interaction answer groups of a state are saved',
         function() {
           var callbackSpy = jasmine.createSpy('callback');
 
-          this.ess.registerOnStateInteractionAnswerGroupsSavedCallback(
-            callbackSpy);
+          this.ess
+            .registerOnStateInteractionAnswerGroupsSavedCallback(callbackSpy);
           this.ess.saveInteractionAnswerGroups('Hola', []);
 
           expect(callbackSpy).toHaveBeenCalledWith('Hola');
@@ -148,10 +157,10 @@ describe('ExplorationStatesService', function() {
       it('does not accept duplicate callbacks', function() {
         var callbackSpy = jasmine.createSpy('callback');
 
-        this.ess.registerOnStateInteractionAnswerGroupsSavedCallback(
-          callbackSpy);
-        this.ess.registerOnStateInteractionAnswerGroupsSavedCallback(
-          callbackSpy);
+        this.ess
+          .registerOnStateInteractionAnswerGroupsSavedCallback(callbackSpy);
+        this.ess
+          .registerOnStateInteractionAnswerGroupsSavedCallback(callbackSpy);
         this.ess.saveInteractionAnswerGroups('Hola', []);
 
         expect(callbackSpy.calls.count()).toEqual(1);
