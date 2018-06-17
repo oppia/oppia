@@ -30,7 +30,8 @@
           <em>Nothing</em>
         </span>
         <span ng-if="outcome.hasNonemptyFeedback()" style="word-wrap: break-word;">
-          <span><angular-html-bind class="oppia-rte-editor" html-data="outcome.feedback.getHtml()"></angular-html-bind></span>
+          <angular-html-bind class="oppia-rte-editor" html-data="outcome.feedback.getHtml()">
+          </angular-html-bind>
         </span>
       </div>
     </div>

@@ -4,16 +4,12 @@
     <div ng-if="getShortAnswerHtml()"
          popover-placement="bottom" uib-popover-template="'popover/answer'"
          popover-trigger="click" style="cursor: pointer;">
-      <div>
-        <angular-html-bind class="rte-viewer conversation-skin-learner-answer-content" html-data="getShortAnswerHtml()">
-        </angular-html-bind>
-      </div>
+      <angular-html-bind class="rte-viewer conversation-skin-learner-answer-content" html-data="getShortAnswerHtml()">
+      </angular-html-bind>
     </div>
     <div ng-if="!getShortAnswerHtml()">
-      <div>
-        <angular-html-bind class="rte-viewer conversation-skin-learner-answer-content" html-data="getAnswerHtml()">
-        </angular-html-bind>
-      </div>
+      <angular-html-bind class="rte-viewer conversation-skin-learner-answer-content" html-data="getAnswerHtml()">
+      </angular-html-bind>
     </div>
   </div>
   <div ng-if="data.isHint">
@@ -75,5 +71,8 @@
 </style>
 
 <script type="text/ng-template" id="popover/answer">
-  <div><angular-html-bind html-data="answer()"></angular-html-bind></div>
+  <div>
+    <angular-html-bind html-data="answer()">
+    </angular-html-bind>
+  </div>
 </script>

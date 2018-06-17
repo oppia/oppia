@@ -8,9 +8,10 @@
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
     <div>
-      <angular-html-bind class="rte-viewer conversation-skin-help-card-content" html-data="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()"></angular-html-bind>
+      <angular-html-bind class="rte-viewer conversation-skin-help-card-content" html-data="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()">
+      </angular-html-bind>
     </div>
-      <br>
+    <br>
     <continue-button ng-if="helpCardHasContinueButton"
                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
                      is-learn-again-button="isLearnAgainButton()"

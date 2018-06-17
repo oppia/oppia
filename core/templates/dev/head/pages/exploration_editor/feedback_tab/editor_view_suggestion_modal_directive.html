@@ -7,14 +7,16 @@
     <div class="oppia-suggestion-review-panel-container" style="float: left;">
       <strong>Current:</strong>
       <div class="oppia-suggestion-review-panel">
-        <div><angular-html-bind ng-if="currentContent" html-data="currentContent"></angular-html-bind></div>
+        <angular-html-bind ng-if="currentContent" html-data="currentContent">
+        </angular-html-bind>
         <div ng-if="!currentContent" style="color: red;">Oops! This state no longer exists!</div>
       </div>
     </div>
     <div class="oppia-suggestion-review-panel-container" style="float: right;">
       <strong>Suggested:</strong>
       <div class="oppia-suggestion-review-panel">
-        <div><angular-html-bind html-data="newContent"></angular-html-bind></div>
+        <angular-html-bind html-data="newContent">
+        </angular-html-bind>
       </div>
     </div>
   </section>

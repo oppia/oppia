@@ -57,8 +57,8 @@
               <[rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices]>...
             </span>
             <span ng-if="getCurrentInteractionId() === 'MultipleChoiceInput'">
-              <span><angular-html-bind class="oppia-multiple-choice-rule" html-data="rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices"></angular-html-bind>...
-              </span>
+              <angular-html-bind class="oppia-multiple-choice-rule" html-data="rule | parameterizeRuleDescription:getCurrentInteractionId():answerChoices">
+              </angular-html-bind>...
             </span>
           </div>
         </a>

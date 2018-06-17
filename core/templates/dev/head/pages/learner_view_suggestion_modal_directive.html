@@ -14,14 +14,16 @@
     <div class="oppia-suggestion-review-panel-container" style="float: right;">
       <strong translate="I18N_LEARNER_DASHBOARD_SUGGESTION_SUGGESTED_STATE_CONTENT_HEADER"></strong>
       <div class="oppia-suggestion-review-panel">
-        <div><angular-html-bind html-data="newContent"></angular-html-bind></div>
+        <angular-html-bind html-data="newContent">
+        </angular-html-bind>
       </div>
     </div>
   </section>
   <div style="margin-top: 20px; margin-left: 10px;">
     <span translate="I18N_LEARNER_DASHBOARD_SUGGESTION_DESCRIPTION"></span>
     <div class="oppia-suggestion-review-panel">
-      <div><angular-html-bind html-data="description"></angular-html-bind></div>
+      <angular-html-bind html-data="description">
+      </angular-html-bind>
     </div>
   </div>
 </div>

@@ -5,7 +5,8 @@
     </div>
 
     <button type="button" ng-repeat="trainingDataButtonContents in trainingDataButtonContentsList" class="btn btn-default protractor-test-train-unresolved-answer oppia-unresolved-answer-button" ng-click="openTrainUnresolvedAnswerModal($index)">
-      <span><angular-html-bind html-data="trainingDataButtonContents.answerHtml"></angular-html-bind></span>
+      <angular-html-bind html-data="trainingDataButtonContents.answerHtml">
+      </angular-html-bind>
       <span style="margin-left: 8px;">
         <em><[trainingDataButtonContents.frequency]> time<span ng-if="trainingDataButtonContents.frequency != 1">s</span></em>
       </span>

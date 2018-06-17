@@ -14,7 +14,10 @@
         <strong>
           <[stateSolutionService.savedMemento.answerIsExclusive ? 'The only' : 'One']> solution is...
         </strong>
-        <span><angular-html-bind html-data="getAnswerHtml()"></angular-html-bind></span>
+        <span>
+          <angular-html-bind html-data="getAnswerHtml()">
+          </angular-html-bind>
+        </span>
       </div>
     </div>
   </div>

@@ -306,7 +306,6 @@ oppia.filter('isFloat', [function() {
 }]);
 
 /* eslint-disable angular/directive-restrict */
-
 oppia.directive('applyValidation', ['$filter', function($filter) {
   return {
     require: 'ngModel',
@@ -348,14 +347,12 @@ oppia.directive('applyValidation', ['$filter', function($filter) {
     }
   };
 }]);
-
 /* eslint-enable angular/directive-restrict */
 
 // This should come before 'apply-validation', if that is defined as
 // an attribute on the HTML tag.
 
 /* eslint-disable angular/directive-restrict */
-
 oppia.directive('requireIsFloat', ['$filter', function($filter) {
   return {
     require: 'ngModel',
@@ -372,5 +369,4 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
     }
   };
 }]);
-
 /* eslint-enable angular/directive-restrict */
