@@ -55,10 +55,9 @@ describe('ExplorationStatesService', function() {
 
     describe('.registerOnStateAddedCallback', function() {
       beforeEach(inject(function($injector) {
-        this.cls = $injector.get('ChangeListService');
         // Don't let ChangeListService.addState run in this unit-test since it
         // the service is not configured properly in this describe block.
-        spyOn(this.cls, 'addState');
+        spyOn($injector.get('ChangeListService'), 'addState');
       }));
 
       it('callsback when a new state is added', function() {
@@ -75,14 +74,13 @@ describe('ExplorationStatesService', function() {
       beforeEach(inject(function($injector) {
         // Don't let ChangeListService.deleteState run in this unit-test since
         // it the service is not configured properly in this describe block.
-        this.cls = $injector.get('ChangeListService');
-        spyOn(this.cls, 'deleteState');
+        spyOn($injector.get('ChangeListService'), 'deleteState');
         // When ExplorationStatesService tries to show the confirm-delete modal,
         // have it immediately confirm.
-        this.$uibModal = $injector.get('$uibModal');
-        spyOn(this.$uibModal, 'open').and.callFake(function(stateName) {
-          return {result: Promise.resolve(stateName)};
-        });
+        spyOn($injector.get('$uibModal'), 'open').and.callFake(
+          function(stateName) {
+            return {result: Promise.resolve(stateName)};
+          });
       }));
 
       it('callsback when a new state is deleted', function() {
@@ -98,6 +96,18 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateRenamedCallback', function() {
+      beforeEach(inject(function($injector) {
+        spyOn($injector.get('ChangeListService'), 'renameState');
+      }));
+
+      it('callsback when a state is renamed', function() {
+        var callbackSpy = jasmine.createSpy('callback');
+
+        this.ess.registerOnStateRenamedCallback(callbackSpy);
+        this.ess.renameState('Hola', 'Bonjour');
+
+        expect(callbackSpy).toHaveBeenCalledWith('Hola', 'Bonjour');
+      });
     });
 
     describe('.registerOnStateInteractionAnswerGroupsSaved', function() {
