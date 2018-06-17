@@ -23,11 +23,13 @@ oppia.constant('EVENT_TOPIC_DELETED', 'topicDeleted');
 oppia.controller('TopicsAndSkillsDashboard', [
   '$scope', '$rootScope', '$http', '$window',
   'AlertsService', 'TopicsAndSkillsDashboardBackendApiService',
-  'UrlInterpolationService', 'FATAL_ERROR_CODES', 'EVENT_TOPIC_DELETED',
+  'UrlInterpolationService', 'TopicCreationService',
+  'FATAL_ERROR_CODES', 'EVENT_TOPIC_DELETED',
   function(
       $scope, $rootScope, $http, $window,
       AlertsService, TopicsAndSkillsDashboardBackendApiService,
-      UrlInterpolationService, FATAL_ERROR_CODES, EVENT_TOPIC_DELETED) {
+      UrlInterpolationService, TopicCreationService,
+      FATAL_ERROR_CODES, EVENT_TOPIC_DELETED) {
     $scope.TAB_NAME_TOPICS = 'topics';
     $scope.TAB_NAME_SKILLS = 'skills';
 
@@ -61,6 +63,9 @@ oppia.controller('TopicsAndSkillsDashboard', [
     });
     $scope.setActiveTab = function(tabName) {
       $scope.activeTab = tabName;
+    };
+    $scope.createTopic = function() {
+      TopicCreationService.createNewTopic();
     };
   }
 ]);
