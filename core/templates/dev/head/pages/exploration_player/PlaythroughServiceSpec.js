@@ -57,9 +57,8 @@ describe('Playthrough service', function() {
       var playthrough = this.ps.getPlaythrough();
 
       expect(playthrough.actions).toEqual(
-        [this.laof.createFromBackendDict({
-          action_type: 'AnswerSubmit',
-          action_customization_args: {
+        [this.laof.createNew(
+          'AnswerSubmit', {
             state_name: {
               value: 'stateName1'
             },
@@ -78,9 +77,8 @@ describe('Playthrough service', function() {
             time_spent_in_state_secs: {
               value: '30'
             }
-          },
-          schema_version: 1
-        })]);
+          }, 1
+        )]);
     });
 
     it('should record exploration quit action.', function() {
@@ -88,18 +86,16 @@ describe('Playthrough service', function() {
       var playthrough = this.ps.getPlaythrough();
 
       expect(playthrough.actions).toEqual(
-        [this.laof.createFromBackendDict({
-          action_type: 'ExplorationQuit',
-          action_customization_args: {
+        [this.laof.createNew(
+          'ExplorationQuit', {
             state_name: {
               value: 'stateName1'
             },
             time_spent_in_state_secs: {
               value: '120'
             }
-          },
-          schema_version: 1
-        })]);
+          }, 1
+        )]);
     });
 
     it(

@@ -47,20 +47,34 @@ oppia.factory('PlaythroughService', [
     var cycleIdentifier = {};
     var visitedStates = [];
 
+    var createMultipleIncorrectIssueTracker = function(initStateName) {
+      multipleIncorrectStateName = {
+        state_name: initStateName,
+        num_times_incorrect: 0
+      };
+    };
+
+    var createCyclicIssueTracker = function() {
+      cycleIdentifier = {
+        cycle: '',
+        num_cycles: 0
+      };
+    };
+
     var incrementIncorrectAnswerInMultipleIncorrectIssueTracker = function() {
       multipleIncorrectStateName.num_times_incorrect += 1;
     };
 
-    var handleStateTransitionInMultipleIncorrectIssueTracker = function(
+    var recordStateTransitionInMultipleIncorrectIssueTracker = function(
         destStateName) {
-      if (multipleIncorrectStateName.num_times_incorrect < (
-        NUM_INCORRECT_ANSWERS_THRESHOLD)) {
+      if (multipleIncorrectStateName.num_times_incorrect <
+        NUM_INCORRECT_ANSWERS_THRESHOLD) {
         multipleIncorrectStateName.state_name = destStateName;
         multipleIncorrectStateName.num_times_incorrect = 0;
       }
     };
 
-    var handleStateTransitionInCyclicIssueTracker = function(destStateName) {
+    var recordStateTransitionInCyclicIssueTracker = function(destStateName) {
       if (cycleIdentifier.num_cycles < NUM_REPEATED_CYCLES_THRESHOLD) {
         if (visitedStates.indexOf(destStateName) !== -1) {
           // Cycle identified.
@@ -154,16 +168,12 @@ oppia.factory('PlaythroughService', [
     };
 
     var storePlaythrough = function(updatePlaythrough) {
-      if (updatePlaythrough) {
-        $http.post(getFullPlaythroughUrl(), {
-          playthrough_data: playthrough.convertToBackendDict(),
-          issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
-        });
-      } else {
-        $http.post(getFullPlaythroughUrl(), {
-          playthrough_data: playthrough.convertToBackendDict(),
-          issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
-        }).then(function(response) {
+      var promise = $http.post(getFullPlaythroughUrl(), {
+        playthrough_data: playthrough.toBackendDict(),
+        issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
+      });
+      if (!updatePlaythrough) {
+        promise.then(function(response) {
           playthrough.playthroughId = response.playthroughId;
         });
       }
@@ -196,15 +206,10 @@ oppia.factory('PlaythroughService', [
           CURRENT_ACTION_SCHEMA_VERSION
         ));
 
-        multipleIncorrectStateName = {
-          state_name: initStateName,
-          num_times_incorrect: 0
-        };
+        createMultipleIncorrectIssueTracker(initStateName);
 
-        cycleIdentifier = {
-          cycle: '',
-          num_cycles: 0
-        };
+        createCyclicIssueTracker();
+
         visitedStates.push(initStateName);
       },
       recordAnswerSubmitAction: function(
@@ -235,12 +240,13 @@ oppia.factory('PlaythroughService', [
           CURRENT_ACTION_SCHEMA_VERSION
         ));
 
-        if (destStateName === stateName) {
+        var didNotMoveToNextState = (destStateName === stateName);
+        if (didNotMoveToNextState) {
           incrementIncorrectAnswerInMultipleIncorrectIssueTracker();
         } else {
-          handleStateTransitionInMultipleIncorrectIssueTracker(destStateName);
+          recordStateTransitionInMultipleIncorrectIssueTracker(destStateName);
 
-          handleStateTransitionInCyclicIssueTracker(destStateName);
+          recordStateTransitionInCyclicIssueTracker(destStateName);
         }
       },
       recordExplorationQuitAction: function(
@@ -259,14 +265,16 @@ oppia.factory('PlaythroughService', [
         ));
       },
       recordPlaythrough: function() {
-        // If playthrough ID exists, issue has already been identified and the
-        // playthrough is updated. Otherwise, check whether an issue exists and
-        // store playthrough if true.
         if (playthrough.playthroughId) {
+          // Playthrough ID exists, so issue has already been identified and we
+          // update the playthrough.
           storePlaythrough(true);
         } else {
+          // Playthrough ID doesn't exist.
           analyzePlaythrough();
           if (playthrough.issueType) {
+            // Issue type exists, so an issue is identified after analyzing the
+            // playthrough, and the playthrough is stored.
             storePlaythrough();
           }
         }

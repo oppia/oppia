@@ -89,14 +89,11 @@ oppia.factory('PlaythroughObjectFactory', [
         playthroughBackendDict.issue_customization_args, actions);
     };
 
-    /**
-     * @returns {PlaythroughBackendDict}
-     */
-    Playthrough.prototype.convertToBackendDict = function() {
-      var actionDicts = [];
-      for (var i = 0; i < this.actions.length; i++) {
-        actionDicts.push(this.actions[i].convertToBackendDict());
-      }
+    /** @returns {PlaythroughBackendDict} */
+    Playthrough.prototype.toBackendDict = function() {
+      var actionDicts = this.actions.map(function(action) {
+        return action.toBackendDict();
+      });
       return {
         playthrough_id: this.playthroughId,
         exp_id: this.expId,

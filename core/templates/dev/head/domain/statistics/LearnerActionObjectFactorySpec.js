@@ -44,9 +44,9 @@ describe('Learner Action Object Factory', function() {
   });
 
   it('should convert a learner action to a backend dict', function() {
-    var learnerActionObject = new this.laof('AnswerSubmit', {}, 1);
+    var learnerActionObject = this.laof.createNew('AnswerSubmit', {}, 1);
 
-    var learnerActionDict = learnerActionObject.convertToBackendDict();
+    var learnerActionDict = learnerActionObject.toBackendDict();
     expect(learnerActionDict).toEqual({
       action_type: 'AnswerSubmit',
       action_customization_args: {},

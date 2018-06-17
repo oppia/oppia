@@ -66,11 +66,11 @@ describe('Playthrough Object Factory', function() {
   });
 
   it('should convert a playthrough to a backend dict', function() {
-    var actions = [new this.laof('AnswerSubmit', {}, 1)];
-    var playthroughObject = new this.pof(
+    var actions = [this.laof.createNew('AnswerSubmit', {}, 1)];
+    var playthroughObject = this.pof.createNew(
       'playthroughId1', 'expId1', 1, 'EarlyQuit', {}, actions);
 
-    var playthroughDict = playthroughObject.convertToBackendDict();
+    var playthroughDict = playthroughObject.toBackendDict();
     expect(playthroughDict).toEqual({
       playthrough_id: 'playthroughId1',
       exp_id: 'expId1',

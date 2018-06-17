@@ -66,10 +66,8 @@ oppia.factory('LearnerActionObjectFactory', [function() {
       learnerActionBackendDict.schema_version);
   };
 
-  /**
-   * @returns {LearnerActionBackendDict}
-   */
-  LearnerAction.prototype.convertToBackendDict = function() {
+  /** @returns {LearnerActionBackendDict} */
+  LearnerAction.prototype.toBackendDict = function() {
     return {
       action_type: this.actionType,
       action_customization_args: this.actionCustomizationArgs,

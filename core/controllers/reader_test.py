@@ -1459,11 +1459,13 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that passing a payload without schema version raises an
         exception.
         """
+        payload_dict_without_schema_version = {
+            'playthrough_data': self.playthrough_data
+        }
         self.post_json(
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-            }, self.csrf_token, expect_errors=True, expected_status_int=400)
+            payload_dict_without_schema_version, self.csrf_token,
+            expect_errors=True, expected_status_int=400)
 
     def test_error_on_invalid_playthrough_dict(self):
         """Test that passing an invalid playthrough dict raises an exception."""
