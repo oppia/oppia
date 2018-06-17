@@ -32,7 +32,7 @@ oppia.controller('TopicsAndSkillsDashboard', [
       FATAL_ERROR_CODES, EVENT_TOPIC_DELETED) {
     $scope.TAB_NAME_TOPICS = 'topics';
     $scope.TAB_NAME_SKILLS = 'skills';
-
+    $scope.canCreateTopic = GLOBALS.canCreateTopic;
 
     TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
       function(response) {
