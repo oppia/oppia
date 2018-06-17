@@ -24,10 +24,11 @@ describe('StateTopAnswersStatsService', function() {
 
   beforeEach(inject(function($injector) {
     this.stas = $injector.get('StateTopAnswersStatsService');
+    this.ecs = $injector.get('ExplorationContextService');
+    this.ess = $injector.get('ExplorationStatesService');
 
-    spyOn($injector.get('ExplorationContextService'), 'getExplorationId')
-      .and.returnValue('7');
-    $injector.get('ExplorationStatesService').init({
+    spyOn(this.ecs, 'getExplorationId').and.returnValue('7');
+    this.ess.init({
       Hola: {
         content: '',
         param_changes: [],
@@ -103,7 +104,17 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     it('registers handlers to ExplorationStatesService', function() {
-      // this.stas
+      var spyStateAdded = spyOn(this.ess, 'registerOnStateAddedCallback');
+      var spyStateDeleted = spyOn(this.ess, 'registerOnStateDeletedCallback');
+      var spyStateRenamed = spyOn(this.ess, 'registerOnStateRenamedCallback');
+      var spyStateInteractionAnswerGroupsSaved =
+        spyOn(this.ess, 'registerOnStateInteractionAnswerGroupsSavedCallback');
+
+      this.stas.init({answers: {}});
+      expect(spyStateAdded).toHaveBeenCalled();
+      expect(spyStateDeleted).toHaveBeenCalled();
+      expect(spyStateRenamed).toHaveBeenCalled();
+      expect(spyStateInteractionAnswerGroupsSaved).toHaveBeenCalled();
     });
   });
 });
