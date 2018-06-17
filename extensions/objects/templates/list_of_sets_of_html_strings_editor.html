@@ -1,0 +1,8 @@
+<div class="container-fluid">
+  <div ng-repeat="choice in choices track by $index">
+    <select ng-model="selectedChoice" aria-label="choice">
+      <option ng-change="selections($index)" ng-repeat="index in allowedChoices()">{{index}}</option>
+    </select>
+    <span angular-html-bind="choice.id"></span>
+  </div>
+</div>
