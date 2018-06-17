@@ -116,8 +116,9 @@ oppia.factory('StateTopAnswersStatsService', [
         ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
         ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
         ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
-        ExplorationStatesService.registerOnStateInteractionAnswerGroupsSaved(
-          onStateInteractionAnswerGroupsSaved);
+        ExplorationStatesService
+          .registerOnStateInteractionAnswerGroupsSavedCallback(
+            onStateInteractionAnswerGroupsSaved);
         isInitialized = true;
       },
 

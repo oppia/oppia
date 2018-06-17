@@ -416,7 +416,7 @@ oppia.factory('ExplorationStatesService', [
           stateRenamedCallbacks.push(callback);
         }
       },
-      registerOnStateInteractionAnswerGroupsSaved: function(callback) {
+      registerOnStateInteractionAnswerGroupsSavedCallback: function(callback) {
         if (stateInteractionAnswerGroupsSavedCallbacks.indexOf(
           callback) === -1) {
           stateInteractionAnswerGroupsSavedCallbacks.push(callback);
