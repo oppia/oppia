@@ -7,6 +7,7 @@ oppia.factory('SkillEditorStateService', [
     var _skill = SkillObjectFactory.createEmptySkill();
     var _skillIsInitialized = false;
     var _isLoadingSkill = false;
+    var _isSavingSkill = false;
 
     var _setSkill = function(skill) {
       _skill = angular.copy(skill);
@@ -14,7 +15,9 @@ oppia.factory('SkillEditorStateService', [
     };
 
     var _updateSkill = function(newBackendSkillObject) {
-      _setSkill()
+      _setSkill(SkillObjectFactory.createFromBackendDict(
+        newBackendSkillObject));
+      console.log(_skill);
     };
 
     return {
@@ -47,7 +50,31 @@ oppia.factory('SkillEditorStateService', [
       },
 
       saveSkill: function(commitMessage, successCallback) {
-        console.log("Not implemented.");
+        if (!_skillIsInitialized) {
+          AlertsService.fatalWarning(
+            'Cannot save a skill before one is loaded.');
+        }
+
+        if (!UndoRedoService.hasChanges()) {
+          return false;
+        }
+        _isSavingSkill = true;
+        EditableSkillBackendApiService.updateSkill(
+          _skill.getId(), commitMessage,
+          UndoRedoService.getCommitableChangeList()).then(
+          function(skillBackendObject) {
+            _updateSkill(skillBackendObject);
+            UndoRedoService.clearChanges();
+            _isSavingCollection = false;
+            if (successCallback) {
+              successCallback();
+            }
+          }, function(error) {
+            AlertsService.addWarning(
+              error || 'There was an error when saving the skill');
+            _isSavingSkill = false;
+          });
+        return true;
       }
     };
   }])

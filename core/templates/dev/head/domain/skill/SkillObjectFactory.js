@@ -18,7 +18,9 @@
  */
 
 oppia.factory('SkillObjectFactory', [
-  function() {
+  'ConceptCardObjectFactory', 'MisconceptionObjectFactory',
+  function(
+      ConceptCardObjectFactory, MisconceptionObjectFactory) {
     var Skill = function(id, description, misconceptions, conceptCard, languageCode) {
       this._id = id
       this._description = description;
@@ -56,6 +58,14 @@ oppia.factory('SkillObjectFactory', [
     Skill.prototype.setDescription = function(description) {
       this._description = description;
     };
+
+    Skill.prototype.getDescription = function() {
+      return this._description;
+    };
+
+    Skill.prototype.getId = function() {
+      return this._id;
+    }
 
     return Skill;
   }

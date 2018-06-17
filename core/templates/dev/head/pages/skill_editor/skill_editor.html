@@ -27,9 +27,15 @@
 {% block footer_js %}
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillEditorMainTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditorStateService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/SkillObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/ConceptCardObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/MisconceptionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/EditableSkillBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/SkillUpdateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
 {% endblock footer_js %}

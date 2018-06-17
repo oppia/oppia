@@ -1,0 +1,22 @@
+<div>
+  <!--Add protractor class -->
+  <!--Restrict topic managers from editing. -->
+  <span>
+    <span ng-if="!skillDescriptionEditorIsShown" ng-click="openSkillDescriptionEditor()" class="oppia-editable-section">
+      <strong><[skillDescription]></strong>
+      <i class="material-icons oppia-editor-edit-icon"
+         title="Edit Skill Description">&#xE254;
+      </i>
+    </span>
+    <span ng-if="skillDescriptionEditorIsShown">
+      <form class="form-horizontal" role="form" ng-submit="saveSkillDescription($parent.tmpSkillDescription)">
+        <input type="text" ng-model="$parent.tmpSkillDescription" focus-on="skillDescriptionEditorOpened">
+        <button type="submit" class="btn btn-success btn-sm">Save</button>
+      </form>
+    </span>
+  </span>
+
+<!--   <span>
+    <strong><[skillDescription]></strong>
+  </span> -->
+</div> 

@@ -28,6 +28,7 @@ oppia.factory('EditableSkillBackendApiService', [
 
       $http.get(skillDataUrl).then(function(response) {
         var skill = angular.copy(response.data.skill);
+        console.log(skill);
         if (successCallback) {
           successCallback(skill);
         }

@@ -30,6 +30,7 @@ oppia.directive('skillEditorMainTab', [
         function($scope, SkillEditorStateService) {
           $scope.hasLoadedSkill = SkillEditorStateService.hasLoadedSkill;
           $scope.skill = SkillEditorStateService.getSkill();
+          console.log($scope.skill);
         }
       ]
     }
