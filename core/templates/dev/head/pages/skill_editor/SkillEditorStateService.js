@@ -10,7 +10,7 @@ oppia.factory('SkillEditorStateService', [
     var _isSavingSkill = false;
 
     var _setSkill = function(skill) {
-      _skill = angular.copy(skill);
+      _skill.copyFromSkill(skill);
       _skillIsInitialized = true;
     };
 

@@ -11,19 +11,18 @@ oppia.directive('skillDescriptionEditor', [
       controller: [
         '$scope',
         function($scope) {
-          var skill = SkillEditorStateService.getSkill();
+          $scope.skill = SkillEditorStateService.getSkill();
           $scope.skillDescriptionEditorIsShown = false;
-          $scope.skillDescription = skill.getDescription();
 
           $scope.openSkillDescriptionEditor = function() {
             $scope.skillDescriptionEditorIsShown = true;
-            $scope.tmpSkillDescription = $scope.skillDescription;
+            $scope.tmpSkillDescription = $scope.skill.getDescription();
           };
 
           $scope.saveSkillDescription = function(newSkillDescription) {
             $scope.skillDescriptionEditorIsShown = false;
             SkillUpdateService.setSkillDescription(
-              skill,
+              $scope.skill,
               newSkillDescription);
           };
         }

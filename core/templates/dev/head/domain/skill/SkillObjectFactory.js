@@ -33,6 +33,14 @@ oppia.factory('SkillObjectFactory', [
       console.log("Not implemented.");
     };
 
+    Skill.prototype.copyFromSkill = function(skill) {
+      this._id = skill._id;
+      this._description = skill._description;
+      this._misconceptions = skill._misconceptions;
+      this._conceptCard = skill._conceptCard;
+      this._languageCode = skill._languageCode;
+    };
+
     Skill.createFromBackendDict = function(skillBackendDict) {
       return new Skill(
         skillBackendDict.id,
