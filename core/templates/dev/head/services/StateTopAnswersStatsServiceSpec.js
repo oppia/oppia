@@ -23,51 +23,52 @@ describe('StateTopAnswersStatsService', function() {
   beforeEach(module('oppia'));
 
   beforeEach(inject(function($injector) {
-    this.StateTopAnswersStatsService =
-      $injector.get('StateTopAnswersStatsService');
-  }));
+    this.stas = $injector.get('StateTopAnswersStatsService');
 
-  beforeEach(inject(function(ExplorationContextService) {
-    spyOn(ExplorationContextService, 'getExplorationId').and.returnValue('7');
-  }));
-
-  beforeEach(inject(function(ExplorationStatesService) {
-    this.EXP_STATES = {
+    spyOn($injector.get('ExplorationContextService'), 'getExplorationId')
+      .and.returnValue('7');
+    $injector.get('ExplorationStatesService').init({
       Hola: {
-        name: 'Hola',
+        content: '',
+        param_changes: [],
         interaction: {
-          answerGroups: [{
-            rules: [{type: 'Contains', inputs: {x: 'hola'}}],
-            outcome: {dest: 'Me Llamo'}
+          answer_groups: [{
+            rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
+            outcome: {
+              dest: 'Me Llamo',
+              feedback: {html: 'buen trabajo!'},
+              labelled_as_correct: true
+            }
           }],
-          defaultOutcome: {dest: 'Hola'},
-          id: 'TextInput'
-        }
+          default_outcome: {
+            dest: 'Hola',
+            feedback: {html: 'try again!'},
+            labelled_as_correct: false
+          },
+          hints: [],
+          id: 'TextInput',
+        },
+        classifier_model_id: 0,
+        content_ids_to_audio_translations: {}
       }
-    };
-
-    var that = this;
-    spyOn(ExplorationStatesService, 'getState').and.callFake(
-      function(stateName) {
-        return that.EXP_STATES[stateName];
-      });
+    });
   }));
 
   describe('.isInitialized', function() {
     it('begins uninitialized', function() {
-      expect(this.StateTopAnswersStatsService.isInitialized()).toBe(false);
+      expect(this.stas.isInitialized()).toBe(false);
     });
 
     it('is true after call to .init', function() {
-      this.StateTopAnswersStatsService.init({answers: {}});
+      this.stas.init({answers: {}});
 
-      expect(this.StateTopAnswersStatsService.isInitialized()).toBe(true);
+      expect(this.stas.isInitialized()).toBe(true);
     });
   });
 
   describe('.init', function() {
     it('correctly identifies unaddressed issues', function() {
-      this.StateTopAnswersStatsService.init({
+      this.stas.init({
         answers: {
           Hola: [
             {answer: 'hola', frequency: 7},
@@ -77,14 +78,14 @@ describe('StateTopAnswersStatsService', function() {
         }
       });
 
-      var stateStats = this.StateTopAnswersStatsService.getStateStats('Hola');
+      var stateStats = this.stas.getStateStats('Hola');
       expect(stateStats).toContain(joC({answer: 'hola', isAddressed: true}));
       expect(stateStats).toContain(joC({answer: 'adios', isAddressed: false}));
       expect(stateStats).toContain(joC({answer: 'que?', isAddressed: false}));
     });
 
     it('maintains frequency in order', function() {
-      this.StateTopAnswersStatsService.init({
+      this.stas.init({
         answers: {
           Hola: [
             {answer: 'hola', frequency: 7},
@@ -94,11 +95,15 @@ describe('StateTopAnswersStatsService', function() {
         }
       });
 
-      expect(this.StateTopAnswersStatsService.getStateStats('Hola')).toEqual([
+      expect(this.stas.getStateStats('Hola')).toEqual([
         joC({answer: 'hola', frequency: 7}),
         joC({answer: 'adios', frequency: 4}),
         joC({answer: 'que?', frequency: 2}),
       ]);
+    });
+
+    it('registers handlers to ExplorationStatesService', function() {
+      // this.stas
     });
   });
 });
