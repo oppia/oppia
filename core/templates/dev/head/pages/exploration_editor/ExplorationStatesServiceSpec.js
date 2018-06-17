@@ -121,6 +121,16 @@ describe('ExplorationStatesService', function() {
 
         expect(callbackSpy).toHaveBeenCalledWith('Hola', 'Bonjour');
       });
+
+      it('does not accept duplicate callbacks', function() {
+        var callbackSpy = jasmine.createSpy('callback');
+
+        this.ess.registerOnStateRenamedCallback(callbackSpy);
+        this.ess.registerOnStateRenamedCallback(callbackSpy);
+        this.ess.renameState('Hola', 'Bonjour');
+
+        expect(callbackSpy.calls.count()).toEqual(1);
+      });
     });
 
     describe('.registerOnStateInteractionAnswerGroupsSaved', function() {
@@ -134,6 +144,18 @@ describe('ExplorationStatesService', function() {
 
           expect(callbackSpy).toHaveBeenCalledWith('Hola');
         });
+
+      it('does not accept duplicate callbacks', function() {
+        var callbackSpy = jasmine.createSpy('callback');
+
+        this.ess.registerOnStateInteractionAnswerGroupsSavedCallback(
+          callbackSpy);
+        this.ess.registerOnStateInteractionAnswerGroupsSavedCallback(
+          callbackSpy);
+        this.ess.saveInteractionAnswerGroups('Hola', []);
+
+        expect(callbackSpy.calls.count()).toEqual(1);
+      });
     });
   });
 });
