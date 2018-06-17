@@ -24,14 +24,15 @@ oppia.controller('StateSolution', [
   'stateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
   'ExplorationContextService', 'ExplorationWarningsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
-  function(
+  'stateContentIdsToAudioTranslationsService', function(
       $scope, $rootScope, $uibModal, $filter, EditorStateService,
       AlertsService, INTERACTION_SPECS, stateSolutionService,
       ExplorationStatesService, SolutionVerificationService,
       ExplorationHtmlFormatterService, stateInteractionIdService,
       stateHintsService, UrlInterpolationService, SolutionObjectFactory,
       ExplorationContextService, ExplorationWarningsService,
-      INFO_MESSAGE_SOLUTION_IS_INVALID) {
+      INFO_MESSAGE_SOLUTION_IS_INVALID,
+      stateContentIdsToAudioTranslationsService) {
     $scope.correctAnswer = null;
     $scope.correctAnswerEditorHtml = '';
     $scope.inlineSolutionEditorIsActive = false;
@@ -90,9 +91,10 @@ oppia.controller('StateSolution', [
         controller: [
           '$scope', '$uibModalInstance', 'stateSolutionService',
           'EVENT_PROGRESS_NAV_SUBMITTED', 'INTERACTION_SPECS',
-          function(
+          'COMPONENT_NAME_SOLUTION', 'GenerateContentIdService', function(
               $scope, $uibModalInstance, stateSolutionService,
-              EVENT_PROGRESS_NAV_SUBMITTED, INTERACTION_SPECS) {
+              EVENT_PROGRESS_NAV_SUBMITTED, INTERACTION_SPECS,
+              COMPONENT_NAME_SOLUTION, GenerateContentIdService) {
             $scope.stateSolutionService = stateSolutionService;
             $scope.correctAnswerEditorHtml = (
               ExplorationHtmlFormatterService.getInteractionHtml(
@@ -111,7 +113,8 @@ oppia.controller('StateSolution', [
             var EMPTY_SOLUTION_DATA = {
               answerIsExclusive: false,
               correctAnswer: null,
-              explanationHtml: ''
+              explanationHtml: '',
+              explanationContentId: COMPONENT_NAME_SOLUTION
             };
 
             $scope.data = stateSolutionService.savedMemento ? {
@@ -119,7 +122,9 @@ oppia.controller('StateSolution', [
                 stateSolutionService.savedMemento.answerIsExclusive),
               correctAnswer: null,
               explanationHtml: (
-                stateSolutionService.savedMemento.explanation.getHtml())
+                stateSolutionService.savedMemento.explanation.getHtml()),
+              explanationContentId: (
+                stateSolutionService.savedMemento.explanation.getContentId())
             } : angular.copy(EMPTY_SOLUTION_DATA);
 
             $scope.onSubmitFromSubmitButton = function() {
@@ -148,7 +153,8 @@ oppia.controller('StateSolution', [
                   solution: SolutionObjectFactory.createNew(
                     $scope.data.answerIsExclusive,
                     $scope.data.correctAnswer,
-                    $scope.data.explanationHtml)
+                    $scope.data.explanationHtml,
+                    $scope.data.explanationContentId)
                 });
               } else {
                 throw Error('Cannot save invalid solution');
@@ -172,10 +178,17 @@ oppia.controller('StateSolution', [
           currentStateName, solutionIsValid);
         ExplorationWarningsService.updateWarnings();
         if (!solutionIsValid) {
-          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID);
+          AlertsService.addInfoMessage(INFO_MESSAGE_SOLUTION_IS_INVALID, 4000);
         }
 
         stateSolutionService.displayed = result.solution;
+
+        if (!stateSolutionService.savedMemento) {
+          var explanationContentId = result.solution.explanation.getContentId();
+          stateContentIdsToAudioTranslationsService.displayed.addContentId(
+            explanationContentId);
+          stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+        }
         stateSolutionService.saveDisplayedValue();
       });
     };
@@ -203,8 +216,13 @@ oppia.controller('StateSolution', [
           }
         ]
       }).result.then(function() {
+        var explanationContentId = stateSolutionService.displayed
+          .explanation.getContentId();
+        stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+          explanationContentId);
         stateSolutionService.displayed = null;
         stateSolutionService.saveDisplayedValue();
+        stateContentIdsToAudioTranslationsService.saveDisplayedValue();
         ExplorationStatesService.deleteSolutionValidity(
           EditorStateService.getActiveStateName());
       });

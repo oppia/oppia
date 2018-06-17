@@ -16,7 +16,7 @@
 
 """Tests for user dashboard computations."""
 
-from collections import defaultdict
+import collections
 
 from core import jobs_registry
 from core.domain import collection_services
@@ -293,9 +293,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 EXP_1_ID, None, editor_id, FEEDBACK_THREAD_SUBJECT,
                 'text')
-            thread_id = feedback_services.get_all_threads(
-                EXP_1_ID, False)[0].get_thread_id()
-            message = feedback_services.get_messages(EXP_1_ID, thread_id)[0]
+            thread_id = feedback_services.get_all_threads(EXP_1_ID, False)[0].id
+            message = feedback_services.get_messages(thread_id)[0]
 
             # User creates another exploration.
             self.save_new_valid_exploration(
@@ -349,11 +348,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0].get_thread_id()
+            thread_id = feedback_services.get_all_threads(EXP_ID, False)[0].id
 
-            message = feedback_services.get_messages(
-                EXP_ID, thread_id)[0]
+            message = feedback_services.get_messages(thread_id)[0]
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -383,14 +380,16 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
-            self.assertEqual(recent_notifications_for_user_a, [
-                expected_thread_notification,
-                expected_creation_notification
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_a, [
+                    expected_thread_notification,
+                    expected_creation_notification
+                ])
             # User B sees only her feedback thread, but no commits.
-            self.assertEqual(recent_notifications_for_user_b, [
-                expected_thread_notification,
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_b, [
+                    expected_thread_notification,
+                ])
 
     def test_subscribing_to_exploration_subscribes_to_its_feedback_threads(
             self):
@@ -411,10 +410,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0].get_thread_id()
-            message = feedback_services.get_messages(
-                EXP_ID, thread_id)[0]
+            thread_id = feedback_services.get_all_threads(EXP_ID, False)[0].id
+            message = feedback_services.get_messages(thread_id)[0]
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role_for_exploration(
@@ -448,15 +445,17 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                     exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
-            self.assertEqual(recent_notifications_for_user_a, [
-                expected_thread_notification,
-                expected_creation_notification
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_a, [
+                    expected_thread_notification,
+                    expected_creation_notification
+                ])
             # User B sees A's commit and B's feedback thread.
-            self.assertEqual(recent_notifications_for_user_b, [
-                expected_thread_notification,
-                expected_creation_notification,
-            ])
+            self.assertEqual(
+                recent_notifications_for_user_b, [
+                    expected_thread_notification,
+                    expected_creation_notification,
+                ])
 
     def test_basic_computation_for_collections(self):
         with self._get_test_context():
@@ -591,12 +590,12 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
     USER_B_USERNAME = 'b'
 
     MIN_NUM_COMPLETIONS = 2
-    EXPONENT = 2.0/3
+    EXPONENT = 2.0 / 3
 
     def setUp(self):
         super(UserStatsAggregatorTest, self).setUp()
-        self.num_completions = defaultdict(int)
-        self.num_starts = defaultdict(int)
+        self.num_completions = collections.defaultdict(int)
+        self.num_starts = collections.defaultdict(int)
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
 
@@ -643,7 +642,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
     def _run_computation(self):
         """Runs the MapReduce job after running the continuous
         statistics aggregator for explorations to get the correct num
-        completion events."""
+        completion events.
+        """
         with self.swap(
             stats_services, 'get_exploration_stats', self._mock_get_statistics):
             ModifiedUserStatsAggregator.start_computation()
@@ -706,7 +706,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_standard_user_stats_calculation_one_exploration(self):
         exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
-        # Give this exploration an average rating of 4
+        # Give this exploration an average rating of 4.
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
 
@@ -725,7 +725,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_exploration_multiple_contributors(self):
         exploration = self._create_exploration(self.EXP_ID_1, self.user_a_id)
-        # Give this exploration an average rating of 4
+        # Give this exploration an average rating of 4.
         avg_rating = 4
         self._rate_exploration(exploration.id, 5, avg_rating)
         exp_services.update_exploration(self.user_b_id, self.EXP_ID_1, [], '')
@@ -770,7 +770,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def test_only_yield_when_rating_greater_than_two(self):
         """Tests that map only yields an impact score for an
-        exploration when the impact score is greater than 0."""
+        exploration when the impact score is greater than 0.
+        """
         self._create_exploration(self.EXP_ID_1, self.user_a_id)
 
         # Give two ratings of 1.
@@ -880,7 +881,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         expected_results = {
             'total_plays': 2,
             'num_ratings': 6,
-            'average_ratings': 22/6.0
+            'average_ratings': 22 / 6.0
         }
 
         user_stats_1 = (
@@ -919,7 +920,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
                 self.user_a_id))
         self.assertEquals(user_stats['total_plays'], 0)
         self.assertEquals(user_stats['num_ratings'], 5)
-        self.assertEquals(user_stats['average_ratings'], 18/5.0)
+        self.assertEquals(user_stats['average_ratings'], 18 / 5.0)
 
     def test_realtime_layer_batch_job_user_rate_same_exp_multiple_times(self):
         self._create_exploration(
@@ -965,7 +966,7 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # _mock_get_statistics() method above.
         self.assertEqual(user_stats_model.total_plays, 14)
         self.assertEqual(user_stats_model.num_ratings, 6)
-        self.assertEqual(user_stats_model.average_ratings, 20/6.0)
+        self.assertEqual(user_stats_model.average_ratings, 20 / 6.0)
 
         # Stop the batch job. Fire up a few events and check data from realtime
         # job.
@@ -982,4 +983,4 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
         # two.
         self.assertEquals(user_stats['total_plays'], 16)
         self.assertEquals(user_stats['num_ratings'], 10)
-        self.assertEquals(user_stats['average_ratings'], 32/10.0)
+        self.assertEquals(user_stats['average_ratings'], 32 / 10.0)

@@ -78,7 +78,8 @@
           '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
         ACTIVITY_STATUS_PUBLIC: JSON.parse(
           '{{ACTIVITY_STATUS_PUBLIC|js_string}}'),
-        ADDITIONAL_ANGULAR_MODULES: [],
+        ADDITIONAL_ANGULAR_MODULES: JSON.parse(
+          '{{additional_angular_modules|js_string}}'),
         ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
         can_create_collections: JSON.parse(
           '{{can_create_collections|js_string}}'),
@@ -92,9 +93,11 @@
         POST_COMPLETION_HOOKS: [],
         preferredSiteLanguageCode: JSON.parse(
           '{{preferred_site_language_code|js_string}}'),
+        SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL|js_string}}'),
         SITE_NAME: JSON.parse('{{SITE_NAME|js_string}}'),
         SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
         TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
+        iframed: JSON.parse('{{iframed|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
         isModerator: JSON.parse('{{is_moderator|js_string}}'),
         isSuperAdmin: JSON.parse('{{is_super_admin|js_string}}'),
@@ -107,11 +110,6 @@
         PROMO_BAR_IS_ENABLED: JSON.parse('{{promo_bar_enabled|js_string}}'),
         PROMO_BAR_MESSAGE: JSON.parse('{{promo_bar_message|js_string}}')
       };
-
-      {% if additional_angular_modules %}
-        GLOBALS.ADDITIONAL_ANGULAR_MODULES = JSON.parse(
-          '{{additional_angular_modules|js_string}}');
-      {% endif %}
     </script>
 
     {% block header_js %}
@@ -122,9 +120,10 @@
   </head>
 
   <body>
-    {% if iframed %}
+    <div ng-if="iframed">
       {{ warnings_and_loader() }}
-    {% else %}
+    </div>
+    <div ng-if="!iframed">
       <div role="button" tabindex="0" ng-click="skipToMainContent()" class="oppia-skip-to-content protractor-test-skip-link">Skip to Main Content</div>
       <promo-bar ng-if="promoBarIsEnabled" promo-message="promoBarMessage">
       </promo-bar>
@@ -176,21 +175,17 @@
         </div>
       </div>
 
-      {% if DEV_MODE %}
-        <div class="oppia-dev-mode">
-          Dev Mode
-        </div>
-      {% endif %}
+      <div ng-if="DEV_MODE" class="oppia-dev-mode">
+        Dev Mode
+      </div>
 
-      {% if SITE_FEEDBACK_FORM_URL %}
-        <a href="{{SITE_FEEDBACK_FORM_URL}}" target="_blank"
-           class="oppia-site-feedback oppia-transition-200">
-          <i class="material-icons md-18">&#xE87F;</i>
-            <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
-          </i>
-        </a>
-      {% endif %}
-    {% endif %}
+      <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
+         class="oppia-site-feedback oppia-transition-200">
+        <i class="material-icons md-18">&#xE87F;</i>
+          <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
+        </i>
+      </a>
+    </div>
 
     {% include 'pages/footer_js_libs.html' %}
 
@@ -211,6 +206,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/HtmlEscaperService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/TranslationFileHashLoaderService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/RteHelperService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/StateRulesStatsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/ConstructTranslationIdsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>

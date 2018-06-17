@@ -36,7 +36,7 @@ oppia.factory('ExplorationPlayerService', [
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
   'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
   'PlayerCorrectnessFeedbackEnabledService',
-  'GuestCollectionProgressService',
+  'GuestCollectionProgressService', 'ImagePreloaderService',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $rootScope, $q, LearnerParamsService,
@@ -50,7 +50,7 @@ oppia.factory('ExplorationPlayerService', [
       LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
       WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
       PlayerCorrectnessFeedbackEnabledService,
-      GuestCollectionProgressService,
+      GuestCollectionProgressService, ImagePreloaderService,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
@@ -159,9 +159,11 @@ oppia.factory('ExplorationPlayerService', [
       LearnerParamsService.init(startingParams);
     };
 
-    // Ensure the transition to a terminal state properly logs the end of the
-    // exploration.
     $rootScope.$on('playerStateChange', function(evt, newStateName) {
+      // To restart the preloader for the new state if required.
+      ImagePreloaderService.onStateChange(newStateName);
+      // Ensure the transition to a terminal state properly logs the end of the
+      // exploration.
       if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
         StatsReportingService.recordExplorationCompleted(
           newStateName, LearnerParamsService.getAllParams());
@@ -222,22 +224,24 @@ oppia.factory('ExplorationPlayerService', [
         if (_editorPreviewMode) {
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
             _explorationId).then(function(data) {
-              exploration = ExplorationObjectFactory.createFromBackendDict(
-                data);
-              exploration.setInitialStateName(initStateName);
-              initParams(manualParamChanges);
-              AudioTranslationLanguageService.init(
-                exploration.getAllAudioLanguageCodes(),
-                null,
-                exploration.getLanguageCode(),
-                data.auto_tts_enabled);
-              AudioPreloaderService.init(exploration);
-              AudioPreloaderService.kickOffAudioPreloader(initStateName);
-              PlayerCorrectnessFeedbackEnabledService.init(
-                data.correctness_feedback_enabled);
-              _loadInitialState(successCallback);
-              NumberAttemptsService.reset();
-            });
+            exploration = ExplorationObjectFactory.createFromBackendDict(
+              data);
+            exploration.setInitialStateName(initStateName);
+            initParams(manualParamChanges);
+            AudioTranslationLanguageService.init(
+              exploration.getAllAudioLanguageCodes(),
+              null,
+              exploration.getLanguageCode(),
+              data.auto_tts_enabled);
+            AudioPreloaderService.init(exploration);
+            AudioPreloaderService.kickOffAudioPreloader(initStateName);
+            ImagePreloaderService.init(exploration);
+            ImagePreloaderService.kickOffImagePreloader(initStateName);
+            PlayerCorrectnessFeedbackEnabledService.init(
+              data.correctness_feedback_enabled);
+            _loadInitialState(successCallback);
+            NumberAttemptsService.reset();
+          });
         } else {
           var loadedExploration = null;
           if (version) {
@@ -267,6 +271,9 @@ oppia.factory('ExplorationPlayerService', [
               data.auto_tts_enabled);
             AudioPreloaderService.init(exploration);
             AudioPreloaderService.kickOffAudioPreloader(
+              exploration.getInitialState().name);
+            ImagePreloaderService.init(exploration);
+            ImagePreloaderService.kickOffImagePreloader(
               exploration.getInitialState().name);
             PlayerCorrectnessFeedbackEnabledService.init(
               data.correctness_feedback_enabled);
@@ -335,6 +342,9 @@ oppia.factory('ExplorationPlayerService', [
       getSolution: function(stateName) {
         return exploration.getInteraction(stateName).solution;
       },
+      getContentIdsToAudioTranslations: function(stateName) {
+        return exploration.getState(stateName).contentIdsToAudioTranslations;
+      },
       isLoggedIn: function() {
         return _isLoggedIn;
       },
@@ -349,6 +359,8 @@ oppia.factory('ExplorationPlayerService', [
         answerIsBeingProcessed = true;
         var oldStateName = PlayerTranscriptService.getLastStateName();
         var oldState = exploration.getState(oldStateName);
+        var contentIdsToAudioTranslations =
+          oldState.contentIdsToAudioTranslations;
         var classificationResult = (
           AnswerClassificationService.getMatchingClassificationResult(
             _explorationId, oldStateName, oldState, answer,
@@ -383,8 +395,10 @@ oppia.factory('ExplorationPlayerService', [
         oldParams.answer = answer;
         var feedbackHtml =
           makeFeedback(outcome.feedback.getHtml(), [oldParams]);
+        var feedbackContentId = outcome.feedback.getContentId();
         var feedbackAudioTranslations =
-          outcome.feedback.getBindableAudioTranslations();
+          contentIdsToAudioTranslations.getBindableAudioTranslations(
+            feedbackContentId);
         if (feedbackHtml === null) {
           answerIsBeingProcessed = false;
           AlertsService.addWarning('Expression parsing error.');
@@ -431,7 +445,7 @@ oppia.factory('ExplorationPlayerService', [
             visitedStateNames.push(newStateName);
 
             if (oldStateName === exploration.initStateName && (
-                !explorationActuallyStarted)) {
+              !explorationActuallyStarted)) {
               StatsReportingService.recordExplorationActuallyStarted(
                 oldStateName);
               explorationActuallyStarted = true;

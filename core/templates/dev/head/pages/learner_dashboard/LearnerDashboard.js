@@ -99,6 +99,7 @@ oppia.controller('LearnerDashboard', [
     $scope.Math = window.Math;
     $scope.profilePictureDataUrl = GLOBALS.profilePictureDataUrl;
     $scope.username = GLOBALS.username;
+    $scope.loadingFeedbacks = false;
     var threadIndex = null;
 
     $scope.newMessage = {
@@ -134,6 +135,13 @@ oppia.controller('LearnerDashboard', [
 
     $scope.checkMobileView = function() {
       return ($window.innerWidth < 500);
+    };
+
+    $scope.getVisibleExplorationList = function(startCompletedExpIndex) {
+      return $scope.completedExplorationsList.slice(
+        startCompletedExpIndex, Math.min(
+          startCompletedExpIndex + $scope.PAGE_SIZE,
+          $scope.completedExplorationsList.length));
     };
 
     $scope.showUsernamePopover = function(subscriberUsername) {
@@ -186,7 +194,7 @@ oppia.controller('LearnerDashboard', [
       } else if (section === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED) {
         if (subsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS) {
           if ($scope.startCompletedExpIndex +
-            $scope.PAGE_SIZE <= $scope.startCompletedExpIndex.length) {
+            $scope.PAGE_SIZE <= $scope.completedExplorationsList.length) {
             $scope.startCompletedExpIndex += $scope.PAGE_SIZE;
           }
         } else if (
@@ -294,9 +302,9 @@ oppia.controller('LearnerDashboard', [
 
     $scope.onClickThread = function(
         threadStatus, explorationId, threadId, explorationTitle) {
+      $scope.loadingFeedbacks = true;
       var threadDataUrl = UrlInterpolationService.interpolateUrl(
-        '/learnerdashboardthreadhandler/<explorationId>/<threadId>', {
-          explorationId: explorationId,
+        '/learnerdashboardthreadhandler/<threadId>', {
           threadId: threadId
         });
       $scope.explorationTitle = explorationTitle;
@@ -306,8 +314,7 @@ oppia.controller('LearnerDashboard', [
       $scope.threadId = threadId;
 
       for (var index = 0; index < $scope.threadSummaries.length; index++) {
-        if ($scope.threadSummaries[index].explorationId === explorationId &&
-            $scope.threadSummaries[index].threadId === threadId) {
+        if ($scope.threadSummaries[index].threadId === threadId) {
           threadIndex = index;
           var threadSummary = $scope.threadSummaries[index];
           threadSummary.markTheLastTwoMessagesAsRead();
@@ -325,6 +332,7 @@ oppia.controller('LearnerDashboard', [
             FeedbackMessageSummaryObjectFactory.createFromBackendDict(
               messageSummaryDicts[index]));
         }
+        $scope.loadingFeedbacks = false;
       });
     };
 
@@ -333,10 +341,9 @@ oppia.controller('LearnerDashboard', [
       threadIndex = null;
     };
 
-    $scope.addNewMessage = function(explorationId, threadId, newMessage) {
+    $scope.addNewMessage = function(threadId, newMessage) {
       var url = UrlInterpolationService.interpolateUrl(
-        '/threadhandler/<explorationId>/<threadId>', {
-          explorationId: explorationId,
+        '/threadhandler/<threadId>', {
           threadId: threadId
         });
       var payload = {
@@ -362,7 +369,7 @@ oppia.controller('LearnerDashboard', [
     $scope.showSuggestionModal = function(newContent, oldContent, description) {
       $uibModal.open({
         templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/learner_dashboard/' +
+          '/pages/' +
           'learner_view_suggestion_modal_directive.html'),
         backdrop: true,
         resolve: {
@@ -562,10 +569,10 @@ oppia.controller('LearnerDashboard', [
         $scope.feedbackThreadActive = false;
 
         $scope.noExplorationActivity = (
-            ($scope.completedExplorationsList.length === 0) &&
+          ($scope.completedExplorationsList.length === 0) &&
             ($scope.incompleteExplorationsList.length === 0));
         $scope.noCollectionActivity = (
-            ($scope.completedCollectionsList.length === 0) &&
+          ($scope.completedCollectionsList.length === 0) &&
             ($scope.incompleteCollectionsList.length === 0));
         $scope.noActivity = (
           ($scope.noExplorationActivity) && ($scope.noCollectionActivity) &&

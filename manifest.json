@@ -162,9 +162,9 @@
       "messageFormat": {
         "version": "0.3.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/SlexAxton/messageformat.js/archive/v0.3.1.zip",
+        "url": "https://github.com/messageformat/messageformat/archive/v0.3.1.zip",
         "targetDirPrefix": "messageformat-",
-        "rootDirPrefix": "messageformat.js-",
+        "rootDirPrefix": "messageformat-",
         "bundle": {
           "js": ["messageformat.js"]
         }
@@ -256,11 +256,11 @@
         }
       },
       "guppy": {
-        "version": "260da662c907e95f3da0a335c896fe9621fc165d",
+        "version": "b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba",
         "downloadFormat": "zip",
-        "url": "https://github.com/daniel3735928559/guppy/archive/260da662c907e95f3da0a335c896fe9621fc165d.zip",
+        "url": "https://github.com/daniel3735928559/guppy/archive/b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba.zip",
         "rootDirPrefix": "guppy-",
-        "targetDir": "guppy-260da6"
+        "targetDir": "guppy-b5055b"
       },
       "hammerJs": {
         "version": "2.0.4",
@@ -332,6 +332,17 @@
         "url": "https://github.com/mathjax/MathJax/archive/2.6.0.zip",
         "rootDirPrefix": "MathJax-",
         "targetDirPrefix": "MathJax-"
+      },
+      "mathJs": {
+        "version": "4.2.2",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/mathjs/4.2.2",
+        "rootDirPrefix": "math-js-",
+        "targetDirPrefix": "math-js-",
+        "files": ["math.js", "math.min.js", "math.min.map"],
+        "bundle": {
+          "js": ["math.js"]
+        }
       },
       "midiJs": {
         "version": "2ef687b47e5f478f1506b47238f3785d9ea8bd25",
@@ -438,6 +449,17 @@
         "targetDirPrefix": "ui-sortable-",
         "bundle": {
           "js": ["src/sortable.js"]
+        }
+      },
+      "uiTree": {
+        "version": "",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular-ui-tree/angular-ui-tree/archive/master.zip",
+        "rootDirPrefix": "angular-ui-tree-master",
+        "targetDirPrefix": "ui-tree-2.22.6",
+        "bundle": {
+          "css": ["dist/angular-ui-tree.min.css"],
+          "js": ["dist/angular-ui-tree.js"]
         }
       },
       "uiUtils": {

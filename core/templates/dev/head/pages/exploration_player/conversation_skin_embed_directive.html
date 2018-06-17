@@ -5,7 +5,7 @@
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
   <div class="conversation-skin-tutor-card-content">
     <div class="conversation-skin-tutor-card-top-section">
-      <div class="conversation-skin-tutor-card-top-content" angular-html-bind="upcomingContentHtml">
+      <div class="rte-viewer conversation-skin-tutor-card-top-content" angular-html-bind="upcomingContentHtml">
       </div>
     </div>
     <div ng-if="upcomingInlineInteractionHtml">
@@ -129,10 +129,7 @@ directive. -->
      float: left;
      min-height: 1px;
      padding: 0;
-  }
-
-  [class*='col-'] {
-    padding-right: 20px;
+     padding-right: 20px;
   }
 
   [class*='col-']:last-of-type {
@@ -383,46 +380,30 @@ directive. -->
   .conversation-skin-oppia-feedback-container,
   .conversation-skin-learner-answer-container {
     position: relative;
-  }
-
-  .conversation-skin-tutor-card-top-section,
-  .conversation-skin-oppia-feedback-container,
-  .conversation-skin-learner-answer-container {
     padding: 0 20px;
   }
+
   /* These rules must be kept in sync with corresponding rules in oppia.css
      (those with '.oppia-rte-editor > p,
        .form-control.oppia-rte-content > div > p' selectors specifying
       the same line-height, margin-top and margin-bottom attributes)
   */
 
-  .conversation-skin-tutor-card-top-content > p,
-  .conversation-skin-oppia-feedback-content > p,
-  .conversation-skin-learner-answer-content > p,
-  .conversation-skin-help-card-content > p {
+  .rte-viewer > p {
     line-height: 28px;
     margin-bottom: 18px;
     margin-top: 18px;
   }
 
-  .conversation-skin-tutor-card-top-content > p:first-child,
-  .conversation-skin-oppia-feedback-content > p:first-child,
-  .conversation-skin-learner-answer-content > p:first-child,
-  .conversation-skin-help-card-content > p:first-child {
+  .rte-viewer > p:first-child {
     margin-top: 0;
   }
 
-  .conversation-skin-tutor-card-top-content > p:last-child,
-  .conversation-skin-oppia-feedback-content > p:last-child,
-  .conversation-skin-learner-answer-content > p:last-child,
-  .conversation-skin-help-card-content > p:last-child {
+  .rte-viewer > p:last-child {
     margin-bottom: 0;
   }
 
-  .conversation-skin-tutor-card-top-content,
-  .conversation-skin-oppia-feedback-content,
-  .conversation-skin-learner-answer-content,
-  .conversation-skin-help-card-content {
+  .rte-viewer {
     border-radius: 2px;
     display: inline-block;
     max-width: 100%;
@@ -455,17 +436,12 @@ directive. -->
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-help-card-content {
     background-color: rgba(224, 242, 241, 1);
+    border-top-left-radius: 0;
   }
 
   .conversation-skin-learner-answer-content {
     background-color: rgba(236, 239, 241, 1);
     border-bottom-right-radius: 0;
-  }
-
-  .conversation-skin-tutor-card-top-content,
-  .conversation-skin-oppia-feedback-content,
-  .conversation-skin-help-card-content {
-    border-top-left-radius: 0;
   }
 
   .conversation-skin-learner-answer-container {
@@ -524,32 +500,32 @@ directive. -->
   }
 
   .conversation-skin-feedback-dot-one {
-    -moz-animation-delay: 0.0s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.0s;
+    -moz-animation-delay: 0.0s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.0s;
+    -webkit-animation-delay: 0.0s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.0s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-two {
-    -moz-animation-delay: 0.2s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.2s;
+    -moz-animation-delay: 0.2s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.2s;
+    -webkit-animation-delay: 0.2s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.2s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-three {
-    -moz-animation-delay: 0.4s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.4s;
+    -moz-animation-delay: 0.4s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.4s;
+    -webkit-animation-delay: 0.4s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.4s;
     opacity: 0;
   }
 
@@ -666,7 +642,6 @@ directive. -->
       display: block;
       height: 40px;
       left: 100%;
-      position: absolute;
       position: absolute;
       transform: translate(-100%, -100%);
       width: 40px;

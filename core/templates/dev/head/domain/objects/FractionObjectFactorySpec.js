@@ -137,9 +137,9 @@ describe('FractionObjectFactory', function() {
 
     it('should correctly detect nonzero integer part', function() {
       expect(
-       Fraction.fromRawInputString('0').hasNonzeroIntegerPart()).toBe(false);
+        Fraction.fromRawInputString('0').hasNonzeroIntegerPart()).toBe(false);
       expect(
-       Fraction.fromRawInputString('1').hasNonzeroIntegerPart()).toBe(true);
+        Fraction.fromRawInputString('1').hasNonzeroIntegerPart()).toBe(true);
       expect(
         Fraction.fromRawInputString('1 0/5').hasNonzeroIntegerPart()
       ).toBe(true);

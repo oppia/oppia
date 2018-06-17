@@ -22,17 +22,25 @@ echo Installing third-party JS libraries and zip files.
 $PYTHON_CMD scripts/install_third_party.py
 
 # Install third-party node modules needed for the build process.
-install_node_module eslint 3.18.0
-install_node_module eslint-plugin-html 2.0.1
+install_node_module ajv 5.0.0
+install_node_module eslint 4.19.0
 install_node_module eslint-plugin-angular 0.12.0
+install_node_module eslint-plugin-html 4.0.1
 install_node_module gulp 3.9.0
-install_node_module through2 2.0.0
-install_node_module yargs 3.29.0
-install_node_module gulp-concat 2.6.0
 install_node_module gulp-clean-css 2.0.2
-install_node_module gulp-util 3.0.7
+install_node_module gulp-concat 2.6.0
 install_node_module gulp-sourcemaps 1.6.0
 install_node_module gulp-uglify 2.0.1
+install_node_module gulp-util 3.0.7
+install_node_module htmllint 0.7.2
+install_node_module htmllint-cli 0.0.7
+install_node_module @mapbox/stylelint-processor-arbitrary-tags 0.2.0
+install_node_module postcss-syntax 0.10.0
+install_node_module stylelint 9.2.1
+install_node_module stylelint-config-standard 18.2.0
+install_node_module through2 2.0.0
+install_node_module uglify-js 3.3.11
+install_node_module yargs 3.29.0
 
 # Download and install Skulpt. Skulpt is built using a Python script included
 # within the Skulpt repository (skulpt.py). This script normally requires
@@ -99,22 +107,16 @@ if ! type pip > /dev/null 2>&1 ; then
     exit 1
 fi
 
-# Note that numpy needs to be built after downloading.
-echo Checking if numpy is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/numpy-1.6.1" ]; then
-  echo Installing numpy
-
-  pip install numpy==1.6.1 --target="$TOOLS_DIR/numpy-1.6.1"
-fi
-
 echo Checking if pylint is installed in $TOOLS_DIR/pip_packages
-if [ ! -d "$TOOLS_DIR/pylint-1.7.1" ]; then
+if [ ! -d "$TOOLS_DIR/pylint-1.8.4" ]; then
   echo Installing Pylint
 
-  pip install pylint==1.7.1 --target="$TOOLS_DIR/pylint-1.7.1"
+  # See https://stackoverflow.com/a/4495175 for the rationale behind the "user"
+  # and "prefix" flags. --system is used for Debian systems (cf. `pip install --help`).
+  pip install pylint==1.8.4 --target="$TOOLS_DIR/pylint-1.8.4" --user --prefix= --system
   # Add __init__.py file so that pylint dependency backports are resolved
   # correctly.
-  touch $TOOLS_DIR/pylint-1.7.1/backports/__init__.py
+  touch $TOOLS_DIR/pylint-1.8.4/backports/__init__.py
 fi
 
 # Install webtest.
@@ -147,19 +149,33 @@ if [ ! -d "$TOOLS_DIR/pycodestyle-2.3.1" ]; then
   rm pycodestyle-2.3.1.tar.gz
 fi
 
+# Install pyjsparser.
+echo Checking if pyjsparser is installed in third_party
+if [ ! -d "$TOOLS_DIR/pyjsparser-2.5.2" ]; then
+  echo Installing pyjsparser
+  # Note that the URL redirects, so we pass in -L to tell curl to follow the redirect.
+  curl -o pyjsparser-2.5.2.tar.gz -L https://pypi.python.org/packages/17/3d/59f7f0cd6a7cdab611b36d8921c9d2d6c5564033d938ec2eb934cdca0e48/pyjsparser-2.5.2.tar.gz
+  tar xzf pyjsparser-2.5.2.tar.gz -C $TOOLS_DIR
+  rm pyjsparser-2.5.2.tar.gz
+fi
+
 # Python API for browsermob-proxy.
 echo Checking if browsermob-proxy is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
   echo Installing browsermob-proxy
 
-  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1"
+  # See https://stackoverflow.com/a/4495175 for the rationale behind the "user"
+  # and "prefix" flags. --system is used for Debian systems (cf. `pip install --help`).
+  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1" --user --prefix= --system
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR/pip_packages
 if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   echo Installing selenium
 
-  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
+  # See https://stackoverflow.com/a/4495175 for the rationale behind the "user"
+  # and "prefix" flags. --system is used for Debian systems (cf. `pip install --help`).
+  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2" --user --prefix= --system
 fi
 
 # install pre-push script

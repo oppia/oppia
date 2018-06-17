@@ -200,43 +200,11 @@ def get_classifier_training_job_by_id(job_id):
     return classifier_training_job
 
 
-def create_classifier_training_job(algorithm_id, interaction_id, exp_id,
-                                   exp_version, state_name, training_data,
-                                   status):
-    """Creates a ClassifierTrainingJobModel in data store.
-
-    Args:
-        algorithm_id: str. ID of the algorithm used to generate the model.
-        interaction_id: str. ID of the interaction to which the algorithm
-            belongs.
-        exp_id: str. ID of the exploration.
-        exp_version: int. The exploration version at the time
-            this training job was created.
-        state_name: str. The name of the state to which the classifier
-            belongs.
-        training_data: dict. The data used in training phase.
-        status: str. The status of the training job (
-            feconf.TRAINING_JOB_STATUS_NEW by default).
-
-    Returns:
-        job_id: str. ID of the classifier training job.
-    """
-    next_scheduled_check_time = datetime.datetime.utcnow()
-    dummy_classifier_training_job = classifier_domain.ClassifierTrainingJob(
-        'job_id_dummy', algorithm_id, interaction_id, exp_id, exp_version,
-        next_scheduled_check_time, state_name, status, training_data, None, 1)
-    dummy_classifier_training_job.validate()
-    job_id = classifier_models.ClassifierTrainingJobModel.create(
-        algorithm_id, interaction_id, exp_id, exp_version,
-        next_scheduled_check_time, training_data, state_name, status, None, 1)
-    return job_id
-
-
 def _update_classifier_training_jobs_status(job_ids, status):
     """Checks for the existence of the model and then updates it.
 
     Args:
-        job_id: list(str). list of ID of the ClassifierTrainingJob domain
+        job_ids: list(str). list of ID of the ClassifierTrainingJob domain
             objects.
         status: str. The status to which the job needs to be updated.
 
@@ -262,7 +230,6 @@ def _update_classifier_training_jobs_status(job_ids, status):
 
     classifier_models.ClassifierTrainingJobModel.put_multi(
         classifier_training_job_models)
-
 
 
 def mark_training_job_complete(job_id):

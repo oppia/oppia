@@ -24,7 +24,7 @@ describe('InteractiveMapValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     validatorService = $injector.get('InteractiveMapValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     oof = $injector.get('OutcomeObjectFactory');
@@ -39,7 +39,8 @@ describe('InteractiveMapValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
     customizationArguments = {
@@ -63,7 +64,8 @@ describe('InteractiveMapValidationService', function() {
         }
       })],
       goodDefaultOutcome,
-      false
+      false,
+      null
     )];
   }));
 
@@ -86,34 +88,33 @@ describe('InteractiveMapValidationService', function() {
 
   it('should expect latitudes and longitudes within [-90, 90] and ' +
     '[-180, 180], respectively',
-    function() {
-      customizationArguments.latitude.value = -120;
-      customizationArguments.longitude.value = 200;
-      var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups,
-        goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please pick a starting latitude between -90 and 90.'
-      }, {
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please pick a starting longitude between -180 and 180.'
-      }]);
+  function() {
+    customizationArguments.latitude.value = -120;
+    customizationArguments.longitude.value = 200;
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: 'Please pick a starting latitude between -90 and 90.'
+    }, {
+      type: WARNING_TYPES.CRITICAL,
+      message: 'Please pick a starting longitude between -180 and 180.'
+    }]);
 
-      customizationArguments.latitude.value = 120;
-      customizationArguments.longitude.value = -200;
-      warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups,
-        goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please pick a starting latitude between -90 and 90.'
-      }, {
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please pick a starting longitude between -180 and 180.'
-      }]);
-    }
-  );
+    customizationArguments.latitude.value = 120;
+    customizationArguments.longitude.value = -200;
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: 'Please pick a starting latitude between -90 and 90.'
+    }, {
+      type: WARNING_TYPES.CRITICAL,
+      message: 'Please pick a starting longitude between -180 and 180.'
+    }]);
+  });
 
   it('should expect all rule types to refer to positive distances',
     function() {

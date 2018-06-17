@@ -88,7 +88,7 @@ oppia.factory('ParameterMetadataService', [
 
       // Next, the content is evaluated.
       ExpressionInterpolationService.getParamsFromString(
-          state.content.getHtml()).forEach(
+        state.content.getHtml()).forEach(
         function(paramName) {
           result.push({
             action: PARAM_ACTION_GET,
@@ -109,7 +109,7 @@ oppia.factory('ParameterMetadataService', [
       state.interaction.answerGroups.forEach(function(group) {
         for (var k = 0; k < group.outcome.feedback.length; k++) {
           ExpressionInterpolationService.getParamsFromString(
-              group.outcome.feedback[k]).forEach(
+            group.outcome.feedback[k]).forEach(
             function(paramName) {
               result.push({
                 action: PARAM_ACTION_GET,

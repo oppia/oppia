@@ -16,7 +16,7 @@
  * @fileoverview Classification service for answer groups.
  */
 
- // TODO(bhenning): Find a better place for these constants.
+// TODO(bhenning): Find a better place for these constants.
 
 // NOTE TO DEVELOPERS: These constants must be the same (in name and value) as
 // the corresponding classification constants defined in core.domain.exp_domain.
@@ -26,18 +26,17 @@ oppia.constant('STATISTICAL_CLASSIFICATION', 'statistical_classifier');
 oppia.constant('DEFAULT_OUTCOME_CLASSIFICATION', 'default_outcome');
 
 oppia.factory('AnswerClassificationService', [
-  '$http', 'LearnerParamsService', 'AlertsService',
-  'AnswerClassificationResultObjectFactory',
+  'AlertsService', 'AnswerClassificationResultObjectFactory',
   'PredictionAlgorithmRegistryService', 'StateClassifierMappingService',
   'INTERACTION_SPECS', 'ENABLE_ML_CLASSIFIERS', 'EXPLICIT_CLASSIFICATION',
   'DEFAULT_OUTCOME_CLASSIFICATION', 'STATISTICAL_CLASSIFICATION',
-  'RULE_TYPE_CLASSIFIER',
-  function($http, LearnerParamsService, AlertsService,
-      AnswerClassificationResultObjectFactory,
+  'TRAINING_DATA_CLASSIFICATION',
+  function(
+      AlertsService, AnswerClassificationResultObjectFactory,
       PredictionAlgorithmRegistryService, StateClassifierMappingService,
       INTERACTION_SPECS, ENABLE_ML_CLASSIFIERS, EXPLICIT_CLASSIFICATION,
       DEFAULT_OUTCOME_CLASSIFICATION, STATISTICAL_CLASSIFICATION,
-      RULE_TYPE_CLASSIFIER) {
+      TRAINING_DATA_CLASSIFICATION) {
     /**
      * Finds the first answer group with a rule that returns true.
      *
@@ -57,9 +56,7 @@ oppia.factory('AnswerClassificationService', [
       for (var i = 0; i < answerGroups.length; i++) {
         for (var j = 0; j < answerGroups[i].rules.length; j++) {
           var rule = answerGroups[i].rules[j];
-          if (rule.type !== RULE_TYPE_CLASSIFIER &&
-              interactionRulesService[rule.type](
-                answer, rule.inputs)) {
+          if (interactionRulesService[rule.type](answer, rule.inputs)) {
             return AnswerClassificationResultObjectFactory.createNew(
               answerGroups[i].outcome, i, j, EXPLICIT_CLASSIFICATION);
           }
@@ -75,25 +72,6 @@ oppia.factory('AnswerClassificationService', [
       } else {
         AlertsService.addWarning('Something went wrong with the exploration.');
       }
-    };
-
-    /**
-     * Finds the first rule that contains RULE_TYPE_CLASSIFIER as rule type.
-     *
-     * @param {object} answerGroup - An answer group of the interaction. Each
-     *     answer group containts rule_specs which is a list of rules.
-     *
-     * @return {integer} The index of the retrieved rule with rule_type
-     *     RULE_TYPE_CLASSIFIER.
-     */
-    var findClassifierRuleIndex = function(answerGroup) {
-      for (var i = 0; i < answerGroup.rules.length; i++) {
-        var rule = answerGroup.rules[i];
-        if (rule.type === RULE_TYPE_CLASSIFIER) {
-          return i;
-        }
-      }
-      throw Error('Classifier Rule type is not present in this answer group.');
     };
 
     return {
@@ -135,6 +113,17 @@ oppia.factory('AnswerClassificationService', [
 
         if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
             ENABLE_ML_CLASSIFIERS) {
+          for (var i = 0; i < answerGroups.length; i++) {
+            if (answerGroups[i].trainingData) {
+              for (var j = 0; j < answerGroups[i].trainingData.length; j++) {
+                if (angular.equals(answer, answerGroups[i].trainingData[j])) {
+                  return AnswerClassificationResultObjectFactory.createNew(
+                    answerGroups[i].outcome, i, null,
+                    TRAINING_DATA_CLASSIFICATION);
+                }
+              }
+            }
+          }
           var classifier = StateClassifierMappingService.getClassifier(
             stateName);
           if (classifier && classifier.classifierData && (
@@ -150,10 +139,7 @@ oppia.factory('AnswerClassificationService', [
               answerClassificationResult = (
                 AnswerClassificationResultObjectFactory.createNew(
                   answerGroups[predictedAnswerGroupIndex].outcome,
-                  predictedAnswerGroupIndex,
-                  findClassifierRuleIndex(
-                    answerGroups[predictedAnswerGroupIndex]),
-                  STATISTICAL_CLASSIFICATION));
+                  predictedAnswerGroupIndex, null, STATISTICAL_CLASSIFICATION));
             }
           }
         }

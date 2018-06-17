@@ -34,8 +34,9 @@ transaction_services = models.Registry.import_transaction_services()
 
 
 def log_new_error(*args, **kwargs):
-    """Logs an error message. (This is a stub for logging.error(), so that the
-    latter can be swapped out in tests.)"""
+    """Logs an error message (This is a stub for logging.error(), so that the
+    latter can be swapped out in tests).
+    """
     logging.error(*args, **kwargs)
 
 
@@ -262,7 +263,7 @@ def _send_email(
             recipient_id, recipient_email, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
-    return transaction_services.run_in_transaction(_send_email_in_transaction)
+    transaction_services.run_in_transaction(_send_email_in_transaction)
 
 
 def _send_bulk_mail(
@@ -311,7 +312,7 @@ def _send_bulk_mail(
             instance_id, recipient_ids, sender_id, sender_name_email, intent,
             email_subject, cleaned_html_body, datetime.datetime.utcnow())
 
-    return transaction_services.run_in_transaction(
+    transaction_services.run_in_transaction(
         _send_bulk_mail_in_transaction, instance_id)
 
 
@@ -930,6 +931,6 @@ def send_test_email_for_bulk_emails(tester_id, email_subject, email_body):
     """
     tester_name = user_services.get_username(tester_id)
     tester_email = user_services.get_email_from_user_id(tester_id)
-    return _send_email(
+    _send_email(
         tester_id, tester_id, feconf.BULK_EMAIL_INTENT_TEST,
         email_subject, email_body, tester_email, sender_name=tester_name)

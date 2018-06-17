@@ -24,7 +24,7 @@ describe('ImageClickInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     var filter = $injector.get('$filter');
     validatorService = $injector.get('ImageClickInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
@@ -39,7 +39,8 @@ describe('ImageClickInputValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
     badOutcome = oof.createFromBackendDict({
@@ -50,7 +51,8 @@ describe('ImageClickInputValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
     customizationArguments = {
@@ -104,45 +106,45 @@ describe('ImageClickInputValidationService', function() {
 
   it('should expect labeled regions with non-empty, unique, and ' +
     'alphanumeric labels',
-    function() {
-      var regions = customizationArguments.imageAndRegions.value.labeledRegions;
-      regions[0].label = '';
-      var warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups,
-        goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the region labels are nonempty.'
-      }]);
+  function() {
+    var regions = customizationArguments.imageAndRegions.value.labeledRegions;
+    regions[0].label = '';
+    var warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: 'Please ensure the region labels are nonempty.'
+    }]);
 
-      regions[0].label = 'SecondLabel';
-      warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups,
-        goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: 'Please ensure the region labels are unique.'
-      }]);
+    regions[0].label = 'SecondLabel';
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: 'Please ensure the region labels are unique.'
+    }]);
 
-      regions[0].label = '@';
-      warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups,
-        goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.CRITICAL,
-        message: 'The region labels should consist of alphanumeric characters.'
-      }]);
+    regions[0].label = '@';
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.CRITICAL,
+      message: 'The region labels should consist of alphanumeric characters.'
+    }]);
 
-      customizationArguments.imageAndRegions.value.labeledRegions = [];
-      goodAnswerGroups[0].rules = [];
-      warnings = validatorService.getAllWarnings(
-        currentState, customizationArguments, goodAnswerGroups,
-        goodDefaultOutcome);
-      expect(warnings).toEqual([{
-        type: WARNING_TYPES.ERROR,
-        message: 'Please specify at least one region in the image.'
-      }]);
-    });
+    customizationArguments.imageAndRegions.value.labeledRegions = [];
+    goodAnswerGroups[0].rules = [];
+    warnings = validatorService.getAllWarnings(
+      currentState, customizationArguments, goodAnswerGroups,
+      goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Please specify at least one region in the image.'
+    }]);
+  });
 
   it('should expect rule types to reference valid region labels', function() {
     goodAnswerGroups[0].rules[0].inputs.x = 'FakeLabel';

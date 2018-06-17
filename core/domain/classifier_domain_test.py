@@ -69,8 +69,9 @@ class ClassifierTrainingJobDomainTests(test_utils.GenericTestBase):
         }
         observed_training_job = self._get_training_job_from_dict(
             expected_training_job_dict)
-        self.assertDictEqual(expected_training_job_dict,
-                             observed_training_job.to_dict())
+        self.assertDictEqual(
+            expected_training_job_dict,
+            observed_training_job.to_dict())
 
     def test_validation(self):
         """Tests to verify validate method of ClassifierTrainingJob domain."""
@@ -179,12 +180,14 @@ class TrainingJobExplorationMappingDomainTests(test_utils.GenericTestBase):
         }
         observed_mapping = self._get_mapping_from_dict(
             expected_mapping_dict)
-        self.assertDictEqual(expected_mapping_dict,
-                             observed_mapping.to_dict())
+        self.assertDictEqual(
+            expected_mapping_dict,
+            observed_mapping.to_dict())
 
     def test_validation(self):
         """Tests to verify validate method of TrainingJobExplorationMapping
-        domain."""
+        domain.
+        """
 
         # Verify no errors are raised for correct data.
         mapping_dict = {

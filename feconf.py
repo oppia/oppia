@@ -48,9 +48,14 @@ CLASSIFIERS_DIR = os.path.join('extensions', 'classifiers')
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
 SAMPLE_COLLECTIONS_DIR = os.path.join('data', 'collections')
+CONTENT_VALIDATION_DIR = os.path.join('core', 'domain')
 
 EXTENSIONS_DIR_PREFIX = (
     'backend_prod_files' if not DEV_MODE else '')
+ACTIONS_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'actions'))
+ISSUES_DIR = (
+    os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'issues'))
 INTERACTIONS_DIR = (
     os.path.join(EXTENSIONS_DIR_PREFIX, 'extensions', 'interactions'))
 RTE_EXTENSIONS_DIR = (
@@ -152,13 +157,25 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 18
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 22
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
 # changes are made to any of the blob schemas in the data store, this version
 # number must be changed.
-CURRENT_COLLECTION_SCHEMA_VERSION = 5
+CURRENT_COLLECTION_SCHEMA_VERSION = 6
+
+# The current version of story contents dict in the story schema.
+CURRENT_STORY_CONTENTS_SCHEMA_VERSION = 1
+
+# The current version of skill contents dict in the skill schema.
+CURRENT_SKILL_CONTENTS_SCHEMA_VERSION = 1
+
+# The current version of misconceptions dict in the skill schema.
+CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
+
+# The current version of subtopics dict in the topic schema.
+CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
 
 # The current version of the question schema.
 CURRENT_QUESTION_SCHEMA_VERSION = 1
@@ -179,6 +196,10 @@ COMMIT_LIST_PAGE_SIZE = 50
 # tab.
 FEEDBACK_TAB_PAGE_SIZE = 20
 
+# The maximum number of top unresolved answers which should be aggregated
+# from all of the submitted answers.
+TOP_UNRESOLVED_ANSWERS_LIMIT = 20
+
 # Default title for a newly-minted exploration.
 DEFAULT_EXPLORATION_TITLE = ''
 # Default category for a newly-minted exploration.
@@ -188,6 +209,15 @@ DEFAULT_EXPLORATION_OBJECTIVE = ''
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'Introduction'
+# Default content id for the state's content.
+DEFAULT_NEW_STATE_CONTENT_ID = 'content'
+# Default content id for the interaction's default outcome.
+DEFAULT_OUTCOME_CONTENT_ID = 'default_outcome'
+# Default content_ids_to_audio_translations dict for a default state template.
+DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = {
+    'content': {},
+    'default_outcome': {}
+}
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = ''
 
@@ -201,6 +231,23 @@ DEFAULT_COLLECTION_TITLE = ''
 DEFAULT_COLLECTION_CATEGORY = ''
 # Default objective for a newly-minted collection.
 DEFAULT_COLLECTION_OBJECTIVE = ''
+
+# Default description for a newly-minted story.
+DEFAULT_STORY_DESCRIPTION = ''
+# Default notes for a newly-minted story.
+DEFAULT_STORY_NOTES = ''
+
+# Default explanation for a newly-minted skill.
+DEFAULT_SKILL_EXPLANATION = ''
+# Default name for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_NAME = ''
+# Default notes for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_NOTES = ''
+# Default feedback for a newly-minted misconception.
+DEFAULT_MISCONCEPTION_FEEDBACK = ''
+
+# Default description for a newly-minted topic.
+DEFAULT_TOPIC_DESCRIPTION = ''
 
 # Default ID of VM which is used for training classifier.
 DEFAULT_VM_ID = 'vm_default'
@@ -326,6 +373,9 @@ ENABLE_PROMO_BAR = True
 # database by non-admins.
 ENABLE_MAINTENANCE_MODE = False
 
+# Disables all the new structures' pages, till they are completed.
+ENABLE_NEW_STRUCTURES = False
+
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
@@ -434,6 +484,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'NumericInput',
         'SetInput',
         'MathExpressionInput',
+        'NumberWithUnits',
     ]
 }, {
     'name': 'Programming',
@@ -504,7 +555,7 @@ DISABLED_EXPLORATION_IDS = ['5']
 EMBEDDED_GOOGLE_GROUP_URL = (
     'https://groups.google.com/forum/embed/?place=forum/oppia')
 
-# External URL for the Foundation site
+# External URL for the Foundation site.
 FOUNDATION_SITE_URL = 'http://oppiafoundation.org'
 
 # Whether to allow YAML file uploads.
@@ -527,16 +578,16 @@ TASK_URL_SUGGESTION_EMAILS = (
 ADMIN_URL = '/admin'
 ADMIN_ROLE_HANDLER_URL = '/adminrolehandler'
 COLLECTION_DATA_URL_PREFIX = '/collection_handler/data'
+COLLECTION_EDITOR_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_SUMMARIES_DATA_URL = '/collectionsummarieshandler/data'
-EDITABLE_COLLECTION_DATA_URL_PREFIX = '/collection_editor_handler/data'
 COLLECTION_RIGHTS_PREFIX = '/collection_editor_handler/rights'
 COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
+CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
-CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
@@ -567,8 +618,13 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+NEW_SKILL_URL = '/skill_editor_handler/create_new'
+NEW_STORY_URL = '/story_editor_handler/create_new'
+NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_DATA_URL = '/questionhandler'
+QUESTION_MANAGER_URL = '/questionmanagerhandler'
+QUESTION_CREATION_URL = '/questioncreationhandler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -576,11 +632,22 @@ SITE_FEEDBACK_FORM_URL = ''
 SITE_LANGUAGE_DATA_URL = '/save_site_language'
 SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
+SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
+SKILL_EDITOR_URL_PREFIX = '/skill_editor'
 SPLASH_URL = '/splash'
+STORY_EDITOR_URL_PREFIX = '/story_editor'
+STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
 SUGGESTION_ACTION_URL_PREFIX = '/suggestionactionhandler'
 SUGGESTION_LIST_URL_PREFIX = '/suggestionlisthandler'
 SUGGESTION_URL_PREFIX = '/suggestionhandler'
 SUBSCRIBE_URL_PREFIX = '/subscribehandler'
+SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
+TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
+TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
+TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
+TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
+TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
+TRANSLATION_DATA_PREFIX = '/createhandler/translate'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
@@ -601,6 +668,7 @@ NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
+NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -623,7 +691,7 @@ EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
 ACTIVITY_STATUS_PRIVATE = 'private'
 ACTIVITY_STATUS_PUBLIC = 'public'
 
-# Play type constants
+# Play type constants.
 PLAY_TYPE_PLAYTEST = 'playtest'
 PLAY_TYPE_NORMAL = 'normal'
 
@@ -631,6 +699,23 @@ PLAY_TYPE_NORMAL = 'normal'
 COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 COMMIT_MESSAGE_COLLECTION_DELETED = 'Collection deleted.'
 COMMIT_MESSAGE_QUESTION_DELETED = 'Question deleted.'
+COMMIT_MESSAGE_SKILL_DELETED = 'Skill deleted.'
+COMMIT_MESSAGE_STORY_DELETED = 'Story deleted.'
+COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
+COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
+
+# Whether learner playthroughs visualization framework should be enabled.
+ENABLE_PLAYTHROUGHS = False
+# Threshold for early quit playthrough.
+EARLY_QUIT_THRESHOLD_IN_SECS = 45
+# Threshold for multiple incorrect answers playthrough.
+NUM_INCORRECT_ANSWERS_THRESHOLD = 5
+# Threshold for repeated cyclic state transitions playthrough.
+NUM_REPEATED_CYCLES_THRESHOLD = 3
+# Max number of playthroughs for an issue.
+MAX_PLAYTHROUGHS_FOR_ISSUE = 5
+# Probability of recording a playthrough.
+RECORD_PLAYTHROUGH_PROBABILITY = 0.2
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
@@ -639,7 +724,7 @@ SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
 # Number of open feedback to be displayed in the dashboard for each exploration.
 OPEN_FEEDBACK_COUNT_DASHBOARD = 3
-# NOTE TO DEVELOPERS: This should be synchronized with app.js
+# NOTE TO DEVELOPERS: This should be synchronized with app.js.
 ENABLE_ML_CLASSIFIERS = False
 SHOW_COLLECTION_NAVIGATION_TAB_HISTORY = False
 SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
@@ -664,7 +749,7 @@ UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
 # Possible values for user query status.
 # Valid status transitions are: processing --> completed --> archived
-# Or processing --> failed.
+# or processing --> failed.
 USER_QUERY_STATUS_PROCESSING = 'processing'
 USER_QUERY_STATUS_COMPLETED = 'completed'
 USER_QUERY_STATUS_ARCHIVED = 'archived'
@@ -724,7 +809,7 @@ LIBRARY_PAGE_MODE_INDEX = 'index'
 # Page mode for the search results page.
 LIBRARY_PAGE_MODE_SEARCH = 'search'
 
-# Defaults for topic similarities
+# Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
@@ -792,6 +877,7 @@ ROLE_ID_GUEST = 'GUEST'
 ROLE_ID_BANNED_USER = 'BANNED_USER'
 ROLE_ID_EXPLORATION_EDITOR = 'EXPLORATION_EDITOR'
 ROLE_ID_COLLECTION_EDITOR = 'COLLECTION_EDITOR'
+ROLE_ID_TOPIC_MANAGER = 'TOPIC_MANAGER'
 ROLE_ID_MODERATOR = 'MODERATOR'
 ROLE_ID_ADMIN = 'ADMIN'
 
@@ -805,3 +891,47 @@ VIEW_METHOD_ROLE = 'role'
 VIEW_METHOD_USERNAME = 'username'
 
 QUESTION_BATCH_SIZE = 10
+
+STATE_ANSWER_STATS_MIN_FREQUENCY = 2
+
+# RTE content specifications according to the type of the editor.
+RTE_CONTENT_SPEC = {
+    'RTE_TYPE_TEXTANGULAR': {
+        # Valid parent-child relation in TextAngular.
+        'ALLOWED_PARENT_LIST': {
+            'p': ['blockquote', 'div', 'pre', '[document]', 'ol', 'ul', 'li'],
+            'b': ['i', 'li', 'p', 'pre'],
+            'br': ['b', 'i', 'li', 'p'],
+            'i': ['b', 'li', 'p', 'pre'],
+            'li': ['ol', 'ul'],
+            'ol': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
+            'ul': ['ol', 'ul', 'blockquote', 'li', 'pre', 'div', '[document]'],
+            'pre': ['ol', 'ul', 'blockquote', '[document]'],
+            'blockquote': ['blockquote', '[document]'],
+            'oppia-noninteractive-link': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-math': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-image': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-collapsible': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-video': ['b', 'i', 'li', 'p', 'pre'],
+            'oppia-noninteractive-tabs': ['b', 'i', 'li', 'p', 'pre']
+        },
+        # Valid html tags in TextAngular.
+        'ALLOWED_TAG_LIST': [
+            'p',
+            'b',
+            'br',
+            'i',
+            'li',
+            'ol',
+            'ul',
+            'pre',
+            'blockquote',
+            'oppia-noninteractive-link',
+            'oppia-noninteractive-math',
+            'oppia-noninteractive-image',
+            'oppia-noninteractive-collapsible',
+            'oppia-noninteractive-video',
+            'oppia-noninteractive-tabs'
+        ]
+    }
+}

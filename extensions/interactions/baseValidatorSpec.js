@@ -35,7 +35,7 @@ describe('Interaction validator', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector, $rootScope) {
     scope = $rootScope.$new();
     filter = $injector.get('$filter');
     bivs = $injector.get('baseInteractionValidationService');
@@ -53,7 +53,8 @@ describe('Interaction validator', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
     goodOutcomeFeedback = oof.createFromBackendDict({
       dest: currentState,
@@ -63,7 +64,8 @@ describe('Interaction validator', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
     badOutcome = oof.createFromBackendDict({
       dest: currentState,
@@ -73,12 +75,13 @@ describe('Interaction validator', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
     goodAnswerGroups = [
-      agof.createNew([], goodOutcomeDest, false),
-      agof.createNew([], goodOutcomeFeedback, false)
+      agof.createNew([], goodOutcomeDest, false, null),
+      agof.createNew([], goodOutcomeFeedback, false, null)
     ];
     goodDefaultOutcome = goodOutcomeDest;
   }));
@@ -94,9 +97,9 @@ describe('Interaction validator', function() {
     it('should have a warning for an answer group with a confusing outcome',
       function() {
         var answerGroups = [
-          agof.createNew([], goodOutcomeDest, false),
-          agof.createNew([], badOutcome, false),
-          agof.createNew([], goodOutcomeFeedback, false)
+          agof.createNew([], goodOutcomeDest, false, null),
+          agof.createNew([], badOutcome, false, null),
+          agof.createNew([], goodOutcomeFeedback, false, null)
         ];
         var warnings = bivs.getAnswerGroupWarnings(answerGroups, currentState);
         expect(warnings).toEqual([{
@@ -136,9 +139,9 @@ describe('Interaction validator', function() {
     it('should be able to concatenate warnings for both answer groups and ' +
         'the default outcome', function() {
       var badAnswerGroups = [
-        agof.createNew([], goodOutcomeDest, false),
-        agof.createNew([], badOutcome, false),
-        agof.createNew([], badOutcome, false)
+        agof.createNew([], goodOutcomeDest, false, null),
+        agof.createNew([], badOutcome, false, null),
+        agof.createNew([], badOutcome, false, null)
       ];
       var warnings = bivs.getAllOutcomeWarnings(
         badAnswerGroups, badOutcome, currentState);

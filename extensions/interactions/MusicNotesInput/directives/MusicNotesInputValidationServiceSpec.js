@@ -23,7 +23,7 @@ describe('MusicNotesInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     validatorService = $injector.get('MusicNotesInputValidationService');
 
     WARNING_TYPES = $injector.get('WARNING_TYPES');
@@ -40,9 +40,10 @@ describe('MusicNotesInputValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
   }));
 
   it('should be able to perform basic validation', function() {

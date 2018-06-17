@@ -24,7 +24,7 @@ describe('MultipleChoiceInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     validatorService = $injector.get('MultipleChoiceInputValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     oof = $injector.get('OutcomeObjectFactory');
@@ -38,7 +38,8 @@ describe('MultipleChoiceInputValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
     badOutcome = oof.createFromBackendDict({
@@ -49,7 +50,8 @@ describe('MultipleChoiceInputValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
     customizationArguments = {
@@ -133,7 +135,8 @@ describe('MultipleChoiceInputValidationService', function() {
       }]);
     });
 
-  it('should expect a non-confusing and non-null default outcome only when ' +
+  it(
+    'should expect a non-confusing and non-null default outcome only when ' +
     'not all choices are covered by rules',
     function() {
       var warnings = validatorService.getAllWarnings(

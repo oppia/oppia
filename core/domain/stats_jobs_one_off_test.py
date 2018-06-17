@@ -28,6 +28,94 @@ import feconf
     [models.NAMES.exploration, models.NAMES.statistics])
 
 
+class ExplorationIssuesModelCreatorOneOffJobTest(test_utils.GenericTestBase):
+    exp_id1 = 'exp_id1'
+    exp_id2 = 'exp_id2'
+
+    def setUp(self):
+        super(ExplorationIssuesModelCreatorOneOffJobTest, self).setUp()
+        self.exp1 = self.save_new_valid_exploration(self.exp_id1, 'owner')
+        self.exp1.add_states(['New state'])
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': 'add_state',
+            'state_name': 'New state'
+        })]
+        exp_services.update_exploration(
+            feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
+        self.exp1 = exp_services.get_exploration_by_id(self.exp1.id)
+        self.exp2 = self.save_new_valid_exploration(self.exp_id2, 'owner')
+
+    def test_default_job_execution(self):
+        job_id = (
+            stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob.create_new()) # pylint: disable=line-too-long
+        stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob.enqueue(
+            job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        # ExplorationIssuesModel will be created for versions 1 and 2.
+        exp_issues11 = stats_models.ExplorationIssuesModel.get_model(
+            self.exp_id1, self.exp1.version - 1)
+        self.assertEqual(exp_issues11.exp_id, self.exp_id1)
+        self.assertEqual(exp_issues11.exp_version, self.exp1.version - 1)
+        self.assertEqual(exp_issues11.unresolved_issues, [])
+
+        exp_issues12 = stats_models.ExplorationIssuesModel.get_model(
+            self.exp_id1, self.exp1.version)
+        self.assertEqual(exp_issues12.exp_id, self.exp_id1)
+        self.assertEqual(exp_issues12.exp_version, self.exp1.version)
+        self.assertEqual(exp_issues12.unresolved_issues, [])
+
+        # ExplorationIssuesModel will be created only for version 1.
+        exp_issues2 = stats_models.ExplorationIssuesModel.get_model(
+            self.exp_id2, self.exp2.version)
+        self.assertEqual(exp_issues2.exp_id, self.exp_id2)
+        self.assertEqual(exp_issues2.exp_version, self.exp2.version)
+        self.assertEqual(exp_issues2.unresolved_issues, [])
+
+    def test_with_existing_exp_issues_instance(self):
+        stats_models.ExplorationIssuesModel.create(
+            self.exp_id1, self.exp1.version,
+            [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': ['playthrough_id1']
+            }]
+        )
+
+        job_id = (
+            stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob.create_new()) # pylint: disable=line-too-long
+        stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob.enqueue(
+            job_id)
+
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+        exp_issues1 = stats_models.ExplorationIssuesModel.get_model(
+            self.exp_id1, self.exp1.version)
+        self.assertEqual(exp_issues1.exp_id, self.exp_id1)
+        self.assertEqual(exp_issues1.exp_version, self.exp1.version)
+        self.assertEqual(exp_issues1.unresolved_issues, [])
+
+        exp_issues2 = stats_models.ExplorationIssuesModel.get_model(
+            self.exp_id2, self.exp2.version)
+        self.assertEqual(exp_issues2.exp_id, self.exp_id2)
+        self.assertEqual(exp_issues2.exp_version, self.exp2.version)
+        self.assertEqual(exp_issues2.unresolved_issues, [])
+
+
 class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     state_b = 'b'
@@ -39,9 +127,13 @@ class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
         change_list = []
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
-        change_list = [{'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': self.exp.init_state_name,
-                        'new_state_name': self.state_b}]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.exp.init_state_name,
+                'new_state_name': self.state_b
+            })
+        ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -161,9 +253,13 @@ class RecomputeAnswerSubmittedStatisticsTest(test_utils.GenericTestBase):
         self.exp = self.save_new_valid_exploration(self.exp_id, 'owner')
         self.state = self.exp.init_state_name
 
-        change_list = [{'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': self.state,
-                        'new_state_name': 'b'}]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.state,
+                'new_state_name': 'b'
+            })
+        ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -266,7 +362,7 @@ class RecomputeAnswerSubmittedStatisticsTest(test_utils.GenericTestBase):
 class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
     exp_id = 'exp_id'
     # Start on version 2 as the update from version 1 to 2 is only to
-    # setup states for testing
+    # setup states for testing.
     exp_version = 1
     session_id_1 = 'session_id_1'
     session_id_2 = 'session_id_2'
@@ -279,9 +375,13 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
         change_list = []
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
-        change_list = [{'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': self.state,
-                        'new_state_name': 'b'}]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.state,
+                'new_state_name': 'b'
+            })
+        ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -434,9 +534,13 @@ class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
         self.exp = self.save_new_valid_exploration(self.exp_id, 'owner')
         self.state = self.exp.init_state_name
 
-        change_list = [{'cmd': exp_domain.CMD_RENAME_STATE,
-                        'old_state_name': self.state,
-                        'new_state_name': 'b'}]
+        change_list = [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_RENAME_STATE,
+                'old_state_name': self.state,
+                'new_state_name': 'b'
+            })
+        ]
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
@@ -547,7 +651,7 @@ class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
         self.save_new_default_exploration(self.exp_id, 'owner')
 
         change_list = []
-        # Update exploration to version 3
+        # Update exploration to version 3.
         exp_services.update_exploration(
             feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
         exp_services.update_exploration(

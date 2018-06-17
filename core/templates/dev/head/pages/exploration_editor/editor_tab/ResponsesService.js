@@ -23,6 +23,7 @@ oppia.factory('ResponsesService', [
   'ExplorationStatesService', 'GraphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ExplorationContextService', 'ExplorationWarningsService',
+  'stateContentIdsToAudioTranslationsService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
@@ -31,6 +32,7 @@ oppia.factory('ResponsesService', [
       ExplorationStatesService, GraphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, AlertsService,
       ExplorationContextService, ExplorationWarningsService,
+      stateContentIdsToAudioTranslationsService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
@@ -114,6 +116,9 @@ oppia.factory('ResponsesService', [
       if (updates.hasOwnProperty('labelledAsCorrect')) {
         answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
       }
+      if (updates.hasOwnProperty('trainingData')) {
+        answerGroup.trainingData = updates.trainingData;
+      }
       _saveAnswerGroups(_answerGroups);
     };
 
@@ -136,7 +141,7 @@ oppia.factory('ResponsesService', [
       var oldConfirmedUnclassifiedAnswers = (
         _confirmedUnclassifiedAnswersMemento);
       if (!angular.equals(
-          newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)) {
+        newConfirmedUnclassifiedAnswers, oldConfirmedUnclassifiedAnswers)) {
         _confirmedUnclassifiedAnswers = newConfirmedUnclassifiedAnswers;
 
         ExplorationStatesService.saveConfirmedUnclassifiedAnswers(
@@ -173,17 +178,22 @@ oppia.factory('ResponsesService', [
           _answerGroups = AnswerGroupsCacheService.get(newInteractionId);
         } else {
           _answerGroups = [];
+          stateContentIdsToAudioTranslationsService.displayed
+            .deleteAllFeedbackContentId();
+          stateContentIdsToAudioTranslationsService.saveDisplayedValue();
         }
 
         // Preserve the default outcome unless the interaction is terminal.
         // Recreate the default outcome if switching away from a terminal
         // interaction.
         if (newInteractionId) {
+          var defaultOutcomeContentId = 'default_outcome';
           if (INTERACTION_SPECS[newInteractionId].is_terminal) {
             _defaultOutcome = null;
           } else if (!_defaultOutcome) {
             _defaultOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(), '', []);
+              EditorStateService.getActiveStateName(), defaultOutcomeContentId,
+              '', []);
           }
         }
 

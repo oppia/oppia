@@ -42,9 +42,7 @@ describe('Read only collection backend API service', function() {
         objective: 'To pass',
         schema_version: '1',
         nodes: [{
-          exploration_id: '0',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: []
+          exploration_id: '0'
         }],
         next_exploration_ids: [],
         completed_exploration_ids: []

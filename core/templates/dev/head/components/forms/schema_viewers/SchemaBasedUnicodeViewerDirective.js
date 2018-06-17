@@ -27,12 +27,12 @@ oppia.directive('schemaBasedUnicodeViewer', [
         'schema_based_unicode_viewer_directive.html'),
       restrict: 'E',
       controller: [
-      '$scope', '$filter', '$sce',
-      function($scope, $filter, $sce) {
-        $scope.getDisplayedValue = function() {
-          return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
-            $scope.localValue));
-        };
-      }]
+        '$scope', '$filter', '$sce',
+        function($scope, $filter, $sce) {
+          $scope.getDisplayedValue = function() {
+            return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')(
+              $scope.localValue));
+          };
+        }]
     };
   }]);

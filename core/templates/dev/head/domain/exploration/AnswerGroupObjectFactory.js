@@ -20,9 +20,12 @@
 oppia.factory('AnswerGroupObjectFactory', [
   'RuleObjectFactory', 'OutcomeObjectFactory',
   function(RuleObjectFactory, OutcomeObjectFactory) {
-    var AnswerGroup = function(rules, outcome) {
+    var AnswerGroup = function(
+        rules, outcome, trainingData, taggedMisconceptionId) {
       this.rules = rules;
       this.outcome = outcome;
+      this.trainingData = trainingData;
+      this.taggedMisconceptionId = taggedMisconceptionId;
     };
 
     AnswerGroup.prototype.toBackendDict = function() {
@@ -30,21 +33,27 @@ oppia.factory('AnswerGroupObjectFactory', [
         rule_specs: this.rules.map(function(rule) {
           return rule.toBackendDict();
         }),
-        outcome: this.outcome.toBackendDict()
+        outcome: this.outcome.toBackendDict(),
+        training_data: this.trainingData,
+        tagged_misconception_id: this.taggedMisconceptionId
       };
     };
 
     // Static class methods. Note that "this" is not available in
     // static contexts.
-    AnswerGroup.createNew = function(rules, outcome) {
-      return new AnswerGroup(rules, outcome);
+    AnswerGroup.createNew = function(
+        rules, outcome, trainingData, taggedMisconceptionId) {
+      return new AnswerGroup(
+        rules, outcome, trainingData, taggedMisconceptionId);
     };
 
     AnswerGroup.createFromBackendDict = function(answerGroupBackendDict) {
       return new AnswerGroup(
         generateRulesFromBackend(answerGroupBackendDict.rule_specs),
         OutcomeObjectFactory.createFromBackendDict(
-          answerGroupBackendDict.outcome));
+          answerGroupBackendDict.outcome),
+        answerGroupBackendDict.training_data,
+        answerGroupBackendDict.tagged_misconception_id);
     };
 
     var generateRulesFromBackend = function(ruleBackendDicts) {

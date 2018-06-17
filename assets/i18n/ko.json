@@ -1,4 +1,5 @@
 {
+	"I18N_ABOUT_PAGE_ABOUT_TAB_CREATE": "코드 리셋",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_HEADING": "Oppia 정보",
 	"I18N_ABOUT_PAGE_ABOUT_TAB_SHARE": "게시하고 공유하기",
 	"I18N_ABOUT_PAGE_CREDITS_TAB_HEADING": "제작진",
@@ -189,6 +190,7 @@
 	"I18N_LIBRARY_NO_EXPLORATIONS": "이런, 표시할 탐험이 없습니다.",
 	"I18N_LIBRARY_NO_EXPLORATION_FOR_QUERY": "이런, 당신의 검색과 일치하는 탐험이 없습니다.",
 	"I18N_LIBRARY_NO_EXPLORATION_GROUPS": "표시할 수 있는 탐험 그룹이 없습니다.",
+	"I18N_LIBRARY_N_LANGUAGES": "{languagesCount, plural, =1{1개의 언어} other{# 언어}}",
 	"I18N_LIBRARY_PAGE_TITLE": "탐험 라이브러리 - Oppia",
 	"I18N_LIBRARY_RATINGS_TOOLTIP": "평가",
 	"I18N_LIBRARY_SEARCH_PLACEHOLDER": "궁금하신 점이 있으십니까?",
@@ -224,6 +226,7 @@
 	"I18N_PLAYER_HINT_REQUEST_STRING_2": "제가 좀 막혔습니다, 힌트가 있나요?",
 	"I18N_PLAYER_HINT_REQUEST_STRING_3": "곤경에 처했습니다.",
 	"I18N_PLAYER_INFO_TOOLTIP": "정보",
+	"I18N_PLAYER_IS_PRIVATE": "이 탐험은 비공개입니다.",
 	"I18N_PLAYER_LAST_UPDATED_TOOLTIP": "최근 업데이트",
 	"I18N_PLAYER_LEAVE_FEEDBACK": "만든 이에게 피드백 남기기...",
 	"I18N_PLAYER_LOADING": "불러오는 중...",

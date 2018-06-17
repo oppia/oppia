@@ -15,8 +15,7 @@
 /**
  * @fileoverview Service to maintain the state of a single collection shared
  * throughout the collection editor. This service provides functionality for
- * retrieving the collection, saving it, and listening for changes. The service
- * also maintains a list of all skills stored within the collection.
+ * retrieving the collection, saving it, and listening for changes.
  */
 
 oppia.constant('EVENT_COLLECTION_INITIALIZED', 'collectionInitialized');
@@ -80,14 +79,14 @@ oppia.factory('CollectionEditorStateService', [
           });
         CollectionRightsBackendApiService.fetchCollectionRights(
           collectionId).then(function(newBackendCollectionRightsObject) {
-            _updateCollectionRights(newBackendCollectionRightsObject);
-            _isLoadingCollection = false;
-          }, function(error) {
-            AlertsService.addWarning(
-              error ||
-              'There was an error when loading the collection rights.');
-            _isLoadingCollection = false;
-          });
+          _updateCollectionRights(newBackendCollectionRightsObject);
+          _isLoadingCollection = false;
+        }, function(error) {
+          AlertsService.addWarning(
+            error ||
+            'There was an error when loading the collection rights.');
+          _isLoadingCollection = false;
+        });
       },
 
       /**

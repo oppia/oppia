@@ -23,15 +23,16 @@ describe('Outcome object factory', function() {
     oof = $injector.get('OutcomeObjectFactory');
   }));
 
-  it('should correctly determine if an outcome is confusing given a ' +
+  it(
+    'should correctly determine if an outcome is confusing given a ' +
     'source state',
     function() {
       var currentState = 'A';
-      var testOutcome1 = oof.createNew('B', 'feedback', []);
-      var testOutcome2 = oof.createNew('B', '', []);
-      var testOutcome3 = oof.createNew('A', 'feedback', []);
-      var testOutcome4 = oof.createNew('A', '', []);
-      var testOutcome5 = oof.createNew('A', '   ', []);
+      var testOutcome1 = oof.createNew('B', 'feedback_1', 'feedback', []);
+      var testOutcome2 = oof.createNew('B', 'feedback_2', '', []);
+      var testOutcome3 = oof.createNew('A', 'feedback_3', 'feedback', []);
+      var testOutcome4 = oof.createNew('A', 'feedback_4', '', []);
+      var testOutcome5 = oof.createNew('A', 'feedback_5', '   ', []);
       expect(testOutcome1.isConfusing(currentState)).toBe(false);
       expect(testOutcome2.isConfusing(currentState)).toBe(false);
       expect(testOutcome3.isConfusing(currentState)).toBe(false);
@@ -42,9 +43,9 @@ describe('Outcome object factory', function() {
 
   it('should correctly output whether an outcome has nonempty feedback',
     function() {
-      var testOutcome1 = oof.createNew('A', 'feedback', []);
-      var testOutcome2 = oof.createNew('A', '', []);
-      var testOutcome3 = oof.createNew('A', '   ', []);
+      var testOutcome1 = oof.createNew('A', 'feedback_1', 'feedback', []);
+      var testOutcome2 = oof.createNew('A', 'feedback_2', '', []);
+      var testOutcome3 = oof.createNew('A', 'feedback_3', '   ', []);
       expect(testOutcome1.hasNonemptyFeedback()).toBe(true);
       expect(testOutcome2.hasNonemptyFeedback()).toBe(false);
       expect(testOutcome3.hasNonemptyFeedback()).toBe(false);

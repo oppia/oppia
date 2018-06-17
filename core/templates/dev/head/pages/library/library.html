@@ -85,6 +85,10 @@
             <h2 class="oppia-library-h2" translate="I18N_LIBRARY_SUB_HEADER"></h2>
           </div>
 
+          <div class="visible-xs" style="margin: 0 auto; width: fit-content; padding-right: 15px">
+            <search-bar></search-bar>
+          </div>
+
           <div ng-if="libraryGroups.length === 0"
                style="margin: 150px auto; text-align: center; width: 100%;"
                translate="I18N_LIBRARY_NO_EXPLORATION_GROUPS">
@@ -126,6 +130,7 @@
                                              category="tile.category"
                                              thumbnail-icon-url="tile.thumbnail_icon_url"
                                              thumbnail-bg-color="tile.thumbnail_bg_color"
+                                             activity-is-owned-by-current-user="activitiesOwned.collections[tile.id]"
                                              show-learner-dashboard-icons-if-possible="true">
                     </collection-summary-tile>
                     <exploration-summary-tile ng-if="tile.activity_type == 'exploration'"
@@ -139,6 +144,7 @@
                                               thumbnail-icon-url="tile.thumbnail_icon_url"
                                               thumbnail-bg-color="tile.thumbnail_bg_color"
                                               class="protractor-test-exp-summary-tile"
+                                              activity-is-owned-by-current-user="activitiesOwned.explorations[tile.id]"
                                               show-learner-dashboard-icons-if-possible="true">
                     </exploration-summary-tile>
                   </div>
@@ -167,26 +173,30 @@
               <div class="oppia-library-carousel">
                 <div class="oppia-library-carousel-tiles">
                   <collection-summary-tile ng-if="group.activity_summary_dicts[leftmostCardIndices[$index]].activity_type == 'collection'"
-                      collection-id="group.activity_summary_dicts[leftmostCardIndices[$index]].id"
-                      collection-title="group.activity_summary_dicts[leftmostCardIndices[$index]].title"
-                      last-updated-msec="group.activity_summary_dicts[leftmostCardIndices[$index]].last_updated_msec"
-                      objective="group.activity_summary_dicts[leftmostCardIndices[$index]].objective"
-                      node-count="group.activity_summary_dicts[leftmostCardIndices[$index]].node_count"
-                      category="group.activity_summary_dicts[leftmostCardIndices[$index]].category"
-                      thumbnail-icon-url="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_icon_url"
-                      thumbnail-bg-color="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_bg_color">
+                                           collection-id="group.activity_summary_dicts[leftmostCardIndices[$index]].id"
+                                           collection-title="group.activity_summary_dicts[leftmostCardIndices[$index]].title"
+                                           last-updated-msec="group.activity_summary_dicts[leftmostCardIndices[$index]].last_updated_msec"
+                                           objective="group.activity_summary_dicts[leftmostCardIndices[$index]].objective"
+                                           node-count="group.activity_summary_dicts[leftmostCardIndices[$index]].node_count"
+                                           category="group.activity_summary_dicts[leftmostCardIndices[$index]].category"
+                                           thumbnail-icon-url="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_icon_url"
+                                           thumbnail-bg-color="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_bg_color"
+                                           show-learner-dashboard-icons-if-possible="true"
+                                           container-is-narrow="true">
                   </collection-summary-tile>
                   <exploration-summary-tile ng-if="group.activity_summary_dicts[leftmostCardIndices[$index]].activity_type == 'exploration'"
-                      exploration-id="group.activity_summary_dicts[leftmostCardIndices[$index]].id"
-                      exploration-title="group.activity_summary_dicts[leftmostCardIndices[$index]].title"
-                      last-updated-msec="group.activity_summary_dicts[leftmostCardIndices[$index]].last_updated_msec"
-                      objective="group.activity_summary_dicts[leftmostCardIndices[$index]].objective"
-                      category="group.activity_summary_dicts[leftmostCardIndices[$index]].category"
-                      ratings="group.activity_summary_dicts[leftmostCardIndices[$index]].ratings"
-                      num-views="group.activity_summary_dicts[leftmostCardIndices[$index]].num_views"
-                      thumbnail-icon-url="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_icon_url"
-                      thumbnail-bg-color="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_bg_color"
-                      class="protractor-test-exp-summary-tile">
+                                            exploration-id="group.activity_summary_dicts[leftmostCardIndices[$index]].id"
+                                            exploration-title="group.activity_summary_dicts[leftmostCardIndices[$index]].title"
+                                            last-updated-msec="group.activity_summary_dicts[leftmostCardIndices[$index]].last_updated_msec"
+                                            objective="group.activity_summary_dicts[leftmostCardIndices[$index]].objective"
+                                            category="group.activity_summary_dicts[leftmostCardIndices[$index]].category"
+                                            ratings="group.activity_summary_dicts[leftmostCardIndices[$index]].ratings"
+                                            num-views="group.activity_summary_dicts[leftmostCardIndices[$index]].num_views"
+                                            thumbnail-icon-url="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_icon_url"
+                                            thumbnail-bg-color="group.activity_summary_dicts[leftmostCardIndices[$index]].thumbnail_bg_color"
+                                            class="protractor-test-exp-summary-tile"
+                                            show-learner-dashboard-icons-if-possible="true"
+                                            container-is-narrow="true">
                   </exploration-summary-tile>
                 </div>
               </div>
@@ -205,6 +215,134 @@
       </div>
     </div>
   </div>
+  <style>
+    .oppia-group-page-header {
+      color: #2c4841;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+    }
+    .oppia-library-h1 {
+      color: #033e39;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+    }
+    .oppia-library-h2 {
+      color: #04857c;
+      font-family: "Rubik, regular", "Roboto", Arial, sans-serif;
+      padding-bottom: 1em;
+    }
+    .oppia-library-group {
+      display: block;
+      height: 350px;
+      margin-bottom: 72px;
+      margin-top: 36px;
+      max-width: 928px;
+      width: 100vw;
+    }
+    .oppia-library-group-header-container {
+      max-width: 928px;
+      min-width: 315px;
+      width: calc(100% - 120px);
+      width: -moz-calc(100% - 120px);
+      width: -o-calc(100% - 120px);
+      width: -webkit-calc(100% - 120px);
+    }
+    @media(max-width: 720px) {
+      .oppia-library-group-header-container {
+        width: 80%;
+      }
+    }
+    @media(max-width: 480px) {
+      .oppia-library-group-header-container {
+        width: 100%;
+      }
+    }
+    .oppia-library-group-header {
+      display: inline-block;
+      font-size: 2em;
+      margin-bottom: 24px;
+      margin-left: 44px;
+      min-width: 126px;
+    }
+    .oppia-library-group-header.active {
+      color: #04857c;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+    }
+    @media(max-width: 720px) {
+      .oppia-library-group-header {
+        width: -webkit-calc(80% - 120px);
+        width: -moz-calc(80% - 120px);
+        width: -o-calc(80% - 120px);
+        width: calc(80% - 120px);
+      }
+    }
+    .oppia-library-group-header a, .oppia-library-group-header span {
+      color: inherit;
+      font-family: "Capriola", "Roboto", Arial, sans-serif;
+    }
+    .oppia-library-group-header a:hover,
+    .oppia-library-group-header a:focus {
+      color: #04857c;
+      text-decoration: none;
+    }
+    @media (max-width: 720px) {
+      .oppia-library-group-header {
+        font-size: 6vw;
+      }
+    }
+    .oppia-library-carousel-scroller {
+      color: #2c4841;
+      cursor: default;
+      float: left;
+      height: 60px;
+      margin-top: 100px;
+      max-width: 40px;
+      padding: 0;
+      position: relative;
+      width: 10vw;
+    }
+    .md-button.oppia-library-carousel-scroller {
+      cursor: pointer;
+    }
+    .oppia-library-carousel-scroller i {
+      font-size: 36px;
+      margin: 0;
+      padding: 0;
+      top: 50%;
+    }
+    .oppia-library-carousel-tiles {
+      /*The height is adjusted to hide the scrollbars*/
+      height: 290px;
+      left: 0;
+      margin: 0;
+      overflow: hidden;
+      padding: 0;
+      position: relative;
+      top: 0;
+      white-space: nowrap;
+    }
+    .oppia-library-carousel {
+      height: 282px;
+      float: left;
+      max-width: 848px;
+      overflow: hidden;
+      position: relative;
+    }
+    @media (min-width: 630px) {
+      .oppia-library-h1 {
+        font-size: 2.5em;
+      }
+      .oppia-library-h2 {
+        font-size: 1.75em;
+      }
+    }
+    @media (max-width: 629px) {
+      .oppia-library-h1 {
+        font-size: 1.2em;
+      }
+      .oppia-library-h2 {
+        font-size: .85em;
+      }
+    }
+  </style>
 
 {% endblock %}
 

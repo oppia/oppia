@@ -23,7 +23,7 @@ describe('SetInputValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     validatorService = $injector.get('SetInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
     agof = $injector.get('AnswerGroupObjectFactory');
@@ -39,10 +39,11 @@ describe('SetInputValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
   }));
 
   it('should be able to perform basic validation', function() {

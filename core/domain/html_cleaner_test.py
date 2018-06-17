@@ -16,6 +16,7 @@
 
 """Tests for the HTML sanitizer."""
 
+import bs4
 from core.domain import html_cleaner
 from core.tests import test_utils
 
@@ -180,3 +181,278 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(components), len(expected_components))
         for component in components:
             self.assertIn(component, expected_components)
+
+
+class ContentMigrationToTextAngular(test_utils.GenericTestBase):
+    """ Tests the function associated with the migration of html
+    strings to valid TextAngular format.
+    """
+
+    def test_wrap_with_siblings(self):
+        test_cases = [{
+            'html_content': (
+                '<p><i>hello</i></p> this is<i>test case1</i> for '
+                '<ol><li><i>testing</i></li></ol>'
+            ),
+            'expected_output': (
+                '<p><i>hello</i></p><p> this is<i>test case1</i> for </p>'
+                '<ol><li><i>testing</i></li></ol>'
+            )
+        }, {
+            'html_content': (
+                '<br/>hello this is<br/>test<p> case2<br/>'
+                '</p> for <p><br/>testing</p>'
+            ),
+            'expected_output': (
+                '<p><br/>hello this is<br/>test</p>'
+                '<p> case2<br/></p> for <p><br/>testing</p>'
+            )
+        }, {
+            'html_content': (
+                '<p>hello</p>this is case <b>3</b> for <i>'
+                'testing</i> the <p>function</p>'
+            ),
+            'expected_output': (
+                '<p>hello</p><p>this is case <b>3</b> for <i>'
+                'testing</i> the </p><p>function</p>'
+            )
+        }]
+        for index, test_case in enumerate(test_cases):
+            soup = bs4.BeautifulSoup(test_case['html_content'], 'html.parser')
+            if index == 0:
+                tag = soup.findAll('i')[1]
+            elif index == 1:
+                tag = soup.find('br')
+            elif index == 2:
+                tag = soup.find('b')
+            html_cleaner.wrap_with_siblings(tag, soup.new_tag('p'))
+            self.assertEqual(str(soup), test_case['expected_output'])
+
+    def test_convert_to_text_angular(self):
+        test_cases = [{
+            'html_content': (
+                '<div><i>hello</i></div> this is<i>test case1</i> for '
+                '<span><i>testing</i></span>'
+            ),
+            'expected_output': (
+                '<p><i>hello</i></p><p> this is<i>test case1</i> for '
+                '<i>testing</i></p>'
+            )
+        }, {
+            'html_content': (
+                '<div><br>hello</div> this is<br>test<pre> case2<br>'
+                '</pre> for <span><br>testing</span>'
+            ),
+            'expected_output': (
+                '<p><br>hello</p><p> this is<br>test</p>'
+                '<pre> case2\n</pre><p> for <br>testing</p>'
+            )
+        }, {
+            'html_content': 'hello <p> this is case3 for </p> testing',
+            'expected_output': (
+                '<p>hello </p><p> this is case3 for </p><p> testing</p>'
+            )
+        }, {
+            'html_content': 'hello <i> this is case4 for </i> testing',
+            'expected_output': '<p>hello <i> this is case4 for </i> testing</p>'
+        }, {
+            'html_content': (
+                '<span>hello</span><code> this is </code><div>'
+                'test </div><div>case4</div> for testing'
+            ),
+            'expected_output': (
+                '<p>hello this is </p><p>test </p><p>case4</p><p> for '
+                'testing</p>'
+            )
+        }, {
+            'html_content': (
+                '<p> Random test</p>case <b>is</b> <i>added</i> here<p>!</p>'
+            ),
+            'expected_output': (
+                '<p> Random test</p><p>case <b>is</b> <i>added</i> '
+                'here</p><p>!</p>'
+            )
+        }, {
+            'html_content': (
+                '<blockquote> Here is another<b>example'
+                '</b></blockquote>'
+            ),
+            'expected_output': (
+                '<blockquote><p> Here is another<b>example</b></p></blockquote>'
+            )
+        }, {
+            'html_content': (
+                '<table><tbody><tr><td>January</td><td>$100</td>'
+                '<td>200</td></tr><tr><td>February</td><td>$80</td><td>400'
+                '</td></tr></tbody></table>'
+            ),
+            'expected_output': (
+                '<p>January $100 200</p><p>February $80 400</p>'
+            )
+        }, {
+            'html_content': (
+                '<p><p><p>Hello <br/> this<p> is <br> test case <p>'
+                'for </p> migration <b>testing</b> </p></p></p></p>'
+            ),
+            'expected_output': (
+                '<p>Hello <br> this</p><p> is <br> test case </p><p>'
+                'for </p><p> migration <b>testing</b> </p>'
+            )
+        }, {
+            'html_content': (
+                '<p>Hello this is <p>test case </p> for <p> <p>migration</p>'
+                'testing </p> for <p> invalid cases </p></p>'
+            ),
+            'expected_output': (
+                '<p>Hello this is </p><p>test case </p><p> for </p><p> </p><p>'
+                'migration</p><p>testing </p><p> for </p><p> invalid cases </p>'
+            )
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                test_case['expected_output'],
+                html_cleaner.convert_to_text_angular(test_case['html_content']))
+
+    def test_validate_text_angular(self):
+        test_cases = [
+            (
+                'This is for <i>testing</i> the validate <b>text</b> '
+                'angular function.'
+            ),
+            (
+                'This is the last test case <a href="https://github.com">hello'
+                '<oppia-noninteractive-link url-with-value="&amp;quot;'
+                'here&amp;quot;" text-with-value="validated">'
+                '</oppia-noninteractive-link></a><p> testing completed</p>'
+            )
+        ]
+        actual_output_with_migration = (
+            html_cleaner.validate_textangular_format(
+                test_cases, True))
+        actual_output_without_migration = (
+            html_cleaner.validate_textangular_format(
+                test_cases))
+
+        expected_output_with_migration = {'strings': []}
+        expected_output_without_migration = {
+            u'i': [u'[document]'],
+            'invalidTags': [u'a'],
+            u'oppia-noninteractive-link': [u'a'],
+            u'b': [u'[document]'],
+            'strings': [
+                (
+                    'This is for <i>testing</i> the validate '
+                    '<b>text</b> angular function.'
+                ),
+                (
+                    'This is the last test case <a href="https://github.com">'
+                    'hello<oppia-noninteractive-link url-with-value="&amp;'
+                    'quot;here&amp;quot;" text-with-value="validated">'
+                    '</oppia-noninteractive-link></a><p> testing completed</p>'
+                ),
+            ]
+        }
+
+        self.assertEqual(
+            actual_output_with_migration,
+            expected_output_with_migration)
+        self.assertEqual(
+            actual_output_without_migration,
+            expected_output_without_migration)
+
+    def test_validate_soup_text_angular(self):
+        test_cases = [
+            (
+                '<p>Hello <b>this </b>is </p><p><br></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;Hello oppia&amp;quot;\" '
+                'heading-with-value=\"&amp;quot;Learn more about APIs&'
+                'amp;quot;\"></oppia-noninteractive-collapsible><br></p><p>'
+                'for migration testing</p>'
+            ),
+            (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            ),
+            (
+                '<p>Hello</p><p>oppia</p><p>testing <i>in progress</i>!</p>'
+            )
+        ]
+
+        expected_output = [False, True, False]
+        err_dict = {}
+
+        for index, test_case in enumerate(test_cases):
+            actual_output = (
+                html_cleaner._validate_soup_for_textangular( # pylint: disable=protected-access
+                    bs4.BeautifulSoup(test_case, 'html.parser'),
+                    err_dict))
+
+            self.assertEqual(actual_output, expected_output[index])
+
+    def test_convert_tag_contents_to_text_angular(self):
+        test_cases = [{
+            'html_content': (
+                '<div>Hello <b>this </b>is </div><p><br></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;Hello oppia&amp;quot;\" '
+                'heading-with-value=\"&amp;quot;Learn more about APIs&amp;'
+                'quot;\"></oppia-noninteractive-collapsible><br></p><p>'
+                'for migration testing</p>'
+            ),
+            'expected_output': (
+                '<div>Hello <b>this </b>is </div><p><br/></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;Hello oppia'
+                '&amp;lt;/p&amp;gt;&amp;quot;\" heading-with-value=\"'
+                '&amp;quot;Learn more about APIs&amp;quot;\">'
+                '</oppia-noninteractive-collapsible><br/></p><p>'
+                'for migration testing</p>'
+            )
+        }, {
+            'html_content': (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            ),
+            'expected_output': (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            )
+        }, {
+            'html_content': (
+                '<span><b>Hello </b></span><div><b><span>this is '
+                'test case</span></b></div><div><b><br></b></div>'
+                '<div><oppia-noninteractive-tabs tab_contents-with-value'
+                '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;span '
+                'style=\\&amp;quot;line-height: 21px; background-color: '
+                'rgb(255, 255, 255);\\&amp;quot;&amp;gt;lorem ipsum&amp;lt;'
+                '/span&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;'
+                'quot;hello&amp;quot;},{&amp;quot;content&amp;quot;:&amp;'
+                'quot;&amp;lt;span style=\\&amp;quot;color: rgb(0, 0, 0); '
+                'font-family: &amp;#39;Times New Roman&amp;#39;; font-size: '
+                'medium; line-height: normal;\\&amp;quot;&amp;gt;&amp;lt;'
+                'font size=\\&amp;quot;3\\&amp;quot; face=\\&amp;quot;Times '
+                'New Roman CE\\&amp;quot;&amp;gt;oppia&amp;lt;/font&amp;gt;'
+                '&amp;lt;/span&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:'
+                '&amp;quot;Savjet 1&amp;quot;}]\"></oppia-noninteractive-tabs>'
+                '<b><br></b></div><div><span></span><b><br></b><div>'
+                '<span><b><br></b></span></div></div>'
+            ),
+            'expected_output': (
+                '<span><b>Hello </b></span><div><b><span>this is '
+                'test case</span></b></div><div><b><br/></b></div>'
+                '<div><oppia-noninteractive-tabs tab_contents-with-value='
+                '\"[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;'
+                'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, '
+                '&amp;quot;title&amp;quot;: &amp;quot;hello&amp;quot;}, '
+                '{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;'
+                'quot;: &amp;quot;Savjet 1&amp;quot;}]\">'
+                '</oppia-noninteractive-tabs><b><br/></b></div>'
+                '<div><span></span><b><br/></b><div>'
+                '<span><b><br/></b></span></div></div>'
+            )
+        }]
+
+        for test_case in test_cases:
+            actual_output = html_cleaner.convert_tag_contents_to_text_angular(
+                test_case['html_content'])
+            self.assertEqual(actual_output, test_case['expected_output'])

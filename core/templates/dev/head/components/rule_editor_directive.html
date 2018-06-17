@@ -26,11 +26,6 @@
         </span>
       </span>
     </div>
-
-    <div ng-if="rule.type == 'FuzzyMatches'">
-      <classifier-panel rule-inputs="rule.inputs" on-training-data-deletion="onDeleteTrainingDataEntry(index)">
-      </classifier-panel>
-    </div>
   </form>
 
   <div class="oppia-rule-save-cancel-buttons" ng-if="isEditingRuleInline()">

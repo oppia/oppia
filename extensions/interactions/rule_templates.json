@@ -20,9 +20,6 @@
     },
     "ErrorContains": {
       "description": "has error message that contains {{x|UnicodeString}}"
-    },
-    "FuzzyMatches": {
-      "description": "is similar to {{training_data|ListOfCodeEvaluation}}"
     }
   },
   "Continue": {},
@@ -129,6 +126,14 @@
       "description": "is a transposition of {{x|MusicPhrase}} by {{y|Int}} semitones except for {{k|NonnegativeInt}} notes"
     }
   },
+  "NumberWithUnits": {
+    "IsEqualTo": {
+        "description": "is equal to {{f|NumberWithUnits}}"
+    },
+    "IsEquivalentTo": {
+        "description": "is equivalent to {{f|NumberWithUnits}}"
+    }
+  },
   "NumericInput": {
     "Equals": {
       "description": "is equal to {{x|Real}}"
@@ -213,9 +218,6 @@
     },
     "FuzzyEquals": {
       "description": "is equal to {{x|NormalizedString}}, misspelled by at most one character"
-    },
-    "FuzzyMatches": {
-      "description": "is similar to {{training_data|SetOfNormalizedString}}"
     }
   }
 }

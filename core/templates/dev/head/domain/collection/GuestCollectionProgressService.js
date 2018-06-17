@@ -42,8 +42,10 @@ oppia.factory('GuestCollectionProgressService', [
 
     var recordCompletedExploration = function(collectionId, explorationId) {
       var guestCollectionProgress = loadGuestCollectionProgress();
-      if (guestCollectionProgress.addCompletedExplorationId(
-          collectionId, explorationId)) {
+      var completedExplorationIdHasBeenAdded = (
+        guestCollectionProgress.addCompletedExplorationId(
+          collectionId, explorationId));
+      if (completedExplorationIdHasBeenAdded) {
         storeGuestCollectionProgress(guestCollectionProgress);
       }
     };
@@ -60,33 +62,16 @@ oppia.factory('GuestCollectionProgressService', [
       });
     };
 
-    // This method corresponds to collection_domain.get_next_exploration_ids.
-    var _getNextExplorationIds = function(collection, completedIds) {
-      // Given the completed exploration IDs, compile a list of acquired skills.
-      var acquiredSkillIds = completedIds.map(function(expId) {
-        var collectionNode = collection.getCollectionNodeByExplorationId(expId);
-        return collectionNode.getAcquiredSkillIds();
-      }).reduce(function(accumulator, value) {
-        return accumulator.concat(value);
-      }, []);
+    // This method corresponds to collection_domain.get_next_exploration_id.
+    var _getNextExplorationId = function(collection, completedIds) {
+      var explorationIds = collection.getExplorationIds();
 
-      // Find remaining collection nodes which have yet to be completed.
-      var collectionNodes = collection.getCollectionNodes();
-      var incompleteNodes = collectionNodes.filter(function(node) {
-        return completedIds.indexOf(node.getExplorationId()) === -1;
-      });
-
-      // Filter out nodes for which the guest does not have the prerequisite
-      // skills for, then map the leftover nodes to their corresponding
-      // exploration IDs.
-      // https://stackoverflow.com/a/15514975
-      return incompleteNodes.filter(function(node) {
-        return node.getPrerequisiteSkillIds().every(function(elem) {
-          return acquiredSkillIds.indexOf(elem) > -1;
-        });
-      }).map(function(node) {
-        return node.getExplorationId();
-      });
+      for (var i = 0; i < explorationIds.length; i++) {
+        if (completedIds.indexOf(explorationIds[i]) === -1) {
+          return explorationIds[i];
+        }
+      }
+      return null;
     };
 
     return {
@@ -123,12 +108,12 @@ oppia.factory('GuestCollectionProgressService', [
 
       /**
        * Given a collection object a list of completed exploration IDs, returns
-       * the list of next exploration IDs the guest user can play as part of
-       * completing the collection. If this method returns an empty list, the
+       * the next exploration ID the guest user can play as part of
+       * completing the collection. If this method returns null, the
        * guest has completed the collection.
        */
-      getNextExplorationIds: function(collection, completedExplorationIds) {
-        return _getNextExplorationIds(collection, completedExplorationIds);
+      getNextExplorationId: function(collection, completedExplorationIds) {
+        return _getNextExplorationId(collection, completedExplorationIds);
       }
     };
   }]);

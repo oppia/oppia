@@ -39,34 +39,31 @@ class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (item.thread_id, item.message_id)
 
     @staticmethod
-    def reduce(key, stringified_message_ids):
+    def reduce(thread_id, stringified_message_ids):
         message_ids = [
             ast.literal_eval(v) for v in stringified_message_ids]
 
-        thread_model = feedback_models.FeedbackThreadModel.get(key)
+        thread_model = feedback_models.FeedbackThreadModel.get(thread_id)
         next_message_id = max(message_ids) + 1
         thread_model.message_count = next_message_id
         thread_model.put(update_last_updated_time=False)
 
         if next_message_id != len(message_ids):
-            exploration_and_thread_id = key.split('.')
-            exploration_id = exploration_and_thread_id[0]
-            thread_id = exploration_and_thread_id[1]
-            thread = feedback_services.get_thread(exploration_id, thread_id)
+            thread = feedback_services.get_thread(thread_id)
             logging.error(
                 'The number of messages in the thread, given by the id %s is %s'
                 '. But the number of messages as estimated by the message ids '
                 'is %s. Therefore the estimate is not equal to the actual '
                 'number of messages.' % (
-                    key, len(message_ids), next_message_id))
+                    thread_id, len(message_ids), next_message_id))
 
-            yield ('error', {
-                'subject': thread.subject,
-                'exploration_id': exploration_id,
-                'thread_id': thread_id,
-                'next_message_id': next_message_id,
-                'message_count': len(message_ids)
-            })
+            yield (
+                'error', {
+                    'subject': thread.subject,
+                    'thread_id': thread_id,
+                    'next_message_id': next_message_id,
+                    'message_count': len(message_ids)
+                })
 
 
 class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -83,8 +80,7 @@ class FeedbackSubjectOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         if item.subject != FeedbackSubjectOneOffJob.DEFAULT_SUBJECT:
             return
 
-        first_message = feedback_services.get_message(
-            item.exploration_id, item.thread_id, 0)
+        first_message = feedback_services.get_message(item.id, 0)
 
         if not first_message.text:
             return

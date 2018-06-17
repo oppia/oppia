@@ -126,6 +126,7 @@
                   <li>Aashish Singh</li>
                   <li>Abhay Raizada</li>
                   <li>Abhijit Suresh</li>
+                  <li>Abhimanyu Thakre</li>
                   <li>Abhishek Arya</li>
                   <li>Abhishek Kumar</li>
                   <li>Abraham Mgowano</li>
@@ -186,6 +187,8 @@
                 <ul>
                   <li>Debanshu Bhaumik</li>
                   <li>Deepank Agarwal</li>
+                  <li>Denis Samokhvalov</li>
+                  <li>Divyadeep Singh</li>
                   <li>Domenico Vitarella</li>
                 </ul>
 
@@ -211,6 +214,7 @@
                 <span>H</span>
                 <ul>
                   <li>Hamza Chandad</li>
+                  <li>Harsh Khajuria</li>
                   <li>Henry Phu</li>
                   <li>Hitesh Sharma</li>
                   <li>Himanshu Aggarwal</li>
@@ -221,7 +225,9 @@
                 <span>I</span>
                 <ul>
                   <li>Ian Luttrell</li>
+                  <li>Ishan Singh</li>
                 </ul>
+                <br><br>
 
                 <span>J</span>
                 <ul>
@@ -242,6 +248,7 @@
                   <li>Joshua Cano</li>
                   <li>Joshua Lan</li>
                   <li>Joshua Lusk</li>
+                  <li>Joydeep Mukherjee</li>
                   <li>Juan Saba</li>
                   <li>Justin Du</li>
                 </ul>
@@ -339,6 +346,7 @@
 
                 <span>S</span>
                 <ul>
+                  <li>Sachin Gopal</li>
                   <li>Saeed Jassani</li>
                   <li>Sagar Manohar</li>
                   <li>Samara Trilling</li>
@@ -348,6 +356,7 @@
                   <li>Sasa Cocic-Banjanac</li>
                   <li>Satish Boggarapu</li>
                   <li>Satmeet Ubhi</li>
+                  <li>Satyam Bhalla</li>
                   <li>Satyam Yadav</li>
                   <li>Satwik Kansal</li>
                   <li>Scott Junner</li>
@@ -368,14 +377,17 @@
                   <li>Sourav Badami</li>
                   <li>Sourav Singh</li>
                   <li>Sreenivasulu Giritheja</li>
+                  <li>Srikar Ch</li>
                   <li>Stephanie Federwisch</li>
                   <li>Stephen Chiang</li>
                   <li>Sudhanva MG</li>
+                  <li>Sumit Paroothi</li>
                 </ul>
 
                 <span>T</span>
                 <ul>
                   <li>Tarashish Mishra</li>
+                  <li>Tezuesh Varshney</li>
                   <li>Timothy Cyrus</li>
                   <li>Tony Jiang</li>
                   <li>Tracy Homer</li>
@@ -392,7 +404,9 @@
 
                 <span>V</span>
                 <ul>
+                  <li>Vasu Tomar</li>
                   <li>Vibhor Agarwal</li>
+                  <li>Vinita Murthi</li>
                   <li>Viraj Prabhu</li>
                   <li>Vishal Gupta</li>
                   <li>Vishal Joisar</li>
@@ -475,6 +489,76 @@
     }
     .oppia-about-text-align {
       text-align: center;
+    }
+    .oppia-about-three-cols-layout {
+      display: inline-block;
+      margin-right: 20px;
+      width: -webkit-calc((100% - 60px) / 3);
+      width: -moz-calc((100% - 60px) / 3);
+      width: -o-calc((100% - 60px) / 3);
+      width: calc((100% - 60px) / 3);
+    }
+    .oppia-about-three-cols-layout:last-of-type {
+      margin-right: 0;
+    }
+    @media only screen and (max-width: 500px) {
+      .oppia-about-three-cols-layout {
+        width: 100%;
+      }
+    }
+    .oppia-about-three-cols-feature,
+    .oppia-about-three-cols-feature p {
+      text-align: center;
+    }
+    .oppia-about-credits-letter-groups.three-col {
+      margin: 0 0 10% 0;
+      -moz-column-count: 3;
+      -moz-column-gap: 20px;
+      -webkit-column-count: 3;
+      -webkit-column-gap: 20px;
+      column-count: 3;
+      column-gap: 20px;
+    }
+    .oppia-about-credits-letter-groups span {
+      font-size: 1.8em;
+    }
+
+    .oppia-about-credits-letter-groups ul li {
+      list-style-type: none;
+    }
+    .oppia-about-clearfix {
+      clear: both;
+      content: "";
+      display: table;
+    }
+    .oppia-about-otter {
+      width: 200px;
+    }
+    .oppia-about-otter-container {
+      bottom: -2.3em;
+      display: inline-block;
+      position: absolute;
+    }
+    @media only screen and (max-width: 768px) {
+      .oppia-about-otter-container {
+        left: -3em;
+        bottom: -1.8em;
+      }
+      .oppia-about-otter {
+        width: 200px;
+      }
+    }
+    .oppia-about-otter-speech-card {
+      float: right;
+      width: 65%;
+    }
+    @media only screen and (max-width: 500px) {
+      .oppia-about-otter-speech-card {
+        width: 50%;
+      }
+    }
+    .oppia-about-page-extra-info {
+      height: 245px;
     }
   </style>
 {% endblock %}

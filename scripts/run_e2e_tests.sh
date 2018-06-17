@@ -30,7 +30,7 @@
 #   --prod_env Run the tests in prod mode. Static resources are served from
 #         build directory and use cache slugs.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
-# --sharding-instances) if running any tests in isolation (iit or ddescribe).
+# --sharding-instances) if running any tests in isolation (fit or fdescribe).
 #   --suite=suite_name Performs test for different suites.
 #   For performing a full test, no argument is required.
 #   For performing tests on mainEditors, use --suite=mainEditor
@@ -43,6 +43,9 @@
 #   For performing embedding tests, use --suite=embedding
 #
 # The root folder MUST be named 'oppia'.
+#
+# Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
+# single test or test suite.
 
 function cleanup {
   # Send a kill signal to the dev server.
@@ -109,9 +112,14 @@ for arg in "$@"; do
   if [ "$arg" == "--prod_env" ]; then
     FORCE_PROD_MODE=True
     echo "  Generating files for production mode..."
-    $PYTHON_CMD scripts/build.py
   fi
 done
+
+if [[ "$FORCE_PROD_MODE" == "True" ]]; then
+  $PYTHON_CMD scripts/build.py --prod_env
+else
+  $PYTHON_CMD scripts/build.py
+fi
 
 feconf_env_variable="FORCE_PROD_MODE = $FORCE_PROD_MODE"
 sed -i.bak -e s/"FORCE_PROD_MODE = .*"/"$feconf_env_variable"/ feconf.py

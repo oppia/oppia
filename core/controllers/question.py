@@ -18,26 +18,54 @@ import json
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import question_domain
 from core.domain import question_services
-import feconf
 
 
-class QuestionsBatchHandler(base.BaseHandler):
-    """This handler completes requests for questions batch."""
+class QuestionsHandler(base.BaseHandler):
+    """This handler completes PUT/DELETE requests for questions."""
 
-    @acl_decorators.open_access
-    def get(self):
-        """Handles GET requests."""
-        collection_id = self.request.get('collection_id')
-        if not collection_id:
+    @acl_decorators.can_access_moderator_page
+    def put(self, question_id):
+        """Handles PUT requests."""
+        commit_message = self.payload.get('commit_message')
+        if not question_id:
             raise self.PageNotFoundException
-        if not self.request.get('stringified_skill_ids'):
+        if not commit_message:
             raise self.PageNotFoundException
-        skill_ids = json.loads(self.request.get('stringified_skill_ids'))
-        batch_size = feconf.QUESTION_BATCH_SIZE
-        questions_dict = [question.to_dict() for question in (
-            question_services.get_questions_batch(
-                collection_id, skill_ids, self.user_id, batch_size))]
+        if not self.payload.get('change_list'):
+            raise self.PageNotFoundException
+        change_list = [
+            question_domain.QuestionChange(change)
+            for change in json.loads(self.payload.get('change_list'))]
+        question_services.update_question(
+            self.user_id, question_id, change_list,
+            commit_message)
         return self.render_json({
-            'questions_dict': questions_dict
+            'question_id': question_id
+        })
+
+    @acl_decorators.can_access_moderator_page
+    def delete(self, question_id):
+        """Handles Delete requests."""
+        if not question_id:
+            raise self.PageNotFoundException
+        question_services.delete_question(
+            self.user_id, question_id)
+
+
+class QuestionCreationHandler(base.BaseHandler):
+    """This handler completes POST requests for questions."""
+
+    @acl_decorators.can_access_moderator_page
+    def post(self):
+        """Handles POST requests."""
+        if not self.payload.get('question'):
+            raise self.PageNotFoundException
+        question = question_domain.Question.from_dict(
+            self.payload.get('question'))
+        question_id = question_services.add_question(
+            self.user_id, question)
+        return self.render_json({
+            'question_id': question_id
         })

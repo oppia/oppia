@@ -45,8 +45,7 @@ class UnsentFeedbackEmailHandler(base.BaseHandler):
         messages = {}
         for reference in references:
             message = feedback_services.get_message(
-                reference.exploration_id, reference.thread_id,
-                reference.message_id)
+                reference.thread_id, reference.message_id)
 
             exploration = exp_services.get_exploration_by_id(
                 reference.exploration_id)
@@ -80,7 +79,7 @@ class SuggestionEmailHandler(base.BaseHandler):
         exploration_rights = (
             rights_manager.get_exploration_rights(exploration_id))
         exploration = exp_services.get_exploration_by_id(exploration_id)
-        suggestion = feedback_services.get_suggestion(exploration_id, thread_id)
+        suggestion = feedback_services.get_suggestion(thread_id)
 
         email_manager.send_suggestion_email(
             exploration.title, exploration.id, suggestion.author_id,
@@ -96,16 +95,13 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         reference_dict = payload['reference_dict']
 
         message = feedback_services.get_message(
-            reference_dict['exploration_id'], reference_dict['thread_id'],
-            reference_dict['message_id'])
+            reference_dict['thread_id'], reference_dict['message_id'])
         exploration = exp_services.get_exploration_by_id(
             reference_dict['exploration_id'])
-        thread = feedback_services.get_thread(
-            reference_dict['exploration_id'], reference_dict['thread_id'])
+        thread = feedback_services.get_thread(reference_dict['thread_id'])
 
         model = email_models.FeedbackEmailReplyToIdModel.get(
-            user_id, reference_dict['exploration_id'],
-            reference_dict['thread_id'])
+            user_id, reference_dict['thread_id'])
         reply_to_id = model.reply_to_id
 
         subject = 'New Oppia message in "%s"' % thread.subject
@@ -117,7 +113,8 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
 
 class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
     """Handles task of sending email instantly when feedback thread status is
-    changed."""
+    changed.
+    """
 
     def post(self):
         payload = json.loads(self.request.body)
@@ -127,12 +124,10 @@ class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):
         new_status = payload['new_status']
 
         message = feedback_services.get_message(
-            reference_dict['exploration_id'], reference_dict['thread_id'],
-            reference_dict['message_id'])
+            reference_dict['thread_id'], reference_dict['message_id'])
         exploration = exp_services.get_exploration_by_id(
             reference_dict['exploration_id'])
-        thread = feedback_services.get_thread(
-            reference_dict['exploration_id'], reference_dict['thread_id'])
+        thread = feedback_services.get_thread(reference_dict['thread_id'])
 
         text = 'changed status from %s to %s' % (old_status, new_status)
         subject = 'Oppia thread status change: "%s"' % thread.subject

@@ -2,7 +2,9 @@
                          activity-type="ACTIVITY_TYPE_COLLECTION"
                          activity-id="getCollectionId()"
                          activity-title="getCollectionTitle()"
-                         activity-active="collectionIsCurrentlyHoveredOver">
+                         container-is-narrow="isContainerNarrow()"
+                         activity-active="collectionIsCurrentlyHoveredOver"
+                         add-to-playlist-icon-is-shown="!isOwnedByCurrentUser()">
 </learner-dashboard-icons>
 <md-card class="oppia-activity-summary-tile"
          ng-class="{'oppia-activity-playlist-tile': isPlaylistTile()}"

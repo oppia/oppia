@@ -31,7 +31,7 @@ describe('Compare versions service', function() {
         explorationId: '0'
       };
       module(function($provide) {
-        $provide.value('ExplorationDataService', mockExplorationData);
+        $provide.value('ExplorationDataService', [mockExplorationData][0]);
       });
     });
 
@@ -58,14 +58,21 @@ describe('Compare versions service', function() {
       for (var stateName in statesDetails) {
         var newStateData = {
           content: {
-            html: statesDetails[stateName].contentStr,
-            audio_translations: {}
+            content_id: 'content',
+            html: statesDetails[stateName].contentStr
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {}
           },
           interaction: {
             answer_groups: [],
             default_outcome: {
               dest: 'default',
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null
@@ -105,12 +112,12 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'A',
         new_value: {
-          html: 'Some text',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'Some text'
         },
         old_value: {
-          html: '',
-          audio_translations: {}
+          content_id: 'content',
+          html: ''
         }
       }],
       version_number: 2
@@ -151,12 +158,12 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'C',
         new_value: {
-          html: 'More text',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'More text'
         },
         old_value: {
-          html: '',
-          audio_translations: {}
+          content_id: 'content',
+          html: ''
         }
       }],
       version_number: 7
@@ -187,12 +194,12 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'A',
         new_value: {
-          html: '',
-          audio_translations: {}
+          content_id: 'content',
+          html: ''
         },
         old_value: {
-          html: 'Some text',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'Some text'
         }
       }],
       version_number: 11
@@ -614,12 +621,12 @@ describe('Compare versions service', function() {
         cmd: 'edit_state_property',
         state_name: 'D',
         new_value: {
-          html: 'Some text',
-          audio_translations: {}
+          content_id: 'content',
+          html: 'Some text'
         },
         old_value: {
-          html: '',
-          audio_translations: {}
+          content_id: 'content',
+          html: ''
         }
       }],
       version_number: 8

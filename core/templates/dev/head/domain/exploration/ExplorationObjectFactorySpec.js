@@ -21,7 +21,7 @@ describe('Exploration object factory', function() {
 
   describe('ExplorationObjectFactory', function() {
     var scope, eof, atof, explorationDict, exploration;
-    beforeEach(inject(function($rootScope, $injector) {
+    beforeEach(inject(function($injector, $rootScope) {
       scope = $rootScope.$new();
       eof = $injector.get('ExplorationObjectFactory');
       sof = $injector.get('StateObjectFactory');
@@ -30,8 +30,11 @@ describe('Exploration object factory', function() {
       var statesDict = {
         'first state': {
           content: {
-            html: 'content',
-            audio_translations: {
+            content_id: 'content',
+            html: 'content'
+          },
+          content_ids_to_audio_translations: {
+            content: {
               en: {
                 filename: 'myfile1.mp3',
                 file_size_bytes: 210000,
@@ -42,7 +45,8 @@ describe('Exploration object factory', function() {
                 file_size_bytes: 430000,
                 needs_update: false
               }
-            }
+            },
+            default_outcome: {}
           },
           interaction: {
             answer_groups: [],
@@ -61,14 +65,18 @@ describe('Exploration object factory', function() {
         },
         'second state': {
           content: {
-            html: 'more content',
-            audio_translations: {
+            content_id: 'content',
+            html: 'more content'
+          },
+          content_ids_to_audio_translations: {
+            content: {
               'hi-en': {
                 filename: 'myfile2.mp3',
                 file_size_bytes: 120000,
                 needs_update: false
               }
-            }
+            },
+            default_outcome: {}
           },
           interaction: {
             answer_groups: [],
@@ -118,27 +126,27 @@ describe('Exploration object factory', function() {
     });
 
     it('should correctly get audio translations from an exploration',
-    function() {
-      expect(exploration.getAllAudioTranslations('hi-en')).toEqual({
-        'first state': [atof.createFromBackendDict({
-          filename: 'myfile3.mp3',
-          file_size_bytes: 430000,
-          needs_update: false
-        })],
-        'second state': [atof.createFromBackendDict({
-          filename: 'myfile2.mp3',
-          file_size_bytes: 120000,
-          needs_update: false
-        })]
+      function() {
+        expect(exploration.getAllAudioTranslations('hi-en')).toEqual({
+          'first state': [atof.createFromBackendDict({
+            filename: 'myfile3.mp3',
+            file_size_bytes: 430000,
+            needs_update: false
+          })],
+          'second state': [atof.createFromBackendDict({
+            filename: 'myfile2.mp3',
+            file_size_bytes: 120000,
+            needs_update: false
+          })]
+        });
+        expect(exploration.getAllAudioTranslations('en')).toEqual({
+          'first state': [atof.createFromBackendDict({
+            filename: 'myfile1.mp3',
+            file_size_bytes: 210000,
+            needs_update: false
+          })],
+          'second state': []
+        });
       });
-      expect(exploration.getAllAudioTranslations('en')).toEqual({
-        'first state': [atof.createFromBackendDict({
-          filename: 'myfile1.mp3',
-          file_size_bytes: 210000,
-          needs_update: false
-        })],
-        'second state': []
-      });
-    });
   });
 });

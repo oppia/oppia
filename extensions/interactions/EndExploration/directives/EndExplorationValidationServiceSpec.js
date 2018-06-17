@@ -23,7 +23,7 @@ describe('EndExplorationValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     validatorService = $injector.get('EndExplorationValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
 
@@ -37,7 +37,8 @@ describe('EndExplorationValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     };
 
     customizationArguments = {
@@ -56,7 +57,8 @@ describe('EndExplorationValidationService', function() {
         },
         labelled_as_correct: false,
         param_changes: [],
-        refresher_exploration_id: null
+        refresher_exploration_id: null,
+        missing_prerequisite_skill_id: null
       }
     }];
   }));
@@ -107,4 +109,26 @@ describe('EndExplorationValidationService', function() {
       currentState, customizationArguments, [], null);
     expect(warnings).toEqual([]);
   });
+
+  it('should catch non-string value for recommended exploration ID',
+    function() {
+      customizationArguments.recommendedExplorationIds.value = [1];
+      warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, [], null);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Recommended exploration ID must be a string.'
+      }]);
+    });
+
+  it('should have warnings for non-list format of recommended exploration IDs',
+    function() {
+      customizationArguments.recommendedExplorationIds.value = 'ExpID0';
+      warnings = validatorService.getAllWarnings(
+        currentState, customizationArguments, [], null);
+      expect(warnings).toEqual([{
+        type: WARNING_TYPES.ERROR,
+        message: 'Set of recommended exploration IDs must be list.'
+      }]);
+    });
 });

@@ -127,6 +127,9 @@ oppia.controller('SettingsTab', [
       name: 'Collaborator (can make changes)',
       value: 'editor'
     }, {
+      name: 'Translator (can do audio translations)',
+      value: 'translator'
+    }, {
       name: 'Playtester (can give feedback)',
       value: 'viewer'
     }];
@@ -170,7 +173,7 @@ oppia.controller('SettingsTab', [
       ExplorationWarningsService.updateWarnings();
     };
 
-    /********************************************
+    /** ******************************************
     * Methods for enabling advanced features.
     ********************************************/
     $scope.areParametersEnabled = (
@@ -188,7 +191,7 @@ oppia.controller('SettingsTab', [
     $scope.toggleCorrectnessFeedback = (
       ExplorationCorrectnessFeedbackService.toggleCorrectnessFeedback);
 
-    /********************************************
+    /** ******************************************
     * Methods for rights management.
     ********************************************/
     $scope.openEditRolesForm = function() {
@@ -214,7 +217,7 @@ oppia.controller('SettingsTab', [
         !ExplorationRightsService.viewableIfPrivate());
     };
 
-    /********************************************
+    /** ******************************************
     * Methods for notifications muting.
     ********************************************/
 
@@ -232,7 +235,7 @@ oppia.controller('SettingsTab', [
       UserEmailPreferencesService.setSuggestionNotificationPreferences(false);
     };
 
-    /********************************************
+    /** ******************************************
     * Methods relating to control buttons.
     ********************************************/
     $scope.previewSummaryTile = function() {
@@ -322,8 +325,8 @@ oppia.controller('SettingsTab', [
       }).result.then(function() {
         EditableExplorationBackendApiService.deleteExploration(
           $scope.explorationId).then(function() {
-            $window.location = CREATOR_DASHBOARD_PAGE_URL;
-          });
+          $window.location = CREATOR_DASHBOARD_PAGE_URL;
+        });
       });
     };
 

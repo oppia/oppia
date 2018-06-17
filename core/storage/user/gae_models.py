@@ -20,7 +20,7 @@ from constants import constants
 from core.platform import models
 import feconf
 
-from google.appengine.datastore.datastore_query import Cursor
+from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -281,8 +281,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
 
 
 class UserSubscribersModel(base_models.BaseModel):
-    """The list of subscribers of the user.
-    """
+    """The list of subscribers of the user."""
+
     # IDs of the learners who have subscribed to this user.
     subscriber_ids = ndb.StringProperty(repeated=True, indexed=True)
 
@@ -393,10 +393,11 @@ class ExplorationUserDataModel(base_models.BaseModel):
     # draft changes to this exploration since the draft_change_list_id property
     # was introduced.
     draft_change_list_id = ndb.IntegerProperty(default=0)
-    # The user's preference for receiving suggestion emails for this exploration
+    # The user's preference for receiving suggestion emails for this
+    # exploration.
     mute_suggestion_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
-    # The user's preference for receiving feedback emails for this exploration
+    # The user's preference for receiving feedback emails for this exploration.
     mute_feedback_notifications = ndb.BooleanProperty(
         default=feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE)
 
@@ -626,7 +627,7 @@ class UserQueryModel(base_models.BaseModel):
                     this batch. If False, there are no further results after
                     this batch.
         """
-        cursor = Cursor(urlsafe=cursor)
+        cursor = datastore_query.Cursor(urlsafe=cursor)
         query_models, next_cursor, more = (
             cls.query().order(-cls.created_on).
             fetch_page(page_size, start_cursor=cursor))
@@ -642,3 +643,32 @@ class UserBulkEmailsModel(base_models.BaseModel):
     # IDs of all BulkEmailModels that correspond to bulk emails sent to this
     # user.
     sent_email_model_ids = ndb.StringProperty(indexed=True, repeated=True)
+
+
+class UserSkillMasteryModel(base_models.BaseModel):
+    """Model for storing a user's degree of mastery of a skill in Oppia.
+
+    This model stores the degree of mastery of each skill for a given user.
+
+    The id for this model is of form '{{USER_ID}}.{{SKILL_ID}}'
+    """
+
+    # The user id of the user.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The skill id for which the degree of mastery is stored.
+    skill_id = ndb.StringProperty(required=True, indexed=True)
+    # The degree of mastery of the user in the skill.
+    degree_of_mastery = ndb.FloatProperty(required=True, indexed=True)
+
+    @classmethod
+    def construct_model_id(cls, user_id, skill_id):
+        """Returns model id corresponding to user and skill.
+
+        Args:
+            user_id: str. The user ID of the user.
+            skill_id: str. The unique id of the skill.
+
+        Returns:
+            str. The model id corresponding to the given user and skill.
+        """
+        return '%s.%s' % (user_id, skill_id)

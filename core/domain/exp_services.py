@@ -54,9 +54,6 @@ taskqueue_services = models.Registry.import_taskqueue_services()
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user
 ])
 
-# This takes additional 'title' and 'category' parameters.
-CMD_CREATE_NEW = 'create_new'
-
 # Name for the exploration search index.
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
@@ -139,7 +136,7 @@ def get_exploration_from_model(exploration_model, run_conversion=True):
     migration works correctly, and it should never be changed otherwise.
 
     Args:
-        exploration_model: An exploration storage model.
+        exploration_model: ExplorationModel. An exploration storage model.
         run_conversion: bool. When True, updates the exploration to the latest
             states_schema_version if necessary.
 
@@ -194,7 +191,7 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.ratings, exp_summary_model.scaled_average_rating,
         exp_summary_model.status, exp_summary_model.community_owned,
         exp_summary_model.owner_ids, exp_summary_model.editor_ids,
-        exp_summary_model.viewer_ids,
+        exp_summary_model.translator_ids, exp_summary_model.viewer_ids,
         exp_summary_model.contributor_ids,
         exp_summary_model.contributors_summary, exp_summary_model.version,
         exp_summary_model.exploration_model_created_on,
@@ -667,6 +664,10 @@ def export_states_to_yaml(exploration_id, version=None, width=80):
     Args:
         exploration_id: str. The id of the exploration whose states should
             be exported.
+        version: int or None. The version of the exploration to be returned.
+            If None, the latest version of the exploration is returned.
+        width: int. Width for the yaml representation, default value
+            is set to be of 80.
 
     Returns:
         dict. The keys are state names, and the values are YAML strings
@@ -690,7 +691,7 @@ def apply_change_list(exploration_id, change_list):
     Args:
         exploration_id: str. The id of the exploration to which the change list
             is to be applied.
-        change_list: list(dict). The list of changes to apply.
+        change_list: list(ExplorationChange). The list of changes to apply.
 
     Returns:
         Exploration. The exploration domain object that results from applying
@@ -701,9 +702,7 @@ def apply_change_list(exploration_id, change_list):
     """
     exploration = get_exploration_by_id(exploration_id)
     try:
-        changes = [exp_domain.ExplorationChange(change_dict)
-                   for change_dict in change_list]
-        for change in changes:
+        for change in change_list:
             if change.cmd == exp_domain.CMD_ADD_STATE:
                 exploration.add_states([change.state_name])
             elif change.cmd == exp_domain.CMD_RENAME_STATE:
@@ -753,6 +752,12 @@ def apply_change_list(exploration_id, change_list):
                         change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_SOLUTION):
                     state.update_interaction_solution(change.new_value)
+
+                elif (
+                        change.property_name ==
+                        exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS): # pylint: disable=line-too-long
+                    state.update_content_ids_to_audio_translations(
+                        change.new_value)
             elif change.cmd == exp_domain.CMD_EDIT_EXPLORATION_PROPERTY:
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)
@@ -861,7 +866,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     exploration_model.correctness_feedback_enabled = (
         exploration.correctness_feedback_enabled)
 
-    exploration_model.commit(committer_id, commit_message, change_list)
+    change_list_dict = [change.to_dict() for change in change_list]
+    exploration_model.commit(committer_id, commit_message, change_list_dict)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
     index_explorations_given_ids([exploration.id])
 
@@ -869,8 +875,7 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
 
     # Trigger statistics model update.
     stats_services.handle_stats_creation_for_new_exp_version(
-        exploration.id, exploration.version, exploration.states,
-        change_list)
+        exploration.id, exploration.version, exploration.states, change_list)
 
     if feconf.ENABLE_ML_CLASSIFIERS:
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
@@ -888,6 +893,16 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
                 exploration, state_names_with_unchanged_answer_groups,
                 exp_versions_diff)
 
+    # Trigger exploration issues model updation.
+    if feconf.ENABLE_PLAYTHROUGHS:
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
+        revert_to_version = None
+        if change_list[0]['cmd'] == (
+                exp_models.ExplorationModel.CMD_REVERT_COMMIT):
+            revert_to_version = change_list[0]['version_number']
+        stats_services.update_exp_issues_for_new_exp_version(
+            exploration, exp_versions_diff, revert_to_version)
+
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
 
@@ -903,11 +918,9 @@ def _create_exploration(
         committer_id: str. The id of the user who made the commit.
         exploration: Exploration. The exploration domain object.
         commit_message: str. The commit description message.
-        commit_cmds: list(dict). A list of commands, describing changes
-            made in this model, which should give sufficient information to
-            reconstruct the commit. Each dict always contains:
-                cmd: str. Unique command.
-                and additional arguments for that command.
+        commit_cmds: list(ExplorationChange). A list of commands, describing
+            changes made in this model, which should give sufficient information
+            to reconstruct the commit.
     """
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
@@ -933,7 +946,8 @@ def _create_exploration(
         auto_tts_enabled=exploration.auto_tts_enabled,
         correctness_feedback_enabled=exploration.correctness_feedback_enabled
     )
-    model.commit(committer_id, commit_message, commit_cmds)
+    commit_cmds_dict = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmds_dict)
     exploration.version += 1
 
     # Trigger statistics model creation.
@@ -952,6 +966,11 @@ def _create_exploration(
             classifier_services.handle_trainable_states(
                 exploration, state_names_to_train)
 
+    # Trigger exploration issues model creation.
+    if feconf.ENABLE_PLAYTHROUGHS:
+        stats_services.create_exp_issues_for_new_exploration(
+            exploration.id, exploration.version)
+
     # Save state id mapping model for new exploration.
     create_and_save_state_id_mapping_model(exploration, commit_cmds)
     create_exploration_summary(exploration.id, committer_id)
@@ -967,11 +986,13 @@ def save_new_exploration(committer_id, exploration):
     commit_message = (
         ('New exploration created with title \'%s\'.' % exploration.title)
         if exploration.title else 'New exploration created.')
-    _create_exploration(committer_id, exploration, commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': exploration.title,
-        'category': exploration.category,
-    }])
+    _create_exploration(
+        committer_id, exploration, commit_message, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_CREATE_NEW,
+                'title': exploration.title,
+                'category': exploration.category,
+            })])
     user_services.add_created_exploration_id(committer_id, exploration.id)
     user_services.add_edited_exploration_id(committer_id, exploration.id)
     user_services.record_user_created_an_exploration(committer_id)
@@ -1105,16 +1126,15 @@ def publish_exploration_and_update_user_profiles(committer, exp_id):
 
 def update_exploration(
         committer_id, exploration_id, change_list, commit_message,
-        is_suggestion=False):
+        is_suggestion=False, is_by_translator=False):
     """Update an exploration. Commits changes.
 
     Args:
         committer_id: str. The id of the user who is performing the update
             action.
         exploration_id: str. The id of the exploration to be updated.
-        change_list: list(dict). A change list to be applied to the given
-            exploration. Each entry in change_list is a dict that represents an
-            ExplorationChange.
+        change_list: list(ExplorationChange). A change list to be applied to the
+            given exploration.
         commit_message: str or None. A description of changes made to the state.
             For published explorations, this must be present; for unpublished
             explorations, it should be equal to None. For suggestions that are
@@ -1122,6 +1142,8 @@ def update_exploration(
             feconf.COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX.
         is_suggestion: bool. Whether the update is due to a suggestion being
             accepted.
+        is_by_translator: bool. Whether the changes are made by a
+            translator.
 
     Raises:
         ValueError: No commit message is supplied and the exploration is public.
@@ -1131,6 +1153,11 @@ def update_exploration(
             message starts with the same prefix as the commit message for
             accepted suggestions.
     """
+    if is_by_translator and not is_translation_change_list(change_list):
+        raise utils.ValidationError(
+            'Translator does not have permission to make some '
+            'changes in the change list.')
+
     is_public = rights_manager.is_exploration_public(exploration_id)
     if is_public and not commit_message:
         raise ValueError(
@@ -1241,7 +1268,7 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
 
     if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
         if contributor_id_to_add is None:
-            # Revert commit or other non-positive commit
+            # Revert commit or other non-positive commit.
             contributors_summary = compute_exploration_contributors_summary(
                 exploration.id)
         else:
@@ -1259,8 +1286,8 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
         exploration.objective, exploration.language_code,
         exploration.tags, ratings, scaled_average_rating, exp_rights.status,
         exp_rights.community_owned, exp_rights.owner_ids,
-        exp_rights.editor_ids, exp_rights.viewer_ids, contributor_ids,
-        contributors_summary, exploration.version,
+        exp_rights.editor_ids, exp_rights.translator_ids, exp_rights.viewer_ids,
+        contributor_ids, contributors_summary, exploration.version,
         exploration_model_created_on, exploration_model_last_updated,
         first_published_msec)
 
@@ -1321,6 +1348,7 @@ def save_exploration_summary(exp_summary):
         community_owned=exp_summary.community_owned,
         owner_ids=exp_summary.owner_ids,
         editor_ids=exp_summary.editor_ids,
+        translator_ids=exp_summary.translator_ids,
         viewer_ids=exp_summary.viewer_ids,
         contributor_ids=exp_summary.contributor_ids,
         contributors_summary=exp_summary.contributors_summary,
@@ -1473,38 +1501,20 @@ def save_new_exploration_from_yaml_and_assets(
     # Check whether audio translations should be stripped.
     if strip_audio_translations:
         for state in exploration.states.values():
-            # Strip away audio translations from the state content.
-            content = state.content
-            content.audio_translations = {}
-
-            if state.interaction is not None:
-                # Strip away audio translations from solutions.
-                solution = state.interaction.solution
-                if solution:
-                    solution.explanation.audio_translations = {}
-
-                # Strip away audio translations from hints.
-                for hint in state.interaction.hints:
-                    hint.hint_content.audio_translations = {}
-
-                # Strip away audio translations from answer groups (feedback).
-                for answer_group in state.interaction.answer_groups:
-                    answer_group.outcome.feedback.audio_translations = {}
-
-                # Strip away audio translations from the default outcome.
-                default_outcome = state.interaction.default_outcome
-                if default_outcome:
-                    default_outcome.feedback.audio_translations = {}
+            for content_id in state.content_ids_to_audio_translations:
+                state.content_ids_to_audio_translations[content_id] = {}
 
     create_commit_message = (
         'New exploration created from YAML file with title \'%s\'.'
         % exploration.title)
 
-    _create_exploration(committer_id, exploration, create_commit_message, [{
-        'cmd': CMD_CREATE_NEW,
-        'title': exploration.title,
-        'category': exploration.category,
-    }])
+    _create_exploration(
+        committer_id, exploration, create_commit_message, [
+            exp_domain.ExplorationChange({
+                'cmd': exp_domain.CMD_CREATE_NEW,
+                'title': exploration.title,
+                'category': exploration.category,
+            })])
 
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(
@@ -1581,6 +1591,8 @@ def get_next_page_of_all_non_private_commits(
         urlsafe_start_cursor: str. If this is not None, then the returned
             commits start from cursor location. Otherwise they start from the
             beginning of the list of commits.
+        max_age: datetime.timedelta. The maximum age to which all non private
+            commits are fetch from the ExplorationCommitLogEntry.
 
     Returns:
         tuple. A 3-tuple consisting of:
@@ -1667,9 +1679,9 @@ def get_scaled_average_rating(ratings):
     x = (average_rating - 1) / 4
     # The following calculates the lower bound Wilson Score as documented
     # http://www.goproblems.com/test/wilson/wilson.php?v1=0&v2=0&v3=0&v4=&v5=1
-    a = x + (z**2)/(2*n)
-    b = z * math.sqrt((x*(1-x))/n + (z**2)/(4*n**2))
-    wilson_score_lower_bound = (a - b)/(1 + z**2/n)
+    a = x + (z**2) / (2 * n)
+    b = z * math.sqrt((x * (1 - x)) / n + (z**2) / (4 * n**2))
+    wilson_score_lower_bound = (a - b) / (1 + z**2 / n)
     return 1 + 4 * wilson_score_lower_bound
 
 
@@ -1713,27 +1725,42 @@ def _is_suggestion_valid(thread_id, exploration_id):
     """
 
     states = get_exploration_by_id(exploration_id).states
-    suggestion = (
-        feedback_models.SuggestionModel.get_by_exploration_and_thread_id(
-            exploration_id, thread_id))
+    suggestion = feedback_models.SuggestionModel.get_by_id(thread_id)
     return suggestion.state_name in states
 
 
-def _is_suggestion_handled(thread_id, exploration_id):
+def is_translation_change_list(change_list):
+    """Checks whether the change list contains only the changes which are
+    allowed for translator to do.
+
+    Args:
+        change_list: list(ExplorationChange). A list that contains the changes
+            to be made to the ExplorationUserDataModel object.
+
+    Returns:
+        bool. Whether the change_list contains only the changes which are
+        allowed for translator to do.
+    """
+    for change in change_list:
+        if (change.property_name !=
+                exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS):
+            return False
+    return True
+
+
+def _is_suggestion_handled(thread_id):
     """Checks if the current suggestion has already been accepted/rejected.
 
     Args:
         thread_id: str. Thread id of the feedback thread containing the
             suggestion.
-        exploration_id: str. The id of the exploration.
 
     Returns:
         bool. Whether the current suggestion has already been acted upon (i.e.,
         accepted or rejected).
     """
 
-    thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
-        exploration_id, thread_id)
+    thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
     return (
         thread.status in [
             feedback_models.STATUS_CHOICES_FIXED,
@@ -1741,13 +1768,17 @@ def _is_suggestion_handled(thread_id, exploration_id):
 
 
 def _create_change_list_from_suggestion(
-        suggestion, old_content, audio_update_required):
+        suggestion, old_content, old_content_ids_to_audio_translations,
+        audio_update_required):
     """Creates a change list from a suggestion object.
 
     Args:
         suggestion: Suggestion. The given Suggestion domain object.
         old_content: SubtitledHtml. A SubtitledHtml domain object representing
             the content of the old state.
+        old_content_ids_to_audio_translations: dict. A dict connecting
+            audio translations for SubtitledHtml objects with the help of
+            content_id as key.
         audio_update_required: bool. Whether the audio for the state content
             should be marked as needing an update.
 
@@ -1763,23 +1794,39 @@ def _create_change_list_from_suggestion(
             new_value: list(str). List of the state content of the suggestion
                 object.
     """
-    audio_translations = old_content.audio_translations
-    if audio_update_required:
-        for _, translation in audio_translations.iteritems():
-            translation.needs_update = True
-
-    return [{
+    change_list = [exp_domain.ExplorationChange({
         'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
         'state_name': suggestion.state_name,
         'property_name': exp_domain.STATE_PROPERTY_CONTENT,
         'new_value': {
             'html': suggestion.suggestion_html,
-            'audio_translations': {
-                language_code: translation.to_dict()
-                for language_code, translation in audio_translations.iteritems()
-            }
+            'content_id': old_content.content_id
         }
-    }]
+    })]
+
+    if audio_update_required:
+        for _, translation in old_content_ids_to_audio_translations[
+                old_content.content_id].iteritems():
+            translation.needs_update = True
+
+        content_ids_to_audio_translations_dict = {}
+        for content_id, audio_translations in (
+                old_content_ids_to_audio_translations.iteritems()):
+            audio_translations_dict = {}
+            for lang_code, audio_translation in audio_translations.iteritems():
+                audio_translations_dict[lang_code] = (
+                    exp_domain.AudioTranslation.to_dict(audio_translation))
+            content_ids_to_audio_translations_dict[content_id] = (
+                audio_translations_dict)
+
+        change_list.append(exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+            'state_name': suggestion.state_name,
+            'property_name': exp_domain.STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS, # pylint: disable=line-too-long
+            'new_value': content_ids_to_audio_translations_dict
+        }))
+
+    return change_list
 
 
 def _get_commit_message_for_suggestion(
@@ -1827,50 +1874,47 @@ def accept_suggestion(
 
     if not commit_message or not commit_message.strip():
         raise Exception('Commit message cannot be empty.')
-    if _is_suggestion_handled(thread_id, exploration_id):
+    if _is_suggestion_handled(thread_id):
         raise Exception('Suggestion has already been accepted/rejected.')
     elif not _is_suggestion_valid(thread_id, exploration_id):
         raise Exception('Invalid suggestion: The state for which it was made '
                         'has been removed/renamed.')
     else:
-        suggestion = feedback_services.get_suggestion(
-            exploration_id, thread_id)
+        suggestion = feedback_services.get_suggestion(thread_id)
         suggestion_author_username = suggestion.get_author_name()
         exploration = get_exploration_by_id(exploration_id)
         old_content = exploration.states[suggestion.state_name].content
+        old_content_ids_to_audio_translations = exploration.states[
+            suggestion.state_name].content_ids_to_audio_translations
         change_list = _create_change_list_from_suggestion(
-            suggestion, old_content, audio_update_required)
+            suggestion, old_content, old_content_ids_to_audio_translations,
+            audio_update_required)
         update_exploration(
             editor_id, exploration_id, change_list,
             _get_commit_message_for_suggestion(
                 suggestion_author_username, commit_message),
             is_suggestion=True)
         feedback_services.create_message(
-            exploration_id, thread_id, editor_id,
-            feedback_models.STATUS_CHOICES_FIXED, None,
+            thread_id, editor_id, feedback_models.STATUS_CHOICES_FIXED, None,
             'Suggestion accepted.')
 
 
-def reject_suggestion(editor_id, thread_id, exploration_id):
+def reject_suggestion(editor_id, thread_id):
     """Set the status of a suggestion to REJECTED.
 
     Args:
         editor_id: str. User id of the editor.
         thread_id: str. The id of the suggestion thread.
-        exploration_id: str. The id of the exploration that the suggestion is
-            for.
 
     Raises:
         Exception: The suggestion has already been accepted or rejected.
     """
-    if _is_suggestion_handled(thread_id, exploration_id):
+    if _is_suggestion_handled(thread_id):
         raise Exception('Suggestion has already been accepted/rejected.')
     else:
-        thread = feedback_models.FeedbackThreadModel.get_by_exp_and_thread_id(
-            exploration_id, thread_id)
+        thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
         feedback_services.create_message(
-            exploration_id, thread_id, editor_id,
-            feedback_models.STATUS_CHOICES_IGNORED,
+            thread_id, editor_id, feedback_models.STATUS_CHOICES_IGNORED,
             None, 'Suggestion rejected.')
         thread.put()
 
@@ -1891,8 +1935,62 @@ def is_version_of_draft_valid(exp_id, version):
     return get_exploration_by_id(exp_id).version == version
 
 
+def get_user_exploration_data(
+        user_id, exploration_id, apply_draft=False, version=None):
+    """Returns a description of the given exploration."""
+    if apply_draft:
+        exploration = get_exp_with_draft_applied(exploration_id, user_id)
+    else:
+        exploration = get_exploration_by_id(exploration_id, version=version)
+
+    states = {}
+    for state_name in exploration.states:
+        state_dict = exploration.states[state_name].to_dict()
+        states[state_name] = state_dict
+    exp_user_data = user_models.ExplorationUserDataModel.get(
+        user_id, exploration_id)
+    draft_changes = (exp_user_data.draft_change_list if exp_user_data
+                     and exp_user_data.draft_change_list else None)
+    is_valid_draft_version = (
+        is_version_of_draft_valid(
+            exploration_id, exp_user_data.draft_change_list_exp_version)
+        if exp_user_data and exp_user_data.draft_change_list_exp_version
+        else None)
+    draft_change_list_id = (exp_user_data.draft_change_list_id
+                            if exp_user_data else 0)
+    exploration_email_preferences = (
+        user_services.get_email_preferences_for_exploration(
+            user_id, exploration_id))
+    editor_dict = {
+        'auto_tts_enabled': exploration.auto_tts_enabled,
+        'category': exploration.category,
+        'correctness_feedback_enabled': (
+            exploration.correctness_feedback_enabled),
+        'draft_change_list_id': draft_change_list_id,
+        'exploration_id': exploration_id,
+        'init_state_name': exploration.init_state_name,
+        'language_code': exploration.language_code,
+        'objective': exploration.objective,
+        'param_changes': exploration.param_change_dicts,
+        'param_specs': exploration.param_specs_dict,
+        'rights': rights_manager.get_exploration_rights(
+            exploration_id).to_dict(),
+        'show_state_editor_tutorial_on_load': None,
+        'states': states,
+        'tags': exploration.tags,
+        'title': exploration.title,
+        'version': exploration.version,
+        'is_version_of_draft_valid': is_valid_draft_version,
+        'draft_changes': draft_changes,
+        'email_preferences': exploration_email_preferences.to_dict()
+    }
+
+    return editor_dict
+
+
 def create_or_update_draft(
-        exp_id, user_id, change_list, exp_version, current_datetime):
+        exp_id, user_id, change_list, exp_version, current_datetime,
+        is_by_translator=False):
     """Create a draft with the given change list, or update the change list
     of the draft if it already exists. A draft is updated only if the change
     list timestamp of the new change list is greater than the change list
@@ -1903,11 +2001,18 @@ def create_or_update_draft(
     Args:
         exp_id: str. The id of the exploration.
         user_id: str. The id of the user.
-        change_list: list(str). A list that contains the changes to be made to
-            the ExplorationUserDataModel object.
+        change_list: list(ExplorationChange). A list that contains the changes
+            to be made to the ExplorationUserDataModel object.
         exp_version: int. The current version of the exploration.
         current_datetime: datetime.datetime. The current date and time.
+        is_by_translator: bool. Whether the changes are made by a
+            translator.
     """
+    if is_by_translator and not is_translation_change_list(change_list):
+        raise utils.ValidationError(
+            'Translator does not have permission to make some '
+            'changes in the change list.')
+
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     if (exp_user_data and exp_user_data.draft_change_list and
             exp_user_data.draft_change_list_last_updated > current_datetime):
@@ -1922,7 +2027,8 @@ def create_or_update_draft(
 
     draft_change_list_id = exp_user_data.draft_change_list_id
     draft_change_list_id += 1
-    exp_user_data.draft_change_list = change_list
+    change_list_dict = [change.to_dict() for change in change_list]
+    exp_user_data.draft_change_list = change_list_dict
     exp_user_data.draft_change_list_last_updated = current_datetime
     exp_user_data.draft_change_list_exp_version = exp_version
     exp_user_data.draft_change_list_id = draft_change_list_id
@@ -1936,12 +2042,20 @@ def get_exp_with_draft_applied(exp_id, user_id):
     Args:
         exp_id: str. The id of the exploration.
         user_id: str. The id of the user whose draft is to be applied.
+
+    Returns:
+        Exploration. The exploration domain object.
     """
 
     exp_user_data = user_models.ExplorationUserDataModel.get(user_id, exp_id)
     exploration = get_exploration_by_id(exp_id)
+    if exp_user_data:
+        if exp_user_data.draft_change_list:
+            draft_change_list = [
+                exp_domain.ExplorationChange(change)
+                for change in exp_user_data.draft_change_list]
     return (
-        apply_change_list(exp_id, exp_user_data.draft_change_list)
+        apply_change_list(exp_id, draft_change_list)
         if exp_user_data and exp_user_data.draft_change_list and
         is_version_of_draft_valid(
             exp_id, exp_user_data.draft_change_list_exp_version)
@@ -1972,7 +2086,7 @@ def get_state_id_mapping(exp_id, exp_version):
         exp_id: str. The exploration id.
         exp_version: int. The exploration version.
 
-    Returnes:
+    Returns:
         StateIdMapping. Domain object for state id mapping model instance.
     """
     model = exp_models.StateIdMappingModel.get_state_id_mapping_model(
@@ -1997,20 +2111,18 @@ def _save_state_id_mapping(state_id_mapping):
         state_id_mapping.largest_state_id_used)
 
 
-def create_and_save_state_id_mapping_model(exploration, change_list):
+def generate_state_id_mapping_model(exploration, change_list):
     """Create and store state id mapping for new exploration.
 
     Args:
         exploration: Exploration. Exploration for which state id mapping is
             to be stored.
-        change_list: list(dict). A list of changes made in the exploration.
+        change_list: list(ExplorationChange). A list of changes made in the
+            exploration.
 
     Returns:
         StateIdMapping. Domain object of StateIdMappingModel instance.
     """
-    if not feconf.ENABLE_STATE_ID_MAPPING:
-        return
-
     if exploration.version > 1:
         # Get state id mapping for new exploration from old exploration with
         # the help of change list.
@@ -2027,7 +2139,58 @@ def create_and_save_state_id_mapping_model(exploration, change_list):
             exp_domain.StateIdMapping.create_mapping_for_new_exploration(
                 exploration))
 
+    new_state_id_mapping.validate()
+    return new_state_id_mapping
+
+
+def create_and_save_state_id_mapping_model(exploration, change_list):
+    """Create and store state id mapping for new exploration.
+
+    Args:
+        exploration: Exploration. Exploration for which state id mapping is
+            to be stored.
+        change_list: list(ExplorationChange). A list of changes made in the
+            exploration.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    if not feconf.ENABLE_STATE_ID_MAPPING:
+        return
+
+    new_state_id_mapping = generate_state_id_mapping_model(
+        exploration, change_list)
     _save_state_id_mapping(new_state_id_mapping)
+    return new_state_id_mapping
+
+
+def generate_state_id_mapping_model_for_reverted_exploration(
+        exploration_id, current_version, revert_to_version):
+    """Generates state id mapping model for when exploration is reverted.
+
+    Args:
+        exploration_id: str. The ID of the exploration.
+        current_version: str. The current version of the exploration.
+        revert_to_version: int. The version to which the given exploration
+            is to be reverted.
+
+    Returns:
+        StateIdMapping. Domain object of StateIdMappingModel instance.
+    """
+    old_state_id_mapping = get_state_id_mapping(
+        exploration_id, revert_to_version)
+    previous_state_id_mapping = get_state_id_mapping(
+        exploration_id, current_version)
+
+    # Note: when an exploration is reverted state id mapping should
+    # be same as reverted version of the exploration but largest
+    # state id used should be kept as it is as in old exploration.
+    new_version = current_version + 1
+    new_state_id_mapping = exp_domain.StateIdMapping(
+        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
+        previous_state_id_mapping.largest_state_id_used)
+    new_state_id_mapping.validate()
+
     return new_state_id_mapping
 
 
@@ -2047,20 +2210,9 @@ def create_and_save_state_id_mapping_model_for_reverted_exploration(
     if not feconf.ENABLE_STATE_ID_MAPPING:
         return
 
-    old_state_id_mapping = get_state_id_mapping(
-        exploration_id, revert_to_version)
-    previous_state_id_mapping = get_state_id_mapping(
-        exploration_id, current_version)
-
-    # Note: when an exploration is reverted state id mapping should
-    # be same as reverted version of the exploration but largest
-    # state id used should be kept as it is as in old exploration.
-    new_version = current_version + 1
-    new_state_id_mapping = exp_domain.StateIdMapping(
-        exploration_id, new_version, old_state_id_mapping.state_names_to_ids,
-        previous_state_id_mapping.largest_state_id_used)
-    new_state_id_mapping.validate()
-
+    new_state_id_mapping = (
+        generate_state_id_mapping_model_for_reverted_exploration(
+            exploration_id, current_version, revert_to_version))
     _save_state_id_mapping(new_state_id_mapping)
     return new_state_id_mapping
 

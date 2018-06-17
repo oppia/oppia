@@ -93,10 +93,12 @@ def download_files(source_url_root, target_dir, source_filenames):
     common.ensure_directory_exists(target_dir)
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
-            print 'Downloading file %s to %s' % (filename, target_dir)
+            print 'Downloading file %s to %s ...' % (filename, target_dir)
             urllib.urlretrieve(
                 '%s/%s' % (source_url_root, filename),
                 os.path.join(target_dir, filename))
+
+            print 'Download of %s succeeded.' % filename
 
 
 def download_and_unzip_files(
@@ -117,7 +119,7 @@ def download_and_unzip_files(
         in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        print 'Downloading and unzipping file %s to %s' % (
+        print 'Downloading and unzipping file %s to %s ...' % (
             zip_root_name, target_parent_dir)
         common.ensure_directory_exists(target_parent_dir)
 
@@ -145,6 +147,8 @@ def download_and_unzip_files(
             os.path.join(target_parent_dir, zip_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
+        print 'Download of %s succeeded.' % zip_root_name
+
 
 def download_and_untar_files(
         source_url, target_parent_dir, tar_root_name, target_root_name):
@@ -164,7 +168,7 @@ def download_and_untar_files(
         in the local directory.
     """
     if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
-        print 'Downloading and untarring file %s to %s' % (
+        print 'Downloading and untarring file %s to %s ...' % (
             tar_root_name, target_parent_dir)
         common.ensure_directory_exists(target_parent_dir)
 
@@ -178,6 +182,8 @@ def download_and_untar_files(
             os.path.join(target_parent_dir, tar_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
+        print 'Download of %s succeeded.' % tar_root_name
+
 
 def get_file_contents(filepath, mode='r'):
     """Gets the contents of a file, given a relative filepath from oppia/."""
@@ -190,7 +196,7 @@ def return_json(filepath):
     Args:
         filepath: the path to the json file.
     Return:
-        a parsed json objects
+        a parsed json objects.
     """
     response = get_file_contents(filepath)
     return json.loads(response)
@@ -201,14 +207,14 @@ def test_manifest_syntax(dependency_type, dependency_dict):
 
     Display warning message when there is an error and terminate the program.
     Args:
-      dependency_type: dependency download format.
-      dependency_dict: manifest.json dependency dict
+      dependency_type: str. Dependency download format.
+      dependency_dict: dict. manifest.json dependency dict.
     """
     keys = dependency_dict.keys()
     mandatory_keys = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['mandatory_keys']
     # Optional keys requires exactly one member of the pair
-    # to be available as a key in the dependency_dict
+    # to be available as a key in the dependency_dict.
     optional_key_pairs = DOWNLOAD_FORMATS_TO_MANIFEST_KEYS[
         dependency_type]['optional_key_pairs']
     for key in mandatory_keys:

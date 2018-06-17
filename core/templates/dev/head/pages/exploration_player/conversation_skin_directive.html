@@ -5,7 +5,7 @@
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
   <div class="conversation-skin-tutor-card-content">
     <div class="conversation-skin-tutor-card-top-section">
-      <div class="conversation-skin-tutor-card-top-content"
+      <div class="rte-viewer conversation-skin-tutor-card-top-content"
            angular-html-bind="upcomingContentHtml">
       </div>
     </div>
@@ -16,7 +16,7 @@
     </div>
 
     <div ng-if="!upcomingInlineInteractionHtml"
-        class="conversation-skin-inline-interaction">
+         class="conversation-skin-inline-interaction">
       <div style="padding: 6px 12px;">
         <[upcomingInteractionInstructions]>
         <i ng-if="canWindowShowTwoCards()" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
@@ -69,7 +69,7 @@
       </div>
     </div>
   </div>
-  <div class="conversation-skin-correctness-footer-container" ng-if="isCorrectnessFooterEnabled() && isOnLastCard()">
+  <div class="conversation-skin-correctness-footer-container" ng-if="isCorrectnessFooterEnabled()">
     <correctness-footer></correctness-footer>
   </div>
 </div>
@@ -206,7 +206,7 @@ otherwise they will interfere with the iframed conversation skin directive.
 
   .conversation-skin-tutor-card-container {
     flex-shrink: 10000;
-    max-width: 560px;
+    max-width: 650px;
     /* NOTE TO DEVELOPERS: If min-width is changed, max-width in media query
        below should be changed to match. */
     min-width: 360px;
@@ -243,30 +243,19 @@ otherwise they will interfere with the iframed conversation skin directive.
        .form-control.oppia-rte-content > div > p' selectors specifying
       the same line-height, margin-top and margin-bottom attributes)
   */
-  .conversation-skin-oppia-feedback-content > p,
-  .conversation-skin-learner-answer-content > p,
-  .conversation-skin-help-card-content > p {
+  .rte-viewer > p {
     line-height: 28px;
     margin-bottom: 18px;
     margin-top: 18px;
   }
-  .conversation-skin-tutor-card-top-content > p:first-child,
-  .conversation-skin-oppia-feedback-content > p:first-child,
-  .conversation-skin-learner-answer-content > p:first-child,
-  .conversation-skin-help-card-content > p:first-child {
+  .rte-viewer > p:first-child {
     margin-top: 0px;
   }
-  .conversation-skin-tutor-card-top-content > p:last-child,
-  .conversation-skin-oppia-feedback-content > p:last-child,
-  .conversation-skin-learner-answer-content > p:last-child,
-  .conversation-skin-help-card-content > p:last-child {
+  .rte-viewer > p:last-child {
     margin-bottom: 0px;
   }
 
-  .conversation-skin-tutor-card-top-content,
-  .conversation-skin-oppia-feedback-content,
-  .conversation-skin-learner-answer-content,
-  .conversation-skin-help-card-content {
+  .rte-viewer {
     border-radius: 2px;
     display: inline-block;
     max-width: 100%;
@@ -296,17 +285,12 @@ otherwise they will interfere with the iframed conversation skin directive.
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-help-card-content {
     background-color: rgba(224,242,241,1);
+    border-top-left-radius: 0;
   }
 
   .conversation-skin-learner-answer-content {
     background-color: rgba(236,239,241,1);
     border-bottom-right-radius: 0;
-  }
-
-  .conversation-skin-tutor-card-top-content,
-  .conversation-skin-oppia-feedback-content,
-  .conversation-skin-help-card-content {
-    border-top-left-radius: 0;
   }
 
   .conversation-skin-feedback-dot-one,
@@ -319,32 +303,32 @@ otherwise they will interfere with the iframed conversation skin directive.
   }
 
   .conversation-skin-feedback-dot-one {
-    -moz-animation-delay: 0.0s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.0s;
+    -moz-animation-delay: 0.0s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.0s;
+    -webkit-animation-delay: 0.0s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.0s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-two {
-    -moz-animation-delay: 0.2s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.2s;
+    -moz-animation-delay: 0.2s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.2s;
+    -webkit-animation-delay: 0.2s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.2s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-three {
-    -moz-animation-delay: 0.4s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.4s;
+    -moz-animation-delay: 0.4s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.4s;
+    -webkit-animation-delay: 0.4s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.4s;
     opacity: 0;
   }
 
@@ -444,13 +428,18 @@ otherwise they will interfere with the iframed conversation skin directive.
       height: 40px;
       left: 100%;
       position: absolute;
-      position: absolute;
       transform: translate(-100%, -100%);
       width: 40px;
       z-index: 16;
     }
     .conversation-skin-oppia-avatar.show-tutor-card:hover {
       opacity: 0.8;
+    }
+
+    .conversation-skin-tutor-card {
+      padding-bottom: 0;
+      padding-left: 0;
+      margin-left: 0;
     }
   }
 </style>

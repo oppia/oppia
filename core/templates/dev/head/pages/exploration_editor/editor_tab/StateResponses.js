@@ -21,14 +21,15 @@ oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$uibModal', '$filter', 'stateInteractionIdService',
   'EditorStateService', 'AlertsService', 'ResponsesService', 'RouterService',
   'ExplorationContextService', 'TrainingDataService',
-  'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
-  'INTERACTION_SPECS', 'UrlInterpolationService', 'AnswerGroupObjectFactory',
-  function(
+  'stateContentIdsToAudioTranslationsService', 'stateCustomizationArgsService',
+  'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS', 'UrlInterpolationService',
+  'AnswerGroupObjectFactory', function(
       $scope, $rootScope, $uibModal, $filter, stateInteractionIdService,
       EditorStateService, AlertsService, ResponsesService, RouterService,
       ExplorationContextService, TrainingDataService,
-      stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
-      INTERACTION_SPECS, UrlInterpolationService, AnswerGroupObjectFactory) {
+      stateContentIdsToAudioTranslationsService, stateCustomizationArgsService,
+      PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS, UrlInterpolationService,
+      AnswerGroupObjectFactory) {
     $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
       GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
     $scope.EditorStateService = EditorStateService;
@@ -72,7 +73,7 @@ oppia.controller('StateResponses', [
         });
       } else if (interactionId === 'ItemSelectionInput') {
         var maxSelectionCount = (
-            customizationArgs.maxAllowableSelectionCount.value);
+          customizationArgs.maxAllowableSelectionCount.value);
         if (maxSelectionCount === 1) {
           var numChoices = $scope.getAnswerChoices().length;
           // This array contains a list of booleans, one for each answer choice.
@@ -264,7 +265,7 @@ oppia.controller('StateResponses', [
           'ExplorationContextService', 'EditorStateService',
           'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
-          'AngularNameService', 'RULE_TYPE_CLASSIFIER',
+          'AngularNameService', 'EXPLICIT_CLASSIFICATION',
           function(
               $scope, $injector, $uibModalInstance,
               ExplorationHtmlFormatterService,
@@ -272,7 +273,7 @@ oppia.controller('StateResponses', [
               ExplorationContextService, EditorStateService,
               ExplorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
-              AngularNameService, RULE_TYPE_CLASSIFIER) {
+              AngularNameService, EXPLICIT_CLASSIFICATION) {
             var _explorationId = ExplorationContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
             var _state = ExplorationStatesService.getState(_stateName);
@@ -337,13 +338,14 @@ oppia.controller('StateResponses', [
               $scope.trainingDataFeedback = feedbackHtml;
               $scope.trainingDataOutcomeDest = dest;
 
-              var answerGroupIndex =
-                classificationResult.answerGroupIndex;
-              var ruleIndex = classificationResult.ruleIndex;
-              if (answerGroupIndex !==
-                _state.interaction.answerGroups.length &&
-                  _state.interaction.answerGroups[answerGroupIndex]
-                    .rules[ruleIndex].type !== RULE_TYPE_CLASSIFIER) {
+              var classificationCategorization = (
+                classificationResult.classificationCategorization);
+
+              // If answer is classified using explicit rules then we don't show
+              // yes / no option to creator. Otherwise we ask whether the
+              // response it satisfactory and assign a different response
+              // if response is not satisfactory.
+              if (classificationCategorization === EXPLICIT_CLASSIFICATION) {
                 $scope.classification.answerGroupIndex = -1;
               } else {
                 $scope.classification.answerGroupIndex = (
@@ -373,18 +375,23 @@ oppia.controller('StateResponses', [
           '$scope', '$uibModalInstance', 'ResponsesService',
           'EditorStateService', 'EditorFirstTimeEventsService',
           'RuleObjectFactory', 'OutcomeObjectFactory',
-          function(
+          'COMPONENT_NAME_FEEDBACK', 'GenerateContentIdService', function(
               $scope, $uibModalInstance, ResponsesService,
               EditorStateService, EditorFirstTimeEventsService,
-              RuleObjectFactory, OutcomeObjectFactory) {
+              RuleObjectFactory, OutcomeObjectFactory, COMPONENT_NAME_FEEDBACK,
+              GenerateContentIdService) {
             $scope.feedbackEditorIsOpen = false;
 
             $scope.openFeedbackEditor = function() {
               $scope.feedbackEditorIsOpen = true;
             };
             $scope.tmpRule = RuleObjectFactory.createNew(null, {});
+            var feedbackContentId = GenerateContentIdService.getNextId(
+              COMPONENT_NAME_FEEDBACK);
+
             $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(), '', []);
+              EditorStateService.getActiveStateName(), feedbackContentId, '',
+              []);
 
             $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
               return (
@@ -417,8 +424,11 @@ oppia.controller('StateResponses', [
       }).result.then(function(result) {
         // Create a new answer group.
         $scope.answerGroups.push(AnswerGroupObjectFactory.createNew(
-          [result.tmpRule], result.tmpOutcome, false));
+          [result.tmpRule], result.tmpOutcome, [], null));
         ResponsesService.save($scope.answerGroups, $scope.defaultOutcome);
+        stateContentIdsToAudioTranslationsService.displayed.addContentId(
+          result.tmpOutcome.feedback.getContentId());
+        stateContentIdsToAudioTranslationsService.saveDisplayedValue();
         $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
 
         // After saving it, check if the modal should be reopened right away.
@@ -473,7 +483,12 @@ oppia.controller('StateResponses', [
           }
         ]
       }).result.then(function() {
+        var deletedOutcome = ResponsesService.getAnswerGroup(index).outcome;
         ResponsesService.deleteAnswerGroup(index);
+        var deletedFeedbackContentId = deletedOutcome.feedback.getContentId();
+        stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+          deletedFeedbackContentId);
+        stateContentIdsToAudioTranslationsService.saveDisplayedValue();
       });
     };
 
@@ -560,8 +575,8 @@ oppia.filter('summarizeAnswerGroup', [
       if (hasFeedback) {
         summary += (
           shortenRule ?
-          $filter('truncate')(outcome.feedback.getHtml(), 30) :
-          $filter('convertToPlainText')(outcome.feedback.getHtml()));
+            $filter('truncate')(outcome.feedback.getHtml(), 30) :
+            $filter('convertToPlainText')(outcome.feedback.getHtml()));
       }
       return summary;
     };

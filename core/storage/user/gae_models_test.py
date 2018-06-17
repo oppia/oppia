@@ -120,8 +120,9 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
         self.assertEqual(retrieved_object.rated_on, self.DATETIME_OBJECT)
         self.assertEqual(
             retrieved_object.draft_change_list, {'new_content': {}})
-        self.assertEqual(retrieved_object.draft_change_list_last_updated,
-                         self.DATETIME_OBJECT)
+        self.assertEqual(
+            retrieved_object.draft_change_list_last_updated,
+            self.DATETIME_OBJECT)
         self.assertEqual(retrieved_object.draft_change_list_exp_version, 3)
         self.assertEqual(retrieved_object.draft_change_list_id, 1)
 
@@ -134,6 +135,7 @@ class ExplorationUserDataModelTest(test_utils.GenericTestBase):
 
 class UserQueryModelTests(test_utils.GenericTestBase):
     """Tests for UserQueryModel."""
+
     def test_instance_stores_correct_data(self):
         submitter_id = 'submitter'
         query_id = 'qid'
@@ -168,3 +170,75 @@ class UserQueryModelTests(test_utils.GenericTestBase):
             query_model.edited_at_least_n_exps, edited_at_least_n_exps)
         self.assertEqual(
             query_model.edited_fewer_than_n_exps, edited_fewer_than_n_exps)
+
+
+class UserSkillMasteryModelTests(test_utils.GenericTestBase):
+    """Tests for UserSkillMasteryModel."""
+
+    USER_ID = 'user_id'
+    SKILL_ID_1 = 'skill_id_1'
+    SKILL_ID_2 = 'skill_id_2'
+    DEGREE_OF_MASTERY = 0.5
+
+    def setUp(self):
+        super(UserSkillMasteryModelTests, self).setUp()
+        user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                self.USER_ID, self.SKILL_ID_1),
+            user_id=self.USER_ID,
+            skill_id=self.SKILL_ID_1,
+            degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+
+        user_models.UserSkillMasteryModel(
+            id=user_models.UserSkillMasteryModel.construct_model_id(
+                self.USER_ID, self.SKILL_ID_2),
+            user_id=self.USER_ID,
+            skill_id=self.SKILL_ID_2,
+            degree_of_mastery=self.DEGREE_OF_MASTERY).put()
+
+    def test_construct_model_id(self):
+        constructed_model_id = (
+            user_models.UserSkillMasteryModel.construct_model_id(
+                self.USER_ID, self.SKILL_ID_1))
+
+        self.assertEqual(constructed_model_id, 'user_id.skill_id_1')
+
+    def test_get_success(self):
+        constructed_model_id = (
+            user_models.UserSkillMasteryModel.construct_model_id(
+                self.USER_ID, self.SKILL_ID_1))
+        retrieved_object = user_models.UserSkillMasteryModel.get(
+            constructed_model_id)
+
+        self.assertEqual(retrieved_object.user_id, 'user_id')
+        self.assertEqual(retrieved_object.skill_id, 'skill_id_1')
+        self.assertEqual(retrieved_object.degree_of_mastery, 0.5)
+
+    def test_get_failure(self):
+        retrieved_object = user_models.UserSkillMasteryModel.get(
+            'unknown_model_id', strict=False)
+
+        self.assertEqual(retrieved_object, None)
+
+    def test_get_multi_success(self):
+        SKILL_IDS = [
+            user_models.UserSkillMasteryModel.construct_model_id(
+                self.USER_ID, self.SKILL_ID_1),
+            user_models.UserSkillMasteryModel.construct_model_id(
+                self.USER_ID, self.SKILL_ID_2)]
+        retrieved_object = user_models.UserSkillMasteryModel.get_multi(
+            SKILL_IDS)
+
+        self.assertEqual(retrieved_object[0].user_id, 'user_id')
+        self.assertEqual(retrieved_object[0].skill_id, 'skill_id_1')
+        self.assertEqual(retrieved_object[0].degree_of_mastery, 0.5)
+        self.assertEqual(retrieved_object[1].user_id, 'user_id')
+        self.assertEqual(retrieved_object[1].skill_id, 'skill_id_2')
+        self.assertEqual(retrieved_object[1].degree_of_mastery, 0.5)
+
+    def test_get_multi_failure(self):
+        SKILL_IDS = ['unknown_model_id_1', 'unknown_model_id_2']
+        retrieved_object = user_models.UserSkillMasteryModel.get_multi(
+            SKILL_IDS)
+
+        self.assertEqual(retrieved_object, [None, None])

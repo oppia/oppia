@@ -44,8 +44,15 @@ oppia.factory('ExplorationDataService', [
 
     var resolvedAnswersUrlPrefix = (
       '/createhandler/resolved_answers/' + explorationId);
-    var explorationDraftAutosaveUrl = (
-      '/createhandler/autosave_draft/' + explorationId);
+    var explorationDraftAutosaveUrl = '';
+    if (GLOBALS.can_edit) {
+      explorationDraftAutosaveUrl = (
+        '/createhandler/autosave_draft/' + explorationId);
+    } else if (GLOBALS.can_translate) {
+      explorationDraftAutosaveUrl = (
+        '/createhandler/autosave_translation_draft/' + explorationId);
+    }
+
 
     // Put exploration variables here.
     var explorationData = {
@@ -98,7 +105,7 @@ oppia.factory('ExplorationDataService', [
           // (which is cached here) will be reused.
           return (
             EditableExplorationBackendApiService.fetchApplyDraftExploration(
-            explorationId).then(function(response) {
+              explorationId).then(function(response) {
               $log.info('Retrieved exploration data.');
               $log.info(response);
               draftChangeListId = response.draft_change_list_id;
@@ -128,11 +135,11 @@ oppia.factory('ExplorationDataService', [
       getLastSavedData: function() {
         return ReadOnlyExplorationBackendApiService.loadLatestExploration(
           explorationId).then(function(response) {
-            $log.info('Retrieved saved exploration data.');
-            $log.info(response);
+          $log.info('Retrieved saved exploration data.');
+          $log.info(response);
 
-            return response.exploration;
-          });
+          return response.exploration;
+        });
       },
       resolveAnswers: function(stateName, resolvedAnswersList) {
         AlertsService.clearWarnings();
@@ -156,20 +163,20 @@ oppia.factory('ExplorationDataService', [
           changeList, commitMessage, successCallback, errorCallback) {
         EditableExplorationBackendApiService.updateExploration(explorationId,
           explorationData.data.version, commitMessage, changeList).then(
-            function(response) {
-              AlertsService.clearWarnings();
-              explorationData.data = response;
-              if (successCallback) {
-                successCallback(
-                  response.is_version_of_draft_valid,
-                  response.draft_changes);
-              }
-            }, function() {
-              if (errorCallback) {
-                errorCallback();
-              }
+          function(response) {
+            AlertsService.clearWarnings();
+            explorationData.data = response;
+            if (successCallback) {
+              successCallback(
+                response.is_version_of_draft_valid,
+                response.draft_changes);
             }
-          );
+          }, function() {
+            if (errorCallback) {
+              errorCallback();
+            }
+          }
+        );
       }
     };
 

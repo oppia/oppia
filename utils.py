@@ -55,7 +55,7 @@ class ExplorationConversionError(Exception):
 
 
 def create_enum(*sequential, **names):
-    """Creates a enumerated constant
+    """Creates a enumerated constant.
 
     Args:
         sequential: *. Sequence List to generate the enumerations.
@@ -510,7 +510,7 @@ def vfs_construct_path(base_path, *path_components):
 
 def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc."""
-    # Preserve unicode (if path is unicode)
+    # Preserve unicode (if path is unicode).
     slash, dot = (u'/', u'.') if isinstance(path, unicode) else ('/', '.')
     if path == '':
         return dot
@@ -631,6 +631,9 @@ def _get_short_language_description(full_language_description):
 
     Args:
         full_language_description: str. Short description of the language.
+
+    Returns:
+        str. Short description of the language.
     """
     if ' (' not in full_language_description:
         return full_language_description

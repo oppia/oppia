@@ -18,11 +18,13 @@
 
 import ast
 import logging
+import traceback
 
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -91,7 +93,7 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
 class ExplorationContributorsSummaryOneOffJob(
         jobs.BaseMapReduceOneOffJobManager):
     """One-off job that computes the number of commits
-    done by contributors for each Exploration
+    done by contributors for each Exploration.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -209,12 +211,12 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
             # exp_services.apply_change_list for more information.
-            commit_cmds = [{
+            commit_cmds = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': str(item.states_schema_version),
                 'to_version': str(
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-            }]
+            })]
             exp_services.update_exploration(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update exploration states from schema version %d to %d.' % (
@@ -361,11 +363,10 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if item.deleted:
             return
-
         try:
             exploration = exp_services.get_exploration_from_model(item)
         except Exception as e:
-            yield ('ERROR with exp_id %s' % item.id, str(e))
+            yield ('ERROR get_exp_from_model: exp_id %s' % item.id, str(e))
             return
 
         explorations = []
@@ -382,7 +383,9 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                     exp_services.get_multiple_explorations_by_version(
                         exploration.id, versions))
             except Exception as e:
-                yield ('ERROR with exp_id %s' % item.id, str(e))
+                yield (
+                    'ERROR get_multiple_exp_by_version exp_id %s' % item.id,
+                    str(e))
                 return
 
         # Append latest exploration to the list of explorations.
@@ -405,22 +408,36 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                         exploration.id, exploration.version))
                 return
 
-            change_list = snapshot['commit_cmds']
+            change_list = [exp_domain.ExplorationChange(
+                change_cmd) for change_cmd in snapshot['commit_cmds']]
 
             try:
                 # Check if commit is to revert the exploration.
-                if change_list and change_list[0]['cmd'].endswith(
-                        'revert_version_number'):
-                    reverted_version = change_list[0]['version_number']
+                if change_list and change_list[0].cmd == (
+                        exp_models.ExplorationModel.CMD_REVERT_COMMIT):
+                    reverted_version = change_list[0].version_number
                     # pylint: disable=line-too-long
-                    exp_services.create_and_save_state_id_mapping_model_for_reverted_exploration(
-                        exploration.id, exploration.version - 1, reverted_version)
+                    state_id_mapping = exp_services.generate_state_id_mapping_model_for_reverted_exploration(
+                        exploration.id, exploration.version - 1,
+                        reverted_version)
                     # pylint: enable=line-too-long
                 else:
-                    exp_services.create_and_save_state_id_mapping_model(
-                        exploration, change_list)
+                    state_id_mapping = (
+                        exp_services.generate_state_id_mapping_model(
+                            exploration, change_list))
+
+                state_id_mapping_model = exp_models.StateIdMappingModel.create(
+                    state_id_mapping.exploration_id,
+                    state_id_mapping.exploration_version,
+                    state_id_mapping.state_names_to_ids,
+                    state_id_mapping.largest_state_id_used, overwrite=True)
+                state_id_mapping_model.put()
+
             except Exception as e:
-                yield ('ERROR with exp_id %s' % item.id, str(e))
+                yield (
+                    'ERROR with exp_id %s version %s' % (
+                        item.id, exploration.version),
+                    traceback.format_exc())
                 return
 
         yield (exploration.id, exploration.version)
@@ -455,3 +472,66 @@ class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates it.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+
+        html_list = exploration.get_all_html_content_strings()
+
+        err_dict = html_cleaner.validate_textangular_format(html_list)
+
+        for key in err_dict:
+            if err_dict[key]:
+                yield(key, err_dict[key])
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))
+
+
+class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that migrates the html content of an exploration into the valid
+    Textangular format and validates it.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+
+        html_list = exploration.get_all_html_content_strings()
+
+        err_dict = html_cleaner.validate_textangular_format(html_list, True)
+
+        for key in err_dict:
+            if err_dict[key]:
+                yield(key, err_dict[key])
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))

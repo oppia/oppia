@@ -28,6 +28,24 @@ def save_new_query_model(
         has_not_logged_in_for_n_days=None, created_at_least_n_exps=None,
         created_fewer_than_n_exps=None, edited_at_least_n_exps=None,
         edited_fewer_than_n_exps=None):
+    """Saves a new UserQueryModel instance in user_models.
+
+    Args:
+        submitter_id: str. ID of the UserQueryModel instance.
+        inactive_in_last_n_days: int. Number of days user is inactive.
+        has_not_logged_in_for_n_days: int. Number of days user hasn't logged in.
+        created_at_least_n_exps: int. Minimum number of explorations created
+            by user.
+        created_fewer_than_n_exps: int. Maximum number of explorations created
+            by user.
+        edited_at_least_n_exps: int|None. Minimum number of
+            explorations edited by user.
+        edited_fewer_than_n_exps: int|None. Maximum number of
+            explorations edited by user.
+
+    Returns:
+        query_id: str. ID of the UserQueryModel instance.
+    """
     query_id = user_models.UserQueryModel.get_new_id('')
     user_models.UserQueryModel(
         id=query_id, inactive_in_last_n_days=inactive_in_last_n_days,

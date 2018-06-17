@@ -30,6 +30,39 @@ from google.appengine.ext import ndb
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
 transaction_services = models.Registry.import_transaction_services()
 
+CURRENT_ACTION_SCHEMA_VERSION = 1
+CURRENT_ISSUE_SCHEMA_VERSION = 1
+
+ACTION_TYPE_EXPLORATION_START = 'ExplorationStart'
+ACTION_TYPE_ANSWER_SUBMIT = 'AnswerSubmit'
+ACTION_TYPE_EXPLORATION_QUIT = 'ExplorationQuit'
+
+ISSUE_TYPE_EARLY_QUIT = 'EarlyQuit'
+ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS = 'MultipleIncorrectSubmissions'
+ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS = 'CyclicStateTransitions'
+
+# Types of allowed issues.
+ALLOWED_ISSUE_TYPES = [
+    ISSUE_TYPE_EARLY_QUIT,
+    ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
+    ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS
+]
+# Types of allowed learner actions.
+ALLOWED_ACTION_TYPES = [
+    ACTION_TYPE_EXPLORATION_START,
+    ACTION_TYPE_ANSWER_SUBMIT,
+    ACTION_TYPE_EXPLORATION_QUIT
+]
+# Mapping from issue type to issue keyname in the issue customization dict. This
+# mapping is useful to uniquely identify issues by the combination of their
+# issue type and other type-specific information (such as the list of states
+# involved).
+ISSUE_TYPE_KEYNAME_MAPPING = {
+    'EarlyQuit': 'state_name',
+    'MultipleIncorrectSubmissions': 'state_name',
+    'CyclicStateTransitions': 'state_names'
+}
+
 
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.
@@ -76,11 +109,11 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
-    # Whether the submitted answer received useful feedback
+    # Whether the submitted answer received useful feedback.
     is_feedback_useful = ndb.BooleanProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(
@@ -89,7 +122,8 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -97,8 +131,9 @@ class AnswerSubmittedEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               time_spent_in_state_secs, is_feedback_useful):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs, is_feedback_useful):
         """Creates a new answer submitted event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -125,7 +160,7 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # The version of the event schema used to describe an event of this type.
     event_schema_version = ndb.IntegerProperty(
@@ -134,7 +169,8 @@ class ExplorationActualStartEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -164,7 +200,7 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     exp_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     time_spent_in_state_secs = ndb.FloatProperty()
@@ -175,7 +211,8 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -183,8 +220,9 @@ class SolutionHitEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               time_spent_in_state_secs):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs):
         """Creates a new solution hit event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -216,7 +254,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         params: Current parameter values, in the form of a map of parameter
             name to value.
     """
-    # Which specific type of event this is
+    # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
     exploration_id = ndb.StringProperty(indexed=True)
@@ -224,11 +262,11 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
-    # Current parameter values, map of parameter name to value
+    # Current parameter values, map of parameter name to value.
     params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
@@ -259,8 +297,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               params, play_type, unused_version=1):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            params, play_type, unused_version=1):
         """Creates a new start exploration event and then writes it to
         the datastore.
 
@@ -273,6 +312,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
                 name to value.
             play_type: str. Type of play-through.
             unused_version: int. Default is 1.
+
+        Returns:
+            str. The ID of the entity.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due tg an error.
@@ -323,7 +365,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         client_time_spent_in_secs: Time spent in this state before the event
             was triggered.
     """
-    # Which specific type of event this is
+    # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
     exploration_id = ndb.StringProperty(indexed=True)
@@ -331,14 +373,14 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     # Note: Some of these events were migrated from StateHit event instances
     # which did not record timestamp data. For this, we use a placeholder
     # value of 0.0 for client_time_spent_in_secs.
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
-    # Current parameter values, map of parameter name to value
+    # Current parameter values, map of parameter name to value.
     params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
@@ -369,8 +411,9 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               client_time_spent_in_secs, params, play_type):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            client_time_spent_in_secs, params, play_type):
         """Creates a new leave exploration event and then writes it
         to the datastore.
 
@@ -427,7 +470,7 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     have the wrong 'last updated' timestamp. However, the 'created_on'
     timestamp is the same as that of the original model.
     """
-    # Which specific type of event this is
+    # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
     exploration_id = ndb.StringProperty(indexed=True)
@@ -435,14 +478,14 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
     # Note: Some of these events were migrated from StateHit event instances
     # which did not record timestamp data. For this, we use a placeholder
     # value of 0.0 for client_time_spent_in_secs.
     client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
-    # Current parameter values, map of parameter name to value
+    # Current parameter values, map of parameter name to value.
     params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
@@ -473,8 +516,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               client_time_spent_in_secs, params, play_type):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            client_time_spent_in_secs, params, play_type):
         """Creates a new exploration completion event and then writes it
         to the datastore.
 
@@ -488,6 +532,9 @@ class CompleteExplorationEventLogEntryModel(base_models.BaseModel):
             play_type: str. Type of play-through.
             client_time_spent_in_secs: float. Time since start of this
                 state before this event occurred.
+
+        Returns:
+            str. The ID of the entity.
         """
         entity_id = cls.get_new_event_entity_id(exp_id, session_id)
         complete_event_entity = cls(
@@ -514,11 +561,11 @@ class RateExplorationEventLogEntryModel(base_models.BaseModel):
         exploration_id: ID of exploration which is being rated.
         rating: Value of rating assigned to exploration.
     """
-    # Which specific type of event this is
+    # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration which has been rated.
     exploration_id = ndb.StringProperty(indexed=True)
-    # Value of rating assigned
+    # Value of rating assigned.
     rating = ndb.IntegerProperty(indexed=True)
     # Value of rating previously assigned by the same user. Will be None when a
     # user rates an exploration for the first time.
@@ -584,7 +631,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     amount of time between this event (i.e., the learner entering the
     state) and the other event.
     """
-    # Which specific type of event this is
+    # Which specific type of event this is.
     event_type = ndb.StringProperty(indexed=True)
     # Id of exploration currently being played.
     exploration_id = ndb.StringProperty(indexed=True)
@@ -592,9 +639,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of current student's session
+    # ID of current student's session.
     session_id = ndb.StringProperty(indexed=True)
-    # Current parameter values, map of parameter name to value
+    # Current parameter values, map of parameter name to value.
     params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (editor preview, or learner view).
     # Note that the 'playtest' option is legacy, since editor preview
@@ -639,6 +686,9 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             params: dict. Current parameter values, map of parameter name
                 to value.
             play_type: str. Type of play-through.
+
+        Returns:
+            str. The ID of the entity.
         """
         # TODO(sll): Some events currently do not have an entity ID that was
         # set using this method; it was randomly set instead due to an error.
@@ -676,7 +726,8 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -684,8 +735,9 @@ class StateCompleteEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id,
-               time_spent_in_state_secs):
+    def create(
+            cls, exp_id, exp_version, state_name, session_id,
+            time_spent_in_state_secs):
         """Creates a new state complete event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -721,7 +773,8 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
         """Generates a unique id for the event model of the form
-        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}."""
+        {{random_hash}} from {{timestamp}:{exp_id}:{session_id}}.
+        """
         timestamp = datetime.datetime.utcnow()
         return cls.get_new_id('%s:%s:%s' % (
             utils.get_time_in_millisecs(timestamp),
@@ -729,8 +782,9 @@ class LeaveForRefresherExplorationEventLogEntryModel(base_models.BaseModel):
             session_id))
 
     @classmethod
-    def create(cls, exp_id, refresher_exp_id, exp_version, state_name,
-               session_id, time_spent_in_state_secs):
+    def create(
+            cls, exp_id, refresher_exp_id, exp_version, state_name,
+            session_id, time_spent_in_state_secs):
         """Creates a new leave for refresher exploration event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -922,6 +976,162 @@ class ExplorationStatsModel(base_models.BaseModel):
         cls.put_multi(exploration_stats_models)
 
 
+class ExplorationIssuesModel(base_models.BaseModel):
+    """Model for storing the list of playthroughs for an exploration grouped by
+    issues.
+    """
+    # ID of exploration.
+    exp_id = ndb.StringProperty(indexed=True, required=True)
+    # Version of exploration.
+    exp_version = ndb.IntegerProperty(indexed=True, required=True)
+    # The unresolved issues for this exploration. This will be a list of dicts
+    # where each dict represents an issue along with the associated
+    # playthroughs.
+    unresolved_issues = ndb.JsonProperty(repeated=True)
+
+    @classmethod
+    def get_entity_id(cls, exp_id, exp_version):
+        """Generates an ID for the instance of the form
+        {{exp_id}}.{{exp_version}}.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+
+        Returns:
+            str. ID of the new ExplorationIssuesModel instance.
+        """
+        return '%s.%s' % (exp_id, exp_version)
+
+    @classmethod
+    def get_model(cls, exp_id, exp_version):
+        """Retrieves ExplorationIssuesModel given exploration ID and version.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+
+        Returns:
+            ExplorationISsuesModel. Exploration issues model instance in
+                datastore.
+        """
+        instance_id = cls.get_entity_id(exp_id, exp_version)
+        exp_issues_model = cls.get(instance_id, strict=False)
+        return exp_issues_model
+
+    @classmethod
+    def create(cls, exp_id, exp_version, unresolved_issues):
+        """Creates an ExplorationIssuesModel instance and writes it to the
+        datastore.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+            unresolved_issues: list(dict). The unresolved issues for this
+                exploration. This will be a list of dicts where each dict
+                represents an issue along with the associated playthroughs.
+
+        Returns:
+            str. ID of the new ExplorationIssuesModel instance.
+        """
+        instance_id = cls.get_entity_id(exp_id, exp_version)
+        exp_issues_instance = cls(
+            id=instance_id, exp_id=exp_id, exp_version=exp_version,
+            unresolved_issues=unresolved_issues)
+        exp_issues_instance.put()
+        return instance_id
+
+
+class PlaythroughModel(base_models.BaseModel):
+    """Model for storing recorded useful playthrough data in the datastore.
+
+    The ID of instances of this class are of the form
+    {{exp_id}}.{{random_hash_of_16_chars}}
+    """
+    # ID of the exploration.
+    exp_id = ndb.StringProperty(indexed=True, required=True)
+    # Version of the exploration.
+    exp_version = ndb.IntegerProperty(indexed=True, required=True)
+    # Type of the issue.
+    issue_type = ndb.StringProperty(
+        indexed=True, required=True, choices=ALLOWED_ISSUE_TYPES)
+    # The customization args dict for the given issue_type.
+    issue_customization_args = ndb.JsonProperty(required=True)
+    # The playthrough actions for this playthrough. This will be a list of dicts
+    # where each dict represents a single playthrough action. The list is
+    # ordered by the time of occurence of the action.
+    actions = ndb.JsonProperty(repeated=True)
+
+    @classmethod
+    def _generate_id(cls, exp_id):
+        """Generates a unique id for the playthrough of the form
+        {{exp_id}}.{{random_hash_of_16_chars}}
+
+        Args:
+            exp_id: str. ID of the exploration.
+
+        Returns:
+            ID of the new PlaythroughModel instance.
+
+        Raises:
+            Exception: The id generator for PlaythroughModel is producing too
+                many collisions.
+        """
+
+        for _ in xrange(base_models.MAX_RETRIES):
+            new_id = '%s.%s' % (
+                exp_id,
+                utils.convert_to_hash(
+                    str(utils.get_random_int(base_models.RAND_RANGE)),
+                    base_models.ID_LENGTH))
+            if not cls.get_by_id(new_id):
+                return new_id
+
+        raise Exception(
+            'The id generator for PlaythroughModel is producing too many '
+            'collisions.')
+
+    @classmethod
+    def create(
+            cls, exp_id, exp_version, issue_type, issue_customization_args,
+            actions):
+        """Creates a PlaythroughModel instance and writes it to the
+        datastore.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: int. Version of the exploration.
+            issue_type: str. Type of the issue.
+            issue_customization_args: dict. The customization args dict for the
+                given issue_type.
+            actions: list(dict). The playthrough actions for this playthrough.
+                This will be a list of dicts where each dict represents a single
+                playthrough action. The list is ordered by the time of occurence
+                of the action.
+
+        Returns:
+            str. ID of the new PlaythroughModel instance.
+        """
+        instance_id = cls._generate_id(exp_id)
+        playthrough_instance = cls(
+            id=instance_id, exp_id=exp_id, exp_version=exp_version,
+            issue_type=issue_type,
+            issue_customization_args=issue_customization_args,
+            actions=actions)
+        playthrough_instance.put()
+        return instance_id
+
+    @classmethod
+    def delete_playthroughs_multi(cls, playthrough_ids):
+        """Deltes multiple playthrough instances.
+
+        Args:
+            playthrough_ids: list(str). List of playthrough IDs to be deleted.
+        """
+        instances = cls.get_multi(playthrough_ids)
+        cls.delete_multi(instances)
+
+
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics.
@@ -932,9 +1142,9 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     exploration_id = ndb.StringProperty(indexed=True)
     # Version of exploration.
     version = ndb.StringProperty(indexed=False)
-    # Number of students who started the exploration
+    # Number of students who started the exploration.
     num_starts = ndb.IntegerProperty(indexed=False)
-    # Number of students who have completed the exploration
+    # Number of students who have completed the exploration.
     num_completions = ndb.IntegerProperty(indexed=False)
     # Keyed by state name that describes the numbers of hits for each state
     # {state_name: {'first_entry_count': ...,
@@ -947,7 +1157,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         """Gets entity_id for a batch model based on given exploration state.
 
         Args:
-            exp_id: str. ID of the exploration currently being played.
+            exploration_id: str. ID of the exploration currently being played.
             exploration_version: int. Version of the exploration currently
                 being played.
 
@@ -987,7 +1197,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
         ExplorationAnnotationsModel for a specific exploration_id.
 
         Args:
-            exp_id: str. ID of the exploration currently being played.
+            exploration_id: str. ID of the exploration currently being played.
 
         Returns:
             list(int). List of versions corresponding to annotation models
@@ -1026,7 +1236,7 @@ class StateAnswersModel(base_models.BaseModel):
     # shards look similar to the master shard except they do not populate
     # shard_count.
     shard_id = ndb.IntegerProperty(indexed=True, required=True)
-    # Store interaction type to know which calculations should be performed
+    # Store interaction type to know which calculations should be performed.
     interaction_id = ndb.StringProperty(indexed=True, required=True)
     # Store how many extra shards are associated with this state. This is only
     # present when shard_id is 0. This starts at 0 (the main shard is not
@@ -1043,6 +1253,10 @@ class StateAnswersModel(base_models.BaseModel):
 
     # List of answer dicts, each of which is stored as JSON blob. The content
     # of answer dicts is specified in core.domain.stats_domain.StateAnswers.
+    # NOTE: The answers stored in submitted_answers_list must be sorted
+    # according to the chronological order of their submission otherwise
+    # TopNUnresolvedAnswersByFrequency calculation in
+    # InteractionAnswerSummariesAggregator will output invalid results.
     submitted_answer_list = ndb.JsonProperty(repeated=True, indexed=False)
     # The version of the submitted_answer_list currently supported by Oppia. If
     # the internal JSON structure of submitted_answer_list changes,
@@ -1137,6 +1351,11 @@ class StateAnswersModel(base_models.BaseModel):
         this method does. It's only safe to call this method from within a
         transaction.
 
+        NOTE: The answers stored in submitted_answers_list must be sorted
+        according to the chronological order of their submission otherwise
+        TopNUnresolvedAnswersByFrequency calculation in
+        InteractionAnswerSummariesAggregator will output invalid results.
+
         Args:
             exploration_id: str. ID of the exploration currently being played.
             exploration_version: int. Version of exploration.
@@ -1181,7 +1400,7 @@ class StateAnswersModel(base_models.BaseModel):
         if sharded_answer_list_sizes[0] != (
                 last_shard.accumulated_answer_json_size_bytes):
             last_shard.submitted_answer_list = sharded_answer_lists[0]
-            last_shard.accumulated_answer_json_size_bytes = (
+            last_shard.accumulated_answer_json_size_bytes = (  # pylint: disable=invalid-name
                 sharded_answer_list_sizes[0])
             last_shard_updated = True
         else:
@@ -1375,7 +1594,7 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
             exploration_id, exploration_version, state_name, calculation_id)
         instance = cls.get(instance_id, strict=False)
         if not instance:
-            # create new instance
+            # create new instance.
             instance = cls(
                 id=instance_id, exploration_id=exploration_id,
                 exploration_version=exploration_version,
@@ -1397,8 +1616,9 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
                     state_name.encode('utf-8'), calculation_id))
 
     @classmethod
-    def get_model(cls, exploration_id, exploration_version, state_name,
-                  calculation_id):
+    def get_model(
+            cls, exploration_id, exploration_version, state_name,
+            calculation_id):
         """Gets entity instance corresponding to the given exploration state.
 
         Args:
@@ -1418,8 +1638,9 @@ class StateAnswersCalcOutputModel(base_models.BaseMapReduceBatchResultsModel):
         return instance
 
     @classmethod
-    def _get_entity_id(cls, exploration_id, exploration_version, state_name,
-                       calculation_id):
+    def _get_entity_id(
+            cls, exploration_id, exploration_version, state_name,
+            calculation_id):
         """Returns entity_id corresponding to the given exploration state.
 
         Args:

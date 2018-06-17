@@ -19,6 +19,7 @@
 import contextlib
 import copy
 import inspect
+import itertools
 import json
 import os
 import re
@@ -30,6 +31,12 @@ from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import skill_domain
+from core.domain import skill_services
+from core.domain import story_domain
+from core.domain import story_services
+from core.domain import topic_domain
+from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -53,6 +60,7 @@ LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
 
 def empty_environ():
+    """Create an empty environment for the tests."""
     os.environ['AUTH_DOMAIN'] = 'example.com'
     os.environ['SERVER_NAME'] = 'localhost'
     os.environ['HTTP_HOST'] = 'localhost'
@@ -135,6 +143,10 @@ class TestBase(unittest.TestCase):
     OWNER_USERNAME = 'owner'
     EDITOR_EMAIL = 'editor@example.com'
     EDITOR_USERNAME = 'editor'
+    TOPIC_MANAGER_EMAIL = 'topicmanager@example.com'
+    TOPIC_MANAGER_USERNAME = 'topicmanager'
+    TRANSLATOR_EMAIL = 'translator@example.com'
+    TRANSLATOR_USERNAME = 'translator'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER_USERNAME = 'viewer'
     NEW_USER_EMAIL = 'new.user@example.com'
@@ -182,8 +194,11 @@ states:
   %s:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -191,9 +206,10 @@ states:
       default_outcome:
         dest: %s
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -203,8 +219,11 @@ states:
   New state:
     classifier_model_id: null
     content:
-      audio_translations: {}
+      content_id: content
       html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
     interaction:
       answer_groups: []
       confirmed_unclassified_answers: []
@@ -212,9 +231,10 @@ states:
       default_outcome:
         dest: New state
         feedback:
-          audio_translations: {}
+          content_id: default_outcome
           html: ''
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -253,6 +273,7 @@ states:
         dest: %s
         feedback: []
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       fallbacks: []
@@ -270,6 +291,7 @@ states:
         dest: New state
         feedback: []
         labelled_as_correct: false
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       fallbacks: []
@@ -316,7 +338,8 @@ tags: []
             item.validate()
 
     def signup_superadmin_user(self):
-        """Signs up a superadmin user. Should be called at the end of setUp().
+        """Signs up a superadmin user. Should be called at the end of
+        setUp().
         """
         self.signup('tmpsuperadmin@example.com', 'tmpsuperadm1n')
 
@@ -392,17 +415,27 @@ tags: []
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
             self.assertEqual(json_response.status_int, 200)
-
         self.assertEqual(
             json_response.content_type, 'application/json')
         self.assertTrue(json_response.body.startswith(feconf.XSSI_PREFIX))
 
         return json.loads(json_response.body[len(feconf.XSSI_PREFIX):])
 
-    def get_json(self, url, params=None, expect_errors=False):
+    def get_json(self, url, params=None, expect_errors=False,
+                 expected_status_int=200):
         """Get a JSON response, transformed to a Python object."""
         json_response = self.testapp.get(
-            url, params, expect_errors=expect_errors)
+            url, params, expect_errors=expect_errors,
+            status=expected_status_int)
+
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
@@ -416,6 +449,14 @@ tags: []
         json_response = self._send_post_request(
             self.testapp, url, data, expect_errors, expected_status_int,
             upload_files)
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
+        self.assertEqual(json_response.status_int, expected_status_int)
 
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
@@ -425,13 +466,28 @@ tags: []
             upload_files=None, headers=None):
         json_response = app.post(
             str(url), data, expect_errors=expect_errors,
-            upload_files=upload_files, headers=headers)
-        self.assertEqual(json_response.status_int, expected_status_int)
+            upload_files=upload_files, headers=headers,
+            status=expected_status_int)
         return json_response
 
     def post_email(
             self, recipient_email, sender_email, subject, body, html_body=None,
             expect_errors=False, expected_status_int=200):
+        """Post an email from the sender to the recipient.
+
+        Args:
+            recipient_email: str. The email of the recipient.
+            sender_email: str. The email of the sender.
+            subject: str. The subject of the email.
+            body: str. The body of the email.
+            html_body: str. The HTML body of the email.
+            expect_errors: bool. Whether errors are expected.
+            expected_status_int: int. The expected status code of
+                the JSON response.
+
+        Returns:
+            json. A JSON response generated by _send_post_request function.
+        """
         email = mail.EmailMessage(
             sender=sender_email, to=recipient_email, subject=subject,
             body=body)
@@ -459,6 +515,13 @@ tags: []
         json_response = self.testapp.put(
             str(url), data, expect_errors=expect_errors)
 
+        # Testapp takes in a status parameter which is the expected status of
+        # the response. However this expected status is verified only when
+        # expect_errors=False. For other situations we need to explicitly check
+        # the status.
+        # Reference URL:
+        # https://github.com/Pylons/webtest/blob/
+        # bf77326420b628c9ea5431432c7e171f88c5d874/webtest/app.py#L1119 .
         self.assertEqual(json_response.status_int, expected_status_int)
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
@@ -484,13 +547,14 @@ tags: []
             response = self.testapp.get(feconf.SIGNUP_URL)
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
-            response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
-                'csrf_token': csrf_token,
-                'payload': json.dumps({
-                    'username': username,
-                    'agreed_to_terms': True
+            response = self.testapp.post(
+                feconf.SIGNUP_DATA_URL, {
+                    'csrf_token': csrf_token,
+                    'payload': json.dumps({
+                        'username': username,
+                        'agreed_to_terms': True
+                    })
                 })
-            })
             self.assertEqual(response.status_int, 200)
         self.logout()
 
@@ -503,12 +567,13 @@ tags: []
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminhandler', {
-            'action': 'save_config_properties',
-            'new_config_property_values': {
-                config_obj.name: new_config_value,
-            }
-        }, csrf_token)
+        self.post_json(
+            '/adminhandler', {
+                'action': 'save_config_properties',
+                'new_config_property_values': {
+                    config_obj.name: new_config_value,
+                }
+            }, csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
@@ -525,10 +590,11 @@ tags: []
         self.login('tmpsuperadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json('/adminrolehandler', {
-            'username': username,
-            'role': user_role
-        }, csrf_token)
+        self.post_json(
+            '/adminrolehandler', {
+                'username': username,
+                'role': user_role
+            }, csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
@@ -541,6 +607,15 @@ tags: []
         """
         for name in admin_usernames:
             self.set_user_role(name, feconf.ROLE_ID_ADMIN)
+
+    def set_topic_managers(self, topic_manager_usernames):
+        """Sets role of given users as TOPIC_MANAGER.
+
+        Args:
+            topic_manager_usernames: list(str). List of usernames.
+        """
+        for name in topic_manager_usernames:
+            self.set_user_role(name, feconf.ROLE_ID_TOPIC_MANAGER)
 
     def set_moderators(self, moderator_usernames):
         """Sets role of given users as MODERATOR.
@@ -621,6 +696,8 @@ tags: []
             category: str. The category this exploration belongs to.
             objective: str. The objective of this exploration.
             language_code: str. The language_code of this exploration.
+            end_state_name: str. The name of the end state for the exploration.
+            interaction_id: str. The id of the interaction.
 
         Returns:
             Exploration. The exploration domain object.
@@ -632,17 +709,64 @@ tags: []
             interaction_id)
         exploration.objective = objective
 
-        # If an end state name is provided, add terminal node with that name
+        # If an end state name is provided, add terminal node with that name.
         if end_state_name is not None:
             exploration.add_states([end_state_name])
             end_state = exploration.states[end_state_name]
             end_state.update_interaction_id('EndExploration')
             end_state.interaction.default_outcome = None
 
-            # Link first state to ending state (to maintain validity)
+            # Link first state to ending state (to maintain validity).
             init_state = exploration.states[exploration.init_state_name]
             init_interaction = init_state.interaction
             init_interaction.default_outcome.dest = end_state_name
+
+        exp_services.save_new_exploration(owner_id, exploration)
+        return exploration
+
+    def save_new_linear_exp_with_state_names_and_interactions(
+            self, exploration_id, owner_id, state_names, interaction_ids,
+            title='A title', category='A category', objective='An objective',
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Saves a new strictly-validated exploration with a sequence of states.
+
+        Args:
+            exploration_id: str. The id of the new validated exploration.
+            owner_id: str. The user_id of the creator of the exploration.
+            state_names: list(str). The names of states to be linked
+                sequentially in the exploration. Must be a non-empty list and
+                contain no duplicates.
+            interaction_ids: list(str). The names of the interaction ids to be
+                assigned to each state. Values will be cycled, so it doesn't
+                need to be the same size as state_names, but it must be
+                non-empty.
+            title: str. The title of the exploration.
+            category: str. The category this exploration belongs to.
+            objective: str. The objective of this exploration.
+            language_code: str. The language_code of this exploration.
+
+        Returns:
+            Exploration. The exploration domain object.
+        """
+        if not state_names:
+            raise ValueError('must provide at least one state name')
+        if not interaction_ids:
+            raise ValueError('must provide at least one interaction type')
+        interaction_ids = itertools.cycle(interaction_ids)
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id, title=title, init_state_name=state_names[0],
+            category=category, objective=objective, language_code=language_code)
+
+        exploration.add_states(state_names[1:])
+        for from_state_name, dest_state_name in (
+                zip(state_names[:-1], state_names[1:])):
+            from_state = exploration.states[from_state_name]
+            from_state.update_interaction_id(next(interaction_ids))
+            from_state.interaction.default_outcome.dest = dest_state_name
+        end_state = exploration.states[state_names[-1]]
+        end_state.update_interaction_id('EndExploration')
+        end_state.interaction.default_outcome = None
 
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
@@ -683,11 +807,12 @@ tags: []
         rights_manager.create_new_exploration_rights(exp_id, user_id)
 
         commit_message = 'New exploration created with title \'%s\'.' % title
-        exp_model.commit(user_id, commit_message, [{
-            'cmd': 'create_new',
-            'title': 'title',
-            'category': 'category',
-        }])
+        exp_model.commit(
+            user_id, commit_message, [{
+                'cmd': 'create_new',
+                'title': 'title',
+                'category': 'category',
+            }])
         exp_rights = exp_models.ExplorationRightsModel.get_by_id(exp_id)
         exp_summary_model = exp_models.ExpSummaryModel(
             id=exp_id,
@@ -793,6 +918,99 @@ tags: []
         committer = user_services.UserActionsInfo(owner_id)
         rights_manager.publish_collection(committer, collection_id)
 
+    def save_new_story(
+            self, story_id, owner_id, title,
+            description, notes,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Story and saves it.
+
+        Args:
+            story_id: str. ID for the story to be created.
+            owner_id: str. The user_id of the creator of the story.
+            title: str. The title of the story.
+            description: str. The high level description of the story.
+            notes: str. A set of notes, that describe the characters,
+                main storyline, and setting.
+            language_code: str. The ISO 639-1 code for the language this
+                story is written in.
+
+        Returns:
+            Story. A newly-created story.
+        """
+        story = story_domain.Story.create_default_story(story_id, title)
+        story.title = title
+        story.description = description
+        story.notes = notes
+        story.language_code = language_code
+        story_services.save_new_story(owner_id, story)
+        return story
+
+    def save_new_topic(
+            self, topic_id, owner_id, name, description,
+            canonical_story_ids, additional_story_ids, uncategorized_skill_ids,
+            subtopics, next_subtopic_id,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Topic and saves it.
+
+        Args:
+            topic_id: str. ID for the topic to be created.
+            owner_id: str. The user_id of the creator of the topic.
+            name: str. The name of the topic.
+            description: str. The desscription of the topic.
+            canonical_story_ids: list(str). The list of ids of canonical stories
+                that are part of the topic.
+            additional_story_ids: list(str). The list of ids of additional
+                stories that are part of the topic.
+            uncategorized_skill_ids: list(str). The list of ids of skills that
+                are not part of any subtopic.
+            subtopics: list(Subtopic). The different subtopics that are part of
+                this topic.
+            next_subtopic_id: int. The id for the next subtopic.
+            language_code: str. The ISO 639-1 code for the language this
+                topic is written in.
+
+        Returns:
+            Topic. A newly-created topic.
+        """
+        topic = topic_domain.Topic(
+            topic_id, name, description, canonical_story_ids,
+            additional_story_ids, uncategorized_skill_ids, subtopics,
+            feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION, next_subtopic_id,
+            language_code, 0
+        )
+        topic_services.save_new_topic(owner_id, topic)
+        return topic
+
+    def save_new_skill(
+            self, skill_id, owner_id,
+            description, misconceptions=None, skill_contents=None,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Skill and saves it.
+
+        Args:
+            skill_id: str. ID for the skill to be created.
+            owner_id: str. The user_id of the creator of the skill.
+            description: str. The description of the skill.
+            skill_contents: SkillContents. A SkillContents object containing the
+                explanation and examples of the skill.
+            misconceptions: list(Misconception). A list of Misconception objects
+                that contains the various misconceptions of the skill.
+            language_code: str. The ISO 639-1 code for the language this
+                skill is written in.
+
+        Returns:
+            Skill. A newly-created skill.
+        """
+        skill = skill_domain.Skill.create_default_skill(skill_id, description)
+        if misconceptions:
+            skill.misconceptions = misconceptions
+        if skill_contents:
+            skill.skill_contents = skill_contents
+        skill.language_code = language_code
+        skill.version = 0
+        skill_services.save_new_skill(owner_id, skill)
+        return skill
+
     def get_updated_param_dict(
             self, param_dict, param_changes, exp_param_specs):
         """Updates a param dict using the given list of param_changes.
@@ -813,7 +1031,7 @@ tags: []
 
     def get_static_asset_filepath(self):
         """Returns filepath for referencing static files on disk.
-        examples: '' or 'build/'
+        examples: '' or 'build/'.
         """
         filepath = ''
         if not feconf.DEV_MODE:
@@ -938,6 +1156,9 @@ class AppEngineTestBase(TestBase):
                 urlfetch mock. The keys of this dict are strings that represent
                 the header name and the value represents corresponding value of
                 that header.
+
+        Yields:
+            None.
         """
         if headers is None:
             response_headers = {}
@@ -951,9 +1172,9 @@ class AppEngineTestBase(TestBase):
         try:
             yield
         finally:
-            # Disables the custom mock
+            # Disables the custom mock.
             self.testbed.init_urlfetch_stub(enable=False)
-            # Enables the testbed urlfetch mock
+            # Enables the testbed urlfetch mock.
             self.testbed.init_urlfetch_stub()
 
     def count_jobs_in_taskqueue(self, queue_name):
@@ -1014,6 +1235,36 @@ class AppEngineTestBase(TestBase):
                 queue_names=queue_names)
             for queue in queue_names:
                 self.taskqueue_stub.FlushQueue(queue)
+
+    def _create_valid_question_data(self, default_dest_state_name):
+        """Creates a valid question_data dict.
+
+        Args:
+            default_dest_state_name: str. The default destination state.
+
+        Returns:
+            dict. The default question_data dict.
+        """
+        state = exp_domain.State.create_default_state(default_dest_state_name)
+        solution_explanation = exp_domain.SubtitledHtml(
+            'solution', 'Solution explanation')
+        solution = exp_domain.Solution(
+            'TextInput', False, 'Solution', solution_explanation)
+        hint_content = exp_domain.SubtitledHtml('hint_1', 'Hint 1')
+        hint = exp_domain.Hint(hint_content)
+        state.interaction.id = 'TextInput'
+        state.interaction.customization_args = {
+            'placeholder': 'Enter text here',
+            'rows': 1
+        }
+        state.interaction.default_outcome.labelled_as_correct = True
+        state.interaction.default_outcome.dest = None
+        state.interaction.hints.append(hint)
+        state.content_ids_to_audio_translations['hint_1'] = {}
+        state.interaction.solution = solution
+        state.content_ids_to_audio_translations['solution'] = {}
+        state = state.to_dict()
+        return state
 
 
 if feconf.PLATFORM == 'gae':

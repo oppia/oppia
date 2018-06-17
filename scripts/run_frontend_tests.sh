@@ -29,6 +29,9 @@
 #
 # The root folder MUST be named 'oppia'.
 # It runs unit tests for frontend JavaScript code (using Karma).
+#
+# Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
+# single test or test suite.
 
 if [ -z "$BASH_VERSION" ]
 then
@@ -59,15 +62,15 @@ echo ""
 echo ""
 echo "  Running test in development environment"
 echo ""
-
+$PYTHON_CMD scripts/build.py
 $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
 
 if [ "$RUN_MINIFIED_TESTS" = "true" ]; then
   echo ""
   echo "  Running test in production environment"
   echo ""
-
-  $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --minify=True
+  $PYTHON_CMD scripts/build.py --prod_env
+  $XVFB_PREFIX $NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js --prod_env=True
 fi
 
 echo Done!

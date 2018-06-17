@@ -53,8 +53,8 @@ oppia.constant(
     'I18N_PLAYER_HINT_REQUEST_STRING_3']);
 
 oppia.constant(
-    'EXPLORATION_DATA_URL_TEMPLATE',
-    '/explorehandler/init/<exploration_id>');
+  'EXPLORATION_DATA_URL_TEMPLATE',
+  '/explorehandler/init/<exploration_id>');
 oppia.constant(
   'EXPLORATION_VERSION_DATA_URL_TEMPLATE',
   '/explorehandler/init/<exploration_id>?v=<version>');
@@ -64,6 +64,9 @@ oppia.constant(
 oppia.constant(
   'EDITABLE_EXPLORATION_DATA_DRAFT_URL_TEMPLATE',
   '/createhandler/data/<exploration_id>?apply_draft=<apply_draft>');
+oppia.constant(
+  'TRANSLATE_EXPLORATION_DATA_URL_TEMPLATE',
+  '/createhandler/translate/<exploration_id>');
 
 
 oppia.constant('EVENT_PROGRESS_NAV_SUBMITTED', 'progress-nav-submit');

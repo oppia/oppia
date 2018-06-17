@@ -24,7 +24,7 @@ describe('ContinueValidationService', function() {
     module('oppia');
   });
 
-  beforeEach(inject(function($rootScope, $controller, $injector) {
+  beforeEach(inject(function($injector) {
     validatorService = $injector.get('ContinueValidationService');
     WARNING_TYPES = $injector.get('WARNING_TYPES');
     oof = $injector.get('OutcomeObjectFactory');
@@ -38,10 +38,11 @@ describe('ContinueValidationService', function() {
       },
       labelled_as_correct: false,
       param_changes: [],
-      refresher_exploration_id: null
+      refresher_exploration_id: null,
+      missing_prerequisite_skill_id: null
     });
 
-    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false)];
+    goodAnswerGroups = [agof.createNew([], goodDefaultOutcome, false, null)];
     customizationArguments = {
       buttonText: {
         value: 'Some Button Text'
