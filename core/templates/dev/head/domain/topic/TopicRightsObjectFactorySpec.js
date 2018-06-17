@@ -24,7 +24,7 @@ describe('Topic rights object factory', function() {
   beforeEach(inject(function($injector) {
     TopicRightsObjectFactory = $injector.get('TopicRightsObjectFactory');
     var initialTopicRightsBackendObject = {
-      is_published: false,
+      published: false,
       can_edit_topic: true,
       can_publish_topic: true
     };
@@ -37,10 +37,10 @@ describe('Topic rights object factory', function() {
     function() {
       expect(sampleTopicRights.isPublished()).toBe(false);
 
-      sampleTopicRights.publishTopic();
+      sampleTopicRights.markTopicAsPublished();
       expect(sampleTopicRights.isPublished()).toBe(true);
 
-      sampleTopicRights.unpublishTopic();
+      sampleTopicRights.markTopicAsUnpublished();
       expect(sampleTopicRights.isPublished()).toBe(false);
     });
 
@@ -59,21 +59,21 @@ describe('Topic rights object factory', function() {
       exampleTopicRightsBackendObject);
 
     expect(function() {
-      exampleTopicRights.publishTopic();
-    }).toThrow(new Error('User is not allowed to edit this topic.'));
+      exampleTopicRights.markTopicAsPublished();
+    }).toThrow(new Error('User is not allowed to publish this topic.'));
 
     expect(function() {
-      exampleTopicRights.unpublishTopic();
-    }).toThrow(new Error('User is not allowed to edit this topic.'));
+      exampleTopicRights.markTopicAsUnpublished();
+    }).toThrow(new Error('User is not allowed to unpublish this topic.'));
   });
 
   it('should create an empty topic rights object', function() {
     var emptyTopicRightsBackendObject = (
       TopicRightsObjectFactory.createEmptyTopicRights());
 
-    expect(emptyTopicRightsBackendObject.isPublished()).toBeUndefined();
-    expect(emptyTopicRightsBackendObject.canEditTopic()).toBeUndefined();
-    expect(emptyTopicRightsBackendObject.getCanPublishTopic()).toBeUndefined();
+    expect(emptyTopicRightsBackendObject.isPublished()).toEqual(null);
+    expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(null);
+    expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(null);
   });
 
   it('should make a copy from another topic rights', function() {
@@ -84,7 +84,7 @@ describe('Topic rights object factory', function() {
 
     expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
     expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(true);
-    expect(emptyTopicRightsBackendObject.getCanPublishTopic()).toEqual(true);
-    expect(emptyTopicRightsBackendObject.getCanEditName()).toEqual(true);
+    expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(true);
+    expect(emptyTopicRightsBackendObject.canEditName()).toEqual(true);
   });
 });

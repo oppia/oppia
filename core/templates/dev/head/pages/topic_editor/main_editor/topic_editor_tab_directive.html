@@ -4,7 +4,7 @@
       <span ng-if="!topicNameEditorIsShown" ng-click="openTopicNameEditor()"
             class="oppia-editable-section">
         <strong style="font-size: 1.2em;"><[topic.getName()]></strong>
-        <i ng-if="topicRights.getCanEditName()" class="material-icons oppia-editor-edit-icon"
+        <i ng-if="topicRights.canEditName()" class="material-icons oppia-editor-edit-icon"
            title="Edit Topic Name">&#xE254;
         </i>
       </span>

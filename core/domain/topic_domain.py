@@ -154,8 +154,7 @@ class TopicRightsChange(object):
                 key, and one or more other keys. The keys depend on what the
                 value for 'cmd' is. The possible values for 'cmd' are listed
                 below, together with the other keys in the dict:
-                - 'change_role' (with assignee_id, new_role
-                and old_role)
+                - 'change_role' (with assignee_id, new_role and old_role)
                 - 'create_new'
                 - 'publish_topic'
                 - 'unpublish_topic'

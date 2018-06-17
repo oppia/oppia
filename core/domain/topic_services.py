@@ -708,16 +708,19 @@ def publish_topic(topic_id, committer_id):
 
     Raises:
         Exception. The given topic does not exist.
+        Exception. The topic is already published.
         Exception. The user does not have enough rights to publish the topic.
     """
     topic_rights = get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
         raise Exception('The given topic does not exist')
-    user_actions_info = user_services.UserActionsInfo(committer_id)
-    if not check_can_edit_topic(user_actions_info, topic_rights):
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to publish the topic.')
 
+    if topic_rights.topic_is_published:
+        raise Exception('The topic is already published.')
     topic_rights.topic_is_published = True
     commit_cmds = [topic_domain.TopicRightsChange({
         'cmd': topic_domain.CMD_PUBLISH_TOPIC
@@ -735,16 +738,19 @@ def unpublish_topic(topic_id, committer_id):
 
     Raises:
         Exception. The given topic does not exist.
+        Exception. The topic is already unpublished.
         Exception. The user does not have enough rights to unpublish the topic.
     """
     topic_rights = get_topic_rights(topic_id, strict=False)
     if topic_rights is None:
         raise Exception('The given topic does not exist')
-    user_actions_info = user_services.UserActionsInfo(committer_id)
-    if not check_can_edit_topic(user_actions_info, topic_rights):
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
         raise Exception(
             'The user does not have enough rights to unpublish the topic.')
 
+    if not topic_rights.topic_is_published:
+        raise Exception('The topic is already unpublished.')
     topic_rights.topic_is_published = False
     commit_cmds = [topic_domain.TopicRightsChange({
         'cmd': topic_domain.CMD_UNPUBLISH_TOPIC
@@ -818,13 +824,14 @@ def get_all_topic_rights():
     """Returns the rights object of all topics present in the datastore.
 
     Returns:
-        list(TopicRights). The list of right objects of all topics present in
-            the datastore.
+        dict. The dict of right objects of all topics present in
+            the datastore keyed by topic id.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_all()
-    topic_rights = [
-        get_topic_rights_from_model(model)
-        for model in topic_rights_models]
+    topic_rights = {}
+    for model in topic_rights_models:
+        rights = get_topic_rights_from_model(model)
+        topic_rights[rights.id] = rights
     return topic_rights
 
 

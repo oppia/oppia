@@ -377,10 +377,9 @@ class TopicRightsHandlerTest(BaseTopicEditorControllerTest):
             json_response = self.get_json(
                 '%s/%s' % (
                     feconf.TOPIC_RIGHTS_URL_PREFIX, self.topic_id))
-            self.assertEqual(json_response['is_published'], False)
+            self.assertEqual(json_response['published'], False)
             self.assertEqual(json_response['can_publish_topic'], True)
             self.logout()
-
 
             self.login(self.NEW_USER_EMAIL)
             # Test that other users cannot access topic rights.

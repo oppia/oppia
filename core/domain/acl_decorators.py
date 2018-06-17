@@ -1031,12 +1031,10 @@ def can_access_topics_and_skills_dashboard(handler):
     return test_can_access_topics_and_skills_dashboard
 
 
-def can_visit_any_topic_editor(handler):
-    """Decorator to check whether the user can access the topics and skills
-    dashboard.
-    """
+def can_view_any_topic_editor(handler):
+    """Decorator to check whether the user can view any topic editor."""
 
-    def test_can_visit_any_topic_editor(self, **kwargs):
+    def test_can_view_any_topic_editor(self, **kwargs):
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -1050,9 +1048,9 @@ def can_visit_any_topic_editor(handler):
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to access the topics and skills'
                 ' dashboard.' % self.user_id)
-    test_can_visit_any_topic_editor.__wrapped__ = True
+    test_can_view_any_topic_editor.__wrapped__ = True
 
-    return test_can_visit_any_topic_editor
+    return test_can_view_any_topic_editor
 
 
 def can_manage_rights_for_topic(handler):
@@ -1087,7 +1085,7 @@ def can_change_topic_publication_status(handler):
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
         if (
-                role_services.ACTION_PUBLISH_TOPIC in
+                role_services.ACTION_CHANGE_TOPIC_STATUS in
                 user_actions_info.actions):
             return handler(self, **kwargs)
         else:

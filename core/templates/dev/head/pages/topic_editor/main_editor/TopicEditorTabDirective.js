@@ -46,7 +46,7 @@ oppia.directive('topicMainEditor', [
           $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
 
           $scope.openTopicNameEditor = function() {
-            if (!$scope.topicRights.getCanEditName()) {
+            if (!$scope.topicRights.canEditName()) {
               return;
             }
             $scope.topicNameEditorIsShown = true;
@@ -54,7 +54,7 @@ oppia.directive('topicMainEditor', [
           };
 
           $scope.closeTopicNameEditor = function() {
-            if (!$scope.topicRights.getCanEditName()) {
+            if (!$scope.topicRights.canEditName()) {
               return;
             }
             $scope.topicNameEditorIsShown = false;

@@ -64,7 +64,7 @@ class NewStoryHandler(base.BaseHandler):
 class TopicEditorPage(base.BaseHandler):
     """The editor page for a single topic."""
 
-    @acl_decorators.can_visit_any_topic_editor
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Handles GET requests."""
 
@@ -147,7 +147,7 @@ class EditableTopicDataHandler(base.BaseHandler):
                 'which is too old. Please reload the page and try again.'
                 % (topic_version, version_from_payload))
 
-    @acl_decorators.can_visit_any_topic_editor
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Populates the data on the individual topic page."""
         if not feconf.ENABLE_NEW_STRUCTURES:
@@ -231,7 +231,7 @@ class EditableTopicDataHandler(base.BaseHandler):
 class TopicRightsHandler(base.BaseHandler):
     """A handler for returning topic rights."""
 
-    @acl_decorators.can_visit_any_topic_editor
+    @acl_decorators.can_view_any_topic_editor
     def get(self, topic_id):
         """Returns the TopicRights object of a topic."""
         topic_domain.Topic.require_valid_topic_id(topic_id)
@@ -239,18 +239,18 @@ class TopicRightsHandler(base.BaseHandler):
         topic_rights = topic_services.get_topic_rights(topic_id, strict=False)
         if topic_rights is None:
             raise self.InvalidInputException(
-                Exception('Expected a valid topic id to be provided.'))
+                'Expected a valid topic id to be provided.')
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         can_edit_topic = topic_services.check_can_edit_topic(
             user_actions_info, topic_rights)
 
-        can_publish_topic = False
-        if role_services.ACTION_PUBLISH_TOPIC in user_actions_info.actions:
-            can_publish_topic = True
+        can_publish_topic = (
+            role_services.ACTION_CHANGE_TOPIC_STATUS in
+            user_actions_info.actions)
 
         self.values.update({
             'can_edit_topic': can_edit_topic,
-            'is_published': topic_rights.topic_is_published,
+            'published': topic_rights.topic_is_published,
             'can_publish_topic': can_publish_topic
         })
 
@@ -269,7 +269,7 @@ class TopicManagerRightsHandler(base.BaseHandler):
 
         if assignee_id is None:
             raise self.InvalidInputException(
-                Exception('Expected a valid assignee id to be provided.'))
+                'Expected a valid assignee id to be provided.')
         assignee_actions_info = user_services.UserActionsInfo(assignee_id)
         user_actions_info = user_services.UserActionsInfo(self.user_id)
         try:
@@ -287,15 +287,14 @@ class TopicPublishHandler(base.BaseHandler):
 
     @acl_decorators.can_change_topic_publication_status
     def put(self, topic_id):
-        """Publishes or unpublishes a topic.
-        """
+        """Publishes or unpublishes a topic."""
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
         publish_status = self.payload.get('publish_status')
 
         if not isinstance(publish_status, bool):
             raise self.InvalidInputException(
-                Exception('Publish status should only be true or false.'))
+                'Publish status should only be true or false.')
 
         try:
             if publish_status:

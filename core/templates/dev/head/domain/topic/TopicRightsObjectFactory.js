@@ -19,10 +19,10 @@
 
 oppia.factory('TopicRightsObjectFactory', [
   function() {
-    var TopicRights = function(topicRightsObject) {
-      this._published = topicRightsObject.is_published;
-      this._canPublishTopic = topicRightsObject.can_publish_topic;
-      this._canEditTopic = topicRightsObject.can_edit_topic;
+    var TopicRights = function(topicRightsBackendObject) {
+      this._published = topicRightsBackendObject.published;
+      this._canPublishTopic = topicRightsBackendObject.can_publish_topic;
+      this._canEditTopic = topicRightsBackendObject.can_edit_topic;
     };
 
     // Instance methods
@@ -35,31 +35,31 @@ oppia.factory('TopicRightsObjectFactory', [
       return this._published;
     };
 
-    TopicRights.prototype.getCanPublishTopic = function() {
+    TopicRights.prototype.canPublishTopic = function() {
       return this._canPublishTopic;
     };
 
     // Currently only admins can publish/unpublish a topic or edit it's name.
-    TopicRights.prototype.getCanEditName = function() {
+    TopicRights.prototype.canEditName = function() {
       return this._canPublishTopic;
     };
 
-    // Sets _isPublished to true only if the user can edit the
+    // Sets _isPublished to true only if the user can publish the
     // corresponding topic.
-    TopicRights.prototype.publishTopic = function() {
+    TopicRights.prototype.markTopicAsPublished = function() {
       if (this._canPublishTopic) {
         this._published = true;
       } else {
-        throw new Error('User is not allowed to edit this topic.');
+        throw new Error('User is not allowed to publish this topic.');
       }
     };
 
-    // Sets _isPublished to false if user can edit the topic.
-    TopicRights.prototype.unpublishTopic = function() {
+    // Sets _isPublished to false if user can unpublish the topic.
+    TopicRights.prototype.markTopicAsUnpublished = function() {
       if (this._canPublishTopic) {
         this._published = false;
       } else {
-        throw new Error('User is not allowed to edit this topic.');
+        throw new Error('User is not allowed to unpublish this topic.');
       }
     };
 
@@ -75,13 +75,17 @@ oppia.factory('TopicRightsObjectFactory', [
     TopicRights.prototype.copyFromTopicRights = function(otherTopicRights) {
       this._published = otherTopicRights.isPublished();
       this._canEditTopic = otherTopicRights.canEditTopic();
-      this._canPublishTopic = otherTopicRights.getCanPublishTopic();
+      this._canPublishTopic = otherTopicRights.canPublishTopic();
     };
 
     // Create a new, empty topic rights object. This is not guaranteed to
     // pass validation tests.
     TopicRights.createEmptyTopicRights = function() {
-      return new TopicRights({});
+      return new TopicRights({
+        published: null,
+        can_publish_topic: null,
+        can_edit_topic: null
+      });
     };
 
     return TopicRights;

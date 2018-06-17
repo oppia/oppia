@@ -10,8 +10,8 @@
            alt="Save Topic">&#xE161;</i>
         <span class="oppia-save-publish-button-label">Save Changes</span>
         <span class="hidden-sm hidden-xs" style="opacity: 0.5"
-              ng-if="getChangeListCount() > 0">
-          (<[getChangeListCount()]>)
+              ng-if="getChangeListLength() > 0">
+          (<[getChangeListLength()]>)
         </span>
       </span>
 
@@ -21,7 +21,7 @@
       </span>
     </button>
 
-    <button type="button" ng-if="!topicRights.isPublished() && topicRights.getCanPublishTopic()"
+    <button type="button" ng-if="!topicRights.isPublished() && topicRights.canPublishTopic()"
             class="btn btn-success oppia-editor-publish-button"
             ng-click="publishTopic()">
       <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
@@ -29,7 +29,7 @@
       <span class="oppia-save-publish-button-label">Publish Topic</span>
     </button>
     <button type="button" ng-click="unpublishTopic()"
-            ng-if="topicRights.isPublished() && topicRights.getCanPublishTopic()"
+            ng-if="topicRights.isPublished() && topicRights.canPublishTopic()"
             class="btn btn-default">
       Unpublish Topic
     </button>

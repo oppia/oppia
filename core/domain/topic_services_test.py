@@ -554,6 +554,11 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertFalse(topic_rights.topic_is_published)
         topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
 
+        with self.assertRaisesRegexp(
+            Exception,
+            'The user does not have enough rights to unpublish the topic.'):
+            topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_a)
+
         topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
         self.assertTrue(topic_rights.topic_is_published)
 
@@ -565,11 +570,6 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
             Exception,
             'The user does not have enough rights to publish the topic.'):
             topic_services.publish_topic(self.TOPIC_ID, self.user_id_a)
-
-        with self.assertRaisesRegexp(
-            Exception,
-            'The user does not have enough rights to unpublish the topic.'):
-            topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_a)
 
     def test_create_new_topic_rights(self):
         topic_services.assign_role(

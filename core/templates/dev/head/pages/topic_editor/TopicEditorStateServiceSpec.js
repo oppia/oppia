@@ -249,9 +249,9 @@ describe('Topic editor state service', function() {
 
   it('should initially return an empty topic rights', function() {
     var topicRights = TopicEditorStateService.getTopicRights();
-    expect(topicRights.canEditTopic()).toBeUndefined();
-    expect(topicRights.getCanPublishTopic()).toBeUndefined();
-    expect(topicRights.isPublished()).toBeUndefined();
+    expect(topicRights.canEditTopic()).toEqual(null);
+    expect(topicRights.canPublishTopic()).toEqual(null);
+    expect(topicRights.isPublished()).toEqual(null);
   });
 
   it('should be able to set a new topic with an in-place copy',
