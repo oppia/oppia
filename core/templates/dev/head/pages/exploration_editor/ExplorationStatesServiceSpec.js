@@ -100,7 +100,7 @@ describe('ExplorationStatesService', function() {
         });
       });
 
-      it('callsback when a new state is added', function() {
+      it('does not accept duplicate callbacks', function() {
         var callbackSpy = jasmine.createSpy('callback');
 
         this.ess.registerOnStateDeletedCallback(callbackSpy);
