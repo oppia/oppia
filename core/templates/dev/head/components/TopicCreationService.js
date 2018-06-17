@@ -53,7 +53,6 @@ oppia.factory('TopicCreationService', [
           if (topicName === '') {
             throw Error('Topic name cannot be empty');
           }
-          console.log(topicName);
           topicCreationInProgress = true;
           AlertsService.clearWarnings();
 
