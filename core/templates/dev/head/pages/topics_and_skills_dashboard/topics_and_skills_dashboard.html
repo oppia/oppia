@@ -46,7 +46,7 @@
       </ul>
 
       <div ng-if="activeTab === TAB_NAME_TOPICS">
-        <topics-list topic-summaries="topicSummaries"></topics-list>
+        <topics-list topic-summaries="topicSummaries" can-delete-topic="canDeleteTopic"></topics-list>
       </div>
 
       <div ng-if="activeTab === TAB_NAME_SKILLS">
@@ -211,5 +211,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsListDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/EditableTopicBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
 {% endblock footer_js %}

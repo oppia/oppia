@@ -46,6 +46,9 @@
           <span ng-if="!topic.is_published"> Not Published </span>
         </a>
       </td>
+      <td ng-if="getCanDeleteTopic()">
+        <span ng-click="deleteTopic(topic.id)" class="fa fa-trash list-summary"> </span>
+      </td>
     </tr>
   </table>
 </md-card>

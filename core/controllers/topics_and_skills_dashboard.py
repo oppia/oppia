@@ -71,9 +71,12 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                 topic_summary[
                     'is_published'] = topic_rights.topic_is_published
 
+        can_delete_topic = (
+            role_services.ACTION_EDIT_ANY_TOPIC in self.user.actions)
         self.values.update({
             'skill_summary_dicts': skill_summary_dicts,
-            'topic_summary_dicts': topic_summary_dicts
+            'topic_summary_dicts': topic_summary_dicts,
+            'can_delete_topic': can_delete_topic
         })
         self.render_json(self.values)
 
