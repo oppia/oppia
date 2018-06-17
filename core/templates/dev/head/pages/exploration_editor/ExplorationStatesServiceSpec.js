@@ -21,8 +21,8 @@ describe('ExplorationStatesService', function() {
 
   beforeEach(inject(function($injector) {
     this.ess = $injector.get('ExplorationStatesService');
-    this.ecs = $injector.get('ExplorationContextService');
-    spyOn(this.ecs, 'getExplorationId').and.returnValue('7');
+    spyOn($injector.get('ExplorationContextService'), 'getExplorationId')
+      .and.returnValue('7');
   }));
 
   describe('Callback Registration', function() {
