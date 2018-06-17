@@ -51,7 +51,7 @@ describe('ExplorationStatesService', function() {
     beforeEach(inject(function($injector) {
       this.cls = $injector.get('ChangeListService');
       // Mock all calls to ChangeListService since it isn't configured
-      // correctly in or interesting to the tests of this describe block.
+      // correctly in, or interesting to, the tests of this describe block.
       spyOn(this.cls, 'addState');
       spyOn(this.cls, 'deleteState');
       spyOn(this.cls, 'renameState');
