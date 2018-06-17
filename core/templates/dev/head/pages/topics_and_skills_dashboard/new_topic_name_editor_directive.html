@@ -1,0 +1,27 @@
+<div class="modal-header">
+  <h3>
+    Enter Topic Name
+  </h3>
+</div>
+<div class="modal-body new-topic-name-editor" ng-class="{'has-error': isTopicNameEmpty}">
+  <p>
+    Enter the name for the topic: &nbsp;
+    <input class="form-group" ng-model="topicName"
+           ng-change="isTopicNameEmpty = (topicName === '')">
+    <span ng-if="isTopicNameEmpty" class="help-block" style="font-size: smaller">
+     A name is required to create a topic.
+    </span>
+  </p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success" ng-disabled="isTopicNameEmpty" ng-click="save(topicName)">
+    <span>Create Topic</span>
+  </button>
+</div>
+<style>
+  .new-topic-name-editor .help-block {
+    margin-left: 37.5%;
+    margin-top: -3%;
+  }
+</style>

@@ -23,8 +23,13 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/' +
         'topics_and_skills_dashboard_navbar_directive.html'),
-      controller: [
-        function() {}
+      controller: ['$scope', 'TopicCreationService',
+        function($scope, TopicCreationService) {
+          $scope.canCreateTopic = GLOBALS.canCreateTopic;
+          $scope.createTopic = function() {
+            TopicCreationService.createNewTopic();
+          };
+        }
       ]
     };
   }]);

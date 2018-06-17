@@ -18,6 +18,7 @@ are created.
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
@@ -34,8 +35,12 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
+        can_create_topic = (
+            role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
+
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD
+            'nav_mode': feconf.NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD,
+            'can_create_topic': can_create_topic
         })
         self.render_template(
             'pages/topics_and_skills_dashboard/'
