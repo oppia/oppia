@@ -55,7 +55,7 @@ oppia.factory('StateTopAnswersStatsService', [
       var unresolvedAnswersCacheEntry =
         stateTopAnswersStatsCache[stateName].unresolvedAnswers;
 
-      // Clear the unresolved answers array since many answers may now have
+      // Clear the unresolvedAnswers array since many answers may now have
       // different "addressed" values.
       unresolvedAnswersCacheEntry.length = 0;
 
@@ -84,9 +84,12 @@ oppia.factory('StateTopAnswersStatsService', [
     };
 
     var onStateRenamed = function(oldStateName, newStateName) {
-      stateTopAnswersStatsCache[newStateName] =
-        stateTopAnswersStatsCache[oldStateName];
-      delete stateTopAnswersStatsCache[oldStateName];
+      onStateAdded(newStateName);
+      // Swap the values before deleting.
+      var cache = stateTopAnswersStatsCache;
+      cache[newStateName] =
+        [cache[oldStateName], (cache[oldStateName] = cache[newStateName])][0];
+      onStateDeleted(oldStateName);
     };
 
     var onStateInteractionAnswerGroupsSaved = function(stateName) {
