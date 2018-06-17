@@ -241,7 +241,7 @@ oppia.directive('answerGroupEditor', [
           };
 
           $scope.openTrainingDataEditor = function() {
-            TrainingDataEditorPanelService.openTrainingDataEditor(true);
+            TrainingDataEditorPanelService.openTrainingDataEditor();
           };
 
           $scope.$on('onInteractionIdChanged', function() {

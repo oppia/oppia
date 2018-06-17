@@ -111,8 +111,7 @@ oppia.factory('AnswerClassificationService', [
         var interactionIsTrainable = INTERACTION_SPECS[
           oldState.interaction.id].is_trainable;
 
-        if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
-            ENABLE_ML_CLASSIFIERS) {
+        if (ruleBasedOutcomeIsDefault && interactionIsTrainable) {
           for (var i = 0; i < answerGroups.length; i++) {
             if (answerGroups[i].trainingData) {
               for (var j = 0; j < answerGroups[i].trainingData.length; j++) {

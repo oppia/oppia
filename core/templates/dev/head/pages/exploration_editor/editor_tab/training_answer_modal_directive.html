@@ -16,10 +16,10 @@
     <div class="trained-feedback-selection-form-container">
       <form>
         <div class="trained-feedback-selection-container" ng-repeat="outcome in allOutcomes track by $index">
-          <button class="trained-feedback-selection" ng-click="confirmAnswerGroupIndex($index)">
-            <span ng-if="outcome.feedback.length > 0" angular-html-bind="outcome.feedback.getHtml()">
+          <button class="trained-feedback-selection" ng-click="selectAnswerGroupIndex($index)" ng-class="{'trained-feedback-selected': $index == selectedAnswerGroupIndex}">
+            <span ng-if="!outcome.feedback.isEmpty()" angular-html-bind="outcome.feedback.getHtml()">
             </span>
-            <span ng-if="outcome.feedback.length == 0">
+            <span ng-if="outcome.feedback.isEmpty()">
               <em>(No feedback)</em>
             </span>
 
@@ -40,5 +40,7 @@
     <outcome-feedback-editor ng-if="addingNewResponse" outcome="classification.newOutcome">
     </outcome-feedback-editor>
     <button class="btn btn-default btn-success" ng-if="addingNewResponse" ng-click="confirmNewFeedback()">Save New Response</button>
+    <button class="btn btn-default" ng-if="addingNewResponse" ng-click="cancelAddingNewResponse()">Cancel</button>
+    <button style="float: right;" class="btn btn-default btn-success" ng-if="selectedAnswerGroupIndex >= 0 && !addingNewResponse" ng-click="onConfirm()">Confirm</button>
   </div>
 </div>

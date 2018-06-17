@@ -26,16 +26,21 @@
   </ul>
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="trainingData">
-      <div ng-show="trainingData.length > 0">
+      <div ng-show="trainingData.length === 0">
+        Try adding answers to training data to see them here.
+      </div>
+      <div ng-show="trainingData.length === 1">
+        <div class="training-data-answer">
+          <div class="training-data-answer-html" angular-html-bind="trainingData[0].answerTemplate"></div>
+        </div>
+      </div>
+      <div ng-show="trainingData.length > 1">
         <div ng-repeat="answer in trainingData track by $index" class="training-data-answer" ng-click="openTrainUnresolvedAnswerModal($index)">
           <div class="training-data-answer-html" angular-html-bind="answer.answerTemplate"></div>
-          <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response" ng-click="removeAnswerFromTrainingData($index)">
+          <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response" ng-click="removeAnswerFromTrainingData($index)" ng-if="trainingData.length > 1">
             <i class="material-icons md-24"></i>
           </span>
         </div>
-      </div>
-      <div ng-show="trainingData.length === 0">
-        Try adding answers to training data to see them here.
       </div>
     </div>
     <div role="tabpanel" class="tab-pane" id="addNewAnswer">
@@ -58,8 +63,11 @@
         </div>
 
         <div>
-          <div angular-html-bind="newAnswerFeedbackHtml || 'Nothing'">
-          </div>
+          <span ng-if="!newAnswerFeedback.isEmpty()" angular-html-bind="newAnswerFeedback.getHtml()">
+          </span>
+          <span ng-if="newAnswerFeedback.isEmpty()">
+            <em>Nothing</em>
+          </span>
         </div>
 
         <br>

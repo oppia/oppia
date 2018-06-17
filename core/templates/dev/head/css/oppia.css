@@ -2379,7 +2379,7 @@ md-card.preview-conversation-skin-supplemental-card {
   width: 100%;
 }
 
-.trained-feedback-selection:hover {
+.trained-feedback-selection:hover, .trained-feedback-selected {
   color: #00897B;
 }
 

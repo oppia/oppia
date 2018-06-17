@@ -40,6 +40,10 @@
   answer-group-editor .oppia-delete-rule-button:hover {
     opacity: 1;
   }
+
+  answer-group-editor .oppia-modify-training-data-button {
+    margin-top: 4%;
+  }
 </style>
 
 <div style="height: 100%;">
@@ -83,8 +87,7 @@
     </button>
 
     <div ng-if="isCurrentInteractionTrainable()">
-      <br>
-      <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="openTrainingDataEditor()">
+      <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer oppia-modify-training-data-button" ng-click="openTrainingDataEditor()">
         <i class="material-icons md-24">playlist_add</i> Modify Training Data
       </button>
     </div>

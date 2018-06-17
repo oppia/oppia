@@ -118,13 +118,15 @@ oppia.directive('trainingPanel', [
         'TrainingDataService', 'ResponsesService', 'stateInteractionIdService',
         'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
         'OutcomeObjectFactory', 'GenerateContentIdService',
-        'COMPONENT_NAME_FEEDBACK', function(
+        'COMPONENT_NAME_FEEDBACK', 'stateContentIdsToAudioTranslationsService',
+        function(
             $scope, ExplorationHtmlFormatterService,
             EditorStateService, ExplorationStatesService,
             TrainingDataService, ResponsesService, stateInteractionIdService,
             stateCustomizationArgsService, AnswerGroupObjectFactory,
             OutcomeObjectFactory, GenerateContentIdService,
-            COMPONENT_NAME_FEEDBACK) {
+            COMPONENT_NAME_FEEDBACK,
+            stateContentIdsToAudioTranslationsService) {
           $scope.addingNewResponse = false;
 
           var _stateName = EditorStateService.getActiveStateName();
@@ -141,6 +143,17 @@ oppia.directive('trainingPanel', [
 
           $scope.$watch('answer', _updateAnswerTemplate);
           _updateAnswerTemplate();
+          $scope.selectedAnswerGroupIndex = -1;
+
+          var _saveNewAnswerGroup = function(newAnswerGroup) {
+            var answerGroups = ResponsesService.getAnswerGroups();
+            answerGroups.push(newAnswerGroup);
+            ResponsesService.save(
+              answerGroups, ResponsesService.getDefaultOutcome());
+            stateContentIdsToAudioTranslationsService.displayed.addContentId(
+              newAnswerGroup.outcome.feedback.getContentId());
+            stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+          };
 
           $scope.getCurrentStateName = function() {
             return EditorStateService.getActiveStateName();
@@ -154,35 +167,40 @@ oppia.directive('trainingPanel', [
             $scope.addingNewResponse = true;
           };
 
-          $scope.confirmAnswerGroupIndex = function(index) {
+          $scope.cancelAddingNewResponse = function() {
+            $scope.addingNewResponse = false;
+            $scope.classification.newOutcome = null;
+          };
+
+          $scope.selectAnswerGroupIndex = function(index) {
+            $scope.selectedAnswerGroupIndex = index;
+          };
+
+          $scope.onConfirm = function() {
+            var index = $scope.selectedAnswerGroupIndex;
             $scope.classification.answerGroupIndex = index;
 
-            if (index === ResponsesService.getAnswerGroupCount()) {
+            if (index > ResponsesService.getAnswerGroupCount()) {
+              var newOutcome = $scope.allOutcomes[index];
+              var newAnswerGroup = AnswerGroupObjectFactory.createNew(
+                [], angular.copy(newOutcome), [$scope.answer], null);
+              _saveNewAnswerGroup(newAnswerGroup);
+            } else if (index === ResponsesService.getAnswerGroupCount()) {
               TrainingDataService.associateWithDefaultResponse($scope.answer);
             } else {
               TrainingDataService.associateWithAnswerGroup(
                 index, $scope.answer);
             }
-
             $scope.onFinishTraining();
           };
 
           $scope.confirmNewFeedback = function() {
             if ($scope.classification.newOutcome) {
-              // Create a new answer group with the given feedback.
-              var answerGroups = ResponsesService.getAnswerGroups();
-              answerGroups.push(AnswerGroupObjectFactory.createNew(
-                [], angular.copy($scope.classification.newOutcome), [], null));
-              ResponsesService.save(
-                answerGroups, ResponsesService.getDefaultOutcome());
-
-              // Train the group with the answer.
-              var index = ResponsesService.getAnswerGroupCount() - 1;
-              TrainingDataService.associateWithAnswerGroup(
-                index, $scope.answer);
+              // Push the new outcome at the end of the all outcomes.
+              $scope.allOutcomes.push($scope.classification.newOutcome);
+              $scope.selectedAnswerGroupIndex = $scope.allOutcomes.length - 1;
+              $scope.addingNewResponse = false;
             }
-
-            $scope.onFinishTraining();
           };
         }
       ]

@@ -23,15 +23,9 @@ oppia.factory('TrainingDataEditorPanelService', [
     return {
       /**
       * Opens training data editor for currently selected answer group.
-      * @param {boolean} externalSave - Whether to save the modified training
-           data externally in state.
       */
-      openTrainingDataEditor: function(externalSave) {
+      openTrainingDataEditor: function() {
         AlertsService.clearWarnings();
-        if (externalSave) {
-          // Save the modified training data externally in state's content.
-          $rootScope.$broadcast('externalSave');
-        }
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
@@ -60,13 +54,13 @@ oppia.factory('TrainingDataEditorPanelService', [
               var answerGroupIndex = (
                 ResponsesService.getActiveAnswerGroupIndex());
 
-              var TEST_INTERACTION_INPUT = 'testInteractionInput';
+              var FOCUS_LABEL_TEST_INTERACTION_INPUT = 'testInteractionInput';
               $scope.stateContent = _state.content.getHtml();
               $scope.inputTemplate = (
                 ExplorationHtmlFormatterService.getInteractionHtml(
                   stateInteractionIdService.savedMemento,
                   stateCustomizationArgsService.savedMemento,
-                  false, TEST_INTERACTION_INPUT));
+                  false, FOCUS_LABEL_TEST_INTERACTION_INPUT));
               $scope.trainingData = [];
 
               var _rebuildTrainingData = function() {
@@ -88,7 +82,8 @@ oppia.factory('TrainingDataEditorPanelService', [
                 _rebuildTrainingData();
                 $scope.newAnswerIsAlreadyResolved = false;
                 $scope.answerSuccessfullyAdded = false;
-                FocusManagerService.setFocus(TEST_INTERACTION_INPUT);
+                FocusManagerService.setFocus(
+                  FOCUS_LABEL_TEST_INTERACTION_INPUT);
               };
 
               $scope.removeAnswerFromTrainingData = function(answerIndex) {
@@ -124,18 +119,14 @@ oppia.factory('TrainingDataEditorPanelService', [
                   AnswerClassificationService.getMatchingClassificationResult(
                     _explorationId, _stateName, _state,
                     newAnswer, rulesService));
-                var newAnswerFeedbackHtml = '';
                 var newAnswerOutcomeDest = classificationResult.outcome.dest;
-                if (classificationResult.outcome.hasNonemptyFeedback()) {
-                  newAnswerFeedbackHtml = (
-                    classificationResult.outcome.feedback.getHtml());
-                }
+                var newAnswerFeedback = classificationResult.outcome.feedback;
                 if (newAnswerOutcomeDest === _stateName) {
                   newAnswerOutcomeDest = '(try again)';
                 }
 
                 $scope.newAnswerTemplate = newAnswerTemplate;
-                $scope.newAnswerFeedbackHtml = newAnswerFeedbackHtml;
+                $scope.newAnswerFeedback = newAnswerFeedback;
                 $scope.newAnswerOutcomeDest = newAnswerOutcomeDest;
 
                 var classificationType = (
@@ -155,14 +146,19 @@ oppia.factory('TrainingDataEditorPanelService', [
               };
 
               $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
-                var answer = $scope.trainingData[answerIndex].answer;
-                return TrainingModalService.openTrainUnresolvedAnswerModal(
-                  answer, true, _rebuildTrainingData());
+                if ($scope.trainingData.length > 1) {
+                  var answer = $scope.trainingData[answerIndex].answer;
+                  return TrainingModalService.openTrainUnresolvedAnswerModal(
+                    answer, _rebuildTrainingData);
+                }
+                return;
               };
 
               $scope.init();
             }]
         });
+        // Save the modified training data externally in state content.
+        $rootScope.$broadcast('externalSave');
       }
     };
   }

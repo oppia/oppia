@@ -23,18 +23,13 @@ oppia.factory('TrainingModalService', [
     return {
       /**
       * Opens unresolved answer trainer modal for given answer.
-      * @param {Object} - unhandledAnswer The answer to be trained.
-      * @param {Boolean} externalSave - Whether to save the modified training
-          data externally in state.
+      * @param {Object} unhandledAnswer - The answer to be trained.
       * @param {requestCallback} finishTrainingCallback - Function to call when
           answer has been trained.
       */
       openTrainUnresolvedAnswerModal: function(
-          unhandledAnswer, externalSave, finishTrainingCallback) {
+          unhandledAnswer, finishTrainingCallback) {
         AlertsService.clearWarnings();
-        if (externalSave) {
-          $rootScope.$broadcast('externalSave');
-        }
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
@@ -117,6 +112,8 @@ oppia.factory('TrainingModalService', [
               $scope.init();
             }]
         });
+        // Save the modified training data externally in state content.
+        $rootScope.$broadcast('externalSave');
       }
     };
   }
