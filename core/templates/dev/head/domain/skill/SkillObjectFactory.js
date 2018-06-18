@@ -73,7 +73,11 @@ oppia.factory('SkillObjectFactory', [
 
     Skill.prototype.getId = function() {
       return this._id;
-    }
+    };
+
+    Skill.prototype.getConceptCard = function() {
+      return this._conceptCard;
+    };
 
     return Skill;
   }

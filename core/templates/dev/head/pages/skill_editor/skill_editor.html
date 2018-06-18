@@ -28,6 +28,7 @@
   {{ super() }}
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillEditorMainTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillConceptCardEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditorStateService.js"></script>
 
@@ -38,4 +39,9 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/SkillUpdateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
 {% endblock footer_js %}

@@ -18,6 +18,14 @@ oppia.factory('ConceptCardObjectFactory', [
         conceptCardBackendDict.worked_examples);
     };
 
+    ConceptCard.prototype.getExplanation = function() {
+      return this.explanation;
+    };
+
+    ConceptCard.prototype.setExplanation = function(explanation) {
+      this.explanation = explanation;
+    };
+
     return ConceptCard;    
   }
 ]);

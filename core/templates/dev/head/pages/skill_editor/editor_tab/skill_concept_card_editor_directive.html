@@ -1,0 +1,44 @@
+<md-card class="oppia-editor-card-with-avatar">
+  <div class="oppia-editor-card-body">
+    <img ng-src="<[oppiaBlackImgUrl]>" alt="" class="oppia-editor-card-avatar">
+    <div class="oppia-editor-card-section"
+         style="padding-bottom: 36px;">
+      <span><b>Explanation</b></span>
+      <div ng-if="!conceptCardExplanationEditorIsShown">
+        <div ng-class="oppia-editable-section"
+             ng-click="openConceptCardExplanationEditor()">
+          <i class="material-icons oppia-editor-edit-icon"
+             title="Edit Concept Card Explanation">&#xE254;
+          </i>
+          <div class="oppia-state-content-display oppia-transition-200"
+               ng-class="oppia-prevent-selection"
+               title="Concept Card Explanation">
+            <span class="oppia-placeholder">
+                Give a review or explanation of the skill.
+            </span>
+            <span angular-html-bind="skill.getConceptCard().getExplanation()"
+                  class="oppia-rte-editor">
+            </span>
+          </div>
+          <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
+          <div class="oppia-editable-section-mask">
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="conceptCardExplanationEditorIsShown">
+        <schema-based-editor schema="HTML_SCHEMA" local-value="skill.getConceptCard().explanation">
+        </schema-based-editor>
+        <div style="margin-top: 2px;">
+          <button type="button"
+                  class="btn btn-success oppia-save-state-item-button pull-right"
+                  ng-click="saveConceptCardExplanation()">
+            Save
+          </button>
+          <button type="button" class="btn btn-default pull-right" ng-click="closeConceptCardExplanationEditor()">Cancel</button>
+          <div style="clear: both;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</md-card>

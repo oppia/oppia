@@ -48,9 +48,9 @@ oppia.factory('SkillUpdateService', [
     };
 
     var _applyPropertyChange = function(
-      skill, proprtyName, newValue, oldValue, apply, reverse) {
+      skill, propertyName, newValue, oldValue, apply, reverse) {
       _applyChange(skill, CMD_UPDATE_SKILL_PROPERTY, {
-        property_name: proprtyName,
+        property_name: propertyName,
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue),
       }, apply, reverse);
@@ -72,10 +72,24 @@ oppia.factory('SkillUpdateService', [
           function(changeDict, skill) {
             var description = _getNewPropertyValueFromChangeDict(changeDict);
             skill.setDescription(description);
-          }, function(changeDict, collection) {
+          }, function(changeDict, skill) {
             skill.setDescription(oldDescription);
           });
-      }
+      },
+
+      setConceptCardExplanation: function(skill, oldExplanation, newExplanation) {
+        console.log(angular.copy(oldExplanation));
+        console.log(angular.copy(newExplanation));
+        _applyPropertyChange(
+          skill, SKILL_CONTENTS_PROPERTY_EXPLANATION,
+          newExplanation, oldExplanation,
+          function(changeDict, skill) {
+            var explanation = _getNewPropertyValueFromChangeDict(changeDict);
+            skill.getConceptCard().setExplanation(explanation);
+          }, function(changeDict, skill) {
+            skill.getConceptCard().setExplanation(oldExplanation);
+          });
+      },
     }
   }
 ]);
