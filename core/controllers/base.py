@@ -26,6 +26,7 @@ import time
 import traceback
 import urlparse
 
+from constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
@@ -331,7 +332,6 @@ class BaseHandler(webapp2.RequestHandler):
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'SITE_FEEDBACK_FORM_URL': feconf.SITE_FEEDBACK_FORM_URL,
             'SITE_NAME': feconf.SITE_NAME,
-            'SYSTEM_USERNAMES': feconf.SYSTEM_USERNAMES,
             'TEMPLATE_DIR_PREFIX': utils.get_template_dir_prefix(),
             'can_create_collections': bool(
                 role_services.ACTION_CREATE_COLLECTION in self.user.actions),
@@ -512,7 +512,7 @@ class CsrfTokenManager(object):
 
         # Initialize to random value.
         config_services.set_property(
-            feconf.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
+            constants.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
             base64.urlsafe_b64encode(os.urandom(20)))
 
     @classmethod

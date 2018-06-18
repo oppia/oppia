@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from constants import constants
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -205,8 +206,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
 
     def test_get_multi_versions(self):
         model1 = TestVersionedModel(id='model_id1')
-        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        model1.commit(constants.SYSTEM_COMMITTER_ID, '', [])
+        model1.commit(constants.SYSTEM_COMMITTER_ID, '', [])
 
         models_by_version = TestVersionedModel.get_multi_versions(
             'model_id1', [1, 2])
@@ -216,8 +217,8 @@ class VersionedModelTests(test_utils.GenericTestBase):
 
     def test_get_multi_versions_errors(self):
         model1 = TestVersionedModel(id='model_id1')
-        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
-        model1.commit(feconf.SYSTEM_COMMITTER_ID, '', [])
+        model1.commit(constants.SYSTEM_COMMITTER_ID, '', [])
+        model1.commit(constants.SYSTEM_COMMITTER_ID, '', [])
 
         with self.assertRaisesRegexp(
             ValueError,

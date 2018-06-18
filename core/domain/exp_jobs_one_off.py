@@ -76,7 +76,7 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if (item.commit_type != _COMMIT_TYPE_REVERT and
-                item.committer_id not in feconf.SYSTEM_USER_IDS):
+                item.committer_id not in constants.SYSTEM_USER_IDS):
             exp_id = item.get_unversioned_instance_id()
             yield (exp_id, item.committer_id)
 
@@ -218,7 +218,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
             })]
             exp_services.update_exploration(
-                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                constants.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update exploration states from schema version %d to %d.' % (
                     item.states_schema_version,
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))

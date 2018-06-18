@@ -24,7 +24,6 @@ from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
-import feconf
 import utils
 
 current_user_services = models.Registry.import_current_user_services()
@@ -368,7 +367,7 @@ def update_activity_first_published_msec(
     }]
     activity_rights.first_published_msec = first_published_msec
     _save_activity_rights(
-        feconf.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
+        constants.SYSTEM_COMMITTER_ID, activity_rights, activity_type,
         'set first published time in msec', commit_cmds)
 
 

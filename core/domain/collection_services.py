@@ -976,11 +976,11 @@ def compute_summary_of_collection(collection, contributor_id_to_add):
         contributors_summary = {}
 
     if (contributor_id_to_add is not None and
-            contributor_id_to_add not in feconf.SYSTEM_USER_IDS and
+            contributor_id_to_add not in constants.SYSTEM_USER_IDS and
             contributor_id_to_add not in contributor_ids):
         contributor_ids.append(contributor_id_to_add)
 
-    if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
+    if contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         if contributor_id_to_add is None:
             # Revert commit or other non-positive commit.
             contributors_summary = compute_collection_contributors_summary(
@@ -1027,7 +1027,7 @@ def compute_collection_contributors_summary(collection_id):
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
         is_revert = (snapshot_metadata['commit_type'] == 'revert')
-        if not is_revert and committer_id not in feconf.SYSTEM_USER_IDS:
+        if not is_revert and committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
 
         if current_version == 1:
@@ -1127,7 +1127,7 @@ def delete_demo(collection_id):
                      'does not exist.' % collection_id)
     else:
         delete_collection(
-            feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)
+            constants.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)
 
 
 def load_demo(collection_id):
@@ -1154,7 +1154,7 @@ def load_demo(collection_id):
         raise Exception('Unrecognized file path: %s' % demo_filepath)
 
     collection = save_new_collection_from_yaml(
-        feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
+        constants.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
 
     system_user = user_services.get_system_user()
     publish_collection_and_update_user_profiles(system_user, collection_id)

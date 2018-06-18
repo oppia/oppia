@@ -17,6 +17,7 @@
 import datetime
 import types
 
+from constants import constants
 from core.domain import config_services
 from core.domain import email_manager
 from core.domain import rights_manager
@@ -47,7 +48,7 @@ class EmailRightsTest(test_utils.GenericTestBase):
 
     def test_sender_id_validation(self):
         sender_ids_to_test = [
-            feconf.SYSTEM_COMMITTER_ID, self.admin_id, self.moderator_id,
+            constants.SYSTEM_COMMITTER_ID, self.admin_id, self.moderator_id,
             self.editor_id]
 
         # These are given in the order of user_ids_to_test.
@@ -77,13 +78,13 @@ class EmailRightsTest(test_utils.GenericTestBase):
         # Also test null and invalid intent strings.
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
             email_manager._require_sender_id_is_valid(
-                '', feconf.SYSTEM_COMMITTER_ID)
+                '', constants.SYSTEM_COMMITTER_ID)
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
             email_manager._require_sender_id_is_valid(
                 '', self.admin_id)
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
             email_manager._require_sender_id_is_valid(
-                'invalid_intent', feconf.SYSTEM_COMMITTER_ID)
+                'invalid_intent', constants.SYSTEM_COMMITTER_ID)
         with self.assertRaisesRegexp(Exception, 'Invalid email intent string'):
             email_manager._require_sender_id_is_valid(
                 'invalid_intent', self.admin_id)
@@ -165,7 +166,7 @@ class ExplorationMembershipEmailTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.NEW_USER_EMAIL)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, constants.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
                 '%s <%s>' % (
@@ -704,7 +705,7 @@ class SignupEmailTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.EDITOR_EMAIL)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, constants.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
                 'Email Sender <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
@@ -772,7 +773,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                constants.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 datetime.datetime.utcnow())
 
@@ -783,7 +784,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             # pylint: disable=protected-access
             email_manager._send_email(
-                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                self.new_user_id, constants.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
@@ -827,7 +828,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             # pylint: disable=protected-access
             email_manager._send_email(
-                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                self.new_user_id, constants.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
 
@@ -844,7 +845,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
             self.assertEqual(log_new_error_counter.times_called, 0)
 
             email_manager._send_email(
-                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                self.new_user_id, constants.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
@@ -876,7 +877,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             email_models.SentEmailModel.create(
                 'recipient_id', self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                constants.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 datetime.datetime.utcnow())
 
@@ -887,7 +888,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             # pylint: disable=protected-access
             email_manager._send_email(
-                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                self.new_user_id, constants.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
@@ -928,7 +929,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                constants.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject1', 'Email Body',
                 datetime.datetime.utcnow())
 
@@ -939,7 +940,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             # pylint: disable=protected-access
             email_manager._send_email(
-                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                self.new_user_id, constants.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
@@ -980,7 +981,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                constants.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body1',
                 datetime.datetime.utcnow())
 
@@ -991,7 +992,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             # pylint: disable=protected-access
             email_manager._send_email(
-                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                self.new_user_id, constants.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
@@ -1034,7 +1035,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                constants.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 email_sent_time)
 
@@ -1048,7 +1049,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             email_models.SentEmailModel.create(
                 self.new_user_id, self.NEW_USER_EMAIL,
-                feconf.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
+                constants.SYSTEM_COMMITTER_ID, feconf.SYSTEM_EMAIL_ADDRESS,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 email_sent_time)
 
@@ -1059,7 +1060,7 @@ class DuplicateEmailTests(test_utils.GenericTestBase):
 
             # pylint: disable=protected-access
             email_manager._send_email(
-                self.new_user_id, feconf.SYSTEM_COMMITTER_ID,
+                self.new_user_id, constants.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SIGNUP, 'Email Subject', 'Email Body',
                 feconf.SYSTEM_EMAIL_ADDRESS)
             # pylint: enable=protected-access
@@ -1173,7 +1174,7 @@ class FeedbackMessageBatchEmailTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.EDITOR_EMAIL)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, constants.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
@@ -1259,7 +1260,7 @@ class SuggestionEmailTest(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.EDITOR_EMAIL)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, constants.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
@@ -1342,7 +1343,7 @@ class SubscriptionEmailTest(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.NEW_USER_EMAIL)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, constants.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
@@ -1425,7 +1426,7 @@ class FeedbackMessageInstantEmailTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.NEW_USER_EMAIL)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, constants.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
@@ -1532,7 +1533,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.MODERATOR_EMAIL)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, constants.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
@@ -1547,7 +1548,7 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.moderator2_email)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, constants.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
@@ -1620,7 +1621,7 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.SUBMITTER_EMAIL)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, constants.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
@@ -1691,7 +1692,7 @@ class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
             self.assertEqual(
                 sent_email_model.recipient_email, self.SUBMITTER_EMAIL)
             self.assertEqual(
-                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+                sent_email_model.sender_id, constants.SYSTEM_COMMITTER_ID)
             self.assertEqual(
                 sent_email_model.sender_email,
                 'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)

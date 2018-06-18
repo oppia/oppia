@@ -19,6 +19,7 @@
 import copy
 import os
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import param_domain
@@ -41,7 +42,7 @@ class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, self.exp_id,
+            constants.SYSTEM_COMMITTER_ID, yaml_content, self.exp_id,
             assets_list)
         self.exploration = exp_services.get_exploration_by_id(self.exp_id)
 
@@ -764,7 +765,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            constants.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
 
         exploration_model = exp_models.ExplorationModel.get(
@@ -3933,7 +3934,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            constants.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -3956,7 +3957,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+            constants.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
             assets_list)
 
         exploration = exp_services.get_exploration_by_id(exploration_id)

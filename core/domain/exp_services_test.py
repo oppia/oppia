@@ -20,6 +20,7 @@ import datetime
 import os
 import zipfile
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
 from core.domain import exp_services
@@ -344,7 +345,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
 
         # Update exploration to version 3.
         change_list = [exp_domain.ExplorationChange({
@@ -352,7 +353,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state 2',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
 
         exploration_latest = exp_services.get_exploration_by_id(self.EXP_ID)
         latest_version = exploration_latest.version
@@ -374,7 +375,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
 
         # Update exploration to version 3.
         change_list = [exp_domain.ExplorationChange({
@@ -382,7 +383,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'state_name': 'New state 2',
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.EXP_ID, change_list, '')
 
         with self.assertRaisesRegexp(
             ValueError,
@@ -2828,7 +2829,7 @@ title: Old Title
             'version_number': 5,
         }
         commit_dict_4 = {
-            'committer_id': feconf.MIGRATION_BOT_USERNAME,
+            'committer_id': constants.MIGRATION_BOT_USERNAME,
             'commit_message':
                 'Update exploration states from schema version 0 to %d.' %
                 feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION,
