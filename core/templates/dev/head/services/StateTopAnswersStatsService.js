@@ -128,6 +128,15 @@ oppia.factory('StateTopAnswersStatsService', [
       },
 
       /**
+       * @returns {boolean} - Whether the cache contains any answers for the
+       * given state.
+       */
+      hasStateStats: function(stateName) {
+        return stateTopAnswersStatsCache.hasOwnProperty(stateName) &&
+          stateTopAnswersStatsCache[stateName].allAnswers.length > 0;
+      },
+
+      /**
        * @param {string} stateName
        * @returns {AnswerStats[]} - list of the statistics for the top answers.
        */
