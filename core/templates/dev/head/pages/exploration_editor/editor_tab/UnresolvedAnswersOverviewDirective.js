@@ -52,7 +52,7 @@ oppia.directive('unresolvedAnswersOverview', [
             return
               StateTopAnswersStatsService.hasStateStats(
                 EditorStateService.getActiveStateName()) &&
-              isStateInteractionIdHtmlRenderable());
+              isStateInteractionIdHtmlRenderable();
           };
 
           $scope.getUnresolvedStateStats = function() {
