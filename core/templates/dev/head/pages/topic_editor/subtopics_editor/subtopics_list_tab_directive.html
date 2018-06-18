@@ -1,0 +1,82 @@
+<md-card layout="row" class="list-view-item">
+  <table class="subtopics-table">
+    <colgroup>
+      <col style="width: 50%;">
+      <col style="width: 50%;">
+    </colgroup>
+    <tr>
+      <th colspan="2">
+      <button type="button" ng-click="createSubtopic()"
+              class="btn btn-default create-subtopic-button">
+        Create Subtopic
+      </button>
+    </th>
+    </tr>
+    <tr ng-if="subtopics.length > 0">
+      <th ng-repeat="key in SUBTOPIC_HEADINGS" class="subtopics-table-headings">
+        <p ng-if="key === 'title'"> Subtopic Title </p>
+        <p ng-if="key === 'skills'"> Skills </p>
+      </th>
+    </tr>
+    <tr ng-repeat="subtopic in subtopics"
+        class="list-item"
+        ng-if="subtopics.length > 0">
+      <td>
+        <span class="list-summary"> <[subtopic.getTitle()]> </span>
+      </td>
+      <td>
+        <span class="list-summary"> <[subtopic.getSkillIds().length]> </span>
+      </td>
+    </tr>
+  </table>
+</md-card>
+
+<style>
+  subtopics-list-tab .list-view-item {
+    background: #fff;
+    margin: 20px 7.5px 0 12.5%;
+    padding: 10px 20px;
+    width: 75%;
+  }
+
+  subtopics-list-tab .create-subtopic-button {
+    margin-bottom: 2%;
+  }
+
+  subtopics-list-tab .subtopics-table {
+    font-size: 15px;
+    width: 100%;
+  }
+
+  subtopics-list-tab .subtopics-table .subtopics-table-headings {
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 0.7em;
+  }
+
+  subtopics-list-tab .subtopics-table .subtopics-table-headings p {
+    display: inline;
+  }
+
+  subtopics-list-tab .list-summary,
+  subtopics-list-tab .list-summary:active,
+  subtopics-list-tab .list-summary:visited {
+    color: inherit;
+    display: block;
+    height: 2em;
+    text-decoration: none;
+  }
+
+  subtopics-list-tab .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  subtopics-list-tab .list-item:hover {
+    background-color: #ededed;
+  }
+
+  subtopics-list-tab .list-summary span {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+  }
+</style>

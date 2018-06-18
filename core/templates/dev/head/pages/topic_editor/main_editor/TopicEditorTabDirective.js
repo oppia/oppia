@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -44,6 +44,8 @@ oppia.directive('topicMainEditor', [
 
           $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
           $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+
+          _initEditor();
 
           $scope.openTopicNameEditor = function() {
             if (!$scope.topicRights.canEditName()) {

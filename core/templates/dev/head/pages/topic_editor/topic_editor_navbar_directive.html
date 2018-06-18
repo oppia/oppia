@@ -34,4 +34,24 @@
       Unpublish Topic
     </button>
   </li>
+  <li ng-class="{'active': getTabStatuses().active === 'main'}" class="icon">
+    <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()">
+      <i class="fa fa-edit"></i>
+    </a>
+  </li>
+
+  <li ng-class="{'active': getTabStatuses().active === 'subtopics'}" class="icon">
+    <a uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
+      <i class="fa fa-book"></i>
+    </a>
+  </li>
 </ul>
+
+<style>
+  topic-editor-navbar .icon {
+    width: 3vw;
+  }
+  topic-editor-navbar .icon .fa {
+    font-size: 1.4em;
+  }
+</style>

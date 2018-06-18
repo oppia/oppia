@@ -23,20 +23,25 @@ oppia.directive('topicEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/topic_editor_navbar_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
+        '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'TopicEditorStateService',
-        'TopicRightsBackendApiService',
+        'TopicRightsBackendApiService', 'TopicEditorRoutingService',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $uibModal, AlertsService, UndoRedoService,
+            $scope, $rootScope, $uibModal, AlertsService, UndoRedoService,
             TopicEditorStateService, TopicRightsBackendApiService,
+            TopicEditorRoutingService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.topicId = GLOBALS.topicId;
           $scope.topic = TopicEditorStateService.getTopic();
           $scope.topicRights = TopicEditorStateService.getTopicRights();
           $scope.isSaveInProgress = TopicEditorStateService.isSavingTopic;
+          $scope.getTabStatuses = TopicEditorRoutingService.getTabStatuses;
+          $scope.selectMainTab = TopicEditorRoutingService.navigateToMainTab;
+          $scope.selectSubtopicsTab =
+            TopicEditorRoutingService.navigateToSubtopicsTab;
 
           $scope.publishTopic = function() {
             if (!$scope.topicRights.canPublishTopic()) {
