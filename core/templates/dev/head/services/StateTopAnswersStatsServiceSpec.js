@@ -195,5 +195,43 @@ describe('StateTopAnswersStatsService', function() {
         }).toThrow();
       });
     });
+
+    describe('State Answer Groups Changes', function() {
+      beforeEach(inject(function($injector) {
+        this.rof = $injector.get('RuleObjectFactory');
+      }));
+      beforeEach(function() {
+        spyOn(this.cls, 'editStateProperty');
+      });
+
+      it('recognizes newly resolved answers', function() {
+        expect(this.stas.getUnresolvedStateStats('Hola'))
+          .toContain(joC({answer: 'adios'}));
+
+        var newAnswerGroups = 
+          angular.copy(this.ess.getState('Hola').interaction.answerGroups);
+        newAnswerGroups[0].rules.push(
+          this.rof.createNew('Contains', {x: 'adios'}));
+        this.ess.saveInteractionAnswerGroups('Hola', newAnswerGroups);
+
+        expect(this.stas.getUnresolvedStateStats('Hola'))
+          .not.toContain(joC({answer: 'adios'}));
+      });
+
+      it('recognizes newly unresolved answers', function() {
+        expect(this.stas.getUnresolvedStateStats('Hola'))
+          .not.toContain(joC({answer: 'hola'}));
+
+        var newAnswerGroups =
+          angular.copy(this.ess.getState('Hola').interaction.answerGroups);
+        newAnswerGroups[0].rules = [
+          this.rof.createNew('Contains', {x: 'bonjour'})
+        ];
+        this.ess.saveInteractionAnswerGroups('Hola', newAnswerGroups);
+
+        expect(this.stas.getUnresolvedStateStats('Hola'))
+          .toContain(joC({answer: 'hola'}));
+      });
+    });
   });
 });
