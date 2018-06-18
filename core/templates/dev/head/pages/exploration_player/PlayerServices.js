@@ -38,6 +38,7 @@ oppia.factory('ExplorationPlayerService', [
   'PlayerCorrectnessFeedbackEnabledService',
   'GuestCollectionProgressService', 'ImagePreloaderService',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
+  'ENABLE_PLAYTHROUGHS', 'PlaythroughService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       AlertsService, AnswerClassificationService, ExplorationContextService,
@@ -51,7 +52,8 @@ oppia.factory('ExplorationPlayerService', [
       WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
       PlayerCorrectnessFeedbackEnabledService,
       GuestCollectionProgressService, ImagePreloaderService,
-      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
+      ENABLE_PLAYTHROUGHS, PlaythroughService) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
       ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
@@ -396,7 +398,7 @@ oppia.factory('ExplorationPlayerService', [
         var newState = exploration.getState(newStateName);
 
         StatsReportingService.recordAnswerSubmitAction(
-          stateName, newStateName, oldState.interaction.id, answer,
+          oldStateName, newStateName, oldState.interaction.id, answer,
           outcome.feedback);
 
         // Compute the data for the next state.

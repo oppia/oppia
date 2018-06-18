@@ -150,7 +150,7 @@ oppia.factory('PlaythroughService', [
                 .state_name.value
           },
           time_spent_in_exp_in_secs: {
-            value: expStopwatch.getTimeInSecs()
+            value: timeSpentInExpInSecs
           }
         };
         return;
@@ -199,6 +199,8 @@ oppia.factory('PlaythroughService', [
         createMultipleIncorrectIssueTracker(initStateName);
 
         createCyclicIssueTracker(initStateName);
+
+        expStopwatch.reset();
       },
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback,
