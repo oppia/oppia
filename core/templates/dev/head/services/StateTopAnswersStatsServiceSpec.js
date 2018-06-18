@@ -129,6 +129,31 @@ describe('StateTopAnswersStatsService', function() {
     });
   });
 
+  describe('.hasStateStats', function() {
+    it('is false when uninitialized', function() {
+      expect(this.stas.isInitialized()).toBe(false);
+      expect(this.stas.hasStateStats('Hola')).toBe(false);
+    });
+
+    it('is true when the state contains answers', function() {
+      this.stas.init({answers: {Hola: [{answer: 'hola', frequency: 3}]}});
+
+      expect(this.stas.hasStateStats('Hola')).toBe(true);
+    });
+
+    it('is false when the state contains no answers', function() {
+      this.stas.init({answers: {Hola: []}});
+
+      expect(this.stas.hasStateStats('Hola')).toBe(false);
+    });
+
+    it('is false when the state does not exist', function() {
+      this.stas.init({answers: {Hola: [{answer: 'hola', frequency: 3}]}});
+
+      expect(this.stas.hasStateStats('Me Llamo')).toBe(false);
+    });
+  });
+
   describe('Cache Maintenance', function() {
     beforeEach(inject(function($injector) {
       // ChangeListService will need its calls mocked out since it isn't
