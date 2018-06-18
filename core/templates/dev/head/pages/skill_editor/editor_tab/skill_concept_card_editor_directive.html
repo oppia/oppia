@@ -4,6 +4,7 @@
     <div class="oppia-editor-card-section"
          style="padding-bottom: 36px;">
       <span><b>Explanation</b></span>
+      
       <div ng-if="!conceptCardExplanationEditorIsShown">
         <div ng-class="oppia-editable-section"
              ng-click="openConceptCardExplanationEditor()">
@@ -38,6 +39,24 @@
           <button type="button" class="btn btn-default pull-right" ng-click="closeConceptCardExplanationEditor()">Cancel</button>
           <div style="clear: both;"></div>
         </div>
+      </div>
+
+      <div ng-if="workedExamples.length > 0">
+        <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist" ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS" ng-model="workedExamples">
+          <li ng-repeat="workedExample in workedExamples" ng-class="{'active': activeWorkedExampleIndex === $index}" class="oppia-rule-block oppia-sortable-rule-block oppia-prevent-selection" style="margin-top: 0;">
+            <span class="oppia-rule-sort-handle" ng-if="workedExamples.length > 1" ng-mousedown="changeActiveWorkedExampleIndex(-1)">
+              <img ng-src="<[dragDotsImgUrl]>" width="10">
+            </span>
+            <a ng-click="changeActiveWorkedExampleIndex($index)" class="oppia-rule-tab" ng-class="{'oppia-rule-tab-active': activeWorkedExampleIndex === $index}">
+              <response-header index="$index"
+                               summary="getWorkedExampleSummary(workedExample)"
+                               short-summary="getWorkedExampleSummary(workedExample)"
+                               is-active="$index === activeWorkedExampleIndex"
+                               on-delete-fn="removeWorkedExample">
+              </response-header>
+            </a>
+          </li>
+        </ul>
       </div>
     </div>
   </div>

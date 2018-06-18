@@ -12,6 +12,10 @@ oppia.directive('skillConceptCardEditor', [
         '$scope',
         function($scope) {
           $scope.skill = SkillEditorStateService.getSkill();
+          $scope.workedExamples =
+            SkillEditorStateService.getSkill().getWorkedExamples();
+          $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/general/drag_dots.png');
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
@@ -44,7 +48,7 @@ oppia.directive('skillConceptCardEditor', [
             SkillUpdateService.addWorkedExample($scope.skill, workedExample);
           };
 
-          $scope.removeWorkedExample = function(index) {
+          $scope.removeWorkedExample = function(index, evt) {
             SkillUpdateService.removeWorkedExample($scope.skill, index);
           };
 

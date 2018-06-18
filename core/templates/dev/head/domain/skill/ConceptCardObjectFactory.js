@@ -26,6 +26,10 @@ oppia.factory('ConceptCardObjectFactory', [
       this.explanation = explanation;
     };
 
+    ConceptCard.prototype.getWorkedExamples = function() {
+      return this.workedExamples;
+    };
+
     return ConceptCard;    
   }
 ]);
