@@ -154,8 +154,7 @@ describe('Playthrough service', function() {
           value: 'stateName1'
         },
         time_spent_in_exp_in_secs: {
-          // Karma tests don't seem to be recording stopwatch time.
-          value: null
+          value: 0
         }
       });
     });
