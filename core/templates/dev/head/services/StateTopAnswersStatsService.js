@@ -134,6 +134,9 @@ oppia.factory('StateTopAnswersStatsService', [
        * @returns {AnswerStats[]} - list of the statistics for the top answers.
        */
       getStateStats: function(stateName) {
+        if (!stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
+          throw Error('No such state exists.');
+        }
         return stateTopAnswersStatsCache[stateName].allAnswers;
       },
 
@@ -143,6 +146,9 @@ oppia.factory('StateTopAnswersStatsService', [
        *    unresolved.
        */
       getUnresolvedStateStats: function(stateName) {
+        if (!stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
+          throw Error('No such state exists.');
+        }
         return stateTopAnswersStatsCache[stateName].unresolvedAnswers;
       },
     };
