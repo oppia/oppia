@@ -17,6 +17,7 @@
 import operator
 import os
 
+from constants import constants
 from core import jobs_registry
 from core.domain import event_services
 from core.domain import exp_domain
@@ -126,7 +127,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             stats_services, 'handle_stats_creation_for_new_exploration',
             stats_for_new_exploration_log):
             exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+                constants.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
                 assets_list)
 
         # Now, the stats creation for new explorations method will be called
@@ -143,7 +144,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             stats_services, 'handle_stats_creation_for_new_exp_version',
             stats_for_new_exp_version_log):
             exp_services.update_exploration(
-                feconf.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
+                constants.SYSTEM_COMMITTER_ID, exp_id, change_list, '')
 
         # Now, the stats creation for new explorations method will be called
         # once and stats creation for new exploration version will also be
@@ -160,7 +161,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            constants.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
@@ -189,7 +190,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         yaml_content = utils.get_file_contents(test_exp_filepath)
         assets_list = []
         exp_services.save_new_exploration_from_yaml_and_assets(
-            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            constants.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
             assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
@@ -386,7 +387,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         assets_list = []
         with self.swap(feconf, 'ENABLE_PLAYTHROUGHS', True):
             exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+                constants.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
                 assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
@@ -409,7 +410,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         assets_list = []
         with self.swap(feconf, 'ENABLE_PLAYTHROUGHS', True):
             exp_services.save_new_exploration_from_yaml_and_assets(
-                feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+                constants.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
                 assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
 
@@ -1794,7 +1795,7 @@ class StateAnswersStatisticsTest(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(
                 taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
         ModifiedInteractionAnswerSummariesAggregator.stop_computation(
-            feconf.SYSTEM_COMMITTER_ID)
+            constants.SYSTEM_COMMITTER_ID)
 
     def setUp(self):
         super(StateAnswersStatisticsTest, self).setUp()

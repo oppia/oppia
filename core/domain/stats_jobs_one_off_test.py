@@ -16,6 +16,7 @@
 
 """Tests for one off statistics jobs."""
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_jobs_one_off
@@ -41,7 +42,7 @@ class ExplorationIssuesModelCreatorOneOffJobTest(test_utils.GenericTestBase):
             'state_name': 'New state'
         })]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.exp1.id, change_list, '')
         self.exp1 = exp_services.get_exploration_by_id(self.exp1.id)
         self.exp2 = self.save_new_valid_exploration(self.exp_id2, 'owner')
 
@@ -126,7 +127,7 @@ class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
 
         change_list = []
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -135,7 +136,7 @@ class RecomputeStateCompleteStatisticsTest(test_utils.GenericTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         stats_models.StateCompleteEventLogEntryModel(
             id='id0',
@@ -261,7 +262,7 @@ class RecomputeAnswerSubmittedStatisticsTest(test_utils.GenericTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
 
         stats_models.AnswerSubmittedEventLogEntryModel(
@@ -374,7 +375,7 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
 
         change_list = []
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
         change_list = [
             exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_RENAME_STATE,
@@ -383,7 +384,7 @@ class RecomputeStateHitStatisticsTest(test_utils.GenericTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         stats_models.StateHitEventLogEntryModel(
             id='id1',
@@ -542,7 +543,7 @@ class RecomputeSolutionHitStatisticsTest(test_utils.GenericTestBase):
             })
         ]
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         stats_models.SolutionHitEventLogEntryModel(
             id='id1',
@@ -653,9 +654,9 @@ class RecomputeActualStartStatisticsTest(test_utils.GenericTestBase):
         change_list = []
         # Update exploration to version 3.
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         stats_models.ExplorationActualStartEventLogEntryModel(
             id='id1',
@@ -757,7 +758,7 @@ class RecomputeCompleteEventStatisticsTest(test_utils.GenericTestBase):
 
         change_list = []
         exp_services.update_exploration(
-            feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+            constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         stats_models.CompleteExplorationEventLogEntryModel(
             id='id1',

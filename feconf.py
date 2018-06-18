@@ -317,8 +317,6 @@ MAILGUN_API_KEY = None
 MAILGUN_DOMAIN_NAME = None
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
-# Committer id for system actions.
-SYSTEM_COMMITTER_ID = 'admin'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
@@ -435,11 +433,10 @@ MAX_AUDIO_FILE_LENGTH_SEC = 300
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
-# User id and username for exploration migration bot. Commits made by this bot
+# User id for exploration migration bot. Commits made by this bot
 # are not reflected in the exploration summary models, but are recorded in the
 # exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
-MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
@@ -809,9 +806,6 @@ LIBRARY_PAGE_MODE_SEARCH = 'search'
 # Defaults for topic similarities.
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
-
-SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
-SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
 
 # The following are all page descriptions for the meta tag.
 ABOUT_PAGE_DESCRIPTION = (
