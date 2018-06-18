@@ -17,46 +17,48 @@
  * domain objects.
  */
 
-oppia.factory('ParamMetadataObjectFactory', [function() {
-  /**
-   * @private @constructor
-   * Provide metadata when a parameter is changed by a GET or SET action
-   * @param {String} action - set or get
-   * @param {String} paramName - parameter's name
-   * @param {String} source - location where the parameter was defined
-   * e.g. answer, content, feedback or param_changes (changing value of param)
-   * @param {String} sourceInd - index of this parameter in a set of changes
-   */
-  var ParamMetadata = function(action, paramName, source, sourceInd) {
-    this.action = action;
-    this.paramName = paramName;
-    this.source = source;
-    this.sourceInd = sourceInd;
-  };
+oppia.factory('ParamMetadataObjectFactory', [
+  'PARAM_ACTION_GET', 'PARAM_ACTION_SET',
+  function(PARAM_ACTION_GET, PARAM_ACTION_SET) {
+    /**
+     * @private @constructor
+     * Provide metadata when a parameter is changed by a GET or SET action
+     * @param {String} action - set or get
+     * @param {String} paramName - parameter's name
+     * @param {String} source - location where the parameter was defined
+     * e.g. answer, content, feedback or param_changes (changing value of param)
+     * @param {String} sourceInd - index of this parameter in a set of changes
+     */
+    var ParamMetadata = function(action, paramName, source, sourceInd) {
+      this.action = action;
+      this.paramName = paramName;
+      this.source = source;
+      this.sourceInd = sourceInd;
+    };
 
-  /**
-   * Metadata about the SET action of a parameter
-   * @param {String} paramName - parameter's name
-   * @param {String} source - location where the parameter was defined
-   * e.g. answer, content, feedback or param_changes (changing value of param)
-   * @param {String} sourceInd - index of this parameter in a set of changes
-   * @returns {ParamMetadata} - A new ParamMetadata instance
-   */
-  ParamMetadata.createWithSetAction = function(paramName, source, sourceInd) {
-    return new ParamMetadata('set', paramName, source, sourceInd);
-  };
+    /**
+     * Metadata about the SET action of a parameter
+     * @param {String} paramName - parameter's name
+     * @param {String} source - location where the parameter was defined
+     * e.g. answer, content, feedback or param_changes (changing value of param)
+     * @param {String} sourceInd - index of this parameter in a set of changes
+     * @returns {ParamMetadata} - A new ParamMetadata instance
+     */
+    ParamMetadata.createWithSetAction = function(paramName, source, sourceInd) {
+      return new ParamMetadata(PARAM_ACTION_SET, paramName, source, sourceInd);
+    };
 
-  /**
-   * Metadata about the GET action of a parameter
-   * @param {String} paramName - parameter's name
-   * @param {String} source - location where the parameter was defined
-   * e.g. answer, content, feedback or param_changes (changing value of param)
-   * @param {String} sourceInd - index of this parameter in a set of changes
-   * @returns {ParamMetadata} - A new ParamMetadata instance
-   */
-  ParamMetadata.createWithGetAction = function(paramName, source, sourceInd) {
-    return new ParamMetadata('get', paramName, source, sourceInd);
-  };
+    /**
+     * Metadata about the GET action of a parameter
+     * @param {String} paramName - parameter's name
+     * @param {String} source - location where the parameter was defined
+     * e.g. answer, content, feedback or param_changes (changing value of param)
+     * @param {String} sourceInd - index of this parameter in a set of changes
+     * @returns {ParamMetadata} - A new ParamMetadata instance
+     */
+    ParamMetadata.createWithGetAction = function(paramName, source, sourceInd) {
+      return new ParamMetadata(PARAM_ACTION_GET, paramName, source, sourceInd);
+    };
 
-  return ParamMetadata;
-}]);
+    return ParamMetadata;
+  }]);

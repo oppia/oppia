@@ -16,17 +16,18 @@
  * @fileoverview Service for computing parameter metadata.
  */
 
+oppia.constant('PARAM_ACTION_GET', 'get');
+
+oppia.constant('PARAM_ACTION_SET', 'set');
+
 oppia.factory('ParameterMetadataService', [
   'ExplorationStatesService', 'ExpressionInterpolationService',
   'ExplorationParamChangesService', 'GraphDataService',
-  'ParamMetadataObjectFactory',
+  'ParamMetadataObjectFactory', 'PARAM_ACTION_GET', 'PARAM_ACTION_SET',
   function(
       ExplorationStatesService, ExpressionInterpolationService,
       ExplorationParamChangesService, GraphDataService,
-      ParamMetadataObjectFactory) {
-    var PARAM_ACTION_GET = 'get';
-    var PARAM_ACTION_SET = 'set';
-
+      ParamMetadataObjectFactory, PARAM_ACTION_GET, PARAM_ACTION_SET) {
     var PARAM_SOURCE_ANSWER = 'answer';
     var PARAM_SOURCE_CONTENT = 'content';
     var PARAM_SOURCE_FEEDBACK = 'feedback';
