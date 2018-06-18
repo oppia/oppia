@@ -106,7 +106,7 @@ oppia.directive('editorNavigation', [
           $scope.ExplorationRightsService = ExplorationRightsService;
           $scope.getTabStatuses = RouterService.getTabStatuses;
           $scope.selectMainTab = RouterService.navigateToMainTab;
-          $scope.selectAudioTab = RouterService.navigateToAudioTab;
+          $scope.selectTranslationTab = RouterService.navigateToTranslationTab;
           $scope.selectPreviewTab = RouterService.navigateToPreviewTab;
           $scope.selectSettingsTab = RouterService.navigateToSettingsTab;
           $scope.selectStatsTab = RouterService.navigateToStatsTab;
