@@ -18,8 +18,10 @@
  */
 
 oppia.factory('ExplorationRightsService', [
-  '$http', 'ExplorationDataService', 'AlertsService',
-  function($http, ExplorationDataService, AlertsService) {
+  '$http', 'ExplorationDataService', 'AlertsService', 'ACTIVITY_STATUS_PRIVATE',
+  'ACTIVITY_STATUS_PUBLIC',
+  function($http, ExplorationDataService, AlertsService,
+      ACTIVITY_STATUS_PRIVATE, ACTIVITY_STATUS_PUBLIC) {
     return {
       init: function(
           ownerNames, editorNames, translatorNames, viewerNames, status,
@@ -39,10 +41,10 @@ oppia.factory('ExplorationRightsService', [
         return this._clonedFrom;
       },
       isPrivate: function() {
-        return this._status === GLOBALS.ACTIVITY_STATUS_PRIVATE;
+        return this._status === ACTIVITY_STATUS_PRIVATE;
       },
       isPublic: function() {
-        return this._status === GLOBALS.ACTIVITY_STATUS_PUBLIC;
+        return this._status === ACTIVITY_STATUS_PUBLIC;
       },
       isCloned: function() {
         return Boolean(this._clonedFrom);
