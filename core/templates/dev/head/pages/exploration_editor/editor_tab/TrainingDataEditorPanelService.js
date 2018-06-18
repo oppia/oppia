@@ -62,6 +62,9 @@ oppia.factory('TrainingDataEditorPanelService', [
                   stateCustomizationArgsService.savedMemento,
                   false, FOCUS_LABEL_TEST_INTERACTION_INPUT));
               $scope.trainingData = [];
+              $scope.answerGroupHasNonEmptyRules = (
+                ResponsesService.getAnswerGroup(
+                  answerGroupIndex).rules.length > 0);
 
               var _rebuildTrainingData = function() {
                 $scope.trainingData = [];
@@ -146,7 +149,9 @@ oppia.factory('TrainingDataEditorPanelService', [
               };
 
               $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
-                if ($scope.trainingData.length > 1) {
+                if (($scope.answerGroupHasNonEmptyRules &&
+                    $scope.trainingData.length > 0) ||
+                    $scope.trainingData.length > 1) {
                   var answer = $scope.trainingData[answerIndex].answer;
                   return TrainingModalService.openTrainUnresolvedAnswerModal(
                     answer, _rebuildTrainingData);

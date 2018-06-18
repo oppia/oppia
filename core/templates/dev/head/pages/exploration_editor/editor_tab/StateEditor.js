@@ -118,7 +118,8 @@ oppia.directive('trainingPanel', [
         'TrainingDataService', 'ResponsesService', 'stateInteractionIdService',
         'stateCustomizationArgsService', 'AnswerGroupObjectFactory',
         'OutcomeObjectFactory', 'GenerateContentIdService',
-        'COMPONENT_NAME_FEEDBACK', 'stateContentIdsToAudioTranslationsService',
+        'COMPONENT_NAME_FEEDBACK',
+        'stateContentIdsToAudioTranslationsService',
         function(
             $scope, ExplorationHtmlFormatterService,
             EditorStateService, ExplorationStatesService,
@@ -143,17 +144,8 @@ oppia.directive('trainingPanel', [
 
           $scope.$watch('answer', _updateAnswerTemplate);
           _updateAnswerTemplate();
-          $scope.selectedAnswerGroupIndex = -1;
-
-          var _saveNewAnswerGroup = function(newAnswerGroup) {
-            var answerGroups = ResponsesService.getAnswerGroups();
-            answerGroups.push(newAnswerGroup);
-            ResponsesService.save(
-              answerGroups, ResponsesService.getDefaultOutcome());
-            stateContentIdsToAudioTranslationsService.displayed.addContentId(
-              newAnswerGroup.outcome.feedback.getContentId());
-            stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-          };
+          $scope.selectedAnswerGroupIndex = (
+            $scope.classification.answerGroupIndex);
 
           $scope.getCurrentStateName = function() {
             return EditorStateService.getActiveStateName();
@@ -174,29 +166,15 @@ oppia.directive('trainingPanel', [
 
           $scope.selectAnswerGroupIndex = function(index) {
             $scope.selectedAnswerGroupIndex = index;
-          };
-
-          $scope.onConfirm = function() {
-            var index = $scope.selectedAnswerGroupIndex;
             $scope.classification.answerGroupIndex = index;
-
             if (index > ResponsesService.getAnswerGroupCount()) {
-              var newOutcome = $scope.allOutcomes[index];
-              var newAnswerGroup = AnswerGroupObjectFactory.createNew(
-                [], angular.copy(newOutcome), [$scope.answer], null);
-              _saveNewAnswerGroup(newAnswerGroup);
-            } else if (index === ResponsesService.getAnswerGroupCount()) {
-              TrainingDataService.associateWithDefaultResponse($scope.answer);
-            } else {
-              TrainingDataService.associateWithAnswerGroup(
-                index, $scope.answer);
+              $scope.classification.newOutcome = $scope.allOutcomes[index];
             }
-            $scope.onFinishTraining();
           };
 
           $scope.confirmNewFeedback = function() {
             if ($scope.classification.newOutcome) {
-              // Push the new outcome at the end of the all outcomes.
+              // Push the new outcome at the end of the existing outcomes.
               $scope.allOutcomes.push($scope.classification.newOutcome);
               $scope.selectedAnswerGroupIndex = $scope.allOutcomes.length - 1;
               $scope.addingNewResponse = false;

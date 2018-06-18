@@ -2372,15 +2372,21 @@ md-card.preview-conversation-skin-supplemental-card {
   border: none;
   color: rgba(0,0,0,0.5);
   margin: 0;
-  padding-left: 0;
+  padding-left: 9px;
   padding-top: 9px;
   text-align: left;
   /* This is needed so that images stay bounded by the container in Firefox. */
   width: 100%;
 }
 
-.trained-feedback-selection:hover, .trained-feedback-selected {
+.trained-feedback-selection:hover {
   color: #00897B;
+}
+
+.trained-feedback-selected {
+  color: #00897B;
+  background: whitesmoke;
+  border-radius: 5px;
 }
 
 .oppia-modal-information-card .modal-dialog {

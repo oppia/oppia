@@ -128,6 +128,7 @@ oppia.directive('unresolvedAnswersOverview', [
                 'AnswerClassificationService', 'EXPLICIT_CLASSIFICATION',
                 'UrlInterpolationService', 'TRAINING_DATA_CLASSIFICATION',
                 'AngularNameService', 'DEFAULT_OUTCOME_CLASSIFICATION',
+                'AlertsService',
                 function(
                     $scope, $injector, $uibModalInstance, $http,
                     ExplorationHtmlFormatterService, TrainingModalService,
@@ -136,7 +137,8 @@ oppia.directive('unresolvedAnswersOverview', [
                     ExplorationStatesService, TrainingDataService,
                     AnswerClassificationService, EXPLICIT_CLASSIFICATION,
                     UrlInterpolationService, TRAINING_DATA_CLASSIFICATION,
-                    AngularNameService, DEFAULT_OUTCOME_CLASSIFICATION) {
+                    AngularNameService, DEFAULT_OUTCOME_CLASSIFICATION,
+                    AlertsService) {
                   var _explorationId = (
                     ExplorationContextService.getExplorationId());
                   var _stateName = EditorStateService.getActiveStateName();
@@ -149,6 +151,14 @@ oppia.directive('unresolvedAnswersOverview', [
 
                   // Inject RulesService dynamically.
                   var rulesService = $injector.get(rulesServiceName);
+
+                  var RESPONSE_CONFIRMED_TOAST_MESSAGE = (
+                    'Response of the answer has been confirmed');
+                  var RESPONSE_FIXED_TOAST_MESSAGE = (
+                    'Response of the answer has been fixed');
+                  // Timeout for the toast that is shown when a response has
+                  // been confirmed or fixed.
+                  var TOAST_TIMEOUT = 2000;
 
                   var fetchAndShowUnresolvedAnswers = function(
                       expId, stateName) {
@@ -214,21 +224,31 @@ oppia.directive('unresolvedAnswersOverview', [
                     if (classificationType === DEFAULT_OUTCOME_CLASSIFICATION) {
                       TrainingDataService.associateWithDefaultResponse(
                         answer.answer);
+                      AlertsService.addSuccessMessage(
+                        RESPONSE_CONFIRMED_TOAST_MESSAGE, 1000);
                       return;
                     }
 
                     TrainingDataService.associateWithAnswerGroup(
                       answer.classificationResult.answerGroupIndex,
                       answer.answer);
+                    AlertsService.addSuccessMessage(
+                      RESPONSE_CONFIRMED_TOAST_MESSAGE, TOAST_TIMEOUT);
                   };
 
                   $scope.openTrainUnresolvedAnswerModal = function(
                       answerIndex) {
                     var selectedAnswerIndex = answerIndex;
-                    answer = $scope.unresolvedAnswers[answerIndex].answer;
+                    var unresolvedAnswer = (
+                      $scope.unresolvedAnswers[answerIndex]);
+                    var answer = unresolvedAnswer.answer;
+                    var answerGroupIndex = (
+                      unresolvedAnswer.classificationResult.answerGroupIndex);
                     return TrainingModalService.openTrainUnresolvedAnswerModal(
                       answer, function() {
                         $scope.unresolvedAnswers.splice(selectedAnswerIndex, 1);
+                        AlertsService.addSuccessMessage(
+                          RESPONSE_FIXED_TOAST_MESSAGE, TOAST_TIMEOUT);
                       });
                   };
 

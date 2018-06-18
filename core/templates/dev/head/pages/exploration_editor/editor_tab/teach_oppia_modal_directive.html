@@ -15,8 +15,29 @@
     float: right;
   }
 
+  .teach-oppia-modal .answer-header-label {
+    margin: 1% 0%;
+  }
+
   .teach-oppia-modal .response-header-label {
     display: inline-block;
+    margin: 1% 0%;
+  }
+
+  .teach-oppia-modal .response-edit-button {
+    color: #f0ad4e;
+    background: white;
+    border-color: #f0ad4e;
+  }
+
+  .teach-oppia-modal .response-edit-button:hover,  .teach-oppia-modal .confrim-respose-button:hover {
+    background: whitesmoke;
+  }
+
+  .teach-oppia-modal .confrim-respose-button {
+    color: green;
+    background: white;
+    border-color: green;
   }
 </style>
 
@@ -35,11 +56,11 @@
         <div>
           <p class="response-header-label"><strong>Response</strong></p>
           <div class="unresolved-answer-btn">
-            <button type="button" class="btn btn-success" ng-click="confirmAnswerAssignment($index)">
-              Confirm
+            <button type="button" class="btn response-edit-button" ng-click="openTrainUnresolvedAnswerModal($index)" title="Edit this response">
+              <i class="material-icons md-18"> edit </i>
             </button>
-            <button type="button" class="btn btn-warning" ng-click="openTrainUnresolvedAnswerModal($index)">
-              Fix
+            <button type="button" class="btn confrim-respose-button" ng-click="confirmAnswerAssignment($index)" title="Conifrm this response">
+              <i class="material-icons md-18"> done </i>
             </button>
           </div>
           <span angular-html-bind="answer.feedbackHtml"></span>
@@ -54,5 +75,5 @@
 </div>
 
 <div class="modal-footer">
-  <button class="btn" ng-click="finishTeaching()">Exit</button>
+  <button class="btn btn-default" ng-click="finishTeaching()">Exit</button>
 </div>

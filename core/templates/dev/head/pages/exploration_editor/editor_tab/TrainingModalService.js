@@ -40,13 +40,17 @@ oppia.factory('TrainingModalService', [
             'ExplorationStatesService', 'EditorStateService',
             'AnswerClassificationService', 'ExplorationContextService',
             'stateInteractionIdService', 'AngularNameService',
+            'ResponsesService', 'TrainingDataService',
+            'stateContentIdsToAudioTranslationsService',
+            'AnswerGroupObjectFactory',
             function($scope, $injector, $uibModalInstance,
                 ExplorationStatesService, EditorStateService,
                 AnswerClassificationService, ExplorationContextService,
-                stateInteractionIdService, AngularNameService) {
+                stateInteractionIdService, AngularNameService,
+                ResponsesService, TrainingDataService,
+                stateContentIdsToAudioTranslationsService,
+                AnswerGroupObjectFactory) {
               $scope.trainingDataAnswer = '';
-              $scope.trainingDataFeedback = '';
-              $scope.trainingDataOutcomeDest = '';
 
               // See the training panel directive in StateEditor for an
               // explanation on the structure of this object.
@@ -55,13 +59,40 @@ oppia.factory('TrainingModalService', [
                 newOutcome: null
               };
 
-              $scope.finishTraining = function() {
-                $uibModalInstance.close();
-                finishTrainingCallback();
+
+              var _saveNewAnswerGroup = function(newAnswerGroup) {
+                var answerGroups = ResponsesService.getAnswerGroups();
+                var translationService = (
+                  stateContentIdsToAudioTranslationsService);
+                answerGroups.push(newAnswerGroup);
+                ResponsesService.save(
+                  answerGroups, ResponsesService.getDefaultOutcome());
+                translationService.displayed.addContentId(
+                  newAnswerGroup.outcome.feedback.getContentId());
+                translationService.saveDisplayedValue();
               };
 
               $scope.exitTrainer = function() {
                 $uibModalInstance.dismiss();
+              };
+
+              $scope.onConfirm = function() {
+                var index = $scope.classification.answerGroupIndex;
+
+                if (index > ResponsesService.getAnswerGroupCount()) {
+                  var newOutcome = $scope.classification.newOutcome;
+                  var newAnswerGroup = AnswerGroupObjectFactory.createNew(
+                    [], angular.copy(newOutcome), [unhandledAnswer], null);
+                  _saveNewAnswerGroup(newAnswerGroup);
+                } else if (index === ResponsesService.getAnswerGroupCount()) {
+                  TrainingDataService.associateWithDefaultResponse(
+                    unhandledAnswer);
+                } else {
+                  TrainingDataService.associateWithAnswerGroup(
+                    index, unhandledAnswer);
+                }
+                $uibModalInstance.close();
+                finishTrainingCallback();
               };
 
               $scope.init = function() {
@@ -103,8 +134,6 @@ oppia.factory('TrainingModalService', [
                 // specific feedback of the outcome (for instance, it
                 // includes the destination state within the feedback).
                 $scope.trainingDataAnswer = unhandledAnswer;
-                $scope.trainingDataFeedback = feedback;
-                $scope.trainingDataOutcomeDest = dest;
                 $scope.classification.answerGroupIndex = (
                   classificationResult.answerGroupIndex);
               };

@@ -715,7 +715,7 @@ MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 RECORD_PLAYTHROUGH_PROBABILITY = 0.2
 
 # Unfinished features.
-SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
+SHOW_TRAINABLE_UNRESOLVED_ANSWERS = True
 # Number of unresolved answers to be displayed in the dashboard for each
 # exploration.
 TOP_UNRESOLVED_ANSWERS_COUNT_DASHBOARD = 3
@@ -889,7 +889,7 @@ VIEW_METHOD_USERNAME = 'username'
 
 QUESTION_BATCH_SIZE = 10
 
-STATE_ANSWER_STATS_MIN_FREQUENCY = 2
+STATE_ANSWER_STATS_MIN_FREQUENCY = 1
 
 # RTE content specifications according to the type of the editor.
 RTE_CONTENT_SPEC = {
