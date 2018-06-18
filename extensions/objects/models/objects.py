@@ -20,7 +20,6 @@ import copy
 import os
 
 import feconf
-import jinja_utils
 import schema_utils
 import utils
 
