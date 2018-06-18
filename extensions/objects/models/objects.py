@@ -901,10 +901,7 @@ class ListOfSetsOfHtmlStrings(BaseObject):
 
     SCHEMA = {
         'type': 'list',
-        'items': {
-            'type': 'list',
-            'items': Html.SCHEMA
-        },
+        'items': SetOfHtmlString.SCHEMA,
         'validators': [{
             'id': 'is_uniquified'
         }]

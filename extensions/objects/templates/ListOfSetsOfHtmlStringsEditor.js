@@ -39,8 +39,8 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
 
-        if ($scope.selectedChoice !== '' && $scope.selectedChoice !== null) {
-          $scope.prevIndices.push(parseInt($scope.selectedChoice));
+        if ($scope.selectedRank !== '' && $scope.selectedRank !== null) {
+          $scope.prevIndices.push(parseInt($scope.selectedRank));
         }
 
         $scope.allowedChoices = function() {
@@ -51,27 +51,27 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
           return allowedList;
         };
 
-        $scope.selections = function(choiceListIndex) {
+        $scope.selectedItem = function(choiceListIndex) {
           var choiceHtml = $scope.choices[choiceListIndex].id;
-          var selectedChoice = parseInt($scope.selectedChoice) - 1;
+          var selectedRank = parseInt($scope.selectedRank) - 1;
           var flag = 0;
           for (var i = 0; i < $scope.value.length; i++) {
             flag = 0;
-            var selectedChoicesIndex = $scope.value[i].indexOf(choiceHtml);
-            if (selectedChoicesIndex > -1) {
-              if (i !== selectedChoice) {
-                $scope.value[i].splice(selectedChoicesIndex, 1);
-                $scope.value[selectedChoice].push(choiceHtml);
+            var choiceHtmlIndex = $scope.value[i].indexOf(choiceHtml);
+            if (choiceHtmlIndex > -1) {
+              if (i !== selectedRank) {
+                $scope.value[i].splice(choiceHtmlIndex, 1);
+                $scope.value[selectedRank].push(choiceHtml);
                 flag = 1;
                 break;
               }
             }
           }
           if (flag === 0) {
-            if ($scope.value[selectedChoice] === undefined) {
-              $scope.value[selectedChoice] = [choiceHtml];
+            if ($scope.value[selectedRank] === undefined) {
+              $scope.value[selectedRank] = [choiceHtml];
             } else {
-              $scope.value[selectedChoice].push(choiceHtml);
+              $scope.value[selectedRank].push(choiceHtml);
             }
           }
         };
