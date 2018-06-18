@@ -197,12 +197,12 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     describe('State Answer Groups Changes', function() {
-      beforeEach(inject(function($injector) {
-        this.rof = $injector.get('RuleObjectFactory');
-      }));
       beforeEach(function() {
         spyOn(this.cls, 'editStateProperty');
       });
+      beforeEach(inject(function($injector) {
+        this.rof = $injector.get('RuleObjectFactory');
+      }));
 
       it('recognizes newly resolved answers', function() {
         expect(this.stas.getUnresolvedStateStats('Hola'))
