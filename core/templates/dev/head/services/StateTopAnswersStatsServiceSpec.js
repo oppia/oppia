@@ -195,9 +195,10 @@ describe('StateTopAnswersStatsService', function() {
 
         this.ess.renameState('Hola', 'Bonjour');
 
-        expect(this.stas.getStateStats('Bonjour')).toEqual(oldStats);
+        expect(this.stas.getStateStats('Bonjour')).toBe(oldStats);
         expect(this.stas.getUnresolvedStateStats('Bonjour'))
-          .toEqual(oldUnresolvedStats);
+          .toBe(oldUnresolvedStats);
+
         expect(function() {
           this.stas.getStateStats('Hola');
         }).toThrow();
