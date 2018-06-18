@@ -24,10 +24,8 @@ describe('StateTopAnswersStatsService', function() {
 
   beforeEach(inject(function($injector) {
     this.stas = $injector.get('StateTopAnswersStatsService');
-    this.ecs = $injector.get('ExplorationContextService');
     this.ess = $injector.get('ExplorationStatesService');
 
-    spyOn(this.ecs, 'getExplorationId').and.returnValue('7');
     this.ess.init({
       Hola: {
         content: '',
@@ -53,6 +51,9 @@ describe('StateTopAnswersStatsService', function() {
         content_ids_to_audio_translations: {}
       }
     });
+
+    spyOn($injector.get('ExplorationContextService'), 'getExplorationId')
+      .and.returnValue('7');
   }));
 
   describe('.isInitialized', function() {
