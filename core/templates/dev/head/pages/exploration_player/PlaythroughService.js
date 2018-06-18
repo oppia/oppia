@@ -54,11 +54,13 @@ oppia.factory('PlaythroughService', [
       };
     };
 
-    var createCyclicIssueTracker = function() {
+    var createCyclicIssueTracker = function(initStateName) {
       cycleIdentifier = {
         cycle: '',
         num_cycles: 0
       };
+
+      visitedStates.push(initStateName);
     };
 
     var incrementIncorrectAnswerInMultipleIncorrectIssueTracker = function() {
@@ -97,25 +99,16 @@ oppia.factory('PlaythroughService', [
     };
 
     var isMultipleIncorrectSubmissionsIssue = function() {
-      if (multipleIncorrectStateName.num_times_incorrect >= (
-        NUM_INCORRECT_ANSWERS_THRESHOLD)) {
-        return true;
-      }
-      return false;
+      return multipleIncorrectStateName.num_times_incorrect >=
+        NUM_INCORRECT_ANSWERS_THRESHOLD;
     };
 
     var isCyclicStateTransitionsIssue = function() {
-      if (cycleIdentifier.num_cycles >= NUM_REPEATED_CYCLES_THRESHOLD) {
-        return true;
-      }
-      return false;
+      return cycleIdentifier.num_cycles >= NUM_REPEATED_CYCLES_THRESHOLD;
     };
 
     var isEarlyQuitIssue = function(timeSpentInExpInSecs) {
-      if (timeSpentInExpInSecs < EARLY_QUIT_THRESHOLD_IN_SECS) {
-        return true;
-      }
-      return false;
+      return timeSpentInExpInSecs < EARLY_QUIT_THRESHOLD_IN_SECS;
     };
 
     var analyzePlaythrough = function() {
@@ -124,7 +117,6 @@ oppia.factory('PlaythroughService', [
       // follows MultipleIncorrectSubmissionsIssue ->
       // CyclicStateTransitionsIssue -> EarlyQuitIssue.
       var timeSpentInExpInSecs = expStopwatch.getTimeInSecs();
-      // Check for multiple incorrect submissions issue.
       if (isMultipleIncorrectSubmissionsIssue()) {
         playthrough.issueType = ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS;
         playthrough.issueCustomizationArgs = {
@@ -138,7 +130,6 @@ oppia.factory('PlaythroughService', [
         return;
       }
 
-      // Check for cyclic state transitions issue.
       if (isCyclicStateTransitionsIssue()) {
         playthrough.issueType = ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS;
         playthrough.issueCustomizationArgs = {
@@ -149,7 +140,6 @@ oppia.factory('PlaythroughService', [
         return;
       }
 
-      // Check for early quit issue.
       if (isEarlyQuitIssue(timeSpentInExpInSecs)) {
         playthrough.issueType = ISSUE_TYPE_EARLY_QUIT;
         playthrough.issueCustomizationArgs = {
@@ -167,12 +157,12 @@ oppia.factory('PlaythroughService', [
       }
     };
 
-    var storePlaythrough = function(updatePlaythrough) {
+    var storePlaythrough = function(isNewPlaythrough) {
       var promise = $http.post(getFullPlaythroughUrl(), {
         playthrough_data: playthrough.toBackendDict(),
         issue_schema_version: CURRENT_ISSUE_SCHEMA_VERSION
       });
-      if (!updatePlaythrough) {
+      if (isNewPlaythrough) {
         promise.then(function(response) {
           playthrough.playthroughId = response.playthroughId;
         });
@@ -208,9 +198,7 @@ oppia.factory('PlaythroughService', [
 
         createMultipleIncorrectIssueTracker(initStateName);
 
-        createCyclicIssueTracker();
-
-        visitedStates.push(initStateName);
+        createCyclicIssueTracker(initStateName);
       },
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback,
@@ -268,14 +256,14 @@ oppia.factory('PlaythroughService', [
         if (playthrough.playthroughId) {
           // Playthrough ID exists, so issue has already been identified and we
           // update the playthrough.
-          storePlaythrough(true);
+          storePlaythrough();
         } else {
           // Playthrough ID doesn't exist.
           analyzePlaythrough();
           if (playthrough.issueType) {
             // Issue type exists, so an issue is identified after analyzing the
             // playthrough, and the playthrough is stored.
-            storePlaythrough();
+            storePlaythrough(true);
           }
         }
       }

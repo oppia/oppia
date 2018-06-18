@@ -40,15 +40,13 @@ describe('Playthrough service', function() {
       var playthrough = this.ps.getPlaythrough();
 
       expect(playthrough.actions).toEqual(
-        [this.laof.createFromBackendDict({
-          action_type: 'ExplorationStart',
-          action_customization_args: {
+        [this.laof.createNew(
+          'ExplorationStart', {
             state_name: {
               value: 'initStateName1'
             }
-          },
-          schema_version: 1
-        })]);
+          }, 1
+        )]);
     });
 
     it('should record answer submit action.', function() {
@@ -101,6 +99,12 @@ describe('Playthrough service', function() {
     it(
       'should analyze a playthrough for multiple incorrect submissions issue',
       function() {
+        var playthrough = this.ps.getPlaythrough();
+
+        expect(playthrough.playthroughId).toEqual(null);
+        expect(playthrough.issueType).toEqual(null);
+        expect(playthrough.issueCustomizationArgs).toEqual({});
+
         this.ps.recordExplorationStartAction('stateName1');
         this.ps.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
@@ -112,12 +116,6 @@ describe('Playthrough service', function() {
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
         this.ps.recordAnswerSubmitAction(
           'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
-
-        var playthrough = this.ps.getPlaythrough();
-
-        expect(playthrough.playthroughId).toEqual(null);
-        expect(playthrough.issueType).toEqual(null);
-        expect(playthrough.issueCustomizationArgs).toEqual({});
 
         this.ps.recordPlaythrough();
 
@@ -135,16 +133,16 @@ describe('Playthrough service', function() {
       });
 
     it('should analyze a playthrough for early quit issue', function() {
-      this.ps.recordExplorationStartAction('stateName1');
-      this.ps.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
-      this.ps.recordExplorationQuitAction('stateName1', '60');
-
       var playthrough = this.ps.getPlaythrough();
 
       expect(playthrough.playthroughId).toEqual(null);
       expect(playthrough.issueType).toEqual(null);
       expect(playthrough.issueCustomizationArgs).toEqual({});
+
+      this.ps.recordExplorationStartAction('stateName1');
+      this.ps.recordAnswerSubmitAction(
+        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
+      this.ps.recordExplorationQuitAction('stateName1', '60');
 
       this.ps.recordPlaythrough();
 
@@ -165,6 +163,12 @@ describe('Playthrough service', function() {
     it(
       'should analyze a playthrough for cyclic state transitions issue',
       function() {
+        var playthrough = this.ps.getPlaythrough();
+
+        expect(playthrough.playthroughId).toEqual(null);
+        expect(playthrough.issueType).toEqual(null);
+        expect(playthrough.issueCustomizationArgs).toEqual({});
+
         this.ps.recordExplorationStartAction('stateName1');
         this.ps.recordAnswerSubmitAction(
           'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', '30');
@@ -185,12 +189,6 @@ describe('Playthrough service', function() {
         this.ps.recordAnswerSubmitAction(
           'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
         this.ps.recordExplorationQuitAction('stateName1', '30');
-
-        var playthrough = this.ps.getPlaythrough();
-
-        expect(playthrough.playthroughId).toEqual(null);
-        expect(playthrough.issueType).toEqual(null);
-        expect(playthrough.issueCustomizationArgs).toEqual({});
 
         this.ps.recordPlaythrough();
 
