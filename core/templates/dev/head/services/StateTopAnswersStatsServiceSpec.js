@@ -104,7 +104,7 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     it('registers handlers to ExplorationStatesService', function() {
-      var expectedCallbacks = [
+      var expectedRegistrationFunctions = [
         spyOn(this.ess, 'registerOnStateAddedCallback'),
         spyOn(this.ess, 'registerOnStateDeletedCallback'),
         spyOn(this.ess, 'registerOnStateRenamedCallback'),
@@ -113,9 +113,49 @@ describe('StateTopAnswersStatsService', function() {
 
       this.stas.init({answers: {}});
 
-      expectedCallbacks.forEach(function(expectedCallback) {
-        expect(expectedCallback).toHaveBeenCalled();
+      expectedRegistrationFunctions.forEach(function(registrationFunction) {
+        expect(registrationFunction).toHaveBeenCalled();
       });
+    });
+
+    it('throws when fetching stats about non-existent states', function() {
+      expect(function() {
+        this.stas.getStateStats('Me Llamo');
+      }).toThrow();
+    });
+  });
+
+  describe('Cache Maintenance', function() {
+    beforeEach(inject(function($injector) {
+      // ChangeListService will need its calls mocked out since it isn't
+      // configured correctly in, or interesting to, the tests of this block.
+      this.cls = $injector.get('ChangeListService');
+    }));
+    beforeEach(function() {
+      this.stas.init({
+        answers: {
+          Hola: [
+            {answer: 'hola', frequency: 7},
+            {answer: 'adios', frequency: 4},
+            {answer: 'que?', frequency: 2},
+          ]
+        }
+      });
+    });
+
+    describe('State Addition', function() {
+      beforeEach(function() {
+        spyOn(this.cls, 'addState');
+      });
+
+      it('creates a new empty list of stats for the new state', function() {
+        this.ess.addState('Me Llamo');
+
+        expect(this.stas.getStateStats('Me Llamo')).toEqual([]);
+        expect(this.stas.getUnresolvedStateStats('Me Llamo')).toEqual([]);
+      });
+
+
     });
   });
 });
