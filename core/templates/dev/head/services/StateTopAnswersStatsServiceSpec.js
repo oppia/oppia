@@ -123,6 +123,9 @@ describe('StateTopAnswersStatsService', function() {
       expect(function() {
         this.stas.getStateStats('Me Llamo');
       }).toThrow();
+      expect(function() {
+        this.stas.getUnresolvedStateStats('Me Llamo');
+      }).toThrow();
     });
   });
 
