@@ -49,8 +49,10 @@ oppia.directive('unresolvedAnswersOverview', [
           };
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
-            return StateTopAnswersStatsService.isInitialized() &&
-              isStateInteractionIdHtmlRenderable();
+            return
+              StateTopAnswersStatsService.hasStateStats(
+                EditorStateService.getActiveStateName()) &&
+              isStateInteractionIdHtmlRenderable());
           };
 
           $scope.getUnresolvedStateStats = function() {
