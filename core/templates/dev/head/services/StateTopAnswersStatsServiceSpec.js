@@ -146,6 +146,7 @@ describe('StateTopAnswersStatsService', function() {
 
     describe('State Addition', function() {
       beforeEach(function() {
+        // Disable ChangeListService.addState.
         spyOn(this.cls, 'addState');
       });
 
@@ -159,6 +160,7 @@ describe('StateTopAnswersStatsService', function() {
 
     describe('State Deletion', function() {
       beforeEach(function() {
+        // Disable ChangeListService.deleteState.
         spyOn(this.cls, 'deleteState');
       });
 
@@ -176,6 +178,7 @@ describe('StateTopAnswersStatsService', function() {
 
     describe('State Renaming', function() {
       beforeEach(function() {
+        // Disable ChangeListService.renameState.
         spyOn(this.cls, 'renameState');
       });
 
@@ -199,6 +202,7 @@ describe('StateTopAnswersStatsService', function() {
 
     describe('State Answer Groups Changes', function() {
       beforeEach(function() {
+        // Disable ChangeListService.editStateProperty.
         spyOn(this.cls, 'editStateProperty');
       });
       beforeEach(inject(function($injector) {
