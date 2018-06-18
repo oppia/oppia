@@ -17,7 +17,7 @@ oppia.directive('numberWithUnitsEditor', [
   'UrlInterpolationService', 'NumberWithUnitsObjectFactory',
   'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, NumberWithUnitsObjectFactory,
-           OBJECT_EDITOR_URL_PREFIX) {
+      OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
       scope: {
