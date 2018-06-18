@@ -104,17 +104,18 @@ describe('StateTopAnswersStatsService', function() {
     });
 
     it('registers handlers to ExplorationStatesService', function() {
-      var spyStateAdded = spyOn(this.ess, 'registerOnStateAddedCallback');
-      var spyStateDeleted = spyOn(this.ess, 'registerOnStateDeletedCallback');
-      var spyStateRenamed = spyOn(this.ess, 'registerOnStateRenamedCallback');
-      var spyStateInteractionAnswerGroupsSaved =
-        spyOn(this.ess, 'registerOnStateInteractionAnswerGroupsSavedCallback');
+      var expectedCallbacks = [
+        spyOn(this.ess, 'registerOnStateAddedCallback'),
+        spyOn(this.ess, 'registerOnStateDeletedCallback'),
+        spyOn(this.ess, 'registerOnStateRenamedCallback'),
+        spyOn(this.ess, 'registerOnStateInteractionAnswerGroupsSavedCallback')
+      ];
 
       this.stas.init({answers: {}});
-      expect(spyStateAdded).toHaveBeenCalled();
-      expect(spyStateDeleted).toHaveBeenCalled();
-      expect(spyStateRenamed).toHaveBeenCalled();
-      expect(spyStateInteractionAnswerGroupsSaved).toHaveBeenCalled();
+
+      expectedCallbacks.forEach(function(expectedCallback) {
+        expect(expectedCallback).toHaveBeenCalled();
+      });
     });
   });
 });
