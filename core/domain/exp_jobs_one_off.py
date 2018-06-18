@@ -307,7 +307,7 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
         if exploration_rights is None:
             return
 
-        if (exploration_rights.status == feconf.ACTIVITY_STATUS_PRIVATE
+        if (exploration_rights.status == constants.ACTIVITY_STATUS_PRIVATE
                 and exploration_rights.viewable_if_private):
             yield (item.id, item.title.encode('utf-8'))
 
