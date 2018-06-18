@@ -151,7 +151,12 @@ describe('StateTopAnswersStatsService', function() {
       });
 
       it('creates a new empty list of stats for the new state', function() {
-        expect(function() { this.stas.getStateStats('Me Llamo'); }).toThrow();
+        expect(function() {
+          this.stas.getStateStats('Me Llamo');
+        }).toThrow();
+        expect(function() {
+          this.stas.getUnresolvedStateStats('Me Llamo');
+        }).toThrow();
 
         this.ess.addState('Me Llamo');
 
