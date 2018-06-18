@@ -44,11 +44,11 @@ describe('Topic object factory', function() {
     _sampleTopic = TopicObjectFactory.create(sampleTopicBackendObject);
   }));
 
-  it('should be able to create an empty topic object', function() {
-    var topic = TopicObjectFactory.createEmptyTopic();
+  it('should be able to create an interstitial topic object', function() {
+    var topic = TopicObjectFactory.createInterstitialTopic();
     expect(topic.getId()).toBeUndefined();
-    expect(topic.getName()).toBeUndefined();
-    expect(topic.getDescription()).toBeUndefined();
+    expect(topic.getName()).toEqual('Topic name loading');
+    expect(topic.getDescription()).toEqual('Topic description loading');
     expect(topic.getLanguageCode()).toBeUndefined();
     expect(topic.getSubtopics()).toEqual([]);
     expect(topic.getAdditionalStoryIds()).toEqual([]);

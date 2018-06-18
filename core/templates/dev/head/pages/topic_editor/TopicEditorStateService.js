@@ -31,8 +31,8 @@ oppia.factory('TopicEditorStateService', [
       TopicRightsObjectFactory, TopicRightsBackendApiService,
       UndoRedoService, EditableTopicBackendApiService,
       EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
-    var _topic = TopicObjectFactory.createEmptyTopic();
-    var _topicRights = TopicRightsObjectFactory.createEmptyTopicRights();
+    var _topic = TopicObjectFactory.createInterstitialTopic();
+    var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
     var _topicIsInitialized = false;
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
@@ -53,7 +53,7 @@ oppia.factory('TopicEditorStateService', [
       _topicRights.copyFromTopicRights(topicRights);
     };
     var _updateTopicRights = function(newBackendTopicRightsObject) {
-      _setTopicRights(TopicRightsObjectFactory.create(
+      _setTopicRights(TopicRightsObjectFactory.createFromBackendDict(
         newBackendTopicRightsObject));
     };
 

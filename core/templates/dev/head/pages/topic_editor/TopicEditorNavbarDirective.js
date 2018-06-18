@@ -23,13 +23,13 @@ oppia.directive('topicEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/topic_editor_navbar_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
+        '$scope', '$uibModal', '$rootScope', 'AlertsService',
         'UndoRedoService', 'TopicEditorStateService',
         'TopicRightsBackendApiService',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $uibModal, AlertsService, UndoRedoService,
+            $scope, $uibModal, $rootScope, AlertsService, UndoRedoService,
             TopicEditorStateService, TopicRightsBackendApiService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {

@@ -63,8 +63,8 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         for topic_summary in topic_summary_dicts:
             topic_rights = topic_rights_dict[topic_summary['id']]
             if topic_rights:
-                topic_summary[
-                    'is_published'] = topic_rights.topic_is_published
+                topic_summary['topic_is_published'] = (
+                    topic_rights.topic_is_published)
 
         self.values.update({
             'skill_summary_dicts': skill_summary_dicts,

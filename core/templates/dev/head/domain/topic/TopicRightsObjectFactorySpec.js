@@ -29,7 +29,7 @@ describe('Topic rights object factory', function() {
       can_publish_topic: true
     };
 
-    sampleTopicRights = TopicRightsObjectFactory.create(
+    sampleTopicRights = TopicRightsObjectFactory.createFromBackendDict(
       initialTopicRightsBackendObject);
   }));
 
@@ -55,7 +55,7 @@ describe('Topic rights object factory', function() {
       can_publish_topic: false
     };
 
-    exampleTopicRights = TopicRightsObjectFactory.create(
+    exampleTopicRights = TopicRightsObjectFactory.createFromBackendDict(
       exampleTopicRightsBackendObject);
 
     expect(function() {
@@ -69,16 +69,16 @@ describe('Topic rights object factory', function() {
 
   it('should create an empty topic rights object', function() {
     var emptyTopicRightsBackendObject = (
-      TopicRightsObjectFactory.createEmptyTopicRights());
+      TopicRightsObjectFactory.createInterstitialRights());
 
-    expect(emptyTopicRightsBackendObject.isPublished()).toEqual(null);
-    expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(null);
-    expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(null);
+    expect(emptyTopicRightsBackendObject.isPublished()).toEqual(false);
+    expect(emptyTopicRightsBackendObject.canEditTopic()).toEqual(false);
+    expect(emptyTopicRightsBackendObject.canPublishTopic()).toEqual(false);
   });
 
   it('should make a copy from another topic rights', function() {
     var emptyTopicRightsBackendObject = (
-      TopicRightsObjectFactory.createEmptyTopicRights());
+      TopicRightsObjectFactory.createInterstitialRights());
 
     emptyTopicRightsBackendObject.copyFromTopicRights(sampleTopicRights);
 

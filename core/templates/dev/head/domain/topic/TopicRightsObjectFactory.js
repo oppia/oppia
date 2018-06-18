@@ -19,10 +19,10 @@
 
 oppia.factory('TopicRightsObjectFactory', [
   function() {
-    var TopicRights = function(topicRightsBackendObject) {
-      this._published = topicRightsBackendObject.published;
-      this._canPublishTopic = topicRightsBackendObject.can_publish_topic;
-      this._canEditTopic = topicRightsBackendObject.can_edit_topic;
+    var TopicRights = function(published, canPublishTopic, canEditTopic) {
+      this._published = published;
+      this._canPublishTopic = canPublishTopic;
+      this._canEditTopic = canEditTopic;
     };
 
     // Instance methods
@@ -39,7 +39,7 @@ oppia.factory('TopicRightsObjectFactory', [
       return this._canPublishTopic;
     };
 
-    // Currently only admins can publish/unpublish a topic or edit it's name.
+    // Currently only admins can publish/unpublish a topic or edit its name.
     TopicRights.prototype.canEditName = function() {
       return this._canPublishTopic;
     };
@@ -65,8 +65,12 @@ oppia.factory('TopicRightsObjectFactory', [
 
     // This function takes a JSON object which represents a backend
     // topic python dict.
-    TopicRights.create = function(topicRightsBackendObject) {
-      return new TopicRights(angular.copy(topicRightsBackendObject));
+    TopicRights.createFromBackendDict = function(topicRightsBackendObject) {
+      return new TopicRights(
+        topicRightsBackendObject.published,
+        topicRightsBackendObject.can_publish_topic,
+        topicRightsBackendObject.can_edit_topic
+      );
     };
 
     // Reassigns all values within this topic to match the existing
@@ -78,14 +82,12 @@ oppia.factory('TopicRightsObjectFactory', [
       this._canPublishTopic = otherTopicRights.canPublishTopic();
     };
 
-    // Create a new, empty topic rights object. This is not guaranteed to
-    // pass validation tests.
-    TopicRights.createEmptyTopicRights = function() {
-      return new TopicRights({
-        published: null,
-        can_publish_topic: null,
-        can_edit_topic: null
-      });
+    // This creates an interstitial topic rights object which acts as a
+    // placeholder until the actual topic rights object is fetched from
+    // the backend. Since it is acting as a placeholder, it should be valid and
+    // hence the most restrictive rights are given to the object.
+    TopicRights.createInterstitialRights = function() {
+      return new TopicRights(false, false, false);
     };
 
     return TopicRights;

@@ -285,10 +285,12 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
       return new Topic(topicBackendObject);
     };
 
-    // Create a new, empty topic. This is not guaranteed to pass validation
-    // tests.
-    Topic.createEmptyTopic = function() {
+    // Create an interstitial topic that would be displayed in the editor until
+    // the actual topic is fetched from the backend.
+    Topic.createInterstitialTopic = function() {
       return new Topic({
+        name: 'Topic name loading',
+        description: 'Topic description loading',
         next_subtopic_id: 1,
         additional_story_ids: [],
         canonical_story_ids: [],
