@@ -18,15 +18,13 @@
  */
 
 oppia.factory('StateTopAnswersStatsService', [
-  '$injector', '$rootScope', 'AngularNameService',
-  'AnswerClassificationService', 'AnswerStatsObjectFactory',
-  'ExplorationContextService', 'ExplorationStatesService',
-  'UrlInterpolationService',
+  '$injector', 'AngularNameService', 'AnswerClassificationService',
+  'AnswerStatsObjectFactory', 'ExplorationContextService',
+  'ExplorationStatesService',
   function(
-      $injector, $rootScope, AngularNameService,
-      AnswerClassificationService, AnswerStatsObjectFactory,
-      ExplorationContextService, ExplorationStatesService,
-      UrlInterpolationService) {
+      $injector, AngularNameService, AnswerClassificationService,
+      AnswerStatsObjectFactory, ExplorationContextService,
+      ExplorationStatesService) {
     /**
      * @typedef AnswerStatsCache
      * @property {AnswerStats[]} allAnswers
