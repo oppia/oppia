@@ -38,12 +38,12 @@ describe('Sidebar state name controller', function() {
       };
       module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
+        $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function(
-        $controller, $filter, $injector, $rootScope) {
+    beforeEach(inject(function($controller, $filter, $injector, $rootScope) {
       scope = $rootScope.$new();
       filter = $filter;
       rootScope = $rootScope;
@@ -51,8 +51,6 @@ describe('Sidebar state name controller', function() {
       fs = $injector.get('FocusManagerService');
       ess = $injector.get('ExplorationStatesService');
       $httpBackend = $injector.get('$httpBackend');
-
-      GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
 
       ess.init({
         'First State': {

@@ -29,12 +29,14 @@ oppia.directive('collectionNodeCreator', [
         'CollectionLinearizerService', 'CollectionUpdateService',
         'CollectionNodeObjectFactory', 'ExplorationSummaryBackendApiService',
         'SearchExplorationsBackendApiService', 'siteAnalyticsService',
+        'INVALID_NAME_CHARS',
         function(
             $scope, $http, $window, $filter, AlertsService,
             ValidatorsService, CollectionEditorStateService,
             CollectionLinearizerService, CollectionUpdateService,
             CollectionNodeObjectFactory, ExplorationSummaryBackendApiService,
-            SearchExplorationsBackendApiService, siteAnalyticsService) {
+            SearchExplorationsBackendApiService, siteAnalyticsService,
+            INVALID_NAME_CHARS) {
           $scope.collection = CollectionEditorStateService.getCollection();
           $scope.newExplorationId = '';
           $scope.newExplorationTitle = '';
@@ -73,7 +75,7 @@ oppia.directive('collectionNodeCreator', [
 
           var isValidSearchQuery = function(searchQuery) {
             // Allow underscores because they are allowed in exploration IDs.
-            var INVALID_SEARCH_CHARS = GLOBALS.INVALID_NAME_CHARS.replace(
+            var INVALID_SEARCH_CHARS = INVALID_NAME_CHARS.replace(
               '_', '');
             for (var i = 0; i < INVALID_SEARCH_CHARS.length; i++) {
               if (searchQuery.indexOf(INVALID_SEARCH_CHARS[i]) !== -1) {
