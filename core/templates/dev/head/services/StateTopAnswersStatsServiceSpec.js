@@ -221,8 +221,8 @@ describe('StateTopAnswersStatsService', function() {
         expect(this.stas.getUnresolvedStateStats('Hola'))
           .toContain(joC({answer: 'adios'}));
 
-        var newAnswerGroups = 
-          angular.copy(this.ess.getState('Hola').interaction.answerGroups);
+        var newAnswerGroups = angular.copy(
+          this.ess.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules.push(
           this.rof.createNew('Contains', {x: 'adios'}));
         this.ess.saveInteractionAnswerGroups('Hola', newAnswerGroups);
@@ -235,8 +235,8 @@ describe('StateTopAnswersStatsService', function() {
         expect(this.stas.getUnresolvedStateStats('Hola'))
           .not.toContain(joC({answer: 'hola'}));
 
-        var newAnswerGroups =
-          angular.copy(this.ess.getState('Hola').interaction.answerGroups);
+        var newAnswerGroups = angular.copy(
+          this.ess.getState('Hola').interaction.answerGroups);
         newAnswerGroups[0].rules = [
           this.rof.createNew('Contains', {x: 'bonjour'})
         ];
