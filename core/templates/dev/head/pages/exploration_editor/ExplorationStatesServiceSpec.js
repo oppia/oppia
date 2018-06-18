@@ -34,13 +34,18 @@ describe('ExplorationStatesService', function() {
           param_changes: [],
           interaction: {
             answer_groups: [{
-              rule_specs: [{type: 'Contains', inputs: {x: 'hola'}}],
+              rule_specs: [{rule_type: 'Contains', inputs: {x: 'hola'}}],
               outcome: {
                 dest: 'Me Llamo',
-                feedback: {html: 'buen trabajo!'}
+                feedback: {html: 'buen trabajo!'},
+                labelled_as_correct: true
               }
             }],
-            defaultOutcome: {dest: 'Hola'},
+            default_outcome: {
+              dest: 'Hola',
+              feedback: {html: 'try again!'},
+              labelled_as_correct: false
+            },
             hints: [],
             id: 'TextInput',
           },
