@@ -35,12 +35,8 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        can_create_topic = (
-            role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
-
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD,
-            'can_create_topic': can_create_topic
+            'nav_mode': feconf.NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD
         })
         self.render_template(
             'pages/topics_and_skills_dashboard/'
@@ -72,11 +68,16 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
                     'is_published'] = topic_rights.topic_is_published
 
         can_delete_topic = (
-            role_services.ACTION_EDIT_ANY_TOPIC in self.user.actions)
+            role_services.ACTION_DELETE_TOPIC in self.user.actions)
+
+        can_create_topic = (
+            role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
+
         self.values.update({
             'skill_summary_dicts': skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
-            'can_delete_topic': can_delete_topic
+            'can_delete_topic': can_delete_topic,
+            'can_create_topic': can_create_topic
         })
         self.render_json(self.values)
 

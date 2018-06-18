@@ -38,7 +38,10 @@ oppia.factory('TopicCreationService', [
           controller: [
             '$scope', '$uibModalInstance',
             function($scope, $uibModalInstance) {
-              $scope.isTopicNameEmpty = true;
+              $scope.topicName = '';
+              $scope.isTopicNameEmpty = function(topicName) {
+                return (topicName === '');
+              };
               $scope.save = function(topicName) {
                 $uibModalInstance.close(topicName);
               };

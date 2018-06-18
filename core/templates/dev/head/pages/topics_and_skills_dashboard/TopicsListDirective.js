@@ -21,7 +21,7 @@ oppia.directive('topicsList', [
       restrict: 'E',
       scope: {
         getTopicSummaries: '&topicSummaries',
-        getCanDeleteTopic: '&canDeleteTopic'
+        canDeleteTopic: '&userCanDeleteTopic'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/topics_list_directive.html'),

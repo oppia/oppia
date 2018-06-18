@@ -2,7 +2,7 @@
 
   <li ng-mouseover="blurNavigationLinks($event)">
     <div class="oppia-navbar-button-container">
-      <button ng-click="createTopic()" ng-if="canCreateTopic"
+      <button ng-click="createTopic()" ng-if="userCanCreateNewTopic"
               class="btn oppia-navbar-button oppia-transition-200">
         <span class="oppia-navbar-tab-content">Create Topic</span>
       </button>

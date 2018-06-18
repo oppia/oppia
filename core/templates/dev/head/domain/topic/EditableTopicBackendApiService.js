@@ -46,8 +46,7 @@ oppia.factory('EditableTopicBackendApiService', [
         EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
           topic_id: topicId
         });
-      // eslint-disable-next-line dot-notation
-      $http.delete(topicDataUrl).then(function(response) {
+      $http['delete'](topicDataUrl).then(function(response) {
         if (successCallback) {
           successCallback(response.status);
         }

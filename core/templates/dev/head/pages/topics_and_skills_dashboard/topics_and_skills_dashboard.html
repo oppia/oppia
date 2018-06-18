@@ -3,13 +3,6 @@
   Topics and Skills Dashboard - Oppia
 {% endblock maintitle %}
 
-{% block header_js %}
-  {{ super() }}
-  <script type="text/javascript">
-    GLOBALS.canCreateTopic = JSON.parse('{{can_create_topic|js_string}}');
-  </script>
-{% endblock header_js %}
-
 {% block navbar_breadcrumb %}
   <topics-and-skills-dashboard-navbar-breadcrumb>
   </topics-and-skills-dashboard-navbar-breadcrumb>
@@ -46,7 +39,7 @@
       </ul>
 
       <div ng-if="activeTab === TAB_NAME_TOPICS">
-        <topics-list topic-summaries="topicSummaries" can-delete-topic="canDeleteTopic"></topics-list>
+        <topics-list topic-summaries="topicSummaries" user-can-delete-topic="userCanDeleteTopic"></topics-list>
       </div>
 
       <div ng-if="activeTab === TAB_NAME_SKILLS">
@@ -63,7 +56,7 @@
         <button class="btn oppia-dashboard-intro-button oppia-transition-200"
                 style="color: white; text-decoration: none;"
                 ng-click="createTopic()"
-                ng-if="canCreateTopic">
+                ng-if="userCanCreateNewTopic">
           Create Topic
         </button>
       </blockquote>
