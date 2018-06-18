@@ -133,7 +133,7 @@ oppia.factory('StateTopAnswersStatsService', [
        */
       getStateStats: function(stateName) {
         if (!stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
-          throw Error('No such state exists.');
+          throw Error(stateName + ' does not exist.');
         }
         return stateTopAnswersStatsCache[stateName].allAnswers;
       },
@@ -145,7 +145,7 @@ oppia.factory('StateTopAnswersStatsService', [
        */
       getUnresolvedStateStats: function(stateName) {
         if (!stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
-          throw Error('No such state exists.');
+          throw Error(stateName + ' does not exist.');
         }
         return stateTopAnswersStatsCache[stateName].unresolvedAnswers;
       },
