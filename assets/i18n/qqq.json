@@ -104,6 +104,7 @@
 	"I18N_DASHBOARD_TABLE_HEADING_PLAYS": "Text shown as table header in list view for explorations on the creator's dashboard - This is the table header for the Plays column.\n{{Identical|Play}}",
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Text shown as table header in list view for explorations on the creator's dashboard - This is the table header for the Rating column.\n{{Identical|Rating}}",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Text shown as table header in list view for explorations on the creator's dashboard - This is the table header for the Unresolved Answers column.",
+	"I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD": "The name to be displayed for the topics and skills dashboard.",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Text displayed in the preferences page. - Text shown in the dialog shown to upload a profile picture. The user can upload the picture by dragging a file to the area with this text.",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Text displayed in the preferences page, or everywhere there's image upload to instruct the user to 'Upload a file' from their computer.",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Text displayed as title when an exploration is unavailable due to having been disabled.",

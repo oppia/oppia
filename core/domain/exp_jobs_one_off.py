@@ -413,8 +413,8 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
 
             try:
                 # Check if commit is to revert the exploration.
-                if change_list and change_list[0].cmd.endswith(
-                        'revert_version_number'):
+                if change_list and change_list[0].cmd == (
+                        exp_models.ExplorationModel.CMD_REVERT_COMMIT):
                     reverted_version = change_list[0].version_number
                     # pylint: disable=line-too-long
                     state_id_mapping = exp_services.generate_state_id_mapping_model_for_reverted_exploration(

@@ -1499,8 +1499,8 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 'state_name': state_name,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'new_value': {
-                    'html': new_content,
-                    'audio_translations': {},
+                    'content_id': 'content',
+                    'html': new_content
                 }
             })], 'Change content description')
 

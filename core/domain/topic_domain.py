@@ -46,7 +46,7 @@ CMD_DELETE_SUBTOPIC = 'delete_subtopic'
 CMD_ADD_UNCATEGORIZED_SKILL_ID = 'add_uncategorized_skill_id'
 CMD_REMOVE_UNCATEGORIZED_SKILL_ID = 'remove_uncategorized_skill_id'
 CMD_MOVE_SKILL_ID_TO_SUBTOPIC = 'move_skill_id_to_subtopic'
-CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'REMOVE_SKILL_ID_FROM_SUBTOPIC'
+CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC = 'remove_skill_id_from_subtopic'
 # These take additional 'property_name' and 'new_value' parameters and,
 # optionally, 'old_value'.
 CMD_UPDATE_TOPIC_PROPERTY = 'update_topic_property'
@@ -77,6 +77,8 @@ class TopicChange(object):
                 below, together with the other keys in the dict:
                 - 'update_topic_property' (with property_name, new_value
                 and old_value)
+                - 'update_subtopic_property' (with property_name, new_value
+                and old_value)
 
         Raises:
             Exception: The given change dict is not valid.
@@ -86,8 +88,8 @@ class TopicChange(object):
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_ADD_SUBTOPIC:
-            self.id = change_dict['subtopic_id']
             self.title = change_dict['title']
+            self.subtopic_id = change_dict['subtopic_id']
         elif self.cmd == CMD_DELETE_SUBTOPIC:
             self.id = change_dict['subtopic_id']
         elif self.cmd == CMD_ADD_UNCATEGORIZED_SKILL_ID:
@@ -142,7 +144,7 @@ class Subtopic(object):
         """Constructs a Subtopic domain object.
 
         Args:
-            subtopic_id: str. The unique ID of the subtopic.
+            subtopic_id: int. The number of the subtopic.
             title: str. The title of the subtopic.
             skill_ids: list(str). The list of skill ids that are part of this
                 subtopic.
@@ -199,6 +201,9 @@ class Subtopic(object):
             ValidationError: One or more attributes of the subtopic are
                 invalid.
         """
+        if not isinstance(self.id, int):
+            raise utils.ValidationError(
+                'Expected subtopic id to be an int, received %s' % self.id)
         if not isinstance(self.title, basestring):
             raise utils.ValidationError(
                 'Expected subtopic title to be a string, received %s' %
@@ -227,8 +232,8 @@ class Topic(object):
     def __init__(
             self, topic_id, name, description, canonical_story_ids,
             additional_story_ids, uncategorized_skill_ids, subtopics,
-            subtopic_schema_version, language_code, version, created_on=None,
-            last_updated=None):
+            subtopic_schema_version, next_subtopic_id, language_code, version,
+            created_on=None, last_updated=None):
         """Constructs a Topic domain object.
 
         Args:
@@ -245,6 +250,7 @@ class Topic(object):
                 the topic.
             subtopic_schema_version: int. The current schema version of the
                 subtopic dict.
+            next_subtopic_id: int. The id for the next subtopic in the topic.
             created_on: datetime.datetime. Date and time when the topic is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -261,6 +267,7 @@ class Topic(object):
         self.uncategorized_skill_ids = uncategorized_skill_ids
         self.subtopics = subtopics
         self.subtopic_schema_version = subtopic_schema_version
+        self.next_subtopic_id = next_subtopic_id
         self.language_code = language_code
         self.created_on = created_on
         self.last_updated = last_updated
@@ -283,6 +290,7 @@ class Topic(object):
                 subtopic.to_dict() for subtopic in self.subtopics
             ],
             'subtopic_schema_version': self.subtopic_schema_version,
+            'next_subtopic_id': self.next_subtopic_id,
             'language_code': self.language_code,
             'version': self.version
         }
@@ -360,6 +368,11 @@ class Topic(object):
                 'Expected subtopics to be a list, received %s'
                 % self.subtopics)
 
+        if not isinstance(self.next_subtopic_id, int):
+            raise utils.ValidationError(
+                'Expected next_subtopic_id to be an int, received %s'
+                % self.next_subtopic_id)
+
         if not isinstance(self.subtopic_schema_version, int):
             raise utils.ValidationError(
                 'Expected schema version to be an integer, received %s'
@@ -379,6 +392,11 @@ class Topic(object):
                     'Expected each subtopic to be a Subtopic object, '
                     'received %s' % subtopic)
             subtopic.validate()
+            if subtopic.id >= self.next_subtopic_id:
+                raise utils.ValidationError(
+                    'The id for subtopic %s is greater than or equal to '
+                    'next_subtopic_id %s'
+                    % (subtopic.id, self.next_subtopic_id))
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
@@ -432,7 +450,7 @@ class Topic(object):
         """
         return cls(
             topic_id, name,
-            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [],
+            feconf.DEFAULT_TOPIC_DESCRIPTION, [], [], [], [], 1,
             feconf.CURRENT_SUBTOPIC_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE, 0)
 
@@ -562,21 +580,27 @@ class Topic(object):
                 return ind
         return None
 
-    def add_subtopic(self, subtopic_id, title):
+    def add_subtopic(self, new_subtopic_id, title):
         """Adds a subtopic with the given id and title.
 
         Args:
-            subtopic_id: str. The id for the new subtopic.
+            new_subtopic_id: int. The id of the new subtopic.
             title: str. The title for the new subtopic.
 
         Raises:
-            Exception. A subtopic with the given id already exists.
+            Exception. The new_subtopic_id and the expected next subtopic id
+                differs.
+        Returns:
+            int. The id of the newly created subtopic.
         """
-        if self.get_subtopic_index(subtopic_id) is not None:
+        if self.next_subtopic_id != new_subtopic_id:
             raise Exception(
-                'A subtopic with id %s already exists. ' % subtopic_id)
+                'The given new subtopic id %s is not equal to the expected '
+                'next subtopic id: %s'
+                % (new_subtopic_id, self.next_subtopic_id))
+        self.next_subtopic_id = self.next_subtopic_id + 1
         self.subtopics.append(
-            Subtopic.create_default_subtopic(subtopic_id, title))
+            Subtopic.create_default_subtopic(new_subtopic_id, title))
 
     def delete_subtopic(self, subtopic_id):
         """Deletes the subtopic with the given id and adds all its skills to
@@ -694,8 +718,8 @@ class TopicSummary(object):
     def __init__(
             self, topic_id, name, language_code, version,
             canonical_story_count, additional_story_count,
-            uncategorized_skill_count, subtopic_count, topic_model_created_on,
-            topic_model_last_updated):
+            uncategorized_skill_count, subtopic_count, total_skill_count,
+            topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
         Args:
@@ -710,6 +734,8 @@ class TopicSummary(object):
             uncategorized_skill_count: int. The number of uncategorized skills
                 in the topic.
             subtopic_count: int. The number of subtopics in the topic.
+            total_skill_count: int. The total number of skills in the topic
+                (including those that are uncategorized).
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
@@ -723,6 +749,7 @@ class TopicSummary(object):
         self.additional_story_count = additional_story_count
         self.uncategorized_skill_count = uncategorized_skill_count
         self.subtopic_count = subtopic_count
+        self.total_skill_count = total_skill_count
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
 
@@ -741,8 +768,11 @@ class TopicSummary(object):
             'additional_story_count': self.additional_story_count,
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
-            'topic_model_created_on': self.topic_model_created_on,
-            'topic_model_last_updated': self.topic_model_last_updated
+            'total_skill_count': self.total_skill_count,
+            'topic_model_created_on': utils.get_time_in_millisecs(
+                self.topic_model_created_on),
+            'topic_model_last_updated': utils.get_time_in_millisecs(
+                self.topic_model_last_updated)
         }
 
 

@@ -20,6 +20,8 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import story_domain
 from core.domain import story_services
+from core.domain import subtopic_page_domain
+from core.domain import subtopic_page_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -83,6 +85,47 @@ class TopicEditorPage(base.BaseHandler):
         self.render_template('pages/topic_editor/topic_editor.html')
 
 
+class EditableSubtopicPageDataHandler(base.BaseHandler):
+    """The data handler for subtopic pages."""
+
+    def _require_valid_version(
+            self, version_from_payload, subtopic_page_version):
+        """Check that the payload version matches the given subtopic page
+        version.
+        """
+        if version_from_payload is None:
+            raise base.BaseHandler.InvalidInputException(
+                'Invalid POST request: a version must be specified.')
+
+        if version_from_payload != subtopic_page_version:
+            raise base.BaseHandler.InvalidInputException(
+                'Trying to update version %s of subtopic page from version %s, '
+                'which is too old. Please reload the page and try again.'
+                % (subtopic_page_version, version_from_payload))
+
+    @acl_decorators.can_edit_subtopic_page
+    def get(self, topic_id, subtopic_id):
+        """Handles GET requests."""
+
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        topic_domain.Topic.require_valid_topic_id(topic_id)
+
+        subtopic_page = subtopic_page_services.get_subtopic_page_by_id(
+            topic_id, subtopic_id, strict=False)
+
+        if subtopic_page is None:
+            raise self.PageNotFoundException(
+                Exception('The subtopic with the given id doesn\'t exist.'))
+
+        self.values.update({
+            'subtopic_page': subtopic_page.to_dict()
+        })
+
+        self.render_json(self.values)
+
+
 class EditableTopicDataHandler(base.BaseHandler):
     """A data handler for topics which supports writing."""
 
@@ -122,7 +165,13 @@ class EditableTopicDataHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_topic
     def put(self, topic_id):
-        """Updates properties of the given topic."""
+        """Updates properties of the given topic.
+        Also, each change_dict given for editing should have an additional
+        property called is_topic_change, which would be a boolean. If True, it
+        means that change is for a topic (includes adding and removing
+        subtopics), while False would mean it is for a Subtopic Page (this
+        includes editing its html data as of now).
+        """
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
@@ -136,14 +185,20 @@ class EditableTopicDataHandler(base.BaseHandler):
         self._require_valid_version(version, topic.version)
 
         commit_message = self.payload.get('commit_message')
-        change_dicts = self.payload.get('change_dicts')
-        change_list = [
-            topic_domain.TopicChange(change_dict)
-            for change_dict in change_dicts
-        ]
+        topic_and_subtopic_page_change_dicts = self.payload.get(
+            'topic_and_subtopic_page_change_dicts')
+        topic_and_subtopic_page_change_list = []
+        for change in topic_and_subtopic_page_change_dicts:
+            if change['change_affects_subtopic_page']:
+                topic_and_subtopic_page_change_list.append(
+                    subtopic_page_domain.SubtopicPageChange(change))
+            else:
+                topic_and_subtopic_page_change_list.append(
+                    topic_domain.TopicChange(change))
         try:
-            topic_services.update_topic(
-                self.user_id, topic_id, change_list, commit_message)
+            topic_services.update_topic_and_subtopic_pages(
+                self.user_id, topic_id, topic_and_subtopic_page_change_list,
+                commit_message)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 

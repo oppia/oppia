@@ -30,7 +30,8 @@
           <em>Nothing</em>
         </span>
         <span ng-if="outcome.hasNonemptyFeedback()" style="word-wrap: break-word;">
-          <span class="oppia-rte-editor" angular-html-bind="outcome.feedback.getHtml()"></span>
+          <angular-html-bind class="oppia-rte-editor" html-data="outcome.feedback.getHtml()">
+          </angular-html-bind>
         </span>
       </div>
     </div>
@@ -68,9 +69,8 @@
 
 <div ng-if="!outcome.feedback.getHtml().isEmpty() && displayFeedback">
   <audio-translations-editor component-name="<[COMPONENT_NAME_FEEDBACK]>"
-                             subtitled-html="outcome.feedback"
-                             on-start-edit="onAudioTranslationsStartEditAction"
-                             on-change="onAudioTranslationsEdited">
+                             content-id="outcome.feedback.getContentId()"
+                             on-start-edit="onAudioTranslationsStartEditAction">
   </audio-translations-editor>
 </div>
 
