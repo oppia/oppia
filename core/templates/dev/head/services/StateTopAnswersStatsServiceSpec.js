@@ -154,8 +154,46 @@ describe('StateTopAnswersStatsService', function() {
         expect(this.stas.getStateStats('Me Llamo')).toEqual([]);
         expect(this.stas.getUnresolvedStateStats('Me Llamo')).toEqual([]);
       });
+    });
 
+    describe('State Deletion', function() {
+      beforeEach(function() {
+        spyOn(this.cls, 'deleteState');
+      });
 
+      it('throws an error after deleting the stats', function() {
+        this.ess.deleteState('Hola');
+
+        expect(function() {
+          this.stas.getStateStats('Hola');
+        }).toThrow();
+        expect(function() {
+          this.stas.getUnresolvedStateStats('Hola');
+        }).toThrow();
+      });
+    });
+
+    describe('State Renaming', function() {
+      beforeEach(function() {
+        spyOn(this.cls, 'renameState');
+      });
+
+      it('only recognizes the renamed state', function() {
+        var oldStats = this.stas.getStateStats('Hola');
+        var oldUnresolvedStats = this.stas.getUnresolvedStateStats('Hola');
+
+        this.ess.renameState('Hola', 'Bonjour');
+
+        expect(this.stas.getStateStats('Bonjour')).toEqual(oldStats);
+        expect(this.stas.getUnresolvedStateStats('Bonjour'))
+          .toEqual(oldUnresolvedStats);
+        expect(function() {
+          this.stas.getStateStats('Hola');
+        }).toThrow();
+        expect(function() {
+          this.stas.getUnresolvedStateStats('Hola');
+        }).toThrow();
+      });
     });
   });
 });
