@@ -46,7 +46,7 @@ var expectComponentDetailsToMatch = function(elem, tabArray) {
             expect(titleElems[i].getText()).toMatch(tabArray[i].title);
             titleElems[i].click();
             forms.expectRichText(
-              contentElems[i].element(by.xpath('./span'))
+              contentElems[i].element(by.css('.protractor-test-tab-content'))
             ).toMatch(tabArray[i].content);
           }
         });

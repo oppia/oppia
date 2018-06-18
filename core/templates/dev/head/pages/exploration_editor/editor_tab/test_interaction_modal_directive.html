@@ -5,7 +5,10 @@
         <img class="preview-conversation-skin-row-avatar-img" ng-src="<[userBlackImgUrl]>">
       </td>
       <td class="preview-conversation-skin-oppia-content">
-        <div angular-html-bind="stateContent()"></div>
+        <div>
+          <angular-html-bind html-data="stateContent()">
+          </angular-html-bind>
+        </div>
       </td>
     </tr>
   </table>
@@ -16,7 +19,8 @@
           <td class="preview-conversation-skin-row-avatar" valign="top">
             <img class="preview-conversation-skin-row-avatar-img img-circle" ng-src="<[userBlueImgUrl]>" >
           </td>
-          <td class="preview-conversation-skin-learner-input" angular-html-bind="inputTemplate()">
+          <td class="preview-conversation-skin-learner-input">
+            <angular-html-bind html-data="inputTemplate()"></angular-html-bind>
           </td>
         </tr>
       </table>
@@ -25,7 +29,9 @@
   <div class="preview-conversation-skin-supplemental-interaction" ng-if="!interactionIsInline">
     <div>
       <md-card class="preview-conversation-skin-supplemental-card">
-        <div angular-html-bind="inputTemplate()">
+        <div>
+          <angular-html-bind html-data="inputTemplate()">
+          </angular-html-bind>
         </div>
       </md-card>
     </div>
