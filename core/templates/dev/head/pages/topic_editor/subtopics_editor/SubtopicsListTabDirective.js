@@ -32,11 +32,10 @@ oppia.directive('subtopicsListTab', [
             $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
             UndoRedoService, EVENT_TOPIC_REINITIALIZED,
             EVENT_TOPIC_INITIALIZED) {
-
           var _initEditor = function() {
-             $scope.topic = TopicEditorStateService.getTopic();
-             $scope.subtopics = $scope.topic.getSubtopics();
-          }
+            $scope.topic = TopicEditorStateService.getTopic();
+            $scope.subtopics = $scope.topic.getSubtopics();
+          };
 
           $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
           $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
