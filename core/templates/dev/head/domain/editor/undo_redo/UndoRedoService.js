@@ -113,6 +113,18 @@ oppia.factory('UndoRedoService', [
       return committableChangeList;
     };
 
+    UndoRedoService.setBackendChangeList = function(changeList) {
+      for (var i = 0; i < _appliedChanges.length; i++) {
+        //if (changeList[i].is_deleted) {
+        //  changeList.splice(i, 1);
+        //  _appliedChanges.splice(i, 1);
+        ///  i--;
+        //  continue;
+        //}
+        _appliedChanges[i].setBackendChangeObject(changeList[i]);
+      }
+    };
+
     /**
      * Returns the number of changes that have been applied to the domain
      * object.

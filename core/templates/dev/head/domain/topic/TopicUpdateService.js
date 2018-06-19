@@ -195,13 +195,21 @@ oppia.factory('TopicUpdateService', [
        *    created in the current draft of the topic. (i.e, the subtopic to
        *    delete hasn't been saved in the datastore yet.)
        */
-      deleteSubtopic: function(topic, subtopicId, isNewlyCreated) {
+      deleteSubtopic: function(topic, subtopicId) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
           throw Error('Subtopic doesn\'t exist');
         }
         var title = subtopic.getTitle();
         var skillIds = subtopic.getSkillIds();
+        var isNewlyCreated = false;
+        var changeList = UndoRedoService.getCommittableChangeList();
+        for (var i = 0; i < changeList.length; i++) {
+          if (changeList[i].cmd === 'add_subtopic' &&
+              changeList[i].subtopic_id === subtopicId) {
+            isNewlyCreated = true;
+          }
+        }
         _applyChange(topic, CMD_DELETE_SUBTOPIC, {
           subtopic_id: subtopicId,
           change_affects_subtopic_page: false
@@ -210,13 +218,25 @@ oppia.factory('TopicUpdateService', [
           topic.deleteSubtopic(subtopicId, isNewlyCreated);
         }, function(changeDict, topic) {
           // Undo.
-          var subtopicId = _getSubtopicIdFromChangeDict(changeDict);
           topic.undoDeleteSubtopic(
             subtopicId, title, skillIds, isNewlyCreated);
           for (var i = 0; i < skillIds.length; i++) {
             topic.removeUncategorizedSkillId(skillIds[i]);
           }
         });
+        if (isNewlyCreated) {
+          var changeList = UndoRedoService.getCommittableChangeList();
+          var subtopicIdDecrementAmount = 0;
+          for (var i = 0; i < changeList.length; i++) {
+            if (changeList[i].subtopic_id === subtopicId) {
+              subtopicIdDecrementAmount++;
+              changeList[i].is_deleted = true;
+              continue;
+            }
+            changeList[i].subtopic_id -= subtopicIdDecrementAmount;
+          }
+          UndoRedoService.setBackendChangeList(angular.copy(changeList));
+        }
       },
 
       /**

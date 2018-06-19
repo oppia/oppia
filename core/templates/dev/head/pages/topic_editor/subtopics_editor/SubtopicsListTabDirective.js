@@ -43,6 +43,11 @@ oppia.directive('subtopicsListTab', [
           _initEditor();
           $scope.SUBTOPIC_HEADINGS = ['title', 'skills'];
 
+          $scope.deleteSubtopic = function(subtopicId) {
+            TopicUpdateService.deleteSubtopic($scope.topic, subtopicId);
+            _initEditor();
+          };
+
           $scope.createSubtopic = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -68,8 +73,7 @@ oppia.directive('subtopicsListTab', [
 
             modalInstance.result.then(function(title) {
               TopicUpdateService.addSubtopic($scope.topic, title);
-              $scope.topic = TopicEditorStateService.getTopic();
-              $scope.subtopics = $scope.topic.getSubtopics();
+              _initEditor();
             });
           };
         }
