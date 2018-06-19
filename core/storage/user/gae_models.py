@@ -705,7 +705,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
     @classmethod
     def get_all_users_with_score_above_minimum_for_category(
-        cls, score_category):
+            cls, score_category):
         """Gets all instances which have score above the
         MINIMUM_SCORE_REQUIRED_TO_REVIEW threshold for the given category.
 
@@ -718,8 +718,8 @@ class UserContributionScoringModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.score_category == score_category).filter(
-            cls.score >=
-            suggestion_models.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
+                cls.score >=
+                suggestion_models.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
 
     @classmethod
     def get_instance_id(cls, user_id, score_category):
@@ -751,7 +751,7 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         if cls.get_by_id(instance_id):
             raise Exception('There is already an entry with the given id: %s' %
-                instance_id)
+                            instance_id)
 
         cls(id=instance_id, user_id=user_id, score_category=score_category,
             score=score).put()

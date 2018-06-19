@@ -24,8 +24,8 @@ from core.platform import models
 import feconf
 
 (feedback_models, suggestion_models, user_models) = (
-    models.Registry.import_models([models.NAMES.feedback,
-                                   models.NAMES.suggestion, models.NAMES.user]))
+    models.Registry.import_models(
+        [models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user]))
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
@@ -381,8 +381,8 @@ def get_all_scores_for_user(user_id):
     """
     scores = {}
     for model in (
-        user_models.UserContributionScoringModel.get_all_scores_of_user(
-            user_id)):
+            user_models.UserContributionScoringModel.get_all_scores_of_user(
+                user_id)):
         scores[model.score_category] = model.score
 
     return scores
@@ -419,8 +419,9 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
             category.
     """
     return [model.user_id for model in
-    user_models.UserContributionScoringModel
-    .get_all_users_with_score_above_minimum_for_category(score_category)]
+            user_models.UserContributionScoringModel
+            .get_all_users_with_score_above_minimum_for_category(
+                score_category)]
 
 
 def update_score_of_user_for_category(user_id, score_category, update_by):
