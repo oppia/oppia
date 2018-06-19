@@ -44,8 +44,8 @@ class DragAndDropSort(base.BaseInteraction):
                 'type': 'html',
                 'ui_config': {
                     'hide_complex_extensions': True,
-                    'placeholder': 'Enter at least two options for the ' +
-                                   'learner to drag and drop',
+                    'placeholder': 'Enter an option for the learner to drag' +
+                                   ' and drop',
                 },
             },
             'ui_config': {

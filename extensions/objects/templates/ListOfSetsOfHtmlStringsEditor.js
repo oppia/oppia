@@ -30,17 +30,21 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
       },
       template: '<span ng-include="getTemplateUrl()"></span>',
       controller: ['$scope', function($scope) {
+        var errorMessage = '';
+
         if (!$scope.value) {
           $scope.value = [];
         }
-        if (!$scope.prevIndices) {
-          $scope.prevIndices = [];
+        if (!$scope.maxPrevIndex) {
+          $scope.maxPrevIndex = 0;
         }
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
 
         if ($scope.selectedRank !== '' && $scope.selectedRank !== null) {
-          $scope.prevIndices.push(parseInt($scope.selectedRank));
+          if ($scope.maxPrevIndex < parseInt($scope.selectedRank)) {
+            $scope.maxPrevIndex = parseInt($scope.selectedRank);
+          }
         }
 
         $scope.allowedChoices = function() {
@@ -51,29 +55,57 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
           return allowedList;
         };
 
+        // Checks the continuity of positions of the items selected.
+        var checkContinuity = function() {
+          errorMessage = '';
+          var maxRank = 0;
+          var selectedRanks = [];
+          for (var i = 0; i < $scope.choices.length; i++) {
+            var selectElement = document.getElementById('{{i}}');
+            // Get text of selected option from the dropdown.
+            selectedRanks.push(parseInt(
+              selectElement.options[selectElement.selectedIndex].text));
+          }
+          selectedRanks = new Set(selectedRanks);
+          maxRank = math.max(selectedRanks);
+          if (math.sum(selectedRanks) !== (maxRank * (maxRank + 1) / 2)) {
+            errorMessage = (
+              'Please enter positions of the items in continuous order.');
+          }
+        };
+
         $scope.selectedItem = function(choiceListIndex) {
           var choiceHtml = $scope.choices[choiceListIndex].id;
           var selectedRank = parseInt($scope.selectedRank) - 1;
-          var flag = 0;
+          var choiceHtmlHasBeenAdded = false;
+          if ($scope.maxPrevIndex < parseInt($scope.selectedRank)) {
+            $scope.maxPrevIndex = parseInt($scope.selectedRank);
+          }
+
+          checkContinuity();
           for (var i = 0; i < $scope.value.length; i++) {
-            flag = 0;
+            choiceHtmlHasBeenAdded = false;
             var choiceHtmlIndex = $scope.value[i].indexOf(choiceHtml);
             if (choiceHtmlIndex > -1) {
               if (i !== selectedRank) {
                 $scope.value[i].splice(choiceHtmlIndex, 1);
                 $scope.value[selectedRank].push(choiceHtml);
-                flag = 1;
+                choiceHtmlHasBeenAdded = true;
                 break;
               }
             }
           }
-          if (flag === 0) {
+          if (choiceHtmlHasBeenAdded === false) {
             if ($scope.value[selectedRank] === undefined) {
               $scope.value[selectedRank] = [choiceHtml];
             } else {
               $scope.value[selectedRank].push(choiceHtml);
             }
           }
+        };
+
+        $scope.getWarningText = function() {
+          return errorMessage;
         };
       }]
     };
