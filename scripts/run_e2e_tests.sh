@@ -30,7 +30,7 @@
 #   --prod_env Run the tests in prod mode. Static resources are served from
 #         build directory and use cache slugs.
 # Sharding must be disabled (either by passing in false to --sharding or 1 to
-# --sharding-instances) if running any tests in isolation (iit or ddescribe).
+# --sharding-instances) if running any tests in isolation (fit or fdescribe).
 #   --suite=suite_name Performs test for different suites.
 #   For performing a full test, no argument is required.
 #   For performing tests on mainEditors, use --suite=mainEditor
@@ -43,6 +43,9 @@
 #   For performing embedding tests, use --suite=embedding
 #
 # The root folder MUST be named 'oppia'.
+#
+# Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
+# single test or test suite.
 
 function cleanup {
   # Send a kill signal to the dev server.

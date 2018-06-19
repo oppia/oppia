@@ -148,7 +148,8 @@ oppia.filter('wrapTextWithEllipsis', [
 // multiple-choice input and image-click input.
 oppia.filter('parameterizeRuleDescription', [
   '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
-  function( $filter, INTERACTION_SPECS, FractionObjectFactory) {
+  'NumberWithUnitsObjectFactory', function( $filter, INTERACTION_SPECS,
+      FractionObjectFactory, NumberWithUnitsObjectFactory) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -239,6 +240,9 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '[reference graph]';
         } else if (varType === 'Fraction') {
           replacementText = FractionObjectFactory
+            .fromDict(inputs[varName]).toString();
+        } else if (varType === 'NumberWithUnits') {
+          replacementText = NumberWithUnitsObjectFactory
             .fromDict(inputs[varName]).toString();
         } else if (
           varType === 'SetOfUnicodeString' ||
