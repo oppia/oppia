@@ -261,167 +261,167 @@ var constants = {
   ],
   "SUPPORTED_AUDIO_LANGUAGES": [{
     "id": "en",
-    "text": "English",
+    "description": "English",
     "related_languages": ["en"]
   }, {
     "id": "ar",
-    "text": "Arabic",
+    "description": "Arabic",
     "related_languages": ["ar"]
   }, {
     "id": "bg",
-    "text": "Bulgarian",
+    "description": "Bulgarian",
     "related_languages": ["bg"]
   }, {
     "id": "bn",
-    "text": "Bangla",
+    "description": "Bangla",
     "related_languages": ["bn"]
   }, {
     "id": "ca",
-    "text": "Catalan",
+    "description": "Catalan",
     "related_languages": ["ca"]
   }, {
     "id": "zh",
-    "text": "Chinese",
+    "description": "Chinese",
     "related_languages": ["zh"]
   }, {
     "id": "hr",
-    "text": "Croatian",
+    "description": "Croatian",
     "related_languages": ["hr"]
   }, {
     "id": "cs",
-    "text": "Czech",
+    "description": "Czech",
     "related_languages": ["cs"]
   }, {
     "id": "da",
-    "text": "Danish",
+    "description": "Danish",
     "related_languages": ["da"]
   }, {
     "id": "nl",
-    "text": "Dutch",
+    "description": "Dutch",
     "related_languages": ["nl"]
   }, {
     "id": "tl",
-    "text": "Filipino",
+    "description": "Filipino",
     "related_languages": ["tl"]
   }, {
     "id": "fi",
-    "text": "Finnish",
+    "description": "Finnish",
     "related_languages": ["fi"]
   }, {
     "id": "fr",
-    "text": "French",
+    "description": "French",
     "related_languages": ["fr"]
   }, {
     "id": "de",
-    "text": "German",
+    "description": "German",
     "related_languages": ["de"]
   }, {
     "id": "el",
-    "text": "Greek",
+    "description": "Greek",
     "related_languages": ["el"]
   }, {
     "id": "he",
-    "text": "Hebrew",
+    "description": "Hebrew",
     "related_languages": ["he"]
   }, {
     "id": "hi",
-    "text": "Hindi",
+    "description": "Hindi",
     "related_languages": ["hi"]
   }, {
     "id": "hi-en",
-    "text": "Hinglish",
+    "description": "Hinglish",
     "related_languages": ["hi", "en"]
   }, {
     "id": "hu",
-    "text": "Hungarian",
+    "description": "Hungarian",
     "related_languages": ["hu"]
   }, {
     "id": "id",
-    "text": "Indonesian",
+    "description": "Indonesian",
     "related_languages": ["id"]
   }, {
     "id": "it",
-    "text": "Italian",
+    "description": "Italian",
     "related_languages": ["it"]
   }, {
     "id": "ja",
-    "text": "Japanese",
+    "description": "Japanese",
     "related_languages": ["ja"]
   }, {
     "id": "kab",
-    "text": "Kabyle",
+    "description": "Kabyle",
     "related_languages": ["kab"]
   }, {
     "id": "ko",
-    "text": "Korean",
+    "description": "Korean",
     "related_languages": ["ko"]
   }, {
     "id": "lv",
-    "text": "Latvian",
+    "description": "Latvian",
     "related_languages": ["lv"]
   }, {
     "id": "lt",
-    "text": "Lithuanian",
+    "description": "Lithuanian",
     "related_languages": ["lt"]
   }, {
     "id": "no",
-    "text": "Norwegian",
+    "description": "Norwegian",
     "related_languages": ["no"]
   }, {
     "id": "fa",
-    "text": "Persian",
+    "description": "Persian",
     "related_languages": ["fa"]
   }, {
     "id": "pl",
-    "text": "Polish",
+    "description": "Polish",
     "related_languages": ["pl"]
   }, {
     "id": "pt",
-    "text": "Portuguese",
+    "description": "Portuguese",
     "related_languages": ["pt"]
   }, {
     "id": "ro",
-    "text": "Romanian",
+    "description": "Romanian",
     "related_languages": ["ro"]
   }, {
     "id": "ru",
-    "text": "Russian",
+    "description": "Russian",
     "related_languages": ["ru"]
   }, {
     "id": "sr",
-    "text": "Serbian",
+    "description": "Serbian",
     "related_languages": ["sr"]
   }, {
     "id": "sk",
-    "text": "Slovak",
+    "description": "Slovak",
     "related_languages": ["sk"]
   }, {
     "id": "sl",
-    "text": "Slovenian",
+    "description": "Slovenian",
     "related_languages": ["sl"]
   }, {
     "id": "es",
-    "text": "Spanish",
+    "description": "Spanish",
     "related_languages": ["es"]
   }, {
     "id": "sv",
-    "text": "Swedish",
+    "description": "Swedish",
     "related_languages": ["sw"]
   }, {
     "id": "th",
-    "text": "Thai",
+    "description": "Thai",
     "related_languages": ["th"]
   }, {
     "id": "tr",
-    "text": "Turkish",
+    "description": "Turkish",
     "related_languages": ["tr"]
   }, {
     "id": "uk",
-    "text": "Ukrainian",
+    "description": "Ukrainian",
     "related_languages": ["uk"]
   }, {
     "id": "vi",
-    "text": "Vietnamese",
+    "description": "Vietnamese",
     "related_languages": ["vi"]
   }],
 

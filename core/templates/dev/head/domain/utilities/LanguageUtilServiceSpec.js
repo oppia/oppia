@@ -23,15 +23,15 @@ describe('Language util service', function() {
     module('oppia', function($provide) {
       var mockSupportedAudioLanguages = [{
         id: 'en',
-        text: 'English',
+        description: 'English',
         related_languages: ['en']
       }, {
         id: 'hi-en',
-        text: 'Hinglish',
+        description: 'Hinglish',
         related_languages: ['hi', 'en']
       }, {
         id: 'es',
-        text: 'Spanish',
+        description: 'Spanish',
         related_languages: ['es']
       }];
       $provide.constant('SUPPORTED_AUDIO_LANGUAGES',
