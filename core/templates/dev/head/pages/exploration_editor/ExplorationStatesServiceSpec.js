@@ -73,16 +73,6 @@ describe('ExplorationStatesService', function() {
 
         expect(callbackSpy).toHaveBeenCalledWith('Me Llamo');
       });
-
-      it('does not accept duplicate callbacks', function() {
-        var callbackSpy = jasmine.createSpy('callback');
-
-        this.ess.registerOnStateAddedCallback(callbackSpy);
-        this.ess.registerOnStateAddedCallback(callbackSpy);
-        this.ess.addState('Me Llamo');
-
-        expect(callbackSpy.calls.count()).toEqual(1);
-      });
     });
 
     describe('.registerOnStateDeletedCallback', function() {
@@ -105,17 +95,6 @@ describe('ExplorationStatesService', function() {
           expect(callbackSpy).toHaveBeenCalledWith('Hola');
         });
       });
-
-      it('does not accept duplicate callbacks', function() {
-        var callbackSpy = jasmine.createSpy('callback');
-
-        this.ess.registerOnStateDeletedCallback(callbackSpy);
-        this.ess.registerOnStateDeletedCallback(callbackSpy);
-
-        this.ess.deleteState('Hola').then(function() {
-          expect(callbackSpy.calls.count()).toEqual(1);
-        });
-      });
     });
 
     describe('.registerOnStateRenamedCallback', function() {
@@ -130,16 +109,6 @@ describe('ExplorationStatesService', function() {
         this.ess.renameState('Hola', 'Bonjour');
 
         expect(callbackSpy).toHaveBeenCalledWith('Hola', 'Bonjour');
-      });
-
-      it('does not accept duplicate callbacks', function() {
-        var callbackSpy = jasmine.createSpy('callback');
-
-        this.ess.registerOnStateRenamedCallback(callbackSpy);
-        this.ess.registerOnStateRenamedCallback(callbackSpy);
-        this.ess.renameState('Hola', 'Bonjour');
-
-        expect(callbackSpy.calls.count()).toEqual(1);
       });
     });
 
@@ -158,18 +127,6 @@ describe('ExplorationStatesService', function() {
 
           expect(callbackSpy).toHaveBeenCalledWith('Hola');
         });
-
-      it('does not accept duplicate callbacks', function() {
-        var callbackSpy = jasmine.createSpy('callback');
-
-        this.ess
-          .registerOnStateInteractionAnswerGroupsSavedCallback(callbackSpy);
-        this.ess
-          .registerOnStateInteractionAnswerGroupsSavedCallback(callbackSpy);
-        this.ess.saveInteractionAnswerGroups('Hola', []);
-
-        expect(callbackSpy.calls.count()).toEqual(1);
-      });
     });
   });
 });

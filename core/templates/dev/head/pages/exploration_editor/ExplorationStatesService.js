@@ -402,25 +402,16 @@ oppia.factory('ExplorationStatesService', [
         $rootScope.$broadcast('refreshGraph');
       },
       registerOnStateAddedCallback: function(callback) {
-        if (stateAddedCallbacks.indexOf(callback) === -1) {
-          stateAddedCallbacks.push(callback);
-        }
+        stateAddedCallbacks.push(callback);
       },
       registerOnStateDeletedCallback: function(callback) {
-        if (stateDeletedCallbacks.indexOf(callback) === -1) {
-          stateDeletedCallbacks.push(callback);
-        }
+        stateDeletedCallbacks.push(callback);
       },
       registerOnStateRenamedCallback: function(callback) {
-        if (stateRenamedCallbacks.indexOf(callback) === -1) {
-          stateRenamedCallbacks.push(callback);
-        }
+        stateRenamedCallbacks.push(callback);
       },
       registerOnStateInteractionAnswerGroupsSavedCallback: function(callback) {
-        if (stateInteractionAnswerGroupsSavedCallbacks.indexOf(
-          callback) === -1) {
-          stateInteractionAnswerGroupsSavedCallbacks.push(callback);
-        }
+        stateInteractionAnswerGroupsSavedCallbacks.push(callback);
       },
     };
   }
