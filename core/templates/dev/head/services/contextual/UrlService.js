@@ -46,6 +46,10 @@ oppia.factory('UrlService', ['$window', function($window) {
     getPathname: function() {
       return this.getCurrentLocation().pathname;
     },
+    getTopicIdFromUrl: function() {
+      var pathname = this.getPathname();
+      return pathname.split('/')[2].substring(0, 12);
+    },
     getQueryFieldValuesAsList: function(fieldName) {
       var fieldValues = [];
       if (this.getCurrentQueryString().indexOf('?') > -1) {

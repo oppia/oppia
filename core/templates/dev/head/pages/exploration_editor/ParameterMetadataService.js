@@ -16,15 +16,18 @@
  * @fileoverview Service for computing parameter metadata.
  */
 
+oppia.constant('PARAM_ACTION_GET', 'get');
+
+oppia.constant('PARAM_ACTION_SET', 'set');
+
 oppia.factory('ParameterMetadataService', [
   'ExplorationStatesService', 'ExpressionInterpolationService',
   'ExplorationParamChangesService', 'GraphDataService',
+  'ParamMetadataObjectFactory', 'PARAM_ACTION_GET', 'PARAM_ACTION_SET',
   function(
       ExplorationStatesService, ExpressionInterpolationService,
-      ExplorationParamChangesService, GraphDataService) {
-    var PARAM_ACTION_GET = 'get';
-    var PARAM_ACTION_SET = 'set';
-
+      ExplorationParamChangesService, GraphDataService,
+      ParamMetadataObjectFactory, PARAM_ACTION_GET, PARAM_ACTION_SET) {
     var PARAM_SOURCE_ANSWER = 'answer';
     var PARAM_SOURCE_CONTENT = 'content';
     var PARAM_SOURCE_FEEDBACK = 'feedback';
@@ -36,41 +39,25 @@ oppia.factory('ParameterMetadataService', [
         var pc = paramChanges[i];
         if (pc.generatorId === 'Copier') {
           if (!pc.customizationArgs.parse_with_jinja) {
-            result.push({
-              action: PARAM_ACTION_SET,
-              paramName: pc.name,
-              source: PARAM_SOURCE_PARAM_CHANGES,
-              sourceInd: i
-            });
+            result.push(ParamMetadataObjectFactory.createWithSetAction(
+              pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
           } else {
             var paramsReferenced = (
               ExpressionInterpolationService.getParamsFromString(
                 pc.customizationArgs.value));
             for (var j = 0; j < paramsReferenced.length; j++) {
-              result.push({
-                action: PARAM_ACTION_GET,
-                paramName: paramsReferenced[j],
-                source: PARAM_SOURCE_PARAM_CHANGES,
-                sourceInd: i
-              });
+              result.push(ParamMetadataObjectFactory.createWithGetAction(
+                paramsReferenced[j], PARAM_SOURCE_PARAM_CHANGES, i));
             }
 
-            result.push({
-              action: PARAM_ACTION_SET,
-              paramName: pc.name,
-              source: PARAM_SOURCE_PARAM_CHANGES,
-              sourceInd: i
-            });
+            result.push(ParamMetadataObjectFactory.createWithSetAction(
+              pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
           }
         } else {
           // RandomSelector. Elements in the list of possibilities are treated
           // as raw unicode strings, not expressions.
-          result.push({
-            action: PARAM_ACTION_SET,
-            paramName: pc.name,
-            source: PARAM_SOURCE_PARAM_CHANGES,
-            sourceInd: i
-          });
+          result.push(ParamMetadataObjectFactory.createWithSetAction(
+            pc.name, PARAM_SOURCE_PARAM_CHANGES, i));
         }
       }
 
@@ -90,20 +77,14 @@ oppia.factory('ParameterMetadataService', [
       ExpressionInterpolationService.getParamsFromString(
         state.content.getHtml()).forEach(
         function(paramName) {
-          result.push({
-            action: PARAM_ACTION_GET,
-            paramName: paramName,
-            source: PARAM_SOURCE_CONTENT
-          });
+          result.push(ParamMetadataObjectFactory.createWithGetAction(
+            paramName, PARAM_SOURCE_CONTENT, null));
         }
       );
 
       // Next, the answer is received.
-      result.push({
-        action: PARAM_ACTION_SET,
-        paramName: 'answer',
-        source: PARAM_SOURCE_ANSWER
-      });
+      result.push(ParamMetadataObjectFactory.createWithSetAction(
+        'answer', PARAM_SOURCE_ANSWER, null));
 
       // Finally, the rule feedback strings are evaluated.
       state.interaction.answerGroups.forEach(function(group) {
@@ -111,12 +92,8 @@ oppia.factory('ParameterMetadataService', [
           ExpressionInterpolationService.getParamsFromString(
             group.outcome.feedback[k]).forEach(
             function(paramName) {
-              result.push({
-                action: PARAM_ACTION_GET,
-                paramName: paramName,
-                source: PARAM_SOURCE_FEEDBACK,
-                sourceInd: k
-              });
+              result.push(ParamMetadataObjectFactory.createWithGetAction(
+                paramName, PARAM_SOURCE_FEEDBACK, k));
             }
           );
         }

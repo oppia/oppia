@@ -64,8 +64,8 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         for topic_summary in topic_summary_dicts:
             topic_rights = topic_rights_dict[topic_summary['id']]
             if topic_rights:
-                topic_summary[
-                    'is_published'] = topic_rights.topic_is_published
+                topic_summary['is_published'] = (
+                    topic_rights.topic_is_published)
 
         can_delete_topic = (
             role_services.ACTION_DELETE_TOPIC in self.user.actions)

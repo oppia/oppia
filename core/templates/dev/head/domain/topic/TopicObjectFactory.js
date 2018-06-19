@@ -19,17 +19,20 @@
 
 oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
   function(SubtopicObjectFactory) {
-    var Topic = function(topicBackendObject) {
-      this._id = topicBackendObject.id;
-      this._name = topicBackendObject.name;
-      this._description = topicBackendObject.description;
-      this._languageCode = topicBackendObject.language_code;
-      this._canonicalStoryIds = topicBackendObject.canonical_story_ids;
-      this._additionalStoryIds = topicBackendObject.additional_story_ids;
-      this._uncategorizedSkillIds = topicBackendObject.uncategorized_skill_ids;
-      this._nextSubtopicId = topicBackendObject.next_subtopic_id;
-      this._version = topicBackendObject.version;
-      this._subtopics = topicBackendObject.subtopics.map(function(subtopic) {
+    var Topic = function(
+        id, name, description, languageCode, canonicalStoryIds,
+        additionalStoryIds, uncategorizedSkillIds, nextSubtopicId, version,
+        subtopics) {
+      this._id = id;
+      this._name = name;
+      this._description = description;
+      this._languageCode = languageCode;
+      this._canonicalStoryIds = canonicalStoryIds;
+      this._additionalStoryIds = additionalStoryIds;
+      this._uncategorizedSkillIds = uncategorizedSkillIds;
+      this._nextSubtopicId = nextSubtopicId;
+      this._version = version;
+      this._subtopics = subtopics.map(function(subtopic) {
         return SubtopicObjectFactory.create(subtopic);
       });
     };
@@ -282,19 +285,24 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     // contexts. This function takes a JSON object which represents a backend
     // topic python dict.
     Topic.create = function(topicBackendObject) {
-      return new Topic(topicBackendObject);
+      return new Topic(
+        topicBackendObject.id, topicBackendObject.name,
+        topicBackendObject.description, topicBackendObject.language_code,
+        topicBackendObject.canonical_story_ids,
+        topicBackendObject.additional_story_ids,
+        topicBackendObject.uncategorized_skill_ids,
+        topicBackendObject.next_subtopic_id, topicBackendObject.version,
+        topicBackendObject.subtopics
+      );
     };
 
-    // Create a new, empty topic. This is not guaranteed to pass validation
-    // tests.
-    Topic.createEmptyTopic = function() {
-      return new Topic({
-        next_subtopic_id: 1,
-        additional_story_ids: [],
-        canonical_story_ids: [],
-        uncategorized_skill_ids: [],
-        subtopics: []
-      });
+    // Create an interstitial topic that would be displayed in the editor until
+    // the actual topic is fetched from the backend.
+    Topic.createInterstitialTopic = function() {
+      return new Topic(
+        null, 'Topic name loading', 'Topic description loading',
+        'en', [], [], [], 1, 1, []
+      );
     };
     return Topic;
   }

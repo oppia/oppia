@@ -27,8 +27,9 @@ oppia.constant(
 oppia.constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');
 
-oppia.controller('TopicEditor', ['$scope', 'TopicEditorStateService',
-  function($scope, TopicEditorStateService) {
-    TopicEditorStateService.loadTopic(GLOBALS.topicId);
+oppia.controller('TopicEditor', [
+  '$scope', 'TopicEditorStateService', 'UrlService',
+  function($scope, TopicEditorStateService, UrlService) {
+    TopicEditorStateService.loadTopic(UrlService.getTopicIdFromUrl());
   }
 ]);

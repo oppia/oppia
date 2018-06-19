@@ -824,7 +824,7 @@ def get_all_topic_rights():
     """Returns the rights object of all topics present in the datastore.
 
     Returns:
-        dict. The dict of right objects of all topics present in
+        dict. The dict of rights objects of all topics present in
             the datastore keyed by topic id.
     """
     topic_rights_models = topic_models.TopicRightsModel.get_all()

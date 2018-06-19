@@ -236,22 +236,22 @@ describe('Topic editor state service', function() {
     }
   );
 
-  it('should initially return an empty topic', function() {
+  it('should initially return an interstitial topic', function() {
     var topic = TopicEditorStateService.getTopic();
-    expect(topic.getId()).toBeUndefined();
-    expect(topic.getName()).toBeUndefined();
-    expect(topic.getDescription()).toBeUndefined();
+    expect(topic.getId()).toEqual(null);
+    expect(topic.getName()).toEqual('Topic name loading');
+    expect(topic.getDescription()).toEqual('Topic description loading');
     expect(topic.getCanonicalStoryIds()).toEqual([]);
     expect(topic.getAdditionalStoryIds()).toEqual([]);
     expect(topic.getUncategorizedSkillIds()).toEqual([]);
     expect(topic.getSubtopics()).toEqual([]);
   });
 
-  it('should initially return an empty topic rights', function() {
+  it('should initially return an interstitial topic rights object', function() {
     var topicRights = TopicEditorStateService.getTopicRights();
-    expect(topicRights.canEditTopic()).toEqual(null);
-    expect(topicRights.canPublishTopic()).toEqual(null);
-    expect(topicRights.isPublished()).toEqual(null);
+    expect(topicRights.isPublished()).toEqual(false);
+    expect(topicRights.canEditTopic()).toEqual(false);
+    expect(topicRights.canPublishTopic()).toEqual(false);
   });
 
   it('should be able to set a new topic with an in-place copy',
@@ -273,7 +273,7 @@ describe('Topic editor state service', function() {
   it('should be able to set a new topic rights with an in-place copy',
     function() {
       var previousTopicRights = TopicEditorStateService.getTopicRights();
-      var expectedTopicRights = TopicRightsObjectFactory.create(
+      var expectedTopicRights = TopicRightsObjectFactory.createFromBackendDict(
         secondTopicRightsObject);
       expect(previousTopicRights).not.toEqual(expectedTopicRights);
 

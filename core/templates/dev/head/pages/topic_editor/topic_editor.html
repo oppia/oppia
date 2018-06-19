@@ -4,13 +4,6 @@
   {{ topic_name }} - Oppia
 {% endblock maintitle %}
 
-{% block header_js %}
-  {{ super() }}
-  <script type="text/javascript">
-    GLOBALS.topicId = JSON.parse('{{topic_id|js_string}}');
-  </script>
-{% endblock header_js %}
-
 {% block navbar_breadcrumb %}
   <topic-editor-navbar-breadcrumb>
   </topic-editor-navbar-breadcrumb>
