@@ -132,13 +132,9 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             exp_services.get_exploration_by_id(
                 suggestion.exploration_id).category)
 
-        # The change_cmd has an old value field which will be set at the time of
-        # accepting the suggestion. For already accepted suggestions of the old
-        # system, this value cannot be determined now. As the suggestions will
-        # be editing only the state content HTML, the translations will not be
-        # affected. The translations are retrieved before accepting. So while
-        # migrating, we can set the translations field as {} without losing any
-        # data.
+        # We do not have any suggestions for translations, hence the migration
+        # job will not be dealing with such suggestions. So while migrating, we
+        # can set the translations field as {} without losing any data.
         change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
             'property_name': exp_domain.STATE_PROPERTY_CONTENT,

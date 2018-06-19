@@ -317,7 +317,7 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
             self.editor, self.EXP_ID, self.owner_id,
             rights_manager.ROLE_EDITOR)
 
-    def test_migration_suggestion(self):
+    def test_suggestion_migration_one_off_job(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         feedback_services.create_suggestion(
             self.EXP_ID, self.author_id, exploration.version, 'State 1',
