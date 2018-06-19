@@ -59,7 +59,9 @@ oppia.directive('hintAndSolutionButtons', [
           $scope.isHintButtonVisible = function(index) {
             return HintsAndSolutionManagerService.isHintViewable(index) &&
               !INTERACTION_SPECS[ExplorationPlayerService.getInteraction(
-                PlayerPositionService.getCurrentStateName()).id].is_terminal;
+                PlayerPositionService.getCurrentStateName()).id].is_terminal &&
+                !INTERACTION_SPECS[ExplorationPlayerService.getInteraction(
+                  PlayerPositionService.getCurrentStateName()).id].is_linear;
           };
 
           $scope.isSolutionButtonVisible = function() {
