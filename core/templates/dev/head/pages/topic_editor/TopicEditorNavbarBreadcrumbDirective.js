@@ -1,4 +1,4 @@
-// Copyright 2018 The Oppia Authors. All Rights Reserved.
+// Copyright 2016 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,28 +13,22 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the topics list viewer.
+ * @fileoverview Controller for the navbar breadcrumb of the topic editor.
  */
-oppia.directive('topicsList', [
+oppia.directive('topicEditorNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        getTopicSummaries: '&topicSummaries'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/topics_and_skills_dashboard/topics_list_directive.html'),
-      controller: ['$scope',
-        function($scope) {
-          // As additional stories are not supported initially, it's not
-          // being shown, for now.
-          $scope.TOPIC_HEADINGS = [
-            'name', 'subtopic_count', 'skill_count',
-            'canonical_story_count', 'topic_status'
-          ];
-          $scope.getTopicEditorUrl = function(topicId) {
-            return '/topic_editor/' + topicId;
-          };
+        '/pages/topic_editor/topic_editor_navbar_breadcrumb_directive.html'),
+      controller: [
+        '$scope', 'TopicEditorStateService',
+        'FocusManagerService', 'TOPIC_NAME_INPUT_FOCUS_LABEL',
+        function(
+            $scope, TopicEditorStateService,
+            FocusManagerService, TOPIC_NAME_INPUT_FOCUS_LABEL) {
+          $scope.topic = TopicEditorStateService.getTopic();
         }
       ]
     };

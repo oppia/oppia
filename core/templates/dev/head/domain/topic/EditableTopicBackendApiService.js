@@ -51,7 +51,7 @@ oppia.factory('EditableTopicBackendApiService', [
       var putData = {
         version: topicVersion,
         commit_message: commitMessage,
-        change_list: changeList
+        topic_and_subtopic_page_change_dicts: changeList
       };
       $http.put(editableTopicDataUrl, putData).then(function(response) {
         // The returned data is an updated topic dict.
