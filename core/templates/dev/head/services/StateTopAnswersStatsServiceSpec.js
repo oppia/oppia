@@ -104,6 +104,15 @@ describe('StateTopAnswersStatsService', function() {
       ]);
     });
 
+    it('throws when fetching stats about non-existent states', function() {
+      expect(function() {
+        this.stas.getStateStats('Me Llamo');
+      }).toThrow();
+      expect(function() {
+        this.stas.getUnresolvedStateStats('Me Llamo');
+      }).toThrow();
+    });
+
     it('registers handlers to ExplorationStatesService', function() {
       var expectedRegistrationFunctions = [
         spyOn(this.ess, 'registerOnStateAddedCallback'),
@@ -117,15 +126,6 @@ describe('StateTopAnswersStatsService', function() {
       expectedRegistrationFunctions.forEach(function(registrationFunction) {
         expect(registrationFunction).toHaveBeenCalled();
       });
-    });
-
-    it('throws when fetching stats about non-existent states', function() {
-      expect(function() {
-        this.stas.getStateStats('Me Llamo');
-      }).toThrow();
-      expect(function() {
-        this.stas.getUnresolvedStateStats('Me Llamo');
-      }).toThrow();
     });
   });
 
