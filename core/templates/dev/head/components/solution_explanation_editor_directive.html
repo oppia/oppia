@@ -12,7 +12,10 @@
           </i>
         </div>
         <strong>Explanation:</strong>
-        <span class="oppia-rte-editor" angular-html-bind="stateSolutionService.savedMemento.explanation.getHtml()"></span>
+        <span>
+          <angular-html-bind class="oppia-rte-editor" html-data="stateSolutionService.savedMemento.explanation.getHtml()">
+          </angular-html-bind>
+        </span>
       </div>
     </div>
   </div>

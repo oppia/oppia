@@ -27,10 +27,11 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
         'number_with_units_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'NumberWithUnitsObjectFactory',
-        'NUMBER_WITH_UNITS_PARSING_ERRORS', 'EVENT_PROGRESS_NAV_SUBMITTED',
-        function(
+        'numberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
+        'EVENT_PROGRESS_NAV_SUBMITTED', function(
             $scope, $attrs, NumberWithUnitsObjectFactory,
-            NUMBER_WITH_UNITS_PARSING_ERRORS, EVENT_PROGRESS_NAV_SUBMITTED) {
+            numberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -106,7 +107,7 @@ oppia.directive('oppiaResponseNumberWithUnits', [
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
-        'number_with_units_directive.html'),
+        'number_with_units_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.answer = NumberWithUnitsObjectFactory.fromDict(
@@ -125,7 +126,7 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
-        'number_with_units_directive.html'),
+        'number_with_units_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.answer = NumberWithUnitsObjectFactory.fromDict(
@@ -135,9 +136,30 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
   }
 ]);
 
-// Rule evaluation for number with units (will be implemented in M1.3).
+// Rules service for number with units interaction.
 oppia.factory('numberWithUnitsRulesService', [
   'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
   function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
+    return {
+      IsEqualTo: function(answer, inputs) {
+        // Returns true only if input is exactly equal to answer.
+        return angular.equals(answer, inputs.f);
+      },
+      IsEquivalentTo: function(answer, inputs) {
+        answer = NumberWithUnitsObjectFactory.fromDict(answer);
+        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
+        if (answer.type === 'fraction') {
+          answer.type = 'real';
+          answer.real = answer.fraction.toFloat();
+        }
+        if (inputs.type === 'fraction') {
+          inputs.type = 'real';
+          inputs.real = inputs.fraction.toFloat();
+        }
+        answerString = answer.toString();
+        inputsString = inputs.toString();
+        return math.unit(answerString).equals(math.unit(inputsString));
+      }
+    };
   }
 ]);

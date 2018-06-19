@@ -51,7 +51,8 @@
     <div ng-show="unresolvedAnswers.length > 0" style="padding-top: 10px;">
       <div class="unresolved-answer" ng-repeat="answer in unresolvedAnswers track by $index">
         <p class="answer-header-label"><strong>Answer</strong></p>
-        <div angular-html-bind="answer.answerTemplate">
+        <div>
+          <angular-html-bind html-data="answer.answerTemplate"></angular-html-bind>
         </div>
         <div>
           <p class="response-header-label"><strong>Response</strong></p>
@@ -63,7 +64,9 @@
               <i class="material-icons md-18"> done </i>
             </button>
           </div>
-          <span angular-html-bind="answer.feedbackHtml"></span>
+          <span>
+            <angular-html-bind html-data="answer.feedbackHtml"></angular-html-bind>
+          </span>
         </div>
       </div>
     </div>

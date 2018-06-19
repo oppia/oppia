@@ -3,12 +3,16 @@
 </div>
 
 <div ng-if="answer.length === 1" class="item-selection-input-response-content">
-  <div angular-html-bind="answer[0]"></div>
+  <angular-html-bind html-data="answer[0]">
+  </angular-html-bind>
 </div>
 
 <ul ng-if="answer.length > 1" class="item-selection-input-response-content">
   <li ng-repeat="response in answer track by $index">
-    <div angular-html-bind="response"></div>
+    <div>
+      <angular-html-bind html-data="response">
+      </angular-html-bind>
+    </div>
   </li>
 </ul>
 

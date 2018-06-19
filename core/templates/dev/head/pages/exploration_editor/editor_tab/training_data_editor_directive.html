@@ -48,7 +48,8 @@
         </div>
 
         <div>
-          <div angular-html-bind="newAnswerTemplate">
+          <div>
+            <angular-html-bind html-data="newAnswerTemplate"></angular-html-bind>
           </div>
         </div>
 
@@ -59,7 +60,8 @@
         </div>
 
         <div>
-          <span ng-if="!newAnswerFeedback.isEmpty()" angular-html-bind="newAnswerFeedback.getHtml()">
+          <span ng-if="!newAnswerFeedback.isEmpty()">
+            <angular-html-bind html-data="newAnswerFeedback.getHtml()"></angular-html-bind>
           </span>
           <span ng-if="newAnswerFeedback.isEmpty()">
             <em>Nothing</em>
@@ -70,7 +72,9 @@
 
         <div>
           <span><strong>and then direct the learner to: </strong></span>
-          <span angular-html-bind="newAnswerOutcomeDest"></span>
+          <span>
+            <angular-html-bind html-data="newAnswerOutcomeDest"></angular-html-bind>
+          </span>
         </div>
 
         <br>
@@ -90,12 +94,16 @@
       </div>
       <div ng-show="!answerGroupHasNonEmptyRules && (trainingData.length === 1)">
         <div class="training-data-answer">
-          <div class="training-data-answer-html" angular-html-bind="trainingData[0].answerTemplate"></div>
+          <div class="training-data-answer-html">
+            <angular-html-bind html-data="trainingData[0].answerTemplate"></angular-html-bind>
+          </div>
         </div>
       </div>
       <div ng-show="(answerGroupHasNonEmptyRules && (trainingData.length > 0)) || (trainingData.length > 1)">
         <div ng-repeat="answer in trainingData track by $index" class="training-data-answer" ng-click="openTrainUnresolvedAnswerModal($index)">
-          <div class="training-data-answer-html" angular-html-bind="answer.answerTemplate"></div>
+          <div class="training-data-answer-html">
+            <angular-html-bind html-data="answer.answerTemplate"></angular-html-bind>
+          </div>
           <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response" ng-click="removeAnswerFromTrainingData($index)">
             <i class="material-icons md-24"></i>
           </span>

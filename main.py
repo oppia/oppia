@@ -43,6 +43,7 @@ from core.controllers import story_editor
 from core.controllers import subscriptions
 from core.controllers import topic_editor
 from core.controllers import topics_and_skills_dashboard
+from core.controllers import translator
 from core.domain import acl_decorators
 from core.domain import user_services
 from core.platform import models
@@ -238,6 +239,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_URL,
         topics_and_skills_dashboard.TopicsAndSkillsDashboardPage),
+    get_redirect_route(
+        r'%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
+        topics_and_skills_dashboard.TopicsAndSkillsDashboardPageDataHandler),
 
     get_redirect_route(
         r'%s/<activity_type>/<activity_id>' %
@@ -367,6 +371,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.EXPLORATION_DATA_PREFIX,
         editor.ExplorationHandler),
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.TRANSLATION_DATA_PREFIX,
+        translator.ExplorationTranslationHandler),
+    get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler),
     get_redirect_route(
@@ -374,7 +381,7 @@ URLS = MAPREDUCE_HANDLERS + [
         editor.ImageUploadHandler),
     get_redirect_route(
         r'/createhandler/audioupload/<exploration_id>',
-        editor.AudioUploadHandler),
+        translator.AudioUploadHandler),
     get_redirect_route(
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
@@ -414,6 +421,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/createhandler/autosave_draft/<exploration_id>',
         editor.EditorAutosaveHandler),
+    get_redirect_route(
+        r'/createhandler/autosave_translation_draft/<exploration_id>',
+        translator.TranslatorAutosaveHandler),
     get_redirect_route(
         r'/createhandler/get_top_unresolved_answers/<exploration_id>',
         editor.TopUnresolvedAnswersHandler),

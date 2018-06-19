@@ -100,3 +100,35 @@ class QuestionModel(base_models.VersionedModel):
             language_code=language_code)
 
         return question_model_instance
+
+
+class QuestionSkillLinkModel(base_models.BaseModel):
+    """Model for storing Question-Skill Links.
+
+    The ID of instances of this class has the form
+    {{random_hash_of_12_chars}}
+    """
+
+    # The ID of the question.
+    question_id = ndb.StringProperty(required=True, indexed=True)
+    # The ID of the skill to which the question is linked.
+    skill_id = ndb.StringProperty(required=True, indexed=True)
+
+    @classmethod
+    def create(
+            cls, question_id, skill_id):
+        """Creates a new QuestionSkillLinkModel entry.
+
+        Args:
+            question_id: str. The ID of the question.
+            skill_id: str. The ID of the skill to which the question is linked.
+
+        Returns:
+            QuestionSkillLinkModel. Instance of the new
+            QuestionSkillLinkModel entry.
+        """
+
+        question_skill_link_model_instance = cls(
+            question_id=question_id, skill_id=skill_id)
+
+        return question_skill_link_model_instance

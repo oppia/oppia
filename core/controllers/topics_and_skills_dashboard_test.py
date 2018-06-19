@@ -26,12 +26,62 @@ class BaseTopicsAndSkillsDashboardTest(test_utils.GenericTestBase):
         """Completes the sign-up process for the various users."""
         super(BaseTopicsAndSkillsDashboardTest, self).setUp()
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.TOPIC_MANAGER_EMAIL, self.TOPIC_MANAGER_USERNAME)
+        self.signup(self.NEW_USER_EMAIL, self.NEW_USER_USERNAME)
+
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.topic_manager_id = self.get_user_id_from_email(
+            self.TOPIC_MANAGER_EMAIL)
+        self.new_user_id = self.get_user_id_from_email(
+            self.NEW_USER_EMAIL)
         self.set_admins([self.ADMIN_USERNAME])
+        self.set_topic_managers([self.TOPIC_MANAGER_USERNAME])
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
             self.topic_id, self.admin_id, 'Name', 'Description', [], [], [],
             [], 1)
+
+
+class TopicsAndSkillsDashboardPageDataHandlerTest(
+        BaseTopicsAndSkillsDashboardTest):
+
+    def test_get(self):
+        # Check that non-admins or non-topic managers cannot access the
+        # topics and skills dashboard data.
+        skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(skill_id, self.admin_id, 'Description')
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            self.login(self.NEW_USER_EMAIL)
+            response = self.testapp.get(
+                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL,
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
+
+            # Check that admins can access the topics and skills dashboard data.
+            self.login(self.ADMIN_EMAIL)
+            json_response = self.get_json(
+                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
+            self.assertEqual(len(json_response['topic_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['topic_summary_dicts'][0]['id'], self.topic_id)
+            self.assertEqual(len(json_response['skill_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['skill_summary_dicts'][0]['id'], skill_id)
+            self.logout()
+
+            # Check that topic managers can access the topics and skills
+            # dashboard editable topic data.
+            self.login(self.ADMIN_EMAIL)
+            json_response = self.get_json(
+                '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
+            self.assertEqual(len(json_response['topic_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['topic_summary_dicts'][0]['id'], self.topic_id)
+            self.assertEqual(len(json_response['skill_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['skill_summary_dicts'][0]['id'], skill_id)
+            self.logout()
 
 
 class NewTopicHandlerTest(BaseTopicsAndSkillsDashboardTest):

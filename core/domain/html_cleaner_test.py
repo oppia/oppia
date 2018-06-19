@@ -287,7 +287,7 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
                 '</td></tr></tbody></table>'
             ),
             'expected_output': (
-                '<p>January  $100  200</p><p>February  $80  400</p>'
+                '<p>January $100 200</p><p>February $80 400</p>'
             )
         }, {
             'html_content': (
@@ -360,3 +360,99 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
         self.assertEqual(
             actual_output_without_migration,
             expected_output_without_migration)
+
+    def test_validate_soup_text_angular(self):
+        test_cases = [
+            (
+                '<p>Hello <b>this </b>is </p><p><br></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;Hello oppia&amp;quot;\" '
+                'heading-with-value=\"&amp;quot;Learn more about APIs&'
+                'amp;quot;\"></oppia-noninteractive-collapsible><br></p><p>'
+                'for migration testing</p>'
+            ),
+            (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            ),
+            (
+                '<p>Hello</p><p>oppia</p><p>testing <i>in progress</i>!</p>'
+            )
+        ]
+
+        expected_output = [False, True, False]
+        err_dict = {}
+
+        for index, test_case in enumerate(test_cases):
+            actual_output = (
+                html_cleaner._validate_soup_for_textangular( # pylint: disable=protected-access
+                    bs4.BeautifulSoup(test_case, 'html.parser'),
+                    err_dict))
+
+            self.assertEqual(actual_output, expected_output[index])
+
+    def test_convert_tag_contents_to_text_angular(self):
+        test_cases = [{
+            'html_content': (
+                '<div>Hello <b>this </b>is </div><p><br></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;Hello oppia&amp;quot;\" '
+                'heading-with-value=\"&amp;quot;Learn more about APIs&amp;'
+                'quot;\"></oppia-noninteractive-collapsible><br></p><p>'
+                'for migration testing</p>'
+            ),
+            'expected_output': (
+                '<div>Hello <b>this </b>is </div><p><br/></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;Hello oppia'
+                '&amp;lt;/p&amp;gt;&amp;quot;\" heading-with-value=\"'
+                '&amp;quot;Learn more about APIs&amp;quot;\">'
+                '</oppia-noninteractive-collapsible><br/></p><p>'
+                'for migration testing</p>'
+            )
+        }, {
+            'html_content': (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            ),
+            'expected_output': (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            )
+        }, {
+            'html_content': (
+                '<span><b>Hello </b></span><div><b><span>this is '
+                'test case</span></b></div><div><b><br></b></div>'
+                '<div><oppia-noninteractive-tabs tab_contents-with-value'
+                '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;span '
+                'style=\\&amp;quot;line-height: 21px; background-color: '
+                'rgb(255, 255, 255);\\&amp;quot;&amp;gt;lorem ipsum&amp;lt;'
+                '/span&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;'
+                'quot;hello&amp;quot;},{&amp;quot;content&amp;quot;:&amp;'
+                'quot;&amp;lt;span style=\\&amp;quot;color: rgb(0, 0, 0); '
+                'font-family: &amp;#39;Times New Roman&amp;#39;; font-size: '
+                'medium; line-height: normal;\\&amp;quot;&amp;gt;&amp;lt;'
+                'font size=\\&amp;quot;3\\&amp;quot; face=\\&amp;quot;Times '
+                'New Roman CE\\&amp;quot;&amp;gt;oppia&amp;lt;/font&amp;gt;'
+                '&amp;lt;/span&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:'
+                '&amp;quot;Savjet 1&amp;quot;}]\"></oppia-noninteractive-tabs>'
+                '<b><br></b></div><div><span></span><b><br></b><div>'
+                '<span><b><br></b></span></div></div>'
+            ),
+            'expected_output': (
+                '<span><b>Hello </b></span><div><b><span>this is '
+                'test case</span></b></div><div><b><br/></b></div>'
+                '<div><oppia-noninteractive-tabs tab_contents-with-value='
+                '\"[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;'
+                'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, '
+                '&amp;quot;title&amp;quot;: &amp;quot;hello&amp;quot;}, '
+                '{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;'
+                'quot;: &amp;quot;Savjet 1&amp;quot;}]\">'
+                '</oppia-noninteractive-tabs><b><br/></b></div>'
+                '<div><span></span><b><br/></b><div>'
+                '<span><b><br/></b></span></div></div>'
+            )
+        }]
+
+        for test_case in test_cases:
+            actual_output = html_cleaner.convert_tag_contents_to_text_angular(
+                test_case['html_content'])
+            self.assertEqual(actual_output, test_case['expected_output'])

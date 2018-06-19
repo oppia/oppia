@@ -4,8 +4,8 @@
   </div>
 
   <div>
-    <div angular-html-bind="answerTemplate">
-    </div>
+    <angular-html-bind html-data="answerTemplate">
+    </angular-html-bind>
   </div>
 
   <br>
@@ -17,7 +17,9 @@
       <form>
         <div class="trained-feedback-selection-container" ng-repeat="outcome in allOutcomes track by $index">
           <button class="trained-feedback-selection" ng-click="selectAnswerGroupIndex($index)" ng-class="{'trained-feedback-selected': $index == selectedAnswerGroupIndex}">
-            <span ng-if="!outcome.feedback.isEmpty()" angular-html-bind="outcome.feedback.getHtml()">
+            <span ng-if="!outcome.feedback.isEmpty()">
+              <angular-html-bind html-data="outcome.feedback.getHtml()">
+              </angular-html-bind>
             </span>
             <span ng-if="outcome.feedback.isEmpty()">
               <em>(No feedback)</em>
