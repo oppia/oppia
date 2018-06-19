@@ -18,12 +18,14 @@ suggestions.
 
 from core.domain import feedback_services
 from core.domain import suggestion_registry
+from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
 
-(feedback_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.suggestion])
+(feedback_models, suggestion_models, user_models) = (
+    models.Registry.import_models([models.NAMES.feedback,
+                                   models.NAMES.suggestion, models.NAMES.user]))
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
@@ -348,3 +350,108 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     feedback_services.create_message(
         get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
         feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
+
+
+def get_user_contribution_scoring_from_model(userContributionScoringModel):
+    """Returns the UserContributionScoring domain object corresponding to the
+    UserContributionScoringModel
+
+    Args:
+        userContributionScoringModel: UserContributionScoringModel. The model
+            instance.
+
+    Returns:
+        UserContributionScoring. The corresponding domain object.
+    """
+    return user_domain.UserContributionScoring(
+        userContributionScoringModel.user_id,
+        userContributionScoringModel.score_category,
+        userContributionScoringModel.score)
+
+
+def get_all_scores_for_user(user_id):
+    """Gets all scores for a given user.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        dict. A dict containing all the scores of the user. The keys of the dict
+            are the score categories and the values are the scores.
+    """
+    scores = {}
+    for model in (
+        user_models.UserContributionScoringModel.get_all_scores_of_user(
+            user_id)):
+        scores[model.score_category] = model.score
+
+    return scores
+
+
+def check_user_can_review_in_category(user_id, score_category):
+    """Checks if user can review suggestions in category score_category.
+    If the user has score above the minimum required score, then the user is
+    allowed to review.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The category to check the user's score.
+
+    Returns:
+        bool. Whether the user can review suggestions under category
+            score_category
+    """
+    instance_id = user_models.UserContributionScoringModel.get_instance_id(
+        user_id, score_category)
+    model = user_models.UserContributionScoringModel.get_by_id(instance_id)
+    return model.score >= suggestion_models.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+
+
+def get_all_user_ids_who_are_allowed_to_review(score_category):
+    """Gets all user_ids of users who are allowed to review (as per their
+    scores) suggestions to a particular category.
+
+    Args:
+        score_category: str. The category of the suggestion.
+
+    Returns:
+        list(str). All user_ids of users who are allowed to review in the given
+            category.
+    """
+    return [model.user_id for model in
+    user_models.UserContributionScoringModel
+    .get_all_users_with_score_above_minimum_for_category(score_category)]
+
+
+def update_score_of_user_for_category(user_id, score_category, update_by):
+    """Update the score of the user in the category by the given amount.
+
+    In the first version of the scoring system, the update_by quantity will be
+    +1, i.e, each user gains a point for a successful contribution and doesn't
+    lose score in any way.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The category of the suggestion.
+        update_by: float. The amount to increase or decrease the score of the
+            user by.
+    """
+    instance_id = user_models.UserContributionScoringModel.get_instance_id(
+        user_id, score_category)
+    model = user_models.UserContributionScoringModel.get_by_id(instance_id)
+    if not model:
+        create_new_user_scores_model(user_id, score_category)
+        model = user_models.UserContributionScoringModel.get_by_id(instance_id)
+    model.score += update_by
+    model.put()
+
+
+def create_new_user_scores_model(user_id, score_category):
+    """Create a new UserContributionScoringModel instance for the user and the
+    given category with a score of 0.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The category of the suggestion.
+    """
+    user_models.UserContributionScoringModel.create(user_id, score_category, 0)

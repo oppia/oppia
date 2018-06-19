@@ -722,7 +722,7 @@ class UserContributionScoringModel(base_models.BaseModel):
             suggestion_models.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
 
     @classmethod
-    def _get_instance_id(cls, user_id, score_category):
+    def get_instance_id(cls, user_id, score_category):
         """Generates the instance id in the form {{score_category}}.{{user_id}}.
 
         Args:
@@ -747,7 +747,7 @@ class UserContributionScoringModel(base_models.BaseModel):
         Raises:
             Exception: There is already an entry with the given id.
         """
-        instance_id = cls._get_instance_id(user_id, score_category)
+        instance_id = cls.get_instance_id(user_id, score_category)
 
         if cls.get_by_id(instance_id):
             raise Exception('There is already an entry with the given id: %s' %
