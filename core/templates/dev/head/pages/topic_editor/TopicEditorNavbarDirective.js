@@ -24,17 +24,17 @@ oppia.directive('topicEditorNavbar', [
         '/pages/topic_editor/topic_editor_navbar_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'UndoRedoService', 'TopicEditorStateService',
+        'UndoRedoService', 'TopicEditorStateService', 'UrlService',
         'TopicRightsBackendApiService', 'TopicEditorRoutingService',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
-            UndoRedoService, TopicEditorStateService,
+            UndoRedoService, TopicEditorStateService, UrlService,
             TopicRightsBackendApiService, TopicEditorRoutingService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
-          $scope.topicId = GLOBALS.topicId;
+          $scope.topicId = UrlService.getTopicIdFromUrl();
           $scope.topic = TopicEditorStateService.getTopic();
           $scope.topicRights = TopicEditorStateService.getTopicRights();
           $scope.isSaveInProgress = TopicEditorStateService.isSavingTopic;

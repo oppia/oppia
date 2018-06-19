@@ -376,9 +376,7 @@ describe('Topic update service', function() {
     expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
     expect(_sampleTopic.getNextSubtopicId()).toEqual(3);
 
-    expect(function() {
-      UndoRedoService.undoChange(_sampleTopic);
-    }).toThrow();
+    expect(UndoRedoService.getChangeCount()).toEqual(1);
   });
 
   it('should create a proper backend change dict for deleting a subtopic',

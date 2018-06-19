@@ -19,7 +19,7 @@ oppia.constant(
   'EDITABLE_TOPIC_DATA_URL_TEMPLATE', '/topic_editor_handler/data/<topic_id>');
 
 oppia.constant('EVENT_TOPIC_DELETED', 'topicDeleted');
-oppia.constant('EVENT_TYPE_TOPIC_CREATION_ENABLED', 'canUserCreateTopic');
+oppia.constant('EVENT_TYPE_TOPIC_CREATION_ENABLED', 'topicCreationEnabled');
 
 oppia.controller('TopicsAndSkillsDashboard', [
   '$scope', '$rootScope', '$http', '$window',
@@ -43,7 +43,7 @@ oppia.controller('TopicsAndSkillsDashboard', [
         $scope.activeTab = $scope.TAB_NAME_TOPICS;
         $scope.userCanCreateTopic = response.data.can_create_topic;
         $rootScope.$broadcast(
-          EVENT_TYPE_TOPIC_CREATION_ENABLED, $scope.userCanCreateNewTopic);
+          EVENT_TYPE_TOPIC_CREATION_ENABLED, $scope.userCanCreateTopic);
         $scope.userCanDeleteTopic = response.data.can_delete_topic;
         if ($scope.topicSummaries.length === 0 &&
             $scope.skillSummaries.length !== 0) {
