@@ -46,10 +46,10 @@ describe('Topic object factory', function() {
 
   it('should be able to create an interstitial topic object', function() {
     var topic = TopicObjectFactory.createInterstitialTopic();
-    expect(topic.getId()).toBeUndefined();
+    expect(topic.getId()).toEqual(null);
     expect(topic.getName()).toEqual('Topic name loading');
     expect(topic.getDescription()).toEqual('Topic description loading');
-    expect(topic.getLanguageCode()).toBeUndefined();
+    expect(topic.getLanguageCode()).toBe('en');
     expect(topic.getSubtopics()).toEqual([]);
     expect(topic.getAdditionalStoryIds()).toEqual([]);
     expect(topic.getCanonicalStoryIds()).toEqual([]);

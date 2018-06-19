@@ -86,4 +86,10 @@ describe('Url Service', function() {
   it('should correctly return hash value of window.location', function() {
     expect(UrlService.getHash()).toBe(sampleHash);
   });
+
+  it('should correctly retrieve topic id from url', function() {
+    mockLocation.pathname = '/topic_editor/abcdefgijklm#'
+    expect(
+      UrlService.getTopicIdFromUrl()).toBe('abcdefgijklm');
+  });
 });

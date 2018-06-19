@@ -238,7 +238,7 @@ describe('Topic editor state service', function() {
 
   it('should initially return an interstitial topic', function() {
     var topic = TopicEditorStateService.getTopic();
-    expect(topic.getId()).toBeUndefined();
+    expect(topic.getId()).toEqual(null);
     expect(topic.getName()).toEqual('Topic name loading');
     expect(topic.getDescription()).toEqual('Topic description loading');
     expect(topic.getCanonicalStoryIds()).toEqual([]);
