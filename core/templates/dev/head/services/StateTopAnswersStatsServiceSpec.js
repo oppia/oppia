@@ -268,8 +268,9 @@ describe('StateTopAnswersStatsService', function() {
 
         var newAnswerGroups = angular.copy(
           this.ess.getState('Hola').interaction.answerGroups);
-        newAnswerGroups[0].rules.push(
-          this.rof.createNew('Contains', {x: 'adios'}));
+        newAnswerGroups[0].rules = [
+          this.rof.createNew('Contains', {x: 'adios'})
+        ];
         this.ess.saveInteractionAnswerGroups('Hola', newAnswerGroups);
 
         expect(this.stas.getUnresolvedStateStats('Hola'))
