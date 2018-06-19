@@ -120,8 +120,7 @@ describe('ExplorationStatesService', function() {
       it('callsback when answer groups of a state are saved', function() {
         var callbackSpy = jasmine.createSpy('callback');
 
-        this.ess
-          .registerOnStateAnswerGroupsSavedCallback(callbackSpy);
+        this.ess.registerOnStateAnswerGroupsSavedCallback(callbackSpy);
         this.ess.saveInteractionAnswerGroups('Hola', []);
 
         expect(callbackSpy).toHaveBeenCalledWith('Hola');
