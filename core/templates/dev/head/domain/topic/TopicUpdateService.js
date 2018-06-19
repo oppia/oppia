@@ -218,22 +218,18 @@ oppia.factory('TopicUpdateService', [
           topic.deleteSubtopic(subtopicId, isNewlyCreated);
         }, function(changeDict, topic) {
           // Undo.
-          topic.undoDeleteSubtopic(
-            subtopicId, title, skillIds, isNewlyCreated);
-          for (var i = 0; i < skillIds.length; i++) {
-            topic.removeUncategorizedSkillId(skillIds[i]);
-          }
+          throw Error('A deleted subtopic cannot be restored');
         });
         if (isNewlyCreated) {
           var changeList = UndoRedoService.getCommittableChangeList();
-          var subtopicIdDecrementAmount = 0;
           for (var i = 0; i < changeList.length; i++) {
             if (changeList[i].subtopic_id === subtopicId) {
-              subtopicIdDecrementAmount++;
               changeList[i].is_deleted = true;
               continue;
             }
-            changeList[i].subtopic_id -= subtopicIdDecrementAmount;
+            if (changeList[i].subtopic_id > subtopicId) {
+              changeList[i].subtopic_id--;
+            }
           }
           UndoRedoService.setBackendChangeList(angular.copy(changeList));
         }

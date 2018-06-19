@@ -29,9 +29,9 @@ oppia.directive('topicEditorNavbar', [
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $rootScope, $uibModal, AlertsService, UndoRedoService,
-            TopicEditorStateService, TopicRightsBackendApiService,
-            TopicEditorRoutingService,
+            $scope, $rootScope, $uibModal, AlertsService,
+            UndoRedoService, TopicEditorStateService,
+            TopicRightsBackendApiService, TopicEditorRoutingService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.topicId = GLOBALS.topicId;

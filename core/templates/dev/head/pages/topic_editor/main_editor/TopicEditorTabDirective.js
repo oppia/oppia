@@ -31,21 +31,15 @@ oppia.directive('topicMainEditor', [
             $scope, TopicEditorStateService, TopicUpdateService,
             UndoRedoService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
-          $scope.topic = TopicEditorStateService.getTopic();
-          $scope.topicRights = TopicEditorStateService.getTopicRights();
-
           var _initEditor = function() {
+            $scope.topic = TopicEditorStateService.getTopic();
+            $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.displayedTopicDescription = (
               $scope.editableDescription !== '');
           };
-
-          $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
-
-          _initEditor();
 
           $scope.openTopicNameEditor = function() {
             if (!$scope.topicRights.canEditName()) {
@@ -74,6 +68,11 @@ oppia.directive('topicMainEditor', [
                 $scope.topic, newDescription);
             }
           };
+
+          $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
+          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+
+          _initEditor();
         }
       ]
     };

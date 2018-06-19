@@ -358,11 +358,9 @@ describe('Topic update service', function() {
       'skill_1', 'skill_2'
     ]);
 
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics().length).toEqual(1);
-    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('Title');
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
+    expect(function() {
+      UndoRedoService.undoChange(_sampleTopic);
+    }).toThrow();
   });
 
   it('should properly remove/add a newly created subtopic', function() {
@@ -378,12 +376,9 @@ describe('Topic update service', function() {
     expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
     expect(_sampleTopic.getNextSubtopicId()).toEqual(3);
 
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics().length).toEqual(3);
-    expect(_sampleTopic.getSubtopics()[1].getTitle()).toEqual('Title2');
-    expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
-    expect(_sampleTopic.getSubtopics()[2].getId()).toEqual(3);
-    expect(_sampleTopic.getNextSubtopicId()).toEqual(4);
+    expect(function() {
+      UndoRedoService.undoChange(_sampleTopic);
+    }).toThrow();
   });
 
   it('should create a proper backend change dict for deleting a subtopic',

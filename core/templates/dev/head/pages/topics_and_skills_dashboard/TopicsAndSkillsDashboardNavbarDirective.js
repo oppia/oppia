@@ -24,15 +24,19 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
         '/pages/topics_and_skills_dashboard/' +
         'topics_and_skills_dashboard_navbar_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'TopicCreationService', 'CAN_USER_CREATE_TOPIC',
+        '$scope', '$rootScope', 'TopicCreationService',
+        'EVENT_TYPE_TOPIC_CREATION_ENABLED',
         function(
-            $scope, $rootScope, TopicCreationService, CAN_USER_CREATE_TOPIC) {
+            $scope, $rootScope, TopicCreationService,
+            EVENT_TYPE_TOPIC_CREATION_ENABLED) {
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
           };
-          $rootScope.$on(CAN_USER_CREATE_TOPIC, function(evt, canCreateTopic) {
-            $scope.userCanCreateNewTopic = canCreateTopic;
-          });
+          $rootScope.$on(
+            EVENT_TYPE_TOPIC_CREATION_ENABLED, function(evt, canCreateTopic) {
+              $scope.userCanCreateTopic = canCreateTopic;
+            }
+          );
         }
       ]
     };
