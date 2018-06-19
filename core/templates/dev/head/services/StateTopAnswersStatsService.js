@@ -90,7 +90,7 @@ oppia.factory('StateTopAnswersStatsService', [
       onStateDeleted(oldStateName);
     };
 
-    var onStateInteractionAnswerGroupsSaved = function(stateName) {
+    var onStateAnswerGroupsSaved = function(stateName) {
       refreshAddressedInfo(stateName);
     };
 
@@ -119,9 +119,8 @@ oppia.factory('StateTopAnswersStatsService', [
         ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
         ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
         ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
-        ExplorationStatesService
-          .registerOnStateInteractionAnswerGroupsSavedCallback(
-            onStateInteractionAnswerGroupsSaved);
+        ExplorationStatesService.registerOnStateAnswerGroupsSavedCallback(
+          onStateAnswerGroupsSaved);
         isInitialized = true;
       },
 

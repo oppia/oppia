@@ -37,7 +37,7 @@ oppia.factory('ExplorationStatesService', [
     var stateAddedCallbacks = [];
     var stateDeletedCallbacks = [];
     var stateRenamedCallbacks = [];
-    var stateInteractionAnswerGroupsSavedCallbacks = [];
+    var stateAnswerGroupsSavedCallbacks = [];
 
     // Properties that have a different backend representation from the
     // frontend and must be converted.
@@ -245,7 +245,7 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
-        stateInteractionAnswerGroupsSavedCallbacks.forEach(function(callback) {
+        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
           callback(stateName);
         });
       },
@@ -410,8 +410,8 @@ oppia.factory('ExplorationStatesService', [
       registerOnStateRenamedCallback: function(callback) {
         stateRenamedCallbacks.push(callback);
       },
-      registerOnStateInteractionAnswerGroupsSavedCallback: function(callback) {
-        stateInteractionAnswerGroupsSavedCallbacks.push(callback);
+      registerOnStateAnswerGroupsSavedCallback: function(callback) {
+        stateAnswerGroupsSavedCallbacks.push(callback);
       },
     };
   }

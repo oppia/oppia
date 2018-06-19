@@ -112,21 +112,20 @@ describe('ExplorationStatesService', function() {
       });
     });
 
-    describe('.registerOnStateInteractionAnswerGroupsSaved', function() {
+    describe('.registerOnStateAnswerGroupsSaved', function() {
       beforeEach(function() {
         spyOn(this.cls, 'editStateProperty');
       });
 
-      it('callsback when interaction answer groups of a state are saved',
-        function() {
-          var callbackSpy = jasmine.createSpy('callback');
+      it('callsback when answer groups of a state are saved', function() {
+        var callbackSpy = jasmine.createSpy('callback');
 
-          this.ess
-            .registerOnStateInteractionAnswerGroupsSavedCallback(callbackSpy);
-          this.ess.saveInteractionAnswerGroups('Hola', []);
+        this.ess
+          .registerOnStateAnswerGroupsSavedCallback(callbackSpy);
+        this.ess.saveInteractionAnswerGroups('Hola', []);
 
-          expect(callbackSpy).toHaveBeenCalledWith('Hola');
-        });
+        expect(callbackSpy).toHaveBeenCalledWith('Hola');
+      });
     });
   });
 });

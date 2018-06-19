@@ -118,7 +118,7 @@ describe('StateTopAnswersStatsService', function() {
         spyOn(this.ess, 'registerOnStateAddedCallback'),
         spyOn(this.ess, 'registerOnStateDeletedCallback'),
         spyOn(this.ess, 'registerOnStateRenamedCallback'),
-        spyOn(this.ess, 'registerOnStateInteractionAnswerGroupsSavedCallback')
+        spyOn(this.ess, 'registerOnStateAnswerGroupsSavedCallback')
       ];
 
       this.stas.init({answers: {}});
@@ -133,7 +133,7 @@ describe('StateTopAnswersStatsService', function() {
         spyOn(this.ess, 'registerOnStateAddedCallback'),
         spyOn(this.ess, 'registerOnStateDeletedCallback'),
         spyOn(this.ess, 'registerOnStateRenamedCallback'),
-        spyOn(this.ess, 'registerOnStateInteractionAnswerGroupsSavedCallback')
+        spyOn(this.ess, 'registerOnStateAnswerGroupsSavedCallback')
       ];
 
       this.stas.init({answers: {}});
