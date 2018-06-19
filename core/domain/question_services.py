@@ -19,7 +19,6 @@
 import logging
 
 from core.domain import question_domain
-from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -62,7 +61,7 @@ def add_question(committer_id, question):
     Returns:
         str. The ID of the question.
     """
-    # question.validate()
+    question.validate()
     commit_message = 'New question created'
     question_id = _create_new_question(committer_id, question, commit_message)
 
@@ -242,8 +241,8 @@ def create_question_summary(
         status: str. The status of the question.
     """
     question = get_question_by_id(question_id)
-    question['creator_id'] = creator_id,
-    question['status'] = status
+    question.update({'creator_id': creator_id})
+    question.update({'status': status})
     question_summary = compute_summary_of_question(question)
     save_question_summary(question_summary)
 
@@ -259,13 +258,10 @@ def compute_summary_of_question(question):
     Returns:
         QuestionSummary. The computed summary for the given question.
     """
-    print '+++++++++++++++++++++++++++++++++++++++++++++++++++++'
-    print question
-    print question['question_id']
-    print '+++++++++++++++++++++++++++++++++++++++++++++++++++++'
     question_summary = question_domain.QuestionSummary(
-        question['question_id'], question['creator_id'], question['language_code'],
-        question['status'], question['question_data']
+        question['question_id'], question['creator_id'],
+        question['language_code'], question['status'],
+        question['question_data']
     )
 
     return question_summary
@@ -293,4 +289,102 @@ def save_question_summary(question_summary):
 
 
 def get_question_summaries_by_creator_id(creator_id):
+    """Gets question summaries of questions created by the user.
+
+    Args:
+        creator_id: str. The user ID of the creator.
+
+    Returns:
+        QuestionSummaryModel. The QuestionSummaryModel for the given question.
+    """
     return question_models.QuestionSummaryModel.get_by_creator_id(creator_id)
+
+
+def get_linked_skills(question_id):
+    """Gets linked skill IDs for given question.
+
+    Args:
+        question_id: str. The question ID for the given question.
+
+    Returns:
+        QuestionSkillLinkModel. The QuestionSkillModel for the given question.
+    """
+    return question_models.QuestionSkillLinkModel.get(question_id)
+
+
+def get_question_rights_from_model(question_rights_model):
+    """Constructs a QuestionRights object from the given question rights model.
+
+    Args:
+        question_rights_model: QuestionRightsModel. Question rights from the
+            datastore.
+
+    Returns:
+        QuestionRights. The rights object created from the model.
+    """
+
+    return question_domain.QuestionRights(
+        question_rights_model.id,
+        question_rights_model.manager_ids
+    )
+
+
+def save_question_rights(
+        question_rights, committer_id, commit_message, commit_cmds):
+    """Saves a QuestionRights domain object to the datastore.
+
+    Args:
+        question_rights: QuestionRights. The rights object for the given
+            question.
+        committer_id: str. ID of the committer.
+        commit_message: str. Descriptive message for the commit.
+        commit_cmds: list(dict). A list of commands describing what kind of
+            commit was done.
+    """
+
+    model = question_models.QuestionRightsModel.get(
+        question_rights.id, strict=False)
+
+    model.manager_ids = question_rights.manager_ids
+
+    model.commit(committer_id, commit_message, commit_cmds)
+
+
+def create_new_question_rights(question_id, committer_id):
+    """Creates a new question rights object and saves it to the datastore.
+
+    Args:
+        question_id: str. ID of the question.
+        committer_id: str. ID of the committer.
+    """
+    question_rights = question_domain.QuestionRights(question_id, [])
+    commit_cmds = [{'cmd': question_domain.CMD_CREATE_NEW}]
+
+    question_models.QuestionRightsModel(
+        id=question_rights.id,
+        manager_ids=question_rights.manager_ids
+    ).commit(committer_id, 'Created new question rights', commit_cmds)
+
+
+def get_question_rights(question_id, strict=True):
+    """Retrieves the rights object for the given question.
+
+    Args:
+        question_id: str. ID of the question.
+        strict: bool. Whether to fail noisily if no question with a given id
+            exists in the datastore.
+
+    Returns:
+        QuestionRights. The rights object associated with the given question.
+
+    Raises:
+        EntityNotFoundError. The question with ID question_id was not
+            found in the datastore.
+    """
+
+    model = question_models.QuestionRightsModel.get(question_id, strict=strict)
+
+    if model is None:
+        return None
+
+    return get_question_rights_from_model(model)

@@ -35,6 +35,7 @@ from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
 from core.controllers import question
+from core.controllers import question_editor
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
@@ -219,9 +220,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),
-    get_redirect_route(
-        r'%s' % feconf.QUESTION_CREATION_URL,
-        creator_dashboard.NewQuestionHandler),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         creator_dashboard.UploadExploration),
@@ -494,7 +492,7 @@ URLS = MAPREDUCE_HANDLERS + [
         question.QuestionsHandler),
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_EDITOR_URL_PREFIX,
-        topic_editor.TopicEditorPage),
+        question_editor.QuestionEditorPage),
 
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,

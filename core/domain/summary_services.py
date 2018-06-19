@@ -755,7 +755,7 @@ def get_displayable_question_summary_dicts(question_summaries):
     valid (i.e., none of them are None).
 
     Args:
-        question_summaries: list(ExplorationSummary). List of question
+        question_summaries: list(QuestionSummary). List of question
         summary objects.
 
     Return:
@@ -763,26 +763,50 @@ def get_displayable_question_summary_dicts(question_summaries):
         Example:
 
         [ {
-            'category': u'A category',
-            'community_owned': False,
-            'id': 'eid2',
-            'language_code': 'en',
-            'num_views': 0,
-            'objective': u'An objective',
-            'status': 'public',
-            'tags': [],
-            'thumbnail_bg_color': '#a33f40',
-            'thumbnail_icon_url': self.get_static_asset_url(
-                '/images/subjects/Lightbulb.svg'),
-            'title': u'Exploration 2 Albert title',
+            'creator_id': u'185804764220139124118',
+            'language_code': u'en',
+            'id': 'F6chQwByyQVu',
+            'status': u'private',
+            'question_data': {
+                u'param_changes': [],
+                u'content_ids_to_audio_translations':{
+                    u'default_outcome': {},
+                    u'content': {}
+                },
+                u'content': {
+                    u'content_id': u'content',
+                    u'html': u''
+                },
+                u'interaction': {
+                    u'id': None,
+                    u'hints': [],
+                    u'default_outcome': {
+                        u'refresher_exploration_id': None,
+                        u'labelled_as_correct': False,
+                        u'dest': u'Introduction',
+                        u'missing_prerequisite_skill_id': None,
+                        u'feedback': {
+                            u'content_id': u'default_outcome',
+                            u'html': u''
+                        },
+                        u'param_changes': []
+                    },
+                    u'confirmed_unclassified_answers': [],
+                    u'answer_groups': [],
+                    u'solution': None,
+                    u'customization_args': {}
+                },
+                u'classifier_model_id': None
+            },
+            'created_on': 1529409528663.468,
+            'last_updated': 1529409528663.472
         }, ]
     """
     displayable_question_summaries = []
 
-    for ind, question_summary in enumerate(question_summaries):
+    for question_summary in question_summaries:
         if not question_summary:
             continue
-
         summary_dict = {
             'id': question_summary.id,
             'creator_id': question_summary.creator_id,

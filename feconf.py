@@ -649,7 +649,9 @@ UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
+NEW_QUESTION_URL = '/question_editor_handler/create_new'
 QUESTION_EDITOR_URL_PREFIX = '/question_editor'
+QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_GET_STARTED = 'get_started'
@@ -667,6 +669,7 @@ NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
 NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
+NAV_MODE_QUESTION_EDITOR = 'question_editor'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

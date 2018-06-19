@@ -128,7 +128,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_commit_log_entry = (
             question_models.QuestionCommitLogEntryModel.get_commit(
-                self.QUESTION_ID, 1)
+                QUESTION_ID, 1)
         )
         self.assertEqual(question_commit_log_entry.commit_type, 'create')
         self.assertEqual(

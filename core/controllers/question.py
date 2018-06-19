@@ -21,8 +21,6 @@ from core.domain import acl_decorators
 from core.domain import question_domain
 from core.domain import question_services
 
-import feconf
-
 
 class QuestionsHandler(base.BaseHandler):
     """This handler completes PUT/DELETE requests for questions."""
@@ -71,28 +69,3 @@ class QuestionCreationHandler(base.BaseHandler):
         return self.render_json({
             'question_id': question_id
         })
-
-
-class QuestionEditorPage(base.BaseHandler):
-    """The editor page for a single question."""
-
-    @acl_decorators.can_create_question
-    def get(self, question_id):
-        """Handles GET requests."""
-
-        if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
-        question_domain.Question.require_valid_question_id(question_id)
-
-        question = question_services.get_question_by_id(question_id)
-
-        if question is None:
-            raise self.PageNotFoundException(
-                Exception('The question with the given id doesn\'t exist.'))
-
-        self.values.update({
-            'question_id': question.id
-        })
-
-        self.render_template('pages/question_editor/question_editor.html')

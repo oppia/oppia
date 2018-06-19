@@ -30,6 +30,10 @@ var constants = {
   "DEFAULT_COLOR": "#a33f40",
   "DEFAULT_THUMBNAIL_ICON": "Lightbulb",
   "DEFAULT_CATEGORY_ICON": "Lightbulb",
+  "QUESTION_STATUS_APPROVED": "approved",
+  "QUESTION_STATUS_PENDING": "pending",
+  "QUESTION_STATUS_PRIVATE": "private",
+  "QUESTION_STATUS_REJECTED": "rejected",
 
   "//": "The default language code for an exploration.",
   "DEFAULT_LANGUAGE_CODE": "en",

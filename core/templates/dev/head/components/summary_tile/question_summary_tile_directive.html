@@ -1,32 +1,22 @@
 <md-card class="oppia-activity-summary-tile" style="position: relative; z-index: 5; width: 100%;">
     <a ng-href="<[getQuestionLink()]>" style="text-decoration: none;">
         <div class="oppia-question-strip" style="background-color: <[getQuestionStripColor()]>"></div>
-        <!-- <div class="oppia-activity-summary-tile">
-            <h3 class="activity-title protractor-test-exp-summary-tile-title" ng-style="isPlaylistTile() && {'width': '93%'}">
-                <span ng-if="isWindowLarge">
-                    <[DEFAULT_EMPTY_DESCRIPTION|truncate:40]>
-                </span>
-                <span ng-if="!isWindowLarge">
-                    <[DEFAULT_EMPTY_DESCRIPTION|truncate:40]>
-                </span>
-            </h3>
-        </div> -->
         <div class="oppia-question-summary-tile">
             <span ng-if="getLastUpdatedDatetime()" class="oppia-question-last-updated">
                 <span class="fa fa-clock-o fa-lg oppia-dashboard-clock-icon" uib-tooltip="Last updated" tooltip-placement="top">
-                        <[getLastUpdatedDatetime()]>
-                <span class="oppia-icon-accessibility-label">Last Updated</span>
+                    <[getLastUpdatedDatetime()]>
+                        <span class="oppia-icon-accessibility-label">Last Updated</span>
+                </span>
+                <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
+                </span>
             </span>
-            <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
-            </span>
-        </span>
-
             <div class="oppia-question-description">
                 <b>Question: </b>
-                <span>Some description goes here. Some description goes here. Some description goes here. Some description goes
-                    here. Some description goes here</span>
+                <span><[getQuestionDescription()]></span>
             </div>
-        </div>
+            <question-skill-list class="">
+
+            </question-skill-list>
         </div>
         <div ng-if="!isPlaylistTile()" class="title-section-mask" ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"></div>
     </a>
@@ -44,6 +34,7 @@
         position: relative;
         float: left;
     }
+
     .oppia-question-strip {
         position: relative;
         float: left;

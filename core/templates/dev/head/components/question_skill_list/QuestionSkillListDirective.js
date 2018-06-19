@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,15 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Summary tile for questions.
+ * @fileoverview Question skill list for questions.
  */
 
-oppia.constant(
-  'QUESTION_VIEWER_URL', '/question/<question_id>');
-oppia.constant(
-  'QUESTION_EDITOR_URL', '/questioncreationhandler/<question_id>');
-
-oppia.directive('questionSummaryTile', [
+oppia.directive('questionSkillList', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -46,16 +41,6 @@ oppia.directive('questionSummaryTile', [
           $scope.getLastUpdatedDatetime = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLastUpdatedMsec());
-          };
-
-          $scope.getQuestionDescription = function () {
-            if ($scope.getDescription()) {
-              // TODO: This description needs to be converted to a readable
-              // and meaningful text.
-              return $scope.getDescription();
-            } else {
-              return 'Edit Question';
-            }
           };
 
           $scope.getQuestionLink = function() {
