@@ -22,7 +22,8 @@ from core.domain import question_domain
 from core.platform import models
 import feconf
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(question_models, skill_models) = models.Registry.import_models(
+    [models.NAMES.question, models.NAMES.skill])
 
 CMD_CREATE_NEW = 'create_new'
 
@@ -113,7 +114,8 @@ def get_question_by_id(question_id):
         Question or None. The domain object representing a question with the
         given id, or None if it does not exist.
     """
-    question_model = question_models.QuestionModel.get(question_id)
+    question_model = question_models.QuestionModel.get(
+        question_id, strict=False)
     if question_model:
         question = get_question_from_model(question_model).to_dict()
         return question
@@ -300,7 +302,7 @@ def get_question_summaries_by_creator_id(creator_id):
     return question_models.QuestionSummaryModel.get_by_creator_id(creator_id)
 
 
-def get_linked_skills(question_id):
+def get_skill_summaries_of_linked_skills(question_id):
     """Gets linked skill IDs for given question.
 
     Args:
@@ -309,7 +311,18 @@ def get_linked_skills(question_id):
     Returns:
         QuestionSkillLinkModel. The QuestionSkillModel for the given question.
     """
-    return question_models.QuestionSkillLinkModel.get(question_id)
+    linked_skill_summaries = []
+    question_skill_links = question_models.QuestionSkillLinkModel.get(
+        question_id, strict=False)
+
+    if question_skill_links is None:
+        return None
+    for question_skill_link in question_skill_links:
+        linked_skill_summaries = (
+            skill_models.SkillSummaryModel.get(
+                question_skill_link.skill_id, strict=False))
+
+    return linked_skill_summaries
 
 
 def get_question_rights_from_model(question_rights_model):

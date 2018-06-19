@@ -1,4 +1,4 @@
-// Copyright 2016 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -29,7 +29,8 @@ oppia.directive('questionSummaryTile', [
         getQuestionId: '&questionId',
         getDescription: '&description',
         getLastUpdatedMsec: '&lastUpdatedMsec',
-        getStatus: '&status'
+        getStatus: '&status',
+        getTaggedSkills: '=taggedSkills'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_tile/' +
@@ -39,10 +40,6 @@ oppia.directive('questionSummaryTile', [
         'QUESTION_VIEWER_URL', 'QUESTION_EDITOR_URL', function(
             $scope, DateTimeFormatService,
             QUESTION_VIEWER_URL, QUESTION_EDITOR_URL) {
-          $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
-          $scope.DEFAULT_EMPTY_DESCRIPTION = 'Question is empty';
-          $scope.ACTIVITY_TYPE_QUESTION = constants.ACTIVITY_TYPE_QUESTION;
-
           $scope.getLastUpdatedDatetime = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLastUpdatedMsec());
@@ -54,7 +51,8 @@ oppia.directive('questionSummaryTile', [
               // and meaningful text.
               return $scope.getDescription();
             } else {
-              return 'Edit Question';
+              return 'This question is private. Tag it with a skill and ' +
+              'publish it.';
             }
           };
 
@@ -70,8 +68,7 @@ oppia.directive('questionSummaryTile', [
           };
 
           $scope.getQuestionStripColor = function () {
-            status = $scope.getStatus();
-            return constants.CATEGORIES_TO_COLORS[status];
+            return constants.CATEGORIES_TO_COLORS[$scope.getStatus()];
           };
 
           $scope.setHoverState = function(hoverState) {

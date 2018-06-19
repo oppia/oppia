@@ -1,59 +1,73 @@
-<md-card class="oppia-activity-summary-tile" style="position: relative; z-index: 5; width: 100%;">
-    <a ng-href="<[getQuestionLink()]>" style="text-decoration: none;">
-        <div class="oppia-question-strip" style="background-color: <[getQuestionStripColor()]>"></div>
-        <div class="oppia-question-summary-tile">
-            <span ng-if="getLastUpdatedDatetime()" class="oppia-question-last-updated">
-                <span class="fa fa-clock-o fa-lg oppia-dashboard-clock-icon" uib-tooltip="Last updated" tooltip-placement="top">
-                    <[getLastUpdatedDatetime()]>
-                        <span class="oppia-icon-accessibility-label">Last Updated</span>
-                </span>
-                <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
-                </span>
-            </span>
-            <div class="oppia-question-description">
-                <b>Question: </b>
-                <span><[getQuestionDescription()]></span>
-            </div>
-            <question-skill-list class="">
-
-            </question-skill-list>
-        </div>
-        <div ng-if="!isPlaylistTile()" class="title-section-mask" ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"></div>
-    </a>
+<md-card class="oppia-activity-summary-tile" style="z-index: 5; width: 100%;">
+  <a ng-href="<[getQuestionLink()]>" style="text-decoration: none;">
+    <div class="oppia-question-summary-tile" style="border-left-color: <[getQuestionStripColor()]>">
+      <div class="oppia-question-description oppia-activity-summary-contents">
+        <em>
+          <b>Question: </b>
+          <span>
+            <[getQuestionDescription()]>
+          </span>
+        </em>
+      </div>
+      <span ng-if="getLastUpdatedDatetime()" class="oppia-question-last-updated">
+        <span class="fa fa-clock-o fa-lg oppia-dashboard-clock-icon" uib-tooltip="Last updated" tooltip-placement="top">
+          <[getLastUpdatedDatetime()]>
+            <span class="oppia-icon-accessibility-label">Last Updated</span>
+        </span>
+        <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
+        </span>
+      </span>
+      <br>
+      <div class="oppia-dashboard-tagged-skills oppia-activity-summary-contents">
+        <span ng-repeat="skill in getTaggedSkills">
+          <span class="oppia-dasboard-skill">
+            <[skill]>
+          </span>
+        </span>
+      </div>
+      <div class="oppia-dashboard-tagged-skills oppia-activity-summary-contents" ng-if="!getTaggedSkills">
+        <span class="oppia-dasboard-skill">
+          <em>Edit Question to tag skills.</em>
+        </span>
+      </div>
+    </div>
+    <div ng-if="!isPlaylistTile()" class="title-section-mask" ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"></div>
+  </a>
 </md-card>
 
 <style>
-    .oppia-question-last-updated {
-        position: relative;
-        float: right;
-        padding: 10px 10px 0 0;
-        font-size: 0.7em
-    }
+  .oppia-question-summary-tile .oppia-activity-summary-contents {
+    display: inline-block;
+  }
 
-    .oppia-dashboard-clock-icon {
-        position: relative;
-        float: left;
-    }
+  .oppia-question-summary-tile  {
+    border-left: 60px solid;
+  }
 
-    .oppia-question-strip {
-        position: relative;
-        float: left;
-        width: 50px;
-        height: 125px;
-    }
+  .oppia-dasboard-skill {
+    border: 2px solid black;
+    border-radius: 3px;
+    padding: 5px;
+    margin-right: 5px;
+  }
 
-    .oppia-question-description {
-        padding-top: 10px;
-        padding-left: 60px;
-        max-width: 85%;
-    }
+  .oppia-dashboard-tagged-skills {
+    font-size: 0.8em;
+    margin: 60px 0 15px 10px;
+  }
 
-    .oppia-activity-summary-tile .thumbnail-image {
-        top: 15.5%;
-    }
+  .oppia-question-last-updated {
+    float: right;
+    padding: 10px 10px 0 0;
+    font-size: 0.7em
+  }
 
-    .oppia-activity-summary-tile .collection-corner-image {
-        position: absolute;
-        width: 36px;
-    }
+  .oppia-dashboard-clock-icon {
+    position: relative;
+    float: left;
+  }
+
+  .oppia-question-description {
+    padding: 10px 0 0 10px;    
+  }
 </style>

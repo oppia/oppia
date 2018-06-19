@@ -431,18 +431,20 @@
                   translate="I18N_CREATE_QUESTION">
           </button>
         </div>
-        <ul class="oppia-dashboard-tiles"
+        
+        <div class="oppia-dashboard-tiles"
             ng-if="activeTab === 'myQuestions' && questionsList.length > 0">
           <span ng-repeat="question in questionsList | filter:{status: activeSection}">
             <span ng-class="activeSection">
               <question-summary-tile question-id="question.id"
                                      description="question.question_data.content.html"
                                      last-updated-msec="question.last_updated"
-                                     status="question.status">
+                                     status="question.status"
+                                     tagged-skills="question.tagged_skills">
               </question-summary-tile>
               </span>
           </span>
-        </ul>
+        </div>
       </div>
   </div>
   <style>
@@ -459,7 +461,7 @@
     }
 
     .oppia-creator-dashboard-questions {
-      max-width: 80%;
+      max-width: 55%;
       margin: 0 auto;
     }
 
@@ -771,18 +773,10 @@
       margin: 0 auto;
       width: 50%;
     }
-
-    @media(max-width: 1475px) {
-      ul.oppia-dashboard-tiles {
-        width: 60%;
-      }
-    }
-
-    @media(max-width: 1265px) {
-      ul.oppia-dashboard-tiles {
-        margin: 0 50px 0 auto;
-        width: 70%;
-      }
+    
+    .oppia-dashboard-tiles {
+      margin: 0 0 0 auto;
+      width: 68%;
     }
 
     @media(max-width: 815px) {
@@ -881,6 +875,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/QuestionSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/question_skill_list/QuestionSkillListDirective.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/creator_dashboard/CreatorDashboardBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/creator_dashboard/CreatorDashboard.js"></script>

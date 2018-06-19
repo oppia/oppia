@@ -176,6 +176,20 @@ class CreatorDashboardHandler(base.BaseHandler):
             summary_services.get_displayable_question_summary_dicts(
                 question_summaries))
 
+        for question_summary in question_summary_dicts:
+            skill_summaries_of_linked_question = (
+                question_services.get_skill_summaries_of_linked_skills(
+                    question_summary['id']))
+
+            if skill_summaries_of_linked_question is None:
+                question_summary.update({'tagged_skills': None})
+            else:
+                skill_list = []
+                for skill_summary in skill_summaries_of_linked_question:
+                    skill_list.append(skill_summary.description)
+                question_summary.update({'tagged_skills': skill_list})
+
+
         # TODO(bhenning): Update this to use unresolved answers from
         # stats_services once the training interface is enabled and it's cheaper
         # to retrieve top answers from stats_services.

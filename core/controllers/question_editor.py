@@ -33,14 +33,14 @@ class QuestionEditorPage(base.BaseHandler):
     def get(self, question_id):
         """Handles GET requests."""
 
-        if feconf.ENABLE_NEW_STRUCTURES:
+        if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         question = question_services.get_question_by_id(question_id)
 
         if question is None:
             raise self.PageNotFoundException(
-                Exception('The question with the given id doesn\'t exist.'))
+                'The question with the given id doesn\'t exist.')
 
         self.values.update({
             'question_id': question['question_id'],
@@ -77,11 +77,11 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         question_domain.Question.require_valid_question_id(question_id)
 
-        question = question_services.get_question_by_id(question_id, strict=False)
+        question = question_services.get_question_by_id(question_id)
 
         if question is None:
             raise self.PageNotFoundException(
-                Exception('The question with the given id doesn\'t exist.'))
+                'The question with the given id doesn\'t exist.')
 
         self.values.update({
             'question': question.to_dict()
@@ -91,18 +91,12 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
     @acl_decorators.can_edit_question
     def put(self, question_id):
-        """Updates properties of the given question.
-        Also, each change_dict given for editing should have an additional
-        property called is_question_change, which would be a boolean. If True, it
-        means that change is for a question (includes adding and removing
-        subquestions), while False would mean it is for a Subquestion Page (this
-        includes editing its html data as of now).
-        """
+        """Updates properties of the given question."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
         question_domain.Question.require_valid_question_id(question_id)
-        question = question_services.get_question_by_id(question_id, strict=False)
+        question = question_services.get_question_by_id(question_id)
         if question is None:
             raise self.PageNotFoundException(
                 Exception('The question with the given id doesn\'t exist.'))
@@ -112,23 +106,20 @@ class EditableQuestionDataHandler(base.BaseHandler):
 
         commit_message = self.payload.get('commit_message')
         question_page_change_dicts = self.payload.get(
-            'question_and_subquestion_page_change_dicts')
-        question_and_subquestion_page_change_list = []
-        for change in question_and_subquestion_page_change_dicts:
-            if change['change_affects_subquestion_page']:
-                question_and_subquestion_page_change_list.append(
-                    subquestion_page_domain.SubquestionPageChange(change))
-            else:
-                question_and_subquestion_page_change_list.append(
-                    question_domain.QuestionChange(change))
+            'question__page_change_dicts')
+        question_page_change_list = []
+        for change in question_page_change_dicts:
+            question_page_change_list.append(
+                question_domain.QuestionChange(change))
         try:
-            question_services.update_question_and_subquestion_pages(
-                self.user_id, question_id, question_and_subquestion_page_change_list,
+            question_services.update_question_pages(
+                self.user_id, question_id, question_page_change_list,
                 commit_message)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        question_dict = question_services.get_question_by_id(question_id).to_dict()
+        question_dict = question_services.get_question_by_id(
+            question_id).to_dict()
 
         self.values.update({
             'question': question_dict
@@ -143,10 +134,10 @@ class EditableQuestionDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         question_domain.Question.require_valid_question_id(question_id)
-        question = question_services.get_question_by_id(question_id, strict=False)
+        question = question_services.get_question_by_id(question_id)
         if question is None:
             raise self.PageNotFoundException(
-                Exception('The question with the given id doesn\'t exist.'))
+                'The question with the given id doesn\'t exist.')
         question_services.delete_question(self.user_id, question_id)
 
 
@@ -158,7 +149,7 @@ class QuestionRightsHandler(base.BaseHandler):
         """Returns the QuestionRights object of a question."""
         question_domain.Question.require_valid_question_id(question_id)
 
-        question_rights = question_services.get_question_rights(question_id, strict=False)
+        question_rights = question_services.get_question_rights(question_id)
         if question_rights is None:
             raise self.InvalidInputException(
                 'Expected a valid question id to be provided.')
@@ -167,7 +158,7 @@ class QuestionRightsHandler(base.BaseHandler):
             user_actions_info, question_rights)
 
         can_publish_question = (
-            role_services.ACTION_CHANGE_TOPIC_STATUS in
+            role_services.ACTION_CHANGE_QUESTION_STATUS in
             user_actions_info.actions)
 
         self.values.update({
@@ -175,31 +166,6 @@ class QuestionRightsHandler(base.BaseHandler):
             'published': question_rights.question_is_published,
             'can_publish_question': can_publish_question
         })
-
-        self.render_json(self.values)
-
-
-class QuestionManagerRightsHandler(base.BaseHandler):
-    """A handler for assigning question manager rights."""
-
-    @acl_decorators.can_manage_rights_for_question
-    def put(self, question_id, assignee_id):
-        """Assign question manager role to a user for a particular question, if the
-        user has general question manager rights.
-        """
-        question_domain.Question.require_valid_question_id(question_id)
-
-        if assignee_id is None:
-            raise self.InvalidInputException(
-                'Expected a valid assignee id to be provided.')
-        assignee_actions_info = user_services.UserActionsInfo(assignee_id)
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-        try:
-            question_services.assign_role(
-                user_actions_info, assignee_actions_info,
-                question_domain.ROLE_MANAGER, question_id)
-        except Exception as e:
-            raise self.UnauthorizedUserException(e)
 
         self.render_json(self.values)
 
