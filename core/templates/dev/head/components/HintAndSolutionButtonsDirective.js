@@ -28,13 +28,13 @@ oppia.directive('hintAndSolutionButtons', [
         'ExplorationPlayerService', 'PlayerTranscriptService',
         'HintAndSolutionModalService', 'DeviceInfoService',
         'PlayerPositionService', 'EVENT_ACTIVE_CARD_CHANGED',
-        'EVENT_NEW_CARD_OPENED',
+        'EVENT_NEW_CARD_OPENED', 'INTERACTION_SPECS',
         function(
             $scope, $rootScope, HintsAndSolutionManagerService,
             ExplorationPlayerService, PlayerTranscriptService,
             HintAndSolutionModalService, DeviceInfoService,
             PlayerPositionService, EVENT_ACTIVE_CARD_CHANGED,
-            EVENT_NEW_CARD_OPENED) {
+            EVENT_NEW_CARD_OPENED, INTERACTION_SPECS) {
           // The state name of the latest card that's open. This is the state
           // name that the current hints and solution correspond to.
           var latestStateName = null;
@@ -57,7 +57,9 @@ oppia.directive('hintAndSolutionButtons', [
           };
 
           $scope.isHintButtonVisible = function(index) {
-            return HintsAndSolutionManagerService.isHintViewable(index);
+            return HintsAndSolutionManagerService.isHintViewable(index) &&
+              !INTERACTION_SPECS[ExplorationPlayerService.getInteraction(
+                PlayerPositionService.getCurrentStateName()).id].is_terminal;
           };
 
           $scope.isSolutionButtonVisible = function() {
