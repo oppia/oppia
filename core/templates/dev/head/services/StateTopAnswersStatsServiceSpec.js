@@ -127,6 +127,23 @@ describe('StateTopAnswersStatsService', function() {
         expect(registrationFunction).toHaveBeenCalled();
       });
     });
+
+    it('does not register duplicate handlers if called again', function() {
+      var expectedRegistrationFunctions = [
+        spyOn(this.ess, 'registerOnStateAddedCallback'),
+        spyOn(this.ess, 'registerOnStateDeletedCallback'),
+        spyOn(this.ess, 'registerOnStateRenamedCallback'),
+        spyOn(this.ess, 'registerOnStateInteractionAnswerGroupsSavedCallback')
+      ];
+
+      this.stas.init({answers: {}});
+      // Second call should not add more callbacks.
+      this.stas.init({answers: {}});
+
+      expectedRegistrationFunctions.forEach(function(registrationFunction) {
+        expect(registrationFunction.calls.count()).toEqual(1);
+      });
+    });
   });
 
   describe('.hasStateStats', function() {

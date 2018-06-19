@@ -103,6 +103,9 @@ oppia.factory('StateTopAnswersStatsService', [
        *    backend representation of the state top answers statistics.
        */
       init: function(stateTopAnswersStatsBackendDict) {
+        if (isInitialized) {
+          return;
+        }
         stateTopAnswersStatsCache = {};
         for (var stateName in stateTopAnswersStatsBackendDict.answers) {
           stateTopAnswersStatsCache[stateName] = {
