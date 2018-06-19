@@ -26,7 +26,7 @@ from core.platform import models
 
 
 class SuggestionHandler(base.BaseHandler):
-    """"Handles operations relating to learner suggestions."""
+    """"Handles operations relating to suggestions."""
 
     @acl_decorators.can_suggest_changes
     def post(self):
@@ -75,13 +75,12 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
                                              'suggestion_id')
 
         action = self.payload.get('action')
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         if action == self.ACTION_TYPE_ACCEPT:
-            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
                 self.payload.get('review_message'))
         elif action == self.ACTION_TYPE_REJECT:
-            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
             suggestion_services.reject_suggestion(
                 suggestion, self.user_id, self.payload.get('review_message'))
         else:
