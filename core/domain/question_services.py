@@ -19,6 +19,7 @@
 import logging
 
 from core.domain import question_domain
+from core.domain import role_services
 from core.platform import models
 import feconf
 
@@ -401,3 +402,23 @@ def get_question_rights(question_id, strict=True):
         return None
 
     return get_question_rights_from_model(model)
+
+
+def check_can_edit_question(user, question_rights):
+    """Checks whether the user can edit the given question.
+
+    Args:
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        question_rights: QuestionRights or None. Rights object for the
+            given question.
+
+    Returns:
+        bool. Whether the given user can edit the given question.
+    """
+    if question_rights is None:
+        return False
+    if role_services.ACTION_EDIT_ANY_QUESTION in user.actions:
+        return True
+
+    return False
