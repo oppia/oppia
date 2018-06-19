@@ -1,0 +1,65 @@
+<div class="modal-header">
+  <b>Rules and possible unit formats</b>
+</div>
+<div class="modal-body">
+  <style>
+    td {
+      padding: 5px;
+      width: 30%;
+    }
+  </style>
+  <table class="table-bordered">
+    <tr>
+      <td><b>Rule Description</b></td>
+      <td><b>Incorrect Format</b></td>
+      <td><b>Correct Format</b></td>
+    </tr>
+    <tr>
+      <td>
+        Separate value and the unit with one space.
+      </td>
+      <td>3km</td>
+      <td>3 km</td>
+    </tr>
+    <tr>
+      <td>
+        In case the value is a fraction, separate numerator and denominator by
+        forward slash '/' symbol.
+      </td>
+      <td>3 by 5 km</td>
+      <td>3/5 km</td>
+    </tr>
+    <tr>
+      <td>
+        For multiplying two or more units, put one space or asterisk '*' between them.
+      </td>
+      <td>5 J-s <br>  5 J . s</td>
+      <td>5 J s <br> 5 J * s</td>
+    </tr>
+    <tr>
+      <td>
+        For adding dimensions to the unit, use caret '^' symbol to add both positive
+        and negative powers.
+      </td>
+      <td>5 kg / m(2) <br> 5 kg / m**2 <br> 5 kg m^(-2)</td>
+      <td>5 kg / m^2 <br> 5 kg / m^2 <br> 5 kg m^-2</td>
+    </tr>
+    <tr>
+      <td>
+        In case of multiple units in the denominator, enclose them within the parenthesis.
+      </td>
+      <td>5 kg / m * s <br> 5 kg/m*s</td>
+      <td>5 kg / (m * s) <br> 5 kg / m / s</td>
+    </tr>
+    <tr>
+      <td>
+        For writing beginning units (like currencies), separate unit and value with one space.
+      </td>
+      <td>$5 <br> 5$ <br> 5 $</td>
+      <td>$ 5</td>
+    </tr>
+  </table>
+</div>
+<div class="modal-footer">
+  <button class="btn" ng-click="close()">Close</button>
+</div>
