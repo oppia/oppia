@@ -73,7 +73,7 @@ source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
 # Install third party dependencies
-bash scripts/install_third_party.sh
+#bash scripts/install_third_party.sh
 
 for arg in "$@"; do
   if [ "$arg" == "--generate_coverage_report" ]; then
