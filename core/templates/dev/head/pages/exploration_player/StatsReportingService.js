@@ -275,7 +275,7 @@ oppia.factory('StatsReportingService', [
           PlaythroughService.recordExplorationQuitAction(
             stateName, stateStopwatch.getTimeInSecs());
 
-          PlaythroughService.recordPlaythrough();
+          PlaythroughService.recordPlaythrough(true);
         }
       },
       recordAnswerSubmitted: function(

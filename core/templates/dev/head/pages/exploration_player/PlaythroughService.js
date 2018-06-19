@@ -254,11 +254,15 @@ oppia.factory('PlaythroughService', [
           CURRENT_ACTION_SCHEMA_VERSION
         ));
       },
-      recordPlaythrough: function() {
+      recordPlaythrough: function(isExplorationComplete) {
+        if (isExplorationComplete) {
+          // If the exploration is completed, do not check for issues.
+          return;
+        }
         if (playthrough.playthroughId) {
           // Playthrough ID exists, so issue has already been identified and we
           // update the playthrough.
-          storePlaythrough();
+          storePlaythrough(false);
         } else {
           // Playthrough ID doesn't exist.
           analyzePlaythrough();

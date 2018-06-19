@@ -58,11 +58,8 @@ describe('Playthrough Object Factory', function() {
     expect(playthroughObject.expVersion).toEqual(1);
     expect(playthroughObject.issueType).toEqual('EarlyQuit');
     expect(playthroughObject.issueCustomizationArgs).toEqual({});
-    expect(playthroughObject.actions).toEqual([this.laof.createFromBackendDict({
-      action_type: 'AnswerSubmit',
-      action_customization_args: {},
-      schema_version: 1
-    })]);
+    expect(playthroughObject.actions).toEqual([this.laof.createNew(
+      'AnswerSubmit', {}, 1)]);
   });
 
   it('should convert a playthrough to a backend dict', function() {
