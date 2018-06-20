@@ -55,25 +55,6 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
           return allowedList;
         };
 
-        // Checks the continuity of positions of the items selected.
-        var checkContinuity = function() {
-          errorMessage = '';
-          var maxRank = 0;
-          var selectedRanks = [];
-          for (var i = 0; i < $scope.choices.length; i++) {
-            var selectElement = document.getElementById('{{i}}');
-            // Get text of selected option from the dropdown.
-            selectedRanks.push(parseInt(
-              selectElement.options[selectElement.selectedIndex].text));
-          }
-          selectedRanks = new Set(selectedRanks);
-          maxRank = math.max(selectedRanks);
-          if (math.sum(selectedRanks) !== (maxRank * (maxRank + 1) / 2)) {
-            errorMessage = (
-              'Please enter positions of the items in continuous order.');
-          }
-        };
-
         $scope.selectedItem = function(choiceListIndex) {
           var choiceHtml = $scope.choices[choiceListIndex].id;
           var selectedRank = parseInt($scope.selectedRank) - 1;
@@ -82,14 +63,19 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
             $scope.maxPrevIndex = parseInt($scope.selectedRank);
           }
 
-          checkContinuity();
           for (var i = 0; i < $scope.value.length; i++) {
             choiceHtmlHasBeenAdded = false;
+            errorMessage = '';
             var choiceHtmlIndex = $scope.value[i].indexOf(choiceHtml);
             if (choiceHtmlIndex > -1) {
               if (i !== selectedRank) {
                 $scope.value[i].splice(choiceHtmlIndex, 1);
                 $scope.value[selectedRank].push(choiceHtml);
+                if ($scope.value[i] === []) {
+                  // Continuity error.
+                  errorMessage = ('Rank ' + String(i + 1) + ' is missing. ' +
+                    'Please enter positions of the items in continuous order.');
+                }
                 choiceHtmlHasBeenAdded = true;
                 break;
               }
