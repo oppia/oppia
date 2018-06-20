@@ -69,7 +69,7 @@ describe('Playthrough Object Factory', function() {
 
     var playthroughDict = playthroughObject.toBackendDict();
     expect(playthroughDict).toEqual({
-      playthrough_id: 'playthroughId1',
+      id: 'playthroughId1',
       exp_id: 'expId1',
       exp_version: 1,
       issue_type: 'EarlyQuit',

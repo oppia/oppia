@@ -1236,6 +1236,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }])
 
         self.playthrough_data = {
+            'id': None,
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
             'issue_type': 'EarlyQuit',
@@ -1333,6 +1334,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model.put()
 
         self.playthrough_data = {
+            'id': None,
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
             'issue_type': 'CyclicStateTransitions',
@@ -1401,6 +1403,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model.put()
 
         self.playthrough_data = {
+            'id': None,
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
             'issue_type': 'CyclicStateTransitions',
@@ -1495,6 +1498,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
         playthrough_id = model.unresolved_issues[0]['playthrough_ids'][1]
         self.assertEqual(response['playthrough_id'], playthrough_id)
+        self.assertEqual(response['playthrough_stored'], True)
 
     def test_playthrough_is_subsequently_updated(self):
         """Test that a playthrough is updated if the controller is called for

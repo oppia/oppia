@@ -397,9 +397,11 @@ oppia.factory('ExplorationPlayerService', [
         var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
 
-        StatsReportingService.recordAnswerSubmitAction(
-          oldStateName, newStateName, oldState.interaction.id, answer,
-          outcome.feedback);
+        if (ENABLE_PLAYTHROUGHS) {
+          StatsReportingService.recordAnswerSubmitAction(
+            oldStateName, newStateName, oldState.interaction.id, answer,
+            outcome.feedback);
+        }
 
         // Compute the data for the next state.
         var oldParams = LearnerParamsService.getAllParams();

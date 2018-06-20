@@ -149,13 +149,10 @@ describe('Playthrough service', function() {
       var playthrough = this.ps.getPlaythrough();
 
       expect(playthrough.issueType).toEqual('EarlyQuit');
-      expect(playthrough.issueCustomizationArgs).toEqual({
-        state_name: {
-          value: 'stateName1'
-        },
-        time_spent_in_exp_in_secs: {
-          value: 0
-        }
+      // We don't check the time spent issue customization arg because it is
+      // flaky between tests.
+      expect(playthrough.issueCustomizationArgs.state_name).toEqual({
+        value: 'stateName1'
       });
     });
 

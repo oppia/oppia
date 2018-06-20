@@ -164,7 +164,11 @@ oppia.factory('PlaythroughService', [
       });
       if (isNewPlaythrough) {
         promise.then(function(response) {
-          playthrough.playthroughId = response.playthroughId;
+          if (response.data.playthrough_stored) {
+            // In cases where maximum number of playthroughs already exists, the
+            // above flag is not True and playthrough ID is not set.
+            playthrough.playthroughId = response.data.playthrough_id;
+          }
         });
       }
     };
@@ -260,8 +264,13 @@ oppia.factory('PlaythroughService', [
           return;
         }
         if (playthrough.playthroughId) {
-          // Playthrough ID exists, so issue has already been identified and we
-          // update the playthrough.
+          // Playthrough ID exists, so issue has already been identified.
+          if (playthrough.issueType === ISSUE_TYPE_EARLY_QUIT) {
+            // If the existing issue is of type early quit, and some other issue
+            // can be identified, update the issue since early quit has lower
+            // priority.
+            analyzePlaythrough();
+          }
           storePlaythrough(false);
         } else {
           // Playthrough ID doesn't exist.

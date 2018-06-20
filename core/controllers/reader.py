@@ -333,7 +333,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         customization_args = playthrough_data['issue_customization_args']
 
         # If playthrough already exists, update it in the datastore.
-        if 'id' in playthrough_data:
+        if playthrough_data['id']:
             playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
             stats_services.update_playthroughs_multi(
                 [playthrough_data['id']], [playthrough])
@@ -342,6 +342,7 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         issue_found = False
         playthrough_id = None
+        payload_return = {'playthrough_stored': True}
         for index, issue in enumerate(exp_issues.unresolved_issues):
             if issue.issue_type == playthrough_data['issue_type']:
                 issue_customization_args = issue.issue_customization_args
@@ -362,6 +363,8 @@ class StorePlaythroughHandler(base.BaseHandler):
                             playthrough_data['actions'])
                         exp_issues.unresolved_issues[
                             index].playthrough_ids.append(playthrough_id)
+                    else:
+                        payload_return['playthrough_stored'] = False
                     break
 
         if not issue_found:
@@ -379,7 +382,8 @@ class StorePlaythroughHandler(base.BaseHandler):
             exp_issues.unresolved_issues.append(issue)
 
         stats_services.save_exp_issues_model_transactional(exp_issues)
-        self.render_json({'playthrough_id': playthrough_id})
+        payload_return['playthrough_id'] = playthrough_id
+        self.render_json(payload_return)
 
 
 class StatsEventsHandler(base.BaseHandler):

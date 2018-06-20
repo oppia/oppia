@@ -95,7 +95,7 @@ oppia.factory('PlaythroughObjectFactory', [
         return action.toBackendDict();
       });
       return {
-        playthrough_id: this.playthroughId,
+        id: this.playthroughId,
         exp_id: this.expId,
         exp_version: this.expVersion,
         issue_type: this.issueType,
