@@ -18,6 +18,7 @@ from constants import constants
 from core.domain import skill_domain
 from core.tests import test_utils
 import feconf
+import utils
 
 
 class SkillDomainUnitTests(test_utils.GenericTestBase):
@@ -26,13 +27,108 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     SKILL_ID = 'skill_id'
     MISCONCEPTION_ID = 'misconception_id'
 
+    def setUp(self):
+        super(SkillDomainUnitTests, self).setUp()
+        skill_contents = skill_domain.SkillContents(
+            'Explanation', ['Example 1'])
+        misconceptions = [skill_domain.Misconception(
+            self.MISCONCEPTION_ID, 'name', 'notes', 'default_feedback')]
+        self.skill = skill_domain.Skill(
+            self.SKILL_ID, 'Description', misconceptions,
+            skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0
+        )
+
+    def _assert_validation_error(self, expected_error_substring):
+        """Checks that the skill passes strict validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            self.skill.validate()
+
+    def _assert_valid_skill_id(self, expected_error_substring, skill_id):
+        """Checks that the skill passes strict validation."""
+        with self.assertRaisesRegexp(
+            utils.ValidationError, expected_error_substring):
+            skill_domain.Skill.require_valid_skill_id(skill_id)
+
+    def test_valid_skill_id(self):
+        self._assert_valid_skill_id('Skill id should be a string', 10)
+        self._assert_valid_skill_id('Invalid skill id', 'abc')
+
+    def test_description_validation(self):
+        self.skill.description = 0
+        self._assert_validation_error('Description should be a string')
+
+    def test_language_code_validation(self):
+        self.skill.language_code = 0
+        self._assert_validation_error('Expected language code to be a string')
+
+        self.skill.language_code = 'xz'
+        self._assert_validation_error('Invalid language code')
+
+    def test_schema_versions_validation(self):
+        self.skill.skill_contents_schema_version = 100
+        self._assert_validation_error(
+            'Expected skill contents schema version to be %s' %
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION)
+
+        self.skill.skill_contents_schema_version = 'a'
+        self._assert_validation_error(
+            'Expected skill contents schema version to be an integer')
+
+        self.skill.misconceptions_schema_version = 100
+        self._assert_validation_error(
+            'Expected misconceptions schema version to be %s' %
+            feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION)
+
+        self.skill.misconceptions_schema_version = 'a'
+        self._assert_validation_error(
+            'Expected misconceptions schema version to be an integer')
+
+    def test_misconception_validation(self):
+        self.skill.misconceptions[0].feedback = 0
+        self._assert_validation_error(
+            'Expected misconception feedback to be a string')
+
+        self.skill.misconceptions[0].notes = 0
+        self._assert_validation_error(
+            'Expected misconception notes to be a string')
+
+        self.skill.misconceptions[0].name = 0
+        self._assert_validation_error(
+            'Expected misconception name to be a string')
+
+        self.skill.misconceptions = ['']
+        self._assert_validation_error(
+            'Expected each misconception to be a Misconception object')
+
+        self.skill.misconceptions = ''
+        self._assert_validation_error('Expected misconceptions to be a list')
+
+    def test_skill_contents_validation(self):
+        self.skill.skill_contents.worked_examples = ''
+        self._assert_validation_error('Expected worked examples to be a list')
+
+        self.skill.skill_contents.worked_examples = [1]
+        self._assert_validation_error(
+            'Expected each worked example to be a string')
+
+        self.skill.skill_contents.explanation = 0
+        self._assert_validation_error(
+            'Expected skill explanation to be a string')
+
+        self.skill.skill_contents = ''
+        self._assert_validation_error(
+            'Expected skill_contents to be a SkillContents object')
+
     def test_create_default_skill(self):
         """Test the create_default_skill function.
         """
-        skill = skill_domain.Skill.create_default_skill(self.SKILL_ID)
+        skill = skill_domain.Skill.create_default_skill(
+            self.SKILL_ID, 'Description')
         expected_skill_dict = {
             'id': self.SKILL_ID,
-            'description': feconf.DEFAULT_SKILL_DESCRIPTION,
+            'description': 'Description',
             'misconceptions': [],
             'skill_contents': {
                 'explanation': feconf.DEFAULT_SKILL_EXPLANATION,
@@ -68,3 +164,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             skill_contents_from_dict.to_dict(), skill_contents_dict)
         self.assertEqual(
             misconceptions_from_dict.to_dict(), misconceptions_dict)
+
+    def test_to_dict(self):
+        expected_skill_mastery_dict = {
+            'user_id': 'user',
+            'skill_id': 'skill_id',
+            'degree_of_mastery': '0.5'
+        }
+        observed_skill_mastery = skill_domain.UserSkillMastery.from_dict(
+            expected_skill_mastery_dict)
+        self.assertDictEqual(
+            expected_skill_mastery_dict,
+            observed_skill_mastery.to_dict())

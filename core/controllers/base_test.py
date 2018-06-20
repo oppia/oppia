@@ -24,6 +24,7 @@ import types
 
 from constants import constants
 from core.controllers import base
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
@@ -72,11 +73,17 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
         with self.swap(feconf, 'DEV_MODE', True):
             response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-            self.assertIn('<div class="oppia-dev-mode">', response.body)
+            self.assertIn('DEV_MODE: JSON.parse(\'true\')',
+                          response.body)
+            self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
+                          response.body)
 
         with self.swap(feconf, 'DEV_MODE', False):
             response = self.testapp.get(feconf.LIBRARY_INDEX_URL)
-            self.assertNotIn('<div class="oppia-dev-mode">', response.body)
+            self.assertIn('DEV_MODE: JSON.parse(\'false\')',
+                          response.body)
+            self.assertIn('<div ng-if="DEV_MODE" class="oppia-dev-mode">',
+                          response.body)
 
     def test_that_no_get_results_in_500_error(self):
         """Test that no GET request results in a 500 error."""
@@ -92,9 +99,9 @@ class BaseHandlerTest(test_utils.GenericTestBase):
 
             # Some of these will 404 or 302. This is expected.
             response = self.testapp.get(url, expect_errors=True)
-            if response.status_int not in [200, 302, 401, 404]:
+            if response.status_int not in [200, 302, 400, 401, 404]:
                 print url
-            self.assertIn(response.status_int, [200, 302, 401, 404])
+            self.assertIn(response.status_int, [200, 302, 400, 401, 404])
 
         # TODO(sll): Add similar tests for POST, PUT, DELETE.
         # TODO(sll): Set a self.payload attr in the BaseHandler for
@@ -179,15 +186,15 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         self.logout()
         self.login(self.TEST_EDITOR_EMAIL)
         exp_services.update_exploration(
-            editor_user_id, exploration_id, [{
+            editor_user_id, exploration_id, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'edited title'
-            }, {
+            }), exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'category',
                 'new_value': 'edited category'
-            }], 'Change title and category')
+            })], 'Change title and category')
 
         # Since user has edited one exploration created by another user,
         # going to '/' should redirect to the dashboard page.

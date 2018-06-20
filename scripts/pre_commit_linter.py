@@ -49,6 +49,7 @@ Note that the root folder MUST be named 'oppia'.
 
 # Pylint has issues with the import order of argparse.
 # pylint: disable=wrong-import-order
+import HTMLParser
 import argparse
 import fnmatch
 import multiprocessing
@@ -126,6 +127,15 @@ BAD_PATTERNS_JS_REGEXP = [
             'extensions/objects/',
             'extensions/value_generators/',
             'extensions/visualizations/')
+    },
+    {
+        'regexp': r"\$parent",
+        'message': "Please do not access parent properties " +
+                   "using $parent. Use the scope object" +
+                   "for this purpose.",
+        'excluded_files': (
+            'core/templates/dev/head/app.js'),
+        'excluded_dirs': ()
     }
 ]
 
@@ -153,6 +163,17 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
     }
 ]
 
+BAD_PATTERNS_PYTHON_REGEXP = [
+    {
+        'regexp': r"print \'",
+        'message': "Please do not use print statement.",
+        'excluded_files': (
+            'core/tests/test_utils.py',
+            'core/tests/performance_framework/perf_domain.py'),
+        'excluded_dirs': ('scripts/',)
+    }
+]
+
 REQUIRED_STRINGS_FECONF = {
     'FORCE_PROD_MODE = False': {
         'message': 'Please set the FORCE_PROD_MODE variable in feconf.py'
@@ -168,7 +189,7 @@ EXCLUDED_PHRASES = [
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
@@ -299,6 +320,57 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
+def _lint_css_files(
+        node_path, stylelint_path, config_path, files_to_lint, stdout, result):
+    """Prints a list of lint errors in the given list of CSS files.
+
+    Args:
+        node_path: str. Path to the node binary.
+        stylelint_path: str. Path to the Stylelint binary.
+        config_path: str. Path to the configuration file.
+        files_to_lint: list(str). A list of filepaths to lint.
+        stdout:  multiprocessing.Queue. A queue to store Stylelint outputs.
+        result: multiprocessing.Queue. A queue to put results of test.
+    """
+    start_time = time.time()
+    num_files_with_errors = 0
+
+    num_css_files = len(files_to_lint)
+    if not files_to_lint:
+        result.put('')
+        print 'There are no CSS files to lint.'
+        return
+
+    print 'Total css files: ', num_css_files
+    stylelint_cmd_args = [
+        node_path, stylelint_path, '--config=' + config_path]
+    for _, filename in enumerate(files_to_lint):
+        print 'Linting: ', filename
+        proc_args = stylelint_cmd_args + [filename]
+        proc = subprocess.Popen(
+            proc_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+
+        linter_stdout, linter_stderr = proc.communicate()
+        if linter_stderr:
+            print 'LINTER FAILED'
+            print linter_stderr
+            sys.exit(1)
+
+        if linter_stdout:
+            num_files_with_errors += 1
+            print linter_stdout
+            stdout.put(linter_stdout)
+
+    if num_files_with_errors:
+        result.put('%s    %s CSS file' % (
+            _MESSAGE_TYPE_FAILED, num_files_with_errors))
+    else:
+        result.put('%s   %s CSS file linted (%.1f secs)' % (
+            _MESSAGE_TYPE_SUCCESS, num_css_files, time.time() - start_time))
+
+    print 'CSS linting finished.'
+
+
 def _lint_js_files(
         node_path, eslint_path, files_to_lint, stdout, result):
     """Prints a list of lint errors in the given list of JavaScript files.
@@ -309,9 +381,6 @@ def _lint_js_files(
         files_to_lint: list(str). A list of filepaths to lint.
         stdout:  multiprocessing.Queue. A queue to store ESLint outputs.
         result: multiprocessing.Queue. A queue to put results of test.
-
-    Returns:
-        None
     """
     start_time = time.time()
     num_files_with_errors = 0
@@ -358,9 +427,6 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
         config_pycodestyle: str. Path to the tox.ini file.
         files_to_lint: list(str). A list of filepaths to lint.
         result: multiprocessing.Queue. A queue to put results of test.
-
-    Returns:
-        None
     """
     start_time = time.time()
     are_there_errors = False
@@ -525,39 +591,76 @@ def _pre_commit_linter(all_files):
         parent_dir, 'oppia_tools', 'node-6.9.1', 'bin', 'node')
     eslint_path = os.path.join(
         parent_dir, 'node_modules', 'eslint', 'bin', 'eslint.js')
-
-    if not os.path.exists(eslint_path):
+    stylelint_path = os.path.join(
+        parent_dir, 'node_modules', 'stylelint', 'bin', 'stylelint.js')
+    config_path_for_css_in_html = os.path.join(
+        parent_dir, 'oppia', '.stylelintrc')
+    config_path_for_oppia_css = os.path.join(
+        parent_dir, 'oppia', 'core', 'templates', 'dev', 'head',
+        'css', '.stylelintrc')
+    if not (os.path.exists(eslint_path) and os.path.exists(stylelint_path)):
         print ''
         print 'ERROR    Please run start.sh first to install node-eslint '
-        print '         and its dependencies.'
+        print '         or node-stylelint and its dependencies.'
         sys.exit(1)
 
     js_files_to_lint = [
         filename for filename in all_files if filename.endswith('.js')]
     py_files_to_lint = [
         filename for filename in all_files if filename.endswith('.py')]
+    html_files_to_lint_for_css = [
+        filename for filename in all_files if filename.endswith('.html')]
+    css_files_to_lint = [
+        filename for filename in all_files if filename.endswith('oppia.css')]
+
+    css_in_html_result = multiprocessing.Queue()
+    css_in_html_stdout = multiprocessing.Queue()
+
+    linting_processes = []
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_css_files, args=(
+            node_path,
+            stylelint_path,
+            config_path_for_css_in_html,
+            html_files_to_lint_for_css, css_in_html_stdout,
+            css_in_html_result)))
+
+    css_result = multiprocessing.Queue()
+    css_stdout = multiprocessing.Queue()
+
+    linting_processes.append(multiprocessing.Process(
+        target=_lint_css_files, args=(
+            node_path,
+            stylelint_path,
+            config_path_for_oppia_css,
+            css_files_to_lint, css_stdout,
+            css_result)))
 
     js_result = multiprocessing.Queue()
-    linting_processes = []
     js_stdout = multiprocessing.Queue()
+
     linting_processes.append(multiprocessing.Process(
         target=_lint_js_files, args=(
             node_path, eslint_path, js_files_to_lint,
             js_stdout, js_result)))
 
     py_result = multiprocessing.Queue()
+
     linting_processes.append(multiprocessing.Process(
         target=_lint_py_files,
         args=(config_pylint, config_pycodestyle, py_files_to_lint, py_result)))
-    print 'Starting Javascript and Python Linting'
+
+    print 'Starting CSS, Javascript and Python Linting'
     print '----------------------------------------'
+
     for process in linting_processes:
+        process.daemon = True
         process.start()
 
     for process in linting_processes:
         # Require timeout parameter to prevent against endless waiting for the
         # linting function to return.
-        process.join(timeout=600)
+        process.join(timeout=200)
 
     js_messages = []
     while not js_stdout.empty():
@@ -567,6 +670,8 @@ def _pre_commit_linter(all_files):
     print '\n'.join(js_messages)
     print '----------------------------------------'
     summary_messages = []
+    summary_messages.append(css_in_html_result.get())
+    summary_messages.append(css_result.get())
     summary_messages.append(js_result.get())
     summary_messages.append(py_result.get())
     print '\n'.join(summary_messages)
@@ -696,6 +801,12 @@ def _check_bad_patterns(all_files):
 
             if filename.endswith('.html'):
                 for regexp in BAD_LINE_PATTERNS_HTML_REGEXP:
+                    if _check_bad_pattern_in_file(filename, content, regexp):
+                        failed = True
+                        total_error_count += 1
+
+            if filename.endswith('.py'):
+                for regexp in BAD_PATTERNS_PYTHON_REGEXP:
                     if _check_bad_pattern_in_file(filename, content, regexp):
                         failed = True
                         total_error_count += 1
@@ -1085,15 +1196,121 @@ def _check_directive_scope(all_files):
     return summary_messages
 
 
+class CustomHTMLParser(HTMLParser.HTMLParser):
+    """Custom HTML parser to check indentation."""
+
+    def __init__(self, filename, file_lines, failed=False):
+        HTMLParser.HTMLParser.__init__(self)
+        self.failed = failed
+        self.filename = filename
+        self.previous_tag_line_number = None
+        self.file_lines = file_lines
+
+    def handle_starttag(self, tag, attrs):
+        line_number, column_number = self.getpos()
+        # Check the indentation of the tag.
+        tag_line = self.file_lines[line_number - 1].lstrip()
+        opening_tag = '<' + tag
+        if tag_line.startswith(opening_tag):
+            if self.previous_tag_line_number is None:
+                if column_number % 2 != 0:
+                    print (
+                        '%s --> Indentation level for %s '
+                        'tag on line %s should be a '
+                        'multiple of 2 ' % (
+                            self.filename, tag, line_number))
+                    self.failed = True
+            else:
+                if column_number % 2 != 0 and (
+                        line_number != self.previous_tag_line_number):
+                    print (
+                        '%s --> Indentation level for %s '
+                        'tag on line %s should be a '
+                        'multiple of 2 ' % (
+                            self.filename, tag, line_number))
+                    self.failed = True
+            self.previous_tag_line_number = line_number
+
+        # Check the indentation of the attributes of the tag.
+        indentation_of_first_attribute = (
+            column_number + len(tag) + 2)
+        starttag_text = self.get_starttag_text()
+
+        for line_num, line in enumerate(
+                str.splitlines(starttag_text)):
+            if line_num == 0:
+                continue
+
+            leading_spaces_count = len(line) - len(line.lstrip())
+            list_of_attrs = []
+
+            for attr, _ in attrs:
+                list_of_attrs.append(attr)
+
+            if not line.lstrip().startswith(tuple(list_of_attrs)):
+                continue
+            if (
+                    indentation_of_first_attribute != (
+                        leading_spaces_count)):
+                line_num_of_error = line_number + line_num
+                print (
+                    '%s --> Attribute for tag %s on line '
+                    '%s should align with the leftmost '
+                    'attribute on line %s ' % (
+                        self.filename, tag,
+                        line_num_of_error, line_number))
+                self.failed = True
+
+
+def _check_html_indent(all_files):
+    """This function checks the indentation of lines in HTML files."""
+
+    print 'Starting HTML indentation check'
+    print '----------------------------------------'
+
+    html_files_to_lint = [
+        filename for filename in all_files if filename.endswith('.html')]
+
+    failed = False
+    summary_messages = []
+
+    for filename in html_files_to_lint:
+        with open(filename, 'r') as f:
+            file_content = f.read()
+            file_lines = file_content.split('\n')
+            parser = CustomHTMLParser(filename, file_lines)
+            parser.feed(file_content)
+
+            if parser.failed:
+                failed = True
+
+    if failed:
+        summary_message = '%s   HTML indentation check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s  HTML indentation check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
-    # TODO(apb7): Enable the _check_directive_scope function.
-    directive_scope_messages = []
+    directive_scope_messages = _check_directive_scope(all_files)
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
+    html_indent_messages = _check_html_indent(all_files)
     html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
@@ -1101,8 +1318,8 @@ def main():
         directive_scope_messages + html_directive_name_messages +
         import_order_messages + newline_messages +
         docstring_messages + comment_messages +
-        html_linter_messages + linter_messages +
-        pattern_messages)
+        html_indent_messages + html_linter_messages +
+        linter_messages + pattern_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

@@ -126,6 +126,14 @@
       "description": "is a transposition of {{x|MusicPhrase}} by {{y|Int}} semitones except for {{k|NonnegativeInt}} notes"
     }
   },
+  "NumberWithUnits": {
+    "IsEqualTo": {
+        "description": "is equal to {{f|NumberWithUnits}}"
+    },
+    "IsEquivalentTo": {
+        "description": "is equivalent to {{f|NumberWithUnits}}"
+    }
+  },
   "NumericInput": {
     "Equals": {
       "description": "is equal to {{x|Real}}"

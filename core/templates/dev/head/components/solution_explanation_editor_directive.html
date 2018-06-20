@@ -12,7 +12,10 @@
           </i>
         </div>
         <strong>Explanation:</strong>
-        <span class="oppia-rte-editor" angular-html-bind="stateSolutionService.savedMemento.explanation.getHtml()"></span>
+        <span>
+          <angular-html-bind class="oppia-rte-editor" html-data="stateSolutionService.savedMemento.explanation.getHtml()">
+          </angular-html-bind>
+        </span>
       </div>
     </div>
   </div>
@@ -47,7 +50,8 @@
 
   <div ng-if="stateSolutionService.savedMemento.explanation && !stateSolutionService.savedMemento.explanation.isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_SOLUTION]>"
-                               subtitled-html="stateSolutionService.displayed.explanation"
+                               content-ids-to-audio-translations="stateContentIdsToAudioTranslationsService.displayed"
+                               content-id="stateSolutionService.displayed.explanation.getContentId()"
                                on-start-edit="onAudioTranslationsStartEditAction"
                                on-change="onAudioTranslationsEdited">
     </audio-translations-editor>

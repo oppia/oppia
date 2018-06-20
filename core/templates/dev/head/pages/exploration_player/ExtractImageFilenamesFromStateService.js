@@ -23,14 +23,69 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var INTERACTION_TYPE_IMAGE_CLICK_INPUT = 'ImageClickInput';
 
     var filenamesInState = [];
+
+    /**
+     * Gets the html from the state's content.
+     * @param {object} state - The state from which the html of the content
+     *                         should be returned.
+     */
+    var _getStateContentHtml = function(state) {
+      return state.content.getHtml();
+    };
+
+    /**
+     * Gets the html from the outcome of the answer groups and the default
+     * outcome of the state.
+     * @param {object} state - The state from which the html of the outcomes of
+     *                         the answer groups should be returned.
+     */
+    var _getOutcomesHtml = function(state) {
+      var outcomesHtml = '';
+      state.interaction.answerGroups.forEach(function(answerGroup) {
+        var answerGroupHtml = answerGroup.outcome.feedback.getHtml();
+        outcomesHtml = outcomesHtml.concat(answerGroupHtml);
+      });
+      if (state.interaction.defaultOutcome !== null) {
+        outcomesHtml = outcomesHtml.concat(
+          state.interaction.defaultOutcome.feedback.getHtml());
+      }
+      return outcomesHtml;
+    };
+
+    /**
+     * Gets the html from the hints in the state.
+     * @param {object} state - The state whose hints' html should be returned.
+     */
+    var _getHintsHtml = function(state) {
+      var hintsHtml = '';
+      state.interaction.hints.forEach(function(hint) {
+        var hintHtml = hint.hintContent.getHtml();
+        hintsHtml = hintsHtml.concat(hintHtml);
+      });
+      return hintsHtml;
+    };
+
+    /**
+     * Gets the html from the solution in the state.
+     * @param {object} state - The state whose solution's html should be
+     *                         returned.
+     */
+    var _getSolutionHtml = function(state) {
+      return state.interaction.solution.explanation.getHtml();
+    };
+
+    /**
+     * Gets all the html in a state.
+     * @param {object} state - The state whose html is to be fetched.
+     */
     var _getAllHtmlOfState = function(state) {
       var _allHtmlInTheState = [];
       // The order of the extracted image names is same as they appear in a
       // state. The images should be preloaded in the following order ---
       // content, customizationArgs of interactions, feedback of outcomes ()
       // including feedback of default outcome if any), hints, solution if any.
-      var stateContentHtml = state.content.getHtml();
-      _allHtmlInTheState.push(stateContentHtml);
+
+      _allHtmlInTheState.push(_getStateContentHtml(state));
 
       if (state.interaction.id === INTERACTION_TYPE_MULTIPLE_CHOICE ||
           state.interaction.id === INTERACTION_TYPE_ITEM_SELECTION ) {
@@ -42,33 +97,25 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         _allHtmlInTheState.push(customizationArgsHtml);
       }
 
-      state.interaction.answerGroups.forEach(function(answerGroup) {
-        var answerGroupHtml = answerGroup.outcome.feedback.getHtml();
-        _allHtmlInTheState.push(answerGroupHtml);
-      });
+      _allHtmlInTheState.push(_getOutcomesHtml(state));
 
-      if (state.interaction.defaultOutcome !== null) {
-        var defaultOutcomeHtml = (
-          state.interaction.defaultOutcome.feedback.getHtml());
-        if (defaultOutcomeHtml !== '') {
-          _allHtmlInTheState.push(defaultOutcomeHtml);
-        }
-      }
+      _allHtmlInTheState.push(_getHintsHtml(state));
 
-      state.interaction.hints.forEach(function(hint) {
-        var hintHtml = hint.hintContent.getHtml();
-        _allHtmlInTheState.push(hintHtml);
-      });
       if (state.interaction.solution !== null) {
-        var solutionHtml = state.interaction.solution.explanation.getHtml();
-        _allHtmlInTheState.push(solutionHtml);
+        _allHtmlInTheState.push(_getSolutionHtml(state));
       }
       return _allHtmlInTheState;
     };
 
+    /**
+     * Extracts the filepath object from the filepath-value attribute of the
+     * oppia-noninteractive-image tags in the strHtml(given string).
+     * @param {string} strHtml - The string from which the object of
+     *                           filepath should be extracted.
+     */
     var _extractFilepathValueFromOppiaNonInteractiveImageTag = function(
         strHtml) {
-      var filenames = [];
+      var fileInfo = [];
       var dummyElement = document.createElement('div');
       dummyElement.innerHTML = (
         HtmlEscaperService.escapedStrToUnescapedStr(strHtml));
@@ -76,35 +123,121 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       var imageTagList = dummyElement.getElementsByTagName(
         'oppia-noninteractive-image');
       for (i = 0; i < imageTagList.length; i++) {
-        filenames.push(imageTagList[i].getAttribute('filepath-with-value'));
+        var filepathObject = JSON.parse(
+          imageTagList[i].getAttribute('filepath-with-value'));
+        // The images already there in Oppia have image filenames as the value
+        // for the attribute 'filepath-with-value'. In explorations the
+        // the attribute value is an object of the form --
+        // {
+        //    name: filename,
+        //    width: widthOfImage,
+        //    height: heightOfImage
+        // }
+        // So, we create an object similar to it for the images which had
+        // filenames as the attribute's value with default dimensions of
+        // 500px x 200px
+        if (!filepathObject.width) {
+          var filename = filepathObject;
+          filepathObject = {
+            name: filename,
+            width: 500,
+            height: 200
+          };
+        }
+        fileInfo.push(filepathObject);
       }
-      // The name in the array is stored as '"image.png"'. We need to remove
-      // the inverted commas. We remove the first and the last character from
-      // the string (name).
-      filenames = filenames.map(function(filename) {
-        return filename.slice(1, filename.length - 1);
-      });
-      return filenames;
+      return fileInfo;
     };
 
+    /**
+    * Gets the filenames of the images from the html provided.
+    * @param {string} htmlStr - The string from which the filenames of the
+    *                           images should be extracted.
+    */
+    var _getImageFilenamesFromFilepathValue = function(htmlStr) {
+      var fileInfos = (
+        _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+      return fileInfos.map(function(fileInfo) {
+        return fileInfo.name;
+      });
+    };
+
+    /**
+    * Gets the dimensions of the images from the html provided.
+    * @param {string} htmlStr - The string from which the dimensions of the
+    *                           images should be extracted.
+    */
+    var _getImageDimensionsFromFilepathValue = function(htmlStr) {
+      var fileInfos = (
+        _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+      var fileDimensions = {};
+      fileInfos.forEach(function(fileInfo){
+        var filename = fileInfo.name;
+        fileDimensions[filename] = {
+          width: fileInfo.width,
+          height: fileInfo.height
+        };
+      });
+      return fileDimensions;
+    };
+
+    /**
+    * Gets the dimensions of the images from the state provided.
+    * @param {object} state - The state from which the dimensions of the
+    *                           images should be extracted.
+    */
+    var _getImageDimensionsInState = function(state) {
+      var fileDimensions = {};
+      if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
+        var filepathObject = (
+          state.interaction.customizationArgs.imageAndRegions.value.imagePath);
+        if (!filepathObject.width) {
+          var filename = filepathObject;
+          filepathObject = {
+            name: filename,
+            width: 500,
+            height: 200
+          };
+        }
+        fileDimensions[filepathObject.name] = {
+          width: filepathObject.width,
+          height: filepathObject.height
+        };
+      }
+      var allHtmlOfState = _getAllHtmlOfState(state);
+      allHtmlOfState.forEach(function(htmlStr) {
+        Object.assign(fileDimensions,
+          _getImageDimensionsFromFilepathValue(htmlStr));
+      });
+      return fileDimensions;
+    };
+
+    /**
+     * Gets the filenames of all the images that are a part of the state.
+     * @param {object} state - The state from which the filenames of the image
+     *                         should be extracted.
+     */
     var _getImageFilenamesInState = function(state) {
       var filenamesInState = [];
       // The Image Click Input interaction has an image whose filename is
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath
-      if (state.interaction.id === 'INTERACTION_TYPE_IMAGE_CLICK_INPUT') {
-        filenamesInState.push(
+      if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
+        var filepathObject = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
+        filenamesInState.push(!filepathObject.name ? filepathObject :
+          filepathObject.name);
       }
       allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {
         filenamesInState = filenamesInState.concat(
-          _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
+          _getImageFilenamesFromFilepathValue(htmlStr));
       });
       return filenamesInState;
     };
 
     return {
-      getImageFilenamesInState: _getImageFilenamesInState
+      getImageFilenamesInState: _getImageFilenamesInState,
+      getImageDimensionsInState: _getImageDimensionsInState
     };
   }]);

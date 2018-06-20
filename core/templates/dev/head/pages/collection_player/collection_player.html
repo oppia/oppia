@@ -61,9 +61,9 @@
           font-size: 32px;
         }
       }
-      <!-- To avoid double shadows caused by overlaying preview card
-      over the blank preview card -->
-      exploration-summary-tile md-card {
+      /* To avoid double shadows caused by overlaying preview card
+      over the blank preview card */
+      .exploration-summary-tile md-card {
         box-shadow: none;
       }
       .mobile-path-segment {
@@ -386,6 +386,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/BrowserCheckerService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/objects/FractionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/objects/NumberWithUnitsObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/collection_player/collectionFooterDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/share/SharingLinksDirective.js"></script>
 `  <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintAndSolutionButtonsDirective.js"></script>

@@ -5,13 +5,13 @@
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
   <div class="conversation-skin-tutor-card-content">
     <div class="conversation-skin-tutor-card-top-section">
-      <div class="rte-viewer conversation-skin-tutor-card-top-content" angular-html-bind="upcomingContentHtml">
-      </div>
+      <angular-html-bind class="rte-viewer conversation-skin-tutor-card-top-content" html-data="upcomingContentHtml">
+      </angular-html-bind>
     </div>
     <div ng-if="upcomingInlineInteractionHtml">
       <div class="conversation-skin-inline-interaction">
-        <div angular-html-bind="upcomingInlineInteractionHtml">
-        </div>
+        <angular-html-bind html-data="upcomingInlineInteractionHtml">
+        </angular-html-bind>
       </div>
     </div>
   </div>
@@ -129,10 +129,7 @@ directive. -->
      float: left;
      min-height: 1px;
      padding: 0;
-  }
-
-  [class*='col-'] {
-    padding-right: 20px;
+     padding-right: 20px;
   }
 
   [class*='col-']:last-of-type {
@@ -383,13 +380,9 @@ directive. -->
   .conversation-skin-oppia-feedback-container,
   .conversation-skin-learner-answer-container {
     position: relative;
-  }
-
-  .conversation-skin-tutor-card-top-section,
-  .conversation-skin-oppia-feedback-container,
-  .conversation-skin-learner-answer-container {
     padding: 0 20px;
   }
+
   /* These rules must be kept in sync with corresponding rules in oppia.css
      (those with '.oppia-rte-editor > p,
        .form-control.oppia-rte-content > div > p' selectors specifying
@@ -443,17 +436,12 @@ directive. -->
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-help-card-content {
     background-color: rgba(224, 242, 241, 1);
+    border-top-left-radius: 0;
   }
 
   .conversation-skin-learner-answer-content {
     background-color: rgba(236, 239, 241, 1);
     border-bottom-right-radius: 0;
-  }
-
-  .conversation-skin-tutor-card-top-content,
-  .conversation-skin-oppia-feedback-content,
-  .conversation-skin-help-card-content {
-    border-top-left-radius: 0;
   }
 
   .conversation-skin-learner-answer-container {
@@ -512,32 +500,32 @@ directive. -->
   }
 
   .conversation-skin-feedback-dot-one {
-    -moz-animation-delay: 0.0s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.0s;
+    -moz-animation-delay: 0.0s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.0s;
+    -webkit-animation-delay: 0.0s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.0s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-two {
-    -moz-animation-delay: 0.2s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.2s;
+    -moz-animation-delay: 0.2s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.2s;
+    -webkit-animation-delay: 0.2s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.2s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-three {
-    -moz-animation-delay: 0.4s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.4s;
+    -moz-animation-delay: 0.4s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.4s;
+    -webkit-animation-delay: 0.4s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.4s;
     opacity: 0;
   }
 
@@ -654,7 +642,6 @@ directive. -->
       display: block;
       height: 40px;
       left: 100%;
-      position: absolute;
       position: absolute;
       transform: translate(-100%, -100%);
       width: 40px;

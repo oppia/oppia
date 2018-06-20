@@ -31,9 +31,22 @@ oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
       // Converts a camel-cased string to a lower-case hyphen-separated string.
       var directiveName = scope.objType.replace(
         /([a-z])([A-Z])/g, '$1-$2').toLowerCase();
+      scope.getInitArgs = function() {
+        return scope.initArgs;
+      };
+      scope.getAlwaysEditable = function() {
+        return scope.alwaysEditable;
+      };
+      scope.getIsEditable = function() {
+        return scope.isEditable;
+      };
       if (directiveName) {
         element.html(
-          '<' + directiveName + '-editor></' + directiveName + '-editor>');
+          '<' + directiveName +
+          '-editor get-always-editable="getAlwaysEditable()"' +
+          ' get-init-args="getInitArgs()" get-is-editable="getIsEditable()"' +
+          ' obj-type="objType" value="value"></' +
+          directiveName + '-editor>');
         $compile(element.contents())(scope);
       } else {
         $log.error('Error in objectEditor: no editor type supplied.');

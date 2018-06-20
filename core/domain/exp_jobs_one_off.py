@@ -18,14 +18,13 @@
 
 import ast
 import logging
-import os
 import traceback
 
-from bs4 import BeautifulSoup
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.platform import models
 import feconf
@@ -212,12 +211,12 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
             # Note: update_exploration does not need to apply a change list in
             # order to perform a migration. See the related comment in
             # exp_services.apply_change_list for more information.
-            commit_cmds = [{
+            commit_cmds = [exp_domain.ExplorationChange({
                 'cmd': exp_domain.CMD_MIGRATE_STATES_SCHEMA_TO_LATEST_VERSION,
                 'from_version': str(item.states_schema_version),
                 'to_version': str(
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
-            }]
+            })]
             exp_services.update_exploration(
                 feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update exploration states from schema version %d to %d.' % (
@@ -409,13 +408,14 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                         exploration.id, exploration.version))
                 return
 
-            change_list = snapshot['commit_cmds']
+            change_list = [exp_domain.ExplorationChange(
+                change_cmd) for change_cmd in snapshot['commit_cmds']]
 
             try:
                 # Check if commit is to revert the exploration.
-                if change_list and change_list[0]['cmd'].endswith(
-                        'revert_version_number'):
-                    reverted_version = change_list[0]['version_number']
+                if change_list and change_list[0].cmd == (
+                        exp_models.ExplorationModel.CMD_REVERT_COMMIT):
+                    reverted_version = change_list[0].version_number
                     # pylint: disable=line-too-long
                     state_id_mapping = exp_services.generate_state_id_mapping_model_for_reverted_exploration(
                         exploration.id, exploration.version - 1,
@@ -488,50 +488,50 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
             return
 
         exploration = exp_services.get_exploration_from_model(item)
-        # err_dict is a dictionary to store the invalid tags and the
-        # invalid parent-child relations that we find.
-        err_dict = {}
 
-        htmlValidation_filepath = os.path.join(
-            feconf.CONTENT_VALIDATION_DIR, 'htmlValidation.yaml')
-        htmlValidation_yaml = utils.get_file_contents(htmlValidation_filepath)
-        # Convert the yaml content to dictionary.
-        htmlValidation_dict = utils.dict_from_yaml(htmlValidation_yaml)
+        html_list = exploration.get_all_html_content_strings()
 
-        allowed_parent_list = htmlValidation_dict['allowed_parent_list']
-        allowed_tag_list = htmlValidation_dict['allowed_tag_list']
+        err_dict = html_cleaner.validate_textangular_format(html_list)
 
-        for state in exploration.states.itervalues():
-            # result is the list of all the html present in the state.
-            result = exp_services.find_all_values_for_key(
-                'html', state.to_dict())
-
-            for html_data in result:
-                html_data = html_data.encode('utf-8')
-                soup = BeautifulSoup(html_data, 'html.parser')
-
-                for tag in soup.findAll():
-                    # Checking for tags not allowed in RTE.
-                    if tag.name not in allowed_tag_list:
-                        if 'invalidTags' in err_dict:
-                            err_dict['invalidTags'] += [tag.name]
-                        else:
-                            err_dict['invalidTags'] = [tag.name]
-                    # Checking for parent-child relation that are not
-                    # allowed in RTE.
-                    parent = tag.parent.name
-                    if (tag.name in allowed_tag_list and parent not in
-                            allowed_parent_list[tag.name]):
-                        if tag.name in err_dict:
-                            err_dict[tag.name] += [parent]
-                        else:
-                            err_dict[tag.name] = [parent]
-
-        for key in err_dict.iterkeys():
-            err_dict[key] = list(set(err_dict[key]))
-
-        yield('Errors', err_dict)
+        for key in err_dict:
+            if err_dict[key]:
+                yield(key, err_dict[key])
 
     @staticmethod
     def reduce(key, values):
-        yield (key, values)
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))
+
+
+class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
+    """Job that migrates the html content of an exploration into the valid
+    Textangular format and validates it.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+
+        html_list = exploration.get_all_html_content_strings()
+
+        err_dict = html_cleaner.validate_textangular_format(html_list, True)
+
+        for key in err_dict:
+            if err_dict[key]:
+                yield(key, err_dict[key])
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))

@@ -5,18 +5,20 @@
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
   <div class="conversation-skin-tutor-card-content">
     <div class="conversation-skin-tutor-card-top-section">
-      <div class="rte-viewer conversation-skin-tutor-card-top-content"
-           angular-html-bind="upcomingContentHtml">
-      </div>
+      <angular-html-bind class="rte-viewer conversation-skin-tutor-card-top-content"
+                         html-data="upcomingContentHtml">
+      </angular-html-bind>
     </div>
 
-    <div ng-if="upcomingInlineInteractionHtml"
-         class="conversation-skin-inline-interaction"
-         angular-html-bind="upcomingInlineInteractionHtml">
+    <div>
+      <angular-html-bind ng-if="upcomingInlineInteractionHtml"
+                         class="conversation-skin-inline-interaction"
+                         html-data="upcomingInlineInteractionHtml">
+      </angular-html-bind>
     </div>
 
     <div ng-if="!upcomingInlineInteractionHtml"
-        class="conversation-skin-inline-interaction">
+         class="conversation-skin-inline-interaction">
       <div style="padding: 6px 12px;">
         <[upcomingInteractionInstructions]>
         <i ng-if="canWindowShowTwoCards()" class="material-icons md-18" style="position: relative;">&#xE5C8;</i>
@@ -285,17 +287,12 @@ otherwise they will interfere with the iframed conversation skin directive.
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-help-card-content {
     background-color: rgba(224,242,241,1);
+    border-top-left-radius: 0;
   }
 
   .conversation-skin-learner-answer-content {
     background-color: rgba(236,239,241,1);
     border-bottom-right-radius: 0;
-  }
-
-  .conversation-skin-tutor-card-top-content,
-  .conversation-skin-oppia-feedback-content,
-  .conversation-skin-help-card-content {
-    border-top-left-radius: 0;
   }
 
   .conversation-skin-feedback-dot-one,
@@ -308,32 +305,32 @@ otherwise they will interfere with the iframed conversation skin directive.
   }
 
   .conversation-skin-feedback-dot-one {
-    -moz-animation-delay: 0.0s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.0s;
+    -moz-animation-delay: 0.0s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.0s;
+    -webkit-animation-delay: 0.0s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.0s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-two {
-    -moz-animation-delay: 0.2s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.2s;
+    -moz-animation-delay: 0.2s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.2s;
+    -webkit-animation-delay: 0.2s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.2s;
     opacity: 0;
   }
 
   .conversation-skin-feedback-dot-three {
-    -moz-animation-delay: 0.4s;
     -moz-animation: dot 1.0s infinite;
-    -webkit-animation-delay: 0.4s;
+    -moz-animation-delay: 0.4s;
     -webkit-animation: dot 1.0s infinite;
-    animation-delay: 0.4s;
+    -webkit-animation-delay: 0.4s;
     animation: dot 1.0s infinite;
+    animation-delay: 0.4s;
     opacity: 0;
   }
 
@@ -432,7 +429,6 @@ otherwise they will interfere with the iframed conversation skin directive.
       display: block;
       height: 40px;
       left: 100%;
-      position: absolute;
       position: absolute;
       transform: translate(-100%, -100%);
       width: 40px;

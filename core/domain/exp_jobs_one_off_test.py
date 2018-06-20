@@ -16,6 +16,9 @@
 
 """Tests for Exploration-related jobs."""
 
+import json
+import os
+
 from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
@@ -326,11 +329,11 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         # Have one user make two commits.
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id, title='Original Title')
-        change_list = [{
+        change_list = [exp_domain.ExplorationChange({
             'cmd': exp_domain.CMD_EDIT_EXPLORATION_PROPERTY,
             'property_name': 'title',
             'new_value': 'New title'
-        }]
+        })]
         exp_services.update_exploration(
             user_a_id, self.EXP_ID, change_list, 'Changed title.')
 
@@ -416,18 +419,18 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID, user_a_id, title='Exploration Title')
 
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
-            }], 'Changed title.')
+            })], 'Changed title.')
 
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
-            }], 'Changed Objective.')
+            })], 'Changed Objective.')
 
         # Run the job to compute contributors summary.
         job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
@@ -453,17 +456,17 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID, user_a_id, title='Exploration Title 1')
 
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
-            }], 'Changed title.')
+            })], 'Changed title.')
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
-            }], 'Changed Objective.')
+            })], 'Changed Objective.')
 
         # Let the second user revert version 3 to version 2.
         exp_services.revert_exploration(user_b_id, self.EXP_ID, 3, 2)
@@ -497,17 +500,17 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         exploration = self.save_new_valid_exploration(
             self.EXP_ID, user_a_id, title='Exploration Title')
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'New Exploration Title'
-            }], 'Changed title.')
+            })], 'Changed title.')
         exp_services.update_exploration(
-            user_a_id, self.EXP_ID, [{
+            user_a_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'New Objective'
-            }], 'Changed Objective.')
+            })], 'Changed Objective.')
 
         # Let USER A revert version 3 to version 2.
         exp_services.revert_exploration(user_a_id, self.EXP_ID, 3, 2)
@@ -532,11 +535,11 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         # Create commits with all the system user ids.
         for system_id in feconf.SYSTEM_USER_IDS:
             exp_services.update_exploration(
-                system_id, self.EXP_ID, [{
+                system_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': 'edit_exploration_property',
                     'property_name': 'title',
                     'new_value': 'Title changed by %s' % system_id
-                }], 'Changed title.')
+                })], 'Changed title.')
 
         # Run the job to compute the contributor summary.
         job_id = exp_jobs_one_off.ExplorationContributorsSummaryOneOffJob.create_new() # pylint: disable=line-too-long
@@ -693,24 +696,24 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
 
     def test_that_mapreduce_job_works(self):
         """Test that mapreduce job is working as expected."""
-        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', False):
+        with self.swap(feconf, 'ENABLE_STATE_ID_MAPPING', True):
             exploration = self.save_new_valid_exploration(
                 self.EXP_ID, self.owner_id)
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state',
-                }], 'Add state name')
+                })], 'Add state name')
 
             exp_services.update_exploration(
-                self.owner_id, self.EXP_ID, [{
+                self.owner_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_ADD_STATE,
                     'state_name': 'new state 2',
-                }, {
+                }), exp_domain.ExplorationChange({
                     'cmd': exp_domain.CMD_DELETE_STATE,
                     'state_name': 'new state'
-                }], 'Modify states')
+                })], 'Modify states')
 
             exp_services.revert_exploration(self.owner_id, self.EXP_ID, 3, 1)
 
@@ -785,23 +788,26 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         content1_dict = {
-            'html': '''<blockquote><div><p>Hello, this <i>is</i> state1
-                </p> </div> </blockquote> <pre>I'm looking for a particular
-                <b>Hello Oppia</b> message</pre>. <p> Don't you want to
-                say hello? You can learn more about oppia
-                <oppia-noninteractive-link url-with-value="&amp;quot;
-                https://www.example.com&amp;quot;" text-with-value="&amp;quot;
-                here&amp;quot;"></oppia-noninteractive-link></p>''',
-            'audio_translations': {}
+            'content_id': 'content',
+            'html': (
+                '<blockquote><p>Hello, this <i>is</i> state1 '
+                '</p></blockquote><pre>I\'m looking for a particular '
+                '<b>Hello Oppia</b> message.</pre><p> Don\'t you want to '
+                'say hello? You can learn more about oppia '
+                '<oppia-noninteractive-link url-with-value="&amp;quot;'
+                'https://www.example.com&amp;quot;" text-with-value="&amp;quot;'
+                'here&amp;quot;"></oppia-noninteractive-link></p>'
+            )
         }
         content2_dict = {
-            'html': '''<pre>Hello, this is state2.</pre> <blockquote>
-                <ol> <li>item1</li> <li>item2</li> </ol> </blockquote>.<p>
-                You can see this equation <b> <oppia-noninteractive-math
-                raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;
-                quot;"></oppia-noninteractive-math></b></p>
-                ''',
-            'audio_translations': {}
+            'content_id': 'content',
+            'html': (
+                '<pre>Hello, this is state2.</pre><blockquote>'
+                '<ol><li>item1</li><li>item2</li></ol></blockquote><p>'
+                'You can see this equation <b><oppia-noninteractive-math'
+                'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;'
+                'quot;"></oppia-noninteractive-math></b></p>'
+            )
         }
         state1.update_content(content1_dict)
         state2.update_content(content2_dict)
@@ -814,26 +820,28 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
 
         actual_output = (
             exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
-        expected_output = [u"[u'Errors', [u'{}']]"]
+        expected_output = []
 
         self.assertEqual(actual_output, expected_output)
 
         default_outcome_dict = {
             'dest': 'State2',
             'feedback': {
-                'html': '''<p>Sorry, it doesn't look like your <span>program
-                </span>prints any output</p>.<p> <blockquote> Could you get
-                it to print something?</blockquote> You can do this by using a
-                statement like print</p>. <br> You can ask any doubt if you have
-                <oppia-noninteractive-link url-with-value="&amp;quot;
-                https://www.example.com&amp;quot;" text-with-value="
-                &amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.
-                ''',
-                'audio_translations': {}
+                'content_id': 'default_outcome',
+                'html': (
+                    '<p>Sorry, it doesn\'t look like your <span>program '
+                    '</span>prints output</p>.<blockquote><p> Could you get '
+                    'it to print something?</p></blockquote> Can do this by '
+                    'using statement like prints. <br> You can ask any if you '
+                    'have<oppia-noninteractive-link url-with-value="&amp;quot;'
+                    'https://www.example.com&amp;quot;" text-with-value="'
+                    '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
+                )
             },
             'labelled_as_correct': False,
             'param_changes': [],
-            'refresher_exploration_id': None
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
         }
 
         state1.update_interaction_default_outcome(default_outcome_dict)
@@ -845,6 +853,215 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
 
         actual_output = (
             exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
-        expected_output = [u'[u\'Errors\', [u"{\'invalidTags\': [u\'span\'], u\'oppia-noninteractive-link\': [u\'[document]\'], u\'br\': [u\'[document]\']}"]]'] # pylint: disable=line-too-long
+
+        expected_output = [
+            "[u'br', [u'[document]']]",
+            "[u'invalidTags', [u'span']]",
+            "[u'oppia-noninteractive-link', [u'[document]']]",
+            (
+                '[u\'strings\', [u\'<p>Sorry, it doesn\\\'t look '
+                'like your <span>program </span>prints output</p>.<blockquote>'
+                '<p> Could you get it to print something?</p></blockquote> '
+                'Can do this by using statement like prints. <br> You can '
+                'ask any if you have<oppia-noninteractive-link text-with-value'
+                '="&amp;quot;Here&amp;quot;" url-with-value="&amp;quot;'
+                'https://www.example.com&amp;quot;">'
+                '</oppia-noninteractive-link>.\']]'
+            )
+        ]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ExplorationMigrationValidationJobTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_migration_job(self):
+        """Tests that the exploration validation job validates the content
+        without skipping any tags.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                'Here is test case <a href="https://github.com">hello<b><i>'
+                'testing</i></b>in <b>progress</b><p>for migration</p>'
+            )
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': (
+                'Here is test case <a href="https://github.com">'
+                '<oppia-noninteractive-link url-with-value="&amp;quot;'
+                'https://github.com&amp;quot;" text-with-value="abc">'
+                '</oppia-noninteractive-link><p> testing in progress</p>'
+            )
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+
+        default_outcome_dict1 = {
+            'dest': 'State2',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<p>Sorry, it doesn\'t look like your <span>program '
+                    '</span>prints output</p>.<blockquote><p> Could you get '
+                    'it to print something?</p></blockquote> Can do this by '
+                    'using statement like prints. <br> You can ask any if you '
+                    'have<oppia-noninteractive-link url-with-value="&amp;quot;'
+                    'https://www.example.com&amp;quot;" text-with-value="'
+                    '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        default_outcome_dict2 = {
+            'dest': 'State1',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<ol><li>This is last case</li><oppia-noninteractive-image '
+                    'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
+                    '</oppia-noninteractive-image></ol>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start validation job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationValidationJob.create_new()
+        exp_jobs_one_off.ExplorationMigrationValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationValidationJob.get_output(
+                job_id))
+        expected_output = [
+            "[u'oppia-noninteractive-image', [u'ol']]",
+            (
+                '[u\'strings\', '
+                '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
+                'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
+                '</oppia-noninteractive-image></ol>\']]'
+            )
+        ]
+
+        self.assertEqual(actual_output, expected_output)
+
+
+class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(TextAngularValidationAndMigrationTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_textangular_validation_and_migration(self):
+        """Tests that the exploration validation and migration job for
+        TextAngular RTE.
+        """
+        test_file_path = os.path.join(
+            feconf.TESTS_DATA_DIR, 'test_cases_for_rte.json')
+        with open(test_file_path, 'r') as f:
+            json_data = json.load(f)
+        test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        state_list = []
+        for index in range(len(test_cases)):
+            state_list.append('State%d' % index)
+
+        exploration.add_states(state_list)
+
+        for index, state_name in enumerate(state_list):
+            state = exploration.states[state_name]
+            content_dict = {
+                'html': test_cases[index]['html_content'],
+                'content_id': 'content'
+            }
+            state.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start validation job on exploration.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJob.create_new())
+        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJob.get_output(
+                job_id))
+
+        # Test that validation fails before migration.
+        self.assertGreater(len(actual_output), 0)
+
+        exploration_dict = exploration.to_dict()
+        updated_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
+            exploration_dict)
+        updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
+        updated_states = updated_dict['states']
+
+        for index, state_name in enumerate(state_list):
+            updated_html = updated_states[state_name]['content']['html']
+
+            # Test that html matches the expected format after migration.
+            self.assertEqual(
+                updated_html, unicode(test_cases[index]['expected_output']))
+
+        exp_services.save_new_exploration(
+            self.albert_id, updated_exploration)
+
+        # Start validation job on updated exploration.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJob.create_new())
+        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJob.get_output(
+                job_id))
+
+        # Test that validation passes after migration.
+        self.assertEqual(actual_output, [])

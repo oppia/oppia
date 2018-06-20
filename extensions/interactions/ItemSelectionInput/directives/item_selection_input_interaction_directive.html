@@ -18,8 +18,11 @@
       <div ng-if="displayCheckboxes">
         <label class="item-selection-input-item">
           <md-checkbox class="item-selection-input-checkbox" ng-model="userSelections[choice]" ng-checked="userSelections[choice]"
-            ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice]" tabindex="0">
-            <span angular-html-bind="choice"></span>
+                       ng-change="onToggleCheckbox()" ng-disabled="preventAdditionalSelections && !userSelections[choice]" tabindex="0">
+            <span>
+              <angular-html-bind html-data="choice">
+              </angular-html-bind>
+            </span>
           </md-checkbox>
         </label>
       </div>
@@ -32,7 +35,10 @@
             </span>
           </div>
           <div class="multiple-choice-content-container">
-            <span class="protractor-test-multiple-choice-option" angular-html-bind="choice"></span>
+            <span>
+              <angular-html-bind class="protractor-test-multiple-choice-option" html-data="choice">
+              </angular-html-bind>
+            </span>
           </div>
         </button>
       </div>

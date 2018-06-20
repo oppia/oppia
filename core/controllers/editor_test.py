@@ -29,19 +29,23 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import stats_jobs_continuous_test
+from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
 from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
-(user_models,) = models.Registry.import_models([models.NAMES.user])
+(user_models, stats_models) = models.Registry.import_models(
+    [models.NAMES.user, models.NAMES.statistics])
 
 
 class BaseEditorControllerTest(test_utils.GenericTestBase):
 
     CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
     CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
+    CAN_TRANSLATE_STR = 'GLOBALS.can_translate = JSON.parse(\'true\');'
+    CANNOT_TRANSLATE_STR = 'GLOBALS.can_translate = JSON.parse(\'false\');'
 
     def setUp(self):
         """Completes the sign-up process for self.EDITOR_EMAIL."""
@@ -51,12 +55,14 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
         self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup(self.TRANSLATOR_EMAIL, self.TRANSLATOR_USERNAME)
 
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.moderator_id = self.get_user_id_from_email(self.MODERATOR_EMAIL)
+        self.translator_id = self.get_user_id_from_email(self.TRANSLATOR_EMAIL)
 
         self.set_admins([self.ADMIN_USERNAME])
         self.set_moderators([self.MODERATOR_USERNAME])
@@ -78,6 +84,20 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
         """
         self.assertIn(self.CANNOT_EDIT_STR, response_body)
         self.assertNotIn(self.CAN_EDIT_STR, response_body)
+
+    def assert_can_translate(self, response_body):
+        """Returns True if the response body indicates that the exploration is
+        translatable.
+        """
+        self.assertIn(self.CAN_TRANSLATE_STR, response_body)
+        self.assertNotIn(self.CANNOT_TRANSLATE_STR, response_body)
+
+    def assert_cannot_translate(self, response_body):
+        """Returns True if the response body indicates that the exploration is
+        not translatable.
+        """
+        self.assertIn(self.CANNOT_TRANSLATE_STR, response_body)
+        self.assertNotIn(self.CAN_TRANSLATE_STR, response_body)
 
 
 class EditorTest(BaseEditorControllerTest):
@@ -577,8 +597,11 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
     SAMPLE_JSON_CONTENT = {
         'State A': ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -590,9 +613,10 @@ interaction:
   default_outcome:
     dest: State A
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -602,8 +626,11 @@ param_changes: []
 """),
         'State B': ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -615,9 +642,10 @@ interaction:
   default_outcome:
     dest: State B
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -627,8 +655,11 @@ param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -640,9 +671,10 @@ interaction:
   default_outcome:
     dest: %s
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -654,8 +686,11 @@ param_changes: []
 
     SAMPLE_STATE_STRING = ("""classifier_model_id: null
 content:
-  audio_translations: {}
+  content_id: content
   html: ''
+content_ids_to_audio_translations:
+  content: {}
+  default_outcome: {}
 interaction:
   answer_groups: []
   confirmed_unclassified_answers: []
@@ -667,9 +702,10 @@ interaction:
   default_outcome:
     dest: State A
     feedback:
-      audio_translations: {}
+      content_id: default_outcome
       html: ''
     labelled_as_correct: false
+    missing_prerequisite_skill_id: null
     param_changes: []
     refresher_exploration_id: null
   hints: []
@@ -792,6 +828,10 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             self.owner, unpublished_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
+        rights_manager.assign_role_for_exploration(
+            self.owner, unpublished_exp_id, self.translator_id,
+            rights_manager.ROLE_TRANSLATOR)
+
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
@@ -799,6 +839,12 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
+        response = self.testapp.delete(
+            '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+        self.login(self.TRANSLATOR_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % unpublished_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
@@ -820,6 +866,9 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         rights_manager.assign_role_for_exploration(
             self.owner, published_exp_id, self.editor_id,
             rights_manager.ROLE_EDITOR)
+        rights_manager.assign_role_for_exploration(
+            self.owner, published_exp_id, self.translator_id,
+            rights_manager.ROLE_TRANSLATOR)
         rights_manager.publish_exploration(self.owner, published_exp_id)
 
         self.login(self.EDITOR_EMAIL)
@@ -829,6 +878,12 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
         self.logout()
 
         self.login(self.VIEWER_EMAIL)
+        response = self.testapp.delete(
+            '/createhandler/data/%s' % published_exp_id, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+        self.login(self.TRANSLATOR_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % published_exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 401)
@@ -949,19 +1004,19 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         # In version 2, change the objective and the initial state content.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exp_services.update_exploration(
-            self.editor_id, self.EXP_ID, [{
+            self.editor_id, self.EXP_ID, [exp_domain.ExplorationChange({
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective',
-            }, {
+            }), exp_domain.ExplorationChange({
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'state_name': exploration.init_state_name,
                 'new_value': {
-                    'html': 'ABC',
-                    'audio_translations': {},
+                    'content_id': 'content',
+                    'html': 'ABC'
                 },
-            }], 'Change objective and init state content')
+            })], 'Change objective and init state content')
 
     def test_reverting_to_old_exploration(self):
         """Test reverting to old exploration versions."""
@@ -1149,6 +1204,12 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.put_json(
             rights_url, {
                 'version': exploration.version,
+                'new_member_username': self.TRANSLATOR_USERNAME,
+                'new_member_role': rights_manager.ROLE_TRANSLATOR
+            }, csrf_token)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR
             }, csrf_token)
@@ -1166,6 +1227,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response = self.testapp.get('/create/%s' % exp_id, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.assert_cannot_edit(response.body)
+        self.assert_cannot_translate(response.body)
         self.logout()
 
         # Check that collaborator can access editor page and can edit.
@@ -1173,6 +1235,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response = self.testapp.get('/create/%s' % exp_id)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
+        self.assert_can_translate(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Check that collaborator can add a new state called 'State 4'.
@@ -1240,6 +1303,27 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.assertIn('State 5', response_dict['states'])
 
         # Check that collaborator2 cannot add new members.
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
+        response_dict = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_username': self.COLLABORATOR3_USERNAME,
+                'new_member_role': rights_manager.ROLE_EDITOR,
+                }, csrf_token, expect_errors=True, expected_status_int=401)
+        self.assertEqual(response_dict['status_code'], 401)
+
+        self.logout()
+
+        # Check that translator can access editor page and can only translate.
+        self.login(self.TRANSLATOR_EMAIL)
+        response = self.testapp.get('/create/%s' % exp_id)
+        self.assertEqual(response.status_int, 200)
+        self.assert_cannot_edit(response.body)
+        self.assert_can_translate(response.body)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Check that translator cannot add new members.
         exploration = exp_services.get_exploration_by_id(exp_id)
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_id)
         response_dict = self.put_json(
@@ -1530,6 +1614,285 @@ class ModeratorEmailsTest(test_utils.GenericTestBase):
             self.logout()
 
 
+class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
+    """Test the handling of request to fetch issues and playthroughs."""
+
+    EXP_ID = 'exp_id1'
+
+    def setUp(self):
+        super(FetchIssuesPlaythroughHandlerTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+
+        # The editor publishes an exploration.
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id, title='My Exploration',
+            end_state_name='END')
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
+
+        self.playthrough_id1 = stats_models.PlaythroughModel.create(
+            self.EXP_ID, 1, 'EarlyQuit',
+            {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            }])
+        self.playthrough_id2 = stats_models.PlaythroughModel.create(
+            self.EXP_ID, 1, 'MultipleIncorrectSubmissions',
+            {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'num_times_answered_incorrectly': {
+                    'value': 7
+                }
+            },
+            [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            }])
+        stats_models.ExplorationIssuesModel.create(
+            self.EXP_ID, 1,
+            [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': [self.playthrough_id1],
+                'schema_version': 1,
+                'is_valid': True
+            }, {
+                'issue_type': 'MultipleIncorrectSubmissions',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'num_times_answered_incorrectly': {
+                        'value': 7
+                    }
+                },
+                'playthrough_ids': [self.playthrough_id2],
+                'schema_version': 1,
+                'is_valid': True
+            }]
+        )
+
+    def test_fetch_issues_handler(self):
+        """Test that all issues get fetched correctly."""
+        response = self.get_json(
+            '/issuesdatahandler/%s' % (self.EXP_ID), {'exp_version': 1})
+        self.assertEqual(len(response), 2)
+        self.assertEqual(response[0]['issue_type'], 'EarlyQuit')
+        self.assertEqual(
+            response[1]['issue_type'], 'MultipleIncorrectSubmissions')
+
+    def test_invalid_issues_are_not_retrieved(self):
+        """Test that invalid issues are not retrieved."""
+        exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
+            self.EXP_ID, 1)
+        exp_issues_model.unresolved_issues[1]['is_valid'] = False
+        exp_issues_model.put()
+
+        response = self.get_json(
+            '/issuesdatahandler/%s' % (self.EXP_ID), {'exp_version': 1})
+        self.assertEqual(len(response), 1)
+        self.assertEqual(response[0]['issue_type'], 'EarlyQuit')
+
+    def test_fetch_playthrough_handler(self):
+        """Test that the playthrough gets fetched correctly."""
+        response = self.get_json(
+            '/playthroughdatahandler/%s/%s' % (
+                self.EXP_ID, self.playthrough_id1))
+        self.assertEqual(response['id'], self.playthrough_id1)
+        self.assertEqual(response['exp_id'], self.EXP_ID)
+        self.assertEqual(response['exp_version'], 1)
+        self.assertEqual(response['issue_type'], 'EarlyQuit')
+        self.assertEqual(
+            response['issue_customization_args'], {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            })
+        self.assertEqual(
+            response['actions'], [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            }])
+
+
+class ResolveIssueHandlerTest(test_utils.GenericTestBase):
+    """Test the handler for resolving issues."""
+
+    EXP_ID = 'exp_id1'
+
+    def setUp(self):
+        super(ResolveIssueHandlerTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.editor = user_services.UserActionsInfo(self.editor_id)
+
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.set_moderators([self.MODERATOR_USERNAME])
+
+        # The editor publishes an exploration.
+        self.save_new_valid_exploration(
+            self.EXP_ID, self.editor_id, title='My Exploration',
+            end_state_name='END')
+        rights_manager.publish_exploration(self.editor, self.EXP_ID)
+
+        self.playthrough_id1 = stats_models.PlaythroughModel.create(
+            self.EXP_ID, 1, 'EarlyQuit',
+            {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    }
+                },
+                'schema_version': 1
+            }])
+        self.playthrough_id2 = stats_models.PlaythroughModel.create(
+            self.EXP_ID, 1, 'EarlyQuit',
+            {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'state_name2'
+                    }
+                },
+                'schema_version': 1
+            }])
+
+        stats_models.ExplorationIssuesModel.create(
+            self.EXP_ID, 1,
+            [{
+                'issue_type': 'EarlyQuit',
+                'issue_customization_args': {
+                    'state_name': {
+                        'value': 'state_name1'
+                    },
+                    'time_spent_in_exp_in_msecs': {
+                        'value': 200
+                    }
+                },
+                'playthrough_ids': [self.playthrough_id1, self.playthrough_id2],
+                'schema_version': 1,
+                'is_valid': True
+            }]
+        )
+
+        self.exp_issue_dict = {
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            'playthrough_ids': [self.playthrough_id1, self.playthrough_id2],
+            'schema_version': 1,
+            'is_valid': True
+        }
+
+        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        self.csrf_token = self.get_csrf_token_from_response(response)
+
+    def test_resolve_issue_handler(self):
+        """Test that resolving an issue deletes associated playthroughs."""
+        self.post_json(
+            '/resolveissuehandler/%s' % (self.EXP_ID),
+            {
+                'exp_issue_dict': self.exp_issue_dict,
+                'exp_version': 1
+            }, self.csrf_token)
+
+        exp_issues = stats_services.get_exp_issues(self.EXP_ID, 1)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
+        playthrough_instances = stats_models.PlaythroughModel.get_multi(
+            [self.playthrough_id1, self.playthrough_id2])
+        self.assertEqual(playthrough_instances, [None, None])
+
+    def test_error_on_passing_invalid_exp_issue_dict(self):
+        """Test that error is raised on passing invalid exploration issue
+        dict.
+        """
+        del self.exp_issue_dict['issue_type']
+        # Since we deleted the 'issue_type' key in the exploration issue dict,
+        # the dict is invalid now and exception should be raised.
+        self.post_json(
+            '/resolveissuehandler/%s' % (self.EXP_ID),
+            {
+                'exp_issue_dict': self.exp_issue_dict,
+                'exp_version': 1
+            }, self.csrf_token, expect_errors=True, expected_status_int=404)
+
+    def test_error_on_passing_non_matching_exp_issue_dict(self):
+        """Test that error is raised on passing an exploration issue dict that
+        doesn't match an issue in the exploration issues model.
+        """
+        self.exp_issue_dict['issue_customization_args']['state_name'][
+            'value'] = 'state_name2'
+        self.post_json(
+            '/resolveissuehandler/%s' % (self.EXP_ID),
+            {
+                'exp_issue_dict': self.exp_issue_dict,
+                'exp_version': 1
+            }, self.csrf_token, expect_errors=True, expected_status_int=404)
+
+
 class EditorAutosaveTest(BaseEditorControllerTest):
     """Test the handling of editor autosave actions."""
 
@@ -1543,10 +1906,12 @@ class EditorAutosaveTest(BaseEditorControllerTest):
     DRAFT_CHANGELIST = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
+        'old_value': None,
         'new_value': 'Updated title'}]
     NEW_CHANGELIST = [{
         'cmd': 'edit_exploration_property',
         'property_name': 'title',
+        'old_value': None,
         'new_value': 'New title'}]
     INVALID_CHANGELIST = [{
         'cmd': 'edit_exploration_property',

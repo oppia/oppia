@@ -102,8 +102,7 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(thread_summaries[1]['total_message_count'], 1)
 
         feedback_services.create_message(
-            self.EXP_ID_1, thread_ids[0].split('.')[1], self.user_id, None,
-            None, 'editor message')
+            thread_ids[0], self.user_id, None, None, 'editor message')
 
         self._run_one_off_job()
 
@@ -116,8 +115,7 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
         # Get the first message so that we can delete it and check the error
         # case.
         first_message_model = (
-            feedback_models.FeedbackMessageModel.get(
-                self.EXP_ID_1, thread_ids[0].split('.')[1], 0))
+            feedback_models.FeedbackMessageModel.get(thread_ids[0], 0))
 
         first_message_model.delete()
 

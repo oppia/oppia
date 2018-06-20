@@ -69,6 +69,45 @@
       </div>
     </div>
   </div>
+  <style>
+    .oppia-page-heading-subtext {
+      font-size: smaller;
+      opacity: 0.7;
+    }
+    .oppia-notifications-dashboard-card {
+      padding: 15px 40px;
+    }
+    .oppia-dashboard-row {
+      background-color: #fff;
+      cursor: pointer;
+      margin-bottom: -5px;
+      overflow: auto;
+      position: relative;
+    }
+    .oppia-dashboard-row:hover {
+      background: #eee;
+    }
+    .oppia-dashboard-row-recent {
+      background: #fff4ca;
+    }
+    .oppia-dashboard-row-recent:hover {
+      background: #ffe279;
+    }
+    .oppia-notification-content {
+      color: black;
+      display: inline-block;
+      float: left;
+    }
+    .oppia-notification-last-updated {
+      float: right;
+    }
+    @media (max-width: 500px) {
+      .oppia-notification-content,
+      .oppia-notification-last-updated {
+        display: inline;
+      }
+    }
+  </style>
 {% endblock %}
 
 {% block footer_js %}

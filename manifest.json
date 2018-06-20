@@ -162,9 +162,9 @@
       "messageFormat": {
         "version": "0.3.1",
         "downloadFormat": "zip",
-        "url": "https://github.com/SlexAxton/messageformat.js/archive/v0.3.1.zip",
+        "url": "https://github.com/messageformat/messageformat/archive/v0.3.1.zip",
         "targetDirPrefix": "messageformat-",
-        "rootDirPrefix": "messageformat.js-",
+        "rootDirPrefix": "messageformat-",
         "bundle": {
           "js": ["messageformat.js"]
         }
@@ -449,6 +449,17 @@
         "targetDirPrefix": "ui-sortable-",
         "bundle": {
           "js": ["src/sortable.js"]
+        }
+      },
+      "uiTree": {
+        "version": "",
+        "downloadFormat": "zip",
+        "url": "https://github.com/angular-ui-tree/angular-ui-tree/archive/master.zip",
+        "rootDirPrefix": "angular-ui-tree-master",
+        "targetDirPrefix": "ui-tree-2.22.6",
+        "bundle": {
+          "css": ["dist/angular-ui-tree.min.css"],
+          "js": ["dist/angular-ui-tree.js"]
         }
       },
       "uiUtils": {

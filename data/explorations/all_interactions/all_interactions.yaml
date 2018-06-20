@@ -23,6 +23,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Hello! Let's move onto another interaction.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -45,6 +46,7 @@ states:
           audio_translations: {}
           html: <p>I'm looking for a particular 'Hello Oppia' message. Don't you want
             to say hello?</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -67,6 +69,7 @@ states:
         feedback:
           audio_translations: {}
           html: <p>Moving onward!</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -98,10 +101,11 @@ states:
       answer_groups:
       - labelled_as_correct: false
         outcome:
-          dest: Set Input
+          dest: Number With Units
           feedback:
             audio_translations: {}
             html: <p>Yes, well done!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -121,6 +125,7 @@ states:
         feedback:
           audio_translations: {}
           html: <p>No, that's not right. The answer is 2/5.</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -140,6 +145,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Penta-penta-pentagon!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -187,6 +193,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That's a triangle. Your shape needs more sides.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -222,6 +229,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Your shape is missing one side!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -303,6 +311,7 @@ states:
         feedback:
           audio_translations: {}
           html: <p>That's not quite a pentagon. Please try again!</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -325,6 +334,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That's the class definition. Try again.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -337,6 +347,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That's the class's docstring. Try again.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -350,6 +361,7 @@ states:
             audio_translations: {}
             html: <p>That's a function, which is close to what you're looking for.
               Try again!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -363,6 +375,7 @@ states:
             audio_translations: {}
             html: <p>That's a classmethod. It does execute code, but it doesn't construct
               anything. Try again!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -376,6 +389,7 @@ states:
             audio_translations: {}
             html: <p>You found it! This is the code responsible for constructing a
               new class object.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -436,6 +450,7 @@ states:
           audio_translations: {}
           html: "<p>Constructors <i>initialize</i>\_an object, or <i>init</i>\_it.Constructors\
             \ are also functions themselves.</p>"
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -458,6 +473,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That's right!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -472,6 +488,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That's not a good option!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -485,6 +502,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That's not all of the good options!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -507,6 +525,7 @@ states:
         feedback:
           audio_translations: {}
           html: <p>The two good options actually have the word 'good' in them.</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -529,6 +548,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>No, you want the one below this one.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -542,6 +562,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Yes, good choice!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -555,6 +576,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>No, you want the choice above this one.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -578,6 +600,7 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -597,6 +620,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>You proved p!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -622,6 +646,7 @@ states:
         feedback:
           audio_translations: {}
           html: <p>Given p, we have p. Try again.</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -643,6 +668,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That is the normal form of a line. Good job!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -655,6 +681,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That's slope-intercept form. A popular form!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -667,6 +694,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That's point-slope form! Great!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -681,6 +709,7 @@ states:
           audio_translations: {}
           html: <p>There are three specific equations I'm looking for. Be aware that
             these can each be derived from each other.</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -717,6 +746,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Nice choice!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -729,6 +759,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Hmm, not quite. Perhaps the right option is below this one.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -741,6 +772,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Hmm, not quite. Perhaps the answer is above this one.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -759,6 +791,7 @@ states:
         feedback:
           audio_translations: {}
           html: ''
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -782,6 +815,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>You found the next C! Excellent.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -807,6 +841,7 @@ states:
         feedback:
           audio_translations: {}
           html: <p>That's not the next C. Try again?</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -830,6 +865,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That number has more than one digit. Right!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -843,10 +879,53 @@ states:
         feedback:
           audio_translations: {}
           html: <p>That's only one digit! Try again.</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
       id: NumericInput
+      solution: null
+    param_changes: []
+  Number With Units:
+    classifier_model_id: null
+    content:
+      audio_translations: {}
+      html: <p>Write 2 km/s in terms of m/s.</p>
+    interaction:
+      answer_groups:
+      - labelled_as_correct: false
+        outcome:
+          dest: Set Input
+          feedback:
+            audio_translations: {}
+            html: <p>Yes, well done!</p>
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            f:
+              type: 'real'
+              real: 2000
+              fraction:
+                isNegative: false
+                wholeNumber: 0
+                numerator: 0
+                denominator: 1
+              units: [{'unit': 'm', 'exponent': 1}, {'unit': 's', 'exponent': -1}]
+          rule_type: IsEqualTo
+      confirmed_unclassified_answers: []
+      customization_args: {}
+      default_outcome:
+        dest: Number With Units
+        feedback:
+          audio_translations: {}
+          html: <p>No, that's not right. The answer is 2000 m/s.</p>
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: NumberWithUnits
       solution: null
     param_changes: []
   Pencil Code Editor:
@@ -863,6 +942,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Goodbye! Well, not quite. We still have a little more to explore.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -875,6 +955,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Goodbye! Well, not quite. We still have a little more to explore.<br></p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -891,6 +972,7 @@ states:
           audio_translations: {}
           html: <p>Where are your manners? You should say goodbye to me. We've explored
             so much, together!</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints: []
@@ -912,6 +994,7 @@ states:
             audio_translations: {}
             html: <p>Nice! Orange, purple, and silver are all words that are exceptionally
               hard to use in rhyming devices.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -928,6 +1011,7 @@ states:
         feedback:
           audio_translations: {}
           html: <p>Not quite.</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -957,6 +1041,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Omnomnom.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -974,6 +1059,7 @@ states:
         feedback:
           audio_translations: {}
           html: <p>The answer needs to contain "ate".</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:
@@ -997,6 +1083,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>That's Washington, D.C., the capital of the United States.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -1012,6 +1099,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Ottawa, the capital of Canada!</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -1027,6 +1115,7 @@ states:
           feedback:
             audio_translations: {}
             html: <p>Mexico City, Mexico. The capital of Mexico.</p>
+          missing_prerequisite_skill_id: null
           param_changes: []
           refresher_exploration_id: null
         rule_specs:
@@ -1049,6 +1138,7 @@ states:
         feedback:
           audio_translations: {}
           html: <p>Not quite. Try again!</p>
+        missing_prerequisite_skill_id: null
         param_changes: []
         refresher_exploration_id: null
       hints:

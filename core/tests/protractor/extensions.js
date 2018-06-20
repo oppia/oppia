@@ -75,8 +75,7 @@ describe('rich-text components', function() {
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
-      }]
-      );
+      }]);
     });
 
     editor.discardChanges();
@@ -98,6 +97,8 @@ describe('rich-text components', function() {
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
       'Error parsing header X-XSS-Protection: 1; mode=block; ' +
       'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
+      'https://www.youtube.com/youtubei/v1/log_interaction?.* Failed to load ' +
+      'resource: the server responded with a status of 401 ()',
     ]);
   });
 });

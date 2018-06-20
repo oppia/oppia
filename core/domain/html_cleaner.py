@@ -24,6 +24,7 @@ import urlparse
 import bleach
 import bs4
 from core.domain import rte_component_registry
+import feconf
 
 
 def filter_a(name, value):
@@ -143,3 +144,456 @@ def get_rte_components(html_string):
             component['customization_args'] = customization_args
             components.append(component)
     return components
+
+
+# Replace list to escape and unescape html strings.
+REPLACE_LIST = [
+    ('&', '&amp;'),
+    ('"', '&quot;'),
+    ('\'', '&#39;'),
+    ('<', '&lt;'),
+    ('>', '&gt;')
+]
+
+
+def escape_html(unescaped_html_data):
+    """This functions escapes an unescaped HTML string.
+
+    Args:
+        unescaped_html_data: str. Unescaped HTML string to be escaped.
+
+    Returns:
+        str. Escaped HTML string.
+    """
+    escaped_html_data = unescaped_html_data
+    for replace_tuple in REPLACE_LIST:
+        escaped_html_data = escaped_html_data.replace(
+            replace_tuple[0], replace_tuple[1])
+
+    return escaped_html_data
+
+
+def unescape_html(escaped_html_data):
+    """This function unescapes an escaped HTML string.
+
+    Args:
+        escaped_html_data: str. Escaped HTML string to be unescaped.
+
+    Returns:
+        str. Unescaped HTML string.
+    """
+    unescaped_html_data = escaped_html_data
+    for replace_tuple in REPLACE_LIST:
+        unescaped_html_data = unescaped_html_data.replace(
+            replace_tuple[1], replace_tuple[0])
+
+    return unescaped_html_data
+
+
+def wrap_with_siblings(tag, p):
+    """This function wraps a tag and its unwrapped sibling in p tag.
+
+    Args:
+        tag: bs4.element.Tag. The tag which is to be wrapped in p tag
+            along with its unwrapped siblings.
+        p: bs4.element.Tag. The new p tag in soup in which the tag and
+            its siblings are to be wrapped.
+    """
+    independent_parents = ['p', 'pre', 'ol', 'ul', 'blockquote']
+    prev_sib = list(tag.previous_siblings)
+    next_sib = list(tag.next_siblings)
+    index_of_first_unwrapped_sibling = -1
+    # Previous siblings are stored in order with the closest one
+    # being the first. All the continuous siblings which cannot be
+    # a valid parent by their own have to be wrapped in same p tag.
+    # This loop finds the index of first sibling which is a valid
+    # parent on its own.
+    for index, sib in enumerate(prev_sib):
+        if sib.name in independent_parents:
+            index_of_first_unwrapped_sibling = len(prev_sib) - index
+            break
+
+    # Previous siblings are accessed in reversed order to
+    # avoid reversing the order of siblings on being wrapped.
+    for index, sib in enumerate(reversed(prev_sib)):
+        if index >= index_of_first_unwrapped_sibling:
+            sib.wrap(p)
+
+    # Wrap the tag in same p tag as previous siblings.
+    tag.wrap(p)
+
+    # To wrap the next siblings which are not valid parents on
+    # their own in the same p tag as previous siblings.
+    for sib in next_sib:
+        if sib.name not in independent_parents:
+            sib.wrap(p)
+        else:
+            break
+
+
+def convert_to_text_angular(html_data):
+    """This function converts the html to text angular supported format.
+
+    Args:
+        html_data: str. HTML string to be converted.
+
+    Returns:
+        str. The converted HTML string.
+    """
+    if not len(html_data):
+        return html_data
+
+    # <br> is replaced with <br/> before conversion because BeautifulSoup
+    # in some cases adds </br> closing tag and br is reported as parent
+    # of other tags which produces issues in migration.
+    html_data = html_data.replace('<br>', '<br/>')
+
+    # To convert the rich text content within tabs and collapsible components
+    # to valid Textangular format. If there is no tabs or collapsible component
+    # convert_tag_contents_to_text_angular will make no change to html_data.
+    html_data = convert_tag_contents_to_text_angular(html_data)
+
+    soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
+
+    allowed_tag_list = (
+        feconf.RTE_CONTENT_SPEC[
+            'RTE_TYPE_TEXTANGULAR']['ALLOWED_TAG_LIST'])
+    allowed_parent_list = (
+        feconf.RTE_CONTENT_SPEC[
+            'RTE_TYPE_TEXTANGULAR']['ALLOWED_PARENT_LIST'])
+
+    # td tag will be unwrapped and tr tag will be replaced with p tag.
+    # So if td is parent of blockquote after migration blockquote should
+    # be parent of the p tag to get the alomst same appearance. p cannot
+    # remain parent of blockquote since that is not allowed in TextAngular.
+    # If blockquote is wrapped in p we need to unwrap the p but here
+    # we need to make blockquote the parent of p. Since this cannot
+    # be distinguished after migration to p, this part is checked
+    # before migration.
+    for blockquote in soup.findAll('blockquote'):
+        if blockquote.parent.name == 'td':
+            blockquote.parent.parent.wrap(soup.new_tag('blockquote'))
+            blockquote.unwrap()
+
+    # If p tags are left within a td tag, the contents of a table row
+    # in final output will span to multiple lines instead of all
+    # items being in a single line. So, any p tag within
+    # td tag is unwrapped.
+    for p in soup.findAll('p'):
+        if p.parent.name == 'td':
+            p.unwrap()
+
+    # To remove all tags except those in allowed tag list.
+    all_tags = soup.findAll()
+    for tag in all_tags:
+        if tag.name == 'strong':
+            tag.name = 'b'
+        elif tag.name == 'em':
+            tag.name = 'i'
+        # Current rte does not support horizontal rule, the closest
+        # replacement of a horizontal rule is a line break to obtain
+        # the same appearance.
+        elif tag.name == 'hr':
+            tag.name = 'br'
+        # a tag is to be replaced with oppia-noninteractive-link.
+        # For this the attributes and text within a tag is used to
+        # create new link tag which is wrapped as parent of a and then
+        # a tag is removed.
+        # In case where there is no href attribute or no text within the
+        # a tag, the tag is simply removed.
+        elif tag.name == 'a':
+            replace_with_link = True
+            if tag.has_attr('href') and tag.get_text():
+                children = tag.findChildren()
+                for child in children:
+                    if child.name == 'oppia-noninteractive-link':
+                        tag.unwrap()
+                        replace_with_link = False
+                if replace_with_link:
+                    link = soup.new_tag('oppia-noninteractive-link')
+                    url = tag['href']
+                    text = tag.get_text()
+                    link['url-with-value'] = escape_html(json.dumps(url))
+                    link['text-with-value'] = escape_html(json.dumps(text))
+                    tag.wrap(link)
+                    # If any part of text in a tag is wrapped in b or i tag
+                    # link tag is also wrapped in those tags to maintain
+                    # almost similar appearance.
+                    count_of_b_parent = 0
+                    count_of_i_parent = 0
+                    for child in children:
+                        if child.name == 'b' and not count_of_b_parent:
+                            link.wrap(soup.new_tag('b'))
+                            count_of_b_parent = 1
+                        if child.name == 'i' and not count_of_i_parent:
+                            link.wrap(soup.new_tag('i'))
+                            count_of_i_parent = 1
+                    tag.extract()
+            else:
+                tag.unwrap()
+        # To maintain the appearance of table, tab is added after
+        # each element in row. In one of the cases the elements were
+        # p tags with some text and line breaks. In such case td.string
+        # is None and there is no need to add tabs since linebreak is
+        # already present.
+        elif tag.name == 'td' and tag.next_sibling:
+            tag.insert_after(' ')
+            tag.unwrap()
+        # div and table rows both are replaced with p tag
+        # to maintain almost same apperance.
+        elif tag.name == 'div' or tag.name == 'tr':
+            tag.name = 'p'
+        # All other invalid tags are simply removed.
+        elif tag.name not in allowed_tag_list:
+            tag.unwrap()
+
+    # Removal of tags can break the soup into parts which are continuous
+    # and not wrapped in any tag. This part recombines the continuous
+    # parts not wrapped in any tag.
+    soup = bs4.BeautifulSoup(unicode(soup).encode('utf-8'), 'html.parser')
+
+    oppia_inline_components = [
+        'oppia-noninteractive-link', 'oppia-noninteractive-math']
+    oppia_block_components = [
+        'oppia-noninteractive-image',
+        'oppia-noninteractive-video',
+        'oppia-noninteractive-collapsible',
+        'oppia-noninteractive-tabs'
+    ]
+
+    # Ensure that blockquote tag is wrapped in an allowed parent.
+    for blockquote in soup.findAll('blockquote'):
+        while blockquote.parent.name not in allowed_parent_list['blockquote']:
+            blockquote.parent.unwrap()
+
+    # Ensure that pre tag is not wrapped p tags.
+    for pre in soup.findAll('pre'):
+        while pre.parent.name == 'p':
+            pre.parent.unwrap()
+
+    # Ensure that ol and ul are not wrapped in p tags.
+    for tag_name in ['ol', 'ul']:
+        for tag in soup.findAll(tag_name):
+            while tag.parent.name == 'p':
+                tag.parent.unwrap()
+
+    # Ensure that br tag is wrapped in an allowed parent.
+    for br in soup.findAll('br'):
+        if br.parent.name == 'pre':
+            br.insert_after('\n')
+            br.unwrap()
+        elif br.parent.name not in allowed_parent_list['br']:
+            wrap_with_siblings(br, soup.new_tag('p'))
+
+    # Ensure that b and i tags are wrapped in an allowed parent.
+    for tag_name in ['b', 'i']:
+        for tag in soup.findAll(tag_name):
+            if tag.parent.name == 'oppia-noninteractive-link':
+                tag.parent.wrap(soup.new_tag(tag_name))
+                parent = tag.parent.parent
+                tag.unwrap()
+                tag = parent
+            if tag.parent.name == tag_name:
+                parent = tag.parent
+                tag.unwrap()
+                tag = parent
+            if tag.parent.name in ['blockquote', '[document]']:
+                wrap_with_siblings(tag, soup.new_tag('p'))
+
+    # Ensure that oppia inline components are wrapped in an allowed parent.
+    for tag_name in oppia_inline_components:
+        for tag in soup.findAll(tag_name):
+            if tag.parent.name in ['blockquote', '[document]']:
+                wrap_with_siblings(tag, soup.new_tag('p'))
+
+    # Ensure oppia link component is not a child of another link component.
+    for link in soup.findAll('oppia-noninteractive-link'):
+        if link.parent.name == 'oppia-noninteractive-link':
+            link.unwrap()
+
+    # Ensure that oppia block components are wrapped in an allowed parent.
+    for tag_name in oppia_block_components:
+        for tag in soup.findAll(tag_name):
+            if tag.parent.name in ['blockquote', '[document]']:
+                wrap_with_siblings(tag, soup.new_tag('p'))
+
+    # Ensure that every content in html is wrapped in a tag.
+    for content in soup.contents:
+        if not content.name:
+            content.wrap(soup.new_tag('p'))
+
+    # Ensure that p tag has a valid parent.
+    for p in soup.findAll('p'):
+        if p.parent.name != 'p' and (
+                p.parent.name not in allowed_parent_list['p']):
+            p.parent.unwrap()
+
+    # Ensure that p tag is not wrapped in p tag.
+    for p in soup.findAll('p'):
+        if p.parent.name == 'p':
+            child_tags = p.parent.contents
+            index = 0
+            while index < len(child_tags):
+                current_tag = child_tags[index]
+
+                # If the current tag is not a paragraph tag, wrap it and all
+                # consecutive non-p tags after it into a single p-tag.
+                new_p = soup.new_tag('p')
+                while current_tag.name != 'p':
+                    current_tag = current_tag.wrap(new_p)
+                    index = child_tags.index(current_tag) + 1
+                    if index >= len(child_tags):
+                        break
+                    current_tag = child_tags[index]
+
+                index += 1
+            p.parent.unwrap()
+
+    # Beautiful soup automatically changes some <br> to <br/>,
+    # so it has to be replaced directly in the string.
+    # Also, when any html string with <br/> is stored in exploration
+    # html strings they are stored as <br>. Since both of these
+    # should match and <br> and <br/> have same working,
+    # so the tag has to be replaced in this way.
+    return unicode(soup).replace('<br/>', '<br>')
+
+
+def convert_tag_contents_to_text_angular(html_data):
+    """This function converts the rich text content within tabs and
+    collapsible components to textangular format. If the html_data
+    does not contain tab or collapsible components it will do nothing.
+
+    Args:
+        html_data: str. The HTML string whose content is to be converted.
+
+    Returns:
+        str. The HTML string with converted content within tag.
+    """
+    soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
+
+    for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
+        content_html = unescape_html(collapsible['content-with-value'])
+        collapsible['content-with-value'] = escape_html(
+            json.dumps(convert_to_text_angular(json.loads(content_html))))
+
+    for tabs in soup.findAll('oppia-noninteractive-tabs'):
+        tab_content_json = unescape_html(tabs['tab_contents-with-value'])
+        tab_content_list = json.loads(tab_content_json)
+        for index, tab_content in enumerate(tab_content_list):
+            tab_content_list[index]['content'] = convert_to_text_angular(
+                tab_content['content'])
+        tabs['tab_contents-with-value'] = escape_html(
+            json.dumps(tab_content_list))
+
+    return unicode(soup)
+
+
+def validate_textangular_format(html_list, run_migration=False):
+    """This function checks if html strings in a given list are
+    valid for TextAngular RTE.
+
+    Args:
+        html_list: list(str). List of html strings to be validated.
+        run_migration: bool. Specifies if migration is to be performed
+            before validating.
+
+    Returns:
+        dict: Dictionary of all the error relations and strings.
+    """
+    # err_dict is a dictionary to store the invalid tags and the
+    # invalid parent-child relations that we find.
+    err_dict = {}
+
+    # All the invalid html strings will be stored in this.
+    err_dict['strings'] = []
+
+    for html_data in html_list:
+        if run_migration:
+            soup_data = convert_to_text_angular(
+                convert_tag_contents_to_text_angular(html_data))
+        else:
+            soup_data = html_data
+
+        # <br> is replaced with <br/> before conversion because
+        # otherwise BeautifulSoup in some cases adds </br> closing tag
+        # and br is reported as parent of other tags which
+        # produces issues in validation.
+        soup = bs4.BeautifulSoup(
+            soup_data.replace('<br>', '<br/>'), 'html.parser')
+
+        is_invalid = _validate_soup_for_textangular(soup, err_dict)
+
+        if is_invalid:
+            err_dict['strings'].append(html_data)
+
+        for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
+            content_html = json.loads(
+                unescape_html(collapsible['content-with-value']))
+            soup_for_collapsible = bs4.BeautifulSoup(
+                content_html.replace('<br>', '<br/>'), 'html.parser')
+            is_invalid = _validate_soup_for_textangular(
+                soup_for_collapsible, err_dict)
+            if is_invalid:
+                err_dict['strings'].append(html_data)
+
+        for tabs in soup.findAll('oppia-noninteractive-tabs'):
+            tab_content_json = unescape_html(tabs['tab_contents-with-value'])
+            tab_content_list = json.loads(tab_content_json)
+            for tab_content in tab_content_list:
+                content_html = tab_content['content']
+                soup_for_tabs = bs4.BeautifulSoup(
+                    content_html.replace('<br>', '<br/>'), 'html.parser')
+                is_invalid = _validate_soup_for_textangular(
+                    soup_for_tabs, err_dict)
+                if is_invalid:
+                    err_dict['strings'].append(html_data)
+
+    for key in err_dict:
+        err_dict[key] = list(set(err_dict[key]))
+
+    return err_dict
+
+
+def _validate_soup_for_textangular(soup, err_dict):
+    """Validate content in given soup for textangular format.
+
+    Args:
+        soup: bs4.BeautifulSoup. The html soup whose content is to be validated.
+        err_dict: dict. The dictionary which stores invalid tags and strings.
+
+    Returns:
+        bool. Boolean indicating whether a html string is valid for textangular.
+    """
+    allowed_parent_list = (
+        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+        ['ALLOWED_PARENT_LIST'])
+    allowed_tag_list = (
+        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
+        ['ALLOWED_TAG_LIST'])
+    is_invalid = False
+
+    # Text with no parent tag is also invalid.
+    for content in soup.contents:
+        if not content.name:
+            is_invalid = True
+
+    for tag in soup.findAll():
+        # Checking for tags not allowed in RTE.
+        if tag.name not in allowed_tag_list:
+            if 'invalidTags' in err_dict:
+                err_dict['invalidTags'].append(tag.name)
+            else:
+                err_dict['invalidTags'] = [tag.name]
+            is_invalid = True
+        # Checking for parent-child relation that are not
+        # allowed in RTE.
+        parent = tag.parent.name
+        if (tag.name in allowed_tag_list) and (
+                parent not in allowed_parent_list[tag.name]):
+            if tag.name in err_dict:
+                err_dict[tag.name].append(parent)
+            else:
+                err_dict[tag.name] = [parent]
+            is_invalid = True
+
+    return is_invalid

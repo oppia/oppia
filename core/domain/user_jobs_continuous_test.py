@@ -16,7 +16,7 @@
 
 """Tests for user dashboard computations."""
 
-from collections import defaultdict
+import collections
 
 from core import jobs_registry
 from core.domain import collection_services
@@ -293,9 +293,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             feedback_services.create_thread(
                 EXP_1_ID, None, editor_id, FEEDBACK_THREAD_SUBJECT,
                 'text')
-            thread_id = feedback_services.get_all_threads(
-                EXP_1_ID, False)[0].get_thread_id()
-            message = feedback_services.get_messages(EXP_1_ID, thread_id)[0]
+            thread_id = feedback_services.get_all_threads(EXP_1_ID, False)[0].id
+            message = feedback_services.get_messages(thread_id)[0]
 
             # User creates another exploration.
             self.save_new_valid_exploration(
@@ -349,11 +348,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0].get_thread_id()
+            thread_id = feedback_services.get_all_threads(EXP_ID, False)[0].id
 
-            message = feedback_services.get_messages(
-                EXP_ID, thread_id)[0]
+            message = feedback_services.get_messages(thread_id)[0]
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(
@@ -413,10 +410,8 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             # User B starts a feedback thread.
             feedback_services.create_thread(
                 EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
-            thread_id = feedback_services.get_all_threads(
-                EXP_ID, False)[0].get_thread_id()
-            message = feedback_services.get_messages(
-                EXP_ID, thread_id)[0]
+            thread_id = feedback_services.get_all_threads(EXP_ID, False)[0].id
+            message = feedback_services.get_messages(thread_id)[0]
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role_for_exploration(
@@ -599,8 +594,8 @@ class UserStatsAggregatorTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserStatsAggregatorTest, self).setUp()
-        self.num_completions = defaultdict(int)
-        self.num_starts = defaultdict(int)
+        self.num_completions = collections.defaultdict(int)
+        self.num_starts = collections.defaultdict(int)
         self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
 
