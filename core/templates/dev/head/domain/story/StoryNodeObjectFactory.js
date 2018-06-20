@@ -109,7 +109,7 @@ oppia.factory('StoryNodeObjectFactory', [
 
     StoryNode.prototype.addPrerequisiteSkillId = function(skillId) {
       if (this._prerequisiteSkillIds.indexOf(skillId) !== -1) {
-        throw Error('The given node is already a destination node.');
+        throw Error('The given skill id is already a prerequisite skill.');
       }
       this._prerequisiteSkillIds.push(skillId);
     };
@@ -117,7 +117,7 @@ oppia.factory('StoryNodeObjectFactory', [
     StoryNode.prototype.removePrerequisiteSkillId = function(skillId) {
       var index = this._prerequisiteSkillIds.indexOf(skillId);
       if (index === -1) {
-        throw Error('The given node is not a destination node.');
+        throw Error('The given skill id is not a prerequisite skill.');
       }
       this._prerequisiteSkillIds.splice(index, 1);
     };

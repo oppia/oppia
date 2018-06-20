@@ -31,6 +31,14 @@ oppia.factory('StoryContentsObjectFactory', ['StoryNodeObjectFactory',
       return this._initialNodeId;
     };
 
+    StoryContents.prototype.getNextNodeId = function() {
+      return this._nextNodeId;
+    };
+
+    StoryContents.prototype.getNodes = function() {
+      return this._nodes;
+    };
+
     StoryContents.prototype.setInitialNodeId = function(nodeId) {
       if (this.getNodeIndex(nodeId) === -1) {
         throw Error('The node with given id doesn\'t exist');
@@ -38,7 +46,7 @@ oppia.factory('StoryContentsObjectFactory', ['StoryNodeObjectFactory',
       return this._initialNodeId = nodeId;
     };
 
-    StoryContents.prototype.addNode = function(nodeId) {
+    StoryContents.prototype.addNode = function() {
       this._nodes.push(StoryNodeObjectFactory.createFromId(this._nextNodeId));
       this._nextNodeId = this.incrementNodeId(this._nextNodeId);
     };
