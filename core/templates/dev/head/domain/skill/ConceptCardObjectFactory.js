@@ -30,6 +30,13 @@ oppia.factory('ConceptCardObjectFactory', [
       return this.workedExamples;
     };
 
+    ConceptCard.prototype.setWorkedExamples = function(workedExamples) {
+      this.workedExamples = [];
+      for (idx in workedExamples) {
+        this.workedExamples.push(workedExamples[idx]);
+      }
+    };
+
     return ConceptCard;    
   }
 ]);

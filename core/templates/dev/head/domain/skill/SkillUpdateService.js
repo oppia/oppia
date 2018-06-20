@@ -78,8 +78,6 @@ oppia.factory('SkillUpdateService', [
       },
 
       setConceptCardExplanation: function(skill, oldExplanation, newExplanation) {
-        console.log(angular.copy(oldExplanation));
-        console.log(angular.copy(newExplanation));
         _applyPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_EXPLANATION,
           newExplanation, oldExplanation,
@@ -90,6 +88,39 @@ oppia.factory('SkillUpdateService', [
             skill.getConceptCard().setExplanation(oldExplanation);
           });
       },
+
+      addWorkedExample: function(skill, newWorkedExample) {
+        var oldWorkedExamples = angular.copy(
+          skill.getConceptCard().getWorkedExamples());
+        var newWorkedExamples = angular.copy(oldWorkedExamples);
+        newWorkedExamples.push(newWorkedExample);
+        _applyPropertyChange(
+          skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+          newWorkedExamples, oldWorkedExamples,
+          function(changeDict, skill) {
+            var newWorkedExamples = _getNewPropertyValueFromChangeDict(changeDict);
+            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+          }, function(changeDict, skill) {
+            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+          });
+      },
+
+      updateWorkedExample: function(
+          skill, workedExampleIndex, newWorkedExample) {
+        var oldWorkedExamples = angular.copy(
+          skill.getConceptCard().getWorkedExamples());
+        var newWorkedExamples = angular.copy(oldWorkedExamples);
+        newWorkedExamples[workedExampleIndex] = newWorkedExample;
+                _applyPropertyChange(
+          skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+          newWorkedExamples, oldWorkedExamples,
+          function(changeDict, skill) {
+            var newWorkedExamples = _getNewPropertyValueFromChangeDict(changeDict);
+            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+          }, function(changeDict, skill) {
+            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+          });
+      }
     }
   }
 ]);
