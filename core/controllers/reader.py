@@ -304,6 +304,34 @@ class StorePlaythroughHandler(base.BaseHandler):
     the playthrough already exists, it is updated in the datastore.
     """
 
+    def _is_issue_in_exp_issues_model(
+            self, exp_issues, issue_type, customization_args):
+        """Checks whether the passed in issue exists in the unresolved issues
+        list of the exploration issues model.
+
+        Args:
+            exp_issues: ExplorationIssues. The exploration issues domain object.
+            issue_type: str. The type of the issue obtained from the playthrough
+                data.
+            customization_args: dict. The customization args dict
+                obtained from the playthrough data.
+
+        Returns:
+            bool, int. Whether the issue was found, the index at which the issue
+             was found, -1 otherwise.
+        """
+        for index, issue in enumerate(exp_issues.unresolved_issues):
+            if issue.issue_type == issue_type:
+                issue_customization_args = issue.issue_customization_args
+                # In case issue_keyname is 'state_names', the ordering of the
+                # list is important i.e. [a,b,c] is different from [b,c,a].
+                issue_keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
+                    issue.issue_type]
+                if (issue_customization_args[issue_keyname] ==
+                        customization_args[issue_keyname]):
+                    return True, index
+        return False, -1
+
     @acl_decorators.can_play_exploration
     def post(self, exploration_id):
         """Handles POST requests. Appends to existing list of playthroughs or
@@ -334,40 +362,69 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         # If playthrough already exists, update it in the datastore.
         if playthrough_data['id']:
+            playthrough_stored = True
+            playthrough_id = playthrough_data['id']
             playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
-            stats_services.update_playthroughs_multi(
-                [playthrough_data['id']], [playthrough])
-            self.render_json({})
-            return
-
-        issue_found = False
-        playthrough_id = None
-        payload_return = {'playthrough_stored': True}
-        for index, issue in enumerate(exp_issues.unresolved_issues):
-            if issue.issue_type == playthrough_data['issue_type']:
-                issue_customization_args = issue.issue_customization_args
-                # In case issue_keyname is 'state_names', the ordering of the
-                # list is important i.e. [a,b,c] is different from [b,c,a].
-                issue_keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
-                    issue.issue_type]
-                if (issue_customization_args[issue_keyname] ==
-                        customization_args[issue_keyname]):
-                    issue_found = True
-                    if (len(issue.playthrough_ids) <
-                            feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
-                        playthrough_id = stats_models.PlaythroughModel.create(
-                            playthrough_data['exp_id'],
-                            playthrough_data['exp_version'],
-                            playthrough_data['issue_type'],
-                            playthrough_data['issue_customization_args'],
-                            playthrough_data['actions'])
+            orig_playthrough = stats_services.get_playthrough_by_id(
+                playthrough_id)
+            if orig_playthrough.issue_type != playthrough.issue_type:
+                # Check whether the playthrough can be added to its new issue,
+                # if not, it stays in its old issue.
+                is_issue_in_exp_issues_model, index = (
+                    self._is_issue_in_exp_issues_model(
+                        exp_issues, playthrough.issue_type,
+                        playthrough.issue_customization_args))
+                if is_issue_in_exp_issues_model:
+                    if (len(exp_issues.unresolved_issues[
+                            index].playthrough_ids) < (
+                                feconf.MAX_PLAYTHROUGHS_FOR_ISSUE)):
                         exp_issues.unresolved_issues[
                             index].playthrough_ids.append(playthrough_id)
                     else:
-                        payload_return['playthrough_stored'] = False
-                    break
+                        playthrough_stored = False
+                else:
+                    issue = stats_domain.ExplorationIssue(
+                        playthrough.issue_type,
+                        playthrough.issue_customization_args,
+                        [playthrough_id], issue_schema_version, is_valid=True)
+                    exp_issues.unresolved_issues.append(issue)
 
-        if not issue_found:
+                # Now, remove the playthrough from its old issue.
+                if playthrough_stored:
+                    is_issue_in_exp_issues_model, index = (
+                        self._is_issue_in_exp_issues_model(
+                            exp_issues, orig_playthrough.issue_type,
+                            orig_playthrough.issue_customization_args))
+                    if is_issue_in_exp_issues_model:
+                        exp_issues.unresolved_issues[
+                            index].playthrough_ids.remove(playthrough_id)
+
+            stats_services.update_playthroughs_multi(
+                [playthrough_data['id']], [playthrough])
+            stats_services.save_exp_issues_model_transactional(exp_issues)
+            self.render_json({})
+            return
+
+        playthrough_id = None
+        payload_return = {'playthrough_stored': True}
+
+        is_issue_in_exp_issues_model, index = (
+            self._is_issue_in_exp_issues_model(
+                exp_issues, playthrough_data['issue_type'], customization_args))
+        if is_issue_in_exp_issues_model:
+            if (len(exp_issues.unresolved_issues[index].playthrough_ids) <
+                    feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
+                playthrough_id = stats_models.PlaythroughModel.create(
+                    playthrough_data['exp_id'],
+                    playthrough_data['exp_version'],
+                    playthrough_data['issue_type'],
+                    playthrough_data['issue_customization_args'],
+                    playthrough_data['actions'])
+                exp_issues.unresolved_issues[
+                    index].playthrough_ids.append(playthrough_id)
+            else:
+                payload_return['playthrough_stored'] = False
+        else:
             playthrough_id = stats_models.PlaythroughModel.create(
                 playthrough_data['exp_id'],
                 playthrough_data['exp_version'],

@@ -1532,6 +1532,45 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             playthrough.issue_customization_args['time_spent_in_exp_in_msecs'][
                 'value'], 150)
 
+    def test_updating_playthrough_issue(self):
+        """Test that updating an existing playthrough's issue creates a new
+        issue if the issue doesn't exist.
+        """
+        response = self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
+                'playthrough_data': self.playthrough_data,
+                'issue_schema_version': 1
+            }, self.csrf_token)
+        self.process_and_flush_pending_tasks()
+
+        playthrough_id = response['playthrough_id']
+        self.playthrough_data['id'] = playthrough_id
+        self.playthrough_data['issue_type'] = 'CyclicStateTransitions'
+        self.playthrough_data['issue_customization_args'] = {
+            'state_names': {
+                'value': ['state1', 'state2', 'state1']
+            }
+        }
+
+        self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
+                'playthrough_data': self.playthrough_data,
+                'issue_schema_version': 1
+            }, self.csrf_token)
+        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
+        print model
+        self.assertEqual(len(model.unresolved_issues), 2)
+        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
+        self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
+        playthrough_id = model.unresolved_issues[1]['playthrough_ids'][0]
+        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
+        self.assertEqual(playthrough.issue_type, 'CyclicStateTransitions')
+        self.assertEqual(
+            playthrough.issue_customization_args['state_names'][
+                'value'], ['state1', 'state2', 'state1'])
+
 
 class StatsEventHandlerTest(test_utils.GenericTestBase):
     """Tests for all the statistics event models recording handlers."""
