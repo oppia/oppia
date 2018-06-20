@@ -191,9 +191,6 @@ oppia.factory('TopicUpdateService', [
       /**
        * @param {Topic} topic - The topic object to be edited.
        * @param {number} subtopicId - The id of the subtopic to delete.
-       * @param {boolean} isNewlyCreated - Whether the subtopic to delete was
-       *    created in the current draft of the topic. (i.e, the subtopic to
-       *    delete hasn't been saved in the datastore yet.)
        */
       deleteSubtopic: function(topic, subtopicId) {
         var subtopic = topic.getSubtopicById(subtopicId);
@@ -202,12 +199,12 @@ oppia.factory('TopicUpdateService', [
         }
         var title = subtopic.getTitle();
         var skillIds = subtopic.getSkillIds();
-        var isNewlyCreated = false;
+        var newlyCreated = false;
         var changeList = UndoRedoService.getCommittableChangeList();
         for (var i = 0; i < changeList.length; i++) {
           if (changeList[i].cmd === 'add_subtopic' &&
               changeList[i].subtopic_id === subtopicId) {
-            isNewlyCreated = true;
+            newlyCreated = true;
           }
         }
         _applyChange(topic, CMD_DELETE_SUBTOPIC, {
@@ -215,12 +212,12 @@ oppia.factory('TopicUpdateService', [
           change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
-          topic.deleteSubtopic(subtopicId, isNewlyCreated);
+          topic.deleteSubtopic(subtopicId, newlyCreated);
         }, function(changeDict, topic) {
           // Undo.
           throw Error('A deleted subtopic cannot be restored');
         });
-        if (isNewlyCreated) {
+        if (newlyCreated) {
           var changeList = UndoRedoService.getCommittableChangeList();
           for (var i = 0; i < changeList.length; i++) {
             if (changeList[i].subtopic_id === subtopicId) {

@@ -114,15 +114,19 @@ oppia.factory('UndoRedoService', [
     };
 
     UndoRedoService.setBackendChangeList = function(changeList) {
-      for (var i = 0; i < _appliedChanges.length; i++) {
+      var indicesToDelete = [];
+      for (var i = 0; i < changeList.length; i++) {
         if (changeList[i].is_deleted) {
-          changeList.splice(i, 1);
-          _appliedChanges.splice(i, 1);
-          i--;
+          indicesToDelete.push(i);
           continue;
         }
         _appliedChanges[i].setBackendChangeObject(changeList[i]);
       }
+      _appliedChanges = _appliedChanges.filter(function(change) {
+        var changeObjectIndex = _appliedChanges.indexOf(change);
+        // Return all elements that were not deleted.
+        return (indicesToDelete.indexOf(changeObjectIndex) === -1);
+      });
     };
 
     /**
