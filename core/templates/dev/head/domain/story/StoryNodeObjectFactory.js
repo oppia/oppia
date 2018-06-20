@@ -38,7 +38,7 @@ oppia.factory('StoryNodeObjectFactory', [
     };
 
     StoryNode.prototype.getExplorationId = function() {
-        return this._explorationId;
+      return this._explorationId;
     };
 
     StoryNode.prototype.setExplorationId = function(explorationId) {
@@ -46,7 +46,7 @@ oppia.factory('StoryNodeObjectFactory', [
     };
 
     StoryNode.prototype.getOutline = function() {
-        return this._outline;
+      return this._outline;
     };
 
     StoryNode.prototype.setOutline = function(outline) {
