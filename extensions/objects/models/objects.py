@@ -17,11 +17,8 @@
 """Classes for interpreting typed objects in Oppia."""
 
 import copy
-import os
 
-import feconf
 import schema_utils
-import utils
 
 
 class BaseObject(object):
@@ -56,20 +53,6 @@ class BaseObject(object):
         """
         return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
-    @classmethod
-    def has_editor_js_template(cls):
-        return cls.edit_js_filename is not None
-
-    @classmethod
-    def get_editor_js_template(cls):
-        if cls.edit_js_filename is None:
-            raise Exception(
-                'There is no editor template defined for objects of type %s' %
-                cls.__name__)
-        return utils.get_file_contents(os.path.join(
-            os.getcwd(), feconf.OBJECT_TEMPLATES_DIR,
-            '%s.js' % cls.edit_js_filename))
-
 
 class Boolean(BaseObject):
     """Class for booleans."""
@@ -94,7 +77,6 @@ class Real(BaseObject):
     """Real number class."""
 
     description = 'A real number.'
-    edit_js_filename = 'RealEditor'
     default_value = 0.0
 
     SCHEMA = {
@@ -106,7 +88,6 @@ class Int(BaseObject):
     """Integer class."""
 
     description = 'An integer.'
-    edit_js_filename = 'IntEditor'
     default_value = 0
 
     SCHEMA = {
@@ -118,7 +99,6 @@ class UnicodeString(BaseObject):
     """Unicode string class."""
 
     description = 'A unicode string.'
-    edit_js_filename = 'UnicodeStringEditor'
     default_value = ''
 
     SCHEMA = {
@@ -130,7 +110,6 @@ class Html(BaseObject):
     """HTML string class."""
 
     description = 'An HTML string.'
-    edit_js_filename = 'HtmlEditor'
 
     SCHEMA = {
         'type': 'html',
@@ -141,7 +120,6 @@ class NonnegativeInt(BaseObject):
     """Nonnegative integer class."""
 
     description = 'A non-negative integer.'
-    edit_js_filename = 'NonnegativeIntEditor'
     default_value = 0
 
     SCHEMA = {
@@ -174,7 +152,6 @@ class CodeString(BaseObject):
     """
 
     description = 'A code string.'
-    edit_js_filename = 'CodeStringEditor'
     default_value = ''
 
     SCHEMA = {
@@ -231,7 +208,6 @@ class CoordTwoDim(BaseObject):
     """2D coordinate class."""
 
     description = 'A two-dimensional coordinate (a pair of reals).'
-    edit_js_filename = 'CoordTwoDimEditor'
     default_value = [0.0, 0.0]
 
     SCHEMA = {
@@ -257,7 +233,6 @@ class ListOfUnicodeString(BaseObject):
     """List class."""
 
     description = 'A list.'
-    edit_js_filename = 'ListOfUnicodeStringEditor'
 
     SCHEMA = {
         'type': 'list',
@@ -269,7 +244,6 @@ class SetOfUnicodeString(BaseObject):
     """Class for sets of UnicodeStrings."""
 
     description = 'A set (a list with unique elements) of unicode strings.'
-    edit_js_filename = 'SetOfUnicodeStringEditor'
     default_value = []
 
     SCHEMA = {
@@ -285,7 +259,6 @@ class NormalizedString(BaseObject):
     """Unicode string with spaces collapsed."""
 
     description = 'A unicode string with adjacent whitespace collapsed.'
-    edit_js_filename = 'NormalizedStringEditor'
     default_value = ''
 
     SCHEMA = {
@@ -316,8 +289,6 @@ class MathLatexString(BaseObject):
     """Math LaTeX string class."""
 
     description = 'A LaTeX string.'
-    edit_html_filename = 'math_latex_string_editor_directive'
-    edit_js_filename = 'MathLatexStringEditor'
 
     SCHEMA = UnicodeString.SCHEMA
 
@@ -326,7 +297,6 @@ class SanitizedUrl(BaseObject):
     """HTTP or HTTPS url string class."""
 
     description = 'An HTTP or HTTPS url.'
-    edit_js_filename = 'SanitizedUrlEditor'
 
     SCHEMA = {
         'type': 'unicode',
@@ -341,7 +311,6 @@ class MusicPhrase(BaseObject):
 
     description = ('A musical phrase that contains zero or more notes, rests, '
                    'and time signature.')
-    edit_js_filename = 'MusicPhraseEditor'
     default_value = []
 
     # The maximum number of notes allowed in a music phrase.
@@ -396,7 +365,6 @@ class Filepath(BaseObject):
     """
 
     description = 'A string that represents a filepath'
-    edit_js_filename = 'FilepathEditor'
 
     SCHEMA = UnicodeString.SCHEMA
 
@@ -429,7 +397,6 @@ class LogicQuestion(BaseObject):
     """A question giving a formula to prove."""
 
     description = 'A question giving a formula to prove.'
-    edit_js_filename = 'LogicQuestionEditor'
 
     @classmethod
     def normalize(cls, raw):
@@ -462,7 +429,6 @@ class LogicErrorCategory(BaseObject):
     """A string from a list of possible categories."""
 
     description = 'One of the possible error categories of a logic proof.'
-    edit_js_filename = 'LogicErrorCategoryEditor'
     default_value = 'mistake'
 
     SCHEMA = {
@@ -478,7 +444,6 @@ class Graph(BaseObject):
     """A (mathematical) graph with edges and vertices."""
 
     description = 'A (mathematical) graph'
-    edit_js_filename = 'GraphEditor'
     default_value = {
         'edges': [],
         'isDirected': False,
@@ -580,7 +545,6 @@ class GraphProperty(BaseObject):
     """A string from a list of possible graph properties."""
 
     description = 'One of the possible properties possessed by a graph.'
-    edit_js_filename = 'GraphPropertyEditor'
     default_value = 'strongly_connected'
 
     SCHEMA = {
@@ -665,7 +629,6 @@ class ImageWithRegions(BaseObject):
     """An image overlaid with labeled regions."""
 
     description = 'An image overlaid with regions.'
-    edit_js_filename = 'ImageWithRegionsEditor'
 
     SCHEMA = {
         'type': 'dict',
@@ -722,7 +685,6 @@ class ParameterName(BaseObject):
     """
 
     description = 'A string representing a parameter name.'
-    edit_js_filename = 'ParameterNameEditor'
 
     SCHEMA = {
         'type': 'unicode',
@@ -733,8 +695,6 @@ class SetOfHtmlString(BaseObject):
     """A Set of Html Strings."""
 
     description = "A list of Html strings."
-    edit_html_filename = 'set_of_html_string_editor_directive'
-    edit_js_filename = 'SetOfHtmlStringEditor'
     default_value = []
 
     SCHEMA = {
@@ -767,7 +727,6 @@ class Fraction(BaseObject):
     """Fraction class."""
 
     description = 'A fraction type'
-    edit_js_filename = 'FractionEditor'
     default_value = {
         'isNegative': False,
         'wholeNumber': 0,
@@ -826,7 +785,6 @@ class NumberWithUnits(BaseObject):
     """Number with units class."""
 
     description = 'A number with units expression.'
-    edit_js_filename = 'NumberWithUnitsEditor'
     default_value = {
         'type': 'real',
         'real': 0.0,
