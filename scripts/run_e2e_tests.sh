@@ -41,7 +41,7 @@
 #   For performing tests on extensions, use --suite=extensions
 #   For performing tests on library, use --suite=library
 #   For performing tests on learnerDashboard, use --suite=learnerDashboard
-#   For performing tests on learnerDashboard, use --suite=stateEditor
+#   For performing tests on state editor, use --suite=stateEditor
 #   For performing users tests, use --suite=users
 #
 # The root folder MUST be named 'oppia'.
