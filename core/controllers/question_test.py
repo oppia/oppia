@@ -68,7 +68,6 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         self.logout()
         self.login(self.random_email)
         response = self.testapp.get('/preferences')
-        csrf_token = self.get_csrf_token_from_response(response)
         payload['question_id'] = question_id
         response = self.delete_json(
             '%s' % feconf.QUESTION_DATA_URL,
