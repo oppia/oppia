@@ -708,7 +708,7 @@ COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
 COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
-ENABLE_PLAYTHROUGHS = False
+ENABLE_PLAYTHROUGHS = True
 # Threshold for early quit playthrough.
 EARLY_QUIT_THRESHOLD_IN_SECS = 45
 # Threshold for multiple incorrect answers playthrough.
