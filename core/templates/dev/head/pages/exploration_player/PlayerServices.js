@@ -30,30 +30,28 @@ oppia.factory('ExplorationPlayerService', [
   'PAGE_CONTEXT', 'ExplorationHtmlFormatterService',
   'PlayerTranscriptService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService',
-  'ReadOnlyExplorationBackendApiService',
+  'ENABLE_PLAYTHROUGHS', 'PlaythroughService', 'StatsReportingService',
+  'UrlInterpolationService', 'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationLanguageService',
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
   'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
   'PlayerCorrectnessFeedbackEnabledService',
   'GuestCollectionProgressService', 'ImagePreloaderService',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
-  'ENABLE_PLAYTHROUGHS', 'PlaythroughService',
   function(
       $http, $rootScope, $q, LearnerParamsService,
       AlertsService, AnswerClassificationService, ExplorationContextService,
       PAGE_CONTEXT, ExplorationHtmlFormatterService,
       PlayerTranscriptService, ExplorationObjectFactory,
       ExpressionInterpolationService, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService,
-      ReadOnlyExplorationBackendApiService,
+      ENABLE_PLAYTHROUGHS, PlaythroughService, StatsReportingService,
+      UrlInterpolationService, ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationLanguageService,
       LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
       WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
       PlayerCorrectnessFeedbackEnabledService,
       GuestCollectionProgressService, ImagePreloaderService,
-      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS,
-      ENABLE_PLAYTHROUGHS, PlaythroughService) {
+      WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
       ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
