@@ -113,20 +113,8 @@ oppia.factory('UndoRedoService', [
       return committableChangeList;
     };
 
-    UndoRedoService.setBackendChangeList = function(changeList) {
-      var indicesToDelete = [];
-      for (var i = 0; i < changeList.length; i++) {
-        if (changeList[i].is_deleted) {
-          indicesToDelete.push(i);
-          continue;
-        }
-        _appliedChanges[i].setBackendChangeObject(changeList[i]);
-      }
-      _appliedChanges = _appliedChanges.filter(function(change) {
-        var changeObjectIndex = _appliedChanges.indexOf(change);
-        // Return all elements that were not deleted.
-        return (indicesToDelete.indexOf(changeObjectIndex) === -1);
-      });
+    UndoRedoService.setChangeList = function(changeList) {
+      _appliedChanges = angular.copy(changeList);  
     };
 
     /**

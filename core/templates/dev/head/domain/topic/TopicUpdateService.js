@@ -218,17 +218,35 @@ oppia.factory('TopicUpdateService', [
           throw Error('A deleted subtopic cannot be restored');
         });
         if (newlyCreated) {
-          var changeList = UndoRedoService.getCommittableChangeList();
-          for (var i = 0; i < changeList.length; i++) {
-            if (changeList[i].subtopic_id === subtopicId) {
-              changeList[i].is_deleted = true;
+          // Get the current change list.
+          var currentChangeList = UndoRedoService.getChangeList();
+          var indicesToDelete = [];
+          for (var i = 0; i < currentChangeList.length; i++) {
+            var backendChangeObject =
+              currentChangeList[i].getBackendChangeObject();
+            if (backendChangeObject.subtopic_id === subtopicId) {
+              // The indices in the change list corresponding to changes to the
+              // currently deleted and newly created topic are to be removed
+              // from the list.
+              indicesToDelete.push(i);
               continue;
             }
-            if (changeList[i].subtopic_id > subtopicId) {
-              changeList[i].subtopic_id--;
+            // When a newly created subtopic is deleted, the subtopics created
+            // after it would their id reduced by 1.
+            if (backendChangeObject.subtopic_id > subtopicId) {
+              backendChangeObject.subtopic_id--;
             }
+            // Apply the above id reduction changes to the changelist.
+            currentChangeList[i].setBackendChangeObject(backendChangeObject);
           }
-          UndoRedoService.setBackendChangeList(angular.copy(changeList));
+          // The new change list is found by deleting the above found elements.
+          var newChangeList = currentChangeList.filter(function(change) {
+            var changeObjectIndex = currentChangeList.indexOf(change);
+            // Return all elements that were not deleted.
+            return (indicesToDelete.indexOf(changeObjectIndex) === -1);
+          });
+          // The new changelist is set.
+          UndoRedoService.setChangeList(newChangeList);
         }
       },
 

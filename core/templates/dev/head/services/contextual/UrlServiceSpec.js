@@ -90,6 +90,11 @@ describe('Url Service', function() {
   it('should correctly retrieve topic id from url', function() {
     mockLocation.pathname = '/topic_editor/abcdefgijklm';
     expect(
-      UrlService.getTopicIdFromUrl()).toBe('abcdefgijklm');
+      UrlService.getTopicIdFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/topic_editor/abcdefgij';
+    expect(function() {
+      UrlService.getTopicIdFromUrl()
+    }).toThrow();
   });
 });

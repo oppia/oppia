@@ -49,7 +49,7 @@ oppia.factory('UrlService', ['$window', function($window) {
     getTopicIdFromUrl: function() {
       var pathname = this.getPathname();
       var topicId = pathname.split('/')[2];
-      if (topicId.length > 12) {
+      if (topicId.length !== 12) {
         throw Error('Invalid Topic Id');
       }
       return topicId;
