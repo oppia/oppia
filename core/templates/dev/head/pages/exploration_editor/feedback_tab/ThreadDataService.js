@@ -52,18 +52,18 @@ oppia.factory('ThreadDataService', [
 
     var _fetchThreads = function(successCallback) {
       var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
-      var params =  {
+      var params = {
         list_type: 'all',
         has_suggestion: true
-      }
+      };
       if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
         params = {
           list_type: 'target',
           target_type: 'exploration',
           target_id: _expId
-        }
+        };
       }
-      var sPromise =  $http.get(_SUGGESTION_LIST_HANDLER_URL, {
+      var sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
         params: params
       });
 
