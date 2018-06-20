@@ -43,6 +43,7 @@
 
 <div class="modal-header">
   <h3>Confirm Oppia's Responses</h3>
+  <p><em>Oppia was unable to determine which response to give to the following student answers. Help Oppia by clicking the 'tick mark' button to confirm a response, or the 'edit' button to select a better response!</em></p>
 </div>
 
 <div class="modal-body teach-oppia-modal">
@@ -57,10 +58,10 @@
         <div>
           <p class="response-header-label"><strong>Response</strong></p>
           <div class="unresolved-answer-btn">
-            <button type="button" class="btn response-edit-button" ng-click="openTrainUnresolvedAnswerModal($index)" title="Edit this response">
+            <button type="button" class="btn response-edit-button" ng-click="openTrainUnresolvedAnswerModal($index)" uib-tooltip="Edit this response" tooltip-placement="bottom">
               <i class="material-icons md-18"> edit </i>
             </button>
-            <button type="button" class="btn confrim-respose-button" ng-click="confirmAnswerAssignment($index)" title="Conifrm this response">
+            <button type="button" class="btn confrim-respose-button" ng-click="confirmAnswerAssignment($index)" uib-tooltip="Conifrm this response" tooltip-placement="bottom">
               <i class="material-icons md-18"> done </i>
             </button>
           </div>

@@ -84,6 +84,9 @@ oppia.factory('TrainingModalService', [
                   var newAnswerGroup = AnswerGroupObjectFactory.createNew(
                     [], angular.copy(newOutcome), [unhandledAnswer], null);
                   _saveNewAnswerGroup(newAnswerGroup);
+                  TrainingDataService.associateWithAnswerGroup(
+                    ResponsesService.getAnswerGroupCount() - 1,
+                    unhandledAnswer);
                 } else if (index === ResponsesService.getAnswerGroupCount()) {
                   TrainingDataService.associateWithDefaultResponse(
                     unhandledAnswer);

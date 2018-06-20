@@ -83,9 +83,6 @@
           <span><strong>This is due to a specific rule and therefore cannot be trained. If you do not think this is right, you should change the rule directly referring to this answer.</strong></span>
         </div>
       </div>
-      <div ng-show="answerSuccessfullyAdded">
-        <span><strong>The answer is successfully added to training data.</strong></span>
-      </div>
     </div>
     <div class="training-data-answers-list">
       <p class="training-data-answer-label"> Training Data Answers </p>
@@ -100,8 +97,8 @@
         </div>
       </div>
       <div ng-show="(answerGroupHasNonEmptyRules && (trainingData.length > 0)) || (trainingData.length > 1)">
-        <div ng-repeat="answer in trainingData track by $index" class="training-data-answer" ng-click="openTrainUnresolvedAnswerModal($index)">
-          <div class="training-data-answer-html">
+        <div ng-repeat="answer in trainingData track by $index" class="training-data-answer">
+          <div class="training-data-answer-html" ng-click="openTrainUnresolvedAnswerModal($index)">
             <angular-html-bind html-data="answer.answerTemplate"></angular-html-bind>
           </div>
           <span class="oppia-delete-response-button oppia-transition-200 protractor-test-delete-response" ng-click="removeAnswerFromTrainingData($index)">

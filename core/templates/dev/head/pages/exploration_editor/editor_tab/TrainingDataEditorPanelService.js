@@ -32,16 +32,16 @@ oppia.factory('TrainingDataEditorPanelService', [
             'training_data_editor_directive.html'),
           backdrop: true,
           controller: [
-            '$scope', '$injector', '$uibModalInstance',
-            'ExplorationStatesService', 'EditorStateService',
+            '$scope', '$injector', '$uibModalInstance', '$filter',
+            'ExplorationStatesService', 'EditorStateService', 'AlertsService',
             'AnswerClassificationService', 'ExplorationContextService',
             'stateInteractionIdService', 'AngularNameService',
             'EXPLICIT_CLASSIFICATION', 'TRAINING_DATA_CLASSIFICATION',
             'ExplorationHtmlFormatterService', 'ResponsesService',
             'stateCustomizationArgsService', 'TrainingDataService',
             'TrainingModalService', 'FocusManagerService',
-            function($scope, $injector, $uibModalInstance,
-                ExplorationStatesService, EditorStateService,
+            function($scope, $injector, $uibModalInstance, $filter,
+                ExplorationStatesService, EditorStateService, AlertsService,
                 AnswerClassificationService, ExplorationContextService,
                 stateInteractionIdService, AngularNameService,
                 EXPLICIT_CLASSIFICATION, TRAINING_DATA_CLASSIFICATION,
@@ -102,7 +102,6 @@ oppia.factory('TrainingDataEditorPanelService', [
 
               $scope.submitAnswer = function(newAnswer) {
                 $scope.newAnswerIsAlreadyResolved = false;
-                $scope.answerSuccessfullyAdded = false;
 
                 var interactionId = stateInteractionIdService.savedMemento;
 
@@ -143,18 +142,40 @@ oppia.factory('TrainingDataEditorPanelService', [
                 } else {
                   TrainingDataService.associateWithAnswerGroup(
                     answerGroupIndex, newAnswer);
+                  var truncatedAnswer = $filter(
+                    'truncateInputBasedOnInteractionAnswerType')(
+                    newAnswer, interactionId, 12);
+                  var successToast = (
+                    'The answer ' + truncatedAnswer +
+                    ' has been successfully trained.');
+                  AlertsService.addSuccessMessage(
+                    successToast, 1000);
                   _rebuildTrainingData();
-                  $scope.answerSuccessfullyAdded = true;
                 }
               };
 
               $scope.openTrainUnresolvedAnswerModal = function(answerIndex) {
+                // An answer group must have either a rule or at least one
+                // answer in training data. Don't allow modification of training
+                // data answers if there are no rules and only one training data
+                // answer is present.
                 if (($scope.answerGroupHasNonEmptyRules &&
                     $scope.trainingData.length > 0) ||
                     $scope.trainingData.length > 1) {
                   var answer = $scope.trainingData[answerIndex].answer;
+                  var interactionId = stateInteractionIdService.savedMemento;
                   return TrainingModalService.openTrainUnresolvedAnswerModal(
-                    answer, _rebuildTrainingData);
+                    answer, function() {
+                      var truncatedAnswer = $filter(
+                        'truncateInputBasedOnInteractionAnswerType')(
+                        answer, interactionId, 12);
+                      var successToast = (
+                        'The answer ' + truncatedAnswer +
+                        ' has been successfully trained.');
+                      AlertsService.addSuccessMessage(
+                        successToast, 1000);
+                      _rebuildTrainingData();
+                    });
                 }
                 return;
               };

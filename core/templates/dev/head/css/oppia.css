@@ -2361,6 +2361,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .trained-feedback-selection-form-container {
   margin-top: -5px;
+  max-height: 250px; 
+  overflow-y: scroll;
 }
 
 .trained-feedback-selection-container {

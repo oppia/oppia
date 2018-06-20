@@ -120,7 +120,7 @@ oppia.directive('unresolvedAnswersOverview', [
                 'teach_oppia_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$injector', '$uibModalInstance', '$http',
+                '$scope', '$injector', '$uibModalInstance', '$http', '$filter',
                 'ExplorationHtmlFormatterService', 'TrainingModalService',
                 'stateInteractionIdService', 'stateCustomizationArgsService',
                 'ExplorationContextService', 'EditorStateService',
@@ -130,7 +130,7 @@ oppia.directive('unresolvedAnswersOverview', [
                 'AngularNameService', 'DEFAULT_OUTCOME_CLASSIFICATION',
                 'AlertsService',
                 function(
-                    $scope, $injector, $uibModalInstance, $http,
+                    $scope, $injector, $uibModalInstance, $http, $filter,
                     ExplorationHtmlFormatterService, TrainingModalService,
                     stateInteractionIdService, stateCustomizationArgsService,
                     ExplorationContextService, EditorStateService,
@@ -152,10 +152,6 @@ oppia.directive('unresolvedAnswersOverview', [
                   // Inject RulesService dynamically.
                   var rulesService = $injector.get(rulesServiceName);
 
-                  var RESPONSE_CONFIRMED_TOAST_MESSAGE = (
-                    'Response of the answer has been confirmed');
-                  var RESPONSE_FIXED_TOAST_MESSAGE = (
-                    'Response of the answer has been fixed');
                   // Timeout for the toast that is shown when a response has
                   // been confirmed or fixed.
                   var TOAST_TIMEOUT = 2000;
@@ -219,13 +215,21 @@ oppia.directive('unresolvedAnswersOverview', [
                   $scope.confirmAnswerAssignment = function(answerIndex) {
                     answer = $scope.unresolvedAnswers[answerIndex];
                     $scope.unresolvedAnswers.splice(answerIndex, 1);
+
                     var classificationType = (
                       answer.classificationResult.classificationCategorization);
+                    var truncatedAnswer = $filter(
+                      'truncateInputBasedOnInteractionAnswerType')(
+                      answer.answer, interactionId, 12);
+                    var successToast = (
+                      'The answer ' + truncatedAnswer +
+                      ' has been successfully trained.');
+
                     if (classificationType === DEFAULT_OUTCOME_CLASSIFICATION) {
                       TrainingDataService.associateWithDefaultResponse(
                         answer.answer);
                       AlertsService.addSuccessMessage(
-                        RESPONSE_CONFIRMED_TOAST_MESSAGE, 1000);
+                        successToast, TOAST_TIMEOUT);
                       return;
                     }
 
@@ -233,7 +237,7 @@ oppia.directive('unresolvedAnswersOverview', [
                       answer.classificationResult.answerGroupIndex,
                       answer.answer);
                     AlertsService.addSuccessMessage(
-                      RESPONSE_CONFIRMED_TOAST_MESSAGE, TOAST_TIMEOUT);
+                      successToast, TOAST_TIMEOUT);
                   };
 
                   $scope.openTrainUnresolvedAnswerModal = function(
@@ -247,8 +251,14 @@ oppia.directive('unresolvedAnswersOverview', [
                     return TrainingModalService.openTrainUnresolvedAnswerModal(
                       answer, function() {
                         $scope.unresolvedAnswers.splice(selectedAnswerIndex, 1);
+                        var truncatedAnswer = $filter(
+                          'truncateInputBasedOnInteractionAnswerType')(
+                          answer, interactionId, 12);
+                        var successToast = (
+                          'The response for ' + truncatedAnswer +
+                          ' has been fixed.');
                         AlertsService.addSuccessMessage(
-                          RESPONSE_FIXED_TOAST_MESSAGE, TOAST_TIMEOUT);
+                          successToast, TOAST_TIMEOUT);
                       });
                   };
 

@@ -176,7 +176,7 @@ oppia.directive('trainingPanel', [
             if ($scope.classification.newOutcome) {
               // Push the new outcome at the end of the existing outcomes.
               $scope.allOutcomes.push($scope.classification.newOutcome);
-              $scope.selectedAnswerGroupIndex = $scope.allOutcomes.length - 1;
+              $scope.selectAnswerGroupIndex($scope.allOutcomes.length - 1);
               $scope.addingNewResponse = false;
             }
           };
