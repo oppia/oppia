@@ -71,8 +71,7 @@ class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
             # Create 5 messages in each thread.
             for _ in range(5):
                 feedback_services.create_message(
-                    self.EXP_ID_1, thread.get_thread_id(), self.user_id, None,
-                    None, 'editor message')
+                    thread.id, self.user_id, None, None, 'editor message')
 
         start = time.time()
         # Fetch the summaries of all the threads.

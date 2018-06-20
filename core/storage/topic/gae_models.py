@@ -160,6 +160,9 @@ class TopicSummaryModel(base_models.BaseModel):
     canonical_story_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of additional stories that are part of this topic.
     additional_story_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The total number of skills in the topic (including those that are
+    # uncategorized).
+    total_skill_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of skills that are not part of any subtopic.
     uncategorized_skill_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of subtopics of the topic.
@@ -278,3 +281,6 @@ class TopicRightsModel(base_models.VersionedModel):
 
     # The user_ids of the managers of this topic.
     manager_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # Whether this topic is published.
+    topic_is_published = ndb.BooleanProperty(
+        indexed=True, required=True, default=False)

@@ -23,13 +23,16 @@
   }
 </style>
 
-<div ng-if="!imageUrl" translate="I18N_INTERACTIONS_IMAGE_CLICK_SELECT"></div>
-
-<div ng-if="isLoadingIndicatorShown" class="oppia-image-loading-indicator-container" ng-style="loadingIndicatorContainerStyle">
-  <img ng-src="<[loadingIndicatorUrl]>" class="center-image-horizontally" ng-style="loadingIndicatorStyle" alt="Loading...">
+<div ng-if="isLoadingIndicatorShown" class="oppia-image-container" ng-style="imageContainerStyle">
+  <img ng-src="<[loadingIndicatorUrl]>" class="center-element-horizontally" ng-style="loadingIndicatorStyle" alt="Loading...">
+</div>
+<div ng-if="isTryAgainShown" class="oppia-image-container" ng-style="imageContainerStyle">
+  <md-button ng-click="loadImage()" class="oppia-learner-try-again-button center-element-horizontally">
+    <span>Try Again</span>
+  </md-button>
 </div>
 
-<div class="image-click-container" ng-if="!isLoadingIndicatorShown">
+<div class="image-click-container" ng-if="!isLoadingIndicatorShown && !isTryAgainShown">
   <img ng-src="<[imageUrl]>"
        class="oppia-image-click-img"
        ng-click="onClickImage($event)"

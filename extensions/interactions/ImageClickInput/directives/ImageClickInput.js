@@ -23,13 +23,13 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ExplorationContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'ImagePreloaderService', 'EVENT_NEW_CARD_AVAILABLE', 'EDITOR_TAB_CONTEXT',
-  'LOADING_INDICATOR_URL',
+  'ImagePreloaderService', 'AssetsBackendApiService', 'EDITOR_TAB_CONTEXT',
+  'EVENT_NEW_CARD_AVAILABLE', 'LOADING_INDICATOR_URL',
   function(
       $sce, HtmlEscaperService, ExplorationContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      ImagePreloaderService, EVENT_NEW_CARD_AVAILABLE, EDITOR_TAB_CONTEXT,
-      LOADING_INDICATOR_URL) {
+      ImagePreloaderService, AssetsBackendApiService, EDITOR_TAB_CONTEXT,
+      EVENT_NEW_CARD_AVAILABLE, LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {
@@ -50,32 +50,51 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           $scope.loadingIndicatorUrl = UrlInterpolationService
             .getStaticImageUrl(LOADING_INDICATOR_URL);
           $scope.isLoadingIndicatorShown = false;
+          $scope.isTryAgainShown = false;
+
           if (ImagePreloaderService.inExplorationPlayer()) {
             $scope.isLoadingIndicatorShown = true;
             $scope.dimensions = (
               ImagePreloaderService.getDimensionsOfImage($scope.filepath.name));
             // For aligning the gif to the center of it's container
-            var loadingIndicatorSize = 120;
-            if ($scope.dimensions.height < 124) {
-              loadingIndicatorSize = 24;
-            }
-            var paddingTop = Math.max(0, (($scope.dimensions.height * 0.5) -
-              (loadingIndicatorSize * 0.5)));
-            $scope.loadingIndicatorContainerStyle =
-            {
-              'padding-top': paddingTop + 'px',
+            var loadingIndicatorSize = (
+              ($scope.dimensions.height < 124) ? 24 : 120);
+            $scope.imageContainerStyle = {
               height: $scope.dimensions.height + 'px'
             };
             $scope.loadingIndicatorStyle = {
               height: loadingIndicatorSize + 'px',
               width: loadingIndicatorSize + 'px'
             };
+
+            $scope.loadImage = function() {
+              ImagePreloaderService.getImageUrl($scope.filepath.name)
+                .then(function(objectUrl) {
+                  $scope.isTryAgainShown = false;
+                  $scope.isLoadingIndicatorShown = false;
+                  $scope.imageUrl = objectUrl;
+                }, function() {
+                  $scope.isTryAgainShown = true;
+                  $scope.isLoadingIndicatorShown = false;
+                });
+            };
+            $scope.loadImage();
+          } else {
+            // This is the case when user is in exploration editor. We don't
+            // have loading indicator or try again for showing images in the
+            // exploration editor. So we directly fetch the images from the
+            // AssetsBackendApiService's cache.
+            AssetsBackendApiService.loadImage(
+              ExplorationContextService.getExplorationId(),
+              $scope.filepath.name)
+              .then(function(loadedImageFile) {
+                $scope.isLoadingIndicatorShown = false;
+                $scope.isTryAgainShown = false;
+                var objectUrl = URL.createObjectURL(loadedImageFile.data);
+                $scope.imageUrl = objectUrl;
+              });
           }
-          ImagePreloaderService.getImageUrl($scope.filepath.name)
-            .then(function(objectUrl) {
-              $scope.isLoadingIndicatorShown = false;
-              $scope.imageUrl = objectUrl;
-            });
+
           $scope.mouseX = 0;
           $scope.mouseY = 0;
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);

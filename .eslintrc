@@ -13,6 +13,12 @@
       ],
     "angular/di-order": "error",
     "angular/di-unused": "error",
+    "angular/directive-restrict": [
+      "error",
+      {
+        "restrict": "E"
+      }
+    ],
     "angular/no-inline-template": [
       "error",
       {

@@ -484,6 +484,7 @@ ALLOWED_INTERACTION_CATEGORIES = [{
         'NumericInput',
         'SetInput',
         'MathExpressionInput',
+        'NumberWithUnits',
     ]
 }, {
     'name': 'Programming',
@@ -644,7 +645,11 @@ SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
+TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
+TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
+TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
+TRANSLATION_DATA_PREFIX = '/createhandler/translate'
 UNSUBSCRIBE_URL_PREFIX = '/unsubscribehandler'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USER_EXPLORATION_EMAILS_PREFIX = '/createhandler/notificationpreferences'
@@ -670,6 +675,7 @@ NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
 NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
 NAV_MODE_QUESTION_EDITOR = 'question_editor'
+NAV_MODE_TOPIC_EDITOR = 'topic_editor'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'

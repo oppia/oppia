@@ -1,5 +1,104 @@
 This file contains a summary of changes to the Oppia code base.
 
+v2.6.5 (18 June 2018)
+--------------------
+Miscellaneous user-facing:
+* Fix #4882: Moved subscribe button to profile card (#4892)
+* Fix #4781: Fixed Code editor zoom in problem (#4921)
+* Minor improvements to html_cleaner.convert_to_text_angular for readability. (#5070)
+* Fix #5041 and #5033: Hide unresolved student answers when the exploration is private, since there is no data to show. (#5080)
+* Fix #5083: Audio needs update span disable for guest users. (#5091)
+* Fix #5088: Removed refresh option from the create view (#5100)
+
+Infrastructure and testing
+* Fix #2255: Remove commons folder and transform toast icons to material (#4898)
+* Added the enable_console flag (#4949)
+* Add build before frontend tests (#4972)
+* Fix e2e tests on accepting a suggestion on a published exploration (#4917)
+* Change visibility of two protected methods in exp_domain (#4933)
+* Fixes backend tests (#5014)
+* Fixes part of #4057: Added spec for InteractionDetailsCacheService (#4889)
+* Fix travis build (#5003)
+* Fix change dict list in ExplorationStateIdMapping job (#5027)
+* Added MigrationValidation one-off-job (#5050)
+* Fix for error in migration validation testing (#5054)
+* Update chromedriver version from 2.39 to 2.40 (#5059)
+* Final Checking for the migration (#5065)
+
+Statistics:
+* Introduce get_state_answer_stats for StateAnswersStatisticsService (#4963)
+* Handler hook (#4964)
+* Fix #2249: E2e tests for exploration statistics (#4357)
+* Fix part of #4666: Fix code classifier prediction service and correct frontend tests. (#4922)
+* Modify the interval calls for storing stats (#4994)
+* Fix #4190: Fix ExplorationStateIdMapping MR job. (#4914)
+
+Translation Dashboard:
+* Add translator role for the exploration (M1.1 Lesson translation dashboard) (#4959)
+
+RTE Upgrade:
+* Content validation script to validate TextAngular content : Milestone 1 (part 1) (#4947)
+* Follow-up PR for the content validation one-off job (#4969)
+* Include html strings in the output of Content Validation job (#5020)
+
+New interactions:
+* Number with Units Interaction: Milestone 1.1 (#4941)
+* Add math.js dependency (#4950)
+* Number with Units Interaction: Milestone 1.2 (#4979)
+
+Improve image loading pipeline:
+* Ml1.1 Improve the image loading pipeline (#4954)
+* PR 2.1 : Added ExtractImageFilenamesFromStateService (#4965)
+* Added the ImagePreloaderService and edited the ImageDirective (#4990)
+* Moved the ExplorationDict back to the ExtractImageFilenamesFromStateSpec.js and added documentattion to ExtractImageFilenamesService.js (#4993)
+* Ammendments to image preloading. (#5030)
+* Amendments to the image Preloading( error case) (#5062)
+
+Generalized review system:
+* Generalized Review System: Milestone 1 (part 1) (#4943)
+* Generalized Review System - Milestone 1.1 (Part 2): Add Suggestion domain class (#4966)
+* Remove ambiguous definitions of thread_id in various places in the feedback and suggestion framework (#4971)
+
+Skills, topics and stories:
+* Fix #4847: Add a new role for topic manager and create TopicRightsModel (#4871)
+* Add Functionality for Skills: Milestone 1.1 (#4953)
+* Added domain objects and services for Topics: Milestone 1.2 (Part 1) (#4981)
+* Added domain objects and services for Skills: Milestone 1.2 (Part 2) (#4983)
+* Fix #4904: Update questions backend to align with Skills construct (#4920)
+* Added update and delete for Skills (#4992)
+* Added update and delete for topics (#4991)
+
+Development Workflow:
+* Improving the dev workflow: Milestone 1.1.1 Enable Pycodestyle rules and fix errors (#4937)
+* Modify _lint_html_files function and enable rules (#4910)
+* Add Email to Travis recipients (#4938)
+* Create stale config for oppiabot (#4940)
+* Improving the dev workflow: Milestone 1.1.2 Update Pylint (#4939)
+* Fix part of #3905: Add checks for directive scope (Part 1)  (#4848)
+* Fixes #4956: Change Pylint version (#4957)
+* Improving the dev workflow: Milestone 1.2.2 Enable in-built JS rules (#4948)
+* Improving the dev workflow: Milestone 1.2.1 Enable in-built angular rules (#4945)
+* Improving the dev workflow: Milestone 1.1.3 Custom pylint checks (#4967)
+* Improving the dev workflow: Separate CSS selectors from oppia.css (#5012)
+* Improving the dev workflow: Setup custom HTML indent function (#4987)
+* Improving the dev workflow: Separate About selectors from oppia.css (#5011)
+
+Playthrough Visualisation:
+* Playthrough Visualisation: Milestone 1.3 (#4984)
+* Validity for issues instead of playthroughs (#4977)
+* Playthrough Visualisation: Milestone 1.2 (Part 2) (#4946)
+* Playthrough Visualisation: Milestone 1.2 (Part 1) (#4944)
+* Playthrough Visualisation: Milestone 1.1 (Part 6) (#4935)
+* Playthrough Visualisation: Milestone 1.1 (Part 5) (#4934)
+* Playthrough Visualisation: Milestone 1.1 (Part 4) (#4928) 
+* Playthrough Visualisation: Milestone 1.1 (Part 3) (#4927)
+* Playthrough Visualisation: Milestone 1.1 (Part 1) (#4918)
+* Playthrough Visualisation: Milestone 1.1 (Part 2) (#4919)
+
+Docstrings:
+* Replaced Content in docstrings (#4929)
+
+
 v2.6.4 (24 May 2018)
 --------------------
 Creator View:

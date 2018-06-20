@@ -18,8 +18,8 @@
         </div>
 
         <div>
-          <div angular-html-bind="answerTemplate">
-          </div>
+          <angular-html-bind html-data="answerTemplate">
+          </angular-html-bind>
         </div>
 
         <br>
@@ -29,15 +29,18 @@
         </div>
 
         <div>
-          <div angular-html-bind="trainingDataFeedback">
-          </div>
+            <angular-html-bind html-data="trainingDataFeedback">
+            </angular-html-bind>
         </div>
 
         <br>
 
         <div>
           <span><strong>and then direct the learner to: </strong></span>
-          <span angular-html-bind="trainingDataOutcomeDest"></span>
+          <span>
+            <angular-html-bind html-data="trainingDataOutcomeDest">
+            </angular-html-bind>
+          </span>
         </div>
 
         <br>

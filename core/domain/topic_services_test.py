@@ -76,6 +76,18 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.additional_story_count, 1)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
+        self.assertEqual(topic_summary.total_skill_count, 2)
+
+    def test_get_all_summaries(self):
+        topic_summaries = topic_services.get_all_topic_summaries()
+
+        self.assertEqual(len(topic_summaries), 1)
+        self.assertEqual(topic_summaries[0].name, 'Name')
+        self.assertEqual(topic_summaries[0].canonical_story_count, 2)
+        self.assertEqual(topic_summaries[0].additional_story_count, 1)
+        self.assertEqual(topic_summaries[0].total_skill_count, 2)
+        self.assertEqual(topic_summaries[0].uncategorized_skill_count, 2)
+        self.assertEqual(topic_summaries[0].subtopic_count, 1)
 
     def test_get_new_topic_id(self):
         new_topic_id = topic_services.get_new_topic_id()
@@ -99,6 +111,7 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(topic_summary.canonical_story_count, 2)
         self.assertEqual(topic_summary.additional_story_count, 1)
         self.assertEqual(topic_summary.uncategorized_skill_count, 2)
+        self.assertEqual(topic_summary.total_skill_count, 2)
         self.assertEqual(topic_summary.subtopic_count, 1)
 
     def test_get_topic_by_id(self):
@@ -535,6 +548,28 @@ class TopicServicesUnitTests(test_utils.GenericTestBase):
 
         self.assertTrue(topic_services.check_can_edit_topic(
             self.user_admin, topic_rights))
+
+    def test_publish_and_unpublish_topic(self):
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        self.assertFalse(topic_rights.topic_is_published)
+        topic_services.publish_topic(self.TOPIC_ID, self.user_id_admin)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The user does not have enough rights to unpublish the topic.'):
+            topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_a)
+
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        self.assertTrue(topic_rights.topic_is_published)
+
+        topic_services.unpublish_topic(self.TOPIC_ID, self.user_id_admin)
+        topic_rights = topic_services.get_topic_rights(self.TOPIC_ID)
+        self.assertFalse(topic_rights.topic_is_published)
+
+        with self.assertRaisesRegexp(
+            Exception,
+            'The user does not have enough rights to publish the topic.'):
+            topic_services.publish_topic(self.TOPIC_ID, self.user_id_a)
 
     def test_create_new_topic_rights(self):
         topic_services.assign_role(

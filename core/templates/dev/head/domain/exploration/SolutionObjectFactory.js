@@ -20,8 +20,10 @@
 oppia.factory('SolutionObjectFactory', [
   '$filter', 'HtmlEscaperService', 'ExplorationHtmlFormatterService',
   'SubtitledHtmlObjectFactory', 'FractionObjectFactory',
+  'NumberWithUnitsObjectFactory',
   function($filter, HtmlEscaperService, ExplorationHtmlFormatterService,
-      SubtitledHtmlObjectFactory, FractionObjectFactory) {
+      SubtitledHtmlObjectFactory, FractionObjectFactory,
+      NumberWithUnitsObjectFactory) {
     var Solution = function(answerIsExclusive, correctAnswer, explanation) {
       this.answerIsExclusive = answerIsExclusive;
       this.correctAnswer = correctAnswer;
@@ -70,6 +72,9 @@ oppia.factory('SolutionObjectFactory', [
         correctAnswer = this.correctAnswer.correct;
       } else if (interactionId === 'FractionInput') {
         correctAnswer = FractionObjectFactory.fromDict(
+          this.correctAnswer).toString();
+      } else if (interactionId === 'NumberWithUnits') {
+        correctAnswer = NumberWithUnitsObjectFactory.fromDict(
           this.correctAnswer).toString();
       } else {
         correctAnswer = (
