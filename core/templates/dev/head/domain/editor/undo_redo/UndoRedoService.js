@@ -114,7 +114,7 @@ oppia.factory('UndoRedoService', [
     };
 
     UndoRedoService.setChangeList = function(changeList) {
-      _appliedChanges = angular.copy(changeList);  
+      _appliedChanges = angular.copy(changeList);
     };
 
     /**

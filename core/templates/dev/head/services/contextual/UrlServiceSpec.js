@@ -94,7 +94,7 @@ describe('Url Service', function() {
     ).toBe('abcdefgijklm');
     mockLocation.pathname = '/topic_editor/abcdefgij';
     expect(function() {
-      UrlService.getTopicIdFromUrl()
+      UrlService.getTopicIdFromUrl();
     }).toThrow();
   });
 });
