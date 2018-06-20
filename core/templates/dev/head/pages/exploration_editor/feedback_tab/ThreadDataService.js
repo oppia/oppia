@@ -35,8 +35,8 @@ oppia.factory('ThreadDataService', [
 
     if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
       _SUGGESTION_LIST_HANDLER_URL = '/generalsuggestionlisthandler';
-      _SUGGESTION_ACTION_HANDLER_URL = ('/generalsuggestionactionhandler/' +
-        'exploration/' + _expId + '/');
+      _SUGGESTION_ACTION_HANDLER_URL = '/generalsuggestionactionhandler/' +
+        'exploration/' + _expId + '/';
     }
 
     // All the threads for this exploration. This is a list whose entries are
@@ -52,23 +52,20 @@ oppia.factory('ThreadDataService', [
 
     var _fetchThreads = function(successCallback) {
       var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
-      var sPromise;
-      if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-        sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-          params: {
-            list_type: 'target',
-            target_type: 'exploration',
-            target_id: _expId
-          }
-        });
-      } else {
-        sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-          params: {
-            list_type: 'all',
-            has_suggestion: true
-          }
-        });
+      var params =  {
+        list_type: 'all',
+        has_suggestion: true
       }
+      if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+        params = {
+          list_type: 'target',
+          target_type: 'exploration',
+          target_id: _expId
+        }
+      }
+      var sPromise =  $http.get(_SUGGESTION_LIST_HANDLER_URL, {
+        params: params
+      });
 
       $q.all([fPromise, sPromise]).then(function(res) {
         _data.feedbackThreads = res[0].data.threads;
@@ -83,7 +80,7 @@ oppia.factory('ThreadDataService', [
           for (var i = 0; i < _data.suggestionThreads.length; i++) {
             for (var j = 0; j < _data.feedbackThreads.length; j++) {
               if (_data.suggestionThreads[i].thread_id ===
-                _data.feedbackThreads[j].thread_id) {
+                  _data.feedbackThreads[j].thread_id) {
                 _data.suggestionThreads[i].subject = (
                   _data.feedbackThreads[j].subject);
                 _data.suggestionThreads[i].description = (

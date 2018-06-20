@@ -58,7 +58,7 @@ oppia.controller('LearnerLocalNav', [
             };
 
             $scope.submitSuggestion = function() {
-              data = {
+              var data = {
                 id: ExplorationPlayerService.getExplorationId(),
                 version: ExplorationPlayerService.getExplorationVersion(),
                 stateName: stateName,
@@ -80,7 +80,7 @@ oppia.controller('LearnerLocalNav', [
             };
           }]
       }).result.then(function(result) {
-        data = {
+        var data = {
           exploration_version: result.version,
           state_name: result.stateName,
           description: result.description,

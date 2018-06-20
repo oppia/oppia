@@ -31,6 +31,6 @@
     <[ errorMessage ]>
   </div>
   <button class="btn btn-default" ng-click="cancelReview()">Cancel</button>
-  <button class="btn btn-danger" ng-show="canEdit && isOpen" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
-  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isOpen" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
+  <button class="btn btn-danger" ng-show="canEdit && isNotHandled" ng-click="rejectSuggestion()" ng-disabled="!canReject">Reject</button>
+  <button class="btn btn-success protractor-test-exploration-accept-suggestion-btn" ng-show="canEdit && isNotHandled" ng-click="acceptSuggestion()" ng-disabled="!canAccept || commitMessage.length == 0">Accept</button>
 </div>
