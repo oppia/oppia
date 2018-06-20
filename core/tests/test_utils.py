@@ -490,14 +490,24 @@ tags: []
         return self._parse_json_response(
             json_response, expect_errors=expect_errors)
 
-    def delete_json(self, url, params, expect_errors=False,
+    def delete_json(self, url, params, csrf_token=None, expect_errors=False,
                     expected_status_int=200):
-        """Get an object to the server by JSON; return the received object."""
+        """Get an object to the server by JSON; return the received object.
+        Note: The delete method ignores the body of the request. In order
+        overcome this we are attaching the params to the url.
+        """
+        updated_url = url
+        if len(params) > 0:
+            for param in params.values():
+                updated_url += ('/' + param)
         json_response = self.testapp.delete(
-            url, params, expect_errors=expect_errors,
+            updated_url, params, csrf_token, expect_errors=expect_errors,
             status=expected_status_int)
-        return self._parse_json_response(
-            json_response, expect_errors=expect_errors)
+        if json_response.content_type == 'application/json':
+            return self._parse_json_response(
+                json_response, expect_errors=expect_errors)
+        else:
+            return json_response
 
     def get_csrf_token_from_response(self, response):
         """Retrieve the CSRF token from a GET response."""
