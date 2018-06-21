@@ -23,20 +23,25 @@ oppia.directive('topicEditorNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/topic_editor_navbar_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'AlertsService',
-        'UndoRedoService', 'TopicEditorStateService',
-        'TopicRightsBackendApiService', 'UrlService',
+        '$scope', '$rootScope', '$uibModal', 'AlertsService',
+        'UndoRedoService', 'TopicEditorStateService', 'UrlService',
+        'TopicRightsBackendApiService', 'TopicEditorRoutingService',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $uibModal, AlertsService, UndoRedoService,
-            TopicEditorStateService, TopicRightsBackendApiService, UrlService,
+            $scope, $rootScope, $uibModal, AlertsService,
+            UndoRedoService, TopicEditorStateService, UrlService,
+            TopicRightsBackendApiService, TopicEditorRoutingService,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.topicId = UrlService.getTopicIdFromUrl();
           $scope.topic = TopicEditorStateService.getTopic();
           $scope.topicRights = TopicEditorStateService.getTopicRights();
           $scope.isSaveInProgress = TopicEditorStateService.isSavingTopic;
+          $scope.getTabStatuses = TopicEditorRoutingService.getTabStatuses;
+          $scope.selectMainTab = TopicEditorRoutingService.navigateToMainTab;
+          $scope.selectSubtopicsTab =
+            TopicEditorRoutingService.navigateToSubtopicsTab;
 
           $scope.publishTopic = function() {
             if (!$scope.topicRights.canPublishTopic()) {
