@@ -1236,7 +1236,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }])
 
         self.playthrough_data = {
-            'id': None,
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
             'issue_type': 'EarlyQuit',
@@ -1259,6 +1258,21 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }]
         }
 
+        self.exp_issue_dict = {
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'state_name1'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 250
+                }
+            },
+            'playthrough_ids': [],
+            'schema_version': 1,
+            'is_valid': True,
+        }
+
         response = self.testapp.get('/explore/%s' % self.exp_id)
         self.csrf_token = self.get_csrf_token_from_response(response)
 
@@ -1270,7 +1284,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
             {
                 'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
+                'exp_issue_dict': self.exp_issue_dict
             }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
@@ -1282,6 +1296,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         """Test that a new playthrough gets created and a new issue is created
         for it.
         """
+        self.exp_issue_dict['issue_customization_args']['state_name'][
+            'value'] = 'state_name2'
         self.playthrough_data['issue_customization_args']['state_name'][
             'value'] = 'state_name2'
 
@@ -1289,7 +1305,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
             {
                 'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
+                'exp_issue_dict': self.exp_issue_dict
             }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
@@ -1334,7 +1350,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model.put()
 
         self.playthrough_data = {
-            'id': None,
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
             'issue_type': 'CyclicStateTransitions',
@@ -1354,11 +1369,23 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }],
         }
 
+        self.exp_issue_dict = {
+            'issue_type': 'CyclicStateTransitions',
+            'issue_customization_args': {
+                'state_names': {
+                    'value': ['state_name1', 'state_name2', 'state_name1']
+                },
+            },
+            'playthrough_ids': [],
+            'schema_version': 1,
+            'is_valid': True
+        }
+
         self.post_json(
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
             {
                 'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
+                'exp_issue_dict': self.exp_issue_dict
             }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
@@ -1403,7 +1430,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         model.put()
 
         self.playthrough_data = {
-            'id': None,
             'exp_id': self.exp_id,
             'exp_version': self.exploration.version,
             'issue_type': 'CyclicStateTransitions',
@@ -1423,11 +1449,23 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             }]
         }
 
+        self.exp_issue_dict = {
+            'issue_type': 'CyclicStateTransitions',
+            'issue_customization_args': {
+                'state_names': {
+                    'value': ['state_name1', 'state_name1', 'state_name2']
+                },
+            },
+            'playthrough_ids': [],
+            'schema_version': 1,
+            'is_valid': True
+        }
+
         self.post_json(
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
             {
                 'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
+                'exp_issue_dict': self.exp_issue_dict
             }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
@@ -1450,7 +1488,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
             {
                 'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
+                'exp_issue_dict': self.exp_issue_dict
             }, self.csrf_token)
         self.process_and_flush_pending_tasks()
 
@@ -1458,17 +1496,31 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 5)
 
-    def test_error_without_schema_version_in_payload_dict(self):
-        """Test that passing a payload without schema version raises an
+    def test_error_on_invalid_exp_issue_dict(self):
+        """Test that passing an invalid exploration issue dict raises an
         exception.
         """
-        payload_dict_without_schema_version = {
-            'playthrough_data': self.playthrough_data
-        }
+        del self.exp_issue_dict['issue_type']
+
         self.post_json(
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            payload_dict_without_schema_version, self.csrf_token,
-            expect_errors=True, expected_status_int=400)
+            {
+                'playthrough_data': self.playthrough_data,
+                'exp_issue_dict': self.exp_issue_dict
+            }, self.csrf_token, expect_errors=True, expected_status_int=400)
+
+    def test_error_without_schema_version_in_exp_issue_dict(self):
+        """Test that passing an exploration issue dict without schema version
+        raises an exception.
+        """
+        del self.exp_issue_dict['schema_version']
+
+        self.post_json(
+            '/explorehandler/store_playthrough/%s' % (self.exp_id),
+            {
+                'playthrough_data': self.playthrough_data,
+                'exp_issue_dict': self.exp_issue_dict
+            }, self.csrf_token, expect_errors=True, expected_status_int=400)
 
     def test_error_on_invalid_playthrough_dict(self):
         """Test that passing an invalid playthrough dict raises an exception."""
@@ -1478,98 +1530,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
             {
                 'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
+                'exp_issue_dict': self.exp_issue_dict
             }, self.csrf_token, expect_errors=True, expected_status_int=400)
-
-    def test_playthrough_id_is_returned(self):
-        """Test that playthrough ID is returned when it is stored for the first
-        time and the playthrough is updated from the next time.
-        """
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
-            }, self.csrf_token)
-        self.process_and_flush_pending_tasks()
-
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        self.assertEqual(len(model.unresolved_issues), 1)
-        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
-        playthrough_id = model.unresolved_issues[0]['playthrough_ids'][1]
-        self.assertEqual(response['playthrough_id'], playthrough_id)
-        self.assertEqual(response['playthrough_stored'], True)
-
-    def test_playthrough_is_subsequently_updated(self):
-        """Test that a playthrough is updated if the controller is called for
-        the second time.
-        """
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
-            }, self.csrf_token)
-        self.process_and_flush_pending_tasks()
-
-        playthrough_id = response['playthrough_id']
-        self.playthrough_data['id'] = playthrough_id
-        self.playthrough_data['issue_customization_args'][
-            'time_spent_in_exp_in_msecs']['value'] = 150
-
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
-            }, self.csrf_token)
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        self.assertEqual(len(model.unresolved_issues), 1)
-        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
-        playthrough_id = model.unresolved_issues[0]['playthrough_ids'][1]
-        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
-        self.assertEqual(
-            playthrough.issue_customization_args['time_spent_in_exp_in_msecs'][
-                'value'], 150)
-
-    def test_updating_playthrough_issue(self):
-        """Test that updating an existing playthrough's issue creates a new
-        issue if the issue doesn't exist.
-        """
-        response = self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
-            }, self.csrf_token)
-        self.process_and_flush_pending_tasks()
-
-        playthrough_id = response['playthrough_id']
-        self.playthrough_data['id'] = playthrough_id
-        self.playthrough_data['issue_type'] = 'CyclicStateTransitions'
-        self.playthrough_data['issue_customization_args'] = {
-            'state_names': {
-                'value': ['state1', 'state2', 'state1']
-            }
-        }
-
-        self.post_json(
-            '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            {
-                'playthrough_data': self.playthrough_data,
-                'issue_schema_version': 1
-            }, self.csrf_token)
-        model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        print model
-        self.assertEqual(len(model.unresolved_issues), 2)
-        self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
-        self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
-        playthrough_id = model.unresolved_issues[1]['playthrough_ids'][0]
-        playthrough = stats_services.get_playthrough_by_id(playthrough_id)
-        self.assertEqual(playthrough.issue_type, 'CyclicStateTransitions')
-        self.assertEqual(
-            playthrough.issue_customization_args['state_names'][
-                'value'], ['state1', 'state2', 'state1'])
 
 
 class StatsEventHandlerTest(test_utils.GenericTestBase):
