@@ -917,7 +917,8 @@ def can_manage_rights_for_question(handler):
 
 def can_change_question_publication_status(handler):
     """Decorator to check whether the user can publish or unpublish a
-        question."""
+        question.
+    """
 
     def test_can_change_question_publication_status(self, **kwargs):
         if not self.user_id:

@@ -431,9 +431,9 @@
                   translate="I18N_CREATE_QUESTION">
           </button>
         </div>
-        
+
         <div class="oppia-dashboard-tiles"
-            ng-if="activeTab === 'myQuestions' && questionsList.length > 0">
+             ng-if="activeTab === 'myQuestions' && questionsList.length > 0">
           <span ng-repeat="question in questionsList | filter:{status: activeSection}">
             <span ng-class="activeSection">
               <question-summary-tile question-id="question.id"
@@ -773,7 +773,7 @@
       margin: 0 auto;
       width: 50%;
     }
-    
+
     .oppia-dashboard-tiles {
       margin: 0 0 0 auto;
       width: 68%;

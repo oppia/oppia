@@ -17,9 +17,7 @@
  */
 
 oppia.constant(
-  'QUESTION_VIEWER_URL', '/question/<question_id>');
-oppia.constant(
-  'QUESTION_EDITOR_URL', '/questioncreationhandler/<question_id>');
+  'QUESTION_EDITOR_URL', '/question_editor/<question_id>');
 
 oppia.directive('questionSummaryTile', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -36,10 +34,8 @@ oppia.directive('questionSummaryTile', [
         '/components/summary_tile/' +
         'question_summary_tile_directive.html'),
       controller: [
-        '$scope', 'DateTimeFormatService',
-        'QUESTION_VIEWER_URL', 'QUESTION_EDITOR_URL', function(
-            $scope, DateTimeFormatService,
-            QUESTION_VIEWER_URL, QUESTION_EDITOR_URL) {
+        '$scope', 'DateTimeFormatService', 'QUESTION_EDITOR_URL', function(
+            $scope, DateTimeFormatService, QUESTION_EDITOR_URL) {
           $scope.getLastUpdatedDatetime = function() {
             return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
               $scope.getLastUpdatedMsec());
@@ -57,9 +53,7 @@ oppia.directive('questionSummaryTile', [
           };
 
           $scope.getQuestionLink = function() {
-            var targetUrl = (
-              $scope.isLinkedToEditorPage ?
-                QUESTION_EDITOR_URL : QUESTION_VIEWER_URL);
+            var targetUrl = QUESTION_EDITOR_URL;
             return UrlInterpolationService.interpolateUrl(
               targetUrl, {
                 question_id: $scope.getQuestionId()

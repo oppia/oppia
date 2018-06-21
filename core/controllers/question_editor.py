@@ -18,9 +18,9 @@ are created.
 
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import role_services
 from core.domain import question_domain
 from core.domain import question_services
+from core.domain import role_services
 from core.domain import user_services
 import feconf
 import utils
