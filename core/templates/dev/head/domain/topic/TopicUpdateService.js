@@ -222,22 +222,22 @@ oppia.factory('TopicUpdateService', [
           var currentChangeList = UndoRedoService.getChangeList();
           var indicesToDelete = [];
           for (var i = 0; i < currentChangeList.length; i++) {
-            var backendChangeObject =
+            var backendChangeDict =
               currentChangeList[i].getBackendChangeObject();
-            if (backendChangeObject.subtopic_id === subtopicId) {
+            if (backendChangeDict.subtopic_id === subtopicId) {
               // The indices in the change list corresponding to changes to the
-              // currently deleted and newly created topic are to be removed
+              // currently deleted and newly created subtopic are to be removed
               // from the list.
               indicesToDelete.push(i);
               continue;
             }
             // When a newly created subtopic is deleted, the subtopics created
-            // after it would their id reduced by 1.
-            if (backendChangeObject.subtopic_id > subtopicId) {
-              backendChangeObject.subtopic_id--;
+            // after it would have their id reduced by 1.
+            if (backendChangeDict.subtopic_id > subtopicId) {
+              backendChangeDict.subtopic_id--;
             }
-            // Apply the above id reduction changes to the changelist.
-            currentChangeList[i].setBackendChangeObject(backendChangeObject);
+            // Apply the above id reduction changes to the backend change.
+            currentChangeList[i].setBackendChangeObject(backendChangeDict);
           }
           // The new change list is found by deleting the above found elements.
           var newChangeList = currentChangeList.filter(function(change) {
