@@ -141,36 +141,18 @@ class Question(object):
                 'Expected question_data to be a dict, received %s' %
                 self.question_data)
 
-        at_least_one_correct_answer = False
         dest_is_specified = False
         interaction = self.question_data['interaction']
         for answer_group in interaction['answer_groups']:
-            if answer_group['labelled_as_correct']:
-                at_least_one_correct_answer = True
             if answer_group['dest'] is not None:
                 dest_is_specified = True
-
-        if interaction['default_outcome']['labelled_as_correct']:
-            at_least_one_correct_answer = True
 
         if interaction['default_outcome']['dest'] is not None:
             dest_is_specified = True
 
-        if not at_least_one_correct_answer:
-            raise utils.ValidationError(
-                'Expected at least one answer group to have a correct answer.'
-            )
-
         if dest_is_specified:
             raise utils.ValidationError(
                 'Expected all answer groups to have destination as None.'
-            )
-
-        if (len(interaction['hints']) == 0) or (
-                interaction['solution'] is None):
-            raise utils.ValidationError(
-                'Expected the question to have at least one hint and a ' +
-                'solution.'
             )
 
         question_data = exp_domain.State.from_dict(self.question_data)

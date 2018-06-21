@@ -25,6 +25,7 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import question_domain
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import subscription_services
@@ -336,6 +337,22 @@ class NewCollectionHandler(base.BaseHandler):
 
         self.render_json({
             COLLECTION_ID_KEY: new_collection_id
+        })
+
+
+class NewQuestionHandler(base.BaseHandler):
+    """Creates a new question."""
+
+    @acl_decorators.can_create_question
+    def post(self):
+        """Handles POST requests."""
+        new_question_id = question_services.get_new_question_id()
+        question = question_domain.Question.create_default_question(
+            new_question_id, constants.DEFAULT_LANGUAGE_CODE)
+        question_services.add_question(self.user_id, question)
+
+        self.render_json({
+            QUESTION_ID_KEY: new_question_id
         })
 
 

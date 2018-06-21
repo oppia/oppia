@@ -40,7 +40,10 @@ def _create_new_question(committer_id, question, commit_message):
     Returns:
         str. The ID of the model.
     """
-    model = question_models.QuestionModel.create(
+    question.validate()
+
+    model = question_models.QuestionModel(
+        id=question.question_id,
         question_data=question.question_data,
         question_data_schema_version=question.question_data_schema_version,
         language_code=question.language_code,
@@ -63,7 +66,6 @@ def add_question(committer_id, question):
     Returns:
         str. The ID of the question.
     """
-    question.validate()
     commit_message = 'New question created'
     question_id = _create_new_question(committer_id, question, commit_message)
 

@@ -23,7 +23,7 @@ oppia.factory('QuestionCreationService', [
   function(
       $http, $uibModal, $timeout, $rootScope, $window,
       AlertsService, siteAnalyticsService, UrlInterpolationService) {
-    var CREATE_NEW_EXPLORATION_URL_TEMPLATE = '/question/<question_id>';
+    var CREATE_NEW_QUESTION_URL_TEMPLATE = '/question_editor/<question_id>';
 
     var questionCreationInProgress = false;
 
@@ -37,13 +37,13 @@ oppia.factory('QuestionCreationService', [
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating question';
 
-        $http.post('//questioncreationhandler', {
+        $http.post('/questioncreationhandler', {
         }).then(function(response) {
           siteAnalyticsService.registerCreateNewQuestionEvent(
             response.data.questionId);
           $timeout(function() {
             $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+              CREATE_NEW_QUESTION_URL_TEMPLATE, {
                 question_id: response.data.questionId
               }
             );
@@ -105,7 +105,7 @@ oppia.factory('QuestionCreationService', [
             url: 'contributehandler/upload'
           }).done(function(data) {
             $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_EXPLORATION_URL_TEMPLATE, {
+              CREATE_NEW_QUESTION_URL_TEMPLATE, {
                 question_id: data.questionId
               }
             );

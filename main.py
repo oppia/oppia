@@ -214,6 +214,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_COLLECTION_URL,
         creator_dashboard.NewCollectionHandler),
     get_redirect_route(
+        r'%s' % feconf.NEW_QUESTION_URL,
+        creator_dashboard.NewQuestionHandler),
+    get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
@@ -494,9 +497,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<collection_id>' % feconf.COLLECTION_UNPUBLISH_PREFIX,
         collection_editor.CollectionUnpublishHandler),
 
-    get_redirect_route(
-        r'%s' % feconf.QUESTION_CREATION_URL,
-        question.QuestionCreationHandler),
     get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_DATA_URL,
         question.QuestionsHandler),

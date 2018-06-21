@@ -84,13 +84,13 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         response = self.testapp.get('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
         response_json = self.post_json(
-            feconf.QUESTION_CREATION_URL, payload, csrf_token,
+            feconf.NEW_QUESTION_URL, payload, csrf_token,
             expect_errors=False)
         self.assertIn('question_id', response_json.keys())
 
         del payload['question']
         self.post_json(
-            feconf.QUESTION_CREATION_URL, payload, csrf_token,
+            feconf.NEW_QUESTION_URL, payload, csrf_token,
             expect_errors=True, expected_status_int=404)
 
         self.logout()
@@ -98,7 +98,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         response = self.testapp.get('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
-            feconf.QUESTION_CREATION_URL, payload, csrf_token,
+            feconf.NEW_QUESTION_URL, payload, csrf_token,
             expect_errors=True, expected_status_int=401)
 
     def test_put(self):
@@ -161,7 +161,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
         response = self.testapp.get('/preferences')
         csrf_token = self.get_csrf_token_from_response(response)
         response_json = self.post_json(
-            feconf.QUESTION_CREATION_URL, payload, csrf_token,
+            feconf.NEW_QUESTION_URL, payload, csrf_token,
             expect_errors=False)
         self.assertIn('question_id', response_json.keys())
 
@@ -171,7 +171,7 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             1, 'en')
         payload['question'] = another_question.to_dict()
         response_json = self.post_json(
-            feconf.QUESTION_CREATION_URL, payload, csrf_token,
+            feconf.NEW_QUESTION_URL, payload, csrf_token,
             expect_errors=False)
         self.assertIn('question_id', response_json.keys())
         another_question_id = response_json['question_id']

@@ -57,7 +57,7 @@ oppia.controller('CreatorDashboard', [
   '$scope', '$rootScope', '$http', '$window', 'DateTimeFormatService',
   'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
-  'UrlInterpolationService', 'FATAL_ERROR_CODES',
+  'UrlInterpolationService', 'FATAL_ERROR_CODES', 'QuestionCreationService',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
@@ -66,7 +66,7 @@ oppia.controller('CreatorDashboard', [
       $scope, $rootScope, $http, $window, DateTimeFormatService,
       AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
-      UrlInterpolationService, FATAL_ERROR_CODES,
+      UrlInterpolationService, FATAL_ERROR_CODES, QuestionCreationService,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS,
@@ -106,6 +106,8 @@ oppia.controller('CreatorDashboard', [
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
+    $scope.createNewQuestion = (
+      QuestionCreationService.createNewQuestion);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
