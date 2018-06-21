@@ -36,7 +36,7 @@ describe('Story update service', function() {
       notes: 'Story notes',
       version: 1,
       story_contents: {
-        initial_node_id: 'node_1',
+        initial_node_id: 'node_2',
         nodes: [
           {
             id: 'node_1',
@@ -287,10 +287,20 @@ describe('Story update service', function() {
 
   it('should remove/add a story node', function() {
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(2);
-    StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[1].getDestinationNodeIds()
+    ).toEqual(['node_1']);
+    StoryUpdateService.deleteStoryNode(_sampleStory, 'node_1');
+    // Initial node should not be deleted.
+    expect(function() {
+      StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
+    }).toThrow();
     expect(_sampleStory.getStoryContents().getNodes().length).toEqual(1);
     expect(
-      _sampleStory.getStoryContents().getNodes()[0].getId()).toEqual('node_1');
+      _sampleStory.getStoryContents().getNodes()[0].getId()).toEqual('node_2');
+    expect(
+      _sampleStory.getStoryContents().getNodes()[0].getDestinationNodeIds()
+    ).toEqual([]);
 
     expect(function() {
       UndoRedoService.undoChange(_sampleStory);
@@ -299,10 +309,10 @@ describe('Story update service', function() {
 
   it('should create a proper backend change dict for removing a story node',
     function() {
-      StoryUpdateService.deleteStoryNode(_sampleStory, 'node_2');
+      StoryUpdateService.deleteStoryNode(_sampleStory, 'node_1');
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'delete_story_node',
-        node_id: 'node_2'
+        node_id: 'node_1'
       }]);
     }
   );
@@ -425,6 +435,30 @@ describe('Story update service', function() {
       node_id: 'node_1'
     }]);
   });
+
+  it('should set/unset the initial node of the story', function() {
+    expect(
+      _sampleStory.getStoryContents().getInitialNodeId()).toEqual('node_2');
+    StoryUpdateService.setInitialNodeId(_sampleStory, 'node_1');
+    expect(
+      _sampleStory.getStoryContents().getInitialNodeId()).toEqual('node_1');
+
+    UndoRedoService.undoChange(_sampleStory);
+    expect(
+      _sampleStory.getStoryContents().getInitialNodeId()).toEqual('node_2');
+  });
+
+  it('should create a proper backend change dict for setting initial node',
+    function() {
+      StoryUpdateService.setInitialNodeId(_sampleStory, 'node_1');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'update_story_contents_property',
+        property_name: 'initial_node_id',
+        new_value: 'node_1',
+        old_value: 'node_2'
+      }]);
+    }
+  );
 
   it('should set/unset changes to a story\'s title', function() {
     expect(_sampleStory.getTitle()).toEqual('Story title');

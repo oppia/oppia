@@ -36,6 +36,8 @@ oppia.constant('STORY_PROPERTY_DESCRIPTION', 'description');
 oppia.constant('STORY_PROPERTY_NOTES', 'notes');
 oppia.constant('STORY_PROPERTY_LANGUAGE_CODE', 'language_code');
 
+oppia.constant('INITIAL_NODE_ID', 'initial_node_id');
+
 oppia.constant('STORY_NODE_PROPERTY_OUTLINE', 'outline');
 oppia.constant('STORY_NODE_PROPERTY_EXPLORATION_ID', 'exploration_id');
 oppia.constant(
@@ -51,7 +53,8 @@ oppia.factory('StoryUpdateService', [
   'CMD_UPDATE_STORY_NODE_PROPERTY', 'CMD_UPDATE_STORY_CONTENTS_PROPERTY',
   'STORY_PROPERTY_TITLE', 'STORY_PROPERTY_DESCRIPTION',
   'STORY_PROPERTY_NOTES', 'STORY_PROPERTY_LANGUAGE_CODE',
-  'STORY_NODE_PROPERTY_OUTLINE', 'STORY_NODE_PROPERTY_EXPLORATION_ID',
+  'INITIAL_NODE_ID', 'STORY_NODE_PROPERTY_OUTLINE',
+  'STORY_NODE_PROPERTY_EXPLORATION_ID',
   'STORY_NODE_PROPERTY_DESTINATION_NODE_IDS',
   'STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS',
   'STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS', function(
@@ -61,7 +64,8 @@ oppia.factory('StoryUpdateService', [
       CMD_UPDATE_STORY_NODE_PROPERTY, CMD_UPDATE_STORY_CONTENTS_PROPERTY,
       STORY_PROPERTY_TITLE, STORY_PROPERTY_DESCRIPTION,
       STORY_PROPERTY_NOTES, STORY_PROPERTY_LANGUAGE_CODE,
-      STORY_NODE_PROPERTY_OUTLINE, STORY_NODE_PROPERTY_EXPLORATION_ID,
+      INITIAL_NODE_ID, STORY_NODE_PROPERTY_OUTLINE,
+      STORY_NODE_PROPERTY_EXPLORATION_ID,
       STORY_NODE_PROPERTY_DESTINATION_NODE_IDS,
       STORY_NODE_PROPERTY_ACQUIRED_SKILL_IDS,
       STORY_NODE_PROPERTY_PREREQUISITE_SKILL_IDS) {
@@ -94,8 +98,17 @@ oppia.factory('StoryUpdateService', [
     // Applies a story property change, specifically. See _applyChange()
     // for details on the other behavior of this function.
     var _applyStoryPropertyChange = function(
-        story, propertyName, newValue, oldValue, apply, reverse) {
+        story, propertyName, oldValue, newValue, apply, reverse) {
       _applyChange(story, CMD_UPDATE_STORY_PROPERTY, {
+        property_name: propertyName,
+        new_value: angular.copy(newValue),
+        old_value: angular.copy(oldValue)
+      }, apply, reverse);
+    };
+
+    var _applyStoryContentsPropertyChange = function(
+        story, propertyName, oldValue, newValue, apply, reverse) {
+      _applyChange(story, CMD_UPDATE_STORY_CONTENTS_PROPERTY, {
         property_name: propertyName,
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue)
@@ -126,7 +139,7 @@ oppia.factory('StoryUpdateService', [
       setStoryTitle: function(story, title) {
         var oldTitle = angular.copy(story.getTitle());
         _applyStoryPropertyChange(
-          story, STORY_PROPERTY_TITLE, title, oldTitle,
+          story, STORY_PROPERTY_TITLE, oldTitle, title,
           function(changeDict, story) {
             // Apply
             var title = _getNewPropertyValueFromChangeDict(changeDict);
@@ -144,7 +157,7 @@ oppia.factory('StoryUpdateService', [
       setStoryDescription: function(story, description) {
         var oldDescription = angular.copy(story.getDescription());
         _applyStoryPropertyChange(
-          story, STORY_PROPERTY_DESCRIPTION, description, oldDescription,
+          story, STORY_PROPERTY_DESCRIPTION, oldDescription, description,
           function(changeDict, story) {
             // Apply
             var description = _getNewPropertyValueFromChangeDict(changeDict);
@@ -162,7 +175,7 @@ oppia.factory('StoryUpdateService', [
       setStoryNotes: function(story, notes) {
         var oldNotes = angular.copy(story.getNotes());
         _applyStoryPropertyChange(
-          story, STORY_PROPERTY_NOTES, notes, oldNotes,
+          story, STORY_PROPERTY_NOTES, oldNotes, notes,
           function(changeDict, story) {
             // Apply
             var notes = _getNewPropertyValueFromChangeDict(changeDict);
@@ -180,8 +193,7 @@ oppia.factory('StoryUpdateService', [
       setStoryLanguageCode: function(story, languageCode) {
         var oldLanguageCode = angular.copy(story.getLanguageCode());
         _applyStoryPropertyChange(
-          story, STORY_PROPERTY_LANGUAGE_CODE, languageCode,
-          oldLanguageCode,
+          story, STORY_PROPERTY_LANGUAGE_CODE, oldLanguageCode, languageCode,
           function(changeDict, story) {
             // Apply.
             var languageCode = _getNewPropertyValueFromChangeDict(changeDict);
@@ -189,6 +201,25 @@ oppia.factory('StoryUpdateService', [
           }, function(changeDict, story) {
             // Undo.
             story.setLanguageCode(oldLanguageCode);
+          });
+      },
+
+      /**
+       * Sets the initial node of the story and records the change in
+       * the undo/redo service.
+       */
+      setInitialNodeId: function(story, newInitialNodeId) {
+        var oldInitialNodeId =
+          angular.copy(story.getStoryContents().getInitialNodeId());
+        _applyStoryContentsPropertyChange(
+          story, INITIAL_NODE_ID, oldInitialNodeId,
+          newInitialNodeId,
+          function(changeDict, story) {
+            // Apply.
+            story.getStoryContents().setInitialNodeId(newInitialNodeId);
+          }, function(changeDict, story) {
+            // Undo.
+            story.getStoryContents().setInitialNodeId(oldInitialNodeId);
           });
       },
 
