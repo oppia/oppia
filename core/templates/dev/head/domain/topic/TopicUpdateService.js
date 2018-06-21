@@ -207,16 +207,6 @@ oppia.factory('TopicUpdateService', [
             newlyCreated = true;
           }
         }
-        _applyChange(topic, CMD_DELETE_SUBTOPIC, {
-          subtopic_id: subtopicId,
-          change_affects_subtopic_page: false
-        }, function(changeDict, topic) {
-          // Apply.
-          topic.deleteSubtopic(subtopicId, newlyCreated);
-        }, function(changeDict, topic) {
-          // Undo.
-          throw Error('A deleted subtopic cannot be restored');
-        });
         if (newlyCreated) {
           // Get the current change list.
           var currentChangeList = UndoRedoService.getChangeList();
@@ -247,7 +237,19 @@ oppia.factory('TopicUpdateService', [
           });
           // The new changelist is set.
           UndoRedoService.setChangeList(newChangeList);
+          topic.deleteSubtopic(subtopicId, newlyCreated);
+          return;
         }
+        _applyChange(topic, CMD_DELETE_SUBTOPIC, {
+          subtopic_id: subtopicId,
+          change_affects_subtopic_page: false
+        }, function(changeDict, topic) {
+          // Apply.
+          topic.deleteSubtopic(subtopicId, newlyCreated);
+        }, function(changeDict, topic) {
+          // Undo.
+          throw Error('A deleted subtopic cannot be restored');
+        });
       },
 
       /**
