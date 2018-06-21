@@ -20,7 +20,6 @@ import copy
 import datetime
 import os
 
-from constants import constants
 from core.domain import classifier_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -52,7 +51,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         assets_list = []
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.save_new_exploration_from_yaml_and_assets(
-                constants.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+                feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
                 assets_list)
 
         self.exp_id = exploration_id
@@ -96,7 +95,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
-                constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and two mappings in the data store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
@@ -114,7 +113,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
-                constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should be two jobs and three mappings in the data store now.
         all_jobs = classifier_models.ClassifierTrainingJobModel.get_all()
@@ -135,7 +134,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         })]
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.update_exploration(
-                constants.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
+                feconf.SYSTEM_COMMITTER_ID, self.exp_id, change_list, '')
 
         # There should still be only two jobs and four mappings in the data
         # store now.

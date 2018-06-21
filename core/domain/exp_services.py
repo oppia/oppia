@@ -1540,7 +1540,7 @@ def delete_demo(exploration_id):
                      'does not exist.' % exploration_id)
     else:
         delete_exploration(
-            constants.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
+            feconf.SYSTEM_COMMITTER_ID, exploration_id, force_deletion=True)
 
 
 def load_demo(exploration_id):
@@ -1564,7 +1564,7 @@ def load_demo(exploration_id):
 
     yaml_content, assets_list = get_demo_exploration_components(exp_filename)
     save_new_exploration_from_yaml_and_assets(
-        constants.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, exploration_id,
         assets_list)
 
     publish_exploration_and_update_user_profiles(

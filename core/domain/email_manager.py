@@ -19,7 +19,6 @@
 import datetime
 import logging
 
-from constants import constants
 from core.domain import config_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
@@ -144,26 +143,26 @@ NOTIFICATION_EMAILS_FOR_FAILED_TASKS = config_domain.ConfigProperty(
 )
 
 SENDER_VALIDATORS = {
-    feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == constants.SYSTEM_COMMITTER_ID),
+    feconf.EMAIL_INTENT_SIGNUP: (lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_UNPUBLISH_EXPLORATION: (
         user_services.is_at_least_moderator),
     feconf.EMAIL_INTENT_DAILY_BATCH: (
-        lambda x: x == constants.SYSTEM_COMMITTER_ID),
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION: (
-        lambda x: x == constants.SYSTEM_COMMITTER_ID),
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION: (
-        lambda x: x == constants.SYSTEM_COMMITTER_ID),
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION: (
-        lambda x: x == constants.SYSTEM_COMMITTER_ID),
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION: (
-        lambda x: x == constants.SYSTEM_COMMITTER_ID),
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION: (
-        lambda x: x == constants.SYSTEM_COMMITTER_ID),
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.EMAIL_INTENT_MARKETING: user_services.is_admin,
     feconf.EMAIL_INTENT_DELETE_EXPLORATION: (
         user_services.is_at_least_moderator),
     feconf.EMAIL_INTENT_REPORT_BAD_CONTENT: (
-        lambda x: x == constants.SYSTEM_COMMITTER_ID),
+        lambda x: x == feconf.SYSTEM_COMMITTER_ID),
     feconf.BULK_EMAIL_INTENT_MARKETING: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_IMPROVE_EXPLORATION: user_services.is_admin,
     feconf.BULK_EMAIL_INTENT_CREATE_EXPLORATION: user_services.is_admin,
@@ -361,7 +360,7 @@ def send_post_signup_email(user_id):
         EMAIL_FOOTER.value)
 
     _send_email(
-        user_id, constants.SYSTEM_COMMITTER_ID, feconf.EMAIL_INTENT_SIGNUP,
+        user_id, feconf.SYSTEM_COMMITTER_ID, feconf.EMAIL_INTENT_SIGNUP,
         email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
 
@@ -518,7 +517,7 @@ def send_role_notification_email(
         exploration_id, EMAIL_FOOTER.value)
 
     _send_email(
-        recipient_id, constants.SYSTEM_COMMITTER_ID,
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION, email_subject, email_body,
         feconf.NOREPLY_EMAIL_ADDRESS,
         sender_name=inviter_user_settings.username)
@@ -570,7 +569,7 @@ def send_emails_to_subscribers(creator_id, exploration_id, exploration_title):
                 username, creator_name, exploration_id,
                 exploration_title, EMAIL_FOOTER.value)
             _send_email(
-                recipient_list[index], constants.SYSTEM_COMMITTER_ID,
+                recipient_list[index], feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUBSCRIPTION_NOTIFICATION,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
@@ -639,7 +638,7 @@ def send_feedback_message_email(recipient_id, feedback_messages):
         EMAIL_FOOTER.value)
 
     _send_email(
-        recipient_id, constants.SYSTEM_COMMITTER_ID,
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION,
         email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
@@ -727,7 +726,7 @@ def send_suggestion_email(
                 exploration_id, exploration_title, exploration_id,
                 EMAIL_FOOTER.value)
             _send_email(
-                recipient_id, constants.SYSTEM_COMMITTER_ID,
+                recipient_id, feconf.SYSTEM_COMMITTER_ID,
                 feconf.EMAIL_INTENT_SUGGESTION_NOTIFICATION,
                 email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
@@ -779,7 +778,7 @@ def send_instant_feedback_message_email(
             exploration_title, sender_settings.username, message,
             EMAIL_FOOTER.value)
         _send_email(
-            recipient_id, constants.SYSTEM_COMMITTER_ID,
+            recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_FEEDBACK_MESSAGE_NOTIFICATION, email_subject,
             email_body, feconf.NOREPLY_EMAIL_ADDRESS, reply_to_id=reply_to_id)
 
@@ -821,7 +820,7 @@ def send_flag_exploration_email(
         feconf.ROLE_ID_MODERATOR)
     for recipient_id in recipient_list:
         _send_email(
-            recipient_id, constants.SYSTEM_COMMITTER_ID,
+            recipient_id, feconf.SYSTEM_COMMITTER_ID,
             feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
             email_subject, email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
@@ -853,7 +852,7 @@ def send_query_completion_email(recipient_id, query_id):
         recipient_user_settings.username, query_id, query_id,
         EMAIL_FOOTER.value)
     _send_email(
-        recipient_id, constants.SYSTEM_COMMITTER_ID,
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION, email_subject,
         email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 
@@ -883,7 +882,7 @@ def send_query_failure_email(recipient_id, query_id, query_params):
     email_body = email_body_template % (
         recipient_user_settings.username, query_id, EMAIL_FOOTER.value)
     _send_email(
-        recipient_id, constants.SYSTEM_COMMITTER_ID,
+        recipient_id, feconf.SYSTEM_COMMITTER_ID,
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION, email_subject,
         email_body, feconf.NOREPLY_EMAIL_ADDRESS)
 

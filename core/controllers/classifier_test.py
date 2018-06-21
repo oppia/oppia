@@ -20,7 +20,6 @@ import datetime
 import json
 import os
 
-from constants import constants
 from core.controllers import classifier
 from core.domain import classifier_services
 from core.domain import exp_services
@@ -48,7 +47,7 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         assets_list = []
         with self.swap(feconf, 'ENABLE_ML_CLASSIFIERS', True):
             exp_services.save_new_exploration_from_yaml_and_assets(
-                constants.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
+                feconf.SYSTEM_COMMITTER_ID, self.yaml_content, self.exp_id,
                 assets_list)
         self.exploration = exp_services.get_exploration_by_id(self.exp_id)
 
