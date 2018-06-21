@@ -370,3 +370,306 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
   };
 }]);
 /* eslint-enable angular/directive-restrict */
+
+// Dynamically generate CKEditor widgets for the rich text components.
+oppia.run([
+  '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService', 'HtmlEscaperService',
+  function($timeout, $compile, $rootScope, $uibModal, RteHelperService, HtmlEscaperService) {
+    var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
+    _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+      // The name of the CKEditor widget corresponding to this component.
+      var ckName = 'oppia' + componentDefn.id;
+
+      // For some reason, frontend tests will error without this check.
+      if (CKEDITOR.plugins.registered[ckName] !== undefined) {
+        return;
+      }
+      var tagName = 'oppia-noninteractive-' + componentDefn.name;
+      var customizationArgSpecs = componentDefn.customizationArgSpecs;
+      var isInline = RteHelperService.isInlineComponent(componentDefn.name);
+      
+      // Inline components will be wrapped in a span, while block components
+      // will be wrapped in a div.
+      if (isInline) {
+        var componentTemplate = '<span type="' + tagName + '">' +
+                                '<' + tagName + '></' + tagName + '>' +
+                                '</span>';
+      } else {
+         var componentTemplate = '<div class="oppia-rte-component-container" ' +
+                                'type="' + tagName + '">' +
+                                '<' + tagName + '></' + tagName + '>' +
+                                '<div class="component-overlay"></div>' +
+                                '</div>';
+      }
+      CKEDITOR.plugins.add(ckName, {
+        init: function(editor) {
+          // Create the widget itself.
+          editor.widgets.add(ckName, {
+            button: componentDefn.tooltip,
+            inline: isInline,
+            template: componentTemplate,
+            edit: function(event) {
+              editor.fire('lockSnapshot', {
+                dontUpdate: true
+              });
+              // Prevent default action since we are using our own edit modal.
+              event.cancel();
+              // Save this for creating the widget later.
+              var container = this.wrapper.getParent(true);
+              var that = this;
+              var customizationArgs = {};
+              customizationArgSpecs.forEach(function(spec) {
+                customizationArgs[spec.name] = that.data[spec.name] ||
+                                               spec.default_value;
+              });
+
+              RteHelperService._openCustomizationModal(
+                customizationArgSpecs,
+                customizationArgs,
+                function(customizationArgsDict) {
+                  for (var arg in customizationArgsDict) {
+                    if (customizationArgsDict.hasOwnProperty(arg)) {
+                      that.setData(arg, customizationArgsDict[arg]);
+                    }
+                  }
+                  if (!that.isReady()) {
+                    // Actually create the widget, if we have not already.
+                    editor.widgets.finalizeCreation(container);
+                  }
+                  // Need to manually $compile so the directive renders.
+                  $compile($(that.element.$).contents())($rootScope);
+                  $timeout(function() {
+                    if (isInline) {
+                      // Move caret after the newly created widget.
+                      var range = editor.createRange();
+                      var widgetContainer = that.element.getParent();
+                      range.moveToPosition(
+                        widgetContainer, CKEDITOR.POSITION_AFTER_END);
+                      editor.getSelection().selectRanges([range]);
+                      $timeout(function() {
+                        editor.fire('unlockSnapshot');
+                        editor.fire('saveSnapshot');
+                      });
+                    } else {
+                      editor.fire('unlockSnapshot');
+                      editor.fire('saveSnapshot');
+                    }
+                  });
+                },
+                function() {},
+                function() {});
+            },
+             downcast: function(element) {
+              element.children[0].setHtml('');
+              return element.children[0];
+            },
+            upcast: function(element) {
+              // This is how the widget is recognized by CKEditor.
+              return (element.name !== 'p' &&
+                      element.children.length > 0 &&
+                      element.children[0].name === tagName);
+            },
+            data: function() {
+              var that = this;
+              // Set attributes of component according to data values.
+              customizationArgSpecs.forEach(function(spec) {
+                that.element.getChild(0).setAttribute(
+                  spec.name + '-with-value',
+                  HtmlEscaperService.objToEscapedJson(
+                    that.data[spec.name] || ''));
+              });
+            },
+            init: function() {
+              editor.fire('lockSnapshot', {
+                dontUpdate: true
+              });
+              var that = this;
+              var isMissingAttributes = false;
+              // On init, read values from component attributes and save them.
+              customizationArgSpecs.forEach(function(spec) {
+                var value = that.element.getChild(0).getAttribute(
+                  spec.name + '-with-value');
+                if (value) {
+                  that.setData(
+                    spec.name, HtmlEscaperService.escapedJsonToObj(value));
+                } else {
+                  isMissingAttributes = true;
+                }
+              });
+
+              if (!isMissingAttributes) {
+                // Need to manually $compile so the directive renders.
+                $compile($(this.element.$).contents())($rootScope);
+              }
+              $timeout(function() {
+                editor.fire('unlockSnapshot');
+                editor.fire('saveSnapshot');
+              });
+            }
+          });
+        }
+      });
+    });
+  }
+]);
+
+oppia.directive('ckEditorRte', [
+  'RteHelperService',
+  function(RteHelperService) {
+    return {
+      restrict: 'E',
+      scope: {
+        uiConfig: '&'
+      },
+      template: '<div><div></div>' +
+                '<div contenteditable="true" class="oppia-rte">' +
+                '</div></div>',
+      require: '?ngModel',
+
+      link: function(scope, el, attr, ngModel) {
+        var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
+        var names = [];
+        var icons = [];
+        _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+          if (!(scope.uiConfig() &&
+                scope.uiConfig().hide_complex_extensions &&
+                componentDefn.isComplex)) {
+            names.push(componentDefn.id);
+            icons.push(componentDefn.iconDataUrl);
+          }
+        });
+
+        // See format of filtering rules here:
+        // http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
+        // Whitelist the component tags with any attributes and classes.
+        var componentRule = names.map(function(name) {
+          return 'oppia-noninteractive-' + name;
+        }).join(' ') + '(*)[*];';
+         // Whitelist the inline component wrapper, which is a
+        // span with a "type" attribute.
+        var inlineWrapperRule = ' span[type];';
+        // Whitelist the block component wrapper, which is a div
+        // with a "type" attribute and a CSS class.
+        var blockWrapperRule = ' div(oppia-rte-component-container)[type];';
+        // Whitelist the transparent block component overlay, which is
+        // a div with a CSS class.
+        var blockOverlayRule = ' div(oppia-rte-component-overlay);';
+        // Put all the rules together.
+        var extraAllowedContentRules = componentRule +
+                                       inlineWrapperRule +
+                                       blockWrapperRule +
+                                       blockOverlayRule;
+ 
+        var pluginNames = names.map(function(name) {
+          return 'oppia' + name;
+        }).join(',');
+        var buttonNames = [];
+        names.forEach(function(name) {
+          buttonNames.push('Oppia' + name);
+          buttonNames.push('-');
+        });
+        buttonNames.pop();
+
+        // Initialize CKEditor.
+         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
+          extraPlugins: 'widget,lineutils,sharedspace,' + pluginNames,
+          startupFocus: true,
+          floatSpaceDockedOffsetY: 15,
+          extraAllowedContent: extraAllowedContentRules,
+          sharedSpaces: {
+            top: el[0].children[0].children[0]
+          },
+          skin: 'bootstrapck,/third_party/static/ckeditor-bootstrapck/',
+          toolbar: [
+            {
+              name: 'history',
+              items: ['Undo', '-', 'Redo']
+            },
+            {
+              name: 'basicstyles',
+              items: ['Bold', '-', 'Italic', '-', 'RemoveFormat']
+            },
+            {
+              name: 'paragraph',
+               items: [
+                'NumberedList', '-',
+                'BulletedList', '-',
+                'Outdent', '-',
+                'Indent'
+              ]
+            },
+            {
+              name: 'rtecomponents',
+              items: buttonNames
+            },
+            {
+              name: 'document',
+              items: ['Source']
+            }
+          ]
+        });
+
+        // A RegExp for matching rich text components.
+        var componentRe = (
+          /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
+        );
+ 
+        // Before data is loaded into CKEditor, we need to wrap every rte
+        // component in a span (inline) or div (block).
+        // For block elements, we add an overlay div as well.
+        var wrapComponents = function(html) {
+          if (html === undefined) {
+            return html;
+          }
+          return html.replace(componentRe, function(match, p1, p2, p3) {
+            if (RteHelperService.isInlineComponent(p3)) {
+              return '<span type="oppia-noninteractive-' + p3 + '">' +
+                    match + '</span>';
+            } else {
+              return '<div type="oppia-noninteractive-' + p3 + '"' +
+                     'class="oppia-rte-component-container">' + match +
+                     '<div class="oppia-rte-component-overlay"></div></div>';
+            }
+          });
+        };
+
+        ck.on('instanceReady', function() {
+          // Set the icons for each toolbar button.
+          names.forEach(function(name, index) {
+            var icon = icons[index];
+            var upperCasedName = name.charAt(0).toUpperCase() + name.slice(1);
+            $('.cke_button__oppia' + name)
+               .css('background-image', 'url("/extensions'+ icon + '")')
+               .css('background-position', 'center')
+               .css('background-repeat', 'no-repeat');
+          });
+          ck.setData(wrapComponents(ngModel.$viewValue));
+        });
+
+        // Angular rendering of components confuses CKEditor's undo system, so
+        // we hide all of that stuff away from CKEditor.
+        ck.on('getSnapshot', function(event) {
+          if (event.data === undefined) {
+            return;
+          }
+          event.data = event.data.replace(componentRe, function(match, p1, p2) {
+            return p1 + '</' + p2 + '>';
+          });
+        }, null, null, 20);
+
+         ck.on('change', function() {
+          ngModel.$setViewValue(ck.getData());
+        });
+
+        ngModel.$render = function() {
+          ck.setData(wrapComponents(ngModel.$viewValue));
+        };
+
+        scope.$on('$destroy', function() {
+          // Clean up CKEditor instance when directive is removed.
+          ck.destroy();
+        });
+      }
+    };
+  }
+]);

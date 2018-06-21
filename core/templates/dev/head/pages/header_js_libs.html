@@ -12,3 +12,14 @@ rendering.-->
 <script src="/third_party/static/jquery-ui-touch-punch-0.3.1/jquery.ui.touch-punch-improved.js"></script>
 <script src="/third_party/static/headroom-js-0.9.4/headroom.min.js"></script>
 <script src="/third_party/static/headroom-js-0.9.4/angular.headroom.min.js"></script>
+<script src="/third_party/static/ckeditor-4.9.1/ckeditor.js"></script>
+
+<script>
+  // Required for custom widgets.
+  CKEDITOR.plugins.addExternal(
+  'widget', '/third_party/static/ckeditor-widget/', 'plugin.js');
+  CKEDITOR.plugins.addExternal(
+  'lineutils', '/third_party/static/ckeditor-lineutils/', 'plugin.js');
+  CKEDITOR.plugins.addExternal(
+  'sharedspace', '/third_party/static/ckeditor-sharedspace/', 'plugin.js');
+</script>

@@ -94,73 +94,6 @@ oppia.config(['$provide', function($provide) {
         });
       };
 
-      // The refocusFn arg is a function that restores focus to the text editor
-      // after exiting the modal, and moves the cursor back to where it was
-      // before the modal was opened.
-      var _openCustomizationModal = function(
-          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
-          onDismissCallback, refocusFn) {
-        $document[0].execCommand('enableObjectResizing', false, false);
-        var modalDialog = $uibModal.open({
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/components/forms/customize_rte_component_modal_directive.html'),
-          backdrop: 'static',
-          resolve: {},
-          controller: [
-            '$scope', '$uibModalInstance', '$timeout',
-            function($scope, $uibModalInstance, $timeout) {
-              $scope.customizationArgSpecs = customizationArgSpecs;
-
-              // Without this code, the focus will remain in the background RTE
-              // even after the modal loads. This switches the focus to a
-              // temporary field in the modal which is then removed from the
-              // DOM.
-              // TODO(sll): Make this switch to the first input field in the
-              // modal instead.
-              $scope.modalIsLoading = true;
-              FocusManagerService.setFocus('tmpFocusPoint');
-              $timeout(function() {
-                $scope.modalIsLoading = false;
-              });
-
-              $scope.tmpCustomizationArgs = [];
-              for (var i = 0; i < customizationArgSpecs.length; i++) {
-                var caName = customizationArgSpecs[i].name;
-                $scope.tmpCustomizationArgs.push({
-                  name: caName,
-                  value: (
-                    attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                      attrsCustomizationArgsDict[caName] :
-                      customizationArgSpecs[i].default_value)
-                });
-              }
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-              };
-
-              $scope.save = function() {
-                $scope.$broadcast('externalSave');
-
-                var customizationArgsDict = {};
-                for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
-                  var caName = $scope.tmpCustomizationArgs[i].name;
-                  customizationArgsDict[caName] = (
-                    $scope.tmpCustomizationArgs[i].value);
-                }
-
-                $uibModalInstance.close(customizationArgsDict);
-              };
-            }
-          ]
-        });
-
-        modalDialog.result.then(onSubmitCallback, onDismissCallback);
-        // 'finally' is a JS keyword. If it is just used in its ".finally" form,
-        // the minification process throws an error.
-        modalDialog.result['finally'](refocusFn);
-      };
-
       RteHelperService.getRichTextComponents().forEach(function(componentDefn) {
         var buttonDisplay = RteHelperService.createToolbarIcon(componentDefn);
         var canUseFs = ExplorationContextService.getPageContext() ===
@@ -203,7 +136,7 @@ oppia.config(['$provide', function($provide) {
 
               // Temporarily pauses sanitizer so rangy markers save position
               textAngular.$editor().$parent.isCustomizationModalOpen = true;
-              _openCustomizationModal(
+              RteHelperService._openCustomizationModal(
                 componentDefn.customizationArgSpecs,
                 RteHelperService.createCustomizationArgDictFromAttrs(
                   $element[0].attributes),
@@ -232,7 +165,7 @@ oppia.config(['$provide', function($provide) {
 
             // Temporarily pauses sanitizer so rangy markers save position.
             textAngular.$editor().$parent.isCustomizationModalOpen = true;
-            _openCustomizationModal(
+            RteHelperService._openCustomizationModal(
               componentDefn.customizationArgSpecs,
               {},
               function(customizationArgsDict) {

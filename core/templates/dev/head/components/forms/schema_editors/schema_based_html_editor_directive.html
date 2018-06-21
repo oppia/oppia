@@ -1,6 +1,6 @@
-<text-angular-rte ng-if="!isDisabled()" html-content="$parent.localValue"
+<ck-editor-rte ng-if="!isDisabled()" ng-model="$parent.localValue"
                   ui-config="uiConfig()" label-for-focus-target="labelForFocusTarget()">
-</text-angular-rte>
+</ck-editor-rte>
 <span ng-if="isDisabled()"
       ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
       ng-bind-html="localValue">

@@ -3683,3 +3683,21 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
   width: 1px;
 }
+
+.oppia-rte-component-container {
+  position: relative;
+}
+
+.oppia-rte-component-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.oppia-rte{
+    outline: 1px solid gray;
+    margin-top: 15px;
+    padding: 8px;
+}
