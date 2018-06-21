@@ -16,6 +16,13 @@
  * @fileoverview Controllers for the creator dashboard.
  */
 
+oppia.constant('CREATOR_DASHBOARD_SECTION_I18N_IDS', {
+  APPROVED: 'I18N_CREATOR_DASHBOARD_APPROVED_SECTION',
+  PENDING: 'I18N_CREATOR_DASHBOARD_PENDING_SECTION',
+  PRIVATE: 'I18N_CREATOR_DASHBOARD_PRIVATE_SECTION',
+  REJECTED: 'I18N_CREATOR_DASHBOARD_REJECTED_SECTION'
+});
+
 oppia.constant('EXPLORATION_DROPDOWN_STATS', {
   OPEN_FEEDBACK: 'open_feedback'
 });
@@ -50,18 +57,20 @@ oppia.controller('CreatorDashboard', [
   '$scope', '$rootScope', '$http', '$window', 'DateTimeFormatService',
   'AlertsService', 'CreatorDashboardBackendApiService',
   'RatingComputationService', 'ExplorationCreationService',
-  'UrlInterpolationService', 'FATAL_ERROR_CODES',
+  'UrlInterpolationService', 'FATAL_ERROR_CODES', 'QuestionCreationService',
   'EXPLORATION_DROPDOWN_STATS', 'EXPLORATIONS_SORT_BY_KEYS',
   'HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS', 'SUBSCRIPTION_SORT_BY_KEYS',
   'HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS',
+  'CREATOR_DASHBOARD_SECTION_I18N_IDS',
   function(
       $scope, $rootScope, $http, $window, DateTimeFormatService,
       AlertsService, CreatorDashboardBackendApiService,
       RatingComputationService, ExplorationCreationService,
-      UrlInterpolationService, FATAL_ERROR_CODES,
+      UrlInterpolationService, FATAL_ERROR_CODES, QuestionCreationService,
       EXPLORATION_DROPDOWN_STATS, EXPLORATIONS_SORT_BY_KEYS,
       HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS, SUBSCRIPTION_SORT_BY_KEYS,
-      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS) {
+      HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS,
+      CREATOR_DASHBOARD_SECTION_I18N_IDS) {
     var EXP_PUBLISH_TEXTS = {
       defaultText: (
         'This exploration is private. Publish it to receive statistics.'),
@@ -69,6 +78,8 @@ oppia.controller('CreatorDashboard', [
     };
 
     $scope.DEFAULT_EMPTY_TITLE = 'Untitled';
+    $scope.CREATOR_DASHBOARD_SECTION_I18N_IDS = (
+      CREATOR_DASHBOARD_SECTION_I18N_IDS);
     $scope.EXPLORATION_DROPDOWN_STATS = EXPLORATION_DROPDOWN_STATS;
     $scope.EXPLORATIONS_SORT_BY_KEYS = EXPLORATIONS_SORT_BY_KEYS;
     $scope.HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS = (
@@ -78,11 +89,25 @@ oppia.controller('CreatorDashboard', [
       HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS);
     $scope.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = (
       GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD);
+    $scope.QUESTION_STATUS = {
+      APPROVED: 'approved',
+      PENDING: 'pending',
+      PRIVATE: 'private',
+      REJECTED: 'rejected',
+      TOTAL_QUESTIONS: {
+        APPROVED: 0,
+        PENDING: 0,
+        PRIVATE: 0,
+        REJECTED: 0
+      }
+    };
 
     $scope.canCreateCollections = GLOBALS.can_create_collections;
     $scope.getAverageRating = RatingComputationService.computeAverageRating;
     $scope.createNewExploration = (
       ExplorationCreationService.createNewExploration);
+    $scope.createNewQuestion = (
+      QuestionCreationService.createNewQuestion);
     $scope.getLocaleAbbreviatedDatetimeString = (
       DateTimeFormatService.getLocaleAbbreviatedDatetimeString);
 
@@ -167,6 +192,10 @@ oppia.controller('CreatorDashboard', [
       return value;
     };
 
+    $scope.setActiveSection = function(newActiveSectionName) {
+      $scope.activeSection = newActiveSectionName;
+    };
+
     $scope.sortByFunction = function(entity) {
       // This function is passed as a custom comparator function to `orderBy`,
       // so that special cases can be handled while sorting explorations.
@@ -203,14 +232,28 @@ oppia.controller('CreatorDashboard', [
         $scope.dashboardStats = responseData.dashboard_stats;
         $scope.lastWeekStats = responseData.last_week_stats;
         $scope.myExplorationsView = responseData.display_preference;
+        $scope.questionsList = responseData.questions_list;
+        $scope.questionsList.forEach(function(question) {
+          $scope.QUESTION_STATUS.TOTAL_QUESTIONS[
+            question.status.toUpperCase()]++;
+        });
         if ($scope.dashboardStats && $scope.lastWeekStats) {
           $scope.relativeChangeInTotalPlays = (
             $scope.dashboardStats.total_plays - $scope.lastWeekStats.total_plays
           );
         }
         if ($scope.explorationsList.length === 0 &&
+          $scope.questionsList.length === 0 &&
           $scope.collectionsList.length > 0) {
           $scope.activeTab = 'myCollections';
+        } else if ($scope.questionsList.length > 0) {
+          $scope.activeTab = 'myQuestions';
+          for (var status in $scope.QUESTION_STATUS.TOTAL_QUESTIONS){
+            if ($scope.QUESTION_STATUS.TOTAL_QUESTIONS[status]) {
+              $scope.setActiveSection(status.toLowerCase());
+              break;
+            }
+          }
         } else {
           $scope.activeTab = 'myExplorations';
         }

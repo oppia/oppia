@@ -1,0 +1,15 @@
+<ul class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak">
+  <li>
+    <span class="oppia-navbar-breadcrumb-separator"></span>
+    <span ng-if="navbarTitle">
+      <[navbarTitle]>
+      <span class="oppia-navbar-breadcrumb-separator" style="margin-left: 5px;"></span>
+      <span>
+        <[getCurrentTabName()]>
+      </span>
+    </span>
+    <span ng-if="navbarTitle === null">
+      Loading...
+    </span>
+  </li>
+</ul>

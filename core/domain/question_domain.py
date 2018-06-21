@@ -18,6 +18,7 @@
 
 from constants import constants
 from core.domain import exp_domain
+from core.domain import user_services
 from core.platform import models
 import feconf
 import utils
@@ -140,38 +141,6 @@ class Question(object):
                 'Expected question_data to be a dict, received %s' %
                 self.question_data)
 
-        at_least_one_correct_answer = False
-        dest_is_specified = False
-        interaction = self.question_data['interaction']
-        for answer_group in interaction['answer_groups']:
-            if answer_group['labelled_as_correct']:
-                at_least_one_correct_answer = True
-            if answer_group['dest'] is not None:
-                dest_is_specified = True
-
-        if interaction['default_outcome']['labelled_as_correct']:
-            at_least_one_correct_answer = True
-
-        if interaction['default_outcome']['dest'] is not None:
-            dest_is_specified = True
-
-        if not at_least_one_correct_answer:
-            raise utils.ValidationError(
-                'Expected at least one answer group to have a correct answer.'
-            )
-
-        if dest_is_specified:
-            raise utils.ValidationError(
-                'Expected all answer groups to have destination as None.'
-            )
-
-        if (len(interaction['hints']) == 0) or (
-                interaction['solution'] is None):
-            raise utils.ValidationError(
-                'Expected the question to have at least one hint and a ' +
-                'solution.'
-            )
-
         question_data = exp_domain.State.from_dict(self.question_data)
         question_data.validate({}, True)
 
@@ -220,7 +189,8 @@ class Question(object):
         """
         return cls(
             question_id, exp_domain.State.create_default_state(
-                feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True),
+                feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
+                ).to_dict(),
             feconf.CURRENT_QUESTION_SCHEMA_VERSION, language_code)
 
     def update_language_code(self, language_code):
@@ -244,15 +214,31 @@ class Question(object):
 class QuestionSummary(object):
     """Domain object for Question Summary.
     """
-    def __init__(self, question_id, question_content):
+    def __init__(
+            self, question_id, creator_id, language_code, status,
+            question_content, question_model_last_updated=None,
+            question_model_created_on=None):
         """Constructs a Question Summary domain object.
 
         Args:
             question_id: str. The ID of the question.
+            creator_id: str. The user ID of the creator of the question.
+            language_code: str. The code that represents the question
+                language.
+            status: str. The status of the question.
+            question_model_last_updated: datetime.datetime. Date and time
+                when the question model was last updated.
+            question_model_created_on: datetime.datetime. Date and time when
+                the question model is created.
             question_content: str. The static HTML of the question shown to
                 the learner.
         """
-        self.question_id = question_id
+        self.id = question_id
+        self.creator_id = creator_id
+        self.language_code = language_code
+        self.status = status
+        self.last_updated = question_model_last_updated
+        self.created_on = question_model_created_on
         self.question_content = question_content
 
     def to_dict(self):
@@ -262,7 +248,12 @@ class QuestionSummary(object):
             dict. A dict representing this QuestionSummary object.
         """
         return {
-            'question_id': self.question_id,
+            'id': self.id,
+            'creator_id': self.creator_id,
+            'language_code': self.language_code,
+            'status': self.status,
+            'last_updated': self.last_updated,
+            'created_on': self.created_on,
             'question_content': self.question_content
         }
 
@@ -296,3 +287,35 @@ class QuestionSkillLink(object):
             'question_id': self.question_id,
             'skill_id': self.skill_id,
         }
+
+
+class QuestionRights(object):
+    """Domain object for question rights."""
+
+    def __init__(self, question_id, manager_ids):
+        self.id = question_id
+        self.manager_ids = manager_ids
+
+    def to_dict(self):
+        """Returns a dict suitable for use by the frontend.
+
+        Returns:
+            dict. A dict version of QuestionRights suitable for use by the
+                frontend.
+        """
+        return {
+            'question_id': self.id,
+            'manager_names': user_services.get_human_readable_user_ids(
+                self.manager_ids)
+        }
+
+    def is_manager(self, user_id):
+        """Checks whether given user is a manager of the question.
+
+        Args:
+            user_id: str or None. Id of the user.
+
+        Returns:
+            bool. Whether user is a question manager of this question.
+        """
+        return bool(user_id in self.manager_ids)
