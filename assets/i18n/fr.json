@@ -104,6 +104,7 @@
 	"I18N_DASHBOARD_TABLE_HEADING_PLAYS": "Exécutions",
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Note",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Réponses non résolues",
+	"I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD": "Tableau de bord des sujets et compérences",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Faire glisser une image dans cette zone",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Téléverser un fichier",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Exploration désactivée",
