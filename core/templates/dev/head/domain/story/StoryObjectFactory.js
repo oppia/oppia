@@ -92,14 +92,14 @@ oppia.factory('StoryObjectFactory', ['StoryContentsObjectFactory',
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // story python dict.
-    Story.createFromBackendDict = function(storyBackendObject) {
+    Story.createFromBackendDict = function(storyBackendDict) {
       return new Story(
-        storyBackendObject.id, storyBackendObject.title,
-        storyBackendObject.description, storyBackendObject.notes,
+        storyBackendDict.id, storyBackendDict.title,
+        storyBackendDict.description, storyBackendDict.notes,
         StoryContentsObjectFactory.createFromBackendDict(
-          storyBackendObject.story_contents),
-        storyBackendObject.language_code,
-        storyBackendObject.version
+          storyBackendDict.story_contents),
+        storyBackendDict.language_code,
+        storyBackendDict.version
       );
     };
 

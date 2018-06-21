@@ -17,12 +17,19 @@
  * story contents domain objects.
  */
 
-oppia.factory('StoryContentsObjectFactory', ['StoryNodeObjectFactory',
-  function(StoryNodeObjectFactory) {
+oppia.factory('StoryContentsObjectFactory', [
+  'StoryNodeObjectFactory', 'NODE_ID_PREFIX',
+  function(StoryNodeObjectFactory, NODE_ID_PREFIX) {
     var StoryContents = function(initialNodeId, nodes, nextNodeId) {
       this._initialNodeId = initialNodeId;
       this._nodes = nodes;
       this._nextNodeId = nextNodeId;
+    };
+
+    var _incrementNodeId = function(nodeId) {
+      var index = parseInt(nodeId.replace(NODE_ID_PREFIX, ''));
+      ++index;
+      return NODE_ID_PREFIX + index;
     };
 
     // Instance methods
@@ -48,7 +55,7 @@ oppia.factory('StoryContentsObjectFactory', ['StoryNodeObjectFactory',
 
     StoryContents.prototype.addNode = function() {
       this._nodes.push(StoryNodeObjectFactory.createFromId(this._nextNodeId));
-      this._nextNodeId = this.incrementNodeId(this._nextNodeId);
+      this._nextNodeId = _incrementNodeId(this._nextNodeId);
     };
 
     StoryContents.prototype.getNodeIndex = function(nodeId) {
@@ -94,7 +101,7 @@ oppia.factory('StoryContentsObjectFactory', ['StoryNodeObjectFactory',
           throw Error('The given exploration already exists in the story.');
         }
       }
-      this._nodes[index].setExplorationId(outline);
+      this._nodes[index].setExplorationId(explorationId);
     };
 
     StoryContents.prototype.markNodeOutlineAsFinalized = function(nodeId) {
@@ -168,12 +175,6 @@ oppia.factory('StoryContentsObjectFactory', ['StoryNodeObjectFactory',
         throw Error('The node with given id doesn\'t exist');
       }
       this._nodes[index].removeDestinationNodeId(destinationNodeId);
-    };
-
-    StoryContents.incrementNodeId = function(nodeId) {
-      var index = parseInt(nodeId.replace('node_', ''));
-      ++index;
-      return 'node_' + index;
     };
 
     // Static class methods. Note that "this" is not available in static

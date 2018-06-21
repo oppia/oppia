@@ -53,15 +53,15 @@ oppia.factory('StoryNodeObjectFactory', [
       this._outline = outline;
     };
 
-    StoryNode.prototype.isOutlineFinalized = function() {
+    StoryNode.prototype.getOutlineStatus = function() {
       return this._outlineIsFinalized;
     };
 
-    StoryNode.prototype.markNodeAsFinalized = function() {
+    StoryNode.prototype.markOutlineAsFinalized = function() {
       this._outlineIsFinalized = true;
     };
 
-    StoryNode.prototype.markNodeAsNotFinalized = function() {
+    StoryNode.prototype.markOutlineAsNotFinalized = function() {
       this._outlineIsFinalized = false;
     };
 

@@ -57,11 +57,6 @@ describe('Story contents object factory', function() {
     expect(_sampleStoryContents.getNodeIndex('node_10')).toEqual(-1);
   });
 
-  it('should correctly increment given node id', function() {
-    expect(
-      StoryContentsObjectFactory.incrementNodeId('node_3')).toEqual('node_4');
-  });
-
   it('should correctly throw error when node id is invalid for any function',
     function() {
       expect(function() {

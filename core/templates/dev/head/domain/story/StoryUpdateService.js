@@ -222,8 +222,95 @@ oppia.factory('StoryUpdateService', [
           story.getStoryContents().deleteNode(nodeId);
         }, function(changeDict, story) {
           // Undo.
-
+          throw Error('A deleted story node cannot be restored.');
         });
+      },
+
+      /**
+       * Marks the node outline of a node as finalized and records the change
+       * in the undo/redo service.
+       */
+      finalizeStoryNodeOutline: function(story, nodeId) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        if (storyNode.getOutlineStatus()) {
+          throw Error('Node outline is already finalized.');
+        }
+        _applyChange(story, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
+          node_id: nodeId,
+          old_value: false,
+          new_value: true
+        }, function(changeDict, story) {
+          // Apply.
+          story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
+        }, function(changeDict, story) {
+          // Undo.
+          story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
+        });
+      },
+
+      /**
+       * Marks the node outline of a node as not finalized and records the
+       * change in the undo/redo service.
+       */
+      unfinalizeStoryNodeOutline: function(story, nodeId) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        if (!storyNode.getOutlineStatus()) {
+          throw Error('Node outline is already not finalized.');
+        }
+        _applyChange(story, CMD_UPDATE_STORY_NODE_OUTLINE_STATUS, {
+          node_id: nodeId,
+          old_value: true,
+          new_value: false
+        }, function(changeDict, story) {
+          // Apply.
+          story.getStoryContents().markNodeOutlineAsNotFinalized(nodeId);
+        }, function(changeDict, story) {
+          // Undo.
+          story.getStoryContents().markNodeOutlineAsFinalized(nodeId);
+        });
+      },
+
+      /**
+       * Sets the outline of a node of the story and records the change
+       * in the undo/redo service.
+       */
+      setStoryNodeOutline: function(story, nodeId, newOutline) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        var oldOutline = storyNode.getOutline();
+
+        _applyStoryNodePropertyChange(
+          story, STORY_NODE_PROPERTY_OUTLINE, nodeId,
+          oldOutline, newOutline,
+          function(changeDict, story) {
+            // Apply.
+            story.getStoryContents().setNodeOutline(nodeId, newOutline);
+          }, function(changeDict, story) {
+            // Undo.
+            story.getStoryContents().setNodeOutline(
+              nodeId, oldOutline);
+          });
+      },
+
+      /**
+       * Sets the id of the exploration that of a node of the story is linked
+       * to and records the change in the undo/redo service.
+       */
+      setStoryNodeExplorationId: function(story, nodeId, newExplorationId) {
+        var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
+        var oldExplorationId = storyNode.getExplorationId();
+
+        _applyStoryNodePropertyChange(
+          story, STORY_NODE_PROPERTY_EXPLORATION_ID, nodeId,
+          oldExplorationId, newExplorationId,
+          function(changeDict, story) {
+            // Apply.
+            story.getStoryContents().setNodeExplorationId(
+              nodeId, newExplorationId);
+          }, function(changeDict, story) {
+            // Undo.
+            story.getStoryContents().setNodeExplorationId(
+              nodeId, oldExplorationId);
+          });
       },
 
       /**
@@ -341,7 +428,7 @@ oppia.factory('StoryUpdateService', [
       addAcquiredSkillIdToNode: function(story, nodeId, skillId) {
         var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
         var oldAcquiredSkillIds = angular.copy(
-          storyNode.getAcquiredSkillIdss());
+          storyNode.getAcquiredSkillIds());
         var newAcquiredSkillIds = angular.copy(oldAcquiredSkillIds);
         newAcquiredSkillIds.push(skillId);
 
@@ -366,7 +453,7 @@ oppia.factory('StoryUpdateService', [
       removeAcquiredSkillIdFromNode: function(story, nodeId, skillId) {
         var storyNode = _getStoryNode(story.getStoryContents(), nodeId);
         var oldAcquiredSkillIds = angular.copy(
-          storyNode.getAcquiredSkillIdss());
+          storyNode.getAcquiredSkillIds());
         var newAcquiredSkillIds = angular.copy(oldAcquiredSkillIds);
         var index = newAcquiredSkillIds.indexOf(skillId);
         if (index === -1) {

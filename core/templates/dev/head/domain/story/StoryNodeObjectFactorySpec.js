@@ -45,7 +45,7 @@ describe('Story node object factory', function() {
     expect(storyNode.getPrerequisiteSkillIds()).toEqual([]);
     expect(storyNode.getAcquiredSkillIds()).toEqual([]);
     expect(storyNode.getOutline()).toEqual('');
-    expect(storyNode.isOutlineFinalized()).toEqual(false);
+    expect(storyNode.getOutlineStatus()).toEqual(false);
     expect(storyNode.getExplorationId()).toEqual(null);
   });
 
