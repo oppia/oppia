@@ -82,14 +82,9 @@ oppia.factory('StateTopAnswersStatsService', [
     };
 
     var onStateRenamed = function(oldStateName, newStateName) {
-      onStateAdded(newStateName);
-      // Swap so onStateDeleted is allowed to assume *anything* in the cache of
-      // oldStateName can be discarded.
-      var emptyStatsCache = stateTopAnswersStatsCache[newStateName];
       stateTopAnswersStatsCache[newStateName] =
         stateTopAnswersStatsCache[oldStateName];
-      stateTopAnswersStatsCache[oldStateName] = emptyStatsCache;
-      onStateDeleted(oldStateName);
+      delete stateTopAnswersStatsCache[oldStateName];
     };
 
     var onStateAnswerGroupsSaved = function(stateName) {
