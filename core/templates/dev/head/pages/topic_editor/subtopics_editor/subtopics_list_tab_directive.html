@@ -1,3 +1,24 @@
+<div class="subtopic-editor">
+  <div class="subtopic-title" ng-show="subtopic">
+    <span ng-if="!subtopicTitleEditorIsShown" ng-click="openSubtopicTitleEditor()"
+          class="oppia-editable-section">
+      <strong style="font-size: 1.2em;"><[subtopic.getTitle()]></strong>
+      <i class="material-icons oppia-editor-edit-icon"
+         title="Edit Subtopic Title">&#xE254;
+      </i>
+    </span>
+    <span ng-if="subtopicTitleEditorIsShown">
+      <form class="form-horizontal" role="form" ng-submit="updateSubtopicTitle(editableTitle)">
+        <input type="text" ng-model="editableTitle">
+        <button type="submit" class="btn btn-success btn-sm">Save</button>
+        <button class="btn btn-default btn-sm" ng-click="closeSubtopicTitleEditor()">Cancel</button>
+      </form>
+    </span>
+  </div>
+  <div ng-show="!subtopic" class="help-text">
+    <h2> Click on a subtopic to show its editor</h2>
+  </div>
+</div>
 <md-card layout="row" class="list-view-item">
   <table class="subtopics-table">
     <colgroup>
@@ -21,10 +42,10 @@
     <tr ng-repeat="subtopic in subtopics"
         class="list-item"
         ng-if="subtopics.length > 0">
-      <td>
+      <td ng-click="setSubtopic(subtopic)">
         <span class="list-summary"> <[subtopic.getTitle()]> </span>
       </td>
-      <td>
+      <td ng-click="setSubtopic(subtopic)">
         <span class="list-summary"> <[subtopic.getSkillIds().length]> </span>
       </td>
       <td>
@@ -37,9 +58,9 @@
 <style>
   subtopics-list-tab .list-view-item {
     background: #fff;
-    margin: 20px 7.5px 0 12.5%;
+    margin: 20px 7.5px 0 50%;
     padding: 10px 20px;
-    width: 75%;
+    width: auto;
   }
 
   subtopics-list-tab .create-subtopic-button {
@@ -48,7 +69,7 @@
 
   subtopics-list-tab .subtopics-table {
     font-size: 15px;
-    width: 100%;
+    width: auto;
   }
 
   subtopics-list-tab .subtopics-table .subtopics-table-headings {
@@ -67,6 +88,15 @@
     display: block;
     height: 2em;
     text-decoration: none;
+  }
+
+  subtopics-list-tab .subtopic-editor {
+    float: left;
+    margin-left: 3%;
+  }
+
+  subtopics-list-tab .subtopic-editor .help-text {
+    margin-top: 50%;
   }
 
   subtopics-list-tab .list-item:not(:last-child) {

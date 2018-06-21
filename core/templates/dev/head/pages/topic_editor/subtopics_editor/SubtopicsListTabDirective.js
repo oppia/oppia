@@ -35,16 +35,33 @@ oppia.directive('subtopicsListTab', [
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.subtopics = $scope.topic.getSubtopics();
+            $scope.subtopic = null;
           };
 
-          $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
-
-          _initEditor();
           $scope.SUBTOPIC_HEADINGS = ['title', 'skills'];
+
+          $scope.setSubtopic = function(subtopic) {
+            $scope.subtopic = subtopic;
+            $scope.editableTitle = $scope.subtopic.getTitle();
+          };
+
+          $scope.openSubtopicTitleEditor = function() {
+            $scope.subtopicTitleEditorIsShown = true;
+          };
+
+          $scope.closeSubtopicTitleEditor = function() {
+            $scope.subtopicTitleEditorIsShown = false;
+          };
 
           $scope.deleteSubtopic = function(subtopicId) {
             TopicUpdateService.deleteSubtopic($scope.topic, subtopicId);
+            _initEditor();
+          };
+
+          $scope.updateSubtopicTitle = function(newTitle) {
+            TopicUpdateService.setSubtopicTitle(
+              $scope.topic, $scope.subtopic.getId(), newTitle);
+            $scope.closeSubtopicTitleEditor();
             _initEditor();
           };
 
@@ -76,6 +93,11 @@ oppia.directive('subtopicsListTab', [
               _initEditor();
             });
           };
+
+          $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
+          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+
+          _initEditor();
         }
       ]
     };
