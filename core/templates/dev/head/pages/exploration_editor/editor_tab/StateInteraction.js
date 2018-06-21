@@ -152,6 +152,11 @@ oppia.controller('StateInteraction', [
       if (EditabilityService.isEditable()) {
         AlertsService.clearWarnings();
 
+        $scope.updatedAnswerGroups = null;
+        $scope.$on('answerGroupsChanged', function (evt, newAnswerGroups) {
+          $scope.updatedAnswerGroups = newAnswerGroups;
+        });
+
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
@@ -376,6 +381,7 @@ oppia.controller('StateInteraction', [
 
       // Special cases for multiple choice input and image click input.
       if ($scope.interactionId === 'MultipleChoiceInput') {
+        $rootScope.$broadcast('updateAnswerGroups', $scope.updatedAnswerGroups);
         $rootScope.$broadcast(
           'updateAnswerChoices',
           currentCustomizationArgs.choices.value.map(function(val, ind) {

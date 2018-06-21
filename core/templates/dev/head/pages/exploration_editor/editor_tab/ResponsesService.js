@@ -356,6 +356,9 @@ oppia.factory('ResponsesService', [
       getConfirmedUnclassifiedAnswers: function() {
         return angular.copy(_confirmedUnclassifiedAnswers);
       },
+      saveAnswerGroups: function(newAnswerGroups) {
+        _saveAnswerGroups(newAnswerGroups);
+      },
       // This registers the change to the handlers in the list of changes, and
       // also updates the states object in ExplorationStatesService.
       save: function(newAnswerGroups, defaultOutcome) {
