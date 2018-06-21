@@ -1560,7 +1560,6 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'issue_schema_version': 1
             }, self.csrf_token)
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
-        print model
         self.assertEqual(len(model.unresolved_issues), 2)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)
         self.assertEqual(len(model.unresolved_issues[1]['playthrough_ids']), 1)
