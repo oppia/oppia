@@ -218,7 +218,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
             })]
             exp_services.update_exploration(
-                constants.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update exploration states from schema version %d to %d.' % (
                     item.states_schema_version,
                     feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION))

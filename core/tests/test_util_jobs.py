@@ -19,13 +19,13 @@ To use these jobs, first need to register them in jobs_registry (at
 the moment they are not displayed there to avoid accidental use).
 """
 
-from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.platform import models
+import feconf
 
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -115,7 +115,7 @@ class ExpCopiesMRJobManager(
             exploration = exp_domain.Exploration.from_untitled_yaml(
                 exp_id, 'Copy', 'Copies', stringified_exp)
             exp_services.save_new_exploration(
-                constants.SYSTEM_COMMITTER_ID, exploration)
+                feconf.SYSTEM_COMMITTER_ID, exploration)
             system_user = user_services.get_system_user()
             rights_manager.publish_exploration(
                 system_user, exp_id)
@@ -180,7 +180,7 @@ class DeleteExpCopiesMRJobManager(
         """
         if item.category == 'Copies':
             exp_services.delete_exploration(
-                constants.SYSTEM_COMMITTER_ID, item.id, force_deletion=True)
+                feconf.SYSTEM_COMMITTER_ID, item.id, force_deletion=True)
 
     @staticmethod
     def reduce(exp_id, list_of_exps):

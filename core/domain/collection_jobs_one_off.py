@@ -18,7 +18,6 @@
 
 import logging
 
-from constants import constants
 from core import jobs
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -76,7 +75,7 @@ class CollectionMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                     feconf.CURRENT_COLLECTION_SCHEMA_VERSION)
             }]
             collection_services.update_collection(
-                constants.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
+                feconf.MIGRATION_BOT_USERNAME, item.id, commit_cmds,
                 'Update collection schema version to %d.' % (
                     feconf.CURRENT_COLLECTION_SCHEMA_VERSION))
             yield (

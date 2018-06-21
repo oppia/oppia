@@ -26,7 +26,6 @@ import time
 import traceback
 import urlparse
 
-from constants import constants
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
@@ -511,7 +510,7 @@ class CsrfTokenManager(object):
 
         # Initialize to random value.
         config_services.set_property(
-            constants.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
+            feconf.SYSTEM_COMMITTER_ID, CSRF_SECRET.name,
             base64.urlsafe_b64encode(os.urandom(20)))
 
     @classmethod

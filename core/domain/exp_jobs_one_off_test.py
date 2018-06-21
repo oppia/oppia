@@ -358,7 +358,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
 
         # Create a commit with the system user id.
         exploration = self.save_new_valid_exploration(
-            self.EXP_ID, constants.SYSTEM_COMMITTER_ID, title='Original Title')
+            self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
         # Run the job to compute the contributor ids.
         job_id = (
             exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
@@ -369,7 +369,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertNotIn(
-            constants.SYSTEM_COMMITTER_ID,
+            feconf.SYSTEM_COMMITTER_ID,
             exploration_summary.contributor_ids)
 
         # Create a commit with the migration bot user id.
@@ -377,7 +377,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID, strict=True, version=None)
         exploration_model.title = 'New title'
         exploration_model.commit(
-            constants.MIGRATION_BOT_USERNAME, 'Changed title.', [])
+            feconf.MIGRATION_BOT_USERNAME, 'Changed title.', [])
         # Run the job to compute the contributor ids.
         job_id = (
             exp_jobs_one_off.ExpSummariesContributorsOneOffJob.create_new())
@@ -388,7 +388,7 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertNotIn(
-            constants.MIGRATION_BOT_USERNAME,
+            feconf.MIGRATION_BOT_USERNAME,
             exploration_summary.contributor_ids)
 
 
@@ -532,7 +532,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
 
         # Create a commit with the system user id.
         exploration = self.save_new_valid_exploration(
-            self.EXP_ID, constants.SYSTEM_COMMITTER_ID, title='Original Title')
+            self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
 
         # Create commits with all the system user ids.
         for system_id in constants.SYSTEM_USER_IDS:

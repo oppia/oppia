@@ -446,9 +446,6 @@ var constants = {
   "ACTIVITY_STATUS_PRIVATE": "private",
   "ACTIVITY_STATUS_PUBLIC": "public",
 
-  "//": "Committer id for system actions.",
-  "SYSTEM_COMMITTER_ID": "admin",
-  "MIGRATION_BOT_USERNAME": "OppiaMigrationBot",
   "SYSTEM_USER_IDS": ["admin", "OppiaMigrationBot"],
 
   "//": [

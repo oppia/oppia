@@ -1127,7 +1127,7 @@ def delete_demo(collection_id):
                      'does not exist.' % collection_id)
     else:
         delete_collection(
-            constants.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)
+            feconf.SYSTEM_COMMITTER_ID, collection_id, force_deletion=True)
 
 
 def load_demo(collection_id):
@@ -1154,7 +1154,7 @@ def load_demo(collection_id):
         raise Exception('Unrecognized file path: %s' % demo_filepath)
 
     collection = save_new_collection_from_yaml(
-        constants.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
+        feconf.SYSTEM_COMMITTER_ID, yaml_content, collection_id)
 
     system_user = user_services.get_system_user()
     publish_collection_and_update_user_profiles(system_user, collection_id)

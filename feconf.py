@@ -307,6 +307,9 @@ MAILGUN_API_KEY = None
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
+
+# Committer id for system actions.
+SYSTEM_COMMITTER_ID = 'admin'
 # Domain name for email address.
 INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
@@ -425,10 +428,11 @@ MAX_AUDIO_FILE_LENGTH_SEC = 300
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
-# User id for exploration migration bot. Commits made by this bot
+# User id and username for exploration migration bot. Commits made by this bot
 # are not reflected in the exploration summary models, but are recorded in the
 # exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
+MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
