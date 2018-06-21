@@ -218,18 +218,18 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     for root in os.listdir(base_path):
         if any([s in root for s in ['.git', 'third_party', 'core/tests']]):
             continue
-        if root.endswith('question_test.py'):
+        if root.endswith('question_editor_test.py'):
             result.append(_convert_to_test_target(
                 os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
             if _LOAD_TESTS_DIR in subroot and include_load_tests:
                 for f in files:
-                    if f.endswith('question_test.py'):
+                    if f.endswith('question_editor_test.py'):
                         result.append(_convert_to_test_target(
                             os.path.join(subroot, f)))
 
             for f in files:
-                if (f.endswith('question_test.py') and
+                if (f.endswith('question_editor_test.py') and
                         os.path.join('core', 'tests') not in subroot):
                     result.append(_convert_to_test_target(
                         os.path.join(subroot, f)))

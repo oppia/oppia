@@ -141,20 +141,6 @@ class Question(object):
                 'Expected question_data to be a dict, received %s' %
                 self.question_data)
 
-        dest_is_specified = False
-        interaction = self.question_data['interaction']
-        for answer_group in interaction['answer_groups']:
-            if answer_group['dest'] is not None:
-                dest_is_specified = True
-
-        if interaction['default_outcome']['dest'] is not None:
-            dest_is_specified = True
-
-        if dest_is_specified:
-            raise utils.ValidationError(
-                'Expected all answer groups to have destination as None.'
-            )
-
         question_data = exp_domain.State.from_dict(self.question_data)
         question_data.validate({}, True)
 

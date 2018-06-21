@@ -23,6 +23,7 @@ from core.domain import question_services
 from core.domain import role_services
 from core.domain import user_services
 import feconf
+import json
 import utils
 
 
@@ -193,3 +194,52 @@ class QuestionPublishHandler(base.BaseHandler):
             raise self.UnauthorizedUserException(e)
 
         self.render_json(self.values)
+
+
+class QuestionsHandler(base.BaseHandler):
+    """This handler completes PUT/DELETE requests for questions."""
+
+    @acl_decorators.can_access_moderator_page
+    def put(self, question_id):
+        """Handles PUT requests."""
+        commit_message = self.payload.get('commit_message')
+        if not question_id:
+            raise self.PageNotFoundException
+        if not commit_message:
+            raise self.PageNotFoundException
+        if not self.payload.get('change_list'):
+            raise self.PageNotFoundException
+        change_list = [
+            question_domain.QuestionChange(change)
+            for change in json.loads(self.payload.get('change_list'))]
+        question_services.update_question(
+            self.user_id, question_id, change_list,
+            commit_message)
+        return self.render_json({
+            'question_id': question_id
+        })
+
+    @acl_decorators.can_access_moderator_page
+    def delete(self, question_id):
+        """Handles Delete requests."""
+        if not question_id:
+            raise self.PageNotFoundException
+        question_services.delete_question(
+            self.user_id, question_id)
+
+
+class QuestionCreationHandler(base.BaseHandler):
+    """This handler completes POST requests for questions."""
+
+    @acl_decorators.can_access_moderator_page
+    def post(self):
+        """Handles POST requests."""
+        if not self.payload.get('question'):
+            raise self.PageNotFoundException
+        question = question_domain.Question.from_dict(
+            self.payload.get('question'))
+        question_id = question_services.add_question(
+            self.user_id, question)
+        return self.render_json({
+            'question_id': question_id
+        })
