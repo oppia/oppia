@@ -49,7 +49,7 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
 
         $scope.allowedChoices = function() {
           var allowedList = [];
-          for (var i = 1; i <= math.max($scope.prevIndices) + 1; i++) {
+          for (var i = 1; i <= $scope.maxPrevIndex + 1; i++) {
             allowedList.push(i);
           }
           return allowedList;
@@ -70,18 +70,24 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
             if (choiceHtmlIndex > -1) {
               if (i !== selectedRank) {
                 $scope.value[i].splice(choiceHtmlIndex, 1);
-                $scope.value[selectedRank].push(choiceHtml);
+                if ($scope.value[selectedRank] === undefined) {
+                  $scope.value[selectedRank] = [choiceHtml];
+                } else {
+                  $scope.value[selectedRank].push(choiceHtml);
+                }
+
                 if ($scope.value[i] === []) {
                   // Continuity error.
-                  errorMessage = ('Rank ' + String(i + 1) + ' is missing. ' +
-                    'Please enter positions of the items in continuous order.');
+                  errorMessage = ('No item(s) is assigned at position ' +
+                    String(i + 1) + '. Please assign some item at this ' +
+                    'position.');
                 }
                 choiceHtmlHasBeenAdded = true;
                 break;
               }
             }
           }
-          if (choiceHtmlHasBeenAdded === false) {
+          if (!choiceHtmlHasBeenAdded) {
             if ($scope.value[selectedRank] === undefined) {
               $scope.value[selectedRank] = [choiceHtml];
             } else {
