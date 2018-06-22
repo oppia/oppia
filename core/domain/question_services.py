@@ -19,10 +19,13 @@
 import logging
 
 from core.domain import question_domain
+from core.domain import role_services
+from core.domain import user_services
 from core.platform import models
 import feconf
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
+(question_models, skill_models) = models.Registry.import_models(
+    [models.NAMES.question, models.NAMES.skill])
 
 CMD_CREATE_NEW = 'create_new'
 
@@ -38,13 +41,19 @@ def _create_new_question(committer_id, question, commit_message):
     Returns:
         str. The ID of the model.
     """
-    model = question_models.QuestionModel.create(
+    question.validate()
+    create_new_question_rights(question.question_id, committer_id)
+    model = question_models.QuestionModel(
+        id=question.question_id,
         question_data=question.question_data,
         question_data_schema_version=question.question_data_schema_version,
         language_code=question.language_code,
     )
 
     model.commit(committer_id, commit_message, [{'cmd': CMD_CREATE_NEW}])
+
+    create_question_summary(
+        model.id, committer_id, feconf.ACTIVITY_STATUS_PRIVATE)
     return model.id
 
 
@@ -58,7 +67,6 @@ def add_question(committer_id, question):
     Returns:
         str. The ID of the question.
     """
-    question.validate()
     commit_message = 'New question created'
     question_id = _create_new_question(committer_id, question, commit_message)
 
@@ -100,17 +108,20 @@ def get_question_from_model(question_model):
         question_model.language_code)
 
 
-def get_question_by_id(question_id):
+def get_question_by_id(question_id, strict=True):
     """Returns a domain object representing a question.
 
     Args:
         question_id: str. ID of the question.
+        strict: bool. Whether to fail noisily if no question with the given
+            id exists in the datastore.
 
     Returns:
         Question or None. The domain object representing a question with the
         given id, or None if it does not exist.
     """
-    question_model = question_models.QuestionModel.get(question_id)
+    question_model = question_models.QuestionModel.get(
+        question_id, strict=strict)
     if question_model:
         question = get_question_from_model(question_model)
         return question
@@ -217,3 +228,265 @@ def update_question(
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)
+
+
+def get_new_question_id():
+    """Returns a new question id.
+
+    Returns:
+        str. A new question id.
+    """
+    return question_models.QuestionModel.get_new_id('')
+
+
+def create_question_summary(
+        question_id, creator_id, status):
+    """Creates and stores a summary of the given question.
+
+    Args:
+        question_id: str. ID of the question.
+        creator_id: str. The user ID of the creator of the question.
+        status: str. The status of the question.
+    """
+    question = get_question_by_id(question_id).to_dict()
+    question.update({'creator_id': creator_id})
+    question.update({'status': status})
+    question_summary = compute_summary_of_question(question)
+    save_question_summary(question_summary)
+
+
+def compute_summary_of_question(question):
+    """Create a QuestionSummary domain object for a given Question domain
+    object and return it.
+
+    Args:
+        question: Question. The question object for which the summary
+            is to be computed.
+
+    Returns:
+        QuestionSummary. The computed summary for the given question.
+    """
+    question_summary = question_domain.QuestionSummary(
+        question['question_id'], question['creator_id'],
+        question['language_code'], question['status'],
+        question['question_data']
+    )
+
+    return question_summary
+
+
+def save_question_summary(question_summary):
+    """Save a question summary domain object as a QuestionSummaryModel
+    entity in the datastore.
+
+    Args:
+        question_summary: The question summary object to be saved in the
+            datastore.
+    """
+    question_summary_model = question_models.QuestionSummaryModel(
+        id=question_summary.id,
+        creator_id=question_summary.creator_id,
+        language_code=question_summary.language_code,
+        status=question_summary.status,
+        question_model_last_updated=question_summary.last_updated,
+        question_model_created_on=question_summary.created_on,
+        question_data=question_summary.question_data
+    )
+
+    question_summary_model.put()
+
+
+def get_question_summaries_by_creator_id(creator_id):
+    """Gets question summaries of questions created by the user.
+
+    Args:
+        creator_id: str. The user ID of the creator.
+
+    Returns:
+        QuestionSummaryModel. The QuestionSummaryModel for the given question.
+    """
+    return question_models.QuestionSummaryModel.get_by_creator_id(creator_id)
+
+
+def get_skill_summaries_of_linked_skills(question_id):
+    """Gets linked skill IDs for given question.
+
+    Args:
+        question_id: str. The question ID for the given question.
+
+    Returns:
+        QuestionSkillLinkModel. The QuestionSkillModel for the given question.
+    """
+    linked_skill_summaries = []
+    question_skill_links = question_models.QuestionSkillLinkModel.get(
+        question_id, strict=False)
+
+    if question_skill_links is None:
+        return None
+    for question_skill_link in question_skill_links:
+        linked_skill_summaries = (
+            skill_models.SkillSummaryModel.get(
+                question_skill_link.skill_id, strict=False))
+
+    return linked_skill_summaries
+
+
+def get_question_rights_from_model(question_rights_model):
+    """Constructs a QuestionRights object from the given question rights model.
+
+    Args:
+        question_rights_model: QuestionRightsModel. Question rights from the
+            datastore.
+
+    Returns:
+        QuestionRights. The rights object created from the model.
+    """
+
+    return question_domain.QuestionRights(
+        question_rights_model.id,
+        question_rights_model.manager_ids
+    )
+
+
+def save_question_rights(
+        question_rights, committer_id, commit_message, commit_cmds):
+    """Saves a QuestionRights domain object to the datastore.
+
+    Args:
+        question_rights: QuestionRights. The rights object for the given
+            question.
+        committer_id: str. ID of the committer.
+        commit_message: str. Descriptive message for the commit.
+        commit_cmds: list(dict). A list of commands describing what kind of
+            commit was done.
+    """
+
+    model = question_models.QuestionRightsModel.get(
+        question_rights.id, strict=False)
+
+    model.manager_ids = question_rights.manager_ids
+
+    model.commit(committer_id, commit_message, commit_cmds)
+
+
+def create_new_question_rights(question_id, committer_id):
+    """Creates a new question rights object and saves it to the datastore.
+
+    Args:
+        question_id: str. ID of the question.
+        committer_id: str. ID of the committer.
+    """
+    question_rights = question_domain.QuestionRights(question_id, [])
+    commit_cmds = [{'cmd': CMD_CREATE_NEW}]
+
+    question_models.QuestionRightsModel(
+        id=question_rights.id,
+        manager_ids=question_rights.manager_ids
+    ).commit(committer_id, 'Created new question rights', commit_cmds)
+
+
+def get_question_rights(question_id, strict=True):
+    """Retrieves the rights object for the given question.
+
+    Args:
+        question_id: str. ID of the question.
+        strict: bool. Whether to fail noisily if no question with a given id
+            exists in the datastore.
+
+    Returns:
+        QuestionRights. The rights object associated with the given question.
+
+    Raises:
+        EntityNotFoundError. The question with ID question_id was not
+            found in the datastore.
+    """
+
+    model = question_models.QuestionRightsModel.get(question_id, strict=strict)
+
+    if model is None:
+        return None
+
+    return get_question_rights_from_model(model)
+
+
+def check_can_edit_question(user, question_rights):
+    """Checks whether the user can edit the given question.
+
+    Args:
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        question_rights: QuestionRights or None. Rights object for the
+            given question.
+
+    Returns:
+        bool. Whether the given user can edit the given question.
+    """
+    if question_rights is None:
+        return False
+    if role_services.ACTION_EDIT_ANY_QUESTION in user.actions:
+        return True
+
+    return False
+
+
+def assign_role(committer, assignee, new_role, question_id):
+    """Assigns a new role to the user.
+
+    Args:
+        committer: UserActionsInfo. UserActionsInfo object for the user
+            who is performing the action.
+        assignee: UserActionsInfo. UserActionsInfo object for the user
+            whose role is being changed.
+        new_role: str. The name of the new role. Possible values are:
+            ROLE_MANAGER
+        question_id: str. ID of the question.
+
+    Raises:
+        Exception. The committer does not have rights to modify a role.
+        Exception. The assignee is already a manager for the question.
+        Exception. The assignee doesn't have enough rights to become a manager.
+        Exception. The role is invalid.
+    """
+    committer_id = committer.user_id
+    question_rights = get_question_rights(question_id)
+    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
+            committer.actions):
+        logging.error(
+            'User %s tried to allow user %s to be a %s of question %s '
+            'but was refused permission.' % (
+                committer_id, assignee.user_id, new_role, question_id))
+        raise Exception(
+            'UnauthorizedUserException: Could not assign new role.')
+
+    assignee_username = user_services.get_username(assignee.user_id)
+    if role_services.ACTION_EDIT_OWNED_QUESTION not in assignee.actions:
+        raise Exception(
+            'The assignee doesn\'t have enough rights to become a manager.')
+
+    old_role = question_domain.ROLE_NONE
+    if question_rights.is_manager(assignee.user_id):
+        old_role = question_domain.ROLE_MANAGER
+
+    if new_role == question_domain.ROLE_MANAGER:
+        if question_rights.is_manager(assignee.user_id):
+            raise Exception('This user already is a manager for this question')
+        question_rights.manager_ids.append(assignee.user_id)
+    elif new_role == question_domain.ROLE_NONE:
+        if question_rights.is_manager(assignee.user_id):
+            question_rights.manager_ids.remove(assignee.user_id)
+        else:
+            old_role = question_domain.ROLE_NONE
+    else:
+        raise Exception('Invalid role: %s' % new_role)
+
+    commit_message = 'Changed role of %s from %s to %s' % (
+        assignee_username, old_role, new_role)
+    commit_cmds = [question_domain.QuestionRightsChange({
+        'cmd': question_domain.CMD_CHANGE_ROLE,
+        'assignee_id': assignee.user_id,
+        'old_role': old_role,
+        'new_role': new_role
+    }).to_dict()]
+
+    save_question_rights(
+        question_rights, committer_id, commit_message, commit_cmds)
