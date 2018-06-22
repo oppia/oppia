@@ -20,25 +20,32 @@
 
 oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
 oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
+oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
 
 oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService', 'TopicObjectFactory',
-  'TopicRightsObjectFactory', 'TopicRightsBackendApiService',
-  'UndoRedoService', 'EditableTopicBackendApiService',
-  'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-  function(
+  'TopicRightsObjectFactory', 'SubtopicPageObjectFactory',
+  'TopicRightsBackendApiService', 'UndoRedoService',
+  'EditableTopicBackendApiService', 'EVENT_TOPIC_INITIALIZED',
+  'EVENT_TOPIC_REINITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED', function(
       $rootScope, AlertsService, TopicObjectFactory,
-      TopicRightsObjectFactory, TopicRightsBackendApiService,
-      UndoRedoService, EditableTopicBackendApiService,
-      EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+      TopicRightsObjectFactory, SubtopicPageObjectFactory,
+      TopicRightsBackendApiService, UndoRedoService,
+      EditableTopicBackendApiService, EVENT_TOPIC_INITIALIZED,
+      EVENT_TOPIC_REINITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
+    var _subtopicPages = [];
+    var _subtopicPage =
+      SubtopicPageObjectFactory.createInterstitialSubtopicPage();
     var _topicIsInitialized = false;
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
 
     var _setTopic = function(topic) {
       _topic.copyFromTopic(topic);
+      // Reset the subtopic pages list after setting new topic.
+      _subtopicPages.length = 0;
       if (_topicIsInitialized) {
         $rootScope.$broadcast(EVENT_TOPIC_REINITIALIZED);
       } else {
@@ -46,8 +53,25 @@ oppia.factory('TopicEditorStateService', [
         _topicIsInitialized = true;
       }
     };
+    var _getSubtopicPageIndex = function(subtopicPageId) {
+      for (var i = 0; i < _subtopicPages.length; i++) {
+        if (_subtopicPages[i].getId() === subtopicPageId) {
+          return i;
+        }
+      }
+      return -1;
+    };
     var _updateTopic = function(newBackendTopicObject) {
       _setTopic(TopicObjectFactory.create(newBackendTopicObject));
+    };
+    var _setSubtopicPage = function(subtopicPage) {
+      _subtopicPage.copyFromSubtopicPage(subtopicPage);
+      _subtopicPages.push(angular.copy(subtopicPage));
+      $rootScope.$broadcast(EVENT_SUBTOPIC_PAGE_LOADED);
+    };
+    var _updateSubtopicPage = function(newBackendSubtopicPageObject) {
+      _setSubtopicPage(SubtopicPageObjectFactory.createFromBackendDict(
+        newBackendSubtopicPageObject));
     };
     var _setTopicRights = function(topicRights) {
       _topicRights.copyFromTopicRights(topicRights);
@@ -88,6 +112,35 @@ oppia.factory('TopicEditorStateService', [
       },
 
       /**
+       * Loads, or reloads, the subtopic page stored by this service given a
+       * specified topic ID and subtopic ID.
+       */
+      loadSubtopicPage: function(topicId, subtopicId) {
+        var subtopicPageId = topicId + '-' + subtopicId;
+        if (_getSubtopicPageIndex(subtopicPageId) !== -1) {
+          _subtopicPage = angular.copy(
+            _subtopicPages[_getSubtopicPageIndex(subtopicPageId)]);
+          $rootScope.$broadcast(EVENT_SUBTOPIC_PAGE_LOADED);
+          return;
+        }
+        EditableTopicBackendApiService.fetchSubtopicPage(
+          topicId, subtopicId).then(
+          function(newBackendSubtopicPageObject) {
+            if (newBackendSubtopicPageObject === null) {
+              _setSubtopicPage(
+                SubtopicPageObjectFactory.createFromTopicAndSubtopicId(
+                  topicId, subtopicId));
+            } else {
+              _updateSubtopicPage(newBackendSubtopicPageObject);
+            }
+          },
+          function(error) {
+            AlertsService.addWarning(
+              error || 'There was an error when loading the topic.');
+          });
+      },
+
+      /**
        * Returns whether this service is currently attempting to load the
        * topic maintained by this service.
        */
@@ -116,6 +169,18 @@ oppia.factory('TopicEditorStateService', [
       },
 
       /**
+       * Returns the current subtopic page to be shared among the topic
+       * editor. Please note any changes to this subtopic page will be
+       * propogated to all bindings to it. This subtopic page object will be
+       * retained for the lifetime of the editor. This function never returns
+       * null, though it may return an empty subtopic page object if the topic
+       * has not yet been loaded for this editor instance.
+       */
+      getSubtopicPage: function() {
+        return _subtopicPage;
+      },
+
+      /**
        * Returns the current topic rights to be shared among the topic
        * editor. Please note any changes to this topic rights will be
        * propogated to all bindings to it. This topic rights object will
@@ -137,6 +202,19 @@ oppia.factory('TopicEditorStateService', [
        */
       setTopic: function(topic) {
         _setTopic(topic);
+      },
+
+      /**
+       * Sets the updated subtopic page object in the correct position in the
+       * _subtopicPages list.
+       */
+      setSubtopicPage: function(subtopicPage) {
+        if (_getSubtopicPageIndex(subtopicPage.getId()) !== -1) {
+          _subtopicPages[_getSubtopicPageIndex(subtopicPage.getId())] =
+            angular.copy(subtopicPage);
+        } else {
+          _setSubtopicPage(subtopicPage);
+        }
       },
 
       /**

@@ -18,9 +18,9 @@
 
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
-  'UrlInterpolationService',
+  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($http, $q, EDITABLE_TOPIC_DATA_URL_TEMPLATE,
-      UrlInterpolationService) {
+      SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -30,6 +30,26 @@ oppia.factory('EditableTopicBackendApiService', [
 
       $http.get(topicDataUrl).then(function(response) {
         var topic = angular.copy(response.data.topic);
+        if (successCallback) {
+          successCallback(topic);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchSubtopicPage = function(
+        topicId, subtopicId, successCallback, errorCallback) {
+      var subtopicPageDataUrl = UrlInterpolationService.interpolateUrl(
+        SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
+          topic_id: topicId,
+          subtopic_id: subtopicId.toString()
+        });
+
+      $http.get(subtopicPageDataUrl).then(function(response) {
+        var topic = angular.copy(response.data.subtopic_page);
         if (successCallback) {
           successCallback(topic);
         }
@@ -88,6 +108,12 @@ oppia.factory('EditableTopicBackendApiService', [
       fetchTopic: function(topicId) {
         return $q(function(resolve, reject) {
           _fetchTopic(topicId, resolve, reject);
+        });
+      },
+
+      fetchSubtopicPage: function(topicId, subtopicId) {
+        return $q(function(resolve, reject) {
+          _fetchSubtopicPage(topicId, subtopicId, resolve, reject);
         });
       },
 
