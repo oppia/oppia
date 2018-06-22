@@ -15,20 +15,15 @@
 // This directive is always editable.
 
 oppia.directive('musicPhraseEditor', [
-  '$compile', 'OBJECT_EDITOR_URL_PREFIX', 'AlertsService',
-  function($compile, OBJECT_EDITOR_URL_PREFIX, AlertsService) {
+  'UrlInterpolationService', 'AlertsService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, AlertsService, OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'MusicPhrase';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         value: '='
       },
-      template: '<div ng-include="getTemplateUrl()"></div>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/music_phrase_editor_directive.html'),
       controller: ['$scope', function($scope) {
         // The maximum number of notes allowed in a music phrase.
         var _MAX_NOTES_IN_PHRASE = 8;

@@ -16,14 +16,18 @@
  * @fileoverview Service to fetch statistics about an exploration's states.
  */
 
+oppia.constant(
+  'STATE_ANSWER_STATS_URL',
+  '/createhandler/state_answer_stats/<exploration_id>');
+
 oppia.factory('StateTopAnswersStatsBackendApiService', [
-  '$http', 'UrlInterpolationService', function($http, UrlInterpolationService) {
+  '$http', 'UrlInterpolationService', 'STATE_ANSWER_STATS_URL',
+  function($http, UrlInterpolationService, STATE_ANSWER_STATS_URL) {
     return {
       fetchStats: function(explorationId) {
         return $http.get(
           UrlInterpolationService.interpolateUrl(
-            '/createhandler/state_answer_stats/<exploration_id>',
-            {exploration_id: explorationId})
+            STATE_ANSWER_STATS_URL, {exploration_id: explorationId})
         ).then(function(response) {
           return response.data;
         });
