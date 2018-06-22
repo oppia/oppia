@@ -31,16 +31,30 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         """Before each individual test, create dummy user."""
         super(QuestionServicesUnitTest, self).setUp()
 
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        user_services.create_new_user(self.owner_id, self.OWNER_EMAIL)
+        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
         self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+
+        self.user_a = user_services.UserActionsInfo(self.user_id_a)
+        self.user_b = user_services.UserActionsInfo(self.user_id_b)
+        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
 
     def test_get_question_by_id(self):
         question = question_domain.Question(
             'dummy', self._create_valid_question_data('ABC'), 1, 'en')
 
         question_id = question_services.add_question(self.owner_id, question)
-        question = question_services.get_question_by_id(question_id)
+        question = question_services.get_question_by_id(
+            question_id, strict=False)
 
         self.assertEqual(question.question_id, question_id)
 
@@ -118,3 +132,68 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(
             model.question_data_schema_version, question_data_schema_version)
         self.assertEqual(model.language_code, language_code)
+
+    def test_compute_summary_of_question(self):
+        question_data = self._create_valid_question_data('ABC')
+        question_id = 'dummy'
+        question_data_schema_version = 1
+        language_code = 'en'
+        status = 'private'
+        question = question_domain.Question(
+            question_id, question_data, question_data_schema_version,
+            language_code).to_dict()
+
+        question.update({'creator_id': self.owner_id})
+        question.update({'status': status})
+        question_summary = question_services.compute_summary_of_question(
+            question).to_dict()
+
+        self.assertEqual(question_summary['id'], 'dummy')
+        self.assertEqual(
+            question_summary['question_data'],
+            self._create_valid_question_data('ABC'))
+        self.assertEqual(question_summary['language_code'], 'en')
+        self.assertEqual(question_summary['status'], 'private')
+
+    def test_get_question_summaries_by_creator_id(self):
+        question = question_domain.Question(
+            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
+
+        question_services.add_question(self.owner_id, question)
+        question_summary = (
+            question_services.get_question_summaries_by_creator_id(
+                self.owner_id))
+
+        self.assertEqual(question_summary[0].id, 'dummy')
+        self.assertEqual(
+            question_summary[0].question_data,
+            self._create_valid_question_data('ABC'))
+        self.assertEqual(question_summary[0].language_code, 'en')
+        self.assertEqual(question_summary[0].status, 'private')
+
+    def test_admin_can_manage_question(self):
+        question = question_domain.Question(
+            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
+
+        question_id = question_services.add_question(self.owner_id, question)
+        question_rights = question_services.get_question_rights(question_id)
+
+        self.assertTrue(question_services.check_can_edit_question(
+            self.user_admin, question_rights))
+
+    def test_create_new_question_rights(self):
+        question = question_domain.Question(
+            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
+
+        question_id = question_services.add_question(self.owner_id, question)
+
+        question_services.assign_role(
+            self.user_admin, self.user_a,
+            question_domain.ROLE_MANAGER, question_id)
+
+        question_rights = question_services.get_question_rights(question_id)
+
+        self.assertTrue(question_services.check_can_edit_question(
+            self.user_a, question_rights))
+        self.assertFalse(question_services.check_can_edit_question(
+            self.user_b, question_rights))
