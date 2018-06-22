@@ -79,7 +79,8 @@ oppia.factory('TopicUpdateService', [
       _applyChange(topic, CMD_UPDATE_TOPIC_PROPERTY, {
         property_name: propertyName,
         new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
+        old_value: angular.copy(oldValue),
+        change_affects_subtopic_page: false
       }, apply, reverse);
     };
 
@@ -89,7 +90,8 @@ oppia.factory('TopicUpdateService', [
         subtopic_id: subtopicId,
         property_name: propertyName,
         new_value: angular.copy(newValue),
-        old_value: angular.copy(oldValue)
+        old_value: angular.copy(oldValue),
+        change_affects_subtopic_page: false
       }, apply, reverse);
     };
 
@@ -174,7 +176,8 @@ oppia.factory('TopicUpdateService', [
         var nextSubtopicId = topic.getNextSubtopicId();
         _applyChange(topic, CMD_ADD_SUBTOPIC, {
           subtopic_id: nextSubtopicId,
-          title: title
+          title: title,
+          change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
           topic.addSubtopic(title);
@@ -188,30 +191,64 @@ oppia.factory('TopicUpdateService', [
       /**
        * @param {Topic} topic - The topic object to be edited.
        * @param {number} subtopicId - The id of the subtopic to delete.
-       * @param {boolean} isNewlyCreated - Whether the subtopic to delete was
-       *    created in the current draft of the topic. (i.e, the subtopic to
-       *    delete hasn't been saved in the datastore yet.)
        */
-      deleteSubtopic: function(topic, subtopicId, isNewlyCreated) {
+      deleteSubtopic: function(topic, subtopicId) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
           throw Error('Subtopic doesn\'t exist');
         }
         var title = subtopic.getTitle();
         var skillIds = subtopic.getSkillIds();
+        var newlyCreated = false;
+        var changeList = UndoRedoService.getCommittableChangeList();
+        for (var i = 0; i < changeList.length; i++) {
+          if (changeList[i].cmd === 'add_subtopic' &&
+              changeList[i].subtopic_id === subtopicId) {
+            newlyCreated = true;
+          }
+        }
+        if (newlyCreated) {
+          // Get the current change list.
+          var currentChangeList = UndoRedoService.getChangeList();
+          var indicesToDelete = [];
+          for (var i = 0; i < currentChangeList.length; i++) {
+            var backendChangeDict =
+              currentChangeList[i].getBackendChangeObject();
+            if (backendChangeDict.subtopic_id === subtopicId) {
+              // The indices in the change list corresponding to changes to the
+              // currently deleted and newly created subtopic are to be removed
+              // from the list.
+              indicesToDelete.push(i);
+              continue;
+            }
+            // When a newly created subtopic is deleted, the subtopics created
+            // after it would have their id reduced by 1.
+            if (backendChangeDict.subtopic_id > subtopicId) {
+              backendChangeDict.subtopic_id--;
+            }
+            // Apply the above id reduction changes to the backend change.
+            currentChangeList[i].setBackendChangeObject(backendChangeDict);
+          }
+          // The new change list is found by deleting the above found elements.
+          var newChangeList = currentChangeList.filter(function(change) {
+            var changeObjectIndex = currentChangeList.indexOf(change);
+            // Return all elements that were not deleted.
+            return (indicesToDelete.indexOf(changeObjectIndex) === -1);
+          });
+          // The new changelist is set.
+          UndoRedoService.setChangeList(newChangeList);
+          topic.deleteSubtopic(subtopicId, newlyCreated);
+          return;
+        }
         _applyChange(topic, CMD_DELETE_SUBTOPIC, {
           subtopic_id: subtopicId,
+          change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
-          topic.deleteSubtopic(subtopicId, isNewlyCreated);
+          topic.deleteSubtopic(subtopicId, newlyCreated);
         }, function(changeDict, topic) {
           // Undo.
-          var subtopicId = _getSubtopicIdFromChangeDict(changeDict);
-          topic.undoDeleteSubtopic(
-            subtopicId, title, skillIds, isNewlyCreated);
-          for (var i = 0; i < skillIds.length; i++) {
-            topic.removeUncategorizedSkillId(skillIds[i]);
-          }
+          throw Error('A deleted subtopic cannot be restored');
         });
       },
 
@@ -232,7 +269,8 @@ oppia.factory('TopicUpdateService', [
         _applyChange(topic, CMD_MOVE_SKILL_ID_TO_SUBTOPIC, {
           old_subtopic_id: oldSubtopicId,
           new_subtopic_id: newSubtopicId,
-          skill_id: skillId
+          skill_id: skillId,
+          change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
           if (oldSubtopicId === null) {
@@ -260,7 +298,8 @@ oppia.factory('TopicUpdateService', [
         var subtopic = topic.getSubtopicById(subtopicId);
         _applyChange(topic, CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC, {
           subtopic_id: subtopicId,
-          skill_id: skillId
+          skill_id: skillId,
+          change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
           subtopic.removeSkillId(skillId);
@@ -396,7 +435,8 @@ oppia.factory('TopicUpdateService', [
        */
       addUncategorizedSkillId: function(topic, skillId) {
         _applyChange(topic, CMD_ADD_UNCATEGORIZED_SKILL_ID, {
-          new_uncategorized_skill_id: skillId
+          new_uncategorized_skill_id: skillId,
+          change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
           var newSkillId = _getParameterFromChangeDict(
@@ -416,7 +456,8 @@ oppia.factory('TopicUpdateService', [
        */
       removeUncategorizedSkillId: function(topic, skillId) {
         _applyChange(topic, CMD_REMOVE_UNCATEGORIZED_SKILL_ID, {
-          uncategorized_skill_id: skillId
+          uncategorized_skill_id: skillId,
+          change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
           var newSkillId = _getParameterFromChangeDict(

@@ -40,6 +40,23 @@ oppia.factory('EditableTopicBackendApiService', [
       });
     };
 
+    var _deleteTopic = function(
+        topicId, successCallback, errorCallback) {
+      var topicDataUrl = UrlInterpolationService.interpolateUrl(
+        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
+          topic_id: topicId
+        });
+      $http['delete'](topicDataUrl).then(function(response) {
+        if (successCallback) {
+          successCallback(response.status);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     var _updateTopic = function(
         topicId, topicVersion, commitMessage, changeList,
         successCallback, errorCallback) {
@@ -51,7 +68,7 @@ oppia.factory('EditableTopicBackendApiService', [
       var putData = {
         version: topicVersion,
         commit_message: commitMessage,
-        change_list: changeList
+        topic_and_subtopic_page_change_dicts: changeList
       };
       $http.put(editableTopicDataUrl, putData).then(function(response) {
         // The returned data is an updated topic dict.
@@ -90,6 +107,12 @@ oppia.factory('EditableTopicBackendApiService', [
           _updateTopic(
             topicId, topicVersion, commitMessage, changeList,
             resolve, reject);
+        });
+      },
+
+      deleteTopic: function(topicId) {
+        return $q(function(resolve, reject) {
+          _deleteTopic(topicId, resolve, reject);
         });
       }
     };

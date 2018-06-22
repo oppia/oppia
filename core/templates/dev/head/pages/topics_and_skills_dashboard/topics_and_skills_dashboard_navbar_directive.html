@@ -2,10 +2,10 @@
 
   <li ng-mouseover="blurNavigationLinks($event)">
     <div class="oppia-navbar-button-container">
-      <a href="/"
-         class="btn oppia-navbar-button oppia-transition-200">
+      <button ng-click="createTopic()" ng-if="userCanCreateTopic"
+              class="btn oppia-navbar-button oppia-transition-200">
         <span class="oppia-navbar-tab-content">Create Topic</span>
-      </a>
+      </button>
     </div>
   </li>
   <li ng-mouseover="blurNavigationLinks($event)">
