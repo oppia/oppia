@@ -75,8 +75,10 @@ oppia.directive('collectionNodeCreator', [
 
           var isValidSearchQuery = function(searchQuery) {
             // Allow underscores because they are allowed in exploration IDs.
-            var INVALID_SEARCH_CHARS = INVALID_NAME_CHARS.replace(
-              '_', '');
+            var INVALID_SEARCH_CHARS = (
+              INVALID_NAME_CHARS.filter(function(item) {
+                return item !== '_';
+              }));
             for (var i = 0; i < INVALID_SEARCH_CHARS.length; i++) {
               if (searchQuery.indexOf(INVALID_SEARCH_CHARS[i]) !== -1) {
                 return false;
