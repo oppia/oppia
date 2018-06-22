@@ -1,1 +1,5 @@
 {% extends 'pages/base.html' %}
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditor.js"></script>
+{% endblock footer_js %}
