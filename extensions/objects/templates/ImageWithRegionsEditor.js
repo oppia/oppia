@@ -18,22 +18,17 @@
 
 // TODO(czx): Uniquify the labels of image regions
 oppia.directive('imageWithRegionsEditor', [
-  '$sce', '$compile', 'AlertsService', '$document', 'ExplorationContextService',
-  'OBJECT_EDITOR_URL_PREFIX',
-  function($sce, $compile, AlertsService, $document, ExplorationContextService,
-      OBJECT_EDITOR_URL_PREFIX) {
+  '$sce', 'UrlInterpolationService', 'AlertsService', '$document',
+  'ExplorationContextService', 'OBJECT_EDITOR_URL_PREFIX',
+  function($sce, UrlInterpolationService, AlertsService, $document,
+      ExplorationContextService, OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'ImageWithRegions';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         value: '='
       },
-      template: '<div ng-include="getTemplateUrl()"></div>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/image_with_regions_editor_directive.html'),
       controller: [
         '$scope', '$element', '$uibModal',
         function($scope, $element, $uibModal) {

@@ -94,6 +94,12 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
+- url: /extensions/objects/templates/(.*\.html)
+  static_files: extensions/objects/templates/\1
+  upload: extensions/objects/templates/(.*\.html)
+  secure: always
+  http_headers:
+    Cache-Control: 'no-cache'
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.17.0/mapreduce/lib/pipeline/ui/images
   secure: always
