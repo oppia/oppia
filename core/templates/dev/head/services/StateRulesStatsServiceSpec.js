@@ -52,6 +52,24 @@ describe('State Rules Stats Service', function() {
       ).and.returnValue(EXPLORATION_ID);
     }));
 
+    describe('handling private explorations', function() {
+      beforeEach(inject(function(ExplorationRightsService) {
+        spyOn(ExplorationRightsService, 'isPrivate').and.returnValue(true);
+        spyOn(ExplorationRightsService, 'isPublic').and.returnValue(false);
+      }));
+
+      it('should not callout when exploration is private', function() {
+        $httpBackend.whenGET('/createhandler/state_rules_stats/7/Hola');
+
+        StateRulesStatsService.computeStateRulesStats({
+          name: 'Hola',
+          interaction: {id: 'TextInput'}
+        });
+
+        expect($httpBackend.flush).toThrow();
+      });
+    });
+
     it('should respond with answer frequencies', function() {
       // Only including properties required for stat computation.
       var HOLA_STATE = {name: 'Hola', interaction: {id: 'TextInput'}};

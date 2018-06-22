@@ -18,10 +18,10 @@
 
 oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ExplorationContextService', 'UrlInterpolationService',
+  'ExplorationContextService', 'ExplorationRightsService', 'UrlInterpolationService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      ExplorationContextService, UrlInterpolationService) {
+      ExplorationContextService, ExplorationRightsService, UrlInterpolationService) {
     return {
       /**
        * TODO(brianrodri): Consider moving this into a visualization domain
@@ -47,36 +47,40 @@ oppia.factory('StateRulesStatsService', [
             state.interaction.id));
         var explorationId = ExplorationContextService.getExplorationId();
 
-        return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            '/createhandler/state_rules_stats/<exploration_id>/<state_name>',
-            {exploration_id: explorationId, state_name: state.name})
-        ).then(function(response) {
-          return {
-            state_name: state.name,
-            exploration_id: explorationId,
-            visualizations_info: response.data.visualizations_info.map(
-              function(vizInfo) {
-                var vizInfoDataWithAddressedInfo = {};
-                if (vizInfo.addressed_info_is_supported) {
-                  vizInfoDataWithAddressedInfo = {
-                    data: vizInfo.data.map(function(vizInfoDatum) {
-                      return Object.assign({
-                        is_addressed: (
-                          AnswerClassificationService
-                            .isClassifiedExplicitlyOrGoesToNewState(
-                              explorationId, state.name, state,
-                              vizInfoDatum.answer, interactionRulesService))
-                      }, vizInfoDatum);
-                    })
-                  };
-                }
+        // Private explorations can not have any stats since they haven't been
+        // published yet, so avoid making a call entirely.
+        return ExplorationRightsService.isPrivate() ?
+          Promise.resolve({data: null}) : $http.get(
+            UrlInterpolationService.interpolateUrl(
+              '/createhandler/state_rules_stats/<exploration_id>/<state_name>',
+              {exploration_id: explorationId, state_name: state.name})
+          ).then(function(response) {
+            return {
+              state_name: state.name,
+              exploration_id: explorationId,
+              visualizations_info: response.data.visualizations_info.map(
+                function(vizInfo) {
+                  var vizInfoDataWithAddressedInfo = {};
+                  if (vizInfo.addressed_info_is_supported) {
+                    vizInfoDataWithAddressedInfo = {
+                      data: vizInfo.data.map(function(vizInfoDatum) {
+                        return Object.assign({
+                          is_addressed: (
+                            AnswerClassificationService
+                              .isClassifiedExplicitlyOrGoesToNewState(
+                                explorationId, state.name, state,
+                                vizInfoDatum.answer, interactionRulesService))
+                        }, vizInfoDatum);
+                      })
+                    };
+                  }
 
-                return Object.assign({}, vizInfo, vizInfoDataWithAddressedInfo);
-              })
-          };
-        });
-      }
+                  return Object.assign(
+                    {}, vizInfo, vizInfoDataWithAddressedInfo);
+                })
+            };
+          });
+        }
     };
   }
 ]);
