@@ -20,20 +20,26 @@
 oppia.factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
   'AnswerStatsObjectFactory', 'ExplorationContextService',
-  'ExplorationStatesService', 'UrlInterpolationService',
+  'ExplorationStatesService',
   function(
       $injector, AngularNameService, AnswerClassificationService,
       AnswerStatsObjectFactory, ExplorationContextService,
-      ExplorationStatesService, UrlInterpolationService) {
-    /** @type {Object.<string, AnswerStats[]>} */
-    var stateTopAnswerStatsCache = {};
+      ExplorationStatesService) {
+    /**
+     * @typedef AnswerStatsCache
+     * @property {AnswerStats[]} allAnswers
+     * @property {AnswerStats[]} unresolvedAnswers
+     */
+
+    /** @type {Object.<string, AnswerStatsCache[]>} */
+    var stateTopAnswersStatsCache = {};
 
     /** @type {boolean} */
     var isInitialized = false;
 
     /**
      * Updates the addressed info of all the answers cached for the given state
-     * to reflect any changes in the state's answer groups.
+     * to reflect the state's current answer groups.
      * @param {string} stateName
      */
     var refreshAddressedInfo = function(stateName) {
@@ -42,34 +48,92 @@ oppia.factory('StateTopAnswersStatsService', [
       var interactionRulesService = $injector.get(
         AngularNameService.getNameOfInteractionRulesService(
           state.interaction.id));
-      stateTopAnswerStatsCache[stateName].forEach(function(answerStats) {
+      var allAnswersCacheEntry =
+        stateTopAnswersStatsCache[stateName].allAnswers;
+      var unresolvedAnswersCacheEntry =
+        stateTopAnswersStatsCache[stateName].unresolvedAnswers;
+
+      // Clear the unresolvedAnswers array since many answers may now have
+      // different "addressed" values.
+      unresolvedAnswersCacheEntry.length = 0;
+
+      // Update the isAddressed data of each answer and put any unaddressed
+      // answers into the unresolvedAnswers array.
+      allAnswersCacheEntry.forEach(function(answerStats) {
         answerStats.isAddressed =
           AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
             explorationId, stateName, state, answerStats.answer,
             interactionRulesService);
+        if (!answerStats.isAddressed) {
+          unresolvedAnswersCacheEntry.push(answerStats);
+        }
       });
+    };
+
+    var onStateAdded = function(stateName) {
+      stateTopAnswersStatsCache[stateName] = {
+        allAnswers: [],
+        unresolvedAnswers: []
+      };
+    };
+
+    var onStateDeleted = function(stateName) {
+      delete stateTopAnswersStatsCache[stateName];
+    };
+
+    var onStateRenamed = function(oldStateName, newStateName) {
+      stateTopAnswersStatsCache[newStateName] =
+        stateTopAnswersStatsCache[oldStateName];
+      delete stateTopAnswersStatsCache[oldStateName];
+    };
+
+    var onStateAnswerGroupsSaved = function(stateName) {
+      refreshAddressedInfo(stateName);
     };
 
     return {
       /**
        * Calls the backend asynchronously to setup the answer statistics of each
        * state this exploration contains.
+       *
+       * @param {Object.<string, *>} stateTopAnswersStatsBackendDict - The
+       *    backend representation of the state top answers statistics.
        */
       init: function(stateTopAnswersStatsBackendDict) {
-        stateTopAnswerStatsCache = {};
+        if (isInitialized) {
+          return;
+        }
+        stateTopAnswersStatsCache = {};
         for (var stateName in stateTopAnswersStatsBackendDict.answers) {
-          stateTopAnswerStatsCache[stateName] =
-            stateTopAnswersStatsBackendDict.answers[stateName].map(
-              AnswerStatsObjectFactory.createFromBackendDict
-            );
+          stateTopAnswersStatsCache[stateName] = {
+            allAnswers: stateTopAnswersStatsBackendDict.answers[stateName].map(
+              AnswerStatsObjectFactory.createFromBackendDict),
+            unresolvedAnswers: []
+          };
           // Still need to manually refresh the addressed information.
           refreshAddressedInfo(stateName);
         }
+        ExplorationStatesService.registerOnStateAddedCallback(onStateAdded);
+        ExplorationStatesService.registerOnStateDeletedCallback(onStateDeleted);
+        ExplorationStatesService.registerOnStateRenamedCallback(onStateRenamed);
+        ExplorationStatesService.registerOnStateAnswerGroupsSavedCallback(
+          onStateAnswerGroupsSaved);
         isInitialized = true;
       },
 
+      /** @returns {boolean} - Whether the cache is ready for use. */
       isInitialized: function() {
         return isInitialized;
+      },
+
+      /**
+       * @returns {boolean} - Whether the cache contains any answers for the
+       * given state.
+       */
+      hasStateStats: function(stateName) {
+        return isInitialized &&
+          stateTopAnswersStatsCache.hasOwnProperty(stateName) &&
+          stateTopAnswersStatsCache[stateName].allAnswers.length > 0;
       },
 
       /**
@@ -77,16 +141,22 @@ oppia.factory('StateTopAnswersStatsService', [
        * @returns {AnswerStats[]} - list of the statistics for the top answers.
        */
       getStateStats: function(stateName) {
-        return angular.copy(stateTopAnswerStatsCache[stateName]);
+        if (!stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
+          throw Error(stateName + ' does not exist.');
+        }
+        return stateTopAnswersStatsCache[stateName].allAnswers;
       },
 
       /**
-       * Update all answers of the given state to reflect any changes in the
-       * state's structure.
        * @param {string} stateName
+       * @returns {AnswerStats[]} - list of stats for answers that are
+       *    unresolved.
        */
-      refreshStateStats: function(stateName) {
-        refreshAddressedInfo(stateName);
+      getUnresolvedStateStats: function(stateName) {
+        if (!stateTopAnswersStatsCache.hasOwnProperty(stateName)) {
+          throw Error(stateName + ' does not exist.');
+        }
+        return stateTopAnswersStatsCache[stateName].unresolvedAnswers;
       },
     };
   }
