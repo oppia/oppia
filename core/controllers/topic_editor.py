@@ -224,7 +224,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
         if topic is None:
             raise self.PageNotFoundException(
-                Exception('The topic with the given id doesn\'t exist.'))
+                'The topic with the given id doesn\'t exist.')
         topic_services.delete_topic(self.user_id, topic_id)
 
 
