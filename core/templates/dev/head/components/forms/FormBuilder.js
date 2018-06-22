@@ -373,8 +373,18 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
 
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([
-  '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService', 'HtmlEscaperService',
-  function($timeout, $compile, $rootScope, $uibModal, RteHelperService, HtmlEscaperService) {
+  '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
+  'HtmlEscaperService', 'taOptions',
+  function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
+      HtmlEscaperService, taOptions) {
+    taOptions.disableSanitizer = true;
+    taOptions.forceTextAngularSanitize = false;
+    taOptions.classes.textEditor = 'form-control oppia-rte-content';
+    taOptions.setup.textEditorSetup = function($element) {
+      $timeout(function() {
+        $element.trigger('focus');
+      });
+    };
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
@@ -384,10 +394,10 @@ oppia.run([
       if (CKEDITOR.plugins.registered[ckName] !== undefined) {
         return;
       }
-      var tagName = 'oppia-noninteractive-' + componentDefn.name;
+      var tagName = 'oppia-noninteractive-' + componentDefn.id;
       var customizationArgSpecs = componentDefn.customizationArgSpecs;
-      var isInline = RteHelperService.isInlineComponent(componentDefn.name);
-      
+      var isInline = RteHelperService.isInlineComponent(componentDefn.id);
+
       // Inline components will be wrapped in a span, while block components
       // will be wrapped in a div.
       if (isInline) {
@@ -395,7 +405,7 @@ oppia.run([
                                 '<' + tagName + '></' + tagName + '>' +
                                 '</span>';
       } else {
-         var componentTemplate = '<div class="oppia-rte-component-container" ' +
+        var componentTemplate = '<div class="oppia-rte-component-container" ' +
                                 'type="' + tagName + '">' +
                                 '<' + tagName + '></' + tagName + '>' +
                                 '<div class="component-overlay"></div>' +
@@ -459,7 +469,7 @@ oppia.run([
                 function() {},
                 function() {});
             },
-             downcast: function(element) {
+            downcast: function(element) {
               element.children[0].setHtml('');
               return element.children[0];
             },
@@ -545,7 +555,7 @@ oppia.directive('ckEditorRte', [
         var componentRule = names.map(function(name) {
           return 'oppia-noninteractive-' + name;
         }).join(' ') + '(*)[*];';
-         // Whitelist the inline component wrapper, which is a
+        // Whitelist the inline component wrapper, which is a
         // span with a "type" attribute.
         var inlineWrapperRule = ' span[type];';
         // Whitelist the block component wrapper, which is a div
@@ -559,7 +569,7 @@ oppia.directive('ckEditorRte', [
                                        inlineWrapperRule +
                                        blockWrapperRule +
                                        blockOverlayRule;
- 
+
         var pluginNames = names.map(function(name) {
           return 'oppia' + name;
         }).join(',');
@@ -571,7 +581,7 @@ oppia.directive('ckEditorRte', [
         buttonNames.pop();
 
         // Initialize CKEditor.
-         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
+        var ck = CKEDITOR.inline(el[0].children[0].children[1], {
           extraPlugins: 'widget,lineutils,sharedspace,' + pluginNames,
           startupFocus: true,
           floatSpaceDockedOffsetY: 15,
@@ -591,7 +601,7 @@ oppia.directive('ckEditorRte', [
             },
             {
               name: 'paragraph',
-               items: [
+              items: [
                 'NumberedList', '-',
                 'BulletedList', '-',
                 'Outdent', '-',
@@ -613,7 +623,7 @@ oppia.directive('ckEditorRte', [
         var componentRe = (
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
         );
- 
+
         // Before data is loaded into CKEditor, we need to wrap every rte
         // component in a span (inline) or div (block).
         // For block elements, we add an overlay div as well.
@@ -639,9 +649,9 @@ oppia.directive('ckEditorRte', [
             var icon = icons[index];
             var upperCasedName = name.charAt(0).toUpperCase() + name.slice(1);
             $('.cke_button__oppia' + name)
-               .css('background-image', 'url("/extensions'+ icon + '")')
-               .css('background-position', 'center')
-               .css('background-repeat', 'no-repeat');
+              .css('background-image', 'url("/extensions' + icon + '")')
+              .css('background-position', 'center')
+              .css('background-repeat', 'no-repeat');
           });
           ck.setData(wrapComponents(ngModel.$viewValue));
         });
@@ -657,12 +667,12 @@ oppia.directive('ckEditorRte', [
           });
         }, null, null, 20);
 
-         ck.on('change', function() {
+        ck.on('change', function() {
           ngModel.$setViewValue(ck.getData());
         });
 
         ngModel.$render = function() {
-          ck.setData(wrapComponents(ngModel.$viewValue));
+          ck.setData(ngModel.$viewValue);
         };
 
         scope.$on('$destroy', function() {

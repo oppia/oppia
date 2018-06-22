@@ -19,11 +19,13 @@
 oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 oppia.factory('RteHelperService', [
-  '$filter', '$log', '$uibModal', '$interpolate', 'ExplorationContextService',
-  'RTE_COMPONENT_SPECS', 'HtmlEscaperService', 'UrlInterpolationService',
+  '$filter', '$log', '$uibModal', '$interpolate', '$document',
+  'ExplorationContextService', 'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
+  'UrlInterpolationService', 'FocusManagerService',
   function(
-      $filter, $log, $uibModal, $interpolate, ExplorationContextService,
-      RTE_COMPONENT_SPECS, HtmlEscaperService, UrlInterpolationService) {
+      $filter, $log, $uibModal, $interpolate, $document,
+      ExplorationContextService, RTE_COMPONENT_SPECS, HtmlEscaperService,
+      UrlInterpolationService, FocusManagerService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -250,7 +252,7 @@ oppia.factory('RteHelperService', [
                   name: caName,
                   value: (
                     attrsCustomizationArgsDict.hasOwnProperty(caName) ?
-                     angular.copy(attrsCustomizationArgsDict[caName]) :
+                      angular.copy(attrsCustomizationArgsDict[caName]) :
                       customizationArgSpecs[i].default_value)
                 });
               }
