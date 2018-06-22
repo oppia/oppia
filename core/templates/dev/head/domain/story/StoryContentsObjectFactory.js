@@ -26,7 +26,7 @@ oppia.factory('StoryContentsObjectFactory', [
       this._nextNodeId = nextNodeId;
     };
 
-    var _incrementNodeId = function(nodeId) {
+    var getIncrementedNodeId = function(nodeId) {
       var index = parseInt(nodeId.replace(NODE_ID_PREFIX, ''));
       ++index;
       return NODE_ID_PREFIX + index;
@@ -55,7 +55,7 @@ oppia.factory('StoryContentsObjectFactory', [
 
     StoryContents.prototype.addNode = function() {
       this._nodes.push(StoryNodeObjectFactory.createFromId(this._nextNodeId));
-      this._nextNodeId = _incrementNodeId(this._nextNodeId);
+      this._nextNodeId = getIncrementedNodeId(this._nextNodeId);
     };
 
     StoryContents.prototype.getNodeIndex = function(nodeId) {

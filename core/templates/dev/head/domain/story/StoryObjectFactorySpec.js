@@ -25,7 +25,7 @@ describe('Story object factory', function() {
   beforeEach(inject(function($injector) {
     StoryObjectFactory = $injector.get('StoryObjectFactory');
 
-    var sampleStoryBackendObject = {
+    var sampleStoryBackendDict = {
       id: 'sample_story_id',
       title: 'Story title',
       description: 'Story description',
@@ -47,7 +47,7 @@ describe('Story object factory', function() {
       language_code: 'en'
     };
     _sampleStory = StoryObjectFactory.createFromBackendDict(
-      sampleStoryBackendObject);
+      sampleStoryBackendDict);
   }));
 
   it('should be able to create an interstitial story object', function() {
