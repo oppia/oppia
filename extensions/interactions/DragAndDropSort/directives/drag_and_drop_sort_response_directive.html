@@ -1,0 +1,35 @@
+<style>
+  .drag-and-drop-sort-response-content img {
+    max-height: 100px;
+  }
+  .item {
+    border: 1px solid grey;
+    width: 70px;
+    height: 70px;
+    background-color: #add8e6;
+    margin: 10px 0 0 0;
+  }
+  .subItem {
+    border: 1px solid grey;
+    width: 70px;
+    height: 70px;
+    background-color: #add8e6;
+    position: relative;
+    margin:-20px 0 0 0;
+  }
+</style>
+
+<ol ng-if="answer.length >= 1" class="drag-and-drop-sort-response-content">
+  <li ng-repeat="responses in answer track by $index">
+    <ol ng-if="responses.length >= 1">
+      <div class="item">
+        <angular-html-bind html-data="responses[0]"></angular-html-bind>
+      </div>
+      <li ng-repeat="response in responses track by $index">
+        <div ng-if="$index > 0" class="subItem">
+          <angular-html-bind html-data="response"></angular-html-bind>
+        </div>
+      </li>
+    </ol>
+  </li>
+</ol>
