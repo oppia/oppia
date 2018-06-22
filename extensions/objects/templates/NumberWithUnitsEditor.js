@@ -14,20 +14,17 @@
 
 
 oppia.directive('numberWithUnitsEditor', [
-  '$compile', 'NumberWithUnitsObjectFactory', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, NumberWithUnitsObjectFactory, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService', 'NumberWithUnitsObjectFactory',
+  'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, NumberWithUnitsObjectFactory,
+      OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'NumberWithUnits';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         value: '='
       },
-      template: '<span ng-include="getTemplateUrl()"></span>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/number_with_units_editor_directive.html'),
       controller: ['$scope', function($scope) {
         var errorMessage = '';
         var numberWithUnitsString = '';

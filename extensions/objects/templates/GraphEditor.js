@@ -17,20 +17,15 @@
 // in via initArgs.
 
 oppia.directive('graphEditor', [
-  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'Graph';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         value: '='
       },
-      template: '<div ng-include="getTemplateUrl()"></div>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/graph_editor_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.alwaysEditable = true;
       }]
