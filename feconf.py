@@ -374,7 +374,7 @@ ENABLE_PROMO_BAR = True
 ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = False
+ENABLE_NEW_STRUCTURES = True
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -618,13 +618,14 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+NEW_QUESTION_URL = '/questioncreationhandler'
 NEW_SKILL_URL = '/skill_editor_handler/create_new'
 NEW_STORY_URL = '/story_editor_handler/create_new'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_DATA_URL = '/questionhandler'
+QUESTION_EDITOR_URL_PREFIX = '/question_editor'
 QUESTION_MANAGER_URL = '/questionmanagerhandler'
-QUESTION_CREATION_URL = '/questioncreationhandler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -666,6 +667,7 @@ NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LEARNER_DASHBOARD = 'learner_dashboard'
 NAV_MODE_LIBRARY = 'library'
 NAV_MODE_PROFILE = 'profile'
+NAV_MODE_QUESTION_EDITOR = 'question_editor'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_TEACH = 'teach'
