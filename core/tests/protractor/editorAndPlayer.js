@@ -16,7 +16,6 @@
  * @fileoverview End-to-end tests of the full exploration editor.
  */
 
-var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -26,17 +25,21 @@ var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Full exploration editor', function() {
   var explorationPlayerPage = null;
+  var explorationEditorPage = null;
   var creatorDashboardPage = null;
   var libraryPage = null;
 
   beforeAll(function() {
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     libraryPage = new LibraryPage.LibraryPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
@@ -47,24 +50,25 @@ describe('Full exploration editor', function() {
     users.login('user2@editorAndPlayer.com');
     workflow.createExploration();
 
-    editor.setStateName('card 1');
-    editor.setContent(forms.toRichText('this is card 1'));
-    editor.setInteraction('Continue');
-    editor.ResponseEditor('default').setDestination('card 2', true, null);
+    explorationEditorPage.setStateName('card 1');
+    explorationEditorPage.setContent(forms.toRichText('this is card 1'));
+    explorationEditorPage.setInteraction('Continue');
+    explorationEditorPage.ResponseEditor('default').setDestination(
+      'card 2', true, null);
 
-    editor.moveToState('card 2');
-    editor.setContent(forms.toRichText(
+    explorationEditorPage.moveToState('card 2');
+    explorationEditorPage.setContent(forms.toRichText(
       'this is card 2 with non-inline interaction'));
-    editor.setInteraction(
+    explorationEditorPage.setInteraction(
       'LogicProof',
       '', '', 'from p we have p');
-    editor.addResponse(
+    explorationEditorPage.addResponse(
       'LogicProof', forms.toRichText('Great'), 'final card', true, 'Correct');
 
     // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    explorationEditorPage.moveToState('final card');
+    explorationEditorPage.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
 
     general.moveToPlayer();
     explorationPlayerPage.submitAnswer('Continue');
@@ -145,13 +149,14 @@ describe('Full exploration editor', function() {
     browser.waitForAngular();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateExplorationButton();
-    editor.exitTutorialIfNecessary();
-    editor.setTitle('Refresher Exploration');
-    editor.setCategory('Algebra');
-    editor.setObjective('This is the refresher exploration');
-    editor.setContent(forms.toRichText('Refresher Exploration Content'));
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    explorationEditorPage.exitTutorialIfNecessary();
+    explorationEditorPage.setTitle('Refresher Exploration');
+    explorationEditorPage.setCategory('Algebra');
+    explorationEditorPage.setObjective('This is the refresher exploration');
+    explorationEditorPage.setContent(forms.toRichText(
+      'Refresher Exploration Content'));
+    explorationEditorPage.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
     workflow.publishExploration();
     general.waitForSystem();
 
@@ -164,25 +169,27 @@ describe('Full exploration editor', function() {
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
-      editor.exitTutorialIfNecessary();
-      editor.setTitle('Parent Exploration not in collection');
-      editor.setCategory('Algebra');
-      editor.setObjective('This is a parent exploration');
-      editor.setContent(forms.toRichText('Parent Exploration Content'));
-      editor.setInteraction(
+      explorationEditorPage.exitTutorialIfNecessary();
+      explorationEditorPage.setTitle('Parent Exploration not in collection');
+      explorationEditorPage.setCategory('Algebra');
+      explorationEditorPage.setObjective('This is a parent exploration');
+      explorationEditorPage.setContent(forms.toRichText(
+        'Parent Exploration Content'));
+      explorationEditorPage.setInteraction(
         'MultipleChoiceInput',
         [forms.toRichText('Correct'), forms.toRichText('Incorrect')]);
-      editor.addResponse('MultipleChoiceInput', null, 'card 2', true,
+      explorationEditorPage.addResponse(
+        'MultipleChoiceInput', null, 'card 2', true,
         'Equals', 'Correct');
 
-      editor.ResponseEditor(
+      explorationEditorPage.ResponseEditor(
         'default').setFeedback(forms.toRichText('try again'));
-      editor.ResponseEditor(
+      explorationEditorPage.ResponseEditor(
         'default').setDestination(null, false, refresherExplorationId);
 
-      editor.moveToState('card 2');
-      editor.setInteraction('EndExploration');
-      editor.saveChanges();
+      explorationEditorPage.moveToState('card 2');
+      explorationEditorPage.setInteraction('EndExploration');
+      explorationEditorPage.saveChanges();
       workflow.publishExploration();
       browser.waitForAngular();
 
@@ -194,25 +201,27 @@ describe('Full exploration editor', function() {
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
-      editor.exitTutorialIfNecessary();
-      editor.setTitle('Parent Exploration in collection');
-      editor.setCategory('Algebra');
-      editor.setObjective('This is a parent exploration');
-      editor.setContent(forms.toRichText('Parent Exploration Content'));
-      editor.setInteraction(
+      explorationEditorPage.exitTutorialIfNecessary();
+      explorationEditorPage.setTitle('Parent Exploration in collection');
+      explorationEditorPage.setCategory('Algebra');
+      explorationEditorPage.setObjective('This is a parent exploration');
+      explorationEditorPage.setContent(forms.toRichText(
+        'Parent Exploration Content'));
+      explorationEditorPage.setInteraction(
         'MultipleChoiceInput',
         [forms.toRichText('Correct'), forms.toRichText('Incorrect')]);
-      editor.addResponse('MultipleChoiceInput', null, 'card 2', true,
+      explorationEditorPage.addResponse(
+        'MultipleChoiceInput', null, 'card 2', true,
         'Equals', 'Correct');
 
-      editor.ResponseEditor(
+      explorationEditorPage.ResponseEditor(
         'default').setFeedback(forms.toRichText('try again'));
-      editor.ResponseEditor(
+      explorationEditorPage.ResponseEditor(
         'default').setDestination(null, false, refresherExplorationId);
 
-      editor.moveToState('card 2');
-      editor.setInteraction('EndExploration');
-      editor.saveChanges();
+      explorationEditorPage.moveToState('card 2');
+      explorationEditorPage.setInteraction('EndExploration');
+      explorationEditorPage.saveChanges();
       workflow.publishExploration();
       browser.waitForAngular();
 
@@ -285,27 +294,29 @@ describe('Full exploration editor', function() {
     users.login('user4@editorAndPlayer.com');
 
     workflow.createExploration();
-    editor.setStateName('card 1');
-    editor.setContent(forms.toRichText('this is card 1'));
-    editor.setInteraction('NumericInput');
-    editor.addResponse(
+    explorationEditorPage.setStateName('card 1');
+    explorationEditorPage.setContent(forms.toRichText('this is card 1'));
+    explorationEditorPage.setInteraction('NumericInput');
+    explorationEditorPage.addResponse(
       'NumericInput', null, 'final card', true, 'Equals', 21);
-    editor.ResponseEditor(0).setDestination('card 2', true, null);
+    explorationEditorPage.ResponseEditor(0).setDestination(
+      'card 2', true, null);
 
-    editor.moveToState('card 2');
-    editor.setContent(forms.toRichText(
+    explorationEditorPage.moveToState('card 2');
+    explorationEditorPage.setContent(forms.toRichText(
       'this is card 2 with previous answer {{answer}}'));
-    editor.setInteraction(
+    explorationEditorPage.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('return'), forms.toRichText('complete')]);
-    editor.addResponse('MultipleChoiceInput', null, 'card 1', false,
+    explorationEditorPage.addResponse(
+      'MultipleChoiceInput', null, 'card 1', false,
       'Equals', 'return');
-    editor.setDefaultOutcome(null, 'final card', false);
+    explorationEditorPage.setDefaultOutcome(null, 'final card', false);
 
     // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    explorationEditorPage.moveToState('final card');
+    explorationEditorPage.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
 
     general.moveToPlayer();
     explorationPlayerPage.expectContentToMatch(
@@ -335,41 +346,47 @@ describe('Full exploration editor', function() {
     workflow.createExploration();
     general.getExplorationIdFromEditor().then(function(explorationId) {
       // Check discarding of changes
-      editor.setStateName('card1');
-      editor.expectCurrentStateToBe('card1');
-      editor.setContent(forms.toRichText('card1 content'));
-      editor.setInteraction('TextInput');
-      editor.setDefaultOutcome(null, 'final card', true);
-      editor.ResponseEditor('default').setDestination('card2', true, null);
-      editor.moveToState('card2');
+      explorationEditorPage.setStateName('card1');
+      explorationEditorPage.expectCurrentStateToBe('card1');
+      explorationEditorPage.setContent(forms.toRichText('card1 content'));
+      explorationEditorPage.setInteraction('TextInput');
+      explorationEditorPage.setDefaultOutcome(null, 'final card', true);
+      explorationEditorPage.ResponseEditor('default').setDestination(
+        'card2', true, null);
+      explorationEditorPage.moveToState('card2');
       // NOTE: we must move to the state before checking state names to avoid
       // inexplicable failures of the protractor utility that reads state names
       // (the user-visible names are fine either way). See issue 732 for more.
-      editor.expectStateNamesToBe(['final card', 'card1', 'card2']);
-      editor.setInteraction('EndExploration');
+      explorationEditorPage.expectStateNamesToBe(
+        ['final card', 'card1', 'card2']);
+      explorationEditorPage.setInteraction('EndExploration');
 
-      editor.discardChanges();
-      editor.expectCurrentStateToBe(general.FIRST_STATE_DEFAULT_NAME);
-      editor.setStateName('first');
-      editor.expectCurrentStateToBe('first');
-      editor.setContent(forms.toRichText('card1 content'));
+      explorationEditorPage.discardChanges();
+      explorationEditorPage.expectCurrentStateToBe(
+        general.FIRST_STATE_DEFAULT_NAME);
+      explorationEditorPage.setStateName('first');
+      explorationEditorPage.expectCurrentStateToBe('first');
+      explorationEditorPage.setContent(forms.toRichText('card1 content'));
 
       // Check deletion of states and changing the first state
-      editor.setInteraction('TextInput');
-      editor.setDefaultOutcome(null, 'final card', true);
-      editor.ResponseEditor('default').setDestination('second', true, null);
-      editor.moveToState('second');
-      editor.expectStateNamesToBe(['final card', 'first', 'second']);
-      editor.expectCurrentStateToBe('second');
-      editor.expectAvailableFirstStatesToBe(['final card', 'first', 'second']);
-      editor.setFirstState('second');
-      editor.moveToState('first');
-      editor.deleteState('first');
-      editor.expectCurrentStateToBe('second');
-      editor.expectStateNamesToBe(['final card', 'second']);
+      explorationEditorPage.setInteraction('TextInput');
+      explorationEditorPage.setDefaultOutcome(null, 'final card', true);
+      explorationEditorPage.ResponseEditor('default').setDestination(
+        'second', true, null);
+      explorationEditorPage.moveToState('second');
+      explorationEditorPage.expectStateNamesToBe(
+        ['final card', 'first', 'second']);
+      explorationEditorPage.expectCurrentStateToBe('second');
+      explorationEditorPage.expectAvailableFirstStatesToBe(
+        ['final card', 'first', 'second']);
+      explorationEditorPage.setFirstState('second');
+      explorationEditorPage.moveToState('first');
+      explorationEditorPage.deleteState('first');
+      explorationEditorPage.expectCurrentStateToBe('second');
+      explorationEditorPage.expectStateNamesToBe(['final card', 'second']);
 
       // Check behaviour of the back button
-      editor.setObjective('do some stuff here');
+      explorationEditorPage.setObjective('do some stuff here');
       expect(browser.getCurrentUrl()).toEqual(
         general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
         explorationId + '#/gui/second');
@@ -383,41 +400,43 @@ describe('Full exploration editor', function() {
         explorationId + '#/gui/second');
 
       // Check display of content & interaction in the editor
-      editor.setContent(function(richTextEditor) {
+      explorationEditorPage.setContent(function(richTextEditor) {
         richTextEditor.appendItalicText('Welcome');
       });
-      editor.expectContentToMatch(function(richTextChecker) {
+      explorationEditorPage.expectContentToMatch(function(richTextChecker) {
         richTextChecker.readItalicText('Welcome');
       });
-      editor.setInteraction('NumericInput');
-      editor.expectInteractionToMatch('NumericInput');
+      explorationEditorPage.setInteraction('NumericInput');
+      explorationEditorPage.expectInteractionToMatch('NumericInput');
 
       // Check deletion of groups
-      editor.setDefaultOutcome(forms.toRichText('Farewell'), null, false);
-      editor.ResponseEditor('default').
+      explorationEditorPage.setDefaultOutcome(
+        forms.toRichText('Farewell'), null, false);
+      explorationEditorPage.ResponseEditor('default').
         expectAvailableDestinationsToBe(['second', 'final card']);
-      editor.ResponseEditor(
+      explorationEditorPage.ResponseEditor(
         'default').setDestination('final card', false, null);
-      editor.ResponseEditor('default').
+      explorationEditorPage.ResponseEditor('default').
         expectAvailableDestinationsToBe(['second', 'final card']);
-      editor.addResponse('NumericInput', null, 'final card', false,
+      explorationEditorPage.addResponse(
+        'NumericInput', null, 'final card', false,
         'IsGreaterThan', 2);
       // eslint-disable-next-line dot-notation
-      editor.ResponseEditor(0).delete();
+      explorationEditorPage.ResponseEditor(0).delete();
 
       // Setup a terminating state
-      editor.moveToState('final card');
-      editor.setInteraction('EndExploration');
+      explorationEditorPage.moveToState('final card');
+      explorationEditorPage.setInteraction('EndExploration');
 
       // Check that preview/editor switch doesn't change state
-      editor.navigateToPreviewTab();
+      explorationEditorPage.navigateToPreviewTab();
       explorationPlayerPage.expectExplorationToBeOver();
-      editor.navigateToMainTab();
-      editor.expectCurrentStateToBe('final card');
-      editor.moveToState('second');
+      explorationEditorPage.navigateToMainTab();
+      explorationEditorPage.expectCurrentStateToBe('final card');
+      explorationEditorPage.moveToState('second');
 
       // Check editor preview tab
-      editor.navigateToPreviewTab();
+      explorationEditorPage.navigateToPreviewTab();
       explorationPlayerPage.expectContentToMatch(function(richTextEditor) {
         richTextEditor.readItalicText('Welcome');
       });
@@ -429,7 +448,7 @@ describe('Full exploration editor', function() {
       explorationPlayerPage.clickThroughToNextCard();
       explorationPlayerPage.expectExplorationToBeOver();
 
-      editor.discardChanges();
+      explorationEditorPage.discardChanges();
       users.logout();
     });
   });
@@ -443,33 +462,38 @@ describe('Full exploration editor', function() {
 
     general.getExplorationIdFromEditor().then(function(explorationId) {
       // Create an exploration with multiple groups.
-      editor.setStateName('first card');
-      editor.setContent(forms.toRichText('How are you feeling?'));
-      editor.setInteraction('TextInput');
-      editor.addResponse('TextInput', forms.toRichText('You must be happy!'),
+      explorationEditorPage.setStateName('first card');
+      explorationEditorPage.setContent(forms.toRichText(
+        'How are you feeling?'));
+      explorationEditorPage.setInteraction('TextInput');
+      explorationEditorPage.addResponse(
+        'TextInput', forms.toRichText('You must be happy!'),
         null, false, 'Equals', 'happy');
-      editor.addResponse('TextInput', forms.toRichText('No being sad!'),
+      explorationEditorPage.addResponse('TextInput',
+        forms.toRichText('No being sad!'),
         null, false, 'Contains', 'sad');
-      editor.setDefaultOutcome(forms.toRichText(
+      explorationEditorPage.setDefaultOutcome(forms.toRichText(
         'Okay, now this is just becoming annoying.'), 'final card', true);
 
       // Now, add multiple rules to a single answer group.
-      editor.ResponseEditor(0).addRule('TextInput', 'Contains', 'meh');
-      editor.ResponseEditor(0).addRule('TextInput', 'Contains', 'okay');
+      explorationEditorPage.ResponseEditor(0).addRule(
+        'TextInput', 'Contains', 'meh');
+      explorationEditorPage.ResponseEditor(0).addRule(
+        'TextInput', 'Contains', 'okay');
 
       // Ensure that the only rule for this group cannot be deleted.
-      editor.ResponseEditor(1).expectCannotDeleteRule(0);
+      explorationEditorPage.ResponseEditor(1).expectCannotDeleteRule(0);
 
       // Setup a terminating state.
-      editor.moveToState('final card');
-      editor.setInteraction('EndExploration');
+      explorationEditorPage.moveToState('final card');
+      explorationEditorPage.setInteraction('EndExploration');
 
       // Save.
-      editor.setTitle('Testing multiple rules');
-      editor.setCategory('Algebra');
-      editor.setObjective('To assess happiness.');
-      editor.openAndClosePreviewSummaryTile();
-      editor.saveChanges();
+      explorationEditorPage.setTitle('Testing multiple rules');
+      explorationEditorPage.setCategory('Algebra');
+      explorationEditorPage.setObjective('To assess happiness.');
+      explorationEditorPage.openAndClosePreviewSummaryTile();
+      explorationEditorPage.saveChanges();
       workflow.publishExploration();
 
       // Login as another user and verify that the exploration editor does not
@@ -477,16 +501,16 @@ describe('Full exploration editor', function() {
       users.logout();
       users.login('user7@editorAndPlayer.com');
       general.openEditor(explorationId);
-      editor.exitTutorialIfNecessary();
+      explorationEditorPage.exitTutorialIfNecessary();
 
       // Verify nothing can change with this user.
-      editor.expectInteractionToMatch('TextInput');
-      editor.expectCannotDeleteInteraction();
-      editor.expectCannotAddResponse();
-      editor.expectCannotSaveChanges();
+      explorationEditorPage.expectInteractionToMatch('TextInput');
+      explorationEditorPage.expectCannotDeleteInteraction();
+      explorationEditorPage.expectCannotAddResponse();
+      explorationEditorPage.expectCannotSaveChanges();
 
       // Check answer group 1.
-      var responseEditor = editor.ResponseEditor(0);
+      var responseEditor = explorationEditorPage.ResponseEditor(0);
       responseEditor.expectCannotSetFeedback();
       responseEditor.expectCannotSetDestination();
       responseEditor.expectCannotDeleteResponse();
@@ -495,7 +519,7 @@ describe('Full exploration editor', function() {
       responseEditor.expectCannotDeleteRule(1);
 
       // Check answer group 2.
-      responseEditor = editor.ResponseEditor(0);
+      responseEditor = explorationEditorPage.ResponseEditor(0);
       responseEditor.expectCannotSetFeedback();
       responseEditor.expectCannotSetDestination();
       responseEditor.expectCannotDeleteResponse();
@@ -503,7 +527,7 @@ describe('Full exploration editor', function() {
       responseEditor.expectCannotDeleteRule(0);
 
       // Check default outcome.
-      responseEditor = editor.ResponseEditor('default');
+      responseEditor = explorationEditorPage.ResponseEditor('default');
       responseEditor.expectCannotSetFeedback();
       responseEditor.expectCannotSetDestination();
 
@@ -547,13 +571,14 @@ describe('Full exploration editor', function() {
     workflow.createExploration();
 
     general.getExplorationIdFromEditor().then(function(explorationId) {
-      editor.setContent(forms.toRichText('How are you feeling?'));
-      editor.setInteraction('EndExploration');
-      editor.setInteraction('TextInput');
-      editor.addResponse(
+      explorationEditorPage.setContent(forms.toRichText(
+        'How are you feeling?'));
+      explorationEditorPage.setInteraction('EndExploration');
+      explorationEditorPage.setInteraction('TextInput');
+      explorationEditorPage.addResponse(
         'TextInput', forms.toRichText('Happy!'), null, false, 'Equals',
         'happy');
-      editor.setInteraction('EndExploration');
+      explorationEditorPage.setInteraction('EndExploration');
       users.logout();
     });
   });
