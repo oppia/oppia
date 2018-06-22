@@ -28,13 +28,13 @@ describe('Subtopic page object factory', function() {
 
   it('should be able to create a subtopic page object with given topic and ' +
     'subtopic id', function() {
-      var subtopicPage = SubtopicPageObjectFactory.createFromTopicAndSubtopicId(
-        'topic_id', 2);
-      expect(subtopicPage.getId()).toBe('topic_id-2');
-      expect(subtopicPage.getTopicId()).toBe('topic_id');
-      expect(subtopicPage.getHtmlData()).toEqual('');
-      expect(subtopicPage.getLanguageCode()).toEqual('en');
-    });
+    var subtopicPage = SubtopicPageObjectFactory.createFromTopicAndSubtopicId(
+      'topic_id', 2);
+    expect(subtopicPage.getId()).toBe('topic_id-2');
+    expect(subtopicPage.getTopicId()).toBe('topic_id');
+    expect(subtopicPage.getHtmlData()).toEqual('');
+    expect(subtopicPage.getLanguageCode()).toEqual('en');
+  });
 
   it('should be able to create an interstitial subtopic page object',
     function() {
@@ -44,28 +44,28 @@ describe('Subtopic page object factory', function() {
       expect(subtopicPage.getTopicId()).toEqual(null);
       expect(subtopicPage.getHtmlData()).toEqual('<p>Html data loading</p>');
       expect(subtopicPage.getLanguageCode()).toBe('en');
-  });
+    });
 
   it('should be able to copy from another subtopic page', function() {
-      var firstSubtopicPage = SubtopicPageObjectFactory.createFromBackendDict({
-        id: 'topic_id-1',
-        topic_id: 'topic_id',
-        html_data: '<p>Data</p>',
-        language_code: 'en'
-      });
-
-      var secondSubtopicPage = SubtopicPageObjectFactory.createFromBackendDict({
-        id: 'topic_id2-2',
-        topic_id: 'topic_id2',
-        html_data: '<p>Data2</p>',
-        language_code: 'en'
-      });
-
-      expect(firstSubtopicPage).not.toBe(secondSubtopicPage);
-      expect(firstSubtopicPage).not.toEqual(secondSubtopicPage);
-
-      firstSubtopicPage.copyFromSubtopicPage(secondSubtopicPage);
-      expect(firstSubtopicPage).not.toBe(secondSubtopicPage);
-      expect(firstSubtopicPage).toEqual(secondSubtopicPage);
+    var firstSubtopicPage = SubtopicPageObjectFactory.createFromBackendDict({
+      id: 'topic_id-1',
+      topic_id: 'topic_id',
+      html_data: '<p>Data</p>',
+      language_code: 'en'
     });
+
+    var secondSubtopicPage = SubtopicPageObjectFactory.createFromBackendDict({
+      id: 'topic_id2-2',
+      topic_id: 'topic_id2',
+      html_data: '<p>Data2</p>',
+      language_code: 'en'
+    });
+
+    expect(firstSubtopicPage).not.toBe(secondSubtopicPage);
+    expect(firstSubtopicPage).not.toEqual(secondSubtopicPage);
+
+    firstSubtopicPage.copyFromSubtopicPage(secondSubtopicPage);
+    expect(firstSubtopicPage).not.toBe(secondSubtopicPage);
+    expect(firstSubtopicPage).toEqual(secondSubtopicPage);
+  });
 });
