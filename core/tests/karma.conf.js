@@ -25,7 +25,7 @@ module.exports = function(config) {
       'third_party/static/headroom-js-0.9.4/headroom.min.js',
       'third_party/static/headroom-js-0.9.4/angular.headroom.min.js',
       'third_party/static/math-expressions-370a77/build/math-expressions.js',
-      'third_party/static/ckeditor-4.9.1/ckeditor.js',
+      'third_party/static/ckeditor-4.9.2/ckeditor.js',
       generatedJs,
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of

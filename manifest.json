@@ -406,30 +406,30 @@
         }
       },
       "ckeditor": {
-        "version": "4.9.1",
+        "version": "4.9.2",
         "downloadFormat": "zip",
-        "url": "http://download.cksource.com/CKEditor/CKEditor/CKEditor%204.9.1/ckeditor_4.9.1_standard.zip",
+        "url": "http://download.cksource.com/CKEditor/CKEditor/CKEditor%204.9.2/ckeditor_4.9.2_full.zip",
         "rootDir": "ckeditor",
         "targetDirPrefix": "ckeditor-"
       },
       "ckeditorWidget": {
-        "version": "4.9.1",
+        "version": "4.9.2",
         "downloadFormat": "zip",
-        "url": "http://download.ckeditor.com/widget/releases/widget_4.9.1.zip",
+        "url": "http://download.ckeditor.com/widget/releases/widget_4.9.2.zip",
         "rootDir": "widget",
         "targetDir": "ckeditor-widget"
       },
       "ckeditorLineutils": {
-        "version": "4.9.1",
+        "version": "4.9.2",
         "downloadFormat": "zip",
-        "url": "http://download.ckeditor.com/lineutils/releases/lineutils_4.9.1.zip",
+        "url": "http://download.ckeditor.com/lineutils/releases/lineutils_4.9.2.zip",
         "rootDir": "lineutils",
         "targetDir": "ckeditor-lineutils"
       },
       "ckeditorSharedspace": {
-        "version": "4.9.1",
+        "version": "4.9.2",
         "downloadFormat": "zip",
-        "url": "http://download.ckeditor.com/sharedspace/releases/sharedspace_4.9.1.zip",
+        "url": "http://download.ckeditor.com/sharedspace/releases/sharedspace_4.9.2.zip",
         "rootDir": "sharedspace",
         "targetDir": "ckeditor-sharedspace"
       },
@@ -439,6 +439,20 @@
         "url": "http://download.ckeditor.com/bootstrapck/releases/bootstrapck_1.0_0.zip",
         "rootDir": "bootstrapck",
         "targetDir": "ckeditor-bootstrapck"
+      },
+      "ckeditorInsertPrePlugin" : {
+        "version": "1.0",
+        "downloadFormat": "zip",
+        "url": "https://download.ckeditor.com/insertpre/releases/insertpre_1.0.zip",
+        "rootDir": "insertpre",
+        "targetDir": "ckeditor-insertpre"
+      },
+      "ckeditorIndentBlockPlugin" : {
+        "version": "4.9.2",
+        "downloadFormat": "zip",
+        "url": "https://download.ckeditor.com/indentblock/releases/indentblock_4.9.2.zip",
+        "rootDir": "indentblock",
+        "targetDir": "ckeditor-indentblock"
       },
       "textAngular": {
         "version": "1.4.5",

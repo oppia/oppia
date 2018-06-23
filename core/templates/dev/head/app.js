@@ -203,6 +203,158 @@ oppia.config(['$provide', function($provide) {
   ]);
 }]);
 
+// Dynamically generate CKEditor widgets for the rich text components.
+oppia.run([
+  '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
+  'HtmlEscaperService', 'taOptions',
+  function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
+      HtmlEscaperService, taOptions) {
+    taOptions.disableSanitizer = true;
+    taOptions.forceTextAngularSanitize = false;
+    taOptions.classes.textEditor = 'form-control oppia-rte-content';
+    taOptions.setup.textEditorSetup = function($element) {
+      $timeout(function() {
+        $element.trigger('focus');
+      });
+    };
+    var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
+    _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
+      // The name of the CKEditor widget corresponding to this component.
+      var ckName = 'oppia' + componentDefn.id;
+
+      // For some reason, frontend tests will error without this check.
+      if (CKEDITOR.plugins.registered[ckName] !== undefined) {
+        return;
+      }
+      var tagName = 'oppia-noninteractive-' + componentDefn.id;
+      var customizationArgSpecs = componentDefn.customizationArgSpecs;
+      var isInline = RteHelperService.isInlineComponent(componentDefn.id);
+
+      // Inline components will be wrapped in a span, while block components
+      // will be wrapped in a div.
+      if (isInline) {
+        var componentTemplate = '<span type="' + tagName + '">' +
+                                '<' + tagName + '></' + tagName + '>' +
+                                '</span>';
+      } else {
+        var componentTemplate = '<div class="oppia-rte-component-container" ' +
+                                'type="' + tagName + '">' +
+                                '<' + tagName + '></' + tagName + '>' +
+                                '<div class="component-overlay"></div>' +
+                                '</div>';
+      }
+      CKEDITOR.plugins.add(ckName, {
+        init: function(editor) {
+          // Create the widget itself.
+          editor.widgets.add(ckName, {
+            button: componentDefn.tooltip,
+            inline: isInline,
+            template: componentTemplate,
+            edit: function(event) {
+              editor.fire('lockSnapshot', {
+                dontUpdate: true
+              });
+              // Prevent default action since we are using our own edit modal.
+              event.cancel();
+              // Save this for creating the widget later.
+              var container = this.wrapper.getParent(true);
+              var that = this;
+              var customizationArgs = {};
+              customizationArgSpecs.forEach(function(spec) {
+                customizationArgs[spec.name] = that.data[spec.name] ||
+                                               spec.default_value;
+              });
+
+              RteHelperService._openCustomizationModal(
+                customizationArgSpecs,
+                customizationArgs,
+                function(customizationArgsDict) {
+                  for (var arg in customizationArgsDict) {
+                    if (customizationArgsDict.hasOwnProperty(arg)) {
+                      that.setData(arg, customizationArgsDict[arg]);
+                    }
+                  }
+                  if (!that.isReady()) {
+                    // Actually create the widget, if we have not already.
+                    editor.widgets.finalizeCreation(container);
+                  }
+                  // Need to manually $compile so the directive renders.
+                  $compile($(that.element.$).contents())($rootScope);
+                  $timeout(function() {
+                    if (isInline) {
+                      // Move caret after the newly created widget.
+                      var range = editor.createRange();
+                      var widgetContainer = that.element.getParent();
+                      range.moveToPosition(
+                        widgetContainer, CKEDITOR.POSITION_AFTER_END);
+                      editor.getSelection().selectRanges([range]);
+                      $timeout(function() {
+                        editor.fire('unlockSnapshot');
+                        editor.fire('saveSnapshot');
+                      });
+                    } else {
+                      editor.fire('unlockSnapshot');
+                      editor.fire('saveSnapshot');
+                    }
+                  });
+                },
+                function() {},
+                function() {});
+            },
+            downcast: function(element) {
+              element.children[0].setHtml('');
+              return element.children[0];
+            },
+            upcast: function(element) {
+              // This is how the widget is recognized by CKEditor.
+              return (element.name !== 'p' &&
+                      element.children.length > 0 &&
+                      element.children[0].name === tagName);
+            },
+            data: function() {
+              var that = this;
+              // Set attributes of component according to data values.
+              customizationArgSpecs.forEach(function(spec) {
+                that.element.getChild(0).setAttribute(
+                  spec.name + '-with-value',
+                  HtmlEscaperService.objToEscapedJson(
+                    that.data[spec.name] || ''));
+              });
+            },
+            init: function() {
+              editor.fire('lockSnapshot', {
+                dontUpdate: true
+              });
+              var that = this;
+              var isMissingAttributes = false;
+              // On init, read values from component attributes and save them.
+              customizationArgSpecs.forEach(function(spec) {
+                var value = that.element.getChild(0).getAttribute(
+                  spec.name + '-with-value');
+                if (value) {
+                  that.setData(
+                    spec.name, HtmlEscaperService.escapedJsonToObj(value));
+                } else {
+                  isMissingAttributes = true;
+                }
+              });
+
+              if (!isMissingAttributes) {
+                // Need to manually $compile so the directive renders.
+                $compile($(this.element.$).contents())($rootScope);
+              }
+              $timeout(function() {
+                editor.fire('unlockSnapshot');
+                editor.fire('saveSnapshot');
+              });
+            }
+          });
+        }
+      });
+    });
+  }
+]);
+
 oppia.config([
   '$compileProvider', '$httpProvider', '$interpolateProvider',
   '$locationProvider', '$cookiesProvider',
