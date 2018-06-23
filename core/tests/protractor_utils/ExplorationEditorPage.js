@@ -73,6 +73,10 @@ var ExplorationEditorPage = function() {
   var responseBody = function(responseNum) {
     return element(by.css('.protractor-test-response-body-' + responseNum));
   };
+  var openOutcomeDestEditor = element(
+    by.css('.protractor-test-open-outcome-dest-editor'));
+  var openOutcomeFeedBackEditor = element(
+    by.css('.protractor-test-open-outcome-feedback-editor'));
   var responseTab = element.all(by.css('.protractor-test-response-tab'));
   var ruleBlock = element.all(by.css('.protractor-test-rule-block'));
   var ruleDetails = element(by.css('.protractor-test-rule-details'));
@@ -146,10 +150,6 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-preview-tab'));
   var navigateToSettingsTabButton = element(
     by.css('.protractor-test-settings-tab'));
-  var openOutcomeDestEditorButton = element(
-    by.css('.protractor-test-open-outcome-dest-editor'));
-  var openOutcomeFeedBackEditorButton = element(
-    by.css('.protractor-test-open-outcome-feedback-editor'));
   var openPreviewSummaryButton = element(
     by.css('.protractor-test-open-preview-summary-modal'));
   var saveAnswerButton = element(
@@ -291,7 +291,7 @@ var ExplorationEditorPage = function() {
     return {
       setFeedback: function(richTextInstructions) {
         // Begin editing feedback.
-        openOutcomeFeedBackEditorButton.click();
+        openOutcomeFeedBackEditor.click();
 
         // Set feedback contents.
         _setOutcomeFeedback(richTextInstructions);
@@ -307,7 +307,7 @@ var ExplorationEditorPage = function() {
       setDestination: function(
           destinationName, createState, refresherExplorationId) {
         // Begin editing destination.
-        openOutcomeDestEditorButton.click();
+        openOutcomeDestEditor.click();
 
         // Set destination contents.
         _setOutcomeDest(destinationName, createState, refresherExplorationId);
@@ -319,7 +319,7 @@ var ExplorationEditorPage = function() {
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: function(stateNames) {
         // Begin editing destination.
-        openOutcomeDestEditorButton.click();
+        openOutcomeDestEditor.click();
 
         var expectedOptionTexts = [_CURRENT_STATE_OPTION].concat(
           stateNames.slice(1));
@@ -360,10 +360,10 @@ var ExplorationEditorPage = function() {
         confirmDeleteResponseButton.click();
       },
       expectCannotSetFeedback: function() {
-        expect(openOutcomeFeedBackEditorButton.isPresent()).toBeFalsy();
+        expect(openOutcomeFeedBackEditor.isPresent()).toBeFalsy();
       },
       expectCannotSetDestination: function() {
-        var destEditorElem = openOutcomeDestEditorButton;
+        var destEditorElem = openOutcomeDestEditor;
         expect(destEditorElem.isPresent()).toBeFalsy();
       },
       expectCannotAddRule: function() {
@@ -574,7 +574,8 @@ var ExplorationEditorPage = function() {
     } else {
       targetOption = destName;
     }
-
+    // browser.pause();
+    // browser.pause();
     editOutcomeDestDropdownOptions(targetOption).click();
     if (createDest) {
       editOutcomeDestStateInput.sendKeys(destName);
