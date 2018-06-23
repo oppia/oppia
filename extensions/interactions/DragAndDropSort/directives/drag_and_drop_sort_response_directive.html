@@ -9,7 +9,7 @@
     margin: 10px 0 0 0;
     width: 70px;
   }
-  .subItem {
+  .subitem {
     background-color: #add8e6;
     border: 1px solid #000000;
     height: 70px;
@@ -26,7 +26,7 @@
         <angular-html-bind html-data="responses[0]"></angular-html-bind>
       </div>
       <li ng-repeat="response in responses track by $index">
-        <div ng-if="$index > 0" class="subItem">
+        <div ng-if="$index > 0" class="subitem">
           <angular-html-bind html-data="response"></angular-html-bind>
         </div>
       </li>
