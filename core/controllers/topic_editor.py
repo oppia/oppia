@@ -32,7 +32,8 @@ import utils
 
 class TopicEditorStoryHandler(base.BaseHandler):
     """Manages the creation of a story and receiving of all story summaries for
-    display in topic editor page."""
+    display in topic editor page.
+    """
 
     @acl_decorators.can_edit_topic
     def get(self, topic_id):
