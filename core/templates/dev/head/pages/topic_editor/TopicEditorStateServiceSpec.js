@@ -37,10 +37,22 @@ describe('Topic editor state service', function() {
       });
     };
 
+    var _fetchStories = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve(self.backendStorySummariesObject);
+        } else {
+          reject();
+        }
+      });
+    };
+
     self.newBackendTopicObject = {};
+    self.backendStorySummariesObject = [];
     self.failure = null;
     self.fetchTopic = _fetchOrUpdateTopic;
     self.updateTopic = _fetchOrUpdateTopic;
+    self.fetchStories = _fetchStories;
 
     return self;
   };

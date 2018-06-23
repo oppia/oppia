@@ -3,7 +3,7 @@
     <div class="topic-name">
       <span ng-if="!topicNameEditorIsShown" ng-click="openTopicNameEditor()"
             class="oppia-editable-section">
-        <strong style="font-size: 1.2em;"><[topic.getName()]></strong>
+        <strong class="form-heading"><[topic.getName()]></strong>
         <i ng-if="topicRights.canEditName()" class="material-icons oppia-editor-edit-icon"
            title="Edit Topic Name">&#xE254;
         </i>
@@ -18,7 +18,7 @@
     </div>
 
     <div class="topic-description" ng-class="{'has-error': !displayedTopicDescription}">
-      <label for="topicDescription" style="font-size: 1.2em;">Description</label>
+      <label for="topicDescription" class="form-heading">Description</label>
       <textarea type="text" class="form-control"
                 ng-model="editableDescription"
                 ng-change="displayedTopicDescription = (editableDescription !== '')"
@@ -27,6 +27,11 @@
       <span ng-if="!displayedTopicDescription" class="help-block" style="font-size: smaller">
         What does this topic contain?
       </span>
+    </div>
+
+    <div class="canonical-stories">
+      <label class="form-heading" ng-if="topic.getCanonicalStoryIds().length > 0"> Canonical Stories </label>
+      <stories-list story-summaries="canonicalStorySummaries"></stories-list>
     </div>
   </md-card>
 </div>
@@ -38,8 +43,16 @@
     width: 80%;
   }
 
+  .topic-editor .form-heading {
+    font-size: 1.2em;
+  }
+
   .topic-editor .topic-name {
     margin-bottom: 1.5%;
+  }
+
+  .topic-editor .canonical-stories {
+    margin-top: 2%;
   }
 
   .topic-editor .topic-description textarea{

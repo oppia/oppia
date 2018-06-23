@@ -18,9 +18,9 @@
 
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'TOPIC_EDITOR_STORY_URL_TEMPLATE',
   function($http, $q, EDITABLE_TOPIC_DATA_URL_TEMPLATE,
-      UrlInterpolationService) {
+      UrlInterpolationService, TOPIC_EDITOR_STORY_URL_TEMPLATE) {
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -32,6 +32,26 @@ oppia.factory('EditableTopicBackendApiService', [
         var topic = angular.copy(response.data.topic);
         if (successCallback) {
           successCallback(topic);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchStories = function(
+        topicId, successCallback, errorCallback) {
+      var storiesDataUrl = UrlInterpolationService.interpolateUrl(
+        TOPIC_EDITOR_STORY_URL_TEMPLATE, {
+          topic_id: topicId
+        });
+
+      $http.get(storiesDataUrl).then(function(response) {
+        var canonicalStorySummaries = angular.copy(
+          response.data.canonical_story_summary_dicts);
+        if (successCallback) {
+          successCallback(canonicalStorySummaries);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -88,6 +108,12 @@ oppia.factory('EditableTopicBackendApiService', [
       fetchTopic: function(topicId) {
         return $q(function(resolve, reject) {
           _fetchTopic(topicId, resolve, reject);
+        });
+      },
+
+      fetchStories: function(topicId) {
+        return $q(function(resolve, reject) {
+          _fetchStories(topicId, resolve, reject);
         });
       },
 

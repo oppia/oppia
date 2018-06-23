@@ -30,8 +30,30 @@ import feconf
 import utils
 
 
-class NewStoryHandler(base.BaseHandler):
-    """Creates a new story."""
+class TopicEditorStoryHandler(base.BaseHandler):
+    """Manages the creation of a story and receiving of all story summaries for
+    display in topic editor page."""
+
+    @acl_decorators.can_edit_topic
+    def get(self, topic_id):
+        """Handles GET requests."""
+
+        topic = topic_services.get_topic_by_id(topic_id)
+        canonical_story_summaries = story_services.get_story_summaries_by_ids(
+            topic.canonical_story_ids)
+        additional_story_summaries = story_services.get_story_summaries_by_ids(
+            topic.additional_story_ids)
+
+        canonical_story_summary_dicts = [
+            summary.to_dict() for summary in canonical_story_summaries]
+        additional_story_summary_dicts = [
+            summary.to_dict() for summary in additional_story_summaries]
+
+        self.values.update({
+            'canonical_story_summary_dicts': canonical_story_summary_dicts,
+            'additional_story_summary_dicts': additional_story_summary_dicts
+        })
+        self.render_json(self.values)
 
     @acl_decorators.can_add_new_story_to_topic
     def post(self, topic_id):

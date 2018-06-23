@@ -25,11 +25,11 @@ oppia.directive('topicMainEditor', [
         '/pages/topic_editor/main_editor/topic_editor_tab_directive.html'),
       controller: [
         '$scope', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService',
+        'UndoRedoService', 'EVENT_STORY_SUMMARIES_INITIALIZED',
         'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
         function(
             $scope, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService,
+            UndoRedoService, EVENT_STORY_SUMMARIES_INITIALIZED,
             EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
@@ -39,6 +39,11 @@ oppia.directive('topicMainEditor', [
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.displayedTopicDescription = (
               $scope.editableDescription !== '');
+          };
+
+          var _initStorySummaries = function() {
+            $scope.canonicalStorySummaries =
+              TopicEditorStateService.getCanonicalStorySummaries();
           };
 
           $scope.openTopicNameEditor = function() {
@@ -71,8 +76,10 @@ oppia.directive('topicMainEditor', [
 
           $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
           $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+          $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
 
           _initEditor();
+          _initStorySummaries();
         }
       ]
     };
