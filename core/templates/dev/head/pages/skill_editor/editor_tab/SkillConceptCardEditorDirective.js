@@ -9,8 +9,8 @@ oppia.directive('skillConceptCardEditor', [
         '/pages/skill_editor/editor_tab/' +
         'skill_concept_card_editor_directive.html'),
       controller: [
-        '$scope', '$filter', '$uibModal',
-        function($scope, $filter, $uibModal) {
+        '$scope', '$filter', '$uibModal', '$rootScope',
+        function($scope, $filter, $uibModal, $rootScope) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
