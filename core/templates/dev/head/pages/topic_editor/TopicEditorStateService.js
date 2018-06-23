@@ -59,7 +59,7 @@ oppia.factory('TopicEditorStateService', [
           return i;
         }
       }
-      return -1;
+      return null;
     };
     var _updateTopic = function(newBackendTopicObject) {
       _setTopic(TopicObjectFactory.create(newBackendTopicObject));
@@ -117,7 +117,7 @@ oppia.factory('TopicEditorStateService', [
        */
       loadSubtopicPage: function(topicId, subtopicId) {
         var subtopicPageId = topicId + '-' + subtopicId;
-        if (_getSubtopicPageIndex(subtopicPageId) !== -1) {
+        if (_getSubtopicPageIndex(subtopicPageId) !== null) {
           _subtopicPage = angular.copy(
             _subtopicPages[_getSubtopicPageIndex(subtopicPageId)]);
           $rootScope.$broadcast(EVENT_SUBTOPIC_PAGE_LOADED);
@@ -128,7 +128,7 @@ oppia.factory('TopicEditorStateService', [
           function(newBackendSubtopicPageObject) {
             if (newBackendSubtopicPageObject === null) {
               _setSubtopicPage(
-                SubtopicPageObjectFactory.createFromTopicAndSubtopicId(
+                SubtopicPageObjectFactory.createDefault(
                   topicId, subtopicId));
             } else {
               _updateSubtopicPage(newBackendSubtopicPageObject);
@@ -209,7 +209,7 @@ oppia.factory('TopicEditorStateService', [
        * _subtopicPages list.
        */
       setSubtopicPage: function(subtopicPage) {
-        if (_getSubtopicPageIndex(subtopicPage.getId()) !== -1) {
+        if (_getSubtopicPageIndex(subtopicPage.getId()) !== null) {
           _subtopicPages[_getSubtopicPageIndex(subtopicPage.getId())] =
             angular.copy(subtopicPage);
         } else {

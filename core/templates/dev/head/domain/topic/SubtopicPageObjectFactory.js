@@ -30,6 +30,7 @@ oppia.factory('SubtopicPageObjectFactory', [
     var getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
     };
+
     // Instance methods
 
     // Returns the id of the subtopic page.
@@ -71,7 +72,7 @@ oppia.factory('SubtopicPageObjectFactory', [
       this._languageCode = otherSubtopicPage.getLanguageCode();
     };
 
-    SubtopicPage.createFromTopicAndSubtopicId = function(topicId, subtopicId) {
+    SubtopicPage.createDefault = function(topicId, subtopicId) {
       return new SubtopicPage(
         getSubtopicPageId(topicId, subtopicId), topicId, '', 'en'
       );
@@ -80,7 +81,7 @@ oppia.factory('SubtopicPageObjectFactory', [
     // Create an interstitial subtopic page that would be displayed in the
     // editor until the actual subtopic page is fetched from the backend.
     SubtopicPage.createInterstitialSubtopicPage = function() {
-      return new SubtopicPage(null, null, '<p>Html data loading</p>', 'en');
+      return new SubtopicPage(null, null, null, 'en');
     };
     return SubtopicPage;
   }

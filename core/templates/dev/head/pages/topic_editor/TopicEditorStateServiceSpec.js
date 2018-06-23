@@ -317,7 +317,7 @@ describe('Topic editor state service', function() {
     var subtopicPage = TopicEditorStateService.getSubtopicPage();
     expect(subtopicPage.getId()).toEqual(null);
     expect(subtopicPage.getTopicId()).toEqual(null);
-    expect(subtopicPage.getHtmlData()).toEqual('<p>Html data loading</p>');
+    expect(subtopicPage.getHtmlData()).toEqual(null);
     expect(subtopicPage.getLanguageCode()).toEqual('en');
   });
 

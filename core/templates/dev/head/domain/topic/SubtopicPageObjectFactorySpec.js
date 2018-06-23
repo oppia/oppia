@@ -28,7 +28,7 @@ describe('Subtopic page object factory', function() {
 
   it('should be able to create a subtopic page object with given topic and ' +
     'subtopic id', function() {
-    var subtopicPage = SubtopicPageObjectFactory.createFromTopicAndSubtopicId(
+    var subtopicPage = SubtopicPageObjectFactory.createDefault(
       'topic_id', 2);
     expect(subtopicPage.getId()).toBe('topic_id-2');
     expect(subtopicPage.getTopicId()).toBe('topic_id');
@@ -42,7 +42,7 @@ describe('Subtopic page object factory', function() {
         SubtopicPageObjectFactory.createInterstitialSubtopicPage();
       expect(subtopicPage.getId()).toEqual(null);
       expect(subtopicPage.getTopicId()).toEqual(null);
-      expect(subtopicPage.getHtmlData()).toEqual('<p>Html data loading</p>');
+      expect(subtopicPage.getHtmlData()).toEqual(null);
       expect(subtopicPage.getLanguageCode()).toBe('en');
     });
 

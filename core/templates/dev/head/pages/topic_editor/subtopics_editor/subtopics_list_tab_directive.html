@@ -18,7 +18,7 @@
         </span>
       </div>
       <div ng-if="isSubtopicEditorDisplayed(subtopic)">
-        <div ng-if="previewSubtopicPage" class="preview">
+        <div ng-if="!subtopicEditorIsShown" class="preview">
           <angular-html-bind html-data="htmlData">
           </angular-html-bind>
           <div class="pull-right">
@@ -29,7 +29,7 @@
             </button>
           </div>
         </div>
-        <div ng-if="!previewSubtopicPage" class="oppia-editor-card-body">
+        <div ng-if="subtopicEditorIsShown" class="oppia-editor-card-body">
           <schema-based-editor schema="SUBTOPIC_PAGE_SCHEMA"
                                local-value="editableHtmlData">
           </schema-based-editor>

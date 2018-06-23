@@ -32,11 +32,13 @@ oppia.directive('subtopicsListTab', [
             $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
             UndoRedoService, EVENT_TOPIC_REINITIALIZED,
             EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
+          // The subtopic preview/editor would be hidden until a subtopic is
+          // clicked.
           $scope.subtopicDisplayed = false;
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.subtopics = $scope.topic.getSubtopics();
-            $scope.previewSubtopicPage = true;
+            $scope.subtopicEditorIsShown = false;
           };
 
           $scope.SUBTOPIC_PAGE_SCHEMA = {
@@ -64,7 +66,7 @@ oppia.directive('subtopicsListTab', [
           $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
             $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
             $scope.subtopicDisplayed = true;
-            $scope.previewSubtopicPage = true;
+            $scope.subtopicEditorIsShown = false;
             $scope.htmlData = $scope.subtopicPage.getHtmlData();
           });
 
@@ -77,12 +79,12 @@ oppia.directive('subtopicsListTab', [
           };
 
           $scope.openPreviewSubtopicPage = function(htmlData) {
-            $scope.previewSubtopicPage = true;
+            $scope.subtopicEditorIsShown = false;
             $scope.htmlData = htmlData;
           };
 
           $scope.closePreviewSubtopicPage = function(previewHtmlData) {
-            $scope.previewSubtopicPage = false;
+            $scope.subtopicEditorIsShown = true;
             $scope.editableHtmlData = previewHtmlData;
           };
 
