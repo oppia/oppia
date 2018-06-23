@@ -18,6 +18,7 @@ are created.
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
@@ -40,6 +41,45 @@ class TopicsAndSkillsDashboardPage(base.BaseHandler):
         self.render_template(
             'pages/topics_and_skills_dashboard/'
             'topics_and_skills_dashboard.html', redirect_url_on_logout='/')
+
+
+class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
+    """Provides data for the user's topics and skills dashboard page."""
+
+    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+    @acl_decorators.can_access_topics_and_skills_dashboard
+    def get(self):
+        """Handles GET requests."""
+
+        topic_summaries = topic_services.get_all_topic_summaries()
+        topic_summary_dicts = [
+            summary.to_dict() for summary in topic_summaries]
+
+        skill_summaries = skill_services.get_all_skill_summaries()
+        skill_summary_dicts = [
+            summary.to_dict() for summary in skill_summaries]
+
+        topic_rights_dict = topic_services.get_all_topic_rights()
+        for topic_summary in topic_summary_dicts:
+            topic_rights = topic_rights_dict[topic_summary['id']]
+            if topic_rights:
+                topic_summary['is_published'] = (
+                    topic_rights.topic_is_published)
+
+        can_delete_topic = (
+            role_services.ACTION_DELETE_TOPIC in self.user.actions)
+
+        can_create_topic = (
+            role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
+
+        self.values.update({
+            'skill_summary_dicts': skill_summary_dicts,
+            'topic_summary_dicts': topic_summary_dicts,
+            'can_delete_topic': can_delete_topic,
+            'can_create_topic': can_create_topic
+        })
+        self.render_json(self.values)
 
 
 class NewTopicHandler(base.BaseHandler):

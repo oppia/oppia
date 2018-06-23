@@ -640,7 +640,7 @@ class SkillSummary(object):
 
     def __init__(
             self, skill_id, description, language_code, version,
-            misconception_count, skill_model_created_on,
+            misconception_count, worked_examples_count, skill_model_created_on,
             skill_model_last_updated):
         """Constructs a SkillSummary domain object.
 
@@ -651,6 +651,8 @@ class SkillSummary(object):
             version: int. The version of the skill.
             misconception_count: int. The number of misconceptions associated
                 with the skill.
+            worked_examples_count: int. The number of worked examples in the
+                skill.
             skill_model_created_on: datetime.datetime. Date and time when
                 the skill model is created.
             skill_model_last_updated: datetime.datetime. Date and time
@@ -661,6 +663,7 @@ class SkillSummary(object):
         self.language_code = language_code
         self.version = version
         self.misconception_count = misconception_count
+        self.worked_examples_count = worked_examples_count
         self.skill_model_created_on = skill_model_created_on
         self.skill_model_last_updated = skill_model_last_updated
 
@@ -676,6 +679,55 @@ class SkillSummary(object):
             'language_code': self.language_code,
             'version': self.version,
             'misconception_count': self.misconception_count,
-            'skill_model_created_on': self.skill_model_created_on,
-            'skill_model_last_updated': self.skill_model_last_updated
+            'worked_examples_count': self.worked_examples_count,
+            'skill_model_created_on': utils.get_time_in_millisecs(
+                self.skill_model_created_on),
+            'skill_model_last_updated': utils.get_time_in_millisecs(
+                self.skill_model_last_updated)
         }
+
+
+class UserSkillMastery(object):
+    """Domain object for a user's mastery of a particular skill."""
+
+    def __init__(self, user_id, skill_id, degree_of_mastery):
+        """Constructs a SkillMastery domain object for a user.
+
+        Args:
+            user_id: str. The user id of the user.
+            skill_id: str. The id of the skill.
+            degree_of_mastery: float. The user's mastery of the
+                corresponding skill.
+        """
+        self.user_id = user_id
+        self.skill_id = skill_id
+        self.degree_of_mastery = degree_of_mastery
+
+    def to_dict(self):
+        """Returns a dictionary representation of this domain object.
+
+        Returns:
+            dict. A dict representing this SkillMastery object.
+        """
+        return {
+            'user_id': self.user_id,
+            'skill_id': self.skill_id,
+            'degree_of_mastery': self.degree_of_mastery
+        }
+
+    @classmethod
+    def from_dict(cls, skill_mastery_dict):
+        """Returns a UserSkillMastery domain object from the given dict.
+
+        Args:
+            skill_mastery_dict. dict. A dict mapping all the fields of
+                UserSkillMastery object.
+
+        Returns:
+            SkillMastery. The SkillMastery domain object.
+        """
+        return cls(
+            skill_mastery_dict['user_id'],
+            skill_mastery_dict['skill_id'],
+            skill_mastery_dict['degree_of_mastery']
+        )

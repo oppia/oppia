@@ -16,6 +16,9 @@
 
 """Tests for Exploration-related jobs."""
 
+import json
+import os
+
 from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
@@ -785,6 +788,7 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         content1_dict = {
+            'content_id': 'content',
             'html': (
                 '<blockquote><p>Hello, this <i>is</i> state1 '
                 '</p></blockquote><pre>I\'m looking for a particular '
@@ -793,18 +797,17 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
                 '<oppia-noninteractive-link url-with-value="&amp;quot;'
                 'https://www.example.com&amp;quot;" text-with-value="&amp;quot;'
                 'here&amp;quot;"></oppia-noninteractive-link></p>'
-            ),
-            'audio_translations': {}
+            )
         }
         content2_dict = {
+            'content_id': 'content',
             'html': (
                 '<pre>Hello, this is state2.</pre><blockquote>'
                 '<ol><li>item1</li><li>item2</li></ol></blockquote><p>'
                 'You can see this equation <b><oppia-noninteractive-math'
                 'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;'
                 'quot;"></oppia-noninteractive-math></b></p>'
-            ),
-            'audio_translations': {}
+            )
         }
         state1.update_content(content1_dict)
         state2.update_content(content2_dict)
@@ -824,6 +827,7 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         default_outcome_dict = {
             'dest': 'State2',
             'feedback': {
+                'content_id': 'default_outcome',
                 'html': (
                     '<p>Sorry, it doesn\'t look like your <span>program '
                     '</span>prints output</p>.<blockquote><p> Could you get '
@@ -832,8 +836,7 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
                     'have<oppia-noninteractive-link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
                     '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
-                ),
-                'audio_translations': {}
+                )
             },
             'labelled_as_correct': False,
             'param_changes': [],
@@ -897,20 +900,20 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         state1 = exploration.states['State1']
         state2 = exploration.states['State2']
         content1_dict = {
+            'content_id': 'content',
             'html': (
                 'Here is test case <a href="https://github.com">hello<b><i>'
                 'testing</i></b>in <b>progress</b><p>for migration</p>'
-            ),
-            'audio_translations': {}
+            )
         }
         content2_dict = {
+            'content_id': 'content',
             'html': (
-                'Here is test case <a href="https://github.com">hello'
+                'Here is test case <a href="https://github.com">'
                 '<oppia-noninteractive-link url-with-value="&amp;quot;'
-                'here&amp;quot;" text-with-value="abc">'
+                'https://github.com&amp;quot;" text-with-value="abc">'
                 '</oppia-noninteractive-link><p> testing in progress</p>'
-            ),
-            'audio_translations': {}
+            )
         }
         state1.update_content(content1_dict)
         state2.update_content(content2_dict)
@@ -918,6 +921,7 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         default_outcome_dict1 = {
             'dest': 'State2',
             'feedback': {
+                'content_id': 'default_outcome',
                 'html': (
                     '<p>Sorry, it doesn\'t look like your <span>program '
                     '</span>prints output</p>.<blockquote><p> Could you get '
@@ -926,8 +930,7 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                     'have<oppia-noninteractive-link url-with-value="&amp;quot;'
                     'https://www.example.com&amp;quot;" text-with-value="'
                     '&amp;quot;Here&amp;quot;"></oppia-noninteractive-link>.'
-                ),
-                'audio_translations': {}
+                )
             },
             'labelled_as_correct': False,
             'param_changes': [],
@@ -937,12 +940,12 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         default_outcome_dict2 = {
             'dest': 'State1',
             'feedback': {
+                'content_id': 'default_outcome',
                 'html': (
                     '<ol><li>This is last case</li><oppia-noninteractive-image '
                     'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
                     '</oppia-noninteractive-image></ol>'
-                ),
-                'audio_translations': {}
+                )
             },
             'labelled_as_correct': False,
             'param_changes': [],
@@ -964,18 +967,101 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                 job_id))
         expected_output = [
             "[u'oppia-noninteractive-image', [u'ol']]",
-            "[u'oppia-noninteractive-link', [u'oppia-noninteractive-link']]",
             (
                 '[u\'strings\', '
                 '[u\'<ol><li>This is last case</li><oppia-noninteractive-image '
                 'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
-                '</oppia-noninteractive-image></ol>\', '
-                'u\'Here is test case <a href="https://github.com">'
-                'hello<oppia-noninteractive-link text-with-value="abc" '
-                'url-with-value="&amp;quot;here&amp;quot;">'
-                '</oppia-noninteractive-link>'
-                '<p> testing in progress</p></a>\']]'
+                '</oppia-noninteractive-image></ol>\']]'
             )
         ]
 
         self.assertEqual(actual_output, expected_output)
+
+
+class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(TextAngularValidationAndMigrationTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_textangular_validation_and_migration(self):
+        """Tests that the exploration validation and migration job for
+        TextAngular RTE.
+        """
+        test_file_path = os.path.join(
+            feconf.TESTS_DATA_DIR, 'test_cases_for_rte.json')
+        with open(test_file_path, 'r') as f:
+            json_data = json.load(f)
+        test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        state_list = []
+        for index in range(len(test_cases)):
+            state_list.append('State%d' % index)
+
+        exploration.add_states(state_list)
+
+        for index, state_name in enumerate(state_list):
+            state = exploration.states[state_name]
+            content_dict = {
+                'html': test_cases[index]['html_content'],
+                'content_id': 'content'
+            }
+            state.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start validation job on exploration.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJob.create_new())
+        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJob.get_output(
+                job_id))
+
+        # Test that validation fails before migration.
+        self.assertGreater(len(actual_output), 0)
+
+        exploration_dict = exploration.to_dict()
+        updated_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
+            exploration_dict)
+        updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
+        updated_states = updated_dict['states']
+
+        for index, state_name in enumerate(state_list):
+            updated_html = updated_states[state_name]['content']['html']
+
+            # Test that html matches the expected format after migration.
+            self.assertEqual(
+                updated_html, unicode(test_cases[index]['expected_output']))
+
+        exp_services.save_new_exploration(
+            self.albert_id, updated_exploration)
+
+        # Start validation job on updated exploration.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJob.create_new())
+        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJob.get_output(
+                job_id))
+
+        # Test that validation passes after migration.
+        self.assertEqual(actual_output, [])

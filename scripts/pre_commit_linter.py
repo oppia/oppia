@@ -124,7 +124,6 @@ BAD_PATTERNS_JS_REGEXP = [
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
             'extensions/dependencies/',
-            'extensions/objects/',
             'extensions/value_generators/',
             'extensions/visualizations/')
     },
@@ -189,7 +188,7 @@ EXCLUDED_PHRASES = [
 
 EXCLUDED_PATHS = (
     'third_party/*', 'build/*', '.git/*', '*.pyc', 'CHANGELOG',
-    'integrations/*', 'integrations_dev/*', '*.svg',
+    'integrations/*', 'integrations_dev/*', '*.svg', '*.gif',
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
@@ -320,10 +319,12 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _lint_css_files(stylelint_path, config_path, files_to_lint, stdout, result):
+def _lint_css_files(
+        node_path, stylelint_path, config_path, files_to_lint, stdout, result):
     """Prints a list of lint errors in the given list of CSS files.
 
     Args:
+        node_path: str. Path to the node binary.
         stylelint_path: str. Path to the Stylelint binary.
         config_path: str. Path to the configuration file.
         files_to_lint: list(str). A list of filepaths to lint.
@@ -341,7 +342,7 @@ def _lint_css_files(stylelint_path, config_path, files_to_lint, stdout, result):
 
     print 'Total css files: ', num_css_files
     stylelint_cmd_args = [
-        stylelint_path, '--config=' + config_path]
+        node_path, stylelint_path, '--config=' + config_path]
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
@@ -617,6 +618,7 @@ def _pre_commit_linter(all_files):
     linting_processes = []
     linting_processes.append(multiprocessing.Process(
         target=_lint_css_files, args=(
+            node_path,
             stylelint_path,
             config_path_for_css_in_html,
             html_files_to_lint_for_css, css_in_html_stdout,
@@ -627,6 +629,7 @@ def _pre_commit_linter(all_files):
 
     linting_processes.append(multiprocessing.Process(
         target=_lint_css_files, args=(
+            node_path,
             stylelint_path,
             config_path_for_oppia_css,
             css_files_to_lint, css_stdout,

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for ChangeObjectFactory.
+ * @fileoverview Tests for Collection update service.
  */
 
 describe('Collection update service', function() {

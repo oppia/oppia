@@ -316,7 +316,7 @@ var MultiSelectEditor = function(elem) {
 // <div>
 //   plain
 //   <b>bold</b>
-//   <oppia-nointeractive-math> ... </oppia-noninteractive-math>
+//   <oppia-noninteractive-math> ... </oppia-noninteractive-math>
 // <div>
 // The richTextInstructions function will be supplied with a 'handler' argument
 // which it should then use to read through the rich-text area using the
@@ -332,7 +332,6 @@ var expectRichText = function(elem) {
     // surround, e.g., <i> tags, so we can't just ignore the <p> elements
     // altogether.)
     var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
-
     elem.all(by.xpath(XPATH_SELECTOR)).map(function(entry) {
       // It is necessary to obtain the texts of the elements in advance since
       // applying .getText() while the RichTextChecker is running would be

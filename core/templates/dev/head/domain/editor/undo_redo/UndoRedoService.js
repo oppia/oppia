@@ -52,8 +52,8 @@ oppia.factory('UndoRedoService', [
      * constant EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED.
      */
     UndoRedoService.applyChange = function(changeObject, domainObject) {
-      _appliedChanges.push(changeObject);
       _applyChange(changeObject, domainObject);
+      _appliedChanges.push(changeObject);
       _undoneChanges = [];
     };
 
@@ -111,6 +111,10 @@ oppia.factory('UndoRedoService', [
         committableChangeList[i] = _appliedChanges[i].getBackendChangeObject();
       }
       return committableChangeList;
+    };
+
+    UndoRedoService.setChangeList = function(changeList) {
+      _appliedChanges = angular.copy(changeList);
     };
 
     /**

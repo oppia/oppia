@@ -14,7 +14,10 @@
         </div>
 
         <strong>Hint #<[getIndexPlusOne()]> is...</strong>
-        <span class="oppia-rte-editor" angular-html-bind="hint.hintContent.getHtml()"></span>
+        <span>
+          <angular-html-bind class="oppia-rte-editor" html-data="hint.hintContent.getHtml()">
+          </angular-html-bind>
+        </span>
       </div>
     </div>
   </div>
@@ -54,9 +57,8 @@
 
   <div ng-if="stateHintsService.savedMemento[getIndexPlusOne() - 1] && !stateHintsService.savedMemento[getIndexPlusOne() - 1].isEmpty()">
     <audio-translations-editor component-name="<[COMPONENT_NAME_HINT]>"
-                               subtitled-html="stateHintsService.displayed[getIndexPlusOne() - 1].hintContent"
-                               on-start-edit="onAudioTranslationsStartEditAction"
-                               on-change="onAudioTranslationsEdited">
+                               content-id="stateHintsService.displayed[getIndexPlusOne() - 1].hintContent.getContentId()"
+                               on-start-edit="onAudioTranslationsStartEditAction">
     </audio-translations-editor>
   </div>
 </div>

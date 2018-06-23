@@ -11,17 +11,19 @@
   }
 </style>
 
-<div ng-show="unresolvedAnswersData !== null">
-  <strong>Unresolved Student Answers</strong>
-  <ul>
-    <li ng-repeat="data in unresolvedAnswersData" class="answer-container">
-      <strong>(<[data.frequency]> times)</strong>: <span ng-bind-html="data.answer"></span>
-    </li>
-    <li ng-if="unresolvedAnswersData.length === 0">
-      <em>No outstanding answers requiring attention.</em>
-    </li>
-  </ul>
-  <div class="refresh-container">
-    <a ng-click="computeUnresolvedAnswers()">Refresh</a>; last updated: <[latestRefreshDate.toLocaleString()]>.
-  </div>
+<div ng-if="isUnresolvedAnswersOverviewShown()">
+  <span style="font-size: 16px;">
+    <strong>Issues Overview</strong>
+  </span>
+  <md-card style="background-color: white; margin: 20px 0; padding: 8px;">
+    <strong>Unresolved Student Answers</strong>
+    <ul>
+      <li ng-repeat="data in getUnresolvedStateStats()" class="answer-container">
+        <strong>(<[data.frequency]> times)</strong>: <span ng-bind-html="data.answerHtml"></span>
+      </li>
+      <li ng-if="getUnresolvedStateStats().length === 0">
+        <em>No outstanding answers require attention.</em>
+      </li>
+    </ul>
+  </md-card>
 </div>
