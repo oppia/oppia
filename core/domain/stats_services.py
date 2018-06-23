@@ -291,8 +291,8 @@ def update_exp_issues_for_new_exp_version(
 
     Args:
         exploration: Exploration. Domain object for the exploration.
-        exp_versions_diff: ExplorationVersionsDiff. The domain object for the
-            exploration versions difference.
+        exp_versions_diff: ExplorationVersionsDiff|None. The domain object for
+            the exploration versions difference, None if it is a revert.
         revert_to_version: int|None. If the change is a revert, the version.
             Otherwise, None.
     """
@@ -306,7 +306,7 @@ def update_exp_issues_for_new_exp_version(
     if revert_to_version:
         old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
         exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
-        exp_issues.exp_version += 1
+        exp_issues.exp_version = exploration.version + 1
         create_exp_issues_model(exp_issues)
         return
 
