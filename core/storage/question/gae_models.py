@@ -213,7 +213,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     """
     # The user ID of the creator of the question.
     creator_id = ndb.StringProperty(required=True)
-    # The ISO 639-1 code for the language this exploration is written in.
+    # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # The status of the question. It can be 'private', 'approved',
     # 'rejected' and 'pending'.
@@ -235,7 +235,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     # model was created).
     question_model_created_on = ndb.DateTimeProperty(indexed=True)
     # A dict representing the question data.
-    question_data = ndb.JsonProperty(indexed=False)
+    question_data = ndb.JsonProperty(indexed=False, required=True)
 
     @classmethod
     def get_by_creator_id(cls, creator_id):

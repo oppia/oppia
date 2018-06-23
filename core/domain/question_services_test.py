@@ -178,7 +178,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_id = question_services.add_question(self.owner_id, question)
         question_rights = question_services.get_question_rights(question_id)
 
-        self.assertTrue(question_services.check_can_edit_question(
+        self.assertTrue(question_services.is_manager(
             self.user_admin, question_rights))
 
     def test_create_new_question_rights(self):
@@ -193,7 +193,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         question_rights = question_services.get_question_rights(question_id)
 
-        self.assertTrue(question_services.check_can_edit_question(
+        self.assertTrue(question_services.is_manager(
             self.user_a, question_rights))
-        self.assertFalse(question_services.check_can_edit_question(
+        self.assertFalse(question_services.is_manager(
             self.user_b, question_rights))

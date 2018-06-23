@@ -18,6 +18,7 @@
 
 from constants import constants
 from core.domain import exp_domain
+from core.domain import html_cleaner
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -195,7 +196,7 @@ class Question(object):
         return cls(
             question_id, exp_domain.State.create_default_state(
                 feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
-                ).to_dict(),
+                ),
             feconf.CURRENT_QUESTION_SCHEMA_VERSION, language_code)
 
     def update_language_code(self, language_code):
@@ -221,7 +222,7 @@ class QuestionSummary(object):
     """
     def __init__(
             self, question_id, creator_id, language_code, status,
-            question_data, question_model_last_updated=None,
+            question_html_data, question_model_last_updated=None,
             question_model_created_on=None):
         """Constructs a Question Summary domain object.
 
@@ -235,7 +236,7 @@ class QuestionSummary(object):
                 when the question model was last updated.
             question_model_created_on: datetime.datetime. Date and time when
                 the question model is created.
-            question_data: str. The static HTML of the question shown to
+            question_html_data: str. The static HTML of the question shown to
                 the learner.
         """
         self.id = question_id
@@ -244,7 +245,7 @@ class QuestionSummary(object):
         self.status = status
         self.last_updated = question_model_last_updated
         self.created_on = question_model_created_on
-        self.question_data = question_data
+        self.question_data = html_cleaner.clean(question_html_data)
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -298,15 +299,16 @@ class QuestionRights(object):
     """Domain object for question rights."""
 
     def __init__(self, question_id, manager_ids):
+        """"""
         self.id = question_id
         self.manager_ids = manager_ids
 
     def to_dict(self):
-        """Returns a dict suitable for use by the frontend.
+        """Returns a dict representing the QuestionRights object.
 
         Returns:
-            dict. A dict version of QuestionRights suitable for use by the
-                frontend.
+            dict. A dict representation of QuestionRights suitable for
+                use by the frontend.
         """
         return {
             'question_id': self.id,

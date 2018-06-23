@@ -249,27 +249,27 @@ def create_question_summary(
         status: str. The status of the question.
     """
     question = get_question_by_id(question_id).to_dict()
-    question.update({'creator_id': creator_id})
-    question.update({'status': status})
-    question_summary = compute_summary_of_question(question)
+    question_summary = compute_summary_of_question(
+        question, creator_id, status)
     save_question_summary(question_summary)
 
 
-def compute_summary_of_question(question):
+def compute_summary_of_question(question, creator_id, status):
     """Create a QuestionSummary domain object for a given Question domain
     object and return it.
 
     Args:
         question: Question. The question object for which the summary
             is to be computed.
+        creator_id: str. The user ID of the creator of the question.
+        status: str. The status of the question.
 
     Returns:
         QuestionSummary. The computed summary for the given question.
     """
     question_summary = question_domain.QuestionSummary(
-        question['question_id'], question['creator_id'],
-        question['language_code'], question['status'],
-        question['question_data']
+        question['question_id'], creator_id, question['language_code'],
+        status, question['question_data']
     )
 
     return question_summary
@@ -308,7 +308,7 @@ def get_question_summaries_by_creator_id(creator_id):
     return question_models.QuestionSummaryModel.get_by_creator_id(creator_id)
 
 
-def get_skill_summaries_of_linked_skills(question_id):
+def get_summaries_of_linked_skills(question_id):
     """Gets linked skill IDs for given question.
 
     Args:
@@ -357,16 +357,16 @@ def save_question_rights(
             question.
         committer_id: str. ID of the committer.
         commit_message: str. Descriptive message for the commit.
-        commit_cmds: list(dict). A list of commands describing what kind of
-            commit was done.
+        commit_cmds: list(QuestionChangeDict). A list of commands
+            describing what kind of commit was done.
     """
 
     model = question_models.QuestionRightsModel.get(
         question_rights.id, strict=False)
 
     model.manager_ids = question_rights.manager_ids
-
-    model.commit(committer_id, commit_message, commit_cmds)
+    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmd_dicts)
 
 
 def create_new_question_rights(question_id, committer_id):
@@ -390,8 +390,8 @@ def get_question_rights(question_id, strict=True):
 
     Args:
         question_id: str. ID of the question.
-        strict: bool. Whether to fail noisily if no question with a given id
-            exists in the datastore.
+        strict: bool. Whether to fail noisily if no question rights with a
+            given id exists in the datastore.
 
     Returns:
         QuestionRights. The rights object associated with the given question.
@@ -409,7 +409,7 @@ def get_question_rights(question_id, strict=True):
     return get_question_rights_from_model(model)
 
 
-def check_can_edit_question(user, question_rights):
+def is_manager(user, question_rights):
     """Checks whether the user can edit the given question.
 
     Args:
@@ -486,7 +486,7 @@ def assign_role(committer, assignee, new_role, question_id):
         'assignee_id': assignee.user_id,
         'old_role': old_role,
         'new_role': new_role
-    }).to_dict()]
+    })]
 
     save_question_rights(
         question_rights, committer_id, commit_message, commit_cmds)
