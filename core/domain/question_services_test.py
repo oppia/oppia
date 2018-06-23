@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from core.domain import html_cleaner
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import user_services
@@ -143,15 +144,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_id, question_data, question_data_schema_version,
             language_code).to_dict()
 
-        question.update({'creator_id': self.owner_id})
-        question.update({'status': status})
         question_summary = question_services.compute_summary_of_question(
-            question).to_dict()
+            question, self.owner_id, status).to_dict()
 
         self.assertEqual(question_summary['id'], 'dummy')
         self.assertEqual(
             question_summary['question_data'],
-            self._create_valid_question_data('ABC'))
+            html_cleaner.clean(self._create_valid_question_data('ABC')))
         self.assertEqual(question_summary['language_code'], 'en')
         self.assertEqual(question_summary['status'], 'private')
 
@@ -167,7 +166,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question_summary[0].id, 'dummy')
         self.assertEqual(
             question_summary[0].question_data,
-            self._create_valid_question_data('ABC'))
+            html_cleaner.clean(self._create_valid_question_data('ABC')))
         self.assertEqual(question_summary[0].language_code, 'en')
         self.assertEqual(question_summary[0].status, 'private')
 
