@@ -10,30 +10,30 @@
     }
   }
   .angular-ui-tree-placeholder {
-    width: 200px;
+    border: 2px dashed #add8e6;
     height: 70px;
-    border: 2px dashed lightblue;
     margin-left: 50px;
+    width: 200px;
   }
   .drag-and-drop-sort-container {
-    border: 1px solid grey;
-    overflow: scroll;
+    border: 1px solid #000000;
     margin: auto;
+    overflow: scroll;
   }
   .item {
-    border: 1px solid grey;
-    width: 200px;
-    height: 70px;
     background-color: #add8e6;
+    border: 1px solid #000000;
+    height: 70px;
     margin: 10px 0 0 70px;
-  }
-  .subItem {
-    border: 1px solid grey;
     width: 200px;
-    height: 70px;
+  }
+  .subitem {
     background-color: #add8e6;
-    position: relative;
+    border: 1px solid #000000;
+    height: 70px;
     margin:-20px 0 0 50px;
+    position: relative;
+    width: 200px;
   }
   .item:hover {
     margin-bottom: 20px;
@@ -51,7 +51,7 @@
           </div>
           <ol ui-tree-nodes="" ng-model="item.items">
             <li ng-repeat="subItem in item.items" ui-tree-node data-scroll-container=".drag-and-drop-sort-container">
-              <div ui-tree-handle class="subItem">
+              <div ui-tree-handle class="subitem">
                 <angular-html-bind html-data="subItem.title"></angular-html-bind>
               </div>
             </li>

@@ -17,10 +17,10 @@
  */
 
 oppia.directive('oppiaInteractiveDragAndDropSort', [
-  'HtmlEscaperService', 'dragAndDropSortRulesService',
+  'dragAndDropSortRulesService', 'HtmlEscaperService',
   'UrlInterpolationService',
   function(
-      HtmlEscaperService, dragAndDropSortRulesService,
+      dragAndDropSortRulesService, HtmlEscaperService,
       UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -101,7 +101,7 @@ oppia.directive('oppiaShortResponseDragAndDropSort', [
   }
 ]);
 
-// Rules Service for DragAndDropSort interaction. Will be implemented in M2.3.
+// TODO(Vibhor): Rules Service for DragAndDropSort interaction.
 oppia.factory('dragAndDropSortRulesService', ['$filter', function($filter) {
   return {};
 }]);
