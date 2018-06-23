@@ -1,12 +1,18 @@
-<div>
-  <md-card ng-if="underConstruction" class="oppia-editor-card md-default-theme">
-    <div>
-      <em>Audio translation tab is under construction.</em>
+<div class="oppia-translation-tab">
+  <div class="oppia-translator-overview">
+    <translator-overview></translator-overview>
+  </div>
+  <div class="row">
+    <div class="col-lg-8 col-md-8 col-sm-8">
+      <!--Place for state-translator directive.-->
     </div>
-  </md-card>
-</div>
-<div ng-if="!underCunstruction">
-
+    <div class="col-lg-4 col-md-4 col-sm-4">
+      <div class="oppia-editor-sidebar hidden-xs hidden-sm">
+        <!--Place for state-translation-status-graph directive.-->
+      </div>
+    </div>
+    <attribution-guide></attribution-guide>
+  </div>
 </div>
 
 <style>

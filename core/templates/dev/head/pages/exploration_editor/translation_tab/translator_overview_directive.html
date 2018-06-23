@@ -1,0 +1,22 @@
+<div class="oppia-translator-overview">
+  <label for="audioTranslationLanguageCodeField" class="">Translation in language:</label>
+  <div class="oppia-translation-language-list">
+    <select id="audioTranslationLanguageCodeField" class="oppia-language-selector" ng-change="changeTranslationLanguage()" ng-model="languageCode"
+            ng-options="language.id as language.description for language in languageCodesAndDescriptions">
+    </select>
+  </div>
+</div>
+
+<style>
+  .oppia-translator-overview {
+    width: 350px;
+    height: 50px;
+    padding: 5px;
+    margin: 0 auto;
+  }
+
+  .oppia-translation-language-list {
+    padding: 5px;
+    align: right;
+  }
+</style>

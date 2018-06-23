@@ -25,11 +25,7 @@ oppia.directive('translationTab', [
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'ExplorationStatesService',
-        'StateRulesStatsService', 'ExplorationRightsService',
-        function(
-            $scope, EditorStateService, ExplorationStatesService,
-            StateRulesStatsService, ExplorationRightsService) {
+        '$scope', function($scope) {
           $scope.underConstruction = true;
           $scope.$on('refreshAudioTab', $scope.refreshSettingsTab);
           $scope.refreshSettingsTab = function() {
