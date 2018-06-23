@@ -113,7 +113,9 @@ if [ ! -d "$TOOLS_DIR/pylint-1.8.4" ]; then
 
   # See https://stackoverflow.com/a/4495175 for the rationale behind the "user"
   # and "prefix" flags. --system is used for Debian systems (cf. `pip install --help`).
-  pip install pylint==1.8.4 --target="$TOOLS_DIR/pylint-1.8.4" --user --install-option="--prefix=--system"
+  # The "user" tag does not work for virtualenv since user site-packages are not visible
+  # in the virtualenv.
+  pip install pylint==1.8.4 --target="$TOOLS_DIR/pylint-1.8.4" --prefix=--system
   # Add __init__.py file so that pylint dependency backports are resolved
   # correctly.
   touch $TOOLS_DIR/pylint-1.8.4/backports/__init__.py
@@ -166,7 +168,9 @@ if [ ! -d "$TOOLS_DIR/browsermob-proxy-0.7.1" ]; then
 
   # See https://stackoverflow.com/a/4495175 for the rationale behind the "user"
   # and "prefix" flags. --system is used for Debian systems (cf. `pip install --help`).
-  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1" --user --install-option="--prefix=--system"
+  # The "user" tag does not work for virtualenv since user site-packages are not visible
+  # in the virtualenv.
+  pip install browsermob-proxy==0.7.1 --target="$TOOLS_DIR/browsermob-proxy-0.7.1" --prefix=--system
 fi
 
 echo Checking if selenium is installed in $TOOLS_DIR/pip_packages
@@ -175,7 +179,9 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
 
   # See https://stackoverflow.com/a/4495175 for the rationale behind the "user"
   # and "prefix" flags. --system is used for Debian systems (cf. `pip install --help`).
-  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2" --user --install-option="--prefix=--system"
+  # The "user" tag does not work for virtualenv since user site-packages are not visible
+  # in the virtualenv.
+  pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2" --prefix=--system
 fi
 
 # install pre-push script
