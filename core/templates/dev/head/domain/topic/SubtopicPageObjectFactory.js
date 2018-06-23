@@ -38,6 +38,10 @@ oppia.factory('SubtopicPageObjectFactory', [
       return this._id;
     };
 
+    SubtopicPage.prototype.setId = function(id) {
+      this._id = id;
+    };
+
     // Returns the topic id that the subtopic page is linked to.
     SubtopicPage.prototype.getTopicId = function() {
       return this._topicId;

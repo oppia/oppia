@@ -26,12 +26,14 @@ oppia.directive('subtopicsListTab', [
         'subtopics_list_tab_directive.html'),
       controller: [
         '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService', 'EVENT_TOPIC_REINITIALIZED',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
+        'UndoRedoService', 'SubtopicPageObjectFactory',
+        'EVENT_TOPIC_REINITIALIZED', 'EVENT_TOPIC_INITIALIZED',
+        'EVENT_SUBTOPIC_PAGE_LOADED',
         function(
             $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService, EVENT_TOPIC_REINITIALIZED,
-            EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
+            UndoRedoService, SubtopicPageObjectFactory,
+            EVENT_TOPIC_REINITIALIZED, EVENT_TOPIC_INITIALIZED,
+            EVENT_SUBTOPIC_PAGE_LOADED) {
           // The subtopic preview/editor would be hidden until a subtopic is
           // clicked.
           $scope.subtopicDisplayed = false;
@@ -93,6 +95,8 @@ oppia.directive('subtopicsListTab', [
                 $scope.subtopics.indexOf(subtopic)) {
               $scope.subtopicDisplayed = false;
             }
+            TopicEditorStateService.deleteSubtopicPage(
+              $scope.topic.getId(), subtopic.getId());
             TopicUpdateService.deleteSubtopic($scope.topic, subtopic.getId());
             _initEditor();
           };
@@ -138,8 +142,13 @@ oppia.directive('subtopicsListTab', [
             });
 
             modalInstance.result.then(function(title) {
+              var subtopicPage = SubtopicPageObjectFactory.createDefault(
+                $scope.topic.getId(), $scope.topic.getNextSubtopicId());
+              TopicEditorStateService.setSubtopicPage(subtopicPage);
               TopicUpdateService.addSubtopic($scope.topic, title);
               _initEditor();
+              // Open the editor for the newly created subtopic page.
+              $scope.setSubtopic($scope.topic.getSubtopics().slice(-1)[0]);
             });
           };
 

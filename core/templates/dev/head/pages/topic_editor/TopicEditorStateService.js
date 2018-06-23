@@ -36,6 +36,7 @@ oppia.factory('TopicEditorStateService', [
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
     var _subtopicPages = [];
+    var _newSubtopicPages = [];
     var _subtopicPage =
       SubtopicPageObjectFactory.createInterstitialSubtopicPage();
     var _topicIsInitialized = false;
@@ -56,6 +57,14 @@ oppia.factory('TopicEditorStateService', [
     var _getSubtopicPageIndex = function(subtopicPageId) {
       for (var i = 0; i < _subtopicPages.length; i++) {
         if (_subtopicPages[i].getId() === subtopicPageId) {
+          return i;
+        }
+      }
+      return null;
+    };
+    var _getNewSubtopicPageIndex = function(subtopicPageId) {
+      for (var i = 0; i < _newSubtopicPages.length; i++) {
+        if (_newSubtopicPages[i].getId() === subtopicPageId) {
           return i;
         }
       }
@@ -126,13 +135,7 @@ oppia.factory('TopicEditorStateService', [
         EditableTopicBackendApiService.fetchSubtopicPage(
           topicId, subtopicId).then(
           function(newBackendSubtopicPageObject) {
-            if (newBackendSubtopicPageObject === null) {
-              _setSubtopicPage(
-                SubtopicPageObjectFactory.createDefault(
-                  topicId, subtopicId));
-            } else {
-              _updateSubtopicPage(newBackendSubtopicPageObject);
-            }
+            _updateSubtopicPage(newBackendSubtopicPageObject);
           },
           function(error) {
             AlertsService.addWarning(
@@ -214,6 +217,38 @@ oppia.factory('TopicEditorStateService', [
             angular.copy(subtopicPage);
         } else {
           _setSubtopicPage(subtopicPage);
+          _newSubtopicPages.push(angular.copy(subtopicPage));
+        }
+      },
+
+      deleteSubtopicPage: function(topicId, subtopicId) {
+        var subtopicPageId = topicId + '-' + subtopicId.toString();
+        var index = _getSubtopicPageIndex(subtopicPageId);
+        var newIndex = _getNewSubtopicPageIndex(subtopicPageId);
+        if (index !== null) {
+          _subtopicPages.splice(index, 1);
+          // If the deleted subtopic page corresponded to a newly created
+          // subtopic, then the 'subtopicId' part of the id of all subsequent
+          // subtopic pages should be decremented to make it in sync with the
+          // their corresponding subtopic ids.
+          if (newIndex !== null) {
+            _newSubtopicPages.splice(newIndex, 1);
+            for (var i = 0; i < _subtopicPages.length; i++) {
+              var newSubtopicId = parseInt(_subtopicPages[i].getId().slice(13));
+              if (newSubtopicId > subtopicId) {
+                newSubtopicId--;
+                _subtopicPages[i].setId(topicId + '-' + newSubtopicId);
+              }
+            }
+            for (var i = 0; i < _newSubtopicPages.length; i++) {
+              var newSubtopicId = parseInt(
+                _newSubtopicPages[i].getId().slice(13));
+              if (newSubtopicId > subtopicId) {
+                newSubtopicId--;
+                _newSubtopicPages[i].setId(topicId + '-' + newSubtopicId);
+              }
+            }
+          }
         }
       },
 
