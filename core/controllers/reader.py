@@ -312,13 +312,12 @@ class StorePlaythroughHandler(base.BaseHandler):
             issue_schema_version: int. The issue schema version.
         """
         super(StorePlaythroughHandler, self).__init__(*args, **kwargs)
-        # Initialize members.
         self.exp_issues = None
         self.issue_schema_version = None
 
-    def _find_issue_in_exp_issues(self, playthrough):
-        """Finds the index of the given issue in the unresolved issues list of
-        the exploration issues model, returns None if it doesn't exist.
+    def _find_playthrough_in_exp_issues(self, playthrough):
+        """Finds the given playthrough in the unresolved issues list of the
+        exploration issues model, returns None if it doesn't exist.
 
         Args:
             playthrough: Playthrough. The playthrough domain object.
@@ -326,17 +325,15 @@ class StorePlaythroughHandler(base.BaseHandler):
         Returns:
             int|None. The index at which the issue was found, None otherwise.
         """
-        issue_type = playthrough.issue_type
-        customization_args = playthrough.issue_customization_args
         for index, issue in enumerate(self.exp_issues.unresolved_issues):
-            if issue.issue_type == issue_type:
+            if issue.issue_type == playthrough.issue_type:
                 issue_customization_args = issue.issue_customization_args
                 # In case issue_keyname is 'state_names', the ordering of the
                 # list is important i.e. [a,b,c] is different from [b,c,a].
                 issue_keyname = stats_models.ISSUE_TYPE_KEYNAME_MAPPING[
                     issue.issue_type]
                 if (issue_customization_args[issue_keyname] ==
-                        customization_args[issue_keyname]):
+                        playthrough.issue_customization_args[issue_keyname]):
                     return index
         return None
 
@@ -350,7 +347,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                 object.
         """
         max_playthroughs_per_issue = False
-        issue_index = self._find_issue_in_exp_issues(playthrough)
+        issue_index = self._find_playthrough_in_exp_issues(playthrough)
         # Check whether the playthrough can be added to its new issue,
         # if not, it stays in its old issue.
         if issue_index is not None:
@@ -370,7 +367,7 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         # Now, remove the playthrough from its old issue.
         if not max_playthroughs_per_issue:
-            issue_index = self._find_issue_in_exp_issues(orig_playthrough)
+            issue_index = self._find_playthrough_in_exp_issues(orig_playthrough)
             if issue_index is not None:
                 self.exp_issues.unresolved_issues[
                     issue_index].playthrough_ids.remove(playthrough.id)
@@ -389,7 +386,7 @@ class StorePlaythroughHandler(base.BaseHandler):
             playthrough_id: int. The playthrough ID.
         """
         # Find whether an issue already exists for the new playthrough.
-        issue_index = self._find_issue_in_exp_issues(playthrough)
+        issue_index = self._find_playthrough_in_exp_issues(playthrough)
         if issue_index is not None:
             if (len(self.exp_issues.unresolved_issues[
                     issue_index].playthrough_ids) < (
@@ -467,7 +464,7 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         # Create a dummy playthrough domain object with a temporary ID since the
         # playthrough doesn't exist yet.
-        playthrough_data['id'] = 'temporary_playthrough_id'
+        playthrough_data['id'] = stats_models.TEMPORARY_PLAYTHROUGH_ID
         temporary_playthrough = stats_domain.Playthrough.from_dict(
             playthrough_data)
         try:

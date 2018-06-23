@@ -63,6 +63,8 @@ ISSUE_TYPE_KEYNAME_MAPPING = {
     'CyclicStateTransitions': 'state_names'
 }
 
+TEMPORARY_PLAYTHROUGH_ID = 'temporary_playthrough_id'
+
 
 class StateCounterModel(base_models.BaseModel):
     """A set of counts that correspond to a state.

@@ -580,7 +580,7 @@ class Playthrough(object):
             for action_dict in playthrough_data['actions']]
 
         dummy_playthrough = cls(
-            'dummy_playthrough_id',
+            stats_models.TEMPORARY_PLAYTHROUGH_ID,
             playthrough_data['exp_id'],
             playthrough_data['exp_version'],
             playthrough_data['issue_type'],
