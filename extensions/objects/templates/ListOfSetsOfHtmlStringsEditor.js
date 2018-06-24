@@ -28,6 +28,7 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
       controller: ['$scope', function($scope) {
         var errorMessage = '';
         $scope.selectedRank = '';
+        $scope.maxPrevIndex = 0;
 
         if (!$scope.value) {
           $scope.value = [];
