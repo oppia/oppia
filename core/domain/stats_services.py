@@ -305,7 +305,11 @@ def update_exp_issues_for_new_exp_version(
     # Handling reverts.
     if revert_to_version:
         old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
-        exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
+        # If the old exploration issues model doesn't exist, the current model
+        # is carried over (this is a fallback case for some tests, and can
+        # never happen in production.)
+        if old_exp_issues:
+            exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
         exp_issues.exp_version = exploration.version + 1
         create_exp_issues_model(exp_issues)
         return
