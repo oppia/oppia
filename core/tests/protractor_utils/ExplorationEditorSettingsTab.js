@@ -24,10 +24,6 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
 var ExplorationEditorSettingsTab = function() {
-  /*
-   * Page objects
-   */
-  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
 
   /*
    * Interactive elements
@@ -59,11 +55,8 @@ var ExplorationEditorSettingsTab = function() {
    * Workflows
    */
 
-  // All functions involving the settings tab should be sent through this
-  // wrapper.
-
   this.expectAvailableFirstStatesToBe = function(names) {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       initialStateSelect.all(by.tagName('option')).map(function(elem) {
         return elem.getText();
       }).then(function(options) {
@@ -73,7 +66,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.openAndClosePreviewSummaryTile = function() {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       openPreviewSummaryButton.click();
       general.waitForSystem();
       expect(explorationSummaryTile.isPresent()).toBeTruthy();
@@ -83,35 +76,36 @@ var ExplorationEditorSettingsTab = function() {
     });
   };
 
-  this.runFromSettingsTab = function(callbackFunction) {
-    explorationEditorPage.navigateToSettingsTab();
-    var result = callbackFunction();
-    explorationEditorPage.navigateToMainTab();
-    return result;
+  // All functions involving the settings tab should be sent through this
+  // wrapper.
+
+  var runFromSettingsTab = function(callbackFunction) {
+    return new ExplorationEditorPage.ExplorationEditorPage().runFromSettingsTab(
+      callbackFunction);
   };
 
   this.setCategory = function(category) {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
         category);
     });
   };
 
   this.setFirstState = function(stateName) {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       initialStateSelectOption(stateName).click();
     });
   };
 
   this.setObjective = function(objective) {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       explorationObjectiveInput.clear();
       explorationObjectiveInput.sendKeys(objective);
     });
   };
 
   this.setTitle = function(title) {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       explorationTitleInput.clear();
       explorationTitleInput.sendKeys(title);
     });
