@@ -152,10 +152,12 @@ describe('Full exploration editor', function() {
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateExplorationButton();
     explorationEditorPage.exitTutorialIfNecessary();
+    explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle('Refresher Exploration');
     explorationEditorSettingsTab.setCategory('Algebra');
     explorationEditorSettingsTab.setObjective(
       'This is the refresher exploration');
+    explorationEditorPage.navigateToMainTab();
     explorationEditorPage.setContent(forms.toRichText(
       'Refresher Exploration Content'));
     explorationEditorPage.setInteraction('EndExploration');
@@ -173,10 +175,12 @@ describe('Full exploration editor', function() {
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
       explorationEditorPage.exitTutorialIfNecessary();
+      explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.setTitle(
         'Parent Exploration not in collection');
       explorationEditorSettingsTab.setCategory('Algebra');
       explorationEditorSettingsTab.setObjective('This is a parent exploration');
+      explorationEditorPage.navigateToMainTab();
       explorationEditorPage.setContent(forms.toRichText(
         'Parent Exploration Content'));
       explorationEditorPage.setInteraction(
@@ -206,9 +210,11 @@ describe('Full exploration editor', function() {
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
       explorationEditorPage.exitTutorialIfNecessary();
+      explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.setTitle('Parent Exploration in collection');
       explorationEditorSettingsTab.setCategory('Algebra');
       explorationEditorSettingsTab.setObjective('This is a parent exploration');
+      explorationEditorPage.navigateToMainTab();
       explorationEditorPage.setContent(forms.toRichText(
         'Parent Exploration Content'));
       explorationEditorPage.setInteraction(
@@ -381,16 +387,20 @@ describe('Full exploration editor', function() {
       explorationEditorPage.expectStateNamesToBe(
         ['final card', 'first', 'second']);
       explorationEditorPage.expectCurrentStateToBe('second');
+      explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.expectAvailableFirstStatesToBe(
         ['final card', 'first', 'second']);
       explorationEditorSettingsTab.setFirstState('second');
+      explorationEditorPage.navigateToMainTab();
       explorationEditorPage.moveToState('first');
       explorationEditorPage.deleteState('first');
       explorationEditorPage.expectCurrentStateToBe('second');
       explorationEditorPage.expectStateNamesToBe(['final card', 'second']);
 
       // Check behaviour of the back button
+      explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.setObjective('do some stuff here');
+      explorationEditorPage.navigateToMainTab();
       expect(browser.getCurrentUrl()).toEqual(
         general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE +
         explorationId + '#/gui/second');
@@ -493,6 +503,7 @@ describe('Full exploration editor', function() {
       explorationEditorPage.setInteraction('EndExploration');
 
       // Save.
+      explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.setTitle('Testing multiple rules');
       explorationEditorSettingsTab.setCategory('Algebra');
       explorationEditorSettingsTab.setObjective('To assess happiness.');
