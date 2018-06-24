@@ -23,10 +23,21 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var ruleTemplates = require(
   '../../../extensions/interactions/rule_templates.json');
 
+var ExplorationEditorSettingsTab = require(
+  '../protractor_utils/ExplorationEditorSettingsTab.js');
+
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
 
 var ExplorationEditorPage = function() {
+  /*
+   * Components
+   */
+
+  this.getSettingsTab = function() {
+    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
+  };
+
   /*
    * Interactive elements
    */
@@ -575,6 +586,13 @@ var ExplorationEditorPage = function() {
 
   // NAVIGATION
 
+  this.runFromSettingsTab = function(callbackFunction) {
+    navigateToSettingsTab();
+    var result = callbackFunction();
+    navigateToMainTab();
+    return result;
+  };
+
   this.navigateToMainTab = function() {
     navigateToMainTabButton.click();
     general.waitForSystem();
@@ -766,3 +784,4 @@ var ExplorationEditorPage = function() {
 };
 // nothing between here
 exports.ExplorationEditorPage = ExplorationEditorPage;
+exports.runFromSettingsTab = ExplorationEditorPage.runFromSettingsTab;
