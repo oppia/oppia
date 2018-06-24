@@ -13,15 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Functionality for the create question button and upload
- * modal.
+ * @fileoverview Functionality for the create question button.
  */
 
 oppia.factory('QuestionCreationService', [
-  '$http', '$uibModal', '$timeout', '$rootScope', '$window',
+  '$http', '$timeout', '$rootScope', '$window',
   'AlertsService', 'siteAnalyticsService', 'UrlInterpolationService',
   function(
-      $http, $uibModal, $timeout, $rootScope, $window,
+      $http, $timeout, $rootScope, $window,
       AlertsService, siteAnalyticsService, UrlInterpolationService) {
     var CREATE_NEW_QUESTION_URL_TEMPLATE = '/question_editor/<question_id>';
 
@@ -52,71 +51,6 @@ oppia.factory('QuestionCreationService', [
         }, function() {
           $rootScope.loadingMessage = '';
           questionCreationInProgress = false;
-        });
-      },
-      showUploadQuestionModal: function() {
-        AlertsService.clearWarnings();
-
-        $uibModal.open({
-          backdrop: true,
-          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-            '/pages/creator_dashboard/' +
-            'upload_activity_modal_directive.html'),
-          controller: [
-            '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-              $scope.save = function() {
-                var returnObj = {};
-                var file = document.getElementById('newFileInput').files[0];
-                if (!file || !file.size) {
-                  AlertsService.addWarning('Empty file detected.');
-                  return;
-                }
-                returnObj.yamlFile = file;
-
-                $uibModalInstance.close(returnObj);
-              };
-
-              $scope.cancel = function() {
-                $uibModalInstance.dismiss('cancel');
-                AlertsService.clearWarnings();
-              };
-            }
-          ]
-        }).result.then(function(result) {
-          var yamlFile = result.yamlFile;
-
-          $rootScope.loadingMessage = 'Creating question';
-
-          var form = new FormData();
-          form.append('yaml_file', yamlFile);
-          form.append('payload', JSON.stringify({}));
-          form.append('csrf_token', GLOBALS.csrf_token);
-
-          $.ajax({
-            contentType: false,
-            data: form,
-            dataFilter: function(data) {
-              // Remove the XSSI prefix.
-              return JSON.parse(data.substring(5));
-            },
-            dataType: 'text',
-            processData: false,
-            type: 'POST',
-            url: 'contributehandler/upload'
-          }).done(function(data) {
-            $window.location = UrlInterpolationService.interpolateUrl(
-              CREATE_NEW_QUESTION_URL_TEMPLATE, {
-                question_id: data.questionId
-              }
-            );
-          }).fail(function(data) {
-            var transformedData = data.responseText.substring(5);
-            var parsedResponse = JSON.parse(transformedData);
-            AlertsService.addWarning(
-              parsedResponse.error || 'Error communicating with server.');
-            $rootScope.loadingMessage = '';
-            $scope.$apply();
-          });
         });
       }
     };

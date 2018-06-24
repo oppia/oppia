@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """Controllers for the questions editor, from where questions are edited
-and stories are created.
+and are created.
 """
 import json
 
@@ -100,21 +100,20 @@ class EditableQuestionDataHandler(base.BaseHandler):
         question = question_services.get_question_by_id(question_id)
         if question is None:
             raise self.PageNotFoundException(
-                Exception('The question with the given id doesn\'t exist.'))
+                'The question with the given id doesn\'t exist.')
 
         version = self.payload.get('version')
         self._require_valid_version(version, question.version)
 
         commit_message = self.payload.get('commit_message')
-        question_page_change_dicts = self.payload.get(
-            'question__page_change_dicts')
-        question_page_change_list = []
-        for change in question_page_change_dicts:
-            question_page_change_list.append(
+        change_dicts = self.payload.get('change_dicts')
+        change_list = []
+        for change in change_dicts:
+            change_list.append(
                 question_domain.QuestionChange(change))
         try:
             question_services.update_question_pages(
-                self.user_id, question_id, question_page_change_list,
+                self.user_id, question_id, change_list,
                 commit_message)
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
@@ -226,20 +225,3 @@ class QuestionsHandler(base.BaseHandler):
             raise self.PageNotFoundException
         question_services.delete_question(
             self.user_id, question_id)
-
-
-class QuestionCreationHandler(base.BaseHandler):
-    """This handler completes POST requests for questions."""
-
-    @acl_decorators.can_access_moderator_page
-    def post(self):
-        """Handles POST requests."""
-        if not self.payload.get('question'):
-            raise self.PageNotFoundException
-        question = question_domain.Question.from_dict(
-            self.payload.get('question'))
-        question_id = question_services.add_question(
-            self.user_id, question)
-        return self.render_json({
-            'question_id': question_id
-        })

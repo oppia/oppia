@@ -882,7 +882,7 @@ def can_delete_question(handler):
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
-        if role_services.ACTION_EDIT_ANY_QUESTION in user_actions_info.actions:
+        if role_services.ACTION_DELETE_ANY_QUESTION in user_actions_info.actions:
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -917,7 +917,7 @@ def can_manage_rights_for_question(handler):
 
 def can_change_question_publication_status(handler):
     """Decorator to check whether the user can publish or unpublish a
-        question.
+       question.
     """
 
     def test_can_change_question_publication_status(self, **kwargs):

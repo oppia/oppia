@@ -26,7 +26,7 @@
         </span>
       </div>
       <div class="oppia-dashboard-tagged-skills oppia-activity-summary-contents" ng-if="!getTaggedSkills">
-        <span class="oppia-dasboard-skill">
+        <span class="oppia-question-linked-skill">
           <em>Edit Question to tag skills.</em>
         </span>
       </div>
@@ -40,34 +40,34 @@
     display: inline-block;
   }
 
-  .oppia-question-summary-tile  {
+  .oppia-question-summary-tile .oppia-question-summary-tile  {
     border-left: 60px solid;
   }
 
-  .oppia-dasboard-skill {
+  .oppia-question-summary-tile .oppia-question-linked-skill {
     border: 2px solid black;
     border-radius: 3px;
     padding: 5px;
     margin-right: 5px;
   }
 
-  .oppia-dashboard-tagged-skills {
+  .oppia-question-summary-tile .oppia-dashboard-tagged-skills {
     font-size: 0.8em;
     margin: 60px 0 15px 10px;
   }
 
-  .oppia-question-last-updated {
+  .oppia-question-summary-tile .oppia-question-last-updated {
     float: right;
     padding: 10px 10px 0 0;
     font-size: 0.7em
   }
 
-  .oppia-dashboard-clock-icon {
+  .oppia-question-summary-tile .oppia-dashboard-clock-icon {
     position: relative;
     float: left;
   }
 
-  .oppia-question-description {
+  .oppia-question-summary-tile .oppia-question-description {
     padding: 10px 0 0 10px;
   }
 </style>
