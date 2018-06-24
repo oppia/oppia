@@ -598,13 +598,6 @@ var ExplorationEditorPage = function() {
     navigateToSettingsTabButton.click();
   };
 
-  this.runFromSettingsTab = function(callBackFunction) {
-    this.navigateToSettingsTab();
-    var result = callBackFunction();
-    this.navigateToMainTab();
-    return result;
-  };
-
   // RULES
   var _getRuleDescription = function(interactionId, ruleName) {
     if (ruleTemplates.hasOwnProperty(interactionId)) {
