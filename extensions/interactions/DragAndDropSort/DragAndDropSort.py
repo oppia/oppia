@@ -45,11 +45,11 @@ class DragAndDropSort(base.BaseInteraction):
                 'ui_config': {
                     'hide_complex_extensions': True,
                     'placeholder': 'Enter an option for the learner to drag' +
-                                   ' and drop',
+                                   ' and drop.',
                 },
             },
             'ui_config': {
-                'add_element_text': 'Add new item',
+                'add_element_text': 'Add a new item',
             }
         },
         'default_value': [''],

@@ -14,23 +14,20 @@
 
 
 oppia.directive('listOfSetsOfHtmlStringsEditor', [
-  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+  'OBJECT_EDITOR_URL_PREFIX', 'UrlInterpolationService',
+  function(OBJECT_EDITOR_URL_PREFIX, UrlInterpolationService) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'ListOfSetsOfHtmlStrings';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         getInitArgs: '&',
         value: '='
       },
-      template: '<span ng-include="getTemplateUrl()"></span>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/' +
+        'list_of_sets_of_html_strings_editor_directive.html'),
       controller: ['$scope', function($scope) {
         var errorMessage = '';
+        $scope.selectedRank = '';
 
         if (!$scope.value) {
           $scope.value = [];
@@ -41,16 +38,15 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
 
-        if ($scope.selectedRank !== '' && $scope.selectedRank !== null) {
-          if ($scope.maxPrevIndex < parseInt($scope.selectedRank)) {
-            $scope.maxPrevIndex = parseInt($scope.selectedRank);
-          }
+        if ($scope.selectedRank !== '') {
+          $scope.maxPrevIndex = math.max(parseInt($scope.selectedRank),
+            $scope.maxPrevIndex);
         }
 
         $scope.allowedChoices = function() {
           var allowedList = [];
-          for (var i = 1; i <= $scope.maxPrevIndex + 1; i++) {
-            allowedList.push(i);
+          for (var i = 0; i <= $scope.maxPrevIndex; i++) {
+            allowedList.push(i + 1);
           }
           return allowedList;
         };
@@ -58,10 +54,13 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
         $scope.selectedItem = function(choiceListIndex) {
           var choiceHtml = $scope.choices[choiceListIndex].id;
           var selectedRank = parseInt($scope.selectedRank) - 1;
+          // Reorder the $scope.choices array to make it consistent with the
+          // selected rank.
+          $scope.choices.splice(selectedRank, 0, $scope.choices.splice(
+            choiceListIndex, 1)[0]);
           var choiceHtmlHasBeenAdded = false;
-          if ($scope.maxPrevIndex < parseInt($scope.selectedRank)) {
-            $scope.maxPrevIndex = parseInt($scope.selectedRank);
-          }
+          $scope.maxPrevIndex = math.max(parseInt($scope.selectedRank),
+            $scope.maxPrevIndex);
 
           for (var i = 0; i < $scope.value.length; i++) {
             choiceHtmlHasBeenAdded = false;

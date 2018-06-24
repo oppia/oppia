@@ -895,8 +895,6 @@ class ListOfSetsOfHtmlStrings(BaseObject):
     """List of sets of Html strings class."""
 
     description = 'A list of sets of Html strings.'
-    edit_html_filename = 'list_of_sets_of_html_strings_editor'
-    edit_js_filename = 'ListOfSetsOfHtmlStringsEditor'
     default_value = []
 
     SCHEMA = {
