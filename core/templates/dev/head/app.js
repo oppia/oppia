@@ -274,12 +274,12 @@ oppia.run([
                       that.setData(arg, customizationArgsDict[arg]);
                     }
                   }
-                   /**
-                   * This checks whether the widget has already been inited
-                   * and set up before (if we are editing a widget that
-                   * has already been inserted into the RTE, we do not
-                   * need to finalizeCreation again).
-                   */
+                  /**
+                  * This checks whether the widget has already been inited
+                  * and set up before (if we are editing a widget that
+                  * has already been inserted into the RTE, we do not
+                  * need to finalizeCreation again).
+                  */
                   if (!that.isReady()) {
                     // Actually create the widget, if we have not already.
                     editor.widgets.finalizeCreation(container);

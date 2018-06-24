@@ -437,7 +437,8 @@ oppia.directive('ckEditorRte', [
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
           extraPlugins:
-            'indentblock,insertpre,blockquote,widget,lineutils,sharedspace,' + pluginNames,
+          'indentblock,insertpre,blockquote,widget,lineutils,sharedspace,' +
+          pluginNames,
           startupFocus: true,
           floatSpaceDockedOffsetY: 15,
           extraAllowedContent: extraAllowedContentRules,

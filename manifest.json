@@ -441,9 +441,9 @@
         "targetDir": "ckeditor-bootstrapck"
       },
       "ckeditorInsertPrePlugin" : {
-        "version": "1.0",
+        "version": "1.0.1",
         "downloadFormat": "zip",
-        "url": "https://download.ckeditor.com/insertpre/releases/insertpre_1.0.zip",
+        "url": "https://download.ckeditor.com/insertpre/releases/insertpre_1.0.1.zip",
         "rootDir": "insertpre",
         "targetDir": "ckeditor-insertpre"
       },
