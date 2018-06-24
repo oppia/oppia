@@ -937,4 +937,43 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-tabs'
         ]
     }
+    'RTE_TYPE_CKEDITOR': {
+        # Valid parent-child relation in CKEditor.
+        'ALLOWED_PARENT_LIST': {
+            'p': ['blockquote', '[document]', 'li'],
+            'strong': ['em', 'li', 'p', 'pre'],
+            'em': ['strong', 'li', 'p', 'pre'],
+            'br': ['strong', 'em', 'li', 'p'],
+            'li': ['ol', 'ul'],
+            'ol': ['li', 'blockquote', 'pre', '[document]'],
+            'ul': ['li', 'blockquote', 'pre', '[document]'],
+            'pre': ['ol', 'ul', 'blockquote', 'li', '[document]'],
+            'blockquote': ['blockquote', '[document]'],
+            'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
+            'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
+            'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-collapsible': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-video': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]']
+        },
+        # Valid html tags in CKEditor.
+        'ALLOWED_TAG_LIST': [
+            'p',
+            'strong',
+            'br',
+            'em',
+            'li',
+            'ol',
+            'ul',
+            'pre',
+            'blockquote',
+            'oppia-noninteractive-link',
+            'oppia-noninteractive-math',
+            'oppia-noninteractive-image',
+            'oppia-noninteractive-collapsible',
+            'oppia-noninteractive-video',
+            'oppia-noninteractive-tabs'
+        ]
+
+    }
 }
