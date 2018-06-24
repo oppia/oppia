@@ -19,19 +19,11 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
-var interactions = require('../../../extensions/interactions/protractor.js');
-var ruleTemplates = require(
-  '../../../extensions/interactions/rule_templates.json');
 
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
 var ExplorationEditorSettingsTab = function() {
-  /*
-   * Page objects
-   */
-  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-
   /*
    * Interactive elements
    */
@@ -65,6 +57,10 @@ var ExplorationEditorSettingsTab = function() {
   // All functions involving the settings tab should be sent through this
   // wrapper.
 
+  var runFromSettingsTab = function() {
+    return new ExplorationEditorPage.runFromSettingsTab();
+  };
+
   this.expectAvailableFirstStatesToBe = function(names) {
     this.runFromSettingsTab(function() {
       initialStateSelect.all(by.tagName('option')).map(function(elem) {
@@ -76,7 +72,7 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.openAndClosePreviewSummaryTile = function() {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       openPreviewSummaryButton.click();
       general.waitForSystem();
       expect(explorationSummaryTile.isPresent()).toBeTruthy();
@@ -84,13 +80,6 @@ var ExplorationEditorSettingsTab = function() {
       general.waitForSystem();
       expect((explorationSummaryTile.isPresent())).toBeFalsy();
     });
-  };
-
-  this.runFromSettingsTab = function(callbackFunction) {
-    explorationEditorPage.navigateToSettingsTab();
-    var result = callbackFunction();
-    explorationEditorPage.navigateToMainTab();
-    return result;
   };
 
   this.setCategory = function(category) {
