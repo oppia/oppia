@@ -22,7 +22,7 @@ oppia.controller('StateSolution', [
   'ExplorationStatesService', 'SolutionVerificationService',
   'ExplorationHtmlFormatterService', 'stateInteractionIdService',
   'stateHintsService', 'UrlInterpolationService', 'SolutionObjectFactory',
-  'ExplorationContextService', 'ExplorationWarningsService',
+  'ContextService', 'ExplorationWarningsService',
   'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'stateContentIdsToAudioTranslationsService', function(
       $scope, $rootScope, $uibModal, $filter, EditorStateService,
@@ -30,7 +30,7 @@ oppia.controller('StateSolution', [
       ExplorationStatesService, SolutionVerificationService,
       ExplorationHtmlFormatterService, stateInteractionIdService,
       stateHintsService, UrlInterpolationService, SolutionObjectFactory,
-      ExplorationContextService, ExplorationWarningsService,
+      ContextService, ExplorationWarningsService,
       INFO_MESSAGE_SOLUTION_IS_INVALID,
       stateContentIdsToAudioTranslationsService) {
     $scope.correctAnswer = null;
@@ -172,7 +172,7 @@ oppia.controller('StateSolution', [
         var currentStateName = EditorStateService.getActiveStateName();
         var state = ExplorationStatesService.getState(currentStateName);
         var solutionIsValid = SolutionVerificationService.verifySolution(
-          ExplorationContextService.getExplorationId(), state, correctAnswer);
+          ContextService.getExplorationId(), state, correctAnswer);
 
         ExplorationStatesService.updateSolutionValidity(
           currentStateName, solutionIsValid);

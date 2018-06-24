@@ -20,6 +20,7 @@
 oppia.constant('PAGE_CONTEXT', {
   EDITOR: 'editor',
   LEARNER: 'learner',
+  QUESTION_EDITOR: 'question_editor',
   OTHER: 'other'
 });
 
@@ -28,7 +29,7 @@ oppia.constant('EDITOR_TAB_CONTEXT', {
   PREVIEW: 'preview'
 });
 
-oppia.factory('ExplorationContextService', [
+oppia.factory('ContextService', [
   'UrlService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
   function(UrlService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
     var pageContext = null;
@@ -66,6 +67,9 @@ oppia.factory('ExplorationContextService', [
             } else if (pathnameArray[i] === 'create') {
               pageContext = PAGE_CONTEXT.EDITOR;
               return PAGE_CONTEXT.EDITOR;
+            } else if (pathnameArray[i] === 'question_editor') {
+              pageContext = PAGE_CONTEXT.QUESTION_EDITOR;
+              return PAGE_CONTEXT.QUESTION_EDITOR;
             }
           }
 
@@ -76,6 +80,10 @@ oppia.factory('ExplorationContextService', [
       isInExplorationContext: function() {
         return (this.getPageContext() === PAGE_CONTEXT.EDITOR ||
           this.getPageContext() === PAGE_CONTEXT.LEARNER);
+      },
+
+      isInQuestionContext: function() {
+        return (this.getPageContext() === PAGE_CONTEXT.QUESTION_EDITOR);
       },
 
       // Returns a string representing the explorationId (obtained from the
@@ -100,8 +108,29 @@ oppia.factory('ExplorationContextService', [
           }
 
           throw Error(
-            'ERROR: ExplorationContextService should not be used outside the ' +
-            'context of an exploration.');
+            'ERROR: ContextService should not be used outside the ' +
+            'context of an exploration or a question.');
+        }
+      },
+
+      // Returns a string representing the questionId (obtained from the
+      // URL).
+      getQuestionId: function() {
+        if (questionId) {
+          return questionId;
+        } else {
+          // The pathname should /question_editor/{question_id}.
+          var pathnameArray = UrlService.getPathname().split('/');
+          for (var i = 0; i < pathnameArray.length; i++) {
+            if (pathnameArray[i] === 'question_editor') {
+              questionId = pathnameArray[i + 1];
+              return pathnameArray[i + 1];
+            }
+          }
+
+          throw Error(
+            'ERROR: ContextService should not be used outside the ' +
+            'context of an question or a question.');
         }
       },
 
@@ -110,6 +139,12 @@ oppia.factory('ExplorationContextService', [
       isInExplorationEditorMode: function() {
         return (this.getPageContext() === PAGE_CONTEXT.EDITOR &&
             this.getEditorTabContext() === EDITOR_TAB_CONTEXT.EDITOR);
+      },
+
+      // Following variable helps to know whether exploration editor is
+      // in main editing mode or preview mode.
+      isInQuestionEditorMode: function() {
+        return (this.getPageContext() === PAGE_CONTEXT.QUESTION_EDITOR);
       }
     };
   }

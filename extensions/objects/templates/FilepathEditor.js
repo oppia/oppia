@@ -15,10 +15,10 @@
 // This directive can only be used in the context of an exploration.
 
 oppia.directive('filepathEditor', [
-  '$http', '$sce', 'AlertsService', 'ExplorationContextService',
+  '$http', '$sce', 'AlertsService', 'ContextService',
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(
-      $http, $sce, AlertsService, ExplorationContextService,
+      $http, $sce, AlertsService, ContextService,
       UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
@@ -720,7 +720,7 @@ oppia.directive('filepathEditor', [
         $scope.userIsResizingCropArea = false;
         $scope.cropAreaResizeDirection = null;
 
-        $scope.explorationId = ExplorationContextService.getExplorationId();
+        $scope.explorationId = ContextService.getExplorationId();
         $scope.resetFilePathEditor();
 
         window.addEventListener('mouseup', function(e) {

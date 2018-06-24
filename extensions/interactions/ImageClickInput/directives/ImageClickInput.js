@@ -21,12 +21,12 @@
  */
 
 oppia.directive('oppiaInteractiveImageClickInput', [
-  '$sce', 'HtmlEscaperService', 'ExplorationContextService',
+  '$sce', 'HtmlEscaperService', 'ContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
   'ImagePreloaderService', 'AssetsBackendApiService', 'EDITOR_TAB_CONTEXT',
   'EVENT_NEW_CARD_AVAILABLE', 'LOADING_INDICATOR_URL',
   function(
-      $sce, HtmlEscaperService, ExplorationContextService,
+      $sce, HtmlEscaperService, ContextService,
       imageClickInputRulesService, UrlInterpolationService,
       ImagePreloaderService, AssetsBackendApiService, EDITOR_TAB_CONTEXT,
       EVENT_NEW_CARD_AVAILABLE, LOADING_INDICATOR_URL) {
@@ -85,7 +85,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             // exploration editor. So we directly fetch the images from the
             // AssetsBackendApiService's cache.
             AssetsBackendApiService.loadImage(
-              ExplorationContextService.getExplorationId(),
+              ContextService.getExplorationId(),
               $scope.filepath.name)
               .then(function(loadedImageFile) {
                 $scope.isLoadingIndicatorShown = false;
@@ -146,7 +146,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             }
           };
           $scope.getDotDisplay = function() {
-            if (ExplorationContextService.getEditorTabContext() ===
+            if (ContextService.getEditorTabContext() ===
                 EDITOR_TAB_CONTEXT.EDITOR) {
               return 'none';
             }

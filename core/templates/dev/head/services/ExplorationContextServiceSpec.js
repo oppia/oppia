@@ -36,7 +36,7 @@ describe('Exploration context service', function() {
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(inject(function($injector) {
-      ecs = $injector.get('ExplorationContextService');
+      ecs = $injector.get('ContextService');
     }));
 
     it('should correctly retrieve the exploration id', function() {
@@ -62,7 +62,7 @@ describe('Exploration context service', function() {
     });
 
     beforeEach(inject(function($injector) {
-      ecs = $injector.get('ExplorationContextService');
+      ecs = $injector.get('ContextService');
     }));
 
     it('should correctly retrieve the exploration id', function() {
@@ -88,7 +88,7 @@ describe('Exploration context service', function() {
     });
 
     beforeEach(inject(function($injector) {
-      ecs = $injector.get('ExplorationContextService');
+      ecs = $injector.get('ContextService');
     }));
 
     it('should throw an error when trying to retrieve the exploration id',

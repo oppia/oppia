@@ -78,12 +78,12 @@ oppia.config(['$provide', function($provide) {
   $provide.decorator('taOptions', [
     '$delegate', '$document', '$uibModal', '$timeout', 'FocusManagerService',
     'taRegisterTool', 'RteHelperService', 'AlertsService',
-    'ExplorationContextService', 'PAGE_CONTEXT',
+    'ContextService', 'PAGE_CONTEXT',
     'UrlInterpolationService',
     function(
         taOptions, $document, $uibModal, $timeout, FocusManagerService,
         taRegisterTool, RteHelperService, AlertsService,
-        ExplorationContextService, PAGE_CONTEXT,
+        ContextService, PAGE_CONTEXT,
         UrlInterpolationService) {
       taOptions.disableSanitizer = true;
       taOptions.forceTextAngularSanitize = false;
@@ -163,7 +163,7 @@ oppia.config(['$provide', function($provide) {
 
       RteHelperService.getRichTextComponents().forEach(function(componentDefn) {
         var buttonDisplay = RteHelperService.createToolbarIcon(componentDefn);
-        var canUseFs = ExplorationContextService.getPageContext() ===
+        var canUseFs = ContextService.getPageContext() ===
           PAGE_CONTEXT.EDITOR;
 
         taRegisterTool(componentDefn.id, {

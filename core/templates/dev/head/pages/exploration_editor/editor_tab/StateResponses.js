@@ -20,13 +20,13 @@
 oppia.controller('StateResponses', [
   '$scope', '$rootScope', '$uibModal', '$filter', 'stateInteractionIdService',
   'EditorStateService', 'AlertsService', 'ResponsesService', 'RouterService',
-  'ExplorationContextService', 'TrainingDataService',
+  'ContextService', 'TrainingDataService',
   'stateContentIdsToAudioTranslationsService', 'stateCustomizationArgsService',
   'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS', 'UrlInterpolationService',
   'AnswerGroupObjectFactory', function(
       $scope, $rootScope, $uibModal, $filter, stateInteractionIdService,
       EditorStateService, AlertsService, ResponsesService, RouterService,
-      ExplorationContextService, TrainingDataService,
+      ContextService, TrainingDataService,
       stateContentIdsToAudioTranslationsService, stateCustomizationArgsService,
       PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS, UrlInterpolationService,
       AnswerGroupObjectFactory) {
@@ -38,7 +38,7 @@ oppia.controller('StateResponses', [
       '/general/drag_dots.png');
 
     var _initializeTrainingData = function() {
-      var explorationId = ExplorationContextService.getExplorationId();
+      var explorationId = ContextService.getExplorationId();
       var currentStateName = EditorStateService.getActiveStateName();
       TrainingDataService.initializeTrainingData(
         explorationId, currentStateName);
@@ -262,7 +262,7 @@ oppia.controller('StateResponses', [
           '$scope', '$injector', '$uibModalInstance',
           'ExplorationHtmlFormatterService',
           'stateInteractionIdService', 'stateCustomizationArgsService',
-          'ExplorationContextService', 'EditorStateService',
+          'ContextService', 'EditorStateService',
           'ExplorationStatesService', 'TrainingDataService',
           'AnswerClassificationService', 'FocusManagerService',
           'AngularNameService', 'EXPLICIT_CLASSIFICATION',
@@ -270,11 +270,11 @@ oppia.controller('StateResponses', [
               $scope, $injector, $uibModalInstance,
               ExplorationHtmlFormatterService,
               stateInteractionIdService, stateCustomizationArgsService,
-              ExplorationContextService, EditorStateService,
+              ContextService, EditorStateService,
               ExplorationStatesService, TrainingDataService,
               AnswerClassificationService, FocusManagerService,
               AngularNameService, EXPLICIT_CLASSIFICATION) {
-            var _explorationId = ExplorationContextService.getExplorationId();
+            var _explorationId = ContextService.getExplorationId();
             var _stateName = EditorStateService.getActiveStateName();
             var _state = ExplorationStatesService.getState(_stateName);
 

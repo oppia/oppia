@@ -48,12 +48,12 @@ oppia.constant('STATS_REPORTING_URLS', {
 oppia.factory('StatsReportingService', [
   '$http', '$interval', 'StopwatchObjectFactory', 'MessengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
-  'STATS_EVENT_TYPES', 'ExplorationContextService', 'PAGE_CONTEXT',
+  'STATS_EVENT_TYPES', 'ContextService', 'PAGE_CONTEXT',
   'DEFAULT_OUTCOME_CLASSIFICATION',
   function(
       $http, $interval, StopwatchObjectFactory, MessengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
-      STATS_EVENT_TYPES, ExplorationContextService, PAGE_CONTEXT,
+      STATS_EVENT_TYPES, ContextService, PAGE_CONTEXT,
       DEFAULT_OUTCOME_CLASSIFICATION) {
     var explorationId = null;
     var explorationTitle = null;
@@ -66,7 +66,7 @@ oppia.factory('StatsReportingService', [
     var explorationIsComplete = false;
 
     var _editorPreviewMode = (
-      ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+      ContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
 
     // The following dict will contain all stats data accumulated over the
     // interval time and will be reset when the dict is sent to backend for

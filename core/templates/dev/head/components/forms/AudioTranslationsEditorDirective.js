@@ -34,11 +34,11 @@ oppia.directive('audioTranslationsEditor', [
         '$scope', '$rootScope', '$uibModal', '$sce', 'stateContentService',
         'stateContentIdsToAudioTranslationsService',
         'EditabilityService', 'LanguageUtilService', 'AlertsService',
-        'ExplorationContextService', 'AssetsBackendApiService',
+        'ContextService', 'AssetsBackendApiService',
         function(
             $scope, $rootScope, $uibModal, $sce, stateContentService,
             stateContentIdsToAudioTranslationsService, EditabilityService,
-            LanguageUtilService, AlertsService, ExplorationContextService,
+            LanguageUtilService, AlertsService, ContextService,
             AssetsBackendApiService) {
           $scope.isTranslatable = EditabilityService.isTranslatable;
 
@@ -59,7 +59,7 @@ oppia.directive('audioTranslationsEditor', [
                 .hasAudioTranslations($scope.contentId);
           }
 
-          var explorationId = ExplorationContextService.getExplorationId();
+          var explorationId = ContextService.getExplorationId();
 
           $scope.getAudioLanguageDescription = (
             LanguageUtilService.getAudioLanguageDescription);
@@ -124,12 +124,12 @@ oppia.directive('audioTranslationsEditor', [
               controller: [
                 '$scope', '$window', '$uibModalInstance', 'LanguageUtilService',
                 'allowedAudioLanguageCodes', 'AlertsService',
-                'ExplorationContextService', 'IdGenerationService',
+                'ContextService', 'IdGenerationService',
                 'componentName',
                 function(
                     $scope, $window, $uibModalInstance, LanguageUtilService,
                     allowedAudioLanguageCodes, AlertsService,
-                    ExplorationContextService, IdGenerationService,
+                    ContextService, IdGenerationService,
                     componentName) {
                   var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
                     'There was an error uploading the audio file.');
@@ -190,7 +190,7 @@ oppia.directive('audioTranslationsEditor', [
                       $window.localStorage.setItem(
                         'last_uploaded_audio_lang', $scope.languageCode);
                       var explorationId = (
-                        ExplorationContextService.getExplorationId());
+                        ContextService.getExplorationId());
                       AssetsBackendApiService.saveAudio(
                         explorationId, generatedFilename, uploadedFile
                       ).then(function() {
