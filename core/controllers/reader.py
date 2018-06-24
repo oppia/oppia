@@ -316,8 +316,9 @@ class StorePlaythroughHandler(base.BaseHandler):
         self.issue_schema_version = None
 
     def _find_playthrough_in_exp_issues(self, playthrough):
-        """Finds the given playthrough in the unresolved issues list of the
-        exploration issues model, returns None if it doesn't exist.
+        """Finds an equivalent playthrough for the given one in the unresolved
+        issues list of the exploration issues model, returns None if it doesn't
+        exist.
 
         Args:
             playthrough: Playthrough. The playthrough domain object.
@@ -344,7 +345,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         Args:
             playthrough: Playthrough. The updated playthrough domain object.
             orig_playthrough: Playthrough. The original playthrough domain
-                object.
+                object which is in the now-incorrect issue list.
         """
         max_playthroughs_per_issue = False
         issue_index = self._find_playthrough_in_exp_issues(playthrough)
