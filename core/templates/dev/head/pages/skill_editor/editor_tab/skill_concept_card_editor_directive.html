@@ -57,7 +57,7 @@
           <ul class="nav oppia-option-list nav-stacked nav-pills" 
               role="tablist" 
               ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS" 
-              ng-model="skill.getConceptCard().getWorkedExamples()">
+              ng-model="skill.getConceptCard().workedExamples">
             <li ng-repeat="workedExample in skill.getConceptCard().getWorkedExamples()" 
                 ng-class="{'active': activeWorkedExampleIndex === $index}" 
                 class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection" 
@@ -74,7 +74,7 @@
                                      summary="getWorkedExampleSummary(workedExample)"
                                      short-summary="getWorkedExampleSummary(workedExample)"
                                      is-active="$index === activeWorkedExampleIndex"
-                                     is-delete-available="canDeleteWorkedExample"
+                                     is-delete-available="isEditable"
                                      on-delete-fn="removeWorkedExample">
                 </summary-list-header>
               </a>
@@ -94,7 +94,7 @@
         <md-card style="margin: 0; padding: 0;">
           <div>
             <button type="button"
-                    class="btn btn-primary btn-lg oppia-add-hint-button"
+                    class="btn btn-primary btn-lg"
                     ng-click="openAddWorkedExampleModal()">
               + Add Worked Example
             </button>

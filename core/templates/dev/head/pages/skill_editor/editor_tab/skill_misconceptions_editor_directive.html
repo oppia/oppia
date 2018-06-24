@@ -1,0 +1,53 @@
+<md-card class="oppia-editor-card-with-avatar">
+	<div class="oppia-editor-card-body">
+		<div class="oppia-editor-card-section">
+			<strong>Misconceptions></strong>
+			<div ng-if="skill.getMisconceptions().length > 0">
+				<ul class="nav oppia-option-list nav-stacked nav-pills"
+				    role="tablist"
+				    ui-sortable="MISCONCEPTIONS_SORTABLE_OPTIONS"
+				    ng-model="skill._misconceptions">
+					<li ng-repeat="misconception in skill.getMisconceptions()"
+					    ng-class="{'active': activeMisconceptionIndex === $index}"
+					    class="oppia-rule-block oppia-sortable-misconception oppia-prevent-selection"
+					    style="margin-top: 0;">
+						<span class="oppia-misconception-sort-handle"
+						      ng-if="skill.getMisconceptions().length > 1"
+						      ng-mousedown="changeActiveMisconceptionIndex(null)">
+						  <img ng-src="<[dragDotsImgUrl]>" width="10">
+						</span>
+						<a ng-click="changeActiveMisconceptionIndex($index)"
+						   class="oppia-rule-tab"
+						   ng-class="{'oppia-rule-tab-active': activeMisconceptionIndex === $index}">
+						  <summary-list-header index="$index"
+						  										 summary="getMisconceptionSummary(misconception)"
+						  										 short-summary="getMisconceptionSummary(misconception)"
+						  										 is-active="$index === activeMisconceptionIndex"
+						  										 is-delete-available="isEditable"
+						  										 on-delete-fn="removeMisconception">
+						  </summary-list-header>
+						</a>
+
+						<div ng-if="activeMisconceptionIndex === $index">
+							<div class="oppia-editor-card-section">
+								<misconception-editor misconception="misconception"
+																			index="$index"
+																			is-editable="isEditable">
+								</misconception-editor>
+							</div>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<md-card style="margin: 0; padding: 0;">
+				<div>
+					<button type="button"
+									class="btn btn-primary btn-lg"
+									ng-click="openAddMisconceptionModal()">
+					  + Add Misconception
+					</button>
+				</div>
+			</md-card>
+		</div>
+	</div>
+</md-card>

@@ -21,6 +21,10 @@ oppia.factory('MisconceptionObjectFactory', [
         misconceptionBackendDict.feedback);
     };
 
+    Misconception.create = function(name, notes, feedback) {
+      return new Misconception(name, notes, feedback);
+    };
+
     return Misconception;
   }
 ]);

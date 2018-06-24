@@ -111,7 +111,7 @@ oppia.factory('SkillUpdateService', [
           skill.getConceptCard().getWorkedExamples());
         var newWorkedExamples = angular.copy(oldWorkedExamples);
         newWorkedExamples[workedExampleIndex] = newWorkedExample;
-                _applyPropertyChange(
+        _applyPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
           newWorkedExamples, oldWorkedExamples,
           function(changeDict, skill) {
@@ -120,6 +120,29 @@ oppia.factory('SkillUpdateService', [
           }, function(changeDict, skill) {
             skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
           });
+      },
+
+      updateWorkedExamples: function(
+        skill, oldWorkedExamples, newWorkedExamples) {
+        _applyPropertyChange(
+          skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
+          newWorkedExamples, oldWorkedExamples,
+          function(changeDict, skill) {
+            var newWorkedExamples = _getNewPropertyValueFromChangeDict(changeDict);
+            skill.getConceptCard().setWorkedExamples(newWorkedExamples);
+          }, function(changeDict, skill) {
+            skill.getConceptCard().setWorkedExamples(oldWorkedExamples);
+          });
+      },
+
+      addMisconception: function(
+        skill, newMisconception) {
+
+      },
+
+      deleteMisconception: function(
+        skill, index) {
+        
       }
     }
   }

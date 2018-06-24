@@ -79,6 +79,10 @@ oppia.factory('SkillObjectFactory', [
       return this._conceptCard;
     };
 
+    Skill.prototype.getMisconceptions = function() {
+      return this._misconceptions;
+    };
+
     return Skill;
   }
 ]);

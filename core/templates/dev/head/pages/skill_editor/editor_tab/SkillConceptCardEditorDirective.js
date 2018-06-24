@@ -18,6 +18,8 @@ oppia.directive('skillConceptCardEditor', [
             type: 'html'
           };
 
+          var workedExamplesMemento = null;
+
           $scope.isEditable = function() {
             return true;
           };
@@ -37,9 +39,15 @@ oppia.directive('skillConceptCardEditor', [
               $rootScope.$broadcast('externalSave');
               $scope.activeWorkedExampleIndex = null;
               ui.placeholder.height(ui.item.height());
+              workedExamplesMemento = angular.copy(
+                $scope.skill.getConceptCard().getWorkedExamples());
             },
             stop: function() {
-              //update
+              var newWorkedExamples = angular.copy(
+                $scope.skill.getConceptCard().getWorkedExamples());
+              SkillUpdateService.updateWorkedExamples(
+                $scope.skill, workedExamplesMemento, newWorkedExamples);
+              workedExamplesMemento = angular.copy(newWorkedExamples);
             }
           };
 
@@ -80,10 +88,6 @@ oppia.directive('skillConceptCardEditor', [
             SkillUpdateService.swapWorkedExamples($scope.skill, indexOne, indexTwo);
           };
 
-          $scope.canDeleteWorkedExample = function() {
-            return true;
-          };
-
           $scope.getWorkedExampleSummary = function(workedExample) {
             return $filter('formatRtePreview')(workedExample);
           };
@@ -116,7 +120,6 @@ oppia.directive('skillConceptCardEditor', [
             }).result.then(function(result) {
               SkillUpdateService.addWorkedExample(
                 $scope.skill, result.workedExample);
-              console.log(angular.copy($scope.skill.getConceptCard().getWorkedExamples()));
             });
           };
         }
