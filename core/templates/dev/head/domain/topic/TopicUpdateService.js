@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -191,31 +191,64 @@ oppia.factory('TopicUpdateService', [
       /**
        * @param {Topic} topic - The topic object to be edited.
        * @param {number} subtopicId - The id of the subtopic to delete.
-       * @param {boolean} isNewlyCreated - Whether the subtopic to delete was
-       *    created in the current draft of the topic. (i.e, the subtopic to
-       *    delete hasn't been saved in the datastore yet.)
        */
-      deleteSubtopic: function(topic, subtopicId, isNewlyCreated) {
+      deleteSubtopic: function(topic, subtopicId) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
           throw Error('Subtopic doesn\'t exist');
         }
         var title = subtopic.getTitle();
         var skillIds = subtopic.getSkillIds();
+        var newlyCreated = false;
+        var changeList = UndoRedoService.getCommittableChangeList();
+        for (var i = 0; i < changeList.length; i++) {
+          if (changeList[i].cmd === 'add_subtopic' &&
+              changeList[i].subtopic_id === subtopicId) {
+            newlyCreated = true;
+          }
+        }
+        if (newlyCreated) {
+          // Get the current change list.
+          var currentChangeList = UndoRedoService.getChangeList();
+          var indicesToDelete = [];
+          for (var i = 0; i < currentChangeList.length; i++) {
+            var backendChangeDict =
+              currentChangeList[i].getBackendChangeObject();
+            if (backendChangeDict.subtopic_id === subtopicId) {
+              // The indices in the change list corresponding to changes to the
+              // currently deleted and newly created subtopic are to be removed
+              // from the list.
+              indicesToDelete.push(i);
+              continue;
+            }
+            // When a newly created subtopic is deleted, the subtopics created
+            // after it would have their id reduced by 1.
+            if (backendChangeDict.subtopic_id > subtopicId) {
+              backendChangeDict.subtopic_id--;
+            }
+            // Apply the above id reduction changes to the backend change.
+            currentChangeList[i].setBackendChangeObject(backendChangeDict);
+          }
+          // The new change list is found by deleting the above found elements.
+          var newChangeList = currentChangeList.filter(function(change) {
+            var changeObjectIndex = currentChangeList.indexOf(change);
+            // Return all elements that were not deleted.
+            return (indicesToDelete.indexOf(changeObjectIndex) === -1);
+          });
+          // The new changelist is set.
+          UndoRedoService.setChangeList(newChangeList);
+          topic.deleteSubtopic(subtopicId, newlyCreated);
+          return;
+        }
         _applyChange(topic, CMD_DELETE_SUBTOPIC, {
           subtopic_id: subtopicId,
           change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
-          topic.deleteSubtopic(subtopicId, isNewlyCreated);
+          topic.deleteSubtopic(subtopicId, newlyCreated);
         }, function(changeDict, topic) {
           // Undo.
-          var subtopicId = _getSubtopicIdFromChangeDict(changeDict);
-          topic.undoDeleteSubtopic(
-            subtopicId, title, skillIds, isNewlyCreated);
-          for (var i = 0; i < skillIds.length; i++) {
-            topic.removeUncategorizedSkillId(skillIds[i]);
-          }
+          throw Error('A deleted subtopic cannot be restored');
         });
       },
 

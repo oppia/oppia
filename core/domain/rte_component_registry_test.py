@@ -77,8 +77,6 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             if ca_spec['schema']['type'] == 'custom':
                 obj_class = obj_services.Registry.get_object_class_by_type(
                     ca_spec['schema']['obj_type'])
-                self.assertIsNotNone(obj_class.edit_html_filename)
-                self.assertIsNotNone(obj_class.edit_js_filename)
                 self.assertEqual(
                     ca_spec['default_value'],
                     obj_class.normalize(ca_spec['default_value']))

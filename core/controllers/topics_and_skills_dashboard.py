@@ -18,6 +18,7 @@ are created.
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import topic_domain
@@ -63,12 +64,20 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         for topic_summary in topic_summary_dicts:
             topic_rights = topic_rights_dict[topic_summary['id']]
             if topic_rights:
-                topic_summary['topic_is_published'] = (
+                topic_summary['is_published'] = (
                     topic_rights.topic_is_published)
+
+        can_delete_topic = (
+            role_services.ACTION_DELETE_TOPIC in self.user.actions)
+
+        can_create_topic = (
+            role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
 
         self.values.update({
             'skill_summary_dicts': skill_summary_dicts,
-            'topic_summary_dicts': topic_summary_dicts
+            'topic_summary_dicts': topic_summary_dicts,
+            'can_delete_topic': can_delete_topic,
+            'can_create_topic': can_create_topic
         })
         self.render_json(self.values)
 

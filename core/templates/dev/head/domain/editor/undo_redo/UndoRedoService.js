@@ -113,6 +113,10 @@ oppia.factory('UndoRedoService', [
       return committableChangeList;
     };
 
+    UndoRedoService.setChangeList = function(changeList) {
+      _appliedChanges = angular.copy(changeList);
+    };
+
     /**
      * Returns the number of changes that have been applied to the domain
      * object.

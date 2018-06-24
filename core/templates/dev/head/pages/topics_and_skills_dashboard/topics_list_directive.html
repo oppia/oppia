@@ -42,9 +42,12 @@
       </td>
       <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
-          <span ng-if="topic.topic_is_published"> Published </span>
-          <span ng-if="!topic.topic_is_published"> Not Published </span>
+          <span ng-if="topic.is_published"> Published </span>
+          <span ng-if="!topic.is_published"> Not Published </span>
         </a>
+      </td>
+      <td ng-if="canDeleteTopic()">
+        <span ng-click="deleteTopic(topic.id)" class="fa fa-trash list-summary"> </span>
       </td>
     </tr>
   </table>

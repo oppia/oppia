@@ -976,7 +976,7 @@ def can_delete_topic(handler):
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
-        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+        if role_services.ACTION_DELETE_TOPIC in user_actions_info.actions:
             return handler(self, topic_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(

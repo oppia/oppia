@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,23 @@ oppia.factory('EditableTopicBackendApiService', [
         var topic = angular.copy(response.data.topic);
         if (successCallback) {
           successCallback(topic);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _deleteTopic = function(
+        topicId, successCallback, errorCallback) {
+      var topicDataUrl = UrlInterpolationService.interpolateUrl(
+        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
+          topic_id: topicId
+        });
+      $http['delete'](topicDataUrl).then(function(response) {
+        if (successCallback) {
+          successCallback(response.status);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -90,6 +107,12 @@ oppia.factory('EditableTopicBackendApiService', [
           _updateTopic(
             topicId, topicVersion, commitMessage, changeList,
             resolve, reject);
+        });
+      },
+
+      deleteTopic: function(topicId) {
+        return $q(function(resolve, reject) {
+          _deleteTopic(topicId, resolve, reject);
         });
       }
     };

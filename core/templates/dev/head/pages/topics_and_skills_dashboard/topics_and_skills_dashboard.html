@@ -39,7 +39,7 @@
       </ul>
 
       <div ng-if="activeTab === TAB_NAME_TOPICS">
-        <topics-list topic-summaries="topicSummaries"></topics-list>
+        <topics-list topic-summaries="topicSummaries" user-can-delete-topic="userCanDeleteTopic"></topics-list>
       </div>
 
       <div ng-if="activeTab === TAB_NAME_SKILLS">
@@ -53,11 +53,12 @@
         <p class="intro-card-message" style="padding-top: 6px;">
           No topics or skills have been created yet.
         </p>
-        <a class="btn oppia-dashboard-intro-button oppia-transition-200"
-           style="color: white; text-decoration: none;"
-           ng-href="/">
-           Create Topic
-        </a>
+        <button class="btn oppia-dashboard-intro-button oppia-transition-200"
+                style="color: white; text-decoration: none;"
+                ng-click="createTopic()"
+                ng-if="userCanCreateTopic">
+          Create Topic
+        </button>
       </blockquote>
     </div>
   </div>
@@ -204,5 +205,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsListDirective.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/EditableTopicBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
 {% endblock footer_js %}

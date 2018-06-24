@@ -352,17 +352,15 @@ describe('Topic update service', function() {
 
   it('should remove/add a subtopic', function() {
     expect(_sampleTopic.getSubtopics().length).toEqual(1);
-    TopicUpdateService.deleteSubtopic(_sampleTopic, 1, false);
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 1);
     expect(_sampleTopic.getSubtopics()).toEqual([]);
     expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([
       'skill_1', 'skill_2'
     ]);
 
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics().length).toEqual(1);
-    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('Title');
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
+    expect(function() {
+      UndoRedoService.undoChange(_sampleTopic);
+    }).toThrow();
   });
 
   it('should properly remove/add a newly created subtopic', function() {
@@ -372,23 +370,18 @@ describe('Topic update service', function() {
     expect(_sampleTopic.getSubtopics()[2].getId()).toEqual(3);
     expect(_sampleTopic.getNextSubtopicId()).toEqual(4);
 
-    TopicUpdateService.deleteSubtopic(_sampleTopic, 2, true);
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
     expect(_sampleTopic.getSubtopics().length).toEqual(2);
     expect(_sampleTopic.getSubtopics()[1].getTitle()).toEqual('Title3');
     expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
     expect(_sampleTopic.getNextSubtopicId()).toEqual(3);
 
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics().length).toEqual(3);
-    expect(_sampleTopic.getSubtopics()[1].getTitle()).toEqual('Title2');
-    expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
-    expect(_sampleTopic.getSubtopics()[2].getId()).toEqual(3);
-    expect(_sampleTopic.getNextSubtopicId()).toEqual(4);
+    expect(UndoRedoService.getChangeCount()).toEqual(1);
   });
 
   it('should create a proper backend change dict for deleting a subtopic',
     function() {
-      TopicUpdateService.deleteSubtopic(_sampleTopic, 1, false);
+      TopicUpdateService.deleteSubtopic(_sampleTopic, 1);
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'delete_subtopic',
         subtopic_id: 1,
@@ -401,7 +394,7 @@ describe('Topic update service', function() {
     'when an error is encountered',
   function() {
     expect(function() {
-      TopicUpdateService.deleteSubtopic(_sampleTopic, 10, false);
+      TopicUpdateService.deleteSubtopic(_sampleTopic, 10);
     }).toThrow();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
