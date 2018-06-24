@@ -397,8 +397,12 @@ oppia.directive('ckEditorRte', [
           }
         });
 
-        // See format of filtering rules here:
-        // http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
+        /**
+         * Create rules to whitelist all the rich text components and
+         * their wrappers and overlays.
+         * See format of filtering rules here:
+         * http://docs.ckeditor.com/#!/guide/dev_allowed_content_rules
+         */
         // Whitelist the component tags with any attributes and classes.
         var componentRule = names.map(function(name) {
           return 'oppia-noninteractive-' + name;
@@ -473,9 +477,11 @@ oppia.directive('ckEditorRte', [
           /(<(oppia-noninteractive-(.+?))\b[^>]*>)[\s\S]*?<\/\2>/g
         );
 
-        // Before data is loaded into CKEditor, we need to wrap every rte
-        // component in a span (inline) or div (block).
-        // For block elements, we add an overlay div as well.
+        /**
+         * Before data is loaded into CKEditor, we need to wrap every rte
+         * component in a span (inline) or div (block).
+         * For block elements, we add an overlay div as well.
+         */
         var wrapComponents = function(html) {
           if (html === undefined) {
             return html;
