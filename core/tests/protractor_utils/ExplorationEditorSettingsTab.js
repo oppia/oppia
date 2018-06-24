@@ -20,9 +20,6 @@
 var forms = require('./forms.js');
 var general = require('./general.js');
 
-var ExplorationEditorPage =
-  require('../protractor_utils/ExplorationEditorPage.js');
-
 var ExplorationEditorSettingsTab = function() {
   /*
    * Interactive elements
@@ -53,61 +50,40 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Workflows
    */
-
   this.expectAvailableFirstStatesToBe = function(names) {
-    runFromSettingsTab(function() {
-      initialStateSelect.all(by.tagName('option')).map(function(elem) {
-        return elem.getText();
-      }).then(function(options) {
-        expect(options.sort()).toEqual(names.sort());
-      });
+    initialStateSelect.all(by.tagName('option')).map(function(elem) {
+      return elem.getText();
+    }).then(function(options) {
+      expect(options.sort()).toEqual(names.sort());
     });
   };
 
   this.openAndClosePreviewSummaryTile = function() {
-    runFromSettingsTab(function() {
-      openPreviewSummaryButton.click();
-      general.waitForSystem();
-      expect(explorationSummaryTile.isPresent()).toBeTruthy();
-      closePreviewSummaryButton.click();
-      general.waitForSystem();
-      expect((explorationSummaryTile.isPresent())).toBeFalsy();
-    });
-  };
-
-  // All functions involving the settings tab should be sent through this
-  // wrapper.
-
-  var runFromSettingsTab = function(callbackFunction) {
-    return new ExplorationEditorPage.ExplorationEditorPage().runFromSettingsTab(
-      callbackFunction);
+    openPreviewSummaryButton.click();
+    general.waitForSystem();
+    expect(explorationSummaryTile.isPresent()).toBeTruthy();
+    closePreviewSummaryButton.click();
+    general.waitForSystem();
+    expect((explorationSummaryTile.isPresent())).toBeFalsy();
   };
 
   this.setCategory = function(category) {
-    runFromSettingsTab(function() {
-      forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
-        category);
-    });
+    forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
+      category);
   };
 
   this.setFirstState = function(stateName) {
-    runFromSettingsTab(function() {
-      initialStateSelectOption(stateName).click();
-    });
+    initialStateSelectOption(stateName).click();
   };
 
   this.setObjective = function(objective) {
-    runFromSettingsTab(function() {
-      explorationObjectiveInput.clear();
-      explorationObjectiveInput.sendKeys(objective);
-    });
+    explorationObjectiveInput.clear();
+    explorationObjectiveInput.sendKeys(objective);
   };
 
   this.setTitle = function(title) {
-    runFromSettingsTab(function() {
-      explorationTitleInput.clear();
-      explorationTitleInput.sendKeys(title);
-    });
+    explorationTitleInput.clear();
+    explorationTitleInput.sendKeys(title);
   };
 };
 
