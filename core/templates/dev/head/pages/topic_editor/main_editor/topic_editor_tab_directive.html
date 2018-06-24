@@ -17,21 +17,32 @@
       </span>
     </div>
 
-    <div class="topic-description" ng-class="{'has-error': !displayedTopicDescription && !firstTimeVisit}">
+    <div class="topic-description" ng-class="{'has-error': !displayedTopicDescription && topicDescriptionChanged}">
       <label for="topicDescription" class="form-heading">Description</label>
       <textarea type="text" class="form-control"
                 ng-model="editableDescription"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
                 placeholder="Enter the description of the topic"></textarea>
-      <span ng-if="!displayedTopicDescription && !firstTimeVisit" class="help-block" style="font-size: smaller">
+      <span ng-if="!displayedTopicDescription && topicDescriptionChanged" class="help-block" style="font-size: smaller">
         What does this topic contain?
       </span>
     </div>
 
-    <div class="canonical-stories" ng-if="topic.getCanonicalStoryIds().length > 0">
+    <div class="canonical-stories">
       <label class="form-heading"> Canonical Stories </label>
-      <stories-list story-summaries="canonicalStorySummaries"></stories-list>
+      <button class="btn btn-default"
+              ng-click="createCanonicalStory()"
+              style="float: right;">
+        Create Story
+      </button>
+      <stories-list ng-if="topic.getCanonicalStoryIds().length > 0"
+                    story-summaries="canonicalStorySummaries"
+                    topic="topic">
+      </stories-list>
+      <h4 ng-if="topic.getCanonicalStoryIds().length === 0" style="color: gray;">
+        Click on Create Story to create a new canonical story for the topic
+      </h4>
     </div>
   </md-card>
 </div>

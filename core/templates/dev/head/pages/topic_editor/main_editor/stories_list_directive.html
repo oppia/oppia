@@ -1,8 +1,7 @@
 <table class="dashboard-table">
   <colgroup>
     <col style="width: 50%;">
-    <col style="width: 25%;">
-    <col style="width: 25%;">
+    <col style="width: 50%;">
   </colgroup>
   <tr>
     <th ng-repeat="key in STORY_TABLE_COLUMN_HEADINGS"
@@ -11,7 +10,7 @@
       <p ng-if="key === 'node_count'"> Node Count </p>
     </th>
   </tr>
-  <tr ng-repeat="story in getStorySummaries()"
+  <tr ng-repeat="story in storySummaries"
       class="list-item">
     <td>
       <a ng-href="<[getStoryEditorUrl(story.id)]>" class="list-summary">
@@ -22,6 +21,9 @@
       <a ng-href="<[getStoryEditorUrl(story.id)]>" class="list-summary">
         <span> <[story.node_count]> </span>
       </a>
+    </td>
+    <td>
+      <span ng-click="deleteCanonicalStory(story.id)" class="fa fa-trash list-summary"> </span>
     </td>
   </tr>
 </table>

@@ -20,25 +20,58 @@ oppia.directive('storiesList', [
     return {
       restrict: 'E',
       scope: {
-        getStorySummaries: '&storySummaries'
+        storySummaries: '=',
+        getTopic: '&topic'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/main_editor/stories_list_directive.html'),
       controller: [
-        '$scope', 'EditableTopicBackendApiService', 'UrlService',
-        'UrlInterpolationService',
+        '$scope', '$rootScope', '$uibModal', 'EditableTopicBackendApiService',
+        'UrlService', 'UrlInterpolationService', 'TopicUpdateService',
+        'EVENT_STORY_SUMMARIES_INITIALIZED',
         function(
-            $scope, EditableTopicBackendApiService, UrlService,
-            UrlInterpolationService) {
+            $scope, $rootScope, $uibModal, EditableTopicBackendApiService,
+            UrlService, UrlInterpolationService, TopicUpdateService,
+            EVENT_STORY_SUMMARIES_INITIALIZED) {
           var topicId = UrlService.getTopicIdFromUrl();
-          var storyEditorUrlTemplate = '/story_editor/<topic_id>/<story_id>';
+          var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<topic_id>/<story_id>';
           $scope.STORY_TABLE_COLUMN_HEADINGS = ['title', 'node_count'];
           $scope.getStoryEditorUrl = function(storyId) {
             return UrlInterpolationService.interpolateUrl(
-              storyEditorUrlTemplate, {
+              STORY_EDITOR_URL_TEMPLATE, {
                 topic_id: topicId,
                 story_id: storyId
               });
+          };
+
+          $scope.deleteCanonicalStory = function(storyId) {
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic_editor/main_editor/' +
+                'delete_story_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.confirmDeletion = function() {
+                    $uibModalInstance.close();
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function() {
+              TopicUpdateService.removeCanonicalStoryId(
+                $scope.getTopic(), storyId);
+              for (var i = 0; i < $scope.storySummaries.length; i++) {
+                if ($scope.storySummaries[i].id === storyId) {
+                  $scope.storySummaries.splice(i, 1);
+                }
+              }
+            });
           };
         }
       ]

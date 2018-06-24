@@ -15,7 +15,6 @@
 /**
  * @fileoverview Controller for the main topic editor.
  */
-
 oppia.directive('topicMainEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -25,12 +24,14 @@ oppia.directive('topicMainEditor', [
         '/pages/topic_editor/main_editor/topic_editor_tab_directive.html'),
       controller: [
         '$scope', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService', 'EVENT_STORY_SUMMARIES_INITIALIZED',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+        'UndoRedoService', 'StoryCreationService',
+        'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
+        'EVENT_TOPIC_REINITIALIZED',
         function(
             $scope, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService, EVENT_STORY_SUMMARIES_INITIALIZED,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+            UndoRedoService, StoryCreationService,
+            EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
+            EVENT_TOPIC_REINITIALIZED) {
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
@@ -39,7 +40,7 @@ oppia.directive('topicMainEditor', [
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.displayedTopicDescription = (
               $scope.editableDescription !== '');
-            $scope.firstTimeVisit = true;
+            $scope.topicDescriptionChanged = false;
           };
 
           var _initStorySummaries = function() {
@@ -47,9 +48,13 @@ oppia.directive('topicMainEditor', [
               TopicEditorStateService.getCanonicalStorySummaries();
           };
 
+          $scope.createCanonicalStory = function() {
+            StoryCreationService.createNewCanonicalStory($scope.topic.getId());
+          };
+
           $scope.updateTopicDescriptionStatus = function(description) {
             $scope.displayedTopicDescription = (description !== '');
-            $scope.firstTimeVisit = false;
+            $scope.topicDescriptionChanged = true;
           };
 
           $scope.openTopicNameEditor = function() {
