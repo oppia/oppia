@@ -23,10 +23,20 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var ruleTemplates = require(
   '../../../extensions/interactions/rule_templates.json');
 
+var ExplorationEditorSettingsTab = require(
+  '../protractor_utils/ExplorationEditorSettingsTab.js');
+
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
 
 var ExplorationEditorPage = function() {
+  /*
+   * Components
+   */
+  this.getSettingsTab = function() {
+    return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
+  };
+
   /*
    * Interactive elements
    */
@@ -156,7 +166,6 @@ var ExplorationEditorPage = function() {
   /*
    * Actions
    */
-
   // This clicks the "add new response" button and then selects the rule type
   // and enters its parameters, and closes the rule editor. Any number of rule
   // parameters may be specified after the ruleName.
@@ -556,8 +565,6 @@ var ExplorationEditorPage = function() {
     } else {
       targetOption = destName;
     }
-    // browser.pause();
-    // browser.pause();
     editOutcomeDestDropdownOptions(targetOption).click();
     if (createDest) {
       editOutcomeDestStateInput.sendKeys(destName);
@@ -589,6 +596,13 @@ var ExplorationEditorPage = function() {
 
   this.navigateToSettingsTab = function() {
     navigateToSettingsTabButton.click();
+  };
+
+  this.runFromSettingsTab = function(callBackFunction) {
+    this.navigateToSettingsTab();
+    var result = callBackFunction();
+    this.navigateToMainTab();
+    return result;
   };
 
   // RULES
@@ -764,5 +778,4 @@ var ExplorationEditorPage = function() {
     expect(stateNameContainer.getText()).toMatch(name);
   };
 };
-// nothing between here
 exports.ExplorationEditorPage = ExplorationEditorPage;
