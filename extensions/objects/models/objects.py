@@ -812,3 +812,18 @@ class NumberWithUnits(BaseObject):
             'schema': Units.SCHEMA
         }]
     }
+
+
+class ListOfSetsOfHtmlStrings(BaseObject):
+    """List of sets of Html strings class."""
+
+    description = 'A list of sets of Html strings.'
+    default_value = []
+
+    SCHEMA = {
+        'type': 'list',
+        'items': SetOfHtmlString.SCHEMA,
+        'validators': [{
+            'id': 'is_uniquified'
+        }]
+    }
