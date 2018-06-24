@@ -79,7 +79,17 @@ oppia.directive('oppiaResponseDragAndDropSort', [
         '/interactions/DragAndDropSort/directives/' +
         'drag_and_drop_sort_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.chooseItemType = function(index) {
+          if (index === 0) {
+            $scope.itemtype = 'item';
+          } else {
+            $scope.itemtype = 'subitem';
+          }
+          return true;
+        };
+
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        $scope.isAnswerLengthGreaterThanZero = ($scope.answer.length > 0);
       }]
     };
   }
@@ -95,7 +105,17 @@ oppia.directive('oppiaShortResponseDragAndDropSort', [
         '/interactions/DragAndDropSort/directives/' +
         'drag_and_drop_sort_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.chooseItemType = function(index) {
+          if (index === 0) {
+            $scope.itemtype = 'item';
+          } else {
+            $scope.itemtype = 'subitem';
+          }
+          return true;
+        };
+
         $scope.answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
+        $scope.isAnswerLengthGreaterThanZero = ($scope.answer.length > 0);
       }]
     };
   }
