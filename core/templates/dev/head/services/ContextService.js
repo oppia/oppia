@@ -50,9 +50,10 @@ oppia.factory('ContextService', [
         }
       },
       // Returns a string representing the context of the current page.
-      // This is either PAGE_CONTEXT.EDITOR or PAGE_CONTEXT.LEARNER.
-      // If the current page is not one in either EDITOR or LEARNER then
-      // return PAGE_CONTEXT.OTHER
+      // This is PAGE_CONTEXT.EDITOR or PAGE_CONTEXT.LEARNER or
+      // PAGE_CONTEXT.QUESTION_EDITOR.
+      // If the current page is not one in either EDITOR or LEARNER or
+      // QUESTION_EDITOR then return PAGE_CONTEXT.OTHER
       getPageContext: function() {
         if (pageContext) {
           return pageContext;
@@ -141,7 +142,7 @@ oppia.factory('ContextService', [
             this.getEditorTabContext() === EDITOR_TAB_CONTEXT.EDITOR);
       },
 
-      // Following variable helps to know whether exploration editor is
+      // Following variable helps to know whether question editor is
       // in main editing mode or preview mode.
       isInQuestionEditorMode: function() {
         return (this.getPageContext() === PAGE_CONTEXT.QUESTION_EDITOR);
