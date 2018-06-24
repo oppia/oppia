@@ -474,8 +474,10 @@ class HintsAuditOneOffJob(jobs.BaseMapReduceOneOffJobManager):
         yield (key, values)
 
 
-class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
-    """Job that checks the html content of an exploration and validates it.
+class ExplorationContentValidationJobForTextAngular(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates it
+    for TextAngular.
     """
 
     @classmethod
@@ -491,7 +493,7 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
 
         html_list = exploration.get_all_html_content_strings()
 
-        err_dict = html_cleaner.validate_textangular_format(html_list)
+        err_dict = html_cleaner.validate_rte_format(html_list, 'text-angular')
 
         for key in err_dict:
             if err_dict[key]:
@@ -507,7 +509,7 @@ class ExplorationContentValidationJob(jobs.BaseMapReduceOneOffJobManager):
 
 class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
     """Job that migrates the html content of an exploration into the valid
-    Textangular format and validates it.
+    TextAngular format and validates it.
     """
 
     @classmethod
@@ -523,7 +525,41 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
 
         html_list = exploration.get_all_html_content_strings()
 
-        err_dict = html_cleaner.validate_textangular_format(html_list, True)
+        err_dict = html_cleaner.validate_rte_format(
+            html_list, 'text-angular', True)
+
+        for key in err_dict:
+            if err_dict[key]:
+                yield(key, err_dict[key])
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))
+
+
+class ExplorationContentValidationJobForCKEditor(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that checks the html content of an exploration and validates it
+    for CKEditor.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+
+        html_list = exploration.get_all_html_content_strings()
+
+        err_dict = html_cleaner.validate_rte_format(html_list, 'ck-editor')
 
         for key in err_dict:
             if err_dict[key]:

@@ -232,7 +232,7 @@ def wrap_with_siblings(tag, p):
 
 
 def convert_to_text_angular(html_data):
-    """This function converts the html to text angular supported format.
+    """This function converts the html to TextAngular supported format.
 
     Args:
         html_data: str. HTML string to be converted.
@@ -249,7 +249,7 @@ def convert_to_text_angular(html_data):
     html_data = html_data.replace('<br>', '<br/>')
 
     # To convert the rich text content within tabs and collapsible components
-    # to valid Textangular format. If there is no tabs or collapsible component
+    # to valid TextAngular format. If there is no tabs or collapsible component
     # convert_tag_contents_to_text_angular will make no change to html_data.
     html_data = convert_tag_contents_to_text_angular(html_data)
 
@@ -460,7 +460,7 @@ def convert_to_text_angular(html_data):
 
 def convert_tag_contents_to_text_angular(html_data):
     """This function converts the rich text content within tabs and
-    collapsible components to textangular format. If the html_data
+    collapsible components to TextAngular format. If the html_data
     does not contain tab or collapsible components it will do nothing.
 
     Args:
@@ -488,12 +488,13 @@ def convert_tag_contents_to_text_angular(html_data):
     return unicode(soup)
 
 
-def validate_textangular_format(html_list, run_migration=False):
+def validate_rte_format(html_list, rte_type, run_migration=False):
     """This function checks if html strings in a given list are
-    valid for TextAngular RTE.
+    valid for given RTE format.
 
     Args:
         html_list: list(str). List of html strings to be validated.
+        rte_type: str. The type of RTE for which html string is to be validated.
         run_migration: bool. Specifies if migration is to be performed
             before validating.
 
@@ -509,8 +510,7 @@ def validate_textangular_format(html_list, run_migration=False):
 
     for html_data in html_list:
         if run_migration:
-            soup_data = convert_to_text_angular(
-                convert_tag_contents_to_text_angular(html_data))
+            soup_data = convert_to_text_angular(html_data)
         else:
             soup_data = html_data
 
@@ -521,7 +521,7 @@ def validate_textangular_format(html_list, run_migration=False):
         soup = bs4.BeautifulSoup(
             soup_data.replace('<br>', '<br/>'), 'html.parser')
 
-        is_invalid = _validate_soup_for_textangular(soup, err_dict)
+        is_invalid = _validate_soup_for_rte(soup, rte_type, err_dict)
 
         if is_invalid:
             err_dict['strings'].append(html_data)
@@ -531,8 +531,8 @@ def validate_textangular_format(html_list, run_migration=False):
                 unescape_html(collapsible['content-with-value']))
             soup_for_collapsible = bs4.BeautifulSoup(
                 content_html.replace('<br>', '<br/>'), 'html.parser')
-            is_invalid = _validate_soup_for_textangular(
-                soup_for_collapsible, err_dict)
+            is_invalid = _validate_soup_for_rte(
+                soup_for_collapsible, rte_type, err_dict)
             if is_invalid:
                 err_dict['strings'].append(html_data)
 
@@ -543,8 +543,8 @@ def validate_textangular_format(html_list, run_migration=False):
                 content_html = tab_content['content']
                 soup_for_tabs = bs4.BeautifulSoup(
                     content_html.replace('<br>', '<br/>'), 'html.parser')
-                is_invalid = _validate_soup_for_textangular(
-                    soup_for_tabs, err_dict)
+                is_invalid = _validate_soup_for_rte(
+                    soup_for_tabs, rte_type, err_dict)
                 if is_invalid:
                     err_dict['strings'].append(html_data)
 
@@ -554,22 +554,23 @@ def validate_textangular_format(html_list, run_migration=False):
     return err_dict
 
 
-def _validate_soup_for_textangular(soup, err_dict):
-    """Validate content in given soup for textangular format.
+def _validate_soup_for_rte(soup, rte_type, err_dict):
+    """Validate content in given soup for given RTE format.
 
     Args:
         soup: bs4.BeautifulSoup. The html soup whose content is to be validated.
+        rte_type: str. The type of RTE for which html string is to be validated.
         err_dict: dict. The dictionary which stores invalid tags and strings.
 
     Returns:
-        bool. Boolean indicating whether a html string is valid for textangular.
+        bool. Boolean indicating whether a html string is valid for given RTE.
     """
-    allowed_parent_list = (
-        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
-        ['ALLOWED_PARENT_LIST'])
-    allowed_tag_list = (
-        feconf.RTE_CONTENT_SPEC['RTE_TYPE_TEXTANGULAR']
-        ['ALLOWED_TAG_LIST'])
+    if rte_type == 'text-angular':
+        RTE = 'RTE_TYPE_TEXTANGULAR'
+    else:
+        RTE = 'RTE_TYPE_CKEDITOR'
+    allowed_parent_list = feconf.RTE_CONTENT_SPEC[RTE]['ALLOWED_PARENT_LIST']
+    allowed_tag_list = feconf.RTE_CONTENT_SPEC[RTE]['ALLOWED_TAG_LIST']
     is_invalid = False
 
     # Text with no parent tag is also invalid.

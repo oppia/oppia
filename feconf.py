@@ -936,7 +936,7 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-video',
             'oppia-noninteractive-tabs'
         ]
-    }
+    },
     'RTE_TYPE_CKEDITOR': {
         # Valid parent-child relation in CKEditor.
         'ALLOWED_PARENT_LIST': {
@@ -952,7 +952,9 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
             'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
-            'oppia-noninteractive-collapsible': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-collapsible': [
+                'blockquote', 'li', '[document]'
+            ],
             'oppia-noninteractive-video': ['blockquote', 'li', '[document]'],
             'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]']
         },
