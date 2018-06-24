@@ -24,7 +24,6 @@ var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 
 var ExplorationEditorSettingsTab = function() {
-
   /*
    * Interactive elements
    */
