@@ -21,6 +21,9 @@ oppia.constant(
 oppia.constant('EVENT_TOPIC_DELETED', 'topicDeleted');
 oppia.constant('EVENT_TYPE_TOPIC_CREATION_ENABLED', 'topicCreationEnabled');
 
+oppia.constant(
+  'TOPIC_EDITOR_STORY_URL_TEMPLATE', '/topic_editor_story_handler/<topic_id>');
+
 oppia.controller('TopicsAndSkillsDashboard', [
   '$scope', '$rootScope', '$http', '$window',
   'AlertsService', 'TopicsAndSkillsDashboardBackendApiService',

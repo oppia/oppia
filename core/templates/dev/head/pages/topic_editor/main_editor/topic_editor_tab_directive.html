@@ -17,20 +17,20 @@
       </span>
     </div>
 
-    <div class="topic-description" ng-class="{'has-error': !displayedTopicDescription}">
+    <div class="topic-description" ng-class="{'has-error': !displayedTopicDescription && !firstTimeVisit}">
       <label for="topicDescription" class="form-heading">Description</label>
       <textarea type="text" class="form-control"
                 ng-model="editableDescription"
-                ng-change="displayedTopicDescription = (editableDescription !== '')"
+                ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
                 placeholder="Enter the description of the topic"></textarea>
-      <span ng-if="!displayedTopicDescription" class="help-block" style="font-size: smaller">
+      <span ng-if="!displayedTopicDescription && !firstTimeVisit" class="help-block" style="font-size: smaller">
         What does this topic contain?
       </span>
     </div>
 
-    <div class="canonical-stories">
-      <label class="form-heading" ng-if="topic.getCanonicalStoryIds().length > 0"> Canonical Stories </label>
+    <div class="canonical-stories" ng-if="topic.getCanonicalStoryIds().length > 0">
+      <label class="form-heading"> Canonical Stories </label>
       <stories-list story-summaries="canonicalStorySummaries"></stories-list>
     </div>
   </md-card>

@@ -39,11 +39,17 @@ oppia.directive('topicMainEditor', [
             $scope.editableDescription = $scope.topic.getDescription();
             $scope.displayedTopicDescription = (
               $scope.editableDescription !== '');
+            $scope.firstTimeVisit = true;
           };
 
           var _initStorySummaries = function() {
             $scope.canonicalStorySummaries =
               TopicEditorStateService.getCanonicalStorySummaries();
+          };
+
+          $scope.updateTopicDescriptionStatus = function(description) {
+            $scope.displayedTopicDescription = (description !== '');
+            $scope.firstTimeVisit = false;
           };
 
           $scope.openTopicNameEditor = function() {

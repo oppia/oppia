@@ -24,12 +24,21 @@ oppia.directive('storiesList', [
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/main_editor/stories_list_directive.html'),
-      controller: ['$scope', 'EditableTopicBackendApiService', 'UrlService',
-        function($scope, EditableTopicBackendApiService, UrlService) {
+      controller: [
+        '$scope', 'EditableTopicBackendApiService', 'UrlService',
+        'UrlInterpolationService',
+        function(
+            $scope, EditableTopicBackendApiService, UrlService,
+            UrlInterpolationService) {
           var topicId = UrlService.getTopicIdFromUrl();
-          $scope.STORY_HEADINGS = ['title', 'node_count'];
+          var storyEditorUrlTemplate = '/story_editor/<topic_id>/<story_id>';
+          $scope.STORY_TABLE_COLUMN_HEADINGS = ['title', 'node_count'];
           $scope.getStoryEditorUrl = function(storyId) {
-            return '/story_editor/' + topicId + '/' + storyId;
+            return UrlInterpolationService.interpolateUrl(
+              storyEditorUrlTemplate, {
+                topic_id: topicId,
+                story_id: storyId
+              });
           };
         }
       ]
