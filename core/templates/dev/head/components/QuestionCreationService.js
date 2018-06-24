@@ -36,7 +36,7 @@ oppia.factory('QuestionCreationService', [
         AlertsService.clearWarnings();
         $rootScope.loadingMessage = 'Creating question';
 
-        $http.post('/questioncreationhandler', {
+        $http.post('/question_editor_handler/create_new', {
         }).then(function(response) {
           siteAnalyticsService.registerCreateNewQuestionEvent(
             response.data.questionId);
