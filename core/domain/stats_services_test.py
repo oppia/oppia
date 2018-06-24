@@ -166,7 +166,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             assets_list)
         exploration = exp_services.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, 1)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
         self.assertEqual(exp_issues.unresolved_issues, [])
 
         # Update exploration to next version, exploration issues model also
@@ -179,7 +179,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'committer_id_v3', exploration.id, change_list, 'Added new state')
         exploration = exp_services.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, 2)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
         self.assertEqual(exp_issues.unresolved_issues, [])
 
         # Create a playthrough and assign it to an issue in exploration issues
@@ -227,7 +227,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'committer_id_v3', exploration.id, change_list, 'Deleted a state')
         exploration = exp_services.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, 3)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
         self.assertEqual(exp_issues.unresolved_issues[0].to_dict(), {
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
@@ -248,7 +248,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'committer_id_v4', exp_id, current_version=3, revert_to_version=2)
         exploration = exp_services.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
-        self.assertEqual(exp_issues.exp_version, 4)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
         self.assertEqual(exp_issues.unresolved_issues[0].to_dict(), {
             'issue_type': 'EarlyQuit',
             'issue_customization_args': {
