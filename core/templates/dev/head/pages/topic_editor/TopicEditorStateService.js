@@ -241,35 +241,34 @@ oppia.factory('TopicEditorStateService', [
         var subtopicPageId = _getSubtopicPageId(topicId, subtopicId);
         var index = _getSubtopicPageIndex(subtopicPageId);
         var newIndex = _getNewSubtopicPageIndex(subtopicPageId);
-        if (index !== null) {
-          _subtopicPages.splice(index, 1);
-          // If the deleted subtopic page corresponded to a newly created
-          // subtopic, then the 'subtopicId' part of the id of all subsequent
-          // subtopic pages should be decremented to make it in sync with the
-          // their corresponding subtopic ids.
-          if (newIndex !== null) {
-            _newSubtopicPages.splice(newIndex, 1);
-            for (var i = 0; i < _subtopicPages.length; i++) {
-              var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
-                _subtopicPages[i].getId());
-              if (newSubtopicId > subtopicId) {
-                newSubtopicId--;
-                _subtopicPages[i].setId(
-                  _getSubtopicPageId(topicId, newSubtopicId));
-              }
-            }
-            for (var i = 0; i < _newSubtopicPages.length; i++) {
-              var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
-                _newSubtopicPages[i].getId());
-              if (newSubtopicId > subtopicId) {
-                newSubtopicId--;
-                _newSubtopicPages[i].setId(
-                  _getSubtopicPageId(topicId, newSubtopicId));
-              }
+        if (index === null) {
+          throw Error('The given subtopic page doesn\'t exist');
+        }
+        _subtopicPages.splice(index, 1);
+        // If the deleted subtopic page corresponded to a newly created
+        // subtopic, then the 'subtopicId' part of the id of all subsequent
+        // subtopic pages should be decremented to make it in sync with the
+        // their corresponding subtopic ids.
+        if (newIndex !== null) {
+          _newSubtopicPages.splice(newIndex, 1);
+          for (var i = 0; i < _subtopicPages.length; i++) {
+            var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
+              _subtopicPages[i].getId());
+            if (newSubtopicId > subtopicId) {
+              newSubtopicId--;
+              _subtopicPages[i].setId(
+                _getSubtopicPageId(topicId, newSubtopicId));
             }
           }
-        } else {
-          throw Error('The given subtopic page doesn\'t exist');
+          for (var i = 0; i < _newSubtopicPages.length; i++) {
+            var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
+              _newSubtopicPages[i].getId());
+            if (newSubtopicId > subtopicId) {
+              newSubtopicId--;
+              _newSubtopicPages[i].setId(
+                _getSubtopicPageId(topicId, newSubtopicId));
+            }
+          }
         }
       },
 
