@@ -215,7 +215,7 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'schema_version': 1,
             'is_valid': True
         })
-        exp_issues.unresolved_issues = [exp_issue1]
+        exp_issues.unresolved_issues.append(exp_issue1)
         stats_services.save_exp_issues_model_transactional(exp_issues)
 
         # Delete a state.
@@ -244,7 +244,8 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         })
 
         # Revert to an older version, exploration issues model also changes.
-        exp_services.revert_exploration('committer_id_v4', exp_id, 3, 2)
+        exp_services.revert_exploration(
+            'committer_id_v4', exp_id, current_version=3, revert_to_version=2)
         exploration = exp_services.get_exploration_by_id(exp_id)
         exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
         self.assertEqual(exp_issues.exp_version, 4)

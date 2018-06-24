@@ -897,7 +897,8 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     if feconf.ENABLE_PLAYTHROUGHS:
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff, None)
+            exploration, exp_versions_diff=exp_versions_diff,
+            revert_to_version=None)
 
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
@@ -1425,7 +1426,8 @@ def revert_exploration(
         current_exploration = get_exploration_by_id(
             exploration_id, version=current_version)
         stats_services.update_exp_issues_for_new_exp_version(
-            current_exploration, None, revert_to_version)
+            current_exploration, exp_versions_diff=None,
+            revert_to_version=revert_to_version)
 
     # Save state id mapping model for the new exploration version.
     create_and_save_state_id_mapping_model_for_reverted_exploration(
