@@ -35,7 +35,10 @@ oppia.factory('TopicEditorStateService', [
       EVENT_TOPIC_REINITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
+    // The array that caches all the subtopic pages loaded by the user.
     var _subtopicPages = [];
+    // The array that stores all the subtopic pages not loaded from the backend
+    // i.e those that correspond to newly created subtopics.
     var _newSubtopicPages = [];
     var _subtopicPage =
       SubtopicPageObjectFactory.createInterstitialSubtopicPage();
@@ -43,6 +46,14 @@ oppia.factory('TopicEditorStateService', [
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
 
+    var _getSubtopicPageId = function(topicId, subtopicId) {
+      return topicId + '-' + subtopicId.toString();
+    };
+    var _getSubtopicIdFromSubtopicPageId = function(subtopicPageId) {
+      // The subtopic page id consists of the topic id of length 12, a hyphen
+      // and a subtopic id (which is a number).
+      return parseInt(subtopicPageId.slice(13));
+    };
     var _setTopic = function(topic) {
       _topic.copyFromTopic(topic);
       // Reset the subtopic pages list after setting new topic.
@@ -125,7 +136,7 @@ oppia.factory('TopicEditorStateService', [
        * specified topic ID and subtopic ID.
        */
       loadSubtopicPage: function(topicId, subtopicId) {
-        var subtopicPageId = topicId + '-' + subtopicId;
+        var subtopicPageId = _getSubtopicPageId(topicId, subtopicId);
         if (_getSubtopicPageIndex(subtopicPageId) !== null) {
           _subtopicPage = angular.copy(
             _subtopicPages[_getSubtopicPageIndex(subtopicPageId)]);
@@ -183,6 +194,10 @@ oppia.factory('TopicEditorStateService', [
         return _subtopicPage;
       },
 
+      getSubtopicPages: function() {
+        return _subtopicPages;
+      },
+
       /**
        * Returns the current topic rights to be shared among the topic
        * editor. Please note any changes to this topic rights will be
@@ -215,6 +230,7 @@ oppia.factory('TopicEditorStateService', [
         if (_getSubtopicPageIndex(subtopicPage.getId()) !== null) {
           _subtopicPages[_getSubtopicPageIndex(subtopicPage.getId())] =
             angular.copy(subtopicPage);
+          _subtopicPage.copyFromSubtopicPage(subtopicPage);
         } else {
           _setSubtopicPage(subtopicPage);
           _newSubtopicPages.push(angular.copy(subtopicPage));
@@ -222,7 +238,7 @@ oppia.factory('TopicEditorStateService', [
       },
 
       deleteSubtopicPage: function(topicId, subtopicId) {
-        var subtopicPageId = topicId + '-' + subtopicId.toString();
+        var subtopicPageId = _getSubtopicPageId(topicId, subtopicId);
         var index = _getSubtopicPageIndex(subtopicPageId);
         var newIndex = _getNewSubtopicPageIndex(subtopicPageId);
         if (index !== null) {
@@ -234,21 +250,26 @@ oppia.factory('TopicEditorStateService', [
           if (newIndex !== null) {
             _newSubtopicPages.splice(newIndex, 1);
             for (var i = 0; i < _subtopicPages.length; i++) {
-              var newSubtopicId = parseInt(_subtopicPages[i].getId().slice(13));
+              var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
+                _subtopicPages[i].getId());
               if (newSubtopicId > subtopicId) {
                 newSubtopicId--;
-                _subtopicPages[i].setId(topicId + '-' + newSubtopicId);
+                _subtopicPages[i].setId(
+                  _getSubtopicPageId(topicId, newSubtopicId));
               }
             }
             for (var i = 0; i < _newSubtopicPages.length; i++) {
-              var newSubtopicId = parseInt(
-                _newSubtopicPages[i].getId().slice(13));
+              var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
+                _newSubtopicPages[i].getId());
               if (newSubtopicId > subtopicId) {
                 newSubtopicId--;
-                _newSubtopicPages[i].setId(topicId + '-' + newSubtopicId);
+                _newSubtopicPages[i].setId(
+                  _getSubtopicPageId(topicId, newSubtopicId));
               }
             }
           }
+        } else {
+          throw Error('The given subtopic page doesn\'t exist');
         }
       },
 
