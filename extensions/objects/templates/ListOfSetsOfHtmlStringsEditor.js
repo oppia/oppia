@@ -33,9 +33,6 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
         if (!$scope.value) {
           $scope.value = [];
         }
-        if (!$scope.maxPrevIndex) {
-          $scope.maxPrevIndex = 0;
-        }
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
 
