@@ -454,6 +454,13 @@
         "rootDir": "indentblock",
         "targetDir": "ckeditor-indentblock"
       },
+      "ckeditorBlockquotePlugin" : {
+        "version": "4.9.2",
+        "downloadFormat": "zip",
+        "url": "https://download.ckeditor.com/blockquote/releases/blockquote_4.9.2.zip",
+        "rootDir": "blockquote",
+        "targetDir": "ckeditor-blockquote"
+      },
       "textAngular": {
         "version": "1.4.5",
         "downloadFormat": "zip",
