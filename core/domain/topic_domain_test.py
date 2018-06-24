@@ -210,19 +210,18 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         user_ids = [self.user_id_a, self.user_id_b]
-        topic_rights = topic_domain.TopicRights(
-            self.topic_id, user_ids)
+        topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False)
         expected_dict = {
             'topic_id': self.topic_id,
-            'manager_names': ['A', 'B']
+            'manager_names': ['A', 'B'],
+            'topic_is_published': False
         }
 
         self.assertEqual(expected_dict, topic_rights.to_dict())
 
     def test_is_manager(self):
         user_ids = [self.user_id_a, self.user_id_b]
-        topic_rights = topic_domain.TopicRights(
-            self.topic_id, user_ids)
+        topic_rights = topic_domain.TopicRights(self.topic_id, user_ids, False)
         self.assertTrue(topic_rights.is_manager(self.user_id_a))
         self.assertTrue(topic_rights.is_manager(self.user_id_b))
         self.assertFalse(topic_rights.is_manager('fakeuser'))

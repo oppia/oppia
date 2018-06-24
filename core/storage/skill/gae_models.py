@@ -139,6 +139,8 @@ class SkillSummaryModel(base_models.BaseModel):
     description = ndb.StringProperty(required=True, indexed=True)
     # The number of misconceptions associated with the skill.
     misconception_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The number of worked examples in the skill.
+    worked_examples_count = ndb.IntegerProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this skill is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # Time when the skill model was last updated (not to be

@@ -33,9 +33,14 @@ oppia.factory('ExplorationStatesService', [
       AnswerClassificationService, ExplorationContextService,
       UrlInterpolationService) {
     var _states = null;
+
+    var stateAddedCallbacks = [];
+    var stateDeletedCallbacks = [];
+    var stateRenamedCallbacks = [];
+    var stateAnswerGroupsSavedCallbacks = [];
+
     // Properties that have a different backend representation from the
     // frontend and must be converted.
-
     var BACKEND_CONVERSIONS = {
       answer_groups: function(answerGroups) {
         return answerGroups.map(function(answerGroup) {
@@ -240,6 +245,9 @@ oppia.factory('ExplorationStatesService', [
       },
       saveInteractionAnswerGroups: function(stateName, newAnswerGroups) {
         saveStateProperty(stateName, 'answer_groups', newAnswerGroups);
+        stateAnswerGroupsSavedCallbacks.forEach(function(callback) {
+          callback(stateName);
+        });
       },
       getConfirmedUnclassifiedAnswersMemento: function(stateName) {
         return getStatePropertyMemento(
@@ -294,6 +302,9 @@ oppia.factory('ExplorationStatesService', [
         _states.addState(newStateName);
 
         ChangeListService.addState(newStateName);
+        stateAddedCallbacks.forEach(function(callback) {
+          callback(newStateName);
+        });
         $rootScope.$broadcast('refreshGraph');
         if (successCallback) {
           successCallback(newStateName);
@@ -312,7 +323,7 @@ oppia.factory('ExplorationStatesService', [
           return;
         }
 
-        $uibModal.open({
+        return $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
             'confirm_delete_state_modal_directive.html'),
@@ -350,6 +361,9 @@ oppia.factory('ExplorationStatesService', [
           }
 
           $location.path('/gui/' + EditorStateService.getActiveStateName());
+          stateDeletedCallbacks.forEach(function(callback) {
+            callback(deleteStateName);
+          });
           $rootScope.$broadcast('refreshGraph');
           // This ensures that if the deletion changes rules in the current
           // state, they get updated in the view.
@@ -382,8 +396,23 @@ oppia.factory('ExplorationStatesService', [
           ExplorationInitStateNameService.displayed = newStateName;
           ExplorationInitStateNameService.saveDisplayedValue(newStateName);
         }
+        stateRenamedCallbacks.forEach(function(callback) {
+          callback(oldStateName, newStateName);
+        });
         $rootScope.$broadcast('refreshGraph');
-      }
+      },
+      registerOnStateAddedCallback: function(callback) {
+        stateAddedCallbacks.push(callback);
+      },
+      registerOnStateDeletedCallback: function(callback) {
+        stateDeletedCallbacks.push(callback);
+      },
+      registerOnStateRenamedCallback: function(callback) {
+        stateRenamedCallbacks.push(callback);
+      },
+      registerOnStateAnswerGroupsSavedCallback: function(callback) {
+        stateAnswerGroupsSavedCallbacks.push(callback);
+      },
     };
   }
 ]);

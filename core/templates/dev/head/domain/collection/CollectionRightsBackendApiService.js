@@ -73,7 +73,7 @@ oppia.factory('CollectionRightsBackendApiService', [
     };
 
     var _isCached = function(collectionId) {
-      return collectionId in collectionRightsCache;
+      return collectionRightsCache.hasOwnProperty(collectionId);
     };
 
     return {

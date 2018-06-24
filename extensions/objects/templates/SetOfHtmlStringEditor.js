@@ -17,21 +17,16 @@
 // in via initArgs.
 
 oppia.directive('setOfHtmlStringEditor', [
-  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'SetOfHtmlString';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         getInitArgs: '&',
         value: '='
       },
-      template: '<span ng-include="getTemplateUrl()"></span>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/set_of_html_string_editor_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.SCHEMA = {
           type: 'list',

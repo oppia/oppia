@@ -976,7 +976,7 @@ def can_delete_topic(handler):
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
-        if role_services.ACTION_EDIT_ANY_TOPIC in user_actions_info.actions:
+        if role_services.ACTION_DELETE_TOPIC in user_actions_info.actions:
             return handler(self, topic_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -1031,6 +1031,28 @@ def can_access_topics_and_skills_dashboard(handler):
     return test_can_access_topics_and_skills_dashboard
 
 
+def can_view_any_topic_editor(handler):
+    """Decorator to check whether the user can view any topic editor."""
+
+    def test_can_view_any_topic_editor(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if (
+                role_services.ACTION_VISIT_ANY_TOPIC_EDITOR in
+                user_actions_info.actions):
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to access the topics and skills'
+                ' dashboard.' % self.user_id)
+    test_can_view_any_topic_editor.__wrapped__ = True
+
+    return test_can_view_any_topic_editor
+
+
 def can_manage_rights_for_topic(handler):
     """Decorator to check whether the user can manage a topic's rights."""
 
@@ -1051,3 +1073,25 @@ def can_manage_rights_for_topic(handler):
     test_can_manage_topic_rights.__wrapped__ = True
 
     return test_can_manage_topic_rights
+
+
+def can_change_topic_publication_status(handler):
+    """Decorator to check whether the user can publish or unpublish a topic."""
+
+    def test_can_change_topic_publication_status(self, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if (
+                role_services.ACTION_CHANGE_TOPIC_STATUS in
+                user_actions_info.actions):
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to publish or unpublish the '
+                'topic.' % self.user_id)
+    test_can_change_topic_publication_status.__wrapped__ = True
+
+    return test_can_change_topic_publication_status

@@ -1,5 +1,6 @@
 is similar to
 
 <button type="button" ng-repeat="trainingDataHtml in trainingDataHtmlList" class="btn btn-default protractor-test-retrain-answer oppia-unresolved-answer-button" ng-click="openRetrainAnswerModal($index)">
-<span angular-html-bind="trainingDataHtml"></span>
+  <angular-html-bind html-data="trainingDataHtml">
+  </angular-html-bind>
 </button>

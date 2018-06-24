@@ -20,23 +20,7 @@ import urllib
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import fs_domain
-from core.domain import obj_services
 from core.domain import value_generators_domain
-
-
-class ObjectEditorTemplateHandler(base.BaseHandler):
-    """Retrieves a template for an object editor."""
-
-    @acl_decorators.open_access
-    def get(self, obj_type):
-        """Handles GET requests."""
-        try:
-            self.response.write(
-                obj_services.Registry.get_object_class_by_type(
-                    obj_type).get_editor_html_template())
-        except Exception as e:
-            logging.error('Object editor not found: %s. %s' % (obj_type, e))
-            raise self.PageNotFoundException
 
 
 class ValueGeneratorHandler(base.BaseHandler):

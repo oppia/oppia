@@ -259,9 +259,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/audiohandler/<exploration_id>/audio/<filename>',
         resources.AudioHandler),
     get_redirect_route(
-        r'/object_editor_template/<obj_type>',
-        resources.ObjectEditorTemplateHandler),
-    get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
     get_redirect_route(r'%s' % feconf.FRACTIONS_LANDING_PAGE_URL,
@@ -513,6 +510,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX,
         topic_editor.TopicManagerRightsHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
+        topic_editor.TopicRightsHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_STATUS_URL_PREFIX,
+        topic_editor.TopicPublishHandler),
 
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,

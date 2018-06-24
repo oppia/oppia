@@ -37,6 +37,10 @@ oppia.factory('ChangeObjectFactory', [function() {
     return angular.copy(this._backendChangeObject);
   };
 
+  Change.prototype.setBackendChangeObject = function(backendChangeObject) {
+    return this._backendChangeObject = angular.copy(backendChangeObject);
+  };
+
   // Applies this change to the related object (such as a frontend collection
   // domain object).
   Change.prototype.applyChange = function(domainObject) {

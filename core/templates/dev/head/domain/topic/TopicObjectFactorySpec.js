@@ -44,6 +44,18 @@ describe('Topic object factory', function() {
     _sampleTopic = TopicObjectFactory.create(sampleTopicBackendObject);
   }));
 
+  it('should be able to create an interstitial topic object', function() {
+    var topic = TopicObjectFactory.createInterstitialTopic();
+    expect(topic.getId()).toEqual(null);
+    expect(topic.getName()).toEqual('Topic name loading');
+    expect(topic.getDescription()).toEqual('Topic description loading');
+    expect(topic.getLanguageCode()).toBe('en');
+    expect(topic.getSubtopics()).toEqual([]);
+    expect(topic.getAdditionalStoryIds()).toEqual([]);
+    expect(topic.getCanonicalStoryIds()).toEqual([]);
+    expect(topic.getUncategorizedSkillIds()).toEqual([]);
+  });
+
   it('should correctly remove the various array elements', function() {
     _sampleTopic.removeCanonicalStoryId('story_1');
     _sampleTopic.removeAdditionalStoryId('story_2');

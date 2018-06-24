@@ -5,6 +5,9 @@
       <i class="material-icons pull-right md-18" ng-show="isOpen">&#xE15C;</i>
       <div class="protractor-test-collapsible-heading"><[heading]></div>
     </uib-accordion-heading>
-    <div angular-html-bind="content"></div>
+    <div>
+      <angular-html-bind class="protractor-test-collapsible-content" html-data="content">
+      </angular-html-bind>
+    </div>
   </div>
 </uib-accordion>
