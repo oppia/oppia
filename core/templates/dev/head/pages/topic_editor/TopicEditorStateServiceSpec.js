@@ -220,7 +220,7 @@ describe('Topic editor state service', function() {
     expect(TopicEditorStateService.getSubtopicPages().length).toEqual(1);
     expect(
       TopicEditorStateService.getSubtopicPage().getHtmlData()
-    ).toEqual('<p>New Data</p>')
+    ).toEqual('<p>New Data</p>');
   });
 
   it('should correctly delete newly created subtopic pages from the ' +
