@@ -469,7 +469,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 actual_output_for_ck_editor,
                 expected_output_for_ck_editor[index])
 
-    def test_convert_tag_contents_to_text_angular(self):
+    def test_convert_tag_contents_to_rte_format(self):
         test_cases = [{
             'html_content': (
                 '<div>Hello <b>this </b>is </div><p><br></p><p>test <b>case '
@@ -532,6 +532,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }]
 
         for test_case in test_cases:
-            actual_output = html_cleaner.convert_tag_contents_to_text_angular(
-                test_case['html_content'])
+            actual_output = html_cleaner.convert_tag_contents_to_rte_format(
+                test_case['html_content'], 'text-angular')
             self.assertEqual(actual_output, test_case['expected_output'])
