@@ -1,9 +1,9 @@
 oppia.factory('SkillEditorStateService', [
   'SkillObjectFactory', 'EditableSkillBackendApiService',
-  'AlertsService',
+  'AlertsService', 'UndoRedoService',
   function(
       SkillObjectFactory, EditableSkillBackendApiService,
-      AlertsService) {
+      AlertsService, UndoRedoService) {
     var _skill = SkillObjectFactory.createEmptySkill();
     var _skillIsInitialized = false;
     var _isLoadingSkill = false;
@@ -17,7 +17,6 @@ oppia.factory('SkillEditorStateService', [
     var _updateSkill = function(newBackendSkillObject) {
       _setSkill(SkillObjectFactory.createFromBackendDict(
         newBackendSkillObject));
-      console.log(_skill);
     };
 
     return {
@@ -27,6 +26,7 @@ oppia.factory('SkillEditorStateService', [
           skillId).then(
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject);
+            _isLoadingSkill = false;
           },
           function(error) {
             AlertsService.addWarning()
@@ -60,8 +60,8 @@ oppia.factory('SkillEditorStateService', [
         }
         _isSavingSkill = true;
         EditableSkillBackendApiService.updateSkill(
-          _skill.getId(), commitMessage,
-          UndoRedoService.getCommitableChangeList()).then(
+          _skill.getId(), _skill.getVersion(), commitMessage,
+          UndoRedoService.getCommittableChangeList()).then(
           function(skillBackendObject) {
             _updateSkill(skillBackendObject);
             UndoRedoService.clearChanges();

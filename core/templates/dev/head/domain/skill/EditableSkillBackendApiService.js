@@ -28,7 +28,33 @@ oppia.factory('EditableSkillBackendApiService', [
 
       $http.get(skillDataUrl).then(function(response) {
         var skill = angular.copy(response.data.skill);
-        console.log(skill);
+        if (successCallback) {
+          successCallback(skill);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _updateSkill = function(
+        skillId, skillVersion, commitMessage, changeList,
+        successCallback, errorCallback) {
+      var editableSkillDataUrl = UrlInterpolationService.interpolateUrl(
+        EDITABLE_SKILL_DATA_URL_TEMPLATE, {
+          skill_id: skillId
+        });
+
+      var putData = {
+        version: skillVersion,
+        commit_message: commitMessage,
+        change_dicts: changeList
+      };
+
+      $http.put(editableSkillDataUrl, putData).then(function(response) {
+        // The returned data is an updated skill dict.
+        var skill = angular.copy(response.data.skill);
         if (successCallback) {
           successCallback(skill);
         }
@@ -43,6 +69,14 @@ oppia.factory('EditableSkillBackendApiService', [
       fetchSkill: function(skillId) {
         return $q(function(resolve, reject) {
           _fetchSkill(skillId, resolve, reject);
+        });
+      },
+      updateSkill: function(
+          skillId, skillVersion, commitMessage, changeList) {
+        return $q(function(resolve, reject) {
+          _updateSkill(
+            skillId, skillVersion, commitMessage, changeList,
+            resolve, reject);
         });
       }
     }

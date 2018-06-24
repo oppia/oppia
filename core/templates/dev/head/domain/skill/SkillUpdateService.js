@@ -56,6 +56,15 @@ oppia.factory('SkillUpdateService', [
       }, apply, reverse);
     };
 
+    var _applySkillContentsPropertyChange = function(
+      skill, propertyName, newValue, oldValue, apply, reverse) {
+      _applyChange(skill, CMD_UPDATE_SKILL_CONTENTS_PROPERTY, {
+        property_name: propertyName,
+        new_value: angular.copy(newValue),
+        old_value: angular.copy(oldValue),
+      }, apply, reverse);
+    };
+
     var _getParameterFromChangeDict = function(changeDict, paramName) {
       return changeDict[paramName];
     };
@@ -78,7 +87,7 @@ oppia.factory('SkillUpdateService', [
       },
 
       setConceptCardExplanation: function(skill, oldExplanation, newExplanation) {
-        _applyPropertyChange(
+        _applySkillContentsPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_EXPLANATION,
           newExplanation, oldExplanation,
           function(changeDict, skill) {
@@ -94,7 +103,7 @@ oppia.factory('SkillUpdateService', [
           skill.getConceptCard().getWorkedExamples());
         var newWorkedExamples = angular.copy(oldWorkedExamples);
         newWorkedExamples.push(newWorkedExample);
-        _applyPropertyChange(
+        _applySkillContentsPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
           newWorkedExamples, oldWorkedExamples,
           function(changeDict, skill) {
@@ -111,7 +120,7 @@ oppia.factory('SkillUpdateService', [
           skill.getConceptCard().getWorkedExamples());
         var newWorkedExamples = angular.copy(oldWorkedExamples);
         newWorkedExamples[workedExampleIndex] = newWorkedExample;
-        _applyPropertyChange(
+        _applySkillContentsPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
           newWorkedExamples, oldWorkedExamples,
           function(changeDict, skill) {
@@ -124,7 +133,7 @@ oppia.factory('SkillUpdateService', [
 
       updateWorkedExamples: function(
         skill, oldWorkedExamples, newWorkedExamples) {
-        _applyPropertyChange(
+        _applySkillContentsPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
           newWorkedExamples, oldWorkedExamples,
           function(changeDict, skill) {

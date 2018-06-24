@@ -21,16 +21,27 @@ oppia.factory('SkillObjectFactory', [
   'ConceptCardObjectFactory', 'MisconceptionObjectFactory',
   function(
       ConceptCardObjectFactory, MisconceptionObjectFactory) {
-    var Skill = function(id, description, misconceptions, conceptCard, languageCode) {
+    var Skill = function(
+        id, description, misconceptions, conceptCard, languageCode, version) {
       this._id = id
       this._description = description;
       this._misconceptions = misconceptions;
       this._conceptCard = conceptCard;
       this._languageCode = languageCode;
+      this._version = version;
     };
 
     Skill.prototype.toBackendDict = function() {
-      console.log("Not implemented.");
+      return {
+        id: this._id,
+        description: this._description,
+        misconceptions: this._misconceptions.map(function(misconception) {
+          return misconception.toBackendDict();
+        }),
+        skill_contents: this._conceptCard.toBackendDict(),
+        language_code: this._languageCode,
+        version: this._version
+      };
     };
 
     Skill.prototype.copyFromSkill = function(skill) {
@@ -39,6 +50,7 @@ oppia.factory('SkillObjectFactory', [
       this._misconceptions = skill._misconceptions;
       this._conceptCard = skill._conceptCard;
       this._languageCode = skill._languageCode;
+      this._version = skill._version;
     };
 
     Skill.createFromBackendDict = function(skillBackendDict) {
@@ -47,7 +59,8 @@ oppia.factory('SkillObjectFactory', [
         skillBackendDict.description,
         generateMisconceptionsFromBackendDict(skillBackendDict.misconceptions),
         ConceptCardObjectFactory.createFromBackendDict(skillBackendDict.skill_contents),
-        skillBackendDict.language_code);
+        skillBackendDict.language_code,
+        skillBackendDict.version);
     };
 
     Skill.createEmptySkill = function() {
@@ -81,6 +94,10 @@ oppia.factory('SkillObjectFactory', [
 
     Skill.prototype.getMisconceptions = function() {
       return this._misconceptions;
+    };
+
+    Skill.prototype.getVersion = function() {
+      return this._version;
     };
 
     return Skill;
