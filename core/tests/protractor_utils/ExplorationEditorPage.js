@@ -55,24 +55,18 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-add-state-input'));
   var editOutcomeDestAddExplorationId = element(
     by.css('.protractor-test-add-refresher-exploration-id'));
-  var editOutcomeFeedback = element(
-    by.css('.protractor-test-edit-outcome-feedback'));
   var editOutcomeDestDropdownOptions = function(targetOption) {
     return element(by.cssContainingText('option', targetOption));
   };
-  var explorationObjectiveInput = element(
-    by.css('.protractor-test-exploration-objective-input'));
-  var explorationSummaryTile = element(
-    by.css('.protractor-test-exploration-summary-tile'));
-  var explorationTitleInput = element(
-    by.css('.protractor-test-exploration-title-input'));
-  var explorationCategoryInput = element(
-    by.css('.protractor-test-exploration-category-input'));
   var feedbackBubble = element(by.css('.protractor-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.protractor-test-open-feedback-editor'));
   var responseBody = function(responseNum) {
     return element(by.css('.protractor-test-response-body-' + responseNum));
   };
+  var openOutcomeDestEditor = element(
+    by.css('.protractor-test-open-outcome-dest-editor'));
+  var openOutcomeFeedBackEditor = element(
+    by.css('.protractor-test-open-outcome-feedback-editor'));
   var responseTab = element.all(by.css('.protractor-test-response-tab'));
   var ruleBlock = element.all(by.css('.protractor-test-rule-block'));
   var ruleDetails = element(by.css('.protractor-test-rule-details'));
@@ -84,12 +78,6 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-state-name-container'));
   var stateNameInput = element(
     by.css('.protractor-test-state-name-input'));
-  var initialStateSelect = element(
-    by.css('.protractor-test-initial-state-select'));
-  var initialStateSelectOption = function(stateName) {
-    return initialStateSelect.element(
-      by.cssContainingText('option', stateName));
-  };
   var interactionTab = function(tabId) {
     return element(by.css('.protractor-test-interaction-tab-' + tabId));
   };
@@ -146,12 +134,6 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-preview-tab'));
   var navigateToSettingsTabButton = element(
     by.css('.protractor-test-settings-tab'));
-  var openOutcomeDestEditorButton = element(
-    by.css('.protractor-test-open-outcome-dest-editor'));
-  var openOutcomeFeedBackEditorButton = element(
-    by.css('.protractor-test-open-outcome-feedback-editor'));
-  var openPreviewSummaryButton = element(
-    by.css('.protractor-test-open-preview-summary-modal'));
   var saveAnswerButton = element(
     by.css('.protractor-test-save-answer'));
   var saveChangesButton = element(by.css('.protractor-test-save-changes'));
@@ -291,7 +273,7 @@ var ExplorationEditorPage = function() {
     return {
       setFeedback: function(richTextInstructions) {
         // Begin editing feedback.
-        openOutcomeFeedBackEditorButton.click();
+        openOutcomeFeedBackEditor.click();
 
         // Set feedback contents.
         _setOutcomeFeedback(richTextInstructions);
@@ -307,7 +289,7 @@ var ExplorationEditorPage = function() {
       setDestination: function(
           destinationName, createState, refresherExplorationId) {
         // Begin editing destination.
-        openOutcomeDestEditorButton.click();
+        openOutcomeDestEditor.click();
 
         // Set destination contents.
         _setOutcomeDest(destinationName, createState, refresherExplorationId);
@@ -319,7 +301,7 @@ var ExplorationEditorPage = function() {
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: function(stateNames) {
         // Begin editing destination.
-        openOutcomeDestEditorButton.click();
+        openOutcomeDestEditor.click();
 
         var expectedOptionTexts = [_CURRENT_STATE_OPTION].concat(
           stateNames.slice(1));
@@ -360,10 +342,10 @@ var ExplorationEditorPage = function() {
         confirmDeleteResponseButton.click();
       },
       expectCannotSetFeedback: function() {
-        expect(openOutcomeFeedBackEditorButton.isPresent()).toBeFalsy();
+        expect(openOutcomeFeedBackEditor.isPresent()).toBeFalsy();
       },
       expectCannotSetDestination: function() {
-        var destEditorElem = openOutcomeDestEditorButton;
+        var destEditorElem = openOutcomeDestEditor;
         expect(destEditorElem.isPresent()).toBeFalsy();
       },
       expectCannotAddRule: function() {
@@ -574,7 +556,8 @@ var ExplorationEditorPage = function() {
     } else {
       targetOption = destName;
     }
-
+    // browser.pause();
+    // browser.pause();
     editOutcomeDestDropdownOptions(targetOption).click();
     if (createDest) {
       editOutcomeDestStateInput.sendKeys(destName);
@@ -719,67 +702,6 @@ var ExplorationEditorPage = function() {
       });
     });
   };
-
-  // SETTINGS
-
-  // All functions involving the settings tab should be sent through this
-  // wrapper.
-
-  this.expectAvailableFirstStatesToBe = function(names) {
-    this.runFromSettingsTab(function() {
-      initialStateSelect.all(by.tagName('option')).map(function(elem) {
-        return elem.getText();
-      }).then(function(options) {
-        expect(options.sort()).toEqual(names.sort());
-      });
-    });
-  };
-
-  this.openAndClosePreviewSummaryTile = function() {
-    this.runFromSettingsTab(function() {
-      openPreviewSummaryButton.click();
-      general.waitForSystem();
-      expect(explorationSummaryTile.isPresent()).toBeTruthy();
-      element(by.css('.protractor-test-close-preview-summary-modal')).click();
-      general.waitForSystem();
-      expect((explorationSummaryTile.isPresent())).toBeFalsy();
-    });
-  };
-
-  this.runFromSettingsTab = function(callbackFunction) {
-    this.navigateToSettingsTab();
-    var result = callbackFunction();
-    this.navigateToMainTab();
-    return result;
-  };
-
-  this.setCategory = function(category) {
-    this.runFromSettingsTab(function() {
-      forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
-        category);
-    });
-  };
-
-  this.setFirstState = function(stateName) {
-    this.runFromSettingsTab(function() {
-      initialStateSelectOption(stateName).click();
-    });
-  };
-
-  this.setObjective = function(objective) {
-    this.runFromSettingsTab(function() {
-      explorationObjectiveInput.clear();
-      explorationObjectiveInput.sendKeys(objective);
-    });
-  };
-
-  this.setTitle = function(title) {
-    this.runFromSettingsTab(function() {
-      explorationTitleInput.clear();
-      explorationTitleInput.sendKeys(title);
-    });
-  };
-
 
   // STATE GRAPH
 
