@@ -230,7 +230,7 @@ var ExplorationEditorPage = function() {
   this.setDefaultOutcome = function(feedbackInstructions,
       destStateName, createState) {
     // Select the default response.
-    var editor = this.ResponseEditor('default');
+    var editor = this.getResponseEditor('default');
 
     if (feedbackInstructions) {
       editor.setFeedback(feedbackInstructions);
@@ -266,7 +266,7 @@ var ExplorationEditorPage = function() {
   };
 
   // Rules are zero-indexed; 'default' denotes the default outcome.
-  this.ResponseEditor = function(responseNum) {
+  this.getResponseEditor = function(responseNum) {
     var headerElem;
     if (responseNum === 'default') {
       headerElem = defaultResponseTab;
@@ -347,8 +347,7 @@ var ExplorationEditorPage = function() {
         // Save the new rule.
         saveAnswerButton.click();
       },
-      // eslint-disable-next-line quote-props
-      delete: function() {
+      deleteResponse: function() {
         deleteResponseButton.click();
         confirmDeleteResponseButton.click();
       },
@@ -587,9 +586,9 @@ var ExplorationEditorPage = function() {
   // NAVIGATION
 
   this.runFromSettingsTab = function(callbackFunction) {
-    navigateToSettingsTab();
+    this.navigateToSettingsTab();
     var result = callbackFunction();
-    navigateToMainTab();
+    this.navigateToMainTab();
     return result;
   };
 
@@ -782,6 +781,4 @@ var ExplorationEditorPage = function() {
     expect(stateNameContainer.getText()).toMatch(name);
   };
 };
-// nothing between here
 exports.ExplorationEditorPage = ExplorationEditorPage;
-exports.runFromSettingsTab = ExplorationEditorPage.runFromSettingsTab;

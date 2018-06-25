@@ -57,12 +57,13 @@ var ExplorationEditorSettingsTab = function() {
   // All functions involving the settings tab should be sent through this
   // wrapper.
 
-  var runFromSettingsTab = function() {
-    return new ExplorationEditorPage.runFromSettingsTab();
+  var runFromSettingsTab = function(callbackFunction) {
+    return new ExplorationEditorPage.ExplorationEditorPage().
+      runFromSettingsTab(callbackFunction);
   };
 
   this.expectAvailableFirstStatesToBe = function(names) {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       initialStateSelect.all(by.tagName('option')).map(function(elem) {
         return elem.getText();
       }).then(function(options) {
@@ -83,27 +84,27 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.setCategory = function(category) {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       forms.AutocompleteDropdownEditor(explorationCategoryInput).setValue(
         category);
     });
   };
 
   this.setFirstState = function(stateName) {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       initialStateSelectOption(stateName).click();
     });
   };
 
   this.setObjective = function(objective) {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       explorationObjectiveInput.clear();
       explorationObjectiveInput.sendKeys(objective);
     });
   };
 
   this.setTitle = function(title) {
-    this.runFromSettingsTab(function() {
+    runFromSettingsTab(function() {
       explorationTitleInput.clear();
       explorationTitleInput.sendKeys(title);
     });
