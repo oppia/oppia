@@ -49,12 +49,25 @@ class FeedbackThreadModel(base_models.BaseModel):
     """Threads for each exploration.
 
     The id of instances of this class has the form
-        [EXPLORATION_ID].[THREAD_ID]
+        [ENTITY_TYPE].[ENTITY_ID].[GENERATED_STRING]
     """
-    # ID of the exploration the thread is about.
-    exploration_id = ndb.StringProperty(required=True, indexed=True)
+    # TODO (nithesh): After migrating data to the new fields, set those fields
+    # as required and remove required from the other fields.
+
+    # ID of the exploration the thread is about (Deprecated).
+    exploration_id = ndb.StringProperty(required=False, indexed=True)
+
+    # The type of entity the thread is linked to.
+    entity_type = ndb.StringProperty(required=False, indexed=True)
+    # The ID of the entity the thread is linked to.
+    entity_id = ndb.StringProperty(required=False, indexed=True)
+
+    # Additional params attached to the feedback thread. Needed for backward
+    # compatibility to store state_name for threads linked to explorations.
+    thread_params = ndb.JsonProperty(required=False, indexed=False)
+
     # ID of state the thread is for. Does not exist if the thread is about the
-    # entire exploration.
+    # entire exploration (Deprecated).
     state_name = ndb.StringProperty(indexed=True)
     # ID of the user who started the thread. This may be None if the feedback
     # was given anonymously by a learner.
@@ -112,9 +125,39 @@ class FeedbackThreadModel(base_models.BaseModel):
            Exception: There were too many collisions with existing thread IDs
                when attempting to generate a new thread ID.
         """
+        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            raise NotImplementedError('This function has been deprecated.')
         for _ in range(_MAX_RETRIES):
             thread_id = (
                 exploration_id + '.' +
+                utils.base64_from_int(utils.get_current_time_in_millisecs()) +
+                utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
+            if not cls.get_by_id(thread_id):
+                return thread_id
+        raise Exception(
+            'New thread id generator is producing too many collisions.')
+
+    @classmethod
+    def generate_new_thread_id(cls, entity_type, entity_id):
+        """Generates a new thread ID which is unique.
+
+        Args:
+            entity_type: str. The type of the entity.
+            entity_id: str. The ID of the entity.
+
+        Returns:
+            str. A thread ID that is different from the IDs of all
+                the existing threads within the given entity.
+
+        Raises:
+           Exception: There were too many collisions with existing thread IDs
+               when attempting to generate a new thread ID.
+        """
+        if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            raise NotImplementedError('This function is not yet enabled.')
+        for _ in range(_MAX_RETRIES):
+            thread_id = (
+                entity_type + '.' + entity_id + '.' +
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +
                 utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
             if not cls.get_by_id(thread_id):
@@ -155,9 +198,35 @@ class FeedbackThreadModel(base_models.BaseModel):
             list(FeedbackThreadModel). List of threads associated with the
                 exploration. Doesn't include deleted entries.
         """
+        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            raise NotImplementedError('This function has been deprecated.')
         return cls.get_all().filter(
             cls.exploration_id == exploration_id).order(
                 cls.last_updated).fetch(limit)
+    @classmethod
+    def get_threads(
+            cls, entity_type, entity_id, limit=feconf.DEFAULT_QUERY_LIMIT):
+        """Returns a list of threads associated with the entity, ordered
+        by their "last updated" field. The number of entities fetched is
+        limited by the `limit` argument to this method, whose default
+        value is equal to the default query limit.
+
+        Args:
+            entity_type: str. The type of the entity.
+            entity_id: str. The ID of the entity.
+            limit: int. The maximum possible number of items
+                in the returned list.
+
+        Returns:
+            list(FeedbackThreadModel). List of threads associated with the
+                exploration. Doesn't include deleted entries.
+        """
+        if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            raise NotImplementedError('This function is not yet enabled.')
+
+        return cls.get_all().filter(cls.entity_type == entity_type).filter(
+            cls.entity_id == entity_id).order(cls.last_updated).fetch(limit)
+
 
 
 class FeedbackMessageModel(base_models.BaseModel):

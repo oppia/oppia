@@ -72,8 +72,12 @@ def _create_models_for_thread_and_first_message(
     Returns:
         The thread id we created.
     """
-    thread_id = feedback_models.FeedbackThreadModel.generate_new_thread_id(
-        exploration_id)
+    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        thread_id = feedback_models.FeedbackThreadModel.generate_new_thread_id(
+            exploration_id)
+    else:
+        thread_id = feedback_models.FeedbackThreadModel.generate_new_thread_id(
+            'exploration', exploration_id)
     thread = feedback_models.FeedbackThreadModel.create(thread_id)
     thread.exploration_id = exploration_id
     thread.state_name = state_name
@@ -575,9 +579,15 @@ def get_most_recent_messages(exp_id):
     Returns:
        A list of FeedbackMessage.
     """
-    thread_models = (
-        feedback_models.FeedbackThreadModel.get_threads(
-            exp_id, limit=feconf.OPEN_FEEDBACK_COUNT_DASHBOARD))
+    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        thread_models = (
+            feedback_models.FeedbackThreadModel.get_threads(
+                exp_id, limit=feconf.OPEN_FEEDBACK_COUNT_DASHBOARD))
+    else:
+        thread_models = (
+            feedback_models.FeedbackThreadModel.get_threads(
+                'exploration', exp_id,
+                limit=feconf.OPEN_FEEDBACK_COUNT_DASHBOARD))
 
     message_models = []
     for thread_model in thread_models:
@@ -599,8 +609,12 @@ def get_threads(exploration_id):
     Returns:
         list of FeedbackThread. The corresponding Suggestion domain object.
     """
-    thread_models = feedback_models.FeedbackThreadModel.get_threads(
-        exploration_id)
+    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        thread_models = feedback_models.FeedbackThreadModel.get_threads(
+            exploration_id)
+    else:
+        thread_models = feedback_models.FeedbackThreadModel.get_threads(
+            'exploration', exploration_id)
     return [_get_thread_from_model(model) for model in thread_models]
 
 
@@ -629,8 +643,10 @@ def get_open_threads(exploration_id, has_suggestion):
     Returns:
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
-
-    threads = get_threads(exploration_id)
+    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        threads = get_threads(exploration_id)
+    else:
+        threads = get_threads('exploration', exploration_id)
     open_threads = []
     for thread in threads:
         if (thread.has_suggestion == has_suggestion and
@@ -651,7 +667,10 @@ def get_closed_threads(exploration_id, has_suggestion):
     Returns:
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
-    threads = get_threads(exploration_id)
+    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        threads = get_threads(exploration_id)
+    else:
+        threads = get_threads('exploration', exploration_id)
     closed_threads = []
     for thread in threads:
         if (thread.has_suggestion == has_suggestion and
@@ -673,7 +692,10 @@ def get_all_threads(exploration_id, has_suggestion):
     Returns:
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
-    threads = get_threads(exploration_id)
+    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        threads = get_threads(exploration_id)
+    else:
+        threads = get_threads('exploration', exploration_id)
     all_threads = []
     for thread in threads:
         if thread.has_suggestion == has_suggestion:

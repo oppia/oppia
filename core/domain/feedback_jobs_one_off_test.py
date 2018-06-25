@@ -23,6 +23,7 @@ from core.domain import feedback_services
 from core.domain import subscription_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
 taskqueue_services = models.Registry.import_taskqueue_services()
@@ -225,11 +226,13 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID_1, 'unused_state_name', self.user_id,
             self.EXPECTED_THREAD_DICT7['subject'],
             self.EXPECTED_THREAD_DICT7['text'])
-        threads_old = feedback_services.get_threads(self.EXP_ID_1)
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            threads_old = feedback_services.get_threads(self.EXP_ID_1)
 
         self._run_one_off_job()
 
-        threads = feedback_services.get_threads(self.EXP_ID_1)
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            threads = feedback_services.get_threads(self.EXP_ID_1)
 
         self.assertEqual(threads[0].subject, u'a small summary')
         self.assertEqual(threads[1].subject, u'Some subject')
