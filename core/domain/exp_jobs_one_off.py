@@ -537,8 +537,9 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
         # for that error type.
         yield (key, list(set().union(*final_values)))
 
+
 class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
-    """ One-off job for migrating the images in the exploration 
+    """ One-off job for migrating the images in the exploration
         from the GAE to GCS
     """
     @classmethod
@@ -548,26 +549,28 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(file_snapshot_content_model):
         instance_id = file_snapshot_content_model.get_unversioned_instance_id()
-        filetype = instance_id[instance_id.rfind(".")+1:]
+        filetype = instance_id[instance_id.rfind(".") + 1:]
 
         if filetype in ALLOWED_IMAGE_EXTENSIONS:
-            filename = instance_id[instance_id.rfind("/")+1:]
+            filename = instance_id[instance_id.rfind("/") + 1:]
             exploration_id = (instance_id[1:])[:(instance_id[1:]).find("/")]
-            filepath = (instance_id[1:])[(instance_id[1:]).find("/")+1:]
-            file_model = file_models.FileModel.get_model(exploration_id,
-                filepath, False)
+            filepath = (instance_id[1:])[(instance_id[1:]).find("/") + 1:]
+            file_model = file_models.FileModel.get_model(
+                exploration_id, filepath, False)
 
-            if file_model and file_model.deleted == False:
-                content = file_model.content
+            if file_model and file_model.deleted:
+                # content = file_model.content
                 # fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
                 #   exploration_id))
                 # fs.commit(file_model.user_id, '%s/%s' %('images',
                 #   filename, content)
                 file_model.delete("ADMIN", "Delete the file", False)
-                file_metadatmodel.delete("ADMIN", "Delete the filemetada", False)
                 file_metadatmodel = file_models.FileMetadataModel.get_model(
                     exploration_id, filepath, False)
+                file_metadatmodel.delete(
+                    "ADMIN", "Delete the filemetada", False)
                 yield(exploration_id, filename)
+
     @staticmethod
     def reduce(exp_id, values):
         yield(exp_id, values)
