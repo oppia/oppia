@@ -308,16 +308,18 @@ class StorePlaythroughHandler(base.BaseHandler):
         """Method that initializes member variables for the handler.
 
         Attributes:
-            exp_issues: ExplorationIssues. The exploration issues domain object.
-            issue_schema_version: int. The issue schema version.
+            current_exp_issues: ExplorationIssues. The exploration issues domain
+                object.
+            current_issue_schema_version: int. The issue schema version.
+            current_playthrough_id: str|None. The Playthrough ID or None.
         """
         super(StorePlaythroughHandler, self).__init__(*args, **kwargs)
-        self.exp_issues = None
-        self.issue_schema_version = None
-        self.playthrough_id = None
+        self.current_exp_issues = None
+        self.current_issue_schema_version = None
+        self.current_playthrough_id = None
 
-    def _find_playthrough_in_exp_issues(self, playthrough):
-        """Finds an equivalent playthrough for the given one in the unresolved
+    def _find_matching_issue_in_exp_issues(self, playthrough):
+        """Finds an equivalent issue for the given playthrough in the unresolved
         issues list of the exploration issues model, returns None if it doesn't
         exist.
 
@@ -348,31 +350,35 @@ class StorePlaythroughHandler(base.BaseHandler):
             orig_playthrough: Playthrough. The original playthrough domain
                 object which is in the now-incorrect issue list.
         """
-        max_playthroughs_per_issue = False
-        issue_index = self._find_playthrough_in_exp_issues(playthrough)
+        did_move_playthrough_to_new_issue = True
+        issue_index = self._find_matching_issue_in_exp_issues(playthrough)
         # Check whether the playthrough can be added to its new issue,
         # if not, it stays in its old issue.
         if issue_index is not None:
-            if (len(self.exp_issues.unresolved_issues[
-                    issue_index].playthrough_ids) < (
-                        feconf.MAX_PLAYTHROUGHS_FOR_ISSUE)):
-                self.exp_issues.unresolved_issues[
-                    issue_index].playthrough_ids.append(self.playthrough_id)
+            issue = self.current_exp_issues.unresolved_issues[issue_index]
+            if len(issue.playthrough_ids) < (
+                    feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
+                self.current_exp_issues.unresolved_issues[
+                    issue_index].playthrough_ids.append(
+                        self.current_playthrough_id)
             else:
-                max_playthroughs_per_issue = True
+                did_move_playthrough_to_new_issue = False
         else:
             issue = stats_domain.ExplorationIssue(
                 playthrough.issue_type,
                 playthrough.issue_customization_args,
-                [self.playthrough_id], self.issue_schema_version, is_valid=True)
-            self.exp_issues.unresolved_issues.append(issue)
+                [self.current_playthrough_id],
+                self.current_issue_schema_version, is_valid=True)
+            self.current_exp_issues.unresolved_issues.append(issue)
 
         # Now, remove the playthrough from its old issue.
-        if not max_playthroughs_per_issue:
-            issue_index = self._find_playthrough_in_exp_issues(orig_playthrough)
-            if issue_index is not None:
-                self.exp_issues.unresolved_issues[
-                    issue_index].playthrough_ids.remove(self.playthrough_id)
+        if did_move_playthrough_to_new_issue:
+            orig_issue_index = self._find_matching_issue_in_exp_issues(
+                orig_playthrough)
+            if orig_issue_index is not None:
+                self.current_exp_issues.unresolved_issues[
+                    orig_issue_index].playthrough_ids.remove(
+                        self.current_playthrough_id)
 
     def _assign_playthrough_to_issue(self, playthrough):
         """Assigns newly created playthrough to its correct issue or makes a new
@@ -388,17 +394,17 @@ class StorePlaythroughHandler(base.BaseHandler):
             playthrough_id: int. The playthrough ID.
         """
         # Find whether an issue already exists for the new playthrough.
-        issue_index = self._find_playthrough_in_exp_issues(playthrough)
+        issue_index = self._find_matching_issue_in_exp_issues(playthrough)
         if issue_index is not None:
-            if (len(self.exp_issues.unresolved_issues[
-                    issue_index].playthrough_ids) < (
-                        feconf.MAX_PLAYTHROUGHS_FOR_ISSUE)):
+            issue = self.current_exp_issues.unresolved_issues[issue_index]
+            if len(issue.playthrough_ids) < (
+                    feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
                 actions = [action.to_dict() for action in playthrough.actions]
                 playthrough_id = stats_models.PlaythroughModel.create(
                     playthrough.exp_id, playthrough.exp_version,
                     playthrough.issue_type,
                     playthrough.issue_customization_args, actions)
-                self.exp_issues.unresolved_issues[
+                self.current_exp_issues.unresolved_issues[
                     issue_index].playthrough_ids.append(playthrough_id)
             else:
                 raise Exception(
@@ -412,9 +418,10 @@ class StorePlaythroughHandler(base.BaseHandler):
             issue = stats_domain.ExplorationIssue(
                 playthrough.issue_type,
                 playthrough.issue_customization_args,
-                [playthrough_id], self.issue_schema_version, is_valid=True)
+                [playthrough_id], self.current_issue_schema_version,
+                is_valid=True)
 
-            self.exp_issues.unresolved_issues.append(issue)
+            self.current_exp_issues.unresolved_issues.append(issue)
 
         return playthrough_id
 
@@ -434,12 +441,13 @@ class StorePlaythroughHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         try:
-            self.issue_schema_version = self.payload['issue_schema_version']
+            self.current_issue_schema_version = self.payload[
+                'issue_schema_version']
         except KeyError as e:
             raise self.InvalidInputException(e)
 
         try:
-            self.playthrough_id = self.payload['playthrough_id']
+            self.current_playthrough_id = self.payload['playthrough_id']
         except KeyError as e:
             raise self.InvalidInputException(e)
 
@@ -447,22 +455,23 @@ class StorePlaythroughHandler(base.BaseHandler):
 
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
             exploration_id, exp_version)
-        self.exp_issues = stats_services.get_exp_issues_from_model(
+        self.current_exp_issues = stats_services.get_exp_issues_from_model(
             exp_issues_model)
 
         playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
 
         # If playthrough already exists, update it in the datastore.
-        if self.playthrough_id:
+        if self.current_playthrough_id:
             orig_playthrough = stats_services.get_playthrough_by_id(
-                self.playthrough_id)
+                self.current_playthrough_id)
             if orig_playthrough.issue_type != playthrough.issue_type:
                 self._move_playthrough_to_correct_issue(
                     playthrough, orig_playthrough)
 
             stats_services.update_playthroughs_multi(
-                [self.playthrough_id], [playthrough])
-            stats_services.save_exp_issues_model_transactional(self.exp_issues)
+                [self.current_playthrough_id], [playthrough])
+            stats_services.save_exp_issues_model_transactional(
+                self.current_exp_issues)
             self.render_json({})
             return
 
@@ -474,7 +483,8 @@ class StorePlaythroughHandler(base.BaseHandler):
         except Exception:
             payload_return['playthrough_stored'] = False
 
-        stats_services.save_exp_issues_model_transactional(self.exp_issues)
+        stats_services.save_exp_issues_model_transactional(
+            self.current_exp_issues)
         payload_return['playthrough_id'] = playthrough_id
         self.render_json(payload_return)
 
