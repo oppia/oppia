@@ -435,8 +435,7 @@ describe('Full exploration editor', function() {
       explorationEditorPage.addResponse(
         'NumericInput', null, 'final card', false,
         'IsGreaterThan', 2);
-      // eslint-disable-next-line dot-notation
-      explorationEditorPage.ResponseEditor(0).delete();
+      explorationEditorPage.ResponseEditor(0).deleteResponse();
 
       // Setup a terminating state
       explorationEditorPage.moveToState('final card');

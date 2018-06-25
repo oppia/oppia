@@ -345,8 +345,7 @@ var ExplorationEditorPage = function() {
         // Save the new rule.
         saveAnswerButton.click();
       },
-      // eslint-disable-next-line quote-props
-      delete: function() {
+      deleteResponse: function() {
         deleteResponseButton.click();
         confirmDeleteResponseButton.click();
       },
