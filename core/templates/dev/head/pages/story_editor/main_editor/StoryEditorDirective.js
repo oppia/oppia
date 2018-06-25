@@ -34,10 +34,36 @@ oppia.directive('storyEditor', [
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
+            $scope.notes = $scope.story.getNotes();
+            $scope.notesEditorIsShown = false;
             $scope.editableDescription = $scope.story.getDescription();
             $scope.storyDescriptionEmpty = (
               $scope.editableDescription === '');
             $scope.storyDescriptionChanged = false;
+          };
+
+          $scope.NOTES_SCHEMA = {
+            type: 'html',
+            ui_config: {
+              rows: 100
+            }
+          };
+          $scope.openPreviewNotes = function(notes) {
+            $scope.notesEditorIsShown = false;
+            $scope.notes = notes;
+          };
+
+          $scope.closePreviewNotes = function(previewNotes) {
+            $scope.notesEditorIsShown = true;
+            $scope.editableNotes = previewNotes;
+          };
+
+          $scope.updateNotes = function(newNotes) {
+            if (newNotes === $scope.story.getNotes()) {
+              return;
+            }
+            StoryUpdateService.setStoryNotes($scope.story, newNotes);
+            $scope.openPreviewNotes(newNotes);
           };
 
           $scope.updateStoryDescriptionStatus = function(description) {

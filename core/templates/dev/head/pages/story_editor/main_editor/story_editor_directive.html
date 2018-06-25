@@ -28,6 +28,35 @@
         What does this story contain?
       </span>
     </div>
+
+    <div class="story-notes">
+      <label for="storyNotes" class="form-heading">Notes</label>
+      <div ng-if="!notesEditorIsShown" class="preview">
+        <angular-html-bind html-data="notes">
+        </angular-html-bind>
+        <button type="button"
+                class="btn btn-default save-button"
+                ng-click="closePreviewNotes(notes)">
+          Edit
+        </button>
+      </div>
+      <div ng-if="notesEditorIsShown" class="oppia-editor-card-body">
+        <schema-based-editor schema="NOTES_SCHEMA"
+                             local-value="editableNotes">
+        </schema-based-editor>
+        <button type="button"
+                class="btn btn-default save-button"
+                ng-click="openPreviewNotes(editableNotes)">
+          Preview
+        </button>
+        <button type="button"
+                class="btn btn-success save-button"
+                ng-disabled="!editableNotes"
+                ng-click="updateNotes(editableNotes)">
+          Save
+        </button>
+      </div>
+    </div>
   </md-card>
 </div>
 
@@ -46,7 +75,17 @@
     margin-bottom: 1.5%;
   }
 
-  .story-editor .story-description textarea{
+  .story-editor .story-notes {
+    margin-top: 1.5%;
+    height: auto;
+    margin-bottom: 2%;
+  }
+
+  .story-editor .story-notes .save-button {
+    margin-top: 1.5vh;
+  }
+
+  .story-editor .story-description textarea {
     height: 20vh;
   }
 </style>
