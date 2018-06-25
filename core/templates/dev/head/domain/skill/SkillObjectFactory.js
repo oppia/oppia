@@ -96,12 +96,35 @@ oppia.factory('SkillObjectFactory', [
       return this._misconceptions;
     };
 
+    Skill.prototype.appendMisconception = function(newMisconception) {
+      this._misconceptions.push(newMisconception);
+    };
+
+    Skill.prototype.removeLastMisconception = function() {
+      this._misconceptions.pop();
+    };
+
     Skill.prototype.getVersion = function() {
       return this._version;
     };
 
     Skill.prototype.getNextMisconceptionId = function() {
-      return this._nextMisconceptionId;
+      var maxId = 0;
+      this._misconceptions.forEach(function(misconception) {
+        var parsedIdAsInt = parseInt(misconception.getId(), 10);
+        maxId = Math.max(maxId, parsedIdAsInt);        
+      });
+      var nextIdAsInt = maxId + 1;
+      return nextIdAsInt.toString();
+    };
+
+    Skill.prototype.findMisconceptionById = function(id) {
+      for (var idx in this._misconceptions) {
+        if (this._misconceptions[idx].getId() === id) {
+          return this._misconceptions[idx];
+        }
+      }
+      return null;
     };
 
     return Skill;

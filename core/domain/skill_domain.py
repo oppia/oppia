@@ -92,7 +92,7 @@ class SkillChange(object):
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_ADD_SKILL_MISCONCEPTION:
-            self.misconception_id = change_dict['id']
+            self.new_value = change_dict['new_value']
         elif self.cmd == CMD_DELETE_SKILL_MISCONCEPTION:
             self.misconception_id = change_dict['id']
         elif self.cmd == CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY:
@@ -567,10 +567,10 @@ class Skill(object):
             misconception_id: str. The id of the new misconception to be added.
         """
         misconception = Misconception(
-            misconception_dict.id,
-            misconception_dict.name,
-            misconception_dict.notes,
-            misconception_dict.feedback)
+            misconception_dict['id'],
+            misconception_dict['name'],
+            misconception_dict['notes'],
+            misconception_dict['feedback'])
         self.misconceptions.append(misconception)
 
     def delete_misconception(self, misconception_id):

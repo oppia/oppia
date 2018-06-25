@@ -28,10 +28,8 @@ oppia.directive('workedExampleEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill_editor/editor_tab/worked_example_editor_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'SkillUpdateService',
-        'SkillEditorStateService',
-        function($scope, $uibModal, SkillUpdateService,
-            SkillEditorStateService) {
+        '$scope', 'SkillUpdateService', 'SkillEditorStateService',
+        function($scope, SkillUpdateService, SkillEditorStateService) {
           $scope.editorIsOpen = false;
           
           $scope.container = {

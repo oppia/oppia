@@ -1,0 +1,152 @@
+<style>
+  .oppia-misconception-editor-section {
+    padding-bottom: 10px;
+  }
+</style>
+
+<div style="height: 100%">
+  <div class="oppia-misconception-editor-section">
+
+    <div ng-if="!nameEditorIsOpen"
+         style="height: 100%"
+         ng-attr-title="Misconception Name">
+      <div class="oppia-readonly-rule-title"
+           ng-class="{'oppia-editable-section': isEditable()}">
+        <div class="oppia-rule-preview">
+          <div class="oppia-click-to-start-editing" ng-click="openNameEditor()">
+            <i ng-if="isEditable()"
+               class="material-icons oppia-editor-edit-icon pull-right"
+               title="Edit Misconception Name">&#xE254;
+            </i>
+          </div>
+
+          <strong>Misconception Name</strong>
+          <div>
+            <span class="oppia-rte-editor" angular-html-bind="container.misconceptionName"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="isEditable() && nameEditorIsOpen">
+      <div class="oppia-rule-details-header">
+        <strong>Misconception Name</strong>
+        <input class="form-control" type="text" ng-model="container.misconceptionName"/>
+      </div>
+
+      <div class="oppia-rule-save-cancel-buttons">
+        <div class="pull-right">
+          <button type="button"
+                  class="btn btn-default"
+                  ng-click="cancelEditName()">
+            Cancel
+          </button>
+          <button type="button"
+                  class="btn btn-success"
+                  ng-disabled="!container.misconceptionName"
+                  ng-click="saveName()">
+            Save
+          </button>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-misconception-editor-section">
+
+    <div ng-if="!notesEditorIsOpen"
+         style="height: 100%"
+         ng-attr-title="Misconception Notes">
+      <div class="oppia-readonly-rule-title"
+           ng-class="{'oppia-editable-section': isEditable()}">
+        <div class="oppia-rule-preview">
+          <div class="oppia-click-to-start-editing" ng-click="openNotesEditor()">
+            <i ng-if="isEditable()"
+               class="material-icons oppia-editor-edit-icon pull-right"
+               title="Edit Misconception Notes">&#xE254;
+            </i>
+          </div>
+
+          <strong>Notes for Creator</strong>
+          <div>
+            <span class="oppia-rte-editor" angular-html-bind="container.misconceptionNotes"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="notesEditorIsOpen && isEditable()">
+      <div class="oppia-rule-details-header">
+        <strong>Notes for Creator</strong>
+        <schema-based-editor schema="NOTES_FORM_SCHEMA" 
+                             local-value="container.misconceptionNotes">
+        </schema-based-editor>
+      </div>
+
+      <div class="oppia-rule-save-cancel-buttons">
+        <div class="pull-right">
+          <button type="button"
+                  class="btn btn-default"
+                  ng-click="cancelEditNotes()">
+            Cancel
+          </button>
+          <button type="button"
+                  class="btn btn-success"
+                  ng-disabled="!container.misconceptionNotes"
+                  ng-click="saveNotes()">
+            Save
+          </button>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="oppia-misconception-editor-section">
+    <div ng-if="!feedbackEditorIsOpen"
+         style="height: 100%"
+         ng-attr-title="Misconception Feedback">
+      <div class="oppia-readonly-rule-title"
+           ng-class="{'oppia-editable-section': isEditable()}">
+        <div class="oppia-rule-preview">
+          <div class="oppia-click-to-start-editing" ng-click="openFeedbackEditor()">
+            <i ng-if="isEditable()"
+               class="material-icons oppia-editor-edit-icon pull-right"
+               title="Edit Misconception Feedback">&#xE254;
+            </i>
+          </div>
+
+          <strong>Feedback for Learner</strong>
+          <span class="oppia-rte-editor" angular-html-bind="container.misconceptionFeedback"></span>
+        </div>
+      </div>
+    </div>
+
+    <div ng-if="feedbackEditorIsOpen && isEditable()">
+      <div class="oppia-rule-details-header">
+        <strong>Feedback for Learner</strong>
+        <schema-based-editor schema="FEEDBACK_FORM_SCHEMA"
+                             local-value="container.misconceptionFeedback">
+        </schema-based-editor>
+      </div>
+
+      <div class="oppia-rule-save-cancel-buttons">
+        <div class="pull-right">
+          <button type="button"
+                  class="btn btn-default"
+                  ng-click="cancelEditFeedback()">
+            Cancel
+          </button>
+          <button type="button"
+                  class="btn btn-success"
+                  ng-disabled="!container.misconceptionFeedback"
+                  ng-click="saveFeedback()">
+            Save
+          </button>
+        </div>
+        <div style="clear: both;"></div>
+      </div>
+    </div>
+  </div>
+</div>

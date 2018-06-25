@@ -50,7 +50,11 @@ oppia.directive('skillMisconceptionsEditor', [
           };  
 
           $scope.changeActiveMisconceptionIndex = function(idx) {
-            $scope.activeMisconceptionIndex = idx;
+            if (idx === $scope.activeMisconceptionIndex) {
+              $scope.activeMisconceptionIndex = null;
+            } else {
+              $scope.activeMisconceptionIndex = idx;
+            }
           };
 
           $scope.getMisconceptionSummary = function(misconception) {
@@ -69,16 +73,19 @@ oppia.directive('skillMisconceptionsEditor', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
+                  $scope.skill = SkillEditorStateService.getSkill();
                   $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {}
                   };
 
+                  $scope.misconceptionName = '';
+                  $scope.misconceptionNotes = '';
+                  $scope.misconceptionFeedback = '';
+
                   $scope.saveMisconception = function() {
-                    console.log(angular.copy($scope.misconceptionName));
-                    console.log(angular.copy($scope.misconceptionNotes));
-                    console.log(angular.copy($scope.misconceptionFeedback));
-                    var newMisconceptionId = skill.getNextMisconceptionId();
+                    var newMisconceptionId =
+                      $scope.skill.getNextMisconceptionId();
                     $uibModalInstance.close({
                       misconception: MisconceptionObjectFactory.create(
                         newMisconceptionId,

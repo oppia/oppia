@@ -52,7 +52,11 @@ oppia.directive('skillConceptCardEditor', [
           };
 
           $scope.changeActiveWorkedExampleIndex = function(idx) {
-            $scope.activeWorkedExampleIndex = idx;
+            if (idx === $scope.activeWorkedExampleIndex) {
+              $scope.activeWorkedExampleIndex = null;
+            } else {
+              $scope.activeWorkedExampleIndex = idx;
+            }
           };
 
           var explanationMemento =

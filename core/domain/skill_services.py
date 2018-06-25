@@ -311,6 +311,7 @@ def apply_change_list(skill_id, change_list):
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     skill.update_worked_examples(change.new_value)
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
+                print change.new_value
                 skill.add_misconception(change.new_value)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)

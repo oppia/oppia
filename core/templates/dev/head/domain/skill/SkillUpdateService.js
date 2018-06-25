@@ -56,6 +56,17 @@ oppia.factory('SkillUpdateService', [
       }, apply, reverse);
     };
 
+    var _applyMisconceptionPropertyChange = function(
+      skill, misconceptionId, propertyName, newValue, oldValue,
+      apply, reverse) {
+      _applyChange(skill, CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY, {
+        property_name: propertyName,
+        new_value: angular.copy(newValue),
+        old_value: angular.copy(oldValue),
+        id: angular.copy(misconceptionId),
+      }, apply, reverse);
+    };
+
     var _applySkillContentsPropertyChange = function(
       skill, propertyName, newValue, oldValue, apply, reverse) {
       _applyChange(skill, CMD_UPDATE_SKILL_CONTENTS_PROPERTY, {
@@ -144,23 +155,67 @@ oppia.factory('SkillUpdateService', [
           });
       },
 
-      addMisconception: function(
-        skill, newMisconception) {
+      addMisconception: function(skill, newMisconception) {
         var params = {
           new_value: newMisconception.toBackendDict()
         };
         _applyChange(
           skill, CMD_ADD_SKILL_MISCONCEPTION, params,
           function(changeDict, skill) {
-
+            skill.appendMisconception(newMisconception);
           }, function(changeDict, skill) {
-
+            skill.removeLastMisconception();
           });
       },
 
       deleteMisconception: function(
         skill, index) {
         
+      },
+
+      updateMisconceptionName: function(
+          skill, misconceptionId, oldName, newName) {
+        var misconception = skill.findMisconceptionById(misconceptionId);
+        if (misconception) {
+          _applyMisconceptionPropertyChange(
+            skill, misconceptionId, SKILL_MISCONCEPTIONS_PROPERTY_NAME,
+            newName, oldName,
+            function(changeDict, skill) {
+              misconception.setName(newName);
+            }, function(changeDict, skill) {
+              misconception.setName(oldName);
+            });
+          }
+        },
+
+      updateMisconceptionNotes: function(
+          skill, misconceptionId, oldNotes, newNotes) {
+        var misconception = skill.findMisconceptionById(misconceptionId);
+        if (misconception) {
+          _applyMisconceptionPropertyChange(
+            skill, misconceptionId, SKILL_MISCONCEPTIONS_PROPERTY_NOTES,
+            newNotes, oldNotes,
+            function(changeDict, skill) {
+              misconception.setNotes(newNotes);
+            }, function(changeDict, skill) {
+              misconception.setNotes(oldNotes);
+            });
+        }
+      },
+
+      updateMisconceptionFeedback: function(
+          skill, misconceptionId, oldFeedback, newFeedback) {
+        var misconception = skill.findMisconceptionById(misconceptionId);
+        if (misconception) {
+          _applyMisconceptionPropertyChange(
+            skill, misconceptionId, SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK,
+            newFeedback, oldFeedback,
+            function(changeDict, skill) {
+              misconception.setFeedback(newFeedback);
+            }, function(changeDict, skill) {
+              misconception.setFeedback(oldFeedback);
+            });
+        }
       }
     }
   }
