@@ -457,11 +457,18 @@ class GcsFileSystem(object):
         Args:
             filepath: str. The path to the relevant file within the exploration.
 
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
         """
-        raise NotImplementedError
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+
+        # Upload to GCS bucket with filepath
+        # "<bucket>/<exploration-id>/assets/<filepath>".
+        gcs_file_url = (
+            '/%s/%s/assets/%s' % (
+                bucket_name, self._exploration_id, filepath))
+        try:
+            return cloudstorage.stat(gcs_file_url, retry_params=None)
+        except cloudstorage.NotFoundError:
+            return False
 
     def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
         """Raises NotImplementedError if the method is not implemented in the

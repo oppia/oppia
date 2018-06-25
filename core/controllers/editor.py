@@ -866,7 +866,8 @@ class ImageUploadHandler(EditorHandler):
             fs_domain.ExplorationFileSystem if feconf.DEV_MODE
             else fs_domain.GcsFileSystem)
         fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
-        if fs.isfile(filename):
+        filepath = 'image/' + filename
+        if fs.isfile(filepath):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
