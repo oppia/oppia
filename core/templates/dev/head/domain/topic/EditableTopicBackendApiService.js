@@ -20,9 +20,11 @@ oppia.constant(
 
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
-  'UrlInterpolationService', 'TOPIC_EDITOR_STORY_URL_TEMPLATE',
+  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE', 'UrlInterpolationService',
+  'TOPIC_EDITOR_STORY_URL_TEMPLATE',
   function($http, $q, EDITABLE_TOPIC_DATA_URL_TEMPLATE,
-      UrlInterpolationService, TOPIC_EDITOR_STORY_URL_TEMPLATE) {
+      SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, UrlInterpolationService,
+      TOPIC_EDITOR_STORY_URL_TEMPLATE) {
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -54,6 +56,26 @@ oppia.factory('EditableTopicBackendApiService', [
           response.data.canonical_story_summary_dicts);
         if (successCallback) {
           successCallback(canonicalStorySummaries);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchSubtopicPage = function(
+        topicId, subtopicId, successCallback, errorCallback) {
+      var subtopicPageDataUrl = UrlInterpolationService.interpolateUrl(
+        SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
+          topic_id: topicId,
+          subtopic_id: subtopicId.toString()
+        });
+
+      $http.get(subtopicPageDataUrl).then(function(response) {
+        var topic = angular.copy(response.data.subtopic_page);
+        if (successCallback) {
+          successCallback(topic);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -116,6 +138,12 @@ oppia.factory('EditableTopicBackendApiService', [
       fetchStories: function(topicId) {
         return $q(function(resolve, reject) {
           _fetchStories(topicId, resolve, reject);
+        });
+      },
+      
+      fetchSubtopicPage: function(topicId, subtopicId) {
+        return $q(function(resolve, reject) {
+          _fetchSubtopicPage(topicId, subtopicId, resolve, reject);
         });
       },
 
