@@ -61,6 +61,7 @@ oppia.factory('StoryEditorStateService', [
           topicId, storyId).then(
           function(newBackendStoryObject) {
             _updateStory(newBackendStoryObject);
+            _storyIsLoading = false;
           },
           function(error) {
             AlertsService.addWarning(
