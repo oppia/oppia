@@ -1,7 +1,11 @@
 <md-card class="oppia-editor-card-with-avatar">
 	<div class="oppia-editor-card-body">
 		<div class="oppia-editor-card-section">
-			<strong>Misconceptions></strong>
+			<strong style="font-size: 1.4em;">Misconceptions</strong>
+			<div style="padding-bottom: 12px;">
+				<span style="font-size:.8em;"><i>These are used to assist creators in writing answer groups of questions that test this skill. Question creators may tag each answer group with a misconception to better ensure that all misconceptions are addressed for the skill being tested.	
+	      </i></span>
+			</div>
 			<div ng-if="skill.getMisconceptions().length > 0">
 				<ul class="nav oppia-option-list nav-stacked nav-pills"
 				    role="tablist"
@@ -42,7 +46,7 @@
 			<md-card style="margin: 0; padding: 0;">
 				<div>
 					<button type="button"
-									class="btn btn-primary btn-lg"
+									class="btn btn-primary btn-lg oppia-add-response-button"
 									ng-click="openAddMisconceptionModal()">
 					  + Add Misconception
 					</button>

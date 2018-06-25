@@ -146,7 +146,16 @@ oppia.factory('SkillUpdateService', [
 
       addMisconception: function(
         skill, newMisconception) {
+        var params = {
+          new_value: newMisconception.toBackendDict()
+        };
+        _applyChange(
+          skill, CMD_ADD_SKILL_MISCONCEPTION, params,
+          function(changeDict, skill) {
 
+          }, function(changeDict, skill) {
+
+          });
       },
 
       deleteMisconception: function(

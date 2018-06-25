@@ -1,4 +1,4 @@
-oppia.directive('skillMisconceptionsEditorDirective', [
+oppia.directive('skillMisconceptionsEditor', [
   'UrlInterpolationService', 'SkillUpdateService', 'SkillEditorStateService',
   function(
       UrlInterpolationService, SkillUpdateService, SkillEditorStateService) {
@@ -10,7 +10,10 @@ oppia.directive('skillMisconceptionsEditorDirective', [
         'skill_misconceptions_editor_directive.html'),
       controller: [
         '$scope', '$filter', '$uibModal', '$rootScope',
-        function($scope, $filter, $uibModal, $rootScope) {
+        'MisconceptionObjectFactory',
+        function(
+            $scope, $filter, $uibModal, $rootScope,
+            MisconceptionObjectFactory) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/drag_dots.png');
@@ -66,14 +69,19 @@ oppia.directive('skillMisconceptionsEditorDirective', [
               controller: [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
-                  $scope.MISCONCEPTION_FORM_SCHEMA = {
+                  $scope.MISCONCEPTION_PROPERTY_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {}
                   };
 
                   $scope.saveMisconception = function() {
+                    console.log(angular.copy($scope.misconceptionName));
+                    console.log(angular.copy($scope.misconceptionNotes));
+                    console.log(angular.copy($scope.misconceptionFeedback));
+                    var newMisconceptionId = skill.getNextMisconceptionId();
                     $uibModalInstance.close({
                       misconception: MisconceptionObjectFactory.create(
+                        newMisconceptionId,
                         $scope.misconceptionName,
                         $scope.misconceptionNotes,
                         $scope.misconceptionFeedback)

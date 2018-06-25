@@ -560,14 +560,17 @@ class Skill(object):
                 return ind
         return None
 
-    def add_misconception(self, misconception_id):
+    def add_misconception(self, misconception_dict):
         """Adds a new misconception to the skill.
 
         Args:
             misconception_id: str. The id of the new misconception to be added.
         """
-        misconception = Misconception.create_default_misconception(
-            misconception_id)
+        misconception = Misconception(
+            misconception_dict.id,
+            misconception_dict.name,
+            misconception_dict.notes,
+            misconception_dict.feedback)
         self.misconceptions.append(misconception)
 
     def delete_misconception(self, misconception_id):

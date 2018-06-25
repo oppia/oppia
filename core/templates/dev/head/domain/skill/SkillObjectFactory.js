@@ -100,6 +100,10 @@ oppia.factory('SkillObjectFactory', [
       return this._version;
     };
 
+    Skill.prototype.getNextMisconceptionId = function() {
+      return this._nextMisconceptionId;
+    };
+
     return Skill;
   }
 ]);
