@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@
 
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
-  'UrlInterpolationService',
+  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($http, $q, EDITABLE_TOPIC_DATA_URL_TEMPLATE,
-      UrlInterpolationService) {
+      SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -32,6 +32,43 @@ oppia.factory('EditableTopicBackendApiService', [
         var topic = angular.copy(response.data.topic);
         if (successCallback) {
           successCallback(topic);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchSubtopicPage = function(
+        topicId, subtopicId, successCallback, errorCallback) {
+      var subtopicPageDataUrl = UrlInterpolationService.interpolateUrl(
+        SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
+          topic_id: topicId,
+          subtopic_id: subtopicId.toString()
+        });
+
+      $http.get(subtopicPageDataUrl).then(function(response) {
+        var topic = angular.copy(response.data.subtopic_page);
+        if (successCallback) {
+          successCallback(topic);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _deleteTopic = function(
+        topicId, successCallback, errorCallback) {
+      var topicDataUrl = UrlInterpolationService.interpolateUrl(
+        EDITABLE_TOPIC_DATA_URL_TEMPLATE, {
+          topic_id: topicId
+        });
+      $http['delete'](topicDataUrl).then(function(response) {
+        if (successCallback) {
+          successCallback(response.status);
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -74,6 +111,12 @@ oppia.factory('EditableTopicBackendApiService', [
         });
       },
 
+      fetchSubtopicPage: function(topicId, subtopicId) {
+        return $q(function(resolve, reject) {
+          _fetchSubtopicPage(topicId, subtopicId, resolve, reject);
+        });
+      },
+
       /**
        * Updates a topic in the backend with the provided topic ID.
        * The changes only apply to the topic of the given version and the
@@ -90,6 +133,12 @@ oppia.factory('EditableTopicBackendApiService', [
           _updateTopic(
             topicId, topicVersion, commitMessage, changeList,
             resolve, reject);
+        });
+      },
+
+      deleteTopic: function(topicId) {
+        return $q(function(resolve, reject) {
+          _deleteTopic(topicId, resolve, reject);
         });
       }
     };

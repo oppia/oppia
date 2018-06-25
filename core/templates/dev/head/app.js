@@ -206,9 +206,9 @@ oppia.config(['$provide', function($provide) {
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',
-  'HtmlEscaperService', 'taOptions',
+  'HtmlEscaperService',
   function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
-      HtmlEscaperService, taOptions) {
+      HtmlEscaperService) {
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.

@@ -1,9 +1,9 @@
-<div ng-if="$parent.value.imagePath === ''">
-  <schema-based-editor local-value="$parent.$parent.value.imagePath"
+<div ng-if="value.imagePath === ''">
+  <schema-based-editor local-value="value.imagePath"
                        schema="{type: 'custom', obj_type: 'Filepath'}">
   </schema-based-editor>
 </div>
-<div style="position: relative" ng-if="$parent.value.imagePath.name !== ''">
+<div style="position: relative" ng-if="value.imagePath !== ''">
   <div>Add new regions by clicking on the image and dragging:</div>
   <svg class="oppia-image-with-regions-editor-svg"
        width="100%"
@@ -12,7 +12,7 @@
        ng-mousedown="onSvgMouseDown($event)"
        ng-mousemove="onSvgMouseMove($event)"
        ng-mouseup="onSvgMouseUp($event)">
-    <image ng-href="<[getPreviewUrl($parent.$parent.value.imagePath.name)]>"
+    <image ng-href="<[getPreviewUrl(value.imagePath.name)]>"
            xlink:href=""
            x="0"
            y="0"
@@ -26,7 +26,7 @@
           ng-attr-height="<[rectHeight]>"
           ng-attr-style="<[getRegionStyle(null)]>">
     </rect>
-    <rect ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
+    <rect ng-repeat="labeledRegion in value.labeledRegions"
           ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth()]>"
           ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight()]>"
           ng-attr-width="<[(labeledRegion.region.area[1][0] - labeledRegion.region.area[0][0]) * getImageWidth()]>"
@@ -37,7 +37,7 @@
           ng-mousemove="onMouseMoveRegion()"
           ng-mousedown="onMousedownRegion($index)">
     </rect>
-    <a ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions" href
+    <a ng-repeat="labeledRegion in value.labeledRegions" href
        ng-click="deleteRegion($index)"
        target="_blank">
       <text font-family="Material Icons"
@@ -47,7 +47,7 @@
             ng-attr-x="<[labeledRegion.region.area[1][0] * getImageWidth() - 25]>"
             ng-attr-y="<[labeledRegion.region.area[1][1] * getImageHeight() - 5]>">&#xE872;</text>
     </a>
-    <text ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
+    <text ng-repeat="labeledRegion in value.labeledRegions"
           ng-attr-style="<[getRegionLabelStyle($index)]>"
           ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth() + 6]>"
           ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight() + 18]>">
@@ -65,18 +65,6 @@
   <div style="color: red; margin-bottom: 4px"><[errorText]></div>
   <button type="button" class="btn btn-danger" ng-click="resetEditor()">Clear Image and Regions</button>
 </div>
-<script type="text/ng-template" id="modals/imageRegionsResetConfirmation">
-  <div class="modal-header">
-    <h4 class="modal-title">Clear Image and Regions</h4>
-  </div>
-  <div class="modal-body">
-    <span>This will remove the image and all regions. Are you sure?</span>
-  </div>
-  <div class="modal-footer">
-    <button type="button" ng-click="cancel()" class="btn btn-default">Cancel</button>
-    <button type="button" ng-click="confirmClear()" class="btn btn-danger">Clear Image and Regions</button>
-  </div>
-</script>
 <style>
   input.oppia-image-with-regions-region-label-editor {
     background-color: rgba(0, 0, 0, 0.5);
