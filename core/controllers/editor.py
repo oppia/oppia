@@ -817,6 +817,10 @@ class ResolveIssueHandler(EditorHandler):
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
+    # The string to prefix to the filename (before tacking the whole thing on
+    # to the end of 'assets/').
+    _FILENAME_PREFIX = 'image'
+
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Saves an image uploaded by a content creator."""
@@ -854,14 +858,21 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-        # Save the file.
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
+        mimetype = 'image/' + str(extension)
+
+        # Image files are stored to the datastore in the dev env, and to GCS
+        # in production.
+        file_system_class = (
+            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+            else fs_domain.GcsFileSystem)
+        fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
         if fs.isfile(filename):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
-        fs.commit(self.user_id, filename, raw)
+        fs.commit(
+            self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
+            raw, mimetype=mimetype)
 
         self.render_json({'filepath': filename})
 
