@@ -140,7 +140,7 @@ oppia.factory('EditableTopicBackendApiService', [
           _fetchStories(topicId, resolve, reject);
         });
       },
-      
+
       fetchSubtopicPage: function(topicId, subtopicId) {
         return $q(function(resolve, reject) {
           _fetchSubtopicPage(topicId, subtopicId, resolve, reject);
