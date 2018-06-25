@@ -64,7 +64,7 @@ oppia.factory('SkillObjectFactory', [
     };
 
     Skill.createEmptySkill = function() {
-      return new Skill(null, '', [], null, null);
+      return new Skill(null, null, [], null, null);
     };
 
     var generateMisconceptionsFromBackendDict = function(
@@ -102,6 +102,10 @@ oppia.factory('SkillObjectFactory', [
 
     Skill.prototype.removeLastMisconception = function() {
       this._misconceptions.pop();
+    };
+
+    Skill.prototype.getLanguageCode = function() {
+      return this._languageCode;
     };
 
     Skill.prototype.getVersion = function() {
