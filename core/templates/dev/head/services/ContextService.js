@@ -34,6 +34,7 @@ oppia.factory('ContextService', [
   function(UrlService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
     var pageContext = null;
     var explorationId = null;
+    var questionId = null;
 
     return {
       // Returns a string representing the current tab of the editor (either
@@ -90,7 +91,7 @@ oppia.factory('ContextService', [
       // Returns a string representing the explorationId (obtained from the
       // URL).
       getExplorationId: function() {
-        if (!isInExplorationContext) {
+        if (!this.isInExplorationContext()) {
           throw Error('Error: You are not in Exploration Context.');
         }
         if (explorationId) {
@@ -120,7 +121,7 @@ oppia.factory('ContextService', [
       // Returns a string representing the questionId (obtained from the
       // URL).
       getQuestionId: function() {
-        if (!isInQuestionContext) {
+        if (!this.isInQuestionContext()) {
           throw Error('Error: You are not in Question Context.');
         }
         if (questionId) {
