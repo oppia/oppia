@@ -314,6 +314,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         super(StorePlaythroughHandler, self).__init__(*args, **kwargs)
         self.exp_issues = None
         self.issue_schema_version = None
+        self.playthrough_id = None
 
     def _find_playthrough_in_exp_issues(self, playthrough):
         """Finds an equivalent playthrough for the given one in the unresolved
@@ -356,14 +357,14 @@ class StorePlaythroughHandler(base.BaseHandler):
                     issue_index].playthrough_ids) < (
                         feconf.MAX_PLAYTHROUGHS_FOR_ISSUE)):
                 self.exp_issues.unresolved_issues[
-                    issue_index].playthrough_ids.append(playthrough.id)
+                    issue_index].playthrough_ids.append(self.playthrough_id)
             else:
                 max_playthroughs_per_issue = True
         else:
             issue = stats_domain.ExplorationIssue(
                 playthrough.issue_type,
                 playthrough.issue_customization_args,
-                [playthrough.id], self.issue_schema_version, is_valid=True)
+                [self.playthrough_id], self.issue_schema_version, is_valid=True)
             self.exp_issues.unresolved_issues.append(issue)
 
         # Now, remove the playthrough from its old issue.
@@ -371,7 +372,7 @@ class StorePlaythroughHandler(base.BaseHandler):
             issue_index = self._find_playthrough_in_exp_issues(orig_playthrough)
             if issue_index is not None:
                 self.exp_issues.unresolved_issues[
-                    issue_index].playthrough_ids.remove(playthrough.id)
+                    issue_index].playthrough_ids.remove(self.playthrough_id)
 
     def _assign_playthrough_to_issue(self, playthrough):
         """Assigns newly created playthrough to its correct issue or makes a new
@@ -437,6 +438,11 @@ class StorePlaythroughHandler(base.BaseHandler):
         except KeyError as e:
             raise self.InvalidInputException(e)
 
+        try:
+            self.playthrough_id = self.payload['playthrough_id']
+        except KeyError as e:
+            raise self.InvalidInputException(e)
+
         exp_version = playthrough_data['exp_version']
 
         exp_issues_model = stats_models.ExplorationIssuesModel.get_model(
@@ -444,33 +450,27 @@ class StorePlaythroughHandler(base.BaseHandler):
         self.exp_issues = stats_services.get_exp_issues_from_model(
             exp_issues_model)
 
+        playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
+
         # If playthrough already exists, update it in the datastore.
-        if playthrough_data['id']:
-            playthrough_id = playthrough_data['id']
-            playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
+        if self.playthrough_id:
             orig_playthrough = stats_services.get_playthrough_by_id(
-                playthrough_id)
+                self.playthrough_id)
             if orig_playthrough.issue_type != playthrough.issue_type:
                 self._move_playthrough_to_correct_issue(
                     playthrough, orig_playthrough)
 
             stats_services.update_playthroughs_multi(
-                [playthrough_data['id']], [playthrough])
+                [self.playthrough_id], [playthrough])
             stats_services.save_exp_issues_model_transactional(self.exp_issues)
             self.render_json({})
             return
 
-        playthrough_id = None
         payload_return = {'playthrough_stored': True}
 
-        # Create a dummy playthrough domain object with a temporary ID since the
-        # playthrough doesn't exist yet.
-        playthrough_data['id'] = stats_models.TEMPORARY_PLAYTHROUGH_ID
-        temporary_playthrough = stats_domain.Playthrough.from_dict(
-            playthrough_data)
+        playthrough_id = None
         try:
-            playthrough_id = self._assign_playthrough_to_issue(
-                temporary_playthrough)
+            playthrough_id = self._assign_playthrough_to_issue(playthrough)
         except Exception:
             payload_return['playthrough_stored'] = False
 
