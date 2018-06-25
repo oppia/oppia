@@ -34,6 +34,7 @@ import utils
     models.NAMES.base_model, models.NAMES.exploration])
 
 _COMMIT_TYPE_REVERT = 'revert'
+ALLOWED_IMAGE_EXTENSIONS = ['png', 'jpg', 'gif', 'jpeg']
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -535,3 +536,33 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
+
+class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+    """ One-off job for migrating the images in the exploration 
+        from the GAE to GCS
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileModel]
+
+    @staticmethod
+    def map(file_model):
+        instance_id = file_model.get_unversioned_instance_id()
+        filename = instance_id[instance_id.rfind("/")+1:]
+        filetype = instance_id[instance_id.rfind(".")+1:]
+        exploration_id = (instance_id[1:])[:(instance_id[1:]).find("/")]
+        filepath = (instance_id[1:])[(instance_id[1:]).find("/")+1:]
+        # fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(exploration_id))
+        # if not fs.isfile(filename):
+        if filetype in ALLOWED_IMAGE_EXTENSIONS:
+            if file_model.deleted == False:
+                content = fmodel.content
+                # fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(exploration_id))
+                # fs.commit(file_model.user_id, '%s/%s' %('images', filename, content)
+                file_model.delete("Admin", "Delete the file", False)
+                file_metadatmodel = file_models.FileMetadataModel.get_model(exploration_id, filepath, False)
+                file_metadatmodel.delete(file_model.user_id, "Delete the filemetada", False)
+                yield(exploration_id, filename)
+    @staticmethod
+    def reduce(exp_id, values):
+        yield(exp_id, values)
