@@ -55,7 +55,7 @@ describe('Full exploration editor', function() {
     explorationEditorPage.setStateName('card 1');
     explorationEditorPage.setContent(forms.toRichText('this is card 1'));
     explorationEditorPage.setInteraction('Continue');
-    explorationEditorPage.ResponseEditor('default').setDestination(
+    explorationEditorPage.getResponseEditor('default').setDestination(
       'card 2', true, null);
 
     explorationEditorPage.moveToState('card 2');
@@ -190,10 +190,9 @@ describe('Full exploration editor', function() {
         'MultipleChoiceInput', null, 'card 2', true,
         'Equals', 'Correct');
 
-      explorationEditorPage.ResponseEditor(
-        'default').setFeedback(forms.toRichText('try again'));
-      explorationEditorPage.ResponseEditor(
-        'default').setDestination(null, false, refresherExplorationId);
+      var responseEditor = explorationEditorPage.getResponseEditor('default');
+      responseEditor.setFeedback(forms.toRichText('try again'));
+      responseEditor.setDestination(null, false, refresherExplorationId);
 
       explorationEditorPage.moveToState('card 2');
       explorationEditorPage.setInteraction('EndExploration');
@@ -224,10 +223,9 @@ describe('Full exploration editor', function() {
         'MultipleChoiceInput', null, 'card 2', true,
         'Equals', 'Correct');
 
-      explorationEditorPage.ResponseEditor(
-        'default').setFeedback(forms.toRichText('try again'));
-      explorationEditorPage.ResponseEditor(
-        'default').setDestination(null, false, refresherExplorationId);
+      var responseEditor = explorationEditorPage.getResponseEditor('default');
+      responseEditor.setFeedback(forms.toRichText('try again'));
+      responseEditor.setDestination(null, false, refresherExplorationId);
 
       explorationEditorPage.moveToState('card 2');
       explorationEditorPage.setInteraction('EndExploration');
@@ -309,7 +307,7 @@ describe('Full exploration editor', function() {
     explorationEditorPage.setInteraction('NumericInput');
     explorationEditorPage.addResponse(
       'NumericInput', null, 'final card', true, 'Equals', 21);
-    explorationEditorPage.ResponseEditor(0).setDestination(
+    explorationEditorPage.getResponseEditor(0).setDestination(
       'card 2', true, null);
 
     explorationEditorPage.moveToState('card 2');
@@ -361,7 +359,7 @@ describe('Full exploration editor', function() {
       explorationEditorPage.setContent(forms.toRichText('card1 content'));
       explorationEditorPage.setInteraction('TextInput');
       explorationEditorPage.setDefaultOutcome(null, 'final card', true);
-      explorationEditorPage.ResponseEditor('default').setDestination(
+      explorationEditorPage.getResponseEditor('default').setDestination(
         'card2', true, null);
       explorationEditorPage.moveToState('card2');
       // NOTE: we must move to the state before checking state names to avoid
@@ -381,7 +379,7 @@ describe('Full exploration editor', function() {
       // Check deletion of states and changing the first state
       explorationEditorPage.setInteraction('TextInput');
       explorationEditorPage.setDefaultOutcome(null, 'final card', true);
-      explorationEditorPage.ResponseEditor('default').setDestination(
+      explorationEditorPage.getResponseEditor('default').setDestination(
         'second', true, null);
       explorationEditorPage.moveToState('second');
       explorationEditorPage.expectStateNamesToBe(
@@ -426,16 +424,14 @@ describe('Full exploration editor', function() {
       // Check deletion of groups
       explorationEditorPage.setDefaultOutcome(
         forms.toRichText('Farewell'), null, false);
-      explorationEditorPage.ResponseEditor('default').
-        expectAvailableDestinationsToBe(['second', 'final card']);
-      explorationEditorPage.ResponseEditor(
-        'default').setDestination('final card', false, null);
-      explorationEditorPage.ResponseEditor('default').
-        expectAvailableDestinationsToBe(['second', 'final card']);
+      var responseEditor = explorationEditorPage.getResponseEditor('default');
+      responseEditor.expectAvailableDestinationsToBe(['second', 'final card']);
+      responseEditor.setDestination('final card', false, null);
+      responseEditor.expectAvailableDestinationsToBe(['second', 'final card']);
       explorationEditorPage.addResponse(
         'NumericInput', null, 'final card', false,
         'IsGreaterThan', 2);
-      explorationEditorPage.ResponseEditor(0).deleteResponse();
+      explorationEditorPage.getResponseEditor(0).deleteResponse();
 
       // Setup a terminating state
       explorationEditorPage.moveToState('final card');
@@ -489,13 +485,12 @@ describe('Full exploration editor', function() {
         'Okay, now this is just becoming annoying.'), 'final card', true);
 
       // Now, add multiple rules to a single answer group.
-      explorationEditorPage.ResponseEditor(0).addRule(
-        'TextInput', 'Contains', 'meh');
-      explorationEditorPage.ResponseEditor(0).addRule(
-        'TextInput', 'Contains', 'okay');
+      var responseEditor = explorationEditorPage.getResponseEditor(0);
+      responseEditor.addRule('TextInput', 'Contains', 'meh');
+      responseEditor.addRule('TextInput', 'Contains', 'okay');
 
       // Ensure that the only rule for this group cannot be deleted.
-      explorationEditorPage.ResponseEditor(1).expectCannotDeleteRule(0);
+      explorationEditorPage.getResponseEditor(1).expectCannotDeleteRule(0);
 
       // Setup a terminating state.
       explorationEditorPage.moveToState('final card');
@@ -524,7 +519,7 @@ describe('Full exploration editor', function() {
       explorationEditorPage.expectCannotSaveChanges();
 
       // Check answer group 1.
-      var responseEditor = explorationEditorPage.ResponseEditor(0);
+      responseEditor = explorationEditorPage.getResponseEditor(0);
       responseEditor.expectCannotSetFeedback();
       responseEditor.expectCannotSetDestination();
       responseEditor.expectCannotDeleteResponse();
@@ -533,7 +528,7 @@ describe('Full exploration editor', function() {
       responseEditor.expectCannotDeleteRule(1);
 
       // Check answer group 2.
-      responseEditor = explorationEditorPage.ResponseEditor(0);
+      responseEditor = explorationEditorPage.getResponseEditor(1);
       responseEditor.expectCannotSetFeedback();
       responseEditor.expectCannotSetDestination();
       responseEditor.expectCannotDeleteResponse();
@@ -541,7 +536,7 @@ describe('Full exploration editor', function() {
       responseEditor.expectCannotDeleteRule(0);
 
       // Check default outcome.
-      responseEditor = explorationEditorPage.ResponseEditor('default');
+      responseEditor = explorationEditorPage.getResponseEditor('default');
       responseEditor.expectCannotSetFeedback();
       responseEditor.expectCannotSetDestination();
 

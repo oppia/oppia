@@ -228,7 +228,7 @@ var ExplorationEditorPage = function() {
   this.setDefaultOutcome = function(feedbackInstructions,
       destStateName, createState) {
     // Select the default response.
-    var editor = this.ResponseEditor('default');
+    var editor = this.getResponseEditor('default');
 
     if (feedbackInstructions) {
       editor.setFeedback(feedbackInstructions);
@@ -264,7 +264,7 @@ var ExplorationEditorPage = function() {
   };
 
   // Rules are zero-indexed; 'default' denotes the default outcome.
-  this.ResponseEditor = function(responseNum) {
+  this.getResponseEditor = function(responseNum) {
     var headerElem;
     if (responseNum === 'default') {
       headerElem = defaultResponseTab;
