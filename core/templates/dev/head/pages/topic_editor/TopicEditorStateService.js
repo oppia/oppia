@@ -21,18 +21,22 @@
 oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
 oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
 oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
+oppia.constant(
+  'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
 
 oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService', 'TopicObjectFactory',
   'TopicRightsObjectFactory', 'SubtopicPageObjectFactory',
   'TopicRightsBackendApiService', 'UndoRedoService',
   'EditableTopicBackendApiService', 'EVENT_TOPIC_INITIALIZED',
-  'EVENT_TOPIC_REINITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED', function(
+  'EVENT_TOPIC_REINITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
+  'EVENT_STORY_SUMMARIES_INITIALIZED', function(
       $rootScope, AlertsService, TopicObjectFactory,
       TopicRightsObjectFactory, SubtopicPageObjectFactory,
       TopicRightsBackendApiService, UndoRedoService,
       EditableTopicBackendApiService, EVENT_TOPIC_INITIALIZED,
-      EVENT_TOPIC_REINITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
+      EVENT_TOPIC_REINITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED,
+      EVENT_STORY_SUMMARIES_INITIALIZED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
     // The array that caches all the subtopic pages loaded by the user.
@@ -45,6 +49,7 @@ oppia.factory('TopicEditorStateService', [
     var _topicIsInitialized = false;
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
+    var _canonicalStorySummaries = [];
 
     var _getSubtopicPageId = function(topicId, subtopicId) {
       return topicId + '-' + subtopicId.toString();
@@ -100,6 +105,10 @@ oppia.factory('TopicEditorStateService', [
       _setTopicRights(TopicRightsObjectFactory.createFromBackendDict(
         newBackendTopicRightsObject));
     };
+    var _setCanonicalStorySummaries = function(canonicalStorySummaries) {
+      _canonicalStorySummaries = angular.copy(canonicalStorySummaries);
+      $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
+    };
 
     return {
       /**
@@ -113,6 +122,10 @@ oppia.factory('TopicEditorStateService', [
           topicId).then(
           function(newBackendTopicObject) {
             _updateTopic(newBackendTopicObject);
+            EditableTopicBackendApiService.fetchStories(topicId).then(
+              function(canonicalStorySummaries) {
+                _setCanonicalStorySummaries(canonicalStorySummaries);
+              });
           },
           function(error) {
             AlertsService.addWarning(
@@ -180,6 +193,10 @@ oppia.factory('TopicEditorStateService', [
        */
       getTopic: function() {
         return _topic;
+      },
+
+      getCanonicalStorySummaries: function() {
+        return _canonicalStorySummaries;
       },
 
       /**

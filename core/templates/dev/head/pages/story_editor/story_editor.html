@@ -1,5 +1,38 @@
 {% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  {{ story_title }} - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <story-editor-navbar-breadcrumb>
+  </story-editor-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <story-editor-navbar>
+  </story-editor-navbar>
+{% endblock local_top_nav_options %}
+
+{% block content %}
+<div ng-controller="StoryEditor">
+  <story-editor></story-editor>
+</div>
+{% endblock content %}
+
 {% block footer_js %}
   {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/EditableStoryBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/StoryObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/StoryContentsObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/StoryNodeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/StoryUpdateService.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditorNavbarBreadcrumbDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditorNavbarDirective.js"></script>
 {% endblock footer_js %}
