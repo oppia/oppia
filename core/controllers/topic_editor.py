@@ -121,7 +121,7 @@ class EditableSubtopicPageDataHandler(base.BaseHandler):
 
         if subtopic_page is None:
             raise self.PageNotFoundException(
-                Exception('The subtopic with the given id doesn\'t exist.'))
+                'The subtopic page with the given id doesn\'t exist.')
 
         self.values.update({
             'subtopic_page': subtopic_page.to_dict()
