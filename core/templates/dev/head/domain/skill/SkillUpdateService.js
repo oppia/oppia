@@ -168,9 +168,18 @@ oppia.factory('SkillUpdateService', [
           });
       },
 
-      deleteMisconception: function(
-        skill, index) {
-        
+      deleteMisconception: function(skill, misconceptionId) {
+        var params = {
+          id: misconceptionId
+        };
+        var oldMisconception = skill.findMisconceptionById(misconceptionId);
+        _applyChange(
+          skill, CMD_DELETE_SKILL_MISCONCEPTION, params,
+          function(changeDict, skill) {
+            skill.deleteMisconception(misconceptionId);
+          }, function(changeDict, skill) {
+            skill.appendMisconception(oldMisconception);
+          });
       },
 
       updateMisconceptionName: function(

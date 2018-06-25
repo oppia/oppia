@@ -127,6 +127,18 @@ oppia.factory('SkillObjectFactory', [
       return null;
     };
 
+    Skill.prototype.deleteMisconception = function(id) {
+      for (var idx in this._misconceptions) {
+        if (this._misconceptions[idx].getId() === id) {
+          this._misconceptions.splice(idx, 1);
+        }
+      }
+    };
+
+    Skill.prototype.getMisconceptionAtIndex = function(idx) {
+      return this._misconceptions[idx];
+    };
+
     return Skill;
   }
 ]);

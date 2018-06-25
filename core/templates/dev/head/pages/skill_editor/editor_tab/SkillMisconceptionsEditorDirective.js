@@ -61,8 +61,30 @@ oppia.directive('skillMisconceptionsEditor', [
             return angular.copy(misconception.name);
           };
 
-          $scope.removeMisconception = function(index, evt) {
-            SkillUpdateService.removeMisconception($scope.skill, index);
+          $scope.openDeleteMisconceptionModal = function(index, evt) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/skill_editor/editor_tab/' +
+                'delete_misconception_modal_directive.html'),
+              backdrop: 'static',
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.skill = SkillEditorStateService.getSkill();
+
+                  $scope.confirm = function() {
+                    $uibModalInstance.close({
+                      id: $scope.skill.getMisconceptionAtIndex(index).getId()
+                    });  
+                  };
+                  
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }]
+            }).result.then(function(result) {
+              SkillUpdateService.deleteMisconception($scope.skill, result.id);
+            });
           };
 
           $scope.openAddMisconceptionModal = function() {
