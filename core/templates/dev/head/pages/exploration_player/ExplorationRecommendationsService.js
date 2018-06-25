@@ -25,7 +25,7 @@ oppia.factory('ExplorationRecommendationsService', [
       EDITOR_TAB_CONTEXT) {
     var isIframed = UrlService.isIframed();
     var isInEditorPage = (
-      ContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+      ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR);
     var isInEditorPreviewMode = isInEditorPage && (
       ContextService.getEditorTabContext() ===
       EDITOR_TAB_CONTEXT.PREVIEW);

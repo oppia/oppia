@@ -58,7 +58,7 @@ oppia.directive('oppiaNoninteractiveVideo', [
             // Autoplay if user is in learner view and creator has specified
             // to autoplay given video.
             if (ContextService.getPageContext() ===
-              PAGE_CONTEXT.LEARNER && autoplayVal) {
+              PAGE_CONTEXT.EXPLORATION_PLAYER && autoplayVal) {
               // If it has been autoplayed then do not autoplay again.
               if (
                 !AutoplayedVideosService.hasVideoBeenAutoplayed(

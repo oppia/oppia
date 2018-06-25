@@ -41,13 +41,13 @@ oppia.directive('oppiaInteractiveEndExploration', [
 
           $scope.isIframed = UrlService.isIframed();
           $scope.isInEditorPage = (
-            ContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+            ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR);
           $scope.isInEditorPreviewMode = $scope.isInEditorPage && (
             ContextService.getEditorTabContext() ===
               EDITOR_TAB_CONTEXT.PREVIEW);
           $scope.isInEditorMainTab = $scope.isInEditorPage && (
             ContextService.getEditorTabContext() ===
-              EDITOR_TAB_CONTEXT.EDITOR);
+              EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR);
 
           $scope.collectionId = GLOBALS.collectionId;
           $scope.getCollectionTitle = function() {

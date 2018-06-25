@@ -164,7 +164,7 @@ oppia.config(['$provide', function($provide) {
       RteHelperService.getRichTextComponents().forEach(function(componentDefn) {
         var buttonDisplay = RteHelperService.createToolbarIcon(componentDefn);
         var canUseFs = ContextService.getPageContext() ===
-          PAGE_CONTEXT.EDITOR;
+          PAGE_CONTEXT.EXPLORATION_EDITOR;
 
         taRegisterTool(componentDefn.id, {
           display: buttonDisplay.outerHTML,

@@ -147,7 +147,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           };
           $scope.getDotDisplay = function() {
             if (ContextService.getEditorTabContext() ===
-                EDITOR_TAB_CONTEXT.EDITOR) {
+                EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR) {
               return 'none';
             }
             return 'inline';

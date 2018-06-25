@@ -13,19 +13,19 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service for returning information about an exploration's
+ * @fileoverview Service for returning information about a page's
  * context.
  */
 
 oppia.constant('PAGE_CONTEXT', {
-  EDITOR: 'editor',
-  LEARNER: 'learner',
+  EXPLORATION_EDITOR: 'editor',
+  EXPLORATION_PLAYER: 'learner',
   QUESTION_EDITOR: 'question_editor',
   OTHER: 'other'
 });
 
 oppia.constant('EDITOR_TAB_CONTEXT', {
-  EDITOR: 'editor',
+  EXPLORATION_EDITOR: 'editor',
   PREVIEW: 'preview'
 });
 
@@ -42,7 +42,7 @@ oppia.factory('ContextService', [
       getEditorTabContext: function() {
         var hash = UrlService.getHash();
         if (hash.indexOf('#/gui') === 0) {
-          return EDITOR_TAB_CONTEXT.EDITOR;
+          return EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR;
         } else if (hash.indexOf('#/preview') === 0) {
           return EDITOR_TAB_CONTEXT.PREVIEW;
         } else {
@@ -50,10 +50,10 @@ oppia.factory('ContextService', [
         }
       },
       // Returns a string representing the context of the current page.
-      // This is PAGE_CONTEXT.EDITOR or PAGE_CONTEXT.LEARNER or
-      // PAGE_CONTEXT.QUESTION_EDITOR.
-      // If the current page is not one in either EDITOR or LEARNER or
-      // QUESTION_EDITOR then return PAGE_CONTEXT.OTHER
+      // This is PAGE_CONTEXT.EXPLORATION_EDITOR or
+      // PAGE_CONTEXT.EXPLORATION_PLAYER or PAGE_CONTEXT.QUESTION_EDITOR.
+      // If the current page is not one in either EXPLORATION_EDITOR or
+      // EXPLORATION_PLAYER or QUESTION_EDITOR then return PAGE_CONTEXT.OTHER
       getPageContext: function() {
         if (pageContext) {
           return pageContext;
@@ -63,11 +63,11 @@ oppia.factory('ContextService', [
             if (pathnameArray[i] === 'explore' ||
                 (pathnameArray[i] === 'embed' &&
                  pathnameArray[i + 1] === 'exploration')) {
-              pageContext = PAGE_CONTEXT.LEARNER;
-              return PAGE_CONTEXT.LEARNER;
+              pageContext = PAGE_CONTEXT.EXPLORATION_PLAYER;
+              return PAGE_CONTEXT.EXPLORATION_PLAYER;
             } else if (pathnameArray[i] === 'create') {
-              pageContext = PAGE_CONTEXT.EDITOR;
-              return PAGE_CONTEXT.EDITOR;
+              pageContext = PAGE_CONTEXT.EXPLORATION_EDITOR;
+              return PAGE_CONTEXT.EXPLORATION_EDITOR;
             } else if (pathnameArray[i] === 'question_editor') {
               pageContext = PAGE_CONTEXT.QUESTION_EDITOR;
               return PAGE_CONTEXT.QUESTION_EDITOR;
@@ -79,8 +79,8 @@ oppia.factory('ContextService', [
       },
 
       isInExplorationContext: function() {
-        return (this.getPageContext() === PAGE_CONTEXT.EDITOR ||
-          this.getPageContext() === PAGE_CONTEXT.LEARNER);
+        return (this.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR ||
+          this.getPageContext() === PAGE_CONTEXT.EXPLORATION_PLAYER);
       },
 
       isInQuestionContext: function() {
@@ -138,14 +138,9 @@ oppia.factory('ContextService', [
       // Following variable helps to know whether exploration editor is
       // in main editing mode or preview mode.
       isInExplorationEditorMode: function() {
-        return (this.getPageContext() === PAGE_CONTEXT.EDITOR &&
-            this.getEditorTabContext() === EDITOR_TAB_CONTEXT.EDITOR);
-      },
-
-      // Following variable helps to know whether question editor is
-      // in main editing mode or preview mode.
-      isInQuestionEditorMode: function() {
-        return (this.getPageContext() === PAGE_CONTEXT.QUESTION_EDITOR);
+        return (this.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR &&
+            this.getEditorTabContext() === (
+              EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR));
       }
     };
   }
