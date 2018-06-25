@@ -18,16 +18,16 @@
 
 oppia.factory('StoryCreationService', [
   '$http', '$window', '$uibModal', '$rootScope', '$timeout', 'AlertsService',
-  'UrlInterpolationService',
+  'UrlInterpolationService', 'TopicUpdateService', 'TopicEditorStateService',
   function(
       $http, $window, $uibModal, $rootScope, $timeout, AlertsService,
-      UrlInterpolationService) {
+      UrlInterpolationService, TopicUpdateService, TopicEditorStateService) {
     var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<topic_id>/<story_id>';
     var STORY_CREATOR_URL_TEMPLATE = '/topic_editor_story_handler/<topic_id>';
     var storyCreationInProgress = false;
 
     return {
-      createNewCanonicalStory: function(topicId) {
+      createNewCanonicalStory: function() {
         if (storyCreationInProgress) {
           return;
         }
@@ -59,22 +59,28 @@ oppia.factory('StoryCreationService', [
           }
           storyCreationInProgress = true;
           AlertsService.clearWarnings();
-
+          var topic = TopicEditorStateService.getTopic();
           $rootScope.loadingMessage = 'Creating story';
           var createStoryUrl = UrlInterpolationService.interpolateUrl(
             STORY_CREATOR_URL_TEMPLATE, {
-              topic_id: topicId
+              topic_id: topic.getId()
             }
           );
           $http.post(createStoryUrl, {title: storyTitle})
             .then(function(response) {
               $timeout(function() {
-                $window.location = UrlInterpolationService.interpolateUrl(
-                  STORY_EDITOR_URL_TEMPLATE, {
-                    topic_id: topicId,
-                    story_id: response.data.storyId
-                  }
-                );
+                TopicUpdateService.addCanonicalStoryId(
+                  topic, response.data.storyId);
+                TopicEditorStateService.saveTopic(
+                  'Added canonical story with id ' + response.data.storyId,
+                  function() {
+                    $window.location = UrlInterpolationService.interpolateUrl(
+                      STORY_EDITOR_URL_TEMPLATE, {
+                        topic_id: topic.getId(),
+                        story_id: response.data.storyId
+                      }
+                    );
+                  });
               }, 150);
             }, function() {
               $rootScope.loadingMessage = '';

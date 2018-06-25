@@ -69,10 +69,8 @@ class TopicEditorStoryHandlerTest(BaseTopicEditorControllerTest):
                 '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
                 {'title': 'Story title'},
                 csrf_token=csrf_token)
-            topic = topic_services.get_topic_by_id(self.topic_id)
             story_id = json_response['storyId']
             self.assertEqual(len(story_id), 12)
-            self.assertEqual(topic.canonical_story_ids, [story_id])
             self.assertIsNotNone(
                 story_services.get_story_by_id(story_id, strict=False))
         self.logout()
