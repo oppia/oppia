@@ -17,6 +17,8 @@
  * translation language.
  */
 
+oppia.constant('DEFAULT_AUDIO_LANGUAGE', 'en');
+
 oppia.directive('translatorOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -27,34 +29,36 @@ oppia.directive('translatorOverview', [
         'translator_overview_directive.html'),
       controller: [
         '$scope', '$window', 'SUPPORTED_AUDIO_LANGUAGES', 'LanguageUtilService',
-        'TranslationLanguageService', function(
+        'TranslationLanguageService', 'DEFAULT_AUDIO_LANGUAGE', function(
             $scope, $window, SUPPORTED_AUDIO_LANGUAGES, LanguageUtilService,
-            TranslationLanguageService) {
-            var prevLanguageCode = $window.localStorage.getItem(
-                    'last_selected_translation_lang');
-            var allAudioLanguageCodes = LanguageUtilService
-              .getAllAudioLanguageCodes();
-            $scope.languageCode =
-              allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
-                prevLanguageCode : allAudioLanguageCodes[0];
+            TranslationLanguageService, DEFAULT_AUDIO_LANGUAGE) {
+          var LAST_SELECTED_TRANSLATION_LANGUAGE = (
+            'last_selected_translation_lang');
+          var prevLanguageCode = $window.localStorage.getItem(
+            LAST_SELECTED_TRANSLATION_LANGUAGE);
+          var allAudioLanguageCodes = LanguageUtilService
+            .getAllAudioLanguageCodes();
+          $scope.languageCode =
+            allAudioLanguageCodes.indexOf(prevLanguageCode) !== -1 ?
+              prevLanguageCode : DEFAULT_AUDIO_LANGUAGE;
+          TranslationLanguageService.setActiveLanguageCode(
+            $scope.languageCode);
+          $scope.languageCodesAndDescriptions = (
+            allAudioLanguageCodes.map(function(languageCode) {
+              return {
+                id: languageCode,
+                description: (
+                  LanguageUtilService.getAudioLanguageDescription(
+                    languageCode))
+              };
+            }));
+
+          $scope.changeTranslationLanguage = function() {
             TranslationLanguageService.setActiveLanguageCode(
               $scope.languageCode);
-            $scope.languageCodesAndDescriptions = (
-              allAudioLanguageCodes.map(function(languageCode) {
-                return {
-                  id: languageCode,
-                  description: (
-                    LanguageUtilService.getAudioLanguageDescription(
-                      languageCode))
-                };
-              }));
-
-            $scope.changeTranslationLanguage = function() {
-              TranslationLanguageService.setActiveLanguageCode(
-                $scope.languageCode);
-              $window.localStorage.setItem(
-                'last_selected_translation_lang', $scope.languageCode);
-            };
+            $window.localStorage.setItem(
+              LAST_SELECTED_TRANSLATION_LANGUAGE, $scope.languageCode);
+          };
         }
       ]
     };

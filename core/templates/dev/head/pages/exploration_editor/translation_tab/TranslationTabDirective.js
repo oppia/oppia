@@ -26,10 +26,9 @@ oppia.directive('translationTab', [
         'translation_tab_directive.html'),
       controller: [
         '$scope', function($scope) {
-          $scope.underConstruction = true;
-          $scope.$on('refreshAudioTab', $scope.refreshSettingsTab);
-          $scope.refreshSettingsTab = function() {
-
+          $scope.$on('refreshTranslationTab', $scope.refreshTranslationTab);
+          $scope.refreshTranslationTab = function() {
+            // This will be used in future to intialize translation services.
           };
         }
       ]
