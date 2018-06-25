@@ -23,13 +23,13 @@ oppia.directive('topicMainEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/main_editor/topic_editor_tab_directive.html'),
       controller: [
-        '$scope', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService', 'StoryCreationService',
+        '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
+        'UndoRedoService', 'UrlInterpolationService', 'StoryCreationService',
         'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
         'EVENT_TOPIC_REINITIALIZED',
         function(
-            $scope, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService, StoryCreationService,
+            $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
+            UndoRedoService, UrlInterpolationService, StoryCreationService,
             EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
           var _initEditor = function() {
@@ -49,7 +49,25 @@ oppia.directive('topicMainEditor', [
           };
 
           $scope.createCanonicalStory = function() {
-            StoryCreationService.createNewCanonicalStory($scope.topic.getId());
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/topic_editor/main_editor/' +
+                  'save_pending_changes_modal_directive.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              });
+            } else {
+              StoryCreationService.createNewCanonicalStory(
+                $scope.topic.getId());
+            }
           };
 
           $scope.updateTopicDescriptionStatus = function(description) {
