@@ -15,6 +15,8 @@
 /**
  * @fileoverview Service to send changes to a topic to the backend.
  */
+oppia.constant(
+  'TOPIC_EDITOR_STORY_URL_TEMPLATE', '/topic_editor_story_handler/<topic_id>');
 
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'EDITABLE_TOPIC_DATA_URL_TEMPLATE',

@@ -17,14 +17,14 @@
       </span>
     </div>
 
-    <div class="topic-description" ng-class="{'has-error': !displayedTopicDescription && topicDescriptionChanged}">
+    <div class="topic-description" ng-class="{'has-error': topicDescriptionEmpty && topicDescriptionChanged}">
       <label for="topicDescription" class="form-heading">Description</label>
       <textarea type="text" class="form-control"
                 ng-model="editableDescription"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
                 placeholder="Enter the description of the topic"></textarea>
-      <span ng-if="!displayedTopicDescription && topicDescriptionChanged" class="help-block" style="font-size: smaller">
+      <span ng-if="topicDescriptionEmpty && topicDescriptionChanged" class="help-block" style="font-size: smaller">
         What does this topic contain?
       </span>
     </div>
