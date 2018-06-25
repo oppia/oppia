@@ -90,6 +90,9 @@ oppia.factory('ContextService', [
       // Returns a string representing the explorationId (obtained from the
       // URL).
       getExplorationId: function() {
+        if (!isInExplorationContext) {
+          throw Error('Error: You are not in Exploration Context.');
+        }
         if (explorationId) {
           return explorationId;
         } else {
@@ -117,10 +120,13 @@ oppia.factory('ContextService', [
       // Returns a string representing the questionId (obtained from the
       // URL).
       getQuestionId: function() {
+        if (!isInQuestionContext) {
+          throw Error('Error: You are not in Question Context.');
+        }
         if (questionId) {
           return questionId;
         } else {
-          // The pathname should /question_editor/{question_id}.
+          // The pathname should have the form /question_editor/{question_id}.
           var pathnameArray = UrlService.getPathname().split('/');
           for (var i = 0; i < pathnameArray.length; i++) {
             if (pathnameArray[i] === 'question_editor') {
