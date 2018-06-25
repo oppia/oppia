@@ -84,8 +84,26 @@ oppia.directive('skillConceptCardEditor', [
             explanationMemento = explanation;
           };
 
-          $scope.removeWorkedExample = function(index, evt) {
-            SkillUpdateService.removeWorkedExample($scope.skill, index);
+          $scope.deleteWorkedExample = function(index, evt) {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/skill_editor/editor_tab/' +
+                'delete_worked_example_modal_directive.html'),
+              backdrop: 'static',
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {                  
+                  $scope.confirm = function() {
+                    $uibModalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }]
+            }).result.then(function(result) {
+              SkillUpdateService.deleteWorkedExample($scope.skill, index);
+            });
           };
 
           $scope.swapWorkedExample = function(indexOne, indexTwo) {

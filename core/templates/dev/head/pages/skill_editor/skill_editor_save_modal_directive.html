@@ -5,14 +5,13 @@
 </div>
 <div class="modal-body oppia-long-text">
   <p>
-    <span>(Optional)</span>
     Please enter a brief description of what you have changed:
     <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input" autofocus></textarea>
   </p>
 </div>
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-close-save-modal" ng-click="save(commitMessage)">
+  <button class="btn btn-success protractor-test-close-save-modal" ng-disabled="!commitMessage" ng-click="save(commitMessage)">
     <span>Save Draft</span>
   </button>
 </div>
