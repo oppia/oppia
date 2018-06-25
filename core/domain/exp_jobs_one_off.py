@@ -30,8 +30,8 @@ from core.platform import models
 import feconf
 import utils
 
-(base_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration])
+(file_models, base_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
 
 _COMMIT_TYPE_REVERT = 'revert'
 ALLOWED_IMAGE_EXTENSIONS = ['png', 'jpg', 'gif', 'jpeg']
@@ -543,25 +543,30 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
     """
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [file_models.FileModel]
+        return [file_models.FileSnapshotContentModel]
 
     @staticmethod
-    def map(file_model):
-        instance_id = file_model.get_unversioned_instance_id()
-        filename = instance_id[instance_id.rfind("/")+1:]
+    def map(file_snapshot_content_model):
+        instance_id = file_snapshot_content_model.get_unversioned_instance_id()
         filetype = instance_id[instance_id.rfind(".")+1:]
-        exploration_id = (instance_id[1:])[:(instance_id[1:]).find("/")]
-        filepath = (instance_id[1:])[(instance_id[1:]).find("/")+1:]
-        # fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(exploration_id))
-        # if not fs.isfile(filename):
+
         if filetype in ALLOWED_IMAGE_EXTENSIONS:
-            if file_model.deleted == False:
-                content = fmodel.content
-                # fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(exploration_id))
-                # fs.commit(file_model.user_id, '%s/%s' %('images', filename, content)
-                file_model.delete("Admin", "Delete the file", False)
-                file_metadatmodel = file_models.FileMetadataModel.get_model(exploration_id, filepath, False)
-                file_metadatmodel.delete(file_model.user_id, "Delete the filemetada", False)
+            filename = instance_id[instance_id.rfind("/")+1:]
+            exploration_id = (instance_id[1:])[:(instance_id[1:]).find("/")]
+            filepath = (instance_id[1:])[(instance_id[1:]).find("/")+1:]
+            file_model = file_models.FileModel.get_model(exploration_id,
+                filepath, False)
+
+            if file_model and file_model.deleted == False:
+                content = file_model.content
+                # fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
+                #   exploration_id))
+                # fs.commit(file_model.user_id, '%s/%s' %('images',
+                #   filename, content)
+                file_model.delete("ADMIN", "Delete the file", False)
+                file_metadatmodel.delete("ADMIN", "Delete the filemetada", False)
+                file_metadatmodel = file_models.FileMetadataModel.get_model(
+                    exploration_id, filepath, False)
                 yield(exploration_id, filename)
     @staticmethod
     def reduce(exp_id, values):
