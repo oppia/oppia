@@ -28,6 +28,12 @@ oppia.directive('schemaBasedHtmlEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_editors/' +
         'schema_based_html_editor_directive.html'),
-      restrict: 'E'
+      restrict: 'E',
+      controller: ['$scope', 'IS_CURRENT_RTE_TEXTANGULAR',
+        function($scope, IS_CURRENT_RTE_TEXTANGULAR) {
+          $scope.isCurrentRTETextAngular = function(){
+            return IS_CURRENT_RTE_TEXTANGULAR;
+          };
+        }]
     };
   }]);

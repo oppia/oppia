@@ -209,20 +209,12 @@ oppia.run([
   'HtmlEscaperService', 'taOptions',
   function($timeout, $compile, $rootScope, $uibModal, RteHelperService,
       HtmlEscaperService, taOptions) {
-    taOptions.disableSanitizer = true;
-    taOptions.forceTextAngularSanitize = false;
-    taOptions.classes.textEditor = 'form-control oppia-rte-content';
-    taOptions.setup.textEditorSetup = function($element) {
-      $timeout(function() {
-        $element.trigger('focus');
-      });
-    };
     var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
     _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
       // The name of the CKEditor widget corresponding to this component.
       var ckName = 'oppia' + componentDefn.id;
 
-      // For some reason, frontend tests will error without this check.
+      // Check to ensure that a plugin is not registered more than once.
       if (CKEDITOR.plugins.registered[ckName] !== undefined) {
         return;
       }
