@@ -443,5 +443,5 @@ var constants = {
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
-  "IS_CURRENT_RTE_TEXTANGULAR": true
+  "IS_CURRENT_RTE_CKEDITOR": false
 };

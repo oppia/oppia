@@ -29,10 +29,10 @@ oppia.directive('schemaBasedHtmlEditor', [
         '/components/forms/schema_editors/' +
         'schema_based_html_editor_directive.html'),
       restrict: 'E',
-      controller: ['$scope', 'IS_CURRENT_RTE_TEXTANGULAR',
-        function($scope, IS_CURRENT_RTE_TEXTANGULAR) {
-          $scope.isCurrentRTETextAngular = function(){
-            return IS_CURRENT_RTE_TEXTANGULAR;
+      controller: ['$scope', 'IS_CURRENT_RTE_CKEDITOR',
+        function($scope, IS_CURRENT_RTE_CKEDITOR) {
+          $scope.isCurrentRTECKEditor = function(){
+            return IS_CURRENT_RTE_CKEDITOR;
           };
         }]
     };

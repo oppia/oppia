@@ -1,10 +1,10 @@
-<!-- If the current RTE is not TextAngular then render CKEditor as the RTE. -->
-<ck-editor-rte ng-if="!isDisabled() && !isCurrentRTETextAngular()" ng-model="$parent.localValue"
+<!-- If the current RTE is CKEditor then render CKEditor as the RTE. -->
+<ck-editor-rte ng-if="!isDisabled() && isCurrentRTECKEditor()" ng-model="$parent.localValue"
                ui-config="uiConfig()" label-for-focus-target="labelForFocusTarget()">
 </ck-editor-rte>
 
-<!-- If the current RTE is TextAngular then render TextAngular as the RTE. -->
-<text-angular-rte ng-if="!isDisabled() && isCurrentRTETextAngular()" html-content="$parent.localValue"
+<!-- If the current RTE is not CKEditor then render TextAngular as the RTE. -->
+<text-angular-rte ng-if="!isDisabled() && !isCurrentRTECKEditor()" html-content="$parent.localValue"
                   ui-config="uiConfig()" label-for-focus-target="labelForFocusTarget()">
 </text-angular-rte>
 <span ng-if="isDisabled()"
