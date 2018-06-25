@@ -82,6 +82,22 @@ describe('Editable story backend API service', function() {
     }
   );
 
+  it('should successfully delete a story from the backend',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expect('DELETE', '/story_editor_handler/data/0/1').respond(
+        200);
+      EditableStoryBackendApiService.deleteStory('0', '1').then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalled();
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
+
   it('should use the rejection handler if the backend request failed',
     function() {
       var successHandler = jasmine.createSpy('success');
