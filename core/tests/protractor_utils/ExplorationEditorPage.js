@@ -566,8 +566,6 @@ var ExplorationEditorPage = function() {
     } else {
       targetOption = destName;
     }
-    // browser.pause();
-    // browser.pause();
     editOutcomeDestDropdownOptions(targetOption).click();
     if (createDest) {
       editOutcomeDestStateInput.sendKeys(destName);
@@ -676,7 +674,13 @@ var ExplorationEditorPage = function() {
   // but does not set any of its input parameters.
   var _selectRule = function(ruleElement, interactionId, ruleName) {
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
-
+    var ruleDescriptionDropdown = element.all(by.css('.select2-dropdown'));
+    var ruleDescriptionDropdownOption =
+      function(ruleOption, ruleDescriptionInDropdown) {
+        return ruleOption.all(by.cssContainingText(
+          'li.select2-results__option', ruleDescriptionInDropdown
+        ));
+      };
     var parameterStart = (
       ruleDescription.indexOf('{{') === -1) ?
       undefined :
@@ -699,24 +703,23 @@ var ExplorationEditorPage = function() {
 
     answerDescription.click();
 
-    element.all(by.css('.select2-dropdown')).map(function(selectorElement) {
-      selectorElement.all(by.cssContainingText(
-        'li.select2-results__option', ruleDescriptionInDropdown
-      )).filter(function(elem) {
-        // We need to do this check because some options may only have
-        // 'ruleDescriptionInDropdown' as a substring.
-        return elem.getText().then(function(text) {
-          return text === ruleDescriptionInDropdown;
+    ruleDescriptionDropdown.map(function(selectorElement) {
+      ruleDescriptionDropdownOption(selectorElement, ruleDescriptionInDropdown)
+        .filter(function(elem) {
+          // We need to do this check because some options may only have
+          // 'ruleDescriptionInDropdown' as a substring.
+          return elem.getText().then(function(text) {
+            return text === ruleDescriptionInDropdown;
+          });
+        }).then(function(optionElements) {
+          if (optionElements.length !== 1) {
+            throw (
+              'Expected exactly one rule option to match: ' +
+              ruleDescriptionInDropdown + '; found ' + optionElements.length +
+              ' instead');
+          }
+          optionElements[0].click();
         });
-      }).then(function(optionElements) {
-        if (optionElements.length !== 1) {
-          throw (
-            'Expected exactly one rule option to match: ' +
-            ruleDescriptionInDropdown + '; found ' + optionElements.length +
-            ' instead');
-        }
-        optionElements[0].click();
-      });
     });
   };
 
@@ -725,8 +728,7 @@ var ExplorationEditorPage = function() {
   this.deleteState = function(stateName) {
     general.waitForSystem();
     interactionNode.map(function(stateElement) {
-      return stateElement.element(by.css('.protractor-test-node-label')).
-        getText();
+      return interactionNodeLabel(stateElement).getText();
     }).then(function(listOfNames) {
       var matched = false;
       for (var i = 0; i < listOfNames.length; i++) {
