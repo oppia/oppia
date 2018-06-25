@@ -24,10 +24,48 @@ oppia.directive('storyEditorNavbar', [
         '/pages/story_editor/story_editor_navbar_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
-        'UndoRedoService', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+        'UndoRedoService', 'StoryEditorStateService', 'UrlService',
+        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
+        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
-            UndoRedoService, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+            UndoRedoService, StoryEditorStateService, UrlService,
+            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+          var topicId = UrlService.getTopicIdFromUrl();
+          $scope.story = StoryEditorStateService.getStory();
+          $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
+
+          $scope.getChangeListLength = function() {
+            return UndoRedoService.getChangeCount();
+          };
+
+          $scope.isStorySaveable = function() {
+            return $scope.getChangeListLength() > 0;
+          };
+
+          $scope.saveChanges = function() {
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/story_editor/story_editor_save_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.save = function(commitMessage) {
+                    $uibModalInstance.close(commitMessage);
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(commitMessage) {
+              StoryEditorStateService.saveStory(topicId, commitMessage);
+            });
+          };
         }
       ]
     };

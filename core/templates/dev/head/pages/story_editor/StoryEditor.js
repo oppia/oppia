@@ -22,6 +22,12 @@ oppia.constant(
 
 oppia.constant('NODE_ID_PREFIX', 'node_');
 
-oppia.controller('StoryEditor', ['$scope', 'UrlService',
-  function($scope, UrlService) {}
+oppia.controller('StoryEditor', [
+  '$scope', 'UrlService', 'StoryEditorStateService',
+  function(
+      $scope, UrlService, StoryEditorStateService) {
+    $scope.topicId = UrlService.getTopicIdFromUrl();
+    StoryEditorStateService.loadStory(
+      $scope.topicId, UrlService.getStoryIdFromUrl());
+  }
 ]);

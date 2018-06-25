@@ -16,8 +16,18 @@
 
 {% block content %}
 <div ng-controller="StoryEditor">
+  <a class="btn btn-primary back-to-topic" ng-href="/topic_editor/<[topicId]>">
+    <i class="fa fa-arrow-left"></i> &nbsp;Go back to topic
+  </a>
   <story-editor></story-editor>
 </div>
+
+<style>
+  .back-to-topic {
+    margin-top: 1.5%;
+    margin-left: 10%;
+  }
+</style>
 {% endblock content %}
 
 {% block footer_js %}
@@ -33,6 +43,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/StoryUpdateService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditorStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/main_editor/StoryEditorDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditorNavbarDirective.js"></script>
 {% endblock footer_js %}
