@@ -28,8 +28,9 @@ from core.platform import models
 import feconf
 import utils
 
-(feedback_models, email_models) = models.Registry.import_models(
-    [models.NAMES.feedback, models.NAMES.email])
+(feedback_models, email_models, suggestion_models) = (
+    models.Registry.import_models(
+    [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
 datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -93,7 +94,8 @@ def _create_models_for_thread_and_first_message(
 
 
 def create_thread(
-        exploration_id, state_name, original_author_id, subject, text):
+        exploration_id, state_name, original_author_id, subject, text,
+        has_suggestion=False):
     """Creates a thread and its first message.
 
     Args:
@@ -108,7 +110,8 @@ def create_thread(
         str. The ID of the newly created thread.
     """
     thread_id = _create_models_for_thread_and_first_message(
-        exploration_id, state_name, original_author_id, subject, text, False)
+        exploration_id, state_name, original_author_id, subject, text,
+        has_suggestion)
     return thread_id
 
 
@@ -177,6 +180,19 @@ def create_message(
             thread.subject = updated_subject
     new_status = thread.status
     thread.put()
+
+    # We do a put on the suggestion linked to the thread, if any so that the
+    # last_updated time changes to show that there is activity in the thread.
+    if thread.has_suggestion:
+        # TODO (nithesh): remove manual construction of suggestion ID after
+        # migrating feedback threads.
+        suggestion_id = 'exploration.' + thread_id
+        suggestion = suggestion_models.GeneralSuggestionModel.get_by_id(
+            suggestion_id)
+        # As the thread is created before the suggestion, for the first message
+        # we need not update the suggestion.
+        if suggestion:
+            suggestion.put()
 
     if (user_services.is_user_registered(author_id) and
             feconf.CAN_SEND_EMAILS and
