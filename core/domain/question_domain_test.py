@@ -106,15 +106,20 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_id = 'col1.random'
         language_code = 'en'
         question = question_domain.Question.create_default_question(
-            question_id, language_code)
+            question_id, language_code).to_dict()
         default_question_data = exp_domain.State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
-        self.assertEqual(question.question_id, question_id)
-        self.assertEqual(question.question_data_schema_version, 1)
+        self.assertEqual(question['question_id'], question_id)
+        self.assertEqual(question['question_data_schema_version'], 1)
         self.assertEqual(
+<<<<<<< HEAD
             question.question_data, default_question_data)
         self.assertEqual(question.language_code, 'en')
+=======
+            question['question_data'].to_dict(), default_question_data)
+        self.assertEqual(question['language_code'], 'en')
+>>>>>>> question-dashboard-backend
 
     def test_update_methods(self):
         """Tests update_question_data and update_language_code
@@ -150,7 +155,11 @@ class QuestionSummaryDomainTest(test_utils.GenericTestBase):
             'status': 'private',
             'last_updated': None,
             'created_on': None,
+<<<<<<< HEAD
             'question_content': 'Question 1'
+=======
+            'question_data': 'Question 1'
+>>>>>>> question-dashboard-backend
         }
         observed_object = question_domain.QuestionSummary(
             'abc', 'creator_id', 'en', 'private', 'Question 1')
