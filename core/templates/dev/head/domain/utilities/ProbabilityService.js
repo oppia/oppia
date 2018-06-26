@@ -18,10 +18,13 @@
 
 oppia.factory('ProbabilityService', [function() {
   return {
+    /**
+     * @param {float} ratio - The probability for recording an issue, a number
+     *   between 0 and 1
+     * @returns {bool}
+     */
     isProbable: function(ratio) {
-      var ratioInPercentage = Math.floor(ratio * 100);
-      var randomNumber = Math.floor(Math.random() * (100)) + 1;
-      return (randomNumber <= ratioInPercentage);
+      return Math.random() < ratio;
     }
   };
 }]);
