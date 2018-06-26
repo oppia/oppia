@@ -15,6 +15,7 @@
 """Models for Oppia suggestions."""
 
 import datetime
+
 from core.platform import models
 import feconf
 
@@ -74,7 +75,7 @@ SCORE_TYPE_CHOICES = [
 SCORE_CATEGORY_DELIMITER = '.'
 
 # Threshold time after which suggestion is considered stale and auto-accepted.
-THRESHOLD_TIME_BEFORE_ACCEPT = 14*24*60*60*1000
+THRESHOLD_TIME_BEFORE_ACCEPT = 14 * 24 * 60 * 60 * 1000
 
 # The default message to be shown when accepting stale suggestions.
 DEFAULT_SUGGESTION_ACCEPT_MESSAGE = 'Accepting suggestion due to inactivity.'
@@ -262,6 +263,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         threshold_time = (
             time - datetime.timedelta(
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT))
-        return (cls.get_all().filter(
-            cls.status.IN([STATUS_IN_REVIEW, STATUS_RECEIVED]))
-        .filter(cls.last_updated < threshold_time).fetch())
+        return cls.get_all().filter(
+            cls.status.IN([STATUS_IN_REVIEW, STATUS_RECEIVED])).filter(
+                cls.last_updated < threshold_time).fetch()

@@ -197,7 +197,7 @@ class CronAcceptStaleSuggestionsHandler(base.BaseHandler):
 
     @acl_decorators.can_perform_cron_tasks
     def get(self):
-        """Handles get requests"""
+        """Handles get requests."""
         suggestions = suggestion_services.get_all_stale_suggestions()
         print suggestions
         for suggestion in suggestions:
