@@ -16,6 +16,8 @@
  * Directive for the DragAndDropSort interaction.
  */
 
+oppia.constant('DRAG_AND_DROP_UI', 'true');
+
 oppia.directive('oppiaInteractiveDragAndDropSort', [
   'dragAndDropSortRulesService', 'HtmlEscaperService',
   'UrlInterpolationService',
@@ -34,7 +36,7 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
         'drag_and_drop_sort_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
-        function(
+        'DRAG_AND_DROP_UI', function(
             $scope, $attrs, UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
