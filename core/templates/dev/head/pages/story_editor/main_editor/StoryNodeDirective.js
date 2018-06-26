@@ -53,7 +53,8 @@ oppia.directive('storyNode', [
               if (storyNodes[i].getId() === currentNodeId) {
                 continue;
               }
-              if (storyNodes[i].getDestinationNodeIds().indexOf(currentNodeId) === -1) {
+              if (storyNodes[i].getDestinationNodeIds().indexOf(
+                currentNodeId) === -1) {
                 elligibleDestinationNodes.push(storyNodes[i]);
               }
             }

@@ -169,7 +169,7 @@ class StoryNode(object):
                 the user on completion of the node.
             prerequisite_skill_ids: list(str). The list of skill ids required
                 before starting a node.
-            outline: str (html). Free-form annotations that a lesson implementer
+            outline: str. Free-form annotations that a lesson implementer
                 can use to construct the exploration. It describes the basic
                 theme or template of the story and is to be provided in html
                 form.
