@@ -47,6 +47,24 @@ oppia.factory('PlaythroughObjectFactory', [
     };
 
     /**
+     * @param {string} playthroughId - ID of a playthrough.
+     * @param {string} expId - ID of an exploration.
+     * @param {number} expVersion - Version of an exploration.
+     * @param {string} issueType - type of an issue.
+     * @param {Object.<string, *>} issueCustomizationArgs - customization dict
+     *   for an issue.
+     * @param {LearnerAction[]} actions - list of learner actions.
+     * @returns {Playthrough}
+     */
+    Playthrough.createNew = function(
+        playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
+        actions) {
+      return new Playthrough(
+        playthroughId, expId, expVersion, issueType, issueCustomizationArgs,
+        actions);
+    };
+
+    /**
      * @typedef PlaythroughBackendDict
      * @property {string} playthroughId - ID of a playthrough.
      * @property {string} expId - ID of an exploration.
@@ -66,9 +84,24 @@ oppia.factory('PlaythroughObjectFactory', [
         LearnerActionObjectFactory.createFromBackendDict);
 
       return new Playthrough(
-        playthroughBackendDict.playthroughId, playthroughBackendDict.expId,
-        playthroughBackendDict.expVersion, playthroughBackendDict.issueType,
-        playthroughBackendDict.issueCustomizationArgs, actions);
+        playthroughBackendDict.playthrough_id, playthroughBackendDict.exp_id,
+        playthroughBackendDict.exp_version, playthroughBackendDict.issue_type,
+        playthroughBackendDict.issue_customization_args, actions);
+    };
+
+    /** @returns {PlaythroughBackendDict} */
+    Playthrough.prototype.toBackendDict = function() {
+      var actionDicts = this.actions.map(function(action) {
+        return action.toBackendDict();
+      });
+      return {
+        id: this.playthroughId,
+        exp_id: this.expId,
+        exp_version: this.expVersion,
+        issue_type: this.issueType,
+        issue_customization_args: this.issueCustomizationArgs,
+        actions: actionDicts
+      };
     };
 
     return Playthrough;
