@@ -21,6 +21,14 @@
       </span>
     </button>
 
+    <button type="button" ng-if="isTopicSaveable()"
+            class="btn btn-default"
+            ng-click="discardChanges()">
+      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+         alt="Publish to Oppia Library">&#xE2C3;</i>
+      Discard Changes
+    </button>
+
     <button type="button" ng-if="!topicRights.isPublished() && topicRights.canPublishTopic()"
             class="btn btn-default oppia-editor-publish-button"
             ng-click="publishTopic()"
@@ -32,7 +40,8 @@
     </button>
     <button type="button" ng-click="unpublishTopic()"
             ng-if="topicRights.isPublished() && topicRights.canPublishTopic()"
-            class="btn btn-default">
+            class="btn btn-default"
+            ng-disabled="isTopicSaveable()">
       Unpublish Topic
     </button>
   </li>
