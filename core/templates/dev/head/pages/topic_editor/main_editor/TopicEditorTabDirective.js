@@ -38,7 +38,7 @@ oppia.directive('topicMainEditor', [
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
             $scope.editableDescription = $scope.topic.getDescription();
-            $scope.topicDescriptionEmpty = (
+            $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.topicDescriptionChanged = false;
           };
@@ -71,7 +71,7 @@ oppia.directive('topicMainEditor', [
           };
 
           $scope.updateTopicDescriptionStatus = function(description) {
-            $scope.topicDescriptionEmpty = (description === '');
+            $scope.editableDescriptionIsEmpty = (description === '');
             $scope.topicDescriptionChanged = true;
           };
 
