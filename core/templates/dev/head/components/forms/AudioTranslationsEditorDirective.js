@@ -77,11 +77,11 @@ oppia.directive('audioTranslationsEditor', [
 
           $scope.getNeedsUpdateTooltipMessage = function(needsUpdate) {
             if (needsUpdate) {
-              return ($scope.isEditable() ? 'Audio might not match text.' +
+              return ($scope.isTranslatable() ? 'Audio might not match text.' +
                 ' Reupload the file, or click to unflag.' :
                 'Audio might not match text.');
             } else {
-              return ($scope.isEditable() ? 'Click to mark this audio ' +
+              return ($scope.isTranslatable() ? 'Click to mark this audio ' +
                 'translation as not matching text.' :
                 'Audio translation matches text.');
             }

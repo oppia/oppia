@@ -712,7 +712,7 @@ QUESTION_STATUS_PENDING = 'pending'
 QUESTION_STATUS_REJECTED = 'rejected'
 
 # Whether learner playthroughs visualization framework should be enabled.
-ENABLE_PLAYTHROUGHS = False
+ENABLE_PLAYTHROUGHS = True
 # Threshold for early quit playthrough.
 EARLY_QUIT_THRESHOLD_IN_SECS = 45
 # Threshold for multiple incorrect answers playthrough.
