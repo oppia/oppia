@@ -48,10 +48,12 @@ oppia.factory('UrlService', ['$window', function($window) {
     },
     getTopicIdFromUrl: function() {
       var pathname = this.getPathname();
-      if (pathname.split('/')[1] !== 'topic_editor') {
+      var pathValues = pathname.split('/');
+      if (pathValues.length < 3 ||
+          pathValues[1] !== 'topic_editor') {
         throw Error('Invalid url for topic editor');
       }
-      var topicId = pathname.split('/')[2];
+      var topicId = pathValues[2];
       if (topicId.length !== 12) {
         throw Error('Invalid Topic Id');
       }
@@ -65,7 +67,7 @@ oppia.factory('UrlService', ['$window', function($window) {
           pathValues[2].length < 12) {
         throw Error('Invalid url for story editor');
       }
-      var storyId = pathname.split('/')[3];
+      var storyId = pathValues[3];
       if (storyId.length !== 12) {
         throw Error('Invalid Story Id');
       }

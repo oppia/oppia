@@ -101,6 +101,11 @@ describe('Url Service', function() {
     expect(function() {
       UrlService.getTopicIdFromUrl();
     }).toThrow();
+
+    mockLocation.pathname = '/topic_editor';
+    expect(function() {
+      UrlService.getTopicIdFromUrl();
+    }).toThrow();
   });
 
   it('should correctly retrieve story id from url', function() {
