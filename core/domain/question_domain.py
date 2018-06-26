@@ -301,7 +301,13 @@ class QuestionRights(object):
     """Domain object for question rights."""
 
     def __init__(self, question_id, manager_ids):
-        """"""
+        """Constructs a QuestionRights domain object.
+
+        Args:
+            question_id: str. The id of the question.
+            manager_ids: list(str). The id of the users who have been assigned
+                as managers for the question.
+        """
         self.id = question_id
         self.manager_ids = manager_ids
 
