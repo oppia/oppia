@@ -57,7 +57,7 @@ class BaseTopicEditorControllerTest(test_utils.GenericTestBase):
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
 
 
-class NewStoryHandlerTest(BaseTopicEditorControllerTest):
+class TopicEditorStoryHandlerTest(BaseTopicEditorControllerTest):
 
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
@@ -66,13 +66,11 @@ class NewStoryHandlerTest(BaseTopicEditorControllerTest):
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
             json_response = self.post_json(
-                '%s/%s' % (feconf.NEW_STORY_URL, self.topic_id),
+                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
                 {'title': 'Story title'},
                 csrf_token=csrf_token)
-            topic = topic_services.get_topic_by_id(self.topic_id)
             story_id = json_response['storyId']
             self.assertEqual(len(story_id), 12)
-            self.assertEqual(topic.canonical_story_ids, [story_id])
             self.assertIsNotNone(
                 story_services.get_story_by_id(story_id, strict=False))
         self.logout()

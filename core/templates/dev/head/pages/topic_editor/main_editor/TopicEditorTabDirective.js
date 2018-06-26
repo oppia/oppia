@@ -15,7 +15,6 @@
 /**
  * @fileoverview Controller for the main topic editor.
  */
-
 oppia.directive('topicMainEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -25,20 +24,37 @@ oppia.directive('topicMainEditor', [
         '/pages/topic_editor/main_editor/topic_editor_tab_directive.html'),
       controller: [
         '$scope', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+        'UndoRedoService', 'StoryCreationService',
+        'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
+        'EVENT_TOPIC_REINITIALIZED',
         function(
             $scope, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+            UndoRedoService, StoryCreationService,
+            EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
+            EVENT_TOPIC_REINITIALIZED) {
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
             $scope.editableDescription = $scope.topic.getDescription();
-            $scope.displayedTopicDescription = (
-              $scope.editableDescription !== '');
+            $scope.topicDescriptionEmpty = (
+              $scope.editableDescription === '');
+            $scope.topicDescriptionChanged = false;
+          };
+
+          var _initStorySummaries = function() {
+            $scope.canonicalStorySummaries =
+              TopicEditorStateService.getCanonicalStorySummaries();
+          };
+
+          $scope.createCanonicalStory = function() {
+            StoryCreationService.createNewCanonicalStory($scope.topic.getId());
+          };
+
+          $scope.updateTopicDescriptionStatus = function(description) {
+            $scope.topicDescriptionEmpty = (description === '');
+            $scope.topicDescriptionChanged = true;
           };
 
           $scope.openTopicNameEditor = function() {
@@ -71,8 +87,10 @@ oppia.directive('topicMainEditor', [
 
           $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
           $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+          $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
 
           _initEditor();
+          _initStorySummaries();
         }
       ]
     };

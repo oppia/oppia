@@ -46,10 +46,13 @@ class StoryEditorPage(base.BaseHandler):
             raise self.PageNotFoundException
 
         self.values.update({
-            'story_id': story.id
+            'story_id': story.id,
+            'story_title': story.title,
+            'nav_mode': feconf.NAV_MODE_STORY_EDITOR
         })
 
-        self.render_template('pages/story_editor/story_editor.html')
+        self.render_template(
+            'pages/story_editor/story_editor.html', redirect_url_on_logout='/')
 
 
 class EditableStoryDataHandler(base.BaseHandler):
