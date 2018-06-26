@@ -36,6 +36,19 @@ oppia.factory('LearnerActionObjectFactory', [function() {
   };
 
   /**
+   * @property {string} actionType - type of an action
+   * @property {Object.<string, *>} actionCustomizationArgs - customization dict
+   *   for an action
+   * @property {number} schemaVersion - schema version of the class instance
+   * @returns {LearnerAction}
+   */
+  LearnerAction.createNew = function(
+      actionType, actionCustomizationArgs, schemaVersion) {
+    return new LearnerAction(
+      actionType, actionCustomizationArgs, schemaVersion);
+  };
+
+  /**
    * @typedef LearnerActionBackendDict
    * @property {string} actionType - type of an action.
    * @property {Object.<string, *>} actionCustomizationArgs - customization dict
@@ -48,9 +61,18 @@ oppia.factory('LearnerActionObjectFactory', [function() {
    */
   LearnerAction.createFromBackendDict = function(learnerActionBackendDict) {
     return new LearnerAction(
-      learnerActionBackendDict.actionType,
-      learnerActionBackendDict.actionCustomizationArgs,
-      learnerActionBackendDict.schemaVersion);
+      learnerActionBackendDict.action_type,
+      learnerActionBackendDict.action_customization_args,
+      learnerActionBackendDict.schema_version);
+  };
+
+  /** @returns {LearnerActionBackendDict} */
+  LearnerAction.prototype.toBackendDict = function() {
+    return {
+      action_type: this.actionType,
+      action_customization_args: this.actionCustomizationArgs,
+      schema_version: this.schemaVersion
+    };
   };
 
   return LearnerAction;
