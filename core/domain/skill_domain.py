@@ -564,7 +564,7 @@ class Skill(object):
         """Adds a new misconception to the skill.
 
         Args:
-            misconception_id: str. The id of the new misconception to be added.
+            misconception_dict: dict. The misconception to be added.
         """
         misconception = Misconception(
             misconception_dict['id'],
