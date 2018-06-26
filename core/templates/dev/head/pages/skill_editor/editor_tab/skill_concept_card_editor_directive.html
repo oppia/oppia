@@ -54,13 +54,13 @@
 
         <strong>Worked Examples</strong>
         <div ng-if="skill.getConceptCard().getWorkedExamples().length > 0">
-          <ul class="nav oppia-option-list nav-stacked nav-pills" 
-              role="tablist" 
-              ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS" 
+          <ul class="nav oppia-option-list nav-stacked nav-pills"
+              role="tablist"
+              ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
               ng-model="skill.getConceptCard().workedExamples">
-            <li ng-repeat="workedExample in skill.getConceptCard().getWorkedExamples()" 
-                ng-class="{'active': activeWorkedExampleIndex === $index}" 
-                class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection" 
+            <li ng-repeat="workedExample in skill.getConceptCard().getWorkedExamples()"
+                ng-class="{'active': activeWorkedExampleIndex === $index}"
+                class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection"
                 style="margin-top: 0;">
               <span class="oppia-worked-example-sort-handle"
                     ng-if="skill.getConceptCard().getWorkedExamples().length > 1"

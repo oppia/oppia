@@ -37,16 +37,16 @@ oppia.factory('SkillCreationService', [
         $http.post('/skill_editor_handler/create_new', {
           description: description
         }).then(function(response) {
-            $timeout(function() {
-              $window.location = UrlInterpolationService.interpolateUrl(
+          $timeout(function() {
+            $window.location = UrlInterpolationService.interpolateUrl(
               CREATE_NEW_SKILL_URL_TEMPLATE, {
                 skill_id: response.data.skillId
-              })
-            }, 150);
-          }, function() {
-            $rootScope.loadingMessage = '';
-          });
+              });
+          }, 150);
+        }, function() {
+          $rootScope.loadingMessage = '';
+        });
       }
-    }
+    };
   }
 ]);

@@ -16,7 +16,6 @@
  * @fileoverview Directive for the skill description editor.
  */
 
-
 oppia.directive('skillDescriptionEditor', [
   'UrlInterpolationService', 'SkillUpdateService', 'SkillEditorStateService',
   function(
@@ -46,6 +45,6 @@ oppia.directive('skillDescriptionEditor', [
           };
         }
       ]
-    }
+    };
   }
 ]);

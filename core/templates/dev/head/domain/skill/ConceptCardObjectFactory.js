@@ -37,6 +37,6 @@ oppia.factory('ConceptCardObjectFactory', [
       }
     };
 
-    return ConceptCard;    
+    return ConceptCard;
   }
 ]);

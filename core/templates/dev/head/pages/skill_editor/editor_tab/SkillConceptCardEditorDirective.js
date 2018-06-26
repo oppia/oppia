@@ -16,7 +16,6 @@
  * @fileoverview Directive for the concept card editor.
  */
 
-
 oppia.directive('skillConceptCardEditor', [
   'UrlInterpolationService', 'SkillUpdateService', 'SkillEditorStateService',
   function (
@@ -44,9 +43,9 @@ oppia.directive('skillConceptCardEditor', [
           };
 
           // When the page is scrolled so that the top of the page is above the
-          // browser viewport, there are some bugs in the positioning of the helper.
-          // This is a bug in jQueryUI that has not been fixed yet. For more details,
-          // see http://stackoverflow.com/q/5791886
+          // browser viewport, there are some bugs in the positioning of the
+          // helper. This is a bug in jQueryUI that has not been fixed yet.
+          // For more details, see http://stackoverflow.com/q/5791886
           $scope.WORKED_EXAMPLES_SORTABLE_OPTIONS = {
             axis: 'y',
             cursor: 'move',
@@ -111,7 +110,7 @@ oppia.directive('skillConceptCardEditor', [
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
-                function($scope, $uibModalInstance) {                  
+                function($scope, $uibModalInstance) {
                   $scope.confirm = function() {
                     $uibModalInstance.close();
                   };
@@ -126,7 +125,8 @@ oppia.directive('skillConceptCardEditor', [
           };
 
           $scope.swapWorkedExample = function(indexOne, indexTwo) {
-            SkillUpdateService.swapWorkedExamples($scope.skill, indexOne, indexTwo);
+            SkillUpdateService.swapWorkedExamples(
+              $scope.skill, indexOne, indexTwo);
           };
 
           $scope.getWorkedExampleSummary = function(workedExample) {
@@ -136,7 +136,8 @@ oppia.directive('skillConceptCardEditor', [
           $scope.openAddWorkedExampleModal = function() {
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-                '/pages/skill_editor/editor_tab/add_worked_example_modal_directive.html'),
+                '/pages/skill_editor/editor_tab/' +
+                'add_worked_example_modal_directive.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
@@ -165,6 +166,6 @@ oppia.directive('skillConceptCardEditor', [
           };
         }
       ]
-    }
+    };
   }
 ]);

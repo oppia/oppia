@@ -46,11 +46,10 @@ oppia.factory('SkillEditorStateService', [
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject);
             _isLoadingSkill = false;
-          },
-          function(error) {
-            AlertsService.addWarning()
+          }, function(error) {
+            AlertsService.addWarning();
             _isLoadingSkill = false;
-        });
+          });
       },
 
       isLoadingSkill: function() {
@@ -97,4 +96,4 @@ oppia.factory('SkillEditorStateService', [
         return _isSavingSkill;
       }
     };
-  }])
+  }]);

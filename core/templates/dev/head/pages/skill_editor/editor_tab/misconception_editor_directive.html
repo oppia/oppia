@@ -54,7 +54,6 @@
   </div>
 
   <div class="oppia-misconception-editor-section">
-
     <div ng-if="!notesEditorIsOpen"
          style="height: 100%"
          ng-attr-title="Misconception Notes">
@@ -79,7 +78,7 @@
     <div ng-if="notesEditorIsOpen && isEditable()">
       <div class="oppia-rule-details-header">
         <strong>Notes for Creator</strong>
-        <schema-based-editor schema="NOTES_FORM_SCHEMA" 
+        <schema-based-editor schema="NOTES_FORM_SCHEMA"
                              local-value="container.misconceptionNotes">
         </schema-based-editor>
       </div>

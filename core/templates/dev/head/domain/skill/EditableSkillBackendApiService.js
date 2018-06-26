@@ -79,6 +79,6 @@ oppia.factory('EditableSkillBackendApiService', [
             resolve, reject);
         });
       }
-    }
+    };
   }
 ]);

@@ -35,7 +35,6 @@ oppia.factory('UndoRedoService', [
 
     var _dispatchMutation = function() {
       $rootScope.$broadcast(EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED);
-      console.log(angular.copy(_appliedChanges));
     };
     var _applyChange = function(changeObject, domainObject) {
       changeObject.applyChange(domainObject);
