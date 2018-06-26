@@ -21,11 +21,10 @@ describe('Playthrough service', function() {
 
   describe('Test playthrough service functions', function() {
     beforeEach(inject(function($injector) {
-      this.prs = $injector.get('ProbabilityService');
-      spyOn(this.prs, 'isProbable').and.returnValue(true);
       this.expId = 'expId1';
       this.expVersion = 1;
       this.ps = $injector.get('PlaythroughService');
+      spyOn(this.ps, 'isPlaythroughProbable').and.returnValue(true);
       this.laof = $injector.get('LearnerActionObjectFactory');
       this.ps.initSession(this.expId, this.expVersion);
     }));

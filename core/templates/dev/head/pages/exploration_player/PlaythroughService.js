@@ -23,7 +23,7 @@ oppia.constant(
 oppia.factory('PlaythroughService', [
   '$http', 'PAGE_CONTEXT', 'PlaythroughObjectFactory',
   'LearnerActionObjectFactory', 'STORE_PLAYTHROUGH_URL',
-  'UrlInterpolationService', 'StopwatchObjectFactory', 'ProbabilityService',
+  'UrlInterpolationService', 'StopwatchObjectFactory',
   'CURRENT_ISSUE_SCHEMA_VERSION', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'EARLY_QUIT_THRESHOLD_IN_SECS',
@@ -34,7 +34,7 @@ oppia.factory('PlaythroughService', [
   function(
       $http, PAGE_CONTEXT, PlaythroughObjectFactory, LearnerActionObjectFactory,
       STORE_PLAYTHROUGH_URL, UrlInterpolationService, StopwatchObjectFactory,
-      ProbabilityService, CURRENT_ISSUE_SCHEMA_VERSION, ISSUE_TYPE_EARLY_QUIT,
+      CURRENT_ISSUE_SCHEMA_VERSION, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, EARLY_QUIT_THRESHOLD_IN_SECS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
@@ -189,11 +189,13 @@ oppia.factory('PlaythroughService', [
 
     return {
       initSession: function(newExplorationId, newExplorationVersion) {
-        isProbable = ProbabilityService.isProbable(
-          RECORD_PLAYTHROUGH_PROBABILITY);
+        isProbable = this.isPlaythroughProbable();
         playthrough = PlaythroughObjectFactory.createNew(
           null, newExplorationId, newExplorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
+      },
+      isPlaythroughProbable: function() {
+        return Math.random() < RECORD_PLAYTHROUGH_PROBABILITY;
       },
       getPlaythrough: function() {
         return playthrough;
