@@ -38,7 +38,7 @@ describe('Editable story backend API service', function() {
     // Sample story object returnable from the backend
     sampleDataResults = {
       story: {
-        id: '1',
+        id: 'storyId',
         title: 'Story title',
         description: 'Story description',
         notes: 'Notes',
@@ -71,9 +71,10 @@ describe('Editable story backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/story_editor_handler/data/0/1').respond(
+      $httpBackend.expect(
+        'GET', '/story_editor_handler/data/topicId/storyId').respond(
         sampleDataResults);
-      EditableStoryBackendApiService.fetchStory('0', '1').then(
+      EditableStoryBackendApiService.fetchStory('topicId', 'storyId').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -87,9 +88,9 @@ describe('Editable story backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('DELETE', '/story_editor_handler/data/0/1').respond(
-        200);
-      EditableStoryBackendApiService.deleteStory('0', '1').then(
+      $httpBackend.expect(
+        'DELETE', '/story_editor_handler/data/topicId/storyId').respond(200);
+      EditableStoryBackendApiService.deleteStory('topicId', 'storyId').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -103,9 +104,10 @@ describe('Editable story backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/story_editor_handler/data/0/2').respond(
+      $httpBackend.expect(
+        'GET', '/story_editor_handler/data/topicId/2').respond(
         500, 'Error loading story 2.');
-      EditableStoryBackendApiService.fetchStory('0', '2').then(
+      EditableStoryBackendApiService.fetchStory('topicId', '2').then(
         successHandler, failHandler);
       $httpBackend.flush();
 
@@ -120,10 +122,11 @@ describe('Editable story backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       // Loading a story the first time should fetch it from the backend.
-      $httpBackend.expect('GET', '/story_editor_handler/data/0/1').respond(
+      $httpBackend.expect(
+        'GET', '/story_editor_handler/data/topicId/storyId').respond(
         sampleDataResults);
 
-      EditableStoryBackendApiService.fetchStory('0', '1').then(
+      EditableStoryBackendApiService.fetchStory('topicId', 'storyId').then(
         function(data) {
           story = data;
         });
@@ -135,12 +138,13 @@ describe('Editable story backend API service', function() {
         story: story
       };
 
-      $httpBackend.expect('PUT', '/story_editor_handler/data/0/1').respond(
+      $httpBackend.expect(
+        'PUT', '/story_editor_handler/data/topicId/storyId').respond(
         storyWrapper);
 
       // Send a request to update story
       EditableStoryBackendApiService.updateStory(
-        '0', story.id, story.version, 'Title is updated', []
+        'topicId', story.id, story.version, 'Title is updated', []
       ).then(successHandler, failHandler);
       $httpBackend.flush();
 
@@ -155,11 +159,12 @@ describe('Editable story backend API service', function() {
       var failHandler = jasmine.createSpy('fail');
 
       // Loading a story the first time should fetch it from the backend.
-      $httpBackend.expect('PUT', '/story_editor_handler/data/0/2').respond(
+      $httpBackend.expect(
+        'PUT', '/story_editor_handler/data/topicId/storyId_1').respond(
         404, 'Story with given id doesn\'t exist.');
 
       EditableStoryBackendApiService.updateStory(
-        '0', '2', '1', 'Update an invalid Story.', []
+        'topicId', 'storyId_1', '1', 'Update an invalid Story.', []
       ).then(successHandler, failHandler);
       $httpBackend.flush();
 
