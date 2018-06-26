@@ -51,7 +51,7 @@ describe('Playthrough service', function() {
 
     it('should record answer submit action.', function() {
       this.ps.recordAnswerSubmitAction(
-        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', '30');
+        'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
       var playthrough = this.ps.getPlaythrough();
 
       expect(playthrough.actions).toEqual(
@@ -73,14 +73,14 @@ describe('Playthrough service', function() {
               value: 'Try again'
             },
             time_spent_in_state_secs: {
-              value: '30'
+              value: 30
             }
           }, 1
         )]);
     });
 
     it('should record exploration quit action.', function() {
-      this.ps.recordExplorationQuitAction('stateName1', '120');
+      this.ps.recordExplorationQuitAction('stateName1', 120);
       var playthrough = this.ps.getPlaythrough();
 
       expect(playthrough.actions).toEqual(
@@ -90,7 +90,7 @@ describe('Playthrough service', function() {
               value: 'stateName1'
             },
             time_spent_in_state_secs: {
-              value: '120'
+              value: 120
             }
           }, 1
         )]);
@@ -107,15 +107,15 @@ describe('Playthrough service', function() {
 
         this.ps.recordExplorationStartAction('stateName1');
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
 
         this.ps.recordPlaythrough();
 
@@ -141,8 +141,8 @@ describe('Playthrough service', function() {
 
       this.ps.recordExplorationStartAction('stateName1');
       this.ps.recordAnswerSubmitAction(
-        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
-      this.ps.recordExplorationQuitAction('stateName1', '60');
+        'stateName1', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+      this.ps.recordExplorationQuitAction('stateName1', 60);
 
       this.ps.recordPlaythrough();
 
@@ -167,24 +167,24 @@ describe('Playthrough service', function() {
 
         this.ps.recordExplorationStartAction('stateName1');
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', '30');
-        this.ps.recordExplorationQuitAction('stateName1', '30');
+          'stateName3', 'stateName1', 'TextInput', 'Hello', 'Try again', 30);
+        this.ps.recordExplorationQuitAction('stateName1', 30);
 
         this.ps.recordPlaythrough();
 
@@ -205,20 +205,19 @@ describe('Playthrough service', function() {
       function() {
         this.ps.recordExplorationStartAction('stateName1');
         this.ps.recordAnswerSubmitAction(
-          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName1', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', '30');
+          'stateName2', 'stateName3', 'TextInput', 'Hello', 'Try again', 30);
         this.ps.recordAnswerSubmitAction(
-          'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', '30');
-        this.ps.recordExplorationQuitAction('stateName2', '60');
+          'stateName3', 'stateName2', 'TextInput', 'Hello', 'Try again', 30);
 
         var playthrough = this.ps.getPlaythrough();
 
@@ -226,6 +225,7 @@ describe('Playthrough service', function() {
         expect(playthrough.issueType).toEqual(null);
         expect(playthrough.issueCustomizationArgs).toEqual({});
 
+        this.ps.recordExplorationQuitAction('stateName2', 60);
         this.ps.recordPlaythrough();
 
         var playthrough = this.ps.getPlaythrough();
