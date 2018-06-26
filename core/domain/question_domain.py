@@ -196,7 +196,7 @@ class Question(object):
         return cls(
             question_id, exp_domain.State.create_default_state(
                 feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
-                ),
+                ).to_dict(),
             feconf.CURRENT_QUESTION_SCHEMA_VERSION,
             constants.DEFAULT_LANGUAGE_CODE)
 
