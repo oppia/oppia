@@ -17,21 +17,16 @@
 // in via initArgs.
 
 oppia.directive('codeStringEditor', [
-  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'CodeString';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         getAlwaysEditable: '&',
         value: '='
       },
-      template: '<span ng-include="getTemplateUrl()"></span>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/code_string_editor_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.alwaysEditable = $scope.getAlwaysEditable();
         $scope.getWarningText = function() {

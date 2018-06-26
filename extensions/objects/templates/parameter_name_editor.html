@@ -1,9 +1,0 @@
-<span ng-model="$parent.$parent.$parent.$parent.localValue" ui-validate="'validate($value)'">
-  <span style="color: red;" ng-if="availableParamNames.length === 0">
-    <em>No available parameters to follow. Please add one first.</em>
-  </span>
-
-  <span ng-if="availableParamNames.length > 0">
-    <schema-based-editor schema="SCHEMA" local-value="$parent.$parent.$parent.$parent.localValue"></schema-based-editor>
-  </span>
-</span>

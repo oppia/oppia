@@ -4,8 +4,8 @@
   </div>
 
   <div>
-    <div angular-html-bind="answerTemplate">
-    </div>
+    <angular-html-bind html-data="answerTemplate">
+    </angular-html-bind>
   </div>
 
   <br>
@@ -15,15 +15,18 @@
   </div>
 
   <div>
-    <div angular-html-bind="answerFeedback">
-    </div>
+    <angular-html-bind html-data="answerFeedback">
+    </angular-html-bind>
   </div>
 
   <br>
 
   <div>
     <span><strong>and then direct the learner to: </strong></span>
-    <span angular-html-bind="answerOutcomeDest"></span>
+    <span>
+      <angular-html-bind html-data="answerOutcomeDest">
+      </angular-html-bind>
+    </span>
   </div>
 
   <br>
@@ -46,8 +49,8 @@
       <form>
         <div class="trained-feedback-selection-container" ng-repeat="outcome in allOutcomes track by $index">
           <button class="trained-feedback-selection" ng-click="confirmAnswerGroupIndex($index)">
-            <span ng-if="outcome.feedback.length > 0" angular-html-bind="outcome.feedback.getHtml()">
-            </span>
+            <angular-html-bind ng-if="outcome.feedback.length > 0" html-data="outcome.feedback.getHtml()">
+            </angular-html-bind>
             <span ng-if="outcome.feedback.length == 0">
               <em>(No feedback)</em>
             </span>

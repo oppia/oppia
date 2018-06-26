@@ -151,6 +151,119 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         self.assertEqual(stats_for_new_exploration_log.times_called, 1)
         self.assertEqual(stats_for_new_exp_version_log.times_called, 1)
 
+    def test_exploration_changes_effect_on_exp_issues_model(self):
+        """Test the effect of exploration changes on exploration issues model.
+        """
+        exp_id = 'exp_id'
+        test_exp_filepath = os.path.join(
+            feconf.TESTS_DATA_DIR, 'string_classifier_test.yaml')
+        yaml_content = utils.get_file_contents(test_exp_filepath)
+        assets_list = []
+
+        # Exploration is created, exploration issues model must also be created.
+        exp_services.save_new_exploration_from_yaml_and_assets(
+            feconf.SYSTEM_COMMITTER_ID, yaml_content, exp_id,
+            assets_list)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
+        # Update exploration to next version, exploration issues model also
+        # created.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_ADD_STATE,
+            'state_name': 'New state'
+        })]
+        exp_services.update_exploration(
+            'committer_id_v3', exploration.id, change_list, 'Added new state')
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
+        self.assertEqual(exp_issues.unresolved_issues, [])
+
+        # Create a playthrough and assign it to an issue in exploration issues
+        # model.
+        playthrough_id1 = stats_models.PlaythroughModel.create(
+            exploration.id, exploration.version, 'EarlyQuit', {
+                'state_name': {
+                    'value': 'New state'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            }, [{
+                'action_type': 'ExplorationStart',
+                'action_customization_args': {
+                    'state_name': {
+                        'value': 'New state'
+                    }
+                },
+                'schema_version': 1
+            }])
+        exp_issue1 = stats_domain.ExplorationIssue.from_dict({
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'New state'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            'playthrough_ids': [playthrough_id1],
+            'schema_version': 1,
+            'is_valid': True
+        })
+        exp_issues.unresolved_issues.append(exp_issue1)
+        stats_services.save_exp_issues_model_transactional(exp_issues)
+
+        # Delete a state.
+        change_list = [exp_domain.ExplorationChange({
+            'cmd': exp_domain.CMD_DELETE_STATE,
+            'state_name': 'New state'
+        })]
+        exp_services.update_exploration(
+            'committer_id_v3', exploration.id, change_list, 'Deleted a state')
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
+        self.assertEqual(exp_issues.unresolved_issues[0].to_dict(), {
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'New state'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            'playthrough_ids': [playthrough_id1],
+            'schema_version': 1,
+            'is_valid': False
+        })
+
+        # Revert to an older version, exploration issues model also changes.
+        exp_services.revert_exploration(
+            'committer_id_v4', exp_id, current_version=3, revert_to_version=2)
+        exploration = exp_services.get_exploration_by_id(exp_id)
+        exp_issues = stats_services.get_exp_issues(exp_id, exploration.version)
+        self.assertEqual(exp_issues.exp_version, exploration.version)
+        self.assertEqual(exp_issues.unresolved_issues[0].to_dict(), {
+            'issue_type': 'EarlyQuit',
+            'issue_customization_args': {
+                'state_name': {
+                    'value': 'New state'
+                },
+                'time_spent_in_exp_in_msecs': {
+                    'value': 200
+                }
+            },
+            'playthrough_ids': [playthrough_id1],
+            'schema_version': 1,
+            'is_valid': True
+        })
+
     def test_handle_stats_creation_for_new_exploration(self):
         """Test the handle_stats_creation_for_new_exploration method."""
         # Create exploration object in datastore.
@@ -1499,8 +1612,8 @@ class AnswerVisualizationsTests(test_utils.GenericTestBase):
                 'state_name': state_name,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
                 'new_value': {
-                    'html': new_content,
-                    'audio_translations': {},
+                    'content_id': 'content',
+                    'html': new_content
                 }
             })], 'Change content description')
 

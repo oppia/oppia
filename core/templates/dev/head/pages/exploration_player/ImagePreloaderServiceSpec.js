@@ -72,10 +72,17 @@ describe('Image preloader service', function() {
             html: '',
             audio_translations: {}
           },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {}
+          },
           interaction: {
             id: 'Continue',
             default_outcome: {
-              feedback: [],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               dest: 'State 3',
               param_changes: []
             },
@@ -94,8 +101,11 @@ describe('Image preloader service', function() {
         'State 3': {
           param_changes: [],
           content: {
-            html: 'Congratulations, you have finished!',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'Congratulations, you have finished!'
+          },
+          content_ids_to_audio_translations: {
+            content: {}
           },
           interaction: {
             id: 'EndExploration',
@@ -116,15 +126,21 @@ describe('Image preloader service', function() {
           classifier_model_id: null,
           param_changes: [],
           content: {
-            html: 'Multiple Choice',
-            audio_translations: {}
+            content_id: 'content',
+            html: 'Multiple Choice'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {}
           },
           interaction: {
             id: 'MultipleChoiceInput',
             default_outcome: {
               dest: 'Introduction',
               feedback: {
-                audio_translation: {},
+                content_id: 'default_outcome',
                 html: 'Try Again!'
               }
             },
@@ -147,7 +163,7 @@ describe('Image preloader service', function() {
                 outcome: {
                   dest: 'State 6',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feedback_1',
                     html: '<p>We are going to ItemSelection' +
                           '<oppia-noninteractive-image filepath-with-value=' +
                           '"&amp;quot;sIOFeedback.png&amp;quot;">' +
@@ -171,7 +187,7 @@ describe('Image preloader service', function() {
                 outcome: {
                   dest: 'State 1',
                   feedback: {
-                    audio_translations: {},
+                    content_id: 'feedback_2',
                     html: "Let's go to state 1 ImageAndRegion"
                   },
                   param_changes: [],
@@ -195,16 +211,24 @@ describe('Image preloader service', function() {
         'State 6': {
           param_changes: [],
           content: {
-            html: '<p>Text Input Content</p>',
-            audio_translations: {}
+            content_id: 'content',
+            html: '<p>Text Input Content</p>'
+          },
+          content_ids_to_audio_translations: {
+            content: {},
+            default_outcome: {},
+            feedback_1: {},
+            feedback_2: {},
+            hint_1: {}
           },
           interaction: {
             id: 'TextInput',
             default_outcome: {
               dest: 'State 6',
-              feedback: [
-                '<p>Try again.</p>'
-              ],
+              feedback: {
+                content_id: 'default_outcome',
+                html: ''
+              },
               labelled_as_correct: false,
               param_changes: [],
               refresher_exploration_id: null,
@@ -228,9 +252,10 @@ describe('Image preloader service', function() {
               }],
               outcome: {
                 dest: 'State 1',
-                feedback: [
-                  "<p>Let's go to State 1</p>"
-                ],
+                feedback: {
+                  content_id: 'feedback_1',
+                  html: "<p>Let's go to State 1</p>"
+                },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
@@ -245,9 +270,10 @@ describe('Image preloader service', function() {
               }],
               outcome: {
                 dest: 'State 1',
-                feedback: [
-                  "<p>Let's go to State 1</p>"
-                ],
+                feedback: {
+                  content_id: 'feedback_2',
+                  html: "<p>Let's go to State 1</p>"
+                },
                 labelled_as_correct: false,
                 param_changes: [],
                 refresher_exploration_id: null,
@@ -256,10 +282,10 @@ describe('Image preloader service', function() {
             }],
             hints: [{
               hint_content: {
+                content_id: 'hint_1',
                 html: '<p><oppia-noninteractive-image filepath-with-value="' +
                       '&amp;quot;s6Hint1.png&amp;quot;">' +
-                      '</oppia-noninteractive-image></p>',
-                audio_translations: {}
+                      '</oppia-noninteractive-image></p>'
               }
             }],
             solution: null,

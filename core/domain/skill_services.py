@@ -157,6 +157,20 @@ def get_skill_from_model(skill_model, run_conversion=True):
         skill_model.last_updated)
 
 
+def get_all_skill_summaries():
+    """Returns the summaries of all skills present in the datastore.
+
+    Returns:
+        list(SkillSummary). The list of summaries of all skills present in the
+            datastore.
+    """
+    skill_summaries_models = skill_models.SkillSummaryModel.get_all()
+    skill_summaries = [
+        get_skill_summary_from_model(summary)
+        for summary in skill_summaries_models]
+    return skill_summaries
+
+
 def get_skill_summary_from_model(skill_summary_model):
     """Returns a domain object for an Oppia skill summary given a
     skill summary model.
@@ -172,6 +186,7 @@ def get_skill_summary_from_model(skill_summary_model):
         skill_summary_model.language_code,
         skill_summary_model.version,
         skill_summary_model.misconception_count,
+        skill_summary_model.worked_examples_count,
         skill_summary_model.skill_model_created_on,
         skill_summary_model.skill_model_last_updated
     )
@@ -303,6 +318,8 @@ def apply_change_list(skill_id, change_list):
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
                     skill.update_language_code(change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_CONTENTS_PROPERTY_EXPLANATION):
@@ -310,6 +327,8 @@ def apply_change_list(skill_id, change_list):
                 elif (change.property_name ==
                       skill_domain.SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES):
                     skill.update_worked_examples(change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
                 print change.new_value
                 skill.add_misconception(change.new_value)
@@ -329,6 +348,8 @@ def apply_change_list(skill_id, change_list):
                       skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_FEEDBACK):
                     skill.update_misconception_feedback(
                         change.misconception_id, change.new_value)
+                else:
+                    raise Exception('Invalid change dict.')
             elif (change.cmd ==
                   skill_domain.CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION
                   or change.cmd ==
@@ -338,6 +359,8 @@ def apply_change_list(skill_id, change_list):
                 # latest schema version. As a result, simply resaving the
                 # skill is sufficient to apply the schema migration.
                 continue
+            else:
+                raise Exception('Invalid change dict.')
         return skill
 
     except Exception as e:
@@ -475,9 +498,13 @@ def compute_summary_of_skill(skill):
         SkillSummary. The computed summary for the given skill.
     """
     skill_model_misconception_count = len(skill.misconceptions)
+    skill_model_worked_examples_count = len(
+        skill.skill_contents.worked_examples)
+
     skill_summary = skill_domain.SkillSummary(
         skill.id, skill.description, skill.language_code,
         skill.version, skill_model_misconception_count,
+        skill_model_worked_examples_count,
         skill.created_on, skill.last_updated
     )
 
@@ -509,6 +536,7 @@ def save_skill_summary(skill_summary):
         language_code=skill_summary.language_code,
         version=skill_summary.version,
         misconception_count=skill_summary.misconception_count,
+        worked_examples_count=skill_summary.worked_examples_count,
         skill_model_last_updated=(
             skill_summary.skill_model_last_updated),
         skill_model_created_on=(

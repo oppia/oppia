@@ -46,6 +46,8 @@ import utils
 # 'answer_groups' and 'default_outcome'.
 STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
+STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS = (
+    'content_ids_to_audio_translations')
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_ANSWER_GROUPS = 'answer_groups'
@@ -210,6 +212,7 @@ class ExplorationChange(object):
     STATE_PROPERTIES = (
         STATE_PROPERTY_PARAM_CHANGES,
         STATE_PROPERTY_CONTENT,
+        STATE_PROPERTY_CONTENT_IDS_TO_AUDIO_TRANSLATIONS,
         STATE_PROPERTY_INTERACTION_ID,
         STATE_PROPERTY_INTERACTION_CUST_ARGS,
         STATE_PROPERTY_INTERACTION_STICKY,
@@ -285,7 +288,7 @@ class ExplorationChange(object):
         elif self.cmd == CMD_CREATE_NEW:
             self.title = change_dict['title']
             self.category = change_dict['category']
-        elif self.cmd.endswith('revert_version_number'):
+        elif self.cmd == exp_models.ExplorationModel.CMD_REVERT_COMMIT:
             # If commit is an exploration version revert commit.
             self.version_number = change_dict['version_number']
         else:
@@ -506,24 +509,17 @@ class ExpVersionReference(object):
 class SubtitledHtml(object):
     """Value object representing subtitled HTML."""
 
-    DEFAULT_SUBTITLED_HTML_DICT = {
-        'html': '',
-        'audio_translations': {}
-    }
-
-    def __init__(self, html, audio_translations):
+    def __init__(self, content_id, html):
         """Initializes a SubtitledHtml domain object.
 
         Args:
+            content_id: str. A unique id referring to the audio translations for
+              this content.
             html: str. A piece of user submitted HTML. This is cleaned in such
                 a way as to contain a restricted set of HTML tags.
-            audio_translations: dict(str: AudioTranslation). Dict mapping
-                language codes (such as "en" or "hi") to AudioTranslation
-                domain objects. Hybrid languages will be represented using
-                composite language codes, such as "hi-en" for Hinglish.
         """
+        self.content_id = content_id
         self.html = html_cleaner.clean(html)
-        self.audio_translations = audio_translations
         self.validate()
 
     def to_dict(self):
@@ -533,12 +529,8 @@ class SubtitledHtml(object):
             dict. A dict, mapping all fields of SubtitledHtml instance.
         """
         return {
-            'html': self.html,
-            'audio_translations': {
-                language_code: audio_translation.to_dict()
-                for language_code, audio_translation
-                in self.audio_translations.iteritems()
-            }
+            'content_id': self.content_id,
+            'html': self.html
         }
 
     @classmethod
@@ -553,12 +545,7 @@ class SubtitledHtml(object):
             SubtitledHtml. The corresponding SubtitledHtml domain object.
         """
         return cls(
-            subtitled_html_dict['html'], {
-                language_code: AudioTranslation.from_dict(
-                    audio_translation_dict)
-                for language_code, audio_translation_dict in
-                subtitled_html_dict['audio_translations'].iteritems()
-            })
+            subtitled_html_dict['content_id'], subtitled_html_dict['html'])
 
     def validate(self):
         """Validates properties of the SubtitledHtml.
@@ -567,30 +554,16 @@ class SubtitledHtml(object):
             ValidationError: One or more attributes of the SubtitledHtml are
             invalid.
         """
+        if not isinstance(self.content_id, basestring):
+            raise utils.ValidationError(
+                'Expected content id to be a string, received %s' %
+                self.content_id)
+
         # TODO(sll): Add HTML sanitization checking.
         # TODO(sll): Validate customization args for rich-text components.
         if not isinstance(self.html, basestring):
             raise utils.ValidationError(
                 'Invalid content HTML: %s' % self.html)
-
-        if not isinstance(self.audio_translations, dict):
-            raise utils.ValidationError(
-                'Expected audio_translations to be a dict, received %s'
-                % self.audio_translations)
-
-        allowed_audio_language_codes = [
-            language['id'] for language in constants.SUPPORTED_AUDIO_LANGUAGES]
-        for language_code, translation in self.audio_translations.iteritems():
-            if not isinstance(language_code, basestring):
-                raise utils.ValidationError(
-                    'Expected language code to be a string, received: %s' %
-                    language_code)
-
-            if language_code not in allowed_audio_language_codes:
-                raise utils.ValidationError(
-                    'Unrecognized language code: %s' % language_code)
-
-            translation.validate()
 
     def to_html(self, params):
         """Exports this SubtitledHTML object to an HTML string. The HTML is
@@ -615,9 +588,9 @@ class SubtitledHtml(object):
         return html_cleaner.clean(jinja_utils.parse_string(self.html, params))
 
     @classmethod
-    def create_default_subtitled_html(cls):
+    def create_default_subtitled_html(cls, content_id):
         """Create a default SubtitledHtml domain object."""
-        return cls('', {})
+        return cls(content_id, '')
 
 
 class RuleSpec(object):
@@ -965,7 +938,8 @@ class Hint(object):
         """Constructs a Hint domain object.
 
         Args:
-            hint_content: SubtitledHtml. The hint text and audio translations.
+            hint_content: SubtitledHtml. The hint text and ID referring to the
+              audio translations for this content.
         """
         self.hint_content = hint_content
 
@@ -1018,8 +992,8 @@ class Solution(object):
                 False if is one of possible answer.
             correct_answer: str. The correct answer; this answer enables the
                 learner to progress to the next card.
-            explanation: SubtitledHtml. Contains text and audio translations for
-                the solution's explanation.
+            explanation: SubtitledHtml. Contains text and text id to link audio
+                translations for the solution's explanation.
         """
         self.answer_is_exclusive = answer_is_exclusive
         self.correct_answer = (
@@ -1276,8 +1250,9 @@ class InteractionInstance(object):
         """
         default_outcome = Outcome(
             default_dest_state_name,
-            SubtitledHtml.create_default_subtitled_html(), False, {}, None,
-            None)
+            SubtitledHtml.create_default_subtitled_html(
+                feconf.DEFAULT_OUTCOME_CONTENT_ID), False, {}, None, None)
+
         return cls(
             cls._DEFAULT_INTERACTION_ID, {}, [], default_outcome, [], [], {})
 
@@ -1331,7 +1306,10 @@ class State(object):
         'answer_groups': [],
         'default_outcome': {
             'dest': feconf.DEFAULT_INIT_STATE_NAME,
-            'feedback': SubtitledHtml.DEFAULT_SUBTITLED_HTML_DICT,
+            'feedback': {
+                'content_id': feconf.DEFAULT_OUTCOME_CONTENT_ID,
+                'html': ''
+            },
             'labelled_as_correct': False,
             'param_changes': [],
             'refresher_exploration_id': None,
@@ -1344,7 +1322,7 @@ class State(object):
 
     def __init__(
             self, content, param_changes, interaction,
-            classifier_model_id=None):
+            content_ids_to_audio_translations, classifier_model_id=None):
         """Initializes a State domain object.
 
         Args:
@@ -1356,6 +1334,8 @@ class State(object):
                 associated with this state.
             classifier_model_id: str or None. The classifier model ID
                 associated with this state, if applicable.
+            content_ids_to_audio_translations: dict. A dict representing audio
+                translations for corresponding content_id.
         """
         # The content displayed to the reader in this state.
         self.content = content
@@ -1371,6 +1351,8 @@ class State(object):
             interaction.confirmed_unclassified_answers,
             interaction.hints, interaction.solution)
         self.classifier_model_id = classifier_model_id
+        self.content_ids_to_audio_translations = (
+            content_ids_to_audio_translations)
 
     def validate(self, exp_param_specs_dict, allow_null_interaction):
         """Validates various properties of the State.
@@ -1401,6 +1383,71 @@ class State(object):
                 'This state does not have any interaction specified.')
         elif self.interaction.id is not None:
             self.interaction.validate(exp_param_specs_dict)
+
+        content_id_list = []
+        content_id_list.append(self.content.content_id)
+        for answer_group in self.interaction.answer_groups:
+            feedback_content_id = answer_group.outcome.feedback.content_id
+            if feedback_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % feedback_content_id)
+            content_id_list.append(feedback_content_id)
+        if self.interaction.default_outcome:
+            default_outcome_content_id = (
+                self.interaction.default_outcome.feedback.content_id)
+            if default_outcome_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s'
+                    % default_outcome_content_id)
+            content_id_list.append(default_outcome_content_id)
+        for hint in self.interaction.hints:
+            hint_content_id = hint.hint_content.content_id
+            if hint_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % hint_content_id)
+            content_id_list.append(hint_content_id)
+        if self.interaction.solution:
+            solution_content_id = (
+                self.interaction.solution.explanation.content_id)
+            if solution_content_id in content_id_list:
+                raise utils.ValidationError(
+                    'Found a duplicate content id %s' % solution_content_id)
+            content_id_list.append(solution_content_id)
+        available_content_ids = self.content_ids_to_audio_translations.keys()
+        if not set(content_id_list) <= set(available_content_ids):
+            raise utils.ValidationError(
+                'Expected state content_ids_to_audio_translations to have all '
+                'of the listed content ids %s' % content_id_list)
+        if not isinstance(self.content_ids_to_audio_translations, dict):
+            raise utils.ValidationError(
+                'Expected state content_ids_to_audio_translations to be a dict,'
+                'received %s' % self.param_changes)
+        for (content_id, audio_translations) in (
+                self.content_ids_to_audio_translations.iteritems()):
+
+            if not isinstance(content_id, basestring):
+                raise utils.ValidationError(
+                    'Expected content_id to be a string, received: %s' %
+                    content_id)
+            if not isinstance(audio_translations, dict):
+                raise utils.ValidationError(
+                    'Expected audio_translations to be a dict, received %s'
+                    % audio_translations)
+
+            allowed_audio_language_codes = [
+                language['id'] for language in (
+                    constants.SUPPORTED_AUDIO_LANGUAGES)]
+            for language_code, translation in audio_translations.iteritems():
+                if not isinstance(language_code, basestring):
+                    raise utils.ValidationError(
+                        'Expected language code to be a string, received: %s' %
+                        language_code)
+
+                if language_code not in allowed_audio_language_codes:
+                    raise utils.ValidationError(
+                        'Unrecognized language code: %s' % language_code)
+
+                translation.validate()
 
     def get_training_data(self):
         """Retrieves training data from the State domain object."""
@@ -1611,6 +1658,24 @@ class State(object):
         else:
             self.interaction.solution = None
 
+    def update_content_ids_to_audio_translations(
+            self, content_ids_to_audio_translations_dict):
+        """Update the content_ids_to_audio_translations of a state.
+
+        Args:
+            content_ids_to_audio_translations_dict: dict. The dict
+                representation of content_ids_to_audio_translations.
+        """
+        self.content_ids_to_audio_translations = {
+            content_id: {
+                language_code: AudioTranslation.from_dict(
+                    audio_translation_dict)
+                for language_code, audio_translation_dict in
+                audio_translations.iteritems()
+            } for content_id, audio_translations in (
+                content_ids_to_audio_translations_dict.iteritems())
+        }
+
     def add_hint(self, hint_content):
         """Add a new hint to the list of hints.
 
@@ -1640,12 +1705,24 @@ class State(object):
         Returns:
             dict. A dict mapping all fields of State instance.
         """
+        content_ids_to_audio_translations_dict = {}
+        for content_id, audio_translations in (
+                self.content_ids_to_audio_translations.iteritems()):
+            audio_translations_dict = {}
+            for lang_code, audio_translation in audio_translations.iteritems():
+                audio_translations_dict[lang_code] = (
+                    AudioTranslation.to_dict(audio_translation))
+            content_ids_to_audio_translations_dict[content_id] = (
+                audio_translations_dict)
+
         return {
             'content': self.content.to_dict(),
             'param_changes': [param_change.to_dict()
                               for param_change in self.param_changes],
             'interaction': self.interaction.to_dict(),
             'classifier_model_id': self.classifier_model_id,
+            'content_ids_to_audio_translations': (
+                content_ids_to_audio_translations_dict)
         }
 
     @classmethod
@@ -1658,13 +1735,23 @@ class State(object):
         Returns:
             State. The corresponding State domain object.
         """
+        content_ids_to_audio_translations = {}
+        for content_id, audio_translations_dict in (
+                state_dict['content_ids_to_audio_translations'].iteritems()):
+            audio_translations = {}
+            for lang_code, audio_translation in (
+                    audio_translations_dict.iteritems()):
+                audio_translations[lang_code] = (
+                    AudioTranslation.from_dict(audio_translation))
+            content_ids_to_audio_translations[content_id] = (
+                audio_translations)
         return cls(
             SubtitledHtml.from_dict(state_dict['content']),
             [param_domain.ParamChange.from_dict(param)
              for param in state_dict['param_changes']],
             InteractionInstance.from_dict(state_dict['interaction']),
-            state_dict['classifier_model_id'],
-        )
+            content_ids_to_audio_translations,
+            state_dict['classifier_model_id'])
 
     @classmethod
     def create_default_state(
@@ -1681,11 +1768,13 @@ class State(object):
         """
         content_html = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
+        content_id = feconf.DEFAULT_NEW_STATE_CONTENT_ID
         return cls(
-            SubtitledHtml(content_html, {}),
+            SubtitledHtml(content_id, content_html),
             [],
             InteractionInstance.create_default_interaction(
-                default_dest_state_name))
+                default_dest_state_name),
+            feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
 
 
 class ExplorationVersionsDiff(object):
@@ -1912,11 +2001,7 @@ class Exploration(object):
             state = exploration.states[state_name]
 
             state.content = SubtitledHtml(
-                sdict['content']['html'], {
-                    language_code: AudioTranslation.from_dict(translation)
-                    for language_code, translation in
-                    sdict['content']['audio_translations'].iteritems()
-                })
+                sdict['content']['content_id'], sdict['content']['html'])
 
             state.param_changes = [param_domain.ParamChange(
                 pc['name'], pc['generator_id'], pc['customization_args']
@@ -1947,6 +2032,16 @@ class Exploration(object):
                 idict['confirmed_unclassified_answers'],
                 [Hint.from_dict(h) for h in idict['hints']],
                 solution)
+
+            state.content_ids_to_audio_translations = {
+                content_id: {
+                    language_code: AudioTranslation.from_dict(
+                        audio_translation_dict)
+                    for language_code, audio_translation_dict in
+                    audio_translations.iteritems()
+                } for content_id, audio_translations in (
+                    sdict['content_ids_to_audio_translations'].iteritems())
+            }
 
             exploration.states[state_name] = state
 
@@ -3304,6 +3399,122 @@ class Exploration(object):
             default_outcome = state_dict['interaction']['default_outcome']
             if default_outcome is not None:
                 default_outcome['missing_prerequisite_skill_id'] = None
+
+        return states_dict
+
+    @classmethod
+    def _convert_states_v20_dict_to_v21_dict(cls, states_dict):
+        """Converts from version 20 to 21. Version 21 moves audio_translations
+        from SubtitledHTML to content_ids_to_audio_translations.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            content_ids_to_audio_translations = {}
+            content_id = 'content'
+            content_ids_to_audio_translations[content_id] = (
+                state_dict['content'].pop('audio_translations'))
+            state_dict['content']['content_id'] = content_id
+
+            for index, answer_group in enumerate(
+                    state_dict['interaction']['answer_groups']):
+                content_id = 'feedback_' + str(index + 1)
+                content_ids_to_audio_translations[content_id] = (
+                    answer_group['outcome']['feedback'].pop(
+                        'audio_translations'))
+                answer_group['outcome']['feedback']['content_id'] = content_id
+
+            if state_dict['interaction']['default_outcome']:
+                default_outcome = state_dict['interaction']['default_outcome']
+                content_id = 'default_outcome'
+                content_ids_to_audio_translations[content_id] = (
+                    default_outcome['feedback'].pop('audio_translations'))
+                default_outcome['feedback']['content_id'] = (content_id)
+
+            for index, hint in enumerate(state_dict['interaction']['hints']):
+                content_id = 'hint_' + str(index + 1)
+                content_ids_to_audio_translations[content_id] = (
+                    hint['hint_content'].pop('audio_translations'))
+                hint['hint_content']['content_id'] = content_id
+
+            if state_dict['interaction']['solution']:
+                solution = state_dict['interaction']['solution']
+                content_id = 'solution'
+                content_ids_to_audio_translations[content_id] = (
+                    solution['explanation'].pop('audio_translations'))
+                solution['explanation']['content_id'] = content_id
+
+            state_dict['content_ids_to_audio_translations'] = (
+                content_ids_to_audio_translations)
+        return states_dict
+
+    @classmethod
+    def _convert_states_v21_dict_to_v22_dict(cls, states_dict):
+        """Converts from version 21 to 22. Version 22 converts all Rich Text
+        Editor content to be compatible with the textAngular format.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for state_dict in states_dict.values():
+            state_dict['content']['html'] = (
+                html_cleaner.convert_to_text_angular(
+                    state_dict['content']['html']))
+            if state_dict['interaction']['default_outcome']:
+                interaction_feedback_html = state_dict[
+                    'interaction']['default_outcome']['feedback']['html']
+                state_dict['interaction']['default_outcome']['feedback'][
+                    'html'] = html_cleaner.convert_to_text_angular(
+                        interaction_feedback_html)
+
+            for answer_group_index, answer_group in enumerate(
+                    state_dict['interaction']['answer_groups']):
+                answer_group_html = answer_group['outcome']['feedback']['html']
+                state_dict['interaction']['answer_groups'][
+                    answer_group_index]['outcome']['feedback']['html'] = (
+                        html_cleaner.convert_to_text_angular(
+                            answer_group_html))
+                if state_dict['interaction']['id'] == 'ItemSelectionInput':
+                    for rule_spec_index, rule_spec in enumerate(
+                            answer_group['rule_specs']):
+                        for x_index, x in enumerate(rule_spec['inputs']['x']):
+                            state_dict['interaction']['answer_groups'][
+                                answer_group_index]['rule_specs'][
+                                    rule_spec_index]['inputs']['x'][x_index] = (
+                                        html_cleaner.convert_to_text_angular(x))
+            for hint_index, hint in enumerate(
+                    state_dict['interaction']['hints']):
+                hint_html = hint['hint_content']['html']
+                state_dict['interaction']['hints'][hint_index][
+                    'hint_content']['html'] = (
+                        html_cleaner.convert_to_text_angular(hint_html))
+
+            if state_dict['interaction']['solution']:
+                solution_html = state_dict[
+                    'interaction']['solution']['explanation']['html']
+                state_dict['interaction']['solution']['explanation']['html'] = (
+                    html_cleaner.convert_to_text_angular(solution_html))
+
+            if state_dict['interaction']['id'] in (
+                    'ItemSelectionInput', 'MultipleChoiceInput'):
+                for value_index, value in enumerate(
+                        state_dict['interaction']['customization_args'][
+                            'choices']['value']):
+                    state_dict['interaction']['customization_args'][
+                        'choices']['value'][value_index] = (
+                            html_cleaner.convert_to_text_angular(value))
+
         return states_dict
 
     @classmethod
@@ -3337,7 +3548,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 25
+    CURRENT_EXP_SCHEMA_VERSION = 27
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -3814,6 +4025,35 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v25_dict_to_v26_dict(cls, exploration_dict):
+        """ Converts a v25 exploration dict into a v26 exploration dict.
+
+        Move audio_translations into a seperate dict.
+        """
+        exploration_dict['schema_version'] = 26
+
+        exploration_dict['states'] = cls._convert_states_v20_dict_to_v21_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 21
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v26_dict_to_v27_dict(cls, exploration_dict):
+        """Converts a v26 exploration dict into a v27 exploration dict.
+
+        Converts all Rich Text Editor content to be compatible with the
+        textAngular format.
+        """
+        exploration_dict['schema_version'] = 27
+
+        exploration_dict['states'] = cls._convert_states_v21_dict_to_v22_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 22
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -3969,6 +4209,16 @@ class Exploration(object):
             exploration_dict = cls._convert_v24_dict_to_v25_dict(
                 exploration_dict)
             exploration_schema_version = 25
+
+        if exploration_schema_version == 25:
+            exploration_dict = cls._convert_v25_dict_to_v26_dict(
+                exploration_dict)
+            exploration_schema_version = 26
+
+        if exploration_schema_version == 26:
+            exploration_dict = cls._convert_v26_dict_to_v27_dict(
+                exploration_dict)
+            exploration_schema_version = 27
 
         return (exploration_dict, initial_schema_version)
 

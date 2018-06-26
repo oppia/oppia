@@ -13,14 +13,67 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for the topics and skills dashboard.
+ * @fileoverview Controllers for the topics and skills dashboard.
  */
+oppia.constant(
+  'EDITABLE_TOPIC_DATA_URL_TEMPLATE', '/topic_editor_handler/data/<topic_id>');
+oppia.constant(
+  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
+  '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
+
+oppia.constant('EVENT_TOPIC_DELETED', 'topicDeleted');
+oppia.constant('EVENT_TYPE_TOPIC_CREATION_ENABLED', 'topicCreationEnabled');
 
 oppia.controller('TopicsAndSkillsDashboard', [
-  '$scope', 'SkillCreationService',
-  function($scope, SkillCreationService) {
-    $scope.createSkill = function() {
-      SkillCreationService.createNewSkill('Add two whole numbers');
+  '$scope', '$rootScope', '$http', '$window',
+  'AlertsService', 'TopicsAndSkillsDashboardBackendApiService',
+  'UrlInterpolationService', 'TopicCreationService',
+  'FATAL_ERROR_CODES', 'EVENT_TOPIC_DELETED',
+  'EVENT_TYPE_TOPIC_CREATION_ENABLED',
+  function(
+      $scope, $rootScope, $http, $window,
+      AlertsService, TopicsAndSkillsDashboardBackendApiService,
+      UrlInterpolationService, TopicCreationService,
+      FATAL_ERROR_CODES, EVENT_TOPIC_DELETED,
+      EVENT_TYPE_TOPIC_CREATION_ENABLED) {
+    $scope.TAB_NAME_TOPICS = 'topics';
+    $scope.TAB_NAME_SKILLS = 'skills';
+
+    TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
+      function(response) {
+        $scope.topicSummaries = response.data.topic_summary_dicts;
+        $scope.skillSummaries = response.data.skill_summary_dicts;
+        $scope.activeTab = $scope.TAB_NAME_TOPICS;
+        $scope.userCanCreateTopic = response.data.can_create_topic;
+        $rootScope.$broadcast(
+          EVENT_TYPE_TOPIC_CREATION_ENABLED, $scope.userCanCreateTopic);
+        $scope.userCanDeleteTopic = response.data.can_delete_topic;
+        if ($scope.topicSummaries.length === 0 &&
+            $scope.skillSummaries.length !== 0) {
+          $scope.activeTab = $scope.TAB_NAME_SKILLS;
+        }
+      },
+      function(errorResponse) {
+        if (FATAL_ERROR_CODES.indexOf(errorResponse.status) !== -1) {
+          AlertsService.addWarning('Failed to get dashboard data');
+        } else {
+          AlertsService.addWarning('Unexpected error code from the server.');
+        }
+      }
+    );
+
+    $rootScope.$on(EVENT_TOPIC_DELETED, function(evt, topicId) {
+      for (var i = 0; i < $scope.topicSummaries.length; i++) {
+        if ($scope.topicSummaries[i].id === topicId) {
+          $scope.topicSummaries.splice(i, 1);
+        }
+      }
+    });
+    $scope.setActiveTab = function(tabName) {
+      $scope.activeTab = tabName;
+    };
+    $scope.createTopic = function() {
+      TopicCreationService.createNewTopic();
     };
   }
 ]);

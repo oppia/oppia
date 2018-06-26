@@ -1,0 +1,106 @@
+<md-card layout="row" class="list-view-item">
+  <table class="dashboard-table">
+    <colgroup>
+      <col style="width: 25%;">
+      <col style="width: 15%;">
+      <col style="width: 23%;">
+      <col style="width: 19%;">
+      <col style="width: 19%;">
+    </colgroup>
+    <tr>
+      <th ng-repeat="key in TOPIC_HEADINGS"
+          class="dashboard-table-headings">
+        <p ng-if="key === 'name'"> Topic Name </p>
+        <p ng-if="key === 'subtopic_count'"> Subtopics </p>
+        <p ng-if="key === 'skill_count'"> Skills </p>
+        <p ng-if="key === 'canonical_story_count'"> Canonical Stories </p>
+        <p ng-if="key === 'topic_status'"> Topic Status </p>
+      </th>
+    </tr>
+    <tr ng-repeat="topic in getTopicSummaries()"
+        class="list-item">
+      <td>
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
+          <span> <[topic.name]> </span>
+        </a>
+      </td>
+      <td>
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
+          <span> <[topic.subtopic_count]> </span>
+        </a>
+      </td>
+      <td>
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
+          <span> <[topic.total_skill_count]> </span>
+          <span class="additional-text" ng-if="topic.uncategorized_skill_count > 0"> ( <[topic.uncategorized_skill_count]> uncategorized ) </span>
+        </a>
+      </td>
+      <td>
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
+          <span> <[topic.canonical_story_count]> </span>
+        </a>
+      </td>
+      <td>
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
+          <span ng-if="topic.is_published"> Published </span>
+          <span ng-if="!topic.is_published"> Not Published </span>
+        </a>
+      </td>
+      <td ng-if="canDeleteTopic()">
+        <span ng-click="deleteTopic(topic.id)" class="fa fa-trash list-summary"> </span>
+      </td>
+    </tr>
+  </table>
+</md-card>
+
+<style>
+  topics-list .list-view-item {
+    background: #fff;
+    margin: 20px 7.5px 0 12.5%;
+    padding: 10px 20px;
+    width: 75%;
+  }
+
+  topics-list .dashboard-table {
+    font-size: 15px;
+    width: 100%;
+  }
+
+  topics-list .dashboard-table .dashboard-table-headings {
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 0.7em;
+  }
+
+  topics-list .dashboard-table .dashboard-table-headings p {
+    display: inline;
+  }
+
+  topics-list .list-summary,
+  topics-list .list-summary:active,
+  topics-list .list-summary:visited {
+    color: inherit;
+    display: block;
+    height: 2em;
+    text-decoration: none;
+  }
+
+  topics-list .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  topics-list .list-item:hover {
+    background-color: #ededed;
+  }
+
+  topics-list .list-summary span {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+  }
+
+  @media(max-width: 815px) {
+    topics-list .list-summary .additional-text{
+      display: none;
+    }
+  }
+</style>

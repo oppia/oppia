@@ -13,8 +13,8 @@
 // limitations under the License.
 
 oppia.directive('coordTwoDimEditor', [
-  '$compile', 'OBJECT_EDITOR_URL_PREFIX',
-  function($compile, OBJECT_EDITOR_URL_PREFIX) {
+  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
     return {
       controller: ['$scope', '$timeout', function($scope, $timeout) {
         $scope.schemaLatitude = {
@@ -94,16 +94,11 @@ oppia.directive('coordTwoDimEditor', [
           $scope.value = [latLng.lat(), latLng.lng()];
         };
       }],
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'CoordTwoDim';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         value: '='
       },
-      template: '<span ng-include="getTemplateUrl()"></span>'
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/coord_two_dim_editor_directive.html'),
     };
   }]);

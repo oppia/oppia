@@ -36,3 +36,16 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
             question_model.question_data_schema_version,
             question_data_schema_version)
         self.assertEqual(question_model.language_code, language_code)
+
+
+class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
+    """Tests the QuestionSkillLinkModel class."""
+
+    def test_create_question_skill_link(self):
+        question_id = 'A Test Question Id'
+        skill_id = 'A Test Skill Id'
+        questionskilllink_model = question_models.QuestionSkillLinkModel.create(
+            question_id, skill_id)
+
+        self.assertEqual(questionskilllink_model.question_id, question_id)
+        self.assertEqual(questionskilllink_model.skill_id, skill_id)

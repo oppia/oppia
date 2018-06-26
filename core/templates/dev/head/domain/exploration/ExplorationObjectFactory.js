@@ -18,12 +18,11 @@
  */
 
 oppia.factory('ExplorationObjectFactory', [
-  'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE', 'StateObjectFactory',
-  'StatesObjectFactory', 'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
-  'UrlInterpolationService',
-  function(
-      INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StateObjectFactory,
-      StatesObjectFactory, ParamChangesObjectFactory, ParamSpecsObjectFactory,
+  'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE', 'StatesObjectFactory',
+  'ParamChangesObjectFactory', 'ParamSpecsObjectFactory',
+  'UrlInterpolationService', function(
+      INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE, StatesObjectFactory,
+      ParamChangesObjectFactory, ParamSpecsObjectFactory,
       UrlInterpolationService) {
     var Exploration = function(
         initStateName, paramChanges, paramSpecs, states, title, languageCode) {
@@ -121,13 +120,20 @@ oppia.factory('ExplorationObjectFactory', [
     };
 
     Exploration.prototype.getAudioTranslations = function(stateName) {
-      return this.getState(stateName).content.getBindableAudioTranslations();
+      var state = this.getState(stateName);
+      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      var contentId = state.content.getContentId();
+      return contentIdsToAudioTranslations.getBindableAudioTranslations(
+        contentId);
     };
 
     Exploration.prototype.getAudioTranslation = function(
         stateName, languageCode) {
-      return this.getState(stateName).content.getAudioTranslation(
-        languageCode);
+      var state = this.getState(stateName);
+      var contentIdsToAudioTranslations = state.contentIdsToAudioTranslations;
+      var contentId = state.content.getContentId();
+      return contentIdsToAudioTranslations.getAudioTranslation(
+        contentId, languageCode);
     };
 
     Exploration.prototype.getAllAudioTranslations = function(languageCode) {

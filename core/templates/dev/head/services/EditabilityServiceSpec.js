@@ -31,6 +31,13 @@ describe('EditabilityService', function() {
     expect(EditabilityService.isEditable()).toBe(true);
   });
 
+  it('should allow to translate an exploration after the tutorial ends',
+    function() {
+      EditabilityService.onEndTutorial();
+      EditabilityService.markTranslatable();
+      expect(EditabilityService.isTranslatable()).toBe(true);
+    });
+
   it('should allow to edit an exploration outside the tutorial mode',
     function() {
       EditabilityService.markEditable();

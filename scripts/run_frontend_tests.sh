@@ -29,6 +29,9 @@
 #
 # The root folder MUST be named 'oppia'.
 # It runs unit tests for frontend JavaScript code (using Karma).
+#
+# Note: You can replace 'it' with 'fit' or 'describe' with 'fdescribe' to run a
+# single test or test suite.
 
 if [ -z "$BASH_VERSION" ]
 then
