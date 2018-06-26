@@ -30,7 +30,7 @@ import utils
 
 (feedback_models, email_models, suggestion_models) = (
     models.Registry.import_models(
-    [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
+        [models.NAMES.feedback, models.NAMES.email, models.NAMES.suggestion]))
 datastore_services = models.Registry.import_datastore_services()
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
@@ -105,6 +105,8 @@ def create_thread(
         original_author_id: str. The author id who starts this thread.
         subject: str. The subject of this thread.
         text: str. The text of the feedback message. This may be ''.
+        has_suggestion: bool. Whether the thread has a suggestion attached to
+            it.
 
     Returns:
         str. The ID of the newly created thread.
