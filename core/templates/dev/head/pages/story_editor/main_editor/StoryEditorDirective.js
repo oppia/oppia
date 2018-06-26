@@ -37,7 +37,7 @@ oppia.directive('storyEditor', [
             $scope.notes = $scope.story.getNotes();
             $scope.notesEditorIsShown = false;
             $scope.editableDescription = $scope.story.getDescription();
-            $scope.storyDescriptionEmpty = (
+            $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.storyDescriptionChanged = false;
           };
@@ -67,7 +67,7 @@ oppia.directive('storyEditor', [
           };
 
           $scope.updateStoryDescriptionStatus = function(description) {
-            $scope.storyDescriptionEmpty = (description === '');
+            $scope.editableDescriptionIsEmpty = (description === '');
             $scope.storyDescriptionChanged = true;
           };
 
@@ -83,7 +83,7 @@ oppia.directive('storyEditor', [
 
           $scope.updateStoryTitle = function(newTitle) {
             StoryUpdateService.setStoryTitle($scope.story, newTitle);
-            $scope.storyTitleEditorIsShown = false;
+            $scope.closeStoryTitleEditor();
           };
 
           $scope.updateStoryDescription = function(newDescription) {

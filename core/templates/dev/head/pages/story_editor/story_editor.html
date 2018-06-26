@@ -15,15 +15,15 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-<div ng-controller="StoryEditor">
-  <a class="btn btn-primary back-to-topic" ng-href="/topic_editor/<[topicId]>">
-    <i class="fa fa-arrow-left"></i> &nbsp;Go back to topic
+<div ng-controller="StoryEditor" class="story-editor">
+  <a class="btn btn-primary back-to-topic-button" ng-href="/topic_editor/<[topicId]>">
+    <i class="fa fa-arrow-left"></i> &nbsp;Return to topic
   </a>
   <story-editor></story-editor>
 </div>
 
 <style>
-  .back-to-topic {
+  .story-editor .back-to-topic-button {
     margin-top: 1.5%;
     margin-left: 10%;
   }

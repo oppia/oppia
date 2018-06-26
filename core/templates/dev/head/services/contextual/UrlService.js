@@ -56,6 +56,9 @@ oppia.factory('UrlService', ['$window', function($window) {
     },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();
+      if (pathname.split('/').length < 4) {
+        throw Error('Invalid url for story editor');
+      }
       var storyId = pathname.split('/')[3];
       if (storyId.length !== 12) {
         throw Error('Invalid Story Id');

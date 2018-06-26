@@ -1,4 +1,4 @@
-<div role="form" class="form-horizontal story-editor">
+<div role="form" class="form-horizontal">
   <md-card class="oppia-page-card oppia-long-text">
     <div class="story-title">
       <span ng-if="!storyTitleEditorIsShown" ng-click="openStoryTitleEditor()"
@@ -17,14 +17,14 @@
       </span>
     </div>
 
-    <div class="story-description" ng-class="{'has-error': storyDescriptionEmpty && storyDescriptionChanged}">
+    <div class="story-description" ng-class="{'has-error': editableDescriptionIsEmpty && storyDescriptionChanged}">
       <label for="storyDescription" class="form-heading">Description</label>
       <textarea type="text" class="form-control"
                 ng-model="editableDescription"
                 ng-change="updateStoryDescriptionStatus(editableDescription)"
                 ng-blur="updateStoryDescription(editableDescription)"
                 placeholder="Enter the description of the story"></textarea>
-      <span ng-if="storyDescriptionEmpty && storyDescriptionChanged" class="help-block" style="font-size: smaller">
+      <span ng-if="editableDescriptionIsEmpty && storyDescriptionChanged" class="help-block" style="font-size: smaller">
         What does this story contain?
       </span>
     </div>
@@ -61,31 +61,31 @@
 </div>
 
 <style>
-  .story-editor {
+  story-editor md-card {
     margin-left: 10%;
     margin-top: -1%;
     width: 80%;
   }
 
-  .story-editor .form-heading {
+  story-editor .form-heading {
     font-size: 1.2em;
   }
 
-  .story-editor .story-title {
+  story-editor .story-title {
     margin-bottom: 1.5%;
   }
 
-  .story-editor .story-notes {
+  story-editor .story-notes {
     margin-top: 1.5%;
     height: auto;
     margin-bottom: 2%;
   }
 
-  .story-editor .story-notes .save-button {
+  story-editor .story-notes .save-button {
     margin-top: 1.5vh;
   }
 
-  .story-editor .story-description textarea {
+  story-editor .story-description textarea {
     height: 20vh;
   }
 </style>
