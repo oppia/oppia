@@ -206,6 +206,19 @@ def get_suggestions_by_target_id(target_type, target_id):
             .get_suggestions_by_target_id(target_type, target_id)]
 
 
+def get_all_stale_suggestions():
+    """Gets a list of suggestions without any activity on them for
+    THRESHOLD_TIME_BEFORE_ACCEPT time.
+
+    Returns:
+        list(Suggestion). A list of suggestions linked to the entity.
+    """
+
+    return [get_suggestion_from_model(s)
+            for s in suggestion_models.GeneralSuggestionModel
+            .get_all_stale_suggestions()]
+
+
 def _update_suggestion(suggestion):
     """Updates the given suggestion.
 

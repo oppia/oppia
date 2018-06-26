@@ -225,3 +225,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 .get_suggestions_by_target_id(
                     suggestion_models.TARGET_TYPE_EXPLORATION, 'exp_invalid')),
             0)
+
+    def test_get_all_stale_suggestions(self):
+        with self.swap(suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT', 0):
+            self.assertEqual(len(
+                suggestion_models.GeneralSuggestionModel
+                .get_all_stale_suggestions()), 1)
