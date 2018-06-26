@@ -17,10 +17,10 @@
 */
 
 describe('Skill update service', function() {
-  var SkillUpdateService, 
-      SkillObjectFactory, 
-      MisconceptionObjectFactory,
-      UndoRedoService;
+  var SkillUpdateService,
+    SkillObjectFactory,
+    MisconceptionObjectFactory,
+    UndoRedoService;
   var skillDict;
 
   beforeEach(module('oppia'));
@@ -237,6 +237,6 @@ describe('Skill update service', function() {
     UndoRedoService.undoChange(skill);
     expect(skill.getConceptCard().getWorkedExamples()).toEqual([
       'test worked example 1',
-      'test worked example 2'])
+      'test worked example 2']);
   });
 });

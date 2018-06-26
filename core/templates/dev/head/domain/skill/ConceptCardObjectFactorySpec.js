@@ -28,7 +28,7 @@ describe('Concept card object factory', function() {
     beforeEach(inject(function($injector) {
       ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
 
-      it('should create a new concept card from a backend dictionary', 
+      it('should create a new concept card from a backend dictionary',
         function() {
           var conceptCard =
             ConceptCardObjectFactory.createFromBackendDict(conceptCardDict);
@@ -43,5 +43,5 @@ describe('Concept card object factory', function() {
         expect(conceptCard.toBackendDict()).toEqual(conceptCardDict);
       });
     }));
-  });  
+  });
 });

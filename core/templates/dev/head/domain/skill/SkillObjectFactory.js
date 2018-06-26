@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Factory for creating frontend 
+ * @fileoverview Factory for creating frontend
  * instances of Skill objects.
  */
 
@@ -23,7 +23,7 @@ oppia.factory('SkillObjectFactory', [
       ConceptCardObjectFactory, MisconceptionObjectFactory) {
     var Skill = function(
         id, description, misconceptions, conceptCard, languageCode, version) {
-      this._id = id
+      this._id = id;
       this._description = description;
       this._misconceptions = misconceptions;
       this._conceptCard = conceptCard;
@@ -58,7 +58,8 @@ oppia.factory('SkillObjectFactory', [
         skillBackendDict.id,
         skillBackendDict.description,
         generateMisconceptionsFromBackendDict(skillBackendDict.misconceptions),
-        ConceptCardObjectFactory.createFromBackendDict(skillBackendDict.skill_contents),
+        ConceptCardObjectFactory.createFromBackendDict(
+          skillBackendDict.skill_contents),
         skillBackendDict.language_code,
         skillBackendDict.version);
     };
@@ -68,9 +69,9 @@ oppia.factory('SkillObjectFactory', [
     };
 
     var generateMisconceptionsFromBackendDict = function(
-      misconceptionsBackendDicts) {
+        misconceptionsBackendDicts) {
       return misconceptionsBackendDicts.map(function(
-        misconceptionsBackendDict) {
+          misconceptionsBackendDict) {
         return MisconceptionObjectFactory.createFromBackendDict(
           misconceptionsBackendDict);
       });
@@ -116,7 +117,7 @@ oppia.factory('SkillObjectFactory', [
       var maxId = 0;
       this._misconceptions.forEach(function(misconception) {
         var parsedIdAsInt = parseInt(misconception.getId(), 10);
-        maxId = Math.max(maxId, parsedIdAsInt);        
+        maxId = Math.max(maxId, parsedIdAsInt);
       });
       var nextIdAsInt = maxId + 1;
       return nextIdAsInt.toString();

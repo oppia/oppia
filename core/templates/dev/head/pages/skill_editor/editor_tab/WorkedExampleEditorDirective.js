@@ -31,7 +31,6 @@ oppia.directive('workedExampleEditor', [
         '$scope', 'SkillUpdateService', 'SkillEditorStateService',
         function($scope, SkillUpdateService, SkillEditorStateService) {
           $scope.editorIsOpen = false;
-          
           $scope.container = {
             workedExample: $scope.workedExample
           };
@@ -43,15 +42,14 @@ oppia.directive('workedExampleEditor', [
 
           $scope.openEditor = function() {
             if ($scope.isEditable()) {
-              $scope.workedExampleMemento = angular.copy($scope.container.workedExample);
+              $scope.workedExampleMemento =
+                angular.copy($scope.container.workedExample);
               $scope.editorIsOpen = true;
             }
           };
 
           $scope.saveWorkedExample = function() {
             $scope.editorIsOpen = false;
-            console.log(angular.copy($scope.container.workedExampleHtml));
-            console.log(angular.copy($scope.workedExampleMemento));
             var contentHasChanged = (
               $scope.workedExampleMemento !==
               $scope.container.workedExample);
@@ -66,12 +64,12 @@ oppia.directive('workedExampleEditor', [
           };
 
           $scope.cancelEdit = function() {
-            $scope.container.workedExample = angular.copy($scope.workedExampleMemento);
+            $scope.container.workedExample = angular.copy(
+              $scope.workedExampleMemento);
             $scope.workedExampleMemento = null;
             $scope.editorIsOpen = false;
           };
-
         }]
-    }
+    };
   }
 ]);

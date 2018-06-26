@@ -32,7 +32,7 @@ describe('Skill editor state service', function() {
           reject();
         }
       });
-    }
+    };
 
     self.newBackendSkillObject = {};
     self.failure = null;
@@ -164,7 +164,7 @@ describe('Skill editor state service', function() {
   it('should be able to save the collection and pending changes',
     function() {
       spyOn(fakeEditableSkillBackendApiService,
-      'updateSkill').and.callThrough();
+        'updateSkill').and.callThrough();
 
       SkillEditorStateService.loadSkill('1');
       SkillUpdateService.setSkillDescription(
@@ -181,7 +181,8 @@ describe('Skill editor state service', function() {
       var updateSkillSpy = (
         fakeEditableSkillBackendApiService.updateSkill);
       expect(updateSkillSpy).toHaveBeenCalledWith(
-        expectedId, expectedVersion, expectedCommitMessage, jasmine.any(Object));
+        expectedId, expectedVersion, expectedCommitMessage,
+        jasmine.any(Object));
     });
 
   it('should track whether it is currently saving the skill',

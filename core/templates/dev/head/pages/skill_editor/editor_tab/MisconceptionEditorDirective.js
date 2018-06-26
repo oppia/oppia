@@ -146,6 +146,6 @@ oppia.directive('misconceptionEditor', [
             $scope.feedbackEditorIsOpen = false;
           };
         }]
-    }
+    };
   }
 ]);

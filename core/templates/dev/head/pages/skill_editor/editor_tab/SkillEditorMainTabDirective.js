@@ -31,6 +31,6 @@ oppia.directive('skillEditorMainTab', [
           $scope.hasLoadedSkill = SkillEditorStateService.hasLoadedSkill;
         }
       ]
-    }
+    };
   }
 ]);

@@ -69,7 +69,7 @@ describe('Skill object factory', function() {
       expect(skill.getMisconceptions()).toEqual(
         [MisconceptionObjectFactory.createFromBackendDict(
           misconceptionDict1),
-         MisconceptionObjectFactory.createFromBackendDict(
+        MisconceptionObjectFactory.createFromBackendDict(
           misconceptionDict2)]);
       expect(skill.getConceptCard()).toEqual(
         ConceptCardObjectFactory.createFromBackendDict(skillContentsDict));

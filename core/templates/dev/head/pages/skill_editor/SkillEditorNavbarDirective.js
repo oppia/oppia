@@ -16,7 +16,7 @@
  * @fileoverview Directive for the navbar of the skill editor.
  */
 
- oppia.directive('skillEditorNavbar', [
+oppia.directive('skillEditorNavbar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -59,13 +59,13 @@
                   };
                 }
               ]
-            })
+            });
 
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
             });
           };
         }]
-    }
+    };
   }
 ]);
