@@ -57,6 +57,18 @@
         </button>
       </div>
     </div>
+    <div class="story-node-editor">
+      <div class="story-nodes-title">
+        <label for="storyNodes" class="form-heading">Story Nodes</label>
+        <br>
+        Click on the check box to mark it as initial node
+      </div>
+      <span ng-repeat="node in story.getStoryContents().getNodes()">
+        <story-node story-node="node"
+                    initial-node="story.getStoryContents().getInitialNodeId() === node.getId()">
+        </story-node>
+      </span>
+    </div>
   </md-card>
 </div>
 
@@ -81,11 +93,15 @@
     margin-bottom: 2%;
   }
 
+  story-editor .story-node-editor .story-nodes-title {
+    margin-bottom: 2%;
+  }
+
   story-editor .story-notes .save-button {
     margin-top: 1.5vh;
   }
 
   story-editor .story-description textarea {
-    height: 20vh;
+    height: 10vh;
   }
 </style>

@@ -1,0 +1,41 @@
+<div class="modal-header">
+  <h3> Edit Story Node </h3>
+</div>
+<div class="modal-body">
+  <div class="node-outline">
+    <label> Node Outline </label>
+    <div ng-if="!outlineEditorIsShown" class="preview">
+      <angular-html-bind html-data="outline">
+      </angular-html-bind>
+      <button type="button"
+              class="btn btn-default save-button"
+              ng-click="closePreviewOutline(outline)">
+        Edit
+      </button>
+    </div>
+    <div ng-if="outlineEditorIsShown">
+      <schema-based-editor schema="OUTLINE_SCHEMA"
+                           local-value="outline">
+      </schema-based-editor>
+      <br>
+      <button type="button"
+              class="btn btn-success save-button"
+              ng-click="openPreviewOutline(outline)">
+        Save
+      </button>
+    </div>
+  </div>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="done()">Done</button>
+</div>
+<style>
+story-editor .node-outline {
+  margin-top: 1.5%;
+  height: auto;
+  margin-bottom: 2%;
+}
+story-editor .node-outline .save-button {
+  margin-top: 1.5vh;
+}
+</style>

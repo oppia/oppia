@@ -48,6 +48,7 @@ oppia.directive('storyEditor', [
               rows: 100
             }
           };
+
           $scope.openPreviewNotes = function(notes) {
             $scope.notesEditorIsShown = false;
             $scope.notes = notes;
