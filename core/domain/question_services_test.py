@@ -49,22 +49,26 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.user_b = user_services.UserActionsInfo(self.user_id_b)
         self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
 
-    def test_get_question_by_id(self):
-        question = question_domain.Question(
-            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
+        self.question_data = self._create_valid_question_data('ABC')
+        self.question_id = 'dummy'
+        self.question_data_schema_version = 1
+        self.language_code = 'en'
+        self.status = 'private'
+        self.question = question_domain.Question(
+            self.question_id, self.question_data,
+            self.question_data_schema_version, self.language_code)
 
-        question_id = question_services.add_question(self.owner_id, question)
+    def test_get_question_by_id(self):
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
         question = question_services.get_question_by_id(
             question_id, strict=False)
 
         self.assertEqual(question.question_id, question_id)
 
     def test_get_questions_by_ids(self):
-        question = question_domain.Question(
-            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
-
         question1_id = question_services.add_question(
-            self.owner_id, question)
+            self.owner_id, self.question)
         question = question_domain.Question(
             'dummy2', self._create_valid_question_data('ABC'), 1, 'en')
 
@@ -77,28 +81,19 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(questions[1].question_id, question2_id)
 
     def test_add_question(self):
-        question_data = self._create_valid_question_data('ABC')
-        question_id = 'dummy'
-        question_data_schema_version = 1
-        language_code = 'en'
-        question = question_domain.Question(
-            question_id, question_data, question_data_schema_version,
-            language_code)
-
-        question_id = question_services.add_question(self.owner_id, question)
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
         model = question_models.QuestionModel.get(question_id)
 
-        self.assertEqual(model.question_data, question_data)
+        self.assertEqual(model.question_data, self.question_data)
         self.assertEqual(
             model.question_data_schema_version,
-            question_data_schema_version)
-        self.assertEqual(model.language_code, language_code)
+            self.question_data_schema_version)
+        self.assertEqual(model.language_code, self.language_code)
 
     def test_delete_question(self):
-        question = question_domain.Question(
-            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
-
-        question_id = question_services.add_question(self.owner_id, question)
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
         question_services.delete_question(
             self.owner_id, question_id)
 
@@ -108,20 +103,13 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_models.QuestionModel.get(question_id)
 
     def test_update_question(self):
-        question_data = self._create_valid_question_data('ABC')
-        question_id = 'dummy'
-        question_data_schema_version = 1
-        language_code = 'en'
-        question = question_domain.Question(
-            question_id, question_data, question_data_schema_version,
-            language_code)
-
         new_question_data = self._create_valid_question_data('DEF')
-        question_id = question_services.add_question(self.owner_id, question)
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
         change_dict = {'cmd': 'update_question_property',
                        'property_name': 'question_data',
                        'new_value': new_question_data,
-                       'old_value': question_data}
+                       'old_value': self.question_data}
         change_list = [question_domain.QuestionChange(change_dict)]
 
         question_services.update_question(
@@ -131,60 +119,46 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         model = question_models.QuestionModel.get(question_id)
         self.assertEqual(model.question_data, new_question_data)
         self.assertEqual(
-            model.question_data_schema_version, question_data_schema_version)
-        self.assertEqual(model.language_code, language_code)
+            model.question_data_schema_version, self.question_data_schema_version)
+        self.assertEqual(
+            model.language_code, self.language_code)
 
     def test_compute_summary_of_question(self):
-        question_data = self._create_valid_question_data('ABC')
-        question_id = 'dummy'
-        question_data_schema_version = 1
-        language_code = 'en'
-        status = 'private'
-        question = question_domain.Question(
-            question_id, question_data, question_data_schema_version,
-            language_code).to_dict()
-
+        question = self.question.to_dict()
         question_summary = question_services.compute_summary_of_question(
-            question, self.owner_id, status).to_dict()
+            question, self.owner_id, self.status)
 
-        self.assertEqual(question_summary['id'], 'dummy')
+        self.assertEqual(question_summary.id, 'dummy')
         self.assertEqual(
-            question_summary['question_data'],
-            html_cleaner.clean(self._create_valid_question_data('ABC')))
-        self.assertEqual(question_summary['language_code'], 'en')
-        self.assertEqual(question_summary['status'], 'private')
+            question_summary.question_data,
+            html_cleaner.clean(''))
+        self.assertEqual(question_summary.language_code, 'en')
+        self.assertEqual(question_summary.status, 'private')
 
     def test_get_question_summaries_by_creator_id(self):
-        question = question_domain.Question(
-            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
-
-        question_services.add_question(self.owner_id, question)
-        question_summary = (
+        question_services.add_question(self.owner_id, self.question)
+        question_summaries = (
             question_services.get_question_summaries_by_creator_id(
                 self.owner_id))
 
-        self.assertEqual(question_summary[0].id, 'dummy')
-        self.assertEqual(
-            question_summary[0].question_data,
-            html_cleaner.clean(self._create_valid_question_data('ABC')))
-        self.assertEqual(question_summary[0].language_code, 'en')
-        self.assertEqual(question_summary[0].status, 'private')
+        for question_summary in question_summaries:
+            self.assertEqual(question_summary.id, 'dummy')
+            self.assertEqual(
+                question_summary.question_html_data, '')
+            self.assertEqual(question_summary.language_code, 'en')
+            self.assertEqual(question_summary.status, 'private')
 
     def test_admin_can_manage_question(self):
-        question = question_domain.Question(
-            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
-
-        question_id = question_services.add_question(self.owner_id, question)
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
         question_rights = question_services.get_question_rights(question_id)
 
         self.assertTrue(question_services.is_manager(
             self.user_admin, question_rights))
 
     def test_create_new_question_rights(self):
-        question = question_domain.Question(
-            'dummy', self._create_valid_question_data('ABC'), 1, 'en')
-
-        question_id = question_services.add_question(self.owner_id, question)
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
 
         question_services.assign_role(
             self.user_admin, self.user_a,

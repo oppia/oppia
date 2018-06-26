@@ -31,6 +31,7 @@ import utils
 # compatibility with previous change dicts.
 QUESTION_PROPERTY_LANGUAGE_CODE = 'language_code'
 QUESTION_PROPERTY_QUESTION_DATA = 'question_data'
+QUESTION_PROPERTY_CONTENT = 'content'
 
 ROLE_MANAGER = 'manager'
 ROLE_NONE = 'none'
@@ -51,7 +52,8 @@ class QuestionChange(object):
     """Domain object for changes made to question object."""
     QUESTION_PROPERTIES = (
         QUESTION_PROPERTY_QUESTION_DATA,
-        QUESTION_PROPERTY_LANGUAGE_CODE)
+        QUESTION_PROPERTY_LANGUAGE_CODE,
+        QUESTION_PROPERTY_CONTENT)
 
     def __init__(self, change_dict):
         """Initialize a QuestionChange object from a dict.

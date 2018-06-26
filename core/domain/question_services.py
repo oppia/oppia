@@ -267,9 +267,10 @@ def compute_summary_of_question(question, creator_id, status):
     Returns:
         QuestionSummary. The computed summary for the given question.
     """
+    question_html_data = question['question_data']['content']['html']
     question_summary = question_domain.QuestionSummary(
         question['question_id'], creator_id, question['language_code'],
-        status, question['question_data']
+        status, question_html_data
     )
 
     return question_summary
@@ -290,7 +291,7 @@ def save_question_summary(question_summary):
         status=question_summary.status,
         question_model_last_updated=question_summary.last_updated,
         question_model_created_on=question_summary.created_on,
-        question_data=question_summary.question_data
+        question_html_data=question_summary.question_data
     )
 
     question_summary_model.put()

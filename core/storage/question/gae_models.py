@@ -235,7 +235,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     # model was created).
     question_model_created_on = ndb.DateTimeProperty(indexed=True)
     # A dict representing the question data.
-    question_data = ndb.JsonProperty(indexed=False, required=True)
+    question_html_data = ndb.StringProperty(indexed=False, required=True)
 
     @classmethod
     def get_by_creator_id(cls, creator_id):

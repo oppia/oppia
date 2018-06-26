@@ -34,7 +34,7 @@ import time
 
 
 COVERAGE_PATH = os.path.join(
-    os.getcwd(), '..', 'oppia_tools', 'coverage-4.0', 'coverage')
+    os.getcwd(), '..', 'oppia_tools', 'coverage-4.5.1', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
@@ -218,18 +218,18 @@ def _get_all_test_targets(test_path=None, include_load_tests=True):
     for root in os.listdir(base_path):
         if any([s in root for s in ['.git', 'third_party', 'core/tests']]):
             continue
-        if root.endswith('question_services_test.py'):
+        if root.endswith('_test.py'):
             result.append(_convert_to_test_target(
                 os.path.join(base_path, root)))
         for subroot, _, files in os.walk(os.path.join(base_path, root)):
             if _LOAD_TESTS_DIR in subroot and include_load_tests:
                 for f in files:
-                    if f.endswith('question_services_test.py'):
+                    if f.endswith('_test.py'):
                         result.append(_convert_to_test_target(
                             os.path.join(subroot, f)))
 
             for f in files:
-                if (f.endswith('question_services_test.py') and
+                if (f.endswith('_test.py') and
                         os.path.join('core', 'tests') not in subroot):
                     result.append(_convert_to_test_target(
                         os.path.join(subroot, f)))
