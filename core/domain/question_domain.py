@@ -184,13 +184,11 @@ class Question(object):
 
     @classmethod
     def create_default_question(
-            cls, question_id, language_code):
+            cls, question_id):
         """Returns a Question domain object with default values.
 
         Args:
             question_id: str. The unique ID of the question.
-            language_code: str. The ISO 639-1 code for the language this
-                question is written in.
 
         Returns:
             Question. A Question domain object with default values.
@@ -199,7 +197,8 @@ class Question(object):
             question_id, exp_domain.State.create_default_state(
                 feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
                 ),
-            feconf.CURRENT_QUESTION_SCHEMA_VERSION, language_code)
+            feconf.CURRENT_QUESTION_SCHEMA_VERSION,
+            constants.DEFAULT_LANGUAGE_CODE)
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.

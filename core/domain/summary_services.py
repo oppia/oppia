@@ -763,37 +763,7 @@ def get_displayable_question_summary_dicts(question_summaries):
             'language_code': u'en',
             'id': 'F6chQwByyQVu',
             'status': u'private',
-            'question_data': {
-                u'param_changes': [],
-                u'content_ids_to_audio_translations':{
-                    u'default_outcome': {},
-                    u'content': {}
-                },
-                u'content': {
-                    u'content_id': u'content',
-                    u'html': u''
-                },
-                u'interaction': {
-                    u'id': None,
-                    u'hints': [],
-                    u'default_outcome': {
-                        u'refresher_exploration_id': None,
-                        u'labelled_as_correct': False,
-                        u'dest': u'Introduction',
-                        u'missing_prerequisite_skill_id': None,
-                        u'feedback': {
-                            u'content_id': u'default_outcome',
-                            u'html': u''
-                        },
-                        u'param_changes': []
-                    },
-                    u'confirmed_unclassified_answers': [],
-                    u'answer_groups': [],
-                    u'solution': None,
-                    u'customization_args': {}
-                },
-                u'classifier_model_id': None
-            },
+            'question_html_data': u'What is numerator in 2/3?',
             'created_on': 1529409528663.468,
             'last_updated': 1529409528663.472
         }, ]
@@ -811,7 +781,7 @@ def get_displayable_question_summary_dicts(question_summaries):
             'language_code': question_summary.language_code,
             'last_updated': utils.get_time_in_millisecs(
                 question_summary.last_updated),
-            'question_data': question_summary.question_data,
+            'question_html_data': question_summary.question_html_data,
             'status': question_summary.status,
         }
 

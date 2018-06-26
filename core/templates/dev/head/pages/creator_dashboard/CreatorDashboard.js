@@ -233,6 +233,8 @@ oppia.controller('CreatorDashboard', [
         $scope.lastWeekStats = responseData.last_week_stats;
         $scope.myExplorationsView = responseData.display_preference;
         $scope.questionsList = responseData.questions_list;
+        console.log($scope.questionsList);
+        
         $scope.questionsList.forEach(function(question) {
           $scope.QUESTION_STATUS.TOTAL_QUESTIONS[
             question.status.toUpperCase()]++;

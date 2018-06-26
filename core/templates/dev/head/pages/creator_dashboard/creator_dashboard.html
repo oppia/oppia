@@ -389,55 +389,56 @@
       </div>
     </div>
 
-      <div ng-if="activeTab === 'myQuestions'" class="oppia-creator-dashboard-questions">
-        <div ng-if="activeTab === 'myQuestions'"
-             class="col-md-2 oppia-creator-dashboard-side-content"
-             ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}"
-             style="min-width: 200px;">
-          <md-card class="oppia-creator-dashboard-main-menu" style="margin: 0;">
-            <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.APPROVED"
-                class="oppia-creator-dashboard-menu"
-                ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.APPROVED}"
-                ng-click="setActiveSection(QUESTION_STATUS.APPROVED)">
-              <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.APPROVED]>"></span>
-              <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.APPROVED]></div>
-            </h4>
-            <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.PENDING"
-                class="oppia-creator-dashboard-menu"
-                ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.PENDING}"
-                ng-click="setActiveSection(QUESTION_STATUS.PENDING)">
-              <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.PENDING]>"></span>
-              <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.PENDING]></div>
-            </h4>
-            <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.PRIVATE"
-                class="oppia-creator-dashboard-menu"
-                ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.PRIVATE}"
-                ng-click="setActiveSection(QUESTION_STATUS.PRIVATE)">
-              <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.PRIVATE]>"></span>
-              <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.PRIVATE]></div>
-            </h4>
-            <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.REJECTED"
-                class="oppia-creator-dashboard-menu"
-                ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.REJECTED}"
-                ng-click="setActiveSection(QUESTION_STATUS.REJECTED)">
-              <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.REJECTED]>"></span>
-              <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.REJECTED]></div>
-            </h4>
-          </md-card>
-
-          <button type="button"
-                  class="btn oppia-dashboard-intro-button oppia-transition-200"
-                  ng-click="createNewQuestion()"
-                  translate="I18N_CREATE_QUESTION">
-          </button>
-        </div>
-
-        <div class="oppia-dashboard-tiles"
+    <div class="oppia-creator-dashboard-questions-tab">
+      <div ng-if="activeTab === 'myQuestions'"
+           class="col-md-2 oppia-creator-dashboard-side-content"
+           ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}"
+           style="min-width: 200px;">
+        <md-card class="oppia-creator-dashboard-main-menu" style="margin: 0;">
+          <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.APPROVED"
+              class="oppia-creator-dashboard-menu"
+              ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.APPROVED}"
+              ng-click="setActiveSection(QUESTION_STATUS.APPROVED)">
+            <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.APPROVED]>"></span>
+            <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.APPROVED]></div>
+          </h4>
+          <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.PENDING"
+              class="oppia-creator-dashboard-menu"
+              ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.PENDING}"
+              ng-click="setActiveSection(QUESTION_STATUS.PENDING)">
+            <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.PENDING]>"></span>
+            <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.PENDING]></div>
+          </h4>
+          <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.PRIVATE"
+              class="oppia-creator-dashboard-menu"
+              ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.PRIVATE}"
+              ng-click="setActiveSection(QUESTION_STATUS.PRIVATE)">
+            <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.PRIVATE]>"></span>
+            <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.PRIVATE]></div>
+          </h4>
+          <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.REJECTED"
+              class="oppia-creator-dashboard-menu"
+              ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.REJECTED}"
+              ng-click="setActiveSection(QUESTION_STATUS.REJECTED)">
+            <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.REJECTED]>"></span>
+            <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.REJECTED]></div>
+          </h4>
+        </md-card>
+        <button type="button"
+                class="btn oppia-dashboard-intro-button oppia-transition-200"
+                ng-click="createNewQuestion()"
+                translate="I18N_CREATE_QUESTION">
+        </button>
+      </div>
+      <div ng-if="activeTab === 'myQuestions'"
+           class="col-md-8 oppia-creator-dashboard-questions"
+           ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
+        <div class="oppia-dashboard-question-tiles"
              ng-if="activeTab === 'myQuestions' && questionsList.length > 0">
           <span ng-repeat="question in questionsList | filter:{status: activeSection}">
             <span ng-class="activeSection">
               <question-summary-tile question-id="question.id"
-                                     description="question.question_data.content.html"
+                                     description="question.question_html_data"
                                      last-updated-msec="question.last_updated"
                                      status="question.status"
                                      tagged-skills="question.tagged_skills">
@@ -446,8 +447,21 @@
           </span>
         </div>
       </div>
+      <div ng-if="activeTab === 'myQuestions'"
+           class="col-md-2 oppia-creator-dashboard-right-side-content"
+           ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}"
+           style="min-width: 200px;">
+      </div>
+    </div>
+
   </div>
   <style>
+    .oppia-creator-dashboard-questions-tab {
+      max-width: 75%;
+      margin: 0 auto;
+      display: flex;
+    }
+
     .oppia-question-count {
       background-color: #fff;
       border-radius: 50%;
@@ -461,13 +475,23 @@
     }
 
     .oppia-creator-dashboard-questions {
-      max-width: 55%;
-      margin: 0 auto;
+      width: 60%;
     }
 
     .oppia-creator-dashboard-side-content {
       padding: 0;
       width: 20%;
+    }
+
+    .oppia-creator-dashboard-right-side-content {
+      padding: 0;
+      width: 20%;
+    }
+
+    @media(max-width: 1020px) {
+      .oppia-creator-dashboard-right-side-content {
+        display: none;
+      }
     }
 
     .oppia-creator-dashboard-mobile-mode {
@@ -774,9 +798,9 @@
       width: 50%;
     }
 
-    .oppia-dashboard-tiles {
-      margin: 0 0 0 auto;
-      width: 68%;
+    .oppia-dashboard-question-tiles {
+      width: 95%;
+      margin: 0 auto;
     }
 
     @media(max-width: 815px) {

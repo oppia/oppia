@@ -30,6 +30,8 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import question_domain
+from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -680,6 +682,22 @@ tags: []
             exploration_id, title=title, category='A category')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
+
+    def save_new_default_question(self, question_id, owner_id):
+        """Saves a new default question written by owner_id.
+
+        Args:
+            question_id: str. The id of the new default question.
+            owner_id: str. The user_id of the creator of the question.
+
+        Returns:
+            question. The question domain object.
+        """
+        question = question_domain.Question.create_default_question(
+            question_id)
+        question_services.add_question(owner_id, question)
+
+        return question
 
     def save_new_valid_exploration(
             self, exploration_id, owner_id, title='A title',

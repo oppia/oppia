@@ -179,7 +179,7 @@ class CreatorDashboardHandler(base.BaseHandler):
 
         for question_summary in question_summary_dicts:
             skill_summaries_of_linked_question = (
-                question_services.get_skill_summaries_of_linked_skills(
+                question_services.get_summaries_of_linked_skills(
                     question_summary['id']))
 
             if skill_summaries_of_linked_question is None:
@@ -348,7 +348,7 @@ class NewQuestionHandler(base.BaseHandler):
         """Handles POST requests."""
         new_question_id = question_services.get_new_question_id()
         question = question_domain.Question.create_default_question(
-            new_question_id, constants.DEFAULT_LANGUAGE_CODE)
+            new_question_id)
         question_services.add_question(self.user_id, question)
 
         self.render_json({

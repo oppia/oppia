@@ -43,8 +43,6 @@ oppia.directive('questionSummaryTile', [
 
           $scope.getQuestionDescription = function () {
             if ($scope.getDescription()) {
-              // TODO: This description needs to be converted to a readable
-              // and meaningful text.
               return $scope.getDescription();
             } else {
               return 'This question is private. Tag it with a skill and ' +

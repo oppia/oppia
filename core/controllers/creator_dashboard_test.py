@@ -624,6 +624,27 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
         self.assertEqual(len(response['subscribers_list']), 0)
 
+    def test_no_questions(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        self.assertEqual(response['questions_list'], [])
+        self.logout()
+
+    def test_no_questions_and_visit_dashboard(self):
+        self.login(self.OWNER_EMAIL)
+        # Testing that creator only visit dashboard without any question
+        # created.
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['questions_list']), 0)
+        self.logout()
+
+    def test_create_single_question_and_visit_dashboard(self):
+        self.login(self.OWNER_EMAIL)
+        self.save_new_default_question(self.EXP_ID, self.owner_id)
+        # Testing the quantity of question created and it should be 1.
+        response = self.get_json(feconf.CREATOR_DASHBOARD_DATA_URL)
+        self.assertEqual(len(response['questions_list']), 1)
+        self.logout()
 
 class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
 
