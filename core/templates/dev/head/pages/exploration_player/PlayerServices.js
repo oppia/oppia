@@ -71,6 +71,8 @@ oppia.factory('ExplorationPlayerService', [
     var initialStateName = null;
     var version = GLOBALS.explorationVersion;
 
+    var isPlaythroughProbable = null;
+
     var randomFromArray = function(arr) {
       return arr[Math.floor(Math.random() * arr.length)];
     };

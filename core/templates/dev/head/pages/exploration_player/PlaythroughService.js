@@ -23,29 +23,36 @@ oppia.constant(
 oppia.factory('PlaythroughService', [
   '$http', 'PAGE_CONTEXT', 'PlaythroughObjectFactory',
   'LearnerActionObjectFactory', 'STORE_PLAYTHROUGH_URL',
-  'UrlInterpolationService', 'StopwatchObjectFactory',
+  'UrlInterpolationService', 'StopwatchObjectFactory', 'ProbabilityService',
   'CURRENT_ISSUE_SCHEMA_VERSION', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
   'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'EARLY_QUIT_THRESHOLD_IN_SECS',
   'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
   'CURRENT_ACTION_SCHEMA_VERSION', 'ACTION_TYPE_EXPLORATION_START',
   'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
+  'RECORD_PLAYTHROUGH_PROBABILITY',
   function(
       $http, PAGE_CONTEXT, PlaythroughObjectFactory, LearnerActionObjectFactory,
       STORE_PLAYTHROUGH_URL, UrlInterpolationService, StopwatchObjectFactory,
-      CURRENT_ISSUE_SCHEMA_VERSION, ISSUE_TYPE_EARLY_QUIT,
+      ProbabilityService, CURRENT_ISSUE_SCHEMA_VERSION, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
       ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, EARLY_QUIT_THRESHOLD_IN_SECS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
       CURRENT_ACTION_SCHEMA_VERSION, ACTION_TYPE_EXPLORATION_START,
-      ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT) {
+      ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
+      RECORD_PLAYTHROUGH_PROBABILITY) {
     var playthrough = null;
     var expStopwatch = null;
+    var isProbable = null;
 
     var multipleIncorrectStateName = {};
 
     var cycleIdentifier = {};
     var visitedStates = [];
+
+    var _isImprobable = function() {
+      return !isProbable;
+    };
 
     var createMultipleIncorrectIssueTracker = function(initStateName) {
       multipleIncorrectStateName = {
@@ -182,6 +189,8 @@ oppia.factory('PlaythroughService', [
 
     return {
       initSession: function(newExplorationId, newExplorationVersion) {
+        isProbable = ProbabilityService.isProbable(
+          RECORD_PLAYTHROUGH_PROBABILITY);
         playthrough = PlaythroughObjectFactory.createNew(
           null, newExplorationId, newExplorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
@@ -190,6 +199,9 @@ oppia.factory('PlaythroughService', [
         return playthrough;
       },
       recordExplorationStartAction: function(initStateName) {
+        if (_isImprobable()) {
+          return;
+        }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
           ACTION_TYPE_EXPLORATION_START,
           {
@@ -209,6 +221,9 @@ oppia.factory('PlaythroughService', [
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
+        if (_isImprobable()) {
+          return;
+        }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
           ACTION_TYPE_ANSWER_SUBMIT,
           {
@@ -245,6 +260,9 @@ oppia.factory('PlaythroughService', [
       },
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
+        if (_isImprobable()) {
+          return;
+        }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
           ACTION_TYPE_EXPLORATION_QUIT,
           {
@@ -259,6 +277,9 @@ oppia.factory('PlaythroughService', [
         ));
       },
       recordPlaythrough: function(isExplorationComplete) {
+        if (_isImprobable()) {
+          return;
+        }
         if (isExplorationComplete) {
           // If the exploration is completed, do not check for issues.
           return;
