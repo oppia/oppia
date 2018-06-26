@@ -541,7 +541,8 @@ def convert_to_ck_editor(html_data):
 
     for tag_name in ['strong', 'em']:
         for tag in soup.findAll(tag_name):
-            if tag.next_sibling.name in oppia_block_components:
+            if tag.next_sibling and (
+                    tag.next_sibling.name in oppia_block_components):
                 parent = tag.parent
                 new_tag_for_prev = soup.new_tag(tag.parent.name)
                 new_tag_for_next = soup.new_tag(tag.parent.name)
