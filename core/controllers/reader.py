@@ -319,9 +319,9 @@ class StorePlaythroughHandler(base.BaseHandler):
         self.current_playthrough_id = None
 
     def _find_matching_issue_in_exp_issues(self, playthrough):
-        """Finds an equivalent issue for the given playthrough in the unresolved
-        issues list of the exploration issues model, returns None if it doesn't
-        exist.
+        """Finds an issue with the equivalent issue_type and associated states
+        as the given playthrough in the unresolved issues list of the
+        exploration issues model.
 
         Args:
             playthrough: Playthrough. The playthrough domain object.
@@ -329,7 +329,8 @@ class StorePlaythroughHandler(base.BaseHandler):
         Returns:
             int|None. The index at which the issue was found, None otherwise.
         """
-        for index, issue in enumerate(self.exp_issues.unresolved_issues):
+        for index, issue in enumerate(
+                self.current_exp_issues.unresolved_issues):
             if issue.issue_type == playthrough.issue_type:
                 issue_customization_args = issue.issue_customization_args
                 # In case issue_keyname is 'state_names', the ordering of the
@@ -350,19 +351,15 @@ class StorePlaythroughHandler(base.BaseHandler):
             orig_playthrough: Playthrough. The original playthrough domain
                 object which is in the now-incorrect issue list.
         """
-        did_move_playthrough_to_new_issue = True
+        did_move_playthrough_to_new_issue = False
         issue_index = self._find_matching_issue_in_exp_issues(playthrough)
         # Check whether the playthrough can be added to its new issue,
         # if not, it stays in its old issue.
         if issue_index is not None:
             issue = self.current_exp_issues.unresolved_issues[issue_index]
-            if len(issue.playthrough_ids) < (
-                    feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
-                self.current_exp_issues.unresolved_issues[
-                    issue_index].playthrough_ids.append(
-                        self.current_playthrough_id)
-            else:
-                did_move_playthrough_to_new_issue = False
+            if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
+                issue.playthrough_ids.append(self.current_playthrough_id)
+                did_move_playthrough_to_new_issue = True
         else:
             issue = stats_domain.ExplorationIssue(
                 playthrough.issue_type,
@@ -370,6 +367,7 @@ class StorePlaythroughHandler(base.BaseHandler):
                 [self.current_playthrough_id],
                 self.current_issue_schema_version, is_valid=True)
             self.current_exp_issues.unresolved_issues.append(issue)
+            did_move_playthrough_to_new_issue = True
 
         # Now, remove the playthrough from its old issue.
         if did_move_playthrough_to_new_issue:
@@ -397,18 +395,15 @@ class StorePlaythroughHandler(base.BaseHandler):
         issue_index = self._find_matching_issue_in_exp_issues(playthrough)
         if issue_index is not None:
             issue = self.current_exp_issues.unresolved_issues[issue_index]
-            if len(issue.playthrough_ids) < (
-                    feconf.MAX_PLAYTHROUGHS_FOR_ISSUE):
+            if len(issue.playthrough_ids) < feconf.MAX_PLAYTHROUGHS_FOR_ISSUE:
                 actions = [action.to_dict() for action in playthrough.actions]
                 playthrough_id = stats_models.PlaythroughModel.create(
                     playthrough.exp_id, playthrough.exp_version,
                     playthrough.issue_type,
                     playthrough.issue_customization_args, actions)
-                self.current_exp_issues.unresolved_issues[
-                    issue_index].playthrough_ids.append(playthrough_id)
+                issue.playthrough_ids.append(playthrough_id)
             else:
-                raise Exception(
-                    'Maximum playthroughs per issue reached.')
+                raise Exception('Maximum playthroughs per issue reached.')
         else:
             actions = [action.to_dict() for action in playthrough.actions]
             playthrough_id = stats_models.PlaythroughModel.create(
@@ -461,7 +456,7 @@ class StorePlaythroughHandler(base.BaseHandler):
         playthrough = stats_domain.Playthrough.from_dict(playthrough_data)
 
         # If playthrough already exists, update it in the datastore.
-        if self.current_playthrough_id:
+        if self.current_playthrough_id is not None:
             orig_playthrough = stats_services.get_playthrough_by_id(
                 self.current_playthrough_id)
             if orig_playthrough.issue_type != playthrough.issue_type:
