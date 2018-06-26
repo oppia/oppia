@@ -24,17 +24,49 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
         '/pages/topics_and_skills_dashboard/' +
         'topics_and_skills_dashboard_navbar_directive.html'),
       controller: [
-        '$scope', '$rootScope', 'TopicCreationService',
-        'EVENT_TYPE_TOPIC_CREATION_ENABLED',
+        '$scope', '$rootScope', '$uibModal', 'TopicCreationService',
+        'SkillCreationService', 'EVENT_TYPE_TOPIC_CREATION_ENABLED',
+        'EVENT_TYPE_SKILL_CREATION_ENABLED',
         function(
-            $scope, $rootScope, TopicCreationService,
-            EVENT_TYPE_TOPIC_CREATION_ENABLED) {
+            $scope, $rootScope, $uibModal, TopicCreationService,
+            SkillCreationService, EVENT_TYPE_TOPIC_CREATION_ENABLED,
+            EVENT_TYPE_SKILL_CREATION_ENABLED) {
           $scope.createTopic = function() {
             TopicCreationService.createNewTopic();
+          };
+          $scope.createSkill = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topics_and_skills_dashboard/' +
+                'create_new_skill_modal.html'),
+              backdrop: 'static',
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.newSkillDescription = '';
+                  $scope.createNewSkill = function() {
+                    $uibModalInstance.close({
+                      description: $scope.newSkillDescription
+                    });
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            }).result.then(function(result) {
+              SkillCreationService.createNewSkill(result.description);
+            });
           };
           $rootScope.$on(
             EVENT_TYPE_TOPIC_CREATION_ENABLED, function(evt, canCreateTopic) {
               $scope.userCanCreateTopic = canCreateTopic;
+            }
+          );
+          $rootScope.$on(
+            EVENT_TYPE_SKILL_CREATION_ENABLED, function(evt, canCreateSkill) {
+              $scope.userCanCreateSkill = canCreateSkill;
             }
           );
         }
