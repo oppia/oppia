@@ -77,7 +77,7 @@ describe('Skill update service', function() {
   it('should set/unset the concept card explanation', function() {
     var skill = SkillObjectFactory.createFromBackendDict(skillDict);
     SkillUpdateService.setConceptCardExplanation(
-      skill, skill.getConceptCard().getExplanation(), 'new explanation');
+      skill, 'new explanation');
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'update_skill_contents_property',
       property_name: 'explanation',

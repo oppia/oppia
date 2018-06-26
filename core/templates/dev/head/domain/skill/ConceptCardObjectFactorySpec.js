@@ -27,21 +27,29 @@ describe('Concept card object factory', function() {
     };
     beforeEach(inject(function($injector) {
       ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
+    }));
 
-      it('should create a new concept card from a backend dictionary',
-        function() {
-          var conceptCard =
-            ConceptCardObjectFactory.createFromBackendDict(conceptCardDict);
-          expect(conceptCard.getExplanation()).toEqual('test explanation');
-          expect(conceptCard.getWorkedExamples()).toEqual(
-            ['worked example 1', 'worked example 2']);
-        });
-
-      it('should convert to a backend dictionary', function() {
+    it('should create a new concept card from a backend dictionary',
+      function() {
         var conceptCard =
           ConceptCardObjectFactory.createFromBackendDict(conceptCardDict);
-        expect(conceptCard.toBackendDict()).toEqual(conceptCardDict);
+        expect(conceptCard.getExplanation()).toEqual('test explanation');
+        expect(conceptCard.getWorkedExamples()).toEqual(
+          ['worked example 1', 'worked example 2']);
       });
-    }));
+
+    it('should convert to a backend dictionary', function() {
+      var conceptCard =
+        ConceptCardObjectFactory.createFromBackendDict(conceptCardDict);
+      expect(conceptCard.toBackendDict()).toEqual(conceptCardDict);
+    });
+
+    it('should create an interstitial concept card', function() {
+      var conceptCard =
+        ConceptCardObjectFactory.createInterstitialConceptCard();
+      expect(conceptCard.getExplanation()).toEqual(
+        'Concept card review material loading');
+      expect(conceptCard.getWorkedExamples()).toEqual([]);
+    });
   });
 });

@@ -96,5 +96,16 @@ describe('Skill object factory', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
       expect(skill.toBackendDict()).toEqual(skillDict);
     });
+
+    it('should be able to create an interstitial skill', function() {
+      var skill = SkillObjectFactory.createInterstitialSkill();
+      expect(skill.getId()).toEqual(null);
+      expect(skill.getDescription()).toEqual('Skill description loading');
+      expect(skill.getMisconceptions()).toEqual([]);
+      expect(skill.getConceptCard()).toEqual(
+        ConceptCardObjectFactory.createInterstitialConceptCard());
+      expect(skill.getLanguageCode()).toEqual('en');
+      expect(skill.getVersion()).toEqual(1);
+    });
   });
 });

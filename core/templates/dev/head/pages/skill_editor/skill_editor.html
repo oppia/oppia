@@ -16,9 +16,6 @@
 
 {% block header_js %}
   {{ super() }}
-  <script type="text/javascript">
-    GLOBALS.skillId = JSON.parse('{{skill_id|js_string}}');
-  </script>
 {% endblock header_js %}
 
 {% block content %}

@@ -54,6 +54,14 @@ oppia.factory('UrlService', ['$window', function($window) {
       }
       return topicId;
     },
+    getSkillIdFromUrl: function() {
+      var pathname = this.getPathname();
+      var skillId = pathname.split('/')[2];
+      if (skillId.length !== 12) {
+        throw Error('Invalid Skill Id');
+      }
+      return skillId;
+    },
     getQueryFieldValuesAsList: function(fieldName) {
       var fieldValues = [];
       if (this.getCurrentQueryString().indexOf('?') > -1) {

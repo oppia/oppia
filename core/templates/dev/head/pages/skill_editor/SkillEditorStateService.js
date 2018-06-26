@@ -23,7 +23,7 @@ oppia.factory('SkillEditorStateService', [
   function(
       SkillObjectFactory, EditableSkillBackendApiService,
       AlertsService, UndoRedoService) {
-    var _skill = SkillObjectFactory.createEmptySkill();
+    var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillIsInitialized = false;
     var _isLoadingSkill = false;
     var _isSavingSkill = false;

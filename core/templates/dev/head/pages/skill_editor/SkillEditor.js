@@ -21,8 +21,8 @@ oppia.constant(
   '/skill_editor_handler/data/<skill_id>');
 
 oppia.controller('SkillEditor', [
-  'SkillEditorStateService',
-  function(SkillEditorStateService) {
-    SkillEditorStateService.loadSkill(GLOBALS.skillId);
+  'SkillEditorStateService', 'UrlService',
+  function(SkillEditorStateService, UrlService) {
+    SkillEditorStateService.loadSkill(UrlService.getSkillIdFromUrl());
   }
 ]);

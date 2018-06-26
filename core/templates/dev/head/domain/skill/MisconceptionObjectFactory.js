@@ -20,18 +20,18 @@
 oppia.factory('MisconceptionObjectFactory', [
   function() {
     var Misconception = function(id, name, notes, feedback) {
-      this.id = id;
-      this.name = name;
-      this.notes = notes;
-      this.feedback = feedback;
+      this._id = id;
+      this._name = name;
+      this._notes = notes;
+      this._feedback = feedback;
     };
 
     Misconception.prototype.toBackendDict = function() {
       return {
-        id: this.id,
-        name: this.name,
-        notes: this.notes,
-        feedback: this.feedback
+        id: this._id,
+        name: this._name,
+        notes: this._notes,
+        feedback: this._feedback
       };
     };
 
@@ -48,31 +48,31 @@ oppia.factory('MisconceptionObjectFactory', [
     };
 
     Misconception.prototype.getId = function() {
-      return this.id;
+      return this._id;
     };
 
     Misconception.prototype.getName = function() {
-      return this.name;
+      return this._name;
     };
 
     Misconception.prototype.setName = function(newName) {
-      this.name = newName;
+      this._name = newName;
     };
 
     Misconception.prototype.getNotes = function() {
-      return this.notes;
+      return this._notes;
     };
 
     Misconception.prototype.setNotes = function(newNotes) {
-      this.notes = newNotes;
+      this._notes = newNotes;
     };
 
     Misconception.prototype.getFeedback = function() {
-      return this.feedback;
+      return this._feedback;
     };
 
     Misconception.prototype.setFeedback = function(newFeedback) {
-      this.feedback = newFeedback;
+      this._feedback = newFeedback;
     };
 
     return Misconception;

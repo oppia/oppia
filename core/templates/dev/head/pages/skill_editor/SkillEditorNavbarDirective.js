@@ -28,7 +28,6 @@ oppia.directive('skillEditorNavbar', [
         function(
             $scope, $uibModal, AlertsService,
             UndoRedoService, SkillEditorStateService) {
-          $scope.skillId = GLOBALS.skillId;
           $scope.skill = SkillEditorStateService.getSkill();
 
           $scope.isLoadingSkill = SkillEditorStateService.isLoadingSkill;

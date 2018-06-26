@@ -45,12 +45,12 @@ oppia.factory('SkillObjectFactory', [
     };
 
     Skill.prototype.copyFromSkill = function(skill) {
-      this._id = skill._id;
-      this._description = skill._description;
-      this._misconceptions = skill._misconceptions;
-      this._conceptCard = skill._conceptCard;
-      this._languageCode = skill._languageCode;
-      this._version = skill._version;
+      this._id = skill.getId();
+      this._description = skill.getDescription();
+      this._misconceptions = skill.getMisconceptions();
+      this._conceptCard = skill.getConceptCard();
+      this._languageCode = skill.getLanguageCode();
+      this._version = skill.getVersion();
     };
 
     Skill.createFromBackendDict = function(skillBackendDict) {
@@ -64,8 +64,12 @@ oppia.factory('SkillObjectFactory', [
         skillBackendDict.version);
     };
 
-    Skill.createEmptySkill = function() {
-      return new Skill(null, null, [], null, null);
+
+    // Create an interstitial skill that would be displayed in the editor until
+    // the actual skill is fetched from the backend.
+    Skill.createInterstitialSkill = function() {
+      return new Skill(null, 'Skill description loading',
+        [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en', 1);
     };
 
     var generateMisconceptionsFromBackendDict = function(
@@ -94,15 +98,11 @@ oppia.factory('SkillObjectFactory', [
     };
 
     Skill.prototype.getMisconceptions = function() {
-      return this._misconceptions;
+      return this._misconceptions.slice();
     };
 
     Skill.prototype.appendMisconception = function(newMisconception) {
       this._misconceptions.push(newMisconception);
-    };
-
-    Skill.prototype.removeLastMisconception = function() {
-      this._misconceptions.pop();
     };
 
     Skill.prototype.getLanguageCode = function() {
@@ -129,7 +129,7 @@ oppia.factory('SkillObjectFactory', [
           return this._misconceptions[idx];
         }
       }
-      return null;
+      throw Error('Could not find misconception with ID: ' + id);
     };
 
     Skill.prototype.deleteMisconception = function(id) {

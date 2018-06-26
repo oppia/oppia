@@ -23,7 +23,8 @@ oppia.directive('workedExampleEditor', [
       scope: {
         workedExample: '=',
         getIndex: '&index',
-        isEditable: '&isEditable'
+        isEditable: '&isEditable',
+        getOnSaveFn: '&onSave',
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill_editor/editor_tab/worked_example_editor_directive.html'),
@@ -60,6 +61,7 @@ oppia.directive('workedExampleEditor', [
                 SkillEditorStateService.getSkill(),
                 $scope.getIndex(),
                 $scope.container.workedExample);
+              $scope.getOnSaveFn()();
             }
           };
 

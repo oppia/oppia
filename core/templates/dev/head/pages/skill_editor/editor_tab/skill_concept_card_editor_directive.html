@@ -27,9 +27,8 @@
                 <span class="oppia-placeholder" ng-show="skill.getConceptCard().getExplanation() === ''">
                     Give a review or explanation of the skill.
                 </span>
-                <span angular-html-bind="skill.getConceptCard().getExplanation()"
-                      class="oppia-rte-editor">
-                </span>
+                <angular-html-bind html-data="container.displayedConceptCardExplanation">
+                </angular-html-bind>
               </div>
               <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
               <div class="oppia-editable-section-mask">
@@ -38,7 +37,7 @@
           </div>
 
           <div ng-if="conceptCardExplanationEditorIsShown">
-            <schema-based-editor schema="HTML_SCHEMA" local-value="skill.getConceptCard().explanation">
+            <schema-based-editor schema="HTML_SCHEMA" local-value="container.displayedConceptCardExplanation">
             </schema-based-editor>
             <div style="margin-top: 2px;">
               <button type="button"
@@ -53,17 +52,17 @@
         </div>
 
         <strong>Worked Examples</strong>
-        <div ng-if="skill.getConceptCard().getWorkedExamples().length > 0">
+        <div ng-if="container.displayedWorkedExamples.length > 0">
           <ul class="nav oppia-option-list nav-stacked nav-pills"
               role="tablist"
               ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
-              ng-model="skill.getConceptCard().workedExamples">
-            <li ng-repeat="workedExample in skill.getConceptCard().getWorkedExamples()"
+              ng-model="container.displayedWorkedExamples">
+            <li ng-repeat="workedExample in container.displayedWorkedExamples"
                 ng-class="{'active': activeWorkedExampleIndex === $index}"
                 class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection"
                 style="margin-top: 0;">
               <span class="oppia-worked-example-sort-handle"
-                    ng-if="skill.getConceptCard().getWorkedExamples().length > 1"
+                    ng-if="container.displayedWorkedExamples.length > 1"
                     ng-mousedown="changeActiveWorkedExampleIndex(-1)">
                 <img ng-src="<[dragDotsImgUrl]>" width="10">
               </span>
@@ -83,7 +82,8 @@
                 <div class="oppia-editor-card-section">
                   <worked-example-editor worked-example="workedExample"
                                          index="$index"
-                                         is-editable="isEditable">
+                                         is-editable="isEditable"
+                                         on-save="onWorkedExampleSaved">
                   </worked-example-editor>
                 </div>
               </div>

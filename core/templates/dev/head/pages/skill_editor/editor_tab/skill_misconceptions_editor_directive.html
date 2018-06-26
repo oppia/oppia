@@ -6,11 +6,11 @@
         <span style="font-size:.8em;"><i>These are used to assist creators in writing answer groups of questions that test this skill. Question creators may tag each answer group with a misconception to better ensure that all misconceptions are addressed for the skill being tested.
         </i></span>
       </div>
-      <div ng-if="skill.getMisconceptions().length > 0">
+      <div ng-if="misconceptions.length > 0">
         <ul class="nav oppia-option-list nav-stacked nav-pills"
             role="tablist"
-            ng-model="skill._misconceptions">
-          <li ng-repeat="misconception in skill.getMisconceptions()"
+            ng-model="misconceptions">
+          <li ng-repeat="misconception in misconceptions"
               ng-class="{'active': activeMisconceptionIndex === $index}"
               class="oppia-rule-block oppia-prevent-selection"
               style="margin-top: 0;">
@@ -28,7 +28,7 @@
 
             <div ng-if="activeMisconceptionIndex === $index">
               <div class="oppia-editor-card-section">
-                <misconception-editor misconception="misconception"
+                <misconception-editor misconception="skill.findMisconceptionById(misconception.getId())"
                                       index="$index"
                                       is-editable="isEditable">
                 </misconception-editor>

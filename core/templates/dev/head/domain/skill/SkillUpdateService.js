@@ -81,7 +81,7 @@ oppia.factory('SkillUpdateService', [
         property_name: propertyName,
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue),
-        id: angular.copy(misconceptionId),
+        id: misconceptionId,
       }, apply, reverse);
     };
 
@@ -115,8 +115,8 @@ oppia.factory('SkillUpdateService', [
           });
       },
 
-      setConceptCardExplanation: function(
-          skill, oldExplanation, newExplanation) {
+      setConceptCardExplanation: function(skill, newExplanation) {
+        var oldExplanation = skill.getConceptCard().getExplanation();
         _applySkillContentsPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_EXPLANATION,
           newExplanation, oldExplanation,
@@ -176,8 +176,8 @@ oppia.factory('SkillUpdateService', [
           });
       },
 
-      updateWorkedExamples: function(
-          skill, oldWorkedExamples, newWorkedExamples) {
+      updateWorkedExamples: function(skill, newWorkedExamples) {
+        var oldWorkedExamples = skill.getConceptCard().getWorkedExamples();
         _applySkillContentsPropertyChange(
           skill, SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES,
           newWorkedExamples, oldWorkedExamples,
@@ -194,12 +194,13 @@ oppia.factory('SkillUpdateService', [
         var params = {
           new_value: newMisconception.toBackendDict()
         };
+        var misconceptionId = newMisconception.getId();
         _applyChange(
           skill, CMD_ADD_SKILL_MISCONCEPTION, params,
           function(changeDict, skill) {
             skill.appendMisconception(newMisconception);
           }, function(changeDict, skill) {
-            skill.removeLastMisconception();
+            skill.deleteMisconception(misconceptionId);
           });
       },
 

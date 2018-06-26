@@ -123,16 +123,6 @@ describe('Skill editor state service', function() {
     expect(SkillEditorStateService.hasLoadedSkill()).toBe(true);
   });
 
-  it('should initially return an empty skill', function() {
-    var skill = SkillEditorStateService.getSkill();
-    expect(skill.getId()).toEqual(null);
-    expect(skill.getDescription()).toEqual(null);
-    expect(skill.getVersion()).toBeUndefined();
-    expect(skill.getConceptCard()).toEqual(null);
-    expect(skill.getLanguageCode()).toEqual(null);
-    expect(skill.getMisconceptions()).toEqual([]);
-  });
-
   it('should return the last skill loaded as the same object', function() {
     var previousSkill = SkillEditorStateService.getSkill();
     var expectedSkill = SkillObjectFactory.createFromBackendDict(

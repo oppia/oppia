@@ -34,6 +34,7 @@ oppia.directive('skillMisconceptionsEditor', [
             $scope, $filter, $uibModal, $rootScope,
             MisconceptionObjectFactory) {
           $scope.skill = SkillEditorStateService.getSkill();
+          $scope.misconceptions = $scope.skill.getMisconceptions();
           $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/general/drag_dots.png');
 
@@ -41,32 +42,6 @@ oppia.directive('skillMisconceptionsEditor', [
             return true;
           };
 
-          // When the page is scrolled so that the top of the page is above the
-          // browser viewport, there are some bugs in the positioning of the
-          // helper. This is a bug in jQueryUI that has not been fixed yet.
-          // For more details, see http://stackoverflow.com/q/5791886
-          $scope.MISCONCEPTIONS_SORTABLE_OPTIONS = {
-            axis: 'y',
-            cursor: 'move',
-            handle: '.oppia-misconception-sort-handle',
-            items: '.oppia-sortable-misconception',
-            revert: 100,
-            tolerance: 'pointer',
-            start: function(e, ui) {
-              $rootScope.$broadcast('externalSave');
-              $scope.activeMisconceptionIndex = null;
-              ui.placeholder.height(ui.item.height());
-              misconceptionsMemento = angular.copy(
-                $scope.skill.getMisconceptions());
-            },
-            stop: function() {
-              var newMisconceptions = angular.copy(
-                $scope.skill.getMisconceptions());
-              SkillUpdateService.updateMisconceptions(
-                $scope.skill, misconceptionsMemento, newMisconceptions);
-              misconceptionsMemento = angular.copy(newMisconceptions);
-            }
-          };
 
           $scope.changeActiveMisconceptionIndex = function(idx) {
             if (idx === $scope.activeMisconceptionIndex) {
@@ -77,7 +52,7 @@ oppia.directive('skillMisconceptionsEditor', [
           };
 
           $scope.getMisconceptionSummary = function(misconception) {
-            return angular.copy(misconception.name);
+            return misconception.getName();
           };
 
           $scope.openDeleteMisconceptionModal = function(index, evt) {
@@ -102,6 +77,8 @@ oppia.directive('skillMisconceptionsEditor', [
                 }]
             }).result.then(function(result) {
               SkillUpdateService.deleteMisconception($scope.skill, result.id);
+              $scope.misconceptions = $scope.skill.getMisconceptions();
+              $scope.activeMisconceptionIndex = null;
             });
           };
 
@@ -143,6 +120,7 @@ oppia.directive('skillMisconceptionsEditor', [
             }).result.then(function(result) {
               SkillUpdateService.addMisconception(
                 $scope.skill, result.misconception);
+              $scope.misconceptions = $scope.skill.getMisconceptions();
             });
           };
         }]
