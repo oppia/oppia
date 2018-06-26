@@ -38,7 +38,7 @@ oppia.directive('topicsAndSkillsDashboardNavbar', [
             $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topics_and_skills_dashboard/' +
-                'create_new_skill_modal.html'),
+                'create_new_skill_modal_directive.html'),
               backdrop: 'static',
               controller: [
                 '$scope', '$uibModalInstance',
