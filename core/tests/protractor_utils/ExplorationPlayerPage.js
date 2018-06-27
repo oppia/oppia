@@ -174,7 +174,10 @@ var ExplorationPlayerPage = function() {
       feedbackPopupLink.click();
     });
     feedbackTextArea.sendKeys(feedback);
-    feedbackSubmitButton.click();
+    browser.waitForAngular();
+    feedbackSubmitButton.isDisplayed().then(function() {
+      feedbackSubmitButton.click();
+    });
   };
 
   this.submitSuggestion = function(suggestion, description) {
@@ -183,7 +186,10 @@ var ExplorationPlayerPage = function() {
     });
     forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
     suggestionDescriptionInput.sendKeys(description);
-    suggestionSubmitButton.click();
+    browser.waitForAngular();
+    suggestionSubmitButton.isDisplayed().then(function() {
+      suggestionSubmitButton.click();
+    });
   };
 };
 
