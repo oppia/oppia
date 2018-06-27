@@ -23,6 +23,11 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var ruleTemplates = require(
   '../../../extensions/interactions/rule_templates.json');
 
+var ExplorationEditorFeedbackTab = require(
+  '../protractor_utils/ExplorationEditorFeedbackTab.js');
+var ExplorationEditorHistoryTab = require(
+  '../protractor_utils/ExplorationEditorHistoryTab.js'
+);
 var ExplorationEditorSettingsTab = require(
   '../protractor_utils/ExplorationEditorSettingsTab.js');
 
@@ -33,6 +38,12 @@ var ExplorationEditorPage = function() {
   /*
    * Components
    */
+  this.getFeedbackTab = function() {
+    return new ExplorationEditorFeedbackTab.ExplorationEditorFeedbackTab();
+  };
+  this.getHistoryTab = function() {
+    return new ExplorationEditorHistoryTab.ExplorationEditorHistoryTab();
+  };
   this.getSettingsTab = function() {
     return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
   };
@@ -128,6 +139,10 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-discard-changes'));
   var dismissWelcomeModalButton = element(
     by.css('.protractor-test-dismiss-welcome-modal'));
+  var navigateToFeedbackTabButton = element(
+    by.css('.protractor-test-feedback-tab'));
+  var navigateToHistoryTabButton = element(
+    by.css('.protractor-test-history-tab'));
   var navigateToMainTabButton = element(by.css('.protractor-test-main-tab'));
   var navigateToPreviewTabButton = element(
     by.css('.protractor-test-preview-tab'));
@@ -565,6 +580,18 @@ var ExplorationEditorPage = function() {
   };
 
   // NAVIGATION
+
+  this.navigateToHistoryTab = function() {
+    navigateToHistoryTabButton.isDisplayed().then(function() {
+      navigateToHistoryTabButton.click();
+    });
+  };
+
+  this.navigateToFeedbackTab = function() {
+    navigateToFeedbackTabButton.isDisplayed().then(function() {
+      navigateToFeedbackTabButton.click();
+    });
+  };
 
   this.navigateToMainTab = function() {
     navigateToMainTabButton.isDisplayed().then(function(isVisible) {
