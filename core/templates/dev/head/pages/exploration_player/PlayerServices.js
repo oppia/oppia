@@ -30,8 +30,8 @@ oppia.factory('ExplorationPlayerService', [
   'PAGE_CONTEXT', 'ExplorationHtmlFormatterService',
   'PlayerTranscriptService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService',
-  'ReadOnlyExplorationBackendApiService',
+  'ENABLE_PLAYTHROUGHS', 'PlaythroughService', 'StatsReportingService',
+  'UrlInterpolationService', 'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationLanguageService',
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
   'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
@@ -44,8 +44,8 @@ oppia.factory('ExplorationPlayerService', [
       PAGE_CONTEXT, ExplorationHtmlFormatterService,
       PlayerTranscriptService, ExplorationObjectFactory,
       ExpressionInterpolationService, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService,
-      ReadOnlyExplorationBackendApiService,
+      ENABLE_PLAYTHROUGHS, PlaythroughService, StatsReportingService,
+      UrlInterpolationService, ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationLanguageService,
       LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
       WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
@@ -264,6 +264,11 @@ oppia.factory('ExplorationPlayerService', [
             StatsReportingService.initSession(
               _explorationId, exploration.title,
               version, data.session_id, GLOBALS.collectionId);
+
+            if (ENABLE_PLAYTHROUGHS) {
+              PlaythroughService.initSession(_explorationId, version);
+            }
+
             AudioTranslationLanguageService.init(
               exploration.getAllAudioLanguageCodes(),
               data.preferred_audio_language_code,
@@ -389,6 +394,12 @@ oppia.factory('ExplorationPlayerService', [
         var newStateName = outcome.dest;
         var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
+
+        if (ENABLE_PLAYTHROUGHS) {
+          StatsReportingService.recordAnswerSubmitAction(
+            oldStateName, newStateName, oldState.interaction.id, answer,
+            outcome.feedback);
+        }
 
         // Compute the data for the next state.
         var oldParams = LearnerParamsService.getAllParams();

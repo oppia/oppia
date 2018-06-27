@@ -28,15 +28,15 @@ oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService', 'TopicObjectFactory',
   'TopicRightsObjectFactory', 'SubtopicPageObjectFactory',
   'TopicRightsBackendApiService', 'UndoRedoService',
-  'EditableTopicBackendApiService', 'EVENT_TOPIC_INITIALIZED',
-  'EVENT_TOPIC_REINITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
-  'EVENT_STORY_SUMMARIES_INITIALIZED', function(
+  'EditableTopicBackendApiService', 'EditableStoryBackendApiService',
+  'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+  'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_STORY_SUMMARIES_INITIALIZED', function(
       $rootScope, AlertsService, TopicObjectFactory,
       TopicRightsObjectFactory, SubtopicPageObjectFactory,
       TopicRightsBackendApiService, UndoRedoService,
-      EditableTopicBackendApiService, EVENT_TOPIC_INITIALIZED,
-      EVENT_TOPIC_REINITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED,
-      EVENT_STORY_SUMMARIES_INITIALIZED) {
+      EditableTopicBackendApiService, EditableStoryBackendApiService,
+      EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
+      EVENT_SUBTOPIC_PAGE_LOADED, EVENT_STORY_SUMMARIES_INITIALIZED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
     // The array that caches all the subtopic pages loaded by the user.
@@ -323,6 +323,26 @@ oppia.factory('TopicEditorStateService', [
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(topicBackendObject) {
             _updateTopic(topicBackendObject);
+            var changeList = UndoRedoService.getCommittableChangeList();
+            for (var i = 0; i < changeList.length; i++) {
+              if (changeList[i].property_name === 'canonical_story_ids') {
+                if (changeList[i].new_value.length ===
+                    changeList[i].old_value.length - 1) {
+                  deletedStoryId = changeList[i].old_value.filter(
+                    function(storyId) {
+                      return changeList[i].new_value.indexOf(storyId) === -1;
+                    }
+                  )[0];
+                  EditableStoryBackendApiService.deleteStory(
+                    _topic.getId(), deletedStoryId);
+                } else if (
+                  changeList[i].new_value.length <
+                  changeList[i].old_value.length) {
+                  throw Error(
+                    'More than one story should not be deleted at a time.');
+                }
+              }
+            }
             UndoRedoService.clearChanges();
             _topicIsBeingSaved = false;
             if (successCallback) {
