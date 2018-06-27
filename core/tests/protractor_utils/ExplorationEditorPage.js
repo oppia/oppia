@@ -185,6 +185,7 @@ var ExplorationEditorPage = function() {
   this.addResponse = function(
       interactionId, feedbackInstructions, destStateName,
       createState, ruleName) {
+    browser.waitForAngular();
     // Open the "Add Response" modal if it is not already open.
     addResponseButton.isDisplayed().then(function() {
       addResponseButton.click();
