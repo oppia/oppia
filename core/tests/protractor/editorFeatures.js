@@ -680,6 +680,6 @@ describe('Suggestions on Explorations', function() {
   });
 
   afterEach(function() {
-    // general.checkForConsoleErrors([]);
+    general.checkForConsoleErrors([]);
   });
 });
