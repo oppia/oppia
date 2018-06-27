@@ -37,17 +37,12 @@ var ExplorationEditorPage = function() {
     return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
   };
 
+
   /*
    * Interactive elements
    */
-  var addResponseDetails = element(
-    by.css('.protractor-test-add-response-details'));
   var addResponseHeader = element(
     by.css('.protractor-test-add-response-modal-header'));
-  var answerDescription = element(
-    by.css('.protractor-test-answer-description'));
-  var answerDescriptionFragment = element.all(
-    by.css('.protractor-test-answer-description-fragment'));
   var commitMessageInput = element(
     by.css('.protractor-test-commit-message-input'));
   var multipleChoiceAnswerOptions = function (optionNum) {
@@ -70,27 +65,6 @@ var ExplorationEditorPage = function() {
   };
   var feedbackBubble = element(by.css('.protractor-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.protractor-test-open-feedback-editor'));
-  var responseBody = function(responseNum) {
-    return element(by.css('.protractor-test-response-body-' + responseNum));
-  };
-  var openOutcomeDestEditor = element(
-    by.css('.protractor-test-open-outcome-dest-editor'));
-  var openOutcomeFeedBackEditor = element(
-    by.css('.protractor-test-open-outcome-feedback-editor'));
-  var responseTab = element.all(by.css('.protractor-test-response-tab'));
-  var ruleBlock = element.all(by.css('.protractor-test-rule-block'));
-  var ruleDetails = element(by.css('.protractor-test-rule-details'));
-  var stateContentEditor = element(
-    by.css('.protractor-test-state-content-editor'));
-  var stateContentDisplay = element(
-    by.css('.protractor-test-state-content-display'));
-  var stateNameContainer = element(
-    by.css('.protractor-test-state-name-container'));
-  var stateNameInput = element(
-    by.css('.protractor-test-state-name-input'));
-  var interactionTab = function(tabId) {
-    return element(by.css('.protractor-test-interaction-tab-' + tabId));
-  };
   var interaction = element(by.css('.protractor-test-interaction'));
   var interactionEditor = element(
     by.css('.protractor-test-interaction-editor'));
@@ -101,6 +75,26 @@ var ExplorationEditorPage = function() {
   var interactionTile = function(interactionId) {
     return element(by.css(
       '.protractor-test-interaction-tile-' + interactionId));
+  };
+  var responseBody = function(responseNum) {
+    return element(by.css('.protractor-test-response-body-' + responseNum));
+  };
+  var openOutcomeDestEditor = element(
+    by.css('.protractor-test-open-outcome-dest-editor'));
+  var openOutcomeFeedBackEditor = element(
+    by.css('.protractor-test-open-outcome-feedback-editor'));
+  var responseTab = element.all(by.css('.protractor-test-response-tab'));
+  var ruleBlock = element.all(by.css('.protractor-test-rule-block'));
+  var stateEditContent = element(
+    by.css('.protractor-test-state-edit-content'));
+  var stateContentDisplay = element(
+    by.css('.protractor-test-state-content-display'));
+  var stateNameContainer = element(
+    by.css('.protractor-test-state-name-container'));
+  var stateNameInput = element(
+    by.css('.protractor-test-state-name-input'));
+  var interactionTab = function(tabId) {
+    return element(by.css('.protractor-test-interaction-tab-' + tabId));
   };
 
   /*
@@ -129,10 +123,6 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-delete-answer'));
   var deleteInteractionButton = element(
     by.css('.protractor-test-delete-interaction'));
-  var deleteNodeButton = function(nodeIndex) {
-    return interactionNode.get(nodeIndex).element(
-      by.css('.protractor-test-delete-node'));
-  };
   var deleteResponseButton = element(
     by.css('.protractor-test-delete-response'));
   var discardChangesButton = element(
@@ -158,8 +148,6 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-save-outcome-feedback'));
   var saveStateContentButton = element(
     by.css('.protractor-test-save-state-content'));
-  var stateEditContentButton = element(
-    by.css('.protractor-test-state-edit-content'));
   var stateNameSubmitButton = stateNameContainer.element(
     by.css('.protractor-test-state-name-submit'));
 
@@ -184,14 +172,13 @@ var ExplorationEditorPage = function() {
       interactionId, feedbackInstructions, destStateName,
       createState, ruleName) {
     // Open the "Add Response" modal if it is not already open.
-    addResponseHeader.isPresent().then(function(isVisible) {
-      if (!isVisible) {
-        addResponseButton.click();
-        general.waitForSystem();
-      }
+    addResponseButton.isDisplayed().then(function() {
+      addResponseButton.click();
     });
 
     // Set the rule description.
+    var addResponseDetails = element(
+      by.css('.protractor-test-add-response-details'));
     var args = [addResponseDetails, interactionId, ruleName];
     for (var i = 5; i < arguments.length; i++) {
       args.push(arguments[i]);
@@ -219,27 +206,9 @@ var ExplorationEditorPage = function() {
     }
 
     // Close new response modal.
-    addNewResponseButton.click();
-
-    // Wait for modal to close.
-    general.waitForSystem();
-  };
-
-  this.setDefaultOutcome = function(feedbackInstructions,
-      destStateName, createState) {
-    // Select the default response.
-    var editor = this.getResponseEditor('default');
-
-    if (feedbackInstructions) {
-      editor.setFeedback(feedbackInstructions);
-    }
-
-    // If the destination is being changed, open the corresponding editor.
-    if (destStateName) {
-      editor.setDestination(destStateName, createState, null);
-    }
-
-    // Wait for feedback and/or destination editors to finish saving.
+    addNewResponseButton.isDisplayed().then(function(){
+      addNewResponseButton.click();
+    });
     general.waitForSystem();
   };
 
@@ -275,7 +244,9 @@ var ExplorationEditorPage = function() {
 
     responseBody(responseNum).isPresent().then(function(isVisible) {
       if (!isVisible) {
-        headerElem.click();
+        headerElem.isDisplayed().then(function() {
+          headerElem.click();
+        });
       }
     });
 
@@ -298,14 +269,17 @@ var ExplorationEditorPage = function() {
       setDestination: function(
           destinationName, createState, refresherExplorationId) {
         // Begin editing destination.
-        openOutcomeDestEditor.click();
+        openOutcomeDestEditor.isDisplayed().then( function() {
+          openOutcomeDestEditor.click();
+        });
 
         // Set destination contents.
         _setOutcomeDest(destinationName, createState, refresherExplorationId);
 
         // Save destination.
-        general.waitForSystem();
-        saveOutcomeDestButton.click();
+        saveOutcomeDestButton.isDisplayed().then( function() {
+          saveOutcomeDestButton.click();
+        });
       },
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: function(stateNames) {
@@ -335,6 +309,7 @@ var ExplorationEditorPage = function() {
         addAnswerButton.click();
 
         // Set the rule description.
+        var ruleDetails = element(by.css('.protractor-test-rule-details'));
         var args = [ruleDetails, interactionId, ruleName];
         for (var i = 2; i < arguments.length; i++) {
           args.push(arguments[i]);
@@ -373,6 +348,25 @@ var ExplorationEditorPage = function() {
     expect(addResponseButton.isPresent()).toBeFalsy();
   };
 
+  var _setOutcomeDest = function(destName, createDest, refresherExplorationId) {
+    expect(destName === null && createDest).toBe(false);
+
+    if (createDest) {
+      targetOption = _NEW_STATE_OPTION;
+    } else if (destName === null) {
+      targetOption = _CURRENT_STATE_OPTION;
+    } else {
+      targetOption = destName;
+    }
+    editOutcomeDestDropdownOptions(targetOption).click();
+
+    if (createDest) {
+      editOutcomeDestStateInput.sendKeys(destName);
+    } else if (refresherExplorationId) {
+      editOutcomeDestAddExplorationId.sendKeys(refresherExplorationId);
+    }
+  };
+
   // CONTENT
 
   // 'richTextInstructions' is a function that is sent a RichTextEditor which it
@@ -380,11 +374,17 @@ var ExplorationEditorPage = function() {
   // .appendBoldText(...).
   this.setContent = function(richTextInstructions) {
     general.waitForSystem();
-    stateEditContentButton.click();
+    stateEditContent.isDisplayed().then(function() {
+      stateEditContent.click();
+    });
+    var stateContentEditor = element(
+      by.css('.protractor-test-state-content-editor'));
     var richTextEditor = forms.RichTextEditor(stateContentEditor);
     richTextEditor.clear();
     richTextInstructions(richTextEditor);
-    saveStateContentButton.click();
+    saveStateContentButton.isDisplayed().then(function() {
+      saveStateContentButton.click();
+    });
   };
 
   // This receives a function richTextInstructions used to verify the display of
@@ -405,18 +405,20 @@ var ExplorationEditorPage = function() {
   // CONTROLS
 
   this.saveChanges = function(commitMessage) {
-    saveChangesButton.click().then(function() {
-      if (commitMessage) {
-        commitMessageInput.
-          sendKeys(commitMessage);
-      }
-      browser.waitForAngular();
-      general.waitForSystem();
-      saveDraftButton.click();
-      // This is necessary to give the page time to record the changes,
-      // so that it does not attempt to stop the user leaving.
-      browser.waitForAngular();
-      general.waitForSystem();
+    saveChangesButton.isDisplayed().then(function() {
+      saveChangesButton.click().then(function() {
+        if (commitMessage) {
+          commitMessageInput.
+            sendKeys(commitMessage);
+        }
+        saveDraftButton.isDisplayed().then(function() {
+          saveDraftButton.click();
+        });
+        // This is necessary to give the page time to record the changes,
+        // so that it does not attempt to stop the user leaving.
+        browser.waitForAngular();
+        general.waitForSystem();
+      });
     });
   };
 
@@ -438,13 +440,14 @@ var ExplorationEditorPage = function() {
   // for most purposes. Additional arguments may be sent to this function,
   // and they will be passed on to the relevant interaction editor.
   this.setInteraction = function(interactionId) {
-    general.waitForSystem();
     openInteraction(interactionId);
     customizeInteraction.apply(null, arguments);
     // If the "Add Response" modal opens, close it.
     addResponseHeader.isPresent().then(function(isVisible) {
       if (isVisible) {
-        closeAddResponseModal();
+        closeAddResponseButton.isDisplayed().then(function() {
+          closeAddResponseButton.click();
+        });
       }
     });
   };
@@ -462,9 +465,9 @@ var ExplorationEditorPage = function() {
         }
       });
 
-    general.waitForSystem();
-
-    addInteractionButton.click();
+    addInteractionButton.isDisplayed().then(function(){
+      addInteractionButton.click();
+    });
 
     var INTERACTION_ID_TO_TAB_NAME = {
       Continue: 'General',
@@ -483,16 +486,13 @@ var ExplorationEditorPage = function() {
       InteractiveMap: 'Geography'
     };
 
-    general.waitForSystem();
-    interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
-    interactionTile(interactionId).click();
-  };
-
-  // This function should not usually be invoked directly; please consider
-  // using setInteraction instead.
-  var closeAddResponseModal = function() {
-    closeAddResponseButton.click();
-    general.waitForSystem();
+    interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).isDisplayed()
+      .then(function() {
+        interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
+      });
+    interactionTile(interactionId).isDisplayed().then( function() {
+      interactionTile(interactionId).click();
+    });
   };
 
   // This function should not usually be invoked directly; please consider
@@ -538,10 +538,14 @@ var ExplorationEditorPage = function() {
   };
 
   this.setStateName = function(name) {
-    stateNameContainer.click();
+    stateNameContainer.isDisplayed().then(function() {
+      stateNameContainer.click();
+    });
     stateNameInput.clear();
     stateNameInput.sendKeys(name);
-    stateNameSubmitButton.click();
+    stateNameSubmitButton.isDisplayed().then(function() {
+      stateNameSubmitButton.click();
+    });
     // Wait for the state to refresh.
     general.waitForSystem();
   };
@@ -554,24 +558,6 @@ var ExplorationEditorPage = function() {
     expect(_getStateName()).toMatch(name);
   };
 
-  var _setOutcomeDest = function(destName, createDest, refresherExplorationId) {
-    expect(destName === null && createDest).toBe(false);
-
-    if (createDest) {
-      targetOption = _NEW_STATE_OPTION;
-    } else if (destName === null) {
-      targetOption = _CURRENT_STATE_OPTION;
-    } else {
-      targetOption = destName;
-    }
-    editOutcomeDestDropdownOptions(targetOption).click();
-    if (createDest) {
-      editOutcomeDestStateInput.sendKeys(destName);
-    } else if (refresherExplorationId) {
-      editOutcomeDestAddExplorationId.sendKeys(refresherExplorationId);
-    }
-  };
-
   var _setOutcomeFeedback = function(richTextInstructions) {
     var feedbackEditor = forms.RichTextEditor(
       feedbackBubble);
@@ -582,15 +568,19 @@ var ExplorationEditorPage = function() {
   // NAVIGATION
 
   this.navigateToMainTab = function() {
-    navigateToMainTabButton.click();
-    general.waitForSystem();
+    navigateToMainTabButton.isDisplayed().then(function(isVisible) {
+      if (isVisible) {
+        navigateToMainTabButton.click();
+      }
+    });
     // Click a neutral element in order to dismiss any warnings.
-    neutralElement.click();
+    neutralElement.isDisplayed().then(function() {
+      neutralElement.click();
+    });
   };
 
   this.navigateToPreviewTab = function() {
     navigateToPreviewTabButton.click();
-    general.waitForSystem();
   };
 
   this.navigateToSettingsTab = function() {
@@ -644,7 +634,8 @@ var ExplorationEditorPage = function() {
     }
     var parameterTypes = _getRuleParameterTypes(interactionId, ruleName);
     expect(parameterValues.length).toEqual(parameterTypes.length);
-
+    var answerDescriptionFragment = element.all(
+      by.css('.protractor-test-answer-description-fragment'));
     for (var i = 0; i < parameterValues.length; i++) {
       var parameterElement = answerDescriptionFragment.get(i * 2 + 1);
       var parameterEditor = forms.getEditor(
@@ -685,8 +676,11 @@ var ExplorationEditorPage = function() {
         ruleDescription.substring(parameterEnd, nextParameterStart);
       parameterStart = nextParameterStart;
     }
-
-    answerDescription.click();
+    var answerDescription = element(
+      by.css('.protractor-test-answer-description'));
+    answerDescription.isDisplayed().then(function(){
+      answerDescription.click();
+    });
 
     element.all(by.css('.select2-dropdown')).map(function(selectorElement) {
       selectorElement.all(by.cssContainingText(
@@ -712,18 +706,21 @@ var ExplorationEditorPage = function() {
   // STATE GRAPH
 
   this.deleteState = function(stateName) {
-    general.waitForSystem();
+    general.scrollToTop();
     interactionNode.map(function(stateElement) {
-      return stateElement.element(by.css('.protractor-test-node-label')).
-        getText();
+      return interactionNodeLabel(stateElement).getText();
     }).then(function(listOfNames) {
       var matched = false;
       for (var i = 0; i < listOfNames.length; i++) {
         if (listOfNames[i] === stateName) {
-          deleteNodeButton(i).click();
-          browser.waitForAngular();
-          general.waitForSystem();
-          confirmDeleteStateButton.click();
+          var deleteNodeButton = interactionNode.get(i).element(by.css(
+            '.protractor-test-delete-node'));
+          deleteNodeButton.isDisplayed().then(function() {
+            deleteNodeButton.click();
+          });
+          confirmDeleteStateButton.isDisplayed().then(function() {
+            confirmDeleteStateButton.click();
+          });
           matched = true;
         }
       }
@@ -733,6 +730,7 @@ var ExplorationEditorPage = function() {
       }
     });
   };
+
   // For this to work, there must be more than one name, otherwise the
   // exploration overview will be disabled.
   this.expectStateNamesToBe = function(names) {
