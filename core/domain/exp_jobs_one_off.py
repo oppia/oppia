@@ -18,6 +18,7 @@
 
 import ast
 import logging
+import re
 import traceback
 
 from constants import constants
@@ -550,29 +551,32 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(file_snapshot_content_model):
-        instance_id = (file_snapshot_content_model
-                       .get_unversioned_instance_id()).lstrip('/')
-        filename = instance_id[instance_id.rfind('/') + 1:]
-        filetype = filename[filename.rfind('.') + 1:]
-        exploration_id = instance_id[:instance_id.find('/')]
-
-        if filetype not in ALLOWED_IMAGE_EXTENSIONS:
-            yield('Error', 'The problematic filename is %s' % filename)
-        else:
-            filepath = instance_id[instance_id.find('/') + 1:]
-            file_model = file_models.FileModel.get_model(
-                exploration_id, filepath, False)
-            if file_model:
-                if file_model.deleted:
-                    yield('Error: found deleted file', file_model.id)
-
-                else:
-                    # content = file_model.content
-                    # fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
-                    #   exploration_id))
-                    # fs.commit(file_model.user_id, '%s/%s' %('images',
-                    #   filename, content)
-                    yield('File Copied', 1)
+        instance_id = (
+            file_snapshot_content_model.get_unversioned_instance_id())
+        filetype = instance_id[instance_id.rfind('.') + 1:]
+        # to filter all the image entries.
+        if filetype in ALLOWED_IMAGE_EXTENSIONS:
+            pattern = re.compile(
+                r"^/([^/]+)/assets/([^/]+)\.(png|jpg|gif|jpeg)$")
+            parts_of_id = pattern.match(instance_id)
+            if not parts_of_id:
+                yield('Error: The instance_id is not correct', instance_id)
+            else:
+                filename = parts_of_id.group(2) + '.' + parts_of_id.group(3)
+                filepath = 'assets/' + filename
+                exploration_id = parts_of_id.group(1)
+                file_model = file_models.FileModel.get_model(
+                    exploration_id, filepath, False)
+                if file_model:
+                    if file_model.deleted:
+                        yield('Error: found deleted file', file_model.id)
+                    else:
+                        # content = file_model.content
+                        # fs = fs_domain.AbstractFileSystem(
+                        #   fs_domain.GcsFileSystem(exploration_id))
+                        # fs.commit(file_model.user_id, '%s/%s' %('images',
+                        #   filename, content)
+                        yield('File Copied', 1)
 
     @staticmethod
     def reduce(status, values):
