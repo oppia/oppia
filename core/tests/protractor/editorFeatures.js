@@ -526,7 +526,7 @@ describe('Exploration history', function() {
 
 
 describe('ExplorationFeedback', function() {
-  var EXPLORATION_TITLE = 'Sample Exploration';
+  var EXPLORATION_TITLE = 'Exploration with Feedback';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
@@ -603,7 +603,7 @@ describe('ExplorationFeedback', function() {
 
 
 describe('Suggestions on Explorations', function() {
-  var EXPLORATION_TITLE = 'Sample Exploration';
+  var EXPLORATION_TITLE = 'Exploration with Suggestion';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
   var EXPLORATION_LANGUAGE = 'English';
