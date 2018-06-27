@@ -1,5 +1,10 @@
 <div class="node-field">
   <label> Node Outline </label>
+  <div style="float: right;">
+     Outline Finalized
+    <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
+    <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
+  </div>
   <div ng-if="!outlineEditorIsShown">
     <angular-html-bind html-data="editableOutline">
     </angular-html-bind>

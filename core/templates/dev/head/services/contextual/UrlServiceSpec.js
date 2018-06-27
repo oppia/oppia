@@ -134,19 +134,4 @@ describe('Url Service', function() {
       UrlService.getStoryIdFromUrl()
     ).toEqual('012345678901');
   });
-
-  it('should correctly retrieve story id from url', function() {
-    mockLocation.pathname = '/story_editor/abcdefgijklm';
-    expect(function(){
-      UrlService.getStoryIdFromUrl();
-    }).toThrow();
-    mockLocation.pathname = '/story_editor/abcdefgijklm/012345678901';
-    expect(
-      UrlService.getStoryIdFromUrl()
-    ).toEqual('012345678901');
-    mockLocation.pathname = '/story_editor/abcdefgijklm/01234578901';
-    expect(function() {
-      UrlService.getStoryIdFromUrl();
-    }).toThrow();
-  });
 });

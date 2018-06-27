@@ -91,6 +91,7 @@
           <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
                              node-id="node.getId()"
                              outline="node.getOutline()"
+                             outline-finalized="node.getOutlineStatus()"
                              destination-node-ids="node.getDestinationNodeIds()">
           </story-node-editor>
         </div>

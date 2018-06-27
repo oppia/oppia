@@ -22,6 +22,7 @@ oppia.directive('storyNodeEditor', [
       scope: {
         getId: '&nodeId',
         getOutline: '&outline',
+        isOutlineFinalized: '&outlineFinalized',
         getDestinationNodeIds: '&destinationNodeIds'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -50,6 +51,16 @@ oppia.directive('storyNodeEditor', [
 
           $scope.viewNodeEditor = function(nodeId) {
             $rootScope.$broadcast(EVENT_VIEW_NODE_EDITOR, nodeId);
+          };
+
+          $scope.finalizeOutline = function() {
+            StoryUpdateService.finalizeStoryNodeOutline(
+              $scope.story, $scope.getId());
+          };
+
+          $scope.unfinalizeOutline = function() {
+            StoryUpdateService.unfinalizeStoryNodeOutline(
+              $scope.story, $scope.getId());
           };
 
           $scope.addNewDestinationNode = function() {
