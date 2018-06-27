@@ -961,6 +961,8 @@ class StorySummary(object):
             'language_code': self.language_code,
             'version': self.version,
             'node_count': self.node_count,
-            'story_model_created_on': self.story_model_created_on,
-            'story_model_last_updated': self.story_model_last_updated
+            'story_model_created_on': utils.get_time_in_millisecs(
+                self.story_model_created_on),
+            'story_model_last_updated': utils.get_time_in_millisecs(
+                self.story_model_last_updated)
         }
