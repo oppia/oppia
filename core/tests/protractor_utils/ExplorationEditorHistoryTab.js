@@ -59,7 +59,9 @@ var ExplorationEditorHistoryTab = function() {
   this.getHistoryGraph = function() {
     return {
       closeStateHistory: function() {
-        general.clickButton(closeStateHistoryButton);
+        closeStateHistoryButton.isDisplayed().then(function() {
+          closeStateHistoryButton.click();
+        });
       },
       deselectTwoVersions: function(versionNumber1, versionNumber2) {
         // Array starts at 0
@@ -67,8 +69,14 @@ var ExplorationEditorHistoryTab = function() {
           v1Position = totalVersionNumber - versionNumber1;
           v2Position = totalVersionNumber - versionNumber2;
 
-          general.clickButton(historyCheckboxSelector.get(v1Position));
-          general.clickButton(historyCheckboxSelector.get(v2Position));
+          historyCheckboxSelector.get(v1Position).isDisplayed()
+            .then(function() {
+              historyCheckboxSelector.get(v1Position).click();
+            });
+          historyCheckboxSelector.get(v2Position).isDisplayed()
+            .then(function() {
+              historyCheckboxSelector.get(v2Position).click();
+            });
         });
       },
       /*
@@ -83,11 +91,19 @@ var ExplorationEditorHistoryTab = function() {
           v1Position = totalVersionNumber - versionNumber1;
           v2Position = totalVersionNumber - versionNumber2;
 
-          general.clickButton(historyCheckboxSelector.get(v1Position));
-          general.clickButton(historyCheckboxSelector.get(v2Position));
+          historyCheckboxSelector.get(v1Position).isDisplayed()
+            .then(function() {
+              historyCheckboxSelector.get(v1Position).click();
+            });
+          historyCheckboxSelector.get(v2Position).isDisplayed()
+            .then(function() {
+              historyCheckboxSelector.get(v2Position).click();
+            });
         });
         // Click button to show graph
-        general.clickButton(showHistoryGraphButton);
+        showHistoryGraphButton.isDisplayed().then(function() {
+          showHistoryGraphButton.click();
+        });
       },
       /*
        * This method compares the states in the history graph using each

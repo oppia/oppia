@@ -20,12 +20,14 @@
 var forms = require('./forms.js');
 var editor = require('./editor.js');
 var general = require('./general.js');
+var ExplorationEditorPage = require('./ExplorationEditorPage');
 var LibraryPage = require('./LibraryPage.js');
 
 // Creates an exploration and opens its editor.
 var createExploration = function() {
   createExplorationAndStartTutorial();
-  editor.exitTutorialIfNecessary();
+  explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  explorationEditorPage.exitTutorialIfNecessary();
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
@@ -41,9 +43,11 @@ var createExplorationAndStartTutorial = function() {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = function() {
-  element(by.css('.protractor-test-publish-exploration')).click();
+  element(by.css('.protractor-test-publish-exploration')).isDisplayed().then(
+    function() {
+      element(by.css('.protractor-test-publish-exploration')).click();
+    });
   browser.waitForAngular();
-  general.waitForSystem();
 
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
@@ -59,15 +63,20 @@ var publishExploration = function() {
 var createAndPublishExploration = function(
     title, category, objective, language) {
   createExploration();
-  editor.setContent(forms.toRichText('new exploration'));
-  editor.setInteraction('EndExploration');
-  editor.setTitle(title);
-  editor.setCategory(category);
-  editor.setObjective(objective);
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  explorationEditorPage.setContent(forms.toRichText('new exploration'));
+  explorationEditorPage.setInteraction('EndExploration');
+
+  var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+  explorationEditorPage.navigateToSettingsTab();
+  explorationEditorSettingsTab.setTitle(title);
+  explorationEditorSettingsTab.setCategory(category);
+  explorationEditorSettingsTab.setObjective(objective);
   if (language) {
-    editor.setLanguage(language);
+    explorationEditorSettingsTab.setLanguage(language);
   }
-  editor.saveChanges();
+  explorationEditorPage.navigateToMainTab();
+  explorationEditorPage.saveChanges();
 
   publishExploration();
 };

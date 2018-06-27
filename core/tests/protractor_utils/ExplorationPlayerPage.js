@@ -170,17 +170,20 @@ var ExplorationPlayerPage = function() {
   };
 
   this.submitFeedback = function(feedback) {
-    feedbackPopupLink.click();
+    feedbackPopupLink.isDisplayed().then(function(){
+      feedbackPopupLink.click();
+    });
     feedbackTextArea.sendKeys(feedback);
     feedbackSubmitButton.click();
   };
 
   this.submitSuggestion = function(suggestion, description) {
-    suggestionPopupLink.click();
+    suggestionPopupLink.isDisplayed().then(function(){
+      suggestionPopupLink.click();
+    });
     forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
     suggestionDescriptionInput.sendKeys(description);
     suggestionSubmitButton.click();
-    general.waitForSystem();
   };
 };
 
