@@ -57,17 +57,44 @@
         </button>
       </div>
     </div>
+    <div class="story-nodes-title">
+      <label for="storyNodes" class="form-heading">Story Nodes</label>
+      <br>
+      Click on the check box to mark it as initial node
+    </div>
     <div class="story-node-editor">
-      <div class="story-nodes-title">
-        <label for="storyNodes" class="form-heading">Story Nodes</label>
-        <br>
-        Click on the check box to mark it as initial node
+      <br>
+      <div class="story-nodes-container">
+        <div ng-repeat="node in nodes">
+          <md-card class="story-editor-node"
+                   ng-class="{'selected-node': (node.getId() === idOfNodeToEdit)}"
+                   ng-click="setNodeToEdit(node.getId())">
+            <div class="story-editor-node-title">
+              <[node.getId()]>
+            </div>
+            <span class="story-editor-initial-node">
+              <span ng-click="markAsInitialNode(node.getId())" aria-hidden="true">
+                <i ng-if="!isInitialNode(node.getId())" class="material-icons md-18">check_box_outline_blank</i>
+                <i ng-if="isInitialNode(node.getId())" class="material-icons md-18">check_boxk</i>
+              </span>
+            </span>
+            <span class="story-editor-delete-node">
+              <span ng-click="deleteNode(node.getId())" aria-hidden="true">
+                <i class="material-icons md-18">&#xE14C;</i>
+              </span>
+            </span>
+          </md-card>
+        </div>
       </div>
-      <span ng-repeat="node in story.getStoryContents().getNodes()">
-        <story-node story-node="node"
-                    initial-node="story.getStoryContents().getInitialNodeId() === node.getId()">
-        </story-node>
-      </span>
+      <div class="node-editor">
+        <div ng-repeat="node in nodes">
+          <story-node-editor ng-if="node.getId() === idOfNodeToEdit"
+                             node-id="node.getId()"
+                             outline="node.getOutline()"
+                             destination-node-ids="node.getDestinationNodeIds()">
+          </story-node-editor>
+        </div>
+      </div>
     </div>
   </md-card>
 </div>
@@ -77,6 +104,66 @@
     margin-left: 10%;
     margin-top: -1%;
     width: 80%;
+  }
+
+  story-editor .story-editor-node {
+    background-color: #F5F5F5;
+    color: #424242;
+    display: inline-block;
+    font-family: "Capriola", "Roboto", Arial, sans-serif;
+    font-size: 0.8em;
+    margin: 0;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    position: relative;
+    text-align: center;
+    width: 15vw;
+  }
+
+  story-editor .selected-node {
+    background-color: #d4d4d4;
+  }
+
+  story-editor .story-editor-delete-node {
+    color: #ef5350;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  story-editor .story-editor-initial-node {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  story-editor .story-editor-node-title {
+    color: blue;
+    padding: 16px 16px 20px 16px;
+  }
+
+  story-editor .story-nodes-container {
+    background-color: white;
+    border-right: 1px solid #BDBDBD;
+    display: inline-block;
+    float: left;
+    overflow-y: auto;
+    padding: 70px 20px;
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    width: 35%;
+  }
+
+  story-editor .node-editor {
+    display: inline-block;
+    min-height: 25vh;
+    padding-left: 5%;
+    width: 65%;
+  }
+
+  story-editor .story-node-editor {
+    display: flex;
   }
 
   story-editor .form-heading {
@@ -93,7 +180,7 @@
     margin-bottom: 2%;
   }
 
-  story-editor .story-node-editor .story-nodes-title {
+  story-editor .story-nodes-title {
     margin-bottom: 2%;
   }
 
