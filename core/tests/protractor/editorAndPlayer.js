@@ -319,8 +319,8 @@ describe('Full exploration editor', function() {
     explorationEditorPage.addResponse(
       'MultipleChoiceInput', null, 'card 1', false,
       'Equals', 'return');
-    explorationEditorPage.setDefaultOutcome(null, 'final card', false);
-
+    explorationEditorPage.getResponseEditor('default').setDestination(
+      'final card', false, null);
     // Setup a terminating state
     explorationEditorPage.moveToState('final card');
     explorationEditorPage.setInteraction('EndExploration');
@@ -358,7 +358,8 @@ describe('Full exploration editor', function() {
       explorationEditorPage.expectCurrentStateToBe('card1');
       explorationEditorPage.setContent(forms.toRichText('card1 content'));
       explorationEditorPage.setInteraction('TextInput');
-      explorationEditorPage.setDefaultOutcome(null, 'final card', true);
+      explorationEditorPage.getResponseEditor('default').setDestination(
+        'final card', true, null);
       explorationEditorPage.getResponseEditor('default').setDestination(
         'card2', true, null);
       explorationEditorPage.moveToState('card2');
@@ -378,7 +379,8 @@ describe('Full exploration editor', function() {
 
       // Check deletion of states and changing the first state
       explorationEditorPage.setInteraction('TextInput');
-      explorationEditorPage.setDefaultOutcome(null, 'final card', true);
+      explorationEditorPage.getResponseEditor('default').setDestination(
+        'final card', true, null);
       explorationEditorPage.getResponseEditor('default').setDestination(
         'second', true, null);
       explorationEditorPage.moveToState('second');
@@ -422,9 +424,9 @@ describe('Full exploration editor', function() {
       explorationEditorPage.expectInteractionToMatch('NumericInput');
 
       // Check deletion of groups
-      explorationEditorPage.setDefaultOutcome(
-        forms.toRichText('Farewell'), null, false);
       var responseEditor = explorationEditorPage.getResponseEditor('default');
+      responseEditor.setFeedback(forms.toRichText('Farewell'));
+      responseEditor.setDestination(null, false, null);
       responseEditor.expectAvailableDestinationsToBe(['second', 'final card']);
       responseEditor.setDestination('final card', false, null);
       responseEditor.expectAvailableDestinationsToBe(['second', 'final card']);
@@ -481,11 +483,13 @@ describe('Full exploration editor', function() {
       explorationEditorPage.addResponse('TextInput',
         forms.toRichText('No being sad!'),
         null, false, 'Contains', 'sad');
-      explorationEditorPage.setDefaultOutcome(forms.toRichText(
-        'Okay, now this is just becoming annoying.'), 'final card', true);
+      var responseEditor = explorationEditorPage.getResponseEditor('default');
+      responseEditor.setFeedback(forms.toRichText(
+        'Okay, now this is just becoming annoying.'));
+      responseEditor.setDestination('final card', true, null);
 
       // Now, add multiple rules to a single answer group.
-      var responseEditor = explorationEditorPage.getResponseEditor(0);
+      responseEditor = explorationEditorPage.getResponseEditor(0);
       responseEditor.addRule('TextInput', 'Contains', 'meh');
       responseEditor.addRule('TextInput', 'Contains', 'okay');
 
