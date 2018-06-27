@@ -185,13 +185,12 @@ var ExplorationPlayerPage = function() {
     suggestionPopupLink.isDisplayed().then(function(){
       suggestionPopupLink.click();
     });
-    browser.waitForAngular();
     forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
-    browser.waitForAngular();
     suggestionDescriptionInput.sendKeys(description);
     suggestionSubmitButton.isDisplayed().then(function() {
       suggestionSubmitButton.click();
     });
+    general.waitForSystem();
   };
 };
 

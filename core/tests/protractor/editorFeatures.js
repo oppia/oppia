@@ -602,7 +602,7 @@ describe('ExplorationFeedback', function() {
 });
 
 
-describe('Suggestions on Explorations', function() {
+fdescribe('Suggestions on Explorations', function() {
   var EXPLORATION_TITLE = 'Exploration with Feedback';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
@@ -650,6 +650,7 @@ describe('Suggestions on Explorations', function() {
     var suggestionDescription = 'Uppercased the first letter';
 
     explorationPlayerPage.submitSuggestion(suggestion, suggestionDescription);
+    browser.waitForAngular();
     users.logout();
 
     // Exploration author reviews the suggestion and accepts it
