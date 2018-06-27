@@ -75,7 +75,7 @@ SCORE_TYPE_CHOICES = [
 SCORE_CATEGORY_DELIMITER = '.'
 
 # Threshold time after which suggestion is considered stale and auto-accepted.
-THRESHOLD_TIME_BEFORE_ACCEPT = 14 * 24 * 60 * 60 * 1000
+THRESHOLD_TIME_BEFORE_ACCEPT = 7 * 24 * 60 * 60 * 1000
 
 # The default message to be shown when accepting stale suggestions.
 DEFAULT_SUGGESTION_ACCEPT_MESSAGE = 'Accepting suggestion due to inactivity.'

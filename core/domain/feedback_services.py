@@ -183,8 +183,9 @@ def create_message(
     new_status = thread.status
     thread.put()
 
-    # We do a put on the suggestion linked to the thread, if any so that the
-    # last_updated time changes to show that there is activity in the thread.
+    # We do a put on the suggestion linked (if it exists) to the thread, so that
+    # the last_updated time changes to show that there is activity in the
+    # thread.
     if thread.has_suggestion:
         # TODO (nithesh): remove manual construction of suggestion ID after
         # migrating feedback threads.
