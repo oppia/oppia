@@ -81,9 +81,9 @@ oppia.directive('oppiaResponseDragAndDropSort', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.chooseItemType = function(index) {
           if (index === 0) {
-            $scope.itemtype = 'item';
+            $scope.itemtype = 'drag-and-drop-item';
           } else {
-            $scope.itemtype = 'subitem';
+            $scope.itemtype = 'drag-and-drop-subitem';
           }
           return true;
         };
@@ -107,9 +107,9 @@ oppia.directive('oppiaShortResponseDragAndDropSort', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.chooseItemType = function(index) {
           if (index === 0) {
-            $scope.itemtype = 'item';
+            $scope.itemtype = 'drag-and-drop-item';
           } else {
-            $scope.itemtype = 'subitem';
+            $scope.itemtype = 'drag-and-drop-subitem';
           }
           return true;
         };

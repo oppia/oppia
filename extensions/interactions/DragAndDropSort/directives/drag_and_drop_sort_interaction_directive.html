@@ -4,39 +4,45 @@
     max-width: 100%;
     padding: 8px;
   }
+
   @media screen and (max-width: 959px) {
     .drag-and-drop-sort-form-container {
       width: 100vw;
     }
   }
+
   .angular-ui-tree-placeholder {
     border: 2px dashed #add8e6;
     height: 70px;
     margin-left: 50px;
     width: 200px;
   }
+
   .drag-and-drop-sort-container {
     border: 1px solid #000000;
     margin: auto;
     overflow: scroll;
   }
-  .item {
+
+  .drag-and-drop-item {
     background-color: #add8e6;
     border: 1px solid #000000;
     height: 70px;
     margin: 10px 0 0 70px;
     width: 200px;
   }
-  .subitem {
+
+  .drag-and-drop-item:hover {
+    margin-bottom: 20px;
+  }
+
+  .drag-and-drop-subitem {
     background-color: #add8e6;
     border: 1px solid #000000;
     height: 70px;
     margin:-20px 0 0 50px;
     position: relative;
     width: 200px;
-  }
-  .item:hover {
-    margin-bottom: 20px;
   }
 </style>
 
@@ -46,12 +52,12 @@
     <div ui-tree class="drag-and-drop-sort-container" data-max-depth="2">
       <ol ui-tree-nodes="" ng-model="list">
         <li ng-repeat="item in list track by $index" ui-tree-node data-scroll-container=".drag-and-drop-sort-container">
-          <div ui-tree-handle class="item">
+          <div ui-tree-handle class="drag-and-drop-item">
             <angular-html-bind html-data="item.title"></angular-html-bind>
           </div>
           <ol ui-tree-nodes="" ng-model="item.items">
             <li ng-repeat="subItem in item.items" ui-tree-node data-scroll-container=".drag-and-drop-sort-container">
-              <div ui-tree-handle class="subitem">
+              <div ui-tree-handle class="drag-and-drop-subitem">
                 <angular-html-bind html-data="subItem.title"></angular-html-bind>
               </div>
             </li>
