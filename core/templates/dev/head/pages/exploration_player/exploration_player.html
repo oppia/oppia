@@ -6,21 +6,20 @@
 
 {% block header_js %}
   {{ super() }}
-  {% if exploration_version %}
-    <script type="text/javascript">
-      GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
-      GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
-      GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse(
-        '{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER|js_string}}');
-      GLOBALS.explorationVersion = JSON.parse(
-        '{{exploration_version|js_string}}');
-      GLOBALS.INTERACTION_SPECS = JSON.parse(
-        '{{INTERACTION_SPECS|js_string}}');
-      GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
-      GLOBALS.username = JSON.parse('{{username|js_string}}');
-    </script>
+  <script ng-if="getExplorationVersion()" type="text/javascript">
+    GLOBALS.collectionId = JSON.parse('{{collection_id|js_string}}');
+    GLOBALS.collectionTitle = JSON.parse('{{collection_title|js_string}}');
+    GLOBALS.DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER = JSON.parse(
+      '{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER|js_string}}');
+    GLOBALS.explorationVersion = JSON.parse(
+      '{{exploration_version|js_string}}');
+    GLOBALS.INTERACTION_SPECS = JSON.parse(
+      '{{INTERACTION_SPECS|js_string}}');
+    GLOBALS.canEdit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.username = JSON.parse('{{username|js_string}}');
+  </script>
 
-  {% endif %}
+
 
   <style>
     @media(max-width: 500px) {
@@ -57,9 +56,9 @@
   <div>
     <background-banner></background-banner>
     <conversation-skin></conversation-skin>
-    {% if not iframed %}
-      <attribution-guide></attribution-guide>
-    {% endif %}
+
+    <attribution-guide ng-if="!iframed"></attribution-guide>
+
   </div>
   <style>
     .oppia-exploration-h1 {
@@ -81,9 +80,7 @@
 {% endblock %}
 
 {% block footer %}
-  {% if not iframed %}
-    <exploration-footer twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
-  {% endif %}
+  <exploration-footer ng-if="!iframed" twitter-text="{{DEFAULT_TWITTER_SHARE_MESSAGE_PLAYER}}"></exploration-footer>
 {% endblock %}
 
 {% block footer_js %}
