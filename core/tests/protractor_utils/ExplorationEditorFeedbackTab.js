@@ -34,6 +34,7 @@ var ExplorationEditorFeedbackTab = function () {
     by.css('.protractor-test-oppia-feedback-back-button'));
   var feedbackResponseTextArea = element(
     by.css('.protractor-test-feedback-response-textarea'));
+  var suggestionRowClassName = '.protractor-test-oppia-feedback-tab-row';
   /*
    * Buttons
    */
@@ -47,35 +48,29 @@ var ExplorationEditorFeedbackTab = function () {
    * Workflows
    */
   this.acceptSuggestion = function(suggestionDescription) {
-    return _runFromFeedbackTab(function() {
-      element.all(by.css(feedbackTabRow)).then(function(rows) {
-        var matchingSuggestionRows = rows.filter(function() {
-          return explorationFeedbackSubject.getText().then(function(subject) {
-            return suggestionDescription.indexOf(subject) !== -1;
-          });
-        });
-
-        matchingSuggestionRows[0].click();
-        general.waitForSystem();
-        viewSuggestionButton.isDisplayed().then(function() {
-          viewSuggestionButton.click();
-        });
-        general.waitForSystem();
-        acceptSuggestionButton.isDisplayed().then(function() {
-          acceptSuggestionButton.click();
+    return element.all(by.css(suggestionRowClassName)).then(function(rows) {
+      var matchingSuggestionRows = rows.filter(function() {
+        return explorationFeedbackSubject.getText().then(function(subject) {
+          return suggestionDescription.indexOf(subject) !== -1;
         });
       });
+
+      matchingSuggestionRows[0].click();
+      general.waitForSystem();
+      viewSuggestionButton.click();
+      general.waitForSystem();
+      acceptSuggestionButton.click();
     });
   };
 
-  this.expecToHaveFeedbackThread = function() {
+  this.expectToHaveFeedbackThread = function() {
     expect(feedbackTabRow.isPresent()).toBe(true);
   };
 
   this.getSuggestionThreads = function() {
     var threads = [];
 
-    return element.all(by.css(feedbackTabRow)).then(function(rows) {
+    return element.all(by.css(suggestionRowClassName)).then(function(rows) {
       rows.forEach(function() {
         explorationFeedbackSubject.getText().then(function(subject) {
           threads.push(subject);
@@ -87,7 +82,8 @@ var ExplorationEditorFeedbackTab = function () {
 
   this.readFeedbackMessages = function() {
     var messages = [];
-    element.all(by.css(feedbackTabRow)).then(function(rows) {
+
+    return element.all(by.css(suggestionRowClassName)).then(function(rows) {
       rows.forEach(function(row) {
         row.click();
         explorationFeedback.getText().then(function(message) {
@@ -95,13 +91,13 @@ var ExplorationEditorFeedbackTab = function () {
         });
         feedbackBackButton.click();
       });
+      return messages;
     });
-    return messages;
   };
 
   this.sendResponseToLatestFeedback = function(feedbackResponse) {
-    element(by.css('.protractor-test-feedback-tab')).click();
-    feedbackTabRow.first().click();
+    element.all(by.css('.protractor-test-oppia-feedback-tab-row')).
+      first().click();
     feedbackResponseTextArea.sendKeys(feedbackResponse);
     feedbackSendResponseButton.click();
   };
