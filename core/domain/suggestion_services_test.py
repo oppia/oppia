@@ -603,9 +603,12 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
 
     def setUp(self):
         super(UserContributionScoringUnitTests, self).setUp()
-        suggestion_services.create_new_user_scores_model('user1', 'category1')
-        suggestion_services.create_new_user_scores_model('user1', 'category2')
-        suggestion_services.create_new_user_scores_model('user2', 'category1')
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user1', 'category1', 0)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user1', 'category2', 0)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user2', 'category1', 0)
 
     def test_update_score_for_user(self):
         suggestion_services.update_score_of_user_for_category(
@@ -616,13 +619,20 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             'user1', 'category2', 15.2)
         suggestion_services.update_score_of_user_for_category(
             'user2', 'category2', 2)
-        scores1 = suggestion_services.get_all_scores_for_user('user1')
-        self.assertEqual(scores1['category1'], 1)
+
+        suggestion_services.update_score_of_user_for_category(
+            'user1', 'category1', -1)
+
+        scores1 = suggestion_services.get_all_scores_of_user('user1')
+        self.assertEqual(scores1['category1'], 0)
         self.assertEqual(scores1['category2'], 15.2)
 
-        scores2 = suggestion_services.get_all_scores_for_user('user2')
+        scores2 = suggestion_services.get_all_scores_of_user('user2')
         self.assertEqual(scores2['category1'], 5)
         self.assertEqual(scores2['category2'], 2)
+
+        scores3 = suggestion_services.get_all_scores_of_user('invalid_user')
+        self.assertDictEqual(scores3, {})
 
     def get_all_user_ids_who_are_allowed_to_review(self):
         suggestion_services.update_score_of_user_for_category(
@@ -650,3 +660,6 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             self.assertFalse(
                 suggestion_services.check_user_can_review_in_category(
                     'user2', 'category1'))
+            self.assertFalse(
+                suggestion_services.check_user_can_review_in_category(
+                    'invalid_user', 'category1'))

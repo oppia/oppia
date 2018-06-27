@@ -369,7 +369,7 @@ def get_user_contribution_scoring_from_model(userContributionScoringModel):
         userContributionScoringModel.score)
 
 
-def get_all_scores_for_user(user_id):
+def get_all_scores_of_user(user_id):
     """Gets all scores for a given user.
 
     Args:
@@ -404,6 +404,8 @@ def check_user_can_review_in_category(user_id, score_category):
     instance_id = user_models.UserContributionScoringModel.get_instance_id(
         user_id, score_category)
     model = user_models.UserContributionScoringModel.get_by_id(instance_id)
+    if not model:
+        return False
     return model.score >= suggestion_models.MINIMUM_SCORE_REQUIRED_TO_REVIEW
 
 
@@ -441,18 +443,21 @@ def update_score_of_user_for_category(user_id, score_category, update_by):
         user_id, score_category)
     model = user_models.UserContributionScoringModel.get_by_id(instance_id)
     if not model:
-        create_new_user_scores_model(user_id, score_category)
-        model = user_models.UserContributionScoringModel.get_by_id(instance_id)
-    model.score += update_by
-    model.put()
+        create_new_user_contribution_scoring_model(
+            user_id, score_category, update_by)
+    else:
+        model.score += update_by
+        model.put()
 
 
-def create_new_user_scores_model(user_id, score_category):
+def create_new_user_contribution_scoring_model(user_id, score_category, score):
     """Create a new UserContributionScoringModel instance for the user and the
     given category with a score of 0.
 
     Args:
         user_id: str. The id of the user.
         score_category: str. The category of the suggestion.
+        score: float. The score of the user for the given category.
     """
-    user_models.UserContributionScoringModel.create(user_id, score_category, 0)
+    user_models.UserContributionScoringModel.create(
+        user_id, score_category, score)
