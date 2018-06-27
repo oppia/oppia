@@ -173,6 +173,7 @@ var ExplorationPlayerPage = function() {
     feedbackPopupLink.isDisplayed().then(function(){
       feedbackPopupLink.click();
     });
+    browser.waitForAngular();
     feedbackTextArea.sendKeys(feedback);
     browser.waitForAngular();
     feedbackSubmitButton.isDisplayed().then(function() {
@@ -184,9 +185,10 @@ var ExplorationPlayerPage = function() {
     suggestionPopupLink.isDisplayed().then(function(){
       suggestionPopupLink.click();
     });
-    forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
-    suggestionDescriptionInput.sendKeys(description);
     browser.waitForAngular();
+    forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
+    browser.waitForAngular();
+    suggestionDescriptionInput.sendKeys(description);
     suggestionSubmitButton.isDisplayed().then(function() {
       suggestionSubmitButton.click();
     });

@@ -602,8 +602,8 @@ describe('ExplorationFeedback', function() {
 });
 
 
-describe('Suggestions on Explorations', function() {
-  var EXPLORATION_TITLE = 'Exploration with Suggestion';
+fdescribe('Suggestions on Explorations', function() {
+  var EXPLORATION_TITLE = 'Exploration with Feedback';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
   var EXPLORATION_LANGUAGE = 'English';
@@ -655,6 +655,7 @@ describe('Suggestions on Explorations', function() {
     // Exploration author reviews the suggestion and accepts it
     users.login('user1@ExplorationSuggestions.com');
     creatorDashboardPage.get();
+    browser.waitForAngular();
     creatorDashboardPage.navigateToExplorationEditor();
     general.waitForSystem();
 
