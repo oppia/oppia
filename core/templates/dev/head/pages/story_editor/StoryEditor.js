@@ -15,11 +15,6 @@
 /**
  * @fileoverview Primary controller for the story editor page.
  */
-
-oppia.constant(
-  'EDITABLE_STORY_DATA_URL_TEMPLATE',
-  '/story_editor_handler/data/<topic_id>/<story_id>');
-
 oppia.constant('NODE_ID_PREFIX', 'node_');
 
 oppia.controller('StoryEditor', [
