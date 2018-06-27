@@ -98,7 +98,7 @@ oppia.directive('storyNodeEditor', [
               return;
             }
             StoryUpdateService.setStoryNodeOutline(
-                $scope.story, $scope.getId(), newOutline);
+              $scope.story, $scope.getId(), newOutline);
             $scope.openPreviewOutline(newOutline);
           };
 
