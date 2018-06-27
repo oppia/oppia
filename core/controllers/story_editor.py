@@ -145,7 +145,7 @@ class EditableStoryDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        if topic is None or story_id not in topic.canonical_story_ids:
+        if topic is None:
             raise self.PageNotFoundException
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
@@ -154,4 +154,3 @@ class EditableStoryDataHandler(base.BaseHandler):
                 Exception('The topic with the given id doesn\'t exist.'))
 
         story_services.delete_story(self.user_id, story_id)
-        topic_services.delete_story(self.user_id, topic_id, story_id)
