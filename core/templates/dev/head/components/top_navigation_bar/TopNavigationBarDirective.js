@@ -40,7 +40,7 @@ oppia.directive('topNavigationBar', [
           var NAV_MODE_SIGNUP = 'signup';
           var NAV_MODES_WITH_CUSTOM_LOCAL_NAV = [
             'create', 'explore', 'collection', 'topics_and_skills_dashboard',
-            'topic_editor'];
+            'topic_editor', 'story_editor'];
           $scope.NAV_MODE = GLOBALS.NAV_MODE;
           $scope.LABEL_FOR_CLEARING_FOCUS = LABEL_FOR_CLEARING_FOCUS;
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;

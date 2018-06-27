@@ -48,11 +48,30 @@ oppia.factory('UrlService', ['$window', function($window) {
     },
     getTopicIdFromUrl: function() {
       var pathname = this.getPathname();
-      var topicId = pathname.split('/')[2];
+      var pathValues = pathname.split('/');
+      if (pathValues.length < 3 ||
+          pathValues[1] !== 'topic_editor') {
+        throw Error('Invalid url for topic editor');
+      }
+      var topicId = pathValues[2];
       if (topicId.length !== 12) {
         throw Error('Invalid Topic Id');
       }
       return topicId;
+    },
+    getStoryIdFromUrl: function() {
+      var pathname = this.getPathname();
+      var pathValues = pathname.split('/');
+      if (pathValues.length < 4 ||
+          pathValues[1] !== 'story_editor' ||
+          pathValues[2].length < 12) {
+        throw Error('Invalid url for story editor');
+      }
+      var storyId = pathValues[3];
+      if (storyId.length !== 12) {
+        throw Error('Invalid Story Id');
+      }
+      return storyId;
     },
     getQueryFieldValuesAsList: function(fieldName) {
       var fieldValues = [];
