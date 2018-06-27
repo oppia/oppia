@@ -616,11 +616,6 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'this is test case to check image tag inside p tag</p>'
             )
         }, {
-            'html_content': '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>',
-            'expected_output': (
-                '<ol style="margin-left:40"><li>Item1</li><li>Item2</li></ol>'
-            )
-        }, {
             'html_content': '<p>hello <i> this is case4 for </i> testing</p>',
             'expected_output': (
                 '<p>hello <em> this is case4 for </em> testing</p>'

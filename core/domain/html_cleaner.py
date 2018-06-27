@@ -19,6 +19,7 @@
 import HTMLParser
 import json
 import logging
+import re
 import urlparse
 
 import bleach
@@ -499,20 +500,23 @@ def convert_to_ck_editor(html_data):
         if parent_tag.name == 'p' and parent_tag.get_text() == '':
             br.replaceWith('&nbsp;')
 
-    for tag_name in ['ol', 'ul']:
+    list_tags = ['ol', 'ul']
+    for tag_name in list_tags:
         for tag in soup.findAll(tag_name):
-            tag_count = 0
-            while True:
-                child = tag.findChildren()
-                if child:
-                    first_child = child[0]
-                if first_child.name == tag_name:
-                    tag_count += 1
-                    first_child.unwrap()
+            if tag.parent.name in list_tags:
+                prev_sib = tag.previous_sibling
+                if prev_sib and prev_sib.name == 'li':
+                    prev_sib.append(tag)
                 else:
-                    if tag_count >= 1:
-                        tag['style'] = 'margin-left:%d' % (40 * tag_count)
-                    break
+                    for child in tag.children:
+                        margin_value = 40
+                        if 'style' in child.attrs:
+                            style = child['style']
+                            match = re.search('margin-left:[0-9]+px;', style)
+                            margin_value += int(
+                                style[match.start() + 12: match.end() - 3])
+                        child['style'] = 'margin-left:%dpx;' % margin_value
+                    tag.unwrap()
 
     oppia_block_components = [
         'oppia-noninteractive-image',
