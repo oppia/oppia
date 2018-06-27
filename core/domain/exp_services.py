@@ -39,6 +39,7 @@ from core.domain import email_subscription_services
 from core.domain import exp_domain
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.domain import search_services
 from core.domain import stats_services
@@ -1620,6 +1621,43 @@ def get_next_page_of_all_non_private_commits(
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
     ) for entry in results], new_urlsafe_start_cursor, more)
+
+
+def get_image_filenames_from_exploration(exploration):
+    """ Get the image filenames from the exploration.
+
+    Args:
+        exploration: object. The exploration itself.
+
+    Returns:
+       list. The list containing the name of the image files in the exploration
+    """
+    filenames = []
+    for state in exploration.states.itervalues():
+        if state.interaction.id == 'ImageClickInput':
+            if isinstance(state.interaction.customization_args['imageAndRegions']['value']['imagePath'], dict): # pylint: disable=line-too-long
+                filenames.append(state.interaction.customization_args['imageAndRegions']['value']['imagePath']['name']) # pylint: disable=line-too-long
+            else:
+                filenames.append(state.interaction.customization_args['imageAndRegions']['value']['imagePath']) # pylint: disable=line-too-long
+
+    html_list = exploration.get_all_html_content_strings()
+    rte_components_in_exp = []
+    for html_string in html_list:
+        rte_components_in_exp = (
+            rte_components_in_exp + html_cleaner.get_rte_components(
+                html_string))
+
+    def get_image_rte(rte_comp):
+                # pylint: disable=line-too-long
+        if 'id' in rte_comp and (str(rte_comp['id']) == 'oppia-noninteractive-image'): # pylint: disable=line-too-long
+            if isinstance(rte_comp['customization_args']['filepath-with-value'], dict): # pylint: disable=line-too-long
+                return rte_comp['customization_args']['filepath-with-value']['name'] # pylint: disable=line-too-long
+            else:
+                return rte_comp['customization_args']['filepath-with-value']
+
+    filenames.extend(list(map(get_image_rte, rte_components_in_exp)))
+    # This is done because the ItemSelectInput may repeat the image names.
+    return list(set(filenames))
 
 
 def get_number_of_ratings(ratings):

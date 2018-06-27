@@ -34,7 +34,9 @@ import utils
     models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
 
 _COMMIT_TYPE_REVERT = 'revert'
-ALLOWED_IMAGE_EXTENSIONS = ['png', 'jpg', 'gif', 'jpeg']
+# pylint: disable=line-too-long
+ALLOWED_IMAGE_EXTENSIONS = [extension for formats, extensions in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.iteritems() for extension in extensions]
+# pylint: enable=line-too-long
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -539,8 +541,8 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
 
 
 class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
-    """ One-off job for migrating the images in the exploration
-        from the GAE to GCS
+    """One-off job for migrating the images in the exploration
+    from the GAE to GCS.
     """
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -548,29 +550,33 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(file_snapshot_content_model):
-        instance_id = file_snapshot_content_model.get_unversioned_instance_id()
-        filetype = instance_id[instance_id.rfind(".") + 1:]
+        instance_id = (file_snapshot_content_model
+                       .get_unversioned_instance_id()).lstrip('/')
+        filename = instance_id[instance_id.rfind('/') + 1:]
+        filetype = filename[filename.rfind('.') + 1:]
+        exploration_id = instance_id[:instance_id.find('/')]
 
-        if filetype in ALLOWED_IMAGE_EXTENSIONS:
-            filename = instance_id[instance_id.rfind("/") + 1:]
-            exploration_id = (instance_id[1:])[:(instance_id[1:]).find("/")]
-            filepath = (instance_id[1:])[(instance_id[1:]).find("/") + 1:]
+        if filetype not in ALLOWED_IMAGE_EXTENSIONS:
+            yield('Error', 'The problematic filename is %s' % filename)
+        else:
+            filepath = instance_id[instance_id.find('/') + 1:]
             file_model = file_models.FileModel.get_model(
                 exploration_id, filepath, False)
+            if file_model:
+                if file_model.deleted:
+                    yield('Error: found deleted file', file_model.id)
 
-            if file_model and file_model.deleted:
-                # content = file_model.content
-                # fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
-                #   exploration_id))
-                # fs.commit(file_model.user_id, '%s/%s' %('images',
-                #   filename, content)
-                file_model.delete("ADMIN", "Delete the file", False)
-                file_metadatmodel = file_models.FileMetadataModel.get_model(
-                    exploration_id, filepath, False)
-                file_metadatmodel.delete(
-                    "ADMIN", "Delete the filemetada", False)
-                yield(exploration_id, filename)
+                else:
+                    # content = file_model.content
+                    # fs = fs_domain.AbstractFileSystem(fs_domain.GcsFileSystem(
+                    #   exploration_id))
+                    # fs.commit(file_model.user_id, '%s/%s' %('images',
+                    #   filename, content)
+                    yield('File Copied', 1)
 
     @staticmethod
-    def reduce(exp_id, values):
-        yield(exp_id, values)
+    def reduce(status, values):
+        if status == 'File Copied':
+            yield(status, len(values))
+        else:
+            yield(status, values)
