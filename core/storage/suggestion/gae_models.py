@@ -259,9 +259,8 @@ class GeneralSuggestionModel(base_models.BaseModel):
         Returns:
             list(SuggestionModel). A list of suggestions that are stale.
         """
-        time = datetime.datetime.utcnow()
         threshold_time = (
-            time - datetime.timedelta(
+            datetime.datetime.utcnow() - datetime.timedelta(
                 0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT))
         return cls.get_all().filter(
             cls.status.IN([STATUS_IN_REVIEW, STATUS_RECEIVED])).filter(
