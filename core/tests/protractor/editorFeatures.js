@@ -634,6 +634,7 @@ describe('Suggestions on Explorations', function() {
 
   it('accepts a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
+    general.waitForSystem();
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,
@@ -659,7 +660,6 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage.get();
     browser.waitForAngular();
     creatorDashboardPage.navigateToExplorationEditor();
-    general.waitForSystem();
 
     explorationEditorPage.navigateToFeedbackTab();
     var explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
@@ -667,7 +667,6 @@ describe('Suggestions on Explorations', function() {
       expect(threads.length).toEqual(1);
       expect(threads[0]).toMatch(suggestionDescription);
     });
-    explorationEditorPage.navigateToFeedbackTab();
     explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription);
 
     explorationEditorPage.navigateToPreviewTab();

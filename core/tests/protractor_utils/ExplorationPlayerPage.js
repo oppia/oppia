@@ -192,7 +192,7 @@ var ExplorationPlayerPage = function() {
     suggestionSubmitButton.isDisplayed().then(function() {
       suggestionSubmitButton.click();
     });
-    general.waitForSystem();
+    browser.waitForAngular();
   };
 };
 
