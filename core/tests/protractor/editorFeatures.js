@@ -573,6 +573,7 @@ describe('ExplorationFeedback', function() {
     libraryPage.get();
     libraryPage.playExploration(EXPLORATION_TITLE);
     explorationPlayerPage.submitFeedback(feedback);
+    general.waitForSystem();
     users.logout();
 
     // Creator reads the feedback and responds
@@ -603,7 +604,7 @@ describe('ExplorationFeedback', function() {
 
 
 describe('Suggestions on Explorations', function() {
-  var EXPLORATION_TITLE = 'Exploration with Feedback';
+  var EXPLORATION_TITLE = 'Exploration with Suggestion';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
   var EXPLORATION_LANGUAGE = 'English';
@@ -650,7 +651,7 @@ describe('Suggestions on Explorations', function() {
     var suggestionDescription = 'Uppercased the first letter';
 
     explorationPlayerPage.submitSuggestion(suggestion, suggestionDescription);
-    browser.waitForAngular();
+    general.waitForSystem();
     users.logout();
 
     // Exploration author reviews the suggestion and accepts it

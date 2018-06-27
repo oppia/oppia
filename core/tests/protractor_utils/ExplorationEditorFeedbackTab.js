@@ -55,11 +55,16 @@ var ExplorationEditorFeedbackTab = function () {
         });
       });
 
+      browser.waitForAngular();
       matchingSuggestionRows[0].click();
       general.waitForSystem();
-      viewSuggestionButton.click();
+      viewSuggestionButton.isDisplayed().then(function(){
+        viewSuggestionButton.click();
+      });
       general.waitForSystem();
-      acceptSuggestionButton.click();
+      acceptSuggestionButton.isDisplayed().then(function(){
+        acceptSuggestionButton.click();
+      });
     });
   };
 
@@ -69,7 +74,7 @@ var ExplorationEditorFeedbackTab = function () {
 
   this.getSuggestionThreads = function() {
     var threads = [];
-
+    browser.waitForAngular();
     return element.all(by.css(suggestionRowClassName)).then(function(rows) {
       rows.forEach(function() {
         explorationFeedbackSubject.getText().then(function(subject) {
