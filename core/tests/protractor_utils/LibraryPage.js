@@ -116,6 +116,12 @@ var LibraryPage = function(){
   this.clickCreateActivity = function(){
     createActivityButton.click();
   };
+
+  this.findExploration = function(explorationTitle) {
+    element(by.css('.protractor-test-search-input')).sendKeys(
+      explorationTitle);
+    browser.waitForAngular();
+  };
 };
 
 exports.LibraryPage = LibraryPage;

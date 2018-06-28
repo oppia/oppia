@@ -572,6 +572,7 @@ describe('ExplorationFeedback', function() {
     // Learner plays the exploration and submits a feedback
     users.login('user2@ExplorationFeedback.com');
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     explorationPlayerPage.submitFeedback(feedback);
     general.waitForSystem();
@@ -647,6 +648,7 @@ describe('Suggestions on Explorations', function() {
     // Suggester plays the exploration and suggests a change
     users.login('user2@ExplorationSuggestions.com');
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
     var suggestion = 'New Exploration';
@@ -677,6 +679,7 @@ describe('Suggestions on Explorations', function() {
     // Student logs in and plays the exploration, finds the updated content
     users.login('user3@ExplorationSuggestions.com');
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
     users.logout();
