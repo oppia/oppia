@@ -227,7 +227,7 @@ var ExplorationEditorPage = function() {
     general.waitForSystem();
   };
 
-  this.exitTutorialIfNecessary = function() {
+  this.exitTutorial = function() {
     // If the editor welcome modal shows up, exit it.
     editorWelcomeModal.then(function(modals) {
       if (modals.length === 1) {

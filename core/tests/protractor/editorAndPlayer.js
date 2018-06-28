@@ -151,7 +151,7 @@ describe('Full exploration editor', function() {
     browser.waitForAngular();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateExplorationButton();
-    explorationEditorPage.exitTutorialIfNecessary();
+    explorationEditorPage.exitTutorial();
     explorationEditorPage.navigateToSettingsTab();
     explorationEditorSettingsTab.setTitle('Refresher Exploration');
     explorationEditorSettingsTab.setCategory('Algebra');
@@ -174,7 +174,7 @@ describe('Full exploration editor', function() {
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
-      explorationEditorPage.exitTutorialIfNecessary();
+      explorationEditorPage.exitTutorial();
       explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.setTitle(
         'Parent Exploration not in collection');
@@ -208,7 +208,7 @@ describe('Full exploration editor', function() {
       browser.waitForAngular();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateExplorationButton();
-      explorationEditorPage.exitTutorialIfNecessary();
+      explorationEditorPage.exitTutorial();
       explorationEditorPage.navigateToSettingsTab();
       explorationEditorSettingsTab.setTitle('Parent Exploration in collection');
       explorationEditorSettingsTab.setCategory('Algebra');
@@ -514,7 +514,7 @@ describe('Full exploration editor', function() {
       users.logout();
       users.login('user7@editorAndPlayer.com');
       general.openEditor(explorationId);
-      explorationEditorPage.exitTutorialIfNecessary();
+      explorationEditorPage.exitTutorial();
 
       // Verify nothing can change with this user.
       explorationEditorPage.expectInteractionToMatch('TextInput');
