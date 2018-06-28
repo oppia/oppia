@@ -17,7 +17,6 @@
  * use in Protractor tests.
  */
 
-var forms = require('./forms.js');
 var general = require('./general.js');
 
 var ExplorationEditorFeedbackTab = function () {
@@ -107,4 +106,5 @@ var ExplorationEditorFeedbackTab = function () {
     feedbackSendResponseButton.click();
   };
 };
+
 exports.ExplorationEditorFeedbackTab = ExplorationEditorFeedbackTab;

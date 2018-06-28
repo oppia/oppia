@@ -795,4 +795,5 @@ var ExplorationEditorPage = function() {
     expect(stateNameContainer.getText()).toMatch(name);
   };
 };
+
 exports.ExplorationEditorPage = ExplorationEditorPage;
