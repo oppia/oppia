@@ -440,6 +440,25 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestion_services.get_suggestion_by_type(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)), 5)
 
+    def test_query_suggestions(self):
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id_1)
+        ]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 4)
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id_1),
+            ('author_id', self.author_id_2)
+        ]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id_1),
+            ('invalid_field', 'value')
+        ]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 0)
+
 
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
 

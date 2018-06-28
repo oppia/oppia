@@ -348,3 +348,36 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     feedback_services.create_message(
         get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
         feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
+
+
+def get_all_suggestions():
+    """Gets all the suggestions.
+
+    Returns: list(Suggestion). All the suggestions.
+    """
+    return [get_suggestion_from_model(s)
+            for s in suggestion_models.GeneralSuggestionModel.get_all()]
+
+
+def query_suggestions(queries):
+    """Queries for suggestions.
+
+    Args:
+        queries: list(tuple). A list of queries. The first element in each tuple
+            is the field to be queried, and the second element is its value.
+
+    Returns:
+        list(Suggestion). A list of suggestions that match the given query
+            values.
+    """
+    suggestions = get_all_suggestions()
+    result = []
+    for suggestion in suggestions:
+        suggestion_matches_filter = True
+        for query in queries:
+            (field, value) = query
+            if getattr(suggestion, field, None) != value:
+                suggestion_matches_filter = False
+        if suggestion_matches_filter:
+            result.append(suggestion)
+    return result
