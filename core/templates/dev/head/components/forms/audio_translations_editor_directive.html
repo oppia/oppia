@@ -7,7 +7,7 @@
         <div class="col-lg-3 col-md-3 col-sm-3 audio-language-description">
           <span class="needs-update-marker"
                 ng-attr-uib-tooltip="<[getNeedsUpdateTooltipMessage(audioTranslation.needsUpdate)]>"
-                ng-click="isEditable() && toggleNeedsUpdateAttribute(languageCode)">
+                ng-click="isTranslatable() && toggleNeedsUpdateAttribute(languageCode)">
             <i ng-if="audioTranslation.needsUpdate" class="material-icons needs-update">&#xE002;</i>
             <i ng-if="!audioTranslation.needsUpdate" class="material-icons is-current">&#xE876;</i>
           </span>

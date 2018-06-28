@@ -1,4 +1,4 @@
-// Copyright 2015 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ oppia.constant(
 
 oppia.constant('CMD_UPDATE_TOPIC_PROPERTY', 'update_topic_property');
 oppia.constant('CMD_UPDATE_SUBTOPIC_PROPERTY', 'update_subtopic_property');
+oppia.constant(
+  'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY', 'update_subtopic_page_property');
 
 oppia.constant('TOPIC_PROPERTY_NAME', 'name');
 oppia.constant('TOPIC_PROPERTY_DESCRIPTION', 'description');
@@ -41,31 +43,36 @@ oppia.constant('TOPIC_PROPERTY_LANGUAGE_CODE', 'language_code');
 
 oppia.constant('SUBTOPIC_PROPERTY_TITLE', 'title');
 
+oppia.constant('SUBTOPIC_PAGE_PROPERTY_HTML_DATA', 'html_data');
+
 oppia.factory('TopicUpdateService', [
   'ChangeObjectFactory', 'UndoRedoService',
   'CMD_ADD_SUBTOPIC', 'CMD_DELETE_SUBTOPIC',
   'CMD_ADD_UNCATEGORIZED_SKILL_ID', 'CMD_REMOVE_UNCATEGORIZED_SKILL_ID',
   'CMD_MOVE_SKILL_ID_TO_SUBTOPIC', 'CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC',
   'CMD_UPDATE_TOPIC_PROPERTY', 'CMD_UPDATE_SUBTOPIC_PROPERTY',
-  'TOPIC_PROPERTY_NAME', 'TOPIC_PROPERTY_DESCRIPTION',
-  'TOPIC_PROPERTY_CANONICAL_STORY_IDS', 'TOPIC_PROPERTY_ADDITIONAL_STORY_IDS',
-  'TOPIC_PROPERTY_LANGUAGE_CODE', 'SUBTOPIC_PROPERTY_TITLE', function(
+  'CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY', 'TOPIC_PROPERTY_NAME',
+  'TOPIC_PROPERTY_DESCRIPTION', 'TOPIC_PROPERTY_CANONICAL_STORY_IDS',
+  'TOPIC_PROPERTY_ADDITIONAL_STORY_IDS', 'TOPIC_PROPERTY_LANGUAGE_CODE',
+  'SUBTOPIC_PROPERTY_TITLE', 'SUBTOPIC_PAGE_PROPERTY_HTML_DATA', function(
       ChangeObjectFactory, UndoRedoService,
       CMD_ADD_SUBTOPIC, CMD_DELETE_SUBTOPIC,
       CMD_ADD_UNCATEGORIZED_SKILL_ID, CMD_REMOVE_UNCATEGORIZED_SKILL_ID,
       CMD_MOVE_SKILL_ID_TO_SUBTOPIC, CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC,
       CMD_UPDATE_TOPIC_PROPERTY, CMD_UPDATE_SUBTOPIC_PROPERTY,
-      TOPIC_PROPERTY_NAME, TOPIC_PROPERTY_DESCRIPTION,
-      TOPIC_PROPERTY_CANONICAL_STORY_IDS, TOPIC_PROPERTY_ADDITIONAL_STORY_IDS,
-      TOPIC_PROPERTY_LANGUAGE_CODE, SUBTOPIC_PROPERTY_TITLE) {
+      CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY, TOPIC_PROPERTY_NAME,
+      TOPIC_PROPERTY_DESCRIPTION, TOPIC_PROPERTY_CANONICAL_STORY_IDS,
+      TOPIC_PROPERTY_ADDITIONAL_STORY_IDS, TOPIC_PROPERTY_LANGUAGE_CODE,
+      SUBTOPIC_PROPERTY_TITLE, SUBTOPIC_PAGE_PROPERTY_HTML_DATA) {
     // Creates a change using an apply function, reverse function, a change
     // command and related parameters. The change is applied to a given
     // topic.
-    var _applyChange = function(topic, command, params, apply, reverse) {
+    // entity can be a topic object or a subtopic page object.
+    var _applyChange = function(entity, command, params, apply, reverse) {
       var changeDict = angular.copy(params);
       changeDict.cmd = command;
       var changeObj = ChangeObjectFactory.create(changeDict, apply, reverse);
-      UndoRedoService.applyChange(changeObj, topic);
+      UndoRedoService.applyChange(changeObj, entity);
     };
 
     var _getParameterFromChangeDict = function(changeDict, paramName) {
@@ -92,6 +99,18 @@ oppia.factory('TopicUpdateService', [
         new_value: angular.copy(newValue),
         old_value: angular.copy(oldValue),
         change_affects_subtopic_page: false
+      }, apply, reverse);
+    };
+
+    var _applySubtopicPagePropertyChange = function(
+        subtopicPage, propertyName, subtopicId, newValue, oldValue, apply,
+        reverse) {
+      _applyChange(subtopicPage, CMD_UPDATE_SUBTOPIC_PAGE_PROPERTY, {
+        subtopic_id: subtopicId,
+        property_name: propertyName,
+        new_value: angular.copy(newValue),
+        old_value: angular.copy(oldValue),
+        change_affects_subtopic_page: true
       }, apply, reverse);
     };
 
@@ -191,31 +210,64 @@ oppia.factory('TopicUpdateService', [
       /**
        * @param {Topic} topic - The topic object to be edited.
        * @param {number} subtopicId - The id of the subtopic to delete.
-       * @param {boolean} isNewlyCreated - Whether the subtopic to delete was
-       *    created in the current draft of the topic. (i.e, the subtopic to
-       *    delete hasn't been saved in the datastore yet.)
        */
-      deleteSubtopic: function(topic, subtopicId, isNewlyCreated) {
+      deleteSubtopic: function(topic, subtopicId) {
         var subtopic = topic.getSubtopicById(subtopicId);
         if (!subtopic) {
           throw Error('Subtopic doesn\'t exist');
         }
         var title = subtopic.getTitle();
         var skillIds = subtopic.getSkillIds();
+        var newlyCreated = false;
+        var changeList = UndoRedoService.getCommittableChangeList();
+        for (var i = 0; i < changeList.length; i++) {
+          if (changeList[i].cmd === 'add_subtopic' &&
+              changeList[i].subtopic_id === subtopicId) {
+            newlyCreated = true;
+          }
+        }
+        if (newlyCreated) {
+          // Get the current change list.
+          var currentChangeList = UndoRedoService.getChangeList();
+          var indicesToDelete = [];
+          for (var i = 0; i < currentChangeList.length; i++) {
+            var backendChangeDict =
+              currentChangeList[i].getBackendChangeObject();
+            if (backendChangeDict.subtopic_id === subtopicId) {
+              // The indices in the change list corresponding to changes to the
+              // currently deleted and newly created subtopic are to be removed
+              // from the list.
+              indicesToDelete.push(i);
+              continue;
+            }
+            // When a newly created subtopic is deleted, the subtopics created
+            // after it would have their id reduced by 1.
+            if (backendChangeDict.subtopic_id > subtopicId) {
+              backendChangeDict.subtopic_id--;
+            }
+            // Apply the above id reduction changes to the backend change.
+            currentChangeList[i].setBackendChangeObject(backendChangeDict);
+          }
+          // The new change list is found by deleting the above found elements.
+          var newChangeList = currentChangeList.filter(function(change) {
+            var changeObjectIndex = currentChangeList.indexOf(change);
+            // Return all elements that were not deleted.
+            return (indicesToDelete.indexOf(changeObjectIndex) === -1);
+          });
+          // The new changelist is set.
+          UndoRedoService.setChangeList(newChangeList);
+          topic.deleteSubtopic(subtopicId, newlyCreated);
+          return;
+        }
         _applyChange(topic, CMD_DELETE_SUBTOPIC, {
           subtopic_id: subtopicId,
           change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
-          topic.deleteSubtopic(subtopicId, isNewlyCreated);
+          topic.deleteSubtopic(subtopicId, newlyCreated);
         }, function(changeDict, topic) {
           // Undo.
-          var subtopicId = _getSubtopicIdFromChangeDict(changeDict);
-          topic.undoDeleteSubtopic(
-            subtopicId, title, skillIds, isNewlyCreated);
-          for (var i = 0; i < skillIds.length; i++) {
-            topic.removeUncategorizedSkillId(skillIds[i]);
-          }
+          throw Error('A deleted subtopic cannot be restored');
         });
       },
 
@@ -299,6 +351,23 @@ oppia.factory('TopicUpdateService', [
           }, function(changeDict, topic) {
             // Undo.
             subtopic.setTitle(oldTitle);
+          });
+      },
+
+      /**
+       * Changes the html data of a subtopic page and records the change in
+       * the undo/redo service.
+       */
+      setSubtopicPageHtmlData: function(subtopicPage, subtopicId, htmlData) {
+        var oldHtmlData = angular.copy(subtopicPage.getHtmlData());
+        _applySubtopicPagePropertyChange(
+          subtopicPage, SUBTOPIC_PAGE_PROPERTY_HTML_DATA, subtopicId, htmlData,
+          oldHtmlData, function(changeDict, subtopicPage) {
+            // Apply.
+            subtopicPage.setHtmlData(htmlData);
+          }, function(changeDict, subtopicPage) {
+            // Undo.
+            subtopicPage.setHtmlData(oldHtmlData);
           });
       },
 

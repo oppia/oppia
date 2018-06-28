@@ -216,7 +216,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
-        r'%s/<topic_id>' % feconf.NEW_STORY_URL, topic_editor.NewStoryHandler),
+        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
+        topic_editor.TopicEditorStoryHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),
@@ -258,9 +259,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/audiohandler/<exploration_id>/audio/<filename>',
         resources.AudioHandler),
-    get_redirect_route(
-        r'/object_editor_template/<obj_type>',
-        resources.ObjectEditorTemplateHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),

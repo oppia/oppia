@@ -196,6 +196,26 @@ def get_story_summary_by_id(story_id, strict=True):
         return None
 
 
+def get_story_summaries_by_ids(story_ids):
+    """Returns the StorySummary objects corresponding the given story ids.
+
+    Args:
+        story_ids: list(str). The list of story ids for which the story
+            summaries are to be found.
+
+    Returns:
+        list(StorySummary). The story summaries corresponding to given story
+            ids.
+    """
+    story_summary_models = story_models.StorySummaryModel.get_multi(story_ids)
+    story_summaries = [
+        get_story_summary_from_model(story_summary_model)
+        for story_summary_model in story_summary_models
+        if story_summary_model is not None
+    ]
+    return story_summaries
+
+
 def get_new_story_id():
     """Returns a new story id.
 
