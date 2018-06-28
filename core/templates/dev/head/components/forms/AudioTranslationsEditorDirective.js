@@ -98,7 +98,7 @@ oppia.directive('audioTranslationsEditor', [
             var allowedAudioLanguageCodes = (
               LanguageUtilService.getComplementAudioLanguageCodes(
                 stateContentIdsToAudioTranslationsService.displayed
-                  .getAudioLanguageCodes ($scope.contentId)));
+                  .getAudioLanguageCodes($scope.contentId)));
 
             if (allowedAudioLanguageCodes.length === 0) {
               AlertsService.addWarning(
