@@ -80,6 +80,9 @@
         {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
       </div>
 
+      <div ng-show="getTabStatuses().active === 'translation'">
+        <translation-tab></translation-tab>
+      </div>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
       <div ng-if="getTabStatuses().active === 'preview'">
         {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
@@ -288,6 +291,10 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionVerificationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionValidityService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateStatistics.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/translation_tab/TranslationTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/translation_tab/TranslatorOverviewDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/translation_tab/TranslationLanguageService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
 
