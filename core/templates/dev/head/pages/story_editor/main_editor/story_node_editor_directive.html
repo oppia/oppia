@@ -1,0 +1,79 @@
+<div class="node-field">
+  <label> Node Outline </label>
+  <div style="float: right;">
+     Outline Finalized
+    <i ng-if="!isOutlineFinalized()" ng-click="finalizeOutline()" class="material-icons md-18">check_box_outline_blank</i>
+    <i ng-if="isOutlineFinalized()" ng-click="unfinalizeOutline()" class="material-icons md-18">check_box</i>
+  </div>
+  <div ng-if="!outlineEditorIsShown">
+    <angular-html-bind html-data="editableOutline">
+    </angular-html-bind>
+    <button type="button"
+            class="btn btn-default save-button"
+            ng-click="closePreviewOutline(editableOutline)">
+      Edit
+    </button>
+  </div>
+  <div ng-if="outlineEditorIsShown">
+    <schema-based-editor schema="OUTLINE_SCHEMA"
+                         local-value="editableOutline">
+    </schema-based-editor>
+    <button type="button"
+            class="btn btn-success save-button"
+            ng-if="isOutlineModified(editableOutline)"
+            ng-click="updateOutline(editableOutline)">
+      Save
+    </button>
+    <button type="button"
+            class="btn btn-default save-button"
+            ng-if="!isOutlineModified(editableOutline)"
+            ng-click="openPreviewOutline(editableOutline)">
+      Preview
+    </button>
+  </div>
+</div>
+<div class="node-field">
+  <label> Destination Nodes </label>
+  <md-card class="destination-node-id"
+           ng-repeat="nodeId in getDestinationNodeIds()"
+           ng-click="viewNodeEditor(nodeId)">
+    <[nodeId]>
+    <span style="float: right;" ng-click="removeDestinationNodeId(nodeId)" aria-hidden="true">
+      <i class="material-icons md-18">&#xE14C;</i>
+    </span>
+  </md-card>
+  <md-card class="destination-node-id" ng-if="!nodeIdEditorIsShown" ng-click="openNodeIdEditor()">
+    + Add existing node.
+  </md-card>
+  <md-card class="destination-node-id" ng-if="nodeIdEditorIsShown" ng-click="openNodeIdEditor()">
+    <input type="text" ng-model="newDestinationNodeId">
+    <button class="btn btn-success" ng-click="addExistingDestinationNode(newDestinationNodeId)">
+      Save
+    </button>
+    <button class="btn btn-default" ng-click="closeNodeIdEditor()">
+      Cancel
+    </button>
+  </md-card>
+  <md-card class="destination-node-id" ng-click="addNewDestinationNode()">
+    + Create a new destination node.
+  </md-card>
+</div>
+
+<style>
+  story-editor .node-field {
+    margin-top: 3%;
+    height: auto;
+  }
+  story-editor .node-field label {
+    margin-bottom: 3%;
+  }
+  story-editor .destination-node-id {
+    background-color: #efefef;
+  }
+  story-editor .destination-node-id:hover {
+    background-color: #e0e0e0;
+  }
+  story-editor .node-field .save-button {
+    margin-top: 1.5vh;
+  }
+</style>

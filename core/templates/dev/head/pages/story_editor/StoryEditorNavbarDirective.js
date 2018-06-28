@@ -44,6 +44,11 @@ oppia.directive('storyEditorNavbar', [
             return $scope.getChangeListLength() > 0;
           };
 
+          $scope.discardChanges = function() {
+            UndoRedoService.clearChanges();
+            StoryEditorStateService.loadStory(topicId, $scope.story.getId());
+          };
+
           $scope.saveChanges = function() {
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
