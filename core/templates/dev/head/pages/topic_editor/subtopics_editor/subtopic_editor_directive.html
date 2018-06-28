@@ -1,0 +1,70 @@
+<div class="subtopic-editor">
+  <div class="modal-header">
+    <h3>
+      Edit Subtopic
+    </h3>
+  </div>
+  <div class="modal-body">
+    <div class="subtopic-title">
+      <span ng-if="!subtopicTitleEditorIsShown" ng-click="openSubtopicTitleEditor()"
+            class="oppia-editable-section">
+        <strong style="font-size: 1.2em;"><[editableTitle]></strong>
+        <i class="material-icons oppia-editor-edit-icon"
+           title="Edit Subtopic Title">&#xE254;
+        </i>
+      </span>
+      <span ng-if="subtopicTitleEditorIsShown">
+        <form class="form-horizontal" role="form" ng-submit="updateSubtopicTitle(editableTitle)">
+          <input type="text" ng-model="editableTitle">
+          <button type="submit" class="btn btn-success btn-sm">Save</button>
+          <button class="btn btn-default btn-sm" ng-click="closeSubtopicTitleEditor()">Cancel</button>
+        </form>
+      </span>
+    </div>
+    <div class="subtopic-page-editor">
+      <div ng-if="!subtopicEditorIsShown" class="preview">
+        <angular-html-bind html-data="htmlData">
+        </angular-html-bind>
+        <div class="pull-right">
+          <button type="button"
+                  class="btn btn-default save-button"
+                  ng-click="closePreviewSubtopicPage(htmlData)">
+            Edit
+          </button>
+        </div>
+      </div>
+      <div ng-if="subtopicEditorIsShown" class="oppia-editor-card-body">
+        <schema-based-editor schema="SUBTOPIC_PAGE_SCHEMA"
+                             local-value="htmlData">
+        </schema-based-editor>
+
+        <div class="pull-right">
+          <button type="button"
+                  class="btn btn-success save-button"
+                  ng-click="updateHtmlData(htmlData)">
+            Save
+          </button>
+          <button type="button"
+                  class="btn btn-default save-button"
+                  ng-click="openPreviewSubtopicPage(htmlData)">
+            Preview
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-primary" ng-click="save()"> Done </button>
+    <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
+  </div>
+</div>
+
+<style>
+  .subtopic-editor .subtopic-page-editor {
+    min-height: 15vh;
+  }
+
+  .subtopic-editor .modal-body .subtopic-title {
+    margin-bottom: 3%;
+  }
+</style>
