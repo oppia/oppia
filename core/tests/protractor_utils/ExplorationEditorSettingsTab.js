@@ -76,6 +76,11 @@ var ExplorationEditorSettingsTab = function() {
     initialStateSelectOption(stateName).click();
   };
 
+  this.setLanguage = function(language) {
+    element(by.css('.protractor-test-exploration-language-select')).
+      element(by.cssContainingText('option', language)).click();
+  };
+
   this.setObjective = function(objective) {
     explorationObjectiveInput.clear();
     explorationObjectiveInput.sendKeys(objective);
