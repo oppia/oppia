@@ -19,5 +19,12 @@
         <loading-dots></loading-dots>
       </span>
     </button>
+    <button type="button" ng-if="isStorySaveable()"
+            class="btn btn-default"
+            ng-click="discardChanges()">
+      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+         alt="Discard current draft">&#xE2C3;</i>
+      Discard Changes
+    </button>
   </li>
 </ul>
