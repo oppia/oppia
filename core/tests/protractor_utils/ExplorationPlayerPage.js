@@ -170,17 +170,29 @@ var ExplorationPlayerPage = function() {
   };
 
   this.submitFeedback = function(feedback) {
-    feedbackPopupLink.click();
+    feedbackPopupLink.isDisplayed().then(function(){
+      feedbackPopupLink.click();
+    });
     feedbackTextArea.sendKeys(feedback);
-    feedbackSubmitButton.click();
+    feedbackSubmitButton.isDisplayed().then(function() {
+      feedbackSubmitButton.click();
+    });
+    general.waitForSystem();
   };
 
   this.submitSuggestion = function(suggestion, description) {
-    suggestionPopupLink.click();
+    suggestionPopupLink.isDisplayed().then(function(){
+      suggestionPopupLink.click();
+    });
+    browser.waitForAngular();
     forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
+    browser.waitForAngular();
     suggestionDescriptionInput.sendKeys(description);
-    suggestionSubmitButton.click();
-    general.waitForSystem();
+    browser.waitForAngular();
+    suggestionSubmitButton.isDisplayed().then(function() {
+      suggestionSubmitButton.click();
+    });
+    browser.waitForAngular();
   };
 };
 
