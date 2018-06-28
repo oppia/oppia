@@ -26,6 +26,7 @@ from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.platform import models
@@ -558,27 +559,27 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         # To separate the image entries from the audio entries we get from the
         # FileSnapshotContentModel.
         if filetype in ALLOWED_IMAGE_EXTENSIONS:
-            pattern = re.compile(
-                r"^/([^/]+)/assets/(([^/]+)\.(png|jpg|gif|jpeg))$")
+            pattern = re.compile(r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
+                ALLOWED_IMAGE_EXTENSIONS) + '))$')
             catched_groups = pattern.match(instance_id)
-            filename = catched_groups.group(2)
-            filepath = 'assets/' + filename
-            exploration_id = catched_groups.group(1)
             if not catched_groups:
                 yield('Error: The instance_id is not correct', instance_id)
             else:
+                filename = catched_groups.group(2)
+                filepath = 'assets/' + filename
+                exploration_id = catched_groups.group(1)
                 file_model = file_models.FileModel.get_model(
                     exploration_id, filepath, False)
                 if file_model:
-                    if file_model.deleted:
-                        yield('Error: found deleted file', file_model.id)
-                    else:
-                        # content = file_model.content
-                        # fs = fs_domain.AbstractFileSystem(
-                        #   fs_domain.GcsFileSystem(exploration_id))
-                        # fs.commit(file_model.user_id, '%s/%s' %('images',
-                        #   filename, content)
-                        yield(FILE_COPIED, 1)
+                    content = file_model.content
+                    fs = fs_domain.AbstractFileSystem(
+                      fs_domain.GcsFileSystem(exploration_id))
+                    fs.commit('ADMIN', '%s/%s' %('images',
+                      filename), content)
+                    yield(FILE_COPIED, 1)
+                else:
+                    yield('Error: found deleted file', file_model.id)
+
 
     @staticmethod
     def reduce(status, values):
