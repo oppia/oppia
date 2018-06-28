@@ -24,8 +24,8 @@ describe('Playthrough service', function() {
       this.expId = 'expId1';
       this.expVersion = 1;
       this.ps = $injector.get('PlaythroughService');
-      spyOn(this.ps, 'determineIfPlayerIsInSamplePopulation').and.returnValue(
-        true);
+      spyOn(this.ps, 'isPlayerExcludedFromSamplePopulation').and.returnValue(
+        false);
       this.laof = $injector.get('LearnerActionObjectFactory');
       this.ps.initSession(this.expId, this.expVersion);
     }));

@@ -50,8 +50,8 @@ oppia.factory('PlaythroughService', [
     var cycleIdentifier = {};
     var visitedStates = [];
 
-    var _isPlayerExcludedFromSamplePopulation = function() {
-      return !isPlayerInSamplePopulation;
+    var _determineIfPlayerIsInSamplePopulation = function() {
+      return Math.random() < RECORD_PLAYTHROUGH_PROBABILITY;
     };
 
     var createMultipleIncorrectIssueTracker = function(initStateName) {
@@ -189,20 +189,19 @@ oppia.factory('PlaythroughService', [
 
     return {
       initSession: function(newExplorationId, newExplorationVersion) {
-        isPlayerInSamplePopulation =
-          this.determineIfPlayerIsInSamplePopulation();
+        isPlayerInSamplePopulation = _determineIfPlayerIsInSamplePopulation();
         playthrough = PlaythroughObjectFactory.createNew(
           null, newExplorationId, newExplorationVersion, null, {}, []);
         expStopwatch = StopwatchObjectFactory.create();
       },
-      determineIfPlayerIsInSamplePopulation: function() {
-        return Math.random() < RECORD_PLAYTHROUGH_PROBABILITY;
+      isPlayerExcludedFromSamplePopulation: function() {
+        return !isPlayerInSamplePopulation;
       },
       getPlaythrough: function() {
         return playthrough;
       },
       recordExplorationStartAction: function(initStateName) {
-        if (_isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation()) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -224,7 +223,7 @@ oppia.factory('PlaythroughService', [
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
-        if (_isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation()) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -263,7 +262,7 @@ oppia.factory('PlaythroughService', [
       },
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
-        if (_isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation()) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -280,7 +279,7 @@ oppia.factory('PlaythroughService', [
         ));
       },
       recordPlaythrough: function(isExplorationComplete) {
-        if (_isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation()) {
           return;
         }
         if (isExplorationComplete) {
