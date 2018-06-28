@@ -122,6 +122,38 @@ oppia.directive('oppiaShortResponseDragAndDropSort', [
 ]);
 
 // TODO(Vibhor): Rules Service for DragAndDropSort interaction.
-oppia.factory('dragAndDropSortRulesService', ['$filter', function($filter) {
-  return {};
+oppia.factory('dragAndDropSortRulesService', [function() {
+  var checkEquality = function(answer, inputs) {
+    for (var i = 0; i < answer.length; i++) {
+      if (answer[i].length === inputs.x[i].length) {
+        for (var j = 0; j < answer[i].length; j++) {
+          if (inputs.x[i].indexOf(answer[i][j]) === -1) {
+            return false;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+    return true;
+  };
+  var checkEqualityWithIncorrectPositions = function(answer, inputs) {
+    var noOfUnmatches = 0;
+    for (var i = 0; i < answer.length; i++) {
+      for (var j = 0; j < answer[i].length; j++) {
+        if (inputs.x[i].indexOf(answer[i][j]) === -1) {
+          noOfUnmatches += 1;
+        }
+      }
+    }
+    return noOfUnmatches === 1;
+  };
+  return {
+    IsEqualToOrdering: function(answer, inputs) {
+      return answer.length === inputs.x.length && checkEquality(answer, inputs);
+    },
+    IsEqualToOrderingWithOneItemAtIncorrectPosition: function(answer, inputs) {
+      return checkEqualityWithIncorrectPositions(answer, inputs);
+    }
+  };
 }]);
