@@ -51,7 +51,7 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
             // with the ListOfSetsOfHtmlStrings object.
             for (var i = 0; i < $scope.list.length; i++) {
               answers.push([$scope.list[i].title]);
-              for (var j = 0; j < $scope.list[i].items; j++) {
+              for (var j = 0; j < $scope.list[i].items.length; j++) {
                 answers[i].push($scope.list[i].items[j].title);
               }
             }
@@ -121,7 +121,7 @@ oppia.directive('oppiaShortResponseDragAndDropSort', [
   }
 ]);
 
-// TODO(Vibhor): Rules Service for DragAndDropSort interaction.
+// Rules Service for DragAndDropSort interaction.
 oppia.factory('dragAndDropSortRulesService', [function() {
   var checkEquality = function(answer, inputs) {
     for (var i = 0; i < answer.length; i++) {

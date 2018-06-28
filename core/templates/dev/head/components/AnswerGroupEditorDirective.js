@@ -103,6 +103,7 @@ oppia.directive('answerGroupEditor', [
                 return [
                   getDefaultInputValue('Real'),
                   getDefaultInputValue('Real')];
+              case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
