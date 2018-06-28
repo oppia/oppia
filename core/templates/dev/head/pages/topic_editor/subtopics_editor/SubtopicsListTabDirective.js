@@ -152,10 +152,6 @@ oppia.directive('subtopicsListTab', [
           };
 
           $scope.deleteSubtopic = function(subtopic) {
-            if ($scope.subtopicIndexToDisplay ===
-                $scope.subtopics.indexOf(subtopic)) {
-              $scope.subtopicDisplayed = false;
-            }
             TopicEditorStateService.deleteSubtopicPage(
               $scope.topic.getId(), subtopic.getId());
             TopicUpdateService.deleteSubtopic($scope.topic, subtopic.getId());
@@ -191,8 +187,6 @@ oppia.directive('subtopicsListTab', [
               TopicEditorStateService.setSubtopicPage(subtopicPage);
               TopicUpdateService.addSubtopic($scope.topic, title);
               _initEditor();
-              // Open the editor for the newly created subtopic page.
-              $scope.setSubtopic($scope.topic.getSubtopics().slice(-1)[0]);
             });
           };
 

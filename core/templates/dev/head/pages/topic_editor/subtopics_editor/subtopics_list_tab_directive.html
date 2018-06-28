@@ -1,24 +1,36 @@
 <div class="subtopics-tab">
   <md-card class="subtopics">
     <h3> Subtopics </h3>
-    <md-card class="subtopic"
-             ng-repeat="subtopic in subtopics"
-             dnd-list="subtopic.getSkillIds()"
-             dnd-drop="endMoveSkillId(subtopic.getId())">
-      <strong><[subtopic.getTitle()]></strong>
-      <md-card class="skill-id"
-               ng-repeat="skillId in subtopic.getSkillIds()"
-               dnd-draggable="skillId"
-               dnd-dragstart="startMoveSkillId(subtopic.getId(), skillId)"
-               dnd-effect-allowed="move">
-        <[skillId]>
+    <h4 style="color: #6d6d6d">
+      (Drag and drop skills across subtopics or to the uncategorized section)
+    </h4>
+    <div class="subtopics-container">
+      <md-card class="subtopic"
+               ng-repeat="subtopic in subtopics"
+               dnd-list="subtopic.getSkillIds()"
+               dnd-drop="endMoveSkillId(subtopic.getId())">
+        <strong style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
+        <span style="float: right; color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
+          <i class="material-icons md-18">&#xE14C;</i>
+        </span>
+        <md-card class="skill-id"
+                 ng-repeat="skillId in subtopic.getSkillIds()"
+                 dnd-draggable="skillId"
+                 dnd-dragstart="startMoveSkillId(subtopic.getId(), skillId)"
+                 dnd-effect-allowed="move">
+          <[skillId]>
+        </md-card>
+        <div class="edit-subtopic">
+          <button class="btn btn-primary" ng-click="editSubtopic(subtopic)">
+            Edit
+          </button>
+        </div>
       </md-card>
-      <div class="edit-subtopic">
-        <button class="btn btn-primary" ng-click="editSubtopic(subtopic)">
-          Edit
-        </button>
-      </div>
-    </md-card>
+      <md-card class="subtopic new" ng-click="createSubtopic()">
+        <strong><[subtopic.getTitle()]></strong>
+        <i class="material-icons">add</i>
+      </md-card>
+    </div>
   </md-card>
 
   <md-card class="uncategorized-skill-ids"
@@ -39,7 +51,9 @@
     display: flex;
     margin: 6vh 10vh 0 10vh;
   }
-
+  subtopics-list-tab h4 {
+    white-space: normal;
+  }
   subtopics-list-tab .dndDraggingSource {
     display: none;
   }
@@ -48,19 +62,35 @@
     display: block;
     min-height: 42px;
   }
+  subtopics-list-tab .subtopics-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
   subtopics-list-tab .subtopic {
+    align-content: center;
+    background-color: #fafafa;
     width: 15vw;
     height: 40vh;
     float: left;
+    flex: 0 0 auto;
     position: relative;
     overflow-y: auto;
+  }
+  subtopics-list-tab .new:hover {
+    background-color: #f1f1f1;
+  }
+  subtopics-list-tab .new .material-icons {
+    position: absolute;
+    font-size: 2.5em;
+    bottom: 50%;
+    left: 46%;
   }
   subtopics-list-tab .subtopics {
     background-color: white;
     border-right: 1px solid #BDBDBD;
     display: inline-block;
     float: left;
-    overflow-x: auto;
     padding-left: 2vw;
     padding-right: 2vw;
     position: relative;

@@ -233,7 +233,9 @@ oppia.factory('TopicUpdateService', [
           for (var i = 0; i < currentChangeList.length; i++) {
             var backendChangeDict =
               currentChangeList[i].getBackendChangeObject();
-            if (backendChangeDict.subtopic_id === subtopicId) {
+            if (backendChangeDict.subtopic_id === subtopicId ||
+                backendChangeDict.old_subtopic_id === subtopicId ||
+                backendChangeDict.new_subtopic_id === subtopicId) {
               // The indices in the change list corresponding to changes to the
               // currently deleted and newly created subtopic are to be removed
               // from the list.
@@ -244,6 +246,12 @@ oppia.factory('TopicUpdateService', [
             // after it would have their id reduced by 1.
             if (backendChangeDict.subtopic_id > subtopicId) {
               backendChangeDict.subtopic_id--;
+            }
+            if (backendChangeDict.old_subtopic_id > subtopicId) {
+              backendChangeDict.old_subtopic_id--;
+            }
+            if (backendChangeDict.new_subtopic_id > subtopicId) {
+              backendChangeDict.new_subtopic_id--;
             }
             // Apply the above id reduction changes to the backend change.
             currentChangeList[i].setBackendChangeObject(backendChangeDict);

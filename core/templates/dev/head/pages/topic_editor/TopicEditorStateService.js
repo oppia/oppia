@@ -259,7 +259,7 @@ oppia.factory('TopicEditorStateService', [
         var index = _getSubtopicPageIndex(subtopicPageId);
         var newIndex = _getNewSubtopicPageIndex(subtopicPageId);
         if (index === null) {
-          throw Error('The given subtopic page doesn\'t exist');
+          return;
         }
         _subtopicPages.splice(index, 1);
         // If the deleted subtopic page corresponded to a newly created
