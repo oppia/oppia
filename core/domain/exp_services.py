@@ -1624,21 +1624,26 @@ def get_next_page_of_all_non_private_commits(
 
 
 def get_image_filenames_from_exploration(exploration):
-    """ Get the image filenames from the exploration.
+    """Get the image filenames from the exploration.
 
     Args:
-        exploration: object. The exploration itself.
+        exploration: Exploration object. The exploration itself.
 
     Returns:
-       list. The list containing the name of the image files in the exploration
+       list(str). List containing the name of the image files in exploration.
     """
     filenames = []
     for state in exploration.states.itervalues():
         if state.interaction.id == 'ImageClickInput':
-            if isinstance(state.interaction.customization_args['imageAndRegions']['value']['imagePath'], dict): # pylint: disable=line-too-long
-                filenames.append(state.interaction.customization_args['imageAndRegions']['value']['imagePath']['name']) # pylint: disable=line-too-long
+            # We may have oppia-noninteractive-image tag's filepath attribute
+            # stored as a dict or a string.
+            if isinstance(state.interaction.customization_args[
+                    'imageAndRegions']['value']['imagePath'], dict):
+                filenames.append(state.interaction.customization_args[
+                    'imageAndRegions']['value']['imagePath']['name'])
             else:
-                filenames.append(state.interaction.customization_args['imageAndRegions']['value']['imagePath']) # pylint: disable=line-too-long
+                filenames.append(state.interaction.customization_args[
+                    'imageAndRegions']['value']['imagePath'])
 
     html_list = exploration.get_all_html_content_strings()
     rte_components_in_exp = []
@@ -1647,15 +1652,16 @@ def get_image_filenames_from_exploration(exploration):
             rte_components_in_exp + html_cleaner.get_rte_components(
                 html_string))
 
-    def get_image_rte(rte_comp):
-                # pylint: disable=line-too-long
-        if 'id' in rte_comp and (str(rte_comp['id']) == 'oppia-noninteractive-image'): # pylint: disable=line-too-long
-            if isinstance(rte_comp['customization_args']['filepath-with-value'], dict): # pylint: disable=line-too-long
-                return rte_comp['customization_args']['filepath-with-value']['name'] # pylint: disable=line-too-long
+    for rte_comp in rte_components_in_exp:
+        if 'id' in rte_comp and (
+                str(rte_comp['id']) == 'oppia-noninteractive-image'):
+            if isinstance(rte_comp['customization_args'][
+                    'filepath-with-value'], dict):
+                filenames.append(rte_comp['customization_args'][
+                    'filepath-with-value']['name'])
             else:
-                return rte_comp['customization_args']['filepath-with-value']
-
-    filenames.extend(list(map(get_image_rte, rte_components_in_exp)))
+                filenames.append(rte_comp['customization_args'][
+                    'filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.
     return list(set(filenames))
 

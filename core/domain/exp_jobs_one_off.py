@@ -17,6 +17,7 @@
 """One-off jobs for explorations."""
 
 import ast
+import itertools
 import logging
 import re
 import traceback
@@ -35,9 +36,9 @@ import utils
     models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
 
 _COMMIT_TYPE_REVERT = 'revert'
-# pylint: disable=line-too-long
-ALLOWED_IMAGE_EXTENSIONS = [extension for formats, extensions in feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.iteritems() for extension in extensions]
-# pylint: enable=line-too-long
+FILE_COPIED = 'File Copied'
+ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
+    feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -554,17 +555,18 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
         instance_id = (
             file_snapshot_content_model.get_unversioned_instance_id())
         filetype = instance_id[instance_id.rfind('.') + 1:]
-        # to filter all the image entries.
+        # To separate the image entries from the audio entries we get from the
+        # FileSnapshotContentModel.
         if filetype in ALLOWED_IMAGE_EXTENSIONS:
             pattern = re.compile(
-                r"^/([^/]+)/assets/([^/]+)\.(png|jpg|gif|jpeg)$")
-            parts_of_id = pattern.match(instance_id)
-            if not parts_of_id:
+                r"^/([^/]+)/assets/(([^/]+)\.(png|jpg|gif|jpeg))$")
+            catched_groups = pattern.match(instance_id)
+            filename = catched_groups.group(2)
+            filepath = 'assets/' + filename
+            exploration_id = catched_groups.group(1)
+            if not catched_groups:
                 yield('Error: The instance_id is not correct', instance_id)
             else:
-                filename = parts_of_id.group(2) + '.' + parts_of_id.group(3)
-                filepath = 'assets/' + filename
-                exploration_id = parts_of_id.group(1)
                 file_model = file_models.FileModel.get_model(
                     exploration_id, filepath, False)
                 if file_model:
@@ -576,11 +578,11 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                         #   fs_domain.GcsFileSystem(exploration_id))
                         # fs.commit(file_model.user_id, '%s/%s' %('images',
                         #   filename, content)
-                        yield('File Copied', 1)
+                        yield(FILE_COPIED, 1)
 
     @staticmethod
     def reduce(status, values):
-        if status == 'File Copied':
+        if status == FILE_COPIED:
             yield(status, len(values))
         else:
             yield(status, values)
