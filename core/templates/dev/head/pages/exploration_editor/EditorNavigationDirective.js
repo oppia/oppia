@@ -60,7 +60,7 @@ oppia.directive('editorNavigation', [
 
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
           // This will be removed after translation tab will be ready.
-          $scope.enableTranslationTab = ENABLE_TRANSLATION_TAB;s
+          $scope.enableTranslationTab = ENABLE_TRANSLATION_TAB;
 
           $scope.showUserHelpModal = function() {
             var explorationId = ExplorationContextService.getExplorationId();

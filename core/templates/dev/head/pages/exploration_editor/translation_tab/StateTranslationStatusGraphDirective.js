@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the translation tab.
+ * @fileoverview Directive for the state translation status graph.
  */
 
 oppia.directive('stateTranslationStatusGraph', [
@@ -26,10 +26,10 @@ oppia.directive('stateTranslationStatusGraph', [
         'state_translation_status_graph_directive.html'),
       controller: [
         '$scope', 'GraphDataService', 'EditorStateService', function(
-          $scope, GraphDataService, EditorStateService) {
+            $scope, GraphDataService, EditorStateService) {
           $scope.getGraphData = GraphDataService.getGraphData;
           $scope.getActiveStateName = function() {
-              return EditorStateService.getActiveStateName();
+            return EditorStateService.getActiveStateName();
           };
           $scope.onClickStateInMap = function() {
             EditorStateService.setActiveStateName(newStateName);
