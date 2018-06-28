@@ -44,20 +44,20 @@ describe('Drag and Drop Sort rules service', function() {
 
   it('should have a correct \'is equal to ordering with one item at incorrect' +
     ' position\' rule', function() {
-      var RULE_INPUT = {
-        x: [['a', 'b'], ['c'], ['de', 'f']]
-      };
-      expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-        [['a', 'b'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(false);
-      expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-        [['a', 'b'], ['c', 'f'], ['de']], RULE_INPUT)).toBe(true);
-      expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-        [['a', 'b', 'c'], ['de', 'f']], RULE_INPUT)).toBe(false);
-      expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-        [['a'], ['c'], ['de', 'f', 'b']], RULE_INPUT)).toBe(true);
-      expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-        [['a', 'b', 'de'], ['c'], ['d', 'f']], RULE_INPUT)).toBe(false);
-      expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
-        [['a', 'b'], ['c', 'de', 'f']], RULE_INPUT)).toBe(false);
+    var RULE_INPUT = {
+      x: [['a', 'b'], ['c'], ['de', 'f']]
+    };
+    expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
+      [['a', 'b'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(false);
+    expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
+      [['a', 'b'], ['c', 'f'], ['de']], RULE_INPUT)).toBe(true);
+    expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
+      [['a', 'b', 'c'], ['de', 'f']], RULE_INPUT)).toBe(false);
+    expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
+      [['a'], ['c'], ['de', 'f', 'b']], RULE_INPUT)).toBe(true);
+    expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
+      [['a', 'b', 'de'], ['c'], ['d', 'f']], RULE_INPUT)).toBe(false);
+    expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
+      [['a', 'b'], ['c', 'de', 'f']], RULE_INPUT)).toBe(false);
   });
 });
