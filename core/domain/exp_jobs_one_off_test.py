@@ -958,7 +958,7 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         state2.update_interaction_default_outcome(default_outcome_dict2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start migrationvalidation job on sample exploration.
+        # Start MigrationValidation job on sample exploration.
         job_id = exp_jobs_one_off.ExplorationMigrationValidationJob.create_new()
         exp_jobs_one_off.ExplorationMigrationValidationJob.enqueue(job_id)
         self.process_and_flush_pending_tasks()

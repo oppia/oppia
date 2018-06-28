@@ -19,6 +19,7 @@
 import bs4
 from core.domain import html_cleaner
 from core.tests import test_utils
+import feconf
 
 
 class HtmlCleanerUnitTests(test_utils.GenericTestBase):
@@ -183,9 +184,9 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             self.assertIn(component, expected_components)
 
 
-class ContentMigrationToTextAngular(test_utils.GenericTestBase):
+class ContentMigrationTests(test_utils.GenericTestBase):
     """ Tests the function associated with the migration of html
-    strings to valid TextAngular format.
+    strings to valid RTE format.
     """
 
     def test_wrap_with_siblings(self):
@@ -329,10 +330,11 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
         ]
         actual_output_with_migration_for_text_angular = (
             html_cleaner.validate_rte_format(
-                test_cases_for_text_angular, 'text-angular', True))
+                test_cases_for_text_angular,
+                feconf.RTE_FORMAT_TEXTANGULAR, True))
         actual_output_without_migration_for_text_angular = (
             html_cleaner.validate_rte_format(
-                test_cases_for_text_angular, 'text-angular'))
+                test_cases_for_text_angular, feconf.RTE_FORMAT_TEXTANGULAR))
 
         expected_output_with_migration_for_text_angular = {'strings': []}
         expected_output_without_migration_for_text_angular = {
@@ -380,7 +382,7 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
 
         actual_output_without_migration_for_ck_editor = (
             html_cleaner.validate_rte_format(
-                test_cases_for_ck_editor, 'ck-editor'))
+                test_cases_for_ck_editor, feconf.RTE_FORMAT_CKEDITOR))
 
         expected_output_without_migration_for_ck_editor = {
             'invalidTags': ['b'],
@@ -433,7 +435,7 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
             actual_output_for_text_angular = (
                 html_cleaner._validate_soup_for_rte( # pylint: disable=protected-access
                     bs4.BeautifulSoup(test_case, 'html.parser'),
-                    'text-angular', err_dict))
+                    feconf.RTE_FORMAT_TEXTANGULAR, err_dict))
 
             self.assertEqual(
                 actual_output_for_text_angular,
@@ -461,7 +463,7 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
             actual_output_for_ck_editor = (
                 html_cleaner._validate_soup_for_rte( # pylint: disable=protected-access
                     bs4.BeautifulSoup(test_case, 'html.parser'),
-                    'ck-editor', err_dict))
+                    feconf.RTE_FORMAT_CKEDITOR, err_dict))
 
             self.assertEqual(
                 actual_output_for_ck_editor,

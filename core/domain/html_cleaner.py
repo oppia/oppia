@@ -488,13 +488,14 @@ def convert_tag_contents_to_text_angular(html_data):
     return unicode(soup)
 
 
-def validate_rte_format(html_list, rte_type, run_migration=False):
+def validate_rte_format(html_list, rte_format, run_migration=False):
     """This function checks if html strings in a given list are
     valid for given RTE format.
 
     Args:
         html_list: list(str). List of html strings to be validated.
-        rte_type: str. The type of RTE for which html string is to be validated.
+        rte_format: str. The type of RTE for which html string is
+            to be validated.
         run_migration: bool. Specifies if migration is to be performed
             before validating.
 
@@ -521,7 +522,7 @@ def validate_rte_format(html_list, rte_type, run_migration=False):
         soup = bs4.BeautifulSoup(
             soup_data.replace('<br>', '<br/>'), 'html.parser')
 
-        is_invalid = _validate_soup_for_rte(soup, rte_type, err_dict)
+        is_invalid = _validate_soup_for_rte(soup, rte_format, err_dict)
 
         if is_invalid:
             err_dict['strings'].append(html_data)
@@ -532,7 +533,7 @@ def validate_rte_format(html_list, rte_type, run_migration=False):
             soup_for_collapsible = bs4.BeautifulSoup(
                 content_html.replace('<br>', '<br/>'), 'html.parser')
             is_invalid = _validate_soup_for_rte(
-                soup_for_collapsible, rte_type, err_dict)
+                soup_for_collapsible, rte_format, err_dict)
             if is_invalid:
                 err_dict['strings'].append(html_data)
 
@@ -544,7 +545,7 @@ def validate_rte_format(html_list, rte_type, run_migration=False):
                 soup_for_tabs = bs4.BeautifulSoup(
                     content_html.replace('<br>', '<br/>'), 'html.parser')
                 is_invalid = _validate_soup_for_rte(
-                    soup_for_tabs, rte_type, err_dict)
+                    soup_for_tabs, rte_format, err_dict)
                 if is_invalid:
                     err_dict['strings'].append(html_data)
 
@@ -554,23 +555,25 @@ def validate_rte_format(html_list, rte_type, run_migration=False):
     return err_dict
 
 
-def _validate_soup_for_rte(soup, rte_type, err_dict):
+def _validate_soup_for_rte(soup, rte_format, err_dict):
     """Validate content in given soup for given RTE format.
 
     Args:
         soup: bs4.BeautifulSoup. The html soup whose content is to be validated.
-        rte_type: str. The type of RTE for which html string is to be validated.
+        rte_format: str. The type of RTE for which html string is
+            to be validated.
         err_dict: dict. The dictionary which stores invalid tags and strings.
 
     Returns:
         bool. Boolean indicating whether a html string is valid for given RTE.
     """
-    if rte_type == 'text-angular':
-        RTE = 'RTE_TYPE_TEXTANGULAR'
+    if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
+        RTE_TYPE = 'RTE_TYPE_TEXTANGULAR'
     else:
-        RTE = 'RTE_TYPE_CKEDITOR'
-    allowed_parent_list = feconf.RTE_CONTENT_SPEC[RTE]['ALLOWED_PARENT_LIST']
-    allowed_tag_list = feconf.RTE_CONTENT_SPEC[RTE]['ALLOWED_TAG_LIST']
+        RTE_TYPE = 'RTE_TYPE_CKEDITOR'
+    allowed_parent_list = feconf.RTE_CONTENT_SPEC[
+        RTE_TYPE]['ALLOWED_PARENT_LIST']
+    allowed_tag_list = feconf.RTE_CONTENT_SPEC[RTE_TYPE]['ALLOWED_TAG_LIST']
     is_invalid = False
 
     # Text with no parent tag is also invalid.

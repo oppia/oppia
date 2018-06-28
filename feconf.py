@@ -897,6 +897,10 @@ QUESTION_BATCH_SIZE = 10
 
 STATE_ANSWER_STATS_MIN_FREQUENCY = 2
 
+RTE_FORMAT_TEXTANGULAR = 'text-angular'
+
+RTE_FORMAT_CKEDITOR = 'ck-editor'
+
 # RTE content specifications according to the type of the editor.
 RTE_CONTENT_SPEC = {
     'RTE_TYPE_TEXTANGULAR': {

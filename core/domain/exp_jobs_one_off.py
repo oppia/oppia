@@ -493,7 +493,8 @@ class ExplorationContentValidationJobForTextAngular(
 
         html_list = exploration.get_all_html_content_strings()
 
-        err_dict = html_cleaner.validate_rte_format(html_list, 'text-angular')
+        err_dict = html_cleaner.validate_rte_format(
+            html_list, feconf.RTE_FORMAT_TEXTANGULAR)
 
         for key in err_dict:
             if err_dict[key]:
@@ -526,7 +527,7 @@ class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
         html_list = exploration.get_all_html_content_strings()
 
         err_dict = html_cleaner.validate_rte_format(
-            html_list, 'text-angular', True)
+            html_list, feconf.RTE_FORMAT_TEXTANGULAR, True)
 
         for key in err_dict:
             if err_dict[key]:
@@ -559,7 +560,8 @@ class ExplorationContentValidationJobForCKEditor(
 
         html_list = exploration.get_all_html_content_strings()
 
-        err_dict = html_cleaner.validate_rte_format(html_list, 'ck-editor')
+        err_dict = html_cleaner.validate_rte_format(
+            html_list, feconf.RTE_FORMAT_CKEDITOR)
 
         for key in err_dict:
             if err_dict[key]:
