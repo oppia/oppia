@@ -23,6 +23,9 @@ oppia.constant(
   '/rightshandler/assign_topic_manager/<topic_id>/<assignee_id>');
 oppia.constant(
   'TOPIC_RIGHTS_URL_TEMPLATE', '/rightshandler/get_topic_rights/<topic_id>');
+oppia.constant(
+  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE',
+  '/subtopic_page_editor_handler/data/<topic_id>/<subtopic_id>');
 
 oppia.constant(
   'TOPIC_NAME_INPUT_FOCUS_LABEL', 'topicNameInputFocusLabel');

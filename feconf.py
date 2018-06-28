@@ -619,7 +619,7 @@ LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_SKILL_URL = '/skill_editor_handler/create_new'
-NEW_STORY_URL = '/story_editor_handler/create_new'
+TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_DATA_URL = '/questionhandler'
@@ -668,6 +668,7 @@ NAV_MODE_LIBRARY = 'library'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
+NAV_MODE_STORY_EDITOR = 'story_editor'
 NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
 NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
@@ -708,7 +709,7 @@ COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
 COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
-ENABLE_PLAYTHROUGHS = False
+ENABLE_PLAYTHROUGHS = True
 # Threshold for early quit playthrough.
 EARLY_QUIT_THRESHOLD_IN_SECS = 45
 # Threshold for multiple incorrect answers playthrough.

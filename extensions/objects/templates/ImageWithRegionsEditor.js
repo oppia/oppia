@@ -490,7 +490,9 @@ oppia.directive('imageWithRegionsEditor', [
           };
           $scope.resetEditor = function() {
             $uibModal.open({
-              templateUrl: 'modals/imageRegionsResetConfirmation',
+              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/objects/templates/' +
+                'image_with_regions_reset_confirmation_directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [

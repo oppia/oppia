@@ -124,7 +124,6 @@ BAD_PATTERNS_JS_REGEXP = [
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
             'extensions/dependencies/',
-            'extensions/objects/',
             'extensions/value_generators/',
             'extensions/visualizations/')
     },
