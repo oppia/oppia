@@ -49,12 +49,14 @@ oppia.factory('StatsReportingService', [
   '$http', '$interval', 'StopwatchObjectFactory', 'MessengerService',
   'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
   'STATS_EVENT_TYPES', 'ExplorationContextService', 'PAGE_CONTEXT',
-  'DEFAULT_OUTCOME_CLASSIFICATION', 'PlaythroughService', 'ENABLE_PLAYTHROUGHS',
+  'DEFAULT_OUTCOME_CLASSIFICATION', 'PlaythroughService',
+  'ENABLE_PLAYTHROUGH_RECORDING',
   function(
       $http, $interval, StopwatchObjectFactory, MessengerService,
       UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
       STATS_EVENT_TYPES, ExplorationContextService, PAGE_CONTEXT,
-      DEFAULT_OUTCOME_CLASSIFICATION, PlaythroughService, ENABLE_PLAYTHROUGHS) {
+      DEFAULT_OUTCOME_CLASSIFICATION, PlaythroughService,
+      ENABLE_PLAYTHROUGH_RECORDING) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;
@@ -173,7 +175,7 @@ oppia.factory('StatsReportingService', [
           session_id: sessionId
         });
 
-        if (ENABLE_PLAYTHROUGHS) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
           PlaythroughService.recordExplorationStartAction(stateName);
         }
       },
@@ -271,7 +273,7 @@ oppia.factory('StatsReportingService', [
         explorationIsComplete = true;
 
         postStatsToBackend();
-        if (ENABLE_PLAYTHROUGHS) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
           PlaythroughService.recordExplorationQuitAction(
             stateName, stateStopwatch.getTimeInSecs());
 
@@ -313,13 +315,13 @@ oppia.factory('StatsReportingService', [
 
         postStatsToBackend();
 
-        if (ENABLE_PLAYTHROUGHS) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
           PlaythroughService.recordPlaythrough();
         }
       },
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback) {
-        if (ENABLE_PLAYTHROUGHS) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
           PlaythroughService.recordAnswerSubmitAction(
             stateName, destStateName, interactionId, answer, feedback,
             stateStopwatch.getTimeInSecs());

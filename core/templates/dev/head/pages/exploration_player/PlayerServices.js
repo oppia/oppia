@@ -30,7 +30,7 @@ oppia.factory('ExplorationPlayerService', [
   'PAGE_CONTEXT', 'ExplorationHtmlFormatterService',
   'PlayerTranscriptService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'StateClassifierMappingService',
-  'ENABLE_PLAYTHROUGHS', 'PlaythroughService', 'StatsReportingService',
+  'ENABLE_PLAYTHROUGH_RECORDING', 'PlaythroughService', 'StatsReportingService',
   'UrlInterpolationService', 'ReadOnlyExplorationBackendApiService',
   'EditableExplorationBackendApiService', 'AudioTranslationLanguageService',
   'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
@@ -44,7 +44,7 @@ oppia.factory('ExplorationPlayerService', [
       PAGE_CONTEXT, ExplorationHtmlFormatterService,
       PlayerTranscriptService, ExplorationObjectFactory,
       ExpressionInterpolationService, StateClassifierMappingService,
-      ENABLE_PLAYTHROUGHS, PlaythroughService, StatsReportingService,
+      ENABLE_PLAYTHROUGH_RECORDING, PlaythroughService, StatsReportingService,
       UrlInterpolationService, ReadOnlyExplorationBackendApiService,
       EditableExplorationBackendApiService, AudioTranslationLanguageService,
       LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
@@ -265,7 +265,7 @@ oppia.factory('ExplorationPlayerService', [
               _explorationId, exploration.title,
               version, data.session_id, GLOBALS.collectionId);
 
-            if (ENABLE_PLAYTHROUGHS) {
+            if (ENABLE_PLAYTHROUGH_RECORDING) {
               PlaythroughService.initSession(_explorationId, version);
             }
 
@@ -395,7 +395,7 @@ oppia.factory('ExplorationPlayerService', [
         var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
 
-        if (ENABLE_PLAYTHROUGHS) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
           StatsReportingService.recordAnswerSubmitAction(
             oldStateName, newStateName, oldState.interaction.id, answer,
             outcome.feedback);
