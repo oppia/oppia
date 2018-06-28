@@ -467,7 +467,6 @@ describe('Exploration history', function() {
     explorationEditorPage.setContent(forms.toRichText('this is card 2'));
     explorationEditorPage.setInteraction('Continue');
 
-    // explorationEditorPage.setDefaultOutcome(null, 'final card', false);
     var responseEditor = explorationEditorPage.getResponseEditor('default');
     responseEditor.setDestination('final card', false, null);
     explorationEditorPage.saveChanges();
