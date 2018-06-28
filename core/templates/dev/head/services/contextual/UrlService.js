@@ -52,14 +52,14 @@ oppia.factory('UrlService', ['$window', function($window) {
       var pathname = this.getPathname();
       if (pathname.match(/\/(story|topic)_editor\/\w{12}\b/g)) {
         return pathname.split('/')[2];
-      };
+      }
       throw Error('Invalid story id url');
     },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();
       if (pathname.match(/\/story_editor(\/\w{12}\b){2}/g)) {
         return pathname.split('/')[3];
-      };
+      }
       throw Error('Invalid story id url');
     },
     getQueryFieldValuesAsList: function(fieldName) {
