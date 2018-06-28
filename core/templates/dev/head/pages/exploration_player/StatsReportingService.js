@@ -53,8 +53,8 @@ oppia.factory('StatsReportingService', [
   'STATS_REPORTING_URLS',
   function(
       $http, $interval, ExplorationContextService, MessengerService,
-      PlaythroughService, siteAnalyticsService, StopwatchObjectFactory,
-      UrlInterpolationService, DEFAULT_OUTCOME_CLASSIFICATION,
+      PlaythroughService, siteAnalyticsService, UrlInterpolationService,
+      StopwatchObjectFactory, DEFAULT_OUTCOME_CLASSIFICATION,
       ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, STATS_EVENT_TYPES,
       STATS_REPORTING_URLS) {
     var explorationId = null;
