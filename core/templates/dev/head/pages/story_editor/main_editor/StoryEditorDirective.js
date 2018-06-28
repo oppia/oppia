@@ -15,7 +15,7 @@
 /**
  * @fileoverview Controller for the main story editor.
  */
-oppia.constant('EVENT_VIEW_NODE_EDITOR', 'viewNodeEditor');
+oppia.constant('EVENT_VIEW_STORY_NODE_EDITOR', 'viewStoryNodeEditor');
 
 oppia.directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -26,15 +26,27 @@ oppia.directive('storyEditor', [
         '/pages/story_editor/main_editor/story_editor_directive.html'),
       controller: [
         '$scope', 'StoryEditorStateService', 'StoryUpdateService',
-        'UndoRedoService', 'EVENT_VIEW_NODE_EDITOR', 'EVENT_STORY_INITIALIZED',
-        'EVENT_STORY_REINITIALIZED',
+        'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR',
+        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
         function(
             $scope, StoryEditorStateService, StoryUpdateService,
-            UndoRedoService, EVENT_VIEW_NODE_EDITOR, EVENT_STORY_INITIALIZED,
-            EVENT_STORY_REINITIALIZED) {
+            UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR,
+            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+          var _init = function() {
+            $scope.story = StoryEditorStateService.getStory();
+            $scope.storyContents = $scope.story.getStoryContents();
+            if ($scope.storyContents) {
+              $scope.setNodeToEdit($scope.storyContents.getInitialNodeId());
+            }
+            _initEditor();
+          };
+
           var _initEditor = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.storyContents = $scope.story.getStoryContents();
+            if ($scope.storyContents) {
+              $scope.nodes = $scope.storyContents.getNodes();
+            }
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
             $scope.notes = $scope.story.getNotes();
@@ -43,12 +55,6 @@ oppia.directive('storyEditor', [
             $scope.editableDescriptionIsEmpty = (
               $scope.editableDescription === '');
             $scope.storyDescriptionChanged = false;
-            if ($scope.storyContents) {
-              $scope.nodes = $scope.storyContents.getNodes();
-              if (!$scope.idOfNodeToEdit) {
-                $scope.setNodeToEdit($scope.storyContents.getInitialNodeId());
-              }
-            }
           };
 
           $scope.setNodeToEdit = function(nodeId) {
@@ -123,13 +129,14 @@ oppia.directive('storyEditor', [
             }
           };
 
-          $scope.$on(EVENT_VIEW_NODE_EDITOR, function(evt, nodeId) {
+          $scope.$on(EVENT_VIEW_STORY_NODE_EDITOR, function(evt, nodeId) {
             $scope.setNodeToEdit(nodeId);
           });
 
-          $scope.$on(EVENT_STORY_INITIALIZED, _initEditor);
+          $scope.$on(EVENT_STORY_INITIALIZED, _init);
           $scope.$on(EVENT_STORY_REINITIALIZED, _initEditor);
 
+          _init();
           _initEditor();
         }
       ]

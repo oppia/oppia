@@ -30,11 +30,11 @@ oppia.directive('storyNodeEditor', [
       controller: [
         '$scope', '$rootScope', '$uibModal', 'StoryEditorStateService',
         'StoryUpdateService', 'UndoRedoService', 'EVENT_STORY_INITIALIZED',
-        'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_NODE_EDITOR',
+        'EVENT_STORY_REINITIALIZED', 'EVENT_VIEW_STORY_NODE_EDITOR',
         function(
             $scope, $rootScope, $uibModal, StoryEditorStateService,
             StoryUpdateService, UndoRedoService, EVENT_STORY_INITIALIZED,
-            EVENT_STORY_REINITIALIZED, EVENT_VIEW_NODE_EDITOR) {
+            EVENT_STORY_REINITIALIZED, EVENT_VIEW_STORY_NODE_EDITOR) {
           var _init = function() {
             $scope.story = StoryEditorStateService.getStory();
             $scope.oldOutline = $scope.getOutline();
@@ -50,7 +50,7 @@ oppia.directive('storyNodeEditor', [
           };
 
           $scope.viewNodeEditor = function(nodeId) {
-            $rootScope.$broadcast(EVENT_VIEW_NODE_EDITOR, nodeId);
+            $rootScope.$broadcast(EVENT_VIEW_STORY_NODE_EDITOR, nodeId);
           };
 
           $scope.finalizeOutline = function() {
