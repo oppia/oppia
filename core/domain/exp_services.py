@@ -1649,7 +1649,7 @@ def get_image_filenames_from_exploration(exploration):
         if 'id' in rte_comp and (
                 str(rte_comp['id']) == 'oppia-noninteractive-image'):
             filenames.append(rte_comp['customization_args'][
-                    'filepath-with-value'])
+                'filepath-with-value'])
     # This is done because the ItemSelectInput may repeat the image names.
     return list(set(filenames))
 
