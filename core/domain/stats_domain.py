@@ -496,12 +496,11 @@ class Playthrough(object):
     """
 
     def __init__(
-            self, playthrough_id, exp_id, exp_version, issue_type,
-            issue_customization_args, actions):
+            self, exp_id, exp_version, issue_type, issue_customization_args,
+            actions):
         """Constructs a Playthrough domain object.
 
         Args:
-            playthrough_id: str. ID of the playthrough.
             exp_id: str. ID of the exploration.
             exp_version: int. Version of the exploration.
             issue_type: str. Type of the issue.
@@ -509,7 +508,6 @@ class Playthrough(object):
                 given issue_type.
             actions: list(LearnerAction). List of playthrough learner actions.
         """
-        self.id = playthrough_id
         self.exp_id = exp_id
         self.exp_version = exp_version
         self.issue_type = issue_type
@@ -524,7 +522,6 @@ class Playthrough(object):
         """
         action_dicts = [action.to_dict() for action in self.actions]
         return {
-            'id': self.id,
             'exp_id': self.exp_id,
             'exp_version': self.exp_version,
             'issue_type': self.issue_type,
@@ -547,7 +544,6 @@ class Playthrough(object):
             LearnerAction.from_dict(action_dict)
             for action_dict in playthrough_dict['actions']]
         return cls(
-            playthrough_dict['id'],
             playthrough_dict['exp_id'],
             playthrough_dict['exp_version'],
             playthrough_dict['issue_type'],
@@ -579,23 +575,18 @@ class Playthrough(object):
             LearnerAction.from_dict(action_dict)
             for action_dict in playthrough_data['actions']]
 
-        dummy_playthrough = cls(
-            'dummy_playthrough_id',
+        playthrough = cls(
             playthrough_data['exp_id'],
             playthrough_data['exp_version'],
             playthrough_data['issue_type'],
             playthrough_data['issue_customization_args'],
             actions)
 
-        dummy_playthrough.validate()
-        return dummy_playthrough
+        playthrough.validate()
+        return playthrough
 
     def validate(self):
         """Validates the Playthrough domain object."""
-        if not isinstance(self.id, basestring):
-            raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % type(self.id))
-
         if not isinstance(self.exp_id, basestring):
             raise utils.ValidationError(
                 'Expected exp_id to be a string, received %s' % type(

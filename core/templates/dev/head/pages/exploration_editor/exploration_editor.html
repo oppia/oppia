@@ -80,6 +80,9 @@
         {% include 'pages/exploration_editor/editor_tab/editor_tab.html' %}
       </div>
 
+      <div ng-show="getTabStatuses().active === 'translation'">
+        <translation-tab></translation-tab>
+      </div>
       <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
       <div ng-if="getTabStatuses().active === 'preview'">
         {% include 'pages/exploration_editor/preview_tab/preview_tab.html' %}
@@ -289,6 +292,10 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/SolutionValidityService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/editor_tab/StateStatistics.js"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/translation_tab/TranslationTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/translation_tab/TranslatorOverviewDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/translation_tab/TranslationLanguageService.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/preview_tab/PreviewTab.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_editor/statistics_tab/StateImprovementSuggestionService.js"></script>
@@ -327,6 +334,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/OutcomeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamChangesObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamMetadataObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamSpecObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamSpecsObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/ParamTypeObjectFactory.js"></script>
@@ -337,6 +345,9 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/SubtitledHtmlObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/exploration/TriggerObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/objects/FractionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/statistics/PlaythroughObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/statistics/ExplorationIssueObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/statistics/LearnerActionObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/objects/NumberWithUnitsObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/AudioFileObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/AudioLanguageObjectFactory.js"></script>
@@ -354,6 +365,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/AnswerClassificationService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/StateClassifierMappingService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PredictionAlgorithmRegistryService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/PlaythroughService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/InputResponsePairDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/exploration_player/CorrectnessFooterDirective.js"></script>
