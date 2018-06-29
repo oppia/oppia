@@ -132,6 +132,17 @@ oppia.directive('subtopicsListTab', [
             });
           };
 
+          $scope.getSkillEditorUrl = function(subtopicIndex, skillIndex) {
+            var skillId;
+            if (subtopicIndex === null) {
+              skillId = $scope.uncategorizedSkillIds[skillIndex];
+            } else {
+              skillId = $scope.subtopics[
+                subtopicIndex].getSkillIds()[skillIndex];
+            }
+            return '/skill_editor/' + skillId;
+          };
+
           $scope.startMoveSkill = function(oldSubtopicIndex, index) {
             if (oldSubtopicIndex === null) {
               $scope.skillIdToMove = $scope.uncategorizedSkillIds[index];

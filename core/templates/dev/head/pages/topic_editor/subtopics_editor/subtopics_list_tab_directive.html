@@ -18,7 +18,7 @@
                  dnd-draggable="skillDescription"
                  dnd-dragstart="startMoveSkill(subtopicIndex, $index)"
                  dnd-effect-allowed="move">
-          <[skillDescription]>
+        <a ng-href="<[getSkillEditorUrl(subtopicIndex, $index)]>" target="_blank"> <[skillDescription]> </a>
         </md-card>
         <div class="edit-subtopic">
           <button class="btn btn-primary" ng-click="editSubtopic(subtopic)">
@@ -42,7 +42,7 @@
              dnd-draggable="skillDescription"
              dnd-effect-allowed="move"
              dnd-dragstart="startMoveSkill(null, $index)">
-      <[skillDescription]>
+      <a ng-href="<[getSkillEditorUrl(null, $index)]>" target="_blank"> <[skillDescription]> </a>
     </md-card>
   </md-card>
 </div>
