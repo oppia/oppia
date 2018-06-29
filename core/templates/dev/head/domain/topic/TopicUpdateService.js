@@ -228,12 +228,37 @@ oppia.factory('TopicUpdateService', [
           // Get the current change list.
           var currentChangeList = UndoRedoService.getChangeList();
           var indicesToDelete = [];
+          var oldSubtopicIdSkillIdMap = {};
+          var skillIds = subtopic.getSkillIds();
+          for (var i = 0; i < currentChangeList.length; i++) {
+            var changeDict =
+              currentChangeList[i].getBackendChangeObject();
+            if (changeDict.new_subtopic_id === subtopicId) {
+              if (skillIds.indexOf(changeDict.skill_id) !== -1) {
+                changeDict.cmd = CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC;
+                changeDict.subtopic_id = changeDict.old_subtopic_id;
+              } else {
+                oldSubtopicIdSkillIdMap[changeDict.skill_id] =
+                  changeDict.old_subtopic_id;
+                currentChangeList.splice(i, 1);
+                i--;
+                continue;
+              }
+            } else if (changeDict.old_subtopic_id === subtopicId) {
+              changeDict.old_subtopic_id =
+                oldSubtopicIdSkillIdMap[changeDict.skill_id];
+            } else if (changeDict.cmd === CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC) {
+              if (changeDict.subtopic_id === subtopicId) {
+                changeDict.subtopic_id =
+                  oldSubtopicIdSkillIdMap[changeDict.skill_id];
+              }
+            }
+            currentChangeList[i].setBackendChangeObject(changeDict);
+          }
           for (var i = 0; i < currentChangeList.length; i++) {
             var backendChangeDict =
               currentChangeList[i].getBackendChangeObject();
-            if (backendChangeDict.subtopic_id === subtopicId ||
-                backendChangeDict.old_subtopic_id === subtopicId ||
-                backendChangeDict.new_subtopic_id === subtopicId) {
+            if (backendChangeDict.subtopic_id === subtopicId) {
               // The indices in the change list corresponding to changes to the
               // currently deleted and newly created subtopic are to be removed
               // from the list.

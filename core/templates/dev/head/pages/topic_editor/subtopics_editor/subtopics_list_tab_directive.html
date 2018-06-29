@@ -2,32 +2,29 @@
   <md-card class="subtopics">
     <h3> Subtopics </h3>
     <h4 style="color: #6d6d6d">
-      (Drag and drop skills across subtopics or to the uncategorized section)
+      (Drag and drop skills across subtopics or to the uncategorized section or click on a subtopic card to edit its page data)
     </h4>
     <div class="subtopics-container">
       <md-card class="subtopic"
                ng-repeat="(subtopicIndex, subtopic) in subtopics"
+               ng-click="editSubtopic(subtopic)"
                dnd-list="subtopic.getSkillDescriptions()"
                dnd-drop="endMoveSkill(subtopic.getId())">
         <strong style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
         <span style="float: right; color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
           <i class="material-icons md-18">&#xE14C;</i>
         </span>
-        <md-card class="skill-id"
-                 ng-repeat="skillDescription in subtopic.getSkillDescriptions()"
-                 dnd-draggable="skillDescription"
-                 dnd-dragstart="startMoveSkill(subtopicIndex, $index)"
-                 dnd-effect-allowed="move">
-        <a ng-href="<[getSkillEditorUrl(subtopicIndex, $index)]>" target="_blank"> <[skillDescription]> </a>
-        </md-card>
-        <div class="edit-subtopic">
-          <button class="btn btn-primary" ng-click="editSubtopic(subtopic)">
-            Edit
-          </button>
+        <div style="max-height: 35vh; overflow-y: auto;">
+          <md-card class="skill-id"
+                   ng-repeat="skillDescription in subtopic.getSkillDescriptions()"
+                   dnd-draggable="skillDescription"
+                   dnd-dragstart="startMoveSkill(subtopicIndex, $index)"
+                   dnd-effect-allowed="move">
+          <a ng-href="<[getSkillEditorUrl(subtopicIndex, $index)]>" target="_blank"> <[skillDescription]> </a>
+          </md-card>
         </div>
       </md-card>
       <md-card class="subtopic new" ng-click="createSubtopic()">
-        <strong><[subtopic.getTitle()]></strong>
         <i class="material-icons">add</i>
       </md-card>
     </div>
@@ -37,13 +34,15 @@
            dnd-list="uncategorizedSkillDescriptions"
            dnd-drop="endMoveSkill(null)">
     <h3> Uncategorized Skills </h3>
-    <md-card class="skill-id"
-             ng-repeat="skillDescription in uncategorizedSkillDescriptions"
-             dnd-draggable="skillDescription"
-             dnd-effect-allowed="move"
-             dnd-dragstart="startMoveSkill(null, $index)">
-      <a ng-href="<[getSkillEditorUrl(null, $index)]>" target="_blank"> <[skillDescription]> </a>
-    </md-card>
+    <div style="max-height: 45vh; overflow-y: auto;">
+      <md-card class="skill-id"
+               ng-repeat="skillDescription in uncategorizedSkillDescriptions"
+               dnd-draggable="skillDescription"
+               dnd-effect-allowed="move"
+               dnd-dragstart="startMoveSkill(null, $index)">
+        <a ng-href="<[getSkillEditorUrl(null, $index)]>" target="_blank"> <[skillDescription]> </a>
+      </md-card>
+  </div>
   </md-card>
 </div>
 <style>
@@ -75,7 +74,9 @@
     float: left;
     flex: 0 0 auto;
     position: relative;
-    overflow-y: auto;
+  }
+  subtopics-list-tab .subtopic:hover {
+    background-color: #f6f6f6;
   }
   subtopics-list-tab .new:hover {
     background-color: #f1f1f1;
@@ -103,12 +104,6 @@
     width: 30%;
     display: inline-block;
     text-align: center;
-  }
-
-  subtopics-list-tab .edit-subtopic {
-    position: absolute;
-    left: 6vw;
-    bottom: 1vh;
   }
 
   subtopics-list-tab .skill-id {
