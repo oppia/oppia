@@ -138,15 +138,15 @@ oppia.factory('dragAndDropSortRulesService', [function() {
     return true;
   };
   var checkEqualityWithIncorrectPositions = function(answer, inputs) {
-    var noOfUnmatches = 0;
+    var noOfMismatches = 0;
     for (var i = 0; i < answer.length; i++) {
       for (var j = 0; j < answer[i].length; j++) {
         if (inputs.x[i].indexOf(answer[i][j]) === -1) {
-          noOfUnmatches += 1;
+          noOfMismatches += 1;
         }
       }
     }
-    return noOfUnmatches === 1;
+    return noOfMismatches === 1;
   };
   return {
     IsEqualToOrdering: function(answer, inputs) {

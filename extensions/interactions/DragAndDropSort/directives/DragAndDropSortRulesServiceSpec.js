@@ -31,6 +31,8 @@ describe('Drag and Drop Sort rules service', function() {
     expect(ddsrs.IsEqualToOrdering(
       [['a', 'b'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(true);
     expect(ddsrs.IsEqualToOrdering(
+      [['b', 'a'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(true);
+    expect(ddsrs.IsEqualToOrdering(
       [['abbb', 'b'], ['c'], ['d', 'f']], RULE_INPUT)).toBe(false);
     expect(ddsrs.IsEqualToOrdering(
       [['a', 'b'], ['c', 'f'], ['de']], RULE_INPUT)).toBe(false);
@@ -49,6 +51,8 @@ describe('Drag and Drop Sort rules service', function() {
     };
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
       [['a', 'b'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(false);
+    expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
+      [['b', 'a'], ['c'], ['de', 'f']], RULE_INPUT)).toBe(false);
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
       [['a', 'b'], ['c', 'f'], ['de']], RULE_INPUT)).toBe(true);
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
