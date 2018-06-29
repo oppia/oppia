@@ -185,11 +185,9 @@ var ExplorationEditorPage = function() {
   this.addResponse = function(
       interactionId, feedbackInstructions, destStateName,
       createState, ruleName) {
-    browser.waitForAngular();
+    expect(addResponseButton.isDisplayed()).toEqual(true);
     // Open the "Add Response" modal if it is not already open.
-    addResponseButton.isDisplayed().then(function() {
-      addResponseButton.click();
-    });
+    addResponseButton.click();
 
     // Set the rule description.
     var addResponseDetails = element(
@@ -221,9 +219,8 @@ var ExplorationEditorPage = function() {
     }
 
     // Close new response modal.
-    addNewResponseButton.isDisplayed().then(function(){
-      addNewResponseButton.click();
-    });
+    expect(addNewResponseButton.isDisplayed()).toBe(true);
+    addNewResponseButton.click();
     general.waitForSystem();
   };
 
@@ -236,6 +233,9 @@ var ExplorationEditorPage = function() {
         throw 'Expected to find at most one \'welcome modal\'';
       }
     });
+
+    expect(element(by.css('.protractor-test-welcome-modal')).isPresent())
+      .toBe(false);
 
     // Otherwise, if the editor tutorial shows up, exit it.
     element.all(by.css('.skipBtn')).then(function(buttons) {
@@ -259,9 +259,8 @@ var ExplorationEditorPage = function() {
 
     responseBody(responseNum).isPresent().then(function(isVisible) {
       if (!isVisible) {
-        headerElem.isDisplayed().then(function() {
-          headerElem.click();
-        });
+        expect(headerElem.isDisplayed()).toBe(true);
+        headerElem.click();
       }
     });
 
@@ -284,17 +283,15 @@ var ExplorationEditorPage = function() {
       setDestination: function(
           destinationName, createState, refresherExplorationId) {
         // Begin editing destination.
-        openOutcomeDestEditor.isDisplayed().then( function() {
-          openOutcomeDestEditor.click();
-        });
+        expect(openOutcomeDestEditor.isDisplayed()).toBe(true);
+        openOutcomeDestEditor.click();
 
         // Set destination contents.
         _setOutcomeDest(destinationName, createState, refresherExplorationId);
 
         // Save destination.
-        saveOutcomeDestButton.isDisplayed().then( function() {
-          saveOutcomeDestButton.click();
-        });
+        expect(saveOutcomeDestButton.isDisplayed()).toBe(true);
+        saveOutcomeDestButton.click();
       },
       // The current state name must be at the front of the list.
       expectAvailableDestinationsToBe: function(stateNames) {
@@ -388,18 +385,17 @@ var ExplorationEditorPage = function() {
   // can then use to alter the state content, for example by calling
   // .appendBoldText(...).
   this.setContent = function(richTextInstructions) {
-    general.waitForSystem();
-    stateEditContent.isDisplayed().then(function() {
-      stateEditContent.click();
-    });
+    var until = protractor.ExpectedConditions;
+    browser.wait(until.presenceOf(stateEditContent), 5000,
+      'stateEditContent taking too long to appear in the DOM');
+    stateEditContent.click();
     var stateContentEditor = element(
       by.css('.protractor-test-state-content-editor'));
     var richTextEditor = forms.RichTextEditor(stateContentEditor);
     richTextEditor.clear();
     richTextInstructions(richTextEditor);
-    saveStateContentButton.isDisplayed().then(function() {
-      saveStateContentButton.click();
-    });
+    expect(saveStateContentButton.isDisplayed()).toBe(true);
+    saveStateContentButton.click();
   };
 
   // This receives a function richTextInstructions used to verify the display of
@@ -420,20 +416,17 @@ var ExplorationEditorPage = function() {
   // CONTROLS
 
   this.saveChanges = function(commitMessage) {
-    saveChangesButton.isDisplayed().then(function() {
-      saveChangesButton.click().then(function() {
-        if (commitMessage) {
-          commitMessageInput.
-            sendKeys(commitMessage);
-        }
-        saveDraftButton.isDisplayed().then(function() {
-          saveDraftButton.click();
-        });
-        // This is necessary to give the page time to record the changes,
-        // so that it does not attempt to stop the user leaving.
-        browser.waitForAngular();
-        general.waitForSystem();
-      });
+    expect(saveChangesButton.isDisplayed()).toBe(true);
+    saveChangesButton.click().then(function() {
+      if (commitMessage) {
+        commitMessageInput.sendKeys(commitMessage);
+      }
+      expect(saveDraftButton.isDisplayed()).toBe(true);
+      saveDraftButton.click();
+      // This is necessary to give the page time to record the changes,
+      // so that it does not attempt to stop the user leaving.
+      browser.waitForAngular();
+      general.waitForSystem();
     });
   };
 
@@ -460,11 +453,13 @@ var ExplorationEditorPage = function() {
     // If the "Add Response" modal opens, close it.
     addResponseHeader.isPresent().then(function(isVisible) {
       if (isVisible) {
-        closeAddResponseButton.isDisplayed().then(function() {
-          closeAddResponseButton.click();
-        });
+        expect(closeAddResponseButton.isDisplayed()).toBe(true);
+        closeAddResponseButton.click();
       }
     });
+    // Click on neutral element to make sure modal is closed.
+    expect(neutralElement.isDisplayed()).toBe(true);
+    neutralElement.click();
   };
 
   // This function should not usually be invoked directly; please consider
@@ -480,9 +475,8 @@ var ExplorationEditorPage = function() {
         }
       });
 
-    addInteractionButton.isDisplayed().then(function(){
-      addInteractionButton.click();
-    });
+    expect(addInteractionButton.isDisplayed()).toBe(true);
+    addInteractionButton.click();
 
     var INTERACTION_ID_TO_TAB_NAME = {
       Continue: 'General',
@@ -501,13 +495,11 @@ var ExplorationEditorPage = function() {
       InteractiveMap: 'Geography'
     };
 
-    interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).isDisplayed()
-      .then(function() {
-        interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
-      });
-    interactionTile(interactionId).isDisplayed().then( function() {
-      interactionTile(interactionId).click();
-    });
+    expect(interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId])
+      .isDisplayed()).toBe(true);
+    interactionTab(INTERACTION_ID_TO_TAB_NAME[interactionId]).click();
+    expect(interactionTile(interactionId).isDisplayed()).toBe(true);
+    interactionTile(interactionId).click();
   };
 
   // This function should not usually be invoked directly; please consider
@@ -553,24 +545,15 @@ var ExplorationEditorPage = function() {
   };
 
   this.setStateName = function(name) {
-    stateNameContainer.isDisplayed().then(function() {
-      stateNameContainer.click();
-    });
+    expect(stateNameContainer.isDisplayed()).toBe(true);
+    stateNameContainer.click();
     stateNameInput.clear();
     stateNameInput.sendKeys(name);
-    stateNameSubmitButton.isDisplayed().then(function() {
-      stateNameSubmitButton.click();
-    });
+    expect(stateNameSubmitButton.isDisplayed()).toBe(true);
+    stateNameSubmitButton.click();
+
     // Wait for the state to refresh.
     general.waitForSystem();
-  };
-
-  var _getStateName = function() {
-    return stateNameContainer.getText();
-  };
-
-  this.expectCurrentStateToBe = function(name) {
-    expect(_getStateName()).toMatch(name);
   };
 
   var _setOutcomeFeedback = function(richTextInstructions) {
@@ -583,27 +566,16 @@ var ExplorationEditorPage = function() {
   // NAVIGATION
 
   this.navigateToHistoryTab = function() {
-    navigateToHistoryTabButton.isDisplayed().then(function() {
-      navigateToHistoryTabButton.click();
-    });
+    navigateToHistoryTabButton.click();
   };
 
   this.navigateToFeedbackTab = function() {
-    navigateToFeedbackTabButton.isDisplayed().then(function() {
-      navigateToFeedbackTabButton.click();
-    });
+    navigateToFeedbackTabButton.click();
   };
 
   this.navigateToMainTab = function() {
-    navigateToMainTabButton.isDisplayed().then(function(isVisible) {
-      if (isVisible) {
-        navigateToMainTabButton.click();
-      }
-    });
-    // Click a neutral element in order to dismiss any warnings.
-    neutralElement.isDisplayed().then(function() {
-      neutralElement.click();
-    });
+    navigateToMainTabButton.click();
+    neutralElement.click();
   };
 
   this.navigateToPreviewTab = function() {
@@ -669,7 +641,7 @@ var ExplorationEditorPage = function() {
         parameterTypes[i])(parameterElement);
 
       if (interactionId === 'MultipleChoiceInput') {
-        // This is a special case as it uses a dropdown to set a NonnegativeInt
+        // This is a special case as it uses a dropdown to set a NonnegativeInt.
         parameterElement.element(by.tagName('button')).click();
         multipleChoiceAnswerOptions(parameterValues[i])
           .click();
@@ -705,9 +677,9 @@ var ExplorationEditorPage = function() {
     }
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
-    answerDescription.isDisplayed().then(function(){
-      answerDescription.click();
-    });
+
+    expect(answerDescription.isDisplayed()).toBe(true);
+    answerDescription.click();
 
     element.all(by.css('.select2-dropdown')).map(function(selectorElement) {
       selectorElement.all(by.cssContainingText(
@@ -742,12 +714,10 @@ var ExplorationEditorPage = function() {
         if (listOfNames[i] === stateName) {
           var deleteNodeButton = interactionNode.get(i).element(by.css(
             '.protractor-test-delete-node'));
-          deleteNodeButton.isDisplayed().then(function() {
-            deleteNodeButton.click();
-          });
-          confirmDeleteStateButton.isDisplayed().then(function() {
-            confirmDeleteStateButton.click();
-          });
+          expect(deleteNodeButton.isDisplayed());
+          deleteNodeButton.click();
+          expect(confirmDeleteStateButton.isDisplayed());
+          confirmDeleteStateButton.click();
           matched = true;
         }
       }
@@ -769,7 +739,7 @@ var ExplorationEditorPage = function() {
   };
 
   // NOTE: if the state is not visible in the state graph this function will
-  // fail
+  // fail.
   this.moveToState = function(targetName) {
     general.scrollToTop();
     interactionNode.map(function(stateElement) {
