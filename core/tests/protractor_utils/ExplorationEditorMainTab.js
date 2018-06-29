@@ -114,6 +114,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-delete-response'));
   var dismissWelcomeModalButton = element(
     by.css('.protractor-test-dismiss-welcome-modal'));
+  var nextTutorialStageButton = element.all(by.css('.nextBtn'));
   var saveAnswerButton = element(
     by.css('.protractor-test-save-answer'));
   var saveInteractionButton = element(
@@ -130,6 +131,72 @@ var ExplorationEditorMainTab = function() {
   /*
    * Actions
    */
+
+  // TUTORIAL
+
+  this.exitTutorial = function() {
+    // If the editor welcome modal shows up, exit it.
+    editorWelcomeModal.then(function(modals) {
+      if (modals.length === 1) {
+        dismissWelcomeModalButton.click();
+      } else if (modals.length !== 0) {
+        throw 'Expected to find at most one \'welcome modal\'';
+      }
+    });
+
+    expect(element(by.css('.protractor-test-welcome-modal')).isPresent())
+      .toBe(false);
+
+    // Otherwise, if the editor tutorial shows up, exit it.
+    element.all(by.css('.skipBtn')).then(function(buttons) {
+      if (buttons.length === 1) {
+        buttons[0].click();
+      } else if (buttons.length !== 0) {
+        throw 'Expected to find at most one \'exit tutorial\' button';
+      }
+    });
+  };
+
+  this.finishTutorial = function() {
+    // Finish the tutorial.
+    element.all(by.buttonText('Finish')).then(function(buttons) {
+      if (buttons.length === 1) {
+        buttons[0].click().then(function(){
+          // Making sure tutorial modal is closed
+          browser.wait(until.elementToBeClickable(neutralElement), 5000,
+            'Tutorial modal taking too long to close');
+          neutralElement.click();
+        });
+      } else {
+        throw 'Expected to find exactly one \'Finish\' button';
+      }
+    });
+  };
+
+  this.progressInTutorial = function() {
+    // Progress to the next instruction in the tutorial.
+    nextTutorialStageButton.then(function(buttons) {
+      if (buttons.length === 1) {
+        buttons[0].click();
+      } else {
+        throw 'Expected to find exactly one \'next\' button';
+      }
+    });
+  };
+
+  this.startTutorial = function() {
+    editorWelcomeModal.isPresent().then(function() {
+      element(by.css('.protractor-test-start-tutorial')).click().then(
+        function() {
+          browser.pause();
+          browser.wait(until.visibilityOf(element(by.css('.ng-joyride-title'))),
+            5000, 'Tutorial modal taking too long to appear');
+        });
+    });
+  };
+
+  // RESPONSE EDITOR
+
   // This clicks the "add new response" button and then selects the rule type
   // and enters its parameters, and closes the rule editor. Any number of rule
   // parameters may be specified after the ruleName.
@@ -170,12 +237,12 @@ var ExplorationEditorMainTab = function() {
     });
 
     if (feedbackInstructions) {
-    // Set feedback contents.
+      // Set feedback contents.
       _setOutcomeFeedback(feedbackInstructions);
     }
     // If the destination is being changed, open the corresponding editor.
     if (destStateName) {
-      // Set destination contents.
+    // Set destination contents.
       _setOutcomeDest(
         destStateName, createState, null);
     }
@@ -186,29 +253,6 @@ var ExplorationEditorMainTab = function() {
     browser.wait(until.presenceOf(neutralElement), 5000,
       'neutralElement taking too long to appear in addResponse');
     neutralElement.click();
-  };
-
-  this.exitTutorial = function() {
-  // If the editor welcome modal shows up, exit it.
-    editorWelcomeModal.then(function(modals) {
-      if (modals.length === 1) {
-        dismissWelcomeModalButton.click();
-      } else if (modals.length !== 0) {
-        throw 'Expected to find at most one \'welcome modal\'';
-      }
-    });
-
-    expect(element(by.css('.protractor-test-welcome-modal')).isPresent())
-      .toBe(false);
-
-    // Otherwise, if the editor tutorial shows up, exit it.
-    element.all(by.css('.skipBtn')).then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click();
-      } else if (buttons.length !== 0) {
-        throw 'Expected to find at most one \'exit tutorial\' button';
-      }
-    });
   };
 
   // Rules are zero-indexed; 'default' denotes the default outcome.
