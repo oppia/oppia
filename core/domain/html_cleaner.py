@@ -485,37 +485,55 @@ def convert_to_ck_editor(html_data):
 
     soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
 
+    # Replaces b tag with strong tag.
     for b in soup.findAll('b'):
         b.name = 'strong'
 
+    # Replaces i tag with em tag.
     for i in soup.findAll('i'):
         i.name = 'em'
 
+    # This block wraps p tag in li tag if the parent of p is ol/ul tag. Also,
+    # if the parent of p tag is pre tag, it unwraps the p tag.
     for p in soup.findAll('p'):
         if p.parent.name == 'pre':
             p.unwrap()
         elif p.parent.name in ['ol', 'ul']:
             p.wrap(soup.new_tag('li'))
 
+    # Replaces <p><br><p> with <p>&nbsp;</p>.
     for br in soup.findAll('br'):
         parent_tag = br.parent
         if parent_tag.name == 'p' and parent_tag.get_text() == '':
             br.replaceWith('&nbsp;')
 
+    # In CKEditor format ol/ul cannot be the parent of ol/ul. So this block
+    # wraps each ol/ul into li tag if the parent of ol/ul is ol/ul. Also if
+    # there are consecutive ol/ul tags this block adds the margin:left according
+    # to the number of ol/ul tags and then remove these consecutive ol/ul tags
+    # to maintain the CKEditor format.
     list_tags = ['ol', 'ul']
     for tag_name in list_tags:
         for tag in soup.findAll(tag_name):
             if tag.parent.name in list_tags:
                 prev_sib = tag.previous_sibling
                 if prev_sib and prev_sib.name == 'li':
-                    prev_sib.append(tag)
+                    if 'style' in tag.attrs:
+                        del tag['style']
                 else:
+                    margin_value = 40
+                    if 'style' in tag.attrs:
+                        style = tag['style']
+                        match = re.search('margin-left:[0-9]+px;', style)
+                        margin_value += int(
+                            style[match.start() + 12: match.end() - 3])
+
                     for child in tag.children:
-                        margin_value = 40
+                        child_margin_value = margin_value
                         if 'style' in child.attrs:
                             style = child['style']
                             match = re.search('margin-left:[0-9]+px;', style)
-                            margin_value += int(
+                            child_margin_value += int(
                                 style[match.start() + 12: match.end() - 3])
                         child['style'] = 'margin-left:%dpx;' % margin_value
                     tag.unwrap()
@@ -527,48 +545,23 @@ def convert_to_ck_editor(html_data):
         'oppia-noninteractive-tabs'
     ]
 
+    # Move block components out of p, pre, strong and em tags.
     for tag_name in oppia_block_components:
         for tag in soup.findAll(tag_name):
-            if tag.parent.name in ['p', 'pre', 'strong', 'em']:
-                new_tag_for_prev = soup.new_tag(tag.parent.name)
-                new_tag_for_next = soup.new_tag(tag.parent.name)
+            while tag.parent.name in ['p', 'pre', 'strong', 'em']:
+                new_parent_for_prev = soup.new_tag(tag.parent.name)
+                new_parent_for_next = soup.new_tag(tag.parent.name)
                 prev_sib = list(tag.previous_siblings)
                 next_sib = list(tag.next_siblings)
 
                 # Previous siblings are accessed in reversed order to
                 # avoid reversing the order of siblings on being wrapped.
                 for sib in reversed(prev_sib):
-                    sib.wrap(new_tag_for_prev)
+                    sib.wrap(new_parent_for_prev)
 
                 for sib in next_sib:
-                    sib.wrap(new_tag_for_next)
-
+                    sib.wrap(new_parent_for_next)
                 tag.parent.unwrap()
-
-    for tag_name in ['strong', 'em']:
-        for tag in soup.findAll(tag_name):
-            if tag.next_sibling and (
-                    tag.next_sibling.name in oppia_block_components):
-                parent = tag.parent
-                new_tag_for_prev = soup.new_tag(tag.parent.name)
-                new_tag_for_next = soup.new_tag(tag.parent.name)
-                prev_sib = list(tag.previous_siblings)
-                next_sib = list(tag.next_siblings)
-
-                # To avoid wrapping the block component.
-                next_sib = next_sib[1:]
-
-                # Previous siblings are accessed in reversed order to
-                # avoid reversing the order of siblings on being wrapped.
-                for sib in reversed(prev_sib):
-                    sib.wrap(new_tag_for_prev)
-
-                tag.wrap(new_tag_for_prev)
-
-                for sib in next_sib:
-                    sib.wrap(new_tag_for_next)
-
-                parent.unwrap()
 
     # Beautiful soup automatically changes some <br> to <br/>,
     # so it has to be replaced directly in the string.
