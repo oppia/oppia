@@ -26,8 +26,8 @@ var LibraryPage = require('./LibraryPage.js');
 // Creates an exploration and opens its editor.
 var createExploration = function() {
   createExplorationAndStartTutorial();
-  explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-  explorationEditorPage.exitTutorial();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  explorationEditorPage.getMainTab().exitTutorial();
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
@@ -66,8 +66,9 @@ var createAndPublishExploration = function(
     title, category, objective, language) {
   createExploration();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-  explorationEditorPage.setContent(forms.toRichText('new exploration'));
-  explorationEditorPage.setInteraction('EndExploration');
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.setContent(forms.toRichText('new exploration'));
+  explorationEditorMainTab.setInteraction('EndExploration');
 
   var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
   explorationEditorPage.navigateToSettingsTab();
