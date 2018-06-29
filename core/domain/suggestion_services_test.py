@@ -619,7 +619,6 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             'user1', 'category2', 15.2)
         suggestion_services.update_score_of_user_for_category(
             'user2', 'category2', 2)
-
         suggestion_services.update_score_of_user_for_category(
             'user1', 'category1', -1)
 
