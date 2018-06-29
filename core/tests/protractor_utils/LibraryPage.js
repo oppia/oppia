@@ -17,7 +17,6 @@
  * tests.
  */
 
-var editor = require('./editor.js');
 var forms = require('./forms.js');
 
 var LibraryPage = function(){
@@ -42,6 +41,19 @@ var LibraryPage = function(){
           });
       }
     );
+  };
+
+  // Returns a promise of all collections with the given name.
+  var _getCollectionElements = function(collectionName) {
+    return element.all(by.css('.protractor-test-collection-summary-tile'))
+      .filter(function(tile) {
+        return tile.element(by.css(
+          '.protractor-test-collection-summary-tile-title')).getText().then(
+          function(tileTitle) {
+            return (tileTitle === collectionName);
+          });
+      }
+      );
   };
 
   this.get = function() {
@@ -81,6 +93,17 @@ var LibraryPage = function(){
   this.expectExplorationToBeHidden = function(name) {
     _getExplorationElements(name).then(function(elems) {
       expect(elems.length).toBe(0);
+    });
+  };
+
+  this.playCollection = function(collectionName) {
+    _getCollectionElements(collectionName).then(function(collectionElems) {
+      if (collectionElems.length === 0) {
+        throw 'Could not find collection tile with name ' + collectionName;
+      }
+      collectionElems[0].element(by.css(
+        '.protractor-test-collection-summary-tile-title'
+      )).click();
     });
   };
 
