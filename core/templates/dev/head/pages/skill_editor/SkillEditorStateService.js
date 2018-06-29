@@ -25,8 +25,8 @@ oppia.factory('SkillEditorStateService', [
       AlertsService, UndoRedoService) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
     var _skillIsInitialized = false;
-    var _isLoadingSkill = false;
-    var _isSavingSkill = false;
+    var _skillIsBeingLoaded = false;
+    var _skillIsBeingSaved = false;
 
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
@@ -40,20 +40,20 @@ oppia.factory('SkillEditorStateService', [
 
     return {
       loadSkill: function(skillId) {
-        _isLoadingSkill = true;
+        _skillIsBeingLoaded = true;
         EditableSkillBackendApiService.fetchSkill(
           skillId).then(
           function(newBackendSkillObject) {
             _updateSkill(newBackendSkillObject);
-            _isLoadingSkill = false;
+            _skillIsBeingLoaded = false;
           }, function(error) {
             AlertsService.addWarning();
-            _isLoadingSkill = false;
+            _skillIsBeingLoaded = false;
           });
       },
 
       isLoadingSkill: function() {
-        return _isLoadingSkill;
+        return _skillIsBeingLoaded;
       },
 
       hasLoadedSkill: function() {
@@ -73,27 +73,27 @@ oppia.factory('SkillEditorStateService', [
         if (!UndoRedoService.hasChanges()) {
           return false;
         }
-        _isSavingSkill = true;
+        _skillIsBeingSaved = true;
         EditableSkillBackendApiService.updateSkill(
           _skill.getId(), _skill.getVersion(), commitMessage,
           UndoRedoService.getCommittableChangeList()).then(
           function(skillBackendObject) {
             _updateSkill(skillBackendObject);
             UndoRedoService.clearChanges();
-            _isSavingSkill = false;
+            _skillIsBeingSaved = false;
             if (successCallback) {
               successCallback();
             }
           }, function(error) {
             AlertsService.addWarning(
               error || 'There was an error when saving the skill');
-            _isSavingSkill = false;
+            _skillIsBeingSaved = false;
           });
         return true;
       },
 
       isSavingSkill: function() {
-        return _isSavingSkill;
+        return _skillIsBeingSaved;
       }
     };
   }]);

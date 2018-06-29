@@ -35,7 +35,7 @@ oppia.directive('skillConceptCardEditor', [
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
-          $scope.container = {
+          $scope.bindableFieldsDict = {
             displayedConceptCardExplanation:
               $scope.skill.getConceptCard().getExplanation(),
             displayedWorkedExamples:
@@ -64,7 +64,7 @@ oppia.directive('skillConceptCardEditor', [
               ui.placeholder.height(ui.item.height());
             },
             stop: function() {
-              var newWorkedExamples = $scope.container.displayedWorkedExamples;
+              var newWorkedExamples = $scope.bindableFieldsDict.displayedWorkedExamples;
               SkillUpdateService.updateWorkedExamples(
                 $scope.skill, newWorkedExamples);
             }
@@ -83,12 +83,12 @@ oppia.directive('skillConceptCardEditor', [
           $scope.openConceptCardExplanationEditor = function() {
             $scope.conceptCardExplanationEditorIsShown = true;
             explanationMemento =
-              $scope.container.displayedConceptCardExplanation;
+              $scope.bindableFieldsDict.displayedConceptCardExplanation;
           };
 
           $scope.closeConceptCardExplanationEditor = function() {
             $scope.conceptCardExplanationEditorIsShown = false;
-            $scope.container.displayedConceptCardExplanation =
+            $scope.bindableFieldsDict.displayedConceptCardExplanation =
               explanationMemento;
           };
 
@@ -96,7 +96,7 @@ oppia.directive('skillConceptCardEditor', [
             $scope.conceptCardExplanationEditorIsShown = false;
             SkillUpdateService.setConceptCardExplanation(
               $scope.skill,
-              $scope.container.displayedConceptCardExplanation);
+              $scope.bindableFieldsDict.displayedConceptCardExplanation);
             explanationMemento = null;
             $scope.displayedConceptCardExplanation =
               $scope.skill.getConceptCard().getExplanation();
@@ -121,7 +121,7 @@ oppia.directive('skillConceptCardEditor', [
                 }]
             }).result.then(function(result) {
               SkillUpdateService.deleteWorkedExample($scope.skill, index);
-              $scope.container.displayedWorkedExamples =
+              $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
               $scope.activeWorkedExampleIndex = null;
             });
@@ -160,13 +160,13 @@ oppia.directive('skillConceptCardEditor', [
             }).result.then(function(result) {
               SkillUpdateService.addWorkedExample(
                 $scope.skill, result.workedExample);
-              $scope.container.displayedWorkedExamples =
+              $scope.bindableFieldsDict.displayedWorkedExamples =
                 $scope.skill.getConceptCard().getWorkedExamples();
             });
           };
 
           $scope.onWorkedExampleSaved = function() {
-            $scope.container.displayedWorkedExamples =
+            $scope.bindableFieldsDict.displayedWorkedExamples =
               $scope.skill.getConceptCard().getWorkedExamples();
           };
         }

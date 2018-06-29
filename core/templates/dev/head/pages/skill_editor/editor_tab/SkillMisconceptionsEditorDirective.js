@@ -16,7 +16,6 @@
  * @fileoverview Directive for the skill misconceptions editor.
  */
 
-
 oppia.directive('skillMisconceptionsEditor', [
   'UrlInterpolationService', 'SkillUpdateService', 'SkillEditorStateService',
   function(
@@ -41,7 +40,6 @@ oppia.directive('skillMisconceptionsEditor', [
           $scope.isEditable = function() {
             return true;
           };
-
 
           $scope.changeActiveMisconceptionIndex = function(idx) {
             if (idx === $scope.activeMisconceptionIndex) {

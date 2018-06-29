@@ -50,16 +50,13 @@ oppia.factory('ConceptCardObjectFactory', [
     };
 
     ConceptCard.prototype.setWorkedExamples = function(workedExamples) {
-      this._workedExamples = [];
-      for (idx in workedExamples) {
-        this._workedExamples.push(workedExamples[idx]);
-      }
+      this._workedExamples = workedExamples.slice();
     };
 
     // Create an interstitial concept card that would be displayed in the
     // editor until the actual skill is fetched from the backend.
     ConceptCard.createInterstitialConceptCard = function() {
-      return new ConceptCard('Concept card review material loading', []);
+      return new ConceptCard('Loading review material', []);
     };
 
     return ConceptCard;

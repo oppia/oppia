@@ -8,8 +8,11 @@
         </div>
 
         <div style="padding-bottom: 12px;">
-          <span style="font-size:.8em;"><i>This will be displayed to learners if they are having trouble with this particular skill during a practice test. Give them a refresher by providing a review of the skill along with some worked examples.
-          </i></span>
+          <span style="font-size:.8em;">
+            <i>
+              This will be displayed to learners if they are having trouble with this particular skill during a practice test. Give them a refresher by providing a review of the skill along with some worked examples.
+            </i>
+          </span>
         </div>
 
         <div>
@@ -27,7 +30,7 @@
                 <span class="oppia-placeholder" ng-show="skill.getConceptCard().getExplanation() === ''">
                     Give a review or explanation of the skill.
                 </span>
-                <angular-html-bind html-data="container.displayedConceptCardExplanation">
+                <angular-html-bind html-data="bindableFieldsDict.displayedConceptCardExplanation">
                 </angular-html-bind>
               </div>
               <!-- This is a dummy div created to mask the contents when the user hovers over the content. -->
@@ -37,7 +40,7 @@
           </div>
 
           <div ng-if="conceptCardExplanationEditorIsShown">
-            <schema-based-editor schema="HTML_SCHEMA" local-value="container.displayedConceptCardExplanation">
+            <schema-based-editor schema="HTML_SCHEMA" local-value="bindableFieldsDict.displayedConceptCardExplanation">
             </schema-based-editor>
             <div style="margin-top: 2px;">
               <button type="button"
@@ -52,17 +55,17 @@
         </div>
 
         <strong>Worked Examples</strong>
-        <div ng-if="container.displayedWorkedExamples.length > 0">
+        <div ng-if="bindableFieldsDict.displayedWorkedExamples.length > 0">
           <ul class="nav oppia-option-list nav-stacked nav-pills"
               role="tablist"
               ui-sortable="WORKED_EXAMPLES_SORTABLE_OPTIONS"
-              ng-model="container.displayedWorkedExamples">
-            <li ng-repeat="workedExample in container.displayedWorkedExamples"
+              ng-model="bindableFieldsDict.displayedWorkedExamples">
+            <li ng-repeat="workedExample in bindableFieldsDict.displayedWorkedExamples"
                 ng-class="{'active': activeWorkedExampleIndex === $index}"
                 class="oppia-rule-block oppia-sortable-worked-example oppia-prevent-selection"
                 style="margin-top: 0;">
               <span class="oppia-worked-example-sort-handle"
-                    ng-if="container.displayedWorkedExamples.length > 1"
+                    ng-if="bindableFieldsDict.displayedWorkedExamples.length > 1"
                     ng-mousedown="changeActiveWorkedExampleIndex(-1)">
                 <img ng-src="<[dragDotsImgUrl]>" width="10">
               </span>

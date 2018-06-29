@@ -48,7 +48,7 @@ describe('Concept card object factory', function() {
       var conceptCard =
         ConceptCardObjectFactory.createInterstitialConceptCard();
       expect(conceptCard.getExplanation()).toEqual(
-        'Concept card review material loading');
+        'Loading review material');
       expect(conceptCard.getWorkedExamples()).toEqual([]);
     });
   });

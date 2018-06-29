@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the header of the response tiles.
+ * @fileoverview Directive for the header of items in a list.
  */
 
 oppia.directive('summaryListHeader', [
@@ -22,14 +22,12 @@ oppia.directive('summaryListHeader', [
       restrict: 'E',
       scope: {
         getIndex: '&index',
-        getOutcome: '&outcome',
         getSummary: '&summary',
         getShortSummary: '&shortSummary',
         isActive: '&isActive',
         getOnDeleteFn: '&onDeleteFn',
         isDeleteAvailable: '&isDeleteAvailable',
         getNumItems: '&numItems',
-        isResponse: '&isResponse'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/summary_list_header_directive.html'),
