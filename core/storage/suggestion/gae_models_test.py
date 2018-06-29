@@ -225,3 +225,37 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 .get_suggestions_by_target_id(
                     suggestion_models.TARGET_TYPE_EXPLORATION, 'exp_invalid')),
             0)
+
+    def test_query_suggestions(self):
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id)
+        ]
+        self.assertEqual(
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                    queries)), 5)
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id),
+            ('author_id', 'author_2')
+        ]
+        self.assertEqual(
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                    queries)), 3)
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id),
+            ('author_id', 'author_2'),
+            ('status', suggestion_models.STATUS_ACCEPTED)
+        ]
+        self.assertEqual(
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                    queries)), 2)
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id),
+            ('invalid_field', 'value')
+        ]
+        with self.assertRaisesRegexp(
+            Exception, 'Not allowed to query on field invalid_field'):
+            suggestion_models.GeneralSuggestionModel.query_suggestions(queries)

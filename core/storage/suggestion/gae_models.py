@@ -72,6 +72,10 @@ SCORE_TYPE_CHOICES = [
 # The delimiter to be used in score category field.
 SCORE_CATEGORY_DELIMITER = '.'
 
+ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
+                        'target_version_at_submission', 'status', 'author_id',
+                        'assigned_reviewer_id', 'final_reviewer_id',
+                        'score_category']
 
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
@@ -242,3 +246,25 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         return cls.get_all().filter(cls.target_type == target_type).filter(
             cls.target_id == target_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def query_suggestions(cls, queries):
+        """Queries for suggestions.
+
+        Args:
+            queries: list(tuple). A list of queries. The first element in each
+                tuple is the field to be queried, and the second element is its
+                value.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that match the given
+            query values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
+            suggestions.
+        """
+        query = cls.query()
+        for (field, value) in queries:
+            if field not in ALLOWED_QUERY_FIELDS:
+                raise Exception('Not allowed to query on field %s' % field)
+            query = query.filter(getattr(cls, field) == value)
+
+        return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
