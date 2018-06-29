@@ -585,7 +585,7 @@ describe('Full exploration editor', function() {
 });
 
 
-fdescribe('Rating', function() {
+describe('Rating', function() {
   var EXPLORATION_RATINGTEST = 'RatingTest';
   var CATEGORY_BUSINESS = 'Business';
   var LANGUAGE_ENGLISH = 'English';
