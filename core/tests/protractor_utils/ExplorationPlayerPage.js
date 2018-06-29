@@ -177,22 +177,17 @@ var ExplorationPlayerPage = function() {
     feedbackSubmitButton.isDisplayed().then(function() {
       feedbackSubmitButton.click();
     });
-    general.waitForSystem();
   };
 
   this.submitSuggestion = function(suggestion, description) {
     suggestionPopupLink.isDisplayed().then(function(){
       suggestionPopupLink.click();
     });
-    browser.waitForAngular();
     forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
-    browser.waitForAngular();
     suggestionDescriptionInput.sendKeys(description);
-    browser.waitForAngular();
     suggestionSubmitButton.isDisplayed().then(function() {
       suggestionSubmitButton.click();
     });
-    browser.waitForAngular();
   };
 };
 
