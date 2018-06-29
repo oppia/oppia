@@ -251,8 +251,9 @@ def convert_to_text_angular(html_data):
 
     # To convert the rich text content within tabs and collapsible components
     # to valid TextAngular format. If there is no tabs or collapsible component
-    # convert_tag_contents_to_text_angular will make no change to html_data.
-    html_data = convert_tag_contents_to_rte_format(html_data, 'text-angular')
+    # convert_tag_contents_to_rte_format will make no change to html_data.
+    html_data = convert_tag_contents_to_rte_format(
+        html_data, feconf.RTE_FORMAT_TEXTANGULAR)
 
     soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
 
@@ -478,8 +479,9 @@ def convert_to_ck_editor(html_data):
 
     # To convert the rich text content within tabs and collapsible components
     # to valid CKEditor format. If there is no tabs or collapsible component
-    # convert_tag_contents_to_text_angular will make no change to html_data.
-    html_data = convert_tag_contents_to_rte_format(html_data, 'ck-editor')
+    # convert_tag_contents_to_rte_format will make no change to html_data.
+    html_data = convert_tag_contents_to_rte_format(
+        html_data, feconf.RTE_FORMAT_CKEDITOR)
 
     soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
 
