@@ -17,7 +17,6 @@
  * use in Protractor tests.
  */
 
-var forms = require('./forms.js');
 var general = require('./general.js');
 
 var ExplorationEditorFeedbackTab = function () {
@@ -54,17 +53,12 @@ var ExplorationEditorFeedbackTab = function () {
           return suggestionDescription.indexOf(subject) !== -1;
         });
       });
-
-      browser.waitForAngular();
+      expect(matchingSuggestionRows[0].isDisplayed()).toBe(true);
       matchingSuggestionRows[0].click();
-      general.waitForSystem();
-      viewSuggestionButton.isDisplayed().then(function(){
-        viewSuggestionButton.click();
-      });
-      general.waitForSystem();
-      acceptSuggestionButton.isDisplayed().then(function(){
-        acceptSuggestionButton.click();
-      });
+      expect(viewSuggestionButton.isDisplayed()).toBe(true);
+      viewSuggestionButton.click();
+      expect(acceptSuggestionButton.isDisplayed()).toBe(true);
+      acceptSuggestionButton.click();
     });
   };
 

@@ -27,7 +27,7 @@ var LibraryPage = require('./LibraryPage.js');
 var createExploration = function() {
   createExplorationAndStartTutorial();
   explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-  explorationEditorPage.exitTutorialIfNecessary();
+  explorationEditorPage.exitTutorial();
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.

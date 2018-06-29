@@ -50,10 +50,6 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Workflows
    */
-
-  // All functions involving the settings tab should be sent through this
-  // wrapper.
-
   this.expectAvailableFirstStatesToBe = function(names) {
     initialStateSelect.all(by.tagName('option')).map(function(elem) {
       return elem.getText();

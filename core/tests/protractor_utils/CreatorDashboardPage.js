@@ -32,6 +32,17 @@ var CreatorDashboardPage = function() {
   var createExplorationButton =
     element(by.css('.protractor-test-create-exploration'));
 
+    // Returns a promise of all explorations with the given name.
+  var _getExplorationElements = function(explorationTitle) {
+    return element.all(by.css('.protractor-test-exploration-dashboard-card'))
+      .filter(function(tile) {
+        return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
+          getText().then(function(tileTitle) {
+            return (tileTitle === explorationTitle);
+          });
+      }
+      );
+  };
 
   this.get = function() {
     return browser.get(CREATOR_DASHBOARD_URL);
@@ -65,6 +76,15 @@ var CreatorDashboardPage = function() {
 
   this.navigateToSubscriptionDashboard = function() {
     subscriptionTab.click();
+  };
+
+  this.editExploration = function(explorationTitle) {
+    _getExplorationElements(explorationTitle).then(function(elems) {
+      if (elems.length === 0) {
+        throw 'Could not find exploration tile with name ' + explorationTitle;
+      }
+      elems[0].element(by.css('.mask-wrap')).click();
+    });
   };
 };
 

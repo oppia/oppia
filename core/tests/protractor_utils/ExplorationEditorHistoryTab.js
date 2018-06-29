@@ -18,7 +18,6 @@
  */
 
 var forms = require('./forms.js');
-var general = require('./general.js');
 
 var ExplorationEditorHistoryTab = function() {
   /*
@@ -59,24 +58,25 @@ var ExplorationEditorHistoryTab = function() {
   this.getHistoryGraph = function() {
     return {
       closeStateHistory: function() {
-        closeStateHistoryButton.isDisplayed().then(function() {
-          closeStateHistoryButton.click();
-        });
+        expect(closeStateHistoryButton.isDisplayed()).toBe(true);
+        closeStateHistoryButton.click();
+        var until = protractor.ExpectedConditions;
+        browser.wait(until.invisibilityOf(element(
+          by.css('CodeMirror-merge'))), 5000);
       },
       deselectTwoVersions: function(versionNumber1, versionNumber2) {
-        // Array starts at 0
+        // Array starts at 0.
         historyCheckboxSelector.count().then(function(totalVersionNumber) {
           v1Position = totalVersionNumber - versionNumber1;
           v2Position = totalVersionNumber - versionNumber2;
 
-          historyCheckboxSelector.get(v1Position).isDisplayed()
-            .then(function() {
-              historyCheckboxSelector.get(v1Position).click();
-            });
-          historyCheckboxSelector.get(v2Position).isDisplayed()
-            .then(function() {
-              historyCheckboxSelector.get(v2Position).click();
-            });
+          expect(historyCheckboxSelector.get(v1Position).isDisplayed())
+            .toBe(true);
+          historyCheckboxSelector.get(v1Position).click();
+
+          expect(historyCheckboxSelector.get(v2Position).isDisplayed())
+            .toBe(true);
+          historyCheckboxSelector.get(v2Position).click();
         });
       },
       /*
@@ -91,19 +91,17 @@ var ExplorationEditorHistoryTab = function() {
           v1Position = totalVersionNumber - versionNumber1;
           v2Position = totalVersionNumber - versionNumber2;
 
-          historyCheckboxSelector.get(v1Position).isDisplayed()
-            .then(function() {
-              historyCheckboxSelector.get(v1Position).click();
-            });
-          historyCheckboxSelector.get(v2Position).isDisplayed()
-            .then(function() {
-              historyCheckboxSelector.get(v2Position).click();
-            });
+          expect(historyCheckboxSelector.get(v1Position).isDisplayed())
+            .toBe(true);
+          historyCheckboxSelector.get(v1Position).click();
+
+          expect(historyCheckboxSelector.get(v2Position).isDisplayed())
+            .toBe(true);
+          historyCheckboxSelector.get(v2Position).click();
         });
-        // Click button to show graph
-        showHistoryGraphButton.isDisplayed().then(function() {
-          showHistoryGraphButton.click();
-        });
+        // Click button to show graph.
+        expect(showHistoryGraphButton.isDisplayed()).toBe(true);
+        showHistoryGraphButton.click();
       },
       /*
        * This method compares the states in the history graph using each
