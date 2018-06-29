@@ -92,56 +92,13 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 
-    LIST_TYPE_ASSIGNED_REVIEWER = 'assignedReviewer'
-    LIST_TYPE_AUTHOR = 'author'
-    LIST_TYPE_ID = 'id'
-    LIST_TYPE_REVIEWER = 'reviewer'
-    LIST_TYPE_STATUS = 'status'
-    LIST_TYPE_SUGGESTION_TYPE = 'type'
-    LIST_TYPE_TARGET_ID = 'target'
-
-    LIST_TYPES_TO_SERVICES_MAPPING = {
-        LIST_TYPE_ASSIGNED_REVIEWER: (
-            suggestion_services.get_suggestions_assigned_to_reviewer),
-        LIST_TYPE_AUTHOR: suggestion_services.get_suggestions_by_author,
-        LIST_TYPE_ID: suggestion_services.get_suggestion_by_id,
-        LIST_TYPE_REVIEWER: suggestion_services.get_suggestions_reviewed_by,
-        LIST_TYPE_STATUS: suggestion_services.get_suggestions_by_status,
-        LIST_TYPE_SUGGESTION_TYPE: suggestion_services.get_suggestion_by_type,
-        LIST_TYPE_TARGET_ID: suggestion_services.get_suggestions_by_target_id
-    }
-
-    PARAMS_FOR_LIST_TYPES = {
-        LIST_TYPE_ASSIGNED_REVIEWER: ['assigned_reviewer_id'],
-        LIST_TYPE_AUTHOR: ['author_id'],
-        LIST_TYPE_ID: ['suggestion_id'],
-        LIST_TYPE_REVIEWER: ['reviewer_id'],
-        LIST_TYPE_STATUS: ['status'],
-        LIST_TYPE_SUGGESTION_TYPE: ['suggestion_type'],
-        LIST_TYPE_TARGET_ID: ['target_type', 'target_id']
-    }
-
-    def get_params_from_request(self, request, list_type):
-        return [request.get(param_name)
-                for param_name in self.PARAMS_FOR_LIST_TYPES[list_type]]
-
     @acl_decorators.open_access
     def get(self):
         if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
             raise self.PageNotFoundException
 
-        list_type = self.request.get('list_type')
-
-        if list_type not in self.LIST_TYPES_TO_SERVICES_MAPPING:
-            raise self.InvalidInputException('Invalid list type.')
-
-        params = self.get_params_from_request(self.request, list_type)
-        suggestions = self.LIST_TYPES_TO_SERVICES_MAPPING[list_type](*params)
-
-        # When querying by ID, only a single suggestion is retrieved, so we make
-        # it a list.
-        if list_type == self.LIST_TYPE_ID:
-            suggestions = [suggestions]
+        suggestions = suggestion_services.query_suggestions(
+            self.request.GET.items())
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
