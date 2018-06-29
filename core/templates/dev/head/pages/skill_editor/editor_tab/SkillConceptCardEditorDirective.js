@@ -64,7 +64,8 @@ oppia.directive('skillConceptCardEditor', [
               ui.placeholder.height(ui.item.height());
             },
             stop: function() {
-              var newWorkedExamples = $scope.bindableFieldsDict.displayedWorkedExamples;
+              var newWorkedExamples =
+                $scope.bindableFieldsDict.displayedWorkedExamples;
               SkillUpdateService.updateWorkedExamples(
                 $scope.skill, newWorkedExamples);
             }

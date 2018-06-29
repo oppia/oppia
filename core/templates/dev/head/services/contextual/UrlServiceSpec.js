@@ -105,7 +105,7 @@ describe('Url Service', function() {
     ).toBe('abcdefghijkl');
     mockLocation.pathname = '/skill_editor/abcdefghijk';
     expect(function() {
-      UrlService.getSkillIdFromUrl()
+      UrlService.getSkillIdFromUrl();
     }).toThrow();
   });
 });
