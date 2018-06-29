@@ -259,3 +259,19 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(
             Exception, 'Not allowed to query on field invalid_field'):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
+
+        queries = [
+            ('suggestion_type',
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id),
+            ('target_version_at_submission', self.target_version_at_submission),
+            ('status', suggestion_models.STATUS_IN_REVIEW),
+            ('author_id', 'author_1'),
+            ('assigned_reviewer_id', 'reviewer_1'),
+            ('final_reviewer_id', 'reviewer_1'),
+            ('score_category', self.score_category)
+        ]
+        self.assertEqual(
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 1)
