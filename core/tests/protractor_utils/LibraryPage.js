@@ -141,7 +141,7 @@ var LibraryPage = function(){
   };
 
   this.findExploration = function(explorationTitle) {
-    element(by.css('.protractor-test-search-input')).sendKeys(
+    element.all(by.css('.protractor-test-search-input')).first().sendKeys(
       explorationTitle);
     browser.waitForAngular();
   };

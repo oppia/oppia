@@ -633,7 +633,6 @@ describe('Suggestions on Explorations', function() {
 
   it('accepts a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
-    general.waitForSystem();
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,

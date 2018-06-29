@@ -59,7 +59,8 @@ var ExplorationEditorPage = function() {
     return element(
       by.cssContainingText('.protractor-test-html-select-option', optionNum));
   };
-  var neutralElement = element(by.css('.protractor-test-neutral-element'));
+  var neutralElement = element.all(by.css('.protractor-test-neutral-element'))
+    .first();
   var defaultResponseTab = element(
     by.css('.protractor-test-default-response-tab'));
   var editorWelcomeModal = element.all(
@@ -71,7 +72,7 @@ var ExplorationEditorPage = function() {
   var editOutcomeDestAddExplorationId = element(
     by.css('.protractor-test-add-refresher-exploration-id'));
   var editOutcomeDestDropdownOptions = function(targetOption) {
-    return element(by.cssContainingText('option', targetOption));
+    return element.all(by.cssContainingText('option', targetOption)).first();
   };
   var feedbackBubble = element(by.css('.protractor-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.protractor-test-open-feedback-editor'));
