@@ -261,7 +261,8 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 
         queries = [
-            ('suggestion_type',
+            (
+                'suggestion_type',
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
             ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
             ('target_id', self.target_id),
