@@ -47,16 +47,18 @@ var publishExploration = function() {
     function() {
       element(by.css('.protractor-test-publish-exploration')).click();
     });
-  browser.waitForAngular();
-
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   prePublicationButtonElem.isPresent().then(function() {
     prePublicationButtonElem.click();
-    general.waitForSystem();
   });
-
-  element(by.css('.protractor-test-confirm-publish')).click();
+  var until = protractor.ExpectedConditions;
+  browser.wait(until.invisibilityOf(prePublicationButtonElem), 5000,
+    'prePublicationButtonElem taking too long to disappear while publishing');
+  element(by.css('.protractor-test-confirm-publish')).click().then(function(){
+    expect(element(by.css('.oppia-share-publish-modal')).isDisplayed())
+      .toBe(true);
+  });
 };
 
 // Creates and publishes a minimal exploration

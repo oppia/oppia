@@ -22,6 +22,7 @@ var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var ruleTemplates = require(
   '../../../extensions/interactions/rule_templates.json');
+var until = protractor.ExpectedConditions;
 
 var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
@@ -97,7 +98,7 @@ var ExplorationEditorPage = function() {
   var responseTab = element.all(by.css('.protractor-test-response-tab'));
   var ruleBlock = element.all(by.css('.protractor-test-rule-block'));
   var stateEditContent = element(
-    by.css('.protractor-test-state-edit-content'));
+    by.css('.protractor-test-edit-content'));
   var stateContentDisplay = element(
     by.css('.protractor-test-state-content-display'));
   var stateNameContainer = element(
@@ -198,7 +199,7 @@ var ExplorationEditorPage = function() {
       args.push(arguments[i]);
     }
 
-    _selectRule(addResponseDetails, interactionId, ruleName);
+    _selectRule(interactionId, ruleName);
     _setRuleParameters.apply(null, args);
 
     // Open the feedback entry form if it is not already open.
@@ -222,7 +223,9 @@ var ExplorationEditorPage = function() {
     // Close new response modal.
     expect(addNewResponseButton.isDisplayed()).toBe(true);
     addNewResponseButton.click();
-    general.waitForSystem();
+    browser.wait(until.presenceOf(neutralElement), 5000,
+      'neutralElement taking too long to appear in addResponse');
+    neutralElement.click();
   };
 
   this.exitTutorial = function() {
@@ -327,7 +330,7 @@ var ExplorationEditorPage = function() {
         for (var i = 2; i < arguments.length; i++) {
           args.push(arguments[i]);
         }
-        _selectRule(ruleDetails, interactionId, ruleName);
+        _selectRule(interactionId, ruleName);
         _setRuleParameters.apply(null, args);
 
         // Save the new rule.
@@ -371,6 +374,10 @@ var ExplorationEditorPage = function() {
     } else {
       targetOption = destName;
     }
+    browser.wait(until.presenceOf(editOutcomeDestDropdownOptions(targetOption))
+      , 5000, 'editOutcomeDestDropdownOptions taking too long to appear');
+    expect(editOutcomeDestDropdownOptions(targetOption).isDisplayed())
+      .toBe(true);
     editOutcomeDestDropdownOptions(targetOption).click();
 
     if (createDest) {
@@ -386,17 +393,21 @@ var ExplorationEditorPage = function() {
   // can then use to alter the state content, for example by calling
   // .appendBoldText(...).
   this.setContent = function(richTextInstructions) {
-    var until = protractor.ExpectedConditions;
+    // Wait for browser to completely load the rich text editor.
+    browser.waitForAngular();
     browser.wait(until.presenceOf(stateEditContent), 5000,
-      'stateEditContent taking too long to appear in the DOM');
+      'stateEditContent taking too long to appear to set content');
     stateEditContent.click();
     var stateContentEditor = element(
       by.css('.protractor-test-state-content-editor'));
+    browser.wait(until.presenceOf(stateContentEditor), 5000,
+      'stateContentEditor taking too long to appear to set content');
     var richTextEditor = forms.RichTextEditor(stateContentEditor);
     richTextEditor.clear();
     richTextInstructions(richTextEditor);
     expect(saveStateContentButton.isDisplayed()).toBe(true);
     saveStateContentButton.click();
+    browser.wait(until.invisibilityOf(saveStateContentButton), 5000);
   };
 
   // This receives a function richTextInstructions used to verify the display of
@@ -417,17 +428,24 @@ var ExplorationEditorPage = function() {
   // CONTROLS
 
   this.saveChanges = function(commitMessage) {
+    var toastSuccessElement = element(by.css('.toast-success'));
     expect(saveChangesButton.isDisplayed()).toBe(true);
     saveChangesButton.click().then(function() {
       if (commitMessage) {
         commitMessageInput.sendKeys(commitMessage);
       }
       expect(saveDraftButton.isDisplayed()).toBe(true);
-      saveDraftButton.click();
-      // This is necessary to give the page time to record the changes,
-      // so that it does not attempt to stop the user leaving.
-      browser.waitForAngular();
-      general.waitForSystem();
+      saveDraftButton.click().then(function() {
+        // This is necessary to give the page time to record the changes,
+        // so that it does not attempt to stop the user leaving.
+        browser.wait(until.visibilityOf(toastSuccessElement), 5000,
+          'success toast taking too long to appear after saving changes')
+          .then(function() {
+            expect(toastSuccessElement.isDisplayed()).toEqual(true);
+          });
+      });
+      browser.wait(until.invisibilityOf(toastSuccessElement), 5000);
+      expect(toastSuccessElement.isPresent()).toBe(false);
     });
   };
 
@@ -435,8 +453,10 @@ var ExplorationEditorPage = function() {
     saveDiscardToggleButton.click();
     discardChangesButton.click();
     confirmDiscardChangesButton.click();
-    general.waitForSystem();
     browser.waitForAngular();
+    browser.wait(until.presenceOf(neutralElement), 5000,
+      'neutralElement taking too long to appear after discarding changes');
+    neutralElement.click();
   };
 
   this.expectCannotSaveChanges = function() {
@@ -459,7 +479,7 @@ var ExplorationEditorPage = function() {
       }
     });
     // Click on neutral element to make sure modal is closed.
-    expect(neutralElement.isDisplayed()).toBe(true);
+    browser.wait(until.invisibilityOf(addResponseHeader), 5000);
     neutralElement.click();
   };
 
@@ -521,10 +541,10 @@ var ExplorationEditorPage = function() {
     saveInteractionButton.isPresent().then(function(result) {
       if (result) {
         saveInteractionButton.click();
-        // Wait for the customization modal to close.
-        general.waitForSystem();
       }
     });
+    browser.wait(until.invisibilityOf(saveInteractionButton), 5000,
+      'Customize Interaction modal taking too long to close');
   };
 
   // Likewise this can receive additional arguments.
@@ -554,7 +574,8 @@ var ExplorationEditorPage = function() {
     stateNameSubmitButton.click();
 
     // Wait for the state to refresh.
-    general.waitForSystem();
+    browser.wait(until.visibilityOf(stateNameContainer), 5000);
+    this.expectCurrentStateToBe(name);
   };
 
   var _setOutcomeFeedback = function(richTextInstructions) {
@@ -654,7 +675,7 @@ var ExplorationEditorPage = function() {
 
   // This function selects a rule from the dropdown,
   // but does not set any of its input parameters.
-  var _selectRule = function(ruleElement, interactionId, ruleName) {
+  var _selectRule = function(interactionId, ruleName) {
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
 
     var parameterStart = (
@@ -751,6 +772,7 @@ var ExplorationEditorPage = function() {
         if (listOfNames[i] === targetName) {
           interactionNode.get(i).click();
           matched = true;
+          // Wait to re-load the entire state editor
           general.waitForSystem();
         }
       }
@@ -759,6 +781,7 @@ var ExplorationEditorPage = function() {
         ' not found by explorationEditorPage.moveToState');
       }
     });
+    this.expectCurrentStateToBe(targetName);
   };
 
   // UTILITIES
