@@ -16,6 +16,7 @@
 suggestions.
 """
 
+from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import suggestion_registry
 from core.domain import user_services
@@ -31,7 +32,7 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 def create_suggestion(
         suggestion_type, target_type, target_id, target_version_at_submission,
-        author_id, change_cmd, score_category, description,
+        author_id, change_cmd, description,
         assigned_reviewer_id, final_reviewer_id):
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
@@ -47,7 +48,6 @@ def create_suggestion(
             entity at the time of creation of the suggestion.
         author_id: str. The ID of the user who submitted the suggestion.
         change_cmd: dict. The details of the suggestion.
-        score_category: str. The category to score the author on.
         description: str. The description of the changes provided by the author.
         assigned_reviewer_id: str|None. The ID of the user assigned to
             review the suggestion.
@@ -74,6 +74,13 @@ def create_suggestion(
         suggestion_models.STATUS_IN_REVIEW if assigned_reviewer_id else
         suggestion_models.STATUS_RECEIVED)
 
+    if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+        exploration = exp_services.get_exploration_by_id(target_id)
+    if suggestion_type == suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT:
+        score_category = (
+            suggestion_models.SCORE_TYPE_CONTENT +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
         target_version_at_submission, status, author_id, assigned_reviewer_id,
@@ -98,7 +105,7 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.status, suggestion_model.author_id,
         suggestion_model.assigned_reviewer_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
-        suggestion_model.score_category)
+        suggestion_model.score_category, suggestion_model.last_updated)
 
 
 def get_suggestion_by_id(suggestion_id):

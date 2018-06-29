@@ -1102,7 +1102,7 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class SuggestChangesTest(test_utils.GenericTestBase):
+class SuggestChangesToExplorationTest(test_utils.GenericTestBase):
     """Tests for can_suggest_changes_to_exploration decorator."""
     username = 'user'
     user_email = 'user@example.com'
@@ -1119,7 +1119,7 @@ class SuggestChangesTest(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(SuggestChangesTest, self).setUp()
+        super(SuggestChangesToExplorationTest, self).setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.set_banned_users([self.banned_username])
@@ -1141,6 +1141,45 @@ class SuggestChangesTest(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.exploration_id)
         self.assertEqual(response['exploration_id'], self.exploration_id)
+        self.logout()
+
+
+class SuggestChangesDecoratorsTest(test_utils.GenericTestBase):
+    """Tests for can_suggest_changes decorator."""
+    username = 'user'
+    user_email = 'user@example.com'
+    banned_username = 'banneduser'
+    banned_user_email = 'banned@example.com'
+    exploration_id = 'exp_id'
+
+    class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_suggest_changes
+        def get(self):
+            self.render_json({})
+
+    def setUp(self):
+        super(SuggestChangesDecoratorsTest, self).setUp()
+        self.signup(self.user_email, self.username)
+        self.signup(self.banned_user_email, self.banned_username)
+        self.set_banned_users([self.banned_username])
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_suggest_changes(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock', expect_errors=True, expected_status_int=401)
+        self.logout()
+
+    def test_normal_user_can_suggest_changes(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock', expected_status_int=200)
         self.logout()
 
 
