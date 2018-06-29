@@ -206,6 +206,22 @@ def get_suggestions_by_target_id(target_type, target_id):
             .get_suggestions_by_target_id(target_type, target_id)]
 
 
+def query_suggestions(queries):
+    """Queries for suggestions.
+
+    Args:
+        queries: list(tuple). A list of queries. The first element in each tuple
+            is the field to be queried, and the second element is its value.
+
+    Returns:
+        list(Suggestion). A list of suggestions that match the given query
+        values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
+    """
+    return [get_suggestion_from_model(s)
+            for s in suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)]
+
+
 def _update_suggestion(suggestion):
     """Updates the given suggestion.
 
