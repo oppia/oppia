@@ -125,9 +125,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             model.language_code, self.language_code)
 
     def test_compute_summary_of_question(self):
-        question = self.question.to_dict()
         question_summary = question_services.compute_summary_of_question(
-            question, self.owner_id, self.status)
+            self.question, self.owner_id, self.status)
 
         self.assertEqual(question_summary.id, 'dummy')
         self.assertEqual(
@@ -149,25 +148,30 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.assertEqual(question_summary.language_code, 'en')
             self.assertEqual(question_summary.status, 'private')
 
-    def test_admin_can_manage_question(self):
+    def test_admin_can_publish_and_edit_question(self):
         question_id = question_services.add_question(
-            self.owner_id, self.question)
-        question_rights = question_services.get_question_rights(question_id)
+            self.user_id_admin, self.question)
+        question_services.publish_question(question_id, self.user_id_admin)
 
-        self.assertTrue(question_services.is_manager(
-            self.user_admin, question_rights))
+        self.assertTrue(
+            question_services.check_can_edit_question(
+                self.user_id_admin, question_id))
 
-    def test_create_new_question_rights(self):
+    def test_topic_manager_can_publish_and_edit_question(self):
         question_id = question_services.add_question(
-            self.owner_id, self.question)
+            self.user_id_a, self.question)
+        question_services.publish_question(question_id, self.user_id_a)
 
-        question_services.assign_role(
-            self.user_admin, self.user_a,
-            question_domain.ROLE_MANAGER, question_id)
+        self.assertTrue(
+            question_services.check_can_edit_question(
+                self.user_id_a, question_id))
 
-        question_rights = question_services.get_question_rights(question_id)
+    def test_admin_can_unpublish_question(self):
+        question_id = question_services.add_question(
+            self.user_id_admin, self.question)
+        question_services.publish_question(question_id, self.user_id_admin)
+        question_services.unpublish_question(question_id, self.user_id_admin)
 
-        self.assertTrue(question_services.is_manager(
-            self.user_a, question_rights))
-        self.assertFalse(question_services.is_manager(
-            self.user_b, question_rights))
+        self.assertFalse(
+            question_services.check_can_edit_question(
+                self.user_id_admin, question_id))

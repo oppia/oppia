@@ -248,7 +248,7 @@ def create_question_summary(
         creator_id: str. The user ID of the creator of the question.
         status: str. The status of the question.
     """
-    question = get_question_by_id(question_id).to_dict()
+    question = get_question_by_id(question_id)
     question_summary = compute_summary_of_question(
         question, creator_id, status)
     save_question_summary(question_summary)
@@ -267,9 +267,9 @@ def compute_summary_of_question(question, creator_id, status):
     Returns:
         QuestionSummary. The computed summary for the given question.
     """
-    question_html_data = question['question_data']['content']['html']
+    question_html_data = question.question_data['content']['html']
     question_summary = question_domain.QuestionSummary(
-        question['question_id'], creator_id, question['language_code'],
+        question.question_id, creator_id, question.language_code,
         status, question_html_data
     )
 
@@ -297,6 +297,44 @@ def save_question_summary(question_summary):
     question_summary_model.put()
 
 
+def send_question_for_review(committer_id, question_id):
+    """Marks a question's status as pending.
+
+    Args:
+        committer_id: str. The user_id of the committer.
+        question_id: str. The user_id of the question.
+
+    Returns:
+        QuestionSummaryModel: The QuestionSummaryModel for the given question.
+    """
+    model = get_question_summary_by_question_id(question_id, strict=False)
+    commit_message = 'Marked question as pending.'
+    model.status = feconf.QUESTION_STATUS_PENDING
+    model.commit(
+        committer_id,
+        commit_message,
+        [{'cmd': question_domain.CMD_SEND_QUESTION_FOR_REVIEW}])
+
+
+def reject_question(committer_id, question_id):
+    """Marks a question's status as rejected.
+
+    Args:
+        committer_id: str. The user_id of the committer.
+        question_id: str. The user_id of the question.
+
+    Returns:
+        QuestionSummaryModel: The QuestionSummaryModel for the given question.
+    """
+    model = get_question_summary_by_question_id(question_id, strict=False)
+    commit_message = 'Marked question as rejected.'
+    model.status = feconf.QUESTION_STATUS_REJECTED
+    model.commit(
+        committer_id,
+        commit_message,
+        [{'cmd': question_domain.CMD_REJECT_QUESTION}])
+
+
 def get_question_summaries_by_creator_id(creator_id):
     """Gets question summaries of questions created by the user.
 
@@ -307,6 +345,20 @@ def get_question_summaries_by_creator_id(creator_id):
         QuestionSummaryModel. The QuestionSummaryModel for the given question.
     """
     return question_models.QuestionSummaryModel.get_by_creator_id(creator_id)
+
+
+def get_question_summary_by_question_id(question_id, strict=False):
+    """Gets question summaries of questions created by the user.
+
+    Args:
+        question_id: str. The user ID of the question.
+        strict: bool. Whether to fail noisily if no question summary for the
+            given question id exists in the datastore.
+
+    Returns:
+        QuestionSummaryModel. The QuestionSummaryModel for the given question.
+    """
+    return question_models.QuestionSummaryModel.get(question_id, strict=strict)
 
 
 def get_summaries_of_linked_skills(question_id):
@@ -410,84 +462,85 @@ def get_question_rights(question_id, strict=True):
     return get_question_rights_from_model(model)
 
 
-def is_manager(user, question_rights):
-    """Checks whether the user can edit the given question.
+def check_can_edit_question(user_id, question_id):
+    """Checks if the user can edit the given question or not
 
     Args:
-        user: UserActionsInfo. Object having user_id, role and actions for
-            given user.
-        question_rights: QuestionRights or None. Rights object for the
-            given question.
+        user_id: str. The user ID of the user.
+        question_id: str. The question ID of the question.
 
     Returns:
-        bool. Whether the given user can edit the given question.
+        bool. Represents if the user can edit the question or not.
     """
-    if question_rights is None:
+    question_summary = get_question_summary_by_question_id(
+        question_id, strict=False)
+
+    if question_summary.status == feconf.QUESTION_STATUS_PENDING:
         return False
-    if role_services.ACTION_EDIT_ANY_QUESTION in user.actions:
+
+    if (user_services.is_admin(user_id) or
+            user_services.is_topic_manager(user_id)):
+        if question_summary.status == feconf.QUESTION_STATUS_APPROVED:
+            return True
+        return False
+
+    if (question_summary.status == feconf.ACTIVITY_STATUS_PRIVATE or
+            question_summary.status == feconf.QUESTION_STATUS_REJECTED):
         return True
 
     return False
 
 
-def assign_role(committer, assignee, new_role, question_id):
-    """Assigns a new role to the user.
+def publish_question(question_id, committer_id):
+    """Marks the given question as published.
 
     Args:
-        committer: UserActionsInfo. UserActionsInfo object for the user
-            who is performing the action.
-        assignee: UserActionsInfo. UserActionsInfo object for the user
-            whose role is being changed.
-        new_role: str. The name of the new role. Possible values are:
-            ROLE_MANAGER
-        question_id: str. ID of the question.
+        question_id: str. The id of the given question.
+        committer_id: str. ID of the committer.
 
     Raises:
-        Exception. The committer does not have rights to modify a role.
-        Exception. The assignee is already a manager for the question.
-        Exception. The assignee doesn't have enough rights to become a manager.
-        Exception. The role is invalid.
+        Exception. The given question does not exist.
+        Exception. The question is already published.
+        Exception. The user does not have enough rights to publish the question.
     """
-    committer_id = committer.user_id
-    question_rights = get_question_rights(question_id)
-    if (role_services.ACTION_MODIFY_ROLES_FOR_ANY_ACTIVITY not in
-            committer.actions):
-        logging.error(
-            'User %s tried to allow user %s to be a %s of question %s '
-            'but was refused permission.' % (
-                committer_id, assignee.user_id, new_role, question_id))
+    question_summary = get_question_summary_by_question_id(
+        question_id, strict=False)
+    if question_summary is None:
+        raise Exception('The given question does not exist')
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_CHANGE_QUESTION_STATUS not in user.actions:
         raise Exception(
-            'UnauthorizedUserException: Could not assign new role.')
+            'The user does not have enough rights to publish the question.')
 
-    assignee_username = user_services.get_username(assignee.user_id)
-    if role_services.ACTION_EDIT_OWNED_QUESTION not in assignee.actions:
+    if question_summary.status == feconf.QUESTION_STATUS_APPROVED:
+        raise Exception('The question is already published.')
+    question_summary.status = feconf.QUESTION_STATUS_APPROVED
+    question_summary.put()
+
+
+def unpublish_question(question_id, committer_id):
+    """Marks the given question as unpublished.
+
+    Args:
+        question_id: str. The id of the given question.
+        committer_id: str. ID of the committer.
+
+    Raises:
+        Exception. The given question does not exist.
+        Exception. The question is already unpublished.
+        Exception. The user does not have enough rights to unpublish the
+            question.
+    """
+    question_summary = get_question_summary_by_question_id(
+        question_id, strict=False)
+    if question_summary is None:
+        raise Exception('The given question does not exist')
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_CHANGE_QUESTION_STATUS not in user.actions:
         raise Exception(
-            'The assignee doesn\'t have enough rights to become a manager.')
+            'The user does not have enough rights to unpublish the question.')
 
-    old_role = question_domain.ROLE_NONE
-    if question_rights.is_manager(assignee.user_id):
-        old_role = question_domain.ROLE_MANAGER
-
-    if new_role == question_domain.ROLE_MANAGER:
-        if question_rights.is_manager(assignee.user_id):
-            raise Exception('This user already is a manager for this question')
-        question_rights.manager_ids.append(assignee.user_id)
-    elif new_role == question_domain.ROLE_NONE:
-        if question_rights.is_manager(assignee.user_id):
-            question_rights.manager_ids.remove(assignee.user_id)
-        else:
-            old_role = question_domain.ROLE_NONE
-    else:
-        raise Exception('Invalid role: %s' % new_role)
-
-    commit_message = 'Changed role of %s from %s to %s' % (
-        assignee_username, old_role, new_role)
-    commit_cmds = [question_domain.QuestionRightsChange({
-        'cmd': question_domain.CMD_CHANGE_ROLE,
-        'assignee_id': assignee.user_id,
-        'old_role': old_role,
-        'new_role': new_role
-    })]
-
-    save_question_rights(
-        question_rights, committer_id, commit_message, commit_cmds)
+    if not question_summary.status == feconf.QUESTION_STATUS_APPROVED:
+        raise Exception('The question is already unpublished.')
+    question_summary.status = feconf.ACTIVITY_STATUS_PRIVATE
+    question_summary.put()

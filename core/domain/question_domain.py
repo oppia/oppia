@@ -47,6 +47,11 @@ CMD_REMOVE_QUESTION_SKILL = 'remove_question_skill'
 CMD_CHANGE_ROLE = 'change_role'
 CMD_CREATE_NEW = 'create_new'
 
+CMD_SEND_QUESTION_FOR_REVIEW = 'send_question_for_review'
+CMD_REJECT_QUESTION = 'reject_question'
+CMD_PUBLISH_QUESTION = 'publish_question'
+CMD_UNPUBLISH_QUESTION = 'unpublish_question'
+
 
 class QuestionChange(object):
     """Domain object for changes made to question object."""
@@ -183,14 +188,11 @@ class Question(object):
         return question
 
     @classmethod
-    def create_default_question(
-            cls, question_id, language_code):
+    def create_default_question(cls, question_id):
         """Returns a Question domain object with default values.
 
         Args:
             question_id: str. The unique ID of the question.
-            language_code: str. The ISO 639-1 code for the language this
-                question is written in.
 
         Returns:
             Question. A Question domain object with default values.
@@ -199,7 +201,8 @@ class Question(object):
             question_id, exp_domain.State.create_default_state(
                 feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
                 ),
-            feconf.CURRENT_QUESTION_SCHEMA_VERSION, language_code)
+            feconf.CURRENT_QUESTION_SCHEMA_VERSION,
+            constants.DEFAULT_LANGUAGE_CODE)
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
@@ -301,13 +304,7 @@ class QuestionRights(object):
     """Domain object for question rights."""
 
     def __init__(self, question_id, manager_ids):
-        """Constructs a QuestionRights domain object.
-
-        Args:
-            question_id: str. The id of the question.
-            manager_ids: list(str). The id of the users who have been assigned
-                as managers for the question.
-        """
+        """"""
         self.id = question_id
         self.manager_ids = manager_ids
 
@@ -334,53 +331,3 @@ class QuestionRights(object):
             bool. Whether user is a question manager of this question.
         """
         return bool(user_id in self.manager_ids)
-
-
-class QuestionRightsChange(object):
-    """Domain object for changes made to a question rights object."""
-
-    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
-        'assignee_id', 'new_role', 'old_role'
-    ]
-
-    def __init__(self, change_dict):
-        """Initialize a QuestionRightsChange object from a dict.
-
-        Args:
-            change_dict: dict. Represents a command. It should have a 'cmd'
-                key, and one or more other keys. The keys depend on what the
-                value for 'cmd' is. The possible values for 'cmd' are listed
-                below, together with the other keys in the dict:
-                - 'change_role' (with assignee_id, new_role and old_role)
-                - 'create_new'
-
-        Raises:
-            Exception: The given change dict is not valid.
-        """
-        if 'cmd' not in change_dict:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-        self.cmd = change_dict['cmd']
-
-        if self.cmd == CMD_CHANGE_ROLE:
-            self.assignee_id = change_dict['assignee_id']
-            self.new_role = change_dict['new_role']
-            self.old_role = change_dict['old_role']
-        elif self.cmd == CMD_CREATE_NEW:
-            pass
-        else:
-            raise Exception('Invalid change_dict: %s' % change_dict)
-
-    def to_dict(self):
-        """Returns a dict representing the QuestionRightsChange domain object.
-
-        Returns:
-            A dict, mapping all fields of QuestionRightsChange instance.
-        """
-        question_rights_change_dict = {}
-        question_rights_change_dict['cmd'] = self.cmd
-        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
-            if hasattr(self, attribute_name):
-                question_rights_change_dict[attribute_name] = getattr(
-                    self, attribute_name)
-
-        return question_rights_change_dict
