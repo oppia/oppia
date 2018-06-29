@@ -38,6 +38,16 @@ describe('Topic editor state service', function() {
       });
     };
 
+    var _fetchStories = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve(self.backendStorySummariesObject);
+        } else {
+          reject();
+        }
+      });
+    };
+
     var _fetchSubtopicPage = function() {
       return $q(function(resolve, reject) {
         if (!self.failure) {
@@ -50,10 +60,12 @@ describe('Topic editor state service', function() {
 
     self.newBackendSubtopicPageObject = {};
     self.newBackendTopicObject = {};
+    self.backendStorySummariesObject = [];
     self.failure = null;
     self.fetchTopic = _fetchOrUpdateTopic;
     self.fetchSubtopicPage = _fetchSubtopicPage;
     self.updateTopic = _fetchOrUpdateTopic;
+    self.fetchStories = _fetchStories;
 
     return self;
   };

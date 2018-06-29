@@ -768,7 +768,6 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
         """Test the get_playthrough_from_model method."""
         model = stats_models.PlaythroughModel.get(self.playthrough_id)
         playthrough = stats_services.get_playthrough_from_model(model)
-        self.assertEqual(playthrough.id, self.playthrough_id)
         self.assertEqual(playthrough.exp_id, 'exp_id1')
         self.assertEqual(playthrough.exp_version, 1)
         self.assertEqual(playthrough.issue_type, 'EarlyQuit')
@@ -785,7 +784,6 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
     def test_get_playthrough_by_id(self):
         """Test the get_playthrough_by_id method."""
         playthrough = stats_services.get_playthrough_by_id(self.playthrough_id)
-        self.assertEqual(playthrough.id, self.playthrough_id)
         self.assertEqual(playthrough.exp_id, 'exp_id1')
         self.assertEqual(playthrough.exp_version, 1)
         self.assertEqual(playthrough.issue_type, 'EarlyQuit')
