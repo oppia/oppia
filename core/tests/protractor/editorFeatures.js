@@ -53,14 +53,15 @@ describe('Exploration history', function() {
     users.login('user@historyTab.com');
     workflow.createExploration();
 
-    // Constants for colors of nodes in history graph
+    // Constants for colors of nodes in history graph.
     var COLOR_ADDED = 'rgb(78, 162, 78)';
     var COLOR_DELETED = 'rgb(220, 20, 60)';
     var COLOR_CHANGED = 'rgb(30, 144, 255)';
     var COLOR_UNCHANGED = 'rgb(245, 245, 220)';
     var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
 
-    // Check renaming state, editing text, editing interactions and adding state
+    // Check renaming state, editing text, editing interactions and adding
+    // state.
     explorationEditorPage.setStateName('first');
     explorationEditorPage.setContent(forms.toRichText('enter 6 to continue'));
     explorationEditorPage.setInteraction('NumericInput');
@@ -69,10 +70,9 @@ describe('Exploration history', function() {
     explorationEditorPage.moveToState('second');
     explorationEditorPage.setContent(forms.toRichText('this is card 2'));
     explorationEditorPage.setInteraction('Continue');
-    // explorationEditorPage.setDefaultOutcome(null, 'final card', true);
     var responseEditor = explorationEditorPage.getResponseEditor('default');
     responseEditor.setDestination('final card', true, null);
-    // Setup a terminating state
+    // Setup a terminating state.
     explorationEditorPage.moveToState('final card');
     explorationEditorPage.setInteraction('EndExploration');
     explorationEditorPage.moveToState('first');
@@ -404,14 +404,14 @@ describe('Exploration history', function() {
     historyGraph.expectTextToMatch(STATE_2_STRING, ' ');
     historyGraph.closeStateHistory();
 
-    // Reset all checkboxes
+    // Reset all checkboxes.
     // Switching the 2 compared versions should give the same result.
     historyGraph.deselectTwoVersions(1, 2);
     historyGraph.selectTwoVersions(2, 1);
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
 
-    // Check deleting a state
+    // Check deleting a state.
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.deleteState('second');
     explorationEditorPage.moveToState('first');
@@ -439,7 +439,7 @@ describe('Exploration history', function() {
     historyGraph.expectTextToMatch(' ', STATE_2_STRING);
     historyGraph.closeStateHistory();
 
-    // Check renaming a state
+    // Check renaming a state.
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.moveToState('first');
     explorationEditorPage.setStateName('third');
@@ -457,7 +457,7 @@ describe('Exploration history', function() {
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(1, 0, 0);
 
-    // Check re-inserting a deleted state
+    // Check re-inserting a deleted state.
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.moveToState('third');
     explorationEditorPage.getResponseEditor(0).
@@ -486,7 +486,7 @@ describe('Exploration history', function() {
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
-    // Check that reverting works
+    // Check that reverting works.
     explorationEditorHistoryTab.revertToVersion(2);
     general.moveToPlayer();
     explorationPlayerPage.expectContentToMatch(
@@ -554,7 +554,7 @@ describe('ExplorationFeedback', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
-    // Creator creates and publishes an exploration
+    // Creator creates and publishes an exploration.
     users.login('user1@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
@@ -567,7 +567,7 @@ describe('ExplorationFeedback', function() {
     ).toEqual(0);
     users.logout();
 
-    // Learner plays the exploration and submits a feedback
+    // Learner plays the exploration and submits a feedback.
     users.login('user2@ExplorationFeedback.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
@@ -576,7 +576,7 @@ describe('ExplorationFeedback', function() {
     general.waitForSystem();
     users.logout();
 
-    // Creator reads the feedback and responds
+    // Creator reads the feedback and responds.
     users.login('user1@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
@@ -634,7 +634,6 @@ describe('Suggestions on Explorations', function() {
 
   it('accepts a suggestion on a published exploration', function() {
     users.login('user1@ExplorationSuggestions.com');
-    general.waitForSystem();
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
       EXPLORATION_CATEGORY,
@@ -643,7 +642,7 @@ describe('Suggestions on Explorations', function() {
     browser.get(general.SERVER_URL_PREFIX);
     users.logout();
 
-    // Suggester plays the exploration and suggests a change
+    // Suggester plays the exploration and suggests a change.
     users.login('user2@ExplorationSuggestions.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
@@ -656,7 +655,7 @@ describe('Suggestions on Explorations', function() {
     general.waitForSystem();
     users.logout();
 
-    // Exploration author reviews the suggestion and accepts it
+    // Exploration author reviews the suggestion and accepts it.
     users.login('user1@ExplorationSuggestions.com');
     creatorDashboardPage.get();
     browser.waitForAngular();
@@ -674,7 +673,7 @@ describe('Suggestions on Explorations', function() {
     explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
     users.logout();
 
-    // Student logs in and plays the exploration, finds the updated content
+    // Student logs in and plays the exploration, finds the updated content.
     users.login('user3@ExplorationSuggestions.com');
     libraryPage.get();
     libraryPage.findExploration(EXPLORATION_TITLE);
