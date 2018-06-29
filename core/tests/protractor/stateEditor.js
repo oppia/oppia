@@ -22,6 +22,8 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
@@ -30,25 +32,29 @@ var CreatorDashboardPage =
 
 describe('State editor', function() {
   var explorationPlayerPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
 
   beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
-  it('should walk through the tutorial when user repeatedly clicks Next',
+  fit('should walk through the tutorial when user repeatedly clicks Next',
     function() {
-      var NUM_TUTORIAL_STAGES = 7;
+      var NUM_TUTORIAL_STAGES = 6;
       users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       users.login('userTutorial@stateEditor.com');
 
       workflow.createExplorationAndStartTutorial();
-      editor.startTutorial();
-      for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
-        editor.progressInTutorial();
+      explorationEditorMainTab.startTutorial();
+      for (var i = 0; i < NUM_TUTORIAL_STAGES; i++) {
+        explorationEditorMainTab.progressInTutorial();
         general.waitForSystem();
       }
-      editor.finishTutorial();
+      explorationEditorMainTab.finishTutorial();
       users.logout();
     }
   );
@@ -58,8 +64,8 @@ describe('State editor', function() {
     users.login('user1@stateEditor.com');
 
     workflow.createExploration();
-    editor.setContent(forms.toRichText('plain text'));
-    editor.setInteraction('Continue', 'click here');
+    explorationEditorMainTab.setContent(forms.toRichText('plain text'));
+    explorationEditorMainTab.setInteraction('Continue', 'click here');
     editor.setDefaultOutcome(null, 'final card', true);
 
     // Setup a terminating state
