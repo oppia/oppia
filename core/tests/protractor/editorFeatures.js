@@ -41,9 +41,11 @@ describe('Exploration history', function() {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
+  var explorationEditorMainTab = null;
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
     explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -61,20 +63,21 @@ describe('Exploration history', function() {
 
     // Check renaming state, editing text, editing interactions and adding
     // state.
-    explorationEditorPage.setStateName('first');
-    explorationEditorPage.setContent(forms.toRichText('enter 6 to continue'));
-    explorationEditorPage.setInteraction('NumericInput');
-    explorationEditorPage.addResponse(
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'enter 6 to continue'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
       'NumericInput', null, 'second', true, 'Equals', 6);
-    explorationEditorPage.moveToState('second');
-    explorationEditorPage.setContent(forms.toRichText('this is card 2'));
-    explorationEditorPage.setInteraction('Continue');
-    var responseEditor = explorationEditorPage.getResponseEditor('default');
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(forms.toRichText('this is card 2'));
+    explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setDestination('final card', true, null);
     // Setup a terminating state.
-    explorationEditorPage.moveToState('final card');
-    explorationEditorPage.setInteraction('EndExploration');
-    explorationEditorPage.moveToState('first');
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.moveToState('first');
     explorationEditorPage.saveChanges();
 
     var VERSION_1_STATE_1_CONTENTS = {
@@ -394,12 +397,12 @@ describe('Exploration history', function() {
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
 
-    explorationEditorPage.moveToState('first (was: Introd...');
+    explorationEditorMainTab.moveToState('first (was: Introd...');
     historyGraph.expectTextWithHighlightingToMatch(
       VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
     historyGraph.closeStateHistory();
 
-    explorationEditorPage.moveToState('second');
+    explorationEditorMainTab.moveToState('second');
     historyGraph.expectTextToMatch(STATE_2_STRING, ' ');
     historyGraph.closeStateHistory();
 
@@ -412,9 +415,9 @@ describe('Exploration history', function() {
 
     // Check deleting a state.
     explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.deleteState('second');
-    explorationEditorPage.moveToState('first');
-    explorationEditorPage.getResponseEditor(0).
+    explorationEditorMainTab.deleteState('second');
+    explorationEditorMainTab.moveToState('first');
+    explorationEditorMainTab.getResponseEditor(0).
       setDestination('final card', false, null);
     explorationEditorPage.saveChanges();
 
@@ -434,14 +437,14 @@ describe('Exploration history', function() {
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
 
-    explorationEditorPage.moveToState('second');
+    explorationEditorMainTab.moveToState('second');
     historyGraph.expectTextToMatch(' ', STATE_2_STRING);
     historyGraph.closeStateHistory();
 
     // Check renaming a state.
     explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.moveToState('first');
-    explorationEditorPage.setStateName('third');
+    explorationEditorMainTab.moveToState('first');
+    explorationEditorMainTab.setStateName('third');
     explorationEditorPage.saveChanges();
     expectedHistoryStates = [{
       label: 'third (was: first)',
@@ -458,14 +461,14 @@ describe('Exploration history', function() {
 
     // Check re-inserting a deleted state.
     explorationEditorPage.navigateToMainTab();
-    explorationEditorPage.moveToState('third');
-    explorationEditorPage.getResponseEditor(0).
+    explorationEditorMainTab.moveToState('third');
+    explorationEditorMainTab.getResponseEditor(0).
       setDestination('second', true, null);
-    explorationEditorPage.moveToState('second');
-    explorationEditorPage.setContent(forms.toRichText('this is card 2'));
-    explorationEditorPage.setInteraction('Continue');
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(forms.toRichText('this is card 2'));
+    explorationEditorMainTab.setInteraction('Continue');
 
-    var responseEditor = explorationEditorPage.getResponseEditor('default');
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setDestination('final card', false, null);
     explorationEditorPage.saveChanges();
 
@@ -529,12 +532,14 @@ describe('ExplorationFeedback', function() {
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
   var explorationEditorPage = null;
+  var explorationEditorFeedbackTab = null;
   var creatorDashboardPage = null;
   var libraryPage = null;
   var explorationPlayerPage = null;
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -584,7 +589,6 @@ describe('ExplorationFeedback', function() {
     creatorDashboardPage.navigateToExplorationEditor();
 
     explorationEditorPage.navigateToFeedbackTab();
-    var explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     explorationEditorFeedbackTab.expectToHaveFeedbackThread();
     explorationEditorFeedbackTab.readFeedbackMessages()
       .then(function(messages) {
@@ -610,10 +614,12 @@ describe('Suggestions on Explorations', function() {
   var creatorDashboardPage = null;
   var libraryPage = null;
   var explorationEditorPage = null;
+  var explorationEditorFeedbackTab = null;
   var explorationPlayerPage = null;
 
   beforeEach(function() {
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -661,7 +667,6 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage.navigateToExplorationEditor();
 
     explorationEditorPage.navigateToFeedbackTab();
-    var explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     explorationEditorFeedbackTab.getSuggestionThreads().then(function(threads) {
       expect(threads.length).toEqual(1);
       expect(threads[0]).toMatch(suggestionDescription);
