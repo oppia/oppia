@@ -77,6 +77,7 @@ ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
                         'assigned_reviewer_id', 'final_reviewer_id',
                         'score_category']
 
+
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
 

@@ -233,7 +233,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         ]
         self.assertEqual(
             len(suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries)), 5)
+                queries)), 5)
         queries = [
             ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
             ('target_id', self.target_id),
@@ -241,7 +241,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         ]
         self.assertEqual(
             len(suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries)), 3)
+                queries)), 3)
         queries = [
             ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
             ('target_id', self.target_id),
@@ -250,7 +250,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
         ]
         self.assertEqual(
             len(suggestion_models.GeneralSuggestionModel.query_suggestions(
-                    queries)), 2)
+                queries)), 2)
         queries = [
             ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
             ('target_id', self.target_id),
