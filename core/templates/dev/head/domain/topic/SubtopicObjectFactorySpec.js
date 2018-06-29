@@ -29,6 +29,7 @@ describe('Subtopic object factory', function() {
       id: 1,
       title: 'Title',
       skill_ids: ['skill_1', 'skill_2'],
+      skill_descriptions: ['Description 1', 'Description 2']
     };
     _sampleSubtopic = SubtopicObjectFactory.create(sampleSubtopicBackendObject);
   }));
@@ -39,14 +40,16 @@ describe('Subtopic object factory', function() {
       expect(subtopic.getId()).toBe(2);
       expect(subtopic.getTitle()).toBe('Title2');
       expect(subtopic.getSkillIds()).toEqual([]);
+      expect(subtopic.getSkillDescriptions()).toEqual([]);
     });
 
   it('should not add duplicate elements to skill ids list', function() {
-    expect(_sampleSubtopic.addSkillId('skill_1')).toEqual(false);
+    expect(_sampleSubtopic.addSkill('skill_1', 'Description 1')).toEqual(false);
   });
 
   it('should correctly remove a skill id', function() {
-    _sampleSubtopic.removeSkillId('skill_1');
+    _sampleSubtopic.removeSkill('skill_1');
     expect(_sampleSubtopic.getSkillIds()).toEqual(['skill_2']);
+    expect(_sampleSubtopic.getSkillDescriptions()).toEqual(['Description 2']);
   });
 });

@@ -6,19 +6,19 @@
     </h4>
     <div class="subtopics-container">
       <md-card class="subtopic"
-               ng-repeat="subtopic in subtopics"
-               dnd-list="subtopic.getSkillIds()"
-               dnd-drop="endMoveSkillId(subtopic.getId())">
+               ng-repeat="(subtopicIndex, subtopic) in subtopics"
+               dnd-list="subtopic.getSkillDescriptions()"
+               dnd-drop="endMoveSkill(subtopic.getId())">
         <strong style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
         <span style="float: right; color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
           <i class="material-icons md-18">&#xE14C;</i>
         </span>
         <md-card class="skill-id"
-                 ng-repeat="skillId in subtopic.getSkillIds()"
-                 dnd-draggable="skillId"
-                 dnd-dragstart="startMoveSkillId(subtopic.getId(), skillId)"
+                 ng-repeat="skillDescription in subtopic.getSkillDescriptions()"
+                 dnd-draggable="skillDescription"
+                 dnd-dragstart="startMoveSkill(subtopicIndex, $index)"
                  dnd-effect-allowed="move">
-          <[skillId]>
+          <[skillDescription]>
         </md-card>
         <div class="edit-subtopic">
           <button class="btn btn-primary" ng-click="editSubtopic(subtopic)">
@@ -34,15 +34,15 @@
   </md-card>
 
   <md-card class="uncategorized-skill-ids"
-           dnd-list="uncategorizedSkillIds"
-           dnd-drop="endMoveSkillId(null)">
+           dnd-list="uncategorizedSkillDescriptions"
+           dnd-drop="endMoveSkill(null)">
     <h3> Uncategorized Skills </h3>
     <md-card class="skill-id"
-             ng-repeat="skillId in uncategorizedSkillIds"
-             dnd-draggable="skillId"
+             ng-repeat="skillDescription in uncategorizedSkillDescriptions"
+             dnd-draggable="skillDescription"
              dnd-effect-allowed="move"
-             dnd-dragstart="startMoveSkillId(null, skillId)">
-      <[skillId]>
+             dnd-dragstart="startMoveSkill(null, $index)">
+      <[skillDescription]>
     </md-card>
   </md-card>
 </div>

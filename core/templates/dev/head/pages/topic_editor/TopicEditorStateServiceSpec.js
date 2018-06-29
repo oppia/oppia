@@ -125,6 +125,7 @@ describe('Topic editor state service', function() {
       canonical_story_ids: ['story_1'],
       additional_story_ids: ['story_2'],
       uncategorized_skill_ids: ['skill_1'],
+      uncategorized_skill_descriptions: ['Description 1'],
       subtopics: [],
       language_code: 'en',
       next_subtopic_id: 1,
@@ -139,15 +140,18 @@ describe('Topic editor state service', function() {
       canonical_story_ids: ['story_3'],
       additional_story_ids: ['story_4'],
       uncategorized_skill_ids: ['skill_5'],
+      uncategorized_skill_descriptions: ['Description 5'],
       subtopics: [
         {
           id: 1,
           title: 'Title',
-          skill_ids: 'skill_2'
+          skill_ids: ['skill_2'],
+          skill_descriptions: ['Description 2']
         }, {
           id: 2,
           title: 'Title 2',
-          skill_ids: 'skill_3'
+          skill_ids: ['skill_3'],
+          skill_descriptions: ['Description 3']
         }
       ],
       language_code: 'en',
@@ -412,6 +416,7 @@ describe('Topic editor state service', function() {
     expect(topic.getCanonicalStoryIds()).toEqual([]);
     expect(topic.getAdditionalStoryIds()).toEqual([]);
     expect(topic.getUncategorizedSkillIds()).toEqual([]);
+    expect(topic.getUncategorizedSkillDescriptions()).toEqual([]);
     expect(topic.getSubtopics()).toEqual([]);
   });
 

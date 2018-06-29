@@ -40,6 +40,8 @@ oppia.directive('subtopicsListTab', [
             $scope.subtopicEditorIsShown = false;
             $scope.uncategorizedSkillIds =
               $scope.topic.getUncategorizedSkillIds();
+            $scope.uncategorizedSkillDescriptions =
+              $scope.topic.getUncategorizedSkillDescriptions();
           };
 
           $scope.editSubtopic = function(subtopic) {
@@ -130,23 +132,35 @@ oppia.directive('subtopicsListTab', [
             });
           };
 
-          $scope.startMoveSkillId = function(oldSubtopicId, skillId) {
-            $scope.skillIdToMove = skillId;
-            $scope.oldSubtopicId = oldSubtopicId;
+          $scope.startMoveSkill = function(oldSubtopicIndex, index) {
+            if (oldSubtopicIndex === null) {
+              $scope.skillIdToMove = $scope.uncategorizedSkillIds[index];
+              $scope.skillDescriptionToMove =
+                $scope.uncategorizedSkillDescriptions[index];
+              $scope.oldSubtopicId = null;
+            } else {
+              $scope.skillIdToMove =
+                $scope.subtopics[oldSubtopicIndex].getSkillIds()[index];
+              $scope.skillDescriptionToMove =
+                $scope.subtopics[
+                  oldSubtopicIndex].getSkillDescriptions()[index];
+              $scope.oldSubtopicId = $scope.subtopics[oldSubtopicIndex].getId();
+            }
           };
 
-          $scope.endMoveSkillId = function(newSubtopicId) {
+          $scope.endMoveSkill = function(newSubtopicId) {
             if (newSubtopicId === $scope.oldSubtopicId) {
               return;
             }
 
             if (newSubtopicId === null) {
-              TopicUpdateService.removeSkillIdFromSubtopic(
-                $scope.topic, $scope.oldSubtopicId, $scope.skillIdToMove);
+              TopicUpdateService.removeSkillFromSubtopic(
+                $scope.topic, $scope.oldSubtopicId, $scope.skillIdToMove,
+                $scope.skillDescriptionToMove);
             } else {
-              TopicUpdateService.moveSkillIdToSubtopic(
+              TopicUpdateService.moveSkillToSubtopic(
                 $scope.topic, $scope.oldSubtopicId, newSubtopicId,
-                $scope.skillIdToMove);
+                $scope.skillIdToMove, $scope.skillDescriptionToMove);
             }
             _initEditor();
           };

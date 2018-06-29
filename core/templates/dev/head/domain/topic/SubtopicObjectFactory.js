@@ -23,6 +23,7 @@ oppia.factory('SubtopicObjectFactory', [
       this._id = subtopicBackendObject.id;
       this._title = subtopicBackendObject.title;
       this._skillIds = subtopicBackendObject.skill_ids;
+      this._skillDescriptions = subtopicBackendObject.skill_descriptions;
     };
 
     // Instance methods
@@ -54,18 +55,24 @@ oppia.factory('SubtopicObjectFactory', [
       return this._skillIds;
     };
 
-    Subtopic.prototype.addSkillId = function(skillId) {
+    Subtopic.prototype.getSkillDescriptions = function() {
+      return this._skillDescriptions;
+    };
+
+    Subtopic.prototype.addSkill = function(skillId, skillDescription) {
       if (this._skillIds.indexOf(skillId) === -1) {
         this._skillIds.push(skillId);
+        this._skillDescriptions.push(skillDescription);
         return true;
       }
       return false;
     };
 
-    Subtopic.prototype.removeSkillId = function(skillId) {
+    Subtopic.prototype.removeSkill = function(skillId) {
       var index = this._skillIds.indexOf(skillId);
       if (index > -1) {
         this._skillIds.splice(index, 1);
+        this._skillDescriptions.splice(index, 1);
       }
     };
 
@@ -77,7 +84,8 @@ oppia.factory('SubtopicObjectFactory', [
       return Subtopic.create({
         id: subtopicId,
         title: title,
-        skill_ids: []
+        skill_ids: [],
+        skill_descriptions: []
       });
     };
 

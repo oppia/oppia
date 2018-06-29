@@ -14,6 +14,7 @@
 
 """Tests for the topic editor page."""
 
+from core.domain import skill_services
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -44,10 +45,12 @@ class BaseTopicEditorControllerTest(test_utils.GenericTestBase):
             self.topic_manager_id)
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [],
-            [], 1)
+            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
+            [self.skill_id], [], 1)
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -173,6 +176,9 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
             self.assertEqual(self.topic_id, json_response['topic']['id'])
+            self.assertEqual(
+                ['Skill Description'],
+                json_response['topic']['uncategorized_skill_descriptions'])
             self.logout()
 
     def test_editable_topic_handler_put(self):
@@ -220,6 +226,9 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             self.assertEqual(self.topic_id, json_response['topic']['id'])
             self.assertEqual('A new name', json_response['topic']['name'])
             self.assertEqual(2, len(json_response['topic']['subtopics']))
+            self.assertEqual(
+                ['Skill Description'],
+                json_response['topic']['uncategorized_skill_descriptions'])
 
             # Test if the corresponding subtopic pages were created.
             json_response = self.get_json(
