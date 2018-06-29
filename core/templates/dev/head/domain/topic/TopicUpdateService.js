@@ -229,31 +229,59 @@ oppia.factory('TopicUpdateService', [
           var currentChangeList = UndoRedoService.getChangeList();
           var indicesToDelete = [];
           var oldSubtopicIdSkillIdMap = {};
+          var index = null;
           var skillIds = subtopic.getSkillIds();
           for (var i = 0; i < currentChangeList.length; i++) {
             var changeDict =
               currentChangeList[i].getBackendChangeObject();
-            if (changeDict.new_subtopic_id === subtopicId) {
-              if (skillIds.indexOf(changeDict.skill_id) !== -1) {
-                changeDict.cmd = CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC;
-                changeDict.subtopic_id = changeDict.old_subtopic_id;
-              } else {
+            if (oldSubtopicIdSkillIdMap[changeDict.skill_id] === undefined) {
+              if (changeDict.new_subtopic_id === subtopicId) {
+                // Record the origin subtopic id for the skill.
                 oldSubtopicIdSkillIdMap[changeDict.skill_id] =
                   changeDict.old_subtopic_id;
+                index = i;
+              }
+            } else {
+              if (changeDict.cmd === CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC) {
+                // If the skill was removed from all subtopics at some point,
+                // modify that change dict, so that it was as if it was removed
+                // from its recorded origin.
+                changeDict.subtopic_id =
+                  oldSubtopicIdSkillIdMap[changeDict.skill_id];
+              } else {
+                // At every move operation, set old subtopic id as the recorded
+                // old subtopic id.
+                changeDict.old_subtopic_id =
+                  oldSubtopicIdSkillIdMap[changeDict.skill_id];
+              }
+              currentChangeList[i].setBackendChangeObject(changeDict);
+              // Remove the previous move operation that was related to the
+              // skill id since, the old subtopic id of the current change dict
+              // is set to the actual initial subtopic id.
+              currentChangeList.splice(index, 1);
+              i--;
+              index = i;
+            }
+          }
+          for (var i = 0; i < currentChangeList.length; i++) {
+            var changeDict =
+              currentChangeList[i].getBackendChangeObject();
+            // If after all the above operations, final destination for skill
+            // is still the subtopic to be deleted, make that skill
+            // uncategorized.
+            if (changeDict.new_subtopic_id === subtopicId) {
+              // But, if the origin was the uncategorized section anyways, don't
+              // change it.
+              if (oldSubtopicIdSkillIdMap[changeDict.skill_id] === null) {
                 currentChangeList.splice(i, 1);
                 i--;
                 continue;
               }
-            } else if (changeDict.old_subtopic_id === subtopicId) {
-              changeDict.old_subtopic_id =
+              changeDict.cmd = CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC;
+              changeDict.subtopic_id =
                 oldSubtopicIdSkillIdMap[changeDict.skill_id];
-            } else if (changeDict.cmd === CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC) {
-              if (changeDict.subtopic_id === subtopicId) {
-                changeDict.subtopic_id =
-                  oldSubtopicIdSkillIdMap[changeDict.skill_id];
-              }
+              currentChangeList[i].setBackendChangeObject(changeDict);
             }
-            currentChangeList[i].setBackendChangeObject(changeDict);
           }
           for (var i = 0; i < currentChangeList.length; i++) {
             var backendChangeDict =

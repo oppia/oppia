@@ -16,7 +16,7 @@
         </span>
         <div style="max-height: 35vh; overflow-y: auto;">
           <md-card class="skill-id"
-                   ng-repeat="skillDescription in subtopic.getSkillDescriptions()"
+                   ng-repeat="skillDescription in subtopic.getSkillDescriptions() track by $index"
                    dnd-draggable="skillDescription"
                    dnd-dragstart="startMoveSkill(subtopicIndex, $index)"
                    dnd-effect-allowed="move">
@@ -36,7 +36,7 @@
     <h3> Uncategorized Skills </h3>
     <div style="max-height: 45vh; overflow-y: auto;">
       <md-card class="skill-id"
-               ng-repeat="skillDescription in uncategorizedSkillDescriptions"
+               ng-repeat="skillDescription in uncategorizedSkillDescriptions track by $index"
                dnd-draggable="skillDescription"
                dnd-effect-allowed="move"
                dnd-dragstart="startMoveSkill(null, $index)">
