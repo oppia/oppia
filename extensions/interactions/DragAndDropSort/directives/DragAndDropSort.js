@@ -49,6 +49,7 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
           $scope.submitAnswer = function() {
             // Converting list of dicts to list of lists to make it consistent
             // with the ListOfSetsOfHtmlStrings object.
+            answers = [];
             for (var i = 0; i < $scope.list.length; i++) {
               answers.push([$scope.list[i].title]);
               for (var j = 0; j < $scope.list[i].items.length; j++) {
