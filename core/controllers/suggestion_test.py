@@ -37,6 +37,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL = 'author@example.com'
     AUTHOR_EMAIL_2 = 'author2@example.com'
     ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
+    NORMAL_USER_EMAIL = 'user@example.com'
 
     def setUp(self):
         super(SuggestionUnitTests, self).setUp()
@@ -45,6 +46,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.AUTHOR_EMAIL_2, 'author2')
         self.signup(self.ASSIGNED_REVIEWER_EMAIL, 'assignedReviewer')
+        self.signup(self.NORMAL_USER_EMAIL, 'normalUser')
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
@@ -211,4 +213,40 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 exploration.states[suggestion_to_accept[
                     'change_cmd']['state_name']].content.html,
                 suggestion_to_accept['change_cmd']['new_value']['html'])
+            self.logout()
+
+            self.login(self.NORMAL_USER_EMAIL)
+            suggestion_to_accept = self.get_json(
+                '%s?list_type=author&author_id=%s' % (
+                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                    self.author_id_2))['suggestions'][0]
+
+            response = self.testapp.get('/explore/%s' % self.EXP_ID)
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.put_json('%s/exploration/%s/%s' % (
+                feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token, expect_errors=True, expected_status_int=401)
+            self.logout()
+
+            self.login(self.AUTHOR_EMAIL_2)
+            suggestion_to_accept = self.get_json(
+                '%s?list_type=author&author_id=%s' % (
+                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+                    self.author_id_2))['suggestions'][0]
+
+            response = self.testapp.get('/explore/%s' % self.EXP_ID)
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.put_json('%s/exploration/%s/%s' % (
+                feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+                suggestion_to_accept['target_id'],
+                suggestion_to_accept['suggestion_id']), {
+                    'action': u'accept',
+                    'commit_message': u'commit message',
+                    'review_message': u'Accepted'
+                }, csrf_token, expect_errors=True, expected_status_int=401)
             self.logout()

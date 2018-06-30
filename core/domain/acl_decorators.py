@@ -519,7 +519,7 @@ def can_subscribe_to_users(handler):
 def can_edit_exploration(handler):
     """Decorator to check whether the user can edit given exploration."""
 
-    def test_can_edit(self, exploration_id, **kwargs):
+    def test_can_edit(self, exploration_id, *args, **kwargs):
         """Checks if the user can edit the exploration.
 
         Args:
@@ -539,7 +539,7 @@ def can_edit_exploration(handler):
 
         if rights_manager.check_can_edit_activity(
                 self.user, exploration_rights):
-            return handler(self, exploration_id, **kwargs)
+            return handler(self, exploration_id, *args, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to edit this exploration.')
@@ -1118,3 +1118,25 @@ def can_change_topic_publication_status(handler):
     test_can_change_topic_publication_status.__wrapped__ = True
 
     return test_can_change_topic_publication_status
+
+
+def get_decorator_for_accepting_suggestion(decorator):
+
+    def generate_decorator_for_handler(handler):
+
+        def test_can_accept_suggestion(
+                self, target_id, suggestion_id, **kwargs):
+            if not self.user_id:
+                raise base.UserFacingExceptions.NotLoggedInException
+            user_actions_info = user_services.UserActionsInfo(self.user_id)
+            if (
+                    role_services.ACTION_ACCEPT_ANY_SUGGESTION in
+                    user_actions_info.actions):
+                return handler(self, target_id, suggestion_id)
+
+            return decorator(handler)(self, target_id, suggestion_id)
+
+        test_can_accept_suggestion.__wrapped__ = True
+        return test_can_accept_suggestion
+
+    return generate_decorator_for_handler

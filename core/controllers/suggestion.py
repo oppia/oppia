@@ -21,6 +21,7 @@ from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import suggestion_services
 from core.platform import models
+import feconf
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -50,12 +51,12 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     ACTION_TYPE_ACCEPT = 'accept'
     ACTION_TYPE_REJECT = 'reject'
 
-
     # TODO (nithesh): Add permissions for users with enough scores to review
     # Will be added as part of milestone 2 of the generalized review system
     # project.
-    @acl_decorators.can_edit_exploration
-    def put(self, exploration_id, suggestion_id):
+    @acl_decorators.get_decorator_for_accepting_suggestion(
+        acl_decorators.can_edit_exploration)
+    def put(self, target_id, suggestion_id):
         if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
             raise self.PageNotFoundException
 
@@ -68,7 +69,7 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
             raise self.InvalidInputException('This handler allows actions only'
                                              ' on suggestions to explorations.')
 
-        if suggestion_id.split('.')[1] != exploration_id:
+        if suggestion_id.split('.')[1] != target_id:
             raise self.InvalidInputException('The exploration id provided does '
                                              'not match the exploration id '
                                              'present as part of the '
@@ -76,6 +77,11 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
 
         action = self.payload.get('action')
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+
+        if suggestion.author_id == self.user_id:
+            raise self.UnauthorizedUserException('You cannot perform an action '
+                                                 'on your own suggestion.')
+
         if action == self.ACTION_TYPE_ACCEPT:
             suggestion_services.accept_suggestion(
                 suggestion, self.user_id, self.payload.get('commit_message'),
