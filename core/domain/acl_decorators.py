@@ -524,6 +524,7 @@ def can_edit_exploration(handler):
 
         Args:
             exploration_id: str. The exploration id.
+            *args: *. Arguments.
             **kwargs: *. Keyword arguments.
 
         Returns:
@@ -1121,9 +1122,11 @@ def can_change_topic_publication_status(handler):
 
 
 def get_decorator_for_accepting_suggestion(decorator):
-
+    """Function that takes a decorator as an argument and then applies some
+    common checks and then checks the permissions specified by the passed in
+    decorator.
+    """
     def generate_decorator_for_handler(handler):
-
         def test_can_accept_suggestion(
                 self, target_id, suggestion_id, **kwargs):
             if not self.user_id:
@@ -1132,9 +1135,11 @@ def get_decorator_for_accepting_suggestion(decorator):
             if (
                     role_services.ACTION_ACCEPT_ANY_SUGGESTION in
                     user_actions_info.actions):
-                return handler(self, target_id, suggestion_id)
+                return handler(self, target_id, suggestion_id, **kwargs)
 
-            return decorator(handler)(self, target_id, suggestion_id)
+            # TODO (nithesh): Add checks based on user scores once those models
+            # are setup.
+            return decorator(handler)(self, target_id, suggestion_id, **kwargs)
 
         test_can_accept_suggestion.__wrapped__ = True
         return test_can_accept_suggestion
