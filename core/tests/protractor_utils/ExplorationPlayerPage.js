@@ -18,8 +18,8 @@
  */
 
 var forms = require('./forms.js');
-var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
+var until = protractor.ExpectedConditions;
 
 var ExplorationPlayerPage = function() {
   var conversationInput = element(
@@ -66,21 +66,33 @@ var ExplorationPlayerPage = function() {
     element(by.css('.protractor-test-exploration-suggestion-popup-link'));
 
   this.clickThroughToNextCard = function() {
+    browser.wait(until.elementToBeClickable(nextCardButton), 5000,
+      ' Next Card button takes too long to appear');
     nextCardButton.click();
   };
 
   this.viewHint = function() {
+    // We need to wait some time for the solution to activate.
+    browser.wait(until.elementToBeClickable(viewHintButton), 5000,
+      ' View Hintbutton takes too long to appear');
     viewHintButton.click();
+    clickGotItButton();
   };
 
   this.viewSolution = function() {
+    // We need to wait some time for the solution to activate.
+    browser.wait(until.elementToBeClickable(viewSolutionButton), 5000,
+      ' Solution takes too long to appear');
     viewSolutionButton.click();
-    general.waitForSystem();
+    browser.wait(until.elementToBeClickable(continueToSolutionButton), 5000,
+      ' Continue Solution button takes too long to appear');
     continueToSolutionButton.click();
-    general.waitForSystem();
+    clickGotItButton();
   };
 
-  this.clickGotItButton = function() {
+  var clickGotItButton = function() {
+    browser.wait(until.elementToBeClickable(gotItButton), 5000,
+      ' Got It button takes too long to appear');
     gotItButton.click();
   };
 
@@ -166,7 +178,6 @@ var ExplorationPlayerPage = function() {
     // it will get the supplemental interaction.
     interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
-    general.waitForSystem();
   };
 
   this.submitFeedback = function(feedback) {
