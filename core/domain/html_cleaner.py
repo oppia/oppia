@@ -232,7 +232,22 @@ def wrap_with_siblings(tag, p):
             break
 
 
-def convert_to_text_angular(html_data):
+# List of oppia noninteractive inline components.
+oppia_inline_components = [
+    'oppia-noninteractive-link',
+    'oppia-noninteractive-math'
+]
+
+# List of oppia noninteractive block components.
+oppia_block_components = [
+    'oppia-noninteractive-image',
+    'oppia-noninteractive-video',
+    'oppia-noninteractive-collapsible',
+    'oppia-noninteractive-tabs'
+]
+
+
+def convert_to_textangular(html_data):
     """This function converts the html to TextAngular supported format.
 
     Args:
@@ -253,7 +268,7 @@ def convert_to_text_angular(html_data):
     # to valid TextAngular format. If there is no tabs or collapsible component
     # convert_tag_contents_to_rte_format will make no change to html_data.
     html_data = convert_tag_contents_to_rte_format(
-        html_data, feconf.RTE_FORMAT_TEXTANGULAR)
+        html_data, convert_to_textangular)
 
     soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
 
@@ -354,15 +369,6 @@ def convert_to_text_angular(html_data):
     # parts not wrapped in any tag.
     soup = bs4.BeautifulSoup(unicode(soup).encode('utf-8'), 'html.parser')
 
-    oppia_inline_components = [
-        'oppia-noninteractive-link', 'oppia-noninteractive-math']
-    oppia_block_components = [
-        'oppia-noninteractive-image',
-        'oppia-noninteractive-video',
-        'oppia-noninteractive-collapsible',
-        'oppia-noninteractive-tabs'
-    ]
-
     # Ensure that blockquote tag is wrapped in an allowed parent.
     for blockquote in soup.findAll('blockquote'):
         while blockquote.parent.name not in allowed_parent_list['blockquote']:
@@ -460,8 +466,8 @@ def convert_to_text_angular(html_data):
     return unicode(soup).replace('<br/>', '<br>')
 
 
-def convert_to_ck_editor(html_data):
-    """This function converts the html to CKEditor supported format.
+def convert_to_ckeditor(html_data):
+    """This function converts html strings to CKEditor supported format.
 
     Args:
         html_data: str. HTML string to be converted.
@@ -477,11 +483,11 @@ def convert_to_ck_editor(html_data):
     # of other tags which produces issues in migration.
     html_data = html_data.replace('<br>', '<br/>')
 
-    # To convert the rich text content within tabs and collapsible components
+    # Convert the rich text content within tabs and collapsible components
     # to valid CKEditor format. If there is no tabs or collapsible component
     # convert_tag_contents_to_rte_format will make no change to html_data.
     html_data = convert_tag_contents_to_rte_format(
-        html_data, feconf.RTE_FORMAT_CKEDITOR)
+        html_data, convert_to_ckeditor)
 
     soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
 
@@ -507,11 +513,15 @@ def convert_to_ck_editor(html_data):
         if parent_tag.name == 'p' and parent_tag.get_text() == '':
             br.replaceWith('&nbsp;')
 
-    # In CKEditor format ol/ul cannot be the parent of ol/ul. So this block
-    # wraps each ol/ul into li tag if the parent of ol/ul is ol/ul. Also if
-    # there are consecutive ol/ul tags this block adds the margin:left according
-    # to the number of ol/ul tags and then remove these consecutive ol/ul tags
-    # to maintain the CKEditor format.
+    # This block ensures that ol/ul tag is not a direct child of another ul/ol
+    # tag. The conversion works as follows:
+    # Invalid html: <ul><li>...</li><ul><ul><li>...</li></ul></ul></ul>
+    # Valid html: <ul><li>...</li><ul><li style="margin-left:40px;">...</li>
+    # </ul></ul>
+    # i.e. if any ol/ul has parent as ol/ul and a previous sibling as li
+    # it is wrapped in it's previous sibling removing any margin styling.
+    # If there is no previous sibling, the tag is unwrapped and each of
+    # it's direct child is given an additional margin-left of 40px.
     list_tags = ['ol', 'ul']
     for tag_name in list_tags:
         for tag in soup.findAll(tag_name):
@@ -524,6 +534,7 @@ def convert_to_ck_editor(html_data):
                     margin_value = 40
                     if 'style' in tag.attrs:
                         style = tag['style']
+                        # This is to obtain the margin value of the tag.
                         match = re.search('margin-left:[0-9]+px;', style)
                         margin_value += int(
                             style[match.start() + 12: match.end() - 3])
@@ -532,18 +543,13 @@ def convert_to_ck_editor(html_data):
                         child_margin_value = margin_value
                         if 'style' in child.attrs:
                             style = child['style']
+                            # This is to obtain the margin value of the child
+                            # tag.
                             match = re.search('margin-left:[0-9]+px;', style)
                             child_margin_value += int(
                                 style[match.start() + 12: match.end() - 3])
                         child['style'] = 'margin-left:%dpx;' % margin_value
                     tag.unwrap()
-
-    oppia_block_components = [
-        'oppia-noninteractive-image',
-        'oppia-noninteractive-video',
-        'oppia-noninteractive-collapsible',
-        'oppia-noninteractive-tabs'
-    ]
 
     # Move block components out of p, pre, strong and em tags.
     for tag_name in oppia_block_components:
@@ -573,14 +579,15 @@ def convert_to_ck_editor(html_data):
     return unicode(soup).replace('<br/>', '<br>')
 
 
-def convert_tag_contents_to_rte_format(html_data, rte_format):
+def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
     """This function converts the rich text content within tabs and
     collapsible components to given RTE format. If the html_data
     does not contain tab or collapsible components it will do nothing.
 
     Args:
         html_data: str. The HTML string whose content is to be converted.
-        rte_format: str. The type of RTE format required for the html string.
+        rte_conversion_fn: function. The RTE conversion function for
+            html strings.
 
     Returns:
         str. The HTML string with converted content within tag.
@@ -589,23 +596,15 @@ def convert_tag_contents_to_rte_format(html_data, rte_format):
 
     for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
         content_html = unescape_html(collapsible['content-with-value'])
-        if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
-            collapsible['content-with-value'] = escape_html(
-                json.dumps(convert_to_text_angular(json.loads(content_html))))
-        else:
-            collapsible['content-with-value'] = escape_html(
-                json.dumps(convert_to_ck_editor(json.loads(content_html))))
+        collapsible['content-with-value'] = escape_html(
+            json.dumps(rte_conversion_fn(json.loads(content_html))))
 
     for tabs in soup.findAll('oppia-noninteractive-tabs'):
         tab_content_json = unescape_html(tabs['tab_contents-with-value'])
         tab_content_list = json.loads(tab_content_json)
         for index, tab_content in enumerate(tab_content_list):
-            if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
-                tab_content_list[index]['content'] = convert_to_text_angular(
-                    tab_content['content'])
-            else:
-                tab_content_list[index]['content'] = convert_to_ck_editor(
-                    tab_content['content'])
+            tab_content_list[index]['content'] = rte_conversion_fn(
+                tab_content['content'])
         tabs['tab_contents-with-value'] = escape_html(
             json.dumps(tab_content_list))
 
@@ -636,9 +635,9 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
     for html_data in html_list:
         if run_migration:
             if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
-                soup_data = convert_to_text_angular(html_data)
+                soup_data = convert_to_textangular(html_data)
             else:
-                soup_data = convert_to_ck_editor(html_data)
+                soup_data = convert_to_ckeditor(html_data)
         else:
             soup_data = html_data
 

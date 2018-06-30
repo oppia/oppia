@@ -229,7 +229,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             html_cleaner.wrap_with_siblings(tag, soup.new_tag('p'))
             self.assertEqual(str(soup), test_case['expected_output'])
 
-    def test_convert_to_text_angular(self):
+    def test_convert_to_textangular(self):
         test_cases = [{
             'html_content': (
                 '<div><i>hello</i></div> this is<i>test case1</i> for '
@@ -313,10 +313,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 test_case['expected_output'],
-                html_cleaner.convert_to_text_angular(test_case['html_content']))
+                html_cleaner.convert_to_textangular(test_case['html_content']))
 
     def test_validate_rte_format(self):
-        test_cases_for_text_angular = [
+        test_cases_for_textangular = [
             (
                 'This is for <i>testing</i> the validate <b>text</b> '
                 'angular function.'
@@ -328,16 +328,16 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-link></a><p> testing completed</p>'
             )
         ]
-        actual_output_with_migration_for_text_angular = (
+        actual_output_with_migration_for_textangular = (
             html_cleaner.validate_rte_format(
-                test_cases_for_text_angular,
+                test_cases_for_textangular,
                 feconf.RTE_FORMAT_TEXTANGULAR, True))
-        actual_output_without_migration_for_text_angular = (
+        actual_output_without_migration_for_textangular = (
             html_cleaner.validate_rte_format(
-                test_cases_for_text_angular, feconf.RTE_FORMAT_TEXTANGULAR))
+                test_cases_for_textangular, feconf.RTE_FORMAT_TEXTANGULAR))
 
-        expected_output_with_migration_for_text_angular = {'strings': []}
-        expected_output_without_migration_for_text_angular = {
+        expected_output_with_migration_for_textangular = {'strings': []}
+        expected_output_without_migration_for_textangular = {
             'i': ['[document]'],
             'invalidTags': ['a'],
             'oppia-noninteractive-link': ['a'],
@@ -357,13 +357,13 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(
-            actual_output_with_migration_for_text_angular,
-            expected_output_with_migration_for_text_angular)
+            actual_output_with_migration_for_textangular,
+            expected_output_with_migration_for_textangular)
         self.assertEqual(
-            actual_output_without_migration_for_text_angular,
-            expected_output_without_migration_for_text_angular)
+            actual_output_without_migration_for_textangular,
+            expected_output_without_migration_for_textangular)
 
-        test_cases_for_ck_editor = [
+        test_cases_for_ckeditor = [
             (
                 '<pre>Hello this is <b> testing '
                 '<oppia-noninteractive-image filepath-with-value="amp;quot;'
@@ -380,15 +380,15 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         ]
 
-        actual_output_with_migration_for_ck_editor = (
+        actual_output_with_migration_for_ckeditor = (
             html_cleaner.validate_rte_format(
-                test_cases_for_ck_editor, feconf.RTE_FORMAT_CKEDITOR, True))
-        actual_output_without_migration_for_ck_editor = (
+                test_cases_for_ckeditor, feconf.RTE_FORMAT_CKEDITOR, True))
+        actual_output_without_migration_for_ckeditor = (
             html_cleaner.validate_rte_format(
-                test_cases_for_ck_editor, feconf.RTE_FORMAT_CKEDITOR))
+                test_cases_for_ckeditor, feconf.RTE_FORMAT_CKEDITOR))
 
-        expected_output_with_migration_for_ck_editor = {'strings': []}
-        expected_output_without_migration_for_ck_editor = {
+        expected_output_with_migration_for_ckeditor = {'strings': []}
+        expected_output_without_migration_for_ckeditor = {
             'invalidTags': ['b'],
             'oppia-noninteractive-image': ['b'],
             'p': ['pre'],
@@ -411,14 +411,14 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(
-            actual_output_with_migration_for_ck_editor,
-            expected_output_with_migration_for_ck_editor)
+            actual_output_with_migration_for_ckeditor,
+            expected_output_with_migration_for_ckeditor)
         self.assertEqual(
-            actual_output_without_migration_for_ck_editor,
-            expected_output_without_migration_for_ck_editor)
+            actual_output_without_migration_for_ckeditor,
+            expected_output_without_migration_for_ckeditor)
 
     def test_validate_soup_for_rte(self):
-        test_cases_for_text_angular = [
+        test_cases_for_textangular = [
             (
                 '<p>Hello <b>this </b>is </p><p><br></p><p>test <b>case '
                 '</b>for </p><p><oppia-noninteractive-collapsible '
@@ -435,20 +435,20 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         ]
 
-        expected_output_for_text_angular = [False, True, False]
+        expected_output_for_textangular = [False, True, False]
         err_dict = {}
 
-        for index, test_case in enumerate(test_cases_for_text_angular):
-            actual_output_for_text_angular = (
+        for index, test_case in enumerate(test_cases_for_textangular):
+            actual_output_for_textangular = (
                 html_cleaner._validate_soup_for_rte( # pylint: disable=protected-access
                     bs4.BeautifulSoup(test_case, 'html.parser'),
                     feconf.RTE_FORMAT_TEXTANGULAR, err_dict))
 
             self.assertEqual(
-                actual_output_for_text_angular,
-                expected_output_for_text_angular[index])
+                actual_output_for_textangular,
+                expected_output_for_textangular[index])
 
-        test_cases_for_ck_editor = [
+        test_cases_for_ckeditor = [
             (
                 '<p>Lorem ipsum </p><p> Hello this is oppia </p>'
             ),
@@ -463,21 +463,21 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         ]
 
-        expected_output_for_ck_editor = [False, True, True]
+        expected_output_for_ckeditor = [False, True, True]
         err_dict = {}
 
-        for index, test_case in enumerate(test_cases_for_ck_editor):
-            actual_output_for_ck_editor = (
+        for index, test_case in enumerate(test_cases_for_ckeditor):
+            actual_output_for_ckeditor = (
                 html_cleaner._validate_soup_for_rte( # pylint: disable=protected-access
                     bs4.BeautifulSoup(test_case, 'html.parser'),
                     feconf.RTE_FORMAT_CKEDITOR, err_dict))
 
             self.assertEqual(
-                actual_output_for_ck_editor,
-                expected_output_for_ck_editor[index])
+                actual_output_for_ckeditor,
+                expected_output_for_ckeditor[index])
 
     def test_convert_tag_contents_to_rte_format(self):
-        test_cases_for_text_angular = [{
+        test_cases_for_textangular = [{
             'html_content': (
                 '<div>Hello <b>this </b>is </div><p><br></p><p>test <b>case '
                 '</b>for </p><p><oppia-noninteractive-collapsible '
@@ -538,15 +538,16 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }]
 
-        for test_case in test_cases_for_text_angular:
-            actual_output_for_text_angular = (
+        for test_case in test_cases_for_textangular:
+            actual_output_for_textangular = (
                 html_cleaner.convert_tag_contents_to_rte_format(
-                    test_case['html_content'], 'text-angular'))
+                    test_case['html_content'],
+                    html_cleaner.convert_to_textangular))
             self.assertEqual(
-                actual_output_for_text_angular,
+                actual_output_for_textangular,
                 test_case['expected_output'])
 
-        test_cases_for_ck_editor = [{
+        test_cases_for_ckeditor = [{
             'html_content': (
                 '<oppia-noninteractive-collapsible '
                 'content-with-value=\"&amp;quot;&amp;lt;pre&amp;gt;&amp;'
@@ -586,15 +587,16 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }]
 
-        for test_case in test_cases_for_ck_editor:
-            actual_output_for_ck_editor = (
+        for test_case in test_cases_for_ckeditor:
+            actual_output_for_ckeditor = (
                 html_cleaner.convert_tag_contents_to_rte_format(
-                    test_case['html_content'], 'ck-editor'))
+                    test_case['html_content'],
+                    html_cleaner.convert_to_ckeditor))
             self.assertEqual(
-                actual_output_for_ck_editor,
+                actual_output_for_ckeditor,
                 test_case['expected_output'])
 
-    def test_convert_to_ck_editor(self):
+    def test_convert_to_ckeditor(self):
         test_cases = [{
             'html_content': (
                 '<p>Lorem <span>ipsum </span></p> Hello this is '
@@ -664,4 +666,4 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 test_case['expected_output'],
-                html_cleaner.convert_to_ck_editor(test_case['html_content']))
+                html_cleaner.convert_to_ckeditor(test_case['html_content']))
