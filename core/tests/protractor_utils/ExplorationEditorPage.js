@@ -29,6 +29,8 @@ var ExplorationEditorMainTab = require(
 );
 var ExplorationEditorSettingsTab = require(
   '../protractor_utils/ExplorationEditorSettingsTab.js');
+var ExplorationEditorStatsTab = require(
+  '../protractor_utils/ExplorationEditorStatsTab.js');
 
 var ExplorationEditorPage = function() {
   /*
@@ -45,6 +47,9 @@ var ExplorationEditorPage = function() {
   };
   this.getSettingsTab = function() {
     return new ExplorationEditorSettingsTab.ExplorationEditorSettingsTab();
+  };
+  this.getStatsTab = function() {
+    return new ExplorationEditorStatsTab.ExplorationEditorStatsTab();
   };
 
   /*
@@ -71,6 +76,7 @@ var ExplorationEditorPage = function() {
     by.css('.protractor-test-preview-tab'));
   var navigateToSettingsTabButton = element(
     by.css('.protractor-test-settings-tab'));
+  var navigateToStatsTabButton = element(by.css('.protractor-test-stats-tab'));
   var saveChangesButton = element(by.css('.protractor-test-save-changes'));
   var saveDiscardToggleButton = element(
     by.css('.protractor-test-save-discard-toggle'));
@@ -134,6 +140,10 @@ var ExplorationEditorPage = function() {
 
   this.navigateToSettingsTab = function() {
     navigateToSettingsTabButton.click();
+  };
+
+  this.navigateToStatsTab = function() {
+    navigateToStatsTabButton.click();
   };
 };
 exports.ExplorationEditorPage = ExplorationEditorPage;
