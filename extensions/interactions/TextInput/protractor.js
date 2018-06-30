@@ -27,9 +27,17 @@ var customizeInteraction = function(elem, placeholderText, heightOfBox) {
   ).setValue(heightOfBox);
 };
 
-var expectInteractionDetailsToMatch = function(elem) {
-  // TODO (Jacob) add checks for the placeholder text and the height of the
-  // textbox.
+var expectInteractionDetailsToMatch = function(
+    elem, placeholderText, heightOfBox) {
+  if (placeholderText) {
+    expect((element(by.tagName('oppia-interactive-text-input'))
+      .getAttribute('placeholder-with-value')))
+      .toEqual('&quot;' + placeholderText + '&quot;');
+  }
+  if (heightOfBox) {
+    expect((element(by.tagName('oppia-interactive-text-input'))
+      .getAttribute('rows-with-value'))).toEqual(heightOfBox.toString());
+  }
   expect(
     elem.element(by.tagName('oppia-interactive-text-input')).isPresent()
   ).toBe(true);

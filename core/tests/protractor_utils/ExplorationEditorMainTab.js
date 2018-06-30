@@ -31,6 +31,8 @@ var ExplorationEditorMainTab = function() {
   /*
    * Interactive elements
    */
+  var addResponseDetails = element(
+    by.css('.protractor-test-add-response-details'));
   var addResponseHeader = element(
     by.css('.protractor-test-add-response-modal-header'));
   var multipleChoiceAnswerOptions = function (optionNum) {
@@ -61,6 +63,9 @@ var ExplorationEditorMainTab = function() {
   var interactionNodeLabel = function(nodeElement) {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
+  var interactionTab = function(tabId) {
+    return element(by.css('.protractor-test-interaction-tab-' + tabId));
+  };
   var interactionTile = function(interactionId) {
     return element(by.css(
       '.protractor-test-interaction-tile-' + interactionId));
@@ -82,9 +87,6 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-state-name-container'));
   var stateNameInput = element(
     by.css('.protractor-test-state-name-input'));
-  var interactionTab = function(tabId) {
-    return element(by.css('.protractor-test-interaction-tab-' + tabId));
-  };
 
   /*
    * Buttons
@@ -114,6 +116,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-delete-response'));
   var dismissWelcomeModalButton = element(
     by.css('.protractor-test-dismiss-welcome-modal'));
+  var nextTutorialStageButton = element.all(by.css('.nextBtn'));
   var saveAnswerButton = element(
     by.css('.protractor-test-save-answer'));
   var saveInteractionButton = element(
@@ -130,6 +133,71 @@ var ExplorationEditorMainTab = function() {
   /*
    * Actions
    */
+
+  // TUTORIAL
+
+  this.exitTutorial = function() {
+    // If the editor welcome modal shows up, exit it.
+    editorWelcomeModal.then(function(modals) {
+      if (modals.length === 1) {
+        dismissWelcomeModalButton.click();
+      } else if (modals.length !== 0) {
+        throw 'Expected to find at most one \'welcome modal\'';
+      }
+    });
+
+    expect(element(by.css('.protractor-test-welcome-modal')).isPresent())
+      .toBe(false);
+
+    // Otherwise, if the editor tutorial shows up, exit it.
+    element.all(by.css('.skipBtn')).then(function(buttons) {
+      if (buttons.length === 1) {
+        buttons[0].click();
+      } else if (buttons.length !== 0) {
+        throw 'Expected to find at most one \'exit tutorial\' button';
+      }
+    });
+  };
+
+  this.finishTutorial = function() {
+    // Finish the tutorial.
+    element.all(by.buttonText('Finish')).then(function(buttons) {
+      if (buttons.length === 1) {
+        buttons[0].click().then(function(){
+          // Making sure tutorial modal is closed
+          browser.wait(until.elementToBeClickable(neutralElement), 5000,
+            'Tutorial modal taking too long to close');
+          neutralElement.click();
+        });
+      } else {
+        throw 'Expected to find exactly one \'Finish\' button';
+      }
+    });
+  };
+
+  this.progressInTutorial = function() {
+    // Progress to the next instruction in the tutorial.
+    nextTutorialStageButton.then(function(buttons) {
+      if (buttons.length === 1) {
+        buttons[0].click();
+      } else {
+        throw 'Expected to find exactly one \'next\' button';
+      }
+    });
+  };
+
+  this.startTutorial = function() {
+    editorWelcomeModal.isPresent().then(function() {
+      element(by.css('.protractor-test-start-tutorial')).click().then(
+        function() {
+          browser.wait(until.visibilityOf(element(by.css('.ng-joyride-title'))),
+            5000, 'Tutorial modal taking too long to appear');
+        });
+    });
+  };
+
+  // RESPONSE EDITOR
+
   // This clicks the "add new response" button and then selects the rule type
   // and enters its parameters, and closes the rule editor. Any number of rule
   // parameters may be specified after the ruleName.
@@ -152,14 +220,12 @@ var ExplorationEditorMainTab = function() {
     addResponseButton.click();
 
     // Set the rule description.
-    var addResponseDetails = element(
-      by.css('.protractor-test-add-response-details'));
     var args = [addResponseDetails, interactionId, ruleName];
     for (var i = 5; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-
-    _selectRule(interactionId, ruleName);
+    expect(addResponseDetails.isDisplayed()).toBe(true);
+    _selectRule(addResponseDetails, interactionId, ruleName);
     _setRuleParameters.apply(null, args);
 
     // Open the feedback entry form if it is not already open.
@@ -170,12 +236,12 @@ var ExplorationEditorMainTab = function() {
     });
 
     if (feedbackInstructions) {
-    // Set feedback contents.
+      // Set feedback contents.
       _setOutcomeFeedback(feedbackInstructions);
     }
     // If the destination is being changed, open the corresponding editor.
     if (destStateName) {
-      // Set destination contents.
+    // Set destination contents.
       _setOutcomeDest(
         destStateName, createState, null);
     }
@@ -186,29 +252,6 @@ var ExplorationEditorMainTab = function() {
     browser.wait(until.presenceOf(neutralElement), 5000,
       'neutralElement taking too long to appear in addResponse');
     neutralElement.click();
-  };
-
-  this.exitTutorial = function() {
-  // If the editor welcome modal shows up, exit it.
-    editorWelcomeModal.then(function(modals) {
-      if (modals.length === 1) {
-        dismissWelcomeModalButton.click();
-      } else if (modals.length !== 0) {
-        throw 'Expected to find at most one \'welcome modal\'';
-      }
-    });
-
-    expect(element(by.css('.protractor-test-welcome-modal')).isPresent())
-      .toBe(false);
-
-    // Otherwise, if the editor tutorial shows up, exit it.
-    element.all(by.css('.skipBtn')).then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click();
-      } else if (buttons.length !== 0) {
-        throw 'Expected to find at most one \'exit tutorial\' button';
-      }
-    });
   };
 
   // Rules are zero-indexed; 'default' denotes the default outcome.
@@ -229,6 +272,36 @@ var ExplorationEditorMainTab = function() {
     });
 
     return {
+      /**
+       * Check for correct rule parameters
+       * @param {string} [interactionId] - Interaction type.
+       * @param {string} [ruleName] - Appropriate rule of provided interaction.
+       * @param {string[]} [feedbackTextArray] - Exact feedback text to match.
+       */
+      expectRuleToBe: function(interactionId, ruleName, feedbackTextArray) {
+        var ruleDescription = _getRuleDescription(interactionId, ruleName);
+        // Expected input = is equal to {{a|NonnegativeInt}} and
+        // {{b|NonnegativeInt}}.
+        ruleDescription = _replaceAngularSelectors(
+          ruleDescription, feedbackTextArray);
+        // Expected output = is equal to feedbackTextElement and
+        // feedbackTextElement.
+        ruleDescription += '...';
+        // Adding ... to end of string
+        var answerTab = element(by.css('.protractor-test-answer-tab'));
+        expect(answerTab.getText()).toEqual(ruleDescription);
+      },
+      /**
+       * Check for correct learner's feedback
+       * @param {string} [feedbackInstructionText] - Exact feedback to match.
+       */
+      expectFeedbackInstructionToBe: function(feedbackInstructionsText) {
+        // The first rule block's RTE editor
+        var feedbackRTE = element.all(by.css('.oppia-rule-block')).first()
+          .element(by.className('oppia-rte-editor'));
+        expect(feedbackRTE.getText()).toEqual(
+          feedbackInstructionsText);
+      },
       setFeedback: function(richTextInstructions) {
       // Begin editing feedback.
         openOutcomeFeedBackEditor.click();
@@ -290,7 +363,7 @@ var ExplorationEditorMainTab = function() {
         for (var i = 2; i < arguments.length; i++) {
           args.push(arguments[i]);
         }
-        _selectRule(interactionId, ruleName);
+        _selectRule(ruleDetails, interactionId, ruleName);
         _setRuleParameters.apply(null, args);
 
         // Save the new rule.
@@ -391,15 +464,9 @@ var ExplorationEditorMainTab = function() {
   // for most purposes. Additional arguments may be sent to this function,
   // and they will be passed on to the relevant interaction editor.
   this.setInteraction = function(interactionId) {
-    openInteraction(interactionId);
-    customizeInteraction.apply(null, arguments);
-    // If the "Add Response" modal opens, close it.
-    addResponseHeader.isPresent().then(function(isVisible) {
-      if (isVisible) {
-        expect(closeAddResponseButton.isDisplayed()).toBe(true);
-        closeAddResponseButton.click();
-      }
-    });
+    this.openInteraction(interactionId);
+    this.customizeInteraction.apply(null, arguments);
+    this.closeAddResponseModal();
     // Click on neutral element to make sure modal is closed.
     browser.wait(until.invisibilityOf(addResponseHeader), 5000);
     neutralElement.click();
@@ -407,7 +474,7 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  var openInteraction = function(interactionId) {
+  this.openInteraction = function(interactionId) {
     deleteInteractionButton.isPresent().then(
       function(isVisible) {
       // If there is already an interaction present, delete it.
@@ -447,7 +514,7 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  var customizeInteraction = function(interactionId) {
+  this.customizeInteraction = function(interactionId) {
     if (arguments.length > 1) {
       var elem = interactionEditor;
       var customizationArgs = [elem];
@@ -467,6 +534,18 @@ var ExplorationEditorMainTab = function() {
     });
     browser.wait(until.invisibilityOf(saveInteractionButton), 5000,
       'Customize Interaction modal taking too long to close');
+  };
+
+  // This function should not usually be invoked directly; please consider
+  // using setInteraction instead.
+  this.closeAddResponseModal = function() {
+    // If the "Add Response" modal opens, close it.
+    addResponseHeader.isPresent().then(function(isVisible) {
+      if (isVisible) {
+        expect(closeAddResponseButton.isDisplayed()).toBe(true);
+        closeAddResponseButton.click();
+      }
+    });
   };
 
   // Likewise this can receive additional arguments.
@@ -507,6 +586,10 @@ var ExplorationEditorMainTab = function() {
   };
 
   // RULES
+  this.selectRuleInAddResponseModal = function(interactionId, ruleName) {
+    _selectRule(addResponseDetails, interactionId, ruleName);
+  };
+
   var _getRuleDescription = function(interactionId, ruleName) {
     if (ruleTemplates.hasOwnProperty(interactionId)) {
       if (ruleTemplates[interactionId].hasOwnProperty(ruleName)) {
@@ -523,21 +606,19 @@ var ExplorationEditorMainTab = function() {
   // the types of the rule input parameters.
   var _getRuleParameterTypes = function(interactionId, ruleName) {
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
-
-    var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
-      undefined : ruleDescription.indexOf('{{');
+    // Expected input = is equal to {{a|NonnegativeInt}} and
+    // {{b|NonnegativeInt}}
     var parameterTypes = [];
-    while (parameterStart !== undefined) {
-      var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
-      parameterTypes.push(
-        ruleDescription.substring(
-          ruleDescription.indexOf('|', parameterStart) + 1, parameterEnd - 2));
-
-      var nextParameterStart =
-      (ruleDescription.indexOf('{{', parameterEnd) === -1) ?
-        undefined : ruleDescription.indexOf('{{', parameterEnd);
-      parameterStart = nextParameterStart;
+    var re = /\|(.*?)\}/ig;
+    // Matched result = Array[|NonnegativeInt}, |NonnegativeInt}]
+    var matchedString = ruleDescription.match(re);
+    // Slicing first and last letter.
+    if (matchedString) {
+      matchedString.forEach(function(elem) {
+        parameterTypes.push(elem.toString().slice(1, -1));
+      });
     }
+    // Expected output = Array[NonnegativeInt, NonnegativeInt]
     return parameterTypes;
   };
 
@@ -571,81 +652,75 @@ var ExplorationEditorMainTab = function() {
     }
   };
 
+  /**
+   * Parse for Angular selectors and remove them.
+   * @param {string} [ruleDescription] - Interaction type.
+   * @param {string|string[]} [providedText] - Feedback text to replace with.
+   */
+  var _replaceAngularSelectors = function(ruleDescription, providedText) {
+    // Expected input = is equal to {{a|NonnegativeInt}} and
+    // {{b|NonnegativeInt}}.
+    var re = /{{[a-z][\|](.*?)}}/ig;
+    // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}]
+    var matchedString = ruleDescription.match(re);
+    // Replacing Angular selectors in ruleDescription with ...
+    var textArray = [];
+    if (matchedString) {
+      if (providedText === '...') {
+        matchedString.forEach(function() {
+          textArray.push(providedText);
+        });
+      } else {
+        // Replacing Angular selectors in ruleDescription with provided text
+        matchedString.forEach(function(elem, index) {
+          textArray.push(providedText[index]);
+        });
+      }
+      if (textArray.length !== matchedString.length) {
+        throw Error('# of text(' + textArray.length +
+        ') is expected to match # of angular selectors(' +
+        (matchedString.length) + ')');
+      }
+      matchedString.forEach(function(elem, index) {
+        ruleDescription = ruleDescription.replace(elem, textArray[index]);
+      });
+    }
+    return ruleDescription;
+  };
+
   // This function selects a rule from the dropdown,
   // but does not set any of its input parameters.
-  var _selectRule = function(interactionId, ruleName) {
+  var _selectRule = function(ruleElem, interactionId, ruleName) {
+    // Expected input = is equal to {{a|NonnegativeInt}} and
+    // {{b|NonnegativeInt}}.
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
-
-    var parameterStart = (
-      ruleDescription.indexOf('{{') === -1) ?
-      undefined :
-      ruleDescription.indexOf('{{');
-    // From the ruleDescription string we can deduce both the description used
-    // in the page (which will have the form "is equal to ...") and the types
-    // of the parameter objects, which will later tell us which object editors
-    // to use to enter the parameterValues.
-    var ruleDescriptionInDropdown = ruleDescription.substring(
-      0, parameterStart);
-    while (parameterStart !== undefined) {
-      var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
-      var nextParameterStart =
-      (ruleDescription.indexOf('{{', parameterEnd) === -1) ?
-        undefined : ruleDescription.indexOf('{{', parameterEnd);
-      ruleDescriptionInDropdown = ruleDescriptionInDropdown + '...' +
-      ruleDescription.substring(parameterEnd, nextParameterStart);
-      parameterStart = nextParameterStart;
-    }
+    ruleDescription = _replaceAngularSelectors(ruleDescription, '...');
+    // Expected output = is equal to ... and ...
+    var ruleDescriptionInDropdown = ruleDescription;
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
-
     expect(answerDescription.isDisplayed()).toBe(true);
     answerDescription.click();
-
-    element.all(by.css('.select2-dropdown')).map(function(selectorElement) {
-      selectorElement.all(by.cssContainingText(
-        'li.select2-results__option', ruleDescriptionInDropdown
-      )).filter(function(elem) {
-      // We need to do this check because some options may only have
-      // 'ruleDescriptionInDropdown' as a substring.
-        return elem.getText().then(function(text) {
-          return text === ruleDescriptionInDropdown;
-        });
-      }).then(function(optionElements) {
-        if (optionElements.length !== 1) {
-          throw (
-            'Expected exactly one rule option to match: ' +
-          ruleDescriptionInDropdown + '; found ' + optionElements.length +
-          ' instead');
-        }
-        optionElements[0].click();
-      });
-    });
+    var ruleDropdownElement = element(by.cssContainingText(
+      '.select2-results__option', ruleDescriptionInDropdown));
+    browser.wait(until.visibilityOf(ruleDropdownElement), 5000,
+      'Rule dropdown element taking too long to appear');
+    ruleDropdownElement.click();
   };
 
   // STATE GRAPH
 
   this.deleteState = function(stateName) {
     general.scrollToTop();
-    interactionNode.map(function(stateElement) {
-      return interactionNodeLabel(stateElement).getText();
-    }).then(function(listOfNames) {
-      var matched = false;
-      for (var i = 0; i < listOfNames.length; i++) {
-        if (listOfNames[i] === stateName) {
-          var deleteNodeButton = interactionNode.get(i).element(by.css(
-            '.protractor-test-delete-node'));
-          expect(deleteNodeButton.isDisplayed());
-          deleteNodeButton.click();
-          expect(confirmDeleteStateButton.isDisplayed());
-          confirmDeleteStateButton.click();
-          matched = true;
-        }
-      }
-      if (!matched) {
-        throw Error('State ' + stateName + ' not found by ' +
-      'explorationEditorPage.deleteState');
-      }
-    });
+    var nodeElement = element(
+      by.cssContainingText('.protractor-test-node', stateName));
+    browser.wait(until.visibilityOf(nodeElement), 5000, 'State ' + stateName +
+      ' takes too long to appear or does not exist');
+    nodeElement.element(by.css('.protractor-test-delete-node')).click();
+    expect(confirmDeleteStateButton.isDisplayed());
+    confirmDeleteStateButton.click();
+    browser.wait(until.invisibilityOf(confirmDeleteStateButton), 5000,
+      'Deleting state takes too long');
   };
 
   // For this to work, there must be more than one name, otherwise the
@@ -676,7 +751,7 @@ var ExplorationEditorMainTab = function() {
       }
       if (!matched) {
         throw Error('State ' + targetName +
-      ' not found by explorationEditorPage.moveToState');
+      ' not found by explorationEditorMainTab.moveToState.');
       }
     });
   };

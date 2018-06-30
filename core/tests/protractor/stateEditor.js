@@ -22,6 +22,8 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
@@ -30,25 +32,29 @@ var CreatorDashboardPage =
 
 describe('State editor', function() {
   var explorationPlayerPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
 
   beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
     function() {
-      var NUM_TUTORIAL_STAGES = 7;
+      var NUM_TUTORIAL_STAGES = 6;
       users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       users.login('userTutorial@stateEditor.com');
 
       workflow.createExplorationAndStartTutorial();
-      editor.startTutorial();
-      for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
-        editor.progressInTutorial();
+      explorationEditorMainTab.startTutorial();
+      for (var i = 0; i < NUM_TUTORIAL_STAGES; i++) {
+        explorationEditorMainTab.progressInTutorial();
         general.waitForSystem();
       }
-      editor.finishTutorial();
+      explorationEditorMainTab.finishTutorial();
       users.logout();
     }
   );
@@ -58,14 +64,15 @@ describe('State editor', function() {
     users.login('user1@stateEditor.com');
 
     workflow.createExploration();
-    editor.setContent(forms.toRichText('plain text'));
-    editor.setInteraction('Continue', 'click here');
-    editor.setDefaultOutcome(null, 'final card', true);
+    explorationEditorMainTab.setContent(forms.toRichText('plain text'));
+    explorationEditorMainTab.setInteraction('Continue', 'click here');
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination('final card', true, null);
 
-    // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    // Setup a terminating state.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
 
     general.moveToPlayer();
     explorationPlayerPage.expectContentToMatch(forms.toRichText('plain text'));
@@ -81,7 +88,7 @@ describe('State editor', function() {
     users.createUser('user2@stateEditor.com', 'user2StateEditor');
     users.login('user2@stateEditor.com');
     workflow.createExploration();
-    editor.setContent(function(richTextEditor) {
+    explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold text');
       richTextEditor.appendPlainText(' ');
       richTextEditor.appendItalicText('italic text');
@@ -90,15 +97,15 @@ describe('State editor', function() {
       richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
       richTextEditor.appendUnorderedList(['an entry', 'another entry']);
     });
-    editor.setInteraction(
+    explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
     editor.setDefaultOutcome(null, 'final card', true);
 
     // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
 
     general.moveToPlayer();
     explorationPlayerPage.expectExplorationToNotBeOver();
@@ -115,17 +122,22 @@ describe('State editor', function() {
     users.login('user3@stateEditor.com');
 
     workflow.createExploration();
-    editor.setContent(forms.toRichText('some content'));
-    editor.setInteraction('NumericInput');
-    editor.addResponse('NumericInput', function(richTextEditor) {
-      richTextEditor.appendBoldText('correct');
-    }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
-    editor.setDefaultOutcome(forms.toRichText('out of bounds'), null, false);
+    explorationEditorMainTab.setContent(forms.toRichText('some content'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse('NumericInput',
+      function(richTextEditor) {
+        richTextEditor.appendBoldText('correct');
+      }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('out of bounds'));
+    explorationEditorMainTab.getResponseEditor('default').setDestination(
+      null, false, null);
 
-    // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    // Setup a terminating state.
+
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
 
     general.moveToPlayer();
     explorationPlayerPage.submitAnswer('NumericInput', 5);
@@ -152,20 +164,19 @@ describe('State editor', function() {
     users.login('user4@stateEditor.com');
 
     workflow.createExploration();
-    editor.setContent(forms.toRichText('some content'));
+    explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore the
     // customization modal and the save interaction button does not appear.
-    editor.openInteraction('NumericInput');
+    explorationEditorMainTab.openInteraction('NumericInput');
     var saveInteractionBtn = element(
       by.css('.protractor-test-save-interaction'));
     expect(saveInteractionBtn.isPresent()).toBe(false);
-
-    editor.closeAddResponseModal();
+    explorationEditorMainTab.closeAddResponseModal();
 
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
-    editor.openInteraction('Continue');
+    explorationEditorMainTab.openInteraction('Continue');
     expect(saveInteractionBtn.isPresent()).toBe(true);
     users.logout();
   });
@@ -176,13 +187,13 @@ describe('State editor', function() {
     users.login('user5@stateEditor.com');
 
     workflow.createExploration();
-    editor.setContent(forms.toRichText('some content'));
+    explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore, on
     // re-clicking, a modal opens up informing the user that this interaction
     // does not have any customization options. To dismiss this modal, user
     // clicks 'Okay' implying that he/she has got the message.
-    editor.setInteraction('NumericInput');
+    explorationEditorMainTab.setInteraction('NumericInput');
     element(by.css('.protractor-test-interaction')).click();
     var okayBtn = element(
       by.css('.protractor-test-close-no-customization-modal'));
@@ -193,7 +204,7 @@ describe('State editor', function() {
     // modal opens up containing the customization arguments for this input.
     // The user can dismiss this modal by clicking the 'Save Interaction'
     // button.
-    editor.setInteraction('Continue');
+    explorationEditorMainTab.setInteraction('Continue');
     element(by.css('.protractor-test-interaction')).click();
     var saveInteractionBtn = element(
       by.css('.protractor-test-save-interaction'));
@@ -208,19 +219,20 @@ describe('State editor', function() {
     users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
     users.login('stateEditorUser1@example.com');
     workflow.createExploration();
-    editor.setContent(forms.toRichText('some content'));
+    explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
-    editor.openInteraction('TextInput');
-    editor.customizeInteraction('TextInput', 'My PlaceHolder', 2);
-    editor.selectRuleInAddResponseModal('TextInput', 'Equals');
-    editor.setRuleParametersInAddResponseModal('TextInput',
-      'Equals', 'Some Text');
-    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
-    editor.selectRuleInAddResponseModal('TextInput', 'Contains');
-    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
-    editor.closeAddResponseModal();
-
-    editor.saveChanges();
+    explorationEditorMainTab.setInteraction('TextInput', 'Click Me!', 2);
+    explorationEditorMainTab.expectInteractionToMatch(
+      'TextInput', 'Click Me!', 2);
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('You must be happy!'),
+      null, false, 'FuzzyEquals', 'happy');
+    // Verify rule input by checking editor's response tab.
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'TextInput', 'FuzzyEquals', ['"happy"']);
+    explorationEditorMainTab.getResponseEditor(0)
+      .expectFeedbackInstructionToBe('You must be happy!');
+    explorationEditorPage.saveChanges();
     users.logout();
   });
 
