@@ -225,7 +225,6 @@ var ExplorationEditorMainTab = function() {
       args.push(arguments[i]);
     }
     expect(addResponseDetails.isDisplayed()).toBe(true);
-
     _selectRule(addResponseDetails, interactionId, ruleName);
     _setRuleParameters.apply(null, args);
 
@@ -664,24 +663,24 @@ var ExplorationEditorMainTab = function() {
     var re = /{{[a-z][\|](.*?)}}/ig;
     // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}]
     var matchedString = ruleDescription.match(re);
-    // Replacing matched strings in ruleDescription with ...
+    // Replacing Angular selectors in ruleDescription with ...
     var textArray = [];
-    if (providedText === '...') {
-      matchedString.forEach(function() {
-        textArray.push(providedText);
-      });
-    } else {
-      // Replacing matched strings in ruleDescription with provided text
-      matchedString.forEach(function(elem, index) {
-        textArray.push(providedText[index]);
-      });
-    }
-    if (textArray.length !== matchedString.length) {
-      throw Error('# of text(' + textArray.length +
-      ') is expected to match # of angular selectors(' +
-      (matchedString.length) + ')');
-    }
     if (matchedString) {
+      if (providedText === '...') {
+        matchedString.forEach(function() {
+          textArray.push(providedText);
+        });
+      } else {
+        // Replacing Angular selectors in ruleDescription with provided text
+        matchedString.forEach(function(elem, index) {
+          textArray.push(providedText[index]);
+        });
+      }
+      if (textArray.length !== matchedString.length) {
+        throw Error('# of text(' + textArray.length +
+        ') is expected to match # of angular selectors(' +
+        (matchedString.length) + ')');
+      }
       matchedString.forEach(function(elem, index) {
         ruleDescription = ruleDescription.replace(elem, textArray[index]);
       });
