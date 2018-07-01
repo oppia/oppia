@@ -556,6 +556,27 @@ var ExplorationEditorMainTab = function() {
 
   // INTERACTIONS
 
+  this.deleteInteraction = function() {
+    browser.wait(until.elementToBeClickable(deleteInteractionButton), 5000,
+      'Delete Interaction button is not clickable').then(
+      function(isClickable) {
+        if (isClickable) {
+          deleteInteractionButton.click();
+          // Click through the "are you sure?" warning.
+          browser.wait(until.elementToBeClickable(
+            confirmDeleteInteractionButton), 5000,
+          'Confirm Delete Interaction button takes too long to appear')
+            .then(function(){
+              confirmDeleteInteractionButton.click();
+            });
+        }
+      });
+    // Click on neutral element to make sure modal is closed.
+    browser.wait(until.invisibilityOf(confirmDeleteInteractionButton), 5000,
+      'Delete Interaction modal takes too long to close');
+    neutralElement.click();
+  };
+
   // This function should be used as the standard way to specify interactions
   // for most purposes. Additional arguments may be sent to this function,
   // and they will be passed on to the relevant interaction editor.
@@ -571,23 +592,16 @@ var ExplorationEditorMainTab = function() {
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
   var createNewInteraction = function(interactionId) {
-    deleteInteractionButton.isDisplayed().then(
-      function(isVisible) {
-      // If there is already an interaction present, delete it.
-        if (isVisible) {
-          browser.wait(until.elementToBeClickable(deleteInteractionButton),
-            5000, 'Delete Interaction button takes too long to appear');
-          deleteInteractionButton.click();
-          // Click through the "are you sure?" warning.
-          browser.wait(until.elementToBeClickable(
-            confirmDeleteInteractionButton), 5000,
-          'Confirm Delete Interaction button takes too long to appear');
-          confirmDeleteInteractionButton.click();
+    browser.wait(until.invisibilityOf(deleteInteractionButton), 5000,
+      'Please delete interaction before creating a new one').then(
+      function(deleteButtonNotVisible) {
+        if (deleteButtonNotVisible) {
+          browser.wait(until.elementToBeClickable(addInteractionButton), 5000,
+            'Add Interaction button takes too long to appear');
+          expect(addInteractionButton.isDisplayed()).toBe(true);
+          addInteractionButton.click();
         }
       });
-
-    expect(addInteractionButton.isDisplayed()).toBe(true);
-    addInteractionButton.click();
 
     var INTERACTION_ID_TO_TAB_NAME = {
       Continue: 'General',
