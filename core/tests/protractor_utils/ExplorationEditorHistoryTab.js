@@ -18,6 +18,7 @@
  */
 
 var forms = require('./forms.js');
+var until = protractor.ExpectedConditions;
 
 var ExplorationEditorHistoryTab = function() {
   /*
@@ -58,11 +59,15 @@ var ExplorationEditorHistoryTab = function() {
   this.getHistoryGraph = function() {
     return {
       closeStateHistory: function() {
-        expect(closeStateHistoryButton.isDisplayed()).toBe(true);
-        closeStateHistoryButton.click();
-        var until = protractor.ExpectedConditions;
-        browser.wait(until.invisibilityOf(element(
-          by.css('CodeMirror-merge'))), 5000);
+        browser.wait(until.elementToBeClickable(closeStateHistoryButton), 5000,
+          'Close State History button is not clickable')
+          .then(function(isClickable) {
+            if (isClickable) {
+              expect(closeStateHistoryButton.isDisplayed()).toBe(true);
+              closeStateHistoryButton.click();
+              browser.wait(until.invisibilityOf(closeStateHistoryButton), 5000);
+            }
+          });
       },
       deselectTwoVersions: function(versionNumber1, versionNumber2) {
         // Array starts at 0.

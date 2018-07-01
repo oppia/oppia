@@ -60,6 +60,7 @@ var submitAnswer = function(elem, answer) {
       // to an element which does not exist.
       inputElem.isPresent().then(function(present) {
         if (present) {
+          inputElem.clear();
           inputElem.sendKeys(answer + '\n');
         }
       });

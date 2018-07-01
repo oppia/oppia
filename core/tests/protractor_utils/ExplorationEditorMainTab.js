@@ -54,6 +54,8 @@ var ExplorationEditorMainTab = function() {
   var editOutcomeDestDropdownOptions = function(targetOption) {
     return element.all(by.cssContainingText('option', targetOption)).first();
   };
+  var editParamChanges = element(
+    by.css('.protractor-test-state-edit-param-changes'));
   var feedbackBubble = element(by.css('.protractor-test-feedback-bubble'));
   var feedbackEditor = element(by.css('.protractor-test-open-feedback-editor'));
   var interaction = element(by.css('.protractor-test-interaction'));
@@ -92,10 +94,14 @@ var ExplorationEditorMainTab = function() {
    * Buttons
    */
   var addAnswerButton = element(by.css('.protractor-test-add-answer'));
+  var addHintButton = element(by.css('.protractor-test-oppia-add-hint-button'));
   var addNewResponseButton = element(
     by.css('.protractor-test-add-new-response'));
+  var addParamButon = element(by.css('.protractor-test-add-param-button'));
   var addResponseButton = element(
     by.css('.protractor-test-open-add-response-modal'));
+  var addSolutionButton = element(
+    by.css('.protractor-test-oppia-add-solution-button'));
   var addInteractionButton = element(
     by.css('.protractor-test-open-add-interaction-modal'));
   var cancelOutcomeDestButton = element(
@@ -119,12 +125,17 @@ var ExplorationEditorMainTab = function() {
   var nextTutorialStageButton = element.all(by.css('.nextBtn'));
   var saveAnswerButton = element(
     by.css('.protractor-test-save-answer'));
+  var saveHintButton = element(by.css('.protractor-test-save-hint'));
+  var saveHintEditButton = element(
+    by.css('.protractor-test-save-hint-edit'));
   var saveInteractionButton = element(
     by.css('.protractor-test-save-interaction'));
   var saveOutcomeDestButton = element(
     by.css('.protractor-test-save-outcome-dest'));
   var saveOutcomeFeedbackButton = element(
     by.css('.protractor-test-save-outcome-feedback'));
+  var saveParamChangesButton = element(
+    by.css('.protractor-test-save-param-changes-button'));
   var saveStateContentButton = element(
     by.css('.protractor-test-save-state-content'));
   var stateNameSubmitButton = stateNameContainer.element(
@@ -140,6 +151,8 @@ var ExplorationEditorMainTab = function() {
     // If the editor welcome modal shows up, exit it.
     editorWelcomeModal.then(function(modals) {
       if (modals.length === 1) {
+        browser.wait(until.elementToBeClickable(dismissWelcomeModalButton),
+          5000, 'Tutorial modal taking too long to appear');
         dismissWelcomeModalButton.click();
       } else if (modals.length !== 0) {
         throw 'Expected to find at most one \'welcome modal\'';
@@ -198,23 +211,25 @@ var ExplorationEditorMainTab = function() {
 
   // RESPONSE EDITOR
 
-  // This clicks the "add new response" button and then selects the rule type
-  // and enters its parameters, and closes the rule editor. Any number of rule
-  // parameters may be specified after the ruleName.
-  // - interactionId: the name of the interaction type, e.g. NumericInput.
-  // - feedbackInstructions: a rich-text object containing feedback, or null.
-  // - destStateName: the name of the destination state of the rule, or null if
-  //     the rule loops to the current state.
-  // - createState: true if the rule creates a new state, else false.
-  // - refresherExplorationId: the id of refresher exploration for the current
-  //     state (if applicable), by default, should be null.
-  // - ruleName: the name of the rule, e.g. IsGreaterThan.
-  //
-  // Note that feedbackInstructions may be null (which means 'specify no
-  // feedback'), and only represents a single feedback element.
+
+  /**
+   * This clicks the "add new response" button and then selects the rule type
+   * and enters its parameters, and closes the rule editor. Any number of rule
+   * parameters may be specified after the ruleName.
+   * Note that feedbackInstructions may be null (which means 'specify no
+   * feedback'), and only represents a single feedback element.
+   * @param {string} interactionId - Interaction type e.g. NumericInput
+   * @param {object} feedbackInstructions - A RTE object containing feedback
+   *                                        or null
+   * @param {string} destStateName - New destination state or 'try again'/null
+   * @param {boolean} createNewState - True if the rule creates a new state,
+   *                                   else false.
+   * @param {string} ruleName - The name of the rule, e.g. IsGreaterThan, must
+   *                            match with interaction type.
+   */
   this.addResponse = function(
       interactionId, feedbackInstructions, destStateName,
-      createState, ruleName) {
+      createNewState, ruleName) {
     expect(addResponseButton.isDisplayed()).toEqual(true);
     // Open the "Add Response" modal if it is not already open.
     addResponseButton.click();
@@ -240,10 +255,10 @@ var ExplorationEditorMainTab = function() {
       _setOutcomeFeedback(feedbackInstructions);
     }
     // If the destination is being changed, open the corresponding editor.
-    if (destStateName) {
+    if (destStateName || destStateName !== '(try again)') {
     // Set destination contents.
       _setOutcomeDest(
-        destStateName, createState, null);
+        destStateName, createNewState, null);
     }
 
     // Close new response modal.
@@ -273,32 +288,29 @@ var ExplorationEditorMainTab = function() {
 
     return {
       /**
-       * Check for correct rule parameters
+       * Check for correct rule parameters.
        * @param {string} [interactionId] - Interaction type.
        * @param {string} [ruleName] - Appropriate rule of provided interaction.
        * @param {string[]} [feedbackTextArray] - Exact feedback text to match.
        */
       expectRuleToBe: function(interactionId, ruleName, feedbackTextArray) {
         var ruleDescription = _getRuleDescription(interactionId, ruleName);
-        // Expected input = is equal to {{a|NonnegativeInt}} and
-        // {{b|NonnegativeInt}}.
+        // Replace selectors with feedbackTextArray's elements.
         ruleDescription = _replaceAngularSelectors(
           ruleDescription, feedbackTextArray);
-        // Expected output = is equal to feedbackTextElement and
-        // feedbackTextElement.
         ruleDescription += '...';
-        // Adding ... to end of string
+        // Adding "..." to end of string.
         var answerTab = element(by.css('.protractor-test-answer-tab'));
         expect(answerTab.getText()).toEqual(ruleDescription);
       },
       /**
-       * Check for correct learner's feedback
+       * Check for correct learner's feedback.
        * @param {string} [feedbackInstructionText] - Exact feedback to match.
        */
       expectFeedbackInstructionToBe: function(feedbackInstructionsText) {
-        // The first rule block's RTE editor
-        var feedbackRTE = element.all(by.css('.oppia-rule-block')).first()
-          .element(by.className('oppia-rte-editor'));
+        // The first rule block's RTE.
+        var feedbackRTE = responseBody(responseNum).
+          element(by.className('oppia-rte-editor'));
         expect(feedbackRTE.getText()).toEqual(
           feedbackInstructionsText);
       },
@@ -315,16 +327,17 @@ var ExplorationEditorMainTab = function() {
       // This saves the rule after the destination is selected.
       //  - destinationName: The name of the state to move to, or null to stay
       //    on the same state.
-      //  - createState: whether the destination state is new and must be
+      //  - createNewState: whether the destination state is new and must be
       //    created at this point.
       setDestination: function(
-          destinationName, createState, refresherExplorationId) {
+          destinationName, createNewState, refresherExplorationId) {
       // Begin editing destination.
         expect(openOutcomeDestEditor.isDisplayed()).toBe(true);
         openOutcomeDestEditor.click();
 
         // Set destination contents.
-        _setOutcomeDest(destinationName, createState, refresherExplorationId);
+        _setOutcomeDest(
+          destinationName, createNewState, refresherExplorationId);
 
         // Save destination.
         expect(saveOutcomeDestButton.isDisplayed()).toBe(true);
@@ -354,7 +367,7 @@ var ExplorationEditorMainTab = function() {
       addRule: function(interactionId, ruleName) {
       // Additional parameters may be provided after ruleName.
 
-      // Add the rule
+      // Add the rule.
         addAnswerButton.click();
 
         // Set the rule description.
@@ -397,12 +410,13 @@ var ExplorationEditorMainTab = function() {
     expect(addResponseButton.isPresent()).toBeFalsy();
   };
 
-  var _setOutcomeDest = function(destName, createDest, refresherExplorationId) {
-    expect(destName === null && createDest).toBe(false);
+  var _setOutcomeDest = function(
+      destName, createNewDest, refresherExplorationId) {
+    expect(destName === null && createNewDest).toBe(false);
 
-    if (createDest) {
+    if (createNewDest) {
       targetOption = _NEW_STATE_OPTION;
-    } else if (destName === null) {
+    } else if (destName === null | destName === '(try again)') {
       targetOption = _CURRENT_STATE_OPTION;
     } else {
       targetOption = destName;
@@ -413,7 +427,7 @@ var ExplorationEditorMainTab = function() {
       .toBe(true);
     editOutcomeDestDropdownOptions(targetOption).click();
 
-    if (createDest) {
+    if (createNewDest) {
       editOutcomeDestStateInput.sendKeys(destName);
     } else if (refresherExplorationId) {
       editOutcomeDestAddExplorationId.sendKeys(refresherExplorationId);
@@ -458,15 +472,117 @@ var ExplorationEditorMainTab = function() {
     forms.expectRichText(stateContentDisplay).toMatch(richTextInstructions);
   };
 
+  // HINT
+
+  this.addHint = function(hint) {
+    addHintButton.click();
+    var addHintModal = element(
+      by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
+    browser.wait(until.visibilityOf(addHintModal), 5000,
+      'Add hint modal takes too long to appear');
+    element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
+      .last().click();
+    browser.switchTo().activeElement().sendKeys(hint);
+    browser.wait(until.elementToBeClickable(saveHintButton), 5000,
+      'Save Hint button takes too long to appear');
+    saveHintButton.click();
+    // Click on neutral element to make sure modal is closed.
+    browser.wait(until.invisibilityOf(addHintModal), 5000,
+      'Add Hint modal takes too long to close');
+    neutralElement.click();
+  };
+
+  // Hints are zero-indexed.
+  this.getHintEditor = function(hintNum) {
+    var confirmDeteletHintButton = element(
+      by.css('.protractor-test-confirm-delete-hint'));
+    var headerElem = element.all(by.css('.protractor-test-hint-tab')).get(
+      hintNum);
+    var deleteHintIcon = headerElem.element(
+      by.css('.protractor-test-delete-response'));
+    var hintBodyElem = element(
+      by.css('.protractor-test-hint-body-' + hintNum));
+    hintBodyElem.isPresent().then(function(isVisible) {
+      if (!isVisible) {
+        headerElem.click();
+      }
+    });
+    return {
+      setHint: function(hint) {
+        var editHintIcon = element(
+          by.css('.protractor-test-open-hint-editor'));
+        editHintIcon.click();
+        browser.switchTo().activeElement().clear();
+        browser.switchTo().activeElement().sendKeys(hint);
+        browser.wait(until.elementToBeClickable(saveHintEditButton), 5000,
+          'Save Hint button takes too long to appear');
+        saveHintEditButton.click();
+        browser.wait(until.visibilityOf(editHintIcon), 5000,
+          'Add Hint modal takes too long to close');
+      },
+      deleteHint: function() {
+        deleteHintIcon.click();
+        confirmDeteletHintButton.click();
+      },
+      expectCannotDeleteHint: function() {
+        expect(deleteHintIcon.isPresent()).toBeFalsy();
+      }
+    };
+  };
+
+  this.addSolution = function(interactionId, solution) {
+    addSolutionButton.click();
+    var addOrUpdateSolutionModal = element(
+      by.css('.protractor-test-add-or-update-solution-modal'));
+    browser.wait(until.visibilityOf(addOrUpdateSolutionModal), 5000,
+      'Add/Update Solution modal takes to long to appear');
+    interactions.getInteraction(interactionId).submitAnswer(
+      element(by.css('.protractor-test-interaction-html')),
+      solution.correctAnswer);
+    element(by.css('.protractor-test-explanation-textarea'))
+      .all(by.tagName('p')).first().click();
+    browser.switchTo().activeElement().sendKeys(solution.explanation);
+    var submitSolutionButton = element(
+      by.css('.protractor-test-submit-solution-button'));
+    browser.wait(until.elementToBeClickable(submitSolutionButton), 5000,
+      'Submit Solution button takes too long to appear');
+    submitSolutionButton.click();
+    // Click on neutral element to make sure modal is closed.
+    browser.wait(until.invisibilityOf(addOrUpdateSolutionModal), 5000,
+      'Add/Update Solution modal takes too long to close');
+    neutralElement.click();
+  };
+
   // INTERACTIONS
+
+  this.deleteInteraction = function() {
+    browser.wait(until.elementToBeClickable(deleteInteractionButton), 5000,
+      'Delete Interaction button is not clickable').then(
+      function(isClickable) {
+        if (isClickable) {
+          deleteInteractionButton.click();
+          // Click through the "are you sure?" warning.
+          browser.wait(until.elementToBeClickable(
+            confirmDeleteInteractionButton), 5000,
+          'Confirm Delete Interaction button takes too long to appear')
+            .then(function(){
+              confirmDeleteInteractionButton.click();
+            });
+        }
+      });
+    // Click on neutral element to make sure modal is closed.
+    browser.wait(until.invisibilityOf(confirmDeleteInteractionButton), 5000,
+      'Delete Interaction modal takes too long to close');
+    neutralElement.click();
+  };
 
   // This function should be used as the standard way to specify interactions
   // for most purposes. Additional arguments may be sent to this function,
   // and they will be passed on to the relevant interaction editor.
   this.setInteraction = function(interactionId) {
-    this.openInteraction(interactionId);
-    this.customizeInteraction.apply(null, arguments);
-    this.closeAddResponseModal();
+    createNewInteraction(interactionId);
+    customizeInteraction.apply(null, arguments);
+    closeAddResponseModal();
     // Click on neutral element to make sure modal is closed.
     browser.wait(until.invisibilityOf(addResponseHeader), 5000);
     neutralElement.click();
@@ -474,19 +590,17 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  this.openInteraction = function(interactionId) {
-    deleteInteractionButton.isPresent().then(
-      function(isVisible) {
-      // If there is already an interaction present, delete it.
-        if (isVisible) {
-          deleteInteractionButton.click();
-          // Click through the "are you sure?" warning.
-          confirmDeleteInteractionButton.click();
+  var createNewInteraction = function(interactionId) {
+    browser.wait(until.invisibilityOf(deleteInteractionButton), 5000,
+      'Please delete interaction before creating a new one').then(
+      function(deleteButtonNotVisible) {
+        if (deleteButtonNotVisible) {
+          browser.wait(until.elementToBeClickable(addInteractionButton), 5000,
+            'Add Interaction button takes too long to appear');
+          expect(addInteractionButton.isDisplayed()).toBe(true);
+          addInteractionButton.click();
         }
       });
-
-    expect(addInteractionButton.isDisplayed()).toBe(true);
-    addInteractionButton.click();
 
     var INTERACTION_ID_TO_TAB_NAME = {
       Continue: 'General',
@@ -514,7 +628,7 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  this.customizeInteraction = function(interactionId) {
+  var customizeInteraction = function(interactionId) {
     if (arguments.length > 1) {
       var elem = interactionEditor;
       var customizationArgs = [elem];
@@ -538,7 +652,7 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  this.closeAddResponseModal = function() {
+  var closeAddResponseModal = function() {
     // If the "Add Response" modal opens, close it.
     addResponseHeader.isPresent().then(function(isVisible) {
       if (isVisible) {
@@ -566,23 +680,59 @@ var ExplorationEditorMainTab = function() {
     expect((deleteInteractionButton).isPresent()).toBeFalsy();
   };
 
-  this.setStateName = function(name) {
-    expect(stateNameContainer.isDisplayed()).toBe(true);
-    stateNameContainer.click();
-    stateNameInput.clear();
-    stateNameInput.sendKeys(name);
-    expect(stateNameSubmitButton.isDisplayed()).toBe(true);
-    stateNameSubmitButton.click().then(function() {
-      // Wait for the state to refresh.
-      general.waitForSystem();
-    });
-  };
-
   var _setOutcomeFeedback = function(richTextInstructions) {
     var feedbackEditor = forms.RichTextEditor(
       feedbackBubble);
     feedbackEditor.clear();
     richTextInstructions(feedbackEditor);
+  };
+
+  // PARAMETERS
+
+  // This function adds a multiple-choice parameter change, creating the
+  // parameter if necessary.
+  this.addMultipleChoiceParameterChange = function(paramName, paramValues) {
+    editParamChanges.click();
+    addParamButon.click();
+
+    var editorRowElem = element.all(by.css(
+      '.protractor-test-param-changes-list')).last();
+
+    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
+
+    editorRowElem.element(by.cssContainingText('option', 'to one of')).click();
+
+    paramValues.forEach(function(paramValue) {
+      var item = editorRowElem.all(by.tagName('input')).last();
+      item.clear();
+      item.sendKeys(paramValue);
+    });
+
+    saveParamChangesButton.click();
+
+    general.waitForSystem(500);
+  };
+
+  // This function adds a parameter change, creating the parameter if necessary.
+  this.addParameterChange = function(paramName, paramValue) {
+    editParamChanges.click();
+    addParamButon.click();
+
+    var editorRowElem = element.all(by.css(
+      '.protractor-test-param-changes-list')).last();
+
+    forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
+
+    /* Setting parameter value is difficult via css since input fields
+    are dynamically generated. We isolate it as the last input in the
+    current parameter changes UI. */
+    var item = editorRowElem.all(by.tagName('input')).last();
+    item.clear();
+    item.sendKeys(paramValue);
+
+    saveParamChangesButton.click();
+
+    general.waitForSystem(500);
   };
 
   // RULES
@@ -606,19 +756,19 @@ var ExplorationEditorMainTab = function() {
   // the types of the rule input parameters.
   var _getRuleParameterTypes = function(interactionId, ruleName) {
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
-    // Expected input = is equal to {{a|NonnegativeInt}} and
-    // {{b|NonnegativeInt}}
+    // NumericInput's 'Equals' ruleDescription example:
+    // is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}.
     var parameterTypes = [];
     var re = /\|(.*?)\}/ig;
     // Matched result = Array[|NonnegativeInt}, |NonnegativeInt}]
-    var matchedString = ruleDescription.match(re);
+    var angularSelectors = ruleDescription.match(re);
     // Slicing first and last letter.
-    if (matchedString) {
-      matchedString.forEach(function(elem) {
+    if (angularSelectors) {
+      angularSelectors.forEach(function(elem) {
         parameterTypes.push(elem.toString().slice(1, -1));
       });
     }
-    // Expected output = Array[NonnegativeInt, NonnegativeInt]
+    // Expected sample output = Array[NonnegativeInt, NonnegativeInt]
     return parameterTypes;
   };
 
@@ -653,36 +803,32 @@ var ExplorationEditorMainTab = function() {
   };
 
   /**
-   * Parse for Angular selectors and remove them.
+   * Parse for Angular selectors in ruleDescription and replace them.
    * @param {string} [ruleDescription] - Interaction type.
-   * @param {string|string[]} [providedText] - Feedback text to replace with.
+   * @param {string[]} [providedText] - Feedback text to replace with.
    */
   var _replaceAngularSelectors = function(ruleDescription, providedText) {
-    // Expected input = is equal to {{a|NonnegativeInt}} and
-    // {{b|NonnegativeInt}}.
+    // NumericInput's 'Equals' ruleDescription example:
+    // is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}.
     var re = /{{[a-z][\|](.*?)}}/ig;
     // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}]
-    var matchedString = ruleDescription.match(re);
-    // Replacing Angular selectors in ruleDescription with ...
+    var angularSelectors = ruleDescription.match(re);
     var textArray = [];
-    if (matchedString) {
-      if (providedText === '...') {
-        matchedString.forEach(function() {
-          textArray.push(providedText);
-        });
-      } else {
-        // Replacing Angular selectors in ruleDescription with provided text
-        matchedString.forEach(function(elem, index) {
-          textArray.push(providedText[index]);
-        });
-      }
-      if (textArray.length !== matchedString.length) {
-        throw Error('# of text(' + textArray.length +
-        ') is expected to match # of angular selectors(' +
-        (matchedString.length) + ')');
-      }
-      matchedString.forEach(function(elem, index) {
-        ruleDescription = ruleDescription.replace(elem, textArray[index]);
+    // Return as-is if string does not contain Angular selectors.
+    if (angularSelectors) {
+      // Replacing Angular selectors in ruleDescription with provided text.
+      angularSelectors.forEach(function(selector, index) {
+        if (providedText[0] === '...') {
+          ruleDescription = ruleDescription.replace(selector, '...');
+        } else {
+          if (providedText.length !== angularSelectors.length) {
+            throw Error('# of feedback text(' + textArray.length +
+            ') is expected to match # of angular selectors(' +
+            (angularSelectors.length) + ')');
+          }
+          ruleDescription = ruleDescription.replace(
+            selector, providedText[index].toString());
+        }
       });
     }
     return ruleDescription;
@@ -691,18 +837,16 @@ var ExplorationEditorMainTab = function() {
   // This function selects a rule from the dropdown,
   // but does not set any of its input parameters.
   var _selectRule = function(ruleElem, interactionId, ruleName) {
-    // Expected input = is equal to {{a|NonnegativeInt}} and
-    // {{b|NonnegativeInt}}.
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
-    ruleDescription = _replaceAngularSelectors(ruleDescription, '...');
-    // Expected output = is equal to ... and ...
+    // Replace selectors with "...".
+    ruleDescription = _replaceAngularSelectors(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
     expect(answerDescription.isDisplayed()).toBe(true);
     answerDescription.click();
-    var ruleDropdownElement = element(by.cssContainingText(
-      '.select2-results__option', ruleDescriptionInDropdown));
+    var ruleDropdownElement = element.all(by.cssContainingText(
+      '.select2-results__option', ruleDescriptionInDropdown)).first();
     browser.wait(until.visibilityOf(ruleDropdownElement), 5000,
       'Rule dropdown element taking too long to appear');
     ruleDropdownElement.click();
@@ -745,7 +889,7 @@ var ExplorationEditorMainTab = function() {
         if (listOfNames[i] === targetName) {
           interactionNode.get(i).click();
           matched = true;
-          // Wait to re-load the entire state editor
+          // Wait to re-load the entire state editor.
           general.waitForSystem();
         }
       }
@@ -753,6 +897,18 @@ var ExplorationEditorMainTab = function() {
         throw Error('State ' + targetName +
       ' not found by explorationEditorMainTab.moveToState.');
       }
+    });
+  };
+
+  this.setStateName = function(name) {
+    expect(stateNameContainer.isDisplayed()).toBe(true);
+    stateNameContainer.click();
+    stateNameInput.clear();
+    stateNameInput.sendKeys(name);
+    expect(stateNameSubmitButton.isDisplayed()).toBe(true);
+    stateNameSubmitButton.click().then(function() {
+      // Wait for the state to refresh.
+      general.waitForSystem();
     });
   };
 

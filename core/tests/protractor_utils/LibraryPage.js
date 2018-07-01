@@ -18,6 +18,7 @@
  */
 
 var forms = require('./forms.js');
+var until = protractor.ExpectedConditions;
 
 var LibraryPage = function(){
   var LIBRARY_URL_SUFFIX = '/library';
@@ -128,6 +129,8 @@ var LibraryPage = function(){
 
   this.expectExplorationRatingToEqual = function(name, ratingValue) {
     _getExplorationElements(name).then(function(elems) {
+      browser.wait(until.visibilityOf(elems[0]), 5000,
+        'Rating card takes too long to appear');
       elems[0].element(by.css(
         '.protractor-test-exp-summary-tile-rating'
       )).getText().then(function(value) {
