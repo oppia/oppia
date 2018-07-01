@@ -602,12 +602,14 @@ describe('Full exploration editor', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
+    general.waitForSystem();
     users.logout();
 
     users.login('user10@editorAndPlayer.com');
     libraryPage.get();
     libraryPage.findExploration('Recommended Exploration 1');
     libraryPage.playExploration('Recommended Exploration 1');
+    general.waitForSystem();
     // Using the Id from Player and create a new exploration
     // and add the Id as suggestion.
     general.getExplorationIdFromPlayer()
@@ -626,6 +628,7 @@ describe('Full exploration editor', function() {
         explorationEditorPage.navigateToMainTab();
         explorationEditorPage.saveChanges();
         workflow.publishExploration();
+        general.waitForSystem();
       });
 
     // Play-test the exploration and visit the recommended exploration
@@ -665,6 +668,7 @@ describe('Rating', function() {
     users.createUser(userEmail, userName);
     users.login(userEmail);
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_RATINGTEST);
     libraryPage.playExploration(EXPLORATION_RATINGTEST);
     explorationPlayerPage.expectExplorationNameToBe(explorationName);
     explorationPlayerPage.rateExploration(ratingValue);
@@ -696,6 +700,7 @@ describe('Rating', function() {
     addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
 
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_RATINGTEST);
     libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
 
     libraryPage.playExploration(EXPLORATION_RATINGTEST);
