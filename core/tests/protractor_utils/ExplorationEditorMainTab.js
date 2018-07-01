@@ -307,8 +307,8 @@ var ExplorationEditorMainTab = function() {
        */
       expectFeedbackInstructionToBe: function(feedbackInstructionsText) {
         // The first rule block's RTE.
-        var feedbackRTE = element.all(by.css('.oppia-rule-block')).first()
-          .element(by.className('oppia-rte-editor'));
+        var feedbackRTE = responseBody(responseNum).
+          element(by.className('oppia-rte-editor'));
         expect(feedbackRTE.getText()).toEqual(
           feedbackInstructionsText);
       },
