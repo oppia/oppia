@@ -584,9 +584,10 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
-  it('should play the recommended exploration successfully', function() {
-    users.createUser('user9@editorAndPlayer.com', 'user9EditorAndPlayer');
-    users.createUser('user10@editorAndPlayer.com', 'user10EditorAndPlayer');
+  fit('should play the recommended exploration successfully', function() {
+    users.createUser('user9@editorAndPlayer.com', 'user9editorAndPlayer');
+    users.createUser('user10@editorAndPlayer.com',
+      'user10editorAndPlayer');
     users.login('user9@editorAndPlayer.com');
     // Publish new exploration.
     workflow.createExploration();
@@ -603,7 +604,7 @@ describe('Full exploration editor', function() {
     workflow.publishExploration();
     users.logout();
 
-    users.login('user10@editorAndPlayer.com');
+    users.login('user10@editorAndPlayer');
     libraryPage.get();
     libraryPage.findExploration('Recommended Exploration 1');
     libraryPage.playExploration('Recommended Exploration 1');
@@ -664,7 +665,7 @@ describe('Rating', function() {
     users.createUser(userEmail, userName);
     users.login(userEmail);
     libraryPage.get();
-    libraryPage.playExploration(explorationName);
+    libraryPage.playExploration(EXPLORATION_RATINGTEST);
     explorationPlayerPage.expectExplorationNameToBe(explorationName);
     explorationPlayerPage.rateExploration(ratingValue);
     users.logout();
@@ -672,9 +673,9 @@ describe('Rating', function() {
 
   it('should display ratings on exploration when minimum ratings have been ' +
      'submitted', function() {
-    users.createUser('user1@explorationRating.com', 'user1Rating');
+    users.createUser('user11@explorationRating.com', 'user11Rating');
     // Create a test exploration.
-    users.login('user1@explorationRating.com');
+    users.login('user11@explorationRating.com');
     workflow.createAndPublishExploration(
       EXPLORATION_RATINGTEST, CATEGORY_BUSINESS,
       'this is an objective', LANGUAGE_ENGLISH);
