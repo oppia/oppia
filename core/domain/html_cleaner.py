@@ -233,13 +233,13 @@ def wrap_with_siblings(tag, p):
 
 
 # List of oppia noninteractive inline components.
-oppia_inline_components = [
+OPPIA_INLINE_COMPONENTS = [
     'oppia-noninteractive-link',
     'oppia-noninteractive-math'
 ]
 
 # List of oppia noninteractive block components.
-oppia_block_components = [
+OPPIA_BLOCK_COMPONENTS = [
     'oppia-noninteractive-image',
     'oppia-noninteractive-video',
     'oppia-noninteractive-collapsible',
@@ -409,7 +409,7 @@ def convert_to_textangular(html_data):
                 wrap_with_siblings(tag, soup.new_tag('p'))
 
     # Ensure that oppia inline components are wrapped in an allowed parent.
-    for tag_name in oppia_inline_components:
+    for tag_name in OPPIA_INLINE_COMPONENTS:
         for tag in soup.findAll(tag_name):
             if tag.parent.name in ['blockquote', '[document]']:
                 wrap_with_siblings(tag, soup.new_tag('p'))
@@ -420,7 +420,7 @@ def convert_to_textangular(html_data):
             link.unwrap()
 
     # Ensure that oppia block components are wrapped in an allowed parent.
-    for tag_name in oppia_block_components:
+    for tag_name in OPPIA_BLOCK_COMPONENTS:
         for tag in soup.findAll(tag_name):
             if tag.parent.name in ['blockquote', '[document]']:
                 wrap_with_siblings(tag, soup.new_tag('p'))
@@ -523,6 +523,7 @@ def convert_to_ckeditor(html_data):
     # If there is no previous sibling, the tag is unwrapped and each of
     # it's direct child is given an additional margin-left of 40px.
     list_tags = ['ol', 'ul']
+    margin_re = re.compile('margin-left:([0-9]+)px;')
     for tag_name in list_tags:
         for tag in soup.findAll(tag_name):
             if tag.parent.name in list_tags:
@@ -535,9 +536,7 @@ def convert_to_ckeditor(html_data):
                     if 'style' in tag.attrs:
                         style = tag['style']
                         # This is to obtain the margin value of the tag.
-                        match = re.search('margin-left:[0-9]+px;', style)
-                        margin_value += int(
-                            style[match.start() + 12: match.end() - 3])
+                        margin_value += int(margin_re.search(style).group(1))
 
                     for child in tag.children:
                         child_margin_value = margin_value
@@ -545,14 +544,13 @@ def convert_to_ckeditor(html_data):
                             style = child['style']
                             # This is to obtain the margin value of the child
                             # tag.
-                            match = re.search('margin-left:[0-9]+px;', style)
                             child_margin_value += int(
-                                style[match.start() + 12: match.end() - 3])
+                                margin_re.search(style).group(1))
                         child['style'] = 'margin-left:%dpx;' % margin_value
                     tag.unwrap()
 
     # Move block components out of p, pre, strong and em tags.
-    for tag_name in oppia_block_components:
+    for tag_name in OPPIA_BLOCK_COMPONENTS:
         for tag in soup.findAll(tag_name):
             while tag.parent.name in ['p', 'pre', 'strong', 'em']:
                 new_parent_for_prev = soup.new_tag(tag.parent.name)
