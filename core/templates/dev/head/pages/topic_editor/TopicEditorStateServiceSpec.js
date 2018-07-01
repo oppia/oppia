@@ -125,7 +125,9 @@ describe('Topic editor state service', function() {
       canonical_story_ids: ['story_1'],
       additional_story_ids: ['story_2'],
       uncategorized_skill_ids: ['skill_1'],
-      uncategorized_skill_descriptions: ['Description 1'],
+      skill_id_to_description_dict: {
+        skill_1: 'Description 1'
+      },
       subtopics: [],
       language_code: 'en',
       next_subtopic_id: 1,
@@ -140,20 +142,22 @@ describe('Topic editor state service', function() {
       canonical_story_ids: ['story_3'],
       additional_story_ids: ['story_4'],
       uncategorized_skill_ids: ['skill_5'],
-      uncategorized_skill_descriptions: ['Description 5'],
       subtopics: [
         {
           id: 1,
           title: 'Title',
-          skill_ids: ['skill_2'],
-          skill_descriptions: ['Description 2']
+          skill_ids: ['skill_2']
         }, {
           id: 2,
           title: 'Title 2',
-          skill_ids: ['skill_3'],
-          skill_descriptions: ['Description 3']
+          skill_ids: ['skill_3']
         }
       ],
+      skill_id_to_description_dict: {
+        skill_2: 'Description 2',
+        skill_3: 'Description 3',
+        skill_5: 'Description 5'
+      },
       language_code: 'en',
       next_subtopic_id: 3,
       subtopic_schema_version: '1',
@@ -230,10 +234,10 @@ describe('Topic editor state service', function() {
     subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
       secondSubtopicPageObject);
     TopicEditorStateService.setSubtopicPage(subtopicPage);
-    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(1);
+    expect(TopicEditorStateService.getCachedSubtopicPages().length).toEqual(1);
     subtopicPage.setHtmlData('<p>New Data</p>');
     TopicEditorStateService.setSubtopicPage(subtopicPage);
-    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(1);
+    expect(TopicEditorStateService.getCachedSubtopicPages().length).toEqual(1);
     expect(
       TopicEditorStateService.getSubtopicPage().getHtmlData()
     ).toEqual('<p>New Data</p>');
@@ -250,21 +254,21 @@ describe('Topic editor state service', function() {
     subtopicPage.setId('validTopicId-2');
     subtopicPage.setHtmlData('<p>Data 2</p>');
     TopicEditorStateService.setSubtopicPage(subtopicPage);
-    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(3);
+    expect(TopicEditorStateService.getCachedSubtopicPages().length).toEqual(3);
     TopicEditorStateService.deleteSubtopicPage('validTopicId', 1);
-    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(2);
+    expect(TopicEditorStateService.getCachedSubtopicPages().length).toEqual(2);
 
     expect(
-      TopicEditorStateService.getSubtopicPages()[0].getId()
+      TopicEditorStateService.getCachedSubtopicPages()[0].getId()
     ).toEqual('validTopicId-0');
     expect(
-      TopicEditorStateService.getSubtopicPages()[0].getHtmlData()
+      TopicEditorStateService.getCachedSubtopicPages()[0].getHtmlData()
     ).toEqual('<p>Data</p>');
     expect(
-      TopicEditorStateService.getSubtopicPages()[1].getId()
+      TopicEditorStateService.getCachedSubtopicPages()[1].getId()
     ).toEqual('validTopicId-1');
     expect(
-      TopicEditorStateService.getSubtopicPages()[1].getHtmlData()
+      TopicEditorStateService.getCachedSubtopicPages()[1].getHtmlData()
     ).toEqual('<p>Data 2</p>');
   });
 
@@ -280,15 +284,15 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
     $rootScope.$apply();
     expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
-    expect(TopicEditorStateService.getSubtopicPages().length).toBe(2);
+    expect(TopicEditorStateService.getCachedSubtopicPages().length).toBe(2);
     TopicEditorStateService.deleteSubtopicPage('validTopicId', 1);
 
-    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(1);
+    expect(TopicEditorStateService.getCachedSubtopicPages().length).toEqual(1);
     expect(
-      TopicEditorStateService.getSubtopicPages()[0].getId()
+      TopicEditorStateService.getCachedSubtopicPages()[0].getId()
     ).toEqual('validTopicId-0');
     expect(
-      TopicEditorStateService.getSubtopicPages()[0].getHtmlData()
+      TopicEditorStateService.getCachedSubtopicPages()[0].getHtmlData()
     ).toEqual('<p>Data</p>');
   });
 
@@ -304,15 +308,15 @@ describe('Topic editor state service', function() {
     TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
     $rootScope.$apply();
     expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
-    expect(TopicEditorStateService.getSubtopicPages().length).toBe(2);
+    expect(TopicEditorStateService.getCachedSubtopicPages().length).toBe(2);
     TopicEditorStateService.deleteSubtopicPage('validTopicId', 0);
 
-    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(1);
+    expect(TopicEditorStateService.getCachedSubtopicPages().length).toEqual(1);
     expect(
-      TopicEditorStateService.getSubtopicPages()[0].getId()
+      TopicEditorStateService.getCachedSubtopicPages()[0].getId()
     ).toEqual('validTopicId-1');
     expect(
-      TopicEditorStateService.getSubtopicPages()[0].getHtmlData()
+      TopicEditorStateService.getCachedSubtopicPages()[0].getHtmlData()
     ).toEqual('<p>Data 1</p>');
   });
 
@@ -415,8 +419,7 @@ describe('Topic editor state service', function() {
     expect(topic.getDescription()).toEqual('Topic description loading');
     expect(topic.getCanonicalStoryIds()).toEqual([]);
     expect(topic.getAdditionalStoryIds()).toEqual([]);
-    expect(topic.getUncategorizedSkillIds()).toEqual([]);
-    expect(topic.getUncategorizedSkillDescriptions()).toEqual([]);
+    expect(topic.getUncategorizedSkills()).toEqual([]);
     expect(topic.getSubtopics()).toEqual([]);
   });
 

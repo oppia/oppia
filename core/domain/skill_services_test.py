@@ -89,7 +89,12 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         skill_descriptions = skill_services.get_skill_descriptions_by_ids([
             self.SKILL_ID, 'skill_2'])
 
-        self.assertEqual(skill_descriptions, ['Description', 'Description 2'])
+        self.assertEqual(
+            skill_descriptions, {
+                self.SKILL_ID: 'Description',
+                'skill_2': 'Description 2'
+            }
+        )
 
     def test_get_skill_by_id(self):
         expected_skill = self.skill.to_dict()

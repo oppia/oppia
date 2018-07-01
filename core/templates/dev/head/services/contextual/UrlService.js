@@ -50,14 +50,14 @@ oppia.factory('UrlService', ['$window', function($window) {
     // story editor, since both have topic id in their url.
     getTopicIdFromUrl: function() {
       var pathname = this.getPathname();
-      if (pathname.match(/\/(story|topic)_editor\/\w{12}\b/g)) {
+      if (pathname.match(/\/(story|topic)_editor\/(\w|-){12}\b/g)) {
         return pathname.split('/')[2];
       }
-      throw Error('Invalid story id url');
+      throw Error('Invalid topic id url');
     },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();
-      if (pathname.match(/\/story_editor(\/\w{12}\b){2}/g)) {
+      if (pathname.match(/\/story_editor(\/(\w|-){12}\b){2}/g)) {
         return pathname.split('/')[3];
       }
       throw Error('Invalid story id url');

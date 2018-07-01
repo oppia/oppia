@@ -31,17 +31,20 @@ describe('Topic object factory', function() {
       description: 'Topic description',
       version: 1,
       uncategorized_skill_ids: ['skill_1', 'skill_2'],
-      uncategorized_skill_descriptions: ['Description 1', 'Description 2'],
       canonical_story_ids: ['story_1', 'story_4'],
       additional_story_ids: ['story_2', 'story_3'],
       subtopics: [{
         id: 1,
         title: 'Title',
-        skill_ids: ['skill_3'],
-        skill_descriptions: ['Description 3']
+        skill_ids: ['skill_3']
       }],
       next_subtopic_id: 1,
-      language_code: 'en'
+      language_code: 'en',
+      skill_id_to_description_dict: {
+        skill_1: 'Description 1',
+        skill_2: 'Description 2',
+        skill_3: 'Description 3'
+      }
     };
     _sampleTopic = TopicObjectFactory.create(sampleTopicBackendObject);
   }));
@@ -55,8 +58,7 @@ describe('Topic object factory', function() {
     expect(topic.getSubtopics()).toEqual([]);
     expect(topic.getAdditionalStoryIds()).toEqual([]);
     expect(topic.getCanonicalStoryIds()).toEqual([]);
-    expect(topic.getUncategorizedSkillIds()).toEqual([]);
-    expect(topic.getUncategorizedSkillDescriptions()).toEqual([]);
+    expect(topic.getUncategorizedSkills()).toEqual([]);
   });
 
   it('should correctly remove the various array elements', function() {
@@ -65,9 +67,10 @@ describe('Topic object factory', function() {
     _sampleTopic.removeUncategorizedSkill('skill_1');
     expect(_sampleTopic.getAdditionalStoryIds()).toEqual(['story_3']);
     expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_4']);
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_2']);
-    expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-      'Description 2']);
+    expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+      id: 'skill_2',
+      description: 'Description 2'
+    }]);
   });
 
   it('should be able to copy from another topic', function() {
@@ -80,14 +83,17 @@ describe('Topic object factory', function() {
       additional_story_ids: ['story_10'],
       canonical_story_ids: ['story_5'],
       uncategorized_skill_ids: ['skill_2', 'skill_3'],
-      uncategorized_skill_descriptions: ['Description 2', 'Description 3'],
       next_subtopic_id: 2,
       subtopics: [{
         id: 1,
         title: 'Title',
-        skill_ids: ['skill_1'],
-        skill_descriptions: ['Description 1']
-      }]
+        skill_ids: ['skill_1']
+      }],
+      skill_id_to_description_dict: {
+        skill_1: 'Description 1',
+        skill_2: 'Description 2',
+        skill_3: 'Description 3'
+      }
     });
 
     expect(_sampleTopic).not.toBe(secondTopic);

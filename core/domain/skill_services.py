@@ -253,15 +253,16 @@ def get_skill_descriptions_by_ids(skill_ids):
         skill_ids: str. The list of skill ids.
 
     Returns:
-        list(str). The skill descriptions of skills corresponding to given ids.
+        dict. The skill descriptions of skills keyed by their corresponding ids.
     """
     skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
-    skill_descriptions = [
-        skill_summary_model.description
-        for skill_summary_model in skill_summary_models
-        if skill_summary_model is not None
-    ]
-    return skill_descriptions
+    skill_id_to_description_dict = {}
+
+    for skill_summary_model in skill_summary_models:
+        if skill_summary_model is not None:
+            skill_id_to_description_dict[skill_summary_model.id] = (
+                skill_summary_model.description)
+    return skill_id_to_description_dict
 
 
 def get_new_skill_id():

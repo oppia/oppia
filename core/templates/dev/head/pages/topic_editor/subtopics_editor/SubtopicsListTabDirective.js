@@ -38,10 +38,8 @@ oppia.directive('subtopicsListTab', [
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.subtopics = $scope.topic.getSubtopics();
             $scope.subtopicEditorIsShown = false;
-            $scope.uncategorizedSkillIds =
-              $scope.topic.getUncategorizedSkillIds();
-            $scope.uncategorizedSkillDescriptions =
-              $scope.topic.getUncategorizedSkillDescriptions();
+            $scope.uncategorizedSkills =
+              $scope.topic.getUncategorizedSkills();
           };
 
           $scope.editSubtopic = function(subtopic) {
@@ -51,7 +49,7 @@ oppia.directive('subtopicsListTab', [
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
                 '/pages/topic_editor/subtopics_editor/' +
-                'subtopic_editor_directive.html'),
+                'subtopic_editor_modal_directive.html'),
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
@@ -120,7 +118,7 @@ oppia.directive('subtopicsListTab', [
               var newTitle = newValues.newTitle;
               var newHtmlData = newValues.newHtmlData;
 
-              if ((newTitle !== subtopic.getTitle()) && (newTitle !== '')) {
+              if (newTitle !== subtopic.getTitle()) {
                 TopicUpdateService.setSubtopicTitle(
                   $scope.topic, subtopic.getId(), newTitle);
               }
@@ -132,31 +130,13 @@ oppia.directive('subtopicsListTab', [
             });
           };
 
-          $scope.getSkillEditorUrl = function(subtopicIndex, skillIndex) {
-            var skillId;
-            if (subtopicIndex === null) {
-              skillId = $scope.uncategorizedSkillIds[skillIndex];
-            } else {
-              skillId = $scope.subtopics[
-                subtopicIndex].getSkillIds()[skillIndex];
-            }
+          $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;
           };
 
-          $scope.startMoveSkill = function(oldSubtopicIndex, index) {
-            if (oldSubtopicIndex === null) {
-              $scope.skillIdToMove = $scope.uncategorizedSkillIds[index];
-              $scope.skillDescriptionToMove =
-                $scope.uncategorizedSkillDescriptions[index];
-              $scope.oldSubtopicId = null;
-            } else {
-              $scope.skillIdToMove =
-                $scope.subtopics[oldSubtopicIndex].getSkillIds()[index];
-              $scope.skillDescriptionToMove =
-                $scope.subtopics[
-                  oldSubtopicIndex].getSkillDescriptions()[index];
-              $scope.oldSubtopicId = $scope.subtopics[oldSubtopicIndex].getId();
-            }
+          $scope.startMoveSkill = function(oldSubtopic, skill) {
+            $scope.skillToMove = skill;
+            $scope.oldSubtopicId = (oldSubtopic) ? oldSubtopic.getId() : null;
           };
 
           $scope.endMoveSkill = function(newSubtopicId) {
@@ -166,12 +146,11 @@ oppia.directive('subtopicsListTab', [
 
             if (newSubtopicId === null) {
               TopicUpdateService.removeSkillFromSubtopic(
-                $scope.topic, $scope.oldSubtopicId, $scope.skillIdToMove,
-                $scope.skillDescriptionToMove);
+                $scope.topic, $scope.oldSubtopicId, $scope.skillToMove);
             } else {
               TopicUpdateService.moveSkillToSubtopic(
                 $scope.topic, $scope.oldSubtopicId, newSubtopicId,
-                $scope.skillIdToMove, $scope.skillDescriptionToMove);
+                $scope.skillToMove);
             }
             _initEditor();
           };

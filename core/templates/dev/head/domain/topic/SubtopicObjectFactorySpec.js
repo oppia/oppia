@@ -28,10 +28,14 @@ describe('Subtopic object factory', function() {
     var sampleSubtopicBackendObject = {
       id: 1,
       title: 'Title',
-      skill_ids: ['skill_1', 'skill_2'],
-      skill_descriptions: ['Description 1', 'Description 2']
+      skill_ids: ['skill_1', 'skill_2']
     };
-    _sampleSubtopic = SubtopicObjectFactory.create(sampleSubtopicBackendObject);
+    var sampleSkillIdToDesriptionMap = {
+      skill_1: 'Description 1',
+      skill_2: 'Description 2'
+    };
+    _sampleSubtopic = SubtopicObjectFactory.create(
+      sampleSubtopicBackendObject, sampleSkillIdToDesriptionMap);
   }));
 
   it('should be able to create a subtopic object with given title and id',
@@ -39,8 +43,7 @@ describe('Subtopic object factory', function() {
       var subtopic = SubtopicObjectFactory.createFromTitle(2, 'Title2');
       expect(subtopic.getId()).toBe(2);
       expect(subtopic.getTitle()).toBe('Title2');
-      expect(subtopic.getSkillIds()).toEqual([]);
-      expect(subtopic.getSkillDescriptions()).toEqual([]);
+      expect(subtopic.getSkills()).toEqual([]);
     });
 
   it('should not add duplicate elements to skill ids list', function() {
@@ -49,7 +52,9 @@ describe('Subtopic object factory', function() {
 
   it('should correctly remove a skill id', function() {
     _sampleSubtopic.removeSkill('skill_1');
-    expect(_sampleSubtopic.getSkillIds()).toEqual(['skill_2']);
-    expect(_sampleSubtopic.getSkillDescriptions()).toEqual(['Description 2']);
+    expect(_sampleSubtopic.getSkills()).toEqual([{
+      id: 'skill_2',
+      description: 'Description 2'
+    }]);
   });
 });

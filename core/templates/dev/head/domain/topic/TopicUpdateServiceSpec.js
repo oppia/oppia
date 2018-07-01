@@ -39,17 +39,19 @@ describe('Topic update service', function() {
       description: 'Topic description',
       version: 1,
       uncategorized_skill_ids: ['skill_1'],
-      uncategorized_skill_descriptions: ['Description 1'],
       canonical_story_ids: ['story_1'],
       additional_story_ids: ['story_2'],
       subtopics: [{
         id: 1,
         title: 'Title',
-        skill_ids: ['skill_2'],
-        skill_descriptions: ['Description 2']
+        skill_ids: ['skill_2']
       }],
       next_subtopic_id: 2,
-      language_code: 'en'
+      language_code: 'en',
+      skill_id_to_description_dict: {
+        skill_1: 'Description 1',
+        skill_2: 'Description 2'
+      }
     };
     var sampleSubtopicPageObject = {
       id: 'topic_id-1',
@@ -200,22 +202,28 @@ describe('Topic update service', function() {
 
   it('should add/remove an uncategorized skill id to/from a topic',
     function() {
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-      expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-        'Description 1']);
+      expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+        id: 'skill_1',
+        description: 'Description 1'
+      }]);
       TopicUpdateService.addUncategorizedSkill(
-        _sampleTopic, 'skill_3', 'Description 3');
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([
-        'skill_1', 'skill_3'
-      ]);
-      expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-        'Description 1', 'Description 3'
-      ]);
+        _sampleTopic, {
+          id: 'skill_3',
+          description: 'Description 3'
+        });
+      expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+        id: 'skill_1',
+        description: 'Description 1'
+      }, {
+        id: 'skill_3',
+        description: 'Description 3'
+      }]);
 
       UndoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-      expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-        'Description 1']);
+      expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+        id: 'skill_1',
+        description: 'Description 1'
+      }]);
     }
   );
 
@@ -223,7 +231,10 @@ describe('Topic update service', function() {
     'skill id',
   function() {
     TopicUpdateService.addUncategorizedSkill(
-      _sampleTopic, 'skill_3', 'Description 3');
+      _sampleTopic, {
+        id: 'skill_3',
+        description: 'Description 3'
+      });
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_uncategorized_skill_id',
       new_uncategorized_skill_id: 'skill_3',
@@ -236,32 +247,43 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.addUncategorizedSkill(
-        _sampleTopic, 'skill_1', 'Description 1');
+        _sampleTopic, {
+          id: 'skill_1',
+          description: 'Description 1'
+        });
     }).toThrow();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
   it('should remove/add an uncategorized skill id from/to a topic',
     function() {
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-      expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-        'Description 1']);
+      expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+        id: 'skill_1',
+        description: 'Description 1'
+      }]);
       TopicUpdateService.removeUncategorizedSkill(
-        _sampleTopic, 'skill_1', 'Description 1');
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([]);
-      expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([]);
+        _sampleTopic, {
+          id: 'skill_1',
+          description: 'Description 1'
+        }
+      );
+      expect(_sampleTopic.getUncategorizedSkills()).toEqual([]);
 
       UndoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-      expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-        'Description 1']);
+      expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+        id: 'skill_1',
+        description: 'Description 1'
+      }]);
     }
   );
 
   it('should create a proper backend change dict for removing an ' +
     'uncategorized skill id',
   function() {
-    TopicUpdateService.removeUncategorizedSkill(_sampleTopic, 'skill_1');
+    TopicUpdateService.removeUncategorizedSkill(_sampleTopic, {
+      id: 'skill_1',
+      description: 'Description 1'
+    });
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'remove_uncategorized_skill_id',
       uncategorized_skill_id: 'skill_1',
@@ -382,12 +404,13 @@ describe('Topic update service', function() {
     expect(_sampleTopic.getSubtopics().length).toEqual(1);
     TopicUpdateService.deleteSubtopic(_sampleTopic, 1);
     expect(_sampleTopic.getSubtopics()).toEqual([]);
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([
-      'skill_1', 'skill_2'
-    ]);
-    expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-      'Description 1', 'Description 2'
-    ]);
+    expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+      id: 'skill_1',
+      description: 'Description 1'
+    }, {
+      id: 'skill_2',
+      description: 'Description 2'
+    }]);
 
     expect(function() {
       UndoRedoService.undoChange(_sampleTopic);
@@ -431,37 +454,140 @@ describe('Topic update service', function() {
   });
 
   it('should move a skill id to a subtopic', function() {
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-    expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-      'Description 1']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillDescriptions()).toEqual([
-      'Description 2']);
+    expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+      id: 'skill_1',
+      description: 'Description 1'
+    }]);
+    expect(_sampleTopic.getSubtopics()[0].getSkills()).toEqual([{
+      id: 'skill_2',
+      description: 'Description 2'
+    }]);
     TopicUpdateService.moveSkillToSubtopic(
-      _sampleTopic, null, 1, 'skill_1', 'Description 1');
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([]);
-    expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([]);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual([
-      'skill_2', 'skill_1'
-    ]);
-    expect(_sampleTopic.getSubtopics()[0].getSkillDescriptions()).toEqual([
-      'Description 2', 'Description 1'
-    ]);
+      _sampleTopic, null, 1, {
+        id: 'skill_1',
+        description: 'Description 1'
+      });
+    expect(_sampleTopic.getUncategorizedSkills()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkills()).toEqual([{
+      id: 'skill_2',
+      description: 'Description 2'
+    }, {
+      id: 'skill_1',
+      description: 'Description 1'
+    }]);
 
     UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-    expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-      'Description 1']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillDescriptions()).toEqual([
-      'Description 2']);
+    expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+      id: 'skill_1',
+      description: 'Description 1'
+    }]);
+    expect(_sampleTopic.getSubtopics()[0].getSkills()).toEqual([{
+      id: 'skill_2',
+      description: 'Description 2'
+    }]);
+  });
+
+  it('should correctly create changelists when moving a skill to a new ' +
+    'subtopic', function() {
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 2, {
+        id: 'skill_1',
+        description: 'Description 1'
+      }
+    );
+    TopicUpdateService.removeSkillFromSubtopic(
+      _sampleTopic, 2, {
+        id: 'skill_1',
+        description: 'Description 1'
+      }
+    );
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
+
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 2, {
+        id: 'skill_2',
+        description: 'Description 2'
+      }
+    );
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 2, 1, {
+        id: 'skill_2',
+        description: 'Description 2'
+      }
+    );
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'remove_skill_id_from_subtopic',
+      skill_id: 'skill_2',
+      subtopic_id: 1,
+      change_affects_subtopic_page: false
+    }, {
+      cmd: 'move_skill_id_to_subtopic',
+      skill_id: 'skill_2',
+      new_subtopic_id: 1,
+      old_subtopic_id: null,
+      change_affects_subtopic_page: false
+    }]);
+    UndoRedoService.clearChanges();
+
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 2, {
+        id: 'skill_1',
+        description: 'Description 1'
+      }
+    );
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 2, {
+        id: 'skill_2',
+        description: 'Description 2'
+      }
+    );
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'remove_skill_id_from_subtopic',
+      skill_id: 'skill_2',
+      subtopic_id: 1,
+      change_affects_subtopic_page: false
+    }]);
+  });
+
+  it('should create properly decrement subtopic ids of later subtopics when ' +
+    'a newly created subtopic is deleted', function() {
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 3');
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 3, {
+        id: 'skill_2',
+        description: 'Description 2'
+      }
+    );
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'add_subtopic',
+      title: 'Title 3',
+      change_affects_subtopic_page: false,
+      subtopic_id: 2
+    }, {
+      cmd: 'move_skill_id_to_subtopic',
+      old_subtopic_id: 1,
+      new_subtopic_id: 2,
+      skill_id: 'skill_2',
+      change_affects_subtopic_page: false
+    }]);
   });
 
   it('should create a proper backend change dict for moving a skill id to a ' +
     'subtopic',
   function() {
     TopicUpdateService.moveSkillToSubtopic(
-      _sampleTopic, null, 1, 'skill_1', 'Description 1');
+      _sampleTopic, null, 1, {
+        id: 'skill_1',
+        description: 'Description 1'
+      });
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: null,
@@ -476,47 +602,63 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.moveSkillToSubtopic(
-        _sampleTopic, null, 1, 'skill_2', 'Description 2');
+        _sampleTopic, null, 1, {
+          id: 'skill_2',
+          description: 'Description 2'
+        });
     }).toThrow();
     expect(function() {
       TopicUpdateService.moveSkillToSubtopic(
-        _sampleTopic, 1, 2, 'skill_2', 'Description 2');
+        _sampleTopic, 1, 2, {
+          id: 'skill_2',
+          description: 'Description 2'
+        });
     }).toThrow();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
   it('should remove a skill id from a subtopic', function() {
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-    expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-      'Description 1']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillDescriptions()).toEqual([
-      'Description 2']);
+    expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+      id: 'skill_1',
+      description: 'Description 1'
+    }]);
+    expect(_sampleTopic.getSubtopics()[0].getSkills()).toEqual([{
+      id: 'skill_2',
+      description: 'Description 2'
+    }]);
     TopicUpdateService.removeSkillFromSubtopic(
-      _sampleTopic, 1, 'skill_2', 'Description 2');
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([
-      'skill_1', 'skill_2'
-    ]);
-    expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-      'Description 1', 'Description 2'
-    ]);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual([]);
-    expect(_sampleTopic.getSubtopics()[0].getSkillDescriptions()).toEqual([]);
+      _sampleTopic, 1, {
+        id: 'skill_2',
+        description: 'Description 2'
+      });
+    expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+      id: 'skill_1',
+      description: 'Description 1'
+    }, {
+      id: 'skill_2',
+      description: 'Description 2'
+    }]);
+    expect(_sampleTopic.getSubtopics()[0].getSkills()).toEqual([]);
 
     UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-    expect(_sampleTopic.getUncategorizedSkillDescriptions()).toEqual([
-      'Description 1']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillDescriptions()).toEqual([
-      'Description 2']);
+    expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
+      id: 'skill_1',
+      description: 'Description 1'
+    }]);
+    expect(_sampleTopic.getSubtopics()[0].getSkills()).toEqual([{
+      id: 'skill_2',
+      description: 'Description 2'
+    }]);
   });
 
   it('should create a proper backend change dict for removing a skill id ' +
     'from a subtopic',
   function() {
     TopicUpdateService.removeSkillFromSubtopic(
-      _sampleTopic, 1, 'skill_2', 'Description 2');
+      _sampleTopic, 1, {
+        id: 'skill_2',
+        description: 'Description 2'
+      });
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'remove_skill_id_from_subtopic',
       subtopic_id: 1,
@@ -530,7 +672,10 @@ describe('Topic update service', function() {
   function() {
     expect(function() {
       TopicUpdateService.removeSkillFromSubtopic(
-        _sampleTopic, 1, 'skill_1', 'Description 1');
+        _sampleTopic, 1, {
+          id: 'skill_1',
+          description: 'Description 1'
+        });
     }).toThrow();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });

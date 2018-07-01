@@ -16,6 +16,8 @@
 are created.
 """
 
+import copy
+
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import role_services
@@ -184,18 +186,17 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        topic_dict = topic.to_dict()
-        topic_dict['uncategorized_skill_descriptions'] = (
-            skill_services.get_skill_descriptions_by_ids(
-                topic_dict['uncategorized_skill_ids']))
+        skill_ids = copy.deepcopy(topic.uncategorized_skill_ids)
 
-        for subtopic in topic_dict['subtopics']:
-            subtopic['skill_descriptions'] = (
-                skill_services.get_skill_descriptions_by_ids(
-                    subtopic['skill_ids']))
+        for subtopic in topic.subtopics:
+            skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
+
+        skill_id_to_description_dict = (
+            skill_services.get_skill_descriptions_by_ids(skill_ids))
 
         self.values.update({
-            'topic': topic_dict
+            'topic_dict': topic.to_dict(),
+            'skill_id_to_description_dict': skill_id_to_description_dict
         })
 
         self.render_json(self.values)
@@ -239,17 +240,18 @@ class EditableTopicDataHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        topic_dict = topic_services.get_topic_by_id(topic_id).to_dict()
-        topic_dict['uncategorized_skill_descriptions'] = (
-            skill_services.get_skill_descriptions_by_ids(
-                topic_dict['uncategorized_skill_ids']))
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        skill_ids = copy.deepcopy(topic.uncategorized_skill_ids)
 
-        for subtopic in topic_dict['subtopics']:
-            subtopic['skill_descriptions'] = (
-                skill_services.get_skill_descriptions_by_ids(
-                    subtopic['skill_ids']))
+        for subtopic in topic.subtopics:
+            skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
+
+        skill_id_to_description_dict = (
+            skill_services.get_skill_descriptions_by_ids(skill_ids))
+
         self.values.update({
-            'topic': topic_dict
+            'topic_dict': topic.to_dict(),
+            'skill_id_to_description_dict': skill_id_to_description_dict
         })
 
         self.render_json(self.values)

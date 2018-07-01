@@ -16,7 +16,7 @@
       <span ng-if="subtopicTitleEditorIsShown">
         <form class="form-horizontal" role="form" ng-submit="updateSubtopicTitle(editableTitle)">
           <input type="text" ng-model="editableTitle">
-          <button type="submit" class="btn btn-success btn-sm">Save</button>
+          <button type="submit" ng-disabled="editableTitle === ''" class="btn btn-success btn-sm">Save</button>
           <button class="btn btn-default btn-sm" ng-click="closeSubtopicTitleEditor()">Cancel</button>
         </form>
       </span>
@@ -55,7 +55,7 @@
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn btn-primary" ng-click="save()"> Done </button>
+    <button class="btn btn-primary" ng-disabled="editableTitle === ''" ng-click="save()"> Done </button>
     <button class="btn btn-default" ng-click="cancel()"> Cancel </button>
   </div>
 </div>

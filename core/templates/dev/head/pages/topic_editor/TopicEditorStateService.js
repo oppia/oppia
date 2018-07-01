@@ -40,10 +40,11 @@ oppia.factory('TopicEditorStateService', [
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
     // The array that caches all the subtopic pages loaded by the user.
-    var _subtopicPages = [];
-    // The array that stores all the subtopic pages not loaded from the backend
-    // i.e those that correspond to newly created subtopics.
-    var _newSubtopicPages = [];
+    var _cachedSubtopicPages = [];
+    // The array that stores all the ids of the subtopic pages that were not
+    // loaded from the backend i.e those that correspond to newly created
+    // subtopics.
+    var _newSubtopicPageIds = [];
     var _subtopicPage =
       SubtopicPageObjectFactory.createInterstitialSubtopicPage();
     var _topicIsInitialized = false;
@@ -62,7 +63,7 @@ oppia.factory('TopicEditorStateService', [
     var _setTopic = function(topic) {
       _topic.copyFromTopic(topic);
       // Reset the subtopic pages list after setting new topic.
-      _subtopicPages.length = 0;
+      _cachedSubtopicPages.length = 0;
       if (_topicIsInitialized) {
         $rootScope.$broadcast(EVENT_TOPIC_REINITIALIZED);
       } else {
@@ -71,16 +72,8 @@ oppia.factory('TopicEditorStateService', [
       }
     };
     var _getSubtopicPageIndex = function(subtopicPageId) {
-      for (var i = 0; i < _subtopicPages.length; i++) {
-        if (_subtopicPages[i].getId() === subtopicPageId) {
-          return i;
-        }
-      }
-      return null;
-    };
-    var _getNewSubtopicPageIndex = function(subtopicPageId) {
-      for (var i = 0; i < _newSubtopicPages.length; i++) {
-        if (_newSubtopicPages[i].getId() === subtopicPageId) {
+      for (var i = 0; i < _cachedSubtopicPages.length; i++) {
+        if (_cachedSubtopicPages[i].getId() === subtopicPageId) {
           return i;
         }
       }
@@ -91,7 +84,7 @@ oppia.factory('TopicEditorStateService', [
     };
     var _setSubtopicPage = function(subtopicPage) {
       _subtopicPage.copyFromSubtopicPage(subtopicPage);
-      _subtopicPages.push(angular.copy(subtopicPage));
+      _cachedSubtopicPages.push(angular.copy(subtopicPage));
       $rootScope.$broadcast(EVENT_SUBTOPIC_PAGE_LOADED);
     };
     var _updateSubtopicPage = function(newBackendSubtopicPageObject) {
@@ -152,7 +145,7 @@ oppia.factory('TopicEditorStateService', [
         var subtopicPageId = _getSubtopicPageId(topicId, subtopicId);
         if (_getSubtopicPageIndex(subtopicPageId) !== null) {
           _subtopicPage = angular.copy(
-            _subtopicPages[_getSubtopicPageIndex(subtopicPageId)]);
+            _cachedSubtopicPages[_getSubtopicPageIndex(subtopicPageId)]);
           $rootScope.$broadcast(EVENT_SUBTOPIC_PAGE_LOADED);
           return;
         }
@@ -211,8 +204,8 @@ oppia.factory('TopicEditorStateService', [
         return _subtopicPage;
       },
 
-      getSubtopicPages: function() {
-        return _subtopicPages;
+      getCachedSubtopicPages: function() {
+        return _cachedSubtopicPages;
       },
 
       /**
@@ -241,49 +234,52 @@ oppia.factory('TopicEditorStateService', [
 
       /**
        * Sets the updated subtopic page object in the correct position in the
-       * _subtopicPages list.
+       * _cachedSubtopicPages list.
        */
       setSubtopicPage: function(subtopicPage) {
         if (_getSubtopicPageIndex(subtopicPage.getId()) !== null) {
-          _subtopicPages[_getSubtopicPageIndex(subtopicPage.getId())] =
+          _cachedSubtopicPages[_getSubtopicPageIndex(subtopicPage.getId())] =
             angular.copy(subtopicPage);
           _subtopicPage.copyFromSubtopicPage(subtopicPage);
         } else {
           _setSubtopicPage(subtopicPage);
-          _newSubtopicPages.push(angular.copy(subtopicPage));
+          _newSubtopicPageIds.push(subtopicPage.getId());
         }
       },
 
       deleteSubtopicPage: function(topicId, subtopicId) {
         var subtopicPageId = _getSubtopicPageId(topicId, subtopicId);
         var index = _getSubtopicPageIndex(subtopicPageId);
-        var newIndex = _getNewSubtopicPageIndex(subtopicPageId);
+        var newIndex = _newSubtopicPageIds.indexOf(subtopicPageId);
+        // If index is null, that means the corresponding subtopic page was
+        // never loaded from the backend and not that the subtopic page doesn't
+        // exist at all. So, not required to throw an error here.
         if (index === null) {
           return;
         }
-        _subtopicPages.splice(index, 1);
+        _cachedSubtopicPages.splice(index, 1);
         // If the deleted subtopic page corresponded to a newly created
         // subtopic, then the 'subtopicId' part of the id of all subsequent
         // subtopic pages should be decremented to make it in sync with the
         // their corresponding subtopic ids.
-        if (newIndex !== null) {
-          _newSubtopicPages.splice(newIndex, 1);
-          for (var i = 0; i < _subtopicPages.length; i++) {
+        if (newIndex !== -1) {
+          _newSubtopicPageIds.splice(newIndex, 1);
+          for (var i = 0; i < _cachedSubtopicPages.length; i++) {
             var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
-              _subtopicPages[i].getId());
+              _cachedSubtopicPages[i].getId());
             if (newSubtopicId > subtopicId) {
               newSubtopicId--;
-              _subtopicPages[i].setId(
+              _cachedSubtopicPages[i].setId(
                 _getSubtopicPageId(topicId, newSubtopicId));
             }
           }
-          for (var i = 0; i < _newSubtopicPages.length; i++) {
+          for (var i = 0; i < _newSubtopicPageIds.length; i++) {
             var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
-              _newSubtopicPages[i].getId());
+              _newSubtopicPageIds[i]);
             if (newSubtopicId > subtopicId) {
               newSubtopicId--;
-              _newSubtopicPages[i].setId(
-                _getSubtopicPageId(topicId, newSubtopicId));
+              _newSubtopicPageIds[i] =
+                _getSubtopicPageId(topicId, newSubtopicId);
             }
           }
         }

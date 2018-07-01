@@ -33,7 +33,9 @@ oppia.factory('EditableTopicBackendApiService', [
         });
 
       $http.get(topicDataUrl).then(function(response) {
-        var topic = angular.copy(response.data.topic);
+        var topic = angular.copy(response.data.topic_dict);
+        topic.skill_id_to_description_dict = angular.copy(
+          response.data.skill_id_to_description_dict);
         if (successCallback) {
           successCallback(topic);
         }
@@ -116,7 +118,9 @@ oppia.factory('EditableTopicBackendApiService', [
       };
       $http.put(editableTopicDataUrl, putData).then(function(response) {
         // The returned data is an updated topic dict.
-        var topic = angular.copy(response.data.topic);
+        var topic = angular.copy(response.data.topic_dict);
+        topic.skill_id_to_description_dict = angular.copy(
+          response.data.skill_id_to_description_dict);
 
         if (successCallback) {
           successCallback(topic);

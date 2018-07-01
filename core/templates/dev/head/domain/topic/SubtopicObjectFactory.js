@@ -19,11 +19,15 @@
 
 oppia.factory('SubtopicObjectFactory', [
   function() {
-    var Subtopic = function(subtopicBackendObject) {
+    var Subtopic = function(subtopicBackendObject, skillIdToDescriptionMap) {
       this._id = subtopicBackendObject.id;
       this._title = subtopicBackendObject.title;
-      this._skillIds = subtopicBackendObject.skill_ids;
-      this._skillDescriptions = subtopicBackendObject.skill_descriptions;
+      this._skills = subtopicBackendObject.skill_ids.map(function(skillId) {
+        return {
+          id: skillId,
+          description: skillIdToDescriptionMap[skillId]
+        };
+      });
     };
 
     // Instance methods
@@ -51,42 +55,46 @@ oppia.factory('SubtopicObjectFactory', [
     };
 
     // Returns the skill ids in the subtopic.
-    Subtopic.prototype.getSkillIds = function() {
-      return this._skillIds;
+    Subtopic.prototype.getSkills = function() {
+      return this._skills.slice();
     };
 
-    Subtopic.prototype.getSkillDescriptions = function() {
-      return this._skillDescriptions;
+    Subtopic.prototype.getIndexOfSkill = function(skillId) {
+      return this._skills.map(function(skill) {
+        return skill.id;
+      }).indexOf(skillId);
     };
 
     Subtopic.prototype.addSkill = function(skillId, skillDescription) {
-      if (this._skillIds.indexOf(skillId) === -1) {
-        this._skillIds.push(skillId);
-        this._skillDescriptions.push(skillDescription);
+      if (this.getIndexOfSkill(skillId) === -1) {
+        this._skills.push({
+          id: skillId,
+          description: skillDescription
+        });
         return true;
       }
       return false;
     };
 
     Subtopic.prototype.removeSkill = function(skillId) {
-      var index = this._skillIds.indexOf(skillId);
+      var index = this.getIndexOfSkill(skillId);
       if (index > -1) {
-        this._skillIds.splice(index, 1);
-        this._skillDescriptions.splice(index, 1);
+        this._skills.splice(index, 1);
+      } else {
+        throw Error('The given skill doesn\'t exist in the subtopic');
       }
     };
 
-    Subtopic.create = function(subtopicBackendObject) {
-      return new Subtopic(subtopicBackendObject);
+    Subtopic.create = function(subtopicBackendObject, skillIdToDescriptionMap) {
+      return new Subtopic(subtopicBackendObject, skillIdToDescriptionMap);
     };
 
     Subtopic.createFromTitle = function(subtopicId, title) {
       return Subtopic.create({
         id: subtopicId,
         title: title,
-        skill_ids: [],
-        skill_descriptions: []
-      });
+        skill_ids: []
+      }, {});
     };
 
     return Subtopic;
