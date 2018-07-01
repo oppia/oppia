@@ -293,14 +293,11 @@ var ExplorationEditorMainTab = function() {
        */
       expectRuleToBe: function(interactionId, ruleName, feedbackTextArray) {
         var ruleDescription = _getRuleDescription(interactionId, ruleName);
-        // Expected input = is equal to {{a|NonnegativeInt}} and
-        // {{b|NonnegativeInt}}.
+        // Replace selectors with feedbackTextArray's elements.
         ruleDescription = _replaceAngularSelectors(
           ruleDescription, feedbackTextArray);
-        // Expected output = is equal to feedbackTextElement and
-        // feedbackTextElement.
         ruleDescription += '...';
-        // Adding ... to end of string.
+        // Adding "..." to end of string.
         var answerTab = element(by.css('.protractor-test-answer-tab'));
         expect(answerTab.getText()).toEqual(ruleDescription);
       },
@@ -757,8 +754,8 @@ var ExplorationEditorMainTab = function() {
   // the types of the rule input parameters.
   var _getRuleParameterTypes = function(interactionId, ruleName) {
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
-    // Expected input = is equal to {{a|NonnegativeInt}} and
-    // {{b|NonnegativeInt}}
+    // NumericInput's 'Equals' ruleDescription example:
+    // is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}.
     var parameterTypes = [];
     var re = /\|(.*?)\}/ig;
     // Matched result = Array[|NonnegativeInt}, |NonnegativeInt}]
@@ -769,7 +766,7 @@ var ExplorationEditorMainTab = function() {
         parameterTypes.push(elem.toString().slice(1, -1));
       });
     }
-    // Expected output = Array[NonnegativeInt, NonnegativeInt]
+    // Expected sample output = Array[NonnegativeInt, NonnegativeInt]
     return parameterTypes;
   };
 
@@ -804,28 +801,22 @@ var ExplorationEditorMainTab = function() {
   };
 
   /**
-   * Parse for Angular selectors and replace them.
+   * Parse for Angular selectors in ruleDescription and replace them.
    * @param {string} [ruleDescription] - Interaction type.
-   * @param {string|string[]} [providedText] - Feedback text to replace with.
+   * @param {string[]} [providedText] - Feedback text to replace with.
    */
   var _replaceAngularSelectors = function(ruleDescription, providedText) {
-    // Expected input = is equal to {{a|NonnegativeInt}} and
-    // {{b|NonnegativeInt}}.
+    // NumericInput's 'Equals' ruleDescription example:
+    // is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}.
     var re = /{{[a-z][\|](.*?)}}/ig;
     // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}]
     var angularSelectors = ruleDescription.match(re);
     var textArray = [];
     // Return as-is if string does not contain Angular selectors.
     if (angularSelectors) {
-      if (providedText === '...') {
-        angularSelectors.forEach(function() {
-          textArray.push(providedText);
-        });
-      } else {
-        angularSelectors.forEach(function(elem, index) {
-          textArray.push(providedText[index]);
-        });
-      }
+      angularSelectors.forEach(function(elem, index) {
+        textArray.push(providedText[index]);
+      });
       if (textArray.length !== angularSelectors.length) {
         throw Error('# of text(' + textArray.length +
         ') is expected to match # of angular selectors(' +
@@ -842,11 +833,9 @@ var ExplorationEditorMainTab = function() {
   // This function selects a rule from the dropdown,
   // but does not set any of its input parameters.
   var _selectRule = function(ruleElem, interactionId, ruleName) {
-    // Expected input = is equal to {{a|NonnegativeInt}} and
-    // {{b|NonnegativeInt}}.
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
-    ruleDescription = _replaceAngularSelectors(ruleDescription, '...');
-    // Expected output = is equal to ... and ...
+    // Replace selectors with "...".
+    ruleDescription = _replaceAngularSelectors(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
