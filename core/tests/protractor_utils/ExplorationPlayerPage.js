@@ -17,6 +17,7 @@
  * tests.
  */
 
+var general = require('../protractor_utils/general.js');
 var forms = require('./forms.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var until = protractor.ExpectedConditions;
@@ -97,14 +98,20 @@ var ExplorationPlayerPage = function() {
   };
 
   this.clickConfirmRedirectionButton = function() {
+    browser.wait(until.elementToBeClickable(confirmRedirectionButton), 5000,
+      ' Confirm Redirect button takes too long to appear');
     confirmRedirectionButton.click();
   };
 
   this.clickCancelRedirectionButton = function() {
+    browser.wait(until.elementToBeClickable(cancelRedirectionButton), 5000,
+      ' Cancel Redirect button takes too long to appear');
     cancelRedirectionButton.click();
   };
 
   this.clickOnReturnToParentButton = function() {
+    browser.wait(until.elementToBeClickable(returnToParentButton), 5000,
+      ' Cancel Redirect button takes too long to appear');
     returnToParentButton.click();
   };
 
@@ -165,6 +172,8 @@ var ExplorationPlayerPage = function() {
   };
 
   this.rateExploration = function(ratingValue) {
+    browser.wait(until.elementToBeClickable(ratingStar), 5000,
+      'Rating Star takes too long to appear');
     ratingStar.then(function(elements) {
       elements[ratingValue - 1].click();
     });
@@ -178,28 +187,28 @@ var ExplorationPlayerPage = function() {
     // it will get the supplemental interaction.
     interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
+    general.waitForSystem();
   };
 
   this.submitFeedback = function(feedback) {
-    feedbackPopupLink.isDisplayed().then(function(){
-      feedbackPopupLink.click();
-    });
+    browser.wait(until.elementToBeClickable(feedbackPopupLink), 5000,
+      'Feedback Popup link takes too long to appear');
+    feedbackPopupLink.click();
     feedbackTextArea.sendKeys(feedback);
-    feedbackSubmitButton.isDisplayed().then(function() {
-      feedbackSubmitButton.click();
-    });
+    browser.wait(until.elementToBeClickable(feedbackSubmitButton), 5000,
+      'Feedback Submit button takes too long to appear');
+    feedbackSubmitButton.click();
   };
 
   this.submitSuggestion = function(suggestion, description) {
-    suggestionPopupLink.isDisplayed().then(function(){
-      suggestionPopupLink.click();
-    });
+    browser.wait(until.elementToBeClickable(suggestionPopupLink), 5000,
+      'Suggestion Popup link takes too long to appear');
+    suggestionPopupLink.click();
     forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
-    browser.waitForAngular();
     suggestionDescriptionInput.sendKeys(description);
-    suggestionSubmitButton.isDisplayed().then(function() {
-      suggestionSubmitButton.click();
-    });
+    browser.wait(until.elementToBeClickable(suggestionSubmitButton), 5000,
+      'Suggestion Submit button takes too long to appear');
+    suggestionSubmitButton.click();
   };
 };
 
