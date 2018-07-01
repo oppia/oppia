@@ -151,6 +151,8 @@ var ExplorationEditorMainTab = function() {
     // If the editor welcome modal shows up, exit it.
     editorWelcomeModal.then(function(modals) {
       if (modals.length === 1) {
+        browser.wait(until.elementToBeClickable(dismissWelcomeModalButton),
+          5000, 'Tutorial modal taking too long to appear');
         dismissWelcomeModalButton.click();
       } else if (modals.length !== 0) {
         throw 'Expected to find at most one \'welcome modal\'';
