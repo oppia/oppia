@@ -693,6 +693,7 @@ describe('Rating', function() {
     }
 
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_RATINGTEST);
     libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
 
     var userEmail = 'Display@explorationRating.com';
