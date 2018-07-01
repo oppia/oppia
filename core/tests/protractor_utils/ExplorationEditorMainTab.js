@@ -814,17 +814,19 @@ var ExplorationEditorMainTab = function() {
     var textArray = [];
     // Return as-is if string does not contain Angular selectors.
     if (angularSelectors) {
-      angularSelectors.forEach(function(elem, index) {
-        textArray.push(providedText[index]);
-      });
-      if (textArray.length !== angularSelectors.length) {
-        throw Error('# of text(' + textArray.length +
-        ') is expected to match # of angular selectors(' +
-        (angularSelectors.length) + ')');
-      }
       // Replacing Angular selectors in ruleDescription with provided text.
       angularSelectors.forEach(function(selector, index) {
-        ruleDescription = ruleDescription.replace(selector, textArray[index]);
+        if (providedText[0] === '...') {
+          ruleDescription = ruleDescription.replace(selector, '...');
+        } else {
+          if (providedText.length !== angularSelectors.length) {
+            throw Error('# of feedback text(' + textArray.length +
+            ') is expected to match # of angular selectors(' +
+            (angularSelectors.length) + ')');
+          }
+          ruleDescription = ruleDescription.replace(
+            selector, providedText[index].toString());
+        }
       });
     }
     return ruleDescription;
