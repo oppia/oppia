@@ -560,9 +560,9 @@ var ExplorationEditorMainTab = function() {
   // for most purposes. Additional arguments may be sent to this function,
   // and they will be passed on to the relevant interaction editor.
   this.setInteraction = function(interactionId) {
-    this.openInteraction(interactionId);
-    this.customizeInteraction.apply(null, arguments);
-    this.closeAddResponseModal();
+    createNewInteraction(interactionId);
+    customizeInteraction.apply(null, arguments);
+    closeAddResponseModal();
     // Click on neutral element to make sure modal is closed.
     browser.wait(until.invisibilityOf(addResponseHeader), 5000);
     neutralElement.click();
@@ -570,13 +570,18 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  this.openInteraction = function(interactionId) {
-    deleteInteractionButton.isPresent().then(
+  var createNewInteraction = function(interactionId) {
+    deleteInteractionButton.isDisplayed().then(
       function(isVisible) {
       // If there is already an interaction present, delete it.
         if (isVisible) {
+          browser.wait(until.elementToBeClickable(deleteInteractionButton),
+            5000, 'Delete Interaction button takes too long to appear');
           deleteInteractionButton.click();
           // Click through the "are you sure?" warning.
+          browser.wait(until.elementToBeClickable(
+            confirmDeleteInteractionButton), 5000,
+          'Confirm Delete Interaction button takes too long to appear');
           confirmDeleteInteractionButton.click();
         }
       });
@@ -610,7 +615,7 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  this.customizeInteraction = function(interactionId) {
+  var customizeInteraction = function(interactionId) {
     if (arguments.length > 1) {
       var elem = interactionEditor;
       var customizationArgs = [elem];
@@ -634,7 +639,7 @@ var ExplorationEditorMainTab = function() {
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
-  this.closeAddResponseModal = function() {
+  var closeAddResponseModal = function() {
     // If the "Add Response" modal opens, close it.
     addResponseHeader.isPresent().then(function(isVisible) {
       if (isVisible) {
