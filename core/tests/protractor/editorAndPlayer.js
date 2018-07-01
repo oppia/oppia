@@ -584,7 +584,7 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
-  fit('should play the recommended exploration successfully', function() {
+  it('should play the recommended exploration successfully', function() {
     users.createUser('user9@editorAndPlayer.com', 'user9editorAndPlayer');
     users.createUser('user10@editorAndPlayer.com',
       'user10editorAndPlayer');
@@ -604,7 +604,7 @@ describe('Full exploration editor', function() {
     workflow.publishExploration();
     users.logout();
 
-    users.login('user10@editorAndPlayer');
+    users.login('user10@editorAndPlayer.com');
     libraryPage.get();
     libraryPage.findExploration('Recommended Exploration 1');
     libraryPage.playExploration('Recommended Exploration 1');
