@@ -19,6 +19,7 @@
 import HTMLParser
 import json
 import logging
+import re
 import urlparse
 
 import bleach
@@ -231,7 +232,22 @@ def wrap_with_siblings(tag, p):
             break
 
 
-def convert_to_text_angular(html_data):
+# List of oppia noninteractive inline components.
+OPPIA_INLINE_COMPONENTS = [
+    'oppia-noninteractive-link',
+    'oppia-noninteractive-math'
+]
+
+# List of oppia noninteractive block components.
+OPPIA_BLOCK_COMPONENTS = [
+    'oppia-noninteractive-image',
+    'oppia-noninteractive-video',
+    'oppia-noninteractive-collapsible',
+    'oppia-noninteractive-tabs'
+]
+
+
+def convert_to_textangular(html_data):
     """This function converts the html to TextAngular supported format.
 
     Args:
@@ -250,8 +266,9 @@ def convert_to_text_angular(html_data):
 
     # To convert the rich text content within tabs and collapsible components
     # to valid TextAngular format. If there is no tabs or collapsible component
-    # convert_tag_contents_to_text_angular will make no change to html_data.
-    html_data = convert_tag_contents_to_text_angular(html_data)
+    # convert_tag_contents_to_rte_format will make no change to html_data.
+    html_data = convert_tag_contents_to_rte_format(
+        html_data, convert_to_textangular)
 
     soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
 
@@ -352,15 +369,6 @@ def convert_to_text_angular(html_data):
     # parts not wrapped in any tag.
     soup = bs4.BeautifulSoup(unicode(soup).encode('utf-8'), 'html.parser')
 
-    oppia_inline_components = [
-        'oppia-noninteractive-link', 'oppia-noninteractive-math']
-    oppia_block_components = [
-        'oppia-noninteractive-image',
-        'oppia-noninteractive-video',
-        'oppia-noninteractive-collapsible',
-        'oppia-noninteractive-tabs'
-    ]
-
     # Ensure that blockquote tag is wrapped in an allowed parent.
     for blockquote in soup.findAll('blockquote'):
         while blockquote.parent.name not in allowed_parent_list['blockquote']:
@@ -401,7 +409,7 @@ def convert_to_text_angular(html_data):
                 wrap_with_siblings(tag, soup.new_tag('p'))
 
     # Ensure that oppia inline components are wrapped in an allowed parent.
-    for tag_name in oppia_inline_components:
+    for tag_name in OPPIA_INLINE_COMPONENTS:
         for tag in soup.findAll(tag_name):
             if tag.parent.name in ['blockquote', '[document]']:
                 wrap_with_siblings(tag, soup.new_tag('p'))
@@ -412,7 +420,7 @@ def convert_to_text_angular(html_data):
             link.unwrap()
 
     # Ensure that oppia block components are wrapped in an allowed parent.
-    for tag_name in oppia_block_components:
+    for tag_name in OPPIA_BLOCK_COMPONENTS:
         for tag in soup.findAll(tag_name):
             if tag.parent.name in ['blockquote', '[document]']:
                 wrap_with_siblings(tag, soup.new_tag('p'))
@@ -458,13 +466,126 @@ def convert_to_text_angular(html_data):
     return unicode(soup).replace('<br/>', '<br>')
 
 
-def convert_tag_contents_to_text_angular(html_data):
+def convert_to_ckeditor(html_data):
+    """This function converts html strings to CKEditor supported format.
+
+    Args:
+        html_data: str. HTML string to be converted.
+
+    Returns:
+        str. The converted HTML string.
+    """
+    if not len(html_data):
+        return html_data
+
+    # <br> is replaced with <br/> before conversion because BeautifulSoup
+    # in some cases adds </br> closing tag and br is reported as parent
+    # of other tags which produces issues in migration.
+    html_data = html_data.replace('<br>', '<br/>')
+
+    # Convert the rich text content within tabs and collapsible components
+    # to valid CKEditor format. If there is no tabs or collapsible component
+    # convert_tag_contents_to_rte_format will make no change to html_data.
+    html_data = convert_tag_contents_to_rte_format(
+        html_data, convert_to_ckeditor)
+
+    soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
+
+    # Replaces b tag with strong tag.
+    for b in soup.findAll('b'):
+        b.name = 'strong'
+
+    # Replaces i tag with em tag.
+    for i in soup.findAll('i'):
+        i.name = 'em'
+
+    # This block wraps p tag in li tag if the parent of p is ol/ul tag. Also,
+    # if the parent of p tag is pre tag, it unwraps the p tag.
+    for p in soup.findAll('p'):
+        if p.parent.name == 'pre':
+            p.unwrap()
+        elif p.parent.name in ['ol', 'ul']:
+            p.wrap(soup.new_tag('li'))
+
+    # Replaces <p><br><p> with <p>&nbsp;</p>.
+    for br in soup.findAll('br'):
+        parent_tag = br.parent
+        if parent_tag.name == 'p' and parent_tag.get_text() == '':
+            br.replaceWith('&nbsp;')
+
+    # This block ensures that ol/ul tag is not a direct child of another ul/ol
+    # tag. The conversion works as follows:
+    # Invalid html: <ul><li>...</li><ul><ul><li>...</li></ul></ul></ul>
+    # Valid html: <ul><li>...</li><ul><li style="margin-left:40px;">...</li>
+    # </ul></ul>
+    # i.e. if any ol/ul has parent as ol/ul and a previous sibling as li
+    # it is wrapped in it's previous sibling removing any margin styling.
+    # If there is no previous sibling, the tag is unwrapped and each of
+    # it's direct child is given an additional margin-left of 40px.
+    list_tags = ['ol', 'ul']
+    margin_re = re.compile('margin-left:([0-9]+)px;')
+    for tag_name in list_tags:
+        for tag in soup.findAll(tag_name):
+            if tag.parent.name in list_tags:
+                prev_sib = tag.previous_sibling
+                if prev_sib and prev_sib.name == 'li':
+                    if 'style' in tag.attrs:
+                        del tag['style']
+                else:
+                    margin_value = 40
+                    if 'style' in tag.attrs:
+                        style = tag['style']
+                        # This is to obtain the margin value of the tag.
+                        margin_value += int(margin_re.search(style).group(1))
+
+                    for child in tag.children:
+                        child_margin_value = margin_value
+                        if 'style' in child.attrs:
+                            style = child['style']
+                            # This is to obtain the margin value of the child
+                            # tag.
+                            child_margin_value += int(
+                                margin_re.search(style).group(1))
+                        child['style'] = 'margin-left:%dpx;' % margin_value
+                    tag.unwrap()
+
+    # Move block components out of p, pre, strong and em tags.
+    for tag_name in OPPIA_BLOCK_COMPONENTS:
+        for tag in soup.findAll(tag_name):
+            while tag.parent.name in ['p', 'pre', 'strong', 'em']:
+                new_parent_for_prev = soup.new_tag(tag.parent.name)
+                new_parent_for_next = soup.new_tag(tag.parent.name)
+                prev_sib = list(tag.previous_siblings)
+                next_sib = list(tag.next_siblings)
+
+                # Previous siblings are accessed in reversed order to
+                # avoid reversing the order of siblings on being wrapped.
+                for sib in reversed(prev_sib):
+                    sib.wrap(new_parent_for_prev)
+
+                for sib in next_sib:
+                    sib.wrap(new_parent_for_next)
+                tag.parent.unwrap()
+
+    # Beautiful soup automatically changes some <br> to <br/>,
+    # so it has to be replaced directly in the string.
+    # Also, when any html string with <br/> is stored in exploration
+    # html strings they are stored as <br>. Since both of these
+    # should match and <br> and <br/> have same working,
+    # so the tag has to be replaced in this way.
+
+    return unicode(soup).replace('<br/>', '<br>')
+
+
+def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
     """This function converts the rich text content within tabs and
-    collapsible components to TextAngular format. If the html_data
+    collapsible components to given RTE format. If the html_data
     does not contain tab or collapsible components it will do nothing.
 
     Args:
         html_data: str. The HTML string whose content is to be converted.
+        rte_conversion_fn: function. The RTE conversion function for
+            html strings.
 
     Returns:
         str. The HTML string with converted content within tag.
@@ -474,13 +595,13 @@ def convert_tag_contents_to_text_angular(html_data):
     for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
         content_html = unescape_html(collapsible['content-with-value'])
         collapsible['content-with-value'] = escape_html(
-            json.dumps(convert_to_text_angular(json.loads(content_html))))
+            json.dumps(rte_conversion_fn(json.loads(content_html))))
 
     for tabs in soup.findAll('oppia-noninteractive-tabs'):
         tab_content_json = unescape_html(tabs['tab_contents-with-value'])
         tab_content_list = json.loads(tab_content_json)
         for index, tab_content in enumerate(tab_content_list):
-            tab_content_list[index]['content'] = convert_to_text_angular(
+            tab_content_list[index]['content'] = rte_conversion_fn(
                 tab_content['content'])
         tabs['tab_contents-with-value'] = escape_html(
             json.dumps(tab_content_list))
@@ -511,7 +632,10 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
 
     for html_data in html_list:
         if run_migration:
-            soup_data = convert_to_text_angular(html_data)
+            if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
+                soup_data = convert_to_textangular(html_data)
+            else:
+                soup_data = convert_to_ckeditor(html_data)
         else:
             soup_data = html_data
 
@@ -574,6 +698,7 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
     allowed_parent_list = feconf.RTE_CONTENT_SPEC[
         RTE_TYPE]['ALLOWED_PARENT_LIST']
     allowed_tag_list = feconf.RTE_CONTENT_SPEC[RTE_TYPE]['ALLOWED_TAG_LIST']
+
     is_invalid = False
 
     # Text with no parent tag is also invalid.

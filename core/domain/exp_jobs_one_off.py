@@ -508,7 +508,8 @@ class ExplorationContentValidationJobForTextAngular(
         yield (key, list(set().union(*final_values)))
 
 
-class ExplorationMigrationValidationJob(jobs.BaseMapReduceOneOffJobManager):
+class ExplorationMigrationValidationJobForTextAngular(
+        jobs.BaseMapReduceOneOffJobManager):
     """Job that migrates the html content of an exploration into the valid
     TextAngular format and validates it.
     """
@@ -562,6 +563,40 @@ class ExplorationContentValidationJobForCKEditor(
 
         err_dict = html_cleaner.validate_rte_format(
             html_list, feconf.RTE_FORMAT_CKEDITOR)
+
+        for key in err_dict:
+            if err_dict[key]:
+                yield(key, err_dict[key])
+
+    @staticmethod
+    def reduce(key, values):
+        final_values = [ast.literal_eval(value) for value in values]
+        # Combine all values from multiple lists into a single list
+        # for that error type.
+        yield (key, list(set().union(*final_values)))
+
+
+class ExplorationMigrationValidationJobForCKEditor(
+        jobs.BaseMapReduceOneOffJobManager):
+    """Job that migrates the html content of an exploration into the valid
+    CKEditor format and validates it.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        if item.deleted:
+            return
+
+        exploration = exp_services.get_exploration_from_model(item)
+
+        html_list = exploration.get_all_html_content_strings()
+
+        err_dict = html_cleaner.validate_rte_format(
+            html_list, feconf.RTE_FORMAT_CKEDITOR, True)
 
         for key in err_dict:
             if err_dict[key]:
