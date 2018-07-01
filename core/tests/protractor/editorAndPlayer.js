@@ -664,7 +664,6 @@ describe('Rating', function() {
     users.createUser(userEmail, userName);
     users.login(userEmail);
     libraryPage.get();
-    libraryPage.findExploration(explorationName);
     libraryPage.playExploration(explorationName);
     explorationPlayerPage.expectExplorationNameToBe(explorationName);
     explorationPlayerPage.rateExploration(ratingValue);
@@ -689,7 +688,6 @@ describe('Rating', function() {
     }
 
     libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_RATINGTEST);
     libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, 'N/A');
 
     var userEmail = 'Display@explorationRating.com';
@@ -697,7 +695,6 @@ describe('Rating', function() {
     addRating(userEmail, username, EXPLORATION_RATINGTEST, 4);
 
     libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_RATINGTEST);
     libraryPage.expectExplorationRatingToEqual(EXPLORATION_RATINGTEST, '4.0');
 
     libraryPage.playExploration(EXPLORATION_RATINGTEST);
