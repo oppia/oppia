@@ -99,7 +99,7 @@ var ExplorationEditorPage = function() {
       });
       // This is necessary to give the page time to record the changes,
       // so that it does not attempt to stop the user leaving.
-      browser.wait(until.stalenessOf(toastSuccessElement), 5000,
+      browser.wait(until.invisibilityOf(toastSuccessElement), 10000,
         'toast message taking too long to disappear after saving changes');
       expect(toastSuccessElement.isPresent()).toBe(false);
     });
