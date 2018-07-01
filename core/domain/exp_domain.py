@@ -1277,7 +1277,7 @@ class InteractionInstance(object):
                     rule_spec_html = rule_spec.inputs['x']
                     html_list = html_list + rule_spec_html
 
-        if self.id == 'ListOfSetsOfHtmlStrings':
+        if self.id == 'DragAndDropSort':
             for answer_group in self.answer_groups:
                 for rule_spec in answer_group.rule_specs:
                     rule_spec_html_list = rule_spec.inputs['x']
