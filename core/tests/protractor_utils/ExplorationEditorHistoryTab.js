@@ -226,4 +226,5 @@ var ExplorationEditorHistoryTab = function() {
     });
   };
 };
+
 exports.ExplorationEditorHistoryTab = ExplorationEditorHistoryTab;

@@ -146,4 +146,5 @@ var ExplorationEditorPage = function() {
     navigateToStatsTabButton.click();
   };
 };
+
 exports.ExplorationEditorPage = ExplorationEditorPage;
