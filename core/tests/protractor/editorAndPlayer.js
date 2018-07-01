@@ -577,9 +577,67 @@ describe('Full exploration editor', function() {
       'TextInput', forms.toRichText('Happy!'), null, false, 'Equals',
       'happy');
     explorationEditorMainTab.expectInteractionToMatch('TextInput');
+    explorationEditorPage.saveChanges();
     explorationEditorMainTab.deleteInteraction();
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorMainTab.expectInteractionToMatch('EndExploration');
+    users.logout();
+  });
+
+  it('should play the recommended exploration successfully', function() {
+    users.createUser('user9@editorAndPlayer.com', 'user9EditorAndPlayer');
+    users.createUser('user10@editorAndPlayer.com', 'user10EditorAndPlayer');
+    users.login('user9@editorAndPlayer.com');
+    // Publish new exploration.
+    workflow.createExploration();
+    explorationEditorMainTab.setContent(
+      forms.toRichText('You should recommend this exploration'));
+    explorationEditorMainTab.setInteraction('EndExploration');
+    var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle('Recommended Exploration 1');
+    explorationEditorSettingsTab.setCategory('Algorithm');
+    explorationEditorSettingsTab.setObjective('To be recommended');
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+    users.logout();
+
+    users.login('user10@editorAndPlayer.com');
+    libraryPage.get();
+    libraryPage.findExploration('Recommended Exploration 1');
+    libraryPage.playExploration('Recommended Exploration 1');
+    // Using the Id from Player and create a new exploration
+    // and add the Id as suggestion.
+    general.getExplorationIdFromPlayer()
+      .then(function(recommendedExplorationId) {
+        workflow.createExploration();
+        explorationEditorMainTab.setContent(
+          forms.toRichText('I want to recommend an exploration at the end'));
+        explorationEditorMainTab.setInteraction(
+          'EndExploration', [recommendedExplorationId]);
+        explorationEditorPage.navigateToSettingsTab();
+        explorationEditorSettingsTab.setTitle(
+          'Exploration with Recommendation');
+        explorationEditorSettingsTab.setCategory('Algorithm');
+        explorationEditorSettingsTab.setObjective(
+          'To display recommended exploration');
+        explorationEditorPage.navigateToMainTab();
+        explorationEditorPage.saveChanges();
+        workflow.publishExploration();
+      });
+
+    // Play-test the exploration and visit the recommended exploration
+    libraryPage.get();
+    libraryPage.findExploration('Exploration with Recommendation');
+    libraryPage.playExploration('Exploration with Recommendation');
+    var recommendedExplorationTile = element(
+      by.css('.protractor-test-exp-summary-tile-title'));
+    expect(recommendedExplorationTile.getText())
+      .toEqual('Recommended Exploration 1');
+    recommendedExplorationTile.click();
+    explorationPlayerPage.expectExplorationNameToBe(
+      'Recommended Exploration 1');
     users.logout();
   });
 
@@ -606,8 +664,8 @@ describe('Rating', function() {
     users.createUser(userEmail, userName);
     users.login(userEmail);
     libraryPage.get();
-    libraryPage.findExploration(EXPLORATION_RATINGTEST);
-    libraryPage.playExploration(EXPLORATION_RATINGTEST);
+    libraryPage.findExploration(explorationName);
+    libraryPage.playExploration(explorationName);
     explorationPlayerPage.expectExplorationNameToBe(explorationName);
     explorationPlayerPage.rateExploration(ratingValue);
     users.logout();
