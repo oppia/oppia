@@ -201,6 +201,7 @@ describe('State editor', function() {
     // modal opens up containing the customization arguments for this input.
     // The user can dismiss this modal by clicking the 'Save Interaction'
     // button.
+    explorationEditorMainTab.deleteInteraction();
     explorationEditorMainTab.setInteraction('Continue');
     element(by.css('.protractor-test-interaction')).click();
     var saveInteractionBtn = element(
