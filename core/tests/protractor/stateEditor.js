@@ -135,8 +135,8 @@ describe('State editor', function() {
       .expectFeedbackInstructionToBe('correct');
     explorationEditorMainTab.getResponseEditor('default').setFeedback(
       forms.toRichText('out of bounds'));
-    explorationEditorMainTab.getResponseEditor(1)
-      .expectFeedbackInstructionToBe(['out of bounds']);
+    explorationEditorMainTab.getResponseEditor('default')
+      .expectFeedbackInstructionToBe('out of bounds');
     explorationEditorMainTab.getResponseEditor('default').setDestination(
       null, false, null);
 
