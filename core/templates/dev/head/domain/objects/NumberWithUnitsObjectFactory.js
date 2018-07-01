@@ -74,6 +74,17 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       };
     };
 
+    NumberWithUnits.createCurrencyUnits = function() {
+      // Creates user-defined currency (base + sub) units.
+      math.createUnit('dollar', {aliases: [
+        'dollars', 'Dollar', 'USD', '$', 'Dollars']});
+      math.createUnit('cent', {definition: '0.01 dollar', aliases: [
+        'Cent', 'cents', 'Cents']});
+      math.createUnit('rupees', {aliases: [
+        'Rupees', 'Rs', 'rupee', 'Rupee', '₹']});
+      math.createUnit('paise', {definition: '0.01 rupees', aliases: ['paisa']});
+    };
+
     NumberWithUnits.fromRawInputString = function(rawInput) {
       rawInput = rawInput.trim();
       var type = '';
@@ -281,10 +292,20 @@ oppia.factory('UnitsObjectFactory', [function() {
 
   Units.fromRawInputString = function(units) {
     units = units.replace(/per/g, '/');
-    // Right now, validation of currency units is not possible as we need to add
-    // them first.
-    if (units !== '' && !units.includes('$') && !units.includes('Rs') &&
-      !units.includes('₹')) {
+    // Special symbols need to be replaced as math.js doesn't support custom
+    // units starting with special symbols. Also, it doesn't allow units
+    // followed by a number as in the case of currency units.
+    if (units.includes('$')) {
+      units = units.replace('$', '');
+      units += ' dollar';
+    }
+    if (units.includes('Rs') || units.includes('₹')) {
+      units = units.replace('Rs', '');
+      units = units.replace('₹', '');
+      units += ' rupees';
+    }
+
+    if (units !== '') {
       try {
         math.unit(units);
       } catch (err) {

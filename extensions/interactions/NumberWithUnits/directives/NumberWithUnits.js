@@ -47,6 +47,10 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
             return errorMessage;
           };
 
+          try {
+            NumberWithUnitsObjectFactory.createCurrencyUnits();
+          } catch (parsingError) {}
+
           $scope.$watch('answer', function(newValue) {
             try {
               var numberWithUnits =
@@ -156,6 +160,10 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
 oppia.factory('numberWithUnitsRulesService', [
   'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
   function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
+    try {
+      NumberWithUnitsObjectFactory.createCurrencyUnits();
+    } catch (parsingError) {}
+
     return {
       IsEqualTo: function(answer, inputs) {
         // Returns true only if input is exactly equal to answer.

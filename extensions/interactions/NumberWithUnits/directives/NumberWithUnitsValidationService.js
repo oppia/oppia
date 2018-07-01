@@ -32,6 +32,10 @@ oppia.factory('NumberWithUnitsValidationService', [
         warningsList = warningsList.concat(
           this.getCustomizationArgsWarnings(customizationArgs));
 
+        try {
+          NumberWithUnitsObjectFactory.createCurrencyUnits();
+        } catch (parsingError) {}
+
         var checkEquality = function(earlierRule, laterRule) {
           return angular.equals(earlierRule.inputs.f, laterRule.inputs.f);
         };
