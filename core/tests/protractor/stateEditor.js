@@ -169,16 +169,12 @@ describe('State editor', function() {
 
     // Numeric input does not have any customization arguments. Therefore the
     // customization modal and the save interaction button does not appear.
-    explorationEditorMainTab.openInteraction('NumericInput');
-    var saveInteractionBtn = element(
-      by.css('.protractor-test-save-interaction'));
-    expect(saveInteractionBtn.isPresent()).toBe(false);
-    explorationEditorMainTab.closeAddResponseModal();
-
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.deleteInteraction();
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
-    explorationEditorMainTab.openInteraction('Continue');
-    expect(saveInteractionBtn.isPresent()).toBe(true);
+    explorationEditorMainTab.setInteraction('Continue');
+
     users.logout();
   });
 
@@ -524,6 +520,11 @@ describe('State editor', function() {
   });
 
   afterEach(function() {
+    // TODO(pranavsid98): Remove this checked error once we figure out and fix
+    // the cause.
+    // general.checkForConsoleErrors([
+    //   'TypeError: google.visualization.PieChart is not a constructor'
+    // ]);
     general.checkForConsoleErrors([]);
   });
 });

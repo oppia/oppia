@@ -571,11 +571,15 @@ describe('Full exploration editor', function() {
     explorationEditorMainTab.setContent(forms.toRichText(
       'How are you feeling?'));
     explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.deleteInteraction();
     explorationEditorMainTab.setInteraction('TextInput');
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Happy!'), null, false, 'Equals',
       'happy');
+    explorationEditorMainTab.expectInteractionToMatch('TextInput');
+    explorationEditorMainTab.deleteInteraction();
     explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.expectInteractionToMatch('EndExploration');
     users.logout();
   });
 
