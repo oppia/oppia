@@ -172,9 +172,9 @@ var ExplorationPlayerPage = function() {
   };
 
   this.rateExploration = function(ratingValue) {
-    browser.wait(until.elementToBeClickable(ratingStar), 5000,
-      'Rating Star takes too long to appear');
     ratingStar.then(function(elements) {
+      browser.wait(until.elementToBeClickable(elements[ratingValue - 1]), 5000,
+        'Rating Star takes too long to appear');
       elements[ratingValue - 1].click();
     });
   };
