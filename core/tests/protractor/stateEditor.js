@@ -129,8 +129,14 @@ describe('State editor', function() {
       function(richTextEditor) {
         richTextEditor.appendBoldText('correct');
       }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
+    explorationEditorMainTab.getResponseEditor(0)
+      .expectFeedbackInstructionToBe('correct');
     explorationEditorMainTab.getResponseEditor('default').setFeedback(
       forms.toRichText('out of bounds'));
+    explorationEditorMainTab.getResponseEditor(1)
+      .expectFeedbackInstructionToBe(['out of bounds']);
     explorationEditorMainTab.getResponseEditor('default').setDestination(
       null, false, null);
 
