@@ -127,7 +127,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
           imageTagList[i].getAttribute('filepath-with-value'));
         // The images already there in Oppia have image filenames as the value
         // for the attribute 'filepath-with-value'. We later on want to have
-        // it's value as the followinging object of the form --
+        // it's value as the following object of the form --
         // {
         //    name: filename,
         //    width: widthOfImage,
