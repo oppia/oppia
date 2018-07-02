@@ -160,3 +160,26 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def reduce(key, value):
         pass
+
+
+class SuggestionMigrationValdiationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for validating all suggestions from the old model are
+    converted to the new model.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.SuggestionModel,
+                suggestion_models.GeneralSuggestionModel]
+
+    @staticmethod
+    def map(item):
+        if isinstance(item, feedback_models.SuggestionModel):
+            yield ('old', item.id)
+        else:
+            yield ('new', item.id)
+
+    @staticmethod
+    def reduce(key, value):
+        yield (key, len(value))
+
