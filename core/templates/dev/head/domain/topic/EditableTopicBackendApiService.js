@@ -33,11 +33,12 @@ oppia.factory('EditableTopicBackendApiService', [
         });
 
       $http.get(topicDataUrl).then(function(response) {
-        var topic = angular.copy(response.data.topic_dict);
-        topic.skill_id_to_description_dict = angular.copy(
-          response.data.skill_id_to_description_dict);
         if (successCallback) {
-          successCallback(topic);
+          successCallback({
+            topicDict: angular.copy(response.data.topic_dict),
+            skillIdToDescriptionDict: angular.copy(
+              response.data.skill_id_to_description_dict)
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -117,13 +118,12 @@ oppia.factory('EditableTopicBackendApiService', [
         topic_and_subtopic_page_change_dicts: changeList
       };
       $http.put(editableTopicDataUrl, putData).then(function(response) {
-        // The returned data is an updated topic dict.
-        var topic = angular.copy(response.data.topic_dict);
-        topic.skill_id_to_description_dict = angular.copy(
-          response.data.skill_id_to_description_dict);
-
         if (successCallback) {
-          successCallback(topic);
+          successCallback({
+            topicDict: angular.copy(response.data.topic_dict),
+            skillIdToDescriptionDict: angular.copy(
+              response.data.skill_id_to_description_dict)
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {

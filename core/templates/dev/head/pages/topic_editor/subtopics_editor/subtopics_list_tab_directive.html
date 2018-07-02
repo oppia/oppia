@@ -8,7 +8,7 @@
       <md-card class="subtopic"
                ng-repeat="(subtopicIndex, subtopic) in subtopics"
                ng-click="editSubtopic(subtopic)"
-               dnd-list="subtopic.getSkills()"
+               dnd-list="subtopic.getSkillSummaries()"
                dnd-drop="endMoveSkill(subtopic.getId())">
         <strong style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
         <span style="float: right; color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
@@ -16,11 +16,13 @@
         </span>
         <div style="max-height: 35vh; overflow-y: auto;">
           <md-card class="skill-id"
-                   ng-repeat="skill in subtopic.getSkills() track by $index"
-                   dnd-draggable="skill"
-                   dnd-dragstart="startMoveSkill(subtopic, skill)"
+                   ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
+                   dnd-draggable="skillSummary"
+                   dnd-dragstart="startMoveSkill(subtopic.getId(), skillSummary)"
                    dnd-effect-allowed="move">
-          <a ng-href="<[getSkillEditorUrl(skill.id)]>" target="_blank"> <[skill.description]> </a>
+            <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
+              <[skillSummary.getDescription()]>
+            </a>
           </md-card>
         </div>
       </md-card>
@@ -31,16 +33,18 @@
   </md-card>
 
   <md-card class="uncategorized-skill-ids"
-           dnd-list="uncategorizedSkills"
+           dnd-list="uncategorizedSkillSummaries"
            dnd-drop="endMoveSkill(null)">
     <h3> Uncategorized Skills </h3>
     <div style="max-height: 45vh; overflow-y: auto;">
       <md-card class="skill-id"
-               ng-repeat="skill in uncategorizedSkills track by $index"
-               dnd-draggable="skill"
+               ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index"
+               dnd-draggable="skillSummary"
                dnd-effect-allowed="move"
-               dnd-dragstart="startMoveSkill(null, skill)">
-        <a ng-href="<[getSkillEditorUrl(skill.id)]>" target="_blank"> <[skill.description]> </a>
+               dnd-dragstart="startMoveSkill(null, skillSummary)">
+        <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
+          <[skillSummary.getDescription()]>
+        </a>
       </md-card>
     </div>
   </md-card>

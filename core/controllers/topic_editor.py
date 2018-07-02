@@ -16,8 +16,6 @@
 are created.
 """
 
-import copy
-
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import role_services
@@ -186,10 +184,7 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
-        skill_ids = copy.deepcopy(topic.uncategorized_skill_ids)
-
-        for subtopic in topic.subtopics:
-            skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
+        skill_ids = topic.get_all_skill_ids()
 
         skill_id_to_description_dict = (
             skill_services.get_skill_descriptions_by_ids(skill_ids))
@@ -241,10 +236,7 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         topic = topic_services.get_topic_by_id(topic_id, strict=False)
-        skill_ids = copy.deepcopy(topic.uncategorized_skill_ids)
-
-        for subtopic in topic.subtopics:
-            skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
+        skill_ids = topic.get_all_skill_ids()
 
         skill_id_to_description_dict = (
             skill_services.get_skill_descriptions_by_ids(skill_ids))

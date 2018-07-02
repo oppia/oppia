@@ -43,7 +43,7 @@ oppia.factory('TopicEditorStateService', [
     var _cachedSubtopicPages = [];
     // The array that stores all the ids of the subtopic pages that were not
     // loaded from the backend i.e those that correspond to newly created
-    // subtopics.
+    // subtopics (and not loaded from the backend).
     var _newSubtopicPageIds = [];
     var _subtopicPage =
       SubtopicPageObjectFactory.createInterstitialSubtopicPage();
@@ -79,8 +79,10 @@ oppia.factory('TopicEditorStateService', [
       }
       return null;
     };
-    var _updateTopic = function(newBackendTopicObject) {
-      _setTopic(TopicObjectFactory.create(newBackendTopicObject));
+    var _updateTopic = function(newBackendTopicDict, skillIdToDescriptionDict) {
+      _setTopic(
+        TopicObjectFactory.create(
+          newBackendTopicDict, skillIdToDescriptionDict));
     };
     var _setSubtopicPage = function(subtopicPage) {
       _subtopicPage.copyFromSubtopicPage(subtopicPage);
@@ -114,7 +116,10 @@ oppia.factory('TopicEditorStateService', [
         EditableTopicBackendApiService.fetchTopic(
           topicId).then(
           function(newBackendTopicObject) {
-            _updateTopic(newBackendTopicObject);
+            _updateTopic(
+              newBackendTopicObject.topicDict,
+              newBackendTopicObject.skillIdToDescriptionDict
+            );
             EditableTopicBackendApiService.fetchStories(topicId).then(
               function(canonicalStorySummaries) {
                 _setCanonicalStorySummaries(canonicalStorySummaries);
@@ -254,8 +259,15 @@ oppia.factory('TopicEditorStateService', [
         // If index is null, that means the corresponding subtopic page was
         // never loaded from the backend and not that the subtopic page doesn't
         // exist at all. So, not required to throw an error here.
+        // Also, since newSubtopicPageIds will only have the ids of a subset of
+        // the pages in the _subtopicPages array, the former need not be edited
+        // either, in this case.
         if (index === null) {
-          return;
+          if (newIndex === -1) {
+            return;
+          } else {
+            throw Error('Invalid subtopic page.');
+          }
         }
         _cachedSubtopicPages.splice(index, 1);
         // If the deleted subtopic page corresponded to a newly created
@@ -278,8 +290,8 @@ oppia.factory('TopicEditorStateService', [
               _newSubtopicPageIds[i]);
             if (newSubtopicId > subtopicId) {
               newSubtopicId--;
-              _newSubtopicPageIds[i] =
-                _getSubtopicPageId(topicId, newSubtopicId);
+              _newSubtopicPageIds[i] = _getSubtopicPageId(
+                topicId, newSubtopicId);
             }
           }
         }
@@ -318,7 +330,10 @@ oppia.factory('TopicEditorStateService', [
           _topic.getId(), _topic.getVersion(),
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(topicBackendObject) {
-            _updateTopic(topicBackendObject);
+            _updateTopic(
+              topicBackendObject.topicDict,
+              topicBackendObject.skillIdToDescriptionDict
+            );
             var changeList = UndoRedoService.getCommittableChangeList();
             for (var i = 0; i < changeList.length; i++) {
               if (changeList[i].property_name === 'canonical_story_ids') {

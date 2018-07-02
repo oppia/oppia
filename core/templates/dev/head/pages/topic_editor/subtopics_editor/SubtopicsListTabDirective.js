@@ -27,19 +27,20 @@ oppia.directive('subtopicsListTab', [
       controller: [
         '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
         'UndoRedoService', 'SubtopicPageObjectFactory',
-        'EVENT_TOPIC_REINITIALIZED', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_SUBTOPIC_PAGE_LOADED',
+        'UrlInterpolationService', 'EVENT_TOPIC_REINITIALIZED',
+        'EVENT_TOPIC_INITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
         function(
             $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
             UndoRedoService, SubtopicPageObjectFactory,
-            EVENT_TOPIC_REINITIALIZED, EVENT_TOPIC_INITIALIZED,
-            EVENT_SUBTOPIC_PAGE_LOADED) {
+            UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
+            EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
+          var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.subtopics = $scope.topic.getSubtopics();
             $scope.subtopicEditorIsShown = false;
-            $scope.uncategorizedSkills =
-              $scope.topic.getUncategorizedSkills();
+            $scope.uncategorizedSkillSummaries =
+              $scope.topic.getUncategorizedSkillSummaries();
           };
 
           $scope.editSubtopic = function(subtopic) {
@@ -131,14 +132,30 @@ oppia.directive('subtopicsListTab', [
           };
 
           $scope.getSkillEditorUrl = function(skillId) {
-            return '/skill_editor/' + skillId;
+            return UrlInterpolationService.interpolateUrl(
+              SKILL_EDITOR_URL_TEMPLATE, {
+                skillId: skillId
+              }
+            );
           };
 
-          $scope.startMoveSkill = function(oldSubtopic, skill) {
+          /**
+           * @param {string|null} oldSubtopicId - The id of the subtopic from
+           *    which the skill is to be moved or null, if the origin is the
+           *    uncategorized section.
+           * @param {SkillSummary} skill - The summary of the skill that is to
+           *    be moved.
+           */
+          $scope.startMoveSkill = function(oldSubtopicId, skill) {
             $scope.skillToMove = skill;
-            $scope.oldSubtopicId = (oldSubtopic) ? oldSubtopic.getId() : null;
+            $scope.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
           };
 
+          /**
+           * @param {string|null} newSubtopicId - The subtopic to which the
+           *    skill is to be moved or null, if the destination is the
+           *    uncategorized section.
+           */
           $scope.endMoveSkill = function(newSubtopicId) {
             if (newSubtopicId === $scope.oldSubtopicId) {
               return;

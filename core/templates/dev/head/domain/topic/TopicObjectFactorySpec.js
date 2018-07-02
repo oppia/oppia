@@ -39,14 +39,15 @@ describe('Topic object factory', function() {
         skill_ids: ['skill_3']
       }],
       next_subtopic_id: 1,
-      language_code: 'en',
-      skill_id_to_description_dict: {
-        skill_1: 'Description 1',
-        skill_2: 'Description 2',
-        skill_3: 'Description 3'
-      }
+      language_code: 'en'
     };
-    _sampleTopic = TopicObjectFactory.create(sampleTopicBackendObject);
+    var skillIdToDescriptionDict = {
+      skill_1: 'Description 1',
+      skill_2: 'Description 2',
+      skill_3: 'Description 3'
+    };
+    _sampleTopic = TopicObjectFactory.create(
+      sampleTopicBackendObject, skillIdToDescriptionDict);
   }));
 
   it('should be able to create an interstitial topic object', function() {
@@ -58,7 +59,7 @@ describe('Topic object factory', function() {
     expect(topic.getSubtopics()).toEqual([]);
     expect(topic.getAdditionalStoryIds()).toEqual([]);
     expect(topic.getCanonicalStoryIds()).toEqual([]);
-    expect(topic.getUncategorizedSkills()).toEqual([]);
+    expect(topic.getUncategorizedSkillSummaries()).toEqual([]);
   });
 
   it('should correctly remove the various array elements', function() {
@@ -67,10 +68,13 @@ describe('Topic object factory', function() {
     _sampleTopic.removeUncategorizedSkill('skill_1');
     expect(_sampleTopic.getAdditionalStoryIds()).toEqual(['story_3']);
     expect(_sampleTopic.getCanonicalStoryIds()).toEqual(['story_4']);
-    expect(_sampleTopic.getUncategorizedSkills()).toEqual([{
-      id: 'skill_2',
-      description: 'Description 2'
-    }]);
+    expect(_sampleTopic.getUncategorizedSkillSummaries().length).toEqual(1);
+    expect(
+      _sampleTopic.getUncategorizedSkillSummaries()[0].getId()
+    ).toEqual('skill_2');
+    expect(
+      _sampleTopic.getUncategorizedSkillSummaries()[0].getDescription()
+    ).toEqual('Description 2');
   });
 
   it('should be able to copy from another topic', function() {
@@ -88,12 +92,11 @@ describe('Topic object factory', function() {
         id: 1,
         title: 'Title',
         skill_ids: ['skill_1']
-      }],
-      skill_id_to_description_dict: {
-        skill_1: 'Description 1',
-        skill_2: 'Description 2',
-        skill_3: 'Description 3'
-      }
+      }]
+    }, {
+      skill_1: 'Description 1',
+      skill_2: 'Description 2',
+      skill_3: 'Description 3'
     });
 
     expect(_sampleTopic).not.toBe(secondTopic);

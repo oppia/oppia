@@ -17,8 +17,9 @@
  * topic domain objects.
  */
 
-oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
-  function(SubtopicObjectFactory) {
+oppia.factory('TopicObjectFactory', [
+  'SubtopicObjectFactory', 'SkillSummaryObjectFactory',
+  function(SubtopicObjectFactory, SkillSummaryObjectFactory) {
     var Topic = function(
         id, name, description, languageCode, canonicalStoryIds,
         additionalStoryIds, uncategorizedSkillIds,
@@ -29,12 +30,11 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
       this._languageCode = languageCode;
       this._canonicalStoryIds = canonicalStoryIds;
       this._additionalStoryIds = additionalStoryIds;
-      this._uncategorizedSkills = uncategorizedSkillIds.map(function(skillId) {
-        return {
-          id: skillId,
-          description: skillIdToDescriptionMap[skillId]
-        };
-      });
+      this._uncategorizedSkillSummaries = uncategorizedSkillIds.map(
+        function(skillId) {
+          return SkillSummaryObjectFactory.create(
+            skillId, skillIdToDescriptionMap[skillId]);
+        });
       this._nextSubtopicId = nextSubtopicId;
       this._version = version;
       this._subtopics = subtopics.map(function(subtopic) {
@@ -106,15 +106,13 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
         if (this._subtopics[i].getId() === subtopicId) {
           // When a subtopic is deleted, all the skills in it are moved to
           // uncategorized skill ids.
-          var skills = this._subtopics[i].getSkills();
+          var skills = this._subtopics[i].getSkillSummaries();
           for (var j = 0; j < skills.length; j++) {
-            var skillId = skills[j].id;
-            var skillDescription = skills[j].description;
-            if (this.getIndexOfUncategorizedSkill(skillId) === -1) {
-              this._uncategorizedSkills.push({
-                id: skillId,
-                description: skillDescription
-              });
+            var skillId = skills[j].getId();
+            var skillDescription = skills[j].getDescription();
+            if (!this.hasUncategorizedSkill(skillId)) {
+              this._uncategorizedSkillSummaries.push(
+                SkillSummaryObjectFactory.create(skillId, skillDescription));
             }
           }
           this._subtopics.splice(i, 1);
@@ -193,18 +191,20 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
       return this._additionalStoryIds.slice();
     };
 
-    Topic.prototype.getIndexOfUncategorizedSkill = function(skillId) {
-      return this._uncategorizedSkills.map(function(skill) {
-        return skill.id;
-      }).indexOf(skillId);
+    Topic.prototype.hasUncategorizedSkill = function(skillId) {
+      for (var i = 0; i < this._uncategorizedSkillSummaries.length; i++) {
+        if (this._uncategorizedSkillSummaries[i].getId() === skillId) {
+          return true;
+        }
+      }
+      return false;
     };
 
     Topic.prototype.addUncategorizedSkill = function(
         skillId, skillDescription) {
       var skillIsPresentInSomeSubtopic = false;
       for (var i = 0; i < this._subtopics.length; i++) {
-        var index = this._subtopics[i].getIndexOfSkill(skillId);
-        if (index !== -1) {
+        if (this._subtopics[i].hasSkill(skillId)) {
           skillIsPresentInSomeSubtopic = true;
           break;
         }
@@ -212,29 +212,29 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
       if (skillIsPresentInSomeSubtopic) {
         throw Error('Given skillId is already present in a subtopic.');
       }
-      if (this.getIndexOfUncategorizedSkill(skillId) !== -1) {
+      if (this.hasUncategorizedSkill(skillId)) {
         throw Error('Given skillId is already an uncategorized skill.');
       }
-      this._uncategorizedSkills.push({
-        id: skillId,
-        description: skillDescription
-      });
+      this._uncategorizedSkillSummaries.push(
+        SkillSummaryObjectFactory.create(skillId, skillDescription));
     };
 
     Topic.prototype.removeUncategorizedSkill = function(skillId) {
-      var index = this.getIndexOfUncategorizedSkill(skillId);
+      var index = this._uncategorizedSkillSummaries.map(function(skillSummary) {
+        return skillSummary.getId();
+      }).indexOf(skillId);
       if (index === -1) {
         throw Error('Given skillId is not an uncategorized skill.');
       }
-      this._uncategorizedSkills.splice(index, 1);
+      this._uncategorizedSkillSummaries.splice(index, 1);
     };
 
     Topic.prototype.clearUncategorizedSkills = function() {
-      this._uncategorizedSkills.length = 0;
+      this._uncategorizedSkillSummaries.length = 0;
     };
 
-    Topic.prototype.getUncategorizedSkills = function() {
-      return this._uncategorizedSkills.slice();
+    Topic.prototype.getUncategorizedSkillSummaries = function() {
+      return this._uncategorizedSkillSummaries.slice();
     };
 
     // Reassigns all values within this topic to match the existing
@@ -262,10 +262,12 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
         this.addAdditionalStoryId(additionalStoryIds[i]);
       }
 
-      var uncategorizedSkills = otherTopic.getUncategorizedSkills();
-      for (var i = 0; i < uncategorizedSkills.length; i++) {
+      var uncategorizedSkillSummaries =
+        otherTopic.getUncategorizedSkillSummaries();
+      for (var i = 0; i < uncategorizedSkillSummaries.length; i++) {
         this.addUncategorizedSkill(
-          uncategorizedSkills[i].id, uncategorizedSkills[i].description);
+          uncategorizedSkillSummaries[i].getId(),
+          uncategorizedSkillSummaries[i].getDescription());
       }
 
       this._subtopics = angular.copy(otherTopic.getSubtopics());
@@ -274,16 +276,15 @@ oppia.factory('TopicObjectFactory', ['SubtopicObjectFactory',
     // Static class methods. Note that "this" is not available in static
     // contexts. This function takes a JSON object which represents a backend
     // topic python dict.
-    Topic.create = function(topicBackendObject) {
+    Topic.create = function(topicBackendDict, skillIdToDescriptionDict) {
       return new Topic(
-        topicBackendObject.id, topicBackendObject.name,
-        topicBackendObject.description, topicBackendObject.language_code,
-        topicBackendObject.canonical_story_ids,
-        topicBackendObject.additional_story_ids,
-        topicBackendObject.uncategorized_skill_ids,
-        topicBackendObject.next_subtopic_id, topicBackendObject.version,
-        topicBackendObject.subtopics,
-        topicBackendObject.skill_id_to_description_dict
+        topicBackendDict.id, topicBackendDict.name,
+        topicBackendDict.description, topicBackendDict.language_code,
+        topicBackendDict.canonical_story_ids,
+        topicBackendDict.additional_story_ids,
+        topicBackendDict.uncategorized_skill_ids,
+        topicBackendDict.next_subtopic_id, topicBackendDict.version,
+        topicBackendDict.subtopics, skillIdToDescriptionDict
       );
     };
 

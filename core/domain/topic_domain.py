@@ -380,6 +380,18 @@ class Topic(object):
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
 
+    def get_all_skill_ids(self):
+        """Returns all the ids of all the skilld present in the topic.
+
+        Returns:
+            list(str). The list of all the skill ids present in the topic.
+        """
+        skill_ids = copy.deepcopy(self.uncategorized_skill_ids)
+
+        for subtopic in self.subtopics:
+            skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
+        return skill_ids
+
     def delete_story(self, story_id):
         """Removes a story from the canonical_story_ids list.
 

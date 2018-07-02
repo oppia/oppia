@@ -58,20 +58,6 @@ describe('Editable topic backend API service', function() {
         language_code: 'en'
       }
     };
-    expectedSuccessObject = {
-      id: '0',
-      name: 'Topic Name',
-      description: 'Topic Description',
-      version: '1',
-      canonical_story_ids: ['story_id_1'],
-      additional_story_ids: ['story_id_2'],
-      uncategorized_skill_ids: ['skill_id_1'],
-      subtopics: [],
-      language_code: 'en',
-      skill_id_to_description_dict: {
-        skill_id_1: 'Description 1'
-      }
-    };
   }));
 
   afterEach(function() {
@@ -90,7 +76,10 @@ describe('Editable topic backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(expectedSuccessObject);
+      expect(successHandler).toHaveBeenCalledWith({
+        topicDict: sampleDataResults.topic_dict,
+        skillIdToDescriptionDict: sampleDataResults.skill_id_to_description_dict
+      });
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -140,7 +129,7 @@ describe('Editable topic backend API service', function() {
 
       EditableTopicBackendApiService.fetchTopic('0').then(
         function(data) {
-          topic = data;
+          topic = data.topicDict;
         });
       $httpBackend.flush();
 
@@ -162,7 +151,10 @@ describe('Editable topic backend API service', function() {
       ).then(successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(topic);
+      expect(successHandler).toHaveBeenCalledWith({
+        topicDict: topic,
+        skillIdToDescriptionDict: sampleDataResults.skill_id_to_description_dict
+      });
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

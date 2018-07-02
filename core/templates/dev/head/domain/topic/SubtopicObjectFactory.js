@@ -17,17 +17,16 @@
  * subtopic domain objects.
  */
 
-oppia.factory('SubtopicObjectFactory', [
-  function() {
+oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
+  function(SkillSummaryObjectFactory) {
     var Subtopic = function(subtopicBackendObject, skillIdToDescriptionMap) {
       this._id = subtopicBackendObject.id;
       this._title = subtopicBackendObject.title;
-      this._skills = subtopicBackendObject.skill_ids.map(function(skillId) {
-        return {
-          id: skillId,
-          description: skillIdToDescriptionMap[skillId]
-        };
-      });
+      this._skillSummaries = subtopicBackendObject.skill_ids.map(
+        function(skillId) {
+          return SkillSummaryObjectFactory.create(
+            skillId, skillIdToDescriptionMap[skillId]);
+        });
     };
 
     // Instance methods
@@ -54,32 +53,35 @@ oppia.factory('SubtopicObjectFactory', [
       this._title = title;
     };
 
-    // Returns the skill ids in the subtopic.
-    Subtopic.prototype.getSkills = function() {
-      return this._skills.slice();
+    // Returns the summaries of the skills in the subtopic.
+    Subtopic.prototype.getSkillSummaries = function() {
+      return this._skillSummaries.slice();
     };
 
-    Subtopic.prototype.getIndexOfSkill = function(skillId) {
-      return this._skills.map(function(skill) {
-        return skill.id;
-      }).indexOf(skillId);
+    Subtopic.prototype.hasSkill = function(skillId) {
+      for (var i = 0; i < this._skillSummaries.length; i++) {
+        if (this._skillSummaries[i].getId() === skillId) {
+          return true;
+        }
+      }
+      return false;
     };
 
     Subtopic.prototype.addSkill = function(skillId, skillDescription) {
-      if (this.getIndexOfSkill(skillId) === -1) {
-        this._skills.push({
-          id: skillId,
-          description: skillDescription
-        });
+      if (!this.hasSkill(skillId)) {
+        this._skillSummaries.push(SkillSummaryObjectFactory.create(
+          skillId, skillDescription));
         return true;
       }
       return false;
     };
 
     Subtopic.prototype.removeSkill = function(skillId) {
-      var index = this.getIndexOfSkill(skillId);
+      var index = this._skillSummaries.map(function(skillSummary) {
+        return skillSummary.getId();
+      }).indexOf(skillId);
       if (index > -1) {
-        this._skills.splice(index, 1);
+        this._skillSummaries.splice(index, 1);
       } else {
         throw Error('The given skill doesn\'t exist in the subtopic');
       }
