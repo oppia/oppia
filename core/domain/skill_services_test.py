@@ -81,6 +81,21 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].misconception_count, 1)
         self.assertEqual(skill_summaries[0].worked_examples_count, 1)
 
+    def test_get_skill_descriptions_by_ids(self):
+        self.save_new_skill(
+            'skill_2', self.USER_ID, 'Description 2', [],
+            skill_domain.SkillContents('Explanation', ['Example 1'])
+        )
+        skill_descriptions = skill_services.get_skill_descriptions_by_ids([
+            self.SKILL_ID, 'skill_2'])
+
+        self.assertEqual(
+            skill_descriptions, {
+                self.SKILL_ID: 'Description',
+                'skill_2': 'Description 2'
+            }
+        )
+
     def test_get_skill_by_id(self):
         expected_skill = self.skill.to_dict()
         skill = skill_services.get_skill_by_id(self.SKILL_ID)

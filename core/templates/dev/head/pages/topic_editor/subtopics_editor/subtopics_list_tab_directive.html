@@ -1,169 +1,119 @@
-<div class="subtopic-editor">
-  <md-card layout="row" class="editor" ng-if="subtopicDisplayed">
-    <div ng-repeat="subtopic in subtopics">
-      <div class="subtopic-title" ng-if="isSubtopicEditorDisplayed(subtopic)">
-        <span ng-if="!subtopicTitleEditorIsShown" ng-click="openSubtopicTitleEditor()"
-              class="oppia-editable-section">
-          <strong style="font-size: 1.2em;"><[subtopic.getTitle()]></strong>
-          <i class="material-icons oppia-editor-edit-icon"
-             title="Edit Subtopic Title">&#xE254;
-          </i>
+<div class="subtopics-tab">
+  <md-card class="subtopics">
+    <h3> Subtopics </h3>
+    <h4 style="color: #6d6d6d">
+      (Drag and drop skills across subtopics or to the uncategorized section or click on a subtopic card to edit its page data)
+    </h4>
+    <div class="subtopics-container">
+      <md-card class="subtopic"
+               ng-repeat="(subtopicIndex, subtopic) in subtopics"
+               ng-click="editSubtopic(subtopic)"
+               dnd-list="subtopic.getSkillSummaries()"
+               dnd-drop="endMoveSkill(subtopic.getId())">
+        <strong style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
+        <span style="float: right; color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
+          <i class="material-icons md-18">&#xE14C;</i>
         </span>
-        <span ng-if="subtopicTitleEditorIsShown">
-          <form class="form-horizontal" role="form" ng-submit="updateSubtopicTitle(subtopic, editableTitle)">
-            <input type="text" ng-model="editableTitle">
-            <button type="submit" class="btn btn-success btn-sm">Save</button>
-            <button class="btn btn-default btn-sm" ng-click="closeSubtopicTitleEditor()">Cancel</button>
-          </form>
-        </span>
-      </div>
-      <div ng-if="isSubtopicEditorDisplayed(subtopic)">
-        <div ng-if="!subtopicEditorIsShown" class="preview">
-          <angular-html-bind html-data="htmlData">
-          </angular-html-bind>
-          <div class="pull-right">
-            <button type="button"
-                    class="btn btn-default save-button"
-                    ng-click="closePreviewSubtopicPage(htmlData)">
-              Edit
-            </button>
-          </div>
+        <div style="max-height: 35vh; overflow-y: auto;">
+          <md-card class="skill-id"
+                   ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
+                   dnd-draggable="skillSummary"
+                   dnd-dragstart="startMoveSkill(subtopic.getId(), skillSummary)"
+                   dnd-effect-allowed="move">
+            <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
+              <[skillSummary.getDescription()]>
+            </a>
+          </md-card>
         </div>
-        <div ng-if="subtopicEditorIsShown" class="oppia-editor-card-body">
-          <schema-based-editor schema="SUBTOPIC_PAGE_SCHEMA"
-                               local-value="editableHtmlData">
-          </schema-based-editor>
-
-          <div class="pull-right">
-            <button type="button"
-                    class="btn btn-default save-button"
-                    ng-click="openPreviewSubtopicPage(editableHtmlData)">
-              Preview
-            </button>
-            <button type="button"
-                    class="btn btn-success save-button"
-                    ng-disabled="!editableHtmlData"
-                    ng-click="updateHtmlData(subtopic.getId(), editableHtmlData)">
-              Save
-            </button>
-          </div>
-        </div>
-      </div>
+      </md-card>
+      <md-card class="subtopic new" ng-click="createSubtopic()">
+        <i class="material-icons">add</i>
+      </md-card>
     </div>
   </md-card>
-  <div ng-show="!subtopicDisplayed" class="help-text">
-    <h2> Click on a subtopic to show its editor</h2>
-  </div>
+
+  <md-card class="uncategorized-skill-ids"
+           dnd-list="uncategorizedSkillSummaries"
+           dnd-drop="endMoveSkill(null)">
+    <h3> Uncategorized Skills </h3>
+    <div style="max-height: 45vh; overflow-y: auto;">
+      <md-card class="skill-id"
+               ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index"
+               dnd-draggable="skillSummary"
+               dnd-effect-allowed="move"
+               dnd-dragstart="startMoveSkill(null, skillSummary)">
+        <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
+          <[skillSummary.getDescription()]>
+        </a>
+      </md-card>
+    </div>
+  </md-card>
 </div>
-<md-card layout="row" class="list-view-item">
-  <table class="subtopics-table">
-    <colgroup>
-      <col style="width: 50%;">
-      <col style="width: 50%;">
-    </colgroup>
-    <tr>
-      <th colspan="2">
-      <button type="button" ng-click="createSubtopic()"
-              class="btn btn-default create-subtopic-button">
-        Create Subtopic
-      </button>
-    </th>
-    </tr>
-    <tr ng-if="subtopics.length > 0">
-      <th ng-repeat="key in SUBTOPIC_HEADINGS" class="subtopics-table-headings">
-        <p ng-if="key === 'title'"> Subtopic Title </p>
-        <p ng-if="key === 'skills'"> Skills </p>
-      </th>
-    </tr>
-    <tr ng-repeat="subtopic in subtopics"
-        class="list-item"
-        ng-if="subtopics.length > 0">
-      <td ng-click="setSubtopic(subtopic)">
-        <span class="list-summary"> <[subtopic.getTitle()]> </span>
-      </td>
-      <td ng-click="setSubtopic(subtopic)">
-        <span class="list-summary"> <[subtopic.getSkillIds().length]> </span>
-      </td>
-      <td>
-        <span ng-click="deleteSubtopic(subtopic)" class="fa fa-trash list-summary"></span>
-      </td>
-    </tr>
-  </table>
-</md-card>
-
 <style>
-  subtopics-list-tab .list-view-item {
-    background: #fff;
-    margin: 20px 7.5px 0 50%;
-    padding: 10px 20px;
-    width: auto;
+  subtopics-list-tab .subtopics-tab {
+    display: flex;
+    margin: 6vh 10vh 0 10vh;
   }
-
-  subtopics-list-tab .editor {
-    background: #fff;
-    padding: 10px 20px;
-    width: 45vw;
+  subtopics-list-tab h4 {
+    white-space: normal;
   }
-
-  subtopics-list-tab .preview {
-    width: 40vw;
+  subtopics-list-tab .dndDraggingSource {
+    display: none;
   }
-
-  subtopics-list-tab .editor .save-button {
-    margin-top: 2em;
-  }
-
-  subtopics-list-tab .create-subtopic-button {
-    margin-bottom: 2%;
-  }
-
-  subtopics-list-tab .subtopics-table {
-    font-size: 15px;
-    width: auto;
-  }
-
-  subtopics-list-tab .subtopics-table .subtopics-table-headings {
-    border-bottom: 2px solid #bbb;
-    padding-bottom: 0.7em;
-  }
-
-  subtopics-list-tab .subtopics-table .subtopics-table-headings p {
-    display: inline;
-  }
-
-  subtopics-list-tab .list-summary,
-  subtopics-list-tab .list-summary:active,
-  subtopics-list-tab .list-summary:visited {
-    color: inherit;
+  subtopics-list-tab .dndPlaceholder {
+    background-color: #e0e0e0;
     display: block;
-    height: 2em;
-    text-decoration: none;
+    min-height: 42px;
   }
-
-  subtopics-list-tab .subtopic-editor {
+  subtopics-list-tab .subtopics-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+  subtopics-list-tab .subtopic {
+    align-content: center;
+    background-color: #fafafa;
+    width: 15vw;
+    height: 40vh;
     float: left;
-    margin-left: 3%;
+    flex: 0 0 auto;
+    position: relative;
   }
-
-  subtopics-list-tab .subtopic-editor .subtopic-title{
-    margin-bottom: 3%;
+  subtopics-list-tab .subtopic:hover {
+    background-color: #f6f6f6;
   }
-
-  subtopics-list-tab .subtopic-editor .help-text {
-    margin-top: 50%;
+  subtopics-list-tab .new:hover {
+    background-color: #f1f1f1;
   }
-
-  subtopics-list-tab .list-item:not(:last-child) {
-    border-bottom: 1px solid #bbb;
+  subtopics-list-tab .new .material-icons {
+    position: absolute;
+    font-size: 2.5em;
+    bottom: 50%;
+    left: 46%;
   }
-
-  subtopics-list-tab .list-item:hover {
-    background-color: #ededed;
-  }
-
-  subtopics-list-tab .list-summary span {
+  subtopics-list-tab .subtopics {
+    background-color: white;
+    border-right: 1px solid #BDBDBD;
     display: inline-block;
-    line-height: normal;
-    vertical-align: middle;
+    float: left;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    width: 80%;
+  }
+  subtopics-list-tab .uncategorized-skill-ids {
+    background-color: white;
+    width: 30%;
+    display: inline-block;
+    text-align: center;
+  }
+
+  subtopics-list-tab .skill-id {
+    background-color: #efefef;
+  }
+  subtopics-list-tab .skill-id:hover {
+    background-color: #e0e0e0;
   }
 </style>

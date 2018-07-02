@@ -27,95 +27,156 @@ oppia.directive('subtopicsListTab', [
       controller: [
         '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
         'UndoRedoService', 'SubtopicPageObjectFactory',
-        'EVENT_TOPIC_REINITIALIZED', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_SUBTOPIC_PAGE_LOADED',
+        'UrlInterpolationService', 'EVENT_TOPIC_REINITIALIZED',
+        'EVENT_TOPIC_INITIALIZED', 'EVENT_SUBTOPIC_PAGE_LOADED',
         function(
             $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
             UndoRedoService, SubtopicPageObjectFactory,
-            EVENT_TOPIC_REINITIALIZED, EVENT_TOPIC_INITIALIZED,
-            EVENT_SUBTOPIC_PAGE_LOADED) {
-          // The subtopic preview/editor would be hidden until a subtopic is
-          // clicked.
-          $scope.subtopicDisplayed = false;
+            UrlInterpolationService, EVENT_TOPIC_REINITIALIZED,
+            EVENT_TOPIC_INITIALIZED, EVENT_SUBTOPIC_PAGE_LOADED) {
+          var SKILL_EDITOR_URL_TEMPLATE = '/skill_editor/<skillId>';
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.subtopics = $scope.topic.getSubtopics();
             $scope.subtopicEditorIsShown = false;
+            $scope.uncategorizedSkillSummaries =
+              $scope.topic.getUncategorizedSkillSummaries();
           };
 
-          $scope.SUBTOPIC_PAGE_SCHEMA = {
-            type: 'html',
-            ui_config: {
-              rows: 100
-            }
-          };
-
-          $scope.SUBTOPIC_HEADINGS = ['title', 'skills'];
-
-          $scope.isSubtopicEditorDisplayed = function(subtopic) {
-            return (
-              $scope.subtopicIndexToDisplay ===
-              $scope.subtopics.indexOf(subtopic));
-          };
-
-          $scope.setSubtopic = function(subtopic) {
-            $scope.subtopicIndexToDisplay = $scope.subtopics.indexOf(subtopic);
-            $scope.editableTitle = subtopic.getTitle();
+          $scope.editSubtopic = function(subtopic) {
+            var editableTitle = subtopic.getTitle();
             TopicEditorStateService.loadSubtopicPage(
               $scope.topic.getId(), subtopic.getId());
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topic_editor/subtopics_editor/' +
+                'subtopic_editor_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.subtopicId = subtopic.getId();
+                  $scope.editableTitle = editableTitle;
+                  $scope.subtopicPage =
+                    TopicEditorStateService.getSubtopicPage();
+                  $scope.htmlData = $scope.subtopicPage.getHtmlData();
+                  $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
+                    $scope.subtopicPage =
+                      TopicEditorStateService.getSubtopicPage();
+                    $scope.htmlData = $scope.subtopicPage.getHtmlData();
+                  });
+                  $scope.SUBTOPIC_PAGE_SCHEMA = {
+                    type: 'html',
+                    ui_config: {
+                      rows: 100
+                    }
+                  };
+
+                  $scope.updateSubtopicTitle = function(title) {
+                    $scope.editableTitle = title;
+                    $scope.closeSubtopicTitleEditor();
+                  };
+
+                  $scope.updateHtmlData = function(htmlData) {
+                    $scope.htmlData = htmlData;
+                    $scope.openPreviewSubtopicPage(htmlData);
+                  };
+
+                  $scope.openSubtopicTitleEditor = function() {
+                    $scope.subtopicTitleEditorIsShown = true;
+                  };
+
+                  $scope.closeSubtopicTitleEditor = function() {
+                    $scope.subtopicTitleEditorIsShown = false;
+                  };
+
+                  $scope.openPreviewSubtopicPage = function(htmlData) {
+                    $scope.subtopicEditorIsShown = false;
+                    $scope.htmlData = htmlData;
+                  };
+
+                  $scope.closePreviewSubtopicPage = function(previewHtmlData) {
+                    $scope.subtopicEditorIsShown = true;
+                    $scope.htmlData = previewHtmlData;
+                  };
+
+                  $scope.save = function() {
+                    $uibModalInstance.close({
+                      newTitle: $scope.editableTitle,
+                      newHtmlData: $scope.htmlData
+                    });
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(newValues) {
+              $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
+              var newTitle = newValues.newTitle;
+              var newHtmlData = newValues.newHtmlData;
+
+              if (newTitle !== subtopic.getTitle()) {
+                TopicUpdateService.setSubtopicTitle(
+                  $scope.topic, subtopic.getId(), newTitle);
+              }
+              if (newHtmlData !== $scope.subtopicPage.getHtmlData()) {
+                TopicUpdateService.setSubtopicPageHtmlData(
+                  $scope.subtopicPage, subtopic.getId(), newHtmlData);
+                TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
+              }
+            });
           };
 
-          $scope.$on(EVENT_SUBTOPIC_PAGE_LOADED, function() {
-            $scope.subtopicPage = TopicEditorStateService.getSubtopicPage();
-            $scope.subtopicDisplayed = true;
-            $scope.subtopicEditorIsShown = false;
-            $scope.htmlData = $scope.subtopicPage.getHtmlData();
-          });
-
-          $scope.openSubtopicTitleEditor = function() {
-            $scope.subtopicTitleEditorIsShown = true;
+          $scope.getSkillEditorUrl = function(skillId) {
+            return UrlInterpolationService.interpolateUrl(
+              SKILL_EDITOR_URL_TEMPLATE, {
+                skillId: skillId
+              }
+            );
           };
 
-          $scope.closeSubtopicTitleEditor = function() {
-            $scope.subtopicTitleEditorIsShown = false;
+          /**
+           * @param {string|null} oldSubtopicId - The id of the subtopic from
+           *    which the skill is to be moved or null, if the origin is the
+           *    uncategorized section.
+           * @param {SkillSummary} skill - The summary of the skill that is to
+           *    be moved.
+           */
+          $scope.startMoveSkill = function(oldSubtopicId, skill) {
+            $scope.skillToMove = skill;
+            $scope.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
           };
 
-          $scope.openPreviewSubtopicPage = function(htmlData) {
-            $scope.subtopicEditorIsShown = false;
-            $scope.htmlData = htmlData;
-          };
+          /**
+           * @param {string|null} newSubtopicId - The subtopic to which the
+           *    skill is to be moved or null, if the destination is the
+           *    uncategorized section.
+           */
+          $scope.endMoveSkill = function(newSubtopicId) {
+            if (newSubtopicId === $scope.oldSubtopicId) {
+              return;
+            }
 
-          $scope.closePreviewSubtopicPage = function(previewHtmlData) {
-            $scope.subtopicEditorIsShown = true;
-            $scope.editableHtmlData = previewHtmlData;
+            if (newSubtopicId === null) {
+              TopicUpdateService.removeSkillFromSubtopic(
+                $scope.topic, $scope.oldSubtopicId, $scope.skillToMove);
+            } else {
+              TopicUpdateService.moveSkillToSubtopic(
+                $scope.topic, $scope.oldSubtopicId, newSubtopicId,
+                $scope.skillToMove);
+            }
+            _initEditor();
           };
 
           $scope.deleteSubtopic = function(subtopic) {
-            if ($scope.subtopicIndexToDisplay ===
-                $scope.subtopics.indexOf(subtopic)) {
-              $scope.subtopicDisplayed = false;
-            }
             TopicEditorStateService.deleteSubtopicPage(
               $scope.topic.getId(), subtopic.getId());
             TopicUpdateService.deleteSubtopic($scope.topic, subtopic.getId());
             _initEditor();
-          };
-
-          $scope.updateSubtopicTitle = function(subtopic, newTitle) {
-            TopicUpdateService.setSubtopicTitle(
-              $scope.topic, subtopic.getId(), newTitle);
-            $scope.closeSubtopicTitleEditor();
-            _initEditor();
-          };
-
-          $scope.updateHtmlData = function(subtopicId, newHtmlData) {
-            if (newHtmlData === $scope.subtopicPage.getHtmlData()) {
-              return;
-            }
-            TopicUpdateService.setSubtopicPageHtmlData(
-              $scope.subtopicPage, subtopicId, newHtmlData);
-            TopicEditorStateService.setSubtopicPage($scope.subtopicPage);
-            $scope.openPreviewSubtopicPage(newHtmlData);
           };
 
           $scope.createSubtopic = function() {
@@ -147,8 +208,6 @@ oppia.directive('subtopicsListTab', [
               TopicEditorStateService.setSubtopicPage(subtopicPage);
               TopicUpdateService.addSubtopic($scope.topic, title);
               _initEditor();
-              // Open the editor for the newly created subtopic page.
-              $scope.setSubtopic($scope.topic.getSubtopics().slice(-1)[0]);
             });
           };
 
