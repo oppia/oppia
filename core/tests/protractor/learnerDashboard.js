@@ -58,7 +58,7 @@ describe('Learner dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  fit('displays completed explorations', function() {
+  it('displays completed explorations', function() {
     users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
     users.createModerator(
       'moderator@learnerDashboard.com', 'moderatorlearnerDashboard');
