@@ -401,12 +401,12 @@ def check_user_can_review_in_category(user_id, score_category):
         bool. Whether the user can review suggestions under category
             score_category
     """
-    instance_id = user_models.UserContributionScoringModel.get_instance_id(
-        user_id, score_category)
-    model = user_models.UserContributionScoringModel.get_by_id(instance_id)
-    if not model:
-        return False
-    return model.score >= suggestion_models.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+    score = (
+        user_models.UserContributionScoringModel.get_score_of_user_for_category(
+            user_id, score_category))
+    if not score:
+        return false
+    return score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
 
 
 def get_all_user_ids_who_are_allowed_to_review(score_category):
@@ -439,15 +439,8 @@ def update_score_of_user_for_category(user_id, score_category, update_by):
         update_by: float. The amount to increase or decrease the score of the
             user by.
     """
-    instance_id = user_models.UserContributionScoringModel.get_instance_id(
-        user_id, score_category)
-    model = user_models.UserContributionScoringModel.get_by_id(instance_id)
-    if not model:
-        create_new_user_contribution_scoring_model(
-            user_id, score_category, update_by)
-    else:
-        model.score += update_by
-        model.put()
+    user_models.UserContributionScoringModel.update_score_for_user(
+        user_id, score_category, update_by)
 
 
 def create_new_user_contribution_scoring_model(user_id, score_category, score):

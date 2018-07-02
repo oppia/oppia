@@ -72,8 +72,6 @@ SCORE_TYPE_CHOICES = [
 # The delimiter to be used in score category field.
 SCORE_CATEGORY_DELIMITER = '.'
 
-MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
-
 
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.

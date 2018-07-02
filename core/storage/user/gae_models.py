@@ -23,8 +23,7 @@ import feconf
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
-(base_models, suggestion_models) = models.Registry.import_models(
-    [models.NAMES.base_model, models.NAMES.suggestion])
+(base_models, ) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -718,11 +717,10 @@ class UserContributionScoringModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.score_category == score_category).filter(
-                cls.score >=
-                suggestion_models.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
+                cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
 
     @classmethod
-    def get_instance_id(cls, user_id, score_category):
+    def _get_instance_id(cls, user_id, score_category):
         """Generates the instance id in the form {{score_category}}.{{user_id}}.
 
         Args:
@@ -736,6 +734,23 @@ class UserContributionScoringModel(base_models.BaseModel):
         return '.'.join([score_category, user_id])
 
     @classmethod
+    def get_score_of_user_for_category(cls, user_id, score_category):
+        """Gets the score of the user for the given score category.
+
+        Args:
+            user_id: str. The ID of the user.
+            score_category: str. The category of suggestion to score the user
+                on.
+
+        Returns:
+            float|None. The score of the user in the given category.
+        """
+        instance_id = cls._get_instance_id(user_id, score_category)
+        model = cls.get_by_id(instance_id)
+
+        return model.score if model else None
+
+    @classmethod
     def create(cls, user_id, score_category, score):
         """Creates a new UserContributionScoringModel entry.
 
@@ -747,7 +762,7 @@ class UserContributionScoringModel(base_models.BaseModel):
         Raises:
             Exception: There is already an entry with the given id.
         """
-        instance_id = cls.get_instance_id(user_id, score_category)
+        instance_id = cls._get_instance_id(user_id, score_category)
 
         if cls.get_by_id(instance_id):
             raise Exception('There is already an entry with the given id: %s' %
@@ -755,3 +770,21 @@ class UserContributionScoringModel(base_models.BaseModel):
 
         cls(id=instance_id, user_id=user_id, score_category=score_category,
             score=score).put()
+
+    @classmethod
+    def update_score_for_user(cls, user_id, score_category, update_by):
+        """Update the score of the user in the category by the given amount.
+
+        Args:
+            user_id: str. The id of the user.
+            score_category: str. The category of the suggestion.
+            update_by: float. The amount to increase or decrease the score of
+                the user by.
+        """
+        instance_id = cls._get_instance_id(user_id, score_category)
+        model = cls.get_by_id(instance_id)
+        if not model:
+            cls.create(user_id, score_category, update_by)
+        else:
+            model.score += update_by
+            model.put()
