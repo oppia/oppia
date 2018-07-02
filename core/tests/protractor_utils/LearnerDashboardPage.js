@@ -144,7 +144,7 @@ var LearnerDashboardPage = function() {
 
   this.expectTitleOfCollectionSummaryTileToBeHidden = function(title) {
     browser.wait(until.invisibilityOf(titleOfCollectionSummaryTile.first()),
-      5000, 'Collection Summary Tile takes too long to appear')
+      5000, 'Collection Summary Tile takes too long to disappear')
       .then(function(isVisible) {
         if (isVisible) {
           titleOfCollectionSummaryTile.map(function(collectionTitle) {
@@ -172,7 +172,7 @@ var LearnerDashboardPage = function() {
   this.expectTitleOfExplorationSummaryTileToBeHidden = function(title) {
     browser.wait(until.invisibilityOf(
       titleOfExplorationSummaryTile.first()), 5000,
-    'Exploration Summary Tile takes too long to appear')
+    'Exploration Summary Tile takes too long to disappear')
       .then(function(inVisible) {
         if (inVisible) {
           titleOfExplorationSummaryTile.map(function(explorationTitle) {

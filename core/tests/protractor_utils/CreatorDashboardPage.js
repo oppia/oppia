@@ -37,18 +37,12 @@ var CreatorDashboardPage = function() {
   var _getExplorationElements = function(explorationTitle) {
     var allExplorationDashboardCard = element.all(
       by.css('.protractor-test-exploration-dashboard-card'));
-    browser.wait(until.visibilityOf(allExplorationDashboardCard), 5000,
-      'Exploration Dashboard Cards are not visible').then(function(isVisible) {
-      if (isVisible) {
-        return allExplorationDashboardCard.filter(function(tile) {
-          return tile.element(
-            by.css('.protractor-test-exp-summary-tile-title')).
-            getText().then(function(tileTitle) {
-              return (tileTitle === explorationTitle);
-            });
-        }
-        );
-      }
+    return allExplorationDashboardCard.filter(function(tile) {
+      return tile.element(
+        by.css('.protractor-test-exp-summary-tile-title')).
+        getText().then(function(tileTitle) {
+          return (tileTitle === explorationTitle);
+        });
     });
   };
 
@@ -57,13 +51,8 @@ var CreatorDashboardPage = function() {
   };
 
   this.getNumberOfFeedbackMessages = function() {
-    browser.wait(until.visibilityOf(explorationFeedbackCount), 5000,
-      'Exploration Feedback Count is not visible').then(function(isVisible) {
-      if (isVisible) {
-        return explorationFeedbackCount.getText().then(function(text) {
-          return parseInt(text);
-        });
-      }
+    return explorationFeedbackCount.getText().then(function(text) {
+      return parseInt(text);
     });
   };
 
