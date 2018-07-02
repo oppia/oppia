@@ -22,12 +22,22 @@ var until = protractor.ExpectedConditions;
 
 var LibraryPage = function(){
   var LIBRARY_URL_SUFFIX = '/library';
+  var allExplorationSummaryTile = element.all(
+    by.css('.protractor-test-exp-summary-tile'));
   var languageSelector = forms.MultiSelectEditor(
     element(by.css('.protractor-test-search-bar-language-selector'))
   );
   var categorySelector = forms.MultiSelectEditor(
     element(by.css('.protractor-test-search-bar-category-selector'))
   );
+  var collectionTitled = function(collectionName) {
+    return element(by.cssContainingText(
+      '.protractor-test-collection-summary-tile-title', collectionName));
+  };
+  var explorationTitled = function(explorationName) {
+    return element(by.cssContainingText(
+      '.protractor-test-exp-summary-tile-title', explorationName));
+  };
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );
@@ -42,19 +52,6 @@ var LibraryPage = function(){
           });
       }
     );
-  };
-
-  // Returns a promise of all collections with the given name.
-  var _getCollectionElements = function(collectionName) {
-    return element.all(by.css('.protractor-test-collection-summary-tile'))
-      .filter(function(tile) {
-        return tile.element(by.css(
-          '.protractor-test-collection-summary-tile-title')).getText().then(
-          function(tileTitle) {
-            return (tileTitle === collectionName);
-          });
-      }
-      );
   };
 
   this.get = function() {
@@ -98,25 +95,29 @@ var LibraryPage = function(){
   };
 
   this.playCollection = function(collectionName) {
-    _getCollectionElements(collectionName).then(function(collectionElems) {
-      if (collectionElems.length === 0) {
-        throw 'Could not find collection tile with name ' + collectionName;
-      }
-      collectionElems[0].element(by.css(
-        '.protractor-test-collection-summary-tile-title'
-      )).click();
-    });
+    var allCollectionSummaryTile = element.all(
+      by.css('.protractor-test-collection-summary-tile'));
+    browser.wait(until.visibilityOf(allCollectionSummaryTile.first()), 5000,
+      'Library Page does not have any collection')
+      .then(function(isVisible) {
+        if (isVisible) {
+          browser.wait(until.visibilityOf(collectionTitled(collectionName)),
+            5000, 'Unable to find collection ' + collectionName);
+          collectionTitled(collectionName).click();
+        }
+      });
   };
 
-  this.playExploration = function(name) {
-    _getExplorationElements(name).then(function(elems) {
-      if (elems.length === 0) {
-        throw 'Could not find exploration tile with name ' + name;
-      }
-      elems[0].element(by.css(
-        '.protractor-test-exp-summary-tile-title'
-      )).click();
-    });
+  this.playExploration = function(explorationName) {
+    browser.wait(until.visibilityOf(allExplorationSummaryTile.first()), 5000,
+      'Library Page does not have any exploration')
+      .then(function(isVisible) {
+        if (isVisible) {
+          browser.wait(until.visibilityOf(explorationTitled(explorationName)),
+            5000, 'Unable to find exploration ' + explorationName);
+          explorationTitled(explorationName).click();
+        }
+      });
   };
 
   this.getExplorationObjective = function(name) {
@@ -144,8 +145,10 @@ var LibraryPage = function(){
   };
 
   this.findExploration = function(explorationTitle) {
-    element.all(by.css('.protractor-test-search-input')).first().sendKeys(
-      explorationTitle);
+    var searchInput = element.all(
+      by.css('.protractor-test-search-input')).first();
+    searchInput.clear();
+    searchInput.sendKeys(explorationTitle);
     browser.waitForAngular();
   };
 };
