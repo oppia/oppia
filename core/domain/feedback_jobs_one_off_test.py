@@ -378,7 +378,7 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
 
     def test_suggestion_miigration_validation_one_off_job(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        for i in range(10):
+        for _ in range(10):
             feedback_services.create_suggestion(
                 self.EXP_ID, self.author_id, exploration.version, 'State 1',
                 'description', 'new_value')
@@ -386,3 +386,4 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
 
         output = self._run_validation_job()
         self.assertEqual(output[0][1], output[1][1])
+        self.assertEqual(output[0][1], 10)

@@ -182,4 +182,3 @@ class SuggestionMigrationValdiationOneOffJob(
     @staticmethod
     def reduce(key, value):
         yield (key, len(value))
-
