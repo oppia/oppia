@@ -111,7 +111,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Expected skill ids to be a list')
         self.topic.subtopics[0].skill_ids = ['skill_id', 'skill_id']
         self._assert_validation_error(
-            'The skill id skill_id is duplicated in the subtopic')
+            'Expected all skill ids to be distinct.')
         self.topic.subtopics[0].skill_ids = [1, 2]
         self._assert_validation_error('Expected each skill id to be a string')
 
