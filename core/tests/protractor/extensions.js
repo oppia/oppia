@@ -43,7 +43,7 @@ describe('rich-text components', function() {
 
     workflow.createExploration();
 
-    explorationEditorPage.setContent(function(richTextEditor) {
+    explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
       richTextEditor.appendPlainText(' ');
       // TODO (Jacob) add test for image RTE component
