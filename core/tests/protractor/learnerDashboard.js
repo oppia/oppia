@@ -1,4 +1,4 @@
-// Copyright 2017 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var workflow = require('../protractor_utils/workflow.js');
+var until = protractor.ExpectedConditions;
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
@@ -41,84 +41,58 @@ describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
   var adminPage = null;
   var explorationEditorPage = null;
+  var explorationPlayerPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;
-  var explorationPlayerPage = null;
   var subscriptionDashboardPage = null;
-
-  beforeEach(function() {
-    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    libraryPage = new LibraryPage.LibraryPage();
-    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
-    subscriptionDashboardPage = (
-      new SubscriptionDashboardPage.SubscriptionDashboardPage());
-  });
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
-    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
+    libraryPage = new LibraryPage.LibraryPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
-    // Create a new learner.
-    users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
-    users.createUser(
-      'creator2@learnerDashboard.com', 'creator2learnerDashboard');
-    users.createModerator(
-      'creator3@learnerDashboard.com', 'creator3learnerDashboard');
-
-    var USERNAME = 'creator1learnerDashboard';
-    users.createAndLoginAdminUser('creator1@learnerDashboard.com', USERNAME);
-    adminPage.reloadAllExplorations();
-    adminPage.updateRole(USERNAME, 'collection editor');
-    browser.get(general.SERVER_URL_PREFIX);
-    var dropdown = element(by.css('.protractor-test-profile-dropdown'));
-    browser.actions().mouseMove(dropdown).perform();
-    dropdown.element(by.css('.protractor-test-dashboard-link')).click();
-    browser.waitForAngular();
-    element(by.css('.protractor-test-create-activity')).click();
-    // Create new collection.
-    element(by.css('.protractor-test-create-collection')).click();
-    browser.waitForAngular();
-    collectionEditorPage.addExistingExploration('14');
-    collectionEditorPage.saveDraft();
-    collectionEditorPage.closeSaveModal();
-    collectionEditorPage.publishCollection();
-    collectionEditorPage.setTitle('Test Collection');
-    collectionEditorPage.setObjective('This is a test collection.');
-    collectionEditorPage.setCategory('Algebra');
-    collectionEditorPage.saveChanges();
-    browser.waitForAngular();
-    users.logout();
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
+    creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    subscriptionDashboardPage =
+      new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('displays incomplete and completed explorations', function() {
+  it('displays completed explorations', function() {
+    users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
+    users.createModerator(
+      'moderator@learnerDashboard.com', 'moderatorlearnerDashboard');
+    users.createAndLoginAdminUser(
+      'admin@learnerDashboard.com', 'collectionAdmlearnerDashboard');
+
+    adminPage.get();
+    // Load exploration '3'
+    adminPage.reloadExploration('root_linear_coefficient_theorem.yaml');
+    // Load exploration '14'
+    adminPage.reloadExploration('about_oppia.yaml');
+
     users.login('learner@learnerDashboard.com');
+    // TODO(hoangviet1993): Play an exploration and leave it in between and
+    // verify exploration is added to Incomplete Exploration section.
 
-    // Play an exploration and leave it in between. It should be added to the
-    // 'In Progress' section.
-    general.openPlayer('3');
-    explorationPlayerPage.submitAnswer('Continue', null);
-    browser.ignoreSynchronization = true;
-    learnerDashboardPage.get();
-    general.acceptAlert();
-    browser.ignoreSynchronization = false;
-    browser.waitForAngular();
-    libraryPage.expectExplorationToBeVisible('Root Linear Coefficient Theorem');
-
-    // Play an exploration completely. It should be added to the 'Completed'
-    // section.
+    // Play exploration '14' completely.
     general.openPlayer('14');
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
     explorationPlayerPage.submitAnswer('Continue', null);
+
+    // Exploration '14' should be added to completed section.
     learnerDashboardPage.get();
-    browser.waitForAngular();
     learnerDashboardPage.navigateToCompletedSection();
-    libraryPage.expectExplorationToBeVisible('About Oppia');
+    learnerDashboardPage.navigateToCompletedExplorationsSection();
+    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+      'About Oppia');
     users.logout();
 
-    users.login('creator3@learnerDashboard.com');
-    general.openEditor('3');
+    // Delete exploration '14'.
+    users.login('moderator@learnerDashboard.com');
+    general.openEditor('14');
     explorationEditorPage.navigateToSettingsTab();
     element(by.css('.protractor-test-delete-exploration-button')).click();
     element(by.css(
@@ -126,125 +100,159 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     users.logout();
 
+    // Verify exploration '14' is deleted from learner dashboard.
     users.login('learner@learnerDashboard.com');
     learnerDashboardPage.get();
-    browser.waitForAngular();
-    libraryPage.expectExplorationToBeHidden('Root Linear Coefficient Theorem');
+    learnerDashboardPage.navigateToCompletedSection();
+    learnerDashboardPage.navigateToCompletedExplorationsSection();
+    learnerDashboardPage.expectTitleOfExplorationSummaryTileToBeHidden(
+      'About Oppia');
     users.logout();
   });
 
-  it('displays incomplete and completed collections', function() {
-    users.login('learner@learnerDashboard.com');
+  it('displays completed collections', function() {
+    users.createUser('learner4@learnerDashboard.com',
+      'learner4learnerDashboard');
+    // Login to admin account
+    users.createAndLoginAdminUser(
+      'testCollectionAdm@learnerDashboard.com',
+      'testcollectionAdmlearnerDashboard');
+    adminPage.get();
+    general.waitForSystem(2000);
+    // Load Exploration '14'
+    adminPage.reloadExploration('about_oppia.yaml');
+    // Load exploration '0'
+    adminPage.reloadExploration('welcome.yaml');
 
-    // Go to the test collection.
-    browser.get('/search/find?q=');
-    browser.waitForAngular();
-    element.all(by.css(
-      '.protractor-test-collection-summary-tile-title')).first().click();
-    // Go to the first and only exploration.
-    element.all(by.css(
-      '.protractor-test-collection-exploration')).first().click();
-    // Leave the exploration inbetween. The collection should be found in the
-    // 'In Progress' section.
-    explorationPlayerPage.submitAnswer('Continue', null);
-    browser.ignoreSynchronization = true;
-    learnerDashboardPage.get();
-    general.acceptAlert();
-    browser.waitForAngular();
+    // Create new 'Test Collection' containing exploration '14'.
+    creatorDashboardPage.get();
+    creatorDashboardPage.clickCreateActivityButton();
+    creatorDashboardPage.clickCreateCollectionButton();
+    collectionEditorPage.searchForAndAddExistingExploration('14');
+    collectionEditorPage.saveDraft();
+    collectionEditorPage.closeSaveModal();
+    collectionEditorPage.publishCollection();
+    collectionEditorPage.setTitle('Test Collection');
+    collectionEditorPage.setObjective('This is a test collection.');
+    collectionEditorPage.setCategory('Algebra');
+    collectionEditorPage.saveChanges();
     general.waitForSystem();
-    browser.ignoreSynchronization = false;
-    learnerDashboardPage.navigateToIncompleteCollectionsSection();
-    learnerDashboardPage.expectTitleOfSummaryTileToMatch('Test Collection');
+    users.logout();
 
-    // Go to the test collection.
-    browser.get('/search/find?q=');
-    browser.waitForAngular();
+    users.login('learner4@learnerDashboard.com');
+    // TODO(hoangviet1993): Play the collection and leave it in between and
+    // verify collection is added to Incomplete collection section.
+
+    // Go to 'Test collection' and complete it.
+    libraryPage.get();
     general.waitForSystem();
-    element.all(by.css(
-      '.protractor-test-collection-summary-tile-title')).first().click();
+    libraryPage.findExploration('Test Collection');
+    libraryPage.playCollection('Test Collection');
+    browser.wait(until.elementToBeClickable(firstExploration), 10000,
+      'Could not click first exploration in collection')
+      .then(function(isClickable) {
+        if (isClickable) {
+          firstExploration.click();
+        }
+      });
     general.waitForSystem();
-    // Go to the first and only exploration.
-    element.all(by.css(
-      '.protractor-test-collection-exploration')).first().click();
-    // Complete the exploration. The collection should be found in the
-    // 'Completed' section as the collection is also completed.
+
+    // Complete the exploration.
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
     explorationPlayerPage.submitAnswer('Continue', null);
+
+    // The collection should be found in the 'Completed' section.
     learnerDashboardPage.get();
-    browser.waitForAngular();
-    general.waitForSystem();
     learnerDashboardPage.navigateToCompletedSection();
-    general.waitForSystem();
     learnerDashboardPage.navigateToCompletedCollectionsSection();
-    learnerDashboardPage.expectTitleOfSummaryTileToMatch('Test Collection');
+    learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
+      'Test Collection');
     users.logout();
 
-    users.login('creator1@learnerDashboard.com');
+    // Add exploration '0' to 'Test Collection' and publish it
+    users.login('testCollectionAdm@learnerDashboard.com');
     creatorDashboardPage.get();
-    browser.waitForAngular();
-    general.waitForSystem();
     creatorDashboardPage.navigateToCollectionEditor();
-    browser.waitForAngular();
-    general.waitForSystem();
-    collectionEditorPage.addExistingExploration('0');
-    browser.waitForAngular();
-    general.waitForSystem();
+    collectionEditorPage.searchForAndAddExistingExploration('0');
     collectionEditorPage.saveDraft();
-    browser.waitForAngular();
-    general.waitForSystem();
     element(by.css('.protractor-test-commit-message-input')).sendKeys('Update');
     browser.driver.sleep(300);
     collectionEditorPage.closeSaveModal();
     general.waitForSystem();
-    browser.driver.sleep(300);
     users.logout();
 
-    users.login('learner@learnerDashboard.com');
+    // Verify 'Test Collection' is now in the incomplete section
+    // in learner dashboard
+    users.login('learner4@learnerDashboard.com');
     learnerDashboardPage.get();
-    browser.waitForAngular();
-    general.waitForSystem();
     learnerDashboardPage.navigateToIncompleteCollectionsSection();
-    learnerDashboardPage.expectTitleOfSummaryTileToMatch('Test Collection');
+    learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
+      'Test Collection');
     users.logout();
   });
 
   it('displays learners subscriptions', function() {
-    users.login('learner@learnerDashboard.com');
+    users.createUser('learner1@learnerDashboard.com',
+      'learner1learnerDashboard');
+    var creator1Id = 'creatorName';
+    users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
+    var creator2Id = 'collectionAdm';
+    users.createAndLoginAdminUser(creator2Id + '@learnerDashboard.com',
+      creator2Id);
+    adminPage.get();
+    // Load Exploration '14'.
+    adminPage.reloadExploration('about_oppia.yaml');
+    users.logout();
 
+    users.login('learner1@learnerDashboard.com');
     // Subscribe to both the creators.
-    browser.get('/profile/creator1learnerDashboard');
-    browser.waitForAngular();
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator1Id);
     subscriptionDashboardPage.navigateToSubscriptionButton();
-    browser.get('/profile/creator2learnerDashboard');
-    browser.waitForAngular();
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(creator2Id);
     subscriptionDashboardPage.navigateToSubscriptionButton();
+
+    // Completing exploration '14' to activate /learner_dashboard
+    general.openPlayer('14');
+    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.submitAnswer(
+      'MultipleChoiceInput', 'Those were all the questions I had!');
+    explorationPlayerPage.submitAnswer('Continue', null);
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.
     learnerDashboardPage.get();
-    browser.waitForAngular();
-    general.waitForSystem();
     learnerDashboardPage.navigateToSubscriptionsSection();
-    learnerDashboardPage.expectSubscriptionFirstNameToMatch('creator...');
+    // LIFO.
+    learnerDashboardPage.expectSubscriptionFirstNameToMatch('collect...');
     learnerDashboardPage.expectSubscriptionLastNameToMatch('creator...');
     users.logout();
   });
 
   it('displays learner feedback threads', function() {
-    users.login('learner@learnerDashboard.com');
+    users.createUser('learner2@learnerDashboard.com',
+      'learner2learnerDashboard');
+    users.createAndLoginAdminUser(
+      'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
+    adminPage.get();
+    // Load Exploration '14'
+    adminPage.reloadExploration('about_oppia.yaml');
+    users.logout();
+
+    users.login('learner2@learnerDashboard.com');
     var feedback = 'A good exploration. Would love to see a few more questions';
 
-    libraryPage.get();
+    // Play exploration '14' and submit feedback.
     general.openPlayer('14');
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.submitFeedback(feedback);
+
+    // Verify feedback thread is created.
     learnerDashboardPage.get();
-    browser.waitForAngular();
     learnerDashboardPage.navigateToFeedbackSection();
     learnerDashboardPage.expectFeedbackExplorationTitleToMatch('About Oppia');
     learnerDashboardPage.navigateToFeedbackThread();
@@ -272,61 +280,58 @@ describe('Subscriptions functionality', function() {
 
   it('handle subscriptions to creators correctly', function() {
     // Create two creators.
-    users.createUser('creator1@subscriptions.com', 'creator1subscriptions');
-    users.login('creator1@subscriptions.com');
-    workflow.createExploration();
-    general.waitForSystem();
-    general.waitForSystem();
-    users.logout();
-
-    users.createUser('creator2@subscriptions.com', 'creator2subscriptions');
-    users.login('creator2@subscriptions.com');
-    workflow.createExploration();
-    users.logout();
+    users.createUser('creator1Id@subscriptions.com', 'creator1Idsubscriptions');
+    users.createUser('creator2Id@subscriptions.com', 'creator2Idsubscriptions');
 
     // Create a learner who subscribes to both the creators.
     users.createUser('learner1@subscriptions.com', 'learner1subscriptions');
     users.login('learner1@subscriptions.com');
-    browser.get('/profile/creator1subscriptions');
-    browser.waitForAngular();
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(
+      'creator1Idsubscriptions');
     subscriptionDashboardPage.navigateToSubscriptionButton();
-    browser.get('/profile/creator2subscriptions');
-    browser.waitForAngular();
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(
+      'creator2Idsubscriptions');
     subscriptionDashboardPage.navigateToSubscriptionButton();
     preferencesPage.get();
     preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
     preferencesPage.expectDisplayedLastSubscriptionToBe('creator...');
     users.logout();
 
-    // Create a learner who subscribes to one creator and unsubscribes from the
-    // other.
+    // Create a learner who subscribes to creator1Id and unsubscribes from the
+    // creator2Id.
     users.createUser('learner2@subscriptions.com', 'learner2subscriptions');
     users.login('learner2@subscriptions.com');
-    browser.get('/profile/creator1subscriptions');
-    browser.waitForAngular();
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(
+      'creator1Idsubscriptions');
     subscriptionDashboardPage.navigateToSubscriptionButton();
-    browser.get('/profile/creator2subscriptions');
-    browser.waitForAngular();
+    subscriptionDashboardPage.navigateToUserSubscriptionPage(
+      'creator2Idsubscriptions');
+
     // Subscribe and then unsubscribe from the same user.
     subscriptionDashboardPage.navigateToSubscriptionButton();
-    browser.waitForAngular();
     subscriptionDashboardPage.navigateToSubscriptionButton();
     preferencesPage.get();
     preferencesPage.expectSubscriptionCountToEqual(1);
     preferencesPage.expectDisplayedFirstSubscriptionToBe('creator...');
     users.logout();
 
-    users.login('creator1@subscriptions.com');
+    // Verify there are 2 subscribers.
+    users.login('creator1Id@subscriptions.com');
+    // Need to go exploration editor to activate /creator_dashboard
     creatorDashboardPage.get();
-    browser.waitForAngular();
+    creatorDashboardPage.clickCreateActivityButton();
+    creatorDashboardPage.get();
     creatorDashboardPage.navigateToSubscriptionDashboard();
     subscriptionDashboardPage.expectSubscriptionFirstNameToMatch('learner...');
     subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');
     users.logout();
 
-    users.login('creator2@subscriptions.com');
+    // Verify there are 1 subscriber.
+    users.login('creator2Id@subscriptions.com');
+    // Need to go exploration editor to activate /creator_dashboard
     creatorDashboardPage.get();
-    browser.waitForAngular();
+    creatorDashboardPage.clickCreateActivityButton();
+    creatorDashboardPage.get();
     creatorDashboardPage.navigateToSubscriptionDashboard();
     subscriptionDashboardPage.expectSubscriptionCountToEqual(1);
     subscriptionDashboardPage.expectSubscriptionLastNameToMatch('learner...');
