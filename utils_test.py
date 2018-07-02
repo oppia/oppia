@@ -18,6 +18,7 @@ import copy
 import datetime
 
 # pylint: disable=relative-import
+from core.domain import html_cleaner
 from core.tests import test_utils
 import feconf
 import utils
@@ -251,3 +252,119 @@ class UtilsTests(test_utils.GenericTestBase):
                 utils.get_hashable_value(json1_deepcopy),
                 utils.get_hashable_value(json2_deepcopy),
             })
+
+    def test_convert_states(self):
+        states_dict = {
+            'Introduction': {
+                'content': {
+                    'content_id': 'content', 'html': 'Hello!'
+                },
+                'param_changes': [],
+                'content_ids_to_audio_translations': {'content': {}},
+                'classifier_model_id': None,
+                'interaction': {
+                    'solution': None,
+                    'answer_groups': [],
+                    'default_outcome': {
+                        'param_changes': [], 'feedback': {
+                            'content_id': 'default_outcome', 'html': (
+                                '<p><oppia-noninteractive-image filepath'
+                                '-with-value="&amp;quot;random.png&amp;'
+                                'quot;"></oppia-noninteractive-image>'
+                                'Hello this is test case to check '
+                                'image tag inside p tag</p>'
+                            )
+                        },
+                        'dest': 'Introduction',
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None,
+                        'labelled_as_correct': False
+                    },
+                    'customization_args': {},
+                    'confirmed_unclassified_answers': [],
+                    'id': None,
+                    'hints': []
+                }
+            }
+        }
+
+        states_dict_in_textangular = {
+            'Introduction': {
+                'content': {
+                    'content_id': 'content', 'html': '<p>Hello!</p>'
+                },
+                'param_changes': [],
+                'content_ids_to_audio_translations': {'content': {}},
+                'classifier_model_id': None,
+                'interaction': {
+                    'solution': None,
+                    'answer_groups': [],
+                    'default_outcome': {
+                        'param_changes': [], 'feedback': {
+                            'content_id': 'default_outcome', 'html': (
+                                '<p><oppia-noninteractive-image filepath'
+                                '-with-value="&amp;quot;random.png&amp;'
+                                'quot;"></oppia-noninteractive-image>'
+                                'Hello this is test case to check '
+                                'image tag inside p tag</p>'
+                            )
+                        },
+                        'dest': 'Introduction',
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None,
+                        'labelled_as_correct': False
+                    },
+                    'customization_args': {},
+                    'confirmed_unclassified_answers': [],
+                    'id': None,
+                    'hints': []
+                }
+            }
+        }
+
+        states_dict_with_image_caption = {
+            'Introduction': {
+                'content': {
+                    'content_id': 'content', 'html': '<p>Hello!</p>'
+                },
+                'param_changes': [],
+                'content_ids_to_audio_translations': {'content': {}},
+                'classifier_model_id': None,
+                'interaction': {
+                    'solution': None,
+                    'answer_groups': [],
+                    'default_outcome': {
+                        'param_changes': [], 'feedback': {
+                            'content_id': 'default_outcome', 'html': (
+                                '<p><oppia-noninteractive-image caption-'
+                                'with-value="&amp;quot;&amp;quot;" filepath'
+                                '-with-value="&amp;quot;random.png&amp;'
+                                'quot;"></oppia-noninteractive-image>'
+                                'Hello this is test case to check '
+                                'image tag inside p tag</p>'
+                            )
+                        },
+                        'dest': 'Introduction',
+                        'refresher_exploration_id': None,
+                        'missing_prerequisite_skill_id': None,
+                        'labelled_as_correct': False
+                    },
+                    'customization_args': {},
+                    'confirmed_unclassified_answers': [],
+                    'id': None,
+                    'hints': []
+                }
+            }
+        }
+
+        self.assertEqual(
+            utils.convert_states(
+                states_dict,
+                html_cleaner.convert_to_textangular),
+            states_dict_in_textangular)
+
+        self.assertEqual(
+            utils.convert_states(
+                states_dict,
+                html_cleaner.add_caption_to_image),
+            states_dict_with_image_caption)

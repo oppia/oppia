@@ -3282,7 +3282,116 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V27
+    YAML_CONTENT_V28 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 28
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 23
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V28
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -3446,9 +3555,15 @@ title: Title
             'eid', self.YAML_CONTENT_V27)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v28(self):
+        """Test direct loading from a v28 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V28)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
-class RTEMigrationUnitTests(test_utils.GenericTestBase):
-    """Test content migration for RTE."""
+
+class HTMLMigrationUnitTests(test_utils.GenericTestBase):
+    """Test HTML migration."""
 
     YAML_CONTENT_V26_TEXTANGULAR = ("""author_notes: ''
 auto_tts_enabled: true
@@ -3654,7 +3769,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long
-    YAML_CONTENT_V27_TEXTANGULAR = ("""author_notes: ''
+    YAML_CONTENT_V28_TEXTANGULAR = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -3664,7 +3779,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 27
+schema_version: 28
 states:
   Introduction:
     classifier_model_id: null
@@ -3754,7 +3869,7 @@ states:
           dest: state3
           feedback:
             content_id: outcome
-            html: \"<pre>Outcome2 \\nfor state2</pre>\"
+            html: "<pre>Outcome2 \\nfor state2</pre>"
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3769,8 +3884,8 @@ states:
       customization_args:
         choices:
           value:
-          - <p>This is </p><p>value1 <br>for MultipleChoice</p>
-          - <p>This is value2 for <br>MultipleChoice</p>
+          - <p>This is </p><p>value1 <br/>for MultipleChoice</p>
+          - <p>This is value2 for <br/>MultipleChoice</p>
       default_outcome:
         dest: state2
         feedback:
@@ -3805,8 +3920,9 @@ states:
           dest: state1
           feedback:
             content_id: outcome
-            html: <p>Here is the image1 <i><oppia-noninteractive-image filepath-with-value="amp;quot;startBlue.png&amp;quot;">
-              </oppia-noninteractive-image></i>Here is the image2 </p><p><oppia-noninteractive-image
+            html: <p>Here is the image1 <i><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+              filepath-with-value="amp;quot;startBlue.png&amp;quot;"> </oppia-noninteractive-image></i>Here
+              is the image2 </p><p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
               filepath-with-value=" amp;quot;startBlue.png&amp;quot;"> </oppia-noninteractive-image></p>
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
@@ -3847,9 +3963,231 @@ states:
       id: ItemSelectionInput
       solution: null
     param_changes: []
-states_schema_version: 22
+states_schema_version: 23
 tags: []
 title: title
+""")
+
+    YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 27
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p><oppia-noninteractive-image filepath-with-value="&amp;quot;random.png
+            &amp;quot;"></oppia-noninteractive-image>Hello this
+            is test case to check image tag inside p tag</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 22
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V28_WITH_IMAGE_CAPTION = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 28
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="&amp;quot;random.png &amp;quot;"></oppia-noninteractive-image>Hello
+        this is test case to check image tag inside p tag</p>
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 23
+tags: []
+title: Title
 """)
 # pylint: enable=line-too-long
 
@@ -3858,7 +4196,14 @@ title: title
         exploration = exp_domain.Exploration.from_yaml(
             'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
         self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V27_TEXTANGULAR)
+            exploration.to_yaml(), self.YAML_CONTENT_V28_TEXTANGULAR)
+
+    def test_load_from_v27_without_image_caption(self):
+        """Test direct loading from a v27 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
+        self.assertEqual(
+            exploration.to_yaml(), self.YAML_CONTENT_V28_WITH_IMAGE_CAPTION)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
