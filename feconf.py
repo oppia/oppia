@@ -433,7 +433,7 @@ MAX_FILE_SIZE_BYTES = 1048576
 MAX_AUDIO_FILE_LENGTH_SEC = 300
 
 # The minimum score required for a user to review suggestions of a particular
-# category
+# category.
 MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
 # The prefix for an 'accepted suggestion' commit message.

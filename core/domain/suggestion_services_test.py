@@ -661,4 +661,7 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
                     'user2', 'category1'))
             self.assertFalse(
                 suggestion_services.check_user_can_review_in_category(
+                    'user_1', 'category_new'))
+            self.assertFalse(
+                suggestion_services.check_user_can_review_in_category(
                     'invalid_user', 'category1'))

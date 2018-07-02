@@ -405,7 +405,7 @@ def check_user_can_review_in_category(user_id, score_category):
         user_models.UserContributionScoringModel.get_score_of_user_for_category(
             user_id, score_category))
     if not score:
-        return false
+        return False
     return score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
 
 
