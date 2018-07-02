@@ -58,7 +58,7 @@ describe('Learner dashboard functionality', function() {
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
-  it('displays completed explorations', function() {
+  fit('displays completed explorations', function() {
     users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
     users.createModerator(
       'moderator@learnerDashboard.com', 'moderatorlearnerDashboard');
@@ -72,8 +72,14 @@ describe('Learner dashboard functionality', function() {
     adminPage.reloadExploration('about_oppia.yaml');
 
     users.login('learner@learnerDashboard.com');
-    // TODO(hoangviet1993): Play an exploration and leave it in between and
-    // verify exploration is added to Incomplete Exploration section.
+
+    // TODO(hoangviet1993): Leave the exploration in between.
+    // The exploration should be found in the 'In Progress' section.
+    // Expecting Alert window after leaving and unable to handle the alert at
+    // the point of writing this.
+    // Issue actively discussed here:
+    // https://github.com/angular/protractor/issues/308
+    // Play an exploration and leave it in between.
 
     // Play exploration '14' completely.
     general.openPlayer('14');
@@ -97,14 +103,13 @@ describe('Learner dashboard functionality', function() {
     element(by.css('.protractor-test-delete-exploration-button')).click();
     element(by.css(
       '.protractor-test-really-delete-exploration-button')).click();
+    general.waitForSystem();
     browser.waitForAngular();
     users.logout();
 
     // Verify exploration '14' is deleted from learner dashboard.
     users.login('learner@learnerDashboard.com');
     learnerDashboardPage.get();
-    learnerDashboardPage.navigateToCompletedSection();
-    learnerDashboardPage.navigateToCompletedExplorationsSection();
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToBeHidden(
       'About Oppia');
     users.logout();
@@ -140,14 +145,14 @@ describe('Learner dashboard functionality', function() {
     users.logout();
 
     users.login('learner4@learnerDashboard.com');
-    // TODO(hoangviet1993): Play the collection and leave it in between and
-    // verify collection is added to Incomplete collection section.
-
-    // Go to 'Test collection' and complete it.
+    // Go to 'Test Collection' and play it.
     libraryPage.get();
     general.waitForSystem();
     libraryPage.findExploration('Test Collection');
     libraryPage.playCollection('Test Collection');
+    var firstExploration = element.all(
+      by.css('.protractor-test-collection-exploration')).first();
+    // Click first exploration in collection.
     browser.wait(until.elementToBeClickable(firstExploration), 10000,
       'Could not click first exploration in collection')
       .then(function(isClickable) {
@@ -155,7 +160,13 @@ describe('Learner dashboard functionality', function() {
           firstExploration.click();
         }
       });
-    general.waitForSystem();
+
+    // TODO(hoangviet1993): Leave the collection in between.
+    // The collection should be found in the 'In Progress' section.
+    // Expecting Alert window after leaving and unable to handle the alert at
+    // the point of writing this.
+    // Issue actively discussed here:
+    // https://github.com/angular/protractor/issues/308
 
     // Complete the exploration.
     explorationPlayerPage.submitAnswer('Continue', null);
