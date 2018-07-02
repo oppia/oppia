@@ -1,8 +1,8 @@
 <table class="table">
-<tr ng-repeat="item in localValue track by $index">
-  <td>
-    <schema-based-viewer schema="itemSchema()" local-value="localValue[$index]">
-    </schema-based-viewer>
-  </td>
-</tr>
+  <tr ng-repeat="item in localValue track by $index">
+    <td>
+      <schema-based-viewer schema="itemSchema()" local-value="localValue[$index]">
+      </schema-based-viewer>
+    </td>
+  </tr>
 </table>
