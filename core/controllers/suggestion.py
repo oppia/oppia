@@ -97,8 +97,12 @@ class SuggestionListHandler(base.BaseHandler):
         if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
             raise self.PageNotFoundException
 
-        suggestions = suggestion_services.query_suggestions(
-            self.request.GET.items())
+        queries = self.request.GET.items()
+        for field, value in queries:
+            if query_field not in suggestion_models.ALLOWED_QUERY_FIELDS:
+                raise Exception('Not allowed to query on field %s' % field)
+
+        suggestions = suggestion_services.query_suggestions(queries)
 
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)

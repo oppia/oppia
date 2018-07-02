@@ -127,104 +127,105 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 self.score_category, 'exploration.exp1.thread_1')
 
     def test_get_suggestions_by_type(self):
+        queries = [('suggestion_type',
+                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_type(
-                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)), 5)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 5)
+        queries = [('suggestion_type', 'invalid_suggestion_type')]
+
         with self.assertRaisesRegexp(
             Exception, 'Value \'invalid_suggestion_type\' for property'
                        ' suggestion_type is not an allowed choice'):
-            suggestion_models.GeneralSuggestionModel.get_suggestions_by_type(
-                'invalid_suggestion_type')
+            suggestion_models.GeneralSuggestionModel.query_suggestions(queries)
 
     def test_get_suggestion_by_author(self):
+        queries = [('author_id', 'author_1')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_author('author_1')), 1)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 1)
+        queries = [('author_id', 'author_2')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_author('author_2')), 3)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 3)
+        queries = [('author_id', 'author_3')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_author('author_3')), 1)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 1)
+        queries = [('author_id', 'author_invalid')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_author('author_invalid')), 0)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 0)
 
     def test_get_suggestion_assigned_to_reviewer(self):
+        queries = [('assigned_reviewer_id', 'reviewer_1')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_assigned_to_reviewer('reviewer_1')), 1)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 1)
+        queries = [('assigned_reviewer_id', 'reviewer_2')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_assigned_to_reviewer('reviewer_2')), 2)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 2)
+        queries = [('assigned_reviewer_id', 'reviewer_3')]
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel
-                .get_suggestions_assigned_to_reviewer('reviewer_3')), 2)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 2)
+        queries = [('assigned_reviewer_id', 'reviewer_invalid')]
         self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel
-                .get_suggestions_assigned_to_reviewer('reviewer_invalid')), 0)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 0)
 
     def test_get_suggestion_by_reviewer(self):
+        queries = [('final_reviewer_id', 'reviewer_1')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_reviewed_by('reviewer_1')), 1)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 1)
+        queries = [('final_reviewer_id', 'reviewer_2')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_reviewed_by('reviewer_2')), 3)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 3)
+        queries = [('final_reviewer_id', 'reviewer_3')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_reviewed_by('reviewer_3')), 1)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 1)
+        queries = [('final_reviewer_id', 'reviewer_invalid')]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_reviewed_by('reviewer_invalid')), 0)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 0)
 
     def test_get_suggestions_by_status(self):
+        queries = [('status', suggestion_models.STATUS_IN_REVIEW)]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_status(
-                    suggestion_models.STATUS_IN_REVIEW)), 1)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 1)
+        queries = [('status', suggestion_models.STATUS_REJECTED)]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_status(
-                    suggestion_models.STATUS_REJECTED)), 2)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 2)
+        queries = [('status', suggestion_models.STATUS_ACCEPTED)]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_status(
-                    suggestion_models.STATUS_ACCEPTED)), 2)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 2)
+        queries = [('status', suggestion_models.STATUS_RECEIVED)]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_status(
-                    suggestion_models.STATUS_RECEIVED)), 0)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 0)
 
     def test_get_suggestions_by_target_id(self):
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id)
+        ]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_target_id(
-                    suggestion_models.TARGET_TYPE_EXPLORATION, self.target_id)),
-            5)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 5)
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', 'exp_invalid')
+        ]
         self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_target_id(
-                    suggestion_models.TARGET_TYPE_EXPLORATION, 'exp_invalid')),
-            0)
+            len(suggestion_models.GeneralSuggestionModel.query_suggestions(
+                queries)), 0)
 
     def test_query_suggestions(self):
         queries = [
