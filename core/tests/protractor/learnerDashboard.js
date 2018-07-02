@@ -17,7 +17,6 @@
  * subscriptions functionality.
  */
 
-var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
@@ -27,6 +26,8 @@ var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LearnerDashboardPage =
@@ -39,6 +40,7 @@ var SubscriptionDashboardPage =
 describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
   var adminPage = null;
+  var explorationEditorPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;
   var explorationPlayerPage = null;
@@ -46,7 +48,6 @@ describe('Learner dashboard functionality', function() {
 
   beforeEach(function() {
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
-    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage = (
@@ -55,6 +56,7 @@ describe('Learner dashboard functionality', function() {
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
+    collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     // Create a new learner.
     users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
@@ -117,7 +119,7 @@ describe('Learner dashboard functionality', function() {
 
     users.login('creator3@learnerDashboard.com');
     general.openEditor('3');
-    editor.navigateToSettingsTab();
+    explorationEditorPage.navigateToSettingsTab();
     element(by.css('.protractor-test-delete-exploration-button')).click();
     element(by.css(
       '.protractor-test-really-delete-exploration-button')).click();

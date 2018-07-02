@@ -30,8 +30,7 @@ env:
     - RUN_E2E_TESTS_EDITOR_FEATURES=true
     - RUN_E2E_TESTS_EMBEDDING=true
     - RUN_E2E_TESTS_EXTENSIONS=true
-    # TODO(sll): Reinstate this once the tests for the learner dashboard are fixed.
-    # - RUN_E2E_TESTS_LEARNER_DASHBOARD=true
+    - RUN_E2E_TESTS_LEARNER_DASHBOARD=true
     - RUN_E2E_TESTS_LIBRARY=true
     - RUN_E2E_TESTS_USERS=true
 
