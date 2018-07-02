@@ -78,17 +78,17 @@ describe('NumberWithUnitsObjectFactory', function() {
       expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
       ), Units.fromRawInputString('m / s^2')).toString()).toBe('2.02 m^1 s^-2');
       expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
-      ), Units.fromRawInputString('Rs')).toString()).toBe('Rs 2.02');
+      ), Units.fromRawInputString('Rs')).toString()).toBe('2.02 rupees^1');
       expect(new NumberWithUnits('real', 2, new Fraction(false, 0, 0, 1
       ), Units.fromRawInputString('')).toString()).toBe('2');
       expect(new NumberWithUnits('fraction', 0, new Fraction(true, 0, 4, 3
       ), Units.fromRawInputString('m / s^2')).toString()).toBe('-4/3 m^1 s^-2');
       expect(new NumberWithUnits('fraction', 0, new Fraction(
         false, 0, 4, 3), Units.fromRawInputString('$ per hour')).toString(
-      )).toBe('$ 4/3 hour^-1');
+      )).toBe('4/3 dollar^1 hour^-1');
       expect(new NumberWithUnits('real', 40, new Fraction(
         false, 0, 0, 1), Units.fromRawInputString('Rs per hour')).toString(
-      )).toBe('Rs 40 hour^-1');
+      )).toBe('40 rupees^1 hour^-1');
     });
 
     it('should parse valid units strings', function() {
