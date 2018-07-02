@@ -897,13 +897,9 @@ def _save_exploration(committer_id, exploration, commit_message, change_list):
     # Trigger exploration issues model updation.
     if feconf.ENABLE_PLAYTHROUGHS:
         exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
-        revert_to_version = None
-        if change_list:
-            if change_list[0].cmd == (
-                    exp_models.ExplorationModel.CMD_REVERT_COMMIT):
-                revert_to_version = change_list[0].version_number
         stats_services.update_exp_issues_for_new_exp_version(
-            exploration, exp_versions_diff, revert_to_version)
+            exploration, exp_versions_diff=exp_versions_diff,
+            revert_to_version=None)
 
     # Save state id mapping model for exploration.
     create_and_save_state_id_mapping_model(exploration, change_list)
@@ -1426,6 +1422,13 @@ def revert_exploration(
     # Update the exploration summary, but since this is just a revert do
     # not add the committer of the revert to the list of contributors.
     update_exploration_summary(exploration_id, None)
+
+    if feconf.ENABLE_PLAYTHROUGHS:
+        current_exploration = get_exploration_by_id(
+            exploration_id, version=current_version)
+        stats_services.update_exp_issues_for_new_exp_version(
+            current_exploration, exp_versions_diff=None,
+            revert_to_version=revert_to_version)
 
     # Save state id mapping model for the new exploration version.
     create_and_save_state_id_mapping_model_for_reverted_exploration(

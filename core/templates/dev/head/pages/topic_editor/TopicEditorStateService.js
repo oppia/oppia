@@ -20,25 +20,49 @@
 
 oppia.constant('EVENT_TOPIC_INITIALIZED', 'topicInitialized');
 oppia.constant('EVENT_TOPIC_REINITIALIZED', 'topicReinitialized');
+oppia.constant('EVENT_SUBTOPIC_PAGE_LOADED', 'subtopicPageLoaded');
+oppia.constant(
+  'EVENT_STORY_SUMMARIES_INITIALIZED', 'storySummariesInitialized');
 
 oppia.factory('TopicEditorStateService', [
   '$rootScope', 'AlertsService', 'TopicObjectFactory',
-  'TopicRightsObjectFactory', 'TopicRightsBackendApiService',
-  'UndoRedoService', 'EditableTopicBackendApiService',
+  'TopicRightsObjectFactory', 'SubtopicPageObjectFactory',
+  'TopicRightsBackendApiService', 'UndoRedoService',
+  'EditableTopicBackendApiService', 'EditableStoryBackendApiService',
   'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
-  function(
+  'EVENT_SUBTOPIC_PAGE_LOADED', 'EVENT_STORY_SUMMARIES_INITIALIZED', function(
       $rootScope, AlertsService, TopicObjectFactory,
-      TopicRightsObjectFactory, TopicRightsBackendApiService,
-      UndoRedoService, EditableTopicBackendApiService,
-      EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+      TopicRightsObjectFactory, SubtopicPageObjectFactory,
+      TopicRightsBackendApiService, UndoRedoService,
+      EditableTopicBackendApiService, EditableStoryBackendApiService,
+      EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
+      EVENT_SUBTOPIC_PAGE_LOADED, EVENT_STORY_SUMMARIES_INITIALIZED) {
     var _topic = TopicObjectFactory.createInterstitialTopic();
     var _topicRights = TopicRightsObjectFactory.createInterstitialRights();
+    // The array that caches all the subtopic pages loaded by the user.
+    var _subtopicPages = [];
+    // The array that stores all the subtopic pages not loaded from the backend
+    // i.e those that correspond to newly created subtopics.
+    var _newSubtopicPages = [];
+    var _subtopicPage =
+      SubtopicPageObjectFactory.createInterstitialSubtopicPage();
     var _topicIsInitialized = false;
     var _topicIsLoading = false;
     var _topicIsBeingSaved = false;
+    var _canonicalStorySummaries = [];
 
+    var _getSubtopicPageId = function(topicId, subtopicId) {
+      return topicId + '-' + subtopicId.toString();
+    };
+    var _getSubtopicIdFromSubtopicPageId = function(subtopicPageId) {
+      // The subtopic page id consists of the topic id of length 12, a hyphen
+      // and a subtopic id (which is a number).
+      return parseInt(subtopicPageId.slice(13));
+    };
     var _setTopic = function(topic) {
       _topic.copyFromTopic(topic);
+      // Reset the subtopic pages list after setting new topic.
+      _subtopicPages.length = 0;
       if (_topicIsInitialized) {
         $rootScope.$broadcast(EVENT_TOPIC_REINITIALIZED);
       } else {
@@ -46,8 +70,33 @@ oppia.factory('TopicEditorStateService', [
         _topicIsInitialized = true;
       }
     };
+    var _getSubtopicPageIndex = function(subtopicPageId) {
+      for (var i = 0; i < _subtopicPages.length; i++) {
+        if (_subtopicPages[i].getId() === subtopicPageId) {
+          return i;
+        }
+      }
+      return null;
+    };
+    var _getNewSubtopicPageIndex = function(subtopicPageId) {
+      for (var i = 0; i < _newSubtopicPages.length; i++) {
+        if (_newSubtopicPages[i].getId() === subtopicPageId) {
+          return i;
+        }
+      }
+      return null;
+    };
     var _updateTopic = function(newBackendTopicObject) {
       _setTopic(TopicObjectFactory.create(newBackendTopicObject));
+    };
+    var _setSubtopicPage = function(subtopicPage) {
+      _subtopicPage.copyFromSubtopicPage(subtopicPage);
+      _subtopicPages.push(angular.copy(subtopicPage));
+      $rootScope.$broadcast(EVENT_SUBTOPIC_PAGE_LOADED);
+    };
+    var _updateSubtopicPage = function(newBackendSubtopicPageObject) {
+      _setSubtopicPage(SubtopicPageObjectFactory.createFromBackendDict(
+        newBackendSubtopicPageObject));
     };
     var _setTopicRights = function(topicRights) {
       _topicRights.copyFromTopicRights(topicRights);
@@ -55,6 +104,10 @@ oppia.factory('TopicEditorStateService', [
     var _updateTopicRights = function(newBackendTopicRightsObject) {
       _setTopicRights(TopicRightsObjectFactory.createFromBackendDict(
         newBackendTopicRightsObject));
+    };
+    var _setCanonicalStorySummaries = function(canonicalStorySummaries) {
+      _canonicalStorySummaries = angular.copy(canonicalStorySummaries);
+      $rootScope.$broadcast(EVENT_STORY_SUMMARIES_INITIALIZED);
     };
 
     return {
@@ -69,6 +122,10 @@ oppia.factory('TopicEditorStateService', [
           topicId).then(
           function(newBackendTopicObject) {
             _updateTopic(newBackendTopicObject);
+            EditableTopicBackendApiService.fetchStories(topicId).then(
+              function(canonicalStorySummaries) {
+                _setCanonicalStorySummaries(canonicalStorySummaries);
+              });
           },
           function(error) {
             AlertsService.addWarning(
@@ -85,6 +142,29 @@ oppia.factory('TopicEditorStateService', [
             'There was an error when loading the topic rights.');
           _topicIsLoading = false;
         });
+      },
+
+      /**
+       * Loads, or reloads, the subtopic page stored by this service given a
+       * specified topic ID and subtopic ID.
+       */
+      loadSubtopicPage: function(topicId, subtopicId) {
+        var subtopicPageId = _getSubtopicPageId(topicId, subtopicId);
+        if (_getSubtopicPageIndex(subtopicPageId) !== null) {
+          _subtopicPage = angular.copy(
+            _subtopicPages[_getSubtopicPageIndex(subtopicPageId)]);
+          $rootScope.$broadcast(EVENT_SUBTOPIC_PAGE_LOADED);
+          return;
+        }
+        EditableTopicBackendApiService.fetchSubtopicPage(
+          topicId, subtopicId).then(
+          function(newBackendSubtopicPageObject) {
+            _updateSubtopicPage(newBackendSubtopicPageObject);
+          },
+          function(error) {
+            AlertsService.addWarning(
+              error || 'There was an error when loading the topic.');
+          });
       },
 
       /**
@@ -115,6 +195,26 @@ oppia.factory('TopicEditorStateService', [
         return _topic;
       },
 
+      getCanonicalStorySummaries: function() {
+        return _canonicalStorySummaries;
+      },
+
+      /**
+       * Returns the current subtopic page to be shared among the topic
+       * editor. Please note any changes to this subtopic page will be
+       * propogated to all bindings to it. This subtopic page object will be
+       * retained for the lifetime of the editor. This function never returns
+       * null, though it may return an empty subtopic page object if the topic
+       * has not yet been loaded for this editor instance.
+       */
+      getSubtopicPage: function() {
+        return _subtopicPage;
+      },
+
+      getSubtopicPages: function() {
+        return _subtopicPages;
+      },
+
       /**
        * Returns the current topic rights to be shared among the topic
        * editor. Please note any changes to this topic rights will be
@@ -137,6 +237,56 @@ oppia.factory('TopicEditorStateService', [
        */
       setTopic: function(topic) {
         _setTopic(topic);
+      },
+
+      /**
+       * Sets the updated subtopic page object in the correct position in the
+       * _subtopicPages list.
+       */
+      setSubtopicPage: function(subtopicPage) {
+        if (_getSubtopicPageIndex(subtopicPage.getId()) !== null) {
+          _subtopicPages[_getSubtopicPageIndex(subtopicPage.getId())] =
+            angular.copy(subtopicPage);
+          _subtopicPage.copyFromSubtopicPage(subtopicPage);
+        } else {
+          _setSubtopicPage(subtopicPage);
+          _newSubtopicPages.push(angular.copy(subtopicPage));
+        }
+      },
+
+      deleteSubtopicPage: function(topicId, subtopicId) {
+        var subtopicPageId = _getSubtopicPageId(topicId, subtopicId);
+        var index = _getSubtopicPageIndex(subtopicPageId);
+        var newIndex = _getNewSubtopicPageIndex(subtopicPageId);
+        if (index === null) {
+          throw Error('The given subtopic page doesn\'t exist');
+        }
+        _subtopicPages.splice(index, 1);
+        // If the deleted subtopic page corresponded to a newly created
+        // subtopic, then the 'subtopicId' part of the id of all subsequent
+        // subtopic pages should be decremented to make it in sync with the
+        // their corresponding subtopic ids.
+        if (newIndex !== null) {
+          _newSubtopicPages.splice(newIndex, 1);
+          for (var i = 0; i < _subtopicPages.length; i++) {
+            var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
+              _subtopicPages[i].getId());
+            if (newSubtopicId > subtopicId) {
+              newSubtopicId--;
+              _subtopicPages[i].setId(
+                _getSubtopicPageId(topicId, newSubtopicId));
+            }
+          }
+          for (var i = 0; i < _newSubtopicPages.length; i++) {
+            var newSubtopicId = _getSubtopicIdFromSubtopicPageId(
+              _newSubtopicPages[i].getId());
+            if (newSubtopicId > subtopicId) {
+              newSubtopicId--;
+              _newSubtopicPages[i].setId(
+                _getSubtopicPageId(topicId, newSubtopicId));
+            }
+          }
+        }
       },
 
       /**
@@ -173,6 +323,26 @@ oppia.factory('TopicEditorStateService', [
           commitMessage, UndoRedoService.getCommittableChangeList()).then(
           function(topicBackendObject) {
             _updateTopic(topicBackendObject);
+            var changeList = UndoRedoService.getCommittableChangeList();
+            for (var i = 0; i < changeList.length; i++) {
+              if (changeList[i].property_name === 'canonical_story_ids') {
+                if (changeList[i].new_value.length ===
+                    changeList[i].old_value.length - 1) {
+                  deletedStoryId = changeList[i].old_value.filter(
+                    function(storyId) {
+                      return changeList[i].new_value.indexOf(storyId) === -1;
+                    }
+                  )[0];
+                  EditableStoryBackendApiService.deleteStory(
+                    _topic.getId(), deletedStoryId);
+                } else if (
+                  changeList[i].new_value.length <
+                  changeList[i].old_value.length) {
+                  throw Error(
+                    'More than one story should not be deleted at a time.');
+                }
+              }
+            }
             UndoRedoService.clearChanges();
             _topicIsBeingSaved = false;
             if (successCallback) {

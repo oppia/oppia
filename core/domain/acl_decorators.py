@@ -27,6 +27,8 @@ import feconf
 
 current_user_services = models.Registry.import_current_user_services()
 
+(suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
+
 
 def open_access(handler):
     """Decorator to give access to everyone."""
@@ -625,13 +627,34 @@ def can_suggest_changes_to_exploration(handler):
             bool. Whether the user can make suggestions to an
                 exploration.
         """
-        if (role_services.ACTION_SUGGEST_CHANGES_TO_EXPLORATION in
-                self.user.actions):
+        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
             return handler(self, exploration_id, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
                 'You do not have credentials to give suggestions to this '
                 'exploration.')
+    test_can_suggest.__wrapped__ = True
+
+    return test_can_suggest
+
+
+def can_suggest_changes(handler):
+    """Decorator to check whether a user can make suggestions."""
+
+    def test_can_suggest(self, **kwargs):
+        """Checks if the user can make suggestions to an exploration.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+        """
+        if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
+            return handler(self, **kwargs)
+        else:
+            raise base.UserFacingExceptions.UnauthorizedUserException(
+                'You do not have credentials to make suggestions.')
     test_can_suggest.__wrapped__ = True
 
     return test_can_suggest

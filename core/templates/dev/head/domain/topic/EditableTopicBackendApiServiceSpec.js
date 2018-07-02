@@ -47,6 +47,12 @@ describe('Editable topic backend API service', function() {
         uncategorized_skill_ids: ['skill_id_1'],
         subtopics: [],
         language_code: 'en'
+      },
+      subtopic_page: {
+        id: 'topicId-1',
+        topicId: 'topicId',
+        html_data: '<p>Data</p>',
+        language_code: 'en'
       }
     };
   }));
@@ -68,6 +74,24 @@ describe('Editable topic backend API service', function() {
       $httpBackend.flush();
 
       expect(successHandler).toHaveBeenCalledWith(sampleDataResults.topic);
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
+
+  it('should successfully fetch an existing subtopic page from the backend',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expect(
+        'GET', '/subtopic_page_editor_handler/data/topicId/1').respond(
+        sampleDataResults);
+      EditableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleDataResults.subtopic_page);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
