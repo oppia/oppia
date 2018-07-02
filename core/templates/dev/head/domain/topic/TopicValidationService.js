@@ -22,30 +22,28 @@
 oppia.factory('TopicValidationService', [
   function() {
     var _validateSubtopic = function(subtopic) {
-      var issues = []
+      var issues = [];
       if (typeof subtopic.getId() !== 'number') {
         issues.push('Subtopic id should be a number');
       }
       if (typeof subtopic.getTitle() !== 'string') {
         issues.push('Subtopic title should be a string');
       }
-      if (!subtopic.getSkillSummaries().isArray()) {
+      if (subtopic.getSkillSummaries().constructor !== Array) {
         issues.push('The skill summaries for subtopic should be a list.');
       }
       var skillIds = subtopic.getSkillSummaries().map(function(skillSummary) {
         return skillSummary.getId();
       });
       if (new Set(skillIds).size !== skillIds.length) {
-          issues.push('All skills in a subtopic should be distinct.');
+        issues.push('All skills in a subtopic should be distinct.');
       }
       return issues;
-    }
+    };
 
     var _validateTopic = function(topic) {
-      // NOTE TO DEVELOPERS: Please ensure that this validation logic is the
-      // same as that in core.domain.topic_domain.Topic.validate().
       var issues = [];
-      if (typeof topic.getName() !== 'string' ||  topic.getName() === '') {
+      if (typeof topic.getName() !== 'string' || topic.getName() === '') {
         issues.push('Topic name should be a non empty string');
       }
       if (typeof topic.getDescription() !== 'string') {
@@ -57,36 +55,38 @@ oppia.factory('TopicValidationService', [
       if (typeof topic.getLanguageCode() !== 'string') {
         issues.push('Language code should be a string');
       }
-      if (!topic.getSubtopics().isArray()) {
+      if (topic.getSubtopics().constructor !== Array) {
         issues.push('Subtopics should be an array.');
       }
-      var subtopics = topic.getSubtopic();
+
+      var subtopics = topic.getSubtopics();
       for (var i = 0; i < subtopics.length; i++) {
         issues = issues.concat(_validateSubtopic(subtopics[i]));
       }
-      if (!topic.getCanonicalStoryIds().isArray()) {
+
+      if (topic.getCanonicalStoryIds().constructor !== Array) {
         issues.push('Canonical story ids should be an array.');
       }
       if (new Set(topic.getCanonicalStoryIds()).size !==
           topic.getCanonicalStoryIds().length) {
-          issues.push('All canonical stories should be distinct.');
+        issues.push('All canonical stories should be distinct.');
       }
-      if (!topic.getAdditionalStoryIds().isArray()) {
+      if (topic.getAdditionalStoryIds().constructor !== Array) {
         issues.push('Additional story ids should be an array.');
       }
       if (new Set(topic.getAdditionalStoryIds()).size !==
           topic.getAdditionalStoryIds().length) {
-          issues.push('All additional stories should be distinct.');
+        issues.push('All additional stories should be distinct.');
       }
       var canonicalStoryIds = topic.getCanonicalStoryIds();
       for (var i = 0; i < canonicalStoryIds.length; i++) {
         if (topic.getAdditionalStoryIds().indexOf(
-              canonicalStoryIds[i]) !== -1) {
-            issues.push('Canonical and additional stories should be mutually' +
-            ' exclusive and should not have any common stories between them.');
+          canonicalStoryIds[i]) !== -1) {
+          issues.push('Canonical and additional stories should be mutually' +
+          ' exclusive and should not have any common stories between them.');
         }
       }
-      if (!topic.getUncategorizedSkillSummaries().isArray()) {
+      if (topic.getUncategorizedSkillSummaries().constructor !== Array) {
         issues.push('Uncategorized skill ids should be an array.');
       }
       return issues;
@@ -96,8 +96,7 @@ oppia.factory('TopicValidationService', [
       /**
        * Returns a list of error strings found when validating the provided
        * topic. The validation methods used in this function are written to
-       * match the validations performed in the backend. This function is
-       * expensive, so it should be called sparingly.
+       * match the validations performed in the backend.
        */
       findValidationIssuesForTopic: function(topic) {
         return _validateTopic(topic);
