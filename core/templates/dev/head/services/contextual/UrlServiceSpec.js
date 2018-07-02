@@ -86,4 +86,52 @@ describe('Url Service', function() {
   it('should correctly return hash value of window.location', function() {
     expect(UrlService.getHash()).toBe(sampleHash);
   });
+
+  it('should correctly retrieve topic id from url', function() {
+    mockLocation.pathname = '/topic_editor/abcdefgijklm';
+    expect(
+      UrlService.getTopicIdFromUrl()
+    ).toBe('abcdefgijklm');
+    mockLocation.pathname = '/topic_editor/abcdefgij';
+    expect(function() {
+      UrlService.getTopicIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/topiceditor/abcdefgijklm';
+    expect(function() {
+      UrlService.getTopicIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/topic_editor';
+    expect(function() {
+      UrlService.getTopicIdFromUrl();
+    }).toThrow();
+  });
+
+  it('should correctly retrieve story id from url', function() {
+    mockLocation.pathname = '/story_editor/abcdefgijklm';
+    expect(function(){
+      UrlService.getStoryIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/storyeditor/abcdefgijklm/012345678901';
+    expect(function(){
+      UrlService.getStoryIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/story_editor/abcdefgijlm/012345678901';
+    expect(function(){
+      UrlService.getStoryIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/story_editor/abcdefgijklm/01234578901';
+    expect(function() {
+      UrlService.getStoryIdFromUrl();
+    }).toThrow();
+
+    mockLocation.pathname = '/story_editor/abcdefgijklm/012345678901';
+    expect(
+      UrlService.getStoryIdFromUrl()
+    ).toEqual('012345678901');
+  });
 });

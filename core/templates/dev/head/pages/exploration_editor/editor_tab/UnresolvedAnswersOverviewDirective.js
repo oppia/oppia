@@ -16,6 +16,10 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+// TODO(brianrodri): Add all other interaction IDs to this list, then remove
+// the list altogether.
+oppia.constant('SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS', ['TextInput']);
+
 oppia.directive('unresolvedAnswersOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -29,11 +33,15 @@ oppia.directive('unresolvedAnswersOverview', [
         'ExplorationStatesService', 'StateRulesStatsService',
         'ExplorationRightsService', 'stateInteractionIdService',
         'INTERACTION_SPECS', 'EditabilityService',
+        'StateTopAnswersStatsService',
+        'SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS',
         function(
             $scope, $rootScope, $uibModal, EditorStateService,
             ExplorationStatesService, StateRulesStatsService,
             ExplorationRightsService, stateInteractionIdService,
-            INTERACTION_SPECS, EditabilityService) {
+            INTERACTION_SPECS, EditabilityService,
+            StateTopAnswersStatsService,
+            SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS) {
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
@@ -44,51 +52,23 @@ oppia.directive('unresolvedAnswersOverview', [
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
 
-          $scope.computeUnresolvedAnswers = function() {
+          /**
+           * @returns {boolean} - answers from this state can be rendered with
+           * HTML.
+           */
+          var isStateInteractionIdHtmlRenderable = function() {
             var state = ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName()
-            );
+              EditorStateService.getActiveStateName());
+            return (!!state &&
+              SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS.indexOf(
+                state.interaction.id) !== -1);
+          };
 
-            if (!StateRulesStatsService.stateSupportsIssuesOverview(state)) {
-              $scope.unresolvedAnswersData = [];
-            } else {
-              StateRulesStatsService.computeStateRulesStats(
-                state
-              ).then(function(stats) {
-                var calculatedUnresolvedAnswersData = [];
-
-                for (var i = 0; i < stats.visualizations_info.length; ++i) {
-                  var vizInfo = stats.visualizations_info[i];
-                  if (!vizInfo.addressed_info_is_supported) {
-                    continue;
-                  }
-
-                  // NOTE: vizInfo.data is already sorted in descending order by
-                  // frequency.
-                  for (var j = 0; j < vizInfo.data.length; ++j) {
-                    var answer = vizInfo.data[j];
-                    if (answer.is_addressed ||
-                        answer.frequency <
-                          MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
-                      continue;
-                    }
-
-                    calculatedUnresolvedAnswersData.push(answer);
-                    if (calculatedUnresolvedAnswersData.length >=
-                          MAXIMUM_UNRESOLVED_ANSWERS) {
-                      break;
-                    }
-                  }
-
-                  // Will only take the answers from first eligible
-                  // visualization.
-                  break;
-                }
-
-                $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
-                $scope.latestRefreshDate = new Date();
-              });
-            }
+          $scope.isUnresolvedAnswersOverviewShown = function() {
+            return (
+              StateTopAnswersStatsService.hasStateStats(
+                EditorStateService.getActiveStateName()) &&
+              isStateInteractionIdHtmlRenderable());
           };
 
           $scope.getCurrentInteractionId = function() {
@@ -272,13 +252,10 @@ oppia.directive('unresolvedAnswersOverview', [
             });
           };
 
-          $scope.$on('refreshStateEditor', function() {
-            $scope.unresolvedAnswersOverviewIsShown = (
-              ExplorationRightsService.isPublic());
-            if ($scope.unresolvedAnswersOverviewIsShown) {
-              $scope.computeUnresolvedAnswers();
-            }
-          });
+          $scope.getUnresolvedStateStats = function() {
+            return StateTopAnswersStatsService.getUnresolvedStateStats(
+              EditorStateService.getActiveStateName());
+          };
         }
       ]
     };

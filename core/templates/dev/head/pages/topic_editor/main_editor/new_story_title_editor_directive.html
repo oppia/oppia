@@ -1,0 +1,26 @@
+<div class="modal-header">
+  <h3>
+    Enter Story Title
+  </h3>
+</div>
+<div class="modal-body new-story-title-editor" ng-class="{'has-error': isStoryTitleEmpty(storyTitle)}">
+  <p>
+    Enter the title for the story: &nbsp;
+    <input class="form-group" ng-model="storyTitle">
+    <span ng-if="isStoryTitleEmpty(storyTitle)" class="help-block" style="font-size: smaller">
+     A title is required to create a story.
+    </span>
+  </p>
+</div>
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success" ng-disabled="isStoryTitleEmpty(storyTitle)" ng-click="save(storyTitle)">
+    <span>Create Story</span>
+  </button>
+</div>
+<style>
+  .new-story-title-editor .help-block {
+    margin-left: 37.5%;
+    margin-top: -3%;
+  }
+</style>

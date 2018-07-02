@@ -1,0 +1,32 @@
+<style>
+  .drag-and-drop-sort-response-content img {
+    max-height: 100px;
+  }
+
+  .drag-and-drop-item {
+    background-color: #add8e6;
+    border: 1px solid #000000;
+    height: 70px;
+    margin: 10px 0 0 0;
+    width: 70px;
+  }
+
+  .drag-and-drop-subitem {
+    background-color: #add8e6;
+    border: 1px solid #000000;
+    height: 70px;
+    margin:-20px 0 0 0;
+    position: relative;
+    width: 70px;
+  }
+</style>
+
+<ol ng-if="isAnswerLengthGreaterThanZero" class="drag-and-drop-sort-response-content">
+  <li ng-repeat="responses in answer">
+    <li ng-repeat="response in responses track by $index">
+      <div ng-if="chooseItemType($index)" ng-class="itemtype">
+        <angular-html-bind html-data="response"></angular-html-bind>
+      </div>
+    </li>
+  </li>
+</ol>
