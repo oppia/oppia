@@ -1125,6 +1125,14 @@ def get_decorator_for_accepting_suggestion(decorator):
     """Function that takes a decorator as an argument and then applies some
     common checks and then checks the permissions specified by the passed in
     decorator.
+
+    Args:
+        decorator: function. The decorator to be used to verify permissions
+            for accepting/rejecting suggestions.
+
+    Returns:
+        function. The new decorator which includes all the permission checks for
+            accepting/rejecting suggestions.
     """
     def generate_decorator_for_handler(handler):
         def test_can_accept_suggestion(

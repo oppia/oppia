@@ -78,8 +78,8 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         if suggestion.author_id == self.user_id:
-            raise self.UnauthorizedUserException('You cannot perform an action '
-                                                 'on your own suggestion.')
+            raise self.UnauthorizedUserException('You cannot accept/reject your'
+                                                 ' own suggestion.')
 
         if action == self.ACTION_TYPE_ACCEPT:
             suggestion_services.accept_suggestion(
