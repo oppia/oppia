@@ -16,6 +16,7 @@
  * @fileoverview Page object for the creator dashboard, for use in Protractor
  * tests.
  */
+var until = protractor.ExpectedConditions;
 
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator_dashboard';
@@ -34,14 +35,21 @@ var CreatorDashboardPage = function() {
 
     // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(explorationTitle) {
-    return element.all(by.css('.protractor-test-exploration-dashboard-card'))
-      .filter(function(tile) {
-        return tile.element(by.css('.protractor-test-exp-summary-tile-title')).
-          getText().then(function(tileTitle) {
-            return (tileTitle === explorationTitle);
-          });
+    var allExplorationDashboardCard = element.all(
+      by.css('.protractor-test-exploration-dashboard-card'));
+    browser.wait(until.visibilityOf(allExplorationDashboardCard), 5000,
+      'Exploration Dashboard Cards are not visible').then(function(isVisible) {
+      if (isVisible) {
+        return allExplorationDashboardCard.filter(function(tile) {
+          return tile.element(
+            by.css('.protractor-test-exp-summary-tile-title')).
+            getText().then(function(tileTitle) {
+              return (tileTitle === explorationTitle);
+            });
+        }
+        );
       }
-      );
+    });
   };
 
   this.get = function() {
@@ -49,8 +57,13 @@ var CreatorDashboardPage = function() {
   };
 
   this.getNumberOfFeedbackMessages = function() {
-    return explorationFeedbackCount.getText().then(function(text) {
-      return parseInt(text);
+    browser.wait(until.visibilityOf(explorationFeedbackCount), 5000,
+      'Exploration Feedback Count is not visible').then(function(isVisible) {
+      if (isVisible) {
+        return explorationFeedbackCount.getText().then(function(text) {
+          return parseInt(text);
+        });
+      }
     });
   };
 
@@ -59,23 +72,53 @@ var CreatorDashboardPage = function() {
   };
 
   this.clickCreateActivityButton = function() {
-    createActivityButton.click();
+    browser.wait(until.elementToBeClickable(createActivityButton), 10000,
+      'Create Activity button takes too long to appear')
+      .then(function(isClickable) {
+        if (isClickable) {
+          createActivityButton.click();
+        }
+      });
   };
 
   this.clickCreateCollectionButton = function() {
-    createCollectionButton.click();
+    browser.wait(until.elementToBeClickable(createCollectionButton), 10000,
+      'Create Collection button takes too long to appear')
+      .then(function(isClickable) {
+        if (isClickable) {
+          createCollectionButton.click();
+        }
+      });
   };
 
   this.clickCreateExplorationButton = function() {
-    createExplorationButton.click();
+    browser.wait(until.elementToBeClickable(createExplorationButton), 5000,
+      'Create Exploration button takes too long to appear')
+      .then(function(isClickable) {
+        if (isClickable) {
+          createExplorationButton.click();
+        }
+      });
   };
 
   this.navigateToCollectionEditor = function() {
-    collectionCard.click();
+    browser.wait(until.elementToBeClickable(collectionCard), 5000,
+      'Collection Card tab takes too long to appear')
+      .then(function(isClickable) {
+        if (isClickable) {
+          collectionCard.click();
+        }
+      });
   };
 
   this.navigateToSubscriptionDashboard = function() {
-    subscriptionTab.click();
+    browser.wait(until.elementToBeClickable(subscriptionTab), 5000,
+      'Subscription Dashboard tab takes too long to appear')
+      .then(function(isClickable) {
+        if (isClickable) {
+          subscriptionTab.click();
+        }
+      });
   };
 
   this.editExploration = function(explorationTitle) {
@@ -83,7 +126,14 @@ var CreatorDashboardPage = function() {
       if (elems.length === 0) {
         throw 'Could not find exploration tile with name ' + explorationTitle;
       }
-      elems[0].element(by.css('.mask-wrap')).click();
+      var explorationElement = elems[0].element(by.css('.mask-wrap'));
+      browser.wait(until.elementToBeClickable(explorationElement), 5000,
+        'Exploration tile takes too long to appear')
+        .then(function(isClickable) {
+          if (isClickable) {
+            explorationElement.click();
+          }
+        });
     });
   };
 };
