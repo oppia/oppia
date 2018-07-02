@@ -16,83 +16,6 @@
     width: 60px;
   }
 
-  .oppia-exploration-footer .author-profile {
-    color: #fff;
-    list-style-type: none;
-    padding-left: 0;
-  }
-
-  .oppia-exploration-footer .author-profile a:hover {
-    text-decoration: none;
-  }
-
-  .oppia-exploration-footer .author-profile li {
-    float: left;
-  }
-
-  .oppia-exploration-footer .author-profile .hover-link {
-    background-color: #094142;
-    width: 190px;
-  }
-
-  .oppia-exploration-footer .author-profile.hovered-text h4 {
-    color: #094142;
-  }
-
-  .oppia-exploration-footer .author-profile .hover-link:hover,
-  .oppia-exploration-footer .author-profile .hover-link:focus {
-    background-color: #fff;
-    color: #094142;
-  }
-
-  .oppia-exploration-footer .uib-dropdown-menu.author-profile-dropdown-menu {
-    border: none;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 0;
-    box-shadow: 0 -6px 12px rgba(0, 0, 0, 0.176);
-    float: left;
-    list-style-type: none;
-    margin:0 0 16px 0;
-  }
-
-  .oppia-exploration-footer .author-profile-dropdown-menu li {
-    color: #094142;
-    float: none;
-    text-overflow: clip;
-    white-space: nowrap;
-    width: 100%;
-  }
-
-  .oppia-exploration-footer .author-profile-dropdown-menu li > a {
-    color: #094142;
-    padding: 3px 6px;
-  }
-
-  .oppia-exploration-footer .author-profile-dropdown-menu li a:hover {
-    background-color: #eee;
-    color: #888;
-  }
-
-  .oppia-exploration-footer .author-profile-text {
-    cursor: default;
-    line-height: 0.6;
-    padding-left: 6px;
-    text-overflow: clip;
-    white-space: nowrap;
-  }
-
-  .oppia-exploration-footer .author-profile-text.not-hovered {
-    color: #fff;
-    text-transform: uppercase;
-  }
-
-  .oppia-exploration-footer .author-profile-text.hovered-text,
-  .oppia-exploration-footer .author-profile .hover-link:focus .author-profile-text {
-    color: #094142;
-    text-decoration: none;
-    text-transform: uppercase;
-  }
-
   .oppia-exploration-footer .oppia-share-exploration-footer {
     line-height: 0.6;
     padding-right: 20px;
@@ -132,6 +55,42 @@
     padding: 12px;
   }
 
+  .oppia-exploration-footer .star-container {
+    margin: 0 0 4px 0;
+    position: relative;
+  }
+
+  .oppia-exploration-footer .star {
+    color: #F2C94C;
+    font-size: 44px;
+    padding: 0 0 4px 0;
+    position: absolute;
+    right: 10px;
+    top: -1px;
+    width: 45px;
+  }
+
+  .oppia-exploration-footer .star-content {
+    color: #094142;
+    position: absolute;
+  }
+
+  .oppia-exploration-footer .single-digit {
+    font-family: monospace;
+    font-size: 15px;
+    font-weight: bold;
+    right: 28px;
+    top: 21px;
+  }
+
+  .oppia-exploration-footer .double-digit {
+    font-family: monospace;
+    font-size: 11px;
+    font-weight: bold;
+    right: 26px;
+    top: 23px;
+  }
+
   @media (max-width: 475px) {
     .oppia-exploration-footer-sharing-links {
       display: none;
@@ -154,49 +113,21 @@
     .oppia-exploration-footer .oppia-exploration-footer-info-icon {
       display: none;
     }
+    .oppia-exploration-footer .double-digit {
+      top: 22px;
+    }
   }
 </style>
 
 <div class="footer navbar-fixed-bottom oppia-exploration-footer">
   <div class="row">
     <div class="col-sm-5">
-      <ul class="author-profile" ng-if="!windowIsNarrow">
-        <li>
-          <img ng-src="<[getStaticImageUrl('/general/apple.svg')]>"
-               class="exploration-footer-img"
-               alt="">
-        </li>
-        <li class="hover-link"
-            ng-mouseenter="hovering = true"
-            ng-mouseleave="hovering = false"
-            tabindex="0"
-            aria-haspopup="true"
-            aria-expanded="false">
-          <div uib-dropdown class="dropup" ng-class="{'open':hovering}">
-            <a uib-dropdown-toggle id="dropdownMenu2"
-               ng-class="{'hovered-text':hovering}"
-               data-toggle="dropdown"
-               ng-if="contributorNames.length > 0"
-               role="menuitem"
-               aria-haspopup="true"
-               aria-expanded="false">
-              <h4 translate="I18N_FOOTER_AUTHOR_PROFILES" class="author-profile-text"
-                  ng-class="{'hovered-text':hovering, 'not-hovered' : !hovering}"></h4>
-            </a>
-            <ul uib-dropdown-menu class="author-profile-dropdown-menu uib-dropdown-menu"
-                aria-labelledby="dropdownMenu2" role="menu">
-              <li ng-repeat="name in contributorNames | limitTo: 5">
-                <a href="/profile/<[name]>" target="_blank"><[name]></a>
-              </li>
-            </ul>
-          </div>
-        </li>
-      </ul>
-      <hint-and-solution-buttons ng-if="windowIsNarrow"></hint-and-solution-buttons>
+      <hint-and-solution-buttons ng-if="windowIsNarrow || getNumberOfCorrectAnswers() > 0"></hint-and-solution-buttons>
     </div>
     <div class="col-sm-7">
-      <div class="pull-right">
-        <hint-and-solution-buttons ng-if="!windowIsNarrow"></hint-and-solution-buttons>
+      <div class="star-container pull-right" ng-if="getNumberOfCorrectAnswers() > 0">
+        <i class="material-icons star">&#xE838;</i>
+        <span ng-class="getClassForStarContent()">{{getNumberOfCorrectAnswers()}}</span>
       </div>
     </div>
   </div>

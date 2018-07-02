@@ -44,6 +44,17 @@ oppia.directive('explorationFooter', [
             $scope.$apply();
           });
 
+          $scope.getNumberOfCorrectAnswers = function () {
+            return ExplorationPlayerService.getCorrectCount();
+          };
+
+          $scope.getClassForStarContent = function() {
+            if ($scope.getNumberOfCorrectAnswers() > 9) {
+              return 'star-content double-digit';
+            }
+            return 'star-content single-digit';
+          };
+
           $scope.contributorNames = [];
           ExplorationSummaryBackendApiService
             .loadPublicAndPrivateExplorationSummaries([$scope.explorationId])

@@ -55,6 +55,7 @@ oppia.factory('ExplorationPlayerService', [
       ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
     var _isLoggedIn = GLOBALS.userIsLoggedIn;
     var answerIsBeingProcessed = false;
+    var correctCount = 0;
 
     var exploration = null;
 
@@ -218,6 +219,7 @@ oppia.factory('ExplorationPlayerService', [
       init: function(successCallback) {
         answerIsBeingProcessed = false;
         PlayerTranscriptService.init();
+        correctCount = 0;
 
         if (_editorPreviewMode) {
           EditableExplorationBackendApiService.fetchApplyDraftExploration(
@@ -354,6 +356,9 @@ oppia.factory('ExplorationPlayerService', [
       isInPreviewMode: function() {
         return !!_editorPreviewMode;
       },
+      getCorrectCount: function() {
+        return correctCount;
+      },
       submitAnswer: function(answer, interactionRulesService, successCallback) {
         if (answerIsBeingProcessed) {
           return;
@@ -369,6 +374,11 @@ oppia.factory('ExplorationPlayerService', [
             _explorationId, oldStateName, oldState, answer,
             interactionRulesService));
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
+
+        if (answerIsCorrect &&
+            PlayerCorrectnessFeedbackEnabledService.isEnabled()) {
+          correctCount = correctCount + 1;
+        }
 
         if (!_editorPreviewMode) {
           var feedbackIsUseful = (
