@@ -111,7 +111,6 @@ var AdminPage = function(){
   // The name should be as given in the admin page (including '.yaml' if
   // necessary).
   this.reloadExploration = function(name) {
-    this.get();
     explorationElements.map(function(explorationElement) {
       explorationTitleElement(explorationElement)
         .getText().then(function(title) {
