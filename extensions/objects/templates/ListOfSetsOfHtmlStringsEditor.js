@@ -49,15 +49,15 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
           return allowedList;
         };
 
-        $scope.selectedItem = function(choiceListIndex) {
+        $scope.selectedItem = function(choiceListIndex, selectedRank) {
           var choiceHtml = $scope.choices[choiceListIndex].id;
-          var selectedRank = parseInt($scope.selectedRank) - 1;
+          var selectedRank = parseInt(selectedRank) - 1;
           // Reorder the $scope.choices array to make it consistent with the
           // selected rank.
-          $scope.choices.splice(selectedRank, 0, $scope.choices.splice(
-            choiceListIndex, 1)[0]);
+          // $scope.choices.splice(selectedRank, 0, $scope.choices.splice(
+          // choiceListIndex, 1)[0]);
           var choiceHtmlHasBeenAdded = false;
-          $scope.maxPrevIndex = math.max(parseInt($scope.selectedRank),
+          $scope.maxPrevIndex = math.max(parseInt(selectedRank + 1),
             $scope.maxPrevIndex);
 
           for (var i = 0; i < $scope.value.length; i++) {

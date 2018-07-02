@@ -278,7 +278,8 @@ oppia.factory('ResponsesService', [
 
         // If the interaction is ItemSelectionInput, update the answer groups
         // to refer to the new answer options.
-        if (stateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
+        if ((stateInteractionIdService.savedMemento === 'ItemSelectionInput' ||
+            stateInteractionIdService.savedMemento === 'DragAndDropSort') &&
             oldAnswerChoices) {
           // We use an approximate algorithm here. If the length of the answer
           // choices array remains the same, and no choice is replicated at
