@@ -98,9 +98,9 @@ class SuggestionListHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         queries = self.request.GET.items()
-        for field, value in queries:
-            if query_field not in suggestion_models.ALLOWED_QUERY_FIELDS:
-                raise Exception('Not allowed to query on field %s' % field)
+        for query in queries:
+            if query[0] not in suggestion_models.ALLOWED_QUERY_FIELDS:
+                raise Exception('Not allowed to query on field %s' % query[0])
 
         suggestions = suggestion_services.query_suggestions(queries)
 

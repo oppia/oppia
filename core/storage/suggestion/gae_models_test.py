@@ -127,8 +127,9 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 self.score_category, 'exploration.exp1.thread_1')
 
     def test_get_suggestions_by_type(self):
-        queries = [('suggestion_type',
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
+        queries = [(
+            'suggestion_type',
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
         self.assertEqual(
             len(suggestion_models.GeneralSuggestionModel.query_suggestions(
                 queries)), 5)

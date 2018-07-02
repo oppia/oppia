@@ -488,8 +488,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
 
     def test_get_by_type(self):
-        queries = [('suggestion_type',
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
+        queries = [(
+            'suggestion_type',
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 5)
 
     def test_query_suggestions(self):
