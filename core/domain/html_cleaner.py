@@ -744,6 +744,6 @@ def add_caption_to_image(html_string):
     for image in soup.findAll('oppia-noninteractive-image'):
         attrs = image.attrs
         if 'caption-with-value' not in attrs:
-            image['caption-with-value'] = escape_html('""')
+            image['caption-with-value'] = escape_html(json.dumps(''))
 
     return unicode(soup)
