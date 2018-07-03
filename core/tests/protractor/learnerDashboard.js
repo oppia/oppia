@@ -284,7 +284,7 @@ describe('Learner dashboard functionality', function() {
     users.logout();
   });
 
-  fit('displays learners subscriptions', function() {
+  it('displays learners subscriptions', function() {
     users.createUser('learner1@learnerDashboard.com',
       'learner1learnerDashboard');
     var creator1Id = 'creatorName';
