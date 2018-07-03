@@ -18,6 +18,7 @@
  */
 
 var forms = require('./forms.js');
+var general = require('./general.js');
 var until = protractor.ExpectedConditions;
 
 var LibraryPage = function(){
@@ -31,11 +32,11 @@ var LibraryPage = function(){
     element(by.css('.protractor-test-search-bar-category-selector'))
   );
   var collectionTitled = function(collectionName) {
-    return element(by.cssContainingText(
+    return element.all(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', collectionName));
   };
   var explorationTitled = function(explorationName) {
-    return element(by.cssContainingText(
+    return element.all(by.cssContainingText(
       '.protractor-test-exp-summary-tile-title', explorationName));
   };
   var createActivityButton = element(
@@ -101,8 +102,9 @@ var LibraryPage = function(){
       'Library Page does not have any collection')
       .then(function(isVisible) {
         if (isVisible) {
-          browser.wait(until.visibilityOf(collectionTitled(collectionName)),
-            5000, 'Unable to find collection ' + collectionName);
+          browser.wait(until.visibilityOf(
+            collectionTitled(collectionName).first()),
+          5000, 'Unable to find collection ' + collectionName);
           collectionTitled(collectionName).click();
         }
       });
@@ -113,9 +115,10 @@ var LibraryPage = function(){
       'Library Page does not have any exploration')
       .then(function(isVisible) {
         if (isVisible) {
-          browser.wait(until.visibilityOf(explorationTitled(explorationName)),
-            5000, 'Unable to find exploration ' + explorationName);
-          explorationTitled(explorationName).click();
+          browser.wait(until.visibilityOf(explorationTitled(
+            explorationName).first()),
+          5000, 'Unable to find exploration ' + explorationName);
+          explorationTitled(explorationName).first().click();
         }
       });
   };
@@ -145,6 +148,7 @@ var LibraryPage = function(){
   };
 
   this.findExploration = function(explorationTitle) {
+    general.waitForSystem(2000);
     var searchInput = element.all(
       by.css('.protractor-test-search-input')).first();
     searchInput.clear();
