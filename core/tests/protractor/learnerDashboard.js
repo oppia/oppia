@@ -17,9 +17,11 @@
  * subscriptions functionality.
  */
 
+var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var until = protractor.ExpectedConditions;
+var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var CreatorDashboardPage =
@@ -41,6 +43,7 @@ describe('Learner dashboard functionality', function() {
   var creatorDashboardPage = null;
   var adminPage = null;
   var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
   var explorationPlayerPage = null;
   var libraryPage = null;
   var learnerDashboardPage = null;
@@ -53,26 +56,67 @@ describe('Learner dashboard functionality', function() {
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     subscriptionDashboardPage =
       new SubscriptionDashboardPage.SubscriptionDashboardPage();
   });
 
+  var createAboutOppiaExploration = function() {
+    workflow.createExploration();
+    explorationEditorMainTab.exitTutorial();
+    explorationEditorMainTab.setStateName('First');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'Hi there, I’m Oppia! I’m an online personal tutor for everybody!'));
+    explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination('Second', true, null);
+    explorationEditorMainTab.moveToState('Second');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'So what can I tell you?'));
+    explorationEditorMainTab.setInteraction('MultipleChoiceInput', [
+      forms.toRichText('How do your explorations work?'),
+      forms.toRichText('What can you tell me about this website?'),
+      forms.toRichText('How can I contribute to Oppia?'),
+      forms.toRichText('Those were all the questions I had!')
+    ]);
+    explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', null, 'End Card', true, 'Equals',
+      'Those were all the questions I had!');
+    responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText('I do not know!'));
+    explorationEditorMainTab.moveToState('End Card');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Congratulations, you have finished!'));
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle('About Oppia');
+    explorationEditorSettingsTab.setCategory('Algorithm');
+    explorationEditorSettingsTab.setObjective('Learn more about Oppia');
+    explorationEditorSettingsTab.setLanguage('English');
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+  };
+
   it('displays completed explorations', function() {
-    users.createUser('learner@learnerDashboard.com', 'learnerlearnerDashboard');
-    users.createModerator(
-      'moderator@learnerDashboard.com', 'moderatorlearnerDashboard');
-    users.createAndLoginAdminUser(
-      'admin@learnerDashboard.com', 'collectionAdmlearnerDashboard');
-
-    adminPage.get();
-    // Load exploration '3'
-    adminPage.reloadExploration('root_linear_coefficient_theorem.yaml');
-    // Load exploration '14'
-    adminPage.reloadExploration('about_oppia.yaml');
-
+    users.createUser('originalCreator@learnerDashboard.com',
+      'originalCreator');
+    users.createUser('learner@learnerDashboard.com',
+      'learnerlearnerDashboard');
+    users.createAdmin('inspector@learnerDashboard.com', 'inspector');
+    users.login('originalCreator@learnerDashboard.com');
+    // Create first exploration named 'About Oppia'
+    createAboutOppiaExploration();
+    // Create a second exploration named 'Dummy Exploration'.
+    workflow.createAndPublishExploration(
+      'Dummy Exploration',
+      'Algebra',
+      'To learn about Algebra!',
+      'English'
+    );
+    users.logout();
     users.login('learner@learnerDashboard.com');
-
     // TODO(hoangviet1993): Leave the exploration in between.
     // The exploration should be found in the 'In Progress' section.
     // Expecting Alert window after leaving and unable to handle the alert at
@@ -81,24 +125,41 @@ describe('Learner dashboard functionality', function() {
     // https://github.com/angular/protractor/issues/308
     // Play an exploration and leave it in between.
 
-    // Play exploration '14' completely.
-    general.openPlayer('14');
+    // Play exploration completely.
+    libraryPage.get();
+    libraryPage.findExploration('About Oppia');
+    libraryPage.playExploration('About Oppia');
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    explorationPlayerPage.submitAnswer('Continue', null);
 
-    // Exploration '14' should be added to completed section.
+    libraryPage.get();
+    libraryPage.findExploration('Dummy Exploration');
+    expect(libraryPage.explorationExists('Dummy Exploration')).toBe(true);
+    libraryPage.playExploration('Dummy Exploration');
+    explorationPlayerPage.expectExplorationNameToBe('Dummy Exploration');
+    explorationPlayerPage.rateExploration(5);
+    general.waitForSystem();
+
+    // Both should be added to
+    // the completed section.
     learnerDashboardPage.get();
     learnerDashboardPage.navigateToCompletedSection();
     learnerDashboardPage.navigateToCompletedExplorationsSection();
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
       'About Oppia');
+    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+      'Dummy Exploration');
     users.logout();
 
-    // Delete exploration '14'.
-    users.login('moderator@learnerDashboard.com');
-    general.openEditor('14');
+    // Login as Admin and delete exploration 'About Oppia'.
+    users.login('inspector@learnerDashboard.com', true);
+    libraryPage.get();
+    libraryPage.findExploration('About Oppia');
+    libraryPage.playExploration('About Oppia');
+    general.getExplorationIdFromPlayer().then(function(explorationId) {
+      general.openEditor(explorationId);
+    });
     explorationEditorPage.navigateToSettingsTab();
     element(by.css('.protractor-test-delete-exploration-button')).click();
     element(by.css(
@@ -107,11 +168,16 @@ describe('Learner dashboard functionality', function() {
     browser.waitForAngular();
     users.logout();
 
-    // Verify exploration '14' is deleted from learner dashboard.
+    // Verify exploration 'About Oppia' is deleted from learner dashboard.
+    // and 'Dummy Exploration' is still
     users.login('learner@learnerDashboard.com');
     learnerDashboardPage.get();
+    learnerDashboardPage.navigateToCompletedSection();
+    learnerDashboardPage.navigateToCompletedExplorationsSection();
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToBeHidden(
       'About Oppia');
+    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
+      'Dummy Exploration');
     users.logout();
   });
 
@@ -119,21 +185,36 @@ describe('Learner dashboard functionality', function() {
     users.createUser('learner4@learnerDashboard.com',
       'learner4learnerDashboard');
     // Login to admin account
-    users.createAndLoginAdminUser(
+    users.createAdmin(
       'testCollectionAdm@learnerDashboard.com',
       'testcollectionAdmlearnerDashboard');
-    adminPage.get();
-    general.waitForSystem(2000);
-    // Load Exploration '14'
-    adminPage.reloadExploration('about_oppia.yaml');
-    // Load exploration '0'
-    adminPage.reloadExploration('welcome.yaml');
+    users.createUser('explorationCreator@learnerDashboard.com',
+      'explorationCreator');
 
-    // Create new 'Test Collection' containing exploration '14'.
+    users.login('explorationCreator@learnerDashboard.com');
+    // Create first exploration named 'Head of Collection'
+    workflow.createAndPublishExploration(
+      'Head of Collection',
+      'Engineering',
+      'You need this exploration!',
+      'English'
+    );
+    // Create a second exploration named 'Collection Exploration'.
+    workflow.createAndPublishExploration(
+      'Collection Exploration',
+      'Architect',
+      'To be a part of a collection!',
+      'English'
+    );
+    users.logout();
+
+    // Create new 'Test Collection' containing exploration 'About Oppia'.
+    users.login('testCollectionAdm@learnerDashboard.com', true);
     creatorDashboardPage.get();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateCollectionButton();
-    collectionEditorPage.searchForAndAddExistingExploration('14');
+    collectionEditorPage.searchForAndAddExistingExploration(
+      'Head of Collection');
     collectionEditorPage.saveDraft();
     collectionEditorPage.closeSaveModal();
     collectionEditorPage.publishCollection();
@@ -169,10 +250,8 @@ describe('Learner dashboard functionality', function() {
     // https://github.com/angular/protractor/issues/308
 
     // Complete the exploration.
-    explorationPlayerPage.submitAnswer('Continue', null);
-    explorationPlayerPage.submitAnswer(
-      'MultipleChoiceInput', 'Those were all the questions I had!');
-    explorationPlayerPage.submitAnswer('Continue', null);
+    explorationPlayerPage.expectExplorationNameToBe('Head of Collection');
+    explorationPlayerPage.rateExploration(5);
 
     // The collection should be found in the 'Completed' section.
     learnerDashboardPage.get();
@@ -182,20 +261,21 @@ describe('Learner dashboard functionality', function() {
       'Test Collection');
     users.logout();
 
-    // Add exploration '0' to 'Test Collection' and publish it
+    // Add exploration 'Dummy Exploration' to 'Test Collection' and publish it
     users.login('testCollectionAdm@learnerDashboard.com');
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToCollectionEditor();
-    collectionEditorPage.searchForAndAddExistingExploration('0');
+    collectionEditorPage.searchForAndAddExistingExploration(
+      'Collection Exploration');
     collectionEditorPage.saveDraft();
-    element(by.css('.protractor-test-commit-message-input')).sendKeys('Update');
+    element(by.css('.protractor-test-commit-message-input')).sendKeys(
+      'Add Collection Exploration.');
     browser.driver.sleep(300);
     collectionEditorPage.closeSaveModal();
     general.waitForSystem();
     users.logout();
 
-    // Verify 'Test Collection' is now in the incomplete section
-    // in learner dashboard
+    // Verify 'Test Collection' is now in the incomplete section.
     users.login('learner4@learnerDashboard.com');
     learnerDashboardPage.get();
     learnerDashboardPage.navigateToIncompleteCollectionsSection();
@@ -204,17 +284,21 @@ describe('Learner dashboard functionality', function() {
     users.logout();
   });
 
-  it('displays learners subscriptions', function() {
+  fit('displays learners subscriptions', function() {
     users.createUser('learner1@learnerDashboard.com',
       'learner1learnerDashboard');
     var creator1Id = 'creatorName';
     users.createUser(creator1Id + '@learnerDashboard.com', creator1Id);
     var creator2Id = 'collectionAdm';
-    users.createAndLoginAdminUser(creator2Id + '@learnerDashboard.com',
+    users.createUser(creator2Id + '@learnerDashboard.com',
       creator2Id);
-    adminPage.get();
-    // Load Exploration '14'.
-    adminPage.reloadExploration('about_oppia.yaml');
+    users.login(creator1Id + '@learnerDashboard.com');
+    workflow.createAndPublishExploration(
+      'Activations',
+      'Chemistry',
+      'Learn about different types of chemistry activations.',
+      'English'
+    );
     users.logout();
 
     users.login('learner1@learnerDashboard.com');
@@ -225,11 +309,11 @@ describe('Learner dashboard functionality', function() {
     subscriptionDashboardPage.navigateToSubscriptionButton();
 
     // Completing exploration '14' to activate /learner_dashboard
-    general.openPlayer('14');
-    explorationPlayerPage.submitAnswer('Continue', null);
-    explorationPlayerPage.submitAnswer(
-      'MultipleChoiceInput', 'Those were all the questions I had!');
-    explorationPlayerPage.submitAnswer('Continue', null);
+    libraryPage.get();
+    libraryPage.findExploration('Activation');
+    libraryPage.playExploration('Activation');
+    explorationPlayerPage.expectExplorationNameToBe('Activation');
+    explorationPlayerPage.rateExploration(4);
 
     // Both creators should be present in the subscriptions section of the
     // dashboard.
@@ -244,22 +328,20 @@ describe('Learner dashboard functionality', function() {
   it('displays learner feedback threads', function() {
     users.createUser('learner2@learnerDashboard.com',
       'learner2learnerDashboard');
-    users.createAndLoginAdminUser(
+    users.createUser(
       'feedbackAdm@learnerDashboard.com', 'feedbackAdmlearnerDashboard');
-    adminPage.get();
-    // Load Exploration '14'
-    adminPage.reloadExploration('about_oppia.yaml');
+    users.login('feedbackAdm@learnerDashboard.com');
+    createAboutOppiaExploration();
     users.logout();
 
     users.login('learner2@learnerDashboard.com');
     var feedback = 'A good exploration. Would love to see a few more questions';
-
-    // Play exploration '14' and submit feedback.
-    general.openPlayer('14');
+    libraryPage.get();
+    libraryPage.findExploration('About Oppia');
+    libraryPage.playExploration('About Oppia');
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.submitAnswer(
       'MultipleChoiceInput', 'Those were all the questions I had!');
-    explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.submitFeedback(feedback);
 
     // Verify feedback thread is created.
