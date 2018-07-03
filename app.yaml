@@ -84,9 +84,9 @@ handlers:
 # under extensions in dev mode. This regex allows us to recursively serve js
 # scripts under the three specified directories. "\1" and "\2" insert capture
 # groups from the url pattern.
-- url: /extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js|png))$
+- url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js|png))$
   static_files: extensions/\1/\2
-  upload: extensions/(interactions|rich_text_components|objects|classifiers)/(.*\.(js|png))$
+  upload: extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js|png))$
   secure: always
 - url: /extensions/visualizations/(.*\.html)
   static_files: extensions/visualizations/\1

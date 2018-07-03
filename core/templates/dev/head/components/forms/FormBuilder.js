@@ -433,11 +433,11 @@ oppia.directive('ckEditorRte', [
         buttonNames.pop();
         // All icons on the toolbar except the Rich Text components.
         var allIcons = ['undo', 'redo', 'bold', 'Italic', 'numberedList',
-          'bulletedList', 'insertpre', 'indent', 'outdent'];
+          'bulletedList', 'pre', 'indent', 'outdent'];
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
           extraPlugins:
-          'indentblock,insertpre,blockquote,widget,lineutils,sharedspace,' +
+          'indentblock,pre,blockquote,widget,lineutils,sharedspace,' +
           pluginNames,
           startupFocus: true,
           floatSpaceDockedOffsetY: 15,
@@ -456,7 +456,7 @@ oppia.directive('ckEditorRte', [
               items: [
                 'NumberedList', '-',
                 'BulletedList', '-',
-                'InsertPre', '-',
+                'Pre', '-',
                 'Blockquote', '-',
                 'Indent', '-',
                 'Outdent'
