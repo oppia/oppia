@@ -187,7 +187,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         skill_ids = topic.get_all_skill_ids()
 
         skill_id_to_description_dict = (
-            skill_services.get_skill_descriptions_by_ids(skill_ids))
+            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
 
         self.values.update({
             'topic_dict': topic.to_dict(),
@@ -239,7 +239,7 @@ class EditableTopicDataHandler(base.BaseHandler):
         skill_ids = topic.get_all_skill_ids()
 
         skill_id_to_description_dict = (
-            skill_services.get_skill_descriptions_by_ids(skill_ids))
+            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
 
         self.values.update({
             'topic_dict': topic.to_dict(),
