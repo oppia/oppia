@@ -33,14 +33,16 @@
 # --sharding-instances) if running any tests in isolation (fit or fdescribe).
 #   --suite=suite_name Performs test for different suites.
 #   For performing a full test, no argument is required.
-#   For performing tests on mainEditors, use --suite=mainEditor
+#   For performing tests on accessibility, use --suite=accessibility
+#   For performing tests on collections, use --suite=collections
+#   For performing embedding tests, use --suite=embedding
+#   For performing tests on editor and player, use --suite=editorAndPlayer
 #   For performing tests on editorFeatures, use --suite=editorFeatures
 #   For performing tests on extensions, use --suite=extensions
 #   For performing tests on library, use --suite=library
 #   For performing tests on learnerDashboard, use --suite=learnerDashboard
+#   For performing tests on state editor, use --suite=stateEditor
 #   For performing users tests, use --suite=users
-#   For performing miscellaneous tests, use --suite=misc
-#   For performing embedding tests, use --suite=embedding
 #
 # The root folder MUST be named 'oppia'.
 #
