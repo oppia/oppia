@@ -102,7 +102,7 @@ class SuggestionListHandler(base.BaseHandler):
         # element is the value of the field being queried.
         # request.GET.items() parses the params from the url into the above
         # format. So in the url, the query should be passed as:
-        # ?field1=value1&field2=value2...fieldN=valueN
+        # ?field1=value1&field2=value2...fieldN=valueN.
         query_fields_and_values = self.request.GET.items()
 
         for query in query_fields_and_values:
