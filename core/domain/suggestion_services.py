@@ -123,12 +123,13 @@ def get_suggestion_by_id(suggestion_id):
     return get_suggestion_from_model(model) if model else None
 
 
-def query_suggestions(queries):
+def query_suggestions(query_fields_and_values):
     """Queries for suggestions.
 
     Args:
-        queries: list(tuple). A list of queries. The first element in each tuple
-            is the field to be queried, and the second element is its value.
+        query_fields_and_values: list(tuple(str, str)). A list of queries. The
+            first element in each tuple is the field to be queried, and the
+            second element is its value.
 
     Returns:
         list(Suggestion). A list of suggestions that match the given query
@@ -136,7 +137,7 @@ def query_suggestions(queries):
     """
     return [get_suggestion_from_model(s)
             for s in suggestion_models.GeneralSuggestionModel.query_suggestions(
-                queries)]
+                query_fields_and_values)]
 
 
 def _update_suggestion(suggestion):

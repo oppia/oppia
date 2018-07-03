@@ -271,7 +271,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
             ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
             ('target_id', self.target_id),
-            ('target_version_at_submission', self.target_version_at_submission),
             ('status', suggestion_models.STATUS_IN_REVIEW),
             ('author_id', 'author_1'),
             ('assigned_reviewer_id', 'reviewer_1'),

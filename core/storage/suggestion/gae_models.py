@@ -73,9 +73,8 @@ SCORE_TYPE_CHOICES = [
 SCORE_CATEGORY_DELIMITER = '.'
 
 ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
-                        'target_version_at_submission', 'status', 'author_id',
-                        'assigned_reviewer_id', 'final_reviewer_id',
-                        'score_category']
+                        'status', 'author_id', 'assigned_reviewer_id',
+                        'final_reviewer_id', 'score_category']
 
 
 class GeneralSuggestionModel(base_models.BaseModel):
@@ -157,13 +156,13 @@ class GeneralSuggestionModel(base_models.BaseModel):
             score_category=score_category).put()
 
     @classmethod
-    def query_suggestions(cls, queries):
+    def query_suggestions(cls, query_fields_and_values):
         """Queries for suggestions.
 
         Args:
-            queries: list(tuple). A list of queries. The first element in each
-                tuple is the field to be queried, and the second element is its
-                value.
+            query_fields_and_values: list(tuple(str, str)). A list of queries.
+                The first element in each tuple is the field to be queried, and
+                the second element is the corresponding value to query for.
 
         Returns:
             list(SuggestionModel). A list of suggestions that match the given
@@ -171,7 +170,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             suggestions.
         """
         query = cls.query()
-        for (field, value) in queries:
+        for (field, value) in query_fields_and_values:
             if field not in ALLOWED_QUERY_FIELDS:
                 raise Exception('Not allowed to query on field %s' % field)
             query = query.filter(getattr(cls, field) == value)
