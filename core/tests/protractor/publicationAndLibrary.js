@@ -218,6 +218,7 @@ describe('Permissions for private explorations', function() {
 
     users.login('alice@privileges.com');
     workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
     workflow.addExplorationCollaborator('bobPrivileges');
     expect(workflow.getExplorationManagers()).toEqual(['alicePrivileges']);
     expect(workflow.getExplorationCollaborators()).toEqual(['bobPrivileges']);
@@ -248,6 +249,7 @@ describe('Permissions for private explorations', function() {
     workflow.createExploration();
     explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
     explorationEditorPage.saveChanges('Added content to first card.');
+    explorationEditorPage.navigateToSettingsTab();
     workflow.addExplorationTranslator('translator');
     expect(workflow.getExplorationManagers()).toEqual(['expOwner']);
     expect(workflow.getExplorationCollaborators()).toEqual([]);
