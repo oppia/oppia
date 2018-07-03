@@ -376,7 +376,7 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(
             suggestion.score_category, 'content.' + exploration.category)
 
-    def test_suggestion_miigration_validation_one_off_job(self):
+    def test_suggestion_migration_validation_one_off_job(self):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         for _ in range(10):
             feedback_services.create_suggestion(
