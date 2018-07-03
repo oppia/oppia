@@ -6,7 +6,8 @@
               class="oppia-editable-section">
           <strong style="font-size: 1.2em;"><[subtopic.getTitle()]></strong>
           <i class="material-icons oppia-editor-edit-icon"
-             title="Edit Subtopic Title">&#xE254;
+             title="Edit Subtopic Title">
+            &#xE254;
           </i>
         </span>
         <span ng-if="subtopicTitleEditorIsShown">
@@ -63,11 +64,11 @@
     </colgroup>
     <tr>
       <th colspan="2">
-      <button type="button" ng-click="createSubtopic()"
-              class="btn btn-default create-subtopic-button">
-        Create Subtopic
-      </button>
-    </th>
+        <button type="button" ng-click="createSubtopic()"
+                class="btn btn-default create-subtopic-button">
+          Create Subtopic
+        </button>
+      </th>
     </tr>
     <tr ng-if="subtopics.length > 0">
       <th ng-repeat="key in SUBTOPIC_HEADINGS" class="subtopics-table-headings">
