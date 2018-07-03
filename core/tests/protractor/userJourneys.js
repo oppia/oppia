@@ -20,12 +20,13 @@ var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage = require(
   '../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 var PreferencesPage = require('../protractor_utils/PreferencesPage.js');
 var ThanksPage = require('../protractor_utils/ThanksPage.js');
-var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -271,6 +272,9 @@ describe('Site language', function() {
   var collectionId = null;
   var creatorDashboardPage = null;
   var collectionEditorPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
   var firstExplorationId = null;
   var libraryPage = null;
 
@@ -278,6 +282,9 @@ describe('Site language', function() {
     adminPage = new AdminPage.AdminPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     collectionEditorPage = new CollectionEditorPage.CollectionEditorPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     libraryPage = new LibraryPage.LibraryPage();
 
     var CREATOR_USERNAME = 'langCreatorExplorations';
@@ -294,24 +301,26 @@ describe('Site language', function() {
     workflow.createExploration();
     general.getExplorationIdFromEditor().then(function(expId) {
       firstExplorationId = expId;
-      editor.setContent(forms.toRichText('Language Test'));
-      editor.setInteraction('NumericInput');
-      editor.addResponse(
+      explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
+      explorationEditorMainTab.setInteraction('NumericInput');
+      explorationEditorMainTab.addResponse(
         'NumericInput', forms.toRichText('Nice!!'),
         'END', true, 'IsLessThanOrEqualTo', 0);
-      editor.setDefaultOutcome(forms.toRichText('Ok!!'), null, false);
-      editor.moveToState('END');
-      editor.setContent(forms.toRichText('END'));
-      editor.setInteraction('EndExploration');
+      explorationEditorMainTab.getResponseEditor('default').setFeedback(
+        forms.toRichText('Ok!!'));
+      explorationEditorMainTab.moveToState('END');
+      explorationEditorMainTab.setContent(forms.toRichText('END'));
+      explorationEditorMainTab.setInteraction('EndExploration');
 
       // Save changes.
       title = 'Language Test';
       category = 'Languages';
       objective = 'To test site language.';
-      editor.setTitle(title);
-      editor.setCategory(category);
-      editor.setObjective(objective);
-      editor.saveChanges('Done!');
+      explorationEditorPage.navigateToSettingsTab();
+      explorationEditorSettingsTab.setTitle(title);
+      explorationEditorSettingsTab.setCategory(category);
+      explorationEditorSettingsTab.setObjective(objective);
+      explorationEditorPage.saveChanges('Done!');
 
       // Publish changes.
       workflow.publishExploration();
