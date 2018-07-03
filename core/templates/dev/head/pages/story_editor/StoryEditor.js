@@ -18,11 +18,39 @@
 oppia.constant('NODE_ID_PREFIX', 'node_');
 
 oppia.controller('StoryEditor', [
-  '$scope', 'UrlService', 'StoryEditorStateService',
+  '$scope', '$uibModal', '$window', 'UrlService', 'StoryEditorStateService',
+  'UrlInterpolationService', 'UndoRedoService',
   function(
-      $scope, UrlService, StoryEditorStateService) {
-    $scope.topicId = UrlService.getTopicIdFromUrl();
+      $scope, $uibModal, $window, UrlService, StoryEditorStateService,
+      UrlInterpolationService, UndoRedoService) {
+    var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
+    var topicId = UrlService.getTopicIdFromUrl();
     StoryEditorStateService.loadStory(
-      $scope.topicId, UrlService.getStoryIdFromUrl());
+      topicId, UrlService.getStoryIdFromUrl());
+
+    $scope.returnToTopic = function() {
+      if (UndoRedoService.getChangeCount() > 0) {
+        var modalInstance = $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/story_editor/save_pending_changes_modal_directive.html'),
+          backdrop: true,
+          controller: [
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
+              $scope.cancel = function() {
+                $uibModalInstance.dismiss('cancel');
+              };
+            }
+          ]
+        });
+      } else {
+        $window.open(
+          UrlInterpolationService.interpolateUrl(
+            TOPIC_EDITOR_URL_TEMPLATE, {
+              topicId: topicId
+            }
+          ), '_self');
+      }
+    };
   }
 ]);
