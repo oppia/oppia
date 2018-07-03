@@ -45,7 +45,9 @@
       <span ng-if="!isSaveInProgress()">
         <span ng-if="collectionRights.isPrivate()">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-             alt="Save Collection">&#xE161;</i>
+             alt="Save Collection">
+            &#xE161;
+          </i>
           <span class="oppia-save-publish-button-label">Save Draft</span>
           <span class="hidden-sm hidden-xs" style="opacity: 0.5"
                 ng-if="getChangeListCount() > 0">
@@ -54,7 +56,9 @@
         </span>
         <span ng-if="collectionRights.isPublic()" title="Publish Changes">
           <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-             alt="Publish Changes">&#xE2C3;</i>
+             alt="Publish Changes">
+            &#xE2C3;
+          </i>
           <span class="oppia-save-publish-button-label">Publish Changes</span>
         </span>
       </span>
@@ -72,7 +76,9 @@
             ng-click="publishCollection()"
             ng-disabled="!isCollectionPublishable()">
       <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
-         alt="Publish to Oppia Library">&#xE2C3;</i>
+         alt="Publish to Oppia Library">
+        &#xE2C3;
+      </i>
       <span class="oppia-save-publish-button-label">Publish</span>
     </button>
 

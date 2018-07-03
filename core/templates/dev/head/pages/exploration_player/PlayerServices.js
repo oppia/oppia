@@ -25,32 +25,30 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 // implemented differently depending on whether the skin is being played
 // in the learner view, or whether it is being previewed in the editor view.
 oppia.factory('ExplorationPlayerService', [
-  '$http', '$rootScope', '$q', 'LearnerParamsService',
-  'AlertsService', 'AnswerClassificationService', 'ExplorationContextService',
-  'PAGE_CONTEXT', 'ExplorationHtmlFormatterService',
-  'PlayerTranscriptService', 'ExplorationObjectFactory',
-  'ExpressionInterpolationService', 'StateClassifierMappingService',
-  'ENABLE_PLAYTHROUGHS', 'PlaythroughService', 'StatsReportingService',
-  'UrlInterpolationService', 'ReadOnlyExplorationBackendApiService',
-  'EditableExplorationBackendApiService', 'AudioTranslationLanguageService',
-  'LanguageUtilService', 'NumberAttemptsService', 'AudioPreloaderService',
-  'WindowDimensionsService', 'TWO_CARD_THRESHOLD_PX',
-  'PlayerCorrectnessFeedbackEnabledService',
-  'GuestCollectionProgressService', 'ImagePreloaderService',
+  '$http', '$rootScope', '$q', 'AlertsService', 'AnswerClassificationService',
+  'AudioPreloaderService', 'AudioTranslationLanguageService',
+  'EditableExplorationBackendApiService', 'ExplorationContextService',
+  'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
+  'ExpressionInterpolationService', 'GuestCollectionProgressService',
+  'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
+  'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
+  'PlayerTranscriptService', 'PlaythroughService',
+  'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
+  'StatsReportingService', 'UrlInterpolationService', 'WindowDimensionsService',
+  'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT', 'TWO_CARD_THRESHOLD_PX',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
-      $http, $rootScope, $q, LearnerParamsService,
-      AlertsService, AnswerClassificationService, ExplorationContextService,
-      PAGE_CONTEXT, ExplorationHtmlFormatterService,
-      PlayerTranscriptService, ExplorationObjectFactory,
-      ExpressionInterpolationService, StateClassifierMappingService,
-      ENABLE_PLAYTHROUGHS, PlaythroughService, StatsReportingService,
-      UrlInterpolationService, ReadOnlyExplorationBackendApiService,
-      EditableExplorationBackendApiService, AudioTranslationLanguageService,
-      LanguageUtilService, NumberAttemptsService, AudioPreloaderService,
-      WindowDimensionsService, TWO_CARD_THRESHOLD_PX,
-      PlayerCorrectnessFeedbackEnabledService,
-      GuestCollectionProgressService, ImagePreloaderService,
+      $http, $rootScope, $q, AlertsService, AnswerClassificationService,
+      AudioPreloaderService, AudioTranslationLanguageService,
+      EditableExplorationBackendApiService, ExplorationContextService,
+      ExplorationHtmlFormatterService, ExplorationObjectFactory,
+      ExpressionInterpolationService, GuestCollectionProgressService,
+      ImagePreloaderService, LanguageUtilService, LearnerParamsService,
+      NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
+      PlayerTranscriptService, PlaythroughService,
+      ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
+      StatsReportingService, UrlInterpolationService, WindowDimensionsService,
+      ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
@@ -265,7 +263,7 @@ oppia.factory('ExplorationPlayerService', [
               _explorationId, exploration.title,
               version, data.session_id, GLOBALS.collectionId);
 
-            if (ENABLE_PLAYTHROUGHS) {
+            if (ENABLE_PLAYTHROUGH_RECORDING) {
               PlaythroughService.initSession(_explorationId, version);
             }
 
@@ -395,7 +393,7 @@ oppia.factory('ExplorationPlayerService', [
         var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
 
-        if (ENABLE_PLAYTHROUGHS) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
           StatsReportingService.recordAnswerSubmitAction(
             oldStateName, newStateName, oldState.interaction.id, answer,
             outcome.feedback);
