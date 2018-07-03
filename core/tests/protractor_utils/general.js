@@ -18,6 +18,7 @@
  */
 
 var editor = require('./editor.js');
+var until = protractor.ExpectedConditions;
 
 // Time (in ms) to wait when the system needs time for some computations.
 var WAIT_TIME = 4000;
@@ -146,15 +147,17 @@ var ensurePageHasNoTranslationIds = function() {
 };
 
 var acceptAlert = function() {
-  browser.wait(function() {
-    return browser.switchTo().alert().accept().then(
-      function() {
-        return true;
-      },
-      function() {
-        return false;
-      }
-    );
+  browser.wait(until.alertIsPresent(), 5000).then( function(activeAlert) {
+    if (activeAlert) {
+      return browser.switchTo().alert().accept().then(
+        function() {
+          return true;
+        },
+        function() {
+          return false;
+        }
+      );
+    }
   });
 };
 

@@ -18,7 +18,6 @@
  */
 
 var forms = require('./forms.js');
-var editor = require('./editor.js');
 var general = require('./general.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage');
 var LibraryPage = require('./LibraryPage.js');
@@ -88,13 +87,11 @@ var createAndPublishExploration = function(
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = function(roleName, username) {
-  editor.runFromSettingsTab(function() {
-    element(by.css('.protractor-test-edit-roles')).click();
-    element(by.css('.protractor-test-role-username')).sendKeys(username);
-    element(by.css('.protractor-test-role-select')).
-      element(by.cssContainingText('option', roleName)).click();
-    element(by.css('.protractor-test-save-role')).click();
-  });
+  element(by.css('.protractor-test-edit-roles')).click();
+  element(by.css('.protractor-test-role-username')).sendKeys(username);
+  element(by.css('.protractor-test-role-select')).
+    element(by.cssContainingText('option', roleName)).click();
+  element(by.css('.protractor-test-save-role')).click();
 };
 
 var addExplorationManager = function(username) {
@@ -115,16 +112,13 @@ var addExplorationPlaytester = function(username) {
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = function(roleName) {
-  var result = editor.runFromSettingsTab(function() {
-    var itemName = roleName + 'Name';
-    var listName = roleName + 'Names';
-    return element.all(by.repeater(
-      itemName + ' in ExplorationRightsService.' + listName + ' track by $index'
-    )).map(function(elem) {
-      return elem.getText();
-    });
+  var itemName = roleName + 'Name';
+  var listName = roleName + 'Names';
+  return element.all(by.repeater(
+    itemName + ' in ExplorationRightsService.' + listName + ' track by $index'
+  )).map(function(elem) {
+    return elem.getText();
   });
-  return result;
 };
 
 var getExplorationManagers = function() {

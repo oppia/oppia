@@ -103,14 +103,14 @@
                  translate="I18N_DASHBOARD_COLLECTIONS">
             </div>
           </div>
-          <h4 class="oppia-learner-dashboard-menu"
+          <h4 class="oppia-learner-dashboard-menu protractor-test-incomplete-section"
               ng-class="{'oppia-learner-dashboard-section-active': activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE}"
               ng-click="setActiveSection(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE)">
             <span translate="<[LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE]>"></span>
             <span class="caret"></span>
           </h4>
           <div ng-show="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE" class="menu-sub-section">
-            <div class="oppia-learner-dashboard-submenu"
+            <div class="oppia-learner-dashboard-submenu protractor-test-incomplete-exp-section"
                  ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
                  ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
                  translate="I18N_DASHBOARD_EXPLORATIONS">
@@ -128,7 +128,7 @@
             <span class="caret"></span>
           </h4>
           <div ng-show="activeSection === LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED" class="menu-sub-section">
-            <div class="oppia-learner-dashboard-submenu"
+            <div class="oppia-learner-dashboard-submenu protractor-test-completed-exp-section"
                  ng-class="{'oppia-learner-dashboard-sub-section-active': activeSubsection === LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS}"
                  ng-click="setActiveSubsection(LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)"
                  translate="I18N_DASHBOARD_EXPLORATIONS">

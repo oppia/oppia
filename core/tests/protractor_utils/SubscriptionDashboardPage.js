@@ -17,32 +17,53 @@
  * for use in Protractor tests.
  */
 
+var until = protractor.ExpectedConditions;
+
 var SubscriptionDashboardPage = function() {
   var subscriptionButton = element(
     by.css('.protractor-test-subscription-button'));
   var subscriptionName = element.all(
     by.css('.protractor-test-subscription-name'));
 
+  this.navigateToUserSubscriptionPage = function(userName) {
+    browser.get('/profile/' + userName);
+  };
+
   this.expectSubscriptionFirstNameToMatch = function(name) {
-    expect(
-      subscriptionName.first().getText()
-    ).toMatch(name);
+    browser.wait(until.visibilityOf(subscriptionName.first()), 5000,
+      'First Subscriber Name is not visible').then(function(isVisible) {
+      if (isVisible) {
+        expect(subscriptionName.first().getText()).toMatch(name);
+      }
+    });
   };
 
   this.expectSubscriptionLastNameToMatch = function(name) {
-    expect(
-      subscriptionName.last().getText()
-    ).toMatch(name);
+    browser.wait(until.visibilityOf(subscriptionName.last()), 5000,
+      'Last Subscriber Name is not visible').then(function(isVisible) {
+      if (isVisible) {
+        expect(subscriptionName.last().getText()).toMatch(name);
+      }
+    });
   };
 
   this.expectSubscriptionCountToEqual = function(value) {
-    expect(
-      subscriptionName.count()
-    ).toEqual(value);
+    browser.wait(until.visibilityOf(subscriptionName.first()), 5000,
+      'Subscriber Name Card takes too long to appear')
+      .then(function(isVisible) {
+        if (isVisible) {
+          expect(subscriptionName.count()).toEqual(value);
+        }
+      });
   };
 
-  this.navigateToSubscriptionButton = function(name) {
-    subscriptionButton.click();
+  this.navigateToSubscriptionButton = function() {
+    browser.wait(until.elementToBeClickable(subscriptionButton), 5000,
+      'Subscription button is not clickable').then(function(isClickable) {
+      if (isClickable) {
+        subscriptionButton.click();
+      }
+    });
   };
 };
 

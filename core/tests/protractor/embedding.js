@@ -19,8 +19,6 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var editor = require('../protractor_utils/editor.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
@@ -28,11 +26,15 @@ var ExplorationPlayerPage =
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Embedding', function() {
-  var explorationEditorPage =
-      new ExplorationEditorPage.ExplorationEditorPage();
-  var explorationEditorMainTab = explorationEditorPage.getMainTab();
-  var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
+
+  explorationEditorPage =
+  new ExplorationEditorPage.ExplorationEditorPage();
+  explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
   var createCountingExploration = function () {
     // Intro.
@@ -98,7 +100,6 @@ describe('Embedding', function() {
   };
 
   beforeEach(function() {
-    adminPage = new AdminPage.AdminPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 

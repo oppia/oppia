@@ -101,4 +101,5 @@ var ExplorationEditorFeedbackTab = function () {
     feedbackSendResponseButton.click();
   };
 };
+
 exports.ExplorationEditorFeedbackTab = ExplorationEditorFeedbackTab;

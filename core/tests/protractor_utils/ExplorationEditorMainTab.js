@@ -756,8 +756,9 @@ var ExplorationEditorMainTab = function() {
   // the types of the rule input parameters.
   var _getRuleParameterTypes = function(interactionId, ruleName) {
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
-    // NumericInput's 'Equals' ruleDescription example:
+    // An example of rule description:
     // is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}.
+    // (from NumericInput).
     var parameterTypes = [];
     var re = /\|(.*?)\}/ig;
     // Matched result = Array[|NonnegativeInt}, |NonnegativeInt}]
@@ -808,9 +809,10 @@ var ExplorationEditorMainTab = function() {
    * @param {string[]} [providedText] - Feedback text to replace with.
    */
   var _replaceAngularSelectors = function(ruleDescription, providedText) {
-    // NumericInput's 'Equals' ruleDescription example:
-    // is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}.
-    var re = /{{[a-z][\|](.*?)}}/ig;
+    // An example of rule description:
+    // "is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}"
+    // (from NumericInput).
+    var re = /{{[a-z]+[\|](.*?)}}/ig;
     // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}]
     var angularSelectors = ruleDescription.match(re);
     var textArray = [];
@@ -901,7 +903,8 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.setStateName = function(name) {
-    expect(stateNameContainer.isDisplayed()).toBe(true);
+    browser.wait(until.elementToBeClickable(stateNameContainer), 5000,
+      'State Name Container takes too long to appear');
     stateNameContainer.click();
     stateNameInput.clear();
     stateNameInput.sendKeys(name);

@@ -17,6 +17,8 @@
  * tests.
  */
 
+var until = protractor.ExpectedConditions;
+
 var CollectionEditorPage = function() {
   var addExplorationButton = element(
     by.css('.protractor-test-add-exploration-button'));
@@ -88,7 +90,12 @@ var CollectionEditorPage = function() {
 
   // Closes the save modal.
   this.closeSaveModal = function() {
-    closeSaveModal.click();
+    browser.wait(until.elementToBeClickable(closeSaveModal), 5000,
+      'Publish Changes button is not clickable').then( function(isClickable) {
+      if (isClickable) {
+        closeSaveModal.click();
+      }
+    });
   };
 
   // Click on publish collection.
