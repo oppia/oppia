@@ -528,7 +528,7 @@ class ExplorationMigrationValidationJobForTextAngular(
         html_list = exploration.get_all_html_content_strings()
 
         err_dict = html_cleaner.validate_rte_format(
-            html_list, feconf.RTE_FORMAT_TEXTANGULAR, True)
+            html_list, feconf.RTE_FORMAT_TEXTANGULAR, run_migration=True)
 
         for key in err_dict:
             if err_dict[key]:
@@ -596,7 +596,7 @@ class ExplorationMigrationValidationJobForCKEditor(
         html_list = exploration.get_all_html_content_strings()
 
         err_dict = html_cleaner.validate_rte_format(
-            html_list, feconf.RTE_FORMAT_CKEDITOR, True)
+            html_list, feconf.RTE_FORMAT_CKEDITOR, run_migration=True)
 
         for key in err_dict:
             if err_dict[key]:
