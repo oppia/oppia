@@ -180,8 +180,8 @@ oppia.factory('numberWithUnitsRulesService', [
           inputs.type = 'real';
           inputs.real = inputs.fraction.toFloat();
         }
-        answerString = answer.toString();
-        inputsString = inputs.toString();
+        answerString = answer.toCompatibleString();
+        inputsString = inputs.toCompatibleString();
         return math.unit(answerString).equals(math.unit(inputsString));
       }
     };

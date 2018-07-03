@@ -65,6 +65,22 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       return numberWithUnitsString;
     };
 
+    NumberWithUnits.prototype.toCompatibleString = function() {
+      var numberWithUnitsString = '';
+      var unitsString = UnitsObjectFactory.fromList(this.units).toString();
+      unitsString = UnitsObjectFactory.makeUnitsCompatible(unitsString);
+
+      if (this.type === 'real') {
+        numberWithUnitsString += this.real + ' ';
+      } else if (this.type === 'fraction') {
+        numberWithUnitsString += this.fraction.toString() + ' ';
+      }
+      numberWithUnitsString += unitsString.trim();
+      numberWithUnitsString = numberWithUnitsString.trim();
+
+      return numberWithUnitsString;
+    };
+
     NumberWithUnits.prototype.toDict = function() {
       return {
         type: this.type,
@@ -276,7 +292,7 @@ oppia.factory('UnitsObjectFactory', [function() {
     var unit = '';
     for (var i = 0; i < this.units.length; i++) {
       var d = this.units[i];
-      if (d.unit === '$' || d.unit === 'Rs' || d.unit === '₹') {
+      if (d.exponent === 1) {
         unit += d.unit + ' ';
       } else {
         unit += d.unit + '^' + d.exponent.toString() + ' ';
@@ -288,19 +304,17 @@ oppia.factory('UnitsObjectFactory', [function() {
   Units.createCurrencyUnits = function() {
     // Creates user-defined currency (base + sub) units.
     math.createUnit('dollar', {aliases: [
-      'dollars', 'Dollar', 'USD', '$', 'Dollars']});
+      'dollars', 'Dollar', 'USD', 'Dollars']});
     math.createUnit('cent', {definition: '0.01 dollar', aliases: [
       'Cent', 'cents', 'Cents']});
     math.createUnit('rupees', {aliases: [
-      'Rupees', 'Rs', 'rupee', 'Rupee', '₹']});
+      'Rupees', 'Rs', 'rupee', 'Rupee']});
     math.createUnit('paise', {definition: '0.01 rupees', aliases: ['paisa']});
   };
 
-  Units.fromRawInputString = function(units) {
+  Units.makeUnitsCompatible = function(units) {
+    // Makes the units compatible with the math.js allowed format.
     units = units.replace(/per/g, '/');
-    try {
-      Units.createCurrencyUnits();
-    } catch (parsingError) {}
 
     // Special symbols need to be replaced as math.js doesn't support custom
     // units starting with special symbols. Also, it doesn't allow units
@@ -314,10 +328,18 @@ oppia.factory('UnitsObjectFactory', [function() {
       units = units.replace('₹', '');
       units = 'rupees ' + units;
     }
+    return units.trim();
+  };
 
-    if (units !== '') {
+  Units.fromRawInputString = function(units) {
+    try {
+      Units.createCurrencyUnits();
+    } catch (parsingError) {}
+
+    compatibleUnits = Units.makeUnitsCompatible(units);
+    if (compatibleUnits !== '') {
       try {
-        math.unit(units);
+        math.unit(compatibleUnits);
       } catch (err) {
         throw new Error(err);
       }
