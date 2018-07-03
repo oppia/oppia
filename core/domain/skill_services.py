@@ -262,6 +262,10 @@ def get_skill_descriptions_by_ids(skill_ids):
         if skill_summary_model is not None:
             skill_id_to_description_dict[skill_summary_model.id] = (
                 skill_summary_model.description)
+
+    for skill_id in skill_ids:
+        if skill_id not in skill_id_to_description_dict:
+            skill_id_to_description_dict[skill_id] = None
     return skill_id_to_description_dict
 
 

@@ -131,6 +131,10 @@ oppia.directive('subtopicsListTab', [
             });
           };
 
+          $scope.isSkillDeleted = function(skillSummary) {
+            return skillSummary.getDescription() === null;
+          };
+
           $scope.getSkillEditorUrl = function(skillId) {
             return UrlInterpolationService.interpolateUrl(
               SKILL_EDITOR_URL_TEMPLATE, {
@@ -143,11 +147,11 @@ oppia.directive('subtopicsListTab', [
            * @param {string|null} oldSubtopicId - The id of the subtopic from
            *    which the skill is to be moved, or null if the origin is the
            *    uncategorized section.
-           * @param {SkillSummary} skill - The summary of the skill that is to
-           *    be moved.
+           * @param {SkillSummary} skillSummary - The summary of the skill that
+           *    is to be moved.
            */
-          $scope.startMoveSkill = function(oldSubtopicId, skill) {
-            $scope.skillToMove = skill;
+          $scope.startMoveSkill = function(oldSubtopicId, skillSummary) {
+            $scope.skillSummaryToMove = skillSummary;
             $scope.oldSubtopicId = oldSubtopicId ? oldSubtopicId : null;
           };
 
@@ -163,11 +167,11 @@ oppia.directive('subtopicsListTab', [
 
             if (newSubtopicId === null) {
               TopicUpdateService.removeSkillFromSubtopic(
-                $scope.topic, $scope.oldSubtopicId, $scope.skillToMove);
+                $scope.topic, $scope.oldSubtopicId, $scope.skillSummaryToMove);
             } else {
               TopicUpdateService.moveSkillToSubtopic(
                 $scope.topic, $scope.oldSubtopicId, newSubtopicId,
-                $scope.skillToMove);
+                $scope.skillSummaryToMove);
             }
             _initEditor();
           };

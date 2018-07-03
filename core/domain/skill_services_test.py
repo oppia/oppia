@@ -86,13 +86,19 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_2', self.USER_ID, 'Description 2', [],
             skill_domain.SkillContents('Explanation', ['Example 1'])
         )
+        self.save_new_skill(
+            'skill_3', self.USER_ID, 'Description 3', [],
+            skill_domain.SkillContents('Explanation', ['Example 1'])
+        )
+        skill_services.delete_skill(self.USER_ID, 'skill_2')
         skill_descriptions = skill_services.get_skill_descriptions_by_ids([
-            self.SKILL_ID, 'skill_2'])
+            self.SKILL_ID, 'skill_2', 'skill_3'])
 
         self.assertEqual(
             skill_descriptions, {
                 self.SKILL_ID: 'Description',
-                'skill_2': 'Description 2'
+                'skill_2': None,
+                'skill_3': 'Description 3'
             }
         )
 
