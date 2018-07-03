@@ -28,13 +28,15 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
       controller: ['$scope', function($scope) {
         var errorMessage = '';
         $scope.selectedRank = '';
-        $scope.maxPrevIndex = 0;
+        $scope.maxPrevIndex = 1;
 
-        if (!$scope.value) {
-          $scope.value = [];
-        }
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
+
+        $scope.value = [[]];
+        for (var i = 0; i < $scope.choices.length; i++) {
+          $scope.value[0].push($scope.choices[i].id);
+        }
 
         if ($scope.selectedRank !== '') {
           $scope.maxPrevIndex = math.max(parseInt($scope.selectedRank),
@@ -43,7 +45,8 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
 
         $scope.allowedChoices = function() {
           var allowedList = [];
-          for (var i = 0; i <= $scope.maxPrevIndex; i++) {
+          for (var i = 0; i <= math.min(
+            $scope.maxPrevIndex, $scope.choices.length - 1); i++) {
             allowedList.push(i + 1);
           }
           return allowedList;
@@ -79,9 +82,9 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
                     String(i + 1) + '. Please assign some item at this ' +
                     'position.');
                 }
-                choiceHtmlHasBeenAdded = true;
-                break;
               }
+              choiceHtmlHasBeenAdded = true;
+              break;
             }
           }
           if (!choiceHtmlHasBeenAdded) {

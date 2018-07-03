@@ -7,7 +7,15 @@
 
   @media screen and (max-width: 959px) {
     .drag-and-drop-sort-form-container {
-      width: 100vw;
+      width: inherit;
+    }
+
+    .drag-and-drop-item .drag-and-drop-subitem {
+      width: inherit;
+    }
+
+    .angular-ui-tree-placeholder {
+      width: inherit;
     }
   }
 
@@ -15,7 +23,7 @@
     border: 2px dashed #add8e6;
     height: 70px;
     margin-left: 50px;
-    width: 200px;
+    max-width: 300px;
   }
 
   .drag-and-drop-sort-container {
@@ -28,9 +36,11 @@
   .drag-and-drop-item {
     background-color: #add8e6;
     border: 1px solid #000000;
-    height: 70px;
+    max-height: 100px;
+    max-width: 300px;
     margin: 10px 0 0 70px;
-    width: 200px;
+    min-height: 50px;
+    padding-left: 10px;
   }
 
   .drag-and-drop-item:hover {
@@ -40,10 +50,12 @@
   .drag-and-drop-subitem {
     background-color: #add8e6;
     border: 1px solid #000000;
-    height: 70px;
+    max-height: 100px;
+    max-width: 300px;
     margin:-20px 0 0 50px;
+    min-height: 50px;
+    padding-left: 10px;
     position: relative;
-    width: 200px;
   }
 </style>
 
@@ -57,7 +69,7 @@
             <angular-html-bind html-data="item.title"></angular-html-bind>
           </div>
           <ol ui-tree-nodes="" ng-model="item.items">
-            <li ng-repeat="subItem in item.items" ui-tree-node data-scroll-container=".drag-and-drop-sort-container">
+            <li ng-repeat="subItem in item.items track by $index" ui-tree-node data-scroll-container=".drag-and-drop-sort-container">
               <div ui-tree-handle class="drag-and-drop-subitem">
                 <angular-html-bind html-data="subItem.title"></angular-html-bind>
               </div>
