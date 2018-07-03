@@ -23,7 +23,8 @@
                 ng-model="editableDescription"
                 ng-change="updateStoryDescriptionStatus(editableDescription)"
                 ng-blur="updateStoryDescription(editableDescription)"
-                placeholder="Enter the description of the story"></textarea>
+                placeholder="Enter the description of the story">
+      </textarea>
       <span ng-if="editableDescriptionIsEmpty && storyDescriptionChanged" class="help-block" style="font-size: smaller">
         What does this story contain?
       </span>
