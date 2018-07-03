@@ -22,13 +22,15 @@ oppia.factory('SkillObjectFactory', [
   function(
       ConceptCardObjectFactory, MisconceptionObjectFactory) {
     var Skill = function(
-        id, description, misconceptions, conceptCard, languageCode, version) {
+        id, description, misconceptions, conceptCard, languageCode, version,
+        nextMisconceptionId) {
       this._id = id;
       this._description = description;
       this._misconceptions = misconceptions;
       this._conceptCard = conceptCard;
       this._languageCode = languageCode;
       this._version = version;
+      this._nextMisconceptionId = nextMisconceptionId;
     };
 
     Skill.prototype.toBackendDict = function() {
@@ -40,7 +42,8 @@ oppia.factory('SkillObjectFactory', [
         }),
         skill_contents: this._conceptCard.toBackendDict(),
         language_code: this._languageCode,
-        version: this._version
+        version: this._version,
+        next_misconception_id: this._nextMisconceptionId
       };
     };
 
@@ -51,6 +54,7 @@ oppia.factory('SkillObjectFactory', [
       this._conceptCard = skill.getConceptCard();
       this._languageCode = skill.getLanguageCode();
       this._version = skill.getVersion();
+      this._nextMisconceptionId = skill.getNextMisconceptionId();
     };
 
     Skill.createFromBackendDict = function(skillBackendDict) {
@@ -61,7 +65,8 @@ oppia.factory('SkillObjectFactory', [
         ConceptCardObjectFactory.createFromBackendDict(
           skillBackendDict.skill_contents),
         skillBackendDict.language_code,
-        skillBackendDict.version);
+        skillBackendDict.version,
+        skillBackendDict.next_misconception_id);
     };
 
 
@@ -69,7 +74,8 @@ oppia.factory('SkillObjectFactory', [
     // the actual skill is fetched from the backend.
     Skill.createInterstitialSkill = function() {
       return new Skill(null, 'Skill description loading',
-        [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en', 1);
+        [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en', 1,
+        '0');
     };
 
     var generateMisconceptionsFromBackendDict = function(
@@ -103,6 +109,8 @@ oppia.factory('SkillObjectFactory', [
 
     Skill.prototype.appendMisconception = function(newMisconception) {
       this._misconceptions.push(newMisconception);
+      this._nextMisconceptionId = this.getIncrementedMisconceptionId(
+        newMisconception.getId());
     };
 
     Skill.prototype.getLanguageCode = function() {
@@ -114,13 +122,11 @@ oppia.factory('SkillObjectFactory', [
     };
 
     Skill.prototype.getNextMisconceptionId = function() {
-      var maxId = 0;
-      this._misconceptions.forEach(function(misconception) {
-        var parsedIdAsInt = parseInt(misconception.getId(), 10);
-        maxId = Math.max(maxId, parsedIdAsInt);
-      });
-      var nextIdAsInt = maxId + 1;
-      return nextIdAsInt.toString();
+      return this._nextMisconceptionId;
+    };
+
+    Skill.prototype.getIncrementedMisconceptionId = function(id) {
+      return String(parseInt(id) + 1);
     };
 
     Skill.prototype.findMisconceptionById = function(id) {

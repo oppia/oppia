@@ -58,7 +58,8 @@ describe('Skill object factory', function() {
         misconceptions: [misconceptionDict1, misconceptionDict2],
         skill_contents: skillContentsDict,
         language_code: 'en',
-        version: 3
+        version: 3,
+        next_misconception_id: '6'
       };
     }));
 
@@ -87,9 +88,22 @@ describe('Skill object factory', function() {
 
     it('should get the correct next misconception id', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-      expect(skill.getNextMisconceptionId()).toEqual('5');
+      expect(skill.getNextMisconceptionId()).toEqual('6');
       skill.deleteMisconception('4');
-      expect(skill.getNextMisconceptionId()).toEqual('3');
+      expect(skill.getNextMisconceptionId()).toEqual('6');
+
+      var misconceptionToAdd1 = MisconceptionObjectFactory
+        .createFromBackendDict({
+          id: skill.getNextMisconceptionId(),
+          name: 'test name',
+          notes: 'test notes',
+          feedback: 'test feedback',
+        });
+
+      skill.appendMisconception(misconceptionToAdd1);
+      expect(skill.getNextMisconceptionId()).toEqual('7');
+      skill.deleteMisconception('6');
+      expect(skill.getNextMisconceptionId()).toEqual('7');
     });
 
     it('should convert to a backend dictionary', function() {

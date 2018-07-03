@@ -153,8 +153,8 @@ def get_skill_from_model(skill_model, run_conversion=True):
         versioned_misconceptions['schema_version'],
         versioned_skill_contents['schema_version'],
         skill_model.language_code,
-        skill_model.version, skill_model.created_on,
-        skill_model.last_updated)
+        skill_model.version, skill_model.next_misconception_id,
+        skill_model.created_on, skill_model.last_updated)
 
 
 def get_all_skill_summaries():
@@ -274,6 +274,7 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
             for misconception in skill.misconceptions
         ],
         skill_contents=skill.skill_contents.to_dict(),
+        next_misconception_id=skill.next_misconception_id,
         misconceptions_schema_version=skill.misconceptions_schema_version,
         skill_contents_schema_version=skill.skill_contents_schema_version
     )
