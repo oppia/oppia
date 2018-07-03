@@ -135,7 +135,6 @@ describe('Learner dashboard functionality', function() {
 
     libraryPage.get();
     libraryPage.findExploration('Dummy Exploration');
-    expect(libraryPage.explorationExists('Dummy Exploration')).toBe(true);
     libraryPage.playExploration('Dummy Exploration');
     explorationPlayerPage.expectExplorationNameToBe('Dummy Exploration');
     explorationPlayerPage.rateExploration(5);
@@ -310,9 +309,9 @@ describe('Learner dashboard functionality', function() {
 
     // Completing exploration '14' to activate /learner_dashboard
     libraryPage.get();
-    libraryPage.findExploration('Activation');
-    libraryPage.playExploration('Activation');
-    explorationPlayerPage.expectExplorationNameToBe('Activation');
+    libraryPage.findExploration('Activations');
+    libraryPage.playExploration('Activations');
+    explorationPlayerPage.expectExplorationNameToBe('Activations');
     explorationPlayerPage.rateExploration(4);
 
     // Both creators should be present in the subscriptions section of the
