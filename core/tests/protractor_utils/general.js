@@ -17,7 +17,8 @@
  * with protractor.
  */
 
-var editor = require('./editor.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
 var until = protractor.ExpectedConditions;
 
 // Time (in ms) to wait when the system needs time for some computations.
@@ -104,7 +105,9 @@ var getExplorationIdFromPlayer = function() {
 var openEditor = function(explorationId) {
   browser.get(EDITOR_URL_SLICE + explorationId);
   browser.waitForAngular();
-  editor.exitTutorialIfNecessary();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.exitTutorial();
 };
 
 var openPlayer = function(explorationId) {
