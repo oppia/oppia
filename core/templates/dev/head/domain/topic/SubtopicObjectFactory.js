@@ -19,10 +19,11 @@
 
 oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
   function(SkillSummaryObjectFactory) {
-    var Subtopic = function(subtopicBackendObject, skillIdToDescriptionMap) {
-      this._id = subtopicBackendObject.id;
-      this._title = subtopicBackendObject.title;
-      this._skillSummaries = subtopicBackendObject.skill_ids.map(
+    var Subtopic = function(
+        subtopicId, title, skillIds, skillIdToDescriptionMap) {
+      this._id = subtopicId;
+      this._title = title;
+      this._skillSummaries = skillIds.map(
         function(skillId) {
           return SkillSummaryObjectFactory.create(
             skillId, skillIdToDescriptionMap[skillId]);
@@ -59,12 +60,9 @@ oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
     };
 
     Subtopic.prototype.hasSkill = function(skillId) {
-      for (var i = 0; i < this._skillSummaries.length; i++) {
-        if (this._skillSummaries[i].getId() === skillId) {
-          return true;
-        }
-      }
-      return false;
+      return this._skillSummaries.some(function(skillSummary) {
+        return skillSummary.getId() === skillId;
+      });
     };
 
     Subtopic.prototype.addSkill = function(skillId, skillDescription) {
@@ -87,8 +85,10 @@ oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
       }
     };
 
-    Subtopic.create = function(subtopicBackendObject, skillIdToDescriptionMap) {
-      return new Subtopic(subtopicBackendObject, skillIdToDescriptionMap);
+    Subtopic.create = function(subtopicBackendDict, skillIdToDescriptionMap) {
+      return new Subtopic(
+        subtopicBackendDict.id, subtopicBackendDict.title,
+        subtopicBackendDict.skill_ids, skillIdToDescriptionMap);
     };
 
     Subtopic.createFromTitle = function(subtopicId, title) {

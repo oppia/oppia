@@ -250,7 +250,7 @@ def get_skill_descriptions_by_ids(skill_ids):
     """Returns a list of skill descriptions corresponding to given skill ids.
 
     Args:
-        skill_ids: str. The list of skill ids.
+        skill_ids: list(str). The list of skill ids.
 
     Returns:
         dict. The skill descriptions of skills keyed by their corresponding ids.

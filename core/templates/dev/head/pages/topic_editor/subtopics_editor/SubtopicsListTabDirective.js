@@ -141,7 +141,7 @@ oppia.directive('subtopicsListTab', [
 
           /**
            * @param {string|null} oldSubtopicId - The id of the subtopic from
-           *    which the skill is to be moved or null, if the origin is the
+           *    which the skill is to be moved, or null if the origin is the
            *    uncategorized section.
            * @param {SkillSummary} skill - The summary of the skill that is to
            *    be moved.
@@ -153,7 +153,7 @@ oppia.directive('subtopicsListTab', [
 
           /**
            * @param {string|null} newSubtopicId - The subtopic to which the
-           *    skill is to be moved or null, if the destination is the
+           *    skill is to be moved, or null if the destination is the
            *    uncategorized section.
            */
           $scope.endMoveSkill = function(newSubtopicId) {
