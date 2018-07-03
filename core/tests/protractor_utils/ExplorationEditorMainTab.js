@@ -61,8 +61,9 @@ var ExplorationEditorMainTab = function() {
   var interaction = element(by.css('.protractor-test-interaction'));
   var interactionEditor = element(
     by.css('.protractor-test-interaction-editor'));
-  var interactionNode = element.all(by.css('.protractor-test-node'));
-  var interactionNodeLabel = function(nodeElement) {
+  var explorationGraph = element(by.css('.protractor-test-exploration-graph'));
+  var stateNode = explorationGraph.all(by.css('.protractor-test-node'));
+  var stateNodeLabel = function(nodeElement) {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
   var interactionTab = function(tabId) {
@@ -210,7 +211,6 @@ var ExplorationEditorMainTab = function() {
   };
 
   // RESPONSE EDITOR
-
 
   /**
    * This clicks the "add new response" button and then selects the rule type
@@ -858,8 +858,8 @@ var ExplorationEditorMainTab = function() {
 
   this.deleteState = function(stateName) {
     general.scrollToTop();
-    var nodeElement = element(
-      by.cssContainingText('.protractor-test-node', stateName));
+    var nodeElement = explorationGraph.all(
+      by.cssContainingText('.protractor-test-node', stateName)).first();
     browser.wait(until.visibilityOf(nodeElement), 5000, 'State ' + stateName +
       ' takes too long to appear or does not exist');
     nodeElement.element(by.css('.protractor-test-delete-node')).click();
@@ -872,8 +872,8 @@ var ExplorationEditorMainTab = function() {
   // For this to work, there must be more than one name, otherwise the
   // exploration overview will be disabled.
   this.expectStateNamesToBe = function(names) {
-    interactionNode.map(function(stateElement) {
-      return interactionNodeLabel(stateElement).getText();
+    stateNode.map(function(stateElement) {
+      return stateNodeLabel(stateElement).getText();
     }).then(function(stateNames) {
       expect(stateNames.sort()).toEqual(names.sort());
     });
@@ -883,13 +883,13 @@ var ExplorationEditorMainTab = function() {
   // fail.
   this.moveToState = function(targetName) {
     general.scrollToTop();
-    interactionNode.map(function(stateElement) {
-      return interactionNodeLabel(stateElement).getText();
+    stateNode.map(function(stateElement) {
+      return stateNodeLabel(stateElement).getText();
     }).then(function(listOfNames) {
       var matched = false;
       for (var i = 0; i < listOfNames.length; i++) {
         if (listOfNames[i] === targetName) {
-          interactionNode.get(i).click();
+          stateNode.get(i).click();
           matched = true;
           // Wait to re-load the entire state editor.
           general.waitForSystem();
@@ -913,9 +913,31 @@ var ExplorationEditorMainTab = function() {
       // Wait for the state to refresh.
       general.waitForSystem();
     });
+    _expectNewStateNameToMatch(name);
   };
 
-  // UTILITIES
+  /**
+   * Throw error if new state name does not match with provided input.
+   * Do not use white spaces at the end of 'name' or non-ASCII letters.
+   * Eg.'White space at the end ' will be truncated to 'White space at the end'
+   * by stateNameInput, which will cause an error to be thrown.
+   * @param {string} name - Expected state name to match.
+   */
+  var _expectNewStateNameToMatch = function (name) {
+    stateNameContainer.getText().then(function(newStateName) {
+      // Look for ASCII letters only in the string from stateNameContainer.
+      // This is because of the 'Pencil' icon at the end of stateNameContainer.
+      var re = /[\x20-\x7F]*/gi;
+      var parsedStateName = newStateName.match(re);
+      if (parsedStateName) {
+        if (parsedStateName[0] !== name) {
+          throw Error ('State name is set to:' + parsedStateName +
+          ' instead of:' + name);
+        }
+      }
+    });
+  };
+
   this.expectCurrentStateToBe = function(name) {
     expect(stateNameContainer.getText()).toMatch(name);
   };
