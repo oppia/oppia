@@ -396,13 +396,12 @@ describe('Exploration history', function() {
     historyGraph.selectTwoVersions(1, 2);
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
-
-    explorationEditorMainTab.moveToState('first (was: Introd...');
+    historyGraph.openStateHistory('first (was: Introd...');
     historyGraph.expectTextWithHighlightingToMatch(
       VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
     historyGraph.closeStateHistory();
 
-    explorationEditorMainTab.moveToState('second');
+    historyGraph.openStateHistory('second');
     historyGraph.expectTextToMatch(STATE_2_STRING, ' ');
     historyGraph.closeStateHistory();
 
@@ -437,7 +436,7 @@ describe('Exploration history', function() {
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
 
-    explorationEditorMainTab.moveToState('second');
+    historyGraph.openStateHistory('second');
     historyGraph.expectTextToMatch(' ', STATE_2_STRING);
     historyGraph.closeStateHistory();
 
