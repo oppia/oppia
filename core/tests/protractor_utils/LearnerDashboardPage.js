@@ -143,60 +143,30 @@ var LearnerDashboardPage = function() {
   };
 
   this.expectTitleOfCollectionSummaryTileToBeHidden = function(title) {
-    browser.wait(until.invisibilityOf(titleOfCollectionSummaryTile.first()),
-      5000, 'Collection Summary Tile takes too long to disappear')
-      .then(function(isVisible) {
-        if (isVisible) {
-          titleOfCollectionSummaryTile.map(function(collectionTitle) {
-            expect(collectionTitle.getText()).not.toMatch(title);
-          });
-        }
+    element.all(by.cssContainingText(
+      '.protractor-test-collection-summary-tile-title', title))
+      .then(function(items) {
+        expect(items.length).toBe(0);
       });
   };
 
   this.expectTitleOfCollectionSummaryTileToMatch = function(title) {
-    titleOfCollectionSummaryTile.map(function(collectionTitle) {
-      expect(collectionTitle.getText()).toMatch(title);
-    });
-    browser.wait(until.visibilityOf(titleOfCollectionSummaryTile.first()), 5000,
-      'Collection Summary Tile takes too long to appear')
-      .then(function(isVisible) {
-        if (isVisible) {
-          titleOfCollectionSummaryTile.map(function(collectionTitle) {
-            expect(collectionTitle.getText()).toMatch(title);
-          });
-        }
-      });
+    var collectionTitle = element(by.cssContainingText(
+      '.protractor-test-collection-summary-tile-title', title));
+    expect(collectionTitle.isDisplayed()).toBe(true);
   };
 
   this.expectTitleOfExplorationSummaryTileToBeHidden = function(title) {
-    browser.wait(until.invisibilityOf(
-      titleOfExplorationSummaryTile.first()), 5000,
-    'Exploration Summary Tile takes too long to disappear')
-      .then(function(inVisible) {
-        if (inVisible) {
-          titleOfExplorationSummaryTile.map(function(explorationTitle) {
-            expect(
-              explorationTitle.getText()
-            ).not.toMatch(title);
-          });
-        }
-      });
+    element.all(by.cssContainingText(
+      '.protractor-test-exp-summary-tile-title', title)).then(function(items) {
+      expect(items.length).toBe(0);
+    });
   };
 
   this.expectTitleOfExplorationSummaryTileToMatch = function(title) {
-    browser.wait(until.visibilityOf(
-      titleOfExplorationSummaryTile.first()), 5000,
-    'Exploration Summary Tile takes too long to appear')
-      .then(function(isVisible) {
-        if (isVisible) {
-          titleOfExplorationSummaryTile.map(function(explorationTitle) {
-            expect(
-              explorationTitle.getText()
-            ).toMatch(title);
-          });
-        }
-      });
+    var explorationTitle = element(
+      by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
+    expect(explorationTitle.isDisplayed()).toBe(true);
   };
 
   this.expectSubscriptionFirstNameToMatch = function(name) {
