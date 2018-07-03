@@ -29,17 +29,17 @@
   <div class="oppia-query-form" ng-controller="EmailDashboard">
     <form class="form" ng-submit="submitQuery()">
       Has not logged in for n days: <input type="number" min="0" ng-model="has_not_logged_in_for_n_days">
-      <br/>
+      <br>
       Inactive in last n days: <input type="number" min="0" ng-model="inactive_in_last_n_days">
-      <br/>
+      <br>
       Has created at least n exps: <input type="number" min="0" ng-model="created_at_least_n_exps">
-      <br/>
+      <br>
       Has created fewer than n exps: <input type="number" min="0" ng-model="created_fewer_than_n_exps">
-      <br/>
+      <br>
       Has edited at least n exps: <input type="number" min="0" ng-model="edited_at_least_n_exps">
-      <br/>
+      <br>
       Has edited fewer than n exps: <input type="number" min="0" ng-model="edited_fewer_than_n_exps">
-      <br/>
+      <br>
       <input type="submit" value="submit query">
       <input type="reset" value="reset" ng-click="resetForm()">
     </form>
