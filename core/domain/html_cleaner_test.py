@@ -331,7 +331,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         actual_output_with_migration_for_textangular = (
             html_cleaner.validate_rte_format(
                 test_cases_for_textangular,
-                feconf.RTE_FORMAT_TEXTANGULAR, True))
+                feconf.RTE_FORMAT_TEXTANGULAR, run_migration=True))
         actual_output_without_migration_for_textangular = (
             html_cleaner.validate_rte_format(
                 test_cases_for_textangular, feconf.RTE_FORMAT_TEXTANGULAR))
@@ -382,7 +382,8 @@ class ContentMigrationTests(test_utils.GenericTestBase):
 
         actual_output_with_migration_for_ckeditor = (
             html_cleaner.validate_rte_format(
-                test_cases_for_ckeditor, feconf.RTE_FORMAT_CKEDITOR, True))
+                test_cases_for_ckeditor, feconf.RTE_FORMAT_CKEDITOR,
+                run_migration=True))
         actual_output_without_migration_for_ckeditor = (
             html_cleaner.validate_rte_format(
                 test_cases_for_ckeditor, feconf.RTE_FORMAT_CKEDITOR))
