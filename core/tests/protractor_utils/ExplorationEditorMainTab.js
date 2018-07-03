@@ -903,7 +903,8 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.setStateName = function(name) {
-    expect(stateNameContainer.isDisplayed()).toBe(true);
+    browser.wait(until.elementToBeClickable(stateNameContainer), 5000,
+      'State Name Container takes too long to appear');
     stateNameContainer.click();
     stateNameInput.clear();
     stateNameInput.sendKeys(name);
