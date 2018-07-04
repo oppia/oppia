@@ -29,10 +29,14 @@ describe('screenreader and keyboard user accessibility features', function() {
 
   it('should skip to the main content element', function() {
     var mainContent = element(by.css('.protractor-test-main-content'));
+    var skipToMainContentLink = element(by.css('.protractor-test-skip-link'));
+    var until = protractor.ExpectedConditions;
     libraryPage.get();
     browser.actions().sendKeys(protractor.Key.TAB).perform();
-    general.waitForSystem();
-    element(by.css('.protractor-test-skip-link')).click();
+    browser.wait(
+      until.elementToBeClickable(skipToMainContentLink),
+      5000, 'Skip to main content link is not clickable');
+    skipToMainContentLink.click();
     expect(mainContent.getAttribute('id'))
       .toEqual(browser.driver.switchTo().activeElement().getAttribute('id'));
   });
