@@ -77,14 +77,17 @@ var CollectionEditorPage = function() {
           matched = true;
         }
       });
-      if (!matched) {
-        throw Error ('Collection Editor could not find exploration ' + query);
-      }
     });
-    browser.wait(until.elementToBeClickable(addExplorationButton), 10000,
-      'Add Exploration Input is not clickable').then(function(isClickable) {
-      if (isClickable) {
+    if (matched === false) {
+      // Press Tab to fill in the default result should one appear when
+      // none of the answer matches the given query.
+      addExplorationInput.sendKeys(protractor.Key.TAB);
+    }
+    addExplorationButton.isEnabled().then( function(isEnabled) {
+      if (isEnabled) {
         addExplorationButton.click();
+      } else {
+        throw Error ('Add Exploration Button is not clickable');
       }
     });
   };
