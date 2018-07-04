@@ -19,24 +19,61 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
-var ExplorationEditorPage = require('./ExplorationEditorPage');
+var CreatorDashboardPage = require('./CreatorDashboardPage.js');
+var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
+var until = protractor.ExpectedConditions;
 
-// Creates an exploration and opens its editor.
+// Creates an exploration, opens its editor and skip the tutorial.
 var createExploration = function() {
   createExplorationAndStartTutorial();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
-  explorationEditorPage.getMainTab().exitTutorial();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.exitTutorial();
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
 var createExplorationAndStartTutorial = function() {
-  libraryPage = new LibraryPage.LibraryPage();
-  libraryPage.get();
-  libraryPage.clickCreateActivity();
-
+  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  browser.waitForAngular();
+  creatorDashboardPage.clickCreateActivityButton();
+};
+
+/**
+ * Only Admin users can create collections.
+ */
+var createCollectionAsAdmin = function() {
+  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  creatorDashboardPage.get();
+  creatorDashboardPage.clickCreateActivityButton();
+  var activityCreationModal = element(
+    by.css('.protractor-test-creation-modal'));
+  browser.wait(until.visibilityOf(activityCreationModal), 5000,
+    'Activity Creation modal takes too long to appear')
+    .then(function(isVisible) {
+      if (isVisible) {
+        creatorDashboardPage.clickCreateCollectionButton();
+      }
+    });
+};
+
+/**
+ * Creating exploration for Admin users.
+ */
+var createExplorationAsAdmin = function() {
+  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  creatorDashboardPage.get();
+  creatorDashboardPage.clickCreateActivityButton();
+  var activityCreationModal = element(
+    by.css('.protractor-test-creation-modal'));
+  browser.wait(until.visibilityOf(activityCreationModal), 5000,
+    'Activity Creation modal takes too long to appear')
+    .then(function(isVisible) {
+      if (isVisible) {
+        creatorDashboardPage.clickCreateExplorationButton();
+      }
+    });
 };
 
 // This will only work if all changes have been saved and there are no
@@ -55,8 +92,22 @@ var publishExploration = function() {
   browser.wait(until.invisibilityOf(prePublicationButtonElem), 5000,
     'prePublicationButtonElem taking too long to disappear while publishing');
   element(by.css('.protractor-test-confirm-publish')).click().then(function(){
-    expect(element(by.css('.oppia-share-publish-modal')).isDisplayed())
-      .toBe(true);
+    var sharePublishModal = element(
+      by.css('.protractor-test-share-publish-modal'));
+    var closePublishModalButton = element(
+      by.css('.protractor-test-share-publish-close'));
+    browser.wait(until.visibilityOf(sharePublishModal), 5000,
+      'Share Publish Modal takes too long to appear').then(function(isVisible){
+      if (isVisible) {
+        browser.wait(until.elementToBeClickable(closePublishModalButton), 5000
+          , 'Close Publish Modal button is not clickable')
+          .then(function(isClickable) {
+            if (isClickable) {
+              closePublishModalButton.click();
+            }
+          });
+      }
+    });
   });
 };
 
@@ -77,9 +128,7 @@ var createAndPublishExploration = function(
   if (language) {
     explorationEditorSettingsTab.setLanguage(language);
   }
-  explorationEditorPage.navigateToMainTab();
   explorationEditorPage.saveChanges();
-
   publishExploration();
 };
 
@@ -141,6 +190,8 @@ exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
 exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
+exports.createCollectionAsAdmin = createCollectionAsAdmin;
+exports.createExplorationAsAdmin = createExplorationAsAdmin;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
