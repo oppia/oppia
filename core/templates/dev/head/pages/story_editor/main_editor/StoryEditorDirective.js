@@ -15,6 +15,8 @@
 /**
  * @fileoverview Controller for the main story editor.
  */
+oppia.constant('EVENT_VIEW_STORY_NODE_EDITOR', 'viewStoryNodeEditor');
+
 oppia.directive('storyEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -24,14 +26,27 @@ oppia.directive('storyEditor', [
         '/pages/story_editor/main_editor/story_editor_directive.html'),
       controller: [
         '$scope', 'StoryEditorStateService', 'StoryUpdateService',
-        'UndoRedoService', 'EVENT_STORY_INITIALIZED',
-        'EVENT_STORY_REINITIALIZED',
+        'UndoRedoService', 'EVENT_VIEW_STORY_NODE_EDITOR',
+        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
         function(
             $scope, StoryEditorStateService, StoryUpdateService,
-            UndoRedoService, EVENT_STORY_INITIALIZED,
-            EVENT_STORY_REINITIALIZED) {
+            UndoRedoService, EVENT_VIEW_STORY_NODE_EDITOR,
+            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED) {
+          var _init = function() {
+            $scope.story = StoryEditorStateService.getStory();
+            $scope.storyContents = $scope.story.getStoryContents();
+            if ($scope.storyContents) {
+              $scope.setNodeToEdit($scope.storyContents.getInitialNodeId());
+            }
+            _initEditor();
+          };
+
           var _initEditor = function() {
             $scope.story = StoryEditorStateService.getStory();
+            $scope.storyContents = $scope.story.getStoryContents();
+            if ($scope.storyContents) {
+              $scope.nodes = $scope.storyContents.getNodes();
+            }
             $scope.storyTitleEditorIsShown = false;
             $scope.editableTitle = $scope.story.getTitle();
             $scope.notes = $scope.story.getNotes();
@@ -42,12 +57,33 @@ oppia.directive('storyEditor', [
             $scope.storyDescriptionChanged = false;
           };
 
+          $scope.setNodeToEdit = function(nodeId) {
+            $scope.idOfNodeToEdit = nodeId;
+          };
+
+          $scope.isInitialNode = function(nodeId) {
+            return (
+              $scope.story.getStoryContents().getInitialNodeId() === nodeId);
+          };
+
+          $scope.markAsInitialNode = function(nodeId) {
+            if ($scope.isInitialNode(nodeId)) {
+              return;
+            }
+            StoryUpdateService.setInitialNodeId($scope.story, nodeId);
+          };
+
+          $scope.deleteNode = function(nodeId) {
+            StoryUpdateService.deleteStoryNode($scope.story, nodeId);
+          };
+
           $scope.NOTES_SCHEMA = {
             type: 'html',
             ui_config: {
               rows: 100
             }
           };
+
           $scope.openPreviewNotes = function(notes) {
             $scope.notesEditorIsShown = false;
             $scope.notes = notes;
@@ -93,9 +129,14 @@ oppia.directive('storyEditor', [
             }
           };
 
-          $scope.$on(EVENT_STORY_INITIALIZED, _initEditor);
+          $scope.$on(EVENT_VIEW_STORY_NODE_EDITOR, function(evt, nodeId) {
+            $scope.setNodeToEdit(nodeId);
+          });
+
+          $scope.$on(EVENT_STORY_INITIALIZED, _init);
           $scope.$on(EVENT_STORY_REINITIALIZED, _initEditor);
 
+          _init();
           _initEditor();
         }
       ]

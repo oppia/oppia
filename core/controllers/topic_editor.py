@@ -19,6 +19,7 @@ are created.
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import role_services
+from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
 from core.domain import subtopic_page_domain
@@ -183,8 +184,14 @@ class EditableTopicDataHandler(base.BaseHandler):
             raise self.PageNotFoundException(
                 Exception('The topic with the given id doesn\'t exist.'))
 
+        skill_ids = topic.get_all_skill_ids()
+
+        skill_id_to_description_dict = (
+            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
+
         self.values.update({
-            'topic': topic.to_dict()
+            'topic_dict': topic.to_dict(),
+            'skill_id_to_description_dict': skill_id_to_description_dict
         })
 
         self.render_json(self.values)
@@ -228,10 +235,15 @@ class EditableTopicDataHandler(base.BaseHandler):
         except utils.ValidationError as e:
             raise self.InvalidInputException(e)
 
-        topic_dict = topic_services.get_topic_by_id(topic_id).to_dict()
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+        skill_ids = topic.get_all_skill_ids()
+
+        skill_id_to_description_dict = (
+            skill_services.get_skill_descriptions_by_ids(topic_id, skill_ids))
 
         self.values.update({
-            'topic': topic_dict
+            'topic_dict': topic.to_dict(),
+            'skill_id_to_description_dict': skill_id_to_description_dict
         })
 
         self.render_json(self.values)

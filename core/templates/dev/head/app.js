@@ -24,7 +24,7 @@ var oppia = angular.module(
     'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'ui.tree', 'infinite-scroll', 'ngJoyRide',
     'ngImgCrop', 'ui.validate', 'textAngular', 'pascalprecht.translate',
-    'ngCookies', 'toastr', 'headroom'
+    'ngCookies', 'toastr', 'headroom', 'dndLists'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
@@ -73,8 +73,10 @@ oppia.constant('COMPONENT_NAME_HINT', 'hint');
 oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
 oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
 
-// Playthrough related constants, should be in sync with feconf.
-oppia.constant('ENABLE_PLAYTHROUGHS', false);
+// Enables recording playthroughs from learner sessions.
+oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', false);
+// Enables visualization of issues on the stats tab.
+oppia.constant('ENABLE_ISSUES', false);
 oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
 oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
 oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);

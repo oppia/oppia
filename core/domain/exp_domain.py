@@ -3477,13 +3477,13 @@ class Exploration(object):
         """
         for state_dict in states_dict.values():
             state_dict['content']['html'] = (
-                html_cleaner.convert_to_text_angular(
+                html_cleaner.convert_to_textangular(
                     state_dict['content']['html']))
             if state_dict['interaction']['default_outcome']:
                 interaction_feedback_html = state_dict[
                     'interaction']['default_outcome']['feedback']['html']
                 state_dict['interaction']['default_outcome']['feedback'][
-                    'html'] = html_cleaner.convert_to_text_angular(
+                    'html'] = html_cleaner.convert_to_textangular(
                         interaction_feedback_html)
 
             for answer_group_index, answer_group in enumerate(
@@ -3491,7 +3491,7 @@ class Exploration(object):
                 answer_group_html = answer_group['outcome']['feedback']['html']
                 state_dict['interaction']['answer_groups'][
                     answer_group_index]['outcome']['feedback']['html'] = (
-                        html_cleaner.convert_to_text_angular(
+                        html_cleaner.convert_to_textangular(
                             answer_group_html))
                 if state_dict['interaction']['id'] == 'ItemSelectionInput':
                     for rule_spec_index, rule_spec in enumerate(
@@ -3500,19 +3500,19 @@ class Exploration(object):
                             state_dict['interaction']['answer_groups'][
                                 answer_group_index]['rule_specs'][
                                     rule_spec_index]['inputs']['x'][x_index] = (
-                                        html_cleaner.convert_to_text_angular(x))
+                                        html_cleaner.convert_to_textangular(x))
             for hint_index, hint in enumerate(
                     state_dict['interaction']['hints']):
                 hint_html = hint['hint_content']['html']
                 state_dict['interaction']['hints'][hint_index][
                     'hint_content']['html'] = (
-                        html_cleaner.convert_to_text_angular(hint_html))
+                        html_cleaner.convert_to_textangular(hint_html))
 
             if state_dict['interaction']['solution']:
                 solution_html = state_dict[
                     'interaction']['solution']['explanation']['html']
                 state_dict['interaction']['solution']['explanation']['html'] = (
-                    html_cleaner.convert_to_text_angular(solution_html))
+                    html_cleaner.convert_to_textangular(solution_html))
 
             if state_dict['interaction']['id'] in (
                     'ItemSelectionInput', 'MultipleChoiceInput'):
@@ -3521,7 +3521,7 @@ class Exploration(object):
                             'choices']['value']):
                     state_dict['interaction']['customization_args'][
                         'choices']['value'][value_index] = (
-                            html_cleaner.convert_to_text_angular(value))
+                            html_cleaner.convert_to_textangular(value))
 
         return states_dict
 

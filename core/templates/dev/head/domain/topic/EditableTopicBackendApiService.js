@@ -33,9 +33,17 @@ oppia.factory('EditableTopicBackendApiService', [
         });
 
       $http.get(topicDataUrl).then(function(response) {
-        var topic = angular.copy(response.data.topic);
         if (successCallback) {
-          successCallback(topic);
+          // The response is passed as a dict with 2 fields and not as 2
+          // parameters, because the successCallback is called as the resolve
+          // callback function in $q in fetchTopic(), and according to its
+          // documentation (https://docs.angularjs.org/api/ng/service/$q),
+          // resolve or reject can have only a single parameter.
+          successCallback({
+            topicDict: angular.copy(response.data.topic_dict),
+            skillIdToDescriptionDict: angular.copy(
+              response.data.skill_id_to_description_dict)
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -115,11 +123,14 @@ oppia.factory('EditableTopicBackendApiService', [
         topic_and_subtopic_page_change_dicts: changeList
       };
       $http.put(editableTopicDataUrl, putData).then(function(response) {
-        // The returned data is an updated topic dict.
-        var topic = angular.copy(response.data.topic);
-
         if (successCallback) {
-          successCallback(topic);
+          // Here also, a dict with 2 fields are passed instead of just 2
+          // parameters, due to the same reason as written for _fetchTopic().
+          successCallback({
+            topicDict: angular.copy(response.data.topic_dict),
+            skillIdToDescriptionDict: angular.copy(
+              response.data.skill_id_to_description_dict)
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {

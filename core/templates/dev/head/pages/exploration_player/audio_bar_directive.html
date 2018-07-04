@@ -5,7 +5,8 @@
          ng-click="onPlayButtonClicked()"
          ng-class="{'fa-ellipsis-h': audioLoadingIndicatorIsShown, 'fa-play-circle': !isAudioPlaying(), 'fa-pause-circle': isAudioPlaying(), 'audio-controls-audio-not-available': !isAudioAvailableInCurrentLanguage() || audioIsLoading}"
          uib-tooltip="<[!isAudioAvailableInCurrentLanguage() ? ('I18N_PLAYER_AUDIO_NOT_AVAILABLE_IN' | translate:{languageDescription:getCurrentAudioLanguageDescription()}) : '']>"
-         tooltip-append-to-body="true" tooltip-placement="right"></i>
+         tooltip-append-to-body="true" tooltip-placement="right">
+      </i>
       <div class="slider-section" ng-if="hasPressedPlayButtonAtLeastOnce">
         <div ng-if="audioLoadingIndicatorIsShown">
           <md-progress-linear md-mode="indeterminate"></md-progress-linear>
@@ -23,7 +24,8 @@
               ng-model="selectedLanguage.value"
               ng-options="o.value as o.displayed for o in languagesInExploration"
               ng-style="hasPressedPlayButtonAtLeastOnce ? {'width': '30%'} : {'width': '60%'}"
-              ng-change="onNewLanguageSelected()"></select>
+              ng-change="onNewLanguageSelected()">
+      </select>
     </div>
     <div class="audio-collapse-button audio-toggle-button" ng-if="audioBarIsExpanded" ng-click="collapseAudioBar()"><i class="fa fa-sort-up"></i></div>
   </div>
