@@ -53,8 +53,8 @@ oppia.factory('NumberWithUnitsValidationService', [
             laterInput.type = 'real';
             laterInput.real = laterInput.fraction.toFloat();
           }
-          earlierInputString = earlierInput.toCompatibleString();
-          laterInputString = laterInput.toCompatibleString();
+          earlierInputString = earlierInput.toMathjsCompatibleString();
+          laterInputString = laterInput.toMathjsCompatibleString();
           return math.unit(laterInputString).equals(math.unit(
             earlierInputString));
         };

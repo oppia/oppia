@@ -65,10 +65,10 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       return numberWithUnitsString;
     };
 
-    NumberWithUnits.prototype.toCompatibleString = function() {
+    NumberWithUnits.prototype.toMathjsCompatibleString = function() {
       var numberWithUnitsString = '';
       var unitsString = UnitsObjectFactory.fromList(this.units).toString();
-      unitsString = UnitsObjectFactory.makeUnitsCompatible(unitsString);
+      unitsString = UnitsObjectFactory.toMathjsCompatibleString(unitsString);
 
       if (this.type === 'real') {
         numberWithUnitsString += this.real + ' ';
@@ -312,7 +312,7 @@ oppia.factory('UnitsObjectFactory', [function() {
     math.createUnit('paise', {definition: '0.01 rupees', aliases: ['paisa']});
   };
 
-  Units.makeUnitsCompatible = function(units) {
+  Units.toMathjsCompatibleString = function(units) {
     // Makes the units compatible with the math.js allowed format.
     units = units.replace(/per/g, '/');
 
@@ -336,7 +336,7 @@ oppia.factory('UnitsObjectFactory', [function() {
       Units.createCurrencyUnits();
     } catch (parsingError) {}
 
-    compatibleUnits = Units.makeUnitsCompatible(units);
+    compatibleUnits = Units.toMathjsCompatibleString(units);
     if (compatibleUnits !== '') {
       try {
         math.unit(compatibleUnits);
