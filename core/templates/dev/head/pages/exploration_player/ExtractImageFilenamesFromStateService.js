@@ -123,6 +123,10 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       var imageTagList = dummyElement.getElementsByTagName(
         'oppia-noninteractive-image');
       for (i = 0; i < imageTagList.length; i++) {
+        // We have the attribute of filepath in oppia-noninteractive-image tag.
+        // But it actually contains the filename only. We use the variable
+        // filename instead of filepath since in the end we are retrieving the
+        // filenames in the exploration.
         var filename = JSON.parse(
           imageTagList[i].getAttribute('filepath-with-value'));
         // The images already there in Oppia have image filenames as the value
@@ -179,6 +183,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var _getImageDimensionsInState = function(state) {
       var fileDimensions = {};
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
+      // The Image Click Input interaction has an image whose filename is
+      // directly stored in the customizationArgs.imageAndRegion.value
+      // .imagePath
         var filename = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
         fileDimensions[filename] = {
