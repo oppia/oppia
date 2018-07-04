@@ -231,8 +231,6 @@ describe('Full exploration editor', function() {
     creatorDashboardPage.get();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateCollectionButton();
-    general.waitForSystem();
-    browser.waitForAngular();
     collectionEditorPage.searchForAndAddExistingExploration(
       'Parent Exploration in collection');
     collectionEditorPage.saveDraft();
@@ -242,7 +240,7 @@ describe('Full exploration editor', function() {
     collectionEditorPage.setObjective('This is a test collection.');
     collectionEditorPage.setCategory('Algebra');
     collectionEditorPage.saveChanges();
-    browser.waitForAngular();
+    general.waitForSystem();
 
     // Play-test exploration and visit the refresher exploration.
     libraryPage.get();
@@ -602,14 +600,12 @@ describe('Full exploration editor', function() {
     explorationEditorPage.navigateToMainTab();
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
-    general.waitForSystem();
     users.logout();
 
     users.login('user10@editorAndPlayer.com');
     libraryPage.get();
     libraryPage.findExploration('Recommended Exploration 1');
     libraryPage.playExploration('Recommended Exploration 1');
-    general.waitForSystem();
     // Using the Id from Player and create a new exploration
     // and add the Id as suggestion.
     general.getExplorationIdFromPlayer()
@@ -628,7 +624,6 @@ describe('Full exploration editor', function() {
         explorationEditorPage.navigateToMainTab();
         explorationEditorPage.saveChanges();
         workflow.publishExploration();
-        general.waitForSystem();
       });
 
     // Play-test the exploration and visit the recommended exploration
