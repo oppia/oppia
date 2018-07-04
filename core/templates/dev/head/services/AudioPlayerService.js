@@ -18,10 +18,10 @@
 
 oppia.factory('AudioPlayerService', [
   '$q', '$timeout', 'ngAudio', 'AssetsBackendApiService',
-  'ExplorationContextService', 'AudioTranslationManagerService',
+  'ContextService', 'AudioTranslationManagerService',
   function(
       $q, $timeout, ngAudio, AssetsBackendApiService,
-      ExplorationContextService, AudioTranslationManagerService) {
+      ContextService, AudioTranslationManagerService) {
     var _currentTrackFilename = null;
     var _currentTrack = null;
 
@@ -29,7 +29,7 @@ oppia.factory('AudioPlayerService', [
         filename, successCallback, errorCallback) {
       if (filename !== _currentTrackFilename) {
         AssetsBackendApiService.loadAudio(
-          ExplorationContextService.getExplorationId(), filename)
+          ContextService.getExplorationId(), filename)
           .then(function(loadedAudiofile) {
             var blobUrl = URL.createObjectURL(loadedAudiofile.data);
             _currentTrack = ngAudio.load(blobUrl);

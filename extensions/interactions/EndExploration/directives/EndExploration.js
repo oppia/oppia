@@ -29,11 +29,11 @@ oppia.directive('oppiaInteractiveEndExploration', [
         'end_exploration_interaction_directive.html'),
       controller: [
         '$scope', '$http', '$attrs', '$q', 'UrlService',
-        'ExplorationContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
+        'ContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
         'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
             $scope, $http, $attrs, $q, UrlService,
-            ExplorationContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
+            ContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
             HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var authorRecommendedExplorationIds = (
             HtmlEscaperService.escapedJsonToObj(
@@ -41,13 +41,13 @@ oppia.directive('oppiaInteractiveEndExploration', [
 
           $scope.isIframed = UrlService.isIframed();
           $scope.isInEditorPage = (
-            ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+            ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR);
           $scope.isInEditorPreviewMode = $scope.isInEditorPage && (
-            ExplorationContextService.getEditorTabContext() ===
+            ContextService.getEditorTabContext() ===
               EDITOR_TAB_CONTEXT.PREVIEW);
           $scope.isInEditorMainTab = $scope.isInEditorPage && (
-            ExplorationContextService.getEditorTabContext() ===
-              EDITOR_TAB_CONTEXT.EDITOR);
+            ContextService.getEditorTabContext() ===
+              EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR);
 
           $scope.collectionId = GLOBALS.collectionId;
           $scope.getCollectionTitle = function() {
@@ -59,7 +59,7 @@ oppia.directive('oppiaInteractiveEndExploration', [
           if ($scope.isInEditorPage) {
             // Display a message if any author-recommended explorations are
             // invalid.
-            var explorationId = ExplorationContextService.getExplorationId();
+            var explorationId = ContextService.getExplorationId();
             $http.get(EXPLORATION_SUMMARY_DATA_URL_TEMPLATE, {
               params: {
                 stringified_exp_ids: JSON.stringify(

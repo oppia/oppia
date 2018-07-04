@@ -20,11 +20,11 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveImage', [
-  '$rootScope', '$sce', 'HtmlEscaperService', 'ExplorationContextService',
+  '$rootScope', '$sce', 'HtmlEscaperService', 'ContextService',
   'UrlInterpolationService', 'ImagePreloaderService',
   'AssetsBackendApiService', 'LOADING_INDICATOR_URL',
   function(
-      $rootScope, $sce, HtmlEscaperService, ExplorationContextService,
+      $rootScope, $sce, HtmlEscaperService, ContextService,
       UrlInterpolationService, ImagePreloaderService, AssetsBackendApiService,
       LOADING_INDICATOR_URL) {
     return {
@@ -76,7 +76,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           // exploration editor. So we directly fetch the images from the
           // AssetsBackendApiService's cache.
           AssetsBackendApiService.loadImage(
-            ExplorationContextService.getExplorationId(), $scope.filepath.name)
+            ContextService.getExplorationId(), $scope.filepath.name)
             .then(function(loadedImageFile) {
               $scope.isLoadingIndicatorShown = false;
               $scope.isTryAgainShown = false;
