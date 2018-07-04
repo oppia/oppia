@@ -33,8 +33,9 @@ oppia.factory('RteHelperService', [
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
         id: RTE_COMPONENT_SPECS[componentId].frontend_id,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
-        previewUrlTemplate:
-        RTE_COMPONENT_SPECS[componentId].preview_url_template,
+        previewUrlTemplate: (GLOBALS.GCS_RESOURCE_BUCKET_NAME ?
+          RTE_COMPONENT_SPECS[componentId].preview_url_template_production :
+          RTE_COMPONENT_SPECS[componentId].preview_url_template),
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
         isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
@@ -89,6 +90,10 @@ oppia.factory('RteHelperService', [
             explorationId: ExplorationContextService.getExplorationId()
           });
         }
+        customizationArgsDict = angular.extend(customizationArgsDict, {
+          urlWithBucket: ('https://storage.googleapis.com/' +
+            GLOBALS.GCS_RESOURCE_BUCKET_NAME)
+        });
         var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
         if (componentDefn.previewUrlTemplate.indexOf(
           '/rich_text_components') === 0) {
@@ -99,6 +104,7 @@ oppia.factory('RteHelperService', [
             componentPreviewUrlTemplate, false, null, true)(
             customizationArgsDict));
         }
+        delete customizationArgsDict.urlWithBucket;
 
         if (!interpolatedUrl) {
           $log.error(

@@ -16,10 +16,12 @@
 
 oppia.directive('filepathEditor', [
   '$http', '$sce', 'AlertsService', 'ExplorationContextService',
-  'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
+  'UrlInterpolationService', 'AssetsBackendApiService',
+  'OBJECT_EDITOR_URL_PREFIX',
   function(
       $http, $sce, AlertsService, ExplorationContextService,
-      UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
+      UrlInterpolationService, AssetsBackendApiService,
+      OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
       scope: {
@@ -310,8 +312,13 @@ oppia.directive('filepathEditor', [
 
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           var encodedFilepath = window.encodeURIComponent(imageFileName);
-          return $sce.trustAsResourceUrl(
-            '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
+          var objectUrl = '';
+          AssetsBackendApiService.loadImage(
+            $scope.explorationId, imageFileName)
+            .then(function(loadedImageFile) {
+              objectUrl = URL.createObjectURL(loadedImageFile.data);
+            });
+          return objectUrl;
         };
 
         /** Scope variables and functions (visibles to the view) */
