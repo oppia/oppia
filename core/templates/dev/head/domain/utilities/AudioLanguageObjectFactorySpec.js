@@ -25,7 +25,7 @@ describe('AudioLanguage object factory', function() {
 
     audioLanguage = alof.createFromDict({
       id: 'a',
-      text: 'a description',
+      description: 'a description',
       related_languages: 'English',
     });
   }));

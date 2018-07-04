@@ -54,6 +54,11 @@ oppia.directive('topicEditorNavbar', [
               });
           };
 
+          $scope.discardChanges = function() {
+            UndoRedoService.clearChanges();
+            TopicEditorStateService.loadTopic($scope.topicId);
+          };
+
           $scope.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
           };
