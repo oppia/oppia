@@ -39,7 +39,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
     <!-- Tiles for Internet Explorer. -->
-    <meta name="application-name" content="{{SITE_NAME}}">
+    <meta name="application-name" content="<[siteName]>">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-square70x70logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-tiny.png')}}">
     <meta name="msapplication-square150x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-square.png')}}">
@@ -87,7 +87,6 @@
         preferredSiteLanguageCode: JSON.parse(
           '{{preferred_site_language_code|js_string}}'),
         SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL|js_string}}'),
-        SITE_NAME: JSON.parse('{{SITE_NAME|js_string}}'),
         TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
         iframed: JSON.parse('{{iframed|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),

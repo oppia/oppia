@@ -857,7 +857,6 @@ TERMS_PAGE_DESCRIPTION = (
     'distributing learning material.')
 THANKS_PAGE_DESCRIPTION = (
     'Thank you for donating to The Oppia Foundation.')
-SITE_NAME = 'Oppia.org'
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'

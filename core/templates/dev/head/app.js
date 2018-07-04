@@ -91,6 +91,7 @@ oppia.constant('ISSUE_TYPE_EARLY_QUIT', 'EarlyQuit');
 oppia.constant(
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS', 'MultipleIncorrectSubmissions');
 oppia.constant('ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'CyclicStateTransitions');
+oppia.constant('SITE_NAME', 'Oppia.org');
 
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {
