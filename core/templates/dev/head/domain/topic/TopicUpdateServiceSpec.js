@@ -20,6 +20,7 @@ describe('Topic update service', function() {
   var TopicUpdateService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
+  var SubtopicPageObjectFactory = null;
   var UndoRedoService = null;
   var _sampleTopic = null;
 
@@ -29,6 +30,7 @@ describe('Topic update service', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
+    SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
 
     var sampleTopicBackendObject = {
@@ -47,6 +49,14 @@ describe('Topic update service', function() {
       next_subtopic_id: 2,
       language_code: 'en'
     };
+    var sampleSubtopicPageObject = {
+      id: 'topic_id-1',
+      topic_id: 'topic_id',
+      html_data: '<p>Data</p>',
+      language_code: 'en'
+    };
+    _sampleSubtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+      sampleSubtopicPageObject);
     _sampleTopic = TopicObjectFactory.create(sampleTopicBackendObject);
   }));
 
@@ -492,6 +502,31 @@ describe('Topic update service', function() {
         new_value: 'fi',
         old_value: 'en',
         change_affects_subtopic_page: false
+      }]);
+    }
+  );
+
+  it('should set/unset changes to a subtopic page\'s html data', function() {
+    expect(_sampleSubtopicPage.getHtmlData()).toEqual('<p>Data</p>');
+    TopicUpdateService.setSubtopicPageHtmlData(
+      _sampleSubtopicPage, 1, '<p>New Data</p>');
+    expect(_sampleSubtopicPage.getHtmlData()).toEqual('<p>New Data</p>');
+
+    UndoRedoService.undoChange(_sampleSubtopicPage);
+    expect(_sampleSubtopicPage.getHtmlData()).toEqual('<p>Data</p>');
+  });
+
+  it('should create a proper backend change dict for changing html data',
+    function() {
+      TopicUpdateService.setSubtopicPageHtmlData(
+        _sampleSubtopicPage, 1, '<p>New Data</p>');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'update_subtopic_page_property',
+        property_name: 'html_data',
+        subtopic_id: 1,
+        new_value: '<p>New Data</p>',
+        old_value: '<p>Data</p>',
+        change_affects_subtopic_page: true
       }]);
     }
   );

@@ -15,7 +15,6 @@
 /**
  * @fileoverview Controller for the main topic editor.
  */
-
 oppia.directive('topicMainEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -24,21 +23,56 @@ oppia.directive('topicMainEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/main_editor/topic_editor_tab_directive.html'),
       controller: [
-        '$scope', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService',
-        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+        '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
+        'UndoRedoService', 'UrlInterpolationService', 'StoryCreationService',
+        'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
+        'EVENT_TOPIC_REINITIALIZED',
         function(
-            $scope, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService,
-            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED) {
+            $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
+            UndoRedoService, UrlInterpolationService, StoryCreationService,
+            EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
+            EVENT_TOPIC_REINITIALIZED) {
           var _initEditor = function() {
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.topicRights = TopicEditorStateService.getTopicRights();
             $scope.topicNameEditorIsShown = false;
             $scope.editableName = $scope.topic.getName();
             $scope.editableDescription = $scope.topic.getDescription();
-            $scope.displayedTopicDescription = (
-              $scope.editableDescription !== '');
+            $scope.editableDescriptionIsEmpty = (
+              $scope.editableDescription === '');
+            $scope.topicDescriptionChanged = false;
+          };
+
+          var _initStorySummaries = function() {
+            $scope.canonicalStorySummaries =
+              TopicEditorStateService.getCanonicalStorySummaries();
+          };
+
+          $scope.createCanonicalStory = function() {
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/topic_editor/main_editor/' +
+                  'save_pending_changes_modal_directive.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
+              });
+            } else {
+              StoryCreationService.createNewCanonicalStory(
+                $scope.topic.getId());
+            }
+          };
+
+          $scope.updateTopicDescriptionStatus = function(description) {
+            $scope.editableDescriptionIsEmpty = (description === '');
+            $scope.topicDescriptionChanged = true;
           };
 
           $scope.openTopicNameEditor = function() {
@@ -71,8 +105,10 @@ oppia.directive('topicMainEditor', [
 
           $scope.$on(EVENT_TOPIC_INITIALIZED, _initEditor);
           $scope.$on(EVENT_TOPIC_REINITIALIZED, _initEditor);
+          $scope.$on(EVENT_STORY_SUMMARIES_INITIALIZED, _initStorySummaries);
 
           _initEditor();
+          _initStorySummaries();
         }
       ]
     };

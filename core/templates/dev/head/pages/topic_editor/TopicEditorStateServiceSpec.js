@@ -19,6 +19,7 @@
 describe('Topic editor state service', function() {
   var TopicEditorStateService = null;
   var TopicObjectFactory = null;
+  var SubtopicPageObjectFactory = null;
   var TopicRightsObjectFactory = null;
   var TopicUpdateService = null;
   var fakeEditableTopicBackendApiService = null;
@@ -37,10 +38,34 @@ describe('Topic editor state service', function() {
       });
     };
 
+    var _fetchStories = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve(self.backendStorySummariesObject);
+        } else {
+          reject();
+        }
+      });
+    };
+
+    var _fetchSubtopicPage = function() {
+      return $q(function(resolve, reject) {
+        if (!self.failure) {
+          resolve(self.newBackendSubtopicPageObject);
+        } else {
+          reject();
+        }
+      });
+    };
+
+    self.newBackendSubtopicPageObject = {};
     self.newBackendTopicObject = {};
+    self.backendStorySummariesObject = [];
     self.failure = null;
     self.fetchTopic = _fetchOrUpdateTopic;
+    self.fetchSubtopicPage = _fetchSubtopicPage;
     self.updateTopic = _fetchOrUpdateTopic;
+    self.fetchStories = _fetchStories;
 
     return self;
   };
@@ -85,6 +110,7 @@ describe('Topic editor state service', function() {
     TopicEditorStateService = $injector.get(
       'TopicEditorStateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
+    SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     TopicRightsObjectFactory = $injector.get(
       'TopicRightsObjectFactory');
     TopicUpdateService = $injector.get('TopicUpdateService');
@@ -145,6 +171,22 @@ describe('Topic editor state service', function() {
       is_published: 'false',
       can_publish_topic: 'false'
     };
+
+    subtopicPageObject = {
+      id: 'validTopicId-0',
+      topic_id: 'validTopicId',
+      html_data: '<p>Data</p>',
+      language_code: 'en'
+    };
+    fakeEditableTopicBackendApiService.newBackendSubtopicPageObject = (
+      subtopicPageObject);
+
+    secondSubtopicPageObject = {
+      id: 'validTopicId-0',
+      topic_id: 'validTopicId',
+      html_data: '<p>Data</p>',
+      language_code: 'en'
+    };
   }));
 
   it('should request to load the topic from the backend', function() {
@@ -153,6 +195,121 @@ describe('Topic editor state service', function() {
 
     TopicEditorStateService.loadTopic(5);
     expect(fakeEditableTopicBackendApiService.fetchTopic).toHaveBeenCalled();
+  });
+
+  it('should request to load the subtopic page from the backend', function() {
+    spyOn(
+      fakeEditableTopicBackendApiService, 'fetchSubtopicPage'
+    ).and.callThrough();
+
+    TopicEditorStateService.loadSubtopicPage('validTopicId', 1);
+    expect(
+      fakeEditableTopicBackendApiService.fetchSubtopicPage).toHaveBeenCalled();
+  });
+
+  it('should not request to load the subtopic page from the backend after ' +
+     'loading it once', function() {
+    spyOn(
+      fakeEditableTopicBackendApiService, 'fetchSubtopicPage'
+    ).and.callThrough();
+
+    subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+      secondSubtopicPageObject);
+    TopicEditorStateService.setSubtopicPage(subtopicPage);
+    TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
+    expect(
+      fakeEditableTopicBackendApiService.fetchSubtopicPage
+    ).not.toHaveBeenCalled();
+  });
+
+  it('should not add duplicate subtopic pages to the local cache', function() {
+    subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+      secondSubtopicPageObject);
+    TopicEditorStateService.setSubtopicPage(subtopicPage);
+    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(1);
+    subtopicPage.setHtmlData('<p>New Data</p>');
+    TopicEditorStateService.setSubtopicPage(subtopicPage);
+    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(1);
+    expect(
+      TopicEditorStateService.getSubtopicPage().getHtmlData()
+    ).toEqual('<p>New Data</p>');
+  });
+
+  it('should correctly delete newly created subtopic pages from the ' +
+    'local cache', function() {
+    subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+      secondSubtopicPageObject);
+    TopicEditorStateService.setSubtopicPage(subtopicPage);
+    subtopicPage.setId('validTopicId-1');
+    subtopicPage.setHtmlData('<p>Data 1</p>');
+    TopicEditorStateService.setSubtopicPage(subtopicPage);
+    subtopicPage.setId('validTopicId-2');
+    subtopicPage.setHtmlData('<p>Data 2</p>');
+    TopicEditorStateService.setSubtopicPage(subtopicPage);
+    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(3);
+    TopicEditorStateService.deleteSubtopicPage('validTopicId', 1);
+    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(2);
+
+    expect(
+      TopicEditorStateService.getSubtopicPages()[0].getId()
+    ).toEqual('validTopicId-0');
+    expect(
+      TopicEditorStateService.getSubtopicPages()[0].getHtmlData()
+    ).toEqual('<p>Data</p>');
+    expect(
+      TopicEditorStateService.getSubtopicPages()[1].getId()
+    ).toEqual('validTopicId-1');
+    expect(
+      TopicEditorStateService.getSubtopicPages()[1].getHtmlData()
+    ).toEqual('<p>Data 2</p>');
+  });
+
+  it('should correctly delete new subtopic pages without changing already ' +
+    'existing subtopic pages from the local cache', function() {
+    spyOn($rootScope, '$broadcast').and.callThrough();
+
+    subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+      secondSubtopicPageObject);
+    subtopicPage.setId('validTopicId-1');
+    subtopicPage.setHtmlData('<p>Data 1</p>');
+    TopicEditorStateService.setSubtopicPage(subtopicPage);
+    TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
+    $rootScope.$apply();
+    expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+    expect(TopicEditorStateService.getSubtopicPages().length).toBe(2);
+    TopicEditorStateService.deleteSubtopicPage('validTopicId', 1);
+
+    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(1);
+    expect(
+      TopicEditorStateService.getSubtopicPages()[0].getId()
+    ).toEqual('validTopicId-0');
+    expect(
+      TopicEditorStateService.getSubtopicPages()[0].getHtmlData()
+    ).toEqual('<p>Data</p>');
+  });
+
+  it('should correctly delete already existing subtopic pages without ' +
+    'changing newly created subtopic pages from the local cache', function() {
+    spyOn($rootScope, '$broadcast').and.callThrough();
+
+    subtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+      secondSubtopicPageObject);
+    subtopicPage.setId('validTopicId-1');
+    subtopicPage.setHtmlData('<p>Data 1</p>');
+    TopicEditorStateService.setSubtopicPage(subtopicPage);
+    TopicEditorStateService.loadSubtopicPage('validTopicId', 0);
+    $rootScope.$apply();
+    expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
+    expect(TopicEditorStateService.getSubtopicPages().length).toBe(2);
+    TopicEditorStateService.deleteSubtopicPage('validTopicId', 0);
+
+    expect(TopicEditorStateService.getSubtopicPages().length).toEqual(1);
+    expect(
+      TopicEditorStateService.getSubtopicPages()[0].getId()
+    ).toEqual('validTopicId-1');
+    expect(
+      TopicEditorStateService.getSubtopicPages()[0].getHtmlData()
+    ).toEqual('<p>Data 1</p>');
   });
 
   it('should request to load the topic rights from the backend',
@@ -174,6 +331,17 @@ describe('Topic editor state service', function() {
       $rootScope.$apply();
 
       expect($rootScope.$broadcast).toHaveBeenCalledWith('topicInitialized');
+    }
+  );
+
+  it('should fire a loaded event after loading a new subtopic page',
+    function() {
+      spyOn($rootScope, '$broadcast').and.callThrough();
+
+      TopicEditorStateService.loadSubtopicPage('validTopicId', 1);
+      $rootScope.$apply();
+
+      expect($rootScope.$broadcast).toHaveBeenCalledWith('subtopicPageLoaded');
     }
   );
 
@@ -245,6 +413,14 @@ describe('Topic editor state service', function() {
     expect(topic.getAdditionalStoryIds()).toEqual([]);
     expect(topic.getUncategorizedSkillIds()).toEqual([]);
     expect(topic.getSubtopics()).toEqual([]);
+  });
+
+  it('should initially return an interstitial subtopic page', function() {
+    var subtopicPage = TopicEditorStateService.getSubtopicPage();
+    expect(subtopicPage.getId()).toEqual(null);
+    expect(subtopicPage.getTopicId()).toEqual(null);
+    expect(subtopicPage.getHtmlData()).toEqual(null);
+    expect(subtopicPage.getLanguageCode()).toEqual('en');
   });
 
   it('should initially return an interstitial topic rights object', function() {

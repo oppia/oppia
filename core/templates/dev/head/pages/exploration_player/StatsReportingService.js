@@ -46,15 +46,17 @@ oppia.constant('STATS_REPORTING_URLS', {
 });
 
 oppia.factory('StatsReportingService', [
-  '$http', '$interval', 'StopwatchObjectFactory', 'MessengerService',
-  'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
-  'STATS_EVENT_TYPES', 'ContextService', 'PAGE_CONTEXT',
-  'DEFAULT_OUTCOME_CLASSIFICATION',
+  '$http', '$interval', 'ContextService', 'MessengerService',
+  'PlaythroughService', 'siteAnalyticsService', 'StopwatchObjectFactory',
+  'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',
+  'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT', 'STATS_EVENT_TYPES',
+  'STATS_REPORTING_URLS',
   function(
-      $http, $interval, StopwatchObjectFactory, MessengerService,
-      UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
-      STATS_EVENT_TYPES, ContextService, PAGE_CONTEXT,
-      DEFAULT_OUTCOME_CLASSIFICATION) {
+      $http, $interval, ContextService, MessengerService,
+      PlaythroughService, siteAnalyticsService, StopwatchObjectFactory,
+      UrlInterpolationService, DEFAULT_OUTCOME_CLASSIFICATION,
+      ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, STATS_EVENT_TYPES,
+      STATS_REPORTING_URLS) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;
@@ -172,6 +174,10 @@ oppia.factory('StatsReportingService', [
           state_name: stateName,
           session_id: sessionId
         });
+
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
+          PlaythroughService.recordExplorationStartAction(stateName);
+        }
       },
       recordSolutionHit: function(stateName) {
         if (!aggregatedStats.state_stats_mapping.hasOwnProperty(stateName)) {
@@ -265,7 +271,14 @@ oppia.factory('StatsReportingService', [
 
         siteAnalyticsService.registerFinishExploration();
         explorationIsComplete = true;
+
         postStatsToBackend();
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
+          PlaythroughService.recordExplorationQuitAction(
+            stateName, stateStopwatch.getTimeInSecs());
+
+          PlaythroughService.recordPlaythrough(true);
+        }
       },
       recordAnswerSubmitted: function(
           stateName, params, answer, answerGroupIndex, ruleIndex,
@@ -301,6 +314,18 @@ oppia.factory('StatsReportingService', [
         });
 
         postStatsToBackend();
+
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
+          PlaythroughService.recordPlaythrough();
+        }
+      },
+      recordAnswerSubmitAction: function(
+          stateName, destStateName, interactionId, answer, feedback) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
+          PlaythroughService.recordAnswerSubmitAction(
+            stateName, destStateName, interactionId, answer, feedback,
+            stateStopwatch.getTimeInSecs());
+        }
       }
     };
   }
