@@ -168,10 +168,14 @@ var RichTextEditor = function(elem) {
         null, args);
       modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
-      general.waitForSystem();
-
+      var firstMatchingElem = elem.all(by.model('html')).first();
+      var until = protractor.ExpectedConditions;
+      browser.wait(
+        until.presenceOf(firstMatchingElem),
+        5000,
+        'First matching element is not present');
       // Ensure that the cursor is at the end of the RTE.
-      elem.all(by.model('html')).first().sendKeys(
+      firstMatchingElem.sendKeys(
         protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
@@ -491,7 +495,11 @@ var CodeMirrorChecker = function(elem) {
     browser.executeScript(
       "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
       ');');
-    general.waitForSystem();
+    var until = protractor.ExpectedConditions;
+    browser.wait(
+      until.visibilityOf(elem),
+      5000,
+      'Code Mirror element is not visible');
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
         .then(function(lineNumber) {
