@@ -303,7 +303,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
 
         score = (user_models.UserContributionScoringModel
-                        .get_score_of_user_for_category('user1', 'category1'))
+                 .get_score_of_user_for_category('user1', 'category1'))
 
         self.assertEqual(score, 1)
 
@@ -314,7 +314,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
             'user1', 'category1', 2)
 
         score = (user_models.UserContributionScoringModel
-                        .get_score_of_user_for_category('user1', 'category1'))
+                 .get_score_of_user_for_category('user1', 'category1'))
 
         self.assertEqual(score, 3)
 
