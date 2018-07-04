@@ -106,8 +106,8 @@
                 ng-attr-popover="<[subscriptionButtonPopoverText]>"
                 popover-append-to-body
                 popover-trigger="mouseenter">
-                <span translate="I18N_SUBSCRIBE_BUTTON_TEXT" ng-if="!isAlreadySubscribed"></span>
-                <span translate="I18N_UNSUBSCRIBE_BUTTON_TEXT" ng-if="isAlreadySubscribed"></span>
+          <span translate="I18N_SUBSCRIBE_BUTTON_TEXT" ng-if="!isAlreadySubscribed"></span>
+          <span translate="I18N_UNSUBSCRIBE_BUTTON_TEXT" ng-if="isAlreadySubscribed"></span>
         </button>
       </div>
     </md-card>
@@ -135,7 +135,9 @@
 
       <span class="oppia-profile-portfolio-pages" ng-if="numUserPortfolioExplorations > 6">
         <i class="material-icons md-18" ng-disabled="currentPageNumber == 0"
-           ng-click="goToPreviousPage()">&#xE5C4;</i>
+           ng-click="goToPreviousPage()">
+          &#xE5C4;
+        </i>
         Showing <[currentPageNumber * PAGE_SIZE + 1]> - <[Math.min(numUserPortfolioExplorations, (currentPageNumber + 1) * PAGE_SIZE)]> of <[numUserPortfolioExplorations]>
         <i class="material-icons md-18" ng-disabled="(currentPageNumber + 1) * PAGE_SIZE >= userEditedExplorations.length" ng-click="goToNextPage()">&#xE5C8;</i>
       </span>

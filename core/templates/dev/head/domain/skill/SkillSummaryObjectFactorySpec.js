@@ -13,26 +13,23 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for AudioLanguageObjectFactory.
+ * @fileoverview Tests for SkillSummaryObjectFactory.
  */
 
-describe('AudioLanguage object factory', function() {
-  var audioLanguage = null;
-  var alof = null;
-  beforeEach(module('oppia'));
-  beforeEach(inject(function($injector) {
-    alof = $injector.get('AudioLanguageObjectFactory');
+describe('Skill summary object factory', function() {
+  var SkillSummaryObjectFactory = null;
 
-    audioLanguage = alof.createFromDict({
-      id: 'a',
-      description: 'a description',
-      related_languages: 'English',
-    });
+  beforeEach(module('oppia'));
+
+  beforeEach(inject(function($injector) {
+    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
   }));
 
-  it('should set attributes correctly', function() {
-    expect(audioLanguage.id).toEqual('a');
-    expect(audioLanguage.description).toEqual('a description');
-    expect(audioLanguage.relatedLanguages).toEqual('English');
-  });
+  it('should be able to create a skill summary object',
+    function() {
+      var skillSummary = SkillSummaryObjectFactory.create(
+        'skill_1', 'Description 1');
+      expect(skillSummary.getId()).toBe('skill_1');
+      expect(skillSummary.getDescription()).toBe('Description 1');
+    });
 });
