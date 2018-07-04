@@ -12,7 +12,7 @@
        ng-mousedown="onSvgMouseDown($event)"
        ng-mousemove="onSvgMouseMove($event)"
        ng-mouseup="onSvgMouseUp($event)">
-    <image ng-href="<[getPreviewUrl(value.imagePath)]>"
+    <image ng-href="<[getPreviewUrl(value.imagePath.name)]>"
            xlink:href=""
            x="0"
            y="0"
@@ -45,7 +45,9 @@
             text-decoration="none"
             ng-attr-style="<[getRegionTrashStyle($index)]>"
             ng-attr-x="<[labeledRegion.region.area[1][0] * getImageWidth() - 25]>"
-            ng-attr-y="<[labeledRegion.region.area[1][1] * getImageHeight() - 5]>">&#xE872;</text>
+            ng-attr-y="<[labeledRegion.region.area[1][1] * getImageHeight() - 5]>">
+            &#xE872;
+      </text>
     </a>
     <text ng-repeat="labeledRegion in value.labeledRegions"
           ng-attr-style="<[getRegionLabelStyle($index)]>"

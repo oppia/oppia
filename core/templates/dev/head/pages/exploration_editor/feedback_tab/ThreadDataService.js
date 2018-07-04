@@ -33,6 +33,12 @@ oppia.factory('ThreadDataService', [
     var _FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event';
     var _THREAD_STATUS_OPEN = 'open';
 
+    if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+      _SUGGESTION_LIST_HANDLER_URL = '/generalsuggestionlisthandler';
+      _SUGGESTION_ACTION_HANDLER_URL = '/generalsuggestionactionhandler/' +
+        'exploration/' + _expId + '/';
+    }
+
     // All the threads for this exploration. This is a list whose entries are
     // objects, each representing threads. The 'messages' key of this object
     // is updated lazily.
@@ -46,16 +52,50 @@ oppia.factory('ThreadDataService', [
 
     var _fetchThreads = function(successCallback) {
       var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
+      var params = {
+        list_type: 'all',
+        has_suggestion: true
+      };
+      if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+        params = {
+          list_type: 'target',
+          target_type: 'exploration',
+          target_id: _expId
+        };
+      }
       var sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
-        params: {
-          list_type: 'all',
-          has_suggestion: true
-        }
+        params: params
       });
 
       $q.all([fPromise, sPromise]).then(function(res) {
         _data.feedbackThreads = res[0].data.threads;
-        _data.suggestionThreads = res[1].data.threads;
+        _data.suggestionThreads = [];
+        if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+          for (var i = 0; i < res[1].data.suggestions.length; i++) {
+            suggestion = res[1].data.suggestions[i];
+            suggestion.thread_id = suggestion.suggestion_id.slice(
+              suggestion.suggestion_id.indexOf('.') + 1);
+            _data.suggestionThreads.push(suggestion);
+          }
+          for (var i = 0; i < _data.suggestionThreads.length; i++) {
+            for (var j = 0; j < _data.feedbackThreads.length; j++) {
+              if (_data.suggestionThreads[i].thread_id ===
+                  _data.feedbackThreads[j].thread_id) {
+                _data.suggestionThreads[i].subject = (
+                  _data.feedbackThreads[j].subject);
+                _data.suggestionThreads[i].description = (
+                  _data.feedbackThreads[j].description);
+                _data.feedbackThreads.splice(j, 1);
+                // As only one feedback thread can link to one suggestion thread
+                // We can stop the inner loop when we find a match and move on
+                // to the next suggestion thread.
+                break;
+              }
+            }
+          }
+        } else {
+          _data.suggestionThreads = res[1].data.threads;
+        }
         if (successCallback) {
           successCallback();
         }
@@ -169,24 +209,45 @@ oppia.factory('ThreadDataService', [
         });
       },
       resolveSuggestion: function(
-          threadId, action, commitMsg, audioUpdateRequired, onSuccess,
-          onFailure) {
+          threadId, action, commitMsg, reviewMsg, audioUpdateRequired,
+          onSuccess, onFailure) {
         var payload = {
           action: action
         };
-        if (action === ACTION_ACCEPT_SUGGESTION) {
-          payload.commit_message = commitMsg;
-          payload.audio_update_required = audioUpdateRequired;
-        }
-        _openThreadsCount -= 1;
-        $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(
-          onSuccess, function() {
-            _openThreadsCount += 1;
-            if (onFailure) {
-              onFailure();
-            }
+
+        if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+          // TODO(nithesh): Remove manual construction of suggestion ID once the
+          // feedback threads are migrated and threadId matches suggestionId.
+          suggestionId = 'exploration.' + threadId;
+          payload.review_message = reviewMsg;
+          if (action === ACTION_ACCEPT_SUGGESTION) {
+            payload.commit_message = commitMsg;
           }
-        );
+          _openThreadsCount -= 1;
+          $http.put(
+            _SUGGESTION_ACTION_HANDLER_URL + suggestionId, payload).then(
+            onSuccess, function() {
+              _openThreadsCount += 1;
+              if (onFailure) {
+                onFailure();
+              }
+            }
+          );
+        } else {
+          if (action === ACTION_ACCEPT_SUGGESTION) {
+            payload.commit_message = commitMsg;
+            payload.audio_update_required = audioUpdateRequired;
+          }
+          _openThreadsCount -= 1;
+          $http.put(_SUGGESTION_ACTION_HANDLER_URL + threadId, payload).then(
+            onSuccess, function() {
+              _openThreadsCount += 1;
+              if (onFailure) {
+                onFailure();
+              }
+            }
+          );
+        }
       }
     };
   }

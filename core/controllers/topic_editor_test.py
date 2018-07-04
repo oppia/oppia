@@ -14,6 +14,7 @@
 
 """Tests for the topic editor page."""
 
+from core.domain import skill_services
 from core.domain import story_services
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -44,10 +45,12 @@ class BaseTopicEditorControllerTest(test_utils.GenericTestBase):
             self.topic_manager_id)
         self.admin = user_services.UserActionsInfo(self.admin_id)
         self.new_user = user_services.UserActionsInfo(self.new_user_id)
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
         self.topic_id = topic_services.get_new_topic_id()
         self.save_new_topic(
-            self.topic_id, self.admin_id, 'Name', 'Description', [], [], [],
-            [], 1)
+            self.topic_id, self.admin_id, 'Name', 'Description', [], [],
+            [self.skill_id], [], 1)
         changelist = [topic_domain.TopicChange({
             'cmd': topic_domain.CMD_ADD_SUBTOPIC,
             'title': 'Title',
@@ -57,7 +60,7 @@ class BaseTopicEditorControllerTest(test_utils.GenericTestBase):
             self.admin_id, self.topic_id, changelist, 'Added subtopic.')
 
 
-class NewStoryHandlerTest(BaseTopicEditorControllerTest):
+class TopicEditorStoryHandlerTest(BaseTopicEditorControllerTest):
 
     def test_story_creation(self):
         self.login(self.ADMIN_EMAIL)
@@ -66,13 +69,11 @@ class NewStoryHandlerTest(BaseTopicEditorControllerTest):
                 '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
             csrf_token = self.get_csrf_token_from_response(response)
             json_response = self.post_json(
-                '%s/%s' % (feconf.NEW_STORY_URL, self.topic_id),
+                '%s/%s' % (feconf.TOPIC_EDITOR_STORY_URL, self.topic_id),
                 {'title': 'Story title'},
                 csrf_token=csrf_token)
-            topic = topic_services.get_topic_by_id(self.topic_id)
             story_id = json_response['storyId']
             self.assertEqual(len(story_id), 12)
-            self.assertEqual(topic.canonical_story_ids, [story_id])
             self.assertIsNotNone(
                 story_services.get_story_by_id(story_id, strict=False))
         self.logout()
@@ -174,7 +175,10 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
             json_response = self.get_json(
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id))
-            self.assertEqual(self.topic_id, json_response['topic']['id'])
+            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertEqual(
+                'Skill Description',
+                json_response['skill_id_to_description_dict'][self.skill_id])
             self.logout()
 
     def test_editable_topic_handler_put(self):
@@ -219,9 +223,12 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
                 change_cmd, csrf_token=csrf_token)
-            self.assertEqual(self.topic_id, json_response['topic']['id'])
-            self.assertEqual('A new name', json_response['topic']['name'])
-            self.assertEqual(2, len(json_response['topic']['subtopics']))
+            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertEqual('A new name', json_response['topic_dict']['name'])
+            self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
+            self.assertEqual(
+                'Skill Description',
+                json_response['skill_id_to_description_dict'][self.skill_id])
 
             # Test if the corresponding subtopic pages were created.
             json_response = self.get_json(
@@ -302,9 +309,9 @@ class TopicEditorTest(BaseTopicEditorControllerTest):
                 '%s/%s' % (
                     feconf.TOPIC_EDITOR_DATA_URL_PREFIX, self.topic_id),
                 change_cmd, csrf_token=csrf_token)
-            self.assertEqual(self.topic_id, json_response['topic']['id'])
-            self.assertEqual('A new name', json_response['topic']['name'])
-            self.assertEqual(2, len(json_response['topic']['subtopics']))
+            self.assertEqual(self.topic_id, json_response['topic_dict']['id'])
+            self.assertEqual('A new name', json_response['topic_dict']['name'])
+            self.assertEqual(2, len(json_response['topic_dict']['subtopics']))
             self.logout()
 
     def test_editable_topic_handler_delete(self):

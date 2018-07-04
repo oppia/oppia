@@ -58,11 +58,11 @@ oppia.factory('ExplorationIssueObjectFactory', [function() {
   ExplorationIssue.createFromBackendDict = function(
       explorationIssueBackendDict) {
     return new ExplorationIssue(
-      explorationIssueBackendDict.issueType,
-      explorationIssueBackendDict.issueCustomizationArgs,
-      explorationIssueBackendDict.playthroughIds,
-      explorationIssueBackendDict.schemaVersion,
-      explorationIssueBackendDict.isValid);
+      explorationIssueBackendDict.issue_type,
+      explorationIssueBackendDict.issue_customization_args,
+      explorationIssueBackendDict.playthrough_ids,
+      explorationIssueBackendDict.schema_version,
+      explorationIssueBackendDict.is_valid);
   };
 
   return ExplorationIssue;

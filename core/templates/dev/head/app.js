@@ -24,7 +24,7 @@ var oppia = angular.module(
     'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
     'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
     'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
-    'toastr', 'headroom'
+    'toastr', 'headroom', 'dndLists'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
@@ -72,6 +72,27 @@ oppia.constant('COMPONENT_NAME_CONTENT', 'content');
 oppia.constant('COMPONENT_NAME_HINT', 'hint');
 oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
 oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
+
+// Enables recording playthroughs from learner sessions.
+oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', false);
+// Enables visualization of issues on the stats tab.
+oppia.constant('ENABLE_ISSUES', false);
+oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
+oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
+oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);
+oppia.constant('NUM_INCORRECT_ANSWERS_THRESHOLD', 5);
+oppia.constant('NUM_REPEATED_CYCLES_THRESHOLD', 3);
+oppia.constant('MAX_PLAYTHROUGHS_FOR_ISSUE', 5);
+oppia.constant('RECORD_PLAYTHROUGH_PROBABILITY', 0.2);
+
+oppia.constant('ACTION_TYPE_EXPLORATION_START', 'ExplorationStart');
+oppia.constant('ACTION_TYPE_ANSWER_SUBMIT', 'AnswerSubmit');
+oppia.constant('ACTION_TYPE_EXPLORATION_QUIT', 'ExplorationQuit');
+
+oppia.constant('ISSUE_TYPE_EARLY_QUIT', 'EarlyQuit');
+oppia.constant(
+  'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS', 'MultipleIncorrectSubmissions');
+oppia.constant('ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'CyclicStateTransitions');
 
 // Add RTE extensions to textAngular toolbar options.
 oppia.config(['$provide', function($provide) {

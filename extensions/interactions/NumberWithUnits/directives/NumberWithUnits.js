@@ -26,10 +26,10 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'NumberWithUnitsObjectFactory',
+        '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
         'numberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
         'EVENT_PROGRESS_NAV_SUBMITTED', function(
-            $scope, $attrs, NumberWithUnitsObjectFactory,
+            $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
             numberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
             EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
@@ -92,8 +92,24 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
               answerValidity: $scope.isAnswerValid()
             });
           });
-        }
-      ]
+
+          $scope.showHelp = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/interactions/NumberWithUnits/directives/' +
+                'number_with_units_help_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.close = function() {
+                    $uibModalInstance.close();
+                  };
+                }
+              ]
+            }).result.then(function() {});
+          };
+        }]
     };
   }
 ]);

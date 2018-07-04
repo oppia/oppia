@@ -112,6 +112,72 @@
         </ul>
       </div>
 
+      <div ng-if="myExplorationsView === 'list' && explorationsList.length > 0">
+        <md-card layout="row"
+                 class="oppia-dashboard-list-view-item">
+          <table class="oppia-dashboard-table">
+            <colgroup>
+              <col style="width: 26%;">
+              <col style="width: 13%;">
+              <col style="width: 13%;">
+              <col style="width: 16%;">
+              <col style="width: 16%;">
+              <col style="width: 16%;">
+            </colgroup>
+            <tr>
+              <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
+                  class="oppia-dashboard-table-headings"
+                  ng-click="setExplorationsSortingOptions(value)">
+                <p ng-if="key === 'TITLE'" translate="I18N_DASHBOARD_TABLE_HEADING_EXPLORATION"></p>
+                <p ng-if="key === 'RATING'" translate="I18N_DASHBOARD_TABLE_HEADING_RATING"></p>
+                <p ng-if="key === 'NUM_VIEWS'" translate="I18N_DASHBOARD_TABLE_HEADING_PLAYS"></p>
+                <p ng-if="key === 'OPEN_FEEDBACK'" translate="I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS"></p>
+                <p ng-if="key === 'LAST_UPDATED'" translate="I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED"></p>
+                <span class="fa"
+                      ng-if="currentSortType === value"
+                      ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+                </span>
+              </th>
+            </tr>
+            <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
+                class="exploration-list-item">
+              <td>
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+                  <[exploration.title || DEFAULT_EMPTY_TITLE]>
+                </a>
+              </td>
+              <td colspan="4"
+                  ng-if="exploration.status === 'private'"
+                  class="exp-private-text">
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+                  <[publishText]>
+                </a>
+              </td>
+              <td ng-if="exploration.status !== 'private'">
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+                  <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
+                </a>
+              </td>
+              <td ng-if="exploration.status !== 'private'">
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+                  <[exploration.num_views]>
+                </a>
+              </td>
+              <td ng-if="exploration.status !== 'private'">
+                <a ng-href="/create/<[exploration.id]>#/feedback"
+                   class="oppia-dashboard-list-summary">
+                  <[exploration.num_open_threads]>
+                </a>
+              </td>
+              <td>
+                <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+                  <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                </a>
+              </td>
+            </tr>
+          </table>
+        </md-card>
+      </div>
 
       <div ng-if="activeTab === 'myExplorations'">
         <div ng-if="explorationsList.length === 0 && collectionsList.length === 0 && questionsList.length === 0" class="oppia-dashboard-empty-text">
@@ -131,8 +197,13 @@
                       translate="I18N_CREATE_QUESTION">
               </button>
             </div>
-            <div class="oppia-dashboard-intro-picture">
-              <img ng-src="<[emptyDashboardImgUrl]>">
+          </a>
+          <div ng-attr-section="'<['right-section']>">
+            <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
+               ng-href="<[getExplorationUrl(exploration.id)]>">
+            </a>
+            <div class="exp-private-text" ng-if="exploration.status === 'private'">
+              <[publishText]>
             </div>
           </md-card>
         </div>

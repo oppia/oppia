@@ -1,85 +1,129 @@
-<md-card layout="row" class="list-view-item">
-  <table class="subtopics-table">
-    <colgroup>
-      <col style="width: 50%;">
-      <col style="width: 50%;">
-    </colgroup>
-    <tr>
-      <th colspan="2">
-      <button type="button" ng-click="createSubtopic()"
-              class="btn btn-default create-subtopic-button">
-        Create Subtopic
-      </button>
-    </th>
-    </tr>
-    <tr ng-if="subtopics.length > 0">
-      <th ng-repeat="key in SUBTOPIC_HEADINGS" class="subtopics-table-headings">
-        <p ng-if="key === 'title'"> Subtopic Title </p>
-        <p ng-if="key === 'skills'"> Skills </p>
-      </th>
-    </tr>
-    <tr ng-repeat="subtopic in subtopics"
-        class="list-item"
-        ng-if="subtopics.length > 0">
-      <td>
-        <span class="list-summary"> <[subtopic.getTitle()]> </span>
-      </td>
-      <td>
-        <span class="list-summary"> <[subtopic.getSkillIds().length]> </span>
-      </td>
-      <td>
-        <span ng-click="deleteSubtopic(subtopic.getId())" class="fa fa-trash list-summary"></span>
-      </td>
-    </tr>
-  </table>
-</md-card>
+<div class="subtopics-tab">
+  <md-card class="subtopics">
+    <h3> Subtopics </h3>
+    <h4 style="color: #6d6d6d">
+      (Drag and drop skills across subtopics or to the uncategorized section or click on a subtopic card to edit its page data)
+    </h4>
+    <div class="subtopics-container">
+      <md-card class="subtopic"
+               ng-repeat="(subtopicIndex, subtopic) in subtopics"
+               ng-click="editSubtopic(subtopic)"
+               dnd-list="subtopic.getSkillSummaries()"
+               dnd-drop="endMoveSkill(subtopic.getId())">
+        <strong style="padding-left: 1.5vw;"><[subtopic.getTitle()]></strong>
+        <span style="float: right; color: #b50000;" ng-click="deleteSubtopic(subtopic)" aria-hidden="true">
+          <i class="material-icons md-18">&#xE14C;</i>
+        </span>
+        <div style="max-height: 35vh; overflow-y: auto;">
+          <md-card class="skill-id"
+                   ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
+                   dnd-draggable="skillSummary"
+                   dnd-dragstart="startMoveSkill(subtopic.getId(), skillSummary)"
+                   dnd-effect-allowed="move"
+                   dnd-disable-if="isSkillDeleted(skillSummary)">
+            <a ng-if="!isSkillDeleted(skillSummary)"
+               ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
+              <[skillSummary.getDescription()]>
+            </a>
+            <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
+              Skill Deleted
+            </span>
+          </md-card>
+        </div>
+      </md-card>
+      <md-card class="subtopic new" ng-click="createSubtopic()">
+        <i class="material-icons">add</i>
+      </md-card>
+    </div>
+  </md-card>
 
+  <md-card class="uncategorized-skill-ids"
+           dnd-list="uncategorizedSkillSummaries"
+           dnd-drop="endMoveSkill(null)">
+    <h3> Uncategorized Skills </h3>
+    <div style="max-height: 45vh; overflow-y: auto;">
+      <md-card class="skill-id"
+               ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index"
+               dnd-draggable="skillSummary"
+               dnd-effect-allowed="move"
+               dnd-dragstart="startMoveSkill(null, skillSummary)"
+               dnd-disable-if="isSkillDeleted(skillSummary)">
+        <a ng-if="!isSkillDeleted(skillSummary)"
+           ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
+          <[skillSummary.getDescription()]>
+        </a>
+        <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
+          Skill Deleted
+        </span>
+      </md-card>
+    </div>
+  </md-card>
+</div>
 <style>
-  subtopics-list-tab .list-view-item {
-    background: #fff;
-    margin: 20px 7.5px 0 12.5%;
-    padding: 10px 20px;
-    width: 75%;
+  subtopics-list-tab .subtopics-tab {
+    display: flex;
+    margin: 6vh 10vh 0 10vh;
   }
-
-  subtopics-list-tab .create-subtopic-button {
-    margin-bottom: 2%;
+  subtopics-list-tab h4 {
+    white-space: normal;
   }
-
-  subtopics-list-tab .subtopics-table {
-    font-size: 15px;
-    width: 100%;
+  subtopics-list-tab .dndDraggingSource {
+    display: none;
   }
-
-  subtopics-list-tab .subtopics-table .subtopics-table-headings {
-    border-bottom: 2px solid #bbb;
-    padding-bottom: 0.7em;
-  }
-
-  subtopics-list-tab .subtopics-table .subtopics-table-headings p {
-    display: inline;
-  }
-
-  subtopics-list-tab .list-summary,
-  subtopics-list-tab .list-summary:active,
-  subtopics-list-tab .list-summary:visited {
-    color: inherit;
+  subtopics-list-tab .dndPlaceholder {
+    background-color: #e0e0e0;
     display: block;
-    height: 2em;
-    text-decoration: none;
+    min-height: 42px;
   }
-
-  subtopics-list-tab .list-item:not(:last-child) {
-    border-bottom: 1px solid #bbb;
+  subtopics-list-tab .subtopics-container {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
   }
-
-  subtopics-list-tab .list-item:hover {
-    background-color: #ededed;
+  subtopics-list-tab .subtopic {
+    align-content: center;
+    background-color: #fafafa;
+    width: 15vw;
+    height: 40vh;
+    float: left;
+    flex: 0 0 auto;
+    position: relative;
   }
-
-  subtopics-list-tab .list-summary span {
+  subtopics-list-tab .subtopic:hover {
+    background-color: #f6f6f6;
+  }
+  subtopics-list-tab .new:hover {
+    background-color: #f1f1f1;
+  }
+  subtopics-list-tab .new .material-icons {
+    position: absolute;
+    font-size: 2.5em;
+    bottom: 50%;
+    left: 46%;
+  }
+  subtopics-list-tab .subtopics {
+    background-color: white;
+    border-right: 1px solid #BDBDBD;
     display: inline-block;
-    line-height: normal;
-    vertical-align: middle;
+    float: left;
+    padding-left: 2vw;
+    padding-right: 2vw;
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+    width: 80%;
+  }
+  subtopics-list-tab .uncategorized-skill-ids {
+    background-color: white;
+    width: 30%;
+    display: inline-block;
+    text-align: center;
+  }
+
+  subtopics-list-tab .skill-id {
+    background-color: #efefef;
+  }
+  subtopics-list-tab .skill-id:hover {
+    background-color: #e0e0e0;
   }
 </style>
