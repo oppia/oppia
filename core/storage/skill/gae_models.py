@@ -14,8 +14,8 @@
 
 """Models for storing the skill data models."""
 
+from constants import constants
 from core.platform import models
-import feconf
 
 from google.appengine.ext import ndb
 
@@ -89,7 +89,7 @@ class SkillModel(base_models.VersionedModel):
         skill_commit_log_entry = SkillCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            feconf.ACTIVITY_STATUS_PUBLIC, False
+            constants.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
         skill_commit_log_entry.put()

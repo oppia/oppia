@@ -17,11 +17,6 @@
  * collection node domain objects.
  */
 
-// This constant must match the corresponding constant defined in
-// core.domain.rights_manager.ACTIVITY_STATUS_PRIVATE.
-// TODO(bhenning): This should be provided by the backend.
-oppia.constant('ACTIVITY_STATUS_PRIVATE', 'private');
-
 oppia.factory('CollectionNodeObjectFactory', [
   'ACTIVITY_STATUS_PRIVATE',
   function(ACTIVITY_STATUS_PRIVATE) {

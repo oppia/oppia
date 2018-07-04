@@ -77,6 +77,8 @@ oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
 oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', false);
 // Enables visualization of issues on the stats tab.
 oppia.constant('ENABLE_ISSUES', false);
+// The name of site used in sign up.
+oppia.constant('SITE_NAME', 'Oppia.org');
 oppia.constant('CURRENT_ACTION_SCHEMA_VERSION', 1);
 oppia.constant('CURRENT_ISSUE_SCHEMA_VERSION', 1);
 oppia.constant('EARLY_QUIT_THRESHOLD_IN_SECS', 45);

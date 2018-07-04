@@ -76,7 +76,7 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if (item.commit_type != _COMMIT_TYPE_REVERT and
-                item.committer_id not in feconf.SYSTEM_USER_IDS):
+                item.committer_id not in constants.SYSTEM_USER_IDS):
             exp_id = item.get_unversioned_instance_id()
             yield (exp_id, item.committer_id)
 
@@ -307,7 +307,7 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
         if exploration_rights is None:
             return
 
-        if (exploration_rights.status == feconf.ACTIVITY_STATUS_PRIVATE
+        if (exploration_rights.status == constants.ACTIVITY_STATUS_PRIVATE
                 and exploration_rights.viewable_if_private):
             yield (item.id, item.title.encode('utf-8'))
 

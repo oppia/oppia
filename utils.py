@@ -568,7 +568,7 @@ def require_valid_name(name, name_type, allow_empty=False):
         raise ValidationError(
             'Adjacent whitespace in %s should be collapsed.' % name_type)
 
-    for character in feconf.INVALID_NAME_CHARS:
+    for character in constants.INVALID_NAME_CHARS:
         if character in name:
             raise ValidationError(
                 'Invalid character %s in %s: %s' %
