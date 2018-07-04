@@ -35,6 +35,13 @@ var waitForSystem = function() {
   browser.sleep(waitTime);
 };
 
+var waitForLoadingMessage = function() {
+  // Wait for page to completely load.
+  var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
+  return browser.wait(until.invisibilityOf(loadingMessage), 15000,
+    'Page takes more than 15 secs to load');
+};
+
 var scrollToTop = function() {
   browser.executeScript('window.scrollTo(0,0);');
 };
@@ -197,6 +204,7 @@ var checkConsoleErrorsExist = function(expectedErrors) {
 
 exports.acceptAlert = acceptAlert;
 exports.waitForSystem = waitForSystem;
+exports.waitForLoadingMessage = waitForLoadingMessage;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 
