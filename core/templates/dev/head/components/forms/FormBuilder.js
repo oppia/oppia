@@ -377,7 +377,8 @@ oppia.directive('ckEditorRte', [
     return {
       restrict: 'E',
       scope: {
-        uiConfig: '&'
+        uiConfig: '&',
+        labelForFocusTarget: '&'
       },
       template: '<div><div></div>' +
                 '<div contenteditable="true" class="oppia-rte">' +
@@ -545,6 +546,16 @@ oppia.directive('ckEditorRte', [
         scope.$on('$destroy', function() {
           // Clean up CKEditor instance when directive is removed.
           ck.destroy();
+        });
+
+        scope.$on('focusOn', function(evt, label) {
+          if (label === scope.labelForFocusTarget()) {
+            var editorScope = CKEDITOR.instances['oppia-rte'](
+              label).scope;
+            $timeout(function() {
+              editorScope.displayElements.text[0].focus();
+            });
+          }
         });
       }
     };
