@@ -257,7 +257,7 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
         self.assertEqual(scoreModels[0].score_category, 'category1')
         self.assertEqual(scoreModels[0].score, 1)
 
-    def test_create_failure(self):
+    def test_create_entry_already_exists_failure(self):
         user_models.UserContributionScoringModel.create('user1', 'category1', 1)
         with self.assertRaisesRegexp(
             Exception, 'There is already an entry with the given id:'
@@ -284,9 +284,51 @@ class UserContributionsScoringModelTests(test_utils.GenericTestBase):
                             'category1'))
 
         self.assertEqual(len(score_models), 3)
+        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
+            'category1.user2'), score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
+            'category1.user3'), score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
+            'category1.user4'), score_models)
 
         score_models = (user_models.UserContributionScoringModel
                         .get_all_users_with_score_above_minimum_for_category(
                             'category2'))
 
         self.assertEqual(len(score_models), 1)
+        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
+            'category2.user1'), score_models)
+
+    def test_get_score_of_user_for_category(self):
+        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+
+        score = (user_models.UserContributionScoringModel
+                        .get_score_of_user_for_category('user1', 'category1'))
+
+        self.assertEqual(score, 1)
+
+    def test_increment_score_for_user(self):
+        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+
+        user_models.UserContributionScoringModel.increment_score_for_user(
+            'user1', 'category1', 2)
+
+        score = (user_models.UserContributionScoringModel
+                        .get_score_of_user_for_category('user1', 'category1'))
+
+        self.assertEqual(score, 3)
+
+    def test_get_all_scores_of_user(self):
+        user_models.UserContributionScoringModel.create('user1', 'category1', 1)
+        user_models.UserContributionScoringModel.create('user1', 'category2', 1)
+        user_models.UserContributionScoringModel.create('user1', 'category3', 1)
+
+        score_models = (user_models.UserContributionScoringModel
+                        .get_all_scores_of_user('user1'))
+        self.assertEqual(len(score_models), 3)
+        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
+            'category1.user1'), score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
+            'category2.user1'), score_models)
+        self.assertIn(user_models.UserContributionScoringModel.get_by_id(
+            'category3.user1'), score_models)

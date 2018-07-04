@@ -23,7 +23,7 @@ import feconf
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
-(base_models, ) = models.Registry.import_models([models.NAMES.base_model])
+(base_models,) = models.Registry.import_models([models.NAMES.base_model])
 
 
 class UserSettingsModel(base_models.BaseModel):
@@ -772,19 +772,19 @@ class UserContributionScoringModel(base_models.BaseModel):
             score=score).put()
 
     @classmethod
-    def update_score_for_user(cls, user_id, score_category, update_by):
-        """Update the score of the user in the category by the given amount.
+    def increment_score_for_user(cls, user_id, score_category, increment_by):
+        """Increment the score of the user in the category by the given amount.
 
         Args:
             user_id: str. The id of the user.
             score_category: str. The category of the suggestion.
-            update_by: float. The amount to increase or decrease the score of
-                the user by.
+            increment_by: float. The amount to increase the score of the user
+                by. May be negative, in which case the score is reduced.
         """
         instance_id = cls._get_instance_id(user_id, score_category)
         model = cls.get_by_id(instance_id)
         if not model:
-            cls.create(user_id, score_category, update_by)
+            cls.create(user_id, score_category, increment_by)
         else:
-            model.score += update_by
+            model.score += increment_by
             model.put()
