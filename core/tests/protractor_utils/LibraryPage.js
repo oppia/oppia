@@ -56,7 +56,8 @@ var LibraryPage = function(){
   };
 
   this.get = function() {
-    return browser.get(LIBRARY_URL_SUFFIX);
+    browser.get(LIBRARY_URL_SUFFIX);
+    return general.waitForLoadingMessage();
   };
 
   this.selectLanguages = function(languages) {
@@ -96,9 +97,10 @@ var LibraryPage = function(){
   };
 
   this.playCollection = function(collectionName) {
+    general.waitForLoadingMessage();
     var allCollectionSummaryTile = element.all(
       by.css('.protractor-test-collection-summary-tile'));
-    browser.wait(until.visibilityOf(allCollectionSummaryTile.first()), 5000,
+    browser.wait(until.visibilityOf(allCollectionSummaryTile.first()), 10000,
       'Library Page does not have any collection')
       .then(function(isVisible) {
         if (isVisible) {
@@ -108,10 +110,12 @@ var LibraryPage = function(){
           collectionTitled(collectionName).click();
         }
       });
+    general.waitForLoadingMessage();
   };
 
   this.playExploration = function(explorationName) {
-    browser.wait(until.visibilityOf(allExplorationSummaryTile.first()), 5000,
+    general.waitForLoadingMessage();
+    browser.wait(until.visibilityOf(allExplorationSummaryTile.first()), 10000,
       'Library Page does not have any exploration')
       .then(function(isVisible) {
         if (isVisible) {
@@ -121,6 +125,7 @@ var LibraryPage = function(){
           explorationTitled(explorationName).first().click();
         }
       });
+    general.waitForLoadingMessage();
   };
 
   this.getExplorationObjective = function(name) {
@@ -148,7 +153,7 @@ var LibraryPage = function(){
   };
 
   this.findExploration = function(explorationTitle) {
-    general.waitForSystem(2000);
+    general.waitForLoadingMessage();
     var searchInput = element.all(
       by.css('.protractor-test-search-input')).first();
     searchInput.clear();

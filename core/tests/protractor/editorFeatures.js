@@ -396,13 +396,12 @@ describe('Exploration history', function() {
     historyGraph.selectTwoVersions(1, 2);
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
-
-    explorationEditorMainTab.moveToState('first (was: Introd...');
+    historyGraph.openStateHistory('first (was: Introd...');
     historyGraph.expectTextWithHighlightingToMatch(
       VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
     historyGraph.closeStateHistory();
 
-    explorationEditorMainTab.moveToState('second');
+    historyGraph.openStateHistory('second');
     historyGraph.expectTextToMatch(STATE_2_STRING, ' ');
     historyGraph.closeStateHistory();
 
@@ -437,7 +436,7 @@ describe('Exploration history', function() {
     historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
     historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
 
-    explorationEditorMainTab.moveToState('second');
+    historyGraph.openStateHistory('second');
     historyGraph.expectTextToMatch(' ', STATE_2_STRING);
     historyGraph.closeStateHistory();
 
@@ -577,7 +576,6 @@ describe('ExplorationFeedback', function() {
     libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     explorationPlayerPage.submitFeedback(feedback);
-    general.waitForSystem();
     users.logout();
 
     // Creator reads the feedback and responds.
@@ -644,7 +642,6 @@ describe('Suggestions on Explorations', function() {
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    browser.get(general.SERVER_URL_PREFIX);
     users.logout();
 
     // Suggester plays the exploration and suggests a change.
@@ -657,16 +654,16 @@ describe('Suggestions on Explorations', function() {
     var suggestionDescription = 'Uppercased the first letter';
 
     explorationPlayerPage.submitSuggestion(suggestion, suggestionDescription);
-    general.waitForSystem();
     users.logout();
 
     // Exploration author reviews the suggestion and accepts it.
     users.login('user1@ExplorationSuggestions.com');
     creatorDashboardPage.get();
-    browser.waitForAngular();
     creatorDashboardPage.navigateToExplorationEditor();
 
     explorationEditorPage.navigateToFeedbackTab();
+    // There is no "Loading" message while feedback tab is loading.
+    general.waitForSystem();
     explorationEditorFeedbackTab.getSuggestionThreads().then(function(threads) {
       expect(threads.length).toEqual(1);
       expect(threads[0]).toMatch(suggestionDescription);

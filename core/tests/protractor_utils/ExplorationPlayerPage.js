@@ -198,6 +198,7 @@ var ExplorationPlayerPage = function() {
     browser.wait(until.elementToBeClickable(feedbackSubmitButton), 5000,
       'Feedback Submit button takes too long to appear');
     feedbackSubmitButton.click();
+    browser.wait(until.invisibilityOf(feedbackSubmitButton), 5000);
   };
 
   this.submitSuggestion = function(suggestion, description) {
@@ -209,6 +210,7 @@ var ExplorationPlayerPage = function() {
     browser.wait(until.elementToBeClickable(suggestionSubmitButton), 5000,
       'Suggestion Submit button takes too long to appear');
     suggestionSubmitButton.click();
+    browser.wait(until.invisibilityOf(suggestionSubmitButton), 5000);
   };
 };
 

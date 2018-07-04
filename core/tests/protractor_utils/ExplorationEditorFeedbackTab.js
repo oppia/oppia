@@ -18,6 +18,7 @@
  */
 
 var general = require('./general.js');
+var until = protractor.ExpectedConditions;
 
 var ExplorationEditorFeedbackTab = function () {
   /*
@@ -59,6 +60,7 @@ var ExplorationEditorFeedbackTab = function () {
       viewSuggestionButton.click();
       expect(acceptSuggestionButton.isDisplayed()).toBe(true);
       acceptSuggestionButton.click();
+      browser.wait(until.invisibilityOf(acceptSuggestionButton), 5000);
     });
   };
 

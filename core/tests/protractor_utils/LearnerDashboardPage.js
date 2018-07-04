@@ -17,6 +17,7 @@
  * tests.
  */
 
+var general = require('./general.js');
 var until = protractor.ExpectedConditions;
 
 var LearnerDashboardPage = function() {
@@ -51,11 +52,12 @@ var LearnerDashboardPage = function() {
     element.all(by.css('.protractor-test-feedback-message'));
 
   this.get = function() {
-    return browser.get(LEARNER_DASHBOARD_URL);
+    browser.get(LEARNER_DASHBOARD_URL);
+    return general.waitForLoadingMessage();
   };
 
   this.navigateToCompletedSection = function() {
-    browser.wait(until.elementToBeClickable(completedSection), 5000,
+    browser.wait(until.elementToBeClickable(completedSection), 10000,
       'Completed tab takes too long to appear').then(function(isClickable) {
       if (isClickable) {
         completedSection.click();
@@ -64,7 +66,7 @@ var LearnerDashboardPage = function() {
   };
 
   this.navigateToInCompleteSection = function() {
-    browser.wait(until.elementToBeClickable(incompleteSection), 5000,
+    browser.wait(until.elementToBeClickable(incompleteSection), 10000,
       'In Progress tab takes too long to appear').then(function(isClickable) {
       if (isClickable) {
         incompleteSection.click();
@@ -153,7 +155,13 @@ var LearnerDashboardPage = function() {
   this.expectTitleOfCollectionSummaryTileToMatch = function(title) {
     var collectionTitle = element(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', title));
-    expect(collectionTitle.isDisplayed()).toBe(true);
+    browser.wait(until.visibilityOf(collectionTitle), 5000,
+      'Unable to find collection ' + title)
+      .then(function(isVisible) {
+        if (isVisible) {
+          expect(collectionTitle.isDisplayed()).toBe(true);
+        }
+      });
   };
 
   this.expectTitleOfExplorationSummaryTileToBeHidden = function(title) {
@@ -166,7 +174,13 @@ var LearnerDashboardPage = function() {
   this.expectTitleOfExplorationSummaryTileToMatch = function(title) {
     var explorationTitle = element(
       by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
-    expect(explorationTitle.isDisplayed()).toBe(true);
+    browser.wait(until.visibilityOf(explorationTitle), 5000,
+      'Unable to find collection ' + title)
+      .then(function(isVisible) {
+        if (isVisible) {
+          expect(explorationTitle.isDisplayed()).toBe(true);
+        }
+      });
   };
 
   this.expectSubscriptionFirstNameToMatch = function(name) {

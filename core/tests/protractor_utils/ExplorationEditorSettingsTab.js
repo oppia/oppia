@@ -19,6 +19,7 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
+var until = protractor.ExpectedConditions;
 
 var ExplorationEditorSettingsTab = function() {
   /*
@@ -53,6 +54,10 @@ var ExplorationEditorSettingsTab = function() {
     by.css('.protractor-test-open-preview-summary-modal'));
   var saveParamChangesButton = element(
     by.css('.protractor-test-save-param-changes-button'));
+  var deleteExplorationButton = element(
+    by.css('.protractor-test-delete-exploration-button'));
+  var confirmDeleteExplorationButton = element(
+    by.css('.protractor-test-really-delete-exploration-button'));
 
   /*
    * Workflows
@@ -78,6 +83,15 @@ var ExplorationEditorSettingsTab = function() {
     item.sendKeys(paramValue);
 
     saveParamChangesButton.click();
+  };
+
+  this.deleteExploration = function() {
+    browser.wait(until.elementToBeClickable(deleteExplorationButton), 5000,
+      'Delete Exploration button is not clickable');
+    deleteExplorationButton.click();
+    confirmDeleteExplorationButton.click();
+    browser.wait(until.invisibilityOf(confirmDeleteExplorationButton), 5000,
+      'Delete Exploration modal takes too long to disappear');
   };
 
   this.enableParameters = function() {

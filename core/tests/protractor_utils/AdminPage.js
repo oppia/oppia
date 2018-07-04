@@ -103,35 +103,6 @@ var AdminPage = function(){
     general.waitForSystem();
     return true;
   };
-
-  this.reloadCollection = function() {
-    reloadCollectionButton.click();
-  };
-
-  // The name should be as given in the admin page (including '.yaml' if
-  // necessary).
-  this.reloadExploration = function(name) {
-    explorationElements.map(function(explorationElement) {
-      explorationTitleElement(explorationElement)
-        .getText().then(function(title) {
-          // We use match here in case there is whitespace around the name
-          if (title.match(name)) {
-            explorationElementReloadButton(explorationElement).click();
-            general.acceptAlert();
-            // Time is needed for the reloading to complete.
-            browser.waitForAngular();
-          }
-        });
-    });
-  };
-
-  // Imports all the demo explorations.
-  this.reloadAllExplorations = function(name) {
-    this.get();
-    reloadAllExplorationsButtons.click();
-    general.acceptAlert();
-    browser.waitForAngular();
-  };
 };
 
 exports.AdminPage = AdminPage;

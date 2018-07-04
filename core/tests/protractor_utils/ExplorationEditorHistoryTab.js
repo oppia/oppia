@@ -27,11 +27,11 @@ var ExplorationEditorHistoryTab = function() {
   var historyCheckboxSelector = element.all(by.css(
     '.protractor-test-history-checkbox-selector'));
   var historyGraph = element(by.css('.protractor-test-history-graph'));
-  var interactionNode = historyGraph.all(by.css('.protractor-test-node'));
-  var interactionNodeBackGround = function(nodeElement) {
+  var stateNode = historyGraph.all(by.css('.protractor-test-node'));
+  var stateNodeBackground = function(nodeElement) {
     return nodeElement.element(by.css('.protractor-test-node-background'));
   };
-  var interactionNodeLabel = function(nodeElement) {
+  var stateNodeLabel = function(nodeElement) {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
 
@@ -58,6 +58,23 @@ var ExplorationEditorHistoryTab = function() {
 
   this.getHistoryGraph = function() {
     return {
+      openStateHistory: function(stateName) {
+        stateNode.map(function(stateElement) {
+          return stateNodeLabel(stateElement).getText();
+        }).then(function(listOfNames) {
+          var matched = false;
+          for (var i = 0; i < listOfNames.length; i++) {
+            if (listOfNames[i] === stateName) {
+              stateNode.get(i).click();
+              matched = true;
+            }
+          }
+          if (!matched) {
+            throw Error('State ' + stateName +
+      ' not found by explorationEditoHistoryTab.moveToState.');
+          }
+        });
+      },
       closeStateHistory: function() {
         browser.wait(until.elementToBeClickable(closeStateHistoryButton), 5000,
           'Close State History button is not clickable')
@@ -121,10 +138,10 @@ var ExplorationEditorHistoryTab = function() {
        *                            may be truncated.)
        */
       expectHistoryStatesToMatch: function(expectedStates) {
-        interactionNode.map(function(stateNode) {
+        stateNode.map(function(stateNode) {
           return {
-            label: interactionNodeLabel(stateNode).getText(),
-            color: interactionNodeBackGround(stateNode).getCssValue('fill')
+            label: stateNodeLabel(stateNode).getText(),
+            color: stateNodeBackground(stateNode).getCssValue('fill')
           };
         }).then(function(states) {
           expect(states.length).toEqual(expectedStates.length);

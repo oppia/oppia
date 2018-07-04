@@ -17,7 +17,8 @@
  * with protractor.
  */
 
-var editor = require('./editor.js');
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
 var until = protractor.ExpectedConditions;
 
 // Time (in ms) to wait when the system needs time for some computations.
@@ -32,6 +33,13 @@ var waitForSystem = function() {
     waitTime = WAIT_TIME;
   }
   browser.sleep(waitTime);
+};
+
+var waitForLoadingMessage = function() {
+  // Wait for page to completely load.
+  var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
+  return browser.wait(until.invisibilityOf(loadingMessage), 15000,
+    'Page takes more than 15 secs to load');
 };
 
 var scrollToTop = function() {
@@ -104,7 +112,9 @@ var getExplorationIdFromPlayer = function() {
 var openEditor = function(explorationId) {
   browser.get(EDITOR_URL_SLICE + explorationId);
   browser.waitForAngular();
-  editor.exitTutorialIfNecessary();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.exitTutorial();
 };
 
 var openPlayer = function(explorationId) {
@@ -194,6 +204,7 @@ var checkConsoleErrorsExist = function(expectedErrors) {
 
 exports.acceptAlert = acceptAlert;
 exports.waitForSystem = waitForSystem;
+exports.waitForLoadingMessage = waitForLoadingMessage;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 

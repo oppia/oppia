@@ -16,7 +16,7 @@
  * @fileoverview Page object for the subscription dashboard,
  * for use in Protractor tests.
  */
-
+var general = require('./general.js');
 var until = protractor.ExpectedConditions;
 
 var SubscriptionDashboardPage = function() {
@@ -27,6 +27,7 @@ var SubscriptionDashboardPage = function() {
 
   this.navigateToUserSubscriptionPage = function(userName) {
     browser.get('/profile/' + userName);
+    return general.waitForLoadingMessage();
   };
 
   this.expectSubscriptionFirstNameToMatch = function(name) {

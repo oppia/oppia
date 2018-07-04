@@ -103,7 +103,7 @@ describe('State editor', function() {
     explorationEditorMainTab.getResponseEditor('default').setDestination(
       'final card', true, null);
 
-    // Setup a terminating state
+    // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
@@ -219,7 +219,7 @@ describe('State editor', function() {
   });
 
   it('should correctly display contents, rule parameters, feedback' +
-  'instructions and newly created state', function() {
+  ' instructions and newly created state', function() {
     users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
     users.login('stateEditorUser1@example.com');
     workflow.createExploration();
@@ -232,7 +232,7 @@ describe('State editor', function() {
     explorationEditorMainTab.expectInteractionToMatch(
       'TextInput', 'How are you?', 5);
     // Verify rule parameter input by checking editor's response tab.
-    // Create new state 'I am happy' for 'happy' rule
+    // Create new state 'I am happy' for 'happy' rule.
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('You must be happy!'),
       'I am happy', true, 'FuzzyEquals', 'happy');
@@ -240,10 +240,10 @@ describe('State editor', function() {
       'TextInput', 'FuzzyEquals', ['"happy"']);
     explorationEditorMainTab.getResponseEditor(0)
       .expectFeedbackInstructionToBe('You must be happy!');
-    // Verify newly created state
+    // Verify newly created state.
     explorationEditorMainTab.moveToState('I am happy');
     explorationEditorMainTab.expectCurrentStateToBe('I am happy');
-    // Go back, create default response (try again) and verify response
+    // Go back, create default response (try again) and verify response.
     explorationEditorMainTab.moveToState('Introduction');
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('You cannot be sad!'),
@@ -295,7 +295,7 @@ describe('State editor', function() {
       'MultipleChoiceInput', null, 'card 2', false, 'Equals', 'return');
     explorationEditorMainTab.getResponseEditor('default').setDestination(
       'final card', true, null);
-    // Setup a terminating state
+    // Setup a terminating state.
     explorationEditorMainTab.moveToState('final card');
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.saveChanges();
@@ -330,7 +330,7 @@ describe('State editor', function() {
     users.createUser('stateEditorUser2@example.com', 'stateEditorUser2');
     users.login('stateEditorUser2@example.com');
     workflow.createExploration();
-    // Verify interaction and response is created correctly
+    // Verify interaction and response is created correctly.
     explorationEditorMainTab.setStateName('1st Question');
     explorationEditorMainTab.setContent(
       forms.toRichText('Exploration w/ Hint'));
@@ -377,7 +377,7 @@ describe('State editor', function() {
       new ExplorationPlayerPage.ExplorationPlayerPage());
     users.createUser('user1@hintsAndSolutions.com', 'hintsAndSolutions');
 
-    // Creator creates and publishes an exploration
+    // Creator creates and publishes an exploration.
     users.login('user1@hintsAndSolutions.com');
     workflow.createExploration();
 
@@ -430,7 +430,7 @@ describe('State editor', function() {
       new ExplorationPlayerPage.ExplorationPlayerPage();
     var explorationStatsTab = explorationEditorPage.getStatsTab();
 
-    // Creator creates and publishes an exploration
+    // Creator creates and publishes an exploration.
     users.login('user1@statisticsTab.com');
     workflow.createExploration();
 
