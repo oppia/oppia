@@ -162,6 +162,7 @@ var ExplorationEditorMainTab = function() {
 
     expect(element(by.css('.protractor-test-welcome-modal')).isPresent())
       .toBe(false);
+    browser.wait(until.invisibilityOf(editorWelcomeModal), 5000);
 
     // Otherwise, if the editor tutorial shows up, exit it.
     element.all(by.css('.skipBtn')).then(function(buttons) {
@@ -175,13 +176,13 @@ var ExplorationEditorMainTab = function() {
 
   this.finishTutorial = function() {
     // Finish the tutorial.
-    element.all(by.buttonText('Finish')).then(function(buttons) {
+    var finishTutorialButton = element.all(by.buttonText('Finish'));
+    finishTutorialButton.then(function(buttons) {
       if (buttons.length === 1) {
         buttons[0].click().then(function(){
           // Making sure tutorial modal is closed
-          browser.wait(until.elementToBeClickable(neutralElement), 5000,
-            'Tutorial modal taking too long to close');
-          neutralElement.click();
+          browser.wait(until.invisibilityOf(finishTutorialButton), 5000,
+            'Tutorial is not closed');
         });
       } else {
         throw 'Expected to find exactly one \'Finish\' button';
@@ -264,9 +265,8 @@ var ExplorationEditorMainTab = function() {
     // Close new response modal.
     expect(addNewResponseButton.isDisplayed()).toBe(true);
     addNewResponseButton.click();
-    browser.wait(until.presenceOf(neutralElement), 5000,
-      'neutralElement taking too long to appear in addResponse');
-    neutralElement.click();
+    browser.wait(until.invisibilityOf(addNewResponseButton), 5000,
+      'Add New Response Modal is not closed');
   };
 
   // Rules are zero-indexed; 'default' denotes the default outcome.
@@ -282,7 +282,13 @@ var ExplorationEditorMainTab = function() {
     responseBody(responseNum).isPresent().then(function(isVisible) {
       if (!isVisible) {
         expect(headerElem.isDisplayed()).toBe(true);
-        headerElem.click();
+        browser.wait(until.elementToBeClickable(headerElem), 5000,
+          'Response Editor header is not clickable')
+          .then(function(isClickable) {
+            if (isClickable) {
+              headerElem.click();
+            }
+          });
       }
     });
 
@@ -442,12 +448,12 @@ var ExplorationEditorMainTab = function() {
   this.setContent = function(richTextInstructions) {
   // Wait for browser to completely load the rich text editor.
     browser.waitForAngular();
-    browser.wait(until.presenceOf(stateEditContent), 5000,
+    browser.wait(until.elementToBeClickable(stateEditContent), 10000,
       'stateEditContent taking too long to appear to set content');
     stateEditContent.click();
     var stateContentEditor = element(
       by.css('.protractor-test-state-content-editor'));
-    browser.wait(until.presenceOf(stateContentEditor), 5000,
+    browser.wait(until.visibilityOf(stateContentEditor), 5000,
       'stateContentEditor taking too long to appear to set content');
     var richTextEditor = forms.RichTextEditor(stateContentEditor);
     richTextEditor.clear();
@@ -486,10 +492,8 @@ var ExplorationEditorMainTab = function() {
     browser.wait(until.elementToBeClickable(saveHintButton), 5000,
       'Save Hint button takes too long to appear');
     saveHintButton.click();
-    // Click on neutral element to make sure modal is closed.
     browser.wait(until.invisibilityOf(addHintModal), 5000,
       'Add Hint modal takes too long to close');
-    neutralElement.click();
   };
 
   // Hints are zero-indexed.
@@ -547,10 +551,8 @@ var ExplorationEditorMainTab = function() {
     browser.wait(until.elementToBeClickable(submitSolutionButton), 5000,
       'Submit Solution button takes too long to appear');
     submitSolutionButton.click();
-    // Click on neutral element to make sure modal is closed.
     browser.wait(until.invisibilityOf(addOrUpdateSolutionModal), 5000,
       'Add/Update Solution modal takes too long to close');
-    neutralElement.click();
   };
 
   // INTERACTIONS
@@ -570,10 +572,8 @@ var ExplorationEditorMainTab = function() {
             });
         }
       });
-    // Click on neutral element to make sure modal is closed.
     browser.wait(until.invisibilityOf(confirmDeleteInteractionButton), 5000,
       'Delete Interaction modal takes too long to close');
-    neutralElement.click();
   };
 
   // This function should be used as the standard way to specify interactions
@@ -583,9 +583,7 @@ var ExplorationEditorMainTab = function() {
     createNewInteraction(interactionId);
     customizeInteraction.apply(null, arguments);
     closeAddResponseModal();
-    // Click on neutral element to make sure modal is closed.
     browser.wait(until.invisibilityOf(addResponseHeader), 5000);
-    neutralElement.click();
   };
 
   // This function should not usually be invoked directly; please consider
@@ -909,10 +907,9 @@ var ExplorationEditorMainTab = function() {
     stateNameInput.clear();
     stateNameInput.sendKeys(name);
     expect(stateNameSubmitButton.isDisplayed()).toBe(true);
-    stateNameSubmitButton.click().then(function() {
-      // Wait for the state to refresh.
-      general.waitForSystem();
-    });
+    stateNameSubmitButton.click();
+    // Wait for the state to refresh.
+    browser.wait(until.invisibilityOf(stateNameSubmitButton), 5000);
     _expectNewStateNameToMatch(name);
   };
 
