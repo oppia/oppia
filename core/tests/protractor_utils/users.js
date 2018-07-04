@@ -55,7 +55,12 @@ var _completeSignup = function(username) {
 var createUser = function(email, username) {
   login(email);
   _completeSignup(username);
-  general.waitForSystem();
+  var until = protractor.ExpectedConditions;
+  var learnerDashboardElem = element(
+    by.css('.protractor-test-learner-dashboard-container'));
+  browser.wait(
+    until.visibilityOf(learnerDashboardElem),
+    5000, 'Learner Dashboard container is not visible');
   logout();
 };
 
