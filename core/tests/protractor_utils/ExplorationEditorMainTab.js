@@ -692,47 +692,92 @@ var ExplorationEditorMainTab = function() {
   // This function adds a multiple-choice parameter change, creating the
   // parameter if necessary.
   this.addMultipleChoiceParameterChange = function(paramName, paramValues) {
-    editParamChanges.click();
-    addParamButon.click();
+    browser.wait(until.elementToBeClickable(editParamChanges), 5000,
+      'Edit Param Changes is not clickable').then(function(isClickable) {
+      if (isClickable) {
+        editParamChanges.click().then(function() {
+          browser.wait(until.elementToBeClickable(addParamButon), 5000,
+            'Add Param button is not clickable').then(function(isClickable) {
+            if (isClickable) {
+              addParamButon.click();
+            }
+          });
+        });
+      }
+    });
 
     var editorRowElem = element.all(by.css(
       '.protractor-test-param-changes-list')).last();
 
     forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
 
-    editorRowElem.element(by.cssContainingText('option', 'to one of')).click();
-
-    paramValues.forEach(function(paramValue) {
-      var item = editorRowElem.all(by.tagName('input')).last();
-      item.clear();
-      item.sendKeys(paramValue);
+    var editorRowOption = editorRowElem.element(
+      by.cssContainingText('option', 'to one of'));
+    browser.wait(until.elementToBeClickable(editorRowOption), 5000,
+      'Param Options are not clickable').then(function(isClickable) {
+      if (isClickable) {
+        editorRowOption.click();
+        paramValues.forEach(function(paramValue) {
+          var item = editorRowElem.all(by.tagName('input')).last();
+          item.clear();
+          item.sendKeys(paramValue);
+        });
+      }
     });
 
-    saveParamChangesButton.click();
+    browser.wait(until.elementToBeClickable(saveParamChangesButton), 5000,
+      'Save Param Changesbutton is not clickable')
+      .then(function(isClickable) {
+        if (isClickable) {
+          saveParamChangesButton.click();
+        }
+      });
 
-    general.waitForSystem(500);
+    browser.wait(until.invisibilityOf(saveParamChangesButton), 5000);
   };
 
   // This function adds a parameter change, creating the parameter if necessary.
   this.addParameterChange = function(paramName, paramValue) {
-    editParamChanges.click();
-    addParamButon.click();
+    browser.wait(until.elementToBeClickable(editParamChanges), 5000,
+      'Edit Param Changes is not clickable').then(function(isClickable) {
+      if (isClickable) {
+        editParamChanges.click();
+        browser.wait(until.elementToBeClickable(addParamButon), 5000,
+          'Add Param button is not clickable').then(function(isClickable) {
+          if (isClickable) {
+            addParamButon.click();
+          }
+        });
+      }
+    });
 
     var editorRowElem = element.all(by.css(
       '.protractor-test-param-changes-list')).last();
 
     forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
 
-    /* Setting parameter value is difficult via css since input fields
+    var item = editorRowElem.all(by.tagName('input')).last();
+    browser.wait(until.elementToBeClickable(item), 5000,
+      'Param Options are not clickable').then(function(isClickable) {
+      if (isClickable) {
+        /* Setting parameter value is difficult via css since input fields
     are dynamically generated. We isolate it as the last input in the
     current parameter changes UI. */
-    var item = editorRowElem.all(by.tagName('input')).last();
-    item.clear();
-    item.sendKeys(paramValue);
+        item.click();
+        item.clear();
+        item.sendKeys(paramValue);
+      }
+    });
 
-    saveParamChangesButton.click();
+    browser.wait(until.elementToBeClickable(saveParamChangesButton), 5000,
+      'Save Param Changesbutton is not clickable')
+      .then(function(isClickable) {
+        if (isClickable) {
+          saveParamChangesButton.click();
+        }
+      });
 
-    general.waitForSystem(500);
+    browser.wait(until.invisibilityOf(saveParamChangesButton), 5000);
   };
 
   // RULES
@@ -908,10 +953,19 @@ var ExplorationEditorMainTab = function() {
     stateNameContainer.click();
     stateNameInput.clear();
     stateNameInput.sendKeys(name);
-    expect(stateNameSubmitButton.isDisplayed()).toBe(true);
-    stateNameSubmitButton.click();
-    // Wait for the state to refresh.
-    browser.wait(until.invisibilityOf(stateNameSubmitButton), 5000);
+    browser.wait(until.elementToBeClickable(stateNameSubmitButton), 5000,
+      'State Name Submit button takes too long to appear')
+      .then(function(isClickable) {
+        if (isClickable) {
+          stateNameSubmitButton.click();
+          // Wait for state name container to completely disappear
+          // and re-appear again.
+          general.waitForSystem();
+        }
+      });
+    browser.wait(until.textToBePresentInElement(stateNameContainer, name),
+      5000, 'Current state name is:' + stateNameContainer.getText() +
+      'instead of expected ' + name);
   };
 
   this.expectCurrentStateToBe = function(name) {
