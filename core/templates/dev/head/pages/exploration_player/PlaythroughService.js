@@ -196,11 +196,20 @@ oppia.factory('PlaythroughService', [
       isPlayerExcludedFromSamplePopulation: function() {
         return !isPlayerInSamplePopulation;
       },
+      isExplorationBlacklisted: function(expId) {
+        if (expId.indexOf(
+          constants.WHITELISTED_EXPLORATION_IDS_FOR_SAVING_PLAYTHROUGHS) >
+            -1) {
+          return false;
+        }
+        return true;
+      },
       getPlaythrough: function() {
         return playthrough;
       },
       recordExplorationStartAction: function(initStateName) {
-        if (this.isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation() ||
+            this.isExplorationBlacklisted(playthrough.expId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -222,7 +231,8 @@ oppia.factory('PlaythroughService', [
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
-        if (this.isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation() ||
+            this.isExplorationBlacklisted(playthrough.explorationId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -261,7 +271,8 @@ oppia.factory('PlaythroughService', [
       },
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
-        if (this.isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation() ||
+            this.isExplorationBlacklisted(playthrough.explorationId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -278,7 +289,8 @@ oppia.factory('PlaythroughService', [
         ));
       },
       recordPlaythrough: function(isExplorationComplete) {
-        if (this.isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation() ||
+            this.isExplorationBlacklisted(playthrough.explorationId)) {
           return;
         }
         if (isExplorationComplete) {
