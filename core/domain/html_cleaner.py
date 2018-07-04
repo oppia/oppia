@@ -517,7 +517,7 @@ def convert_to_ckeditor(html_data):
     # Invalid html: <ul><li>...</li><ul><ul><li>...</li></ul></ul></ul>
     # Valid html: <ul><li>...<ul><li>...</li></ul></li></ul>
     # i.e. if any ol/ul has parent as ol/ul and a previous sibling as li
-    # it is wrapped in it's previous sibling. If there is no previous sibling,
+    # it is wrapped in its previous sibling. If there is no previous sibling,
     # the tag is unwrapped.
     list_tags = ['ol', 'ul']
     for tag_name in list_tags:
