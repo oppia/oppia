@@ -19,6 +19,7 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
+var until = protractor.ExpectedConditions;
 
 var ExplorationEditorSettingsTab = function() {
   /*
