@@ -369,6 +369,15 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
             yield ('ERROR get_exp_from_model: exp_id %s' % item.id, str(e))
             return
 
+        # Commit commands which are required to generate state id mapping for
+        # given version of exploration from previous version of exploration.
+        RELEVANT_COMMIT_CMDS = [
+            exp_domain.CMD_ADD_STATE,
+            exp_domain.CMD_RENAME_STATE,
+            exp_domain.CMD_DELETE_STATE,
+            exp_models.ExplorationModel.CMD_REVERT_COMMIT
+        ]
+
         explorations = []
 
         # Fetch all versions of the exploration, if they exist.
@@ -408,8 +417,11 @@ class ExplorationStateIdMappingJob(jobs.BaseMapReduceOneOffJobManager):
                         exploration.id, exploration.version))
                 return
 
-            change_list = [exp_domain.ExplorationChange(
-                change_cmd) for change_cmd in snapshot['commit_cmds']]
+            change_list = [
+                exp_domain.ExplorationChange(change_cmd)
+                for change_cmd in snapshot['commit_cmds']
+                if change_cmd['cmd'] in RELEVANT_COMMIT_CMDS
+            ]
 
             try:
                 # Check if commit is to revert the exploration.
