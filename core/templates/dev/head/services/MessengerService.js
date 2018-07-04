@@ -96,13 +96,6 @@ oppia.factory('MessengerService', ['$log', '$window', function($log, $window) {
       // TODO(sll): Delete/deprecate 'reset exploration' from the list of
       // events sent to a container page.
 
-      // Run each post-completion hook on exploration completion.
-      if (messageTitle === 'explorationCompleted') {
-        for (var i = 0; i < GLOBALS.POST_COMPLETION_HOOKS.length; i++) {
-          GLOBALS.POST_COMPLETION_HOOKS[i](messageData);
-        }
-      }
-
       // Only send a message to the parent if the oppia window is iframed and
       // a hash is passed in.
       var rawHash = $window.location.hash.substring(1);

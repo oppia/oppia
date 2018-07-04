@@ -25,9 +25,6 @@ describe('Exploration rights service', function() {
 
     beforeEach(inject(function($injector) {
       ers = $injector.get('ExplorationRightsService');
-
-      GLOBALS.ACTIVITY_STATUS_PRIVATE = 'private';
-      GLOBALS.ACTIVITY_STATUS_PUBLIC = 'public';
     }));
 
     it('correctly initializes the service', function() {
