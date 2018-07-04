@@ -49,9 +49,9 @@
              style="margin-bottom: 20px;">
           <div ng-if="activityList.length === 0"
                style="font-size: 1.2em; padding-bottom: 40px; padding-top: 40px;">
-              <p style="text-align: center;">
-                <span translate="I18N_LIBRARY_NO_EXPLORATIONS"></span>
-              </p>
+            <p style="text-align: center;">
+              <span translate="I18N_LIBRARY_NO_EXPLORATIONS"></span>
+            </p>
           </div>
 
           <div ng-if="activityList.length > 0"
@@ -158,7 +158,8 @@
                 <i class="material-icons">&#xE315;</i>
               </md-button>
               <div class="oppia-library-carousel-scroller"
-                   ng-if="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]"></div>
+                   ng-if="(group.activity_summary_dicts.length - tileDisplayCount) <= leftmostCardIndices[$index]">
+              </div>
             </div>
 
             <div ng-if="libraryWindowIsNarrow && leftmostCardIndices">
