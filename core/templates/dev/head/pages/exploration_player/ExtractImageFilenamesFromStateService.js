@@ -126,15 +126,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         var filename = JSON.parse(
           imageTagList[i].getAttribute('filepath-with-value'));
         // The images already there in Oppia have image filenames as the value
-        // for the attribute 'filepath-with-value'. We later on want to have
-        // it's value as the following object of the form --
-        // {
-        //    name: filename,
-        //    width: widthOfImage,
-        //    height: heightOfImage
-        // }
-        // So, we create an object similar to it for the images with default
-        // dimensions of 500px x 200px
+        // for the attribute 'filepath-with-value'.
+        // We create an object for the images with default dimensions of
+        // 500px x 200px
         var filepathObject = {
           name: filename,
           width: 500,
@@ -187,14 +181,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
         var filename = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
-        var filepathObject = {
-          name: filename,
+        fileDimensions[filename] = {
           width: 500,
           height: 200
-        };
-        fileDimensions[filepathObject.name] = {
-          width: filepathObject.width,
-          height: filepathObject.height
         };
       }
       var allHtmlOfState = _getAllHtmlOfState(state);
