@@ -426,21 +426,20 @@ def get_all_user_ids_who_are_allowed_to_review(score_category):
                 score_category)]
 
 
-def update_score_of_user_for_category(user_id, score_category, update_by):
-    """Update the score of the user in the category by the given amount.
+def increment_score_for_user(user_id, score_category, increment_by):
+    """Increment the score of the user in the category by the given amount.
 
-    In the first version of the scoring system, the update_by quantity will be
-    +1, i.e, each user gains a point for a successful contribution and doesn't
-    lose score in any way.
+    In the first version of the scoring system, the increment_by quantity will
+    be +1, i.e, each user gains a point for a successful contribution and
+    doesn't lose score in any way.
 
     Args:
         user_id: str. The id of the user.
         score_category: str. The category of the suggestion.
-        update_by: float. The amount to increase or decrease the score of the
-            user by.
+        increment_by: float. The amount to increase the score of the user by.
     """
-    user_models.UserContributionScoringModel.update_score_for_user(
-        user_id, score_category, update_by)
+    user_models.UserContributionScoringModel.increment_score_for_user(
+        user_id, score_category, increment_by)
 
 
 def create_new_user_contribution_scoring_model(user_id, score_category, score):

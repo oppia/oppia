@@ -611,16 +611,11 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
             'user2', 'category1', 0)
 
     def test_update_score_for_user(self):
-        suggestion_services.update_score_of_user_for_category(
-            'user1', 'category1', 1)
-        suggestion_services.update_score_of_user_for_category(
-            'user2', 'category1', 5)
-        suggestion_services.update_score_of_user_for_category(
-            'user1', 'category2', 15.2)
-        suggestion_services.update_score_of_user_for_category(
-            'user2', 'category2', 2)
-        suggestion_services.update_score_of_user_for_category(
-            'user1', 'category1', -1)
+        suggestion_services.increment_score_for_user('user1', 'category1', 1)
+        suggestion_services.increment_score_for_user('user2', 'category1', 5)
+        suggestion_services.increment_score_for_user('user1', 'category2', 15.2)
+        suggestion_services.increment_score_for_user('user2', 'category2', 2)
+        suggestion_services.increment_score_for_user('user1', 'category1', -1)
 
         scores1 = suggestion_services.get_all_scores_of_user('user1')
         self.assertEqual(scores1['category1'], 0)
@@ -634,14 +629,10 @@ class UserContributionScoringUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(scores3, {})
 
     def get_all_user_ids_who_are_allowed_to_review(self):
-        suggestion_services.update_score_of_user_for_category(
-            'user1', 'category1', 1)
-        suggestion_services.update_score_of_user_for_category(
-            'user2', 'category1', 5)
-        suggestion_services.update_score_of_user_for_category(
-            'user1', 'category2', 15.2)
-        suggestion_services.update_score_of_user_for_category(
-            'user2', 'category2', 2)
+        suggestion_services.increment_score_for_user('user1', 'category1', 1)
+        suggestion_services.increment_score_for_user('user2', 'category1', 5)
+        suggestion_services.increment_score_for_user('user1', 'category2', 15.2)
+        suggestion_services.increment_score_for_user('user2', 'category2', 2)
         with self.swap(
             suggestion_models, 'MINIMUM_SCORE_REQUIRED_TO_REVIEW', 10):
             user_ids = (
