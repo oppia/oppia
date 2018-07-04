@@ -118,13 +118,6 @@ oppia.factory('TopicUpdateService', [
       return _getParameterFromChangeDict(changeDict, 'new_value');
     };
 
-    var _checkIfSkillIdInList = function(skillId, skillIdList) {
-      if (skillIdList.indexOf(skillId) === -1) {
-        return false;
-      }
-      return true;
-    };
-
     var _getSubtopicIdFromChangeDict = function(changeDict) {
       return _getParameterFromChangeDict(changeDict, 'subtopic_id');
     };
@@ -216,8 +209,6 @@ oppia.factory('TopicUpdateService', [
         if (!subtopic) {
           throw Error('Subtopic doesn\'t exist');
         }
-        var title = subtopic.getTitle();
-        var skillIds = subtopic.getSkillIds();
         var newlyCreated = false;
         var changeList = UndoRedoService.getCommittableChangeList();
         for (var i = 0; i < changeList.length; i++) {
@@ -230,20 +221,75 @@ oppia.factory('TopicUpdateService', [
           // Get the current change list.
           var currentChangeList = UndoRedoService.getChangeList();
           var indicesToDelete = [];
+          // Loop over the current changelist and handle all the cases where
+          // a skill moved into the subtopic or moved out of it.
+          for (var i = 0; i < currentChangeList.length; i++) {
+            var changeDict =
+              currentChangeList[i].getBackendChangeObject();
+            if (changeDict.cmd === CMD_MOVE_SKILL_ID_TO_SUBTOPIC) {
+              // If a skill was moved into the subtopic, then that change is
+              // modified to have the skill move into the uncategorized section
+              // since after this delete, it would be as if this subtopic never
+              // existed.
+              if (changeDict.new_subtopic_id === subtopicId) {
+                // If the origin of the move operation was the uncategorized
+                // section itself, delete that change, since no change is to be
+                // done following the previous comment.
+                if (changeDict.old_subtopic_id === null) {
+                  indicesToDelete.push(i);
+                } else {
+                  // Change the move operation to the deleted subtopic to a
+                  // remove operation, to move that skill into the uncategorized
+                  // section from its origin.
+                  changeDict.cmd = CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC;
+                  changeDict.subtopic_id = changeDict.old_subtopic_id;
+                  delete changeDict.old_subtopic_id;
+                  delete changeDict.new_subtopic_id;
+                }
+              } else if (changeDict.old_subtopic_id === subtopicId) {
+                // Any operation where a skill was moved out of this subtopic
+                // would now be equivalent to a move out from the uncategorized
+                // section, as a newly created subtopic wouldn't have any skills
+                // of its own initially, and any skills moved into it have been
+                // shifted to the uncategorized section.
+                changeDict.old_subtopic_id = null;
+              }
+            } else if (changeDict.cmd === CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC) {
+              // If a skill was removed from this subtopic, then that change
+              // should be deleted, since all skills moved into the subtopic
+              // have already been moved into the uncategorized section.
+              if (changeDict.subtopic_id === subtopicId) {
+                indicesToDelete.push(i);
+              }
+            }
+            currentChangeList[i].setBackendChangeObject(changeDict);
+          }
           for (var i = 0; i < currentChangeList.length; i++) {
             var backendChangeDict =
               currentChangeList[i].getBackendChangeObject();
-            if (backendChangeDict.subtopic_id === subtopicId) {
-              // The indices in the change list corresponding to changes to the
-              // currently deleted and newly created subtopic are to be removed
-              // from the list.
-              indicesToDelete.push(i);
-              continue;
+            if (backendChangeDict.hasOwnProperty('subtopic_id')) {
+              if (backendChangeDict.subtopic_id === subtopicId) {
+                // The indices in the change list corresponding to changes to
+                // the currently deleted and newly created subtopic are to be
+                // removed from the list.
+                indicesToDelete.push(i);
+                continue;
+              }
+              // When a newly created subtopic is deleted, the subtopics created
+              // after it would have their id reduced by 1.
+              if (backendChangeDict.subtopic_id > subtopicId) {
+                backendChangeDict.subtopic_id--;
+              }
             }
-            // When a newly created subtopic is deleted, the subtopics created
-            // after it would have their id reduced by 1.
-            if (backendChangeDict.subtopic_id > subtopicId) {
-              backendChangeDict.subtopic_id--;
+            if (backendChangeDict.hasOwnProperty('old_subtopic_id')) {
+              if (backendChangeDict.old_subtopic_id > subtopicId) {
+                backendChangeDict.old_subtopic_id--;
+              }
+            }
+            if (backendChangeDict.hasOwnProperty('new_subtopic_id')) {
+              if (backendChangeDict.new_subtopic_id > subtopicId) {
+                backendChangeDict.new_subtopic_id--;
+              }
             }
             // Apply the above id reduction changes to the backend change.
             currentChangeList[i].setBackendChangeObject(backendChangeDict);
@@ -272,12 +318,11 @@ oppia.factory('TopicUpdateService', [
       },
 
       /**
-       * Moves a skill id to a subtopic from either another subtopic or
-       * uncategorized skill ids and records the change in
-       * the undo/redo service.
+       * Moves a skill to a subtopic from either another subtopic or
+       * uncategorized skills and records the change in the undo/redo service.
        */
-      moveSkillIdToSubtopic: function(
-          topic, oldSubtopicId, newSubtopicId, skillId) {
+      moveSkillToSubtopic: function(
+          topic, oldSubtopicId, newSubtopicId, skillSummary) {
         if (newSubtopicId === null) {
           throw Error('New subtopic cannot be null');
         }
@@ -288,47 +333,52 @@ oppia.factory('TopicUpdateService', [
         _applyChange(topic, CMD_MOVE_SKILL_ID_TO_SUBTOPIC, {
           old_subtopic_id: oldSubtopicId,
           new_subtopic_id: newSubtopicId,
-          skill_id: skillId,
+          skill_id: skillSummary.getId(),
           change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
           if (oldSubtopicId === null) {
-            topic.removeUncategorizedSkillId(skillId);
+            topic.removeUncategorizedSkill(skillSummary.getId());
           } else {
-            oldSubtopic.removeSkillId(skillId);
+            oldSubtopic.removeSkill(skillSummary.getId());
           }
-          newSubtopic.addSkillId(skillId);
+          newSubtopic.addSkill(
+            skillSummary.getId(), skillSummary.getDescription());
         }, function(changeDict, topic) {
           // Undo.
-          newSubtopic.removeSkillId(skillId);
+          newSubtopic.removeSkill(skillSummary.getId());
           if (oldSubtopicId === null) {
-            topic.addUncategorizedSkillId(skillId);
+            topic.addUncategorizedSkill(
+              skillSummary.getId(), skillSummary.getDescription());
           } else {
-            oldSubtopic.addSkillId(skillId);
+            oldSubtopic.addSkill(
+              skillSummary.getId(), skillSummary.getDescription());
           }
         });
       },
 
       /**
-       * Moves a skill id from a subtopic to uncategorized skill ids and records
-       * the change in the undo/redo service.
+       * Moves a skill from a subtopic to uncategorized skills
+       * and records the change in the undo/redo service.
        */
-      removeSkillIdFromSubtopic: function(topic, subtopicId, skillId) {
+      removeSkillFromSubtopic: function(topic, subtopicId, skillSummary) {
         var subtopic = topic.getSubtopicById(subtopicId);
         _applyChange(topic, CMD_REMOVE_SKILL_ID_FROM_SUBTOPIC, {
           subtopic_id: subtopicId,
-          skill_id: skillId,
+          skill_id: skillSummary.getId(),
           change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
-          subtopic.removeSkillId(skillId);
-          if (!_checkIfSkillIdInList(skillId, subtopic.getSkillIds())) {
-            topic.addUncategorizedSkillId(skillId);
+          subtopic.removeSkill(skillSummary.getId());
+          if (!topic.hasUncategorizedSkill(skillSummary.getId())) {
+            topic.addUncategorizedSkill(
+              skillSummary.getId(), skillSummary.getDescription());
           }
         }, function(changeDict, topic) {
           // Undo.
-          subtopic.addSkillId(skillId);
-          topic.removeUncategorizedSkillId(skillId);
+          subtopic.addSkill(
+            skillSummary.getId(), skillSummary.getDescription());
+          topic.removeUncategorizedSkill(skillSummary.getId());
         });
       },
 
@@ -466,44 +516,46 @@ oppia.factory('TopicUpdateService', [
       },
 
       /**
-       * Adds an uncategorized skill id to a topic and records the change
+       * Adds an uncategorized skill to a topic and records the change
        * in the undo/redo service.
        */
-      addUncategorizedSkillId: function(topic, skillId) {
+      addUncategorizedSkill: function(topic, skillSummary) {
         _applyChange(topic, CMD_ADD_UNCATEGORIZED_SKILL_ID, {
-          new_uncategorized_skill_id: skillId,
+          new_uncategorized_skill_id: skillSummary.getId(),
           change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
           var newSkillId = _getParameterFromChangeDict(
             changeDict, 'new_uncategorized_skill_id');
-          topic.addUncategorizedSkillId(newSkillId);
+          topic.addUncategorizedSkill(
+            newSkillId, skillSummary.getDescription());
         }, function(changeDict, topic) {
           // Undo.
           var newSkillId = _getParameterFromChangeDict(
             changeDict, 'new_uncategorized_skill_id');
-          topic.removeUncategorizedSkillId(newSkillId);
+          topic.removeUncategorizedSkill(newSkillId);
         });
       },
 
       /**
-       * Removes an uncategorized skill id to a topic and records the change
+       * Removes an uncategorized skill from a topic and records the change
        * in the undo/redo service.
        */
-      removeUncategorizedSkillId: function(topic, skillId) {
+      removeUncategorizedSkill: function(topic, skillSummary) {
         _applyChange(topic, CMD_REMOVE_UNCATEGORIZED_SKILL_ID, {
-          uncategorized_skill_id: skillId,
+          uncategorized_skill_id: skillSummary.getId(),
           change_affects_subtopic_page: false
         }, function(changeDict, topic) {
           // Apply.
           var newSkillId = _getParameterFromChangeDict(
             changeDict, 'uncategorized_skill_id');
-          topic.removeUncategorizedSkillId(newSkillId);
+          topic.removeUncategorizedSkill(newSkillId);
         }, function(changeDict, topic) {
           // Undo.
           var newSkillId = _getParameterFromChangeDict(
             changeDict, 'uncategorized_skill_id');
-          topic.addUncategorizedSkillId(newSkillId);
+          topic.addUncategorizedSkill(
+            newSkillId, skillSummary.getDescription());
         });
       }
     };
