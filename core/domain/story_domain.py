@@ -407,10 +407,9 @@ class StoryContents(object):
         if not initial_node_is_present:
             raise utils.ValidationError('Expected starting node to exist.')
 
-        for node_id in node_id_list:
-            if node_id_list.count(node_id) > 1:
-                raise utils.ValidationError(
-                    'The node id %s is duplicated in the story.' % node_id)
+        if len(node_id_list) > len(set(node_id_list)):
+            raise utils.ValidationError(
+                'Expected all node ids to be distinct.')
 
         # nodes_queue stores the pending nodes to visit in the story that are
         # unlocked, in a 'queue' form with a First In First Out structure.

@@ -1,5 +1,24 @@
 <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak">
-  <li style="margin-right: 20px; margin-top: 8px;">
+  <li ng-class="{'active': true, 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>">
+    <a uib-tooltip="Editor" class="protractor-test-main-tab">
+      <i class="material-icons">&#xE254;</i>
+    </a>
+    <div ng-show="getWarningsCount()"
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color">
+      <span class="oppia-editor-warnings-count">
+        <[getWarningsCount()]>
+      </span>
+    </div>
+    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
+      <span class="oppia-editor-warnings-header">Warnings</span>
+      <li class="oppia-editor-warnings-text"
+          ng-repeat="issue in validationIssues track by $index">
+        <hr class="oppia-editor-warnings-separator">
+        <[issue]>
+      </li>
+    </ul>
+  </li>
+  <li style="margin-right: 20px; margin-top: 8px; margin-left: 10px;">
     <button class="btn btn-default oppia-save-draft-button"
             ng-class="{'btn-success': isStorySaveable()}"
             ng-click="saveChanges()"

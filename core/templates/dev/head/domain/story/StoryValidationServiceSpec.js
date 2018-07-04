@@ -39,16 +39,16 @@ describe('Story validation service', function() {
         nodes: [
           {
             id: 'node_1',
-            prerequisite_skill_ids: ['skill_1'],
-            acquired_skill_ids: ['skill_2'],
+            prerequisite_skill_ids: ['skill_2'],
+            acquired_skill_ids: ['skill_3'],
             destination_node_ids: [],
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false
           }, {
             id: 'node_2',
-            prerequisite_skill_ids: ['skill_3'],
-            acquired_skill_ids: ['skill_4'],
+            prerequisite_skill_ids: ['skill_1'],
+            acquired_skill_ids: ['skill_2', 'skill_3'],
             destination_node_ids: ['node_1'],
             outline: 'Outline 2',
             exploration_id: 'exp_1',
@@ -62,13 +62,19 @@ describe('Story validation service', function() {
       sampleStoryBackendObject);
   }));
 
+  it('should correctly validate a valid story', function() {
+    expect(
+      StoryValidationService.findValidationIssuesForStory(_sampleStory)
+    ).toEqual([]);
+  });
+
   it('should correctly validate story', function() {
     _sampleStory.setTitle('');
     _sampleStory.setDescription(123);
     _sampleStory.setNotes(123);
     _sampleStory.setLanguageCode(123);
     expect(
-      StoryValidationService.findValidationIssuesInStory(_sampleStory)
+      StoryValidationService.findValidationIssuesForStory(_sampleStory)
     ).toEqual([
       'Story title should be a non-empty string',
       'Story description should be a string',
@@ -80,7 +86,7 @@ describe('Story validation service', function() {
   it('should correctly validate node ids', function() {
     _sampleStory.getStoryContents().getNodes()[0].addDestinationNodeId('node1');
     expect(
-      StoryValidationService.findValidationIssuesInStory(_sampleStory)
+      StoryValidationService.findValidationIssuesForStory(_sampleStory)
     ).toEqual([
       'Each destination node id should be valid'
     ]);
@@ -90,18 +96,10 @@ describe('Story validation service', function() {
     _sampleStory.getStoryContents().getNodes()[0].addDestinationNodeId(
       'node_a');
     expect(
-      StoryValidationService.findValidationIssuesInStory(_sampleStory)
+      StoryValidationService.findValidationIssuesForStory(_sampleStory)
     ).toEqual([
       'Each destination node id should be valid'
     ]);
-
-    _sampleStory.getStoryContents().getNodes()[0].removeDestinationNodeId(
-      'node_a');
-    _sampleStory.getStoryContents().getNodes()[0].addDestinationNodeId(
-      'node_111');
-    expect(
-      StoryValidationService.findValidationIssuesInStory(_sampleStory)
-    ).toEqual([]);
   });
 
   it('should correctly validate story nodes', function() {
@@ -113,7 +111,7 @@ describe('Story validation service', function() {
       'node_1', 'node_1');
 
     expect(
-      StoryValidationService.findValidationIssuesInStory(_sampleStory)
+      StoryValidationService.findValidationIssuesForStory(_sampleStory)
     ).toEqual([
       'Node outline should be a string',
       'Exploration id should be a string or null',

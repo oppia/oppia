@@ -120,38 +120,131 @@ oppia.factory('StoryValidationService', [
 
     var _validateStoryContents = function(storyContents) {
       var issues = [];
+      var invalidStoryContents = false;
       if (!(storyContents instanceof StoryContentsObjectFactory)) {
         issues.push('Story contents should be StoryContents object');
-        return issues;
+        invalidStoryContents = true;
       }
       if (!_checkValidNodeId(storyContents.getInitialNodeId())) {
         issues.push('Invalid initial node id');
+        invalidStoryContents = true;
       }
       if (!_checkValidNodeId(storyContents.getNextNodeId())) {
         issues.push('Invalid next node id');
+        invalidStoryContents = true;
       }
       if (storyContents.getNodes().constructor !== Array) {
         issues.push('Story nodes should be an array');
-        return issues;
+        invalidStoryContents = true;
       }
       var nodes = storyContents.getNodes();
-      var allNodesValid = true;
       for (var i = 0; i < nodes.length; i++) {
         var nodeIssues = _validateNode(nodes[i]);
         if (nodeIssues.length > 0) {
-          allNodesValid = false;
+          invalidStoryContents = true;
         }
         issues = issues.concat(nodeIssues);
       }
-      if (!allNodesValid) {
+      if (invalidStoryContents) {
         return issues;
       }
+
       // Provided the nodes list is valid and each node in it is valid, the
-      // following check is done similar to the one in
-      // story_domain.StoryContents to check if each node can be visited with
-      // given parameters.
+      // prelimiary checks are done to see if the story node graph obtained is
+      // valid.
+      var nodeIds = storyContents.getNodes().map(function(node) {
+        return node.getId();
+      });
+      if ((new Set(nodeIds)).size !== nodeIds.length) {
+        issues.push('All node ids should be distinct');
+      }
+      var nextNodeIdNumber = parseInt(
+        storyContents.getNextNodeId().replace(NODE_ID_PREFIX, ''));
+      var initialNodeIsPresent = false;
+      for (var i = 0; i < nodes.length; i++) {
+        var nodeIdNumber = parseInt(
+          nodes[i].getId().replace(NODE_ID_PREFIX, ''));
+        if (nodes[i].getId() === storyContents.getInitialNodeId()) {
+          initialNodeIsPresent = true;
+        }
+        if (nodeIdNumber > nextNodeIdNumber) {
+          issues.push(
+            'Node id out of bounds for node with id ' + nodes[i].getId());
+        }
+        for (var j = 0; j < nodes[i].getDestinationNodeIds().length; j++) {
+          if (nodeIds.indexOf(nodes[i].getDestinationNodeIds()[j]) === -1) {
+            issues.push(
+              'The node with id ' + nodes[i].getDestinationNodeIds()[j] +
+              ' doesn\'t exist');
+          }
+        }
+      }
+      if (!initialNodeIsPresent) {
+        issues.push('Initial node is not present in the story');
+      }
 
+      // All the validations above should be successfully completed before going
+      // to validating the story node graph.
+      if (issues.length > 0) {
+        return issues;
+      }
 
+      // nodesQueue stores the pending nodes to visit in a queue form.
+      var nodesQueue = [];
+      var nodeIsVisited = new Array(nodeIds.length).fill(false);
+      var startingNode = nodes[
+        storyContents.getNodeIndex(storyContents.getInitialNodeId())
+      ];
+      nodesQueue.push(startingNode.getId());
+
+      // The user is assumed to have all the prerequisite skills of the
+      // starting node before starting the story. Also, this list models the
+      // skill IDs acquired by a learner as they progress through the story.
+      simulatedSkillIds = new Set(startingNode.getPrerequisiteSkillIds());
+
+      // The following loop employs a Breadth First Search from the given
+      // starting node and makes sure that the user has acquired all the
+      // prerequisite skills required by the destination nodes 'unlocked' by
+      // visiting a particular node by the time that node is finished.
+      while (nodesQueue.length > 0) {
+        var currentNodeIndex = storyContents.getNodeIndex(nodesQueue.shift());
+        nodeIsVisited[currentNodeIndex] = true;
+        var currentNode = nodes[currentNodeIndex];
+
+        startingNode.getAcquiredSkillIds().forEach(function(skillId) {
+          simulatedSkillIds.add(skillId);
+        });
+        for (var i = 0; i < currentNode.getDestinationNodeIds().length; i++) {
+          var nodeId = currentNode.getDestinationNodeIds()[i];
+          var nodeIndex = storyContents.getNodeIndex(nodeId);
+          // The following condition checks whether the destination node
+          // for a particular node, has already been visited, in which case
+          // the story would have loops, which are not allowed.
+          if (nodeIsVisited[nodeIndex]) {
+            issues.push('Loops are not allowed in the node graph');
+            // If a loop is encountered, then all further checks are halted,
+            // since it can lead to same error being reported again.
+            return issues;
+          }
+          var destinationNode = nodes[nodeIndex];
+          destinationNode.getPrerequisiteSkillIds().forEach(function(skillId) {
+            if (!simulatedSkillIds.has(skillId)) {
+              issues.push(
+                'The prerequisite skill with id ' + skillId +
+                ' was not completed before node with id ' + nodeId +
+                ' was unlocked');
+            }
+          });
+          nodesQueue.push(nodeId);
+        }
+      }
+      for (var i = 0; i < nodeIsVisited.length; i++){
+        if (!nodeIsVisited[i]) {
+          issues.push(
+            'The node with id ' + nodeIds[i] +
+            ' is disconnected from the graph');
+        }
+      }
       return issues;
     };
 
@@ -185,7 +278,7 @@ oppia.factory('StoryValidationService', [
        * match the validations performed in the backend. This function is
        * expensive, so it should be called sparingly.
        */
-      findValidationIssuesInStory: function(story) {
+      findValidationIssuesForStory: function(story) {
         return _validateStory(story);
       }
     };
