@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for the Question controller."""
+"""Tests for the Question Editor controller."""
 
 import json
 
@@ -25,14 +25,14 @@ import feconf
 (question_models,) = models.Registry.import_models([models.NAMES.question])
 
 
-class QuestionsHandlersTest(test_utils.GenericTestBase):
+class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
     """Tests put and delete methods of questions handler, get method of
     questions batch handler, post method question creation handler and get
     method of question manager handler.
     """
 
     def setUp(self):
-        super(QuestionsHandlersTest, self).setUp()
+        super(EditableQuestionDataHandlerTest, self).setUp()
 
         self.exp_id = 'exp_1'
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
