@@ -432,6 +432,10 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300
 
+# The minimum score required for a user to review suggestions of a particular
+# category.
+MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
+
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
