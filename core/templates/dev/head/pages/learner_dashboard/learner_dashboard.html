@@ -224,7 +224,8 @@
                   ng-if="numberNonexistentIncompleteExplorations !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_EXPLORATIONS"
                     translate-values="{numberNonexistent: <[numberNonexistentIncompleteExplorations]>}"
-                    translate-interpolation="messageformat"></span>
+                    translate-interpolation="messageformat">
+              </span>
               &#9785
             </span>
 
@@ -251,7 +252,8 @@
                  aria-hidden="true"
                  ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                  uib-tooltip="Remove"
-                 tooltip-placement="top"></i>
+                 tooltip-placement="top">
+              </i>
               <exploration-summary-tile exploration-id="tile.id"
                                         exploration-title="tile.title"
                                         last-updated-msec="tile.last_updated_msec"
@@ -268,7 +270,8 @@
             <div class="oppia-learner-dashboard-page-portfolio"
                  ng-if="incompleteExplorationsList.length > 8">
               <i class="material-icons md-18"
-                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">&#xE5C4;</i>
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">&#xE5C4;
+              </i>
               Showing <[startIncompleteExpIndex + 1]> - <[Math.min(startIncompleteExpIndex + PAGE_SIZE, incompleteExplorationsList.length)]> of <[incompleteExplorationsList.length]>
               <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">&#xE5C8;</i>
             </div>
@@ -279,7 +282,8 @@
                   ng-if="numberNonexistentCompletedExplorations !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_EXPLORATIONS"
                     translate-values="{numberNonexistent: <[numberNonexistentCompletedExplorations]>}"
-                    translate-interpolation="messageformat"></span>
+                    translate-interpolation="messageformat">
+              </span>
               &#9785
             </span>
 
@@ -315,7 +319,8 @@
             <div class="oppia-learner-dashboard-page-portfolio"
                  ng-if="completedExplorationsList.length > 8">
               <i class="material-icons md-18"
-                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">&#xE5C4;</i>
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">&#xE5C4;
+              </i>
               Showing <[startCompletedExpIndex + 1]> - <[Math.min(startCompletedExpIndex + PAGE_SIZE, completedExplorationsList.length)]> of <[completedExplorationsList.length]>
               <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.EXPLORATIONS)">&#xE5C8;</i>
             </div>
@@ -330,7 +335,8 @@
                   ng-if="numberNonexistentExplorationsFromPlaylist !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_EXPLORATIONS_FROM_PLAYLIST"
                     translate-values="{numberNonexistent: <[numberNonexistentExplorationsFromPlaylist]>}"
-                    translate-interpolation="messageformat"></span>
+                    translate-interpolation="messageformat">
+              </span>
               &#9785
             </span>
 
@@ -359,7 +365,8 @@
                    style="color: black;"
                    ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                    uib-tooltip="Remove"
-                   tooltip-placement="top"></i>
+                   tooltip-placement="top">
+                </i>
                 <exploration-summary-tile style="height: 145px; display: block;"
                                           exploration-id="tile.id"
                                           exploration-title="tile.title"
@@ -383,7 +390,8 @@
                   ng-if="numberNonexistentIncompleteCollections !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_INCOMPLETE_COLLECTIONS"
                     translate-values="{numberNonexistent: <[numberNonexistentIncompleteCollections]>}"
-                    translate-interpolation="messageformat"></span>
+                    translate-interpolation="messageformat">
+              </span>
               &#9785
             </span>
 
@@ -410,7 +418,8 @@
                  aria-hidden="true"
                  ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                  uib-tooltip="Remove"
-                 tooltip-placement="top"></i>
+                 tooltip-placement="top">
+              </i>
               <collection-summary-tile
                                        collection-id="tile.id"
                                        collection-title="tile.title"
@@ -426,7 +435,8 @@
             <div class="oppia-learner-dashboard-page-portfolio"
                  ng-if="incompleteCollectionsList.length > 8">
               <i class="material-icons md-18"
-                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C4;</i>
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C4;
+              </i>
               Showing <[startIncompleteCollectionIndex + 1]> - <[Math.min(startIncompleteCollectionIndex + PAGE_SIZE, incompleteCollectionsList.length)]> of <[incompleteCollectionsList.length]>
               <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.INCOMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C8;</i>
             </div>
@@ -441,7 +451,8 @@
                   ng-if="numberNonexistentCollectionsFromPlaylist !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COLLECTIONS_FROM_PLAYLIST"
                     translate-values="{numberNonexistent: <[numberNonexistentCollectionsFromPlaylist]>}"
-                    translate-interpolation="messageformat"></span>
+                    translate-interpolation="messageformat">
+              </span>
               &#9785
             </span>
 
@@ -470,7 +481,8 @@
                    aria-hidden="true"
                    ng-click="openRemoveActivityModal(activeSection, activeSubsection, tile)"
                    uib-tooltip="Remove"
-                   tooltip-placement="top"></i>
+                   tooltip-placement="top">
+                </i>
                 <collection-summary-tile style="height: 145px; display: block;"
                                          collection-id="tile.id"
                                          collection-title="tile.title"
@@ -503,7 +515,8 @@
                   ng-if="numberNonexistentCompletedCollections !== 0">
               <span translate="I18N_LEARNER_DASHBOARD_NONEXISTENT_COMPLETED_COLLECTIONS"
                     translate-values="{numberNonexistent: <[numberNonexistentCompletedCollections]>}"
-                    translate-interpolation="messageformat"></span>
+                    translate-interpolation="messageformat">
+              </span>
               &#9785
             </span>
 
@@ -538,7 +551,8 @@
             <div class="oppia-learner-dashboard-page-portfolio"
                  ng-if="completedCollectionsList.length > 8">
               <i class="material-icons md-18"
-                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C4;</i>
+                 ng-click="goToPreviousPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETED, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C4;
+              </i>
               Showing <[startCompletedCollectionIndex + 1]> - <[Math.min(startCompletedCollectionIndex + PAGE_SIZE, completedCollectionsList.length)]> of <[completedCollectionsList.length]>
               <i class="material-icons md-18" ng-click="goToNextPage(LEARNER_DASHBOARD_SECTION_I18N_IDS.COMPLETE, LEARNER_DASHBOARD_SUBSECTION_I18N_IDS.COLLECTIONS)">&#xE5C8;</i>
             </div>
@@ -641,9 +655,11 @@
                   <span ng-if="thread.lastMessageText"><[thread.lastMessageText | truncate:50]></span>
                   <span ng-if="!thread.lastMessageText && thread.totalMessageCount !== 1">
                     <i translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
-                       translate-values="{threadStatus: getHumanReadableStatus(thread.status)}"></i>
+                       translate-values="{threadStatus: getHumanReadableStatus(thread.status)}">
+                    </i>
                   </span>
                   <span ng-if="!thread.lastMessageText && thread.totalMessageCount === 1"><i translate="I18N_LEARNER_DASHBOARD_SUGGESTION_TEXT"></i></span>
+                </td>
                 <td class="col-lg-2 col-md-2 col-sm-2">
                   <span><[getLocaleAbbreviatedDatetimeString(thread.lastUpdated)]></span>
                 </td>
@@ -691,7 +707,8 @@
                       <span style="float: right; margin-right: 15px;"
                             ng-if="message.messageId !== 0 && message.updatedStatus">
                         <em translate="I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_STATUS_CHANGE_MESSAGE"
-                            translate-values="{threadStatus: getHumanReadableStatus(message.updatedStatus)}"></em>
+                            translate-values="{threadStatus: getHumanReadableStatus(message.updatedStatus)}">
+                        </em>
                       </span>
                     </div>
                     <div class="col-lg-3 col-md-3 col-sm-3">
@@ -704,12 +721,12 @@
                     <div class="col-sm-10 feedback-thread-message-body">
                       <div>
                         <span class="protractor-test-feedback-message" ng-if="message.text"><[message.text]></span>
-                          <button style="margin-top: 5px;"
-                                  ng-if="message.currentContentHtml"
-                                  class="btn btn-primary"
-                                  ng-click="showSuggestionModal(message.suggestionHtml, message.currentContentHtml, message.description)"
-                                  translate="I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION">
-                          </button>
+                        <button style="margin-top: 5px;"
+                                ng-if="message.currentContentHtml"
+                                class="btn btn-primary"
+                                ng-click="showSuggestionModal(message.suggestionHtml, message.currentContentHtml, message.description)"
+                                translate="I18N_LEARNER_DASHBOARD_VIEW_SUGGESTION">
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -733,7 +750,8 @@
                       <div class="feedback-thread-new-message">
                         <textarea class="form-control feedback-thread-reply-box"
                                   placeholder="<['I18N_LEARNER_DASHBOARD_FEEDBACK_THREAD_DEFAULT_MESSAGE' | translate]>" ng-model="newMessage.text"
-                                  style=""></textarea>
+                                  style="">
+                        </textarea>
                       </div>
                       <div>
                         <button class="btn btn-success feedback-thread-new-message-send"
@@ -742,7 +760,8 @@
                           <span ng-if="messageSendingInProgress" translate="I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE_IN_PROGRESS"></span>
                           <span class="protractor-test-feedback-send-message"
                                 ng-if="!messageSendingInProgress"
-                                translate="I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE"></span>
+                                translate="I18N_LEARNER_DASHBOARD_SEND_FEEDBACK_THREAD_MESSAGE">
+                          </span>
                         </button>
                       </div>
                     </div>

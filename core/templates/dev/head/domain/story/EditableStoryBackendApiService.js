@@ -15,6 +15,9 @@
 /**
  * @fileoverview Service to send changes to a story to the backend.
  */
+oppia.constant(
+  'EDITABLE_STORY_DATA_URL_TEMPLATE',
+  '/story_editor_handler/data/<topic_id>/<story_id>');
 
 oppia.factory('EditableStoryBackendApiService', [
   '$http', '$q', 'EDITABLE_STORY_DATA_URL_TEMPLATE',
@@ -69,6 +72,24 @@ oppia.factory('EditableStoryBackendApiService', [
       });
     };
 
+    var _deleteStory = function(
+        topicId, storyId, successCallback, errorCallback) {
+      var storyDataUrl = UrlInterpolationService.interpolateUrl(
+        EDITABLE_STORY_DATA_URL_TEMPLATE, {
+          topic_id: topicId,
+          story_id: storyId
+        });
+      $http['delete'](storyDataUrl).then(function(response) {
+        if (successCallback) {
+          successCallback(response.status);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
     return {
       fetchStory: function(topicId, storyId) {
         return $q(function(resolve, reject) {
@@ -92,6 +113,12 @@ oppia.factory('EditableStoryBackendApiService', [
           _updateStory(
             topicId, storyId, storyVersion, commitMessage, changeList,
             resolve, reject);
+        });
+      },
+
+      deleteStory: function(topicId, storyId) {
+        return $q(function(resolve, reject) {
+          _deleteStory(topicId, storyId, resolve, reject);
         });
       }
     };

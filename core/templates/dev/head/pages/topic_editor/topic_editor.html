@@ -15,35 +15,70 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-<div ng-controller="TopicEditor">
-  <div ng-if="getTabStatuses().active === 'main'">
-    <topic-main-editor></topic-main-editor>
-  </div>
+  <div ng-controller="TopicEditor">
+    <div ng-if="getTabStatuses().active === 'main'">
+      <topic-main-editor></topic-main-editor>
+    </div>
 
-  <div ng-if="getTabStatuses().active === 'subtopics'">
-    <subtopics-list-tab></subtopics-list-tab>
+    <div ng-if="getTabStatuses().active === 'subtopics'">
+      <subtopics-list-tab></subtopics-list-tab>
+    </div>
   </div>
-</div>
 {% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
-  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
+
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/MathLatexStringEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SanitizedUrlEditor.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaDefaultValueService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaUndefinedLastElementService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/GenerateContentIdService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/AutoplayedVideosService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/EditableStoryBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/SkillSummaryObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/EditableTopicBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/SubtopicObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/SubtopicPageObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicRightsBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicRightsObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/TopicUpdateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/ImageFileObjectFactory.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/main_editor/TopicEditorTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/main_editor/StoriesListDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/subtopics_editor/SubtopicsListTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorStateService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorRoutingService.js"></script>
+  {% include 'components/rich_text_components.html' %}
 {% endblock footer_js %}

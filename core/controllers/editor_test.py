@@ -1729,7 +1729,6 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/playthroughdatahandler/%s/%s' % (
                 self.EXP_ID, self.playthrough_id1))
-        self.assertEqual(response['id'], self.playthrough_id1)
         self.assertEqual(response['exp_id'], self.EXP_ID)
         self.assertEqual(response['exp_version'], 1)
         self.assertEqual(response['issue_type'], 'EarlyQuit')

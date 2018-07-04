@@ -1195,40 +1195,50 @@ def _check_directive_scope(all_files):
     return summary_messages
 
 
+class TagMismatchException(Exception):
+    """Error class for mismatch between start and end tags."""
+
+
 class CustomHTMLParser(HTMLParser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
-    def __init__(self, filename, file_lines, failed=False):
+    def __init__(self, filename, file_lines, debug, failed=False):
         HTMLParser.HTMLParser.__init__(self)
+        self.tag_stack = []
+        self.debug = debug
         self.failed = failed
         self.filename = filename
-        self.previous_tag_line_number = None
         self.file_lines = file_lines
+        self.indentation_level = 0
+        self.indentation_width = 2
+        self.void_elements = [
+            'area', 'base', 'br', 'col', 'embed',
+            'hr', 'img', 'input', 'link', 'meta',
+            'param', 'source', 'track', 'wbr']
 
     def handle_starttag(self, tag, attrs):
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
+        expected_indentation = self.indentation_level * self.indentation_width
         tag_line = self.file_lines[line_number - 1].lstrip()
         opening_tag = '<' + tag
-        if tag_line.startswith(opening_tag):
-            if self.previous_tag_line_number is None:
-                if column_number % 2 != 0:
-                    print (
-                        '%s --> Indentation level for %s '
-                        'tag on line %s should be a '
-                        'multiple of 2 ' % (
-                            self.filename, tag, line_number))
-                    self.failed = True
-            else:
-                if column_number % 2 != 0 and (
-                        line_number != self.previous_tag_line_number):
-                    print (
-                        '%s --> Indentation level for %s '
-                        'tag on line %s should be a '
-                        'multiple of 2 ' % (
-                            self.filename, tag, line_number))
-                    self.failed = True
-            self.previous_tag_line_number = line_number
+        if tag_line.startswith(opening_tag) and (
+                column_number != expected_indentation):
+            print (
+                '%s --> Expected indentation '
+                'of %s, found indentation of %s '
+                'for %s tag on line %s ' % (
+                    self.filename, expected_indentation,
+                    column_number, tag, line_number))
+            self.failed = True
+
+        if tag not in self.void_elements:
+            self.tag_stack.append((tag, line_number, column_number))
+            self.indentation_level += 1
+
+        if self.debug:
+            print 'DEBUG MODE: Start tag_stack'
+            print self.tag_stack
 
         # Check the indentation of the attributes of the tag.
         indentation_of_first_attribute = (
@@ -1260,8 +1270,51 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                         line_num_of_error, line_number))
                 self.failed = True
 
+    def handle_endtag(self, tag):
+        line_number, _ = self.getpos()
+        tag_line = self.file_lines[line_number - 1]
+        leading_spaces_count = len(tag_line) - len(tag_line.lstrip())
 
-def _check_html_indent(all_files):
+        try:
+            last_starttag, last_starttag_line_num, last_starttag_col_num = (
+                self.tag_stack.pop())
+        except IndexError:
+            raise TagMismatchException('Error in line %s of file %s' % (
+                line_number, self.filename))
+
+        if last_starttag != tag:
+            raise TagMismatchException('Error in line %s of file %s' % (
+                line_number, self.filename))
+
+        if leading_spaces_count != last_starttag_col_num and (
+                last_starttag_line_num != line_number):
+            print (
+                '%s --> Indentation for end tag %s on line '
+                '%s does not match the indentation of the '
+                'start tag %s on line %s ' % (
+                    self.filename, tag, line_number,
+                    last_starttag, last_starttag_line_num))
+            self.failed = True
+
+        self.indentation_level -= 1
+
+        if self.debug:
+            print 'DEBUG MODE: End tag_stack'
+            print self.tag_stack
+
+    def handle_data(self, data):
+        data_lines = data.split('\n')
+        opening_block = tuple(['{% block', '{% macro', '{% if'])
+        ending_block = tuple(['{% end', '{%- end'])
+        for data_line in data_lines:
+            data_line = data_line.lstrip()
+            if data_line.startswith(opening_block):
+                self.indentation_level += 1
+            elif data_line.startswith(ending_block):
+                self.indentation_level -= 1
+
+
+def _check_html_indent(all_files, debug=False):
     """This function checks the indentation of lines in HTML files."""
 
     print 'Starting HTML indentation check'
@@ -1277,8 +1330,11 @@ def _check_html_indent(all_files):
         with open(filename, 'r') as f:
             file_content = f.read()
             file_lines = file_content.split('\n')
-            parser = CustomHTMLParser(filename, file_lines)
+            parser = CustomHTMLParser(filename, file_lines, debug)
             parser.feed(file_content)
+
+            if len(parser.tag_stack) != 0:
+                raise TagMismatchException('Error in file %s' % filename)
 
             if parser.failed:
                 failed = True
@@ -1309,6 +1365,8 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
+    # The html indent check has an additional debug mode which
+    # when enabled prints the tag_stack for each file.
     html_indent_messages = _check_html_indent(all_files)
     html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)

@@ -15,12 +15,16 @@
 /**
  * @fileoverview Service to send changes to a topic to the backend.
  */
+oppia.constant(
+  'TOPIC_EDITOR_STORY_URL_TEMPLATE', '/topic_editor_story_handler/<topic_id>');
 
 oppia.factory('EditableTopicBackendApiService', [
   '$http', '$q', 'EDITABLE_TOPIC_DATA_URL_TEMPLATE',
-  'UrlInterpolationService',
+  'SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE', 'UrlInterpolationService',
+  'TOPIC_EDITOR_STORY_URL_TEMPLATE',
   function($http, $q, EDITABLE_TOPIC_DATA_URL_TEMPLATE,
-      UrlInterpolationService) {
+      SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, UrlInterpolationService,
+      TOPIC_EDITOR_STORY_URL_TEMPLATE) {
     var _fetchTopic = function(
         topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
@@ -29,7 +33,55 @@ oppia.factory('EditableTopicBackendApiService', [
         });
 
       $http.get(topicDataUrl).then(function(response) {
-        var topic = angular.copy(response.data.topic);
+        if (successCallback) {
+          // The response is passed as a dict with 2 fields and not as 2
+          // parameters, because the successCallback is called as the resolve
+          // callback function in $q in fetchTopic(), and according to its
+          // documentation (https://docs.angularjs.org/api/ng/service/$q),
+          // resolve or reject can have only a single parameter.
+          successCallback({
+            topicDict: angular.copy(response.data.topic_dict),
+            skillIdToDescriptionDict: angular.copy(
+              response.data.skill_id_to_description_dict)
+          });
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchStories = function(
+        topicId, successCallback, errorCallback) {
+      var storiesDataUrl = UrlInterpolationService.interpolateUrl(
+        TOPIC_EDITOR_STORY_URL_TEMPLATE, {
+          topic_id: topicId
+        });
+
+      $http.get(storiesDataUrl).then(function(response) {
+        var canonicalStorySummaries = angular.copy(
+          response.data.canonical_story_summary_dicts);
+        if (successCallback) {
+          successCallback(canonicalStorySummaries);
+        }
+      }, function(errorResponse) {
+        if (errorCallback) {
+          errorCallback(errorResponse.data);
+        }
+      });
+    };
+
+    var _fetchSubtopicPage = function(
+        topicId, subtopicId, successCallback, errorCallback) {
+      var subtopicPageDataUrl = UrlInterpolationService.interpolateUrl(
+        SUBTOPIC_PAGE_EDITOR_DATA_URL_TEMPLATE, {
+          topic_id: topicId,
+          subtopic_id: subtopicId.toString()
+        });
+
+      $http.get(subtopicPageDataUrl).then(function(response) {
+        var topic = angular.copy(response.data.subtopic_page);
         if (successCallback) {
           successCallback(topic);
         }
@@ -71,11 +123,14 @@ oppia.factory('EditableTopicBackendApiService', [
         topic_and_subtopic_page_change_dicts: changeList
       };
       $http.put(editableTopicDataUrl, putData).then(function(response) {
-        // The returned data is an updated topic dict.
-        var topic = angular.copy(response.data.topic);
-
         if (successCallback) {
-          successCallback(topic);
+          // Here also, a dict with 2 fields are passed instead of just 2
+          // parameters, due to the same reason as written for _fetchTopic().
+          successCallback({
+            topicDict: angular.copy(response.data.topic_dict),
+            skillIdToDescriptionDict: angular.copy(
+              response.data.skill_id_to_description_dict)
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -88,6 +143,18 @@ oppia.factory('EditableTopicBackendApiService', [
       fetchTopic: function(topicId) {
         return $q(function(resolve, reject) {
           _fetchTopic(topicId, resolve, reject);
+        });
+      },
+
+      fetchStories: function(topicId) {
+        return $q(function(resolve, reject) {
+          _fetchStories(topicId, resolve, reject);
+        });
+      },
+
+      fetchSubtopicPage: function(topicId, subtopicId) {
+        return $q(function(resolve, reject) {
+          _fetchSubtopicPage(topicId, subtopicId, resolve, reject);
         });
       },
 
