@@ -80,8 +80,8 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
-# Serve js scripts for gadgets, interactions, rich_text_components and objects
-# under extensions in dev mode. This regex allows us to recursively serve js
+# Serve js scripts for gadgets, interactions, rich_text_components, custom ckeditor plugins
+# and objects under extensions in dev mode. This regex allows us to recursively serve js
 # scripts under the three specified directories. "\1" and "\2" insert capture
 # groups from the url pattern.
 - url: /extensions/(interactions|rich_text_components|objects|classifiers|ckeditor_plugins)/(.*\.(js|png))$
