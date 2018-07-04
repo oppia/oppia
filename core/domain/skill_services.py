@@ -273,6 +273,10 @@ def get_skill_descriptions_by_ids(topic_id, skill_ids):
 
     if deleted_skill_ids:
         deleted_skills_string = ', '.join(deleted_skill_ids)
+        logging.error(
+            'The deleted skills: %s are still present in topic with id %s'
+            % (deleted_skills_string, topic_id)
+        )
         if feconf.CAN_SEND_EMAILS:
             email_manager.send_mail_to_admin(
                 'Deleted skills present in topic',
