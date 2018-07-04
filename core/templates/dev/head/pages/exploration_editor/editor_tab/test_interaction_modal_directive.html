@@ -31,6 +31,10 @@
   </div>
   <br>
   <div class='submit-answer-btn'>
-    <button class="btn btn-success" ng-click="onSubmitAnswerFromButton()">Submit</button>
+    <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
+               ng-disabled="!interactionAnswerIsValid"
+               ng-click="onSubmitAnswerFromButton()"
+               translate="I18N_INTERACTIONS_SUBMIT">
+    </md-button>
   </div>
 </div>

@@ -6,7 +6,7 @@
   <form name="teachOppiaForm" class="form-inline">
     <div class="oppia-rule-details-header">
       <div>
-        <training-panel answer="trainingDataAnswer"  classification="classification" on-finish-training="finishTraining()">
+        <training-panel answer="trainingDataAnswer"  classification="classification" on-finish-training="finishTraining()" adding-new-response="addingNewResponse">
         </training-panel>
       </div>
     </div>
@@ -15,5 +15,5 @@
 
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="exitTrainer()">Cancel</button>
-  <button class="btn btn-default btn-success" ng-if="classification.answerGroupIndex >= 0" ng-click="onConfirm()">Confirm Response</button>
+  <button class="btn btn-default btn-success" ng-if="classification.answerGroupIndex >= 0 && !addingNewResponse" ng-click="onConfirm()">Confirm Response</button>
 </div>

@@ -437,6 +437,7 @@ oppia.directive('testInteractionPanel', [
           $scope.interactionIsInline = (
             INTERACTION_SPECS[_state.interaction.id].display_mode ===
             INTERACTION_DISPLAY_MODE_INLINE);
+          $scope.interactionAnswerIsValid = true;
           $scope.submitAnswer = function(answer) {
             $scope.onSubmitAnswer({
               answer: answer
@@ -445,6 +446,10 @@ oppia.directive('testInteractionPanel', [
 
           $scope.onSubmitAnswerFromButton = function() {
             $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
+          };
+
+          $scope.setInteractionAnswerValidity = function(answerValidity) {
+            $scope.interactionAnswerIsValid = answerValidity;
           };
         }
       ]

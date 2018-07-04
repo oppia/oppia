@@ -56,15 +56,15 @@ oppia.factory('TrainingDataEditorPanelService', [
 
               var FOCUS_LABEL_TEST_INTERACTION_INPUT = 'testInteractionInput';
               $scope.stateContent = _state.content.getHtml();
+              $scope.trainingData = [];
+              $scope.answerGroupHasNonEmptyRules = (
+                ResponsesService.getAnswerGroup(
+                  answerGroupIndex).rules.length > 0);
               $scope.inputTemplate = (
                 ExplorationHtmlFormatterService.getInteractionHtml(
                   stateInteractionIdService.savedMemento,
                   stateCustomizationArgsService.savedMemento,
                   false, FOCUS_LABEL_TEST_INTERACTION_INPUT));
-              $scope.trainingData = [];
-              $scope.answerGroupHasNonEmptyRules = (
-                ResponsesService.getAnswerGroup(
-                  answerGroupIndex).rules.length > 0);
 
               var _rebuildTrainingData = function() {
                 $scope.trainingData = [];

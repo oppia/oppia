@@ -58,7 +58,7 @@ oppia.factory('TrainingModalService', [
                 answerGroupIndex: 0,
                 newOutcome: null
               };
-
+              $scope.addingNewResponse = false;
 
               var _saveNewAnswerGroup = function(newAnswerGroup) {
                 var answerGroups = ResponsesService.getAnswerGroups();

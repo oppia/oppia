@@ -36,7 +36,7 @@
           </button>
         </div>
       </form>
-      <button class="btn btn-default" ng-if="!addingNewResponse" ng-click="beginAddingNewResponse()">New Response</button>
+      <button class="btn btn-default" ng-if="!addingNewResponse" ng-click="beginAddingNewResponse()">Add New Response</button>
       <outcome-feedback-editor ng-if="addingNewResponse" outcome="classification.newOutcome">
       </outcome-feedback-editor>
       <button class="btn btn-default btn-success" ng-if="addingNewResponse" ng-click="confirmNewFeedback()">Save New Response</button>

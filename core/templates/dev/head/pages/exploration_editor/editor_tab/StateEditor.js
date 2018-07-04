@@ -107,7 +107,8 @@ oppia.directive('trainingPanel', [
         //      non-null if, and only if, the creator has specified that a new
         //      response should be created for the trained answer.
         classification: '=',
-        onFinishTraining: '&'
+        onFinishTraining: '&',
+        addingNewResponse: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
