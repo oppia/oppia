@@ -94,13 +94,16 @@ var ExplorationEditorPage = function() {
       if (commitMessage) {
         commitMessageInput.sendKeys(commitMessage);
       }
-      expect(saveDraftButton.isDisplayed()).toBe(true);
-      saveDraftButton.click().then(function() {
+      browser.wait(until.elementToBeClickable(saveDraftButton), 5000,
+        'Save Draft button is not clickable').then(function(isClickable){
+        if (isClickable) {
+          saveDraftButton.click();
+        }
       });
       // This is necessary to give the page time to record the changes,
       // so that it does not attempt to stop the user leaving.
       browser.wait(until.invisibilityOf(toastSuccessElement), 10000,
-        'toast message taking too long to disappear after saving changes');
+        'Toast message taking too long to disappear after saving changes');
       expect(toastSuccessElement.isPresent()).toBe(false);
     });
   };
@@ -122,27 +125,33 @@ var ExplorationEditorPage = function() {
   // NAVIGATION
 
   this.navigateToHistoryTab = function() {
+    browser.wait(until.elementToBeClickable(navigateToHistoryTabButton), 5000);
     navigateToHistoryTabButton.click();
   };
 
   this.navigateToFeedbackTab = function() {
+    browser.wait(until.elementToBeClickable(navigateToFeedbackTabButton), 5000);
     navigateToFeedbackTabButton.click();
   };
 
   this.navigateToMainTab = function() {
+    browser.wait(until.elementToBeClickable(navigateToMainTabButton), 5000);
     navigateToMainTabButton.click();
     neutralElement.click();
   };
 
   this.navigateToPreviewTab = function() {
+    browser.wait(until.elementToBeClickable(navigateToPreviewTabButton), 5000);
     navigateToPreviewTabButton.click();
   };
 
   this.navigateToSettingsTab = function() {
+    browser.wait(until.elementToBeClickable(navigateToSettingsTabButton), 5000);
     navigateToSettingsTabButton.click();
   };
 
   this.navigateToStatsTab = function() {
+    browser.wait(until.elementToBeClickable(navigateToStatsTabButton), 5000);
     navigateToStatsTabButton.click();
   };
 };
