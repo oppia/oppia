@@ -858,7 +858,7 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-        mimetype = 'image/' + str(extension)
+        mimetype = '%s/%s' % (self._FILENAME_PREFIX, extension)
 
         # Image files are stored to the datastore in the dev env, and to GCS
         # in production.
@@ -866,14 +866,13 @@ class ImageUploadHandler(EditorHandler):
             fs_domain.ExplorationFileSystem if feconf.DEV_MODE
             else fs_domain.GcsFileSystem)
         fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
-        filepath = 'image/' + filename
+        filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
         if fs.isfile(filepath):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
         fs.commit(
-            self.user_id, '%s/%s' % (self._FILENAME_PREFIX, filename),
-            raw, mimetype=mimetype)
+            self.user_id, filepath, raw, mimetype=mimetype)
 
         self.render_json({'filepath': filename})
 
