@@ -160,8 +160,6 @@ var ExplorationEditorMainTab = function() {
       }
     });
 
-    expect(element(by.css('.protractor-test-welcome-modal')).isPresent())
-      .toBe(false);
     browser.wait(until.invisibilityOf(editorWelcomeModal), 5000);
 
     // Otherwise, if the editor tutorial shows up, exit it.
@@ -449,8 +447,12 @@ var ExplorationEditorMainTab = function() {
   // Wait for browser to completely load the rich text editor.
     browser.waitForAngular();
     browser.wait(until.elementToBeClickable(stateEditContent), 10000,
-      'stateEditContent taking too long to appear to set content');
-    stateEditContent.click();
+      'stateEditContent taking too long to appear to set content')
+      .then(function(isClickable) {
+        if (isClickable) {
+          stateEditContent.click();
+        }
+      });
     var stateContentEditor = element(
       by.css('.protractor-test-state-content-editor'));
     browser.wait(until.visibilityOf(stateContentEditor), 5000,
@@ -910,29 +912,6 @@ var ExplorationEditorMainTab = function() {
     stateNameSubmitButton.click();
     // Wait for the state to refresh.
     browser.wait(until.invisibilityOf(stateNameSubmitButton), 5000);
-    _expectNewStateNameToMatch(name);
-  };
-
-  /**
-   * Throw error if new state name does not match with provided input.
-   * Do not use white spaces at the end of 'name' or non-ASCII letters.
-   * Eg.'White space at the end ' will be truncated to 'White space at the end'
-   * by stateNameInput, which will cause an error to be thrown.
-   * @param {string} name - Expected state name to match.
-   */
-  var _expectNewStateNameToMatch = function (name) {
-    stateNameContainer.getText().then(function(newStateName) {
-      // Look for ASCII letters only in the string from stateNameContainer.
-      // This is because of the 'Pencil' icon at the end of stateNameContainer.
-      var re = /[\x20-\x7F]*/gi;
-      var parsedStateName = newStateName.match(re);
-      if (parsedStateName) {
-        if (parsedStateName[0] !== name) {
-          throw Error ('State name is set to:' + parsedStateName +
-          ' instead of:' + name);
-        }
-      }
-    });
   };
 
   this.expectCurrentStateToBe = function(name) {
