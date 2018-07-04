@@ -199,7 +199,6 @@ class CronAcceptStaleSuggestionsHandler(base.BaseHandler):
     def get(self):
         """Handles get requests."""
         suggestions = suggestion_services.get_all_stale_suggestions()
-        print suggestions
         for suggestion in suggestions:
             suggestion_services.accept_suggestion(
                 suggestion, feconf.SUGGESTION_BOT_USER_ID,
