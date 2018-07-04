@@ -65,11 +65,11 @@ var CollectionEditorPage = function() {
         general.waitForSystem();
       }
     });
+    var matched = false;
     var dropdownResultElements = element.all(by.css('.dropdown-menu'));
     dropdownResultElements.map(function(dropdownResult) {
       return dropdownResult.getText();
     }).then(function(listOfResult) {
-      var matched = false;
       listOfResult.forEach(function(element, index) {
         if (element.indexOf(query) >= 0) {
           // Selects the exploration from dropdown.
@@ -78,10 +78,12 @@ var CollectionEditorPage = function() {
         }
       });
     });
-    if (matched === false) {
+    if (!matched) {
       // Press Tab to fill in the default result should one appear when
       // none of the answer matches the given query.
       addExplorationInput.sendKeys(protractor.Key.TAB);
+      // If query gets zero result, hitting Tab would not enable the
+      // addExplorationButton.
     }
     addExplorationButton.isEnabled().then( function(isEnabled) {
       if (isEnabled) {
