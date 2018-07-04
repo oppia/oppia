@@ -16,7 +16,7 @@
  * @fileoverview Page object for the exploration editor, for use in Protractor
  * tests.
  */
-
+var general = require('./general.js');
 var until = protractor.ExpectedConditions;
 
 var ExplorationEditorFeedbackTab = require(
@@ -112,10 +112,8 @@ var ExplorationEditorPage = function() {
     saveDiscardToggleButton.click();
     discardChangesButton.click();
     confirmDiscardChangesButton.click();
-    browser.waitForAngular();
-    browser.wait(until.presenceOf(neutralElement), 5000,
-      'neutralElement taking too long to appear after discarding changes');
-    neutralElement.click();
+    // Expect editor page to completely reload.
+    general.waitForLoadingMessage();
   };
 
   this.expectCannotSaveChanges = function() {
