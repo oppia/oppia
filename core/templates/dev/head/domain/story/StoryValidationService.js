@@ -29,7 +29,7 @@ oppia.factory('StoryValidationService', [
       if (typeof nodeId !== 'string') {
         return false;
       }
-      var nodeIdPattern = new RegExp(NODE_ID_PREFIX + "[0-9]+", 'g');
+      var nodeIdPattern = new RegExp(NODE_ID_PREFIX + '[0-9]+', 'g');
       if (!nodeId.match(nodeIdPattern)) {
         return false;
       }
@@ -49,7 +49,8 @@ oppia.factory('StoryValidationService', [
       if (typeof node.getOutline() !== 'string') {
         issues.push('Node outline should be a string');
       }
-      if ((typeof node.getExplorationId() !== 'string') && (node.getExplorationId() !== null)) {
+      if ((typeof node.getExplorationId() !== 'string') &&
+          (node.getExplorationId() !== null)) {
         issues.push('Exploration id should be a string or null');
       }
       if (typeof node.getOutlineStatus() !== 'boolean') {
@@ -61,7 +62,8 @@ oppia.factory('StoryValidationService', [
       if (prerequisiteSkillIds.constructor !== Array) {
         issues.push('Prerequisite skill ids should be an array');
       }
-      if (prerequisiteSkillIds.some(function(skillId) {
+      if (
+        prerequisiteSkillIds.some(function(skillId) {
           return typeof skillId !== 'string';
         })) {
         issues.push('Each prerequisite skill id should be a string');
@@ -74,7 +76,8 @@ oppia.factory('StoryValidationService', [
       if (acquiredSkillIds.constructor !== Array) {
         issues.push('Acquired skill ids should be an array');
       }
-      if (acquiredSkillIds.some(function(skillId) {
+      if (
+        acquiredSkillIds.some(function(skillId) {
           return typeof skillId !== 'string';
         })) {
         issues.push('Each acquired skill id should be a string');
@@ -95,12 +98,14 @@ oppia.factory('StoryValidationService', [
       if (destinationNodeIds.constructor !== Array) {
         issues.push('Destination node ids should be an array');
       }
-      if (destinationNodeIds.some(function(nodeId) {
+      if (
+        destinationNodeIds.some(function(nodeId) {
           return !_checkValidNodeId(nodeId);
         })) {
         issues.push('Each destination node id should be valid');
       }
-      if (destinationNodeIds.some(function(nodeId) {
+      if (
+        destinationNodeIds.some(function(nodeId) {
           return nodeId === node.getId();
         })) {
         issues.push(
