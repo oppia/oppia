@@ -19,10 +19,15 @@
                    ng-repeat="skillSummary in subtopic.getSkillSummaries() track by $index"
                    dnd-draggable="skillSummary"
                    dnd-dragstart="startMoveSkill(subtopic.getId(), skillSummary)"
-                   dnd-effect-allowed="move">
-            <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
+                   dnd-effect-allowed="move"
+                   dnd-disable-if="isSkillDeleted(skillSummary)">
+            <a ng-if="!isSkillDeleted(skillSummary)"
+               ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
               <[skillSummary.getDescription()]>
             </a>
+            <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
+              Skill Deleted
+            </span>
           </md-card>
         </div>
       </md-card>
@@ -41,10 +46,15 @@
                ng-repeat="skillSummary in uncategorizedSkillSummaries track by $index"
                dnd-draggable="skillSummary"
                dnd-effect-allowed="move"
-               dnd-dragstart="startMoveSkill(null, skillSummary)">
-        <a ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
+               dnd-dragstart="startMoveSkill(null, skillSummary)"
+               dnd-disable-if="isSkillDeleted(skillSummary)">
+        <a ng-if="!isSkillDeleted(skillSummary)"
+           ng-href="<[getSkillEditorUrl(skillSummary.getId())]>" target="_blank">
           <[skillSummary.getDescription()]>
         </a>
+        <span ng-if="isSkillDeleted(skillSummary)" style="color: red;">
+          Skill Deleted
+        </span>
       </md-card>
     </div>
   </md-card>

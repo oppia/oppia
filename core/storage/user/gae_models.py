@@ -672,3 +672,119 @@ class UserSkillMasteryModel(base_models.BaseModel):
             str. The model id corresponding to the given user and skill.
         """
         return '%s.%s' % (user_id, skill_id)
+
+
+class UserContributionScoringModel(base_models.BaseModel):
+    """Model for storing the scores of a user for various suggestions created by
+    the user. Users having scores above a particular threshold for a category
+    can review suggestions for that category.
+
+    The id for this model is of the form '{{score_category}}.{{user_id}}'.
+    """
+
+    # The user id of the user.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The category of suggestion to score the user on.
+    score_category = ndb.StringProperty(required=True, indexed=True)
+    # The score of the user for the above category of suggestions.
+    score = ndb.FloatProperty(required=True, indexed=True)
+
+    @classmethod
+    def get_all_scores_of_user(cls, user_id):
+        """Gets all scores for a given user.
+
+        Args:
+            user_id: str. The id of the user.
+
+        Returns:
+            list(UserContributionsScoringModel). All instances for the given
+                user.
+        """
+        return cls.get_all().filter(cls.user_id == user_id).fetch()
+
+    @classmethod
+    def get_all_users_with_score_above_minimum_for_category(
+            cls, score_category):
+        """Gets all instances which have score above the
+        MINIMUM_SCORE_REQUIRED_TO_REVIEW threshold for the given category.
+
+        Args:
+            score_category: str. The category being queried.
+
+        Returns:
+            list(UserContributionsScoringModel). All instances for the given
+                category with scores above MINIMUM_SCORE_REQUIRED_TO_REVIEW.
+        """
+        return cls.get_all().filter(
+            cls.score_category == score_category).filter(
+                cls.score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW).fetch()
+
+    @classmethod
+    def _get_instance_id(cls, user_id, score_category):
+        """Generates the instance id in the form {{score_category}}.{{user_id}}.
+
+        Args:
+            user_id: str. The ID of the user.
+            score_category: str. The category of suggestion to score the user
+                on.
+
+        Returns:
+            str. The instance ID for UserContributionScoringModel.
+        """
+        return '.'.join([score_category, user_id])
+
+    @classmethod
+    def get_score_of_user_for_category(cls, user_id, score_category):
+        """Gets the score of the user for the given score category.
+
+        Args:
+            user_id: str. The ID of the user.
+            score_category: str. The category of suggestion to score the user
+                on.
+
+        Returns:
+            float|None. The score of the user in the given category.
+        """
+        instance_id = cls._get_instance_id(user_id, score_category)
+        model = cls.get_by_id(instance_id)
+
+        return model.score if model else None
+
+    @classmethod
+    def create(cls, user_id, score_category, score):
+        """Creates a new UserContributionScoringModel entry.
+
+        Args:
+            user_id: str. The ID of the user.
+            score_category: str. The category of the suggestion.
+            score: float. The score of the user.
+
+        Raises:
+            Exception: There is already an entry with the given id.
+        """
+        instance_id = cls._get_instance_id(user_id, score_category)
+
+        if cls.get_by_id(instance_id):
+            raise Exception('There is already an entry with the given id: %s' %
+                            instance_id)
+
+        cls(id=instance_id, user_id=user_id, score_category=score_category,
+            score=score).put()
+
+    @classmethod
+    def increment_score_for_user(cls, user_id, score_category, increment_by):
+        """Increment the score of the user in the category by the given amount.
+
+        Args:
+            user_id: str. The id of the user.
+            score_category: str. The category of the suggestion.
+            increment_by: float. The amount to increase the score of the user
+                by. May be negative, in which case the score is reduced.
+        """
+        instance_id = cls._get_instance_id(user_id, score_category)
+        model = cls.get_by_id(instance_id)
+        if not model:
+            cls.create(user_id, score_category, increment_by)
+        else:
+            model.score += increment_by
+            model.put()

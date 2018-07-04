@@ -531,6 +531,7 @@ def convert_to_ckeditor(html_data):
                 if prev_sib and prev_sib.name == 'li':
                     if 'style' in tag.attrs:
                         del tag['style']
+                    prev_sib.append(tag)
                 else:
                     margin_value = 40
                     if 'style' in tag.attrs:

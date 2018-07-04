@@ -463,8 +463,8 @@ describe('Topic update service', function() {
     ]);
   });
 
-  it('should correctly create changelists when moving a skill to a new ' +
-    'subtopic', function() {
+  it('should correctly create changelists when moving a skill to a newly ' +
+    'created subtopic that has since been deleted', function() {
     TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
     TopicUpdateService.moveSkillToSubtopic(
       _sampleTopic, null, 2, _firstSkillSummary

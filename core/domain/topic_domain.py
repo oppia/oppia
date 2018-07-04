@@ -379,7 +379,7 @@ class Topic(object):
             raise utils.ValidationError('Name field should not be empty')
 
     def get_all_skill_ids(self):
-        """Returns all the ids of all the skilld present in the topic.
+        """Returns all the ids of all the skills present in the topic.
 
         Returns:
             list(str). The list of all the skill ids present in the topic.

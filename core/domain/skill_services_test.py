@@ -18,6 +18,7 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -86,15 +87,36 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_2', self.USER_ID, 'Description 2', [],
             skill_domain.SkillContents('Explanation', ['Example 1'])
         )
-        skill_descriptions = skill_services.get_skill_descriptions_by_ids([
-            self.SKILL_ID, 'skill_2'])
-
-        self.assertEqual(
-            skill_descriptions, {
-                self.SKILL_ID: 'Description',
-                'skill_2': 'Description 2'
-            }
+        self.save_new_skill(
+            'skill_3', self.USER_ID, 'Description 3', [],
+            skill_domain.SkillContents('Explanation', ['Example 1'])
         )
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            skill_descriptions = skill_services.get_skill_descriptions_by_ids(
+                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+
+            skill_services.delete_skill(self.USER_ID, 'skill_2')
+            skill_descriptions = skill_services.get_skill_descriptions_by_ids(
+                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: skill_2 are still'
+                ' present in topic with id topic_id')
+            self.assertEqual(len(messages), 1)
+            self.assertIn(
+                expected_email_html_body,
+                messages[0].html.decode())
+            self.assertEqual(
+                skill_descriptions, {
+                    self.SKILL_ID: 'Description',
+                    'skill_2': None,
+                    'skill_3': 'Description 3'
+                }
+            )
 
     def test_get_skill_by_id(self):
         expected_skill = self.skill.to_dict()

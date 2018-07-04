@@ -37,9 +37,7 @@ oppia.factory('TopicObjectFactory', [
         });
       this._nextSubtopicId = nextSubtopicId;
       this._version = version;
-      this._subtopics = subtopics.map(function(subtopic) {
-        return SubtopicObjectFactory.create(subtopic, skillIdToDescriptionMap);
-      });
+      this._subtopics = angular.copy(subtopics);
     };
 
     // Instance methods
@@ -106,10 +104,10 @@ oppia.factory('TopicObjectFactory', [
         if (this._subtopics[i].getId() === subtopicId) {
           // When a subtopic is deleted, all the skills in it are moved to
           // uncategorized skill ids.
-          var skills = this._subtopics[i].getSkillSummaries();
-          for (var j = 0; j < skills.length; j++) {
-            var skillId = skills[j].getId();
-            var skillDescription = skills[j].getDescription();
+          var skillSummaries = this._subtopics[i].getSkillSummaries();
+          for (var j = 0; j < skillSummaries.length; j++) {
+            var skillId = skillSummaries[j].getId();
+            var skillDescription = skillSummaries[j].getDescription();
             if (!this.hasUncategorizedSkill(skillId)) {
               this._uncategorizedSkillSummaries.push(
                 SkillSummaryObjectFactory.create(skillId, skillDescription));
@@ -192,12 +190,9 @@ oppia.factory('TopicObjectFactory', [
     };
 
     Topic.prototype.hasUncategorizedSkill = function(skillId) {
-      for (var i = 0; i < this._uncategorizedSkillSummaries.length; i++) {
-        if (this._uncategorizedSkillSummaries[i].getId() === skillId) {
-          return true;
-        }
-      }
-      return false;
+      return this._uncategorizedSkillSummaries.some(function(skillSummary) {
+        return skillSummary.getId() === skillId;
+      });
     };
 
     Topic.prototype.addUncategorizedSkill = function(
@@ -277,6 +272,9 @@ oppia.factory('TopicObjectFactory', [
     // contexts. This function takes a JSON object which represents a backend
     // topic python dict.
     Topic.create = function(topicBackendDict, skillIdToDescriptionDict) {
+      var subtopics = topicBackendDict.subtopics.map(function(subtopic) {
+        return SubtopicObjectFactory.create(subtopic, skillIdToDescriptionDict);
+      });
       return new Topic(
         topicBackendDict.id, topicBackendDict.name,
         topicBackendDict.description, topicBackendDict.language_code,
@@ -284,7 +282,7 @@ oppia.factory('TopicObjectFactory', [
         topicBackendDict.additional_story_ids,
         topicBackendDict.uncategorized_skill_ids,
         topicBackendDict.next_subtopic_id, topicBackendDict.version,
-        topicBackendDict.subtopics, skillIdToDescriptionDict
+        subtopics, skillIdToDescriptionDict
       );
     };
 
