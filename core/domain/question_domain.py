@@ -234,8 +234,8 @@ class QuestionSummary(object):
         Args:
             question_id: str. The ID of the question.
             creator_id: str. The user ID of the creator of the question.
-            language_code: str. The code that represents the question
-                language.
+            language_code: str. The ISO 639-1 code for the language this
+                question is written in.
             status: str. The status of the question.
             question_model_last_updated: datetime.datetime. Date and time
                 when the question model was last updated.
@@ -250,7 +250,7 @@ class QuestionSummary(object):
         self.status = status
         self.last_updated = question_model_last_updated
         self.created_on = question_model_created_on
-        self.question_data = html_cleaner.clean(question_html_data)
+        self.question_html_data = html_cleaner.clean(question_html_data)
 
     def to_dict(self):
         """Returns a dictionary representation of this domain object.
@@ -265,7 +265,7 @@ class QuestionSummary(object):
             'status': self.status,
             'last_updated': self.last_updated,
             'created_on': self.created_on,
-            'question_data': self.question_data
+            'question_html_data': self.question_html_data
         }
 
 

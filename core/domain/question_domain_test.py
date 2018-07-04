@@ -149,7 +149,7 @@ class QuestionSummaryDomainTest(test_utils.GenericTestBase):
             'status': 'private',
             'last_updated': None,
             'created_on': None,
-            'question_data': 'Question 1'
+            'question_html_data': 'Question 1'
         }
         observed_object = question_domain.QuestionSummary(
             'abc', 'creator_id', 'en', 'private', 'Question 1')
