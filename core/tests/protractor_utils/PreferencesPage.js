@@ -16,7 +16,7 @@
  * @fileoverview Page object for the preferences page, for use in Protractor
  * tests.
  */
-
+var general = require('./general.js');
 var PreferencesPage = function() {
   var USER_PREFERENCES_URL = '/preferences';
   var editorRoleEmailsCheckbox = element(
@@ -26,7 +26,8 @@ var PreferencesPage = function() {
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
 
   this.get = function() {
-    return browser.get(USER_PREFERENCES_URL);
+    browser.get(USER_PREFERENCES_URL);
+    return general.waitForLoadingMessage();
   };
 
   this.toggleEditorRoleEmailsCheckbox = function() {
