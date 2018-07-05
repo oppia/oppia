@@ -192,6 +192,17 @@ EXCLUDED_PATHS = (
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
+GENERATED_FILE_PATHS = (
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
+    'extensions/interactions/LogicProof/static/js/generatedParser.js',
+    'core/templates/dev/head/expressions/ExpressionParserService.js')
+
+CONFIG_FILE_PATHS = (
+    'core/tests/protractor.conf.js',
+    'core/tests/karma.conf.js',
+    'core/templates/dev/head/mathjaxConfig.js',
+    'assets/constants.js',
+    'assets/rich_text_components_definitions.js')
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -1362,13 +1373,10 @@ def _check_for_copyright_notice(all_files):
     present at the beginning of files.
     """
 
-    js_files_to_exclude = [
-        'generatedDefaultData.js', 'generatedParser.js', 'protractor.conf.js',
-        'karma.conf.js', 'mathjaxConfig.js', 'ExpressionParserService.js',
-        'constants.js', 'rich_text_components_definitions.js']
     js_files_to_check = [
         filename for filename in all_files if filename.endswith('.js') and (
-            not filename.endswith(tuple(js_files_to_exclude)))]
+            not filename.endswith(GENERATED_FILE_PATHS)) and (
+                not filename.endswith(CONFIG_FILE_PATHS))]
     py_files_to_check = [
         filename for filename in all_files if filename.endswith('.py') and (
             not filename.endswith('__init__.py'))]
@@ -1376,7 +1384,7 @@ def _check_for_copyright_notice(all_files):
         filename for filename in all_files if filename.endswith('.sh')]
     all_files_to_check = (
         js_files_to_check + py_files_to_check + sh_files_to_check)
-    statement_to_check = 'All Rights Reserved.'
+    regexp_to_check = r"Copyright \d+ The Oppia Authors\. All Rights Reserved\."
 
     failed = False
     summary_messages = []
@@ -1385,7 +1393,7 @@ def _check_for_copyright_notice(all_files):
         has_copyright_notice = False
         with open(filename, 'r') as f:
             for line in f:
-                if 'Copyright' in line and statement_to_check in line:
+                if re.search(regexp_to_check, line):
                     has_copyright_notice = True
                     break
 
