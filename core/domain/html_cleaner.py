@@ -137,12 +137,11 @@ def get_rte_components(html_string):
             customization_args = {}
             for attr in oppia_custom_tag_attrs[tag_name]:
                 # Unescape special HTML characters such as '&quot;'.
-                if attr in str(component_tag):
-                    attr_val = parser.unescape(component_tag[attr])
-                    # Adds escapes so that things like '\frac' aren't
-                    # interpreted as special characters.
-                    attr_val = attr_val.encode('unicode_escape')
-                    customization_args[attr] = json.loads(attr_val)
+                attr_val = parser.unescape(component_tag[attr])
+                # Adds escapes so that things like '\frac' aren't
+                # interpreted as special characters.
+                attr_val = attr_val.encode('unicode_escape')
+                customization_args[attr] = json.loads(attr_val)
             component['customization_args'] = customization_args
             components.append(component)
     return components
