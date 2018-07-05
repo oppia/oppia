@@ -34,7 +34,6 @@ from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
-from core.controllers import question
 from core.controllers import question_editor
 from core.controllers import reader
 from core.controllers import recent_commits

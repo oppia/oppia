@@ -905,7 +905,9 @@ def can_delete_question(handler):
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
+        # pylint: disable=C0301
         if role_services.ACTION_DELETE_ANY_QUESTION in user_actions_info.actions:
+        # pylint: enable=C0301
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
