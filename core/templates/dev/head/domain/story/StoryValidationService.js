@@ -265,8 +265,7 @@ oppia.factory('StoryValidationService', [
       /**
        * Returns a list of error strings found when validating the provided
        * story. The validation methods used in this function are written to
-       * match the validations performed in the backend. This function is
-       * expensive, so it should be called sparingly.
+       * match the validations performed in the backend.
        */
       findValidationIssuesForStory: function(story) {
         return _validateStory(story);
