@@ -111,7 +111,7 @@ var getExplorationIdFromPlayer = function() {
 // The explorationId here should be a string, not a promise.
 var openEditor = function(explorationId) {
   browser.get(EDITOR_URL_SLICE + explorationId);
-  browser.waitForAngular();
+  waitForLoadingMessage();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorMainTab.exitTutorial();
@@ -119,7 +119,7 @@ var openEditor = function(explorationId) {
 
 var openPlayer = function(explorationId) {
   browser.get(PLAYER_URL_SLICE + explorationId);
-  browser.waitForAngular();
+  waitForLoadingMessage();
 };
 
 // Takes the user from an exploration editor to its player.
