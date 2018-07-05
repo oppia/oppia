@@ -57,12 +57,12 @@ var _completeSignup = function(username) {
   usernameInput.sendKeys(username);
   agreeToTermsCheckbox.click();
   registerUser.click();
+  general.waitForLoadingMessage();
 };
 
+
 var createUser = function(email, username) {
-  login(email);
-  _completeSignup(username);
-  general.waitForSystem();
+  createAndLoginUser(email, username);
   logout();
 };
 
@@ -74,6 +74,7 @@ var createAndLoginUser = function(email, username) {
 var createModerator = function(email, username) {
   login(email, true);
   _completeSignup(username);
+  adminPage.get();
   adminPage.updateRole(username, 'moderator');
   logout();
 };
@@ -86,6 +87,7 @@ var createAdmin = function(email, username) {
 var createAndLoginAdminUser = function(email, username) {
   login(email, true);
   _completeSignup(username);
+  adminPage.get();
   adminPage.updateRole(username, 'admin');
 };
 
