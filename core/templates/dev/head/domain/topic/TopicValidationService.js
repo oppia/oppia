@@ -21,7 +21,7 @@
 
 oppia.factory('TopicValidationService', [
   function() {
-    var _validateSubtopic = function(subtopic, topicSkillIds) {
+    var _validateSubtopic = function(subtopic) {
       var issues = [];
       if (subtopic.getTitle() === '') {
         issues.push('Subtopic title should not be empty');
@@ -29,15 +29,12 @@ oppia.factory('TopicValidationService', [
       var skillIds = subtopic.getSkillSummaries().map(function(skillSummary) {
         return skillSummary.getId();
       });
-      if ((new Set(skillIds)).size !== skillIds.length) {
-        issues.push('All subtopic skills should be distinct');
-      }
       for (var i = 0; i < skillIds.length; i++) {
-        if (topicSkillIds.indexOf(skillIds[i]) === -1) {
-          topicSkillIds.push(skillIds[i]);
-        } else {
+        var skillId = skillIds[i];
+        if (skillIds.indexOf(skillId) < skillIds.lastIndexOf(skillId)) {
           issues.push(
-            'The skill with id ' + skillIds[i] + ' is duplicated in the topic');
+            'The skill with id ' + skillId + ' is duplicated in' +
+            ' subtopic with id ' + subtopic.getId());
         }
       }
       return issues;
@@ -53,16 +50,29 @@ oppia.factory('TopicValidationService', [
       var canonicalStoryIds = topic.getCanonicalStoryIds();
       var additionalStoryIds = topic.getAdditionalStoryIds();
 
-      if (new Set(canonicalStoryIds).size !== canonicalStoryIds.length) {
-        issues.push('All canonical stories should be distinct.');
+      for (var i = 0; i < canonicalStoryIds.length; i++) {
+        var storyId = canonicalStoryIds[i];
+        if (canonicalStoryIds.indexOf(storyId) <
+          canonicalStoryIds.lastIndexOf(storyId)) {
+          issues.push(
+            'The canonical story with id ' + storyId + ' is duplicated in' +
+            ' the topic.');
+        }
       }
-      if (new Set(additionalStoryIds).size !== additionalStoryIds.length) {
-        issues.push('All additional stories should be distinct.');
+      for (var i = 0; i < additionalStoryIds.length; i++) {
+        var storyId = additionalStoryIds[i];
+        if (additionalStoryIds.indexOf(storyId) <
+          additionalStoryIds.lastIndexOf(storyId)) {
+          issues.push(
+            'The additional story with id ' + storyId + ' is duplicated in' +
+            ' the topic.');
+        }
       }
       for (var i = 0; i < canonicalStoryIds.length; i++) {
         if (additionalStoryIds.indexOf(canonicalStoryIds[i]) !== -1) {
-          issues.push('Canonical and additional stories should be mutually' +
-          ' exclusive and should not have any common stories between them.');
+          issues.push(
+            'The story with id ' + canonicalStoryIds[i] +
+            ' is present in both canonical and additional stories.');
         }
       }
       var topicSkillIds =
@@ -71,7 +81,21 @@ oppia.factory('TopicValidationService', [
         });
       for (var i = 0; i < subtopics.length; i++) {
         issues = issues.concat(
-          _validateSubtopic(subtopics[i], topicSkillIds));
+          _validateSubtopic(subtopics[i]));
+        var skillIds = subtopics[i].getSkillSummaries().map(
+          function(skillSummary) {
+            return skillSummary.getId();
+          }
+        );
+        for (var j = 0; j < skillIds.length; j++) {
+          if (topicSkillIds.indexOf(skillIds[j]) === -1) {
+            topicSkillIds.push(skillIds[j]);
+          } else {
+            issues.push(
+              'The skill with id ' + skillIds[j] +
+              ' is duplicated in the topic');
+          }
+        }
       }
       return issues;
     };

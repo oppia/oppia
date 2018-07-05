@@ -71,8 +71,8 @@ describe('Topic validation service', function() {
     var issues = _findValidationIssues();
     expect(issues).toEqual([
       'Topic name should not be empty.',
-      'Canonical and additional stories should be mutually ' +
-      'exclusive and should not have any common stories between them.',
+      'The story with id story_2 is present in both canonical ' +
+      'and additional stories.',
       'Subtopic title should not be empty',
       'The skill with id skill_1 is duplicated in the topic'
     ]);
