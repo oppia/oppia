@@ -75,7 +75,7 @@ oppia.factory('SkillObjectFactory', [
     Skill.createInterstitialSkill = function() {
       return new Skill(null, 'Skill description loading',
         [], ConceptCardObjectFactory.createInterstitialConceptCard(), 'en', 1,
-        '0');
+        0);
     };
 
     var generateMisconceptionsFromBackendDict = function(
@@ -126,7 +126,7 @@ oppia.factory('SkillObjectFactory', [
     };
 
     Skill.prototype.getIncrementedMisconceptionId = function(id) {
-      return String(parseInt(id) + 1);
+      return id + 1;
     };
 
     Skill.prototype.findMisconceptionById = function(id) {

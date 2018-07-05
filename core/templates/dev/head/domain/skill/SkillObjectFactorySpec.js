@@ -34,14 +34,14 @@ describe('Skill object factory', function() {
       ConceptCardObjectFactory = $injector.get('ConceptCardObjectFactory');
 
       misconceptionDict1 = {
-        id: '2',
+        id: 2,
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback'
       };
 
       misconceptionDict2 = {
-        id: '4',
+        id: 4,
         name: 'test name',
         notes: 'test notes',
         feedback: 'test feedback'
@@ -59,7 +59,7 @@ describe('Skill object factory', function() {
         skill_contents: skillContentsDict,
         language_code: 'en',
         version: 3,
-        next_misconception_id: '6'
+        next_misconception_id: 6
       };
     }));
 
@@ -80,7 +80,7 @@ describe('Skill object factory', function() {
 
     it('should delete a misconception given its id', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-      skill.deleteMisconception('2');
+      skill.deleteMisconception(2);
       expect(skill.getMisconceptions()).toEqual(
         [MisconceptionObjectFactory.createFromBackendDict(
           misconceptionDict2)]);
@@ -88,9 +88,9 @@ describe('Skill object factory', function() {
 
     it('should get the correct next misconception id', function() {
       var skill = SkillObjectFactory.createFromBackendDict(skillDict);
-      expect(skill.getNextMisconceptionId()).toEqual('6');
-      skill.deleteMisconception('4');
-      expect(skill.getNextMisconceptionId()).toEqual('6');
+      expect(skill.getNextMisconceptionId()).toEqual(6);
+      skill.deleteMisconception(4);
+      expect(skill.getNextMisconceptionId()).toEqual(6);
 
       var misconceptionToAdd1 = MisconceptionObjectFactory
         .createFromBackendDict({
@@ -101,9 +101,9 @@ describe('Skill object factory', function() {
         });
 
       skill.appendMisconception(misconceptionToAdd1);
-      expect(skill.getNextMisconceptionId()).toEqual('7');
-      skill.deleteMisconception('6');
-      expect(skill.getNextMisconceptionId()).toEqual('7');
+      expect(skill.getNextMisconceptionId()).toEqual(7);
+      skill.deleteMisconception(6);
+      expect(skill.getNextMisconceptionId()).toEqual(7);
     });
 
     it('should convert to a backend dictionary', function() {

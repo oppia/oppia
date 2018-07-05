@@ -146,7 +146,7 @@ class Misconception(object):
         """Initializes a Misconception domain object.
 
         Args:
-            misconception_id: str. The unique id of each misconception.
+            misconception_id: int. The unique id of each misconception.
             name: str. The name of the misconception.
             notes: str. General advice for creators about the
                 misconception (including examples) and general notes. This
@@ -213,9 +213,9 @@ class Misconception(object):
         Args:
             misconception_id: str. The misconception id to be validated.
         """
-        if not isinstance(misconception_id, basestring):
+        if not isinstance(misconception_id, int):
             raise utils.ValidationError(
-                'Expected misconception ID to be a string, received %s' %
+                'Expected misconception ID to be an integer, received %s' %
                 misconception_id)
 
     def validate(self):
@@ -330,7 +330,7 @@ class Skill(object):
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
             version: int. The version of the skill.
-            next_misconception_id: str. The misconception id to be used by
+            next_misconception_id: int. The misconception id to be used by
                 the next misconception added.
             created_on: datetime.datetime. Date and time when the skill is
                 created.
@@ -481,7 +481,7 @@ class Skill(object):
             skill_id, description, [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, '0')
+            constants.DEFAULT_LANGUAGE_CODE, 0, 0)
 
     @classmethod
     def update_skill_contents_from_model(
@@ -599,7 +599,7 @@ class Skill(object):
             misconception_dict['id'])
 
     def get_incremented_misconception_id(self, misconception_id):
-        return str(int(misconception_id) + 1)
+        return misconception_id + 1
 
     def delete_misconception(self, misconception_id):
         """Removes a misconception with the given id.

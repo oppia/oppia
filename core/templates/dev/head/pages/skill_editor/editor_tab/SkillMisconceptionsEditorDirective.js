@@ -34,8 +34,6 @@ oppia.directive('skillMisconceptionsEditor', [
             MisconceptionObjectFactory) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.misconceptions = $scope.skill.getMisconceptions();
-          $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
-            '/general/drag_dots.png');
 
           $scope.isEditable = function() {
             return true;
