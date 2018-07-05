@@ -37,7 +37,17 @@ oppia.factory('NumberWithUnitsValidationService', [
         } catch (parsingError) {}
 
         var checkEquality = function(earlierRule, laterRule) {
-          return angular.equals(earlierRule.inputs.f, laterRule.inputs.f);
+          answer = NumberWithUnitsObjectFactory.fromDict(earlierRule.inputs.f);
+          inputs = NumberWithUnitsObjectFactory.fromDict(laterRule.inputs.f);
+
+          answerString = answer.toMathjsCompatibleString();
+          inputsString = inputs.toMathjsCompatibleString();
+
+          answerList = NumberWithUnitsObjectFactory.fromRawInputString(
+            answerString).toDict();
+          inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
+            inputsString).toDict();
+          return angular.equals(answerList, inputsList);
         };
 
         var checkEquivalency = function(earlierRule, laterRule) {

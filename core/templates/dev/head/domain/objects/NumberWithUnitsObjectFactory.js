@@ -316,6 +316,19 @@ oppia.factory('UnitsObjectFactory', [function() {
     // Makes the units compatible with the math.js allowed format.
     units = units.replace(/per/g, '/');
 
+    if (units.includes('Dollars') || units.includes('dollars') ||
+      units.includes('Dollar')) {
+      units = units.replace('dollars', 'dollar');
+      units = units.replace('Dollars', 'dollar');
+      units = units.replace('Dollar', 'dollar');
+    }
+    if (units.includes('Rupees') || units.includes('rupees') ||
+      units.includes('Rupee')) {
+      units = units.replace('rupees', 'rupee');
+      units = units.replace('Rupees', 'rupee');
+      units = units.replace('Rupee', 'rupee');
+    }
+
     // Special symbols need to be replaced as math.js doesn't support custom
     // units starting with special symbols. Also, it doesn't allow units
     // followed by a number as in the case of currency units.
@@ -326,7 +339,7 @@ oppia.factory('UnitsObjectFactory', [function() {
     if (units.includes('Rs') || units.includes('₹')) {
       units = units.replace('Rs', '');
       units = units.replace('₹', '');
-      units = 'rupees ' + units;
+      units = 'rupee ' + units;
     }
     return units.trim();
   };
