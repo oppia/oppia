@@ -28,7 +28,7 @@ oppia.controller('StoryEditor', [
     StoryEditorStateService.loadStory(
       topicId, UrlService.getStoryIdFromUrl());
 
-    $scope.returnToTopic = function() {
+    $scope.returnToTopicEditorPage = function() {
       if (UndoRedoService.getChangeCount() > 0) {
         var modalInstance = $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(

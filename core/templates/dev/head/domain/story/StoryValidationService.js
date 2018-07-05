@@ -40,43 +40,61 @@ oppia.factory('StoryValidationService', [
       var issues = [];
 
       if (!_checkValidNodeId(node.getId())) {
-        throw Error('Invalid node id');
+        throw Error('The node id ' + node.getId() + ' is invalid.');
       }
       var prerequisiteSkillIds = node.getPrerequisiteSkillIds();
       var acquiredSkillIds = node.getAcquiredSkillIds();
       var destinationNodeIds = node.getDestinationNodeIds();
 
-      if ((new Set(prerequisiteSkillIds)).size !==
-          prerequisiteSkillIds.length) {
-        issues.push('All prerequisite skill ids should be distinct');
+      for (var i = 0; i < prerequisiteSkillIds.length; i++) {
+        var skillId = prerequisiteSkillIds[i];
+        if (prerequisiteSkillIds.indexOf(skillId) <
+          prerequisiteSkillIds.lastIndexOf(skillId)) {
+          issues.push(
+            'The prerequisite skill with id ' + skillId + ' is duplicated in' +
+            ' node with id ' + node.getId());
+        }
       }
-      if ((new Set(acquiredSkillIds)).size !==
-          acquiredSkillIds.length) {
-        issues.push('All acquired skill ids should be distinct');
+      for (var i = 0; i < acquiredSkillIds.length; i++) {
+        var skillId = acquiredSkillIds[i];
+        if (acquiredSkillIds.indexOf(skillId) <
+          acquiredSkillIds.lastIndexOf(skillId)) {
+          issues.push(
+            'The acquired skill with id ' + skillId + ' is duplicated in' +
+            ' node with id ' + node.getId());
+        }
       }
       for (var i = 0; i < prerequisiteSkillIds.length; i++) {
         if (acquiredSkillIds.indexOf(prerequisiteSkillIds[i]) !== -1) {
           issues.push(
-            'Acquired and prerequisite skills for a node should not have any ' +
-            'skill in common');
+            'The skill with id ' + prerequisiteSkillIds[i] + ' is common ' +
+            'to both the acquired and prerequisite skill id list in node with' +
+            ' id ' + node.getId());
         }
       }
-      if (
-        destinationNodeIds.some(function(nodeId) {
-          return !_checkValidNodeId(nodeId);
-        })) {
-        throw Error('Each destination node id should be valid');
+      for (var i = 0; i < destinationNodeIds.length; i++) {
+        if (!_checkValidNodeId(destinationNodeIds[i])) {
+          throw Error(
+            'The destination node id ' + destinationNodeIds[i] + ' is ' +
+            'invalid in node with id ' + node.getId());
+        }
       }
       if (
         destinationNodeIds.some(function(nodeId) {
           return nodeId === node.getId();
         })) {
         issues.push(
-          'A destination node id of a node should not point to the same node.');
+          'The destination node id of node with id ' + node.getId() +
+          ' points to itself.');
       }
-      if ((new Set(destinationNodeIds)).size !==
-          destinationNodeIds.length) {
-        issues.push('All destination node ids should be distinct');
+      for (var i = 0; i < destinationNodeIds.length; i++) {
+        var nodeId = destinationNodeIds[i];
+        if (destinationNodeIds.indexOf(nodeId) <
+          destinationNodeIds.lastIndexOf(nodeId)) {
+          issues.push(
+            'The destination node with id ' + nodeId + ' is duplicated in' +
+            ' node with id ' + node.getId());
+        }
       }
       return issues;
     };
@@ -93,13 +111,17 @@ oppia.factory('StoryValidationService', [
       }
 
       // Provided the nodes list is valid and each node in it is valid, the
-      // prelimiary checks are done to see if the story node graph obtained is
+      // preliminary checks are done to see if the story node graph obtained is
       // valid.
       var nodeIds = storyContents.getNodes().map(function(node) {
         return node.getId();
       });
-      if ((new Set(nodeIds)).size !== nodeIds.length) {
-        throw Error('All node ids should be distinct');
+      for (var i = 0; i < nodeIds.length; i++) {
+        var nodeId = nodeIds[i];
+        if (nodeIds.indexOf(nodeId) < nodeIds.lastIndexOf(nodeId)) {
+          throw Error(
+            'The node with id ' + nodeId + ' is duplicated in the story');
+        }
       }
       var nextNodeIdNumber = parseInt(
         storyContents.getNextNodeId().replace(NODE_ID_PREFIX, ''));
@@ -123,7 +145,9 @@ oppia.factory('StoryValidationService', [
         }
       }
       if (!initialNodeIsPresent) {
-        throw Error('Initial node is not present in the story');
+        throw Error(
+          'Initial node - ' + storyContents.getInitialNodeId() +
+          ' - is not present in the story');
       }
 
       // All the validations above should be successfully completed before going

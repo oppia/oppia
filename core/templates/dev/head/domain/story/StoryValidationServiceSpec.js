@@ -84,9 +84,9 @@ describe('Story validation service', function() {
       'node_1', 'node_1');
 
     expect(_findValidationIssuesInStory()).toEqual([
-      'Acquired and prerequisite skills for a node should not have any ' +
-      'skill in common',
-      'A destination node id of a node should not point to the same node.'
+      'The skill with id skill_2 is common to both the acquired and' +
+      ' prerequisite skill id list in node with id node_1',
+      'The destination node id of node with id node_1 points to itself.'
     ]);
   });
 
