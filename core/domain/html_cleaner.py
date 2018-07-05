@@ -19,7 +19,6 @@
 import HTMLParser
 import json
 import logging
-import re
 import urlparse
 
 import bleach
