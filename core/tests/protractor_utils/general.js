@@ -36,7 +36,12 @@ var waitForSystem = function() {
 };
 
 var waitForLoadingMessage = function() {
-  // Wait for page to completely load.
+  // Consider adding this method after each browser.get() call going to an
+  // Angular page destination. Completely wait for page to load to
+  // avoid XMLHTTPReq error on page refresh:
+  // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
+  // and browser.waitForAngular()'s flakiness
+  // https://github.com/angular/protractor/issues/2954.
   var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
   return browser.wait(until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');
