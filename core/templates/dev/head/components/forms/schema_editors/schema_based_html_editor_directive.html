@@ -1,6 +1,8 @@
 <!-- If the current RTE is CKEditor then render CKEditor as the RTE. -->
+<!-- label-for-focus-target feature is removed since CKEditor has a
+focusManager to manage the focus activity automatically. -->
 <ck-editor-rte ng-if="!isDisabled() && isCurrentRTECKEditor()" ng-model="$parent.localValue"
-               ui-config="uiConfig()" label-for-focus-target="labelForFocusTarget()">
+               ui-config="uiConfig()">
 </ck-editor-rte>
 
 <!-- If the current RTE is not CKEditor then render TextAngular as the RTE. -->
