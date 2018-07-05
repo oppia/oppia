@@ -16,12 +16,14 @@
  * @fileoverview Page object for the thanks page, for use in Protractor
  * tests.
  */
+var general = require('./general.js');
 
 var ThanksPage = function() {
   var THANKS_PAGE_URL = '/thanks';
 
   this.get = function() {
-    return browser.get(THANKS_PAGE_URL);
+    browser.get(THANKS_PAGE_URL);
+    return general.waitForLoadingMessage();
   };
 };
 
