@@ -19,7 +19,6 @@
 import logging
 
 from core.domain import question_domain
-from core.domain import role_services
 from core.domain import user_services
 from core.platform import models
 import feconf
@@ -296,44 +295,6 @@ def save_question_summary(question_summary):
     question_summary_model.put()
 
 
-def send_question_for_review(committer_id, question_id):
-    """Marks a question's status as pending.
-
-    Args:
-        committer_id: str. The user_id of the committer.
-        question_id: str. The user_id of the question.
-
-    Returns:
-        QuestionSummaryModel: The QuestionSummaryModel for the given question.
-    """
-    model = get_question_summary_by_question_id(question_id, strict=False)
-    commit_message = 'Marked question as pending.'
-    model.status = feconf.QUESTION_STATUS_PENDING
-    model.commit(
-        committer_id,
-        commit_message,
-        [{'cmd': question_domain.CMD_SEND_QUESTION_FOR_REVIEW}])
-
-
-def reject_question(committer_id, question_id):
-    """Marks a question's status as rejected.
-
-    Args:
-        committer_id: str. The user_id of the committer.
-        question_id: str. The user_id of the question.
-
-    Returns:
-        QuestionSummaryModel: The QuestionSummaryModel for the given question.
-    """
-    model = get_question_summary_by_question_id(question_id, strict=False)
-    commit_message = 'Marked question as rejected.'
-    model.status = feconf.QUESTION_STATUS_REJECTED
-    model.commit(
-        committer_id,
-        commit_message,
-        [{'cmd': question_domain.CMD_REJECT_QUESTION}])
-
-
 def get_question_summaries_by_creator_id(creator_id):
     """Gets question summaries of questions created by the user.
 
@@ -400,69 +361,14 @@ def check_can_edit_question(user_id, question_id):
     if question_summary.status == feconf.QUESTION_STATUS_PENDING:
         return False
 
+    if question_summary.creator_id == user_id:
+        if (question_summary.status == feconf.ACTIVITY_STATUS_PRIVATE or
+                question_summary.status == feconf.QUESTION_STATUS_REJECTED):
+            return True
+
     if (user_services.is_admin(user_id) or
             user_services.is_topic_manager(user_id)):
         if question_summary.status == feconf.QUESTION_STATUS_APPROVED:
             return True
-        return False
-
-    if (question_summary.status == feconf.ACTIVITY_STATUS_PRIVATE or
-            question_summary.status == feconf.QUESTION_STATUS_REJECTED):
-        return True
 
     return False
-
-
-def approve_and_publish_question(question_id, committer_id):
-    """Marks the given question as published.
-
-    Args:
-        question_id: str. The id of the given question.
-        committer_id: str. ID of the committer.
-
-    Raises:
-        Exception. The given question does not exist.
-        Exception. The question is already published.
-        Exception. The user does not have enough rights to publish the question.
-    """
-    question_summary = get_question_summary_by_question_id(
-        question_id, strict=False)
-    if question_summary is None:
-        raise Exception('The given question does not exist')
-    user = user_services.UserActionsInfo(committer_id)
-    if role_services.ACTION_CHANGE_QUESTION_STATUS not in user.actions:
-        raise Exception(
-            'The user does not have enough rights to publish the question.')
-
-    if question_summary.status == feconf.QUESTION_STATUS_APPROVED:
-        raise Exception('The question is already published.')
-    question_summary.status = feconf.QUESTION_STATUS_APPROVED
-    question_summary.put()
-
-
-def unpublish_question(question_id, committer_id):
-    """Marks the given question as unpublished.
-
-    Args:
-        question_id: str. The id of the given question.
-        committer_id: str. ID of the committer.
-
-    Raises:
-        Exception. The given question does not exist.
-        Exception. The question is already unpublished.
-        Exception. The user does not have enough rights to unpublish the
-            question.
-    """
-    question_summary = get_question_summary_by_question_id(
-        question_id, strict=False)
-    if question_summary is None:
-        raise Exception('The given question does not exist')
-    user = user_services.UserActionsInfo(committer_id)
-    if role_services.ACTION_CHANGE_QUESTION_STATUS not in user.actions:
-        raise Exception(
-            'The user does not have enough rights to unpublish the question.')
-
-    if not question_summary.status == feconf.QUESTION_STATUS_APPROVED:
-        raise Exception('The question is already unpublished.')
-    question_summary.status = feconf.ACTIVITY_STATUS_PRIVATE
-    question_summary.put()
