@@ -935,8 +935,8 @@ var ExplorationEditorMainTab = function() {
         }
       }
       if (!matched) {
-        throw Error('State ' + targetName +
-      ' not found by explorationEditorMainTab.moveToState.');
+        throw Error(
+          'State ' + targetName + ' not found by editorMainTab.moveToState.');
       }
     });
     browser.wait(until.textToBePresentInElement(stateNameContainer, targetName),

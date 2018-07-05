@@ -70,8 +70,8 @@ var ExplorationEditorHistoryTab = function() {
             }
           }
           if (!matched) {
-            throw Error('State ' + stateName +
-      ' not found by explorationEditoHistoryTab.openStateHistory.');
+            throw Error(
+              'State ' + stateName + ' not found by getHistoryGraph.');
           }
         });
       },
