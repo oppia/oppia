@@ -102,7 +102,7 @@ describe('Skill update service', function() {
     SkillUpdateService.addMisconception(skill, aNewMisconception);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_skill_misconception',
-      new_value: aNewMisconceptionDict
+      new_misconception_dict: aNewMisconceptionDict
     }]);
     expect(skill.getMisconceptions().length).toEqual(3);
     UndoRedoService.undoChange(skill);
