@@ -158,10 +158,9 @@ oppia.directive('imageWithRegionsEditor', [
           };
 
           $scope.getPreviewUrl = function(imageUrl) {
-            var objectUrl = AssetsBackendApiService.getImageUrlForPreview(
+            return AssetsBackendApiService.getImageUrlForPreview(
               ExplorationContextService.getExplorationId(),
               encodeURIComponent(imageUrl));
-            return objectUrl;
           };
 
           // Called when the image is changed to calculate the required

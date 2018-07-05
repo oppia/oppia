@@ -35,7 +35,7 @@ oppia.factory('RteHelperService', [
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
         previewUrlTemplate: (GLOBALS.DEV_MODE ?
           RTE_COMPONENT_SPECS[componentId].preview_url_template_prod :
-          RTE_COMPONENT_SPECS[componentId].preview_url_template),
+          RTE_COMPONENT_SPECS[componentId].preview_url_template_dev),
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
         isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,

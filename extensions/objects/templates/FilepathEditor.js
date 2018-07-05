@@ -312,9 +312,8 @@ oppia.directive('filepathEditor', [
 
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           var encodedFilepath = window.encodeURIComponent(imageFileName);
-          var objectUrl = AssetsBackendApiService.getImageUrlForPreview(
+          return AssetsBackendApiService.getImageUrlForPreview(
             $scope.explorationId, encodedFilepath);
-          return objectUrl;
         };
 
         /** Scope variables and functions (visibles to the view) */
