@@ -58,8 +58,9 @@ var _completeSignup = function(username) {
   agreeToTermsCheckbox.click();
   registerUser.click();
   general.waitForLoadingMessage();
+  // Transitioning between Angular and Non-Angular login page.
+  general.waitForSystem();
 };
-
 
 var createUser = function(email, username) {
   createAndLoginUser(email, username);
