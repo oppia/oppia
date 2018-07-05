@@ -42,7 +42,6 @@ def _create_new_question(committer_id, question, commit_message):
         str. The ID of the model.
     """
     question.validate()
-    create_new_question_rights(question.question_id, committer_id)
     model = question_models.QuestionModel(
         id=question.question_id,
         question_data=question.question_data,
@@ -383,84 +382,6 @@ def get_summaries_of_linked_skills(question_id):
                 question_skill_link.skill_id, strict=False))
 
     return linked_skill_summaries
-
-
-def get_question_rights_from_model(question_rights_model):
-    """Constructs a QuestionRights object from the given question rights model.
-
-    Args:
-        question_rights_model: QuestionRightsModel. Question rights from the
-            datastore.
-
-    Returns:
-        QuestionRights. The rights object created from the model.
-    """
-
-    return question_domain.QuestionRights(
-        question_rights_model.id,
-        question_rights_model.manager_ids
-    )
-
-
-def save_question_rights(
-        question_rights, committer_id, commit_message, commit_cmds):
-    """Saves a QuestionRights domain object to the datastore.
-
-    Args:
-        question_rights: QuestionRights. The rights object for the given
-            question.
-        committer_id: str. ID of the committer.
-        commit_message: str. Descriptive message for the commit.
-        commit_cmds: list(QuestionChangeDict). A list of commands
-            describing what kind of commit was done.
-    """
-
-    model = question_models.QuestionRightsModel.get(
-        question_rights.id, strict=False)
-
-    model.manager_ids = question_rights.manager_ids
-    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
-    model.commit(committer_id, commit_message, commit_cmd_dicts)
-
-
-def create_new_question_rights(question_id, committer_id):
-    """Creates a new question rights object and saves it to the datastore.
-
-    Args:
-        question_id: str. ID of the question.
-        committer_id: str. ID of the committer.
-    """
-    question_rights = question_domain.QuestionRights(question_id, [])
-    commit_cmds = [{'cmd': CMD_CREATE_NEW}]
-
-    question_models.QuestionRightsModel(
-        id=question_rights.id,
-        manager_ids=question_rights.manager_ids
-    ).commit(committer_id, 'Created new question rights', commit_cmds)
-
-
-def get_question_rights(question_id, strict=True):
-    """Retrieves the rights object for the given question.
-
-    Args:
-        question_id: str. ID of the question.
-        strict: bool. Whether to fail noisily if no question rights with a
-            given id exists in the datastore.
-
-    Returns:
-        QuestionRights. The rights object associated with the given question.
-
-    Raises:
-        EntityNotFoundError. The question rights for question with ID was not
-            found in the datastore.
-    """
-
-    model = question_models.QuestionRightsModel.get(question_id, strict=strict)
-
-    if model is None:
-        return None
-
-    return get_question_rights_from_model(model)
 
 
 def check_can_edit_question(user_id, question_id):
