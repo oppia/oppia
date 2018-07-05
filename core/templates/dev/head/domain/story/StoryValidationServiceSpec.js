@@ -73,7 +73,7 @@ describe('Story validation service', function() {
   it('should correctly validate story', function() {
     _sampleStory.setTitle('');
     expect(_findValidationIssuesInStory()).toEqual([
-      'Story title should be a non-empty string'
+      'Story title should not be empty'
     ]);
   });
 

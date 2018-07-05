@@ -39,63 +39,27 @@ oppia.factory('StoryValidationService', [
     var _validateNode = function(node) {
       var issues = [];
 
-      if (!(node instanceof StoryNodeObjectFactory)) {
-        throw Error('All nodes should be a StoryNode instance');
-      }
       if (!_checkValidNodeId(node.getId())) {
         throw Error('Invalid node id');
-      }
-      if (typeof node.getOutline() !== 'string') {
-        throw Error('Node outline should be a string');
-      }
-      if ((typeof node.getExplorationId() !== 'string') &&
-          (node.getExplorationId() !== null)) {
-        throw Error('Exploration id should be a string or null');
-      }
-      if (typeof node.getOutlineStatus() !== 'boolean') {
-        throw Error('Node outline status should be true or false.');
       }
       var prerequisiteSkillIds = node.getPrerequisiteSkillIds();
       var acquiredSkillIds = node.getAcquiredSkillIds();
       var destinationNodeIds = node.getDestinationNodeIds();
-      if (prerequisiteSkillIds.constructor !== Array) {
-        throw Error('Prerequisite skill ids should be an array');
-      }
-      if (
-        prerequisiteSkillIds.some(function(skillId) {
-          return typeof skillId !== 'string';
-        })) {
-        throw Error('Each prerequisite skill id should be a string');
-      }
+
       if ((new Set(prerequisiteSkillIds)).size !==
           prerequisiteSkillIds.length) {
         issues.push('All prerequisite skill ids should be distinct');
-      }
-
-      if (acquiredSkillIds.constructor !== Array) {
-        throw Error('Acquired skill ids should be an array');
-      }
-      if (
-        acquiredSkillIds.some(function(skillId) {
-          return typeof skillId !== 'string';
-        })) {
-        throw Error('Each acquired skill id should be a string');
       }
       if ((new Set(acquiredSkillIds)).size !==
           acquiredSkillIds.length) {
         issues.push('All acquired skill ids should be distinct');
       }
-
       for (var i = 0; i < prerequisiteSkillIds.length; i++) {
         if (acquiredSkillIds.indexOf(prerequisiteSkillIds[i]) !== -1) {
           issues.push(
             'Acquired and prerequisite skills for a node should not have any ' +
             'skill in common');
         }
-      }
-
-      if (destinationNodeIds.constructor !== Array) {
-        throw Error('Destination node ids should be an array');
       }
       if (
         destinationNodeIds.some(function(nodeId) {
@@ -119,18 +83,6 @@ oppia.factory('StoryValidationService', [
 
     var _validateStoryContents = function(storyContents) {
       var issues = [];
-      if (!(storyContents instanceof StoryContentsObjectFactory)) {
-        throw Error('Story contents should be StoryContents object');
-      }
-      if (!_checkValidNodeId(storyContents.getInitialNodeId())) {
-        throw Error('Invalid initial node id');
-      }
-      if (!_checkValidNodeId(storyContents.getNextNodeId())) {
-        throw Error('Invalid next node id');
-      }
-      if (storyContents.getNodes().constructor !== Array) {
-        throw Error('Story nodes should be an array');
-      }
       var nodes = storyContents.getNodes();
       for (var i = 0; i < nodes.length; i++) {
         var nodeIssues = _validateNode(nodes[i]);
@@ -241,20 +193,8 @@ oppia.factory('StoryValidationService', [
 
     var _validateStory = function(story) {
       var issues = [];
-      if (!(story instanceof StoryObjectFactory)) {
-        throw Error('The story should be Story object');
-      }
-      if (typeof story.getTitle() !== 'string' || story.getTitle() === '') {
-        issues.push('Story title should be a non-empty string');
-      }
-      if (typeof story.getDescription() !== 'string') {
-        throw Error('Story description should be a string');
-      }
-      if (typeof story.getNotes() !== 'string') {
-        throw Error('Story notes should be a string');
-      }
-      if (typeof story.getLanguageCode() !== 'string') {
-        throw Error('Story language code should be a string');
+      if (story.getTitle() === '') {
+        issues.push('Story title should not be empty');
       }
       issues = issues.concat(_validateStoryContents(story.getStoryContents()));
 
