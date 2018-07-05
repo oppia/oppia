@@ -150,6 +150,7 @@ var LibraryPage = function(){
 
   this.clickCreateActivity = function(){
     createActivityButton.click();
+    general.waitForLoadingMessage();
   };
 
   this.findExploration = function(explorationTitle) {

@@ -101,6 +101,7 @@ var ExplorationPlayerPage = function() {
     browser.wait(until.elementToBeClickable(confirmRedirectionButton), 5000,
       ' Confirm Redirect button takes too long to appear');
     confirmRedirectionButton.click();
+    general.waitForLoadingMessage();
   };
 
   this.clickCancelRedirectionButton = function() {
@@ -113,6 +114,7 @@ var ExplorationPlayerPage = function() {
     browser.wait(until.elementToBeClickable(returnToParentButton), 5000,
       ' Cancel Redirect button takes too long to appear');
     returnToParentButton.click();
+    general.waitForLoadingMessage();
   };
 
   // This verifies the question just asked, including formatting and

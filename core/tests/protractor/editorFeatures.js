@@ -662,8 +662,6 @@ describe('Suggestions on Explorations', function() {
     creatorDashboardPage.navigateToExplorationEditor();
 
     explorationEditorPage.navigateToFeedbackTab();
-    // There is no "Loading" message while feedback tab is loading.
-    general.waitForSystem();
     explorationEditorFeedbackTab.getSuggestionThreads().then(function(threads) {
       expect(threads.length).toEqual(1);
       expect(threads[0]).toMatch(suggestionDescription);

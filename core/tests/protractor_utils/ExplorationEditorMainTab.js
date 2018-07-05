@@ -62,7 +62,7 @@ var ExplorationEditorMainTab = function() {
   var interactionEditor = element(
     by.css('.protractor-test-interaction-editor'));
   var explorationGraph = element(by.css('.protractor-test-exploration-graph'));
-  var stateNode = explorationGraph.all(by.css('.protractor-test-node'));
+  var stateNodes = explorationGraph.all(by.css('.protractor-test-node'));
   var stateNodeLabel = function(nodeElement) {
     return nodeElement.element(by.css('.protractor-test-node-label'));
   };
@@ -123,7 +123,6 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-delete-response'));
   var dismissWelcomeModalButton = element(
     by.css('.protractor-test-dismiss-welcome-modal'));
-  var nextTutorialStageButton = element.all(by.css('.nextBtn'));
   var saveAnswerButton = element(
     by.css('.protractor-test-save-answer'));
   var saveHintButton = element(by.css('.protractor-test-save-hint'));
@@ -174,29 +173,26 @@ var ExplorationEditorMainTab = function() {
 
   this.finishTutorial = function() {
     // Finish the tutorial.
-    var finishTutorialButton = element.all(by.buttonText('Finish'));
-    finishTutorialButton.then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click().then(function(){
-          // Making sure tutorial modal is closed
-          browser.wait(until.invisibilityOf(finishTutorialButton), 5000,
-            'Tutorial is not closed');
-        });
-      } else {
-        throw 'Expected to find exactly one \'Finish\' button';
-      }
-    });
+    var finishTutorialButton = element.all(by.buttonText('Finish')).first();
+    browser.wait(until.elementToBeClickable(finishTutorialButton), 5000,
+      'Next Tutorial Stage button is not clickable')
+      .then (function(isClickable) {
+        if (isClickable) {
+          finishTutorialButton.click();
+        }
+      });
   };
 
   this.progressInTutorial = function() {
     // Progress to the next instruction in the tutorial.
-    nextTutorialStageButton.then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click();
-      } else {
-        throw 'Expected to find exactly one \'next\' button';
-      }
-    });
+    var nextTutorialStageButton = element.all(by.css('.nextBtn')).first();
+    browser.wait(until.elementToBeClickable(nextTutorialStageButton), 5000,
+      'Next Tutorial Stage button is not clickable')
+      .then (function(isClickable) {
+        if (isClickable) {
+          nextTutorialStageButton.click();
+        }
+      });
   };
 
   this.startTutorial = function() {
@@ -445,24 +441,23 @@ var ExplorationEditorMainTab = function() {
   // .appendBoldText(...).
   this.setContent = function(richTextInstructions) {
   // Wait for browser to completely load the rich text editor.
-    browser.waitForAngular();
     browser.wait(until.elementToBeClickable(stateEditContent), 10000,
       'stateEditContent taking too long to appear to set content')
       .then(function(isClickable) {
         if (isClickable) {
           stateEditContent.click();
+          var stateContentEditor = element(
+            by.css('.protractor-test-state-content-editor'));
+          browser.wait(until.visibilityOf(stateContentEditor), 10000,
+            'stateContentEditor taking too long to appear to set content');
+          var richTextEditor = forms.RichTextEditor(stateContentEditor);
+          richTextEditor.clear();
+          richTextInstructions(richTextEditor);
+          expect(saveStateContentButton.isDisplayed()).toBe(true);
+          saveStateContentButton.click();
+          browser.wait(until.invisibilityOf(saveStateContentButton), 5000);
         }
       });
-    var stateContentEditor = element(
-      by.css('.protractor-test-state-content-editor'));
-    browser.wait(until.visibilityOf(stateContentEditor), 5000,
-      'stateContentEditor taking too long to appear to set content');
-    var richTextEditor = forms.RichTextEditor(stateContentEditor);
-    richTextEditor.clear();
-    richTextInstructions(richTextEditor);
-    expect(saveStateContentButton.isDisplayed()).toBe(true);
-    saveStateContentButton.click();
-    browser.wait(until.invisibilityOf(saveStateContentButton), 5000);
   };
 
   // This receives a function richTextInstructions used to verify the display of
@@ -917,7 +912,7 @@ var ExplorationEditorMainTab = function() {
   // For this to work, there must be more than one name, otherwise the
   // exploration overview will be disabled.
   this.expectStateNamesToBe = function(names) {
-    stateNode.map(function(stateElement) {
+    stateNodes.map(function(stateElement) {
       return stateNodeLabel(stateElement).getText();
     }).then(function(stateNames) {
       expect(stateNames.sort()).toEqual(names.sort());
@@ -928,16 +923,15 @@ var ExplorationEditorMainTab = function() {
   // fail.
   this.moveToState = function(targetName) {
     general.scrollToTop();
-    stateNode.map(function(stateElement) {
+    stateNodes.map(function(stateElement) {
       return stateNodeLabel(stateElement).getText();
     }).then(function(listOfNames) {
       var matched = false;
       for (var i = 0; i < listOfNames.length; i++) {
         if (listOfNames[i] === targetName) {
-          stateNode.get(i).click();
+          stateNodes.get(i).click();
           matched = true;
           // Wait to re-load the entire state editor.
-          general.waitForSystem();
         }
       }
       if (!matched) {
@@ -945,14 +939,21 @@ var ExplorationEditorMainTab = function() {
       ' not found by explorationEditorMainTab.moveToState.');
       }
     });
+    browser.wait(until.textToBePresentInElement(stateNameContainer, targetName),
+      5000, 'Current state name is:' + stateNameContainer.getText() +
+      'instead of expected ' + targetName);
   };
 
   this.setStateName = function(name) {
-    browser.wait(until.elementToBeClickable(stateNameContainer), 5000,
-      'State Name Container takes too long to appear');
-    stateNameContainer.click();
-    stateNameInput.clear();
-    stateNameInput.sendKeys(name);
+    browser.wait(until.elementToBeClickable(stateNameContainer), 10000,
+      'State Name Container takes too long to appear')
+      .then(function (isClickable) {
+        if (isClickable) {
+          stateNameContainer.click();
+          stateNameInput.clear();
+          stateNameInput.sendKeys(name);
+        }
+      });
     browser.wait(until.elementToBeClickable(stateNameSubmitButton), 5000,
       'State Name Submit button takes too long to appear')
       .then(function(isClickable) {
@@ -960,7 +961,6 @@ var ExplorationEditorMainTab = function() {
           stateNameSubmitButton.click();
           // Wait for state name container to completely disappear
           // and re-appear again.
-          general.waitForSystem();
         }
       });
     browser.wait(until.textToBePresentInElement(stateNameContainer, name),

@@ -113,9 +113,7 @@ describe('Embedding', function() {
     }];
 
     var playCountingExploration = function(version) {
-      general.waitForSystem();
-      browser.waitForAngular();
-
+      general.waitForLoadingMessage();
       explorationPlayerPage.expectContentToMatch(
         forms.toRichText((version === 2) ?
           'Given three balls of different colors. How many ways are there ' +
@@ -255,8 +253,7 @@ describe('Embedding', function() {
 
       browser.switchTo().frame(driver.findElement(
         by.css('.protractor-test-embedded-exploration > iframe')));
-      general.waitForSystem();
-      browser.waitForAngular();
+      general.waitForLoadingMessage();
       expect(driver.findElement(by.css('.protractor-test-float-form-input'))
         .getAttribute('placeholder')).toBe(expectedPlaceholder);
       browser.switchTo().defaultContent();

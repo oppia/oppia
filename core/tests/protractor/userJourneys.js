@@ -31,6 +31,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var until = protractor.ExpectedConditions;
 
 var ERROR_PAGE_URL_SUFFIX = '/console_errors';
 
@@ -38,7 +39,7 @@ var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
     element(by.cssContainingText('option', language)).click();
   // Wait for the language-change request to reach the backend.
-  general.waitForSystem();
+  general.waitForLoadingMessage();
 };
 
 
@@ -70,8 +71,17 @@ describe('Basic user journeys', function() {
 
       users.login('mod@userManagement.com');
       browser.get(general.MODERATOR_URL_SUFFIX);
+      // There is no loading message for /moderator. Furthermore,
+      // browser.get() sometimes does not wait for Angular before page load
+      // https://github.com/angular/protractor/issues/2461
+      // which causes
+      // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
+      // which is a wont-fix from Angular team.
+      var profileDropdown = element(by.css(
+        '.protractor-test-profile-dropdown'));
+      browser.wait(until.elementToBeClickable(profileDropdown), 5000);
+      profileDropdown.click();
       users.logout();
-
       general.checkForConsoleErrors([]);
     });
 
@@ -99,8 +109,10 @@ describe('Basic user journeys', function() {
       ];
       classNames.forEach(function(className) {
         browser.actions().mouseMove(profileDropdown).perform();
-        general.waitForSystem(100);
-        profileDropdown.element(by.css(className)).click();
+        var dropdownElement = element.all(by.css(className)).first();
+        browser.wait(until.elementToBeClickable(dropdownElement), 5000);
+        dropdownElement.click();
+        general.waitForLoadingMessage();
       });
     });
 
@@ -159,25 +171,19 @@ describe('Basic user journeys', function() {
       explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     });
 
-    var visitLibraryPage = function() {
-      libraryPage.get();
-    };
-
     var visitRecentlyPublishedPage = function() {
       browser.get('library/recently_published');
+      general.waitForLoadingMessage();
     };
 
     it('visits the search page', function() {
-      visitLibraryPage();
-      element(by.css('.protractor-test-search-input')).sendKeys(SEARCH_TERM);
-      // It takes a while for the URL to change.
-      general.waitForSystem();
-      general.waitForSystem();
+      libraryPage.get();
+      libraryPage.findExploration(SEARCH_TERM);
       expect(browser.getCurrentUrl()).toContain('search/find?q=python');
     });
 
     it('visits the library index page', function() {
-      visitLibraryPage();
+      libraryPage.get();
     });
 
     it('visits the top rated page', function() {
@@ -191,12 +197,14 @@ describe('Basic user journeys', function() {
         EXPLORATION_OBJECTIVE,
         EXPLORATION_LANGUAGE
       );
-      visitLibraryPage();
+      libraryPage.get();
+      libraryPage.findExploration(EXPLORATION_TITLE);
       libraryPage.playExploration(EXPLORATION_TITLE);
       explorationPlayerPage.rateExploration(EXPLORATION_RATING);
 
-      visitLibraryPage();
+      libraryPage.get();
       element(by.css('.protractor-test-library-top-rated')).click();
+      general.waitForLoadingMessage();
       expect(browser.getCurrentUrl()).toContain('library/top_rated');
       users.logout();
     });
@@ -217,7 +225,7 @@ describe('Oppia static pages tour', function() {
 
   beforeEach(function() {
     browser.get(general.SERVER_URL_PREFIX);
-    thanksPage = new ThanksPage.ThanksPage();
+    general.waitForLoadingMessage();
   });
 
   it('visits the links in About dropdown', function() {
@@ -231,24 +239,28 @@ describe('Oppia static pages tour', function() {
       var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css(className)).click();
-      general.waitForSystem();
+      general.waitForLoadingMessage();
     });
   });
 
   it('visits the donate link', function() {
     element(by.css('.protractor-test-donate-link')).click();
+    general.waitForLoadingMessage();
   });
 
   it('visits the thanks for donating page', function() {
+    thanksPage = new ThanksPage.ThanksPage();
     thanksPage.get();
   });
 
   it('visits the terms page', function() {
     element(by.css('.protractor-test-terms-link')).click();
+    general.waitForLoadingMessage();
   });
 
   it('visits the privacy page', function() {
     element(by.css('.protractor-test-privacy-policy-link')).click();
+    general.waitForLoadingMessage();
   });
 
   afterEach(function() {
@@ -277,6 +289,7 @@ describe('Site language', function() {
   var explorationEditorSettingsTab = null;
   var firstExplorationId = null;
   var libraryPage = null;
+  var preferencesPage = null;
 
   beforeAll(function() {
     adminPage = new AdminPage.AdminPage();
@@ -286,6 +299,7 @@ describe('Site language', function() {
     explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     libraryPage = new LibraryPage.LibraryPage();
+    preferencesPage = new PreferencesPage.PreferencesPage();
 
     var CREATOR_USERNAME = 'langCreatorExplorations';
     var EDITOR_USERNAME = 'langCollections';
@@ -327,11 +341,7 @@ describe('Site language', function() {
       users.logout();
 
       users.login('lang@collections.com');
-      browser.get(general.SERVER_URL_PREFIX);
-      var dropdown = element(by.css('.protractor-test-profile-dropdown'));
-      browser.actions().mouseMove(dropdown).perform();
-      dropdown.element(by.css('.protractor-test-dashboard-link')).click();
-      browser.waitForAngular();
+      creatorDashboardPage.get();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateCollectionButton();
       browser.getCurrentUrl().then(function(url) {
@@ -339,7 +349,6 @@ describe('Site language', function() {
         // in the url a # is added at the end that is not part of collection ID
         collectionId = pathname[5].slice(0, -1);
       });
-      browser.waitForAngular();
       // Add existing explorations.
       collectionEditorPage.addExistingExploration(firstExplorationId);
       collectionEditorPage.saveDraft();
@@ -349,7 +358,6 @@ describe('Site language', function() {
       collectionEditorPage.setObjective('This is the test collection.');
       collectionEditorPage.setCategory('Algebra');
       collectionEditorPage.saveChanges();
-      browser.waitForAngular();
       users.logout();
     });
   });
@@ -357,18 +365,14 @@ describe('Site language', function() {
   beforeEach(function() {
     // Starting language is English
     browser.get('/about');
+    general.waitForLoadingMessage();
     _selectLanguage('English');
     expect(browser.getTitle()).toEqual('About us - Oppia');
   });
 
-  afterEach(function() {
-    // Reset language back to English
-    browser.get('/about');
-    _selectLanguage('English');
-  });
-
   it('should change after selecting a different language', function() {
     browser.get('/about');
+    general.waitForLoadingMessage();
     _selectLanguage('Español');
     libraryPage.get();
     expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
@@ -378,17 +382,9 @@ describe('Site language', function() {
   it('should use language selected in the Preferences page.', function() {
     users.createUser('varda@example.com', 'Varda');
     users.login('varda@example.com');
-    browser.get('/preferences');
-    element(by.css('.protractor-test-system-language-selector')).click();
-    var options = element.all(by.css('.select2-dropdown li')).filter(
-      function(elem) {
-        return elem.getText().then(function(text) {
-          return text === 'Español';
-        });
-      });
-    options.first().click();
-    expect(element(by.css('.protractor-test-preferences-title'))
-      .getText()).toEqual('Preferencias');
+    preferencesPage.get();
+    preferencesPage.selectSystemLanguage('Español');
+    preferencesPage.expectPageHeaderToBe('Preferencias');
     general.ensurePageHasNoTranslationIds();
     users.logout();
   });
@@ -398,15 +394,14 @@ describe('Site language', function() {
       users.createUser('feanor@example.com', 'Feanor');
       users.login('feanor@example.com');
       browser.get('/about');
+      general.waitForLoadingMessage();
       _selectLanguage('Español');
       libraryPage.get();
       expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
 
       // The preference page shows the last selected language
-      browser.get('/preferences');
-      language = element(by.css('.protractor-test-system-language-selector'))
-        .element(by.css('.select2-selection__rendered'));
-      expect(language.getText(), 'Español');
+      preferencesPage.get();
+      preferencesPage.expectPreferredSiteLanguageToBe('Español');
       expect(browser.getTitle()).toEqual(
         'Cambiar sus preferencias de perfil - Oppia');
       general.ensurePageHasNoTranslationIds();
@@ -416,6 +411,7 @@ describe('Site language', function() {
 
   it('should be used in titles of pages without controllers', function() {
     browser.get('/about');
+    general.waitForLoadingMessage();
     _selectLanguage('English');
     expect(browser.getTitle()).toEqual('About us - Oppia');
     _selectLanguage('Español');
@@ -426,6 +422,7 @@ describe('Site language', function() {
   it('should not change in an exploration', function() {
     users.login('langCreator@explorations.com', true);
     browser.get('/about');
+    general.waitForLoadingMessage();
     _selectLanguage('Español');
 
     general.openEditor(firstExplorationId);
@@ -441,18 +438,19 @@ describe('Site language', function() {
   it('should not change in exploration and collection player for guest users',
     function() {
       browser.get('/about');
+      general.waitForLoadingMessage();
       _selectLanguage('Español');
 
       // Checking collection player page.
       browser.get('/collection/' + collectionId);
-      browser.waitForAngular();
+      general.waitForLoadingMessage();
       expect(element(by.css('.oppia-share-collection-footer')).getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       general.ensurePageHasNoTranslationIds();
 
       // Checking exploration player page.
       browser.get('/explore/' + firstExplorationId);
-      browser.waitForAngular();
+      general.waitForLoadingMessage();
       expect(element(by.css('.author-profile-text')).getText())
         .toEqual('PERFILES DE AUTORES');
       general.ensurePageHasNoTranslationIds();
@@ -460,6 +458,10 @@ describe('Site language', function() {
   );
 
   afterEach(function() {
+    // Reset language back to English
+    browser.get('/about');
+    general.waitForLoadingMessage();
+    _selectLanguage('English');
     general.checkForConsoleErrors([]);
   });
 });

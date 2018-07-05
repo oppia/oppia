@@ -89,9 +89,14 @@ var ExplorationEditorSettingsTab = function() {
     browser.wait(until.elementToBeClickable(deleteExplorationButton), 5000,
       'Delete Exploration button is not clickable');
     deleteExplorationButton.click();
+    browser.wait(until.elementToBeClickable(confirmDeleteExplorationButton),
+      5000,
+      'Confirm Delete Exploration button is not clickable');
     confirmDeleteExplorationButton.click();
     browser.wait(until.invisibilityOf(confirmDeleteExplorationButton), 5000,
       'Delete Exploration modal takes too long to disappear');
+    // Returning to /creator_dashboard.
+    general.waitForLoadingMessage();
   };
 
   this.enableParameters = function() {
@@ -108,10 +113,12 @@ var ExplorationEditorSettingsTab = function() {
 
   this.openAndClosePreviewSummaryTile = function() {
     openPreviewSummaryButton.click();
-    general.waitForSystem();
+    browser.wait(until.visibilityOf(explorationSummaryTile), 5000,
+      'Summary Tile takes too long to appear');
     expect(explorationSummaryTile.isPresent()).toBeTruthy();
     closePreviewSummaryButton.click();
-    general.waitForSystem();
+    browser.wait(until.invisibilityOf(explorationSummaryTile), 5000,
+      'Summary Tile takes too long to disappear');
     expect((explorationSummaryTile.isPresent())).toBeFalsy();
   };
 

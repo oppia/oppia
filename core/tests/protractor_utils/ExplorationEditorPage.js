@@ -125,11 +125,13 @@ var ExplorationEditorPage = function() {
   this.navigateToHistoryTab = function() {
     browser.wait(until.elementToBeClickable(navigateToHistoryTabButton), 5000);
     navigateToHistoryTabButton.click();
+    general.waitForLoadingMessage();
   };
 
   this.navigateToFeedbackTab = function() {
     browser.wait(until.elementToBeClickable(navigateToFeedbackTabButton), 5000);
     navigateToFeedbackTabButton.click();
+    general.waitForLoadingMessage();
   };
 
   this.navigateToMainTab = function() {
@@ -141,6 +143,7 @@ var ExplorationEditorPage = function() {
   this.navigateToPreviewTab = function() {
     browser.wait(until.elementToBeClickable(navigateToPreviewTabButton), 5000);
     navigateToPreviewTabButton.click();
+    general.waitForLoadingMessage();
   };
 
   this.navigateToSettingsTab = function() {

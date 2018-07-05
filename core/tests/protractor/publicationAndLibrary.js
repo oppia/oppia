@@ -162,7 +162,6 @@ describe('Library index page', function() {
     // The first letter of the objective is automatically capitalized.
     expect(libraryPage.getExplorationObjective(EXPLORATION_VINGILOT)).toBe(
       'Seek the aid of the Valar');
-    general.waitForSystem();
     libraryPage.findExploration(EXPLORATION_SILMARILS);
     libraryPage.playExploration(EXPLORATION_SILMARILS);
     explorationPlayerPage.expectExplorationNameToBe('silmarils');
