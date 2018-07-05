@@ -728,7 +728,7 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
     return is_invalid
 
 
-def add_caption_to_image(html_string):
+def add_caption_attr_to_image(html_string):
     """Adds caption attribute to all oppia-noninteractive-image tags.
 
     Args:

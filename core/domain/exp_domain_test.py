@@ -4415,7 +4415,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         exploration.delete_state('END')
         self.assertNotIn('END', exploration.states)
 
-    def test_convert_state(self):
+    def test_convert_html_fields_in_state(self):
         """Test conversion of html strings in state."""
         state_dict = {
             'content': {
@@ -4515,15 +4515,15 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         }
 
         self.assertEqual(
-            exp_domain.State.convert_state(
+            exp_domain.State.convert_html_fields_in_state(
                 state_dict,
                 html_cleaner.convert_to_textangular),
             state_dict_in_textangular)
 
         self.assertEqual(
-            exp_domain.State.convert_state(
+            exp_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_cleaner.add_caption_to_image),
+                html_cleaner.add_caption_attr_to_image),
             state_dict_with_image_caption)
 
 

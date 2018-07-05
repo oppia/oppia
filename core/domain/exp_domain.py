@@ -1777,9 +1777,10 @@ class State(object):
             feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
 
     @classmethod
-    def convert_state(cls, state_dict, conversion_fn):
+    def convert_html_fields_in_state(cls, state_dict, conversion_fn):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
+
         Args:
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
@@ -1789,22 +1790,19 @@ class State(object):
             dict. The converted state_dict.
         """
         state_dict['content']['html'] = (
-            conversion_fn(
-                state_dict['content']['html']))
+            conversion_fn(state_dict['content']['html']))
         if state_dict['interaction']['default_outcome']:
             interaction_feedback_html = state_dict[
                 'interaction']['default_outcome']['feedback']['html']
             state_dict['interaction']['default_outcome']['feedback'][
-                'html'] = conversion_fn(
-                    interaction_feedback_html)
+                'html'] = conversion_fn(interaction_feedback_html)
 
         for answer_group_index, answer_group in enumerate(
                 state_dict['interaction']['answer_groups']):
             answer_group_html = answer_group['outcome']['feedback']['html']
             state_dict['interaction']['answer_groups'][
                 answer_group_index]['outcome']['feedback']['html'] = (
-                    conversion_fn(
-                        answer_group_html))
+                    conversion_fn(answer_group_html))
             if state_dict['interaction']['id'] == 'ItemSelectionInput':
                 for rule_spec_index, rule_spec in enumerate(
                         answer_group['rule_specs']):
@@ -1817,8 +1815,7 @@ class State(object):
                 state_dict['interaction']['hints']):
             hint_html = hint['hint_content']['html']
             state_dict['interaction']['hints'][hint_index][
-                'hint_content']['html'] = (
-                    conversion_fn(hint_html))
+                'hint_content']['html'] = conversion_fn(hint_html)
 
         if state_dict['interaction']['solution']:
             solution_html = state_dict[
@@ -1832,8 +1829,7 @@ class State(object):
                     state_dict['interaction']['customization_args'][
                         'choices']['value']):
                 state_dict['interaction']['customization_args'][
-                    'choices']['value'][value_index] = (
-                        conversion_fn(value))
+                    'choices']['value'][value_index] = conversion_fn(value)
 
         return state_dict
 
@@ -3529,7 +3525,7 @@ class Exploration(object):
             dict. The converted states_dict.
         """
         for key, state_dict in states_dict.iteritems():
-            states_dict[key] = State.convert_state(
+            states_dict[key] = State.convert_html_fields_in_state(
                 state_dict, html_cleaner.convert_to_textangular)
         return states_dict
 
@@ -3546,8 +3542,8 @@ class Exploration(object):
             dict. The converted states_dict.
         """
         for key, state_dict in states_dict.iteritems():
-            states_dict[key] = State.convert_state(
-                state_dict, html_cleaner.add_caption_to_image)
+            states_dict[key] = State.convert_html_fields_in_state(
+                state_dict, html_cleaner.add_caption_attr_to_image)
         return states_dict
 
     @classmethod
