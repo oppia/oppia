@@ -1,17 +1,10 @@
-<div class="form-inline" style="margin-bottom: 20px;">
-  <table class="preview-conversation-skin-card-row-container">
-    <tr class="preview-conversation-skin-card-row">
-      <td class="preview-conversation-skin-row-avatar" valign="top">
-        <img class="preview-conversation-skin-row-avatar-img" ng-src="<[userBlackImgUrl]>">
-      </td>
-      <td class="preview-conversation-skin-oppia-content">
-        <div>
-          <angular-html-bind html-data="stateContent()">
-          </angular-html-bind>
-        </div>
-      </td>
-    </tr>
-  </table>
+<style>
+  .test-interaction-modal .submit-answer-btn {
+    text-align: right;
+  }
+</style>
+
+<div class="form-inline test-interaction-modal" style="margin-bottom: 20px;">
   <div ng-if="interactionIsInline">
     <div class="preview-conversation-skin-inline-interaction">
       <table class="preview-conversation-skin-card-row-container" style="margin-bottom: 0;">
@@ -35,5 +28,13 @@
         </div>
       </md-card>
     </div>
+  </div>
+  <br>
+  <div class='submit-answer-btn'>
+    <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
+               ng-disabled="!interactionAnswerIsValid"
+               ng-click="onSubmitAnswerFromButton()"
+               translate="I18N_INTERACTIONS_SUBMIT">
+    </md-button>
   </div>
 </div>

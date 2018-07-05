@@ -1,58 +1,83 @@
+<style>
+  .teach-oppia-modal .unresolved-answers-loading-text {
+    font-size: 1.17em;
+    text-align: center;
+  }
+
+  .teach-oppia-modal .unresolved-answer {
+    border: black solid 1px;
+    border-radius: 5px;
+    padding: 1%;
+    margin-top: 1%;
+  }
+
+  .teach-oppia-modal .unresolved-answer-btn {
+    float: right;
+  }
+
+  .teach-oppia-modal .answer-header-label {
+    margin: 1% 0%;
+  }
+
+  .teach-oppia-modal .response-header-label {
+    display: inline-block;
+    margin: 1% 0%;
+  }
+
+  .teach-oppia-modal .response-edit-button {
+    color: #f0ad4e;
+    background: white;
+    border-color: #f0ad4e;
+  }
+
+  .teach-oppia-modal .response-edit-button:hover,  .teach-oppia-modal .confrim-respose-button:hover {
+    background: whitesmoke;
+  }
+
+  .teach-oppia-modal .confrim-respose-button {
+    color: green;
+    background: white;
+    border-color: green;
+  }
+</style>
+
 <div class="modal-header">
-  <h3>Enter a Sample Answer</h3>
+  <h3>Confirm Oppia's Responses</h3>
+  <p><em>Oppia was unable to determine which response to give to the following student answers. Help Oppia by clicking the 'tick mark' button to confirm a response, or the 'edit' button to select a better response!</em></p>
 </div>
 
-<div class="modal-body">
-  <div class="oppia-rule-details-header">
-    <test-interaction-panel state-content="stateContent" input-template="inputTemplate" on-submit-answer="submitAnswer(answer)">
-    </test-interaction-panel>
-
-    <div ng-if="trainingDataAnswer" style="padding-top: 10px; border-top: 1px solid #e5e5e5;">
-      <form name="testOppiaForm" class="form-inline">
-        <training-panel ng-if="classification.answerGroupIndex >= 0" answer="trainingDataAnswer" answer-feedback="trainingDataFeedback" answer-outcome-dest="trainingDataOutcomeDest" classification="classification" on-finish-training="finishTeaching(true)">
-        </training-panel>
-      </form>
-      <div ng-if="classification.answerGroupIndex === -1">
+<div class="modal-body teach-oppia-modal">
+  <div class="unresolved-answers-list oppia-rule-details-header">
+    <p class="unresolved-answers-loading-text" ng-show="loadingDotsAreShown">Loading <loading-dots></loading-dots></p>
+    <div ng-show="unresolvedAnswers.length > 0" style="padding-top: 10px;">
+      <div class="unresolved-answer" ng-repeat="answer in unresolvedAnswers track by $index">
+        <p class="answer-header-label"><strong>Answer</strong></p>
         <div>
-          <span><strong>If Oppia encounters the answer:</strong></span>
+          <angular-html-bind html-data="answer.answerTemplate"></angular-html-bind>
         </div>
-
         <div>
-          <angular-html-bind html-data="answerTemplate">
-          </angular-html-bind>
-        </div>
-
-        <br>
-
-        <div>
-          <span><strong>it will reply with:</strong></span>
-        </div>
-
-        <div>
-          <angular-html-bind html-data="trainingDataFeedback">
-          </angular-html-bind>
-        </div>
-
-        <br>
-
-        <div>
-          <span><strong>and then direct the learner to: </strong></span>
+          <p class="response-header-label"><strong>Response</strong></p>
+          <div class="unresolved-answer-btn">
+            <button type="button" class="btn response-edit-button" ng-click="openTrainUnresolvedAnswerModal($index)" uib-tooltip="Edit this response" tooltip-placement="bottom">
+              <i class="material-icons md-18"> edit </i>
+            </button>
+            <button type="button" class="btn confrim-respose-button" ng-click="confirmAnswerAssignment($index)" uib-tooltip="Conifrm this response" tooltip-placement="bottom">
+              <i class="material-icons md-18"> done </i>
+            </button>
+          </div>
           <span>
-            <angular-html-bind html-data="trainingDataOutcomeDest">
-            </angular-html-bind>
+            <angular-html-bind html-data="answer.feedbackHtml"></angular-html-bind>
           </span>
         </div>
-
-        <br>
-
-        <div>
-          <span><strong>This is due to a specific rule and therefore cannot be trained. If you do not think this is right, you should change the rule directly referring to this answer.</strong></span>
-        </div>
       </div>
+    </div>
+    <div ng-show="unresolvedAnswers.length === 0">
+      <p>Congratulations! You've finished addressing important unresolved answers.</p>
+      <p>Please visit this page later for more unresolved answers.</p>
     </div>
   </div>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-default" ng-click="finishTeaching(false)">Exit</button>
+  <button class="btn btn-default" ng-click="finishTeaching()">Exit</button>
 </div>

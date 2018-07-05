@@ -151,7 +151,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'is_linear', 'rule_descriptions', 'instructions',
             'narrow_instructions', 'needs_summary',
             'default_outcome_heading', 'can_have_solution',
-            'show_generic_submit_button'])
+            'show_generic_submit_button', 'answer_type'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(
             interaction_dict['customization_arg_specs'], [{
