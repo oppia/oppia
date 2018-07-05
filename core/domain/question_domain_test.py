@@ -39,7 +39,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             expected_object['question_data'],
             expected_object['question_data_schema_version'],
             expected_object['language_code'])
-        self.assertDictEqual(expected_object, observed_object.to_dict())
+        self.assertEqual(expected_object, observed_object.to_dict())
 
     def test_validation(self):
         """Test to verify validate method of Question domain object."""
@@ -104,9 +104,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         """
 
         question_id = 'col1.random'
-        language_code = 'en'
         question = question_domain.Question.create_default_question(
-            question_id, language_code)
+            question_id)
         default_question_data = exp_domain.State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
@@ -144,10 +143,16 @@ class QuestionSummaryDomainTest(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         expected_object_dict = {
-            'question_id': 'abc',
-            'question_content': 'Question 1'
+            'id': 'abc',
+            'creator_id': 'creator_id',
+            'language_code': 'en',
+            'status': 'private',
+            'last_updated': None,
+            'created_on': None,
+            'question_html_data': 'Question 1'
         }
-        observed_object = question_domain.QuestionSummary('abc', 'Question 1')
+        observed_object = question_domain.QuestionSummary(
+            'abc', 'creator_id', 'en', 'private', 'Question 1')
         self.assertEqual(expected_object_dict, observed_object.to_dict())
 
 
