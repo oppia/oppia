@@ -2,9 +2,14 @@
   .col-sm-1 {
     margin-right: 10px;
   }
+
+  p {
+    margin-bottom: 10px;
+  }
 </style>
 
 <div class="container-fluid">
+  <p>NOTE: Two or more items may occupy the same slot.</p>
   <div ng-repeat="choice in choices track by $index">
     <div class="row">
       <div class="col-sm-1">

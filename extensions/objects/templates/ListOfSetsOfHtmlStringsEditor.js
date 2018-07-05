@@ -76,11 +76,16 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
                   $scope.value[selectedRank].push(choiceHtml);
                 }
 
-                if ($scope.value[i] === []) {
-                  // Continuity error.
-                  errorMessage = ('No item(s) is assigned at position ' +
-                    String(i + 1) + '. Please assign some item at this ' +
-                    'position.');
+                if ($scope.value[i].length === 0) {
+                  if (i === $scope.value.length - 1) {
+                    // If it is empty list at the last, pop it out.
+                    $scope.value.pop();
+                  } else {
+                    // Continuity error.
+                    errorMessage = ('No item(s) is assigned at position ' +
+                      String(i + 1) + '. Please assign some item at this ' +
+                      'position.');
+                  }
                 }
               }
               choiceHtmlHasBeenAdded = true;
