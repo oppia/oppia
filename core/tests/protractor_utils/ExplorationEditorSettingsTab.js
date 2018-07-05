@@ -108,10 +108,12 @@ var ExplorationEditorSettingsTab = function() {
 
   this.openAndClosePreviewSummaryTile = function() {
     openPreviewSummaryButton.click();
-    general.waitForSystem();
+    browser.wait(until.visibilityOf(explorationSummaryTile), 5000,
+      'Summary Tile takes too long to appear');
     expect(explorationSummaryTile.isPresent()).toBeTruthy();
     closePreviewSummaryButton.click();
-    general.waitForSystem();
+    browser.wait(until.invisibilityOf(explorationSummaryTile), 5000,
+      'Summary Tile takes too long to disappear');
     expect((explorationSummaryTile.isPresent())).toBeFalsy();
   };
 
