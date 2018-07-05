@@ -278,7 +278,7 @@ describe('Learner dashboard functionality', function() {
     libraryPage.playCollection('Test Collection');
     var firstExploration = element.all(
       by.css('.protractor-test-collection-exploration')).first();
-      // Click first exploration in collection.
+    // Click first exploration in collection.
     browser.wait(until.elementToBeClickable(firstExploration), 10000,
       'Could not click first exploration in collection')
       .then(function(isClickable) {
