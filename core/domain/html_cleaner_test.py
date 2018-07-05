@@ -684,14 +684,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</ol></ol></ol></ol>'
             ),
             'expected_output': (
-                '<ol><li>Item1<ol><li style="margin-left:80px;">Item2</li>'
-                '<li style="margin-left:80px;">Item3</li><li style="margin-'
-                'left:80px;">Item4<ol><li style="margin-left:80px;">Item5'
-                '</li><li style="margin-left:80px;">Item6</li></ol></li>'
-                '</ol></li><li>Item7<ol><li>Item8</li><li>Item9<ol>'
-                '<li style="margin-left:40px;">Item10</li>'
-                '<li style="margin-left:40px;">Item11</li></ol>'
-                '</li></ol></li></ol>'
+                '<ol><li>Item1<ol><li>Item2</li><li>Item3</li><li>Item4<ol>'
+                '<li>Item5</li><li>Item6</li></ol></li></ol></li><li>Item7'
+                '<ol><li>Item8</li><li>Item9<ol><li>Item10</li><li>Item11'
+                '</li></ol></li></ol></li></ol>'
             )
         }]
 
