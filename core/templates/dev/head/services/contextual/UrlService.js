@@ -46,13 +46,21 @@ oppia.factory('UrlService', ['$window', function($window) {
     getPathname: function() {
       return this.getCurrentLocation().pathname;
     },
+    // Topic id should be correctly returned from topic editor as well as
+    // story editor, since both have topic id in their url.
     getTopicIdFromUrl: function() {
       var pathname = this.getPathname();
-      var topicId = pathname.split('/')[2];
-      if (topicId.length !== 12) {
-        throw Error('Invalid Topic Id');
+      if (pathname.match(/\/(story|topic)_editor\/(\w|-){12}\b/g)) {
+        return pathname.split('/')[2];
       }
-      return topicId;
+      throw Error('Invalid topic id url');
+    },
+    getStoryIdFromUrl: function() {
+      var pathname = this.getPathname();
+      if (pathname.match(/\/story_editor(\/(\w|-){12}\b){2}/g)) {
+        return pathname.split('/')[3];
+      }
+      throw Error('Invalid story id url');
     },
     getSkillIdFromUrl: function() {
       var pathname = this.getPathname();

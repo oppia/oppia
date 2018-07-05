@@ -35,11 +35,11 @@ describe('Exploration Issue Object Factory', function() {
 
   it('should create a new exploration issue from a backend dict', function() {
     var explorationIssueObject = this.eiof.createFromBackendDict({
-      issueType: 'EarlyQuit',
-      issueCustomizationArgs: {},
-      playthroughIds: [],
-      schemaVersion: 1,
-      isValid: true
+      issue_type: 'EarlyQuit',
+      issue_customization_args: {},
+      playthrough_ids: [],
+      schema_version: 1,
+      is_valid: true
     });
 
     expect(explorationIssueObject.issueType).toEqual('EarlyQuit');

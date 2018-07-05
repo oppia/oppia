@@ -76,6 +76,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         def __init__(self, exploration_id, states):
             self.id = exploration_id
             self.states = states
+            self.category = 'Algebra'
 
     # All mock explorations created for testing.
     explorations = [
@@ -100,7 +101,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
             'target_id': self.target_id,
             'target_version_at_submission': self.target_version_at_submission,
             'status': suggestion_models.STATUS_IN_REVIEW,
-            'author_id': self.author_id,
+            'author_name': 'author',
             'final_reviewer_id': self.reviewer_id,
             'assigned_reviewer_id': self.assigned_reviewer_id,
             'change_cmd': {
@@ -115,16 +116,19 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.FeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id, self.target_version_at_submission,
-                self.author_id, self.change_cmd, self.score_category,
-                'test description', self.assigned_reviewer_id, self.reviewer_id)
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change_cmd, 'test description',
+                    self.assigned_reviewer_id, self.reviewer_id)
 
             observed_suggestion = suggestion_services.get_suggestion_by_id(
                 self.suggestion_id)
-            self.assertDictEqual(
+            self.assertDictContainsSubset(
                 expected_suggestion_dict, observed_suggestion.to_dict())
 
     def check_commit_message(
@@ -139,12 +143,15 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.FeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id, self.target_version_at_submission,
-                self.author_id, self.change_cmd, self.score_category,
-                'test description', self.assigned_reviewer_id, self.reviewer_id)
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change_cmd, 'test description',
+                    self.assigned_reviewer_id, self.reviewer_id)
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -180,12 +187,15 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.FeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id, self.target_version_at_submission,
-                self.author_id, self.change_cmd, self.score_category,
-                'test description', self.assigned_reviewer_id, self.reviewer_id)
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change_cmd, 'test description',
+                    self.assigned_reviewer_id, self.reviewer_id)
 
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
@@ -219,12 +229,15 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.FeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id, self.target_version_at_submission,
-                self.author_id, self.change_cmd, self.score_category,
-                'test description', self.assigned_reviewer_id, self.reviewer_id)
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change_cmd, 'test description',
+                    self.assigned_reviewer_id, self.reviewer_id)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -245,12 +258,15 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.FeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id, self.target_version_at_submission,
-                self.author_id, self.change_cmd, self.score_category,
-                'test description', self.assigned_reviewer_id, self.reviewer_id)
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change_cmd, 'test description',
+                    self.assigned_reviewer_id, self.reviewer_id)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -263,12 +279,15 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.FeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id, self.target_version_at_submission,
-                self.author_id, self.change_cmd, self.score_category,
-                'test description', self.assigned_reviewer_id, self.reviewer_id)
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change_cmd, 'test description',
+                    self.assigned_reviewer_id, self.reviewer_id)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -288,12 +307,15 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         with self.swap(
             feedback_models.FeedbackThreadModel,
             'generate_new_thread_id', self.generate_thread_id):
-            suggestion_services.create_suggestion(
-                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-                suggestion_models.TARGET_TYPE_EXPLORATION,
-                self.target_id, self.target_version_at_submission,
-                self.author_id, self.change_cmd, self.score_category,
-                'test description', self.assigned_reviewer_id, self.reviewer_id)
+            with self.swap(
+                exp_services, 'get_exploration_by_id',
+                self.mock_get_exploration_by_id):
+                suggestion_services.create_suggestion(
+                    suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                    suggestion_models.TARGET_TYPE_EXPLORATION,
+                    self.target_id, self.target_version_at_submission,
+                    self.author_id, self.change_cmd, 'test description',
+                    self.assigned_reviewer_id, self.reviewer_id)
         suggestion = suggestion_services.get_suggestion_by_id(
             self.suggestion_id)
 
@@ -348,6 +370,28 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     REVIEWER_EMAIL_2 = 'reviewer2@example.com'
     ASSIGNED_REVIEWER_EMAIL_2 = 'assigned_reviewer2@example.com'
 
+    def generate_thread_id(self, unused_exp_id):
+        return self.THREAD_ID
+
+    class MockExploration(object):
+        """Mocks an exploration. To be used only for testing."""
+        def __init__(self, exploration_id, states):
+            self.id = exploration_id
+            self.states = states
+            self.category = 'Algebra'
+
+    # All mock explorations created for testing.
+    explorations = [
+        MockExploration('exp1', {'state_1': {}, 'state_2': {}}),
+        MockExploration('exp2', {'state_1': {}, 'state_2': {}})
+    ]
+
+    def mock_get_exploration_by_id(self, exp_id):
+        for exp in self.explorations:
+            if exp.id == exp_id:
+                return exp
+        return None
+
     def setUp(self):
         super(SuggestionGetServicesUnitTests, self).setUp()
 
@@ -368,41 +412,44 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         self.assigned_reviewer_id_2 = self.get_user_id_from_email(
             self.ASSIGNED_REVIEWER_EMAIL_2)
 
+        with self.swap(
+            exp_services, 'get_exploration_by_id',
+            self.mock_get_exploration_by_id):
 
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id_1, self.target_version_at_submission,
-            self.author_id_1, self.change_cmd, self.score_category,
-            'test description', self.assigned_reviewer_id_1, self.reviewer_id_1)
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, self.change_cmd, 'test description',
+                self.assigned_reviewer_id_1, self.reviewer_id_1)
 
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id_1, self.target_version_at_submission,
-            self.author_id_1, self.change_cmd, self.score_category,
-            'test description', self.assigned_reviewer_id_1, None)
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, self.change_cmd, 'test description',
+                self.assigned_reviewer_id_1, None)
 
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id_1, self.target_version_at_submission,
-            self.author_id_1, self.change_cmd, self.score_category,
-            'test description', None, None)
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_1, self.change_cmd, 'test description', None,
+                None)
 
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id_1, self.target_version_at_submission,
-            self.author_id_2, self.change_cmd, self.score_category,
-            'test description', self.assigned_reviewer_id_1, self.reviewer_id_2)
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_1, self.target_version_at_submission,
+                self.author_id_2, self.change_cmd, 'test description',
+                self.assigned_reviewer_id_1, self.reviewer_id_2)
 
-        suggestion_services.create_suggestion(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
-            suggestion_models.TARGET_TYPE_EXPLORATION,
-            self.target_id_2, self.target_version_at_submission,
-            self.author_id_2, self.change_cmd, self.score_category,
-            'test description', self.assigned_reviewer_id_2, self.reviewer_id_2)
+            suggestion_services.create_suggestion(
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+                suggestion_models.TARGET_TYPE_EXPLORATION,
+                self.target_id_2, self.target_version_at_submission,
+                self.author_id_2, self.change_cmd, 'test description',
+                self.assigned_reviewer_id_2, self.reviewer_id_2)
 
     def test_get_by_author(self):
         self.assertEqual(len(suggestion_services.get_suggestions_by_author(
@@ -524,8 +571,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change_cmd, self.score_category,
-                'test description', self.assigned_reviewer_id, None)
+                self.author_id, self.change_cmd, 'test description',
+                self.assigned_reviewer_id, None)
 
         suggestion_id = 'exploration.' + self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -549,8 +596,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change_cmd, self.score_category,
-                'test description', self.assigned_reviewer_id, None)
+                self.author_id, self.change_cmd, 'test description',
+                self.assigned_reviewer_id, None)
 
         suggestion_id = 'exploration.' + self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -577,8 +624,8 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.EXP_ID, self.target_version_at_submission,
-                self.author_id, self.change_cmd, self.score_category,
-                'test description', self.assigned_reviewer_id, None)
+                self.author_id, self.change_cmd, 'test description',
+                self.assigned_reviewer_id, None)
 
         suggestion_id = 'exploration.' + self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
@@ -597,3 +644,62 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
             'new content')
 
         self.assertEqual(suggestion.status, suggestion_models.STATUS_ACCEPTED)
+
+
+class UserContributionScoringUnitTests(test_utils.GenericTestBase):
+
+    def setUp(self):
+        super(UserContributionScoringUnitTests, self).setUp()
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user1', 'category1', 0)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user1', 'category2', 0)
+        suggestion_services.create_new_user_contribution_scoring_model(
+            'user2', 'category1', 0)
+
+    def test_update_score_for_user(self):
+        suggestion_services.increment_score_for_user('user1', 'category1', 1)
+        suggestion_services.increment_score_for_user('user2', 'category1', 5)
+        suggestion_services.increment_score_for_user('user1', 'category2', 15.2)
+        suggestion_services.increment_score_for_user('user2', 'category2', 2)
+        suggestion_services.increment_score_for_user('user1', 'category1', -1)
+
+        scores1 = suggestion_services.get_all_scores_of_user('user1')
+        self.assertEqual(scores1['category1'], 0)
+        self.assertEqual(scores1['category2'], 15.2)
+
+        scores2 = suggestion_services.get_all_scores_of_user('user2')
+        self.assertEqual(scores2['category1'], 5)
+        self.assertEqual(scores2['category2'], 2)
+
+        scores3 = suggestion_services.get_all_scores_of_user('invalid_user')
+        self.assertDictEqual(scores3, {})
+
+    def get_all_user_ids_who_are_allowed_to_review(self):
+        suggestion_services.increment_score_for_user('user1', 'category1', 1)
+        suggestion_services.increment_score_for_user('user2', 'category1', 5)
+        suggestion_services.increment_score_for_user('user1', 'category2', 15.2)
+        suggestion_services.increment_score_for_user('user2', 'category2', 2)
+        with self.swap(
+            suggestion_models, 'MINIMUM_SCORE_REQUIRED_TO_REVIEW', 10):
+            user_ids = (
+                suggestion_services.get_all_user_ids_who_are_allowed_to_review(
+                    'category1'))
+            self.assertEqual(user_ids, [])
+            user_ids = (
+                suggestion_services.get_all_user_ids_who_are_allowed_to_review(
+                    'category2'))
+            self.assertEqual(user_ids, ['user2'])
+
+            self.assertTrue(
+                suggestion_services.check_user_can_review_in_category(
+                    'user1', 'category2'))
+            self.assertFalse(
+                suggestion_services.check_user_can_review_in_category(
+                    'user2', 'category1'))
+            self.assertFalse(
+                suggestion_services.check_user_can_review_in_category(
+                    'user_1', 'category_new'))
+            self.assertFalse(
+                suggestion_services.check_user_can_review_in_category(
+                    'invalid_user', 'category1'))

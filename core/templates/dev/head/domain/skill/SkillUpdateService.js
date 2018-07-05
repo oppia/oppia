@@ -192,7 +192,7 @@ oppia.factory('SkillUpdateService', [
 
       addMisconception: function(skill, newMisconception) {
         var params = {
-          new_value: newMisconception.toBackendDict()
+          new_misconception_dict: newMisconception.toBackendDict()
         };
         var misconceptionId = newMisconception.getId();
         _applyChange(

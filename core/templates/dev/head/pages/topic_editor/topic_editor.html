@@ -15,15 +15,15 @@
 {% endblock local_top_nav_options %}
 
 {% block content %}
-<div ng-controller="TopicEditor">
-  <div ng-if="getTabStatuses().active === 'main'">
-    <topic-main-editor></topic-main-editor>
-  </div>
+  <div ng-controller="TopicEditor">
+    <div ng-if="getTabStatuses().active === 'main'">
+      <topic-main-editor></topic-main-editor>
+    </div>
 
-  <div ng-if="getTabStatuses().active === 'subtopics'">
-    <subtopics-list-tab></subtopics-list-tab>
+    <div ng-if="getTabStatuses().active === 'subtopics'">
+      <subtopics-list-tab></subtopics-list-tab>
+    </div>
   </div>
-</div>
 {% endblock content %}
 
 {% block footer_js %}
@@ -61,6 +61,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/services/AutoplayedVideosService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/EditableStoryBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/SkillSummaryObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/EditableTopicBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/SubtopicObjectFactory.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/SubtopicPageObjectFactory.js"></script>
@@ -71,6 +73,7 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/ImageFileObjectFactory.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/main_editor/TopicEditorTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/main_editor/StoriesListDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/subtopics_editor/SubtopicsListTabDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditor.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_editor/TopicEditorNavbarBreadcrumbDirective.js"></script>

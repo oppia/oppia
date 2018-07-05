@@ -92,7 +92,7 @@ class SkillChange(object):
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_ADD_SKILL_MISCONCEPTION:
-            self.new_value = change_dict['new_value']
+            self.new_value = change_dict['new_misconception_dict']
         elif self.cmd == CMD_DELETE_SKILL_MISCONCEPTION:
             self.misconception_id = change_dict['id']
         elif self.cmd == CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY:

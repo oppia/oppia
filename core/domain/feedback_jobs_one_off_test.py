@@ -279,6 +279,24 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
                 taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
         self.process_and_flush_pending_tasks()
 
+    def _run_validation_job(self):
+        job_id = (
+            feedback_jobs_one_off.SuggestionMigrationValdiationOneOffJob
+            .create_new())
+        feedback_jobs_one_off.SuggestionMigrationValdiationOneOffJob.enqueue(
+            job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+        stringified_output = (
+            feedback_jobs_one_off.SuggestionMigrationValdiationOneOffJob
+            .get_output(job_id))
+
+        eval_output = [ast.literal_eval(stringified_item)
+                       for stringified_item in stringified_output]
+        return eval_output
+
     def setUp(self):
         super(SuggestionMigrationOneOffJobTest, self).setUp()
 
@@ -357,3 +375,15 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
             suggestion.change_cmd, expected_change_cmd)
         self.assertEqual(
             suggestion.score_category, 'content.' + exploration.category)
+
+    def test_suggestion_migration_validation_one_off_job(self):
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        for _ in range(10):
+            feedback_services.create_suggestion(
+                self.EXP_ID, self.author_id, exploration.version, 'State 1',
+                'description', 'new_value')
+        self._run_one_off_job()
+
+        output = self._run_validation_job()
+        self.assertEqual(output[0][1], output[1][1])
+        self.assertEqual(output[0][1], 10)
