@@ -52,7 +52,6 @@ describe('State editor', function() {
       explorationEditorMainTab.startTutorial();
       for (var i = 0; i < NUM_TUTORIAL_STAGES; i++) {
         explorationEditorMainTab.progressInTutorial();
-        general.waitForSystem();
       }
       explorationEditorMainTab.finishTutorial();
       users.logout();

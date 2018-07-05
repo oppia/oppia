@@ -119,7 +119,7 @@ describe('Full exploration editor', function() {
 
           browser.get('/explore/' + refresherExplorationId + '?parent=' +
             parentId1 + '&parent=' + parentId2);
-          browser.waitForAngular();
+          general.waitForLoadingMessage();
 
           explorationPlayerPage.clickOnReturnToParentButton();
 
@@ -240,7 +240,6 @@ describe('Full exploration editor', function() {
     collectionEditorPage.setObjective('This is a test collection.');
     collectionEditorPage.setCategory('Algebra');
     collectionEditorPage.saveChanges();
-    general.waitForSystem();
 
     // Play-test exploration and visit the refresher exploration.
     libraryPage.get();
@@ -270,7 +269,6 @@ describe('Full exploration editor', function() {
       var pathname = url.split('/');
       expect(
         pathname[4].split('?')[1].split('=')[0]).toEqual('collection_id');
-      general.waitForSystem();
       users.logout();
     });
   });

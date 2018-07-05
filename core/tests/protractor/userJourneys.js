@@ -279,7 +279,7 @@ describe('Oppia static pages tour', function() {
 });
 
 
-fdescribe('Site language', function() {
+describe('Site language', function() {
   var adminPage = null;
   var collectionId = null;
   var creatorDashboardPage = null;

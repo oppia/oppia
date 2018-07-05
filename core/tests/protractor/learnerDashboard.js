@@ -214,8 +214,6 @@ describe('Learner dashboard functionality', function() {
     collectionEditorPage.setObjective('This is a test collection.');
     collectionEditorPage.setCategory('Algebra');
     collectionEditorPage.saveChanges();
-    // There is no discernible UX changes to indicate save finishes.
-    general.waitForSystem();
     users.logout();
 
     users.login('learner4@learnerDashboard.com');
