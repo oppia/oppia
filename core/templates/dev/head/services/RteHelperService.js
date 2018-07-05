@@ -33,7 +33,7 @@ oppia.factory('RteHelperService', [
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
         id: RTE_COMPONENT_SPECS[componentId].frontend_id,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
-        previewUrlTemplate: (GLOBALS.GCS_RESOURCE_BUCKET_NAME ?
+        previewUrlTemplate: (GLOBALS.DEV_MODE ?
           RTE_COMPONENT_SPECS[componentId].preview_url_template_production :
           RTE_COMPONENT_SPECS[componentId].preview_url_template),
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
@@ -87,13 +87,10 @@ oppia.factory('RteHelperService', [
           // convertRteToHtml(), but we need to find a less invasive way to
           // handle previews.
           customizationArgsDict = angular.extend(customizationArgsDict, {
-            explorationId: ExplorationContextService.getExplorationId()
+            explorationId: ExplorationContextService.getExplorationId(),
+            bucketName: GLOBALS.GCS_RESOURCE_BUCKET_NAME
           });
         }
-        customizationArgsDict = angular.extend(customizationArgsDict, {
-          urlWithBucket: ('https://storage.googleapis.com/' +
-            GLOBALS.GCS_RESOURCE_BUCKET_NAME)
-        });
         var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
         if (componentDefn.previewUrlTemplate.indexOf(
           '/rich_text_components') === 0) {
@@ -104,7 +101,7 @@ oppia.factory('RteHelperService', [
             componentPreviewUrlTemplate, false, null, true)(
             customizationArgsDict));
         }
-        delete customizationArgsDict.urlWithBucket;
+        delete customizationArgsDict.bucketName;
 
         if (!interpolatedUrl) {
           $log.error(

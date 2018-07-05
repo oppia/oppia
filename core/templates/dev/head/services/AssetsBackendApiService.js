@@ -244,6 +244,11 @@ oppia.factory('AssetsBackendApiService', [
         return { audio: _audioFilesCurrentlyBeingRequested,
           image: _imageFilesCurrentlyBeingRequested
         };
+      },
+      getImageUrlForPreview: function(explorationId, filename) {
+        var bucketName = GLOBALS.GCS_RESOURCE_BUCKET_NAME;
+        return ('https://storage.googleapis.com/' + bucketName + '/' +
+          explorationId + '/assets/image/' + filename);
       }
     };
   }

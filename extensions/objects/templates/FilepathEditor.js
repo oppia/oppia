@@ -312,12 +312,8 @@ oppia.directive('filepathEditor', [
 
         var getTrustedResourceUrlForImageFileName = function(imageFileName) {
           var encodedFilepath = window.encodeURIComponent(imageFileName);
-          var objectUrl = '';
-          AssetsBackendApiService.loadImage(
-            $scope.explorationId, imageFileName)
-            .then(function(loadedImageFile) {
-              objectUrl = URL.createObjectURL(loadedImageFile.data);
-            });
+          var objectUrl = AssetsBackendApiService.getImageUrlForPreview(
+            $scope.explorationId, encodedFilepath);
           return objectUrl;
         };
 

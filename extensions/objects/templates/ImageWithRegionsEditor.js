@@ -158,13 +158,9 @@ oppia.directive('imageWithRegionsEditor', [
           };
 
           $scope.getPreviewUrl = function(imageUrl) {
-            var objectUrl = '';
-            AssetsBackendApiService.loadImage(
+            var objectUrl = AssetsBackendApiService.getImageUrlForPreview(
               ExplorationContextService.getExplorationId(),
-              encodeURIComponent(imageUrl))
-              .then(function(loadedImageFile) {
-                objectUrl = URL.createObjectURL(loadedImageFile.data);
-              });
+              encodeURIComponent(imageUrl));
             return objectUrl;
           };
 
