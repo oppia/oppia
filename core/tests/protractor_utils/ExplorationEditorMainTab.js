@@ -446,18 +446,18 @@ var ExplorationEditorMainTab = function() {
       .then(function(isClickable) {
         if (isClickable) {
           stateEditContent.click();
+          var stateContentEditor = element(
+            by.css('.protractor-test-state-content-editor'));
+          browser.wait(until.visibilityOf(stateContentEditor), 10000,
+            'stateContentEditor taking too long to appear to set content');
+          var richTextEditor = forms.RichTextEditor(stateContentEditor);
+          richTextEditor.clear();
+          richTextInstructions(richTextEditor);
+          expect(saveStateContentButton.isDisplayed()).toBe(true);
+          saveStateContentButton.click();
+          browser.wait(until.invisibilityOf(saveStateContentButton), 5000);
         }
       });
-    var stateContentEditor = element(
-      by.css('.protractor-test-state-content-editor'));
-    browser.wait(until.visibilityOf(stateContentEditor), 5000,
-      'stateContentEditor taking too long to appear to set content');
-    var richTextEditor = forms.RichTextEditor(stateContentEditor);
-    richTextEditor.clear();
-    richTextInstructions(richTextEditor);
-    expect(saveStateContentButton.isDisplayed()).toBe(true);
-    saveStateContentButton.click();
-    browser.wait(until.invisibilityOf(saveStateContentButton), 5000);
   };
 
   // This receives a function richTextInstructions used to verify the display of
@@ -945,11 +945,15 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.setStateName = function(name) {
-    browser.wait(until.elementToBeClickable(stateNameContainer), 5000,
-      'State Name Container takes too long to appear');
-    stateNameContainer.click();
-    stateNameInput.clear();
-    stateNameInput.sendKeys(name);
+    browser.wait(until.elementToBeClickable(stateNameContainer), 10000,
+      'State Name Container takes too long to appear')
+      .then(function (isClickable) {
+        if (isClickable) {
+          stateNameContainer.click();
+          stateNameInput.clear();
+          stateNameInput.sendKeys(name);
+        }
+      });
     browser.wait(until.elementToBeClickable(stateNameSubmitButton), 5000,
       'State Name Submit button takes too long to appear')
       .then(function(isClickable) {
