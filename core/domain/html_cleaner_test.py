@@ -609,12 +609,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }, {
             'html_content': (
-                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             ),
             'expected_output': (
-                '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image><p>Hello '
                 'this is test case to check image tag inside p tag</p>'
             )
@@ -643,13 +643,13 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }, {
             'html_content': (
                 '<pre>Hello this is <b> testing '
-                '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image> in '
                 '</b>progress</pre>'
             ),
             'expected_output': (
                 '<pre>Hello this is <strong> testing </strong></pre>'
-                '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image><pre>'
                 '<strong> in </strong>progress</pre>'
             )
@@ -695,3 +695,41 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 test_case['expected_output'],
                 html_cleaner.convert_to_ckeditor(test_case['html_content']))
+
+    def test_add_caption_to_image(self):
+        test_cases = [{
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that caption attribute is added to '
+                'image tags if it is missing.</p>'
+            ),
+            'expected_output': (
+                '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;'
+                'quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that caption attribute is added to '
+                'image tags if it is missing.</p>'
+            )
+        }, {
+            'html_content': (
+                '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                'abc&amp;quot;" filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that image tags that already have '
+                'caption attribute are not changed.</p>'
+            ),
+            'expected_output': (
+                '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                'abc&amp;quot;" filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that image tags that already have '
+                'caption attribute are not changed.</p>'
+            )
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                html_cleaner.add_caption_attr_to_image(
+                    test_case['html_content']),
+                test_case['expected_output'])
