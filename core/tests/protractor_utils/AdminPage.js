@@ -19,6 +19,7 @@
 
 var general = require('./general.js');
 var forms = require('./forms.js');
+var until = protractor.ExpectedConditions;
 
 var AdminPage = function(){
   var ADMIN_URL_SUFFIX = '/admin';
@@ -31,30 +32,6 @@ var AdminPage = function(){
   var updateFormName = element(by.css('.protractor-update-form-name'));
   var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
-  var explorationElements = element.all(by.css(
-    '.protractor-test-reload-exploration-row'
-  ));
-  var reloadAllExplorationsButtons = element.all(by.css(
-    '.protractor-test-reload-all-explorations-button'
-  ));
-  var reloadCollectionButton = element.all(by.css(
-    '.protractor-test-reload-collection-button')).first();
-
-  var roleOption = function(role){
-    return roleSelect.element(by.cssContainingText('option', role));
-  };
-
-  var explorationTitleElement = function(explorationElement) {
-    return explorationElement.element(
-      by.css('.protractor-test-reload-exploration-title')
-    );
-  };
-
-  var explorationElementReloadButton = function(explorationElement) {
-    return explorationElement.element(
-      by.css('.protractor-test-reload-exploration-button')
-    );
-  };
 
   var saveConfigProperty = function(configProperty) {
     return configProperty.element(by.css('.protractor-test-config-title'))
@@ -72,7 +49,8 @@ var AdminPage = function(){
   };
 
   this.get = function(){
-    return browser.get(ADMIN_URL_SUFFIX);
+    browser.get(ADMIN_URL_SUFFIX);
+    return general.waitForLoadingMessage();
   };
 
   this.editConfigProperty = function(
@@ -92,15 +70,16 @@ var AdminPage = function(){
   };
 
   this.updateRole = function(name, newRole) {
-    general.waitForSystem();
-    this.get();
     adminRolesTab.click();
-    browser.waitForAngular();
     // Change values for "update role" form, and submit it.
     updateFormName.sendKeys(name);
-    roleOption(newRole).click();
+    var roleOption = roleSelect.element(
+      by.cssContainingText('option', newRole));
+    roleOption.click();
     updateFormSubmit.click();
-    general.waitForSystem();
+    var statusMessage = element(by.css('[ng-if="statusMessage"]'));
+    browser.wait(until.textToBePresentInElement(statusMessage,
+      'successfully updated to'), 5000, 'Role was set unsuccessfully');
     return true;
   };
 };
