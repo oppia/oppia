@@ -66,13 +66,15 @@ describe('Topic validation service', function() {
     _sampleTopic.setName('');
     _sampleTopic.addCanonicalStoryId('story_2');
     _sampleTopic.getSubtopics()[0].setTitle('');
+    _sampleTopic.getSubtopics()[0].addSkill('skill_1');
 
     var issues = _findValidationIssues();
     expect(issues).toEqual([
-      'Topic name should be a non empty string',
-      'Subtopic title should be a non-empty string',
+      'Topic name should not be empty.',
       'Canonical and additional stories should be mutually ' +
-      'exclusive and should not have any common stories between them.'
+      'exclusive and should not have any common stories between them.',
+      'Subtopic title should not be empty',
+      'The skill with id skill_1 is duplicated in the topic'
     ]);
   });
 });
