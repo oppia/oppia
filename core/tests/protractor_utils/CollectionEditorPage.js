@@ -176,7 +176,13 @@ var CollectionEditorPage = function() {
 
   // Saves changes and publishes collection.
   this.saveChanges = function () {
-    saveChangesButton.click();
+    browser.wait(until.elementToBeClickable(saveChangesButton), 5000,
+      'Save Changes button is not clickable').then(function (isClickable) {
+      if (isClickable) {
+        saveChangesButton.click();
+      }
+    });
+    browser.wait(until.invisibilityOf(saveChangesButton), 5000);
   };
 };
 
