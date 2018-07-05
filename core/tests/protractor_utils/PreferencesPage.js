@@ -80,8 +80,6 @@ var PreferencesPage = function() {
   };
 
   this.expectPreferredSiteLanguageToBe = function(language) {
-    var languageSelector = element(
-      by.css('.protractor-test-system-language-selector'));
     language = systemLanguageSelector.element(
       by.css('.select2-selection__rendered'));
     expect(language.getText(), language);
