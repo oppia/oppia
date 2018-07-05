@@ -197,11 +197,11 @@
                       translate="I18N_CREATE_QUESTION">
               </button>
             </div>
-          </a>
-          <div ng-attr-section="'<['right-section']>">
-            <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
-               ng-href="<[getExplorationUrl(exploration.id)]>">
-            </a>
+            <div ng-attr-section="'<['right-section']>">
+              <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
+                 ng-href="<[getExplorationUrl(exploration.id)]>">
+              </a>
+            </div>
             <div class="exp-private-text" ng-if="exploration.status === 'private'">
               <[publishText]>
             </div>
@@ -230,14 +230,14 @@
           <md-card layout="row"
                    class="oppia-dashboard-list-view-item">
             <table class="oppia-dashboard-table">
-                <colgroup>
-                  <col style="width: 26%;">
-                  <col style="width: 13%;">
-                  <col style="width: 13%;">
-                  <col style="width: 16%;">
-                  <col style="width: 16%;">
-                  <col style="width: 16%;">
-                </colgroup>
+              <colgroup>
+                <col style="width: 26%;">
+                <col style="width: 13%;">
+                <col style="width: 13%;">
+                <col style="width: 16%;">
+                <col style="width: 16%;">
+                <col style="width: 16%;">
+              </colgroup>
               <tr>
                 <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
                     class="oppia-dashboard-table-headings"
@@ -313,7 +313,8 @@
             </a>
             <div ng-attr-section="'<['right-section']>">
               <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
-                 ng-href="<[getExplorationUrl(exploration.id)]>"></a>
+                 ng-href="<[getExplorationUrl(exploration.id)]>">
+              </a>
               <div class="exp-private-text" ng-if="exploration.status === 'private'">
                 <[publishText]>
               </div>
@@ -514,7 +515,7 @@
                                      status="question.status"
                                      tagged-skills="question.tagged_skills">
               </question-summary-tile>
-              </span>
+            </span>
           </span>
         </div>
       </div>
