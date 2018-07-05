@@ -1357,6 +1357,61 @@ def _check_html_indent(all_files, debug=False):
     return summary_messages
 
 
+def _check_for_copyright_notice(all_files):
+    """This function checks whether copyright notice is
+    present at the beginning of files."""
+
+    js_files_to_exclude = [
+        'generatedDefaultData.js', 'generatedParser.js', 'protractor.conf.js',
+        'karma.conf.js', 'mathjaxConfig.js', 'ExpressionParserService.js',
+        'constants.js', 'rich_text_components_definitions.js']
+    js_files_to_check = [
+        filename for filename in all_files if filename.endswith('.js') and (
+            not filename.endswith(tuple(js_files_to_exclude)))]
+    py_files_to_check = [
+        filename for filename in all_files if filename.endswith('.py') and (
+            not filename.endswith('__init__.py'))]
+    sh_files_to_check = [
+        filename for filename in all_files if filename.endswith('.sh')]
+    all_files_to_check = (
+        js_files_to_check + py_files_to_check + sh_files_to_check)
+    statement_to_check = 'All Rights Reserved.'
+
+    failed = False
+    summary_messages = []
+
+    for filename in all_files_to_check:
+        has_copyright_notice = False
+        with open(filename, 'r') as f:
+            for line in f:
+                if 'Copyright' in line and statement_to_check in line:
+                    has_copyright_notice = True
+                    break
+
+        if not has_copyright_notice:
+            failed = True
+            print (
+                '%s --> Please add a proper copyright notice to this file.' % (
+                    filename))
+
+    if failed:
+        summary_message = '%s   Copyright notice check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s  Copyright notice check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
+
 def main():
     all_files = _get_all_files()
     directive_scope_messages = _check_directive_scope(all_files)
@@ -1371,12 +1426,14 @@ def main():
     html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
+    copyright_notice_messages = _check_for_copyright_notice(all_files)
     all_messages = (
         directive_scope_messages + html_directive_name_messages +
         import_order_messages + newline_messages +
         docstring_messages + comment_messages +
         html_indent_messages + html_linter_messages +
-        linter_messages + pattern_messages)
+        linter_messages + pattern_messages +
+        copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)
