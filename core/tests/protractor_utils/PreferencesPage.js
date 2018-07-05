@@ -23,7 +23,10 @@ var PreferencesPage = function() {
     by.css('.protractor-test-editor-role-email-checkbox'));
   var feedbackMessageEmailsCheckbox = element(
     by.css('.protractor-test-feedback-message-email-checkbox'));
+  var pageHeader = element(by.css('.protractor-test-preferences-title'));
   var subscriptions = element.all(by.css('.protractor-test-subscription-name'));
+  var systemLanguageSelector = element.all(
+    by.css('.protractor-test-system-language-selector')).first();
 
   this.get = function() {
     browser.get(USER_PREFERENCES_URL);
@@ -36,6 +39,17 @@ var PreferencesPage = function() {
 
   this.toggleFeedbackEmailsCheckbox = function() {
     feedbackMessageEmailsCheckbox.click();
+  };
+
+  this.selectSystemLanguage = function(language) {
+    systemLanguageSelector.click();
+    var options = element.all(by.css('.select2-dropdown li')).filter(
+      function(elem) {
+        return elem.getText().then(function(text) {
+          return text === language;
+        });
+      });
+    options.first().click();
   };
 
   this.isFeedbackEmailsCheckboxSelected = function() {
@@ -58,6 +72,19 @@ var PreferencesPage = function() {
   // when hovering over the tile.
   this.expectDisplayedLastSubscriptionToBe = function(name) {
     expect(subscriptions.last().getText()).toMatch(name);
+  };
+
+  this.expectPageHeaderToBe = function(text) {
+    expect(pageHeader
+      .getText()).toEqual(text);
+  };
+
+  this.expectPreferredSiteLanguageToBe = function(language) {
+    var languageSelector = element(
+      by.css('.protractor-test-system-language-selector'));
+    language = systemLanguageSelector.element(
+      by.css('.select2-selection__rendered'));
+    expect(language.getText(), language);
   };
 
   this.expectSubscriptionCountToEqual = function(value) {
