@@ -67,7 +67,7 @@ oppia.factory('TopicValidationService', [
         return skillSummary.getId();
       });
       if ((new Set(skillIds)).size !== skillIds.length) {
-        throw Error('All subtopic skills should be distinct');
+        issues.push('All subtopic skills should be distinct');
       }
       return issues;
     };
@@ -105,7 +105,7 @@ oppia.factory('TopicValidationService', [
         throw Error('Canonical story ids should be an array.');
       }
       if (new Set(canonicalStoryIds).size !== canonicalStoryIds.length) {
-        throw Error('All canonical stories should be distinct.');
+        issues.push('All canonical stories should be distinct.');
       }
       if (
         canonicalStoryIds.some(function(storyId) {
@@ -118,7 +118,7 @@ oppia.factory('TopicValidationService', [
         throw Error('Additional story ids should be an array.');
       }
       if (new Set(additionalStoryIds).size !== additionalStoryIds.length) {
-        throw Error('All additional stories should be distinct.');
+        issues.push('All additional stories should be distinct.');
       }
       if (
         additionalStoryIds.some(function(storyId) {
