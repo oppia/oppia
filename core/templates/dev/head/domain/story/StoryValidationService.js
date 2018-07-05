@@ -134,8 +134,6 @@ oppia.factory('StoryValidationService', [
       var nodes = storyContents.getNodes();
       for (var i = 0; i < nodes.length; i++) {
         var nodeIssues = _validateNode(nodes[i]);
-        if (nodeIssues.length > 0) {
-        }
         issues = issues.concat(nodeIssues);
       }
       if (issues.length > 0) {
