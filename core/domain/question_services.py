@@ -26,8 +26,6 @@ import feconf
 (question_models, skill_models) = models.Registry.import_models(
     [models.NAMES.question, models.NAMES.skill])
 
-CMD_CREATE_NEW = 'create_new'
-
 
 def _create_new_question(committer_id, question, commit_message):
     """Creates a new question.
@@ -48,7 +46,7 @@ def _create_new_question(committer_id, question, commit_message):
         language_code=question.language_code,
     )
 
-    model.commit(committer_id, commit_message, [{'cmd': CMD_CREATE_NEW}])
+    model.commit(committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
 
     create_question_summary(
         model.id, committer_id, feconf.ACTIVITY_STATUS_PRIVATE)
