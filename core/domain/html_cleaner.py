@@ -516,38 +516,18 @@ def convert_to_ckeditor(html_data):
     # This block ensures that ol/ul tag is not a direct child of another ul/ol
     # tag. The conversion works as follows:
     # Invalid html: <ul><li>...</li><ul><ul><li>...</li></ul></ul></ul>
-    # Valid html: <ul><li>...</li><ul><li style="margin-left:40px;">...</li>
-    # </ul></ul>
+    # Valid html: <ul><li>...<ul><li>...</li></ul></li></ul>
     # i.e. if any ol/ul has parent as ol/ul and a previous sibling as li
-    # it is wrapped in it's previous sibling removing any margin styling.
-    # If there is no previous sibling, the tag is unwrapped and each of
-    # it's direct child is given an additional margin-left of 40px.
+    # it is wrapped in its previous sibling. If there is no previous sibling,
+    # the tag is unwrapped.
     list_tags = ['ol', 'ul']
-    margin_re = re.compile('margin-left:([0-9]+)px;')
     for tag_name in list_tags:
         for tag in soup.findAll(tag_name):
             if tag.parent.name in list_tags:
                 prev_sib = tag.previous_sibling
                 if prev_sib and prev_sib.name == 'li':
-                    if 'style' in tag.attrs:
-                        del tag['style']
                     prev_sib.append(tag)
                 else:
-                    margin_value = 40
-                    if 'style' in tag.attrs:
-                        style = tag['style']
-                        # This is to obtain the margin value of the tag.
-                        margin_value += int(margin_re.search(style).group(1))
-
-                    for child in tag.children:
-                        child_margin_value = margin_value
-                        if 'style' in child.attrs:
-                            style = child['style']
-                            # This is to obtain the margin value of the child
-                            # tag.
-                            child_margin_value += int(
-                                margin_re.search(style).group(1))
-                        child['style'] = 'margin-left:%dpx;' % margin_value
                     tag.unwrap()
 
     # Move block components out of p, pre, strong and em tags.
@@ -727,3 +707,24 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
             is_invalid = True
 
     return is_invalid
+
+
+def add_caption_attr_to_image(html_string):
+    """Adds caption attribute to all oppia-noninteractive-image tags.
+
+    Args:
+        html_string. str: HTML string in which the caption attribute is to be
+            added.
+
+    Returns:
+        str. Updated HTML string with the caption attribute for all
+            oppia-noninteractive-image tags.
+    """
+    soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
+
+    for image in soup.findAll('oppia-noninteractive-image'):
+        attrs = image.attrs
+        if 'caption-with-value' not in attrs:
+            image['caption-with-value'] = escape_html(json.dumps(''))
+
+    return unicode(soup)

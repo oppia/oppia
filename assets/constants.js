@@ -443,5 +443,10 @@ var constants = {
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
+<<<<<<< HEAD
+=======
+  "IS_CURRENT_RTE_CKEDITOR": false,
+
+>>>>>>> 712df64dc5b61c7390a71d43cfb3cf81d0938705
   "USE_NEW_SUGGESTION_FRAMEWORK": false
 };
