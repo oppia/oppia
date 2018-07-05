@@ -152,3 +152,27 @@ class SkillSummaryModel(base_models.BaseModel):
     # model was created).
     skill_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
+
+
+class SkillRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a skill rights snapshot."""
+    pass
+
+
+class SkillRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content of a skill rights snapshot."""
+    pass
+
+
+class SkillRightsModel(base_models.BaseModel):
+    """Storage model for the rights related to a skill.
+
+    The id of each instance is the id of the corresponding skill.
+    """
+    ALLOW_REVERT = False
+
+    # The user_id of the creator this skill.
+    creator_id = ndb.StringProperty(indexed=True, repeated=True)
+    # Whether the skill is private.
+    skill_is_private = ndb.BooleanProperty(
+        indexed=True, required=True, default=True)

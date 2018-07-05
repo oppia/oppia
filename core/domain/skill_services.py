@@ -19,7 +19,9 @@ import copy
 import logging
 
 from core.domain import email_manager
+from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -488,6 +490,55 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     create_skill_summary(skill.id)
 
 
+def publish_skill(skill_id, committer_id):
+    """Marks the given skill as published.
+
+    Args:
+        skill_id: str. The id of the given skill.
+        committer_id: str. The user id of the committer.
+
+    Raises:
+        Exception. The given skill does not exist.
+        Exception. The skill is already published.
+        Exception. The user does not have permissions to publish the skill.
+    """
+    skill_rights = get_skill_rights(skill_id, strict=False)
+    if skill_rights is None:
+        raise Exception('The given skill does not exist.')
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
+        raise Exception(
+            'The user does not have enough rights to publish the skill.')
+
+    if not skill_rights.skill_is_private:
+        raise Exception('The skill is already published.')
+    skill_rights.skill_is_published = True
+    commit_cmds = [skill_domain.SkillRightsChange({
+        'cmd': skill_domain.CMD_PUBLISH_SKILL
+    })]
+    save_skill_rights(
+        skill_rights, committer_id, 'Published the skill', commit_cmds)
+
+
+def save_skill_rights(skill_rights, committer_id, commit_message, commit_cmds):
+    """Saves a SkillRights domain object to the datastore.
+
+    Args:
+        skill_rights: SkillRights. The rights object for the given skill.
+        committer_id: str. ID of the committer.
+        commit_message: str. Descriptive message for the commit.
+        commit_cmds: list(TopicRightsChange). A list of commands describing
+            what kind of commit was done.
+    """
+
+    model = skill_models.SkillRightsModel.get(skill_rights.id, strict=False)
+
+    model.skill_is_published = skill_rights.skill_is_published
+    model.creator_id = skill_rights.creator_id
+    commit_cmd_dicts = [commit_cmd.todict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmd_dicts)
+
+
 def delete_skill(committer_id, skill_id, force_deletion=False):
     """Deletes the skill with the given skill_id.
 
@@ -583,6 +634,88 @@ def save_skill_summary(skill_summary):
     )
 
     skill_summary_model.put()
+
+
+def create_new_skill_rights(skill_id, committer_id):
+    """Creates a new skill rights object and saves it to the datastore.
+
+    Args:
+        skill_id: str. ID of the skill.
+        committer_id: str. ID of the committer.
+    """
+    skill_rights = skill_domain.SkillRights(skill_id, True, committer_id)
+    commit_cmds = [{'cmd': skill_domain.CMD_CREATE_NEW}]
+
+    skill_models.SkillRightsModel(
+        id=skill_rights.id,
+        creator_id=skill_rights.creator_id,
+        skill_is_private=skill_rights.skill_is_private
+    ).commit(committer_id, 'Created new skill rights', commit_cmds)
+
+
+def get_skill_rights_from_model(skill_rights_model):
+    """Constructs a SkillRights object from the given skill rights model.
+
+    Args:
+        skill rights model: SkillRightsModel. Skill rights from the datastore.
+
+    Returns:
+        SkillRights. The rights object created from the model.
+    """
+
+    return skill_domain.SkillRights(
+        skill_rights_model.id,
+        skill_rights_model.skill_is_private,
+        skill_rights_model.creator_id
+    )
+
+
+def get_skill_rights(skill_id, strict=True):
+    """Retrieves the rights object for the given skill.
+
+    Args:
+        skill_id: str. ID of the skill.
+        strict: bool. Whether to fail noisily if no skill with the given id
+            exists in the datastore.
+
+    Returns:
+        SkillRights. The rights object associated with the given skill.
+
+    Raises:
+        EntityNotFoundError. The skill with ID skill id was not found
+            in the datastore.
+    """
+
+    model = skill_models.SkillRightsModel.get(skill_id, strict=strict)
+
+    if model is None:
+        return None
+
+    return get_skill_rights_from_model(model)
+
+
+def check_can_edit_skill(user, skill_rights):
+    """Checks whether the user can edit the given skill.
+
+    Args:
+        user: UserActionsInfo. Object having user id, role and actions for
+            given user.
+        skill_rights: SkillRights or None. Rights object for the given skill.
+
+    Returns:
+        bool. Whether the given user can edit the given skill.
+    """
+    if skill_rights is None:
+        return False
+    if role_services.ACTION_EDIT_PUBLIC_SKILLS not in user.actions:
+        return False
+    if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
+        if not skill_rights.is_private():
+            return True
+        if skill_rights.is_private() and skill_rights.is_creator(user.id):
+            return True
+    else:
+        return False
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):

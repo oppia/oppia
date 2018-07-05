@@ -141,7 +141,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
             ),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'version': 0
+            'version': 0,
+            'next_misconception_id': 0
         }
         self.assertEqual(skill.to_dict(), expected_skill_dict)
 
