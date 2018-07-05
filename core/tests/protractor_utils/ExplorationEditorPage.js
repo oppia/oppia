@@ -125,6 +125,7 @@ var ExplorationEditorPage = function() {
   this.navigateToHistoryTab = function() {
     browser.wait(until.elementToBeClickable(navigateToHistoryTabButton), 5000);
     navigateToHistoryTabButton.click();
+    general.waitForLoadingMessage();
   };
 
   this.navigateToFeedbackTab = function() {
