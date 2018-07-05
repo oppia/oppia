@@ -674,6 +674,87 @@ class UserSkillMasteryModel(base_models.BaseModel):
         return '%s.%s' % (user_id, skill_id)
 
 
+class QuestionUserDataModel(base_models.BaseModel):
+    """User-specific data pertaining to a specific question.
+
+    Instances of this class have keys of the form
+    [USER_ID].[QUESTION_ID]
+    """
+    # The user id.
+    user_id = ndb.StringProperty(required=True, indexed=True)
+    # The question id.
+    question_id = ndb.StringProperty(required=True, indexed=True)
+    # List of uncommitted changes made by the user to the question.
+    draft_change_list = ndb.JsonProperty(default=None)
+    # Timestamp of when the change list was last updated.
+    draft_change_list_last_updated = ndb.DateTimeProperty(default=None)
+    # The question version that this change list applied to.
+    draft_change_list_question_version = ndb.IntegerProperty(default=None)
+    # The version of the draft change list which was last saved by the user.
+    # Can be zero if the draft is None or if the user has not committed
+    # draft changes to this question since the draft_change_list_id property
+    # was introduced.
+    draft_change_list_id = ndb.IntegerProperty(default=0)
+
+    @classmethod
+    def _generate_id(cls, user_id, question_id):
+        return '%s.%s' % (user_id, question_id)
+
+    @classmethod
+    def create(cls, user_id, question_id):
+        """Creates a new QuestionUserDataModel instance and returns it.
+
+        Note that the client is responsible for actually saving this entity to
+        the datastore.
+
+        Args:
+            user_id: str. The id of the user.
+            question_id: str. The id of the question.
+
+        Returns:
+            QuestionUserDataModel. The newly created QuestionUserDataModel
+            instance.
+        """
+        instance_id = cls._generate_id(user_id, question_id)
+        return cls(
+            id=instance_id, user_id=user_id, question_id=question_id)
+
+    @classmethod
+    def get(cls, user_id, question_id):
+        """Gets the QuestionUserDataModel for the given user and question
+         ids.
+
+        Args:
+            user_id: str. The id of the user.
+            question_id: str. The id of the question.
+
+        Returns:
+            QuestionUserDataModel. The QuestionUserDataModel instance
+            which matches with the given user_id and question_id.
+        """
+        instance_id = cls._generate_id(user_id, question_id)
+        return super(QuestionUserDataModel, cls).get(
+            instance_id, strict=False)
+
+    @classmethod
+    def get_multi(cls, user_ids, question_id):
+        """Gets the QuestionUserDataModel for the given question and user
+         ids.
+
+        Args:
+            user_ids: list(str). A list of user_ids.
+            question_id: str. The id of the question.
+
+        Returns:
+            QuestionUserDataModel. The QuestionUserDataModel instance
+            which matches with the given user_ids and question_id.
+        """
+        instance_ids = (
+            cls._generate_id(user_id, question_id) for user_id in user_ids)
+        return super(QuestionUserDataModel, cls).get_multi(
+            instance_ids)
+
+
 class UserContributionScoringModel(base_models.BaseModel):
     """Model for storing the scores of a user for various suggestions created by
     the user. Users having scores above a particular threshold for a category

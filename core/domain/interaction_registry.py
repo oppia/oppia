@@ -38,10 +38,24 @@ class Registry(object):
         ]))
 
     @classmethod
-    def _refresh(cls):
+    def get_all_question_specific_interaction_ids(cls):
+        """Get a list of all interaction ids allowed for question editor."""
+        # pylint: disable=C0301
+        return list(itertools.chain(*[
+            interaction_category['interaction_ids']
+            for interaction_category in feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES
+        ]))
+        # pylint: enable=C0301
+
+    @classmethod
+    def _refresh(cls, is_editor_context_exploration=True):
         cls._interactions.clear()
 
-        all_interaction_ids = cls.get_all_interaction_ids()
+        if is_editor_context_exploration:
+            all_interaction_ids = cls.get_all_interaction_ids()
+        else:
+            all_interaction_ids = (
+                cls.get_all_question_specific_interaction_ids())
 
         # Assemble all paths to the interactions.
         extension_paths = [
@@ -60,10 +74,10 @@ class Registry(object):
                 cls._interactions[clazz.__name__] = clazz()
 
     @classmethod
-    def get_all_interactions(cls):
+    def get_all_interactions(cls, is_editor_context_exploration=True):
         """Get a list of instances of all interactions."""
         if len(cls._interactions) == 0:
-            cls._refresh()
+            cls._refresh(is_editor_context_exploration)
         return cls._interactions.values()
 
     @classmethod
@@ -104,3 +118,13 @@ class Registry(object):
             interaction.id: interaction.to_dict()
             for interaction in cls.get_all_interactions()
         }
+
+    @classmethod
+    def get_all_question_editor_specs(cls):
+        """Returns a dict containing the full specs of each interaction."""
+        # pylint: disable=C0301
+        return {
+            interaction.id: interaction.to_dict()
+            for interaction in cls.get_all_interactions(is_editor_context_exploration=False)
+        }
+        # pylint: enable=C0301

@@ -23,8 +23,9 @@ from core.domain import user_services
 from core.platform import models
 import feconf
 
-(question_models, skill_models) = models.Registry.import_models(
-    [models.NAMES.question, models.NAMES.skill])
+memcache_services = models.Registry.import_memcache_services()
+(question_models, skill_models, user_models) = models.Registry.import_models(
+    [models.NAMES.question, models.NAMES.skill, models.NAMES.user])
 
 
 def _create_new_question(committer_id, question, commit_message):
@@ -104,25 +105,56 @@ def get_question_from_model(question_model):
         question_model.language_code)
 
 
-def get_question_by_id(question_id, strict=True):
-    """Returns a domain object representing a question.
+def _get_question_memcache_key(question_id, version=None):
+    """Returns a memcache key for an question.
 
     Args:
-        question_id: str. ID of the question.
-        strict: bool. Whether to fail noisily if no question with the given
-            id exists in the datastore.
+        question_id: str. The id of the question whose memcache key
+            is to be returned.
+        version: int or None. If specified, the version of the question
+            whose memcache key is to be returned.
 
     Returns:
-        Question or None. The domain object representing a question with the
-        given id, or None if it does not exist.
+        str. Memcache key for the given question (or question version).
     """
-    question_model = question_models.QuestionModel.get(
-        question_id, strict=strict)
-    if question_model:
-        question = get_question_from_model(question_model)
-        return question
+
+    if version:
+        return 'question-version:%s:%s' % (question_id, version)
     else:
-        return None
+        return 'question:%s' % question_id
+
+
+def get_question_by_id(question_id, strict=True, version=None):
+    """Returns an question domain object.
+
+    Args:
+        question_id: str. The id of the question to be returned.
+        strict: bool. Whether to fail noisily if no question with a given id
+            exists.
+        version: int or None. The version of the question to be returned.
+            If None, the latest version of the question is returned.
+
+    Returns:
+        Question. The domain object corresponding to the given question.
+    """
+
+    question_memcache_key = _get_question_memcache_key(
+        question_id, version=version)
+    memcached_question = memcache_services.get_multi(
+        [question_memcache_key]).get(question_memcache_key)
+
+    if memcached_question is not None:
+        return memcached_question
+    else:
+        question_model = question_models.QuestionModel.get(
+            question_id, strict=strict, version=version)
+        if question_model:
+            question = get_question_from_model(question_model)
+            memcache_services.set_multi({
+                question_memcache_key: question})
+            return question
+        else:
+            return None
 
 
 def get_questions_by_ids(question_ids):

@@ -34,7 +34,7 @@ from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
-from core.controllers import question
+from core.controllers import question_editor
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
@@ -213,6 +213,9 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s' % feconf.NEW_COLLECTION_URL,
         creator_dashboard.NewCollectionHandler),
+    get_redirect_route(
+        r'%s' % feconf.NEW_QUESTION_URL,
+        creator_dashboard.NewQuestionHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
@@ -498,11 +501,14 @@ URLS = MAPREDUCE_HANDLERS + [
         collection_editor.CollectionUnpublishHandler),
 
     get_redirect_route(
-        r'%s' % feconf.QUESTION_CREATION_URL,
-        question.QuestionCreationHandler),
-    get_redirect_route(
         r'%s/<question_id>' % feconf.QUESTION_DATA_URL,
-        question.QuestionsHandler),
+        question_editor.EditableQuestionDataHandler),
+    get_redirect_route(
+        r'%s/<question_id>' % feconf.QUESTION_EDITOR_URL_PREFIX,
+        question_editor.QuestionEditorPage),
+    get_redirect_route(
+        r'/questionhandler/autosave_draft/<question_id>',
+        question_editor.QuestionAutosaveHandler),
 
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,

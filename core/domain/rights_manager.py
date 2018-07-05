@@ -1302,3 +1302,24 @@ def unpublish_collection(committer, collection_id):
     """
     _unpublish_activity(
         committer, collection_id, constants.ACTIVITY_TYPE_COLLECTION)
+
+
+def check_can_delete_question(user, question_rights):
+    """Checks whether the user can delete given question.
+
+    Args:
+        user: UserActionsInfo. Object having user_id, role and actions for
+            given user.
+        question_rights: QuestionRights or None. Rights object for the given
+            question.
+
+    Returns:
+        bool. Whether the user can delete given question.
+    """
+    if question_rights is None:
+        return False
+
+    if role_services.ACTION_PUBLISH_ANY_QUESTION in user.actions:
+        return True
+
+    return False
