@@ -35,21 +35,21 @@ describe('Story validation service', function() {
       notes: 'Story notes',
       version: 1,
       story_contents: {
-        initial_node_id: 'node_2',
+        initial_node_id: 'node_1',
         nodes: [
           {
             id: 'node_1',
-            prerequisite_skill_ids: ['skill_2'],
-            acquired_skill_ids: ['skill_3'],
-            destination_node_ids: [],
+            prerequisite_skill_ids: ['skill_1'],
+            acquired_skill_ids: ['skill_2'],
+            destination_node_ids: ['node_2'],
             outline: 'Outline',
             exploration_id: null,
             outline_is_finalized: false
           }, {
             id: 'node_2',
-            prerequisite_skill_ids: ['skill_1'],
-            acquired_skill_ids: ['skill_2', 'skill_3'],
-            destination_node_ids: ['node_1'],
+            prerequisite_skill_ids: ['skill_2'],
+            acquired_skill_ids: ['skill_3', 'skill_4'],
+            destination_node_ids: [],
             outline: 'Outline 2',
             exploration_id: 'exp_1',
             outline_is_finalized: true
@@ -62,64 +62,63 @@ describe('Story validation service', function() {
       sampleStoryBackendObject);
   }));
 
+  var _findValidationIssuesInStory = function() {
+    return StoryValidationService.findValidationIssuesForStory(_sampleStory);
+  };
+
   it('should correctly validate a valid story', function() {
-    expect(
-      StoryValidationService.findValidationIssuesForStory(_sampleStory)
-    ).toEqual([]);
+    expect(_findValidationIssuesInStory()).toEqual([]);
   });
 
   it('should correctly validate story', function() {
     _sampleStory.setTitle('');
-    _sampleStory.setDescription(123);
-    _sampleStory.setNotes(123);
-    _sampleStory.setLanguageCode(123);
-    expect(
-      StoryValidationService.findValidationIssuesForStory(_sampleStory)
-    ).toEqual([
-      'Story title should be a non-empty string',
-      'Story description should be a string',
-      'Story notes should be a string',
-      'Story language code should be a string'
-    ]);
-  });
-
-  it('should correctly validate node ids', function() {
-    _sampleStory.getStoryContents().getNodes()[0].addDestinationNodeId('node1');
-    expect(
-      StoryValidationService.findValidationIssuesForStory(_sampleStory)
-    ).toEqual([
-      'Each destination node id should be valid'
-    ]);
-
-    _sampleStory.getStoryContents().getNodes()[0].removeDestinationNodeId(
-      'node1');
-    _sampleStory.getStoryContents().getNodes()[0].addDestinationNodeId(
-      'node_a');
-    expect(
-      StoryValidationService.findValidationIssuesForStory(_sampleStory)
-    ).toEqual([
-      'Each destination node id should be valid'
+    expect(_findValidationIssuesInStory()).toEqual([
+      'Story title should be a non-empty string'
     ]);
   });
 
   it('should correctly validate story nodes', function() {
-    _sampleStory.getStoryContents().setNodeExplorationId('node_1', 123);
-    _sampleStory.getStoryContents().setNodeOutline('node_1', 123);
-    _sampleStory.getStoryContents().addPrerequisiteSkillIdToNode('node_1', 123);
-    _sampleStory.getStoryContents().addAcquiredSkillIdToNode('node_1', 123);
+    _sampleStory.getStoryContents().addPrerequisiteSkillIdToNode(
+      'node_1', 'skill_2');
     _sampleStory.getStoryContents().addDestinationNodeIdToNode(
       'node_1', 'node_1');
 
-    expect(
-      StoryValidationService.findValidationIssuesForStory(_sampleStory)
-    ).toEqual([
-      'Node outline should be a string',
-      'Exploration id should be a string or null',
-      'Each prerequisite skill id should be a string',
-      'Each acquired skill id should be a string',
+    expect(_findValidationIssuesInStory()).toEqual([
       'Acquired and prerequisite skills for a node should not have any ' +
       'skill in common',
       'A destination node id of a node should not point to the same node.'
+    ]);
+  });
+
+  it('should correctly correctly validate case where prerequisite skills ' +
+     'are not acquired by the user', function() {
+    var storyContents = _sampleStory.getStoryContents();
+    storyContents.addNode();
+    storyContents.addDestinationNodeIdToNode('node_1', 'node_3');
+    storyContents.addPrerequisiteSkillIdToNode('node_3', 'skill_3');
+    expect(_findValidationIssuesInStory()).toEqual([
+      'The prerequisite skill with id skill_3 was not completed before node ' +
+      'with id node_3 was unlocked'
+    ]);
+  });
+
+  it('should correctly correctly validate the case where the story graph ' +
+    'has loops', function() {
+    var storyContents = _sampleStory.getStoryContents();
+    storyContents.addNode();
+    storyContents.addDestinationNodeIdToNode('node_2', 'node_3');
+    storyContents.addDestinationNodeIdToNode('node_3', 'node_1');
+    expect(_findValidationIssuesInStory()).toEqual([
+      'Loops are not allowed in the node graph'
+    ]);
+  });
+
+  it('should correctly correctly validate the case where the story graph is' +
+    ' disconnected.', function() {
+    var storyContents = _sampleStory.getStoryContents();
+    storyContents.addNode();
+    expect(_findValidationIssuesInStory()).toEqual([
+      'The node with id node_3 is disconnected from the graph'
     ]);
   });
 });

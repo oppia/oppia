@@ -40,33 +40,32 @@ oppia.factory('StoryValidationService', [
       var issues = [];
 
       if (!(node instanceof StoryNodeObjectFactory)) {
-        issues.push('All nodes should be a StoryNode instance');
-        return issues;
+        throw Error('All nodes should be a StoryNode instance');
       }
       if (!_checkValidNodeId(node.getId())) {
-        issues.push('Invalid node id');
+        throw Error('Invalid node id');
       }
       if (typeof node.getOutline() !== 'string') {
-        issues.push('Node outline should be a string');
+        throw Error('Node outline should be a string');
       }
       if ((typeof node.getExplorationId() !== 'string') &&
           (node.getExplorationId() !== null)) {
-        issues.push('Exploration id should be a string or null');
+        throw Error('Exploration id should be a string or null');
       }
       if (typeof node.getOutlineStatus() !== 'boolean') {
-        issues.push('Node outline status should be true or false.');
+        throw Error('Node outline status should be true or false.');
       }
       var prerequisiteSkillIds = node.getPrerequisiteSkillIds();
       var acquiredSkillIds = node.getAcquiredSkillIds();
       var destinationNodeIds = node.getDestinationNodeIds();
       if (prerequisiteSkillIds.constructor !== Array) {
-        issues.push('Prerequisite skill ids should be an array');
+        throw Error('Prerequisite skill ids should be an array');
       }
       if (
         prerequisiteSkillIds.some(function(skillId) {
           return typeof skillId !== 'string';
         })) {
-        issues.push('Each prerequisite skill id should be a string');
+        throw Error('Each prerequisite skill id should be a string');
       }
       if ((new Set(prerequisiteSkillIds)).size !==
           prerequisiteSkillIds.length) {
@@ -74,13 +73,13 @@ oppia.factory('StoryValidationService', [
       }
 
       if (acquiredSkillIds.constructor !== Array) {
-        issues.push('Acquired skill ids should be an array');
+        throw Error('Acquired skill ids should be an array');
       }
       if (
         acquiredSkillIds.some(function(skillId) {
           return typeof skillId !== 'string';
         })) {
-        issues.push('Each acquired skill id should be a string');
+        throw Error('Each acquired skill id should be a string');
       }
       if ((new Set(acquiredSkillIds)).size !==
           acquiredSkillIds.length) {
@@ -96,13 +95,13 @@ oppia.factory('StoryValidationService', [
       }
 
       if (destinationNodeIds.constructor !== Array) {
-        issues.push('Destination node ids should be an array');
+        throw Error('Destination node ids should be an array');
       }
       if (
         destinationNodeIds.some(function(nodeId) {
           return !_checkValidNodeId(nodeId);
         })) {
-        issues.push('Each destination node id should be valid');
+        throw Error('Each destination node id should be valid');
       }
       if (
         destinationNodeIds.some(function(nodeId) {
@@ -120,32 +119,26 @@ oppia.factory('StoryValidationService', [
 
     var _validateStoryContents = function(storyContents) {
       var issues = [];
-      var invalidStoryContents = false;
       if (!(storyContents instanceof StoryContentsObjectFactory)) {
-        issues.push('Story contents should be StoryContents object');
-        invalidStoryContents = true;
+        throw Error('Story contents should be StoryContents object');
       }
       if (!_checkValidNodeId(storyContents.getInitialNodeId())) {
-        issues.push('Invalid initial node id');
-        invalidStoryContents = true;
+        throw Error('Invalid initial node id');
       }
       if (!_checkValidNodeId(storyContents.getNextNodeId())) {
-        issues.push('Invalid next node id');
-        invalidStoryContents = true;
+        throw Error('Invalid next node id');
       }
       if (storyContents.getNodes().constructor !== Array) {
-        issues.push('Story nodes should be an array');
-        invalidStoryContents = true;
+        throw Error('Story nodes should be an array');
       }
       var nodes = storyContents.getNodes();
       for (var i = 0; i < nodes.length; i++) {
         var nodeIssues = _validateNode(nodes[i]);
         if (nodeIssues.length > 0) {
-          invalidStoryContents = true;
         }
         issues = issues.concat(nodeIssues);
       }
-      if (invalidStoryContents) {
+      if (issues.length > 0) {
         return issues;
       }
 
@@ -156,7 +149,7 @@ oppia.factory('StoryValidationService', [
         return node.getId();
       });
       if ((new Set(nodeIds)).size !== nodeIds.length) {
-        issues.push('All node ids should be distinct');
+        throw Error('All node ids should be distinct');
       }
       var nextNodeIdNumber = parseInt(
         storyContents.getNextNodeId().replace(NODE_ID_PREFIX, ''));
@@ -168,7 +161,7 @@ oppia.factory('StoryValidationService', [
           initialNodeIsPresent = true;
         }
         if (nodeIdNumber > nextNodeIdNumber) {
-          issues.push(
+          throw Error(
             'Node id out of bounds for node with id ' + nodes[i].getId());
         }
         for (var j = 0; j < nodes[i].getDestinationNodeIds().length; j++) {
@@ -180,7 +173,7 @@ oppia.factory('StoryValidationService', [
         }
       }
       if (!initialNodeIsPresent) {
-        issues.push('Initial node is not present in the story');
+        throw Error('Initial node is not present in the story');
       }
 
       // All the validations above should be successfully completed before going
@@ -251,20 +244,19 @@ oppia.factory('StoryValidationService', [
     var _validateStory = function(story) {
       var issues = [];
       if (!(story instanceof StoryObjectFactory)) {
-        issues.push('The story should be Story object');
-        return issues;
+        throw Error('The story should be Story object');
       }
       if (typeof story.getTitle() !== 'string' || story.getTitle() === '') {
         issues.push('Story title should be a non-empty string');
       }
       if (typeof story.getDescription() !== 'string') {
-        issues.push('Story description should be a string');
+        throw Error('Story description should be a string');
       }
       if (typeof story.getNotes() !== 'string') {
-        issues.push('Story notes should be a string');
+        throw Error('Story notes should be a string');
       }
       if (typeof story.getLanguageCode() !== 'string') {
-        issues.push('Story language code should be a string');
+        throw Error('Story language code should be a string');
       }
       issues = issues.concat(_validateStoryContents(story.getStoryContents()));
 
