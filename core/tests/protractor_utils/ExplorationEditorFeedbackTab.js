@@ -70,7 +70,8 @@ var ExplorationEditorFeedbackTab = function () {
 
   this.getSuggestionThreads = function() {
     var threads = [];
-    browser.waitForAngular();
+    browser.wait(until.visibilityOf(
+      element.all(by.css(suggestionRowClassName)).first()), 5000);
     return element.all(by.css(suggestionRowClassName)).then(function(rows) {
       rows.forEach(function() {
         explorationFeedbackSubject.getText().then(function(subject) {
@@ -83,7 +84,8 @@ var ExplorationEditorFeedbackTab = function () {
 
   this.readFeedbackMessages = function() {
     var messages = [];
-
+    browser.wait(until.visibilityOf(
+      element.all(by.css(suggestionRowClassName)).first()), 5000);
     return element.all(by.css(suggestionRowClassName)).then(function(rows) {
       rows.forEach(function(row) {
         row.click();
