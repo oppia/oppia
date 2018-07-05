@@ -1359,7 +1359,8 @@ def _check_html_indent(all_files, debug=False):
 
 def _check_for_copyright_notice(all_files):
     """This function checks whether copyright notice is
-    present at the beginning of files."""
+    present at the beginning of files.
+    """
 
     js_files_to_exclude = [
         'generatedDefaultData.js', 'generatedParser.js', 'protractor.conf.js',
