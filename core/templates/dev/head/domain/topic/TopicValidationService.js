@@ -26,34 +26,32 @@ oppia.factory('TopicValidationService', [
     var _validateSubtopic = function(subtopic) {
       var issues = [];
       if (!(subtopic instanceof SubtopicObjectFactory)) {
-        issues.push('All subtopics should be Subtopic objects');
-        return issues;
+        throw Error('All subtopics should be Subtopic objects');
       }
       if (typeof subtopic.getId() !== 'number') {
-        issues.push('Subtopic id should be a number');
+        throw Error('Subtopic id should be a number');
       }
-      if (typeof subtopic.getTitle() !== 'string') {
-        issues.push('Subtopic title should be a string');
+      if (typeof subtopic.getTitle() !== 'string' ||
+          subtopic.getTitle() === '') {
+        issues.push('Subtopic title should be a non-empty string');
       }
-      if (subtopic.getSkillSummaries().constructor !== Array) {
-        issues.push('The skill summaries for subtopic should be a list.');
-      }
+
       var skillSummaries = subtopic.getSkillSummaries();
       if (skillSummaries.constructor !== Array) {
-        issues.push('Subtopic skill summaries should be an array.');
+        throw Error('Subtopic skill summaries should be an array.');
       }
       if (
         skillSummaries.some(function(skillSummary) {
           return !(skillSummary instanceof SkillSummaryObjectFactory);
         })) {
-        issues.push(
+        throw Error(
           'Each subtopic skill summary should be a SkillSummary object');
       }
       if (
         skillSummaries.some(function(skillSummary) {
           return (typeof skillSummary.getId() !== 'string');
         })) {
-        issues.push(
+        throw Error(
           'Each subtopic skill id should be a string');
       }
       if (
@@ -62,14 +60,14 @@ oppia.factory('TopicValidationService', [
             typeof skillSummary.getDescription() !== 'string' &&
             skillSummary.getDescription() !== null);
         })) {
-        issues.push(
+        throw Error(
           'Each subtopic skill description should be a string or null');
       }
       var skillIds = skillSummaries.map(function(skillSummary) {
         return skillSummary.getId();
       });
       if ((new Set(skillIds)).size !== skillIds.length) {
-        issues.push('All subtopic skills should be distinct');
+        throw Error('All subtopic skills should be distinct');
       }
       return issues;
     };
@@ -77,23 +75,22 @@ oppia.factory('TopicValidationService', [
     var _validateTopic = function(topic) {
       var issues = [];
       if (!(topic instanceof TopicObjectFactory)) {
-        issues.push('The topic should be a Topic object');
-        return issues;
+        throw Error('The topic should be a Topic object');
       }
       if (typeof topic.getName() !== 'string' || topic.getName() === '') {
         issues.push('Topic name should be a non empty string');
       }
       if (typeof topic.getDescription() !== 'string') {
-        issues.push('Topic description should be a string');
+        throw Error('Topic description should be a string');
       }
       if (typeof topic.getNextSubtopicId() !== 'number') {
-        issues.push('Next subtopic id should be a number');
+        throw Error('Next subtopic id should be a number');
       }
       if (typeof topic.getLanguageCode() !== 'string') {
-        issues.push('Language code should be a string');
+        throw Error('Language code should be a string');
       }
       if (topic.getSubtopics().constructor !== Array) {
-        issues.push('Subtopics should be an array.');
+        throw Error('Subtopics should be an array.');
       }
 
       var subtopics = topic.getSubtopics();
@@ -105,29 +102,29 @@ oppia.factory('TopicValidationService', [
       }
 
       if (canonicalStoryIds.constructor !== Array) {
-        issues.push('Canonical story ids should be an array.');
+        throw Error('Canonical story ids should be an array.');
       }
       if (new Set(canonicalStoryIds).size !== canonicalStoryIds.length) {
-        issues.push('All canonical stories should be distinct.');
+        throw Error('All canonical stories should be distinct.');
       }
       if (
         canonicalStoryIds.some(function(storyId) {
           return typeof storyId !== 'string';
         })) {
-        issues.push('Each canonical story id should be a string');
+        throw Error('Each canonical story id should be a string');
       }
 
       if (additionalStoryIds.constructor !== Array) {
-        issues.push('Additional story ids should be an array.');
+        throw Error('Additional story ids should be an array.');
       }
       if (new Set(additionalStoryIds).size !== additionalStoryIds.length) {
-        issues.push('All additional stories should be distinct.');
+        throw Error('All additional stories should be distinct.');
       }
       if (
         additionalStoryIds.some(function(storyId) {
           return typeof storyId !== 'string';
         })) {
-        issues.push('Each additional story id should be a string');
+        throw Error('Each additional story id should be a string');
       }
 
       for (var i = 0; i < canonicalStoryIds.length; i++) {
@@ -138,20 +135,20 @@ oppia.factory('TopicValidationService', [
       }
 
       if (uncategorizedSkillSummaries.constructor !== Array) {
-        issues.push('Uncategorized skill summaries should be an array.');
+        throw Error('Uncategorized skill summaries should be an array.');
       }
       if (
         uncategorizedSkillSummaries.some(function(skillSummary) {
           return !(skillSummary instanceof SkillSummaryObjectFactory);
         })) {
-        issues.push(
+        throw Error(
           'Each uncategorized skill summary should be a SkillSummary object');
       }
       if (
         uncategorizedSkillSummaries.some(function(skillSummary) {
           return (typeof skillSummary.getId() !== 'string');
         })) {
-        issues.push(
+        throw Error(
           'Each uncategorized skill id should be a string');
       }
       if (
@@ -160,7 +157,7 @@ oppia.factory('TopicValidationService', [
             typeof skillSummary.getDescription() !== 'string' &&
             skillSummary.getDescription() !== null);
         })) {
-        issues.push(
+        throw Error(
           'Each uncategorized skill description should be a string or null');
       }
       return issues;

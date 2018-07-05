@@ -62,37 +62,17 @@ describe('Topic validation service', function() {
     expect(issues).toEqual([]);
   });
 
-  it('should validate the topic', function() {
+  it('should validate the topic and subtopic', function() {
     _sampleTopic.setName('');
-    _sampleTopic.setDescription(123);
-    _sampleTopic.setLanguageCode(123);
-    _sampleTopic.addSubtopic(123);
-    _sampleTopic.addCanonicalStoryId(123);
-    _sampleTopic.addAdditionalStoryId(123);
-    _sampleTopic.addUncategorizedSkill(123, 123);
+    _sampleTopic.addCanonicalStoryId('story_2');
+    _sampleTopic.getSubtopics()[0].setTitle('');
 
     var issues = _findValidationIssues();
     expect(issues).toEqual([
       'Topic name should be a non empty string',
-      'Topic description should be a string',
-      'Language code should be a string',
-      'Subtopic title should be a string',
-      'Each canonical story id should be a string',
-      'Each additional story id should be a string',
+      'Subtopic title should be a non-empty string',
       'Canonical and additional stories should be mutually ' +
-      'exclusive and should not have any common stories between them.',
-      'Each uncategorized skill id should be a string',
-      'Each uncategorized skill description should be a string or null'
-    ]);
-  });
-
-  it('should validate the subtopic', function() {
-    _sampleTopic.getSubtopics()[0].addSkill(123, 123);
-
-    var issues = _findValidationIssues();
-    expect(issues).toEqual([
-      'Each subtopic skill id should be a string',
-      'Each subtopic skill description should be a string or null'
+      'exclusive and should not have any common stories between them.'
     ]);
   });
 });
