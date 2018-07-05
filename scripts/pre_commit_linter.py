@@ -101,20 +101,20 @@ BAD_PATTERNS = {
 
 BAD_PATTERNS_JS_REGEXP = [
     {
-        'regexp': r"\b(ddescribe|fdescribe)\(",
+        'regexp': r'\b(ddescribe|fdescribe)\(',
         'message': "In tests, please use 'describe' instead of 'ddescribe'"
                    "or 'fdescribe'",
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r"\b(iit|fit)\(",
+        'regexp': r'\b(iit|fit)\(',
         'message': "In tests, please use 'it' instead of 'iit' or 'fit'",
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r"templateUrl: \'",
+        'regexp': r'templateUrl: \'',
         'message': "The directives must be directly referenced.",
         'excluded_files': (
             'core/templates/dev/head/pages/exploration_player/'
@@ -128,7 +128,7 @@ BAD_PATTERNS_JS_REGEXP = [
             'extensions/visualizations/')
     },
     {
-        'regexp': r"\$parent",
+        'regexp': r'\$parent',
         'message': "Please do not access parent properties " +
                    "using $parent. Use the scope object" +
                    "for this purpose.",
@@ -140,7 +140,7 @@ BAD_PATTERNS_JS_REGEXP = [
 
 BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
-        'regexp': r"text\/ng-template",
+        'regexp': r'text\/ng-template',
         'message': "The directives must be directly referenced.",
         'excluded_files': (
             'core/templates/dev/head/pages/exploration_player/'
@@ -155,7 +155,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
             'extensions/value_generators/')
     },
     {
-        'regexp': r"[ \t]+$",
+        'regexp': r'[ \t]+$',
         'message': "There should not be any trailing whitespaces.",
         'excluded_files': (),
         'excluded_dirs': ()
@@ -164,7 +164,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
-        'regexp': r"print \'",
+        'regexp': r'print \'',
         'message': "Please do not use print statement.",
         'excluded_files': (
             'core/tests/test_utils.py',
@@ -1038,8 +1038,8 @@ def _check_html_directive_name(all_files):
     summary_messages = []
     # For RegExp explanation, please see https://regex101.com/r/gU7oT6/37.
     pattern_to_match = (
-        r"templateUrl: UrlInterpolationService\.[A-z\(]+" +
-        r"(?P<directive_name>[^\)]+)")
+        r'templateUrl: UrlInterpolationService\.[A-z\(]+' +
+        r'(?P<directive_name>[^\)]+)')
     for filename in files_to_check:
         with open(filename) as f:
             content = f.read()
@@ -1385,7 +1385,7 @@ def _check_for_copyright_notice(all_files):
     all_files_to_check = (
         js_files_to_check + py_files_to_check + sh_files_to_check)
     regexp_to_check = (
-        r"Copyright \d{4} The Oppia Authors\. All Rights Reserved\.")
+        r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.')
 
     failed = False
     summary_messages = []
