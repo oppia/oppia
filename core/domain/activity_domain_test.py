@@ -32,7 +32,7 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
         self.invalid_activity_reference = activity_domain.ActivityReference(
             'invalid_activity_type', '1234')
 
-    def test_get_hash(self):
+    def test_that_hashes_for_different_object_types_are_distinct(self):
         exp_hash = self.exp_activity_reference.get_hash()
         collection_hash = self.collection_activity_reference.get_hash()
         invalid_activity_hash = self.invalid_activity_reference.get_hash()
@@ -41,10 +41,8 @@ class ActivityReferenceDomainUnitTests(test_utils.GenericTestBase):
         self.assertNotEqual(collection_hash, invalid_activity_hash)
 
     def test_validate(self):
-        self.assertRaisesRegexp(
-            Exception,
-            'Invalid activity type: .+',
-            callableObj=self.invalid_activity_reference.validate)
+        with self.assertRaisesRegexp(Exception, 'Invalid activity type: .+'):
+            self.invalid_activity_reference.validate()
 
     def test_to_dict(self):
         exp_dict = self.exp_activity_reference.to_dict()
