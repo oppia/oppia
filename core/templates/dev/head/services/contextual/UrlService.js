@@ -53,7 +53,7 @@ oppia.factory('UrlService', ['$window', function($window) {
       if (pathname.match(/\/(story|topic)_editor\/(\w|-){12}\b/g)) {
         return pathname.split('/')[2];
       }
-      throw Error('Invalid story id url');
+      throw Error('Invalid topic id url');
     },
     getStoryIdFromUrl: function() {
       var pathname = this.getPathname();

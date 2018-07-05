@@ -40,8 +40,6 @@ oppia.controller('StateResponses', [
     var _initializeTrainingData = function() {
       var explorationId = ExplorationContextService.getExplorationId();
       var currentStateName = EditorStateService.getActiveStateName();
-      TrainingDataService.initializeTrainingData(
-        explorationId, currentStateName);
     };
 
     $scope.suppressDefaultAnswerGroupWarnings = function() {
@@ -148,13 +146,6 @@ oppia.controller('StateResponses', [
       return stateInteractionIdService.savedMemento;
     };
 
-    $scope.isCurrentInteractionTrainable = function() {
-      var interactionId = $scope.getCurrentInteractionId();
-      return (
-        interactionId &&
-        INTERACTION_SPECS[interactionId].is_trainable);
-    };
-
     $scope.isCreatingNewState = function(outcome) {
       return outcome && outcome.dest === PLACEHOLDER_OUTCOME_DEST;
     };
@@ -227,14 +218,7 @@ oppia.controller('StateResponses', [
       if (newInteractionId &&
           !INTERACTION_SPECS[newInteractionId].is_linear &&
           !INTERACTION_SPECS[newInteractionId].is_terminal) {
-        // Open the training interface if the interaction is trainable,
-        // otherwise open the answer group modal.
-        if (GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS &&
-            $scope.isCurrentInteractionTrainable()) {
-          $scope.openTeachOppiaModal();
-        } else {
-          $scope.openAddAnswerGroupModal();
-        }
+        $scope.openAddAnswerGroupModal();
       }
     });
 
@@ -248,118 +232,6 @@ oppia.controller('StateResponses', [
     $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
       ResponsesService.updateAnswerChoices(newAnswerChoices);
     });
-
-    $scope.openTeachOppiaModal = function() {
-      AlertsService.clearWarnings();
-      $rootScope.$broadcast('externalSave');
-
-      $uibModal.open({
-        templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-          '/pages/exploration_editor/editor_tab/' +
-          'teach_oppia_modal_directive.html'),
-        backdrop: false,
-        controller: [
-          '$scope', '$injector', '$uibModalInstance',
-          'ExplorationHtmlFormatterService',
-          'stateInteractionIdService', 'stateCustomizationArgsService',
-          'ExplorationContextService', 'EditorStateService',
-          'ExplorationStatesService', 'TrainingDataService',
-          'AnswerClassificationService', 'FocusManagerService',
-          'AngularNameService', 'EXPLICIT_CLASSIFICATION',
-          function(
-              $scope, $injector, $uibModalInstance,
-              ExplorationHtmlFormatterService,
-              stateInteractionIdService, stateCustomizationArgsService,
-              ExplorationContextService, EditorStateService,
-              ExplorationStatesService, TrainingDataService,
-              AnswerClassificationService, FocusManagerService,
-              AngularNameService, EXPLICIT_CLASSIFICATION) {
-            var _explorationId = ExplorationContextService.getExplorationId();
-            var _stateName = EditorStateService.getActiveStateName();
-            var _state = ExplorationStatesService.getState(_stateName);
-
-            $scope.stateContent = _state.content.getHtml();
-            $scope.inputTemplate = (
-              ExplorationHtmlFormatterService.getInteractionHtml(
-                stateInteractionIdService.savedMemento,
-                stateCustomizationArgsService.savedMemento,
-                false,
-                'testInteractionInput'));
-            $scope.answerTemplate = '';
-
-            $scope.trainingData = [];
-            $scope.trainingDataAnswer = '';
-            $scope.trainingDataFeedback = '';
-            $scope.trainingDataOutcomeDest = '';
-
-            // Retrieve the interaction ID.
-            var interactionId = stateInteractionIdService.savedMemento;
-
-            var rulesServiceName =
-              AngularNameService.getNameOfInteractionRulesService(
-                interactionId);
-
-            // Inject RulesService dynamically.
-            var rulesService = $injector.get(rulesServiceName);
-
-            // See the training panel directive in StateEditor for an
-            // explanation on the structure of this object.
-            $scope.classification = {
-              answerGroupIndex: 0,
-              newOutcome: null
-            };
-
-            FocusManagerService.setFocus('testInteractionInput');
-
-            $scope.finishTeaching = function(reopen) {
-              $uibModalInstance.close({
-                reopen: reopen
-              });
-            };
-
-            $scope.submitAnswer = function(answer) {
-              $scope.answerTemplate = (
-                ExplorationHtmlFormatterService.getAnswerHtml(
-                  answer, stateInteractionIdService.savedMemento,
-                  stateCustomizationArgsService.savedMemento));
-
-              var classificationResult = (
-                AnswerClassificationService.getMatchingClassificationResult(
-                  _explorationId, _stateName, _state, answer, rulesService));
-              var feedbackHtml = 'Nothing';
-              var dest = classificationResult.outcome.dest;
-              if (classificationResult.outcome.hasNonemptyFeedback()) {
-                feedbackHtml = classificationResult.outcome.feedback.getHtml();
-              }
-              if (dest === _stateName) {
-                dest = '<em>(try again)</em>';
-              }
-              $scope.trainingDataAnswer = answer;
-              $scope.trainingDataFeedback = feedbackHtml;
-              $scope.trainingDataOutcomeDest = dest;
-
-              var classificationCategorization = (
-                classificationResult.classificationCategorization);
-
-              // If answer is classified using explicit rules then we don't show
-              // yes / no option to creator. Otherwise we ask whether the
-              // response it satisfactory and assign a different response
-              // if response is not satisfactory.
-              if (classificationCategorization === EXPLICIT_CLASSIFICATION) {
-                $scope.classification.answerGroupIndex = -1;
-              } else {
-                $scope.classification.answerGroupIndex = (
-                  classificationResult.answerGroupIndex);
-              }
-            };
-          }]
-      }).result.then(function(result) {
-        // Check if the modal should be reopened right away.
-        if (result.reopen) {
-          $scope.openTeachOppiaModal();
-        }
-      });
-    };
 
     $scope.openAddAnswerGroupModal = function() {
       AlertsService.clearWarnings();

@@ -662,6 +662,33 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<blockquote><p> Here is another<strong>example'
                 '</strong></p></blockquote>'
             )
+        }, {
+            'html_content': (
+                '<p>Hello </p><p>this </p><p>is test case.</p>'
+                '<ul><li>Item1</li><li>Item2</li>'
+                '<ul><li>This is for <b>testing </b>migration.</li>'
+                '<li>Item3</li></ul></ul><p></p>'
+            ),
+            'expected_output': (
+                '<p>Hello </p><p>this </p><p>is test case.</p>'
+                '<ul><li>Item1</li><li>Item2'
+                '<ul><li>This is for <strong>testing </strong>migration.</li>'
+                '<li>Item3</li></ul></li></ul><p></p>'
+            )
+        }, {
+            'html_content': (
+                '<ol><li>Item1</li><ol><ol><ol><li>Item2</li><li>Item3</li>'
+                '<li>Item4</li><ol><ol><ol><li>Item5</li><li>Item6</li></ol>'
+                '</ol></ol></ol></ol></ol><li>Item7</li><ol><li>Item8</li>'
+                '<li>Item9</li><ol><ol><li>Item10</li><li>Item11</li>'
+                '</ol></ol></ol></ol>'
+            ),
+            'expected_output': (
+                '<ol><li>Item1<ol><li>Item2</li><li>Item3</li><li>Item4<ol>'
+                '<li>Item5</li><li>Item6</li></ol></li></ol></li><li>Item7'
+                '<ol><li>Item8</li><li>Item9<ol><li>Item10</li><li>Item11'
+                '</li></ol></li></ol></li></ol>'
+            )
         }]
 
         for test_case in test_cases:
