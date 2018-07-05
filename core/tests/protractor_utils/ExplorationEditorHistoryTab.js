@@ -27,7 +27,7 @@ var ExplorationEditorHistoryTab = function() {
   var historyCheckboxSelector = element.all(by.css(
     '.protractor-test-history-checkbox-selector'));
   var historyGraph = element(by.css('.protractor-test-history-graph'));
-  var stateNode = historyGraph.all(by.css('.protractor-test-node'));
+  var stateNodes = historyGraph.all(by.css('.protractor-test-node'));
   var stateNodeBackground = function(nodeElement) {
     return nodeElement.element(by.css('.protractor-test-node-background'));
   };
@@ -59,19 +59,19 @@ var ExplorationEditorHistoryTab = function() {
   this.getHistoryGraph = function() {
     return {
       openStateHistory: function(stateName) {
-        stateNode.map(function(stateElement) {
+        stateNodes.map(function(stateElement) {
           return stateNodeLabel(stateElement).getText();
         }).then(function(listOfNames) {
           var matched = false;
           for (var i = 0; i < listOfNames.length; i++) {
             if (listOfNames[i] === stateName) {
-              stateNode.get(i).click();
+              stateNodes.get(i).click();
               matched = true;
             }
           }
           if (!matched) {
             throw Error('State ' + stateName +
-      ' not found by explorationEditoHistoryTab.moveToState.');
+      ' not found by explorationEditoHistoryTab.openStateHistory.');
           }
         });
       },
@@ -138,10 +138,10 @@ var ExplorationEditorHistoryTab = function() {
        *                            may be truncated.)
        */
       expectHistoryStatesToMatch: function(expectedStates) {
-        stateNode.map(function(stateNode) {
+        stateNodes.map(function(stateElement) {
           return {
-            label: stateNodeLabel(stateNode).getText(),
-            color: stateNodeBackground(stateNode).getCssValue('fill')
+            label: stateNodeLabel(stateElement).getText(),
+            color: stateNodeBackground(stateElement).getCssValue('fill')
           };
         }).then(function(states) {
           expect(states.length).toEqual(expectedStates.length);
