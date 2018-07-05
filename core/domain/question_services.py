@@ -291,7 +291,7 @@ def save_question_summary(question_summary):
         status=question_summary.status,
         question_model_last_updated=question_summary.last_updated,
         question_model_created_on=question_summary.created_on,
-        question_html_data=question_summary.question_data
+        question_html_data=question_summary.question_html_data
     )
 
     question_summary_model.put()
