@@ -47,7 +47,7 @@ var richTextComponents = {
     "tooltip": "Insert image",
     "icon_data_url": "/rich_text_components/Image/Image.png",
     "preview_url_template_dev": "/imagehandler/<[explorationId]>/<[filepath.name]>",
-    "preview_url_template_prod": "https://storage.googleapis.com/<[bucketName]>/assets/image/<[explorationId]>/<[filepath.name]>",
+    "preview_url_template_prod": "https://storage.googleapis.com/<[bucketName]>/<[explorationId]>/assets/image/<[filepath.name]>",
     "is_complex": false,
     "requires_fs": true,
     "is_block_element": true,
