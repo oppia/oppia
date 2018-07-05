@@ -368,7 +368,8 @@ def get_summaries_of_linked_skills(question_id):
         question_id: str. The question ID for the given question.
 
     Returns:
-        QuestionSkillLinkModel. The QuestionSkillModel for the given question.
+        QuestionSkillLinkModel|None. The QuestionSkillModel for the given
+            question or None if there exists no skill linked for question.
     """
     linked_skill_summaries = []
     question_skill_links = question_models.QuestionSkillLinkModel.get(
@@ -450,7 +451,7 @@ def get_question_rights(question_id, strict=True):
         QuestionRights. The rights object associated with the given question.
 
     Raises:
-        EntityNotFoundError. The question with ID question_id was not
+        EntityNotFoundError. The question rights for question with ID was not
             found in the datastore.
     """
 
@@ -491,7 +492,7 @@ def check_can_edit_question(user_id, question_id):
     return False
 
 
-def publish_question(question_id, committer_id):
+def approve_and_publish_question(question_id, committer_id):
     """Marks the given question as published.
 
     Args:

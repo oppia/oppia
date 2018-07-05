@@ -130,7 +130,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(question_summary.id, 'dummy')
         self.assertEqual(
-            question_summary.question_data,
+            question_summary.question_html_data,
             html_cleaner.clean(''))
         self.assertEqual(question_summary.language_code, 'en')
         self.assertEqual(question_summary.status, 'private')
@@ -151,16 +151,26 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_admin_can_publish_and_edit_question(self):
         question_id = question_services.add_question(
             self.user_id_admin, self.question)
-        question_services.publish_question(question_id, self.user_id_admin)
+        question_services.approve_and_publish_question(
+            question_id, self.user_id_admin)
 
         self.assertTrue(
             question_services.check_can_edit_question(
                 self.user_id_admin, question_id))
 
+    def test_user_can_edit_question(self):
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
+
+        self.assertTrue(
+            question_services.check_can_edit_question(
+                self.owner_id, question_id))
+
     def test_topic_manager_can_publish_and_edit_question(self):
         question_id = question_services.add_question(
             self.user_id_a, self.question)
-        question_services.publish_question(question_id, self.user_id_a)
+        question_services.approve_and_publish_question(
+            question_id, self.user_id_a)
 
         self.assertTrue(
             question_services.check_can_edit_question(
@@ -169,9 +179,21 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
     def test_admin_can_unpublish_question(self):
         question_id = question_services.add_question(
             self.user_id_admin, self.question)
-        question_services.publish_question(question_id, self.user_id_admin)
+        question_services.approve_and_publish_question(
+            question_id, self.user_id_admin)
         question_services.unpublish_question(question_id, self.user_id_admin)
 
         self.assertFalse(
             question_services.check_can_edit_question(
                 self.user_id_admin, question_id))
+
+    def test_topic_manager_can_unpublish_question(self):
+        question_id = question_services.add_question(
+            self.user_id_a, self.question)
+        question_services.approve_and_publish_question(
+            question_id, self.user_id_a)
+        question_services.unpublish_question(question_id, self.user_id_a)
+
+        self.assertFalse(
+            question_services.check_can_edit_question(
+                self.user_id_a, question_id))

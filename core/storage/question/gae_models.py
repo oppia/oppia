@@ -234,7 +234,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     # with created_on, which is the time when the question *summary*
     # model was created).
     question_model_created_on = ndb.DateTimeProperty(indexed=True)
-    # A dict representing the question data.
+    # The html content for the question.
     question_html_data = ndb.StringProperty(indexed=False, required=True)
 
     @classmethod
@@ -249,28 +249,3 @@ class QuestionSummaryModel(base_models.BaseModel):
         """
         return QuestionSummaryModel.query().filter(
             cls.creator_id == creator_id).fetch()
-
-
-class QuestionRightsSnapshotMetadataModel(
-        base_models.BaseSnapshotMetadataModel):
-    """Storage model for the metadata for a question rights snapshot."""
-    pass
-
-
-class QuestionRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
-    """Storage model for the content of a question rights snapshot."""
-    pass
-
-
-class QuestionRightsModel(base_models.VersionedModel):
-    """Storage model for rights related to a question.
-
-    The id of each instance is the id of the corresponding question.
-    """
-
-    SNAPSHOT_METADATA_CLASS = QuestionRightsSnapshotMetadataModel
-    SNAPSHOT_CONTENT_CLASS = QuestionRightsSnapshotContentModel
-    ALLOW_REVERT = False
-
-    # The user_ids of the managers of this question.
-    manager_ids = ndb.StringProperty(indexed=True, repeated=True)
