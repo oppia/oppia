@@ -1369,8 +1369,8 @@ def _check_html_indent(all_files, debug=False):
 
 
 def _check_for_copyright_notice(all_files):
-    """This function checks whether copyright notice is
-    present at the beginning of files.
+    """This function checks whether the copyright notice
+    is present at the beginning of files.
     """
 
     js_files_to_check = [
@@ -1384,7 +1384,8 @@ def _check_for_copyright_notice(all_files):
         filename for filename in all_files if filename.endswith('.sh')]
     all_files_to_check = (
         js_files_to_check + py_files_to_check + sh_files_to_check)
-    regexp_to_check = r"Copyright \d+ The Oppia Authors\. All Rights Reserved\."
+    regexp_to_check = (
+        r"Copyright \d{4} The Oppia Authors\. All Rights Reserved\.")
 
     failed = False
     summary_messages = []
@@ -1392,9 +1393,12 @@ def _check_for_copyright_notice(all_files):
     for filename in all_files_to_check:
         has_copyright_notice = False
         with open(filename, 'r') as f:
-            for line in f:
-                if re.search(regexp_to_check, line):
-                    has_copyright_notice = True
+            for line_num, line in enumerate(f):
+                if line_num < 5:
+                    if re.search(regexp_to_check, line):
+                        has_copyright_notice = True
+                        break
+                else:
                     break
 
         if not has_copyright_notice:
