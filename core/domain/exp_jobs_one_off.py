@@ -629,36 +629,40 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
 
     @staticmethod
     def map(file_snapshot_content_model):
-        instance_id = (
-            file_snapshot_content_model.get_unversioned_instance_id())
-        filetype = instance_id[instance_id.rfind('.') + 1:]
-        # To separate the image entries from the audio entries we get from the
-        # FileSnapshotContentModel.
-        if filetype in ALLOWED_IMAGE_EXTENSIONS:
-            pattern = re.compile(r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
-                ALLOWED_IMAGE_EXTENSIONS) + '))$')
-            catched_groups = pattern.match(instance_id)
-            if not catched_groups:
-                yield(WRONG_INSTANCE_ID, instance_id)
-            else:
-                filename = catched_groups.group(2)
-                filepath = 'assets/' + filename
-                exploration_id = catched_groups.group(1)
-                file_model = file_models.FileModel.get_model(
-                    exploration_id, filepath, False)
-                if file_model:
-                    content = file_model.content
-                    fs = fs_domain.AbstractFileSystem(
-                        fs_domain.GcsFileSystem(exploration_id))
-                    if fs.isfile('%s/%s' % ('image', filename)):
-                        yield(FILE_ALREADY_EXISTS, file_model.id)
-                    else:
-                        fs.commit(
-                            'ADMIN', '%s/%s' % ('image', filename), content,
-                            '%s/%s' % ('image', filetype))
-                        yield(FILE_COPIED, 1)
+        # This job is allowed to run only in Production environment since it
+        # uses GcsFileSystem which can't be used in Development environment.
+        if not feconf.DEV_MODE:
+            instance_id = (
+                file_snapshot_content_model.get_unversioned_instance_id())
+            filetype = instance_id[instance_id.rfind('.') + 1:]
+            # To separate the image entries from the audio entries we get from
+            # the FileSnapshotContentModel.
+            if filetype in ALLOWED_IMAGE_EXTENSIONS:
+                pattern = re.compile(
+                    r'^/([^/]+)/assets/(([^/]+)\.(' +'|'.join(
+                        ALLOWED_IMAGE_EXTENSIONS) + '))$')
+                catched_groups = pattern.match(instance_id)
+                if not catched_groups:
+                    yield(WRONG_INSTANCE_ID, instance_id)
                 else:
-                    yield(FOUND_DELETED_FILE, file_model.id)
+                    filename = catched_groups.group(2)
+                    filepath = 'assets/' + filename
+                    exploration_id = catched_groups.group(1)
+                    file_model = file_models.FileModel.get_model(
+                        exploration_id, filepath, False)
+                    if file_model:
+                        content = file_model.content
+                        fs = fs_domain.AbstractFileSystem(
+                            fs_domain.GcsFileSystem(exploration_id))
+                        if fs.isfile('%s/%s' % ('image', filename)):
+                            yield(FILE_ALREADY_EXISTS, file_model.id)
+                        else:
+                            fs.commit(
+                                'ADMIN', '%s/%s' % ('image', filename),
+                                content, '%s/%s' % ('image', filetype))
+                            yield(FILE_COPIED, 1)
+                    else:
+                        yield(FOUND_DELETED_FILE, file_model.id)
 
 
     @staticmethod

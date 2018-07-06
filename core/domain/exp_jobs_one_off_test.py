@@ -981,36 +981,6 @@ class ExplorationMigrationValidationJobForTextAngularTest(
         self.assertEqual(actual_output, expected_output)
 
 
-class ImageDataMigrationTest(test_utils.GenericTestBase):
-
-    def setUp(self):
-        """Initialize owner before each test case."""
-        super(ImageDataMigrationTest, self).setUp()
-        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.process_and_flush_pending_tasks()
-
-    def test_image_migration_job(self):
-        exp_services.delete_demo('2')
-        exp_services.load_demo('2')
-
-        exploration = exp_services.get_exploration_by_id('2')
-        image_filenames_in_exploration = (
-            exp_services.get_image_filenames_from_exploration(exploration))
-
-        # Start validation job on demo exploration.
-        job_id = exp_jobs_one_off.ImageDataMigrationJob.create_new()
-        exp_jobs_one_off.ImageDataMigrationJob.enqueue(job_id)
-        self.process_and_flush_pending_tasks()
-
-        actual_output = (
-            exp_jobs_one_off.ImageDataMigrationJob.get_output(
-                job_id))
-        expected_output = [
-            "[u'File Copied', %d]" % len(image_filenames_in_exploration)]
-        self.assertEqual(actual_output, expected_output)
-
-
 class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
