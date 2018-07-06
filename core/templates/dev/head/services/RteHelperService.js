@@ -35,9 +35,10 @@ oppia.factory('RteHelperService', [
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
         id: RTE_COMPONENT_SPECS[componentId].frontend_id,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
-        previewUrlTemplate: (GLOBALS.DEV_MODE ?
-          RTE_COMPONENT_SPECS[componentId].preview_url_template_production :
-          RTE_COMPONENT_SPECS[componentId].preview_url_template),
+        previewUrlTemplate: ((GLOBALS.DEV_MODE ||
+          !constants.ENABLE_GCS_STORAGE_FOR_IMAGES) ?
+          RTE_COMPONENT_SPECS[componentId].preview_url_template_dev :
+          RTE_COMPONENT_SPECS[componentId].preview_url_template_prod),
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
         isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
