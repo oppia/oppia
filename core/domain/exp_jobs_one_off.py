@@ -654,12 +654,12 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                         content = file_model.content
                         fs = fs_domain.AbstractFileSystem(
                             fs_domain.GcsFileSystem(exploration_id))
-                        if fs.isfile('%s/%s' % ('image', filename)):
+                        if fs.isfile('image/%s' % (filename)):
                             yield(FILE_ALREADY_EXISTS, file_model.id)
                         else:
                             fs.commit(
-                                'ADMIN', '%s/%s' % ('image', filename),
-                                content, '%s/%s' % ('image', filetype))
+                                'ADMIN', 'image/%s' % (filename),
+                                content, 'image/%s' % (filetype))
                             yield(FILE_COPIED, 1)
                     else:
                         yield(FOUND_DELETED_FILE, file_model.id)
