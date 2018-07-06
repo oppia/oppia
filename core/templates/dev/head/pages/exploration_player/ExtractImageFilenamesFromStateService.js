@@ -115,7 +115,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
      */
     var _extractFilepathValueFromOppiaNonInteractiveImageTag = function(
         strHtml) {
-      var fileInfo = [];
+      var filenames = [];
       var dummyElement = document.createElement('div');
       dummyElement.innerHTML = (
         HtmlEscaperService.escapedStrToUnescapedStr(strHtml));
@@ -129,31 +129,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         // filenames in the exploration.
         var filename = JSON.parse(
           imageTagList[i].getAttribute('filepath-with-value'));
-        // The images already there in Oppia have image filenames as the value
-        // for the attribute 'filepath-with-value'.
-        // We create an object for the images with default dimensions of
-        // 500px x 200px
-        var filepathObject = {
-          name: filename,
-          width: 500,
-          height: 200
-        };
-        fileInfo.push(filepathObject);
+        filenames.push(filename);
       }
-      return fileInfo;
-    };
-
-    /**
-    * Gets the filenames of the images from the html provided.
-    * @param {string} htmlStr - The string from which the filenames of the
-    *                           images should be extracted.
-    */
-    var _getImageFilenamesFromFilepathValue = function(htmlStr) {
-      var fileInfos = (
-        _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
-      return fileInfos.map(function(fileInfo) {
-        return fileInfo.name;
-      });
+      return filenames;
     };
 
     /**
@@ -162,14 +140,15 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     *                           images should be extracted.
     */
     var _getImageDimensionsFromFilepathValue = function(htmlStr) {
-      var fileInfos = (
+      var filenames = (
         _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
       var fileDimensions = {};
-      fileInfos.forEach(function(fileInfo){
-        var filename = fileInfo.name;
+      // Currently we don't have dimensions of the images stored in backend. So
+      // we assign default dimensions to the images 500px x 200px.
+      filenames.forEach(function(filename){
         fileDimensions[filename] = {
-          width: fileInfo.width,
-          height: fileInfo.height
+          width: 500,
+          height: 200
         };
       });
       return fileDimensions;
@@ -219,7 +198,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {
         filenamesInState = filenamesInState.concat(
-          _getImageFilenamesFromFilepathValue(htmlStr));
+          _extractFilepathValueFromOppiaNonInteractiveImageTag(htmlStr));
       });
       return filenamesInState;
     };
