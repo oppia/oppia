@@ -778,16 +778,17 @@ class ImageUploadHandler(EditorHandler):
                 feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
             else fs_domain.GcsFileSystem)
         fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
-        filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
+        filepath = (
+            filename if (
+                feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
+            else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
+
         if fs.isfile(filepath):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
-        # Because the ExplorationFileSystem we have to pass the filename
-        # and for GcsFileSystem, the filepath.
-        fs.commit(self.user_id, filename if (
-            feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
-                  else filepath, raw, mimetype=mimetype)
+
+        fs.commit(self.user_id, filepath, raw, mimetype=mimetype)
 
         self.render_json({'filepath': filename})
 
