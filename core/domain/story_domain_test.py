@@ -345,8 +345,7 @@ class StoryDomainUnitTests(test_utils.GenericTestBase):
             story_domain.StoryNode.from_dict(node_2),
             story_domain.StoryNode.from_dict(node_3)
         ]
-        self._assert_validation_error(
-            'The node id node_2 is duplicated in the story.')
+        self._assert_validation_error('Expected all node ids to be distinct')
 
         self.story.story_contents.next_node_id = 'node_5'
         # Case 5: A valid graph.
