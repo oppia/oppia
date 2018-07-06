@@ -102,13 +102,13 @@ BAD_PATTERNS = {
 BAD_PATTERNS_JS_REGEXP = [
     {
         'regexp': r'\b(browser.explore)\(',
-        'message': "Please remove browser.explore() calls from e2e tests.",
+        'message': "In tests, please do not use browser.explore().",
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
         'regexp': r'\b(browser.pause)\(',
-        'message': "Please remove browser.pause() calls from e2e tests.",
+        'message': "In tests, please do not use browser.pause().",
         'excluded_files': (),
         'excluded_dirs': ()
     },
