@@ -72,12 +72,8 @@ def _create_models_for_thread_and_first_message(
     Returns:
         The thread id we created.
     """
-    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        thread_id = feedback_models.FeedbackThreadModel.generate_new_thread_id(
-            exploration_id)
-    else:
-        thread_id = feedback_models.FeedbackThreadModel.generate_new_thread_id(
-            'exploration', exploration_id)
+    thread_id = feedback_models.FeedbackThreadModel.generate_new_thread_id(
+        'exploration', exploration_id)
     thread = feedback_models.FeedbackThreadModel.create(thread_id)
     thread.exploration_id = exploration_id
     thread.state_name = state_name
@@ -609,12 +605,8 @@ def get_threads(exploration_id):
     Returns:
         list of FeedbackThread. The corresponding Suggestion domain object.
     """
-    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        thread_models = feedback_models.FeedbackThreadModel.get_threads(
-            exploration_id)
-    else:
-        thread_models = feedback_models.FeedbackThreadModel.get_threads(
-            'exploration', exploration_id)
+    thread_models = feedback_models.FeedbackThreadModel.get_threads(
+        'exploration', exploration_id)
     return [_get_thread_from_model(model) for model in thread_models]
 
 
@@ -692,10 +684,7 @@ def get_all_threads(exploration_id, has_suggestion):
     Returns:
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
-    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        threads = get_threads(exploration_id)
-    else:
-        threads = get_threads('exploration', exploration_id)
+    threads = get_threads(exploration_id)
     all_threads = []
     for thread in threads:
         if thread.has_suggestion == has_suggestion:
