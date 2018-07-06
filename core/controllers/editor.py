@@ -858,7 +858,7 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-        mimetype = '%s/%s' % (self._FILENAME_PREFIX, extension)
+        mimetype = 'image/%s' % (extension)
 
         # Image files are stored to the datastore in the dev env, and to GCS
         # in production.
