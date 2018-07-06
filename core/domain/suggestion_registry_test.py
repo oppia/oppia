@@ -55,9 +55,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.signup(self.ASSIGNED_REVIEWER_EMAIL, 'assignedReviewer')
-        self.assigned_reviewer_id = self.get_user_id_from_email(
-            self.ASSIGNED_REVIEWER_EMAIL)
         self.suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': (
@@ -68,7 +65,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'status': suggestion_models.STATUS_ACCEPTED,
             'author_name': 'author',
             'final_reviewer_id': self.reviewer_id,
-            'assigned_reviewer_id': self.assigned_reviewer_id,
             'change_cmd': {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -88,8 +84,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.assigned_reviewer_id, self.reviewer_id,
-            expected_suggestion_dict['change_cmd'],
+            self.reviewer_id, expected_suggestion_dict['change_cmd'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
         self.assertDictEqual(
@@ -106,7 +101,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'status': suggestion_models.STATUS_ACCEPTED,
             'author_id': self.author_id,
             'final_reviewer_id': self.reviewer_id,
-            'assigned_reviewer_id': self.assigned_reviewer_id,
             'change_cmd': {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -133,8 +127,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.assigned_reviewer_id, self.reviewer_id,
-            expected_suggestion_dict['change_cmd'],
+            self.reviewer_id, expected_suggestion_dict['change_cmd'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
         suggestion.validate()
@@ -147,8 +140,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.assigned_reviewer_id, self.reviewer_id,
-            expected_suggestion_dict['change_cmd'],
+            self.reviewer_id, expected_suggestion_dict['change_cmd'],
             expected_suggestion_dict['score_category'], self.fake_date)
 
         self.assertEqual(suggestion.get_score_type(), 'content')
