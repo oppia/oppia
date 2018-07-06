@@ -25,7 +25,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     """Test the skill domain object."""
 
     SKILL_ID = 'skill_id'
-    MISCONCEPTION_ID = '0'
+    MISCONCEPTION_ID = 0
 
     def setUp(self):
         super(SkillDomainUnitTests, self).setUp()
@@ -36,7 +36,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill = skill_domain.Skill(
             self.SKILL_ID, 'Description', misconceptions,
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, '1'
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1
         )
 
     def _assert_validation_error(self, expected_error_substring):
@@ -141,7 +141,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
             ),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'next_misconception_id': '0',
+            'next_misconception_id': 0,
             'version': 0
         }
         self.assertEqual(skill.to_dict(), expected_skill_dict)
