@@ -15,13 +15,42 @@
 /**
  * @fileoverview Primary controller for the story editor page.
  */
-
-oppia.constant(
-  'EDITABLE_STORY_DATA_URL_TEMPLATE',
-  '/story_editor_handler/data/<topic_id>/<story_id>');
-
 oppia.constant('NODE_ID_PREFIX', 'node_');
 
-oppia.controller('StoryEditor', ['$scope', 'UrlService',
-  function($scope, UrlService) {}
+oppia.controller('StoryEditor', [
+  '$scope', '$uibModal', '$window', 'UrlService', 'StoryEditorStateService',
+  'UrlInterpolationService', 'UndoRedoService',
+  function(
+      $scope, $uibModal, $window, UrlService, StoryEditorStateService,
+      UrlInterpolationService, UndoRedoService) {
+    var TOPIC_EDITOR_URL_TEMPLATE = '/topic_editor/<topicId>';
+    var topicId = UrlService.getTopicIdFromUrl();
+    StoryEditorStateService.loadStory(
+      topicId, UrlService.getStoryIdFromUrl());
+
+    $scope.returnToTopicEditorPage = function() {
+      if (UndoRedoService.getChangeCount() > 0) {
+        var modalInstance = $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/pages/story_editor/save_pending_changes_modal_directive.html'),
+          backdrop: true,
+          controller: [
+            '$scope', '$uibModalInstance',
+            function($scope, $uibModalInstance) {
+              $scope.cancel = function() {
+                $uibModalInstance.dismiss('cancel');
+              };
+            }
+          ]
+        });
+      } else {
+        $window.open(
+          UrlInterpolationService.interpolateUrl(
+            TOPIC_EDITOR_URL_TEMPLATE, {
+              topicId: topicId
+            }
+          ), '_self');
+      }
+    };
+  }
 ]);

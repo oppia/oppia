@@ -19,11 +19,13 @@
 oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 oppia.factory('RteHelperService', [
-  '$filter', '$log', '$interpolate', 'ExplorationContextService',
-  'RTE_COMPONENT_SPECS', 'HtmlEscaperService', 'UrlInterpolationService',
+  '$filter', '$log', '$uibModal', '$interpolate', '$document',
+  'ExplorationContextService', 'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
+  'UrlInterpolationService', 'FocusManagerService',
   function(
-      $filter, $log, $interpolate, ExplorationContextService,
-      RTE_COMPONENT_SPECS, HtmlEscaperService, UrlInterpolationService) {
+      $filter, $log, $uibModal, $interpolate, $document,
+      ExplorationContextService, RTE_COMPONENT_SPECS, HtmlEscaperService,
+      UrlInterpolationService, FocusManagerService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -214,7 +216,78 @@ oppia.factory('RteHelperService', [
       },
       getRichTextComponents: function() {
         return angular.copy(_RICH_TEXT_COMPONENTS);
+      },
+      isInlineComponent: function(richTextComponent) {
+        var inlineComponents = ['link', 'math'];
+        return inlineComponents.indexOf(richTextComponent) !== -1;
+      },
+      // The refocusFn arg is a function that restores focus to the text editor
+      // after exiting the modal, and moves the cursor back to where it was
+      // before the modal was opened.
+      _openCustomizationModal: function(
+          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+          onDismissCallback, refocusFn) {
+        $document[0].execCommand('enableObjectResizing', false, false);
+        var modalDialog = $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/forms/customize_rte_component_modal_directive.html'),
+          backdrop: 'static',
+          resolve: {},
+          controller: [
+            '$scope', '$uibModalInstance', '$timeout',
+            function($scope, $uibModalInstance, $timeout) {
+              $scope.customizationArgSpecs = customizationArgSpecs;
+
+              // Without this code, the focus will remain in the background RTE
+              // even after the modal loads. This switches the focus to a
+              // temporary field in the modal which is then removed from the
+              // DOM.
+              // TODO(sll): Make this switch to the first input field in the
+              // modal instead.
+              $scope.modalIsLoading = true;
+              FocusManagerService.setFocus('tmpFocusPoint');
+              $timeout(function() {
+                $scope.modalIsLoading = false;
+              });
+
+              $scope.tmpCustomizationArgs = [];
+              for (var i = 0; i < customizationArgSpecs.length; i++) {
+                var caName = customizationArgSpecs[i].name;
+                $scope.tmpCustomizationArgs.push({
+                  name: caName,
+                  value: (
+                    attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                      angular.copy(attrsCustomizationArgsDict[caName]) :
+                      customizationArgSpecs[i].default_value)
+                });
+              }
+
+              $scope.cancel = function() {
+                $uibModalInstance.dismiss('cancel');
+              };
+
+              $scope.save = function() {
+                $scope.$broadcast('externalSave');
+
+                var customizationArgsDict = {};
+                for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+                  var caName = $scope.tmpCustomizationArgs[i].name;
+                  customizationArgsDict[caName] = (
+                    $scope.tmpCustomizationArgs[i].value);
+                }
+
+                $uibModalInstance.close(customizationArgsDict);
+              };
+            }
+          ]
+        });
+
+        modalDialog.result.then(onSubmitCallback, onDismissCallback);
+        // 'finally' is a JS keyword. If it is just used in its ".finally" form,
+        // the minification process throws an error.
+        modalDialog.result['finally'](refocusFn);
       }
+
     };
   }
 ]);

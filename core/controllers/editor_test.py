@@ -20,11 +20,9 @@ import logging
 import os
 import zipfile
 
-from core import jobs_registry
 from core.controllers import creator_dashboard
 from core.controllers import editor
 from core.domain import config_services
-from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -32,7 +30,6 @@ from core.domain import stats_jobs_continuous_test
 from core.domain import stats_services
 from core.domain import user_services
 from core.platform import models
-from core.platform.taskqueue import gae_taskqueue_services as taskqueue_services
 from core.tests import test_utils
 import feconf
 
@@ -237,200 +234,6 @@ class EditorTest(BaseEditorControllerTest):
         self.assertIn('Adjacent whitespace', response_dict['error'])
 
         self.logout()
-
-    def test_untrained_answers_handler(self):
-        with self.swap(feconf, 'SHOW_TRAINABLE_UNRESOLVED_ANSWERS', True):
-            def _create_answer(value, count=1):
-                return {'answer': value, 'frequency': count}
-
-            def _create_training_data(*arg):
-                return [_create_answer(value) for value in arg]
-
-            def _submit_answer(
-                    exp_id, state_name, interaction_id, answer_group_index,
-                    rule_spec_index, classification_categorization, answer,
-                    exp_version=1, session_id='dummy_session_id',
-                    time_spent_in_secs=0.0):
-                event_services.AnswerSubmissionEventHandler.record(
-                    exp_id, exp_version, state_name, interaction_id,
-                    answer_group_index, rule_spec_index,
-                    classification_categorization, session_id,
-                    time_spent_in_secs, {}, answer)
-
-            # Load the string classifier demo exploration.
-            exp_id = '15'
-            exp_services.load_demo(exp_id)
-            rights_manager.release_ownership_of_exploration(
-                self.system_user, exp_id)
-
-            exploration_dict = self.get_json(
-                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-            self.assertEqual(
-                exploration_dict['exploration']['title'],
-                'Demonstrating string classifier')
-
-            # This test uses the interaction which supports numeric input.
-            state_name = 'text'
-
-            self.assertIn(
-                state_name, exploration_dict['exploration']['states'])
-            self.assertEqual(
-                exploration_dict['exploration']['states'][state_name][
-                    'interaction']['id'], 'TextInput')
-
-            # Input happy since there is an explicit rule checking for that.
-            _submit_answer(
-                exp_id, state_name, 'TextInput', 0, 0,
-                exp_domain.EXPLICIT_CLASSIFICATION, 'happy')
-
-            # Input text not at all similar to happy (default outcome).
-            _submit_answer(
-                exp_id, state_name, 'TextInput', 2, 0,
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 'sad')
-
-            # Input cheerful: this is current training data and falls under the
-            # classifier.
-            _submit_answer(
-                exp_id, state_name, 'TextInput', 1, 0,
-                exp_domain.TRAINING_DATA_CLASSIFICATION, 'cheerful')
-
-            # Input joyful: this is not training data but it will later be
-            # classified under the classifier.
-            _submit_answer(
-                exp_id, state_name, 'TextInput', 2, 0,
-                exp_domain.DEFAULT_OUTCOME_CLASSIFICATION, 'joyful')
-
-            # Perform answer summarization on the summarized answers.
-            with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CC_MANAGERS_FOR_TESTS):
-                # Run job on exploration with answers.
-                stats_jobs_continuous_test.ModifiedInteractionAnswerSummariesAggregator.start_computation() # pylint: disable=line-too-long
-                self.assertEqual(
-                    self.count_jobs_in_taskqueue(
-                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 1)
-                self.process_and_flush_pending_tasks()
-                self.assertEqual(
-                    self.count_jobs_in_taskqueue(
-                        taskqueue_services.QUEUE_NAME_CONTINUOUS_JOBS), 0)
-
-            # Log in as an editor.
-            self.login(self.EDITOR_EMAIL)
-            response = self.testapp.get('/create/%s' % exp_id)
-            csrf_token = self.get_csrf_token_from_response(response)
-            url = str(
-                '/createhandler/training_data/%s/%s' % (exp_id, state_name))
-
-            exploration_dict = self.get_json(
-                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-
-            # Only two of the four submitted answers should be unhandled.
-            # NOTE: Here, the return data here should really be
-            #     _create_training_data('joyful', 'sad'). However, it is the
-            # empty list here because unhandled answers have not been
-            # implemented yet.
-            response_dict = self.get_json(url)
-            self.assertEqual(response_dict['unhandled_answers'], [])
-            self.assertTrue(exploration_dict['version'])
-
-            # If the confirmed unclassified answers is trained for one of the
-            # values, it should no longer show up in unhandled answers.
-            self.put_json('/createhandler/data/%s' % exp_id, {
-                'change_list': [{
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': state_name,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS),
-                    'new_value': ['sad']
-                }],
-                'commit_message': 'Update confirmed unclassified answers',
-                'version': exploration_dict['version'],
-            }, csrf_token)
-            response_dict = self.get_json(url)
-            # NOTE: Here, the return data here should really be
-            #     _create_training_data('joyful'). However, it is the
-            # empty list here because unhandled answers have not been
-            # implemented yet.
-            self.assertEqual(response_dict['unhandled_answers'], [])
-
-            exploration_dict = self.get_json(
-                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-
-            # If one of the values is added to the training data of the
-            # classifier, then it should not be returned as an unhandled answer.
-            state = exploration_dict['exploration']['states'][state_name]
-            answer_group = state['interaction']['answer_groups'][1]
-            answer_group['training_data'].append('joyful')
-            self.put_json('/createhandler/data/%s' % exp_id, {
-                'change_list': [{
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': state_name,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS),
-                    'new_value': []
-                }, {
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': state_name,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS),
-                    'new_value': state['interaction']['answer_groups']
-                }],
-                'commit_message': 'Update confirmed unclassified answers',
-                'version': exploration_dict['version'],
-            }, csrf_token)
-            response_dict = self.get_json(url)
-            # NOTE: Here, the return data here should really be
-            #     _create_training_data('sad'). However, it is the
-            # empty list here because unhandled answers have not been
-            # implemented yet.
-            self.assertEqual(response_dict['unhandled_answers'], [])
-
-            exploration_dict = self.get_json(
-                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-
-            # If both are classified, then nothing should be returned
-            # unhandled.
-            self.put_json('/createhandler/data/%s' % exp_id, {
-                'change_list': [{
-                    'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                    'state_name': state_name,
-                    'property_name': (
-                        exp_domain.STATE_PROPERTY_UNCLASSIFIED_ANSWERS),
-                    'new_value': ['sad']
-                }],
-                'commit_message': 'Update confirmed unclassified answers',
-                'version': exploration_dict['version'],
-            }, csrf_token)
-            response_dict = self.get_json(url)
-            self.assertEqual(response_dict['unhandled_answers'], [])
-
-            exploration_dict = self.get_json(
-                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, exp_id))
-
-            # If one of the existing training data elements in the classifier
-            # is removed (5 in this case), but it is not backed up by an
-            # answer, it will not be returned as potential training data.
-            state = exploration_dict['exploration']['states'][state_name]
-            answer_group = state['interaction']['answer_groups'][1]
-
-            del answer_group['training_data'][1]
-            self.put_json(
-                '/createhandler/data/15', {
-                    'change_list': [{
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'state_name': state_name,
-                        'property_name': (
-                            exp_domain.STATE_PROPERTY_INTERACTION_ANSWER_GROUPS), # pylint:disable=line-too-long
-                        'new_value': state['interaction']['answer_groups']
-                    }],
-                    'commit_message': 'Update confirmed unclassified answers',
-                    'version': exploration_dict['version'],
-                }, csrf_token)
-
-            response_dict = self.get_json(url)
-            self.assertEqual(response_dict['unhandled_answers'], [])
-
-            self.logout()
 
 
 class ExplorationEditorLogoutTest(BaseEditorControllerTest):
@@ -1729,7 +1532,6 @@ class FetchIssuesPlaythroughHandlerTest(test_utils.GenericTestBase):
         response = self.get_json(
             '/playthroughdatahandler/%s/%s' % (
                 self.EXP_ID, self.playthrough_id1))
-        self.assertEqual(response['id'], self.playthrough_id1)
         self.assertEqual(response['exp_id'], self.EXP_ID)
         self.assertEqual(response['exp_version'], 1)
         self.assertEqual(response['issue_type'], 'EarlyQuit')

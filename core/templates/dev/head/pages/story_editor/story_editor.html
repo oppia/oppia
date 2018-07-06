@@ -1,5 +1,81 @@
 {% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  {{ story_title }} - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <story-editor-navbar-breadcrumb>
+  </story-editor-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <story-editor-navbar>
+  </story-editor-navbar>
+{% endblock local_top_nav_options %}
+
+{% block content %}
+  <div ng-controller="StoryEditor" class="story-editor">
+    <button class="btn btn-primary back-to-topic-button" ng-click="returnToTopicEditorPage()">
+      <i class="fa fa-arrow-left"></i> &nbsp;Return to topic
+    </button>
+    <story-editor></story-editor>
+  </div>
+
+  <style>
+    .story-editor .back-to-topic-button {
+      margin-top: 1.5%;
+      margin-left: 10%;
+    }
+  </style>
+{% endblock content %}
+
 {% block footer_js %}
   {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/mathjaxConfig.js"></script>
+  <script src="/third_party/static/MathJax-2.6.0/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedCustomEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedDictEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedExpressionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedFloatEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedIntEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedListEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedUnicodeEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedCustomViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedDictViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedListViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedPrimitiveViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedUnicodeViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedViewerDirective.js"></script>
+
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/MathLatexStringEditor.js"></script>
+  <script src="{{ASSET_DIR_PREFIX}}/extensions/objects/templates/SanitizedUrlEditor.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaDefaultValueService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaUndefinedLastElementService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/services/GenerateContentIdService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/EditableStoryBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/StoryObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/StoryValidationService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/StoryContentsObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/StoryNodeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/story/StoryUpdateService.js"></script>
+
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditorStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/main_editor/StoryEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/main_editor/StoryNodeEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditorNavbarBreadcrumbDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/story_editor/StoryEditorNavbarDirective.js"></script>
+  {% include 'components/rich_text_components.html' %}
 {% endblock footer_js %}

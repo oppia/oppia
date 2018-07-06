@@ -573,8 +573,8 @@ def get_playthrough_from_model(playthrough_model):
         _migrate_to_latest_action_schema(action_dict)
         actions.append(stats_domain.LearnerAction.from_dict(action_dict))
     return stats_domain.Playthrough(
-        playthrough_model.id, playthrough_model.exp_id,
-        playthrough_model.exp_version, playthrough_model.issue_type,
+        playthrough_model.exp_id, playthrough_model.exp_version,
+        playthrough_model.issue_type,
         playthrough_model.issue_customization_args, actions)
 
 
@@ -935,10 +935,13 @@ def get_top_state_unresolved_answers(exploration_id, state_name):
     Returns:
         list(*). A list of the top 10 answers, sorted by decreasing frequency.
     """
-    calculation_output = (
-        _get_calc_output(
-            exploration_id, state_name, 'TopNUnresolvedAnswersByFrequency')
-        .calculation_output.to_raw_type())
+    calc_output_model = _get_calc_output(
+        exploration_id, state_name, 'TopNUnresolvedAnswersByFrequency')
+
+    if not calc_output_model:
+        return []
+
+    calculation_output = calc_output_model.calculation_output.to_raw_type()
     return [
         {'answer': output['answer'], 'frequency': output['frequency']}
         for output in calculation_output

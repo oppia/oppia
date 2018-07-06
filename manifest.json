@@ -149,6 +149,16 @@
           "js": ["angular-cookies.min.js"]
         }
       },
+      "angularDragAndDrop": {
+        "version": "2.1.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/marceljuenemann/angular-drag-and-drop-lists/archive/2.1.0.zip",
+        "rootDirPrefix": "angular-drag-and-drop-lists-",
+        "targetDirPrefix": "angular-drag-and-drop-lists-",
+        "bundle": {
+          "js": ["angular-drag-and-drop-lists.min.js"]
+        }
+      },
       "angularStorageCookiesRev": {
         "version": "2.8.1",
         "downloadFormat": "zip",
@@ -404,6 +414,62 @@
           "css": ["dist/css/select2.css"],
           "js": ["dist/js/select2.full.js"]
         }
+      },
+      "ckeditor": {
+        "version": "4.9.2",
+        "downloadFormat": "zip",
+        "url": "http://download.cksource.com/CKEditor/CKEditor/CKEditor%204.9.2/ckeditor_4.9.2_full.zip",
+        "rootDir": "ckeditor",
+        "targetDirPrefix": "ckeditor-"
+      },
+      "ckeditorWidget": {
+        "version": "4.9.2",
+        "downloadFormat": "zip",
+        "url": "http://download.ckeditor.com/widget/releases/widget_4.9.2.zip",
+        "rootDir": "widget",
+        "targetDir": "ckeditor-widget"
+      },
+      "ckeditorLineutils": {
+        "version": "4.9.2",
+        "downloadFormat": "zip",
+        "url": "http://download.ckeditor.com/lineutils/releases/lineutils_4.9.2.zip",
+        "rootDir": "lineutils",
+        "targetDir": "ckeditor-lineutils"
+      },
+      "ckeditorSharedspace": {
+        "version": "4.9.2",
+        "downloadFormat": "zip",
+        "url": "http://download.ckeditor.com/sharedspace/releases/sharedspace_4.9.2.zip",
+        "rootDir": "sharedspace",
+        "targetDir": "ckeditor-sharedspace"
+      },
+      "ckeditorBootstrapCK": {
+        "version": "1.0",
+        "downloadFormat": "zip",
+        "url": "http://download.ckeditor.com/bootstrapck/releases/bootstrapck_1.0_0.zip",
+        "rootDir": "bootstrapck",
+        "targetDir": "ckeditor-bootstrapck"
+      },
+      "ckeditorInsertPrePlugin" : {
+        "version": "1.0.1",
+        "downloadFormat": "zip",
+        "url": "https://download.ckeditor.com/insertpre/releases/insertpre_1.0.1.zip",
+        "rootDir": "insertpre",
+        "targetDir": "ckeditor-insertpre"
+      },
+      "ckeditorIndentBlockPlugin" : {
+        "version": "4.9.2",
+        "downloadFormat": "zip",
+        "url": "https://download.ckeditor.com/indentblock/releases/indentblock_4.9.2.zip",
+        "rootDir": "indentblock",
+        "targetDir": "ckeditor-indentblock"
+      },
+      "ckeditorBlockquotePlugin" : {
+        "version": "4.9.2",
+        "downloadFormat": "zip",
+        "url": "https://download.ckeditor.com/blockquote/releases/blockquote_4.9.2.zip",
+        "rootDir": "blockquote",
+        "targetDir": "ckeditor-blockquote"
       },
       "textAngular": {
         "version": "1.4.5",
