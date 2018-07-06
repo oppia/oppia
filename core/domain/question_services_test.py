@@ -56,7 +56,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.status = 'private'
         self.question = question_domain.Question(
             self.question_id, self.question_data,
-            self.question_data_schema_version, self.language_code)
+            self.question_data_schema_version, self.language_code, self.status)
 
     def test_get_question_by_id(self):
         question_id = question_services.add_question(
@@ -70,7 +70,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question1_id = question_services.add_question(
             self.owner_id, self.question)
         question = question_domain.Question(
-            'dummy2', self._create_valid_question_data('ABC'), 1, 'en')
+            'dummy2', self._create_valid_question_data('ABC'), 1,
+            'en', 'private')
 
         question2_id = question_services.add_question(
             self.owner_id, question)
@@ -90,19 +91,19 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             model.question_data_schema_version,
             self.question_data_schema_version)
         self.assertEqual(model.language_code, self.language_code)
+        self.assertEqual(model.status, self.status)
 
     def test_delete_question(self):
         question_id = question_services.add_question(
             self.owner_id, self.question)
-        question_services.delete_question(
-            self.owner_id, question_id)
+        question_services.delete_question(self.owner_id, question_id)
 
         with self.assertRaisesRegexp(Exception, (
             'Entity for class QuestionModel with id %s not found' % (
                 question_id))):
             question_models.QuestionModel.get(question_id)
 
-    def test_update_question(self):
+    def test_update_question_data(self):
         new_question_data = self._create_valid_question_data('DEF')
         question_id = question_services.add_question(
             self.owner_id, self.question)
@@ -123,17 +124,17 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_data_schema_version)
         self.assertEqual(
             model.language_code, self.language_code)
+        self.assertEqual(
+            model.status, self.status)
 
     def test_compute_summary_of_question(self):
         question_summary = question_services.compute_summary_of_question(
-            self.question, self.owner_id, self.status)
+            self.question, self.owner_id)
 
         self.assertEqual(question_summary.id, 'dummy')
         self.assertEqual(
             question_summary.question_html_data,
             html_cleaner.clean(''))
-        self.assertEqual(question_summary.language_code, 'en')
-        self.assertEqual(question_summary.status, 'private')
 
     def test_get_question_summaries_by_creator_id(self):
         question_services.add_question(self.owner_id, self.question)
@@ -145,8 +146,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.assertEqual(question_summary.id, 'dummy')
             self.assertEqual(
                 question_summary.question_html_data, '')
-            self.assertEqual(question_summary.language_code, 'en')
-            self.assertEqual(question_summary.status, 'private')
 
     def test_admin_cannot_edit_question_created_by_user(self):
         question_id = question_services.add_question(

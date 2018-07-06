@@ -44,12 +44,13 @@ def _create_new_question(committer_id, question, commit_message):
         question_data=question.question_data,
         question_data_schema_version=question.question_data_schema_version,
         language_code=question.language_code,
+        status=question.status
     )
 
-    model.commit(committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
+    model.commit(
+        committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
 
-    create_question_summary(
-        model.id, committer_id, feconf.ACTIVITY_STATUS_PRIVATE)
+    create_question_summary(model.id, committer_id)
     return model.id
 
 
@@ -101,7 +102,7 @@ def get_question_from_model(question_model):
     return question_domain.Question(
         question_model.id, question_model.question_data,
         question_model.question_data_schema_version,
-        question_model.language_code)
+        question_model.language_code, question_model.status)
 
 
 def get_question_by_id(question_id, strict=True):
@@ -203,6 +204,7 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model.question_data_schema_version = (
         question.question_data_schema_version)
     question_model.language_code = question.language_code
+    question_model.status = question.status
     change_list_dict = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_list_dict)
 
@@ -236,21 +238,19 @@ def get_new_question_id():
 
 
 def create_question_summary(
-        question_id, creator_id, status):
+        question_id, creator_id):
     """Creates and stores a summary of the given question.
 
     Args:
         question_id: str. ID of the question.
         creator_id: str. The user ID of the creator of the question.
-        status: str. The status of the question.
     """
     question = get_question_by_id(question_id)
-    question_summary = compute_summary_of_question(
-        question, creator_id, status)
+    question_summary = compute_summary_of_question(question, creator_id)
     save_question_summary(question_summary)
 
 
-def compute_summary_of_question(question, creator_id, status):
+def compute_summary_of_question(question, creator_id):
     """Create a QuestionSummary domain object for a given Question domain
     object and return it.
 
@@ -258,16 +258,13 @@ def compute_summary_of_question(question, creator_id, status):
         question: Question. The question object for which the summary
             is to be computed.
         creator_id: str. The user ID of the creator of the question.
-        status: str. The status of the question.
 
     Returns:
         QuestionSummary. The computed summary for the given question.
     """
     question_html_data = question.question_data['content']['html']
     question_summary = question_domain.QuestionSummary(
-        question.question_id, creator_id, question.language_code,
-        status, question_html_data
-    )
+        question.question_id, creator_id, question_html_data)
 
     return question_summary
 
@@ -283,8 +280,6 @@ def save_question_summary(question_summary):
     question_summary_model = question_models.QuestionSummaryModel(
         id=question_summary.id,
         creator_id=question_summary.creator_id,
-        language_code=question_summary.language_code,
-        status=question_summary.status,
         question_model_last_updated=question_summary.last_updated,
         question_model_created_on=question_summary.created_on,
         question_html_data=question_summary.question_html_data
@@ -355,18 +350,18 @@ def check_can_edit_question(user_id, question_id):
     """
     question_summary = get_question_summary_by_question_id(
         question_id, strict=False)
-
-    if question_summary.status == feconf.QUESTION_STATUS_PENDING:
-        return False
+    question = get_question_by_id(question_id, strict=False)
 
     if question_summary.creator_id == user_id:
-        if (question_summary.status == feconf.ACTIVITY_STATUS_PRIVATE or
-                question_summary.status == feconf.QUESTION_STATUS_REJECTED):
+        if (question.status == feconf.ACTIVITY_STATUS_PRIVATE or
+                question.status == feconf.QUESTION_STATUS_REJECTED):
             return True
+        return False
 
     if (user_services.is_admin(user_id) or
             user_services.is_topic_manager(user_id)):
-        if question_summary.status == feconf.QUESTION_STATUS_APPROVED:
+        if (question.status == feconf.QUESTION_STATUS_APPROVED or
+                question.status == feconf.QUESTION_STATUS_PENDING):
             return True
 
     return False

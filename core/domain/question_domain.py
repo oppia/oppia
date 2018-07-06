@@ -109,11 +109,13 @@ class Question(object):
         question_data_schema_version: int. The schema version for the data.
         language_code: str. The ISO 639-1 code for the language this
             question is written in.
+        status: str. The status of the question among approved, rejected,
+            pending or private.
     """
 
     def __init__(
-            self, question_id, question_data,
-            question_data_schema_version, language_code):
+            self, question_id, question_data, question_data_schema_version,
+            language_code, status):
         """Constructs a Question domain object.
 
         Args:
@@ -122,11 +124,14 @@ class Question(object):
             question_data_schema_version: int. The schema version for the data.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
+            status: str. The status of the question among approved, rejected,
+                pending or private.
         """
         self.question_id = question_id
         self.question_data = question_data
         self.question_data_schema_version = question_data_schema_version
         self.language_code = language_code
+        self.status = status
 
     def to_dict(self):
         """Returns a dict representing this Question domain object.
@@ -138,7 +143,8 @@ class Question(object):
             'question_id': self.question_id,
             'question_data': self.question_data,
             'question_data_schema_version': self.question_data_schema_version,
-            'language_code': self.language_code
+            'language_code': self.language_code,
+            'status': self.status
         }
 
     def validate(self):
@@ -170,6 +176,11 @@ class Question(object):
                     for lc in constants.ALL_LANGUAGE_CODES]):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
+
+        if not isinstance(self.status, basestring):
+            raise utils.ValidationError(
+                'Expected status to be a string, received %s' %
+                self.status)
 
     def validate_for_publishing_or_send_for_review(self):
         """Validates the Question domain object before it is published or send
@@ -228,6 +239,11 @@ class Question(object):
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
 
+        if not isinstance(self.status, basestring):
+            raise utils.ValidationError(
+                'Expected status to be a string, received %s' %
+                self.language_code)
+
         if not any([self.language_code == lc['code']
                     for lc in constants.ALL_LANGUAGE_CODES]):
             raise utils.ValidationError(
@@ -244,7 +260,8 @@ class Question(object):
             question_dict['question_id'],
             question_dict['question_data'],
             question_dict['question_data_schema_version'],
-            question_dict['language_code'])
+            question_dict['language_code'],
+            question_dict['status'])
 
         return question
 
@@ -261,9 +278,8 @@ class Question(object):
         return cls(
             question_id, exp_domain.State.create_default_state(
                 feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True
-                ),
-            feconf.CURRENT_QUESTION_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE)
+                ).to_dict(), feconf.CURRENT_QUESTION_SCHEMA_VERSION,
+            constants.DEFAULT_LANGUAGE_CODE, feconf.ACTIVITY_STATUS_PRIVATE)
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
@@ -282,22 +298,26 @@ class Question(object):
         """
         self.question_data = question_data
 
+    def update_question_status(self, status):
+        """Updates the question data of the question.
+
+        Args:
+            status: str. The status of the question.
+        """
+        self.status = status
+
 
 class QuestionSummary(object):
     """Domain object for Question Summary.
     """
     def __init__(
-            self, question_id, creator_id, language_code, status,
-            question_html_data, question_model_last_updated=None,
-            question_model_created_on=None):
+            self, question_id, creator_id, question_html_data,
+            question_model_last_updated=None, question_model_created_on=None):
         """Constructs a Question Summary domain object.
 
         Args:
             question_id: str. The ID of the question.
             creator_id: str. The user ID of the creator of the question.
-            language_code: str. The ISO 639-1 code for the language this
-                question is written in.
-            status: str. The status of the question.
             question_model_last_updated: datetime.datetime. Date and time
                 when the question model was last updated.
             question_model_created_on: datetime.datetime. Date and time when
@@ -307,8 +327,6 @@ class QuestionSummary(object):
         """
         self.id = question_id
         self.creator_id = creator_id
-        self.language_code = language_code
-        self.status = status
         self.last_updated = question_model_last_updated
         self.created_on = question_model_created_on
         self.question_html_data = html_cleaner.clean(question_html_data)
@@ -322,8 +340,6 @@ class QuestionSummary(object):
         return {
             'id': self.id,
             'creator_id': self.creator_id,
-            'language_code': self.language_code,
-            'status': self.status,
             'last_updated': self.last_updated,
             'created_on': self.created_on,
             'question_html_data': self.question_html_data

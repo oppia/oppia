@@ -51,6 +51,17 @@ class QuestionModel(base_models.VersionedModel):
         ndb.IntegerProperty(required=True, indexed=True))
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The status of the question. It can be 'private', 'approved',
+    # 'rejected' and 'pending'.
+    status = ndb.StringProperty(
+        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
+        choices=[
+            feconf.ACTIVITY_STATUS_PRIVATE,
+            feconf.QUESTION_STATUS_APPROVED,
+            feconf.QUESTION_STATUS_REJECTED,
+            feconf.QUESTION_STATUS_PENDING
+        ]
+    )
 
     @classmethod
     def _get_new_id(cls):
@@ -134,7 +145,8 @@ class QuestionModel(base_models.VersionedModel):
             id=instance_id,
             question_data=question_data,
             question_data_schema_version=question_data_schema_version,
-            language_code=language_code)
+            language_code=language_code,
+            status=feconf.ACTIVITY_STATUS_PRIVATE)
 
         return question_model_instance
 
@@ -206,26 +218,13 @@ class QuestionSummaryModel(base_models.BaseModel):
 
     A QuestionSummaryModel instance stores the following information:
 
-    creator_id, language_code, status, question_model_last_updated,
-    question_model_created_on, question_data.
+    creator_id, question_model_last_updated, question_model_created_on,
+    question_data.
 
     The key of each instance is the question id.
     """
     # The user ID of the creator of the question.
     creator_id = ndb.StringProperty(required=True)
-    # The ISO 639-1 code for the language this question is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
-    # The status of the question. It can be 'private', 'approved',
-    # 'rejected' and 'pending'.
-    status = ndb.StringProperty(
-        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
-        choices=[
-            feconf.ACTIVITY_STATUS_PRIVATE,
-            feconf.QUESTION_STATUS_APPROVED,
-            feconf.QUESTION_STATUS_REJECTED,
-            feconf.QUESTION_STATUS_PENDING
-        ]
-    )
     # Time when the question model was last updated (not to be
     # confused with last_updated, which is the time when the
     # question *summary* model was last updated).
