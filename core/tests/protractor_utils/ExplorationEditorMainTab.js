@@ -173,26 +173,28 @@ var ExplorationEditorMainTab = function() {
 
   this.finishTutorial = function() {
     // Finish the tutorial.
-    var finishTutorialButton = element.all(by.buttonText('Finish')).first();
-    browser.wait(until.elementToBeClickable(finishTutorialButton), 5000,
-      'Next Tutorial Stage button is not clickable')
-      .then (function(isClickable) {
-        if (isClickable) {
-          finishTutorialButton.click();
-        }
-      });
+    var finishTutorialButton = element.all(by.buttonText('Finish'));
+    browser.wait(until.elementToBeClickable(finishTutorialButton.first()), 5000,
+      'Finish Tutorial Stage button is not clickable');
+    finishTutorialButton.then(function(buttons) {
+      if (buttons.length === 1) {
+        buttons[0].click();
+      }
+    });
   };
 
   this.progressInTutorial = function() {
     // Progress to the next instruction in the tutorial.
-    var nextTutorialStageButton = element.all(by.css('.nextBtn')).first();
-    browser.wait(until.elementToBeClickable(nextTutorialStageButton), 5000,
-      'Next Tutorial Stage button is not clickable')
-      .then (function(isClickable) {
-        if (isClickable) {
-          nextTutorialStageButton.click();
-        }
-      });
+    var nextTutorialStageButton = element.all(by.css('.nextBtn'));
+    browser.wait(
+      until.elementToBeClickable(nextTutorialStageButton.first()), 5000,
+      'Next Tutorial Stage button is not clickable');
+    nextTutorialStageButton.then(function(buttons) {
+      if (buttons.length === 1) {
+        buttons[0].click();
+        general.waitForSystem(1000);
+      }
+    });
   };
 
   this.startTutorial = function() {
