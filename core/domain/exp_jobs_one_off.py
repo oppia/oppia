@@ -602,13 +602,21 @@ class ExplorationMigrationValidationJobForCKEditor(
     def map(item):
         if item.deleted:
             return
+        err_dict = {}
 
-        exploration = exp_services.get_exploration_from_model(item)
+        try:
+            exploration = exp_services.get_exploration_from_model(item)
+        except Exception as e:
+            yield('Error %s in exploration' % str(e), [item.id])
+            return
 
         html_list = exploration.get_all_html_content_strings()
-
-        err_dict = html_cleaner.validate_rte_format(
-            html_list, feconf.RTE_FORMAT_CKEDITOR, run_migration=True)
+        try:
+            err_dict = html_cleaner.validate_rte_format(
+                html_list, feconf.RTE_FORMAT_CKEDITOR, run_migration=True)
+        except Exception as e:
+            yield('Error %s in exploration %s' % (str(e), item.id), html_list)
+            return
 
         for key in err_dict:
             if err_dict[key]:
