@@ -639,7 +639,7 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
             # the FileSnapshotContentModel.
             if filetype in ALLOWED_IMAGE_EXTENSIONS:
                 pattern = re.compile(
-                    r'^/([^/]+)/assets/(([^/]+)\.(' +'|'.join(
+                    r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
                         ALLOWED_IMAGE_EXTENSIONS) + '))$')
                 catched_groups = pattern.match(instance_id)
                 if not catched_groups:
