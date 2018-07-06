@@ -447,7 +447,7 @@ var constants = {
     "zW39GLG_BdN2", "Xa3B_io-2WI5", "6Q6IyIDkjpYC", "osw1m5Q3jK41"
   ],
 
-  "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50
+  "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
   "IS_CURRENT_RTE_CKEDITOR": false,
 

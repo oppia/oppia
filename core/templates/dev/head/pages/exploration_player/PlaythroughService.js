@@ -196,20 +196,20 @@ oppia.factory('PlaythroughService', [
       isPlayerExcludedFromSamplePopulation: function() {
         return !isPlayerInSamplePopulation;
       },
-      isExplorationBlacklisted: function(expId) {
-        if (expId.indexOf(
-          constants.WHITELISTED_EXPLORATION_IDS_FOR_SAVING_PLAYTHROUGHS) >
-            -1) {
-          return false;
+      isExplorationWhitelisted: function(expId) {
+        var whiteListedExpIds =
+          constants.WHITELISTED_EXPLORATION_IDS_FOR_SAVING_PLAYTHROUGHS;
+        if (whiteListedExpIds.indexOf(expId) !== -1) {
+          return true;
         }
-        return true;
+        return false;
       },
       getPlaythrough: function() {
         return playthrough;
       },
       recordExplorationStartAction: function(initStateName) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            this.isExplorationBlacklisted(playthrough.expId)) {
+            !this.isExplorationWhitelisted(playthrough.expId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -232,7 +232,7 @@ oppia.factory('PlaythroughService', [
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            this.isExplorationBlacklisted(playthrough.explorationId)) {
+            !this.isExplorationWhitelisted(playthrough.explorationId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -272,7 +272,7 @@ oppia.factory('PlaythroughService', [
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            this.isExplorationBlacklisted(playthrough.explorationId)) {
+            !this.isExplorationWhitelisted(playthrough.explorationId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -290,7 +290,7 @@ oppia.factory('PlaythroughService', [
       },
       recordPlaythrough: function(isExplorationComplete) {
         if (this.isPlayerExcludedFromSamplePopulation() ||
-            this.isExplorationBlacklisted(playthrough.explorationId)) {
+            !this.isExplorationWhitelisted(playthrough.explorationId)) {
           return;
         }
         if (isExplorationComplete) {
