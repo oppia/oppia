@@ -863,7 +863,8 @@ class ImageUploadHandler(EditorHandler):
         # Image files are stored to the datastore in the dev env, and to GCS
         # in production.
         file_system_class = (
-            fs_domain.ExplorationFileSystem if feconf.DEV_MODE
+            fs_domain.ExplorationFileSystem if (
+                feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
             else fs_domain.GcsFileSystem)
         fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
         filepath = '%s/%s' % (self._FILENAME_PREFIX, filename)
@@ -873,8 +874,9 @@ class ImageUploadHandler(EditorHandler):
                 'different name.' % filename)
         # Because the ExplorationFileSystem we have to pass the filename
         # and for GcsFileSystem, the filepath.
-        fs.commit(self.user_id, filename if feconf.DEV_MODE else filepath,
-                  raw, mimetype=mimetype)
+        fs.commit(self.user_id, filename if (
+            feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
+                  else filepath, raw, mimetype=mimetype)
 
         self.render_json({'filepath': filename})
 
