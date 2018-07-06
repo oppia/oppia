@@ -277,11 +277,9 @@ class Subtopic(object):
                     'Expected each skill id to be a string, received %s' %
                     skill_id)
 
-        for skill_id in self.skill_ids:
-            if self.skill_ids.count(skill_id) > 1:
-                raise utils.ValidationError(
-                    'The skill id %s is duplicated in the subtopic %s.'
-                    % (skill_id, self.id))
+        if len(self.skill_ids) > len(set(self.skill_ids)):
+            raise utils.ValidationError(
+                'Expected all skill ids to be distinct.')
 
 
 class Topic(object):

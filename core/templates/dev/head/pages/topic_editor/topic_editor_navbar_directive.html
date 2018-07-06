@@ -37,7 +37,7 @@
             class="btn btn-default oppia-editor-publish-button"
             ng-click="publishTopic()"
             ng-class="{'btn-success': !isTopicSaveable()}"
-            ng-disabled="isTopicSaveable()">
+            ng-disabled="isTopicSaveable() || getWarningsCount() > 0">
       <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
          alt="Publish to Oppia Library">
         &#xE2C3;
@@ -51,10 +51,25 @@
       Unpublish Topic
     </button>
   </li>
-  <li ng-class="{'active': getTabStatuses().active === 'main'}" class="icon">
+  <li ng-class="{'active': getTabStatuses().active === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>" class="icon">
     <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()">
       <i class="material-icons">&#xE254;</i>
     </a>
+    <div ng-show="getWarningsCount()"
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+         ng-click="selectMainTab()">
+      <span class="oppia-editor-warnings-count">
+        <[getWarningsCount()]>
+      </span>
+    </div>
+    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
+      <span class="oppia-editor-warnings-header">Warnings</span>
+      <li class="oppia-editor-warnings-text"
+          ng-repeat="issue in validationIssues track by $index">
+        <hr class="oppia-editor-warnings-separator">
+        <[issue]>
+      </li>
+    </ul>
   </li>
 
   <li ng-class="{'active': getTabStatuses().active === 'subtopics'}" class="icon">
