@@ -31,6 +31,5 @@ oppia.factory('AnswerClassificationResultObjectFactory', [function() {
     return new AnswerClassificationResult(
       outcome, answerGroupIndex, ruleIndex, classificationCategorization);
   };
-
   return AnswerClassificationResult;
 }]);

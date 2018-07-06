@@ -129,20 +129,11 @@ describe('Learner dashboard functionality', function() {
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    // Disable waiting for Angular to accept alert.
-    browser.waitForAngularEnabled(false);
-    // Refresh page to simulate user leaving.
-    browser.navigate().refresh().then(function() {
-      browser.wait(until.alertIsPresent(), 5000);
-      return browser.switchTo().alert().then(function (alert) {
-        alert.accept().then(function() {
-          // Re-enable waiting for Angular.
-          return browser.waitForAngularEnabled(true);
-        });
-      });
-    });
-
+    // Refresh page to simulate user leaving and accept the alert.
+    general.safeAcceptAlert();
+    // Wait for exploration to re-load again.
     general.waitForLoadingMessage();
+
     // Learner Dashboard should display 'About Oppia' as incomplete.
     learnerDashboardPage.get();
     learnerDashboardPage.navigateToInCompleteSection();
@@ -252,20 +243,11 @@ describe('Learner dashboard functionality', function() {
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    // Disable waiting for Angular to accept alert.
-    browser.waitForAngularEnabled(false);
-    // Refresh page to simulate user leaving.
-    browser.navigate().refresh().then(function() {
-      browser.wait(until.alertIsPresent(), 5000);
-      return browser.switchTo().alert().then(function (alert) {
-        alert.accept().then(function() {
-          // Re-enable waiting for Angular
-          return browser.waitForAngularEnabled(true);
-        });
-      });
-    });
-
+    // Refresh page to simulate user leaving and accept the alert.
+    general.safeAcceptAlert();
+    // Wait for exploration to re-load again.
     general.waitForLoadingMessage();
+
     // Learner Dashboard should display 'Test Collection' as incomplete.
     learnerDashboardPage.get();
     learnerDashboardPage.navigateToInCompleteSection();
@@ -278,7 +260,7 @@ describe('Learner dashboard functionality', function() {
     libraryPage.playCollection('Test Collection');
     var firstExploration = element.all(
       by.css('.protractor-test-collection-exploration')).first();
-      // Click first exploration in collection.
+    // Click first exploration in collection.
     browser.wait(until.elementToBeClickable(firstExploration), 10000,
       'Could not click first exploration in collection')
       .then(function(isClickable) {
