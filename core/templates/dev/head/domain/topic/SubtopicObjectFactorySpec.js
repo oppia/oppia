@@ -38,6 +38,18 @@ describe('Subtopic object factory', function() {
       sampleSubtopicBackendObject, sampleSkillIdToDesriptionMap);
   }));
 
+  it('should not find issues with a valid subtopic', function() {
+    var issues = _sampleSubtopic.validate();
+    expect(issues).toEqual([]);
+  });
+
+  it('should validate the subtopic', function() {
+    _sampleSubtopic.setTitle('');
+
+    var issues = _sampleSubtopic.validate();
+    expect(issues).toEqual(['Subtopic title should not be empty']);
+  });
+
   it('should be able to create a subtopic object with given title and id',
     function() {
       var subtopic = SubtopicObjectFactory.createFromTitle(2, 'Title2');

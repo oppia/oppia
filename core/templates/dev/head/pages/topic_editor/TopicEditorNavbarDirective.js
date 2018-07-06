@@ -26,14 +26,14 @@ oppia.directive('topicEditorNavbar', [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'TopicEditorStateService', 'UrlService',
         'TopicRightsBackendApiService', 'TopicEditorRoutingService',
-        'TopicValidationService', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_TOPIC_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+        'EVENT_TOPIC_INITIALIZED', 'EVENT_TOPIC_REINITIALIZED',
+        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             UndoRedoService, TopicEditorStateService, UrlService,
             TopicRightsBackendApiService, TopicEditorRoutingService,
-            TopicValidationService, EVENT_TOPIC_INITIALIZED,
-            EVENT_TOPIC_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+            EVENT_TOPIC_INITIALIZED, EVENT_TOPIC_REINITIALIZED,
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.topicId = UrlService.getTopicIdFromUrl();
           $scope.topic = TopicEditorStateService.getTopic();
           $scope.validationIssues = [];
@@ -45,8 +45,7 @@ oppia.directive('topicEditorNavbar', [
             TopicEditorRoutingService.navigateToSubtopicsTab;
 
           var _validateTopic = function() {
-            $scope.validationIssues =
-              TopicValidationService.findValidationIssuesForTopic($scope.topic);
+            $scope.validationIssues = $scope.topic.validate();
           };
 
           $scope.publishTopic = function() {
