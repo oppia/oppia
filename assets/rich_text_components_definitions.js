@@ -45,7 +45,7 @@ var richTextComponents = {
     "frontend_id": "image",
     "tooltip": "Insert image",
     "icon_data_url": "/rich_text_components/Image/Image.png",
-    "preview_url_template": "/imagehandler/<[explorationId]>/<[filepath.name]>",
+    "preview_url_template": "/imagehandler/<[explorationId]>/<[filepath]>",
     "is_complex": false,
     "requires_fs": true,
     "is_block_element": true,

@@ -157,7 +157,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 22
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 23
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -431,6 +431,10 @@ MAX_FILE_SIZE_BYTES = 1048576
 
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300
+
+# The minimum score required for a user to review suggestions of a particular
+# category.
+MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
 
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'

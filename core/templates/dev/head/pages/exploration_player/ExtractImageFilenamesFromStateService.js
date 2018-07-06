@@ -123,27 +123,21 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       var imageTagList = dummyElement.getElementsByTagName(
         'oppia-noninteractive-image');
       for (i = 0; i < imageTagList.length; i++) {
-        var filepathObject = JSON.parse(
+        // We have the attribute of filepath in oppia-noninteractive-image tag.
+        // But it actually contains the filename only. We use the variable
+        // filename instead of filepath since in the end we are retrieving the
+        // filenames in the exploration.
+        var filename = JSON.parse(
           imageTagList[i].getAttribute('filepath-with-value'));
         // The images already there in Oppia have image filenames as the value
-        // for the attribute 'filepath-with-value'. In explorations the
-        // the attribute value is an object of the form --
-        // {
-        //    name: filename,
-        //    width: widthOfImage,
-        //    height: heightOfImage
-        // }
-        // So, we create an object similar to it for the images which had
-        // filenames as the attribute's value with default dimensions of
+        // for the attribute 'filepath-with-value'.
+        // We create an object for the images with default dimensions of
         // 500px x 200px
-        if (!filepathObject.width) {
-          var filename = filepathObject;
-          filepathObject = {
-            name: filename,
-            width: 500,
-            height: 200
-          };
-        }
+        var filepathObject = {
+          name: filename,
+          width: 500,
+          height: 200
+        };
         fileInfo.push(filepathObject);
       }
       return fileInfo;
@@ -189,19 +183,14 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var _getImageDimensionsInState = function(state) {
       var fileDimensions = {};
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-        var filepathObject = (
+      // The Image Click Input interaction has an image whose filename is
+      // directly stored in the customizationArgs.imageAndRegion.value
+      // .imagePath
+        var filename = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
-        if (!filepathObject.width) {
-          var filename = filepathObject;
-          filepathObject = {
-            name: filename,
-            width: 500,
-            height: 200
-          };
-        }
-        fileDimensions[filepathObject.name] = {
-          width: filepathObject.width,
-          height: filepathObject.height
+        fileDimensions[filename] = {
+          width: 500,
+          height: 200
         };
       }
       var allHtmlOfState = _getAllHtmlOfState(state);
@@ -223,10 +212,9 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-        var filepathObject = (
+        var filename = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
-        filenamesInState.push(!filepathObject.name ? filepathObject :
-          filepathObject.name);
+        filenamesInState.push(filename);
       }
       allHtmlOfState = _getAllHtmlOfState(state);
       allHtmlOfState.forEach(function(htmlStr) {
