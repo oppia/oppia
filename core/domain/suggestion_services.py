@@ -63,7 +63,7 @@ def create_suggestion(
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         thread_id = feedback_services.create_thread(
             target_id, None, author_id, description,
-            DEFAULT_SUGGESTION_THREAD_SUBJECT, True)
+            DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
         # This line and the if..else will be removed after the feedback thread
         # migration is complete and the IDs for both models match.
         thread_id = suggestion_models.TARGET_TYPE_EXPLORATION + '.' + thread_id

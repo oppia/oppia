@@ -198,8 +198,9 @@ class CronAcceptStaleSuggestionsHandler(base.BaseHandler):
     @acl_decorators.can_perform_cron_tasks
     def get(self):
         """Handles get requests."""
-        suggestions = suggestion_services.get_all_stale_suggestions()
-        for suggestion in suggestions:
-            suggestion_services.accept_suggestion(
-                suggestion, feconf.SUGGESTION_BOT_USER_ID,
-                suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)
+        if feconf.ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS:
+            suggestions = suggestion_services.get_all_stale_suggestions()
+            for suggestion in suggestions:
+                suggestion_services.accept_suggestion(
+                    suggestion, feconf.SUGGESTION_BOT_USER_ID,
+                    suggestion_models.DEFAULT_SUGGESTION_ACCEPT_MESSAGE, None)

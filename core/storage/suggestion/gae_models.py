@@ -74,11 +74,16 @@ SCORE_TYPE_CHOICES = [
 # The delimiter to be used in score category field.
 SCORE_CATEGORY_DELIMITER = '.'
 
+# Threshold number of days after which suggestion will be accepted.
+THRESHOLD_DAYS_BEFORE_ACCEPT = 7
+
 # Threshold time after which suggestion is considered stale and auto-accepted.
-THRESHOLD_TIME_BEFORE_ACCEPT = 7 * 24 * 60 * 60 * 1000
+THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
+    THRESHOLD_DAYS_BEFORE_ACCEPT * 24 * 60 * 60 * 1000)
 
 # The default message to be shown when accepting stale suggestions.
-DEFAULT_SUGGESTION_ACCEPT_MESSAGE = 'Accepting suggestion due to inactivity.'
+DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
+                                     ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
 
 
 class GeneralSuggestionModel(base_models.BaseModel):
@@ -261,7 +266,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         threshold_time = (
             datetime.datetime.utcnow() - datetime.timedelta(
-                0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT))
+                0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
         return cls.get_all().filter(
             cls.status.IN([STATUS_IN_REVIEW, STATUS_RECEIVED])).filter(
                 cls.last_updated < threshold_time).fetch()
