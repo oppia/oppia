@@ -24,8 +24,10 @@
       </div>
     </div>
     <div ng-show="!loadingMessage">
-      {% block content %}{% endblock %}
-      {% block footer %}{% endblock %}
+      {% block content %}
+      {% endblock %}
+      {% block footer %}
+      {% endblock %}
     </div>
   </div>
 {%- endmacro %}
@@ -66,7 +68,8 @@
     the page title because the head of the file is outside the scope of
     any other controller. -->
     <title itemprop="name" translate="{% block maintitle %}Oppia{% endblock maintitle %}"></title>
-    {% block base_url %}{% endblock base_url %}
+    {% block base_url %}
+    {% endblock base_url %}
 
     {% block header_css %}
       {% include 'pages/header_css_libs.html' %}
@@ -132,7 +135,7 @@
 
       <div class="oppia-base-container"
            ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
-           ng-swipe-left="closeSidebarOnSwipe()">
+           ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
         <div class="oppia-content-container">
           <div id="wrapper">
             <div class="oppia-main-body">
@@ -164,7 +167,9 @@
                     <i class="material-icons">&#xE811;</i>
                   </h2>
                   <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_DESCRIPTION"
-                     translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com"/>click here.</a></p>
+                     translate-values="{hrefUrl: 'http://www.enable-javascript.com/'}">
+                     Oppia is a free, open-source learning platform full of interactive activities called 'explorations'.  Sadly, Oppia requires JavaScript to be enabled in your web browser in order to function properly and your web browser has JavaScript disabled.  If you need help enabling JavaScript, <a href="http://www.enable-javascript.com">click here.</a>
+                  </p>
                   <p translate="I18N_SPLASH_JAVASCRIPT_ERROR_THANKS">Thank you.</p>
                 </div>
               </div>
@@ -182,8 +187,7 @@
       <a ng-if="siteFeedbackFormUrl" ng-href="<[siteFeedbackFormUrl]>" target="_blank"
          class="oppia-site-feedback oppia-transition-200">
         <i class="material-icons md-18">&#xE87F;</i>
-          <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
-        </i>
+        <span translate="I18N_SPLASH_SITE_FEEDBACK"></span>
       </a>
     </div>
 

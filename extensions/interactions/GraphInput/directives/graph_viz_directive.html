@@ -126,11 +126,11 @@
 
 <div style="float: right; height: 35px;">
   <div ng-if="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel">
-    <input type="text" ng-model="selectedVertexLabelGetterSetter" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun"></input>
+    <input type="text" ng-model="selectedVertexLabelGetterSetter" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun">
     <md-button class="md-raised" ng-click="state.selectedVertex = null;" translate="I18N_INTERACTIONS_GRAPH_UPDATE_LABEL"></md-button>
   </div>
   <div ng-if="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
-    <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun" ng-style="shouldShowWrongWeightWarning ? {'border': '1px solid red'}: {}" ng-blur="shouldShowWrongWeightWarning = !isValidEdgeWeight()" ng-focus="shouldShowWrongWeightWarning = false"></input>
+    <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun" ng-style="shouldShowWrongWeightWarning ? {'border': '1px solid red'}: {}" ng-blur="shouldShowWrongWeightWarning = !isValidEdgeWeight()" ng-focus="shouldShowWrongWeightWarning = false">
     <md-button class="md-raised" ng-click="onUpdateEdgeWeight()" translate="I18N_INTERACTIONS_GRAPH_UPDATE_WEIGHT"></md-button>
   </div>
 </div>

@@ -52,6 +52,7 @@ ONE_OFF_JOB_MANAGERS = [
     feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
     feedback_jobs_one_off.FeedbackSubjectOneOffJob,
     feedback_jobs_one_off.SuggestionMigrationOneOffJob,
+    feedback_jobs_one_off.SuggestionMigrationValdiationOneOffJob,
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
