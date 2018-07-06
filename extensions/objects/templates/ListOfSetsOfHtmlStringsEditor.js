@@ -55,6 +55,7 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
         $scope.selectedItem = function(choiceListIndex, selectedRank) {
           var choiceHtml = $scope.choices[choiceListIndex].id;
           var selectedRank = parseInt(selectedRank) - 1;
+          errorMessage = '';
           // Reorder the $scope.choices array to make it consistent with the
           // selected rank.
           // $scope.choices.splice(selectedRank, 0, $scope.choices.splice(
@@ -65,7 +66,6 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
 
           for (var i = 0; i < $scope.value.length; i++) {
             choiceHtmlHasBeenAdded = false;
-            errorMessage = '';
             var choiceHtmlIndex = $scope.value[i].indexOf(choiceHtml);
             if (choiceHtmlIndex > -1) {
               if (i !== selectedRank) {
@@ -75,21 +75,22 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
                 } else {
                   $scope.value[selectedRank].push(choiceHtml);
                 }
-
-                if ($scope.value[i].length === 0) {
-                  if (i === $scope.value.length - 1) {
-                    // If it is empty list at the last, pop it out.
-                    $scope.value.pop();
-                  } else {
-                    // Continuity error.
-                    errorMessage = ('No item(s) is assigned at position ' +
-                      String(i + 1) + '. Please assign some item at this ' +
-                      'position.');
-                  }
-                }
               }
               choiceHtmlHasBeenAdded = true;
               break;
+            }
+          }
+          for (var i = 0; i < $scope.value.length; i++) {
+            if ($scope.value[i].length === 0) {
+              if (i === $scope.value.length - 1) {
+                // If it is empty list at the last, pop it out.
+                $scope.value.pop();
+              } else {
+                // Continuity error.
+                errorMessage = ('No item(s) is assigned at position ' +
+                  String(i + 1) + '. Please assign some item at this ' +
+                  'position.');
+              }
             }
           }
           if (!choiceHtmlHasBeenAdded) {
