@@ -51,8 +51,7 @@ describe('Topic object factory', function() {
   }));
 
   it('should not find issues with a valid topic', function() {
-    var issues = _sampleTopic.validate();
-    expect(issues).toEqual([]);
+    expect(_sampleTopic.validate()).toEqual([]);
   });
 
   it('should validate the topic', function() {
@@ -60,8 +59,7 @@ describe('Topic object factory', function() {
     _sampleTopic.addCanonicalStoryId('story_2');
     _sampleTopic.getSubtopics()[0].addSkill('skill_1');
 
-    var issues = _sampleTopic.validate();
-    expect(issues).toEqual([
+    expect(_sampleTopic.validate()).toEqual([
       'Topic name should not be empty.',
       'The story with id story_2 is present in both canonical ' +
       'and additional stories.',
