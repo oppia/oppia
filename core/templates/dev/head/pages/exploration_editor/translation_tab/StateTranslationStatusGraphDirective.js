@@ -25,14 +25,15 @@ oppia.directive('stateTranslationStatusGraph', [
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_status_graph_directive.html'),
       controller: [
-        '$scope', 'GraphDataService', 'EditorStateService', function(
-            $scope, GraphDataService, EditorStateService) {
+        '$scope', '$rootScope', 'GraphDataService', 'EditorStateService',
+        function($scope, $rootScope, GraphDataService, EditorStateService) {
           $scope.getGraphData = GraphDataService.getGraphData;
           $scope.getActiveStateName = function() {
             return EditorStateService.getActiveStateName();
           };
           $scope.onClickStateInMap = function(newStateName) {
             EditorStateService.setActiveStateName(newStateName);
+            $rootScope.$broadcast('refreshStateTranslation');
           };
         }
       ]
