@@ -315,13 +315,6 @@
           "js": []
         }
       },
-      "jqueryThemes": {
-        "version": "1.10.3",
-        "downloadFormat": "zip",
-        "url": "http://jqueryui.com/resources/download/jquery-ui-themes-1.10.3.zip",
-        "rootDirPrefix": "jquery-ui-themes-",
-        "targetDirPrefix": "jquery-ui-themes-"
-      },
       "jqueryUITouchPunch": {
         "version": "0.3.1",
         "downloadFormat": "zip",

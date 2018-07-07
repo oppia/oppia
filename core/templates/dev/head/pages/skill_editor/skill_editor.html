@@ -1,1 +1,56 @@
 {% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Skill Editor
+{% endblock maintitle %}
+
+
+{% block navbar_breadcrumb %}
+
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <skill-editor-navbar>
+  </skill-editor-navbar>
+{% endblock local_top_nav_options %}
+
+{% block header_js %}
+  {{ super() }}
+{% endblock header_js %}
+
+{% block content %}
+  <div ng-controller="SkillEditor">
+    <skill-editor-main-tab></skill-editor-main-tab>
+  </div>
+{% endblock content %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillEditorMainTabDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillDescriptionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillConceptCardEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/SkillMisconceptionsEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/MisconceptionEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/editor_tab/WorkedExampleEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditor.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditorStateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/skill_editor/SkillEditorNavbarDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/SkillObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/ConceptCardObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/MisconceptionObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/EditableSkillBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/skill/SkillUpdateService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/ChangeObjectFactory.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/editor/undo_redo/UndoRedoService.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/FormBuilder.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_editors/SchemaBasedHtmlEditorDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/forms/schema_viewers/SchemaBasedHtmlViewerDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/SummaryListHeaderDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/loading/LoadingDotsDirective.js"></script>
+
+
+{% endblock footer_js %}

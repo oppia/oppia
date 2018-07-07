@@ -1,0 +1,20 @@
+<div class="modal-header">
+  <h3>Add Worked Example</h3>
+</div>
+
+<div class="modal-body">
+  <form name="addWorkedExampleForm.workedExampleTextForm"
+        class="form-inline">
+    <div class="oppia-rule-details-header">
+      <strong>Worked Example</strong>
+      <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
+                           local-value="tmpWorkedExampleHtml">
+      </schema-based-editor>
+    </div>
+  </form>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success" ng-click="saveWorkedExample()" ng-disabled="!tmpWorkedExampleHtml">Save</button>
+</div>
