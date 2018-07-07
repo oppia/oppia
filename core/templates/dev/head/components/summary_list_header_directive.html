@@ -1,0 +1,53 @@
+<style>
+  summary-list-header .oppia-delete-example-button {
+    cursor: pointer;
+    opacity: 0.5;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    width: 20px;
+  }
+
+  summary-list-header .oppia-delete-example-button:hover {
+    opacity: 1;
+  }
+
+  summary-list-header .oppia-example-header-block {
+    overflow: hidden;
+    padding-left: 24px;
+    white-space: nowrap;
+  }
+
+  summary-list-header .oppia-example-header {
+    float: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 80%;
+  }
+
+  /* This is to break the line only when screen is too narrow to have both divs
+     in same line.*/
+  @media screen and (min-width: 370px) {
+    summary-list-header .break-in-mobile {
+      display: none;
+    }
+  }
+</style>
+<div class="oppia-example-header-block">
+  <div class="oppia-example-header">
+    <span ng-if="!isActive()" ng-attr-title="<[getSummary()]>">
+      <[getShortSummary()]>
+      <span ng-if="getNumItems() > 1" class="label label-primary" style="position: relative; bottom: 4px;">
+        +<[getNumItems() - 1]>
+      </span>
+    </span>
+    <span ng-if="isActive()">&nbsp;</span>
+  </div>
+</div>
+
+<span class="oppia-delete-example-button oppia-transition-200"
+      ng-if="isDeleteAvailable() && getOnDeleteFn()"
+      ng-click="deleteItem($event)">
+  <i class="material-icons md-18">&#xE5CD;</i>
+</span>

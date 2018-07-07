@@ -451,14 +451,13 @@ class GcsFileSystem(object):
         return self._exploration_id
 
     def isfile(self, filepath):
-        """Returns True if the file with the given filepath exists in the GCS,
-        else it returns False
+        """Checks if the file with the given filepath exists in the GCS.
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            bool. True or False
+            bool. Returns True if the file exists in GCS else False.
         """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
 

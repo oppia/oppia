@@ -39,7 +39,6 @@ class SuggestionHandler(base.BaseHandler):
             self.payload.get('target_version_at_submission'),
             self.user_id, self.payload.get('change_cmd'),
             self.payload.get('description'),
-            self.payload.get('assigned_reviewer_id'),
             self.payload.get('final_reviewer_id'))
         self.render_json(self.values)
 
@@ -92,7 +91,6 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 
-    LIST_TYPE_ASSIGNED_REVIEWER = 'assignedReviewer'
     LIST_TYPE_AUTHOR = 'author'
     LIST_TYPE_ID = 'id'
     LIST_TYPE_REVIEWER = 'reviewer'
@@ -101,8 +99,6 @@ class SuggestionListHandler(base.BaseHandler):
     LIST_TYPE_TARGET_ID = 'target'
 
     LIST_TYPES_TO_SERVICES_MAPPING = {
-        LIST_TYPE_ASSIGNED_REVIEWER: (
-            suggestion_services.get_suggestions_assigned_to_reviewer),
         LIST_TYPE_AUTHOR: suggestion_services.get_suggestions_by_author,
         LIST_TYPE_ID: suggestion_services.get_suggestion_by_id,
         LIST_TYPE_REVIEWER: suggestion_services.get_suggestions_reviewed_by,
@@ -112,7 +108,6 @@ class SuggestionListHandler(base.BaseHandler):
     }
 
     PARAMS_FOR_LIST_TYPES = {
-        LIST_TYPE_ASSIGNED_REVIEWER: ['assigned_reviewer_id'],
         LIST_TYPE_AUTHOR: ['author_id'],
         LIST_TYPE_ID: ['suggestion_id'],
         LIST_TYPE_REVIEWER: ['reviewer_id'],

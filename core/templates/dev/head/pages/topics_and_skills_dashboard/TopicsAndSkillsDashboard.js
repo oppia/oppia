@@ -23,6 +23,7 @@ oppia.constant(
 
 oppia.constant('EVENT_TOPIC_DELETED', 'topicDeleted');
 oppia.constant('EVENT_TYPE_TOPIC_CREATION_ENABLED', 'topicCreationEnabled');
+oppia.constant('EVENT_TYPE_SKILL_CREATION_ENABLED', 'skillCreationEnabled');
 
 oppia.controller('TopicsAndSkillsDashboard', [
   '$scope', '$rootScope', '$http', '$window',
@@ -30,12 +31,14 @@ oppia.controller('TopicsAndSkillsDashboard', [
   'UrlInterpolationService', 'TopicCreationService',
   'FATAL_ERROR_CODES', 'EVENT_TOPIC_DELETED',
   'EVENT_TYPE_TOPIC_CREATION_ENABLED',
+  'EVENT_TYPE_SKILL_CREATION_ENABLED',
   function(
       $scope, $rootScope, $http, $window,
       AlertsService, TopicsAndSkillsDashboardBackendApiService,
       UrlInterpolationService, TopicCreationService,
       FATAL_ERROR_CODES, EVENT_TOPIC_DELETED,
-      EVENT_TYPE_TOPIC_CREATION_ENABLED) {
+      EVENT_TYPE_TOPIC_CREATION_ENABLED,
+      EVENT_TYPE_SKILL_CREATION_ENABLED) {
     $scope.TAB_NAME_TOPICS = 'topics';
     $scope.TAB_NAME_SKILLS = 'skills';
 
@@ -45,8 +48,11 @@ oppia.controller('TopicsAndSkillsDashboard', [
         $scope.skillSummaries = response.data.skill_summary_dicts;
         $scope.activeTab = $scope.TAB_NAME_TOPICS;
         $scope.userCanCreateTopic = response.data.can_create_topic;
+        $scope.userCanCreateSkill = response.data.can_create_skill;
         $rootScope.$broadcast(
           EVENT_TYPE_TOPIC_CREATION_ENABLED, $scope.userCanCreateTopic);
+        $rootScope.$broadcast(
+          EVENT_TYPE_SKILL_CREATION_ENABLED, $scope.userCanCreateSkill);
         $scope.userCanDeleteTopic = response.data.can_delete_topic;
         if ($scope.topicSummaries.length === 0 &&
             $scope.skillSummaries.length !== 0) {
