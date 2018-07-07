@@ -19,7 +19,6 @@ import logging
 
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
 import feconf
