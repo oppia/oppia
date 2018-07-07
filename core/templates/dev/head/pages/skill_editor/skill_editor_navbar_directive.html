@@ -1,0 +1,24 @@
+<ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-if="!isLoadingSkill()">
+  <li style="margin-right: 10px; margin-top: 8px;">
+    <button class="btn btn-default oppia-save-draft-button protractor-test-save-draft-button"
+            ng-class="{'btn-success': isSkillSaveable()}"
+            ng-click="saveChanges()"
+            ng-disabled="!isSkillSaveable()"
+            ng-if="!isSaveInProgress()">
+      <span ng-if="!isSaveInProgress()">
+        <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+           alt="Save Skill">&#xE161;</i>
+        <span class="oppia-save-publish-button-label">Save Draft</span>
+        <span class="hidden-sm hidden-xs" style="opacity:0.5"
+              ng-if="getChangeListCount() > 0">
+          (<[getChangeListCount()]>)
+        </span>
+      </span>
+
+      <span ng-if="isSaveInProgress()">
+        <span class="oppia-save-publish-button-label">Saving</span>
+        <loading-dots></loading-dots>
+      </span>
+    </button>
+  </li>
+</ul>
