@@ -1,0 +1,28 @@
+<div class="modal-header">
+  <h3>Select topic to which the skill is to be assigned</h3>
+</div>
+
+<div class="modal-body">
+  <p>
+    Selected Topics Count: <[selectedTopicList.length]>
+  </p>
+  <div class="topics-table">
+    <topics-list topic-summaries="topicSummaries"
+                 user-can-delete-topic="false"
+                 topic-link-disabled="true"
+                 selected-topic-list="selectedTopicList">
+    </topics-list>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+  <button class="btn btn-success" ng-click="done()">Save</button>
+</div>
+
+<style>
+  .topics-table {
+    width: 56vw;
+    margin-left: -6vw;
+  }
+</style>

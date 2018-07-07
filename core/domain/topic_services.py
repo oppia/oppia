@@ -132,6 +132,22 @@ def get_all_topic_summaries():
     return topic_summaries
 
 
+def get_all_triaged_skills():
+    """Returns the ids of all the skills that are linked to some topics.
+
+    Returns:
+        list(str). The ids of all the skills linked to some topic.
+    """
+    skill_ids = []
+    all_topic_models = topic_models.TopicModel.get_all()
+    for topic_model in all_topic_models:
+        skill_ids.extend(topic_model.uncategorized_skill_ids)
+        for subtopic in topic_model.subtopics:
+            skill_ids.extend(subtopic['skill_ids'])
+    unique_skill_ids = list(set(skill_ids))
+    return unique_skill_ids
+
+
 def get_topic_summary_from_model(topic_summary_model):
     """Returns a domain object for an Oppia topic summary given a
     topic summary model.
