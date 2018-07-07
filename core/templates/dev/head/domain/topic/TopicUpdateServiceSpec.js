@@ -20,6 +20,8 @@ describe('Topic update service', function() {
   var TopicUpdateService = null;
   var TopicObjectFactory = null;
   var SubtopicObjectFactory = null;
+  var SkillSummaryObjectFactory = null;
+  var SubtopicPageObjectFactory = null;
   var UndoRedoService = null;
   var _sampleTopic = null;
 
@@ -29,25 +31,50 @@ describe('Topic update service', function() {
     TopicUpdateService = $injector.get('TopicUpdateService');
     TopicObjectFactory = $injector.get('TopicObjectFactory');
     SubtopicObjectFactory = $injector.get('SubtopicObjectFactory');
+    SubtopicPageObjectFactory = $injector.get('SubtopicPageObjectFactory');
     UndoRedoService = $injector.get('UndoRedoService');
+    SkillSummaryObjectFactory = $injector.get('SkillSummaryObjectFactory');
 
     var sampleTopicBackendObject = {
-      id: 'sample_topic_id',
-      name: 'Topic name',
-      description: 'Topic description',
-      version: 1,
-      uncategorized_skill_ids: ['skill_1'],
-      canonical_story_ids: ['story_1'],
-      additional_story_ids: ['story_2'],
-      subtopics: [{
-        id: 1,
-        title: 'Title',
-        skill_ids: ['skill_2']
-      }],
-      next_subtopic_id: 2,
+      topicDict: {
+        id: 'sample_topic_id',
+        name: 'Topic name',
+        description: 'Topic description',
+        version: 1,
+        uncategorized_skill_ids: ['skill_1'],
+        canonical_story_ids: ['story_1'],
+        additional_story_ids: ['story_2'],
+        subtopics: [{
+          id: 1,
+          title: 'Title',
+          skill_ids: ['skill_2']
+        }],
+        next_subtopic_id: 2,
+        language_code: 'en'
+      },
+      skillIdToDescriptionDict: {
+        skill_1: 'Description 1',
+        skill_2: 'Description 2'
+      }
+    };
+    var sampleSubtopicPageObject = {
+      id: 'topic_id-1',
+      topic_id: 'topic_id',
+      html_data: '<p>Data</p>',
       language_code: 'en'
     };
-    _sampleTopic = TopicObjectFactory.create(sampleTopicBackendObject);
+    _firstSkillSummary = SkillSummaryObjectFactory.create(
+      'skill_1', 'Description 1');
+    _secondSkillSummary = SkillSummaryObjectFactory.create(
+      'skill_2', 'Description 2');
+    _thirdSkillSummary = SkillSummaryObjectFactory.create(
+      'skill_3', 'Description 3');
+
+    _sampleSubtopicPage = SubtopicPageObjectFactory.createFromBackendDict(
+      sampleSubtopicPageObject);
+    _sampleTopic = TopicObjectFactory.create(
+      sampleTopicBackendObject.topicDict,
+      sampleTopicBackendObject.skillIdToDescriptionDict);
   }));
 
   it('should add/remove an additional story id to/from a topic',
@@ -71,7 +98,8 @@ describe('Topic update service', function() {
       cmd: 'update_topic_property',
       property_name: 'additional_story_ids',
       new_value: ['story_2', 'story_3'],
-      old_value: ['story_2']
+      old_value: ['story_2'],
+      change_affects_subtopic_page: false
     }]);
   });
 
@@ -103,7 +131,8 @@ describe('Topic update service', function() {
       cmd: 'update_topic_property',
       property_name: 'additional_story_ids',
       new_value: [],
-      old_value: ['story_2']
+      old_value: ['story_2'],
+      change_affects_subtopic_page: false
     }]);
   });
 
@@ -137,7 +166,8 @@ describe('Topic update service', function() {
       cmd: 'update_topic_property',
       property_name: 'canonical_story_ids',
       new_value: ['story_1', 'story_3'],
-      old_value: ['story_1']
+      old_value: ['story_1'],
+      change_affects_subtopic_page: false
     }]);
   });
 
@@ -169,7 +199,8 @@ describe('Topic update service', function() {
       cmd: 'update_topic_property',
       property_name: 'canonical_story_ids',
       new_value: [],
-      old_value: ['story_1']
+      old_value: ['story_1'],
+      change_affects_subtopic_page: false
     }]);
   });
 
@@ -184,24 +215,31 @@ describe('Topic update service', function() {
 
   it('should add/remove an uncategorized skill id to/from a topic',
     function() {
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-      TopicUpdateService.addUncategorizedSkillId(_sampleTopic, 'skill_3');
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([
-        'skill_1', 'skill_3'
+      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+        _firstSkillSummary
+      ]);
+      TopicUpdateService.addUncategorizedSkill(
+        _sampleTopic, _thirdSkillSummary);
+      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+        _firstSkillSummary, _thirdSkillSummary
       ]);
 
       UndoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
+      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+        _firstSkillSummary
+      ]);
     }
   );
 
   it('should create a proper backend change dict for adding an uncategorized ' +
     'skill id',
   function() {
-    TopicUpdateService.addUncategorizedSkillId(_sampleTopic, 'skill_3');
+    TopicUpdateService.addUncategorizedSkill(
+      _sampleTopic, _thirdSkillSummary);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'add_uncategorized_skill_id',
-      new_uncategorized_skill_id: 'skill_3'
+      new_uncategorized_skill_id: 'skill_3',
+      change_affects_subtopic_page: false
     }]);
   });
 
@@ -209,29 +247,38 @@ describe('Topic update service', function() {
     'skill id when an error is encountered',
   function() {
     expect(function() {
-      TopicUpdateService.addUncategorizedSkillId(_sampleTopic, 'skill_1');
+      TopicUpdateService.addUncategorizedSkill(
+        _sampleTopic, _firstSkillSummary);
     }).toThrow();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
   it('should remove/add an uncategorized skill id from/to a topic',
     function() {
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-      TopicUpdateService.removeUncategorizedSkillId(_sampleTopic, 'skill_1');
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([]);
+      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+        _firstSkillSummary
+      ]);
+      TopicUpdateService.removeUncategorizedSkill(
+        _sampleTopic, _firstSkillSummary
+      );
+      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
 
       UndoRedoService.undoChange(_sampleTopic);
-      expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
+      expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+        _firstSkillSummary
+      ]);
     }
   );
 
   it('should create a proper backend change dict for removing an ' +
     'uncategorized skill id',
   function() {
-    TopicUpdateService.removeUncategorizedSkillId(_sampleTopic, 'skill_1');
+    TopicUpdateService.removeUncategorizedSkill(
+      _sampleTopic, _firstSkillSummary);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'remove_uncategorized_skill_id',
-      uncategorized_skill_id: 'skill_1'
+      uncategorized_skill_id: 'skill_1',
+      change_affects_subtopic_page: false
     }]);
   });
 
@@ -239,7 +286,7 @@ describe('Topic update service', function() {
     'skill id when an error is encountered',
   function() {
     expect(function() {
-      TopicUpdateService.removeUncategorizedSkillId(_sampleTopic, 'skill_10');
+      TopicUpdateService.removeUncategorizedSkill(_sampleTopic, 'skill_10');
     }).toThrow();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
@@ -260,7 +307,8 @@ describe('Topic update service', function() {
         cmd: 'update_topic_property',
         property_name: 'name',
         new_value: 'new name',
-        old_value: 'Topic name'
+        old_value: 'Topic name',
+        change_affects_subtopic_page: false
       }]);
     }
   );
@@ -281,7 +329,8 @@ describe('Topic update service', function() {
         cmd: 'update_topic_property',
         property_name: 'description',
         new_value: 'new description',
-        old_value: 'Topic description'
+        old_value: 'Topic description',
+        change_affects_subtopic_page: false
       }]);
     }
   );
@@ -303,7 +352,8 @@ describe('Topic update service', function() {
         subtopic_id: 1,
         property_name: 'title',
         new_value: 'new title',
-        old_value: 'Title'
+        old_value: 'Title',
+        change_affects_subtopic_page: false
       }]);
     }
   );
@@ -335,24 +385,23 @@ describe('Topic update service', function() {
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'add_subtopic',
         subtopic_id: 2,
-        title: 'Title2'
+        title: 'Title2',
+        change_affects_subtopic_page: false
       }]);
     }
   );
 
   it('should remove/add a subtopic', function() {
     expect(_sampleTopic.getSubtopics().length).toEqual(1);
-    TopicUpdateService.deleteSubtopic(_sampleTopic, 1, false);
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 1);
     expect(_sampleTopic.getSubtopics()).toEqual([]);
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([
-      'skill_1', 'skill_2'
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary, _secondSkillSummary
     ]);
 
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics().length).toEqual(1);
-    expect(_sampleTopic.getSubtopics()[0].getTitle()).toEqual('Title');
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
+    expect(function() {
+      UndoRedoService.undoChange(_sampleTopic);
+    }).toThrow();
   });
 
   it('should properly remove/add a newly created subtopic', function() {
@@ -362,26 +411,22 @@ describe('Topic update service', function() {
     expect(_sampleTopic.getSubtopics()[2].getId()).toEqual(3);
     expect(_sampleTopic.getNextSubtopicId()).toEqual(4);
 
-    TopicUpdateService.deleteSubtopic(_sampleTopic, 2, true);
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
     expect(_sampleTopic.getSubtopics().length).toEqual(2);
     expect(_sampleTopic.getSubtopics()[1].getTitle()).toEqual('Title3');
     expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
     expect(_sampleTopic.getNextSubtopicId()).toEqual(3);
 
-    UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getSubtopics().length).toEqual(3);
-    expect(_sampleTopic.getSubtopics()[1].getTitle()).toEqual('Title2');
-    expect(_sampleTopic.getSubtopics()[1].getId()).toEqual(2);
-    expect(_sampleTopic.getSubtopics()[2].getId()).toEqual(3);
-    expect(_sampleTopic.getNextSubtopicId()).toEqual(4);
+    expect(UndoRedoService.getChangeCount()).toEqual(1);
   });
 
   it('should create a proper backend change dict for deleting a subtopic',
     function() {
-      TopicUpdateService.deleteSubtopic(_sampleTopic, 1, false);
+      TopicUpdateService.deleteSubtopic(_sampleTopic, 1);
       expect(UndoRedoService.getCommittableChangeList()).toEqual([{
         cmd: 'delete_subtopic',
-        subtopic_id: 1
+        subtopic_id: 1,
+        change_affects_subtopic_page: false
       }]);
     }
   );
@@ -390,34 +435,117 @@ describe('Topic update service', function() {
     'when an error is encountered',
   function() {
     expect(function() {
-      TopicUpdateService.deleteSubtopic(_sampleTopic, 10, false);
+      TopicUpdateService.deleteSubtopic(_sampleTopic, 10);
     }).toThrow();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
   it('should move a skill id to a subtopic', function() {
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
-    TopicUpdateService.moveSkillIdToSubtopic(_sampleTopic, null, 1, 'skill_1');
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([]);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual([
-      'skill_2', 'skill_1'
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary
+    ]);
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 1, _firstSkillSummary);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary, _firstSkillSummary
     ]);
 
     UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary
+    ]);
+  });
+
+  it('should correctly create changelists when moving a skill to a newly ' +
+    'created subtopic that has since been deleted', function() {
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 2, _firstSkillSummary
+    );
+    TopicUpdateService.removeSkillFromSubtopic(
+      _sampleTopic, 2, _firstSkillSummary
+    );
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
+
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 2, _secondSkillSummary
+    );
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 2, 1, _secondSkillSummary
+    );
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'remove_skill_id_from_subtopic',
+      skill_id: 'skill_2',
+      subtopic_id: 1,
+      change_affects_subtopic_page: false
+    }, {
+      cmd: 'move_skill_id_to_subtopic',
+      skill_id: 'skill_2',
+      new_subtopic_id: 1,
+      old_subtopic_id: null,
+      change_affects_subtopic_page: false
+    }]);
+    UndoRedoService.clearChanges();
+
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 2, _firstSkillSummary
+    );
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 2, _secondSkillSummary
+    );
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'remove_skill_id_from_subtopic',
+      skill_id: 'skill_2',
+      subtopic_id: 1,
+      change_affects_subtopic_page: false
+    }]);
+  });
+
+  it('should create properly decrement subtopic ids of later subtopics when ' +
+    'a newly created subtopic is deleted', function() {
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 2');
+    TopicUpdateService.addSubtopic(_sampleTopic, 'Title 3');
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, 1, 3, _secondSkillSummary
+    );
+    TopicUpdateService.deleteSubtopic(_sampleTopic, 2);
+    expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+      cmd: 'add_subtopic',
+      title: 'Title 3',
+      change_affects_subtopic_page: false,
+      subtopic_id: 2
+    }, {
+      cmd: 'move_skill_id_to_subtopic',
+      old_subtopic_id: 1,
+      new_subtopic_id: 2,
+      skill_id: 'skill_2',
+      change_affects_subtopic_page: false
+    }]);
   });
 
   it('should create a proper backend change dict for moving a skill id to a ' +
     'subtopic',
   function() {
-    TopicUpdateService.moveSkillIdToSubtopic(_sampleTopic, null, 1, 'skill_1');
+    TopicUpdateService.moveSkillToSubtopic(
+      _sampleTopic, null, 1, _firstSkillSummary);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'move_skill_id_to_subtopic',
       old_subtopic_id: null,
       new_subtopic_id: 1,
-      skill_id: 'skill_1'
+      skill_id: 'skill_1',
+      change_affects_subtopic_page: false
     }]);
   });
 
@@ -425,37 +553,49 @@ describe('Topic update service', function() {
     'subtopic when an error is encountered',
   function() {
     expect(function() {
-      TopicUpdateService.moveSkillIdToSubtopic(
-        _sampleTopic, null, 1, 'skill_2');
+      TopicUpdateService.moveSkillToSubtopic(
+        _sampleTopic, null, 1, _secondSkillSummary);
     }).toThrow();
     expect(function() {
-      TopicUpdateService.moveSkillIdToSubtopic(_sampleTopic, 1, 2, 'skill_2');
+      TopicUpdateService.moveSkillToSubtopic(
+        _sampleTopic, 1, 2, _secondSkillSummary);
     }).toThrow();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
 
   it('should remove a skill id from a subtopic', function() {
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
-    TopicUpdateService.removeSkillIdFromSubtopic(_sampleTopic, 1, 'skill_2');
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual([
-      'skill_1', 'skill_2'
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
     ]);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual([]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary
+    ]);
+    TopicUpdateService.removeSkillFromSubtopic(
+      _sampleTopic, 1, _secondSkillSummary);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary, _secondSkillSummary
+    ]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([]);
 
     UndoRedoService.undoChange(_sampleTopic);
-    expect(_sampleTopic.getUncategorizedSkillIds()).toEqual(['skill_1']);
-    expect(_sampleTopic.getSubtopics()[0].getSkillIds()).toEqual(['skill_2']);
+    expect(_sampleTopic.getUncategorizedSkillSummaries()).toEqual([
+      _firstSkillSummary
+    ]);
+    expect(_sampleTopic.getSubtopics()[0].getSkillSummaries()).toEqual([
+      _secondSkillSummary
+    ]);
   });
 
   it('should create a proper backend change dict for removing a skill id ' +
     'from a subtopic',
   function() {
-    TopicUpdateService.removeSkillIdFromSubtopic(_sampleTopic, 1, 'skill_2');
+    TopicUpdateService.removeSkillFromSubtopic(
+      _sampleTopic, 1, _secondSkillSummary);
     expect(UndoRedoService.getCommittableChangeList()).toEqual([{
       cmd: 'remove_skill_id_from_subtopic',
       subtopic_id: 1,
-      skill_id: 'skill_2'
+      skill_id: 'skill_2',
+      change_affects_subtopic_page: false
     }]);
   });
 
@@ -463,7 +603,8 @@ describe('Topic update service', function() {
     'subtopic when an error is encountered',
   function() {
     expect(function() {
-      TopicUpdateService.removeSkillIdFromSubtopic(_sampleTopic, 1, 'skill_1');
+      TopicUpdateService.removeSkillFromSubtopic(
+        _sampleTopic, 1, _firstSkillSummary);
     }).toThrow();
     expect(UndoRedoService.getCommittableChangeList()).toEqual([]);
   });
@@ -484,7 +625,33 @@ describe('Topic update service', function() {
         cmd: 'update_topic_property',
         property_name: 'language_code',
         new_value: 'fi',
-        old_value: 'en'
+        old_value: 'en',
+        change_affects_subtopic_page: false
+      }]);
+    }
+  );
+
+  it('should set/unset changes to a subtopic page\'s html data', function() {
+    expect(_sampleSubtopicPage.getHtmlData()).toEqual('<p>Data</p>');
+    TopicUpdateService.setSubtopicPageHtmlData(
+      _sampleSubtopicPage, 1, '<p>New Data</p>');
+    expect(_sampleSubtopicPage.getHtmlData()).toEqual('<p>New Data</p>');
+
+    UndoRedoService.undoChange(_sampleSubtopicPage);
+    expect(_sampleSubtopicPage.getHtmlData()).toEqual('<p>Data</p>');
+  });
+
+  it('should create a proper backend change dict for changing html data',
+    function() {
+      TopicUpdateService.setSubtopicPageHtmlData(
+        _sampleSubtopicPage, 1, '<p>New Data</p>');
+      expect(UndoRedoService.getCommittableChangeList()).toEqual([{
+        cmd: 'update_subtopic_page_property',
+        property_name: 'html_data',
+        subtopic_id: 1,
+        new_value: '<p>New Data</p>',
+        old_value: '<p>Data</p>',
+        change_affects_subtopic_page: true
       }]);
     }
   );

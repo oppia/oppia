@@ -157,7 +157,7 @@ CURRENT_DASHBOARD_STATS_SCHEMA_VERSION = 1
 # incompatible changes are made to the states blob schema in the data store,
 # this version number must be changed and the exploration migration job
 # executed.
-CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 22
+CURRENT_EXPLORATION_STATES_SCHEMA_VERSION = 23
 
 # The current version of the all collection blob schemas (such as the nodes
 # structure within the Collection domain object). If any backward-incompatible
@@ -434,6 +434,10 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The maximum playback length of an audio file, in seconds.
 MAX_AUDIO_FILE_LENGTH_SEC = 300
 
+# The minimum score required for a user to review suggestions of a particular
+# category.
+MINIMUM_SCORE_REQUIRED_TO_REVIEW = 10
+
 # The prefix for an 'accepted suggestion' commit message.
 COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 
@@ -605,6 +609,9 @@ FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 FEEDBACK_THREAD_VIEW_EVENT_URL = '/feedbackhandler/thread_view_event'
 FLAG_EXPLORATION_URL_PREFIX = '/flagexplorationhandler'
 FRACTIONS_LANDING_PAGE_URL = '/fractions'
+GENERAL_SUGGESTION_ACTION_URL_PREFIX = '/generalsuggestionactionhandler'
+GENERAL_SUGGESTION_LIST_URL_PREFIX = '/generalsuggestionlisthandler'
+GENERAL_SUGGESTION_URL_PREFIX = '/generalsuggestionhandler'
 LEARNER_DASHBOARD_URL = '/learner_dashboard'
 LEARNER_DASHBOARD_DATA_URL = '/learnerdashboardhandler/data'
 LEARNER_DASHBOARD_IDS_DATA_URL = '/learnerdashboardidshandler/data'
@@ -621,7 +628,7 @@ LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 NEW_SKILL_URL = '/skill_editor_handler/create_new'
-NEW_STORY_URL = '/story_editor_handler/create_new'
+TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
 QUESTION_DATA_URL = '/questionhandler'
@@ -647,6 +654,8 @@ SUBTOPIC_PAGE_EDITOR_DATA_URL_PREFIX = '/subtopic_page_editor_handler/data'
 TOPIC_EDITOR_DATA_URL_PREFIX = '/topic_editor_handler/data'
 TOPIC_EDITOR_URL_PREFIX = '/topic_editor'
 TOPIC_MANAGER_RIGHTS_URL_PREFIX = '/rightshandler/assign_topic_manager'
+TOPIC_RIGHTS_URL_PREFIX = '/rightshandler/get_topic_rights'
+TOPIC_STATUS_URL_PREFIX = '/rightshandler/change_topic_status'
 TOPICS_AND_SKILLS_DASHBOARD_DATA_URL = '/topics_and_skills_dashboard/data'
 TOPICS_AND_SKILLS_DASHBOARD_URL = '/topics_and_skills_dashboard'
 TRANSLATION_DATA_PREFIX = '/createhandler/translate'
@@ -668,9 +677,11 @@ NAV_MODE_LIBRARY = 'library'
 NAV_MODE_PROFILE = 'profile'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
+NAV_MODE_STORY_EDITOR = 'story_editor'
 NAV_MODE_TEACH = 'teach'
 NAV_MODE_THANKS = 'thanks'
 NAV_MODE_TOPICS_AND_SKILLS_DASHBOARD = 'topics_and_skills_dashboard'
+NAV_MODE_TOPIC_EDITOR = 'topic_editor'
 
 # Event types.
 EVENT_TYPE_ALL_STATS = 'all_stats'
@@ -707,7 +718,7 @@ COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
 COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
-ENABLE_PLAYTHROUGHS = False
+ENABLE_PLAYTHROUGHS = True
 # Threshold for early quit playthrough.
 EARLY_QUIT_THRESHOLD_IN_SECS = 45
 # Threshold for multiple incorrect answers playthrough.
@@ -896,6 +907,10 @@ QUESTION_BATCH_SIZE = 10
 
 STATE_ANSWER_STATS_MIN_FREQUENCY = 2
 
+RTE_FORMAT_TEXTANGULAR = 'text-angular'
+
+RTE_FORMAT_CKEDITOR = 'ck-editor'
+
 # RTE content specifications according to the type of the editor.
 RTE_CONTENT_SPEC = {
     'RTE_TYPE_TEXTANGULAR': {
@@ -935,5 +950,46 @@ RTE_CONTENT_SPEC = {
             'oppia-noninteractive-video',
             'oppia-noninteractive-tabs'
         ]
+    },
+    'RTE_TYPE_CKEDITOR': {
+        # Valid parent-child relation in CKEditor.
+        'ALLOWED_PARENT_LIST': {
+            'p': ['blockquote', '[document]', 'li'],
+            'strong': ['em', 'li', 'p', 'pre'],
+            'em': ['strong', 'li', 'p', 'pre'],
+            'br': ['strong', 'em', 'li', 'p'],
+            'li': ['ol', 'ul'],
+            'ol': ['li', 'blockquote', 'pre', '[document]'],
+            'ul': ['li', 'blockquote', 'pre', '[document]'],
+            'pre': ['ol', 'ul', 'blockquote', 'li', '[document]'],
+            'blockquote': ['blockquote', '[document]'],
+            'oppia-noninteractive-link': ['strong', 'em', 'li', 'p', 'pre'],
+            'oppia-noninteractive-math': ['strong', 'em', 'li', 'p', 'pre'],
+            'oppia-noninteractive-image': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-collapsible': [
+                'blockquote', 'li', '[document]'
+            ],
+            'oppia-noninteractive-video': ['blockquote', 'li', '[document]'],
+            'oppia-noninteractive-tabs': ['blockquote', 'li', '[document]']
+        },
+        # Valid html tags in CKEditor.
+        'ALLOWED_TAG_LIST': [
+            'p',
+            'strong',
+            'br',
+            'em',
+            'li',
+            'ol',
+            'ul',
+            'pre',
+            'blockquote',
+            'oppia-noninteractive-link',
+            'oppia-noninteractive-math',
+            'oppia-noninteractive-image',
+            'oppia-noninteractive-collapsible',
+            'oppia-noninteractive-video',
+            'oppia-noninteractive-tabs'
+        ]
+
     }
 }

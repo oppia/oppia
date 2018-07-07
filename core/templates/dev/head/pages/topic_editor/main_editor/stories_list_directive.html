@@ -1,0 +1,75 @@
+<table class="dashboard-table">
+  <colgroup>
+    <col style="width: 50%;">
+    <col style="width: 50%;">
+  </colgroup>
+  <tr>
+    <th ng-repeat="key in STORY_TABLE_COLUMN_HEADINGS"
+        class="dashboard-table-headings">
+      <p ng-if="key === 'title'"> Title </p>
+      <p ng-if="key === 'node_count'"> Node Count </p>
+    </th>
+  </tr>
+  <tr ng-repeat="story in storySummaries"
+      class="list-item">
+    <td>
+      <a ng-click="openStoryEditor(story.id)" class="list-summary">
+        <span> <[story.title]> </span>
+      </a>
+    </td>
+    <td>
+      <a ng-click="openStoryEditor(story.id)" class="list-summary">
+        <span> <[story.node_count]> </span>
+      </a>
+    </td>
+    <td>
+      <span ng-click="deleteCanonicalStory(story.id)" class="fa fa-trash list-summary"> </span>
+    </td>
+  </tr>
+</table>
+
+<style>
+  stories-list .list-view-item {
+    background: #fff;
+    margin: 20px 7.5px 0 12.5%;
+    padding: 10px 20px;
+    width: 75%;
+  }
+
+  stories-list .dashboard-table {
+    font-size: 15px;
+    width: 100%;
+  }
+
+  stories-list .dashboard-table .dashboard-table-headings {
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 0.7em;
+  }
+
+  stories-list .dashboard-table .dashboard-table-headings p {
+    display: inline;
+  }
+
+  stories-list .list-summary,
+  stories-list .list-summary:active,
+  stories-list .list-summary:visited {
+    color: inherit;
+    display: block;
+    height: 2em;
+    text-decoration: none;
+  }
+
+  stories-list .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  stories-list .list-item:hover {
+    background-color: #ededed;
+  }
+
+  stories-list .list-summary span {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+  }
+</style>

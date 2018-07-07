@@ -58,6 +58,8 @@ class SkillModel(base_models.VersionedModel):
         required=True, indexed=True)
     # A dict representing the skill contents.
     skill_contents = ndb.JsonProperty(indexed=False)
+    # The id to be used by the next misconception added.
+    next_misconception_id = ndb.IntegerProperty(required=True, indexed=False)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -139,6 +141,8 @@ class SkillSummaryModel(base_models.BaseModel):
     description = ndb.StringProperty(required=True, indexed=True)
     # The number of misconceptions associated with the skill.
     misconception_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The number of worked examples in the skill.
+    worked_examples_count = ndb.IntegerProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this skill is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # Time when the skill model was last updated (not to be

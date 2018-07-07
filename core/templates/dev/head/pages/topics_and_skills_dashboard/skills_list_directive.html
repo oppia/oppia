@@ -1,0 +1,81 @@
+<md-card layout="row" class="list-view-item">
+  <table class="dashboard-table">
+    <colgroup>
+      <col style="width: 50%;">
+      <col style="width: 25%;">
+      <col style="width: 25%;">
+    </colgroup>
+    <tr>
+      <th ng-repeat="key in SKILL_HEADINGS"
+          class="dashboard-table-headings">
+        <p ng-if="key === 'description'"> Skill Description </p>
+        <p ng-if="key === 'worked_examples_count'"> Worked Examples </p>
+        <p ng-if="key === 'misconception_count'"> Misconceptions </p>
+      </th>
+    </tr>
+    <tr ng-repeat="skill in getSkillSummaries()"
+        class="list-item">
+      <td>
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+          <span> <[skill.description]> </span>
+        </a>
+      </td>
+      <td>
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+          <span> <[skill.worked_examples_count]> </span>
+        </a>
+      </td>
+      <td>
+        <a ng-href="<[getSkillEditorUrl(skill.id)]>" class="list-summary">
+          <span> <[skill.misconception_count]> </span>
+        </a>
+      </td>
+    </tr>
+  </table>
+</md-card>
+
+<style>
+  skills-list .list-view-item {
+    background: #fff;
+    margin: 20px 7.5px 0 12.5%;
+    padding: 10px 20px;
+    width: 75%;
+  }
+
+  skills-list .dashboard-table {
+    font-size: 15px;
+    width: 100%;
+  }
+
+  skills-list .dashboard-table .dashboard-table-headings {
+    border-bottom: 2px solid #bbb;
+    padding-bottom: 0.7em;
+  }
+
+  skills-list .dashboard-table .dashboard-table-headings p {
+    display: inline;
+  }
+
+  skills-list .list-summary,
+  skills-list .list-summary:active,
+  skills-list .list-summary:visited {
+    color: inherit;
+    display: block;
+    height: 2em;
+    text-decoration: none;
+  }
+
+  skills-list .list-item:not(:last-child) {
+    border-bottom: 1px solid #bbb;
+  }
+
+  skills-list .list-item:hover {
+    background-color: #ededed;
+  }
+
+  skills-list .list-summary span {
+    display: inline-block;
+    line-height: normal;
+    vertical-align: middle;
+  }
+</style>

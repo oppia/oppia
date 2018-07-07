@@ -753,55 +753,58 @@ var expectCannotAddResponse = function() {
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
   general.scrollToTop();
-  element.all(by.css('.protractor-test-node')).map(function(stateElement) {
-    return stateElement.element(by.css('.protractor-test-node-label')).
-      getText();
-  }).then(function(listOfNames) {
-    var matched = false;
-    for (var i = 0; i < listOfNames.length; i++) {
-      if (listOfNames[i] === targetName) {
-        element.all(by.css('.protractor-test-node')).get(i).click();
-        matched = true;
-        general.waitForSystem();
+  element(by.css('.protractor-test-exploration-graph'))
+    .all(by.css('.protractor-test-node')).map(function(stateElement) {
+      return stateElement.element(by.css('.protractor-test-node-label')).
+        getText();
+    }).then(function(listOfNames) {
+      var matched = false;
+      for (var i = 0; i < listOfNames.length; i++) {
+        if (listOfNames[i] === targetName) {
+          element.all(by.css('.protractor-test-node')).get(i).click();
+          matched = true;
+          general.waitForSystem();
+        }
       }
-    }
-    if (!matched) {
-      throw Error('State ' + targetName + ' not found by editor.moveToState');
-    }
-  });
+      if (!matched) {
+        throw Error('State ' + targetName + ' not found by editor.moveToState');
+      }
+    });
 };
 
 var deleteState = function(stateName) {
   general.waitForSystem();
-  element.all(by.css('.protractor-test-node')).map(function(stateElement) {
-    return stateElement.element(by.css('.protractor-test-node-label')).
-      getText();
-  }).then(function(listOfNames) {
-    var matched = false;
-    for (var i = 0; i < listOfNames.length; i++) {
-      if (listOfNames[i] === stateName) {
-        element.all(by.css('.protractor-test-node')).get(i).
-          element(by.css('.protractor-test-delete-node')).click();
-        browser.waitForAngular();
-        general.waitForSystem();
-        element(by.css('.protractor-test-confirm-delete-state')).click();
-        matched = true;
+  element(by.css('.protractor-test-exploration-graph'))
+    .all(by.css('.protractor-test-node')).map(function(stateElement) {
+      return stateElement.element(by.css('.protractor-test-node-label')).
+        getText();
+    }).then(function(listOfNames) {
+      var matched = false;
+      for (var i = 0; i < listOfNames.length; i++) {
+        if (listOfNames[i] === stateName) {
+          element.all(by.css('.protractor-test-node')).get(i).
+            element(by.css('.protractor-test-delete-node')).click();
+          browser.waitForAngular();
+          general.waitForSystem();
+          element(by.css('.protractor-test-confirm-delete-state')).click();
+          matched = true;
+        }
       }
-    }
-    if (!matched) {
-      throw Error('State ' + stateName + ' not found by editor.deleteState');
-    }
-  });
+      if (!matched) {
+        throw Error('State ' + stateName + ' not found by editor.deleteState');
+      }
+    });
 };
 
 // For this to work, there must be more than one name, otherwise the
 // exploration overview will be disabled.
 var expectStateNamesToBe = function(names) {
-  element.all(by.css('.protractor-test-node')).map(function(stateNode) {
-    return stateNode.element(by.css('.protractor-test-node-label')).getText();
-  }).then(function(stateNames) {
-    expect(stateNames.sort()).toEqual(names.sort());
-  });
+  element(by.css('.protractor-test-exploration-graph'))
+    .all(by.css('.protractor-test-node')).map(function(stateNode) {
+      return stateNode.element(by.css('.protractor-test-node-label')).getText();
+    }).then(function(stateNames) {
+      expect(stateNames.sort()).toEqual(names.sort());
+    });
 };
 
 // SETTINGS
@@ -1163,6 +1166,7 @@ var revertToVersion = function(version) {
 // Wrapper for functions involving the feedback tab
 var _runFromFeedbackTab = function(callbackFunction) {
   element(by.css('.protractor-test-feedback-tab')).click();
+  general.waitForSystem();
   var result = callbackFunction();
   general.waitForSystem();
   element(by.css('.protractor-test-main-tab')).click();
@@ -1200,6 +1204,7 @@ var acceptSuggestion = function(suggestionDescription) {
       matchingSuggestionRows[0].click();
       general.waitForSystem();
       element(by.css('.protractor-test-view-suggestion-btn')).click();
+      general.waitForSystem();
       element(by.css('.protractor-test-exploration-accept-suggestion-btn')).
         click();
     });

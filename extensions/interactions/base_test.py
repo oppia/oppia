@@ -94,8 +94,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             if ca_spec['schema']['type'] == 'custom':
                 obj_class = obj_services.Registry.get_object_class_by_type(
                     ca_spec['schema']['obj_type'])
-                self.assertIsNotNone(obj_class.edit_html_filename)
-                self.assertIsNotNone(obj_class.edit_js_filename)
                 self.assertEqual(
                     ca_spec['default_value'],
                     obj_class.normalize(ca_spec['default_value']))
@@ -153,7 +151,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'is_linear', 'rule_descriptions', 'instructions',
             'narrow_instructions', 'needs_summary',
             'default_outcome_heading', 'can_have_solution',
-            'show_generic_submit_button'])
+            'show_generic_submit_button', 'answer_type'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(
             interaction_dict['customization_arg_specs'], [{
@@ -428,7 +426,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
 
             # Check that the rules for this interaction have object editor
             # templates and default values.
-            for rule_name, rule_dict in interaction.rules_dict.iteritems():
+            for rule_name in interaction.rules_dict.keys():
                 param_list = interaction.get_rule_param_list(rule_name)
 
                 for (_, param_obj_cls) in param_list:
@@ -438,11 +436,6 @@ class InteractionUnitTests(test_utils.GenericTestBase):
                             'ListOfCoordTwoDim', 'ListOfGraph',
                             'SetOfNormalizedString']:
                         continue
-
-                    # Check that the rule has an object editor template.
-                    self.assertTrue(
-                        param_obj_cls.has_editor_js_template(),
-                        msg='(%s)' % rule_dict['description'])
 
                     # Check that the rule has a default value.
                     self.assertIn(

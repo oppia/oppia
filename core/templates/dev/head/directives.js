@@ -21,12 +21,12 @@
 // custom directive tags in the provided value.
 oppia.directive('angularHtmlBind', ['$compile', function($compile) {
   return {
-    restrict: 'A',
+    restrict: 'E',
     link: function(scope, elm, attrs) {
       // Clean up old scopes if the html changes.
       // Reference: https://stackoverflow.com/a/42927814
       var newScope;
-      scope.$watch(attrs.angularHtmlBind, function(newValue) {
+      scope.$watch(attrs.htmlData, function(newValue) {
         if (newScope) {
           newScope.$destroy();
         }
@@ -41,10 +41,10 @@ oppia.directive('angularHtmlBind', ['$compile', function($compile) {
 
 oppia.directive('mathjaxBind', [function() {
   return {
-    restrict: 'A',
+    restrict: 'E',
     controller: [
       '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.$watch($attrs.mathjaxBind, function(value) {
+        $scope.$watch($attrs.mathjaxData, function(value) {
           var $script = angular.element(
             '<script type="math/tex">'
           ).html(value === undefined ? '' : value);
@@ -60,7 +60,7 @@ oppia.directive('mathjaxBind', [function() {
 // Highlights the text of an input field when it is clicked.
 oppia.directive('selectOnClick', [function() {
   return {
-    restrict: 'A',
+    restrict: 'E',
     link: function(scope, elm) {
       elm.bind('click', function() {
         this.select();
@@ -74,7 +74,7 @@ oppia.directive('selectOnClick', [function() {
 oppia.directive('customPopover', [
   'UrlInterpolationService', '$sce', function(UrlInterpolationService, $sce) {
     return {
-      restrict: 'A',
+      restrict: 'E',
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/custom_popover_directive.html'),
       link: function(scope, elt, attrs) {
@@ -130,7 +130,7 @@ oppia.directive('focusOn', [
 
 oppia.directive('mobileFriendlyTooltip', ['$timeout', function($timeout) {
   return {
-    restrict: 'A',
+    restrict: 'E',
     scope: {},
     controller: ['$scope', 'DeviceInfoService', function(
         $scope, DeviceInfoService) {

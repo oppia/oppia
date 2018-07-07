@@ -37,7 +37,7 @@ describe('Editable topic backend API service', function() {
 
     // Sample topic object returnable from the backend
     sampleDataResults = {
-      topic: {
+      topic_dict: {
         id: '0',
         name: 'Topic Name',
         description: 'Topic Description',
@@ -46,6 +46,15 @@ describe('Editable topic backend API service', function() {
         additional_story_ids: ['story_id_2'],
         uncategorized_skill_ids: ['skill_id_1'],
         subtopics: [],
+        language_code: 'en'
+      },
+      skill_id_to_description_dict: {
+        skill_id_1: 'Description 1'
+      },
+      subtopic_page: {
+        id: 'topicId-1',
+        topicId: 'topicId',
+        html_data: '<p>Data</p>',
         language_code: 'en'
       }
     };
@@ -67,7 +76,28 @@ describe('Editable topic backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleDataResults.topic);
+      expect(successHandler).toHaveBeenCalledWith({
+        topicDict: sampleDataResults.topic_dict,
+        skillIdToDescriptionDict: sampleDataResults.skill_id_to_description_dict
+      });
+      expect(failHandler).not.toHaveBeenCalled();
+    }
+  );
+
+  it('should successfully fetch an existing subtopic page from the backend',
+    function() {
+      var successHandler = jasmine.createSpy('success');
+      var failHandler = jasmine.createSpy('fail');
+
+      $httpBackend.expect(
+        'GET', '/subtopic_page_editor_handler/data/topicId/1').respond(
+        sampleDataResults);
+      EditableTopicBackendApiService.fetchSubtopicPage('topicId', 1).then(
+        successHandler, failHandler);
+      $httpBackend.flush();
+
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleDataResults.subtopic_page);
       expect(failHandler).not.toHaveBeenCalled();
     }
   );
@@ -99,14 +129,17 @@ describe('Editable topic backend API service', function() {
 
       EditableTopicBackendApiService.fetchTopic('0').then(
         function(data) {
-          topic = data;
+          topic = data.topicDict;
         });
       $httpBackend.flush();
 
       topic.name = 'New Name';
       topic.version = '2';
       var topicWrapper = {
-        topic: topic
+        topic_dict: topic,
+        skill_id_to_description_dict: {
+          skill_id_1: 'Description 1'
+        }
       };
 
       $httpBackend.expect('PUT', '/topic_editor_handler/data/0').respond(
@@ -118,7 +151,10 @@ describe('Editable topic backend API service', function() {
       ).then(successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(topic);
+      expect(successHandler).toHaveBeenCalledWith({
+        topicDict: topic,
+        skillIdToDescriptionDict: sampleDataResults.skill_id_to_description_dict
+      });
       expect(failHandler).not.toHaveBeenCalled();
     }
   );

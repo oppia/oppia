@@ -344,7 +344,7 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-editor-card">
+  <md-card class="oppia-editor-card" ng-if="EditabilityService.isEditable()">
     <h3>Feedback/Suggestion Email Preferences</h3>
     <div class="row">
       <div class="row">
@@ -471,7 +471,9 @@
     <h3>
       Initial parameter changes
       <i class="material-icons md-18" uib-tooltip="These changes are applied before the learner begins the exploration."
-         tooltip-placement="right" style="padding-left: 4px; vertical-align: text-top;">&#xE88E;</i>
+         tooltip-placement="right" style="padding-left: 4px; vertical-align: text-top;">
+        &#xE88E;
+      </i>
     </h3>
 
     <div class="row">

@@ -18,6 +18,7 @@ from core.domain import skill_domain
 from core.domain import skill_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -27,8 +28,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     SKILL_ID = None
     USER_ID = 'user'
-    MISCONCEPTION_ID_1 = 'misconception_id_1'
-    MISCONCEPTION_ID_2 = 'misconception_id_2'
+    MISCONCEPTION_ID_1 = 1
+    MISCONCEPTION_ID_2 = 2
 
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
@@ -48,6 +49,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
+        self.assertEqual(skill_summary.worked_examples_count, 1)
 
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()
@@ -69,6 +71,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
+        self.assertEqual(skill_summary.worked_examples_count, 1)
 
     def test_get_all_skill_summaries(self):
         skill_summaries = skill_services.get_all_skill_summaries()
@@ -77,6 +80,43 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summaries[0].id, self.SKILL_ID)
         self.assertEqual(skill_summaries[0].description, 'Description')
         self.assertEqual(skill_summaries[0].misconception_count, 1)
+        self.assertEqual(skill_summaries[0].worked_examples_count, 1)
+
+    def test_get_skill_descriptions_by_ids(self):
+        self.save_new_skill(
+            'skill_2', self.USER_ID, 'Description 2', [],
+            skill_domain.SkillContents('Explanation', ['Example 1'])
+        )
+        self.save_new_skill(
+            'skill_3', self.USER_ID, 'Description 3', [],
+            skill_domain.SkillContents('Explanation', ['Example 1'])
+        )
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            skill_descriptions = skill_services.get_skill_descriptions_by_ids(
+                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+
+            skill_services.delete_skill(self.USER_ID, 'skill_2')
+            skill_descriptions = skill_services.get_skill_descriptions_by_ids(
+                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: skill_2 are still'
+                ' present in topic with id topic_id')
+            self.assertEqual(len(messages), 1)
+            self.assertIn(
+                expected_email_html_body,
+                messages[0].html.decode())
+            self.assertEqual(
+                skill_descriptions, {
+                    self.SKILL_ID: 'Description',
+                    'skill_2': None,
+                    'skill_3': 'Description 3'
+                }
+            )
 
     def test_get_skill_by_id(self):
         expected_skill = self.skill.to_dict()
@@ -102,14 +142,19 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
-                'id': self.MISCONCEPTION_ID_2
+                'new_misconception_dict': {
+                    'id': 0,
+                    'name': 'test name',
+                    'notes': 'test notes',
+                    'feedback': 'test feedback'
+                }
             }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
-                'id': self.MISCONCEPTION_ID_2,
-                'old_value': '',
+                'id': 0,
+                'old_value': 'test name',
                 'new_value': 'Name'
             })
         ]

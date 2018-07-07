@@ -28,6 +28,8 @@ import utils
 
 CMD_CREATE_NEW = 'create_new'
 CMD_CHANGE_ROLE = 'change_role'
+CMD_PUBLISH_TOPIC = 'publish_topic'
+CMD_UNPUBLISH_TOPIC = 'unpublish_topic'
 
 ROLE_MANAGER = 'manager'
 ROLE_NONE = 'none'
@@ -137,6 +139,62 @@ class TopicChange(object):
         return topic_change_dict
 
 
+class TopicRightsChange(object):
+    """Domain object for changes made to a topic rights object."""
+
+    OPTIONAL_CMD_ATTRIBUTE_NAMES = [
+        'assignee_id', 'new_role', 'old_role'
+    ]
+
+    def __init__(self, change_dict):
+        """Initialize a TopicRightsChange object from a dict.
+
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd'
+                key, and one or more other keys. The keys depend on what the
+                value for 'cmd' is. The possible values for 'cmd' are listed
+                below, together with the other keys in the dict:
+                - 'change_role' (with assignee_id, new_role and old_role)
+                - 'create_new'
+                - 'publish_topic'
+                - 'unpublish_topic'
+
+        Raises:
+            Exception: The given change dict is not valid.
+        """
+        if 'cmd' not in change_dict:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == CMD_CHANGE_ROLE:
+            self.assignee_id = change_dict['assignee_id']
+            self.new_role = change_dict['new_role']
+            self.old_role = change_dict['old_role']
+        elif self.cmd == CMD_CREATE_NEW:
+            pass
+        elif self.cmd == CMD_PUBLISH_TOPIC:
+            pass
+        elif self.cmd == CMD_UNPUBLISH_TOPIC:
+            pass
+        else:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the TopicRightsChange domain object.
+
+        Returns:
+            A dict, mapping all fields of TopicRightsChange instance.
+        """
+        topic_rights_change_dict = {}
+        topic_rights_change_dict['cmd'] = self.cmd
+        for attribute_name in self.OPTIONAL_CMD_ATTRIBUTE_NAMES:
+            if hasattr(self, attribute_name):
+                topic_rights_change_dict[attribute_name] = getattr(
+                    self, attribute_name)
+
+        return topic_rights_change_dict
+
+
 class Subtopic(object):
     """Domain object for a Subtopic."""
 
@@ -219,11 +277,9 @@ class Subtopic(object):
                     'Expected each skill id to be a string, received %s' %
                     skill_id)
 
-        for skill_id in self.skill_ids:
-            if self.skill_ids.count(skill_id) > 1:
-                raise utils.ValidationError(
-                    'The skill id %s is duplicated in the subtopic %s.'
-                    % (skill_id, self.id))
+        if len(self.skill_ids) > len(set(self.skill_ids)):
+            raise utils.ValidationError(
+                'Expected all skill ids to be distinct.')
 
 
 class Topic(object):
@@ -321,6 +377,18 @@ class Topic(object):
 
         if name == '':
             raise utils.ValidationError('Name field should not be empty')
+
+    def get_all_skill_ids(self):
+        """Returns all the ids of all the skills present in the topic.
+
+        Returns:
+            list(str). The list of all the skill ids present in the topic.
+        """
+        skill_ids = copy.deepcopy(self.uncategorized_skill_ids)
+
+        for subtopic in self.subtopics:
+            skill_ids.extend(copy.deepcopy(subtopic.skill_ids))
+        return skill_ids
 
     def delete_story(self, story_id):
         """Removes a story from the canonical_story_ids list.
@@ -718,8 +786,8 @@ class TopicSummary(object):
     def __init__(
             self, topic_id, name, language_code, version,
             canonical_story_count, additional_story_count,
-            uncategorized_skill_count, subtopic_count, topic_model_created_on,
-            topic_model_last_updated):
+            uncategorized_skill_count, subtopic_count, total_skill_count,
+            topic_model_created_on, topic_model_last_updated):
         """Constructs a TopicSummary domain object.
 
         Args:
@@ -734,6 +802,8 @@ class TopicSummary(object):
             uncategorized_skill_count: int. The number of uncategorized skills
                 in the topic.
             subtopic_count: int. The number of subtopics in the topic.
+            total_skill_count: int. The total number of skills in the topic
+                (including those that are uncategorized).
             topic_model_created_on: datetime.datetime. Date and time when
                 the topic model is created.
             topic_model_last_updated: datetime.datetime. Date and time
@@ -747,6 +817,7 @@ class TopicSummary(object):
         self.additional_story_count = additional_story_count
         self.uncategorized_skill_count = uncategorized_skill_count
         self.subtopic_count = subtopic_count
+        self.total_skill_count = total_skill_count
         self.topic_model_created_on = topic_model_created_on
         self.topic_model_last_updated = topic_model_last_updated
 
@@ -765,6 +836,7 @@ class TopicSummary(object):
             'additional_story_count': self.additional_story_count,
             'uncategorized_skill_count': self.uncategorized_skill_count,
             'subtopic_count': self.subtopic_count,
+            'total_skill_count': self.total_skill_count,
             'topic_model_created_on': utils.get_time_in_millisecs(
                 self.topic_model_created_on),
             'topic_model_last_updated': utils.get_time_in_millisecs(
@@ -775,9 +847,19 @@ class TopicSummary(object):
 class TopicRights(object):
     """Domain object for topic rights."""
 
-    def __init__(self, topic_id, manager_ids):
+    def __init__(self, topic_id, manager_ids, topic_is_published):
+        """Constructs a TopicRights domain object.
+
+        Args:
+            topic_id: str. The id of the topic.
+            manager_ids: list(str). The id of the users who have been assigned
+                as managers for the topic.
+            topic_is_published: bool. Whether the topic is viewable by a
+                learner.
+        """
         self.id = topic_id
         self.manager_ids = manager_ids
+        self.topic_is_published = topic_is_published
 
     def to_dict(self):
         """Returns a dict suitable for use by the frontend.
@@ -789,7 +871,8 @@ class TopicRights(object):
         return {
             'topic_id': self.id,
             'manager_names': user_services.get_human_readable_user_ids(
-                self.manager_ids)
+                self.manager_ids),
+            'topic_is_published': self.topic_is_published
         }
 
     def is_manager(self, user_id):

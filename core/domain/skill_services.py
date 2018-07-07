@@ -18,6 +18,7 @@
 import copy
 import logging
 
+from core.domain import email_manager
 from core.domain import skill_domain
 from core.platform import models
 import feconf
@@ -153,8 +154,8 @@ def get_skill_from_model(skill_model, run_conversion=True):
         versioned_misconceptions['schema_version'],
         versioned_skill_contents['schema_version'],
         skill_model.language_code,
-        skill_model.version, skill_model.created_on,
-        skill_model.last_updated)
+        skill_model.version, skill_model.next_misconception_id,
+        skill_model.created_on, skill_model.last_updated)
 
 
 def get_all_skill_summaries():
@@ -164,10 +165,10 @@ def get_all_skill_summaries():
         list(SkillSummary). The list of summaries of all skills present in the
             datastore.
     """
-    skill_summary_dicts_models = skill_models.SkillSummaryModel.get_all()
+    skill_summaries_models = skill_models.SkillSummaryModel.get_all()
     skill_summaries = [
         get_skill_summary_from_model(summary)
-        for summary in skill_summary_dicts_models]
+        for summary in skill_summaries_models]
     return skill_summaries
 
 
@@ -186,6 +187,7 @@ def get_skill_summary_from_model(skill_summary_model):
         skill_summary_model.language_code,
         skill_summary_model.version,
         skill_summary_model.misconception_count,
+        skill_summary_model.worked_examples_count,
         skill_summary_model.skill_model_created_on,
         skill_summary_model.skill_model_last_updated
     )
@@ -245,6 +247,45 @@ def get_skill_summary_by_id(skill_id, strict=True):
         return None
 
 
+def get_skill_descriptions_by_ids(topic_id, skill_ids):
+    """Returns a list of skill descriptions corresponding to given skill ids.
+
+    Args:
+        topic_id: str. The id of the topic that these skills are a part of.
+        skill_ids: list(str). The list of skill ids.
+
+    Returns:
+        dict. The skill descriptions of skills keyed by their corresponding ids.
+    """
+    skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
+    skill_id_to_description_dict = {}
+
+    for skill_summary_model in skill_summary_models:
+        if skill_summary_model is not None:
+            skill_id_to_description_dict[skill_summary_model.id] = (
+                skill_summary_model.description)
+
+    deleted_skill_ids = []
+    for skill_id in skill_ids:
+        if skill_id not in skill_id_to_description_dict:
+            skill_id_to_description_dict[skill_id] = None
+            deleted_skill_ids.append(skill_id)
+
+    if deleted_skill_ids:
+        deleted_skills_string = ', '.join(deleted_skill_ids)
+        logging.error(
+            'The deleted skills: %s are still present in topic with id %s'
+            % (deleted_skills_string, topic_id)
+        )
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_mail_to_admin(
+                'Deleted skills present in topic',
+                'The deleted skills: %s are still present in topic with id %s'
+                % (deleted_skills_string, topic_id))
+
+    return skill_id_to_description_dict
+
+
 def get_new_skill_id():
     """Returns a new skill id.
 
@@ -273,6 +314,7 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
             for misconception in skill.misconceptions
         ],
         skill_contents=skill.skill_contents.to_dict(),
+        next_misconception_id=skill.next_misconception_id,
         misconceptions_schema_version=skill.misconceptions_schema_version,
         skill_contents_schema_version=skill.skill_contents_schema_version
     )
@@ -329,7 +371,7 @@ def apply_change_list(skill_id, change_list):
                 else:
                     raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
-                skill.add_misconception(change.misconception_id)
+                skill.add_misconception(change.new_value)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
             elif (change.cmd ==
@@ -496,9 +538,13 @@ def compute_summary_of_skill(skill):
         SkillSummary. The computed summary for the given skill.
     """
     skill_model_misconception_count = len(skill.misconceptions)
+    skill_model_worked_examples_count = len(
+        skill.skill_contents.worked_examples)
+
     skill_summary = skill_domain.SkillSummary(
         skill.id, skill.description, skill.language_code,
         skill.version, skill_model_misconception_count,
+        skill_model_worked_examples_count,
         skill.created_on, skill.last_updated
     )
 
@@ -530,6 +576,7 @@ def save_skill_summary(skill_summary):
         language_code=skill_summary.language_code,
         version=skill_summary.version,
         misconception_count=skill_summary.misconception_count,
+        worked_examples_count=skill_summary.worked_examples_count,
         skill_model_last_updated=(
             skill_summary.skill_model_last_updated),
         skill_model_created_on=(

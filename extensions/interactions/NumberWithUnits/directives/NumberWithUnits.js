@@ -26,10 +26,10 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'NumberWithUnitsObjectFactory',
+        '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
         'numberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
         'EVENT_PROGRESS_NAV_SUBMITTED', function(
-            $scope, $attrs, NumberWithUnitsObjectFactory,
+            $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
             numberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
             EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
@@ -46,6 +46,10 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
           $scope.getWarningText = function() {
             return errorMessage;
           };
+
+          try {
+            NumberWithUnitsObjectFactory.createCurrencyUnits();
+          } catch (parsingError) {}
 
           $scope.$watch('answer', function(newValue) {
             try {
@@ -92,8 +96,24 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
               answerValidity: $scope.isAnswerValid()
             });
           });
-        }
-      ]
+
+          $scope.showHelp = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/interactions/NumberWithUnits/directives/' +
+                'number_with_units_help_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.close = function() {
+                    $uibModalInstance.close();
+                  };
+                }
+              ]
+            }).result.then(function() {});
+          };
+        }]
     };
   }
 ]);
@@ -140,10 +160,24 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
 oppia.factory('numberWithUnitsRulesService', [
   'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
   function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
+    try {
+      NumberWithUnitsObjectFactory.createCurrencyUnits();
+    } catch (parsingError) {}
+
     return {
       IsEqualTo: function(answer, inputs) {
         // Returns true only if input is exactly equal to answer.
-        return angular.equals(answer, inputs.f);
+        answer = NumberWithUnitsObjectFactory.fromDict(answer);
+        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
+
+        answerString = answer.toMathjsCompatibleString();
+        inputsString = inputs.toMathjsCompatibleString();
+
+        answerList = NumberWithUnitsObjectFactory.fromRawInputString(
+          answerString).toDict();
+        inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
+          inputsString).toDict();
+        return angular.equals(answerList, inputsList);
       },
       IsEquivalentTo: function(answer, inputs) {
         answer = NumberWithUnitsObjectFactory.fromDict(answer);
@@ -156,8 +190,8 @@ oppia.factory('numberWithUnitsRulesService', [
           inputs.type = 'real';
           inputs.real = inputs.fraction.toFloat();
         }
-        answerString = answer.toString();
-        inputsString = inputs.toString();
+        answerString = answer.toMathjsCompatibleString();
+        inputsString = inputs.toMathjsCompatibleString();
         return math.unit(answerString).equals(math.unit(inputsString));
       }
     };

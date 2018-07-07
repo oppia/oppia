@@ -41,6 +41,7 @@ from core.controllers import resources
 from core.controllers import skill_editor
 from core.controllers import story_editor
 from core.controllers import subscriptions
+from core.controllers import suggestion
 from core.controllers import topic_editor
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import translator
@@ -216,7 +217,8 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s' % feconf.NEW_SKILL_URL,
         topics_and_skills_dashboard.NewSkillHandler),
     get_redirect_route(
-        r'%s/<topic_id>' % feconf.NEW_STORY_URL, topic_editor.NewStoryHandler),
+        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
+        topic_editor.TopicEditorStoryHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),
@@ -258,9 +260,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/audiohandler/<exploration_id>/audio/<filename>',
         resources.AudioHandler),
-    get_redirect_route(
-        r'/object_editor_template/<obj_type>',
-        resources.ObjectEditorTemplateHandler),
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler),
@@ -386,9 +385,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
     get_redirect_route(
-        r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
-        editor.UntrainedAnswersHandler),
-    get_redirect_route(
         r'/createhandler/resource_list/<exploration_id>',
         editor.ExplorationResourcesHandler),
     get_redirect_route(
@@ -454,6 +450,22 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<exploration_id>' % feconf.SUGGESTION_URL_PREFIX,
         feedback.SuggestionHandler),
     get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' %
+        feconf.SUGGESTION_ACTION_URL_PREFIX, feedback.SuggestionActionHandler),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
+        feedback.SuggestionListHandler),
+    get_redirect_route(
+        r'%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX,
+        suggestion.SuggestionHandler),
+    get_redirect_route(
+        r'%s/exploration/<exploration_id>/<suggestion_id>' %
+        feconf.GENERAL_SUGGESTION_ACTION_URL_PREFIX,
+        suggestion.SuggestionToExplorationActionHandler),
+    get_redirect_route(
+        r'%s' % feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
+        suggestion.SuggestionListHandler),
+    get_redirect_route(
         r'%s' % feconf.SUBSCRIBE_URL_PREFIX,
         subscriptions.SubscribeHandler),
     get_redirect_route(
@@ -462,14 +474,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FLAG_EXPLORATION_URL_PREFIX,
         reader.FlagExplorationHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>' %
-        feconf.SUGGESTION_ACTION_URL_PREFIX,
-        feedback.SuggestionActionHandler),
-    get_redirect_route(
-        r'%s/<exploration_id>' % feconf.SUGGESTION_LIST_URL_PREFIX,
-        feedback.SuggestionListHandler),
-
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_URL_PREFIX,
         collection_viewer.CollectionPage),
@@ -513,6 +517,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_id>/<assignee_id>' % feconf.TOPIC_MANAGER_RIGHTS_URL_PREFIX,
         topic_editor.TopicManagerRightsHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_RIGHTS_URL_PREFIX,
+        topic_editor.TopicRightsHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_STATUS_URL_PREFIX,
+        topic_editor.TopicPublishHandler),
 
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,

@@ -1,21 +1,33 @@
 <div class="oppia-learner-hint-and-solution-modal-title"><[isHint ? "Hint" : "Solution"]></div>
 
 <div class="modal-body">
-  <span ng-if="isHint" class="oppia-learner-hint-and-solution-modal-body"
-        angular-html-bind="hint.getHtml()"></span>
+  <span>
+    <angular-html-bind ng-if="isHint" class="oppia-learner-hint-and-solution-modal-body"
+                       html-data="hint.getHtml()">
+    </angular-html-bind>
+  </span>
   <div ng-if="!isHint">
     <label><[shortAnswerHtml.prefix]> solution is: &nbsp; </label>
-    <span class="oppia-learner-hint-and-solution-modal-body"
-          angular-html-bind="shortAnswerHtml.answer"></span>
-    <br><br>
+    <span>
+      <angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
+                         html-data="shortAnswerHtml.answer">
+      </angular-html-bind>
+    </span>
+    <br>
+    <br>
     <label>Explanation: </label>
-    <span class="oppia-learner-hint-and-solution-modal-body"
-          angular-html-bind="solutionExplanationHtml"></span>
+    <span>
+      <angular-html-bind class="oppia-learner-hint-and-solution-modal-body"
+                         html-data="solutionExplanationHtml">
+      </angular-html-bind>
+    </span>
   </div>
 </div>
 
 <button class="oppia-learner-got-it-button md-button md-default-theme pull-right"
-        ng-click="closeModal()">GOT IT</button>
+        ng-click="closeModal()">
+  GOT IT
+</button>
 <span class="clearfix"></span>
 
 <style>
