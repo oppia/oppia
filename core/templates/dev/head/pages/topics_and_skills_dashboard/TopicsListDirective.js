@@ -22,7 +22,7 @@ oppia.directive('topicsList', [
       scope: {
         getTopicSummaries: '&topicSummaries',
         canDeleteTopic: '&userCanDeleteTopic',
-        isTopicLinkDisabled: '&topicLinkDisabled',
+        isInModal: '&inModal',
         selectedTopicList: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -40,7 +40,7 @@ oppia.directive('topicsList', [
             'canonical_story_count', 'topic_status'
           ];
           $scope.getTopicEditorUrl = function(topicId) {
-            if ($scope.isTopicLinkDisabled()) {
+            if ($scope.isInModal()) {
               return;
             }
             return '/topic_editor/' + topicId;
@@ -81,9 +81,11 @@ oppia.directive('topicsList', [
 
             modalInstance.result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
-                function() {
-                  $rootScope.$broadcast(
-                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED, topicId);
+                function(status) {
+                  if (status === 200) {
+                    $rootScope.$broadcast(
+                      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                  }
                 },
                 function(error) {
                   AlertsService.addWarning(

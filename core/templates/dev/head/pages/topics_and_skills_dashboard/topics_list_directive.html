@@ -1,4 +1,4 @@
-<md-card layout="row" class="list-view-item">
+<md-card layout="row" ng-class="{'list-view-item': !isInModal()}">
   <table class="dashboard-table">
     <colgroup>
       <col style="width: 25%;">
@@ -18,7 +18,7 @@
       </th>
     </tr>
     <tr ng-repeat="topic in getTopicSummaries()"
-        ng-class="{'list-item': !isTopicLinkDisabled()}">
+        ng-class="{'list-item': !isInModal()}">
       <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id, topic.version)" class="list-summary">
           <span> <[topic.name]> </span>
@@ -32,7 +32,10 @@
       <td>
         <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id, topic.version)" class="list-summary">
           <span> <[topic.total_skill_count]> </span>
-          <span class="additional-text" ng-if="topic.uncategorized_skill_count > 0"> ( <[topic.uncategorized_skill_count]> uncategorized ) </span>
+          <span class="additional-text"
+                ng-if="topic.uncategorized_skill_count > 0 && isInModal() === false">
+            ( <[topic.uncategorized_skill_count]> uncategorized )
+          </span>
         </a>
       </td>
       <td>

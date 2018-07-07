@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h3>Select topic to which the skill is to be assigned</h3>
+  <h3>Select topic(s) to which the skill is to be assigned</h3>
 </div>
 
 <div class="modal-body">
@@ -9,7 +9,7 @@
   <div class="topics-table">
     <topics-list topic-summaries="topicSummaries"
                  user-can-delete-topic="false"
-                 topic-link-disabled="true"
+                 in-modal="true"
                  selected-topic-list="selectedTopicList">
     </topics-list>
   </div>
@@ -22,7 +22,6 @@
 
 <style>
   .topics-table {
-    width: 56vw;
-    margin-left: -6vw;
+    width: 100%;
   }
 </style>

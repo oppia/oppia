@@ -4,7 +4,7 @@
       <col style="width: 40%;">
       <col style="width: 20%;">
       <col style="width: 20%;">
-      <col style="width: 20%;">
+      <col style="width: 10%;">
     </colgroup>
     <tr>
       <th ng-repeat="key in SKILL_HEADINGS"
@@ -32,8 +32,8 @@
         </a>
       </td>
       <td ng-if="getEditableTopicSummaries().length > 0">
-        <button class="btn btn-default list-summary" ng-click="assignSkillToTopic(skill.id)">
-          <span> Assign Skill to Topic </span>
+        <button class="btn btn-default" ng-click="assignSkillToTopic(skill.id)">
+          <span> Assign to Topic </span>
         </button>
       </td>
     </tr>
