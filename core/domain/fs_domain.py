@@ -457,6 +457,8 @@ class GcsFileSystem(object):
         Args:
             filepath: str. The path to the relevant file within the exploration.
 
+        Returns:
+            bool. True or False.
         """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
 
