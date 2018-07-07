@@ -584,11 +584,11 @@ def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
             collapsible['content-with-value'] = escape_html(json.dumps(''))
         else:
             content_html = unescape_html(collapsible['content-with-value'])
-            converted_html = ''
             # Empty html strings gives error on json.loads. This block ensures
             # that json.loads is performed only if html string is not empty.
-            if len(content_html):
-                converted_html = rte_conversion_fn(json.loads(content_html))
+            converted_html = (
+                rte_conversion_fn(
+                    json.loads(content_html)) if content_html else '')
             collapsible['content-with-value'] = escape_html(
                 json.dumps(converted_html))
         # To ensure that collapsible tags have heading-with-value attribute.
