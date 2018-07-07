@@ -14,7 +14,9 @@ exemptLabels:
 # Label to use when marking as stale
 staleLabel: stale
 
-# Comment to post when marking as stale. Set to `false` to disable
+# Comment to post when marking as stale. Set to `false` to disable.
+# Here, @author is a special keyword and is automatically replaced
+# by the bot, with the actual author of the pull request.
 markComment: >
   Hi @author, I'm going to mark this PR as stale because it hasn't had any updates for 10 days.
   If no further activity occurs within **7 days**, it will be automatically closed so that others can take up the issue.
