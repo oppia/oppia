@@ -188,7 +188,8 @@ def unescape_html(escaped_html_data):
     # Any such extra quotes are not rendered as \&quot; in html
     # string. They are rendered in form of &amp;quot;. This line
     # ensures that all such extra quotes are removed from the html string.
-    unescaped_html_data = escaped_html_data.replace('&amp;quot;', '')
+    unescaped_html_data = escaped_html_data.replace(
+        '&amp;quot;', '\\&amp;quot;')
     for replace_tuple in REPLACE_LIST:
         unescaped_html_data = unescaped_html_data.replace(
             replace_tuple[1], replace_tuple[0])
