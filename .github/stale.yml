@@ -19,7 +19,8 @@ markComment: >
   Hi @author, I'm going to mark this PR as stale because it hasn't had any updates for 10 days.
   If no further activity occurs within **7 days**, it will be automatically closed so that others can take up the issue.
 
-  If you don't want this PR to be deleted, please make a follow-up commit within **7 days** (and submit it for review, if applicable). Thanks!
+  If you are still working on this PR, please make a follow-up commit within **7 days** (and submit it for review, if applicable).
+  Please also let us know if you are stuck so we can help you!
 
 # Limit the number of actions per hour, from 1-30. Default is 30
 limitPerRun: 30
