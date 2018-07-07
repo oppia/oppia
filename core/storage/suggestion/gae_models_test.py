@@ -40,35 +40,35 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_1',
-            'reviewer_1', 'reviewer_1', self.change_cmd, self.score_category,
+            'reviewer_1', self.change_cmd, self.score_category,
             'exploration.exp1.thread_1')
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_2',
-            'reviewer_2', 'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_2')
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_ACCEPTED, 'author_2',
-            'reviewer_3', 'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_3')
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_2',
-            'reviewer_2', 'reviewer_3', self.change_cmd, self.score_category,
+            'reviewer_3', self.change_cmd, self.score_category,
             'exploration.exp1.thread_4')
         suggestion_models.GeneralSuggestionModel.create(
             suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT,
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_REJECTED, 'author_3',
-            'reviewer_3', 'reviewer_2', self.change_cmd, self.score_category,
+            'reviewer_2', self.change_cmd, self.score_category,
             'exploration.exp1.thread_5')
 
     def test_score_type_contains_delimiter(self):
@@ -82,7 +82,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.TARGET_TYPE_EXPLORATION,
             self.target_id, self.target_version_at_submission,
             suggestion_models.STATUS_IN_REVIEW, 'author_3',
-            'reviewer_3', 'reviewer_3', self.change_cmd, self.score_category,
+            'reviewer_3', self.change_cmd, self.score_category,
             'exploration.exp1.thread_6')
 
         suggestion_id = 'exploration.exp1.thread_6'
@@ -107,8 +107,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(observed_suggestion_model.author_id, 'author_3')
         self.assertEqual(
-            observed_suggestion_model.assigned_reviewer_id, 'reviewer_3')
-        self.assertEqual(
             observed_suggestion_model.final_reviewer_id, 'reviewer_3')
         self.assertEqual(
             observed_suggestion_model.score_category, self.score_category)
@@ -123,7 +121,7 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 suggestion_models.TARGET_TYPE_EXPLORATION,
                 self.target_id, self.target_version_at_submission,
                 suggestion_models.STATUS_IN_REVIEW, 'author_3',
-                'reviewer_3', 'reviewer_3', self.change_cmd,
+                'reviewer_3', self.change_cmd,
                 self.score_category, 'exploration.exp1.thread_1')
 
     def test_get_suggestions_by_type(self):
@@ -155,22 +153,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             len(
                 suggestion_models.GeneralSuggestionModel
                 .get_suggestions_by_author('author_invalid')), 0)
-
-    def test_get_suggestion_assigned_to_reviewer(self):
-        self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_assigned_to_reviewer('reviewer_1')), 1)
-        self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_assigned_to_reviewer('reviewer_2')), 2)
-        self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel
-                .get_suggestions_assigned_to_reviewer('reviewer_3')), 2)
-        self.assertEqual(
-            len(suggestion_models.GeneralSuggestionModel
-                .get_suggestions_assigned_to_reviewer('reviewer_invalid')), 0)
 
     def test_get_suggestion_by_reviewer(self):
         self.assertEqual(
@@ -206,11 +188,6 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 suggestion_models.GeneralSuggestionModel
                 .get_suggestions_by_status(
                     suggestion_models.STATUS_ACCEPTED)), 2)
-        self.assertEqual(
-            len(
-                suggestion_models.GeneralSuggestionModel
-                .get_suggestions_by_status(
-                    suggestion_models.STATUS_RECEIVED)), 0)
 
     def test_get_suggestions_by_target_id(self):
         self.assertEqual(
