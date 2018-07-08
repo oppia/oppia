@@ -60,7 +60,7 @@ oppia.directive('questionSummaryTile', [
           };
 
           $scope.getQuestionStripColor = function () {
-            return constants.CATEGORIES_TO_COLORS[$scope.getStatus()];
+            return constants.QUESTION_STATUS_COLORS[$scope.getStatus()];
           };
 
           $scope.setHoverState = function(hoverState) {

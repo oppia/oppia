@@ -92,7 +92,9 @@ var constants = {
     "Puzzles": "#a8554a",
     "Sport": "#893327",
     "Welcome": "#992a2b",
+  },
 
+  "QUESTION_STATUS_COLORS": {
     "private": "#36748e",
     "approved": "#619912",
     "pending": "#d0cf00",
@@ -452,8 +454,6 @@ var constants = {
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
-
-  "IS_CURRENT_RTE_CKEDITOR": false,
 
   "USE_NEW_SUGGESTION_FRAMEWORK": false
 };
