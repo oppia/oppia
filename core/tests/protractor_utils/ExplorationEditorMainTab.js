@@ -183,17 +183,30 @@ var ExplorationEditorMainTab = function() {
     });
   };
 
-  this.progressInTutorial = function() {
-    // Progress to the next instruction in the tutorial.
-    var nextTutorialStageButton = element.all(by.css('.nextBtn'));
-    browser.wait(
-      until.elementToBeClickable(nextTutorialStageButton.first()), 5000,
-      'Next Tutorial Stage button is not clickable');
-    nextTutorialStageButton.then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click();
-        general.waitForSystem(1000);
-      }
+  this.playTutorial = function() {
+    var tutorialTabHeadings = [
+      'Creating in Oppia',
+      'Content',
+      'Interaction',
+      'Responses',
+      'Preview',
+      'Save',
+    ];
+    tutorialTabHeadings.forEach(function(heading) {
+      var tutorialTabHeadingElement = element(by.cssContainingText(
+        '.popover-title', heading));
+      browser.wait(until.visibilityOf(tutorialTabHeadingElement), 5000,
+        'Tutorial: ' + heading + 'is not visible');
+      // Progress to the next instruction in the tutorial.
+      var nextTutorialStageButton = element.all(by.css('.nextBtn'));
+      browser.wait(
+        until.elementToBeClickable(nextTutorialStageButton.first()), 5000,
+        'Next Tutorial Stage button is not clickable');
+      nextTutorialStageButton.then(function(buttons) {
+        if (buttons.length === 1) {
+          buttons[0].click();
+        }
+      });
     });
   };
 
