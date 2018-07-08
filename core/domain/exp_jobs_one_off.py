@@ -17,23 +17,32 @@
 """One-off jobs for explorations."""
 
 import ast
+import itertools
 import logging
+import re
 import traceback
 
 from constants import constants
 from core import jobs
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import rights_manager
 from core.platform import models
 import feconf
 import utils
 
-(base_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.exploration])
+(file_models, base_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.file, models.NAMES.base_model, models.NAMES.exploration])
 
 _COMMIT_TYPE_REVERT = 'revert'
+FILE_COPIED = 'File Copied'
+FILE_ALREADY_EXISTS = 'File already exists in GCS'
+FOUND_DELETED_FILE = 'Error: found deleted file'
+WRONG_INSTANCE_ID = 'Error: The instance_id is not correct'
+ALLOWED_IMAGE_EXTENSIONS = list(itertools.chain.from_iterable(
+    feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS.values()))
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -628,3 +637,57 @@ class ExplorationMigrationValidationJobForCKEditor(
         # Combine all values from multiple lists into a single list
         # for that error type.
         yield (key, list(set().union(*final_values)))
+
+
+class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for migrating the images in the exploration
+    from the GAE to GCS.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [file_models.FileSnapshotContentModel]
+
+    @staticmethod
+    def map(file_snapshot_content_model):
+        # This job is allowed to run only in Production environment since it
+        # uses GcsFileSystem which can't be used in Development environment.
+        if not feconf.DEV_MODE:
+            instance_id = (
+                file_snapshot_content_model.get_unversioned_instance_id())
+            filetype = instance_id[instance_id.rfind('.') + 1:]
+            # To separate the image entries from the audio entries we get from
+            # the FileSnapshotContentModel.
+            if filetype in ALLOWED_IMAGE_EXTENSIONS:
+                pattern = re.compile(
+                    r'^/([^/]+)/assets/(([^/]+)\.(' + '|'.join(
+                        ALLOWED_IMAGE_EXTENSIONS) + '))$')
+                catched_groups = pattern.match(instance_id)
+                if not catched_groups:
+                    yield(WRONG_INSTANCE_ID, instance_id)
+                else:
+                    filename = catched_groups.group(2)
+                    filepath = 'assets/' + filename
+                    exploration_id = catched_groups.group(1)
+                    file_model = file_models.FileModel.get_model(
+                        exploration_id, filepath, False)
+                    if file_model:
+                        content = file_model.content
+                        fs = fs_domain.AbstractFileSystem(
+                            fs_domain.GcsFileSystem(exploration_id))
+                        if fs.isfile('image/%s' % (filename)):
+                            yield(FILE_ALREADY_EXISTS, file_model.id)
+                        else:
+                            fs.commit(
+                                'ADMIN', 'image/%s' % (filename),
+                                content, 'image/%s' % (filetype))
+                            yield(FILE_COPIED, 1)
+                    else:
+                        yield(FOUND_DELETED_FILE, file_model.id)
+
+
+    @staticmethod
+    def reduce(status, values):
+        if status == FILE_COPIED:
+            yield(status, len(values))
+        else:
+            yield(status, values)
