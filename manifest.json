@@ -112,6 +112,16 @@
           "js": ["app/angular.audio.js"]
         }
       },
+      "angularRecorder": {
+        "version": "1.4.1",
+        "downloadFormat": "zip",
+        "url": "https://github.com/logbon72/angular-recorder/archive/1.4.1.zip",
+        "rootDirPrefix": "ngAudioRecorder-",
+        "targetDirPrefix": "angular-recorder-",
+        "bundle": {
+          "js": ["dist/angular-audio-recorder.min.js"]
+        }
+      },
       "angularTest": {
         "version": "1.5.8",
         "downloadFormat": "files",
@@ -289,6 +299,17 @@
         "rootDirPrefix": "headroom-js-",
         "targetDirPrefix": "headroom-js-",
         "files": ["angular.headroom.min.js", "headroom.min.js"],
+        "bundle": {
+          "js": []
+        }
+      },
+      "waveSurferJs": {
+        "version": "2.0.6",
+        "downloadFormat": "files",
+        "url": "https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/2.0.6",
+        "rootDirPrefix": "waveSurfer-js-",
+        "targetDirPrefix": "wave-surfer-js-",
+        "files": ["wavesurfer.min.js"],
         "bundle": {
           "js": []
         }
