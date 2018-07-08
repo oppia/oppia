@@ -63,6 +63,12 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         }
         self.assertEqual(topic.to_dict(), expected_topic_dict)
 
+    def test_get_all_skill_ids(self):
+        self.topic.uncategorized_skill_ids = ['skill_id_2', 'skill_id_3']
+        self.assertEqual(
+            self.topic.get_all_skill_ids(),
+            ['skill_id_2', 'skill_id_3', 'skill_id_1'])
+
     def test_delete_story(self):
         self.topic.canonical_story_ids = [
             'story_id', 'story_id_1', 'story_id_2']
@@ -111,7 +117,7 @@ class TopicDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error('Expected skill ids to be a list')
         self.topic.subtopics[0].skill_ids = ['skill_id', 'skill_id']
         self._assert_validation_error(
-            'The skill id skill_id is duplicated in the subtopic')
+            'Expected all skill ids to be distinct.')
         self.topic.subtopics[0].skill_ids = [1, 2]
         self._assert_validation_error('Expected each skill id to be a string')
 

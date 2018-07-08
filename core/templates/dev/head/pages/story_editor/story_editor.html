@@ -16,9 +16,9 @@
 
 {% block content %}
   <div ng-controller="StoryEditor" class="story-editor">
-    <a class="btn btn-primary back-to-topic-button" ng-href="/topic_editor/<[topicId]>">
+    <button class="btn btn-primary back-to-topic-button" ng-click="returnToTopicEditorPage()">
       <i class="fa fa-arrow-left"></i> &nbsp;Return to topic
-    </a>
+    </button>
     <story-editor></story-editor>
   </div>
 

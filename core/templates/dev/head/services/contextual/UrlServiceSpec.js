@@ -134,4 +134,15 @@ describe('Url Service', function() {
       UrlService.getStoryIdFromUrl()
     ).toEqual('012345678901');
   });
+
+  it('should correctly retrieve skill id from url', function() {
+    mockLocation.pathname = '/skill_editor/abcdefghijkl';
+    expect(
+      UrlService.getSkillIdFromUrl()
+    ).toBe('abcdefghijkl');
+    mockLocation.pathname = '/skill_editor/abcdefghijk';
+    expect(function() {
+      UrlService.getSkillIdFromUrl();
+    }).toThrow();
+  });
 });

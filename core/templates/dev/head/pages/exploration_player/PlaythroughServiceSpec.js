@@ -26,6 +26,7 @@ describe('Playthrough service', function() {
       this.ps = $injector.get('PlaythroughService');
       spyOn(this.ps, 'isPlayerExcludedFromSamplePopulation').and.returnValue(
         false);
+      spyOn(this.ps, 'isExplorationWhitelisted').and.returnValue(true);
       this.laof = $injector.get('LearnerActionObjectFactory');
       this.ps.initSession(this.expId, this.expVersion);
     }));
@@ -240,5 +241,30 @@ describe('Playthrough service', function() {
           },
         });
       });
+  });
+
+  describe('Test whitelisting functions', function() {
+    beforeEach(inject(function($injector) {
+      this.expId = 'expId1';
+      this.expVersion = 1;
+      this.ps = $injector.get('PlaythroughService');
+      spyOn(this.ps, 'isPlayerExcludedFromSamplePopulation').and.returnValue(
+        false);
+      this.laof = $injector.get('LearnerActionObjectFactory');
+      this.ps.initSession(this.expId, this.expVersion);
+    }));
+
+    it('should test whitelisting of explorations.', function() {
+      expect(this.ps.isExplorationWhitelisted(this.expId)).toEqual(false);
+    });
+
+    it('should not record learner actions for blacklisted exps', function() {
+      spyOn(this.ps, 'isExplorationWhitelisted').and.returnValue(false);
+
+      this.ps.recordExplorationStartAction('initStateName1');
+      var playthrough = this.ps.getPlaythrough();
+
+      expect(playthrough.actions).toEqual([]);
+    });
   });
 });

@@ -160,7 +160,7 @@ describe('RTE helper service', function() {
         backend_id: 'Image',
         tooltip: 'Insert image',
         icon_data_url: _IMAGE_URL,
-        preview_url_template: _IMAGE_URL
+        preview_url_template_dev: _IMAGE_URL
       }]);
     });
   });

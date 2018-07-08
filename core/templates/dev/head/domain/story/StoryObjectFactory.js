@@ -76,6 +76,15 @@ oppia.factory('StoryObjectFactory', ['StoryContentsObjectFactory',
       return this._storyContents;
     };
 
+    Story.prototype.validate = function() {
+      var issues = [];
+      if (this._title === '') {
+        issues.push('Story title should not be empty');
+      }
+      issues = issues.concat(this._storyContents.validate());
+      return issues;
+    };
+
     // Reassigns all values within this story to match the existing
     // story. This is performed as a deep copy such that none of the
     // internal, bindable objects are changed within this story.

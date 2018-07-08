@@ -10,10 +10,10 @@
   </li>
   <li ng-mouseover="blurNavigationLinks($event)">
     <div class="oppia-navbar-button-container">
-      <a href="/"
-         class="btn oppia-navbar-button oppia-transition-200">
+      <button ng-click="createSkill()" ng-if="userCanCreateSkill"
+              class="btn oppia-navbar-button oppia-transition-200">
         <span class="oppia-navbar-tab-content">Create Skill</span>
-      </a>
+      </button>
     </div>
   </li>
 </ul>

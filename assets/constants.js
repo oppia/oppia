@@ -441,6 +441,12 @@ var constants = {
 
   "WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS": [],
 
+  "WHITELISTED_EXPLORATION_IDS_FOR_SAVING_PLAYTHROUGHS": [
+    "umPkwp0L1M0-", "MjZzEVOG47_1", "9trAQhj6uUC2", "rfX8jNkPnA-1",
+    "0FBWxCE5egOw", "670bU6d9JGBh", "aHikhPlxYgOH", "-tMgcP1i_4au",
+    "zW39GLG_BdN2", "Xa3B_io-2WI5", "6Q6IyIDkjpYC", "osw1m5Q3jK41"
+  ],
+
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
   "ACTIVITY_STATUS_PRIVATE": "private",
@@ -463,6 +469,10 @@ var constants = {
     "\\u0014", "\\u0015", "\\u0016", "\\u0017", "\\u0018", "\\u0019", "\\u001a",
     "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
   ],
-  
+
+  "ENABLE_GCS_STORAGE_FOR_IMAGES": false,
+
+  "IS_CURRENT_RTE_CKEDITOR": false,
+
   "USE_NEW_SUGGESTION_FRAMEWORK": false
 };
