@@ -23,124 +23,93 @@
 
 {% block content %}
   <background-banner></background-banner>
-  <div class="oppia-dashboard-container" ng-controller="CreatorDashboard" style="position: relative;">
-    <div class="oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content"
-         style="margin: auto;" ng-if="explorationsList.length > 0 || collectionsList.length > 0"
-         ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
-      <md-card layout="row">
-        <div class="average-ratings stats-card">
-          <p class="stat-description" translate="I18N_DASHBOARD_STATS_AVERAGE_RATING"></p>
-          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
-          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
-          <p ng-hide="!dashboardStats.num_ratings">
-            (by <[dashboardStats.num_ratings]> users)
-          </p>
-        </div>
-        <div class="total-plays stats-card">
-          <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_PLAYS"></p>
-          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_plays]></h1>
-          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_plays]></h1>
-          <p ng-hide="!relativeChangeInTotalPlays">
-            (+<[relativeChangeInTotalPlays]> from last week)
-          </p>
-        </div>
-        <div class="total-open-feedback stats-card">
-          <p class="stat-description" translate="I18N_DASHBOARD_STATS_OPEN_FEEDBACK"></p>
-          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_open_feedback]></h1>
-          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_open_feedback]></h1>
-        </div>
-        <div class="total-open-feedback stats-card">
-          <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS"></p>
-          <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[subscribersList.length]></h1>
-          <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[subscribersList.length]></h1>
-        </div>
-      </md-card>
-    </div>
-
-    <div ng-if="explorationsList.length > 0 || collectionsList.length > 0">
-      <ul class="oppia-dashboard-tabs">
-        <li ng-if="explorationsList.length > 0"
-            ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
-          <a class="oppia-dashboard-tabs-text"
-             ng-click="setActiveTab('myExplorations')"
-             translate="I18N_DASHBOARD_EXPLORATIONS">
-          </a>
-        </li>
-        <!-- A layout fix when the 'My Collections' tab is absent. -->
-        <li ng-if="!canCreateCollections && collectionsList.length === 0 && subscribersList.length === 0"></li>
-        <li ng-if="canCreateCollections && collectionsList.length > 0"
-            ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
-          <a class="oppia-dashboard-tabs-text"
-             ng-click="setActiveTab('myCollections')"
-             translate="I18N_DASHBOARD_COLLECTIONS">
-          </a>
-        </li>
-        <li ng-if="subscribersList.length > 0"
-            class="protractor-test-subscription-tab"
-            ng-class="{'oppia-dashboard-tabs-active': activeTab === 'mySubscribers'}">
-          <a class="oppia-dashboard-tabs-text"
-             ng-click="setActiveTab('mySubscribers')"
-             translate="I18N_DASHBOARD_SUBSCRIBERS">
-          </a>
-        </li>
-
-        <li class="list-card-view-toggle dashboard-hide-mobile"
-            ng-if="activeTab === 'myExplorations' && explorationsList.length > 0">
-          <button class="card-view-btn"
-                  ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
-                  ng-click="setMyExplorationsView('card')"
-                  aria-label="Card View">
-            <span class="fa fa-th-large fa-lg"></span>
-          </button>
-          <button class="list-view-btn"
-                  ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
-                  ng-click="setMyExplorationsView('list')"
-                  aria-label="List View">
-            <span class="fa fa-list fa-lg"></span>
-          </button>
-        </li>
-      </ul>
-    </div>
-
-    <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
-      <h2 class="oppia-dashboard-title" translate="I18N_DASHBOARD_CREATOR_DASHBOARD"></h2>
-    </div>
-
-    <div ng-if="activeTab === 'myExplorations'">
-      <div ng-if="explorationsList.length === 0 && collectionsList.length === 0" class="oppia-dashboard-empty-text">
-        <md-card layout="row"
-                 class="oppia-page-card oppia-dashboard-intro-card"
-                 style="margin-top: 0;">
-          <div>
-            <p translate="I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE"></p>
-            <button type="button"
-                    class="btn oppia-dashboard-intro-button oppia-transition-200"
-                    ng-click="createNewExploration()"
-                    translate="I18N_CREATE_EXPLORATION">
-            </button>
+  <div ng-controller="CreatorDashboard" >
+    <div class="oppia-dashboard-container" style="position: relative;">
+      <div ng-if="explorationsList.length === 0 && collectionsList.length === 0">
+        <h2 class="oppia-dashboard-title" translate="I18N_DASHBOARD_CREATOR_DASHBOARD"></h2>
+      </div>
+      <div class="oppia-dashboard-aggregated-stats oppia-creator-dashboard-main-content"
+           style="margin: auto;" ng-if="explorationsList.length > 0 || collectionsList.length > 0"
+           ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
+        <md-card layout="row">
+          <div class="average-ratings stats-card">
+            <p class="stat-description" translate="I18N_DASHBOARD_STATS_AVERAGE_RATING"></p>
+            <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
+            <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.average_ratings || 'N/A']></h1>
+            <p ng-hide="!dashboardStats.num_ratings">
+              (by <[dashboardStats.num_ratings]> users)
+            </p>
           </div>
-          <div class="oppia-dashboard-intro-picture">
-            <img ng-src="<[emptyDashboardImgUrl]>">
+          <div class="total-plays stats-card">
+            <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_PLAYS"></p>
+            <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_plays]></h1>
+            <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_plays]></h1>
+            <p ng-hide="!relativeChangeInTotalPlays">
+              (+<[relativeChangeInTotalPlays]> from last week)
+            </p>
+          </div>
+          <div class="total-open-feedback stats-card">
+            <p class="stat-description" translate="I18N_DASHBOARD_STATS_OPEN_FEEDBACK"></p>
+            <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_open_feedback]></h1>
+            <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[dashboardStats.total_open_feedback]></h1>
+          </div>
+          <div class="total-open-feedback stats-card">
+            <p class="stat-description" translate="I18N_DASHBOARD_STATS_TOTAL_SUBSCRIBERS"></p>
+            <h1 class="stat-value-with-rating" ng-show="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[subscribersList.length]></h1>
+            <h1 class="stat-value-without-rating" ng-hide="dashboardStats.num_ratings || relativeChangeInTotalPlays"><[subscribersList.length]></h1>
           </div>
         </md-card>
       </div>
+      <div ng-if="explorationsList.length > 0 || collectionsList.length > 0 || questionsList.length > 0">
+        <ul class="oppia-dashboard-tabs" ng-class="{'oppia-dashboard-tab-padding': explorationsList.length === 0 && collectionsList.length === 0 && questionsList.length > 0}">
+          <li ng-if="explorationsList.length > 0"
+              ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myExplorations'}">
+            <a class="oppia-dashboard-tabs-text"
+               ng-click="setActiveTab('myExplorations')"
+               translate="I18N_DASHBOARD_EXPLORATIONS">
+            </a>
+          </li>
+          <li ng-if="questionsList.length > 0"
+              ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myQuestions'}">
+            <a class="oppia-dashboard-tabs-text"
+               ng-click="setActiveTab('myQuestions')"
+               translate="I18N_DASHBOARD_QUESTIONS">
+            </a>
+          </li>
+          <!-- A layout fix when the 'My Collections' tab is absent. -->
+          <li ng-if="!canCreateCollections && collectionsList.length === 0 && subscribersList.length === 0"></li>
+          <li ng-if="canCreateCollections && collectionsList.length > 0"
+              ng-class="{'oppia-dashboard-tabs-active': activeTab === 'myCollections'}">
+            <a class="oppia-dashboard-tabs-text"
+               ng-click="setActiveTab('myCollections')"
+               translate="I18N_DASHBOARD_COLLECTIONS">
+            </a>
+          </li>
+          <li ng-if="subscribersList.length > 0"
+              class="protractor-test-subscription-tab"
+              ng-class="{'oppia-dashboard-tabs-active': activeTab === 'mySubscribers'}">
+            <a class="oppia-dashboard-tabs-text"
+               ng-click="setActiveTab('mySubscribers')"
+               translate="I18N_DASHBOARD_SUBSCRIBERS">
+            </a>
+          </li>
 
-      <div ng-if="explorationsList.length > 0" class="oppia-dashboard-tab-panel" style="padding-top: 13px; padding-bottom: 46px;">
-        <span class="sort-explorations-select"
-              ng-if="activeTab === 'myExplorations'"
-              ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}"
-              style="float: right;">
-          <p class="sort-by-text" translate="I18N_DASHBOARD_EXPLORATIONS_SORT_BY">Sort By</p>
-          <select ng-model="currentSortType"
-                  class="sort-options"
-                  ng-change="setExplorationsSortingOptions(currentSortType)"
-                  ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value | translate for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
-          </select>
-          <span class="sort-order fa"
-                ng-click="setExplorationsSortingOptions(currentSortType)"
-                ng-class="isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
-          </span>
-        </span>
+          <li class="list-card-view-toggle dashboard-hide-mobile"
+              ng-if="activeTab === 'myExplorations' && explorationsList.length > 0">
+            <button class="card-view-btn"
+                    ng-class="{'dashboard-active-view': myExplorationsView === 'card'}"
+                    ng-click="setMyExplorationsView('card')"
+                    aria-label="Card View">
+              <span class="fa fa-th-large fa-lg"></span>
+            </button>
+            <button class="list-view-btn"
+                    ng-class="{'dashboard-active-view': myExplorationsView === 'list'}"
+                    ng-click="setMyExplorationsView('list')"
+                    aria-label="List View">
+              <span class="fa fa-list fa-lg"></span>
+            </button>
+          </li>
+        </ul>
       </div>
 
       <div ng-if="myExplorationsView === 'list' && explorationsList.length > 0">
@@ -210,174 +179,419 @@
         </md-card>
       </div>
 
-      <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0"
-           class="oppia-card-view-wrap">
-        <md-card ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
-                 class="oppia-activity-summary-tile oppia-dashboard-card-view-item protractor-test-exploration-dashboard-card"
-                 is-private="exploration.status === 'private'">
-          <a ng-href="/create/<[exploration.id]>">
-            <div class="title-section"
-                 style="background-color: <[exploration.thumbnail_bg_color]>;">
-              <img class="thumbnail-image"
-                   ng-src="<[getCompleteThumbnailIconUrl(exploration.thumbnail_icon_url)]>">
-              <h2 class="activity-title protractor-test-exp-summary-tile-title">
-                <span><[(exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40]></span>
-              </h2>
+      <div ng-if="activeTab === 'myExplorations'">
+        <div ng-if="explorationsList.length === 0 && collectionsList.length === 0 && questionsList.length === 0" class="oppia-dashboard-empty-text">
+          <md-card layout="row"
+                   class="oppia-page-card oppia-dashboard-intro-card"
+                   style="margin-top: 0;">
+            <div>
+              <p translate="I18N_DASHBOARD_EXPLORATIONS_EMPTY_MESSAGE"></p>
+              <button type="button"
+                      class="btn oppia-dashboard-intro-button oppia-transition-200"
+                      ng-click="createNewExploration()"
+                      translate="I18N_CREATE_EXPLORATION">
+              </button>
+              <button type="button"
+                      class="btn oppia-dashboard-intro-button oppia-transition-200"
+                      ng-click="createNewQuestion()"
+                      translate="I18N_CREATE_QUESTION">
+              </button>
             </div>
-            <div class="mask-wrap">
-              <div class="title-section-mask"></div>
+            <div ng-attr-section="'<['right-section']>">
+              <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
+                 ng-href="<[getExplorationUrl(exploration.id)]>">
+              </a>
             </div>
-          </a>
-          <div ng-attr-section="'<['right-section']>">
-            <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
-               ng-href="<[getExplorationUrl(exploration.id)]>">
-            </a>
             <div class="exp-private-text" ng-if="exploration.status === 'private'">
               <[publishText]>
             </div>
-            <ul ng-if="exploration.status !== 'private'"
-                layout="row"
-                layout-wrap
-                class="metrics"
-                layout-align="space-between center">
-              <li flex="50">
-                <span class="protractor-test-exp-summary-tile-rating">
-                  <span class="fa fa-star fa-lg oppia-dashboard-card-statistic-icon"
-                        uib-tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
+          </md-card>
+        </div>
+
+        <div ng-if="explorationsList.length > 0" class="oppia-dashboard-tab-panel" style="padding-top: 13px; padding-bottom: 46px;">
+          <span class="sort-explorations-select"
+                ng-if="activeTab === 'myExplorations'"
+                ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}"
+                style="float: right;">
+            <p class="sort-by-text" translate="I18N_DASHBOARD_EXPLORATIONS_SORT_BY">Sort By</p>
+            <select ng-model="currentSortType"
+                    class="sort-options"
+                    ng-change="setExplorationsSortingOptions(currentSortType)"
+                    ng-options="EXPLORATIONS_SORT_BY_KEYS[key] as value | translate for (key, value) in HUMAN_READABLE_EXPLORATIONS_SORT_BY_KEYS">
+            </select>
+            <span class="sort-order fa"
+                  ng-click="setExplorationsSortingOptions(currentSortType)"
+                  ng-class="isCurrentSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+            </span>
+          </span>
+        </div>
+
+        <div ng-if="myExplorationsView === 'list' && explorationsList.length > 0">
+          <md-card layout="row"
+                   class="oppia-dashboard-list-view-item">
+            <table class="oppia-dashboard-table">
+              <colgroup>
+                <col style="width: 26%;">
+                <col style="width: 13%;">
+                <col style="width: 13%;">
+                <col style="width: 16%;">
+                <col style="width: 16%;">
+                <col style="width: 16%;">
+              </colgroup>
+              <tr>
+                <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
+                    class="oppia-dashboard-table-headings"
+                    ng-click="setExplorationsSortingOptions(value)">
+                  <p ng-if="key === 'TITLE'" translate="I18N_DASHBOARD_TABLE_HEADING_EXPLORATION"></p>
+                  <p ng-if="key === 'RATING'" translate="I18N_DASHBOARD_TABLE_HEADING_RATING"></p>
+                  <p ng-if="key === 'NUM_VIEWS'" translate="I18N_DASHBOARD_TABLE_HEADING_PLAYS"></p>
+                  <p ng-if="key === 'OPEN_FEEDBACK'" translate="I18N_DASHBOARD_TABLE_HEADING_OPEN_THREADS"></p>
+                  <p ng-if="key === 'LAST_UPDATED'" translate="I18N_DASHBOARD_TABLE_HEADING_LAST_UPDATED"></p>
+                  <span class="fa"
+                        ng-if="currentSortType === value"
+                        ng-class="isCurrentSortDescending ? 'fa-caret-up': 'fa-caret-down'">
+                  </span>
+                </th>
+              </tr>
+              <tr ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
+                  class="exploration-list-item">
+                <td>
+                  <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+                    <[exploration.title || DEFAULT_EMPTY_TITLE]>
+                  </a>
+                </td>
+                <td colspan="4"
+                    ng-if="exploration.status === 'private'"
+                    class="exp-private-text">
+                  <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+                    <[publishText]>
+                  </a>
+                </td>
+                <td ng-if="exploration.status !== 'private'">
+                  <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+                    <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
+                  </a>
+                </td>
+                <td ng-if="exploration.status !== 'private'">
+                  <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+                    <[exploration.num_views]>
+                  </a>
+                </td>
+                <td ng-if="exploration.status !== 'private'">
+                  <a ng-href="/create/<[exploration.id]>#/feedback"
+                     class="oppia-dashboard-list-summary">
+                    <[exploration.num_open_threads]>
+                  </a>
+                </td>
+                <td>
+                  <a ng-href="<[getExplorationUrl(exploration.id)]>" class="oppia-dashboard-list-summary">
+                    <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </md-card>
+        </div>
+
+        <div ng-if="myExplorationsView === 'card' && explorationsList.length > 0"
+             class="oppia-card-view-wrap">
+          <md-card ng-repeat="exploration in explorationsList | orderBy:sortByFunction:isCurrentSortDescending track by exploration.id"
+                   class="oppia-activity-summary-tile oppia-dashboard-card-view-item protractor-test-exploration-dashboard-card"
+                   is-private="exploration.status === 'private'">
+            <a ng-href="/create/<[exploration.id]>">
+              <div class="title-section"
+                   style="background-color: <[exploration.thumbnail_bg_color]>;">
+                <img class="thumbnail-image"
+                     ng-src="<[getCompleteThumbnailIconUrl(exploration.thumbnail_icon_url)]>">
+                <h2 class="activity-title protractor-test-exp-summary-tile-title">
+                  <span><[(exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40]></span>
+                </h2>
+              </div>
+              <div class="mask-wrap">
+                <div class="title-section-mask"></div>
+              </div>
+            </a>
+            <div ng-attr-section="'<['right-section']>">
+              <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
+                 ng-href="<[getExplorationUrl(exploration.id)]>">
+              </a>
+              <div class="exp-private-text" ng-if="exploration.status === 'private'">
+                <[publishText]>
+              </div>
+              <ul ng-if="exploration.status !== 'private'"
+                  layout="row"
+                  layout-wrap
+                  class="metrics"
+                  layout-align="space-between center">
+                <li flex="50">
+                  <span class="protractor-test-exp-summary-tile-rating">
+                    <span class="fa fa-star fa-lg oppia-dashboard-card-statistic-icon"
+                          uib-tooltip="<['I18N_LIBRARY_RATINGS_TOOLTIP' | translate]>"
+                          tooltip-placement="top">
+                    </span>
+                    <span class="oppia-dashboard-card-statistic-value">
+                      <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
+                    </span>
+                  </span>
+                </li>
+
+                <li flex="50" class="protractor-test-exploration-feedback-count">
+                  <span class="fa fa-comments fa-lg oppia-dashboard-card-statistic-icon"
+                        uib-tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
+                        tooltip-placement="top">
+                  </span>
+                  <a ng-if="exploration.num_open_threads != 0" ng-href="/create/<[exploration.id]>#/feedback"
+                     class="oppia-dashboard-card-statistic-value">
+                    <[exploration.num_open_threads]>
+                  </a>
+                  <span ng-if="exploration.num_open_threads === 0"
+                        class="oppia-dashboard-card-statistic-value">
+                    <[exploration.num_open_threads]>
+                  </span>
+                </li>
+
+                <li flex="50">
+                  <span class="fa fa-eye fa-lg oppia-dashboard-card-statistic-icon"
+                        uib-tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
                         tooltip-placement="top">
                   </span>
                   <span class="oppia-dashboard-card-statistic-value">
-                    <[(getAverageRating(exploration.ratings) | number:1) || 'N/A']>
+                    <[exploration.num_views]>
                   </span>
-                </span>
-              </li>
+                </li>
 
-              <li flex="50" class="protractor-test-exploration-feedback-count">
-                <span class="fa fa-comments fa-lg oppia-dashboard-card-statistic-icon"
-                      uib-tooltip="<['I18N_DASHBOARD_OPEN_FEEDBACK' | translate]>"
-                      tooltip-placement="top">
-                </span>
-                <a ng-if="exploration.num_open_threads != 0" ng-href="/create/<[exploration.id]>#/feedback"
-                   class="oppia-dashboard-card-statistic-value">
-                  <[exploration.num_open_threads]>
-                </a>
-                <span ng-if="exploration.num_open_threads === 0"
-                      class="oppia-dashboard-card-statistic-value">
-                  <[exploration.num_open_threads]>
-                </span>
-              </li>
+                <li flex="50">
+                  <span class="fa fa-clock-o fa-lg oppia-dashboard-card-statistic-icon"
+                        uib-tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
+                        tooltip-placement="top">
+                  </span>
+                  <span class="oppia-dashboard-card-statistic-value">
+                    <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
+                  </span>
+                </li>
+                <li>
+                  <sharing-links ng-if="exploration.status !== 'private'"
+                                 ng-click="$event.stopPropagation()"
+                                 style="position: relative; right: 1px; bottom: 2px;"
+                                 flex="100"
+                                 class="dashboard-hide-mobile"
+                                 layout-type="row"
+                                 layout-align-type="center left"
+                                 twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
+                                 share-type="exploration"
+                                 exploration-id="exploration.id">
+                  </sharing-links>
+                </li>
+              </ul>
+            </div>
+          </md-card>
+        </div>
+      </div>
 
-              <li flex="50">
-                <span class="fa fa-eye fa-lg oppia-dashboard-card-statistic-icon"
-                      uib-tooltip="<['I18N_LIBRARY_VIEWS_TOOLTIP' | translate]>"
-                      tooltip-placement="top">
-                </span>
-                <span class="oppia-dashboard-card-statistic-value">
-                  <[exploration.num_views]>
-                </span>
-              </li>
-
-              <li flex="50">
-                <span class="fa fa-clock-o fa-lg oppia-dashboard-card-statistic-icon"
-                      uib-tooltip="<['I18N_LIBRARY_LAST_UPDATED' | translate]>"
-                      tooltip-placement="top">
-                </span>
-                <span class="oppia-dashboard-card-statistic-value">
-                  <[getLocaleAbbreviatedDatetimeString(exploration.last_updated_msec)]>
-                </span>
-              </li>
-              <li>
-                <sharing-links ng-if="exploration.status !== 'private'"
-                               ng-click="$event.stopPropagation()"
-                               style="position: relative; right: 1px; bottom: 2px;"
-                               flex="100"
-                               class="dashboard-hide-mobile"
-                               layout-type="row"
-                               layout-align-type="center left"
-                               twitter-text="DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD"
-                               share-type="exploration"
-                               exploration-id="exploration.id">
-                </sharing-links>
-              </li>
-            </ul>
-          </div>
+      <div ng-if="activeTab === 'mySubscribers'" style="margin-top: 8px;">
+        <div class="oppia-dashboard-tab-panel">
+          <span ng-if="subscribersList.length > 1"
+                style="margin-top: 14px; display: inline-block;"
+                translate="I18N_TOTAL_SUBSCRIBERS_TEXT"
+                translate-values="{totalSubscribers: <[subscribersList.length]>}">>
+          </span>
+          <span ng-if="subscribersList.length === 1"
+                style="margin-top: 14px; display: inline-block;"
+                translate="I18N_ONE_SUBSCRIBER_TEXT">
+          </span>
+          <span class="sort-explorations-select"
+                ng-if="activeTab === 'mySubscribers'"
+                ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}"
+                style="float: right;">
+            <p class="sort-by-text">Sort By</p>
+            <select ng-model="currentSubscribersSortType"
+                    class="sort-options"
+                    ng-change="setSubscriptionSortingOptions(currentSubscribersSortType)"
+                    ng-options="SUBSCRIPTION_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS"
+                    style="width: 160px;">
+            </select>
+            <span class="sort-order fa"
+                  ng-click="setSubscriptionSortingOptions(currentSubscribersSortType)"
+                  ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+            </span>
+          </span>
+        </div>
+        <md-card class="oppia-subscription-card protractor-test-subscription-card"
+                 ng-repeat="subscriber in subscribersList | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending">
+          <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank">
+            <img ng-src="<[subscriber.subscriber_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
+            <span class="oppia-subscription-card-summary">
+              <div style="margin-bottom: 5px; font-size: 17.5px;">
+                <strong class="protractor-test-subscription-name"
+                        popover-append-to-body
+                        popover-trigger="<[showUsernamePopover(subscriber.subscriber_username)]>"
+                        ng-attr-uib-popover="<[subscriber.subscriber_username]>">
+                  <[subscriber.subscriber_username| truncate:10]>
+                </strong>
+              </div>
+              <div style="font-size: 14.5px;">
+                <span>Impact</span>
+                <span><[subscriber.subscriber_impact || 0]></span>
+              </div>
+            </span>
+          </a>
         </md-card>
       </div>
-    </div>
 
-    <div ng-if="activeTab === 'mySubscribers'" style="margin-top: 8px;">
-      <div class="oppia-dashboard-tab-panel">
-        <span ng-if="subscribersList.length > 1"
-              style="margin-top: 14px; display: inline-block;"
-              translate="I18N_TOTAL_SUBSCRIBERS_TEXT"
-              translate-values="{totalSubscribers: <[subscribersList.length]>}">>
-        </span>
-        <span ng-if="subscribersList.length === 1"
-              style="margin-top: 14px; display: inline-block;"
-              translate="I18N_ONE_SUBSCRIBER_TEXT">
-        </span>
-        <span class="sort-explorations-select"
-              ng-if="activeTab === 'mySubscribers'"
-              ng-class="{'sort-explorations-select-three-tabs': (collectionsList.length !== 0 && subscribersList.length !== 0)}"
-              style="float: right;">
-          <p class="sort-by-text">Sort By</p>
-          <select ng-model="currentSubscribersSortType"
-                  class="sort-options"
-                  ng-change="setSubscriptionSortingOptions(currentSubscribersSortType)"
-                  ng-options="SUBSCRIPTION_SORT_BY_KEYS[key] as value for (key, value) in HUMAN_READABLE_SUBSCRIPTION_SORT_BY_KEYS"
-                  style="width: 160px;">
-          </select>
-          <span class="sort-order fa"
-                ng-click="setSubscriptionSortingOptions(currentSubscribersSortType)"
-                ng-class="isCurrentSubscriptionSortDescending ? 'fa-long-arrow-up': 'fa-long-arrow-down'">
+      <div ng-if="canCreateCollections && activeTab === 'myCollections'">
+        <div ng-if="collectionsList.length === 0" class="oppia-dashboard-empty-text">
+          <em>There are no collections to display.</em>
+        </div>
+
+        <ul class="oppia-dashboard-tiles"
+            ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
+          <span ng-repeat="collection in collectionsList">
+            <collection-summary-tile class="protractor-test-collection-card"
+                                     collection-id="collection.id"
+                                     collection-title="collection.title"
+                                     last-updated-msec="collection.last_updated"
+                                     node-count="collection.node_count"
+                                     objective="collection.objective"
+                                     thumbnail-icon-url="collection.thumbnail_icon_url"
+                                     thumbnail-bg-color="collection.thumbnail_bg_color"
+                                     is-linked-to-editor-page="true">
+            </collection-summary-tile>
           </span>
-        </span>
+        </ul>
       </div>
-      <md-card class="oppia-subscription-card protractor-test-subscription-card"
-               ng-repeat="subscriber in subscribersList | orderBy:sortSubscriptionFunction:isCurrentSubscriptionSortDescending">
-        <a class="oppia-subscription-profile-link" href="/profile/<[subscriber.subscriber_username]>" target="_blank">
-          <img ng-src="<[subscriber.subscriber_picture_data_url]>" class="oppia-subscription-card-profile-picture img-circle">
-          <span class="oppia-subscription-card-summary">
-            <div style="margin-bottom: 5px; font-size: 17.5px;">
-              <strong class="protractor-test-subscription-name"
-                      popover-append-to-body
-                      popover-trigger="<[showUsernamePopover(subscriber.subscriber_username)]>"
-                      ng-attr-uib-popover="<[subscriber.subscriber_username]>">
-                <[subscriber.subscriber_username| truncate:10]>
-              </strong>
-            </div>
-            <div style="font-size: 14.5px;">
-              <span>Impact</span>
-              <span><[subscriber.subscriber_impact || 0]></span>
-            </div>
+    </div>
+
+    <div class="oppia-creator-dashboard-questions-tab">
+      <div ng-if="activeTab === 'myQuestions'"
+           class="col-md-2 oppia-creator-dashboard-side-content"
+           ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}"
+           style="min-width: 200px;">
+        <md-card class="oppia-creator-dashboard-main-menu" style="margin: 0;">
+          <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.APPROVED"
+              class="oppia-creator-dashboard-menu"
+              ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.APPROVED}"
+              ng-click="setActiveSection(QUESTION_STATUS.APPROVED)">
+            <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.APPROVED]>"></span>
+            <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.APPROVED]></div>
+          </h4>
+          <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.PENDING"
+              class="oppia-creator-dashboard-menu"
+              ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.PENDING}"
+              ng-click="setActiveSection(QUESTION_STATUS.PENDING)">
+            <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.PENDING]>"></span>
+            <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.PENDING]></div>
+          </h4>
+          <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.PRIVATE"
+              class="oppia-creator-dashboard-menu"
+              ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.PRIVATE}"
+              ng-click="setActiveSection(QUESTION_STATUS.PRIVATE)">
+            <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.PRIVATE]>"></span>
+            <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.PRIVATE]></div>
+          </h4>
+          <h4 ng-if="QUESTION_STATUS.TOTAL_QUESTIONS.REJECTED"
+              class="oppia-creator-dashboard-menu"
+              ng-class="{'oppia-creator-dashboard-section-active': activeSection === QUESTION_STATUS.REJECTED}"
+              ng-click="setActiveSection(QUESTION_STATUS.REJECTED)">
+            <span translate="<[CREATOR_DASHBOARD_SECTION_I18N_IDS.REJECTED]>"></span>
+            <div class="oppia-question-count"><[QUESTION_STATUS.TOTAL_QUESTIONS.REJECTED]></div>
+          </h4>
+        </md-card>
+        <button type="button"
+                class="btn oppia-dashboard-intro-button oppia-transition-200"
+                ng-click="createNewQuestion()"
+                translate="I18N_CREATE_QUESTION">
+        </button>
+      </div>
+      <div ng-if="activeTab === 'myQuestions'"
+           class="col-md-8 oppia-creator-dashboard-questions"
+           ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}">
+        <div class="oppia-dashboard-question-tiles"
+             ng-if="activeTab === 'myQuestions' && questionsList.length > 0">
+          <span ng-repeat="question in questionsList | filter:{status: activeSection}">
+            <span ng-class="activeSection">
+              <question-summary-tile question-id="question.id"
+                                     description="question.question_html_data"
+                                     last-updated-msec="question.last_updated"
+                                     status="question.status"
+                                     tagged-skills="question.tagged_skills">
+              </question-summary-tile>
+            </span>
           </span>
-        </a>
-      </md-card>
-    </div>
-
-    <div ng-if="canCreateCollections && activeTab === 'myCollections'">
-      <div ng-if="collectionsList.length === 0" class="oppia-dashboard-empty-text">
-        <em>There are no collections to display.</em>
+        </div>
       </div>
-
-      <ul class="oppia-dashboard-tiles"
-          ng-if="activeTab === 'myCollections' && collectionsList.length > 0">
-        <span ng-repeat="collection in collectionsList">
-          <collection-summary-tile class="protractor-test-collection-card"
-                                   collection-id="collection.id"
-                                   collection-title="collection.title"
-                                   last-updated-msec="collection.last_updated"
-                                   node-count="collection.node_count"
-                                   objective="collection.objective"
-                                   thumbnail-icon-url="collection.thumbnail_icon_url"
-                                   thumbnail-bg-color="collection.thumbnail_bg_color"
-                                   is-linked-to-editor-page="true">
-          </collection-summary-tile>
-        </span>
-      </ul>
+      <div ng-if="activeTab === 'myQuestions'"
+           class="col-md-2 oppia-creator-dashboard-right-side-content"
+           ng-class="{'oppia-creator-dashboard-mobile-mode': checkMobileView()}"
+           style="min-width: 200px;">
+      </div>
     </div>
+
   </div>
   <style>
+    .oppia-creator-dashboard-questions-tab {
+      max-width: 75%;
+      margin: 0 auto;
+      display: flex;
+    }
+
+    .oppia-question-count {
+      background-color: #fff;
+      border-radius: 50%;
+      width: 25px;
+      height: 25px;
+      position: relative;
+      float: right;
+      color:#009688;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    .oppia-creator-dashboard-questions {
+      width: 60%;
+    }
+
+    .oppia-creator-dashboard-side-content {
+      padding: 0;
+      width: 20%;
+    }
+
+    .oppia-creator-dashboard-right-side-content {
+      padding: 0;
+      width: 20%;
+    }
+
+    @media(max-width: 1020px) {
+      .oppia-creator-dashboard-right-side-content {
+        display: none;
+      }
+    }
+
+    .oppia-creator-dashboard-mobile-mode {
+      margin: auto;
+      width: 100%;
+    }
+
+    .oppia-creator-dashboard-main-menu {
+      background-color: white;
+      padding: 0;
+    }
+
+    .oppia-creator-dashboard-menu {
+      border: 1px solid #d0d0d0;
+      color: #009688;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 1em;
+      font-weight: normal;
+      margin: 0;
+      padding: 15px 20px 15px 20px;
+      text-transform: uppercase;
+    }
+
+    .oppia-creator-dashboard-section-active {
+      background-color: #009688;
+      color: white;
+    }
+
     .oppia-creator-dashboard-main-content {
       width: 100%;
     }
@@ -398,10 +612,6 @@
    .oppia-creator-dashboard-main-content .stats-card .stat-value-without-rating {
       bottom: -0.7em;
       position: absolute;
-    }
-    .oppia-creator-dashboard-mobile-mode {
-      margin: auto;
-      width: 100%;
     }
     .oppia-dashboard-tabs {
       border-bottom: 1px solid #eee;
@@ -652,10 +862,17 @@
     .oppia-dashboard-card-statistic-value {
       padding-left: 19px;
     }
+
     ul.oppia-dashboard-tiles {
       list-style-type: none;
-      margin-top: 15px;
       padding-left: 0;
+      margin: 0 auto;
+      width: 50%;
+    }
+
+    .oppia-dashboard-question-tiles {
+      width: 95%;
+      margin: 0 auto;
     }
 
     @media(max-width: 815px) {
@@ -739,6 +956,9 @@
         content: none;
       }
     }
+    .oppia-dashboard-tab-padding {
+      margin-top: 100px;
+    }
   </style>
 {% endblock %}
 
@@ -750,6 +970,8 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/HintAndSolutionButtonsDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/CollectionSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/summary_tile/QuestionSummaryTileDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/QuestionCreationService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/creator_dashboard/CreatorDashboardBackendApiService.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/creator_dashboard/CreatorDashboard.js"></script>

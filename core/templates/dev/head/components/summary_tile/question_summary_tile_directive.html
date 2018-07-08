@@ -1,0 +1,78 @@
+<md-card class="oppia-activity-summary-tile" style="z-index: 5; width: 100%; margin: 0 0 20px 0;">
+  <a ng-href="<[getQuestionLink()]>" style="text-decoration: none;">
+    <div class="oppia-question-summary-tile" style="border-left: 60px <[getQuestionStripColor()]> solid;">
+      <div class="oppia-question-description oppia-activity-summary-contents">
+        <em>
+          <b>Question: </b>
+          <span>
+            <[getQuestionDescription()]>
+          </span>
+        </em>
+      </div>
+      <span ng-if="getLastUpdatedDatetime()" class="oppia-question-last-updated">
+        <span class="fa fa-clock-o fa-lg oppia-dashboard-clock-icon" uib-tooltip="Last updated" tooltip-placement="top">
+          <[getLastUpdatedDatetime()]>
+            <span class="oppia-icon-accessibility-label">Last Updated</span>
+        </span>
+        <span ng-if="!getLastUpdatedDatetime()" translate="I18N_LIBRARY_N/A" class="oppia-inactive-summary-tile-attribute">
+        </span>
+      </span>
+      <br>
+      <div class="oppia-dashboard-tagged-skills oppia-activity-summary-contents">
+        <span ng-repeat="skill in getTaggedSkills">
+          <div class="oppia-question-linked-skill">
+              <span>
+                <em><[skill]></em>
+              </span>
+          </div>
+        </span>
+      </div>
+      <div class="oppia-dashboard-tagged-skills oppia-activity-summary-contents" ng-if="!getTaggedSkills">
+        <div class="oppia-question-linked-skill">
+            <span>
+              <em>Edit Question to tag skills.</em>
+            </span>
+        </div>
+      </div>
+    </div>
+    <div ng-if="!isPlaylistTile()" class="title-section-mask" ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"></div>
+  </a>
+</md-card>
+
+<style>
+  .oppia-question-summary-tile .oppia-activity-summary-contents {
+    display: inline-block;
+  }
+
+  .oppia-question-summary-tile .oppia-question-summary-tile  {
+    border-left: 60px solid;
+  }
+
+  .oppia-question-summary-tile .oppia-question-linked-skill {
+    border: 2px solid black;
+    border-radius: 3px;
+    padding: 5px;
+    display: inline-block;
+    margin-right: 5px;
+  }
+
+  .oppia-question-summary-tile .oppia-dashboard-tagged-skills {
+    font-size: 0.8em;
+    margin: 60px 0 15px 10px;
+  }
+
+  .oppia-question-summary-tile .oppia-question-last-updated {
+    float: right;
+    padding: 10px 10px 0 0;
+    font-size: 0.7em
+  }
+
+  .oppia-question-summary-tile .oppia-dashboard-clock-icon {
+    position: relative;
+    float: left;
+  }
+
+  .oppia-question-summary-tile .oppia-question-description {
+    padding: 10px 0 0 10px;
+  }
+</style>

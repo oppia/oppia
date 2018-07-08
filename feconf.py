@@ -508,42 +508,12 @@ ALLOWED_INTERACTION_CATEGORIES = [{
     ],
 }]
 
-ALLOWED_QUESTION_INTERACTION_CATEGORIES = [{
-    'name': 'General',
-    'interaction_ids': [
-        'ImageClickInput',
-        'ItemSelectionInput',
-        'MultipleChoiceInput',
-        'TextInput'
-    ],
-}, {
-    'name': 'Math',
-    'interaction_ids': [
-        'FractionInput',
-        'GraphInput',
-        'LogicProof',
-        'NumericInput',
-        'SetInput',
-        'MathExpressionInput',
-        'NumberWithUnits',
-    ]
-}, {
-    'name': 'Programming',
-    'interaction_ids': [
-        'CodeRepl',
-        'PencilCodeEditor',
-    ],
-}, {
-    'name': 'Music',
-    'interaction_ids': [
-        'MusicNotesInput'
-    ],
-}, {
-    'name': 'Geography',
-    'interaction_ids': [
-        'InteractiveMap'
-    ],
-}]
+ALLOWED_QUESTION_INTERACTION_CATEGORIES = copy.deepcopy(
+    ALLOWED_INTERACTION_CATEGORIES)
+
+ALLOWED_QUESTION_INTERACTION_CATEGORIES[0]['interaction_ids'].remove('Continue')
+ALLOWED_QUESTION_INTERACTION_CATEGORIES[0]['interaction_ids'].remove(
+    'EndExploration')
 
 # The list of interaction IDs which correspond to interactions that set their
 # is_linear property to true. Linear interactions do not support branching and
@@ -667,10 +637,10 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
+QUESTION_CREATION_URL = '/question_editor_handler/create_new'
 QUESTION_DATA_URL = '/questionhandler/data'
 QUESTION_EDITOR_URL_PREFIX = '/question_editor'
 QUESTION_MANAGER_URL = '/questionmanagerhandler'
-QUESTION_RIGHTS_URL_PREFIX = '/questionhandler/rights'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
