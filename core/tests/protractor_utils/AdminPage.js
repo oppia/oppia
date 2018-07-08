@@ -19,6 +19,7 @@
 
 var general = require('./general.js');
 var forms = require('./forms.js');
+var until = protractor.ExpectedConditions;
 
 var AdminPage = function(){
   var ADMIN_URL_SUFFIX = '/admin';
@@ -31,30 +32,6 @@ var AdminPage = function(){
   var updateFormName = element(by.css('.protractor-update-form-name'));
   var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
-  var explorationElements = element.all(by.css(
-    '.protractor-test-reload-exploration-row'
-  ));
-  var reloadAllExplorationsButtons = element.all(by.css(
-    '.protractor-test-reload-all-explorations-button'
-  ));
-  var reloadCollectionButton = element.all(by.css(
-    '.protractor-test-reload-collection-button')).first();
-
-  var roleOption = function(role){
-    return roleSelect.element(by.cssContainingText('option', role));
-  };
-
-  var explorationTitleElement = function(explorationElement) {
-    return explorationElement.element(
-      by.css('.protractor-test-reload-exploration-title')
-    );
-  };
-
-  var explorationElementReloadButton = function(explorationElement) {
-    return explorationElement.element(
-      by.css('.protractor-test-reload-exploration-button')
-    );
-  };
 
   var saveConfigProperty = function(configProperty) {
     return configProperty.element(by.css('.protractor-test-config-title'))
@@ -72,7 +49,8 @@ var AdminPage = function(){
   };
 
   this.get = function(){
-    return browser.get(ADMIN_URL_SUFFIX);
+    browser.get(ADMIN_URL_SUFFIX);
+    return general.waitForLoadingMessage();
   };
 
   this.editConfigProperty = function(
@@ -92,46 +70,24 @@ var AdminPage = function(){
   };
 
   this.updateRole = function(name, newRole) {
-    general.waitForSystem();
-    this.get();
-    adminRolesTab.click();
-    browser.waitForAngular();
-    // Change values for "update role" form, and submit it.
-    updateFormName.sendKeys(name);
-    roleOption(newRole).click();
-    updateFormSubmit.click();
-    general.waitForSystem();
-    return true;
-  };
-
-  this.reloadCollection = function() {
-    reloadCollectionButton.click();
-  };
-
-  // The name should be as given in the admin page (including '.yaml' if
-  // necessary).
-  this.reloadExploration = function(name) {
-    this.get();
-    explorationElements.map(function(explorationElement) {
-      explorationTitleElement(explorationElement)
-        .getText().then(function(title) {
-          // We use match here in case there is whitespace around the name
-          if (title.match(name)) {
-            explorationElementReloadButton(explorationElement).click();
-            general.acceptAlert();
-            // Time is needed for the reloading to complete.
-            browser.waitForAngular();
-          }
-        });
+    browser.wait(until.elementToBeClickable(adminRolesTab), 5000,
+      'Admin Roles tab is not clickable').then(function(isClickable) {
+      if (isClickable) {
+        adminRolesTab.click();
+      }
     });
-  };
-
-  // Imports all the demo explorations.
-  this.reloadAllExplorations = function(name) {
-    this.get();
-    reloadAllExplorationsButtons.click();
-    general.acceptAlert();
-    browser.waitForAngular();
+    // Change values for "update role" form, and submit it.
+    browser.wait(until.visibilityOf(updateFormName), 5000,
+      'Update Form Name is not visible');
+    updateFormName.sendKeys(name);
+    var roleOption = roleSelect.element(
+      by.cssContainingText('option', newRole));
+    roleOption.click();
+    updateFormSubmit.click();
+    var statusMessage = element(by.css('[ng-if="statusMessage"]'));
+    browser.wait(until.textToBePresentInElement(statusMessage,
+      'successfully updated to'), 5000, 'Role was set unsuccessfully');
+    return true;
   };
 };
 

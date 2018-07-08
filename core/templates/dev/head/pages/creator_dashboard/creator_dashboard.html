@@ -197,10 +197,8 @@
                       translate="I18N_CREATE_QUESTION">
               </button>
             </div>
-            <div ng-attr-section="'<['right-section']>">
-              <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
-                 ng-href="<[getExplorationUrl(exploration.id)]>">
-              </a>
+            <div class="mask-wrap protractor-test-title-mask">
+              <div class="title-section-mask"></div>
             </div>
             <div class="exp-private-text" ng-if="exploration.status === 'private'">
               <[publishText]>
