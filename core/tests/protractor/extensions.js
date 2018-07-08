@@ -27,7 +27,7 @@ var ExplorationEditorPage =
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
-fdescribe('rich-text components', function() {
+describe('rich-text components', function() {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
 
