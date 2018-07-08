@@ -504,6 +504,26 @@ def convert_to_ckeditor(html_data):
     for i in soup.findAll('i'):
         i.name = 'em'
 
+    # Ensures li is not wrapped in li or p.
+    for li in soup.findAll('li'):
+        while li.parent.name in ['li', 'p']:
+            li.parent.unwrap()
+
+    # Ensure that the children of ol/ul are li/pre.
+    list_tags = ['ol', 'ul']
+    for tag_name in list_tags:
+        for tag in soup.findAll(tag_name):
+            for child in tag.children:
+                if child.name not in ['li', 'pre', 'ol', 'ul']:
+                    new_parent = soup.new_tag('li')
+                    next_sib = list(child.next_siblings)
+                    child.wrap(new_parent)
+                    for sib in next_sib:
+                        if sib.name not in ['li', 'pre']:
+                            sib.wrap(new_parent)
+                        else:
+                            break
+
     # This block wraps p tag in li tag if the parent of p is ol/ul tag. Also,
     # if the parent of p tag is pre tag, it unwraps the p tag.
     for p in soup.findAll('p'):
@@ -512,11 +532,14 @@ def convert_to_ckeditor(html_data):
         elif p.parent.name in ['ol', 'ul']:
             p.wrap(soup.new_tag('li'))
 
-    # Replaces <p><br><p> with <p>&nbsp;</p>.
+    # Replaces <p><br><p> with <p>&nbsp;</p> and <pre>...<br>...</pre>
+    # with <pre>...\n...</pre>.
     for br in soup.findAll('br'):
-        parent_tag = br.parent
-        if parent_tag.name == 'p' and parent_tag.get_text() == '':
+        if br.parent.name == 'p' and br.parent.get_text() == '':
             br.replaceWith('&nbsp;')
+        elif br.parent.name == 'pre':
+            br.insert_after('\n')
+            br.unwrap()
 
     # This block ensures that ol/ul tag is not a direct child of another ul/ol
     # tag. The conversion works as follows:
@@ -525,7 +548,6 @@ def convert_to_ckeditor(html_data):
     # i.e. if any ol/ul has parent as ol/ul and a previous sibling as li
     # it is wrapped in its previous sibling. If there is no previous sibling,
     # the tag is unwrapped.
-    list_tags = ['ol', 'ul']
     for tag_name in list_tags:
         for tag in soup.findAll(tag_name):
             if tag.parent.name in list_tags:
