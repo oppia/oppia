@@ -159,7 +159,7 @@ class EditableSkillDataHandler(base.BaseHandler):
 class SkillPublishHandler(base.BaseHandler):
     """A handler for publishing skills."""
 
-    @acl_decorators.can_publish_owned_skill
+    @acl_decorators.can_publish_skill
     def put(self, skill_id):
         """Publishes a skill."""
         skill_domain.Skill.require_valid_skill_id(skill_id)

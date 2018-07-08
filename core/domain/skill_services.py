@@ -551,6 +551,11 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
+    skill_rights_model = skill_mdoels.SkillRightsModel.get(skill_id)
+    skill_rights_model.delete(
+        committer_id, feconf.COMMIT_MESSAGE_SKILL_DELETED,
+        force_deletion=force_deletion)
+
     skill_model = skill_models.SkillModel.get(skill_id)
     skill_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_SKILL_DELETED,
@@ -714,8 +719,28 @@ def check_can_edit_skill(user, skill_rights):
             return True
         if skill_rights.is_private() and skill_rights.is_creator(user.id):
             return True
-    else:
+    return False
+
+
+def check_can_publish_skill(user, skill_rights):
+    """Checks whether the user can publish the given skill.
+
+    Args:
+        user: UserActionsInfo. Object having user id, role and actions for
+            given user.
+        skill_rights: SkillRights or None. Rights object for the given skill.
+
+    Returns:
+        bool. Whether the given user can publish the given skill.
+    """
+
+    if skill_rights is None:
         return False
+    if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
+        return False
+    if skill_rights.is_creator(user.id):
+        return True
+    return False
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):
