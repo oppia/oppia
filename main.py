@@ -367,6 +367,13 @@ URLS = MAPREDUCE_HANDLERS + [
         reader.RecommendationsHandler),
 
     get_redirect_route(
+        r'%s/<question_id>' % feconf.QUESTION_EDITOR_URL_PREFIX,
+        question_editor.QuestionEditorPage),
+    get_redirect_route(
+        r'%s/<question_id>' % feconf.QUESTION_DATA_URL,
+        question_editor.EditableQuestionDataHandler),
+
+    get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
         editor.ExplorationPage),
     get_redirect_route(
@@ -502,13 +509,6 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<collection_id>' % feconf.COLLECTION_UNPUBLISH_PREFIX,
         collection_editor.CollectionUnpublishHandler),
-
-    get_redirect_route(
-        r'%s/<question_id>' % feconf.QUESTION_DATA_URL,
-        question_editor.EditableQuestionDataHandler),
-    get_redirect_route(
-        r'%s/<question_id>' % feconf.QUESTION_EDITOR_URL_PREFIX,
-        question_editor.QuestionEditorPage),
 
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_URL_PREFIX,

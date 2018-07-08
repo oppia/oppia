@@ -20,15 +20,19 @@
       <br>
       <div class="oppia-dashboard-tagged-skills oppia-activity-summary-contents">
         <span ng-repeat="skill in getTaggedSkills">
-          <span class="oppia-dasboard-skill">
-            <[skill]>
-          </span>
+          <div class="oppia-question-linked-skill">
+              <span>
+                <em><[skill]></em>
+              </span>
+          </div>
         </span>
       </div>
       <div class="oppia-dashboard-tagged-skills oppia-activity-summary-contents" ng-if="!getTaggedSkills">
-        <span class="oppia-question-linked-skill">
-          <em>Edit Question to tag skills.</em>
-        </span>
+        <div class="oppia-question-linked-skill">
+            <span>
+              <em>Edit Question to tag skills.</em>
+            </span>
+        </div>
       </div>
     </div>
     <div ng-if="!isPlaylistTile()" class="title-section-mask" ng-mouseenter="setHoverState(true)" ng-mouseleave="setHoverState(false)"></div>
@@ -48,6 +52,7 @@
     border: 2px solid black;
     border-radius: 3px;
     padding: 5px;
+    display: inline-block;
     margin-right: 5px;
   }
 

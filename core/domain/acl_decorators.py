@@ -860,12 +860,8 @@ def can_edit_question(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        question_rights = question_services.get_question_rights(question_id)
-        if question_rights is None:
-            raise base.UserFacingExceptions.PageNotFoundException
-
         if question_services.check_can_edit_question(
-                self.user, question_rights):
+                self.user.user_id, question_id):
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -905,9 +901,8 @@ def can_delete_question(handler):
 
         user_actions_info = user_services.UserActionsInfo(self.user_id)
 
-        # pylint: disable=C0301
-        if role_services.ACTION_DELETE_ANY_QUESTION in user_actions_info.actions:
-        # pylint: enable=C0301
+        if (role_services.ACTION_DELETE_ANY_QUESTION in
+                user_actions_info.actions):
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -916,28 +911,6 @@ def can_delete_question(handler):
     test_can_delete_question.__wrapped__ = True
 
     return test_can_delete_question
-
-
-def can_manage_rights_for_question(handler):
-    """Decorator to check whether the user can manage a question's rights."""
-
-    def test_can_manage_question_rights(self, question_id, **kwargs):
-        if not self.user_id:
-            raise self.NotLoggedInException
-
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-
-        if (
-                role_services.ACTION_MANAGE_QUESTION_RIGHTS in
-                user_actions_info.actions):
-            return handler(self, question_id, **kwargs)
-        else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to assign roles for the '
-                'question.' % self.user_id)
-    test_can_manage_question_rights.__wrapped__ = True
-
-    return test_can_manage_question_rights
 
 
 def can_change_question_publication_status(handler):

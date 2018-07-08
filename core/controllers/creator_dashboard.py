@@ -173,6 +173,21 @@ class CreatorDashboardHandler(base.BaseHandler):
             question_services.get_question_summaries_by_creator_id(
                 self.user_id))
 
+        question_ids_created_by_user = []
+
+        for question_summary in question_summaries:
+            question_ids_created_by_user.append(
+                question_summary.id)
+
+        questions = question_services.get_questions_by_ids(
+            question_ids_created_by_user)
+
+        for question_summary in question_summaries:
+            for question in questions:
+                if question.id == question_summary.id:
+                    question_summary.language_code = question.language_code
+                    question_summary.status = question.status
+
         question_summary_dicts = (
             summary_services.get_displayable_question_summary_dicts(
                 question_summaries))

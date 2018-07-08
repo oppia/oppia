@@ -15,17 +15,14 @@
 """Controllers for the questions editor, from where questions are edited
 and are created.
 """
+import json
 import logging
 
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import interaction_registry
 from core.domain import question_domain
 from core.domain import question_services
-from core.domain import role_services
-from core.domain import user_services
 import feconf
-import utils
 
 
 class QuestionEditorPage(base.BaseHandler):
@@ -38,21 +35,17 @@ class QuestionEditorPage(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        question = question_services.get_question_by_id(question_id)
+        question = question_services.get_question_by_id(
+            question_id, strict=False)
 
         if question is None:
             raise self.PageNotFoundException(
                 'The question with the given id doesn\'t exist.')
 
         self.values.update({
-            'INTERACTION_SPECS': (
-                interaction_registry.Registry.get_all_question_editor_specs()),
-            'question_id': question.to_dict(),
+            'question': question.to_dict(),
             'can_edit': question_services.check_can_edit_question(
-                self.user.user_id, question.question_id),
-            'ALLOWED_QUESTION_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES),
-            'nav_mode': feconf.NAV_MODE_QUESTION_EDITOR
+                self.user.user_id, question_id)
         })
 
         self.render_template(
@@ -66,17 +59,14 @@ class EditableQuestionDataHandler(base.BaseHandler):
     @acl_decorators.can_view_any_question_editor
     def get(self, question_id):
         """Gets the data for the question overview page."""
-        # 'apply_draft' and 'v'(version) are optional parameters because the
-        # question history tab also uses this handler, and these parameters
-        # are not used by that tab.
-        version = self.request.get('v', default_value=None)
-        apply_draft = self.request.get('apply_draft', default_value=False)
 
-        question_data = question_services.get_user_question_data(
-            self.user_id, question_id, apply_draft=apply_draft,
-            version=version)
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
 
-        self.values.update(question_data)
+        question_data = question_services.get_question_by_id(
+            question_id, strict=False)
+
+        self.values.update(question_data.to_dict())
         self.render_json(self.values)
 
     @acl_decorators.can_edit_question
@@ -85,35 +75,22 @@ class EditableQuestionDataHandler(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        question = question_services.get_question_by_id(question_id)
-        if question is None:
-            raise self.PageNotFoundException(
-                'The question with the given id doesn\'t exist.')
-
-        version = self.payload.get('version')
-        self._require_valid_version(version, question.version)
-
         commit_message = self.payload.get('commit_message')
-        change_dicts = self.payload.get('change_dicts')
-        change_list = []
-        for change in change_dicts:
-            change_list.append(
-                question_domain.QuestionChange(change))
-        try:
-            question_services.update_question_pages(
-                self.user_id, question_id, change_list,
-                commit_message)
-        except utils.ValidationError as e:
-            raise self.InvalidInputException(e)
-
-        question_dict = question_services.get_question_by_id(
-            question_id).to_dict()
-
-        self.values.update({
-            'question': question_dict
+        if not question_id:
+            raise self.PageNotFoundException
+        if not commit_message:
+            raise self.PageNotFoundException
+        if not self.payload.get('change_list'):
+            raise self.PageNotFoundException
+        change_list = [
+            question_domain.QuestionChange(change)
+            for change in json.loads(self.payload.get('change_list'))]
+        question_services.update_question(
+            self.user_id, question_id, change_list,
+            commit_message)
+        return self.render_json({
+            'question_id': question_id
         })
-
-        self.render_json(self.values)
 
     @acl_decorators.can_delete_question
     def delete(self, question_id):
@@ -125,7 +102,8 @@ class EditableQuestionDataHandler(base.BaseHandler):
             self.role, self.user_id, question_id)
         logging.debug(log_debug_string)
 
-        question = question_services.get_question_by_id(question_id)
+        question = question_services.get_question_by_id(
+            question_id, strict=False)
         if question is None:
             raise self.PageNotFoundException(
                 'The question with the given id doesn\'t exist.')
@@ -134,57 +112,3 @@ class EditableQuestionDataHandler(base.BaseHandler):
         log_info_string = '(%s) %s deleted question %s' % (
             self.role, self.user_id, question_id)
         logging.info(log_info_string)
-
-
-class QuestionRightsHandler(base.BaseHandler):
-    """A handler for returning question rights."""
-
-    @acl_decorators.can_view_any_question_editor
-    def get(self, question_id):
-        """Returns the QuestionRights object of a question."""
-        question_domain.Question.require_valid_question_id(question_id)
-
-        question_rights = question_services.get_question_rights(question_id)
-        if question_rights is None:
-            raise self.InvalidInputException(
-                'Expected a valid question id to be provided.')
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-        can_edit_question = question_services.check_can_edit_question(
-            user_actions_info, question_rights)
-
-        can_publish_question = (
-            role_services.ACTION_CHANGE_QUESTION_STATUS in
-            user_actions_info.actions)
-
-        self.values.update({
-            'can_edit_question': can_edit_question,
-            'published': question_rights.question_is_published,
-            'can_publish_question': can_publish_question
-        })
-
-        self.render_json(self.values)
-
-
-class QuestionPublishHandler(base.BaseHandler):
-    """A handler for publishing and unpublishing questions."""
-
-    @acl_decorators.can_change_question_publication_status
-    def put(self, question_id):
-        """Publishes or unpublishes a question."""
-        question_domain.Question.require_valid_question_id(question_id)
-
-        publish_status = self.payload.get('publish_status')
-
-        if not isinstance(publish_status, bool):
-            raise self.InvalidInputException(
-                'Publish status should only be true or false.')
-
-        try:
-            if publish_status:
-                question_services.publish_question(question_id, self.user_id)
-            else:
-                question_services.unpublish_question(question_id, self.user_id)
-        except Exception as e:
-            raise self.UnauthorizedUserException(e)
-
-        self.render_json(self.values)

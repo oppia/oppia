@@ -56,7 +56,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.status = 'private'
         self.question = question_domain.Question(
             self.question_id, self.question_data,
-            self.question_data_schema_version, self.language_code)
+            self.question_data_schema_version, self.language_code, self.status)
 
     def test_get_question_by_id(self):
         question_id = question_services.add_question(
@@ -64,21 +64,22 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question = question_services.get_question_by_id(
             question_id, strict=False)
 
-        self.assertEqual(question.question_id, question_id)
+        self.assertEqual(question.id, question_id)
 
     def test_get_questions_by_ids(self):
         question1_id = question_services.add_question(
             self.owner_id, self.question)
         question = question_domain.Question(
-            'dummy2', self._create_valid_question_data('ABC'), 1, 'en')
+            'dummy2', self._create_valid_question_data('ABC'), 1,
+            'en', 'private')
 
         question2_id = question_services.add_question(
             self.owner_id, question)
         questions = question_services.get_questions_by_ids(
             [question1_id, question2_id])
         self.assertEqual(len(questions), 2)
-        self.assertEqual(questions[0].question_id, question1_id)
-        self.assertEqual(questions[1].question_id, question2_id)
+        self.assertEqual(questions[0].id, question1_id)
+        self.assertEqual(questions[1].id, question2_id)
 
     def test_add_question(self):
         question_id = question_services.add_question(
@@ -90,19 +91,19 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             model.question_data_schema_version,
             self.question_data_schema_version)
         self.assertEqual(model.language_code, self.language_code)
+        self.assertEqual(model.status, self.status)
 
     def test_delete_question(self):
         question_id = question_services.add_question(
             self.owner_id, self.question)
-        question_services.delete_question(
-            self.owner_id, question_id)
+        question_services.delete_question(self.owner_id, question_id)
 
         with self.assertRaisesRegexp(Exception, (
             'Entity for class QuestionModel with id %s not found' % (
                 question_id))):
             question_models.QuestionModel.get(question_id)
 
-    def test_update_question(self):
+    def test_update_question_data(self):
         new_question_data = self._create_valid_question_data('DEF')
         question_id = question_services.add_question(
             self.owner_id, self.question)
@@ -123,18 +124,17 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.question_data_schema_version)
         self.assertEqual(
             model.language_code, self.language_code)
+        self.assertEqual(
+            model.status, self.status)
 
     def test_compute_summary_of_question(self):
-        question = self.question.to_dict()
         question_summary = question_services.compute_summary_of_question(
-            question, self.owner_id, self.status)
+            self.question, self.owner_id)
 
         self.assertEqual(question_summary.id, 'dummy')
         self.assertEqual(
-            question_summary.question_data,
+            question_summary.question_html_data,
             html_cleaner.clean(''))
-        self.assertEqual(question_summary.language_code, 'en')
-        self.assertEqual(question_summary.status, 'private')
 
     def test_get_question_summaries_by_creator_id(self):
         question_services.add_question(self.owner_id, self.question)
@@ -146,28 +146,43 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self.assertEqual(question_summary.id, 'dummy')
             self.assertEqual(
                 question_summary.question_html_data, '')
-            self.assertEqual(question_summary.language_code, 'en')
-            self.assertEqual(question_summary.status, 'private')
 
-    def test_admin_can_manage_question(self):
-        question_id = question_services.add_question(
-            self.owner_id, self.question)
-        question_rights = question_services.get_question_rights(question_id)
-
-        self.assertTrue(question_services.is_manager(
-            self.user_admin, question_rights))
-
-    def test_create_new_question_rights(self):
+    def test_admin_cannot_edit_question_created_by_user(self):
         question_id = question_services.add_question(
             self.owner_id, self.question)
 
-        question_services.assign_role(
-            self.user_admin, self.user_a,
-            question_domain.ROLE_MANAGER, question_id)
+        self.assertFalse(
+            question_services.check_can_edit_question(
+                self.user_id_admin, question_id))
 
-        question_rights = question_services.get_question_rights(question_id)
+    def test_admin_can_create_and_edit_question(self):
+        question_id = question_services.add_question(
+            self.user_id_admin, self.question)
 
-        self.assertTrue(question_services.is_manager(
-            self.user_a, question_rights))
-        self.assertFalse(question_services.is_manager(
-            self.user_b, question_rights))
+        self.assertTrue(
+            question_services.check_can_edit_question(
+                self.user_id_admin, question_id))
+
+    def test_user_can_create_and_edit_question(self):
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
+
+        self.assertTrue(
+            question_services.check_can_edit_question(
+                self.owner_id, question_id))
+
+    def test_topic_manager_can_create_and_edit_question(self):
+        question_id = question_services.add_question(
+            self.user_id_a, self.question)
+
+        self.assertTrue(
+            question_services.check_can_edit_question(
+                self.user_id_a, question_id))
+
+    def test_topic_manager_cannot_edit_question_created_by_user(self):
+        question_id = question_services.add_question(
+            self.owner_id, self.question)
+
+        self.assertFalse(
+            question_services.check_can_edit_question(
+                self.user_id_a, question_id))
