@@ -307,6 +307,7 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         commit_cmds: list(SkillChange). A list of change commands made to the
             given skill.
     """
+    create_new_skill_rights(skill.id, committer_id)
     model = skill_models.SkillModel(
         id=skill.id,
         description=skill.description,
@@ -651,7 +652,7 @@ def create_new_skill_rights(skill_id, committer_id):
     """
     skill_rights = skill_domain.SkillRights(skill_id, True, committer_id)
     commit_cmds = [{'cmd': skill_domain.CMD_CREATE_NEW}]
-
+    print committer_id
     skill_models.SkillRightsModel(
         id=skill_rights.id,
         creator_id=skill_rights.creator_id,
@@ -718,7 +719,7 @@ def check_can_edit_skill(user, skill_rights):
     if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
         if not skill_rights.is_private():
             return True
-        if skill_rights.is_private() and skill_rights.is_creator(user.id):
+        if skill_rights.is_private() and skill_rights.is_creator(user.user_id):
             return True
     return False
 
@@ -739,7 +740,7 @@ def check_can_publish_skill(user, skill_rights):
         return False
     if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
         return False
-    if skill_rights.is_creator(user.id):
+    if skill_rights.is_creator(user.user_id):
         return True
     return False
 

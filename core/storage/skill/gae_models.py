@@ -166,15 +166,17 @@ class SkillRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
     pass
 
 
-class SkillRightsModel(base_models.BaseModel):
+class SkillRightsModel(base_models.VersionedModel):
     """Storage model for the rights related to a skill.
 
     The id of each instance is the id of the corresponding skill.
     """
+    SNAPSHOT_METADATA_CLASS = SkillRightsSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = SkillRightsSnapshotContentModel
     ALLOW_REVERT = False
 
     # The user_id of the creator this skill.
-    creator_id = ndb.StringProperty(indexed=True, repeated=True)
+    creator_id = ndb.StringProperty(indexed=True)
     # Whether the skill is private.
     skill_is_private = ndb.BooleanProperty(
         indexed=True, required=True, default=True)

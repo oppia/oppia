@@ -38,8 +38,18 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', 'description', 'default_feedback')]
         self.SKILL_ID = skill_services.get_new_skill_id()
-        self.skill = self.save_new_skill(
-            self.SKILL_ID, self.USER_ID, 'Description', misconceptions,
+
+        self.signup('a@example.com', 'A')
+        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.set_admins([self.ADMIN_USERNAME])
+        self.user_a = user_services.UserActionsInfo(self.user_id_a)
+        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)     
+
+        self.save_new_skill(
+            self.SKILL_ID, self.user_id_admin, 'Description', misconceptions,
             skill_contents
         )
 
@@ -175,6 +185,14 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             skill_services.get_skill_summary_by_id(self.SKILL_ID, False), None)
 
+    def test_admin_can_edit_owned_skill(self):
+        skill_rights = skill_services.get_skill_rights(self.SKILL_ID)
+
+        self.assertTrue(skill_services.check_can_edit_skill(
+            self.user_admin, skill_rights))
+
+    def test_admin_can_not_edit_other_skill(self):
+        ...
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
     """Test the skill mastery services module."""
