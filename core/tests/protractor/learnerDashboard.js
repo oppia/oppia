@@ -221,7 +221,6 @@ describe('Learner dashboard functionality', function() {
     collectionEditorPage.setObjective('This is a test collection.');
     collectionEditorPage.setCategory('Algebra');
     collectionEditorPage.saveChanges();
-    general.waitForSystem();
     users.logout();
 
     users.createAndLoginUser('learner4@learnerDashboard.com',
