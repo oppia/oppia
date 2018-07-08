@@ -689,6 +689,48 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<ol><li>Item8</li><li>Item9<ol><li>Item10</li><li>Item11'
                 '</li></ol></li></ol></li></ol>'
             )
+        }, {
+            'html_content': (
+                '<p><em><strong>this is </strong></em><br></p>'
+                '<oppia-noninteractive-collapsible content-with-value'
+                '="&amp;quot;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;&amp;'
+                'lt;p&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;'
+                '&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;li&amp;'
+                'gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;'
+                'oppia-noninteractive-image alt-with-value=\\&amp;quot;&amp;'
+                'amp;amp;quot;loremipsum&amp;amp;amp;quot;\\&amp;quot; '
+                'caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                'quot;\\&amp;quot; filepath-with-value=\\&amp;quot;&amp;amp;amp'
+                ';quot;loremipsum.png&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp'
+                ';lt;/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;&amp;'
+                'lt;br&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;&amp;lt;/ul'
+                '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;loremipusm'
+                '&amp;quot;"></oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                '<p><em><strong>this is </strong></em><br></p>'
+                '<oppia-noninteractive-collapsible content-with-value='
+                '"&amp;quot;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;'
+                'lt;/li&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;'
+                '&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;'
+                'li&amp;gt;&amp;lt;oppia-noninteractive-image alt-with-value'
+                '=\\&amp;quot;&amp;amp;amp;quot;loremipsum&amp;amp;amp;quot;'
+                '\\&amp;quot; caption-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+                '&amp;amp;amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot'
+                ';&amp;amp;amp;quot;loremipsum.png&amp;amp;amp;quot;\\&amp;quot'
+                ';&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
+                'p&amp;gt;&amp;amp;amp;nbsp;&amp;lt;/p&amp;gt;&amp;lt;/li&amp;'
+                'gt;&amp;lt;/ul&amp;gt;&amp;quot;" heading-with-value="&amp;'
+                'quot;loremipusm&amp;quot;"></oppia-noninteractive-collapsible>'
+            )
+        }, {
+            'html_content': (
+                '<pre><p>Hello this is test case for </p><p>br '
+                'in </p><p>pre </p><p>tag<br></p></pre>'
+            ),
+            'expected_output': (
+                '<pre>Hello this is test case for br in pre tag\n</pre>'
+            )
         }]
 
         for test_case in test_cases:

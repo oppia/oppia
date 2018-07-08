@@ -624,7 +624,9 @@ class ExplorationMigrationValidationJobForCKEditor(
             err_dict = html_cleaner.validate_rte_format(
                 html_list, feconf.RTE_FORMAT_CKEDITOR, run_migration=True)
         except Exception as e:
-            yield('Error %s in exploration %s' % (str(e), item.id), html_list)
+            yield(
+                'Error in exploration %s' % item.id,
+                [traceback.format_exc()])
             return
 
         for key in err_dict:
