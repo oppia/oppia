@@ -25,13 +25,13 @@ oppia.directive('storyEditorNavbar', [
       controller: [
         '$scope', '$rootScope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'StoryEditorStateService', 'UrlService',
-        'StoryValidationService', 'EVENT_STORY_INITIALIZED',
-        'EVENT_STORY_REINITIALIZED', 'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
+        'EVENT_STORY_INITIALIZED', 'EVENT_STORY_REINITIALIZED',
+        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $rootScope, $uibModal, AlertsService,
             UndoRedoService, StoryEditorStateService, UrlService,
-            StoryValidationService, EVENT_STORY_INITIALIZED,
-            EVENT_STORY_REINITIALIZED, EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
+            EVENT_STORY_INITIALIZED, EVENT_STORY_REINITIALIZED,
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           var topicId = UrlService.getTopicIdFromUrl();
           $scope.story = StoryEditorStateService.getStory();
           $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
@@ -57,8 +57,7 @@ oppia.directive('storyEditorNavbar', [
           };
 
           var _validateStory = function() {
-            $scope.validationIssues =
-              StoryValidationService.findValidationIssuesForStory($scope.story);
+            $scope.validationIssues = $scope.story.validate();
           };
 
           $scope.saveChanges = function() {
