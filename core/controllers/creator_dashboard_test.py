@@ -649,6 +649,7 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['questions_list']), 1)
         self.logout()
 
+
 class NotificationsDashboardHandlerTest(test_utils.GenericTestBase):
 
     DASHBOARD_DATA_URL = '/notificationsdashboardhandler/data'
