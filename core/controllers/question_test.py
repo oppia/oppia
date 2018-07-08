@@ -52,29 +52,26 @@ class QuestionsHandlersTest(test_utils.GenericTestBase):
             self.new_user_id, self.question)
         self.login(self.NEW_USER_EMAIL)
         response = self.testapp.get('/preferences')
-        csrf_token = self.get_csrf_token_from_response(response)
-        response = self.testapp.delete(
-            '%s/%s' % (
-                feconf.QUESTION_DATA_URL, question_id),
-            csrf_token, expect_errors=False)
+        payload = {}
+        payload['question_id'] = question_id
+        response = self.delete_json(
+            '%s' % feconf.QUESTION_DATA_URL,
+            payload, expect_errors=False)
         self.assertEqual(response.status_int, 200)
 
-        response = self.testapp.delete(
-            feconf.QUESTION_DATA_URL, csrf_token, expect_errors=True)
-        self.assertEqual(response.status_int, 404)
-
-        response = self.testapp.delete(
-            '%s/' % feconf.QUESTION_DATA_URL, csrf_token, expect_errors=True)
+        del payload['question_id']
+        response = self.delete_json(
+            '%s' % feconf.QUESTION_DATA_URL,
+            payload, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
         self.logout()
         self.login(self.random_email)
         response = self.testapp.get('/preferences')
-        csrf_token = self.get_csrf_token_from_response(response)
-        response = self.testapp.delete(
-            '%s/%s' % (
-                feconf.QUESTION_DATA_URL, question_id),
-            csrf_token, expect_errors=True)
+        payload['question_id'] = question_id
+        response = self.delete_json(
+            '%s' % feconf.QUESTION_DATA_URL,
+            payload, expect_errors=True)
         self.assertEqual(response.status_int, 401)
 
     def test_post(self):
