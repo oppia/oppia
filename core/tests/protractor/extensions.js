@@ -46,7 +46,6 @@ describe('rich-text components', function() {
     explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
       richTextEditor.appendPlainText(' ');
-
       // TODO (Jacob) add test for image RTE component
       richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       richTextEditor.addRteComponent('Math', 'abc');
@@ -69,7 +68,11 @@ describe('rich-text components', function() {
     explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('bold');
       richTextChecker.readPlainText(' ');
-
+      richTextChecker.readRteComponent('Link', 'http://google.com/', true);
+      richTextChecker.readRteComponent('Math', 'abc');
+      richTextChecker.readRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextChecker.readRteComponent(
+        'Collapsible', 'title', forms.toRichText('inner'));
       richTextChecker.readRteComponent('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
@@ -77,11 +80,6 @@ describe('rich-text components', function() {
         title: 'title 1',
         content: forms.toRichText('contents 2')
       }]);
-      richTextChecker.readRteComponent(
-        'Collapsible', 'title', forms.toRichText('inner'));
-      richTextChecker.readRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
-      richTextChecker.readRteComponent('Math', 'abc');
-      richTextChecker.readRteComponent('Link', 'http://google.com/', true);
     });
 
     explorationEditorPage.discardChanges();
