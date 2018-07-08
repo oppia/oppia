@@ -168,7 +168,6 @@ var RichTextEditor = function(elem) {
         null, args);
       modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
-      general.waitForSystem();
 
       // Ensure that the cursor is at the end of the RTE.
       elem.all(by.model('html')).first().sendKeys(
@@ -491,7 +490,6 @@ var CodeMirrorChecker = function(elem) {
     browser.executeScript(
       "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
       ');');
-    general.waitForSystem();
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
         .then(function(lineNumber) {
