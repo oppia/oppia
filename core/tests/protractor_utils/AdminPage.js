@@ -44,7 +44,7 @@ var AdminPage = function(){
           general.acceptAlert();
           // Waiting for success message.
           browser.wait(until.textToBePresentInElement(statusMessage,
-            'saved successfully'), 15000, 'New config could not be saved');
+            'saved successfully'), 5000, 'New config could not be saved');
           return true;
         }
       });
