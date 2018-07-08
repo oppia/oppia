@@ -24,7 +24,7 @@ var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
 var until = protractor.ExpectedConditions;
 
-// Creates an exploration, opens its editor and skip the tutorial.
+// Creates an exploration, opens its editor and skips the tutorial.
 var createExploration = function() {
   createExplorationAndStartTutorial();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
