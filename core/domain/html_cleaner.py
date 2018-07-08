@@ -19,6 +19,7 @@
 import HTMLParser
 import json
 import logging
+import re
 import urlparse
 
 import bleach
@@ -185,8 +186,9 @@ def unescape_html(escaped_html_data):
     # Some content erroneously contains un-escaped double quotes (&amp;quot;
     # instead of \&amp;quot;) which breaks json parsing. This line ensures
     # all double quotes are escaped.
-    unescaped_html_data = escaped_html_data.replace(
-        '&amp;quot;', '\\&amp;quot;')
+    unescaped_html_data = re.sub(
+        r'(font-family:)(&amp;quot;)(.*?)(&amp;quot;)',
+        r'\1\\\2\3\\\4', escaped_html_data)
     for replace_tuple in REPLACE_LIST:
         unescaped_html_data = unescaped_html_data.replace(
             replace_tuple[1], replace_tuple[0])
