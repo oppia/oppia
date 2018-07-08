@@ -43,6 +43,8 @@ var ExplorationPlayerPage = function() {
 
   var suggestionSubmitButton = element(
     by.css('.protractor-test-suggestion-submit-btn'));
+  var feedbackCloseButton = element(
+    by.css('.protractor-test-exploration-feedback-close-button'));
   var feedbackSubmitButton = element(
     by.css('.protractor-test-exploration-feedback-submit-btn'));
   var explorationInfoIcon = element(
@@ -178,6 +180,10 @@ var ExplorationPlayerPage = function() {
       browser.wait(until.elementToBeClickable(elements[ratingValue - 1]), 5000,
         'Rating Star takes too long to appear');
       elements[ratingValue - 1].click();
+      browser.wait(until.elementToBeClickable(feedbackCloseButton),
+        5000, 'Close Feedback button is not clickable');
+      feedbackCloseButton.click();
+      browser.wait(until.invisibilityOf(feedbackCloseButton), 5000);
     });
   };
 
