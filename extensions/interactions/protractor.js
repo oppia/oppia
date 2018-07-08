@@ -44,6 +44,7 @@
 
 var INTERACTIONS = {
   Continue: require('./Continue/protractor.js'),
+  EndExploration: require('./EndExploration/protractor.js'),
   FractionInput: require('./FractionInput/protractor.js'),
   MultipleChoiceInput: require('./MultipleChoiceInput/protractor.js'),
   NumericInput: require('./NumericInput/protractor.js'),

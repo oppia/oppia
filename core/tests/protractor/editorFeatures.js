@@ -23,7 +23,6 @@
  * in an e2e test.
  */
 
-var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -31,15 +30,22 @@ var workflow = require('../protractor_utils/workflow.js');
 
 var CreatorDashboardPage =
   require('../protractor_utils/CreatorDashboardPage.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
 describe('Exploration history', function() {
+  var explorationEditorPage = null;
   var explorationPlayerPage = null;
-
+  var explorationEditorHistoryTab = null;
+  var explorationEditorMainTab = null;
   beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorHistoryTab = explorationEditorPage.getHistoryTab();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -48,28 +54,31 @@ describe('Exploration history', function() {
     users.login('user@historyTab.com');
     workflow.createExploration();
 
-    // Constants for colors of nodes in history graph
+    // Constants for colors of nodes in history graph.
     var COLOR_ADDED = 'rgb(78, 162, 78)';
     var COLOR_DELETED = 'rgb(220, 20, 60)';
     var COLOR_CHANGED = 'rgb(30, 144, 255)';
     var COLOR_UNCHANGED = 'rgb(245, 245, 220)';
     var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
 
-    // Check renaming state, editing text, editing interactions and adding state
-    editor.setStateName('first');
-    editor.setContent(forms.toRichText('enter 6 to continue'));
-    editor.setInteraction('NumericInput');
-    editor.addResponse('NumericInput', null, 'second', true, 'Equals', 6);
-    editor.moveToState('second');
-    editor.setContent(forms.toRichText('this is card 2'));
-    editor.setInteraction('Continue');
-    editor.setDefaultOutcome(null, 'final card', true);
-
-    // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setInteraction('EndExploration');
-    editor.moveToState('first');
-    editor.saveChanges();
+    // Check renaming state, editing text, editing interactions and adding
+    // state.
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'enter 6 to continue'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', null, 'second', true, 'Equals', 6);
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(forms.toRichText('this is card 2'));
+    explorationEditorMainTab.setInteraction('Continue');
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination('final card', true, null);
+    // Setup a terminating state.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorMainTab.moveToState('first');
+    explorationEditorPage.saveChanges();
 
     var VERSION_1_STATE_1_CONTENTS = {
       1: {
@@ -371,7 +380,8 @@ describe('Exploration history', function() {
       '  solution: null\n' +
       'param_changes: []\n' +
       ' ';
-    editor.expectGraphComparisonOf(1, 2).toBe([{
+
+    var expectedHistoryStates = [{
       label: 'first (was: Introd...',
       color: COLOR_CHANGED
     }, {
@@ -380,33 +390,37 @@ describe('Exploration history', function() {
     }, {
       label: 'final card',
       color: COLOR_ADDED
-    }], [2, 2, 0]);
-    editor.expectTextComparisonOf(
-      1, 2, 'first (was: Introd...'
-    ).toBeWithHighlighting(
+    }];
+    explorationEditorPage.navigateToHistoryTab();
+    var historyGraph = explorationEditorHistoryTab.getHistoryGraph();
+    historyGraph.selectTwoVersions(1, 2);
+    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
+    historyGraph.openStateHistory('first (was: Introd...');
+    historyGraph.expectTextWithHighlightingToMatch(
       VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
-    editor.expectTextComparisonOf(1, 2, 'second').toBe(STATE_2_STRING, ' ');
+    historyGraph.closeStateHistory();
 
+    historyGraph.openStateHistory('second');
+    historyGraph.expectTextToMatch(STATE_2_STRING, ' ');
+    historyGraph.closeStateHistory();
+
+    // Reset all checkboxes.
     // Switching the 2 compared versions should give the same result.
-    editor.expectGraphComparisonOf(2, 1).toBe([{
-      label: 'first (was: Introd...',
-      color: COLOR_CHANGED
-    }, {
-      label: 'second',
-      color: COLOR_ADDED
-    }, {
-      label: 'final card',
-      color: COLOR_ADDED
-    }], [2, 2, 0]);
+    historyGraph.deselectTwoVersions(1, 2);
+    historyGraph.selectTwoVersions(2, 1);
+    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    historyGraph.expectNumberOfLinksToMatch(2, 2, 0);
 
+    // Check deleting a state.
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.deleteState('second');
+    explorationEditorMainTab.moveToState('first');
+    explorationEditorMainTab.getResponseEditor(0).
+      setDestination('final card', false, null);
+    explorationEditorPage.saveChanges();
 
-    // Check deleting a state
-    editor.deleteState('second');
-    editor.moveToState('first');
-    editor.ResponseEditor(0).setDestination('final card', false, null);
-    editor.saveChanges();
-
-    editor.expectGraphComparisonOf(2, 3).toBe([{
+    expectedHistoryStates = [{
       label: 'first',
       color: COLOR_CHANGED
     }, {
@@ -415,31 +429,49 @@ describe('Exploration history', function() {
     }, {
       label: 'final card',
       color: COLOR_UNCHANGED
-    }], [3, 1, 2]);
-    editor.expectTextComparisonOf(2, 3, 'second')
-      .toBe(' ', STATE_2_STRING);
-    // Check renaming a state
-    editor.moveToState('first');
-    editor.setStateName('third');
-    editor.saveChanges();
-    editor.expectGraphComparisonOf(3, 4).toBe([{
+    }];
+    explorationEditorPage.navigateToHistoryTab();
+    historyGraph = explorationEditorHistoryTab.getHistoryGraph();
+    historyGraph.selectTwoVersions(2, 3);
+    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    historyGraph.expectNumberOfLinksToMatch(3, 1, 2);
+
+    historyGraph.openStateHistory('second');
+    historyGraph.expectTextToMatch(' ', STATE_2_STRING);
+    historyGraph.closeStateHistory();
+
+    // Check renaming a state.
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.moveToState('first');
+    explorationEditorMainTab.setStateName('third');
+    explorationEditorPage.saveChanges();
+    expectedHistoryStates = [{
       label: 'third (was: first)',
       color: COLOR_RENAMED_UNCHANGED
     }, {
       label: 'final card',
       color: COLOR_UNCHANGED
-    }], [1, 0, 0]);
+    }];
+    explorationEditorPage.navigateToHistoryTab();
+    historyGraph = explorationEditorHistoryTab.getHistoryGraph();
+    historyGraph.selectTwoVersions(3, 4);
+    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    historyGraph.expectNumberOfLinksToMatch(1, 0, 0);
 
-    // Check re-inserting a deleted state
-    editor.moveToState('third');
-    editor.ResponseEditor(0).setDestination('second', true, null);
-    editor.moveToState('second');
-    editor.setContent(forms.toRichText('this is card 2'));
-    editor.setInteraction('Continue');
-    editor.setDefaultOutcome(null, 'final card', false);
-    editor.saveChanges();
+    // Check re-inserting a deleted state.
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.moveToState('third');
+    explorationEditorMainTab.getResponseEditor(0).
+      setDestination('second', true, null);
+    explorationEditorMainTab.moveToState('second');
+    explorationEditorMainTab.setContent(forms.toRichText('this is card 2'));
+    explorationEditorMainTab.setInteraction('Continue');
 
-    editor.expectGraphComparisonOf(2, 5).toBe([{
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setDestination('final card', false, null);
+    explorationEditorPage.saveChanges();
+
+    expectedHistoryStates = [{
       label: 'third (was: first)',
       color: COLOR_CHANGED
     }, {
@@ -448,10 +480,15 @@ describe('Exploration history', function() {
     }, {
       label: 'final card',
       color: COLOR_UNCHANGED
-    }], [2, 0, 0]);
+    }];
+    explorationEditorPage.navigateToHistoryTab();
+    historyGraph = explorationEditorHistoryTab.getHistoryGraph();
+    historyGraph.selectTwoVersions(2, 5);
+    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    historyGraph.expectNumberOfLinksToMatch(2, 0, 0);
 
-    // Check that reverting works
-    editor.revertToVersion(2);
+    // Check that reverting works.
+    explorationEditorHistoryTab.revertToVersion(2);
     general.moveToPlayer();
     explorationPlayerPage.expectContentToMatch(
       forms.toRichText('enter 6 to continue'));
@@ -464,7 +501,7 @@ describe('Exploration history', function() {
     explorationPlayerPage.expectExplorationToBeOver();
 
     general.moveToEditor();
-    editor.expectGraphComparisonOf(4, 6).toBe([{
+    expectedHistoryStates = [{
       label: 'first (was: third)',
       color: COLOR_CHANGED
     }, {
@@ -473,7 +510,12 @@ describe('Exploration history', function() {
     }, {
       label: 'final card',
       color: COLOR_UNCHANGED
-    }], [3, 2, 1]);
+    }];
+    explorationEditorPage.navigateToHistoryTab();
+    historyGraph = explorationEditorHistoryTab.getHistoryGraph();
+    historyGraph.selectTwoVersions(4, 6);
+    historyGraph.expectHistoryStatesToMatch(expectedHistoryStates);
+    historyGraph.expectNumberOfLinksToMatch(3, 2, 1);
     users.logout();
   });
 
@@ -484,15 +526,19 @@ describe('Exploration history', function() {
 
 
 describe('ExplorationFeedback', function() {
-  var EXPLORATION_TITLE = 'Sample Exploration';
+  var EXPLORATION_TITLE = 'Exploration with Feedback';
   var EXPLORATION_OBJECTIVE = 'To explore something';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_LANGUAGE = 'English';
+  var explorationEditorPage = null;
+  var explorationEditorFeedbackTab = null;
   var creatorDashboardPage = null;
   var libraryPage = null;
   var explorationPlayerPage = null;
 
   beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
@@ -511,7 +557,7 @@ describe('ExplorationFeedback', function() {
     var feedback = 'A good exploration. Would love to see a few more questions';
     var feedbackResponse = 'Thanks for the feedback';
 
-    // Creator creates and publishes an exploration
+    // Creator creates and publishes an exploration.
     users.login('user1@ExplorationFeedback.com');
     workflow.createAndPublishExploration(
       EXPLORATION_TITLE,
@@ -524,14 +570,15 @@ describe('ExplorationFeedback', function() {
     ).toEqual(0);
     users.logout();
 
-    // Learner plays the exploration and submits a feedback
+    // Learner plays the exploration and submits a feedback.
     users.login('user2@ExplorationFeedback.com');
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
     explorationPlayerPage.submitFeedback(feedback);
     users.logout();
 
-    // Creator reads the feedback and responds
+    // Creator reads the feedback and responds.
     users.login('user1@ExplorationFeedback.com');
     creatorDashboardPage.get();
     expect(
@@ -539,12 +586,15 @@ describe('ExplorationFeedback', function() {
     ).toEqual(1);
     creatorDashboardPage.navigateToExplorationEditor();
 
-    editor.expectCurrentTabToBeFeedbackTab();
-    editor.readFeedbackMessages().then(function(messages) {
-      expect(messages.length).toEqual(1);
-      expect(messages[0]).toEqual(feedback);
-    });
-    editor.sendResponseToLatestFeedback(feedbackResponse);
+    explorationEditorPage.navigateToFeedbackTab();
+    explorationEditorFeedbackTab.expectToHaveFeedbackThread();
+    explorationEditorFeedbackTab.readFeedbackMessages()
+      .then(function(messages) {
+        expect(messages.length).toEqual(1);
+        expect(messages[0]).toEqual(feedback);
+      });
+    explorationEditorPage.navigateToFeedbackTab();
+    explorationEditorFeedbackTab.sendResponseToLatestFeedback(feedbackResponse);
     users.logout();
   });
 
@@ -555,15 +605,19 @@ describe('ExplorationFeedback', function() {
 
 
 describe('Suggestions on Explorations', function() {
-  var EXPLORATION_TITLE = 'Sample Exploration';
+  var EXPLORATION_TITLE = 'Exploration with Suggestion';
   var EXPLORATION_CATEGORY = 'Algorithms';
   var EXPLORATION_OBJECTIVE = 'To explore something new';
   var EXPLORATION_LANGUAGE = 'English';
   var creatorDashboardPage = null;
   var libraryPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorFeedbackTab = null;
   var explorationPlayerPage = null;
 
   beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorFeedbackTab = explorationEditorPage.getFeedbackTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
     creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     libraryPage = new LibraryPage.LibraryPage();
@@ -588,12 +642,12 @@ describe('Suggestions on Explorations', function() {
       EXPLORATION_CATEGORY,
       EXPLORATION_OBJECTIVE,
       EXPLORATION_LANGUAGE);
-    browser.get(general.SERVER_URL_PREFIX);
     users.logout();
 
-    // Suggester plays the exploration and suggests a change
+    // Suggester plays the exploration and suggests a change.
     users.login('user2@ExplorationSuggestions.com');
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
     var suggestion = 'New Exploration';
@@ -602,27 +656,29 @@ describe('Suggestions on Explorations', function() {
     explorationPlayerPage.submitSuggestion(suggestion, suggestionDescription);
     users.logout();
 
-    // Exploration author reviews the suggestion and accepts it
+    // Exploration author reviews the suggestion and accepts it.
     users.login('user1@ExplorationSuggestions.com');
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
-    general.waitForSystem();
-    editor.getSuggestionThreads().then(function(threads) {
+
+    explorationEditorPage.navigateToFeedbackTab();
+    explorationEditorFeedbackTab.getSuggestionThreads().then(function(threads) {
       expect(threads.length).toEqual(1);
       expect(threads[0]).toMatch(suggestionDescription);
-      editor.acceptSuggestion(suggestionDescription);
-
-      editor.navigateToPreviewTab();
-      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
-      users.logout();
-
-      // Student logs in and plays the exploration, finds the updated content
-      users.login('user3@ExplorationSuggestions.com');
-      libraryPage.get();
-      libraryPage.playExploration(EXPLORATION_TITLE);
-      explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
-      users.logout();
     });
+    explorationEditorFeedbackTab.acceptSuggestion(suggestionDescription);
+
+    explorationEditorPage.navigateToPreviewTab();
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
+    users.logout();
+
+    // Student logs in and plays the exploration, finds the updated content.
+    users.login('user3@ExplorationSuggestions.com');
+    libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
+    libraryPage.playExploration(EXPLORATION_TITLE);
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(suggestion));
+    users.logout();
   });
 
   afterEach(function() {

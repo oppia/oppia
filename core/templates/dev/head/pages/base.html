@@ -135,7 +135,7 @@
 
       <div class="oppia-base-container"
            ng-class="{'oppia-sidebar-menu-open': isSidebarShown(), 'oppia-sidebar-menu-closed': !isSidebarShown()}"
-           ng-swipe-left="closeSidebarOnSwipe()">
+           ng-swipe-left="closeSidebarOnSwipe()" ng-swipe-disable-mouse="false">
         <div class="oppia-content-container">
           <div id="wrapper">
             <div class="oppia-main-body">
@@ -230,6 +230,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/CollectionCreationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/ExplorationCreationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/TopicCreationService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/SkillCreationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/StoryCreationService.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/sidebar/SidebarStatusService.js"></script>

@@ -37,11 +37,11 @@ oppia.directive('answerGroupEditor', [
       controller: [
         '$scope', 'stateInteractionIdService', 'ResponsesService',
         'EditorStateService', 'AlertsService', 'INTERACTION_SPECS',
-        'RuleObjectFactory',
+        'RuleObjectFactory', 'TrainingDataEditorPanelService',
         function(
             $scope, stateInteractionIdService, ResponsesService,
             EditorStateService, AlertsService, INTERACTION_SPECS,
-            RuleObjectFactory) {
+            RuleObjectFactory, TrainingDataEditorPanelService) {
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
@@ -233,6 +233,15 @@ oppia.directive('answerGroupEditor', [
 
           $scope.isRuleEditorOpen = function() {
             return $scope.activeRuleIndex !== -1;
+          };
+
+          $scope.isCurrentInteractionTrainable = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return INTERACTION_SPECS[interactionId].is_trainable;
+          };
+
+          $scope.openTrainingDataEditor = function() {
+            TrainingDataEditorPanelService.openTrainingDataEditor();
           };
 
           $scope.$on('onInteractionIdChanged', function() {
