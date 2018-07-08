@@ -20,6 +20,7 @@ var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
+var until = protractor.ExpectedConditions;
 
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
@@ -542,6 +543,9 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.expectLatestFeedbackToMatch(
       forms.toRichText('You must be happy!'));
 
+    // Wait statement is necessary here due to fast sequences of submitting
+    // answers that lead to default state.
+    general.waitForSystem();
     explorationPlayerPage.submitAnswer('TextInput', 'NO I\'M SAD');
     explorationPlayerPage.expectLatestFeedbackToMatch(
       forms.toRichText('No being sad!'));
