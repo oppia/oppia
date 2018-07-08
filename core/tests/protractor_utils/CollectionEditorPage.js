@@ -51,7 +51,8 @@ var CollectionEditorPage = function() {
   this.addExistingExploration = function(explorationId) {
     addExplorationInput.sendKeys(explorationId);
     // Waits until the button becomes active after debouncing.
-    browser.driver.sleep(300);
+    browser.wait(until.elementToBeClickable(addExplorationInput), 5000,
+      'Unable to find exploration Id ' + explorationId);
     addExplorationButton.click();
   };
 
@@ -62,7 +63,8 @@ var CollectionEditorPage = function() {
       if (isVisbile) {
         addExplorationInput.sendKeys(query);
         // Need to wait for result to appear.
-        general.waitForSystem();
+        browser.wait(until.elementToBeClickable(addExplorationInput), 5000,
+          'Unable to find exploration ' + query);
       }
     });
     var matched = false;
