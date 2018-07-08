@@ -179,6 +179,8 @@ var ExplorationEditorMainTab = function() {
     finishTutorialButton.then(function(buttons) {
       if (buttons.length === 1) {
         buttons[0].click();
+      } else {
+        throw Error('There is more than 1 Finish button!');
       }
     });
   };
@@ -205,6 +207,8 @@ var ExplorationEditorMainTab = function() {
       nextTutorialStageButton.then(function(buttons) {
         if (buttons.length === 1) {
           buttons[0].click();
+        } else {
+          throw Error('There is more than one Next button!');
         }
       });
     });
