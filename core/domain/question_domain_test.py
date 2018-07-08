@@ -122,8 +122,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
         self.assertEqual(question.question_id, question_id)
         self.assertEqual(question.question_data_schema_version, 1)
-        self.assertEqual(
-            question.question_data, default_question_data)
+        self.assertEqual(question.question_data, default_question_data)
         self.assertEqual(question.language_code, 'en')
         self.assertEqual(question.status, 'private')
 

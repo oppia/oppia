@@ -237,8 +237,7 @@ def get_new_question_id():
     return question_models.QuestionModel.get_new_id('')
 
 
-def create_question_summary(
-        question_id, creator_id):
+def create_question_summary(question_id, creator_id):
     """Creates and stores a summary of the given question.
 
     Args:

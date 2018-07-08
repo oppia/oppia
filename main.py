@@ -34,6 +34,7 @@ from core.controllers import library
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
+from core.controllers import question_editor
 from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
@@ -361,6 +362,13 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'/explorehandler/recommendations/<exploration_id>',
         reader.RecommendationsHandler),
+
+    get_redirect_route(
+        r'%s/<question_id>' % feconf.QUESTION_EDITOR_URL_PREFIX,
+        question_editor.QuestionEditorPage),
+    get_redirect_route(
+        r'%s/<question_id>' % feconf.QUESTION_DATA_URL,
+        question_editor.EditableQuestionDataHandler),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,

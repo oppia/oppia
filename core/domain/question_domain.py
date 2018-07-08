@@ -186,16 +186,7 @@ class Question(object):
         """Validates the Question domain object before it is published or send
         for review to admins and topic managers.
         """
-
-        if not isinstance(self.question_id, basestring):
-            raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % self.question_id)
-
-        if not isinstance(self.question_data, dict):
-            raise utils.ValidationError(
-                'Expected question_data to be a dict, received %s' %
-                self.question_data)
-
+        self.validate()
         dest_is_specified = False
         interaction = self.question_data['interaction']
         for answer_group in interaction['answer_groups']:
@@ -226,28 +217,6 @@ class Question(object):
                 'Expected the question to have at least one hint and a ' +
                 'solution.'
             )
-        question_data = exp_domain.State.from_dict(self.question_data)
-        question_data.validate({}, True)
-
-        if not isinstance(self.question_data_schema_version, int):
-            raise utils.ValidationError(
-                'Expected question_data_schema_version to be a integer,' +
-                'received %s' % self.question_data_schema_version)
-
-        if not isinstance(self.language_code, basestring):
-            raise utils.ValidationError(
-                'Expected language_code to be a string, received %s' %
-                self.language_code)
-
-        if not isinstance(self.status, basestring):
-            raise utils.ValidationError(
-                'Expected status to be a string, received %s' %
-                self.language_code)
-
-        if not any([self.language_code == lc['code']
-                    for lc in constants.ALL_LANGUAGE_CODES]):
-            raise utils.ValidationError(
-                'Invalid language code: %s' % self.language_code)
 
     @classmethod
     def from_dict(cls, question_dict):
