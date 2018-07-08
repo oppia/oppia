@@ -62,9 +62,6 @@ var _completeSignup = function(username) {
 
 var createUser = function(email, username) {
   createAndLoginUser(email, username);
-  // Transitioning to non-Angular login page. Need to completely wait out
-  // $http or $timeout calls before continuing.
-  browser.waitForAngular();
   logout();
 };
 
@@ -78,17 +75,11 @@ var createModerator = function(email, username) {
   _completeSignup(username);
   adminPage.get();
   adminPage.updateRole(username, 'moderator');
-  // Transitioning to non-Angular login page. Need to completely wait out
-  // $http or $timeout calls before continuing.
-  browser.waitForAngular();
   logout();
 };
 
 var createAdmin = function(email, username) {
   createAndLoginAdminUser(email, username);
-  // Transitioning to non-Angular login page. Need to completely wait out
-  // $http or $timeout calls before continuing.
-  browser.waitForAngular();
   logout();
 };
 
