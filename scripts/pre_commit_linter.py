@@ -1041,7 +1041,6 @@ def _check_html_directive_name(all_files):
     print '----------------------------------------'
     total_files_checked = 0
     total_error_count = 0
-    summary_messages = []
     files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
@@ -1095,7 +1094,6 @@ def _check_directive_scope(all_files):
     """
     print 'Starting directive scope check'
     print '----------------------------------------'
-    summary_messages = []
     # Select JS files which need to be checked.
     files_to_check = [
         filename for filename in all_files if not
@@ -1207,6 +1205,61 @@ def _check_directive_scope(all_files):
         summary_messages.append(summary_message)
     else:
         summary_message = '%s  Directive scope check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
+
+def _match_line_breaks_in_controller_dependencies(all_files):
+    """This function checks whether the line breaks between the dependencies
+    listed in the controller of a directive or service exactly match those
+    between the arguments of the controller function.
+    """
+    print 'Starting controller dependency check'
+    print '----------------------------------------'
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.js')]
+    failed = False
+    summary_messages = []
+
+    # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
+    pattern_to_match = (
+        r'controller: \[(?P<stringfied_dependencies>[\S\s]*?)' +
+        r'function\((?P<function_parameters>[\S\s]*?)\)')
+    for filename in files_to_check:
+        with open(filename) as f:
+            content = f.read()
+        matched_patterns = re.findall(pattern_to_match, content)
+        for matched_pattern in matched_patterns:
+            stringfied_dependencies, function_parameters = matched_pattern
+            stringfied_dependencies = (
+                stringfied_dependencies.strip().replace(
+                    "'", '').replace(' ', ''))[:-1]
+            function_parameters = function_parameters.strip().replace(' ', '')
+            if stringfied_dependencies != function_parameters:
+                failed = True
+                print (
+                    '%s --> Please ensure that line breaks between '
+                    'the stringfied dependencies,"%s" and the function '
+                    'parameters, "%s" for the corresponding controller '
+                    'in this file exactly match.' % (
+                        filename, stringfied_dependencies, function_parameters))
+
+    if failed:
+        summary_message = '%s   Controller dependency check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s  Controller dependency check passed' % (
             _MESSAGE_TYPE_SUCCESS)
         print summary_message
         summary_messages.append(summary_message)
@@ -1384,7 +1437,8 @@ def _check_for_copyright_notice(all_files):
     """This function checks whether the copyright notice
     is present at the beginning of files.
     """
-
+    print 'Starting copyright notice check'
+    print '----------------------------------------'
     js_files_to_check = [
         filename for filename in all_files if filename.endswith('.js') and (
             not filename.endswith(GENERATED_FILE_PATHS)) and (
@@ -1440,6 +1494,8 @@ def _check_for_copyright_notice(all_files):
 def main():
     all_files = _get_all_files()
     directive_scope_messages = _check_directive_scope(all_files)
+    controller_dependency_messages = (
+        _match_line_breaks_in_controller_dependencies(all_files))
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
@@ -1453,9 +1509,9 @@ def main():
     pattern_messages = _check_bad_patterns(all_files)
     copyright_notice_messages = _check_for_copyright_notice(all_files)
     all_messages = (
-        directive_scope_messages + html_directive_name_messages +
-        import_order_messages + newline_messages +
-        docstring_messages + comment_messages +
+        directive_scope_messages + controller_dependency_messages +
+        html_directive_name_messages + import_order_messages +
+        newline_messages + docstring_messages + comment_messages +
         html_indent_messages + html_linter_messages +
         linter_messages + pattern_messages +
         copyright_notice_messages)
