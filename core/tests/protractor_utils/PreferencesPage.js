@@ -80,9 +80,9 @@ var PreferencesPage = function() {
   };
 
   this.expectPreferredSiteLanguageToBe = function(language) {
-    language = systemLanguageSelector.element(
+    var selectedLanguageElement = systemLanguageSelector.element(
       by.css('.select2-selection__rendered'));
-    expect(language.getText(), language);
+    expect(selectedLanguageElement.getText()).toEqual(language);
   };
 
   this.expectSubscriptionCountToEqual = function(value) {
