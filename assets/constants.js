@@ -451,7 +451,7 @@ var constants = {
 
   "ENABLE_GCS_STORAGE_FOR_IMAGES": false,
 
-  "IS_CURRENT_RTE_CKEDITOR": false,
+  "IS_CURRENT_RTE_CKEDITOR": true,
 
   "USE_NEW_SUGGESTION_FRAMEWORK": false
 };

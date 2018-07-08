@@ -99,17 +99,17 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = function(elem) {
   // Set focus in the RTE.
-  elem.all(by.model('html')).first().click();
+  elem.all(by.css('.oppia-rte')).first().click();
 
   var _appendContentText = function(text) {
-    elem.all(by.model('html')).first().sendKeys(text);
+    elem.all(by.css('.oppia-rte')).first().sendKeys(text);
   };
   var _clickToolbarButton = function(buttonName) {
-    elem.element(by.css('[name="' + buttonName + '"]')).click();
+    elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = function() {
-    expect(elem.all(by.model('html')).first().isPresent()).toBe(true);
-    elem.all(by.model('html')).first().clear();
+    expect(elem.all(by.css('.oppia-rte')).first().isPresent()).toBe(true);
+    elem.all(by.css('.oppia-rte')).first().clear();
   };
 
   return {
@@ -124,36 +124,36 @@ var RichTextEditor = function(elem) {
       _appendContentText(text);
     },
     appendBoldText: function(text) {
-      _clickToolbarButton('bold');
+      _clickToolbarButton('cke_button__bold');
       _appendContentText(text);
-      _clickToolbarButton('bold');
+      _clickToolbarButton('cke_button__bold');
     },
     appendItalicText: function(text) {
-      _clickToolbarButton('italics');
+      _clickToolbarButton('cke_button__italic');
       _appendContentText(text);
-      _clickToolbarButton('italics');
+      _clickToolbarButton('cke_button__italic');
     },
     appendOrderedList: function(textArray) {
       _appendContentText('\n');
-      _clickToolbarButton('ol');
+      _clickToolbarButton('cke_button__numberedlist');
       for (var i = 0; i < textArray.length; i++) {
         _appendContentText(textArray[i] + '\n');
       }
-      _clickToolbarButton('ol');
+      _clickToolbarButton('cke_button__numberedlist');
     },
     appendUnorderedList: function(textArray) {
       _appendContentText('\n');
-      _clickToolbarButton('ul');
+      _clickToolbarButton('cke_button__bulletedlist');
       for (var i = 0; i < textArray.length; i++) {
         _appendContentText(textArray[i] + '\n');
       }
-      _clickToolbarButton('ul');
+      _clickToolbarButton('cke_button__bulletedlist');
     },
     // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     addRteComponent: function(componentName) {
-      _clickToolbarButton(componentName.toLowerCase());
+      _clickToolbarButton('cke_button__oppia' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = element.all(by.css('.modal-dialog')).last();
@@ -170,8 +170,14 @@ var RichTextEditor = function(elem) {
         by.css('.protractor-test-close-rich-text-component-editor')).click();
       general.waitForSystem();
 
+      // Ensure that focus is not on added component once it is added so that
+      // the component is not overwritten by some other element.
+      if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
+        elem.all(by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
+      }
+
       // Ensure that the cursor is at the end of the RTE.
-      elem.all(by.model('html')).first().sendKeys(
+      elem.all(by.css('.oppia-rte')).first().sendKeys(
         protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
@@ -404,10 +410,10 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       justPassedRteComponent = false;
     },
     readBoldText: function(text) {
-      _readFormattedText(text, 'b');
+      _readFormattedText(text, 'strong');
     },
     readItalicText: function(text) {
-      _readFormattedText(text, 'i');
+      _readFormattedText(text, 'em');
     },
     // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
