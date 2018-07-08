@@ -502,7 +502,7 @@ var ExplorationEditorMainTab = function() {
       .last().click();
     browser.switchTo().activeElement().sendKeys(hint);
     browser.wait(until.elementToBeClickable(saveHintButton), 5000,
-      'Save Hint button takes too long to appear');
+      'Save Hint button takes too long to be clickable');
     saveHintButton.click();
     browser.wait(until.invisibilityOf(addHintModal), 5000,
       'Add Hint modal takes too long to close');
@@ -531,7 +531,7 @@ var ExplorationEditorMainTab = function() {
         browser.switchTo().activeElement().clear();
         browser.switchTo().activeElement().sendKeys(hint);
         browser.wait(until.elementToBeClickable(saveHintEditButton), 5000,
-          'Save Hint button takes too long to appear');
+          'Save Hint button takes too long to be clickable');
         saveHintEditButton.click();
         browser.wait(until.visibilityOf(editHintIcon), 5000,
           'Add Hint modal takes too long to close');
@@ -561,7 +561,7 @@ var ExplorationEditorMainTab = function() {
     var submitSolutionButton = element(
       by.css('.protractor-test-submit-solution-button'));
     browser.wait(until.elementToBeClickable(submitSolutionButton), 5000,
-      'Submit Solution button takes too long to appear');
+      'Submit Solution button takes too long to be clickable');
     submitSolutionButton.click();
     browser.wait(until.invisibilityOf(addOrUpdateSolutionModal), 5000,
       'Add/Update Solution modal takes too long to close');
@@ -578,7 +578,7 @@ var ExplorationEditorMainTab = function() {
           // Click through the "are you sure?" warning.
           browser.wait(until.elementToBeClickable(
             confirmDeleteInteractionButton), 5000,
-          'Confirm Delete Interaction button takes too long to appear')
+          'Confirm Delete Interaction button takes too long to be clickable')
             .then(function(){
               confirmDeleteInteractionButton.click();
             });
@@ -606,7 +606,7 @@ var ExplorationEditorMainTab = function() {
       function(deleteButtonNotVisible) {
         if (deleteButtonNotVisible) {
           browser.wait(until.elementToBeClickable(addInteractionButton), 5000,
-            'Add Interaction button takes too long to appear');
+            'Add Interaction button takes too long to be clickable');
           expect(addInteractionButton.isDisplayed()).toBe(true);
           addInteractionButton.click();
         }
@@ -970,7 +970,7 @@ var ExplorationEditorMainTab = function() {
         }
       });
     browser.wait(until.elementToBeClickable(stateNameSubmitButton), 5000,
-      'State Name Submit button takes too long to appear')
+      'State Name Submit button takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           stateNameSubmitButton.click();
