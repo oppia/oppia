@@ -706,3 +706,24 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
             is_invalid = True
 
     return is_invalid
+
+
+def add_caption_attr_to_image(html_string):
+    """Adds caption attribute to all oppia-noninteractive-image tags.
+
+    Args:
+        html_string. str: HTML string in which the caption attribute is to be
+            added.
+
+    Returns:
+        str. Updated HTML string with the caption attribute for all
+            oppia-noninteractive-image tags.
+    """
+    soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
+
+    for image in soup.findAll('oppia-noninteractive-image'):
+        attrs = image.attrs
+        if 'caption-with-value' not in attrs:
+            image['caption-with-value'] = escape_html(json.dumps(''))
+
+    return unicode(soup)

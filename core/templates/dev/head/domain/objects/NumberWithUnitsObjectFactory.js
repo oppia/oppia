@@ -65,6 +65,22 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       return numberWithUnitsString;
     };
 
+    NumberWithUnits.prototype.toMathjsCompatibleString = function() {
+      var numberWithUnitsString = '';
+      var unitsString = UnitsObjectFactory.fromList(this.units).toString();
+      unitsString = UnitsObjectFactory.toMathjsCompatibleString(unitsString);
+
+      if (this.type === 'real') {
+        numberWithUnitsString += this.real + ' ';
+      } else if (this.type === 'fraction') {
+        numberWithUnitsString += this.fraction.toString() + ' ';
+      }
+      numberWithUnitsString += unitsString.trim();
+      numberWithUnitsString = numberWithUnitsString.trim();
+
+      return numberWithUnitsString;
+    };
+
     NumberWithUnits.prototype.toDict = function() {
       return {
         type: this.type,
@@ -72,6 +88,12 @@ oppia.factory('NumberWithUnitsObjectFactory', [
         fraction: this.fraction.toDict(),
         units: this.units
       };
+    };
+
+    NumberWithUnits.createCurrencyUnits = function() {
+      try {
+        Units.createCurrencyUnits();
+      } catch (parsingError) {}
     };
 
     NumberWithUnits.fromRawInputString = function(rawInput) {
@@ -270,7 +292,7 @@ oppia.factory('UnitsObjectFactory', [function() {
     var unit = '';
     for (var i = 0; i < this.units.length; i++) {
       var d = this.units[i];
-      if (d.unit === '$' || d.unit === 'Rs' || d.unit === '₹') {
+      if (d.exponent === 1) {
         unit += d.unit + ' ';
       } else {
         unit += d.unit + '^' + d.exponent.toString() + ' ';
@@ -279,14 +301,58 @@ oppia.factory('UnitsObjectFactory', [function() {
     return unit.trim();
   };
 
-  Units.fromRawInputString = function(units) {
+  Units.createCurrencyUnits = function() {
+    // Creates user-defined currency (base + sub) units.
+    math.createUnit('dollar', {aliases: [
+      'dollars', 'Dollar', 'USD', 'Dollars']});
+    math.createUnit('cent', {definition: '0.01 dollar', aliases: [
+      'Cent', 'cents', 'Cents']});
+    math.createUnit('rupees', {aliases: [
+      'Rupees', 'Rs', 'rupee', 'Rupee']});
+    math.createUnit('paise', {definition: '0.01 rupees', aliases: ['paisa']});
+  };
+
+  Units.toMathjsCompatibleString = function(units) {
+    // Makes the units compatible with the math.js allowed format.
     units = units.replace(/per/g, '/');
-    // Right now, validation of currency units is not possible as we need to add
-    // them first.
-    if (units !== '' && !units.includes('$') && !units.includes('Rs') &&
-      !units.includes('₹')) {
+
+    if (units.includes('Dollars') || units.includes('dollars') ||
+      units.includes('Dollar')) {
+      units = units.replace('dollars', 'dollar');
+      units = units.replace('Dollars', 'dollar');
+      units = units.replace('Dollar', 'dollar');
+    }
+    if (units.includes('Rupees') || units.includes('rupees') ||
+      units.includes('Rupee')) {
+      units = units.replace('rupees', 'rupee');
+      units = units.replace('Rupees', 'rupee');
+      units = units.replace('Rupee', 'rupee');
+    }
+
+    // Special symbols need to be replaced as math.js doesn't support custom
+    // units starting with special symbols. Also, it doesn't allow units
+    // followed by a number as in the case of currency units.
+    if (units.includes('$')) {
+      units = units.replace('$', '');
+      units = 'dollar ' + units;
+    }
+    if (units.includes('Rs') || units.includes('₹')) {
+      units = units.replace('Rs', '');
+      units = units.replace('₹', '');
+      units = 'rupee ' + units;
+    }
+    return units.trim();
+  };
+
+  Units.fromRawInputString = function(units) {
+    try {
+      Units.createCurrencyUnits();
+    } catch (parsingError) {}
+
+    compatibleUnits = Units.toMathjsCompatibleString(units);
+    if (compatibleUnits !== '') {
       try {
-        math.unit(units);
+        math.unit(compatibleUnits);
       } catch (err) {
         throw new Error(err);
       }

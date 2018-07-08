@@ -94,7 +94,7 @@ class SkillChange(object):
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_ADD_SKILL_MISCONCEPTION:
-            self.misconception_id = change_dict['id']
+            self.new_value = change_dict['new_misconception_dict']
         elif self.cmd == CMD_DELETE_SKILL_MISCONCEPTION:
             self.misconception_id = change_dict['id']
         elif self.cmd == CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY:
@@ -148,7 +148,7 @@ class Misconception(object):
         """Initializes a Misconception domain object.
 
         Args:
-            misconception_id: str. The unique id of each misconception.
+            misconception_id: int. The unique id of each misconception.
             name: str. The name of the misconception.
             notes: str. General advice for creators about the
                 misconception (including examples) and general notes. This
@@ -208,6 +208,18 @@ class Misconception(object):
             feconf.DEFAULT_MISCONCEPTION_NOTES,
             feconf.DEFAULT_MISCONCEPTION_FEEDBACK)
 
+    @classmethod
+    def require_valid_misconception_id(cls, misconception_id):
+        """Validates the misconception id for a Misconception object.
+
+        Args:
+            misconception_id: str. The misconception id to be validated.
+        """
+        if not isinstance(misconception_id, int):
+            raise utils.ValidationError(
+                'Expected misconception ID to be an integer, received %s' %
+                misconception_id)
+
     def validate(self):
         """Validates various properties of the Misconception object.
 
@@ -215,6 +227,7 @@ class Misconception(object):
             ValidationError: One or more attributes of the misconception are
                 invalid.
         """
+        self.require_valid_misconception_id(self.id)
         if not isinstance(self.name, basestring):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
@@ -302,7 +315,7 @@ class Skill(object):
             self, skill_id, description, misconceptions,
             skill_contents, misconceptions_schema_version,
             skill_contents_schema_version, language_code, version,
-            created_on=None, last_updated=None):
+            next_misconception_id, created_on=None, last_updated=None):
         """Constructs a Skill domain object.
 
         Args:
@@ -319,6 +332,8 @@ class Skill(object):
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
             version: int. The version of the skill.
+            next_misconception_id: int. The misconception id to be used by
+                the next misconception added.
             created_on: datetime.datetime. Date and time when the skill is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -334,6 +349,7 @@ class Skill(object):
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+        self.next_misconception_id = next_misconception_id
 
     @classmethod
     def require_valid_skill_id(cls, skill_id):
@@ -368,6 +384,8 @@ class Skill(object):
             ValidationError: One or more attributes of skill are invalid.
         """
         self.require_valid_description(self.description)
+
+        Misconception.require_valid_misconception_id(self.next_misconception_id)
 
         if not isinstance(self.misconceptions_schema_version, int):
             raise utils.ValidationError(
@@ -421,6 +439,10 @@ class Skill(object):
                 raise utils.ValidationError(
                     'Expected each misconception to be a Misconception '
                     'object, received %s' % misconception)
+            if int(misconception.id) >= int(self.next_misconception_id):
+                raise utils.ValidationError(
+                    'The misconception with id %s is out of bounds.'
+                    % misconception.id)
             misconception.validate()
 
     def to_dict(self):
@@ -439,7 +461,8 @@ class Skill(object):
             'language_code': self.language_code,
             'misconceptions_schema_version': self.misconceptions_schema_version,
             'skill_contents_schema_version': self.skill_contents_schema_version,
-            'version': self.version
+            'version': self.version,
+            'next_misconception_id': self.next_misconception_id
         }
 
     @classmethod
@@ -460,7 +483,7 @@ class Skill(object):
             skill_id, description, [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0)
+            constants.DEFAULT_LANGUAGE_CODE, 0, 0)
 
     @classmethod
     def update_skill_contents_from_model(
@@ -562,15 +585,23 @@ class Skill(object):
                 return ind
         return None
 
-    def add_misconception(self, misconception_id):
+    def add_misconception(self, misconception_dict):
         """Adds a new misconception to the skill.
 
         Args:
-            misconception_id: str. The id of the new misconception to be added.
+            misconception_dict: dict. The misconception to be added.
         """
-        misconception = Misconception.create_default_misconception(
-            misconception_id)
+        misconception = Misconception(
+            misconception_dict['id'],
+            misconception_dict['name'],
+            misconception_dict['notes'],
+            misconception_dict['feedback'])
         self.misconceptions.append(misconception)
+        self.next_misconception_id = self.get_incremented_misconception_id(
+            misconception_dict['id'])
+
+    def get_incremented_misconception_id(self, misconception_id):
+        return misconception_id + 1
 
     def delete_misconception(self, misconception_id):
         """Removes a misconception with the given id.
