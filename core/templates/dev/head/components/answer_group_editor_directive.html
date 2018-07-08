@@ -24,7 +24,10 @@
 
   answer-group-editor .oppia-add-rule-button:active,
   answer-group-editor .oppia-add-rule-button:focus,
-  answer-group-editor .oppia-add-rule-button:hover {
+  answer-group-editor .oppia-add-rule-button:hover,
+  answer-group-editor .oppia-modify-training-data-button:active,
+  answer-group-editor .oppia-modify-training-data-button:focus,
+  answer-group-editor .oppia-modify-training-data-button:hover {
     background-color: rgba(165,165,165,1);
     color: white;
     opacity: 1;
@@ -39,6 +42,17 @@
   }
   answer-group-editor .oppia-delete-rule-button:hover {
     opacity: 1;
+  }
+
+  answer-group-editor .oppia-modify-training-data-button {
+    background-color: rgba(165,165,165,0.9);
+    border: 0;
+    border-radius: 0;
+    color: white;
+    opacity: 0.9;
+    padding: 7px;
+    width: 100%;
+    margin-top: 4%;
   }
 </style>
 
@@ -82,6 +96,12 @@
     <button type="button" ng-if="isEditable" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-answer" ng-click="addNewRule()">
       + Add Another Possible Answer
     </button>
+
+    <div ng-if="isEditable && isCurrentInteractionTrainable()">
+      <button type="button" class="btn btn-default btn-lg oppia-modify-training-data-button" ng-click="openTrainingDataEditor()">
+        <i class="material-icons md-24">playlist_add</i> Modify Training Data
+      </button>
+    </div>
   </div>
 
   <br ng-if="rules">

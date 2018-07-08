@@ -978,7 +978,6 @@ class ExplorationMigrationValidationJobForTextAngularTest(
                 '</oppia-noninteractive-image></ol>\']]'
             )
         ]
-
         self.assertEqual(actual_output, expected_output)
 
 

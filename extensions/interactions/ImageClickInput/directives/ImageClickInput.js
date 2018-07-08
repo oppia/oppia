@@ -55,7 +55,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           if (ImagePreloaderService.inExplorationPlayer()) {
             $scope.isLoadingIndicatorShown = true;
             $scope.dimensions = (
-              ImagePreloaderService.getDimensionsOfImage($scope.filepath.name));
+              ImagePreloaderService.getDimensionsOfImage($scope.filepath));
             // For aligning the gif to the center of it's container
             var loadingIndicatorSize = (
               ($scope.dimensions.height < 124) ? 24 : 120);
@@ -68,7 +68,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             };
 
             $scope.loadImage = function() {
-              ImagePreloaderService.getImageUrl($scope.filepath.name)
+              ImagePreloaderService.getImageUrl($scope.filepath)
                 .then(function(objectUrl) {
                   $scope.isTryAgainShown = false;
                   $scope.isLoadingIndicatorShown = false;
@@ -86,7 +86,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             // AssetsBackendApiService's cache.
             AssetsBackendApiService.loadImage(
               ExplorationContextService.getExplorationId(),
-              $scope.filepath.name)
+              $scope.filepath)
               .then(function(loadedImageFile) {
                 $scope.isLoadingIndicatorShown = false;
                 $scope.isTryAgainShown = false;

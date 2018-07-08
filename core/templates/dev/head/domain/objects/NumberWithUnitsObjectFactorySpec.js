@@ -51,12 +51,12 @@ describe('NumberWithUnitsObjectFactory', function() {
         [{exponent: -1, unit: 'kg'}, {exponent: 2, unit: 'K'},
           {exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'N'},
           {exponent: -1, unit: 'm'}, {exponent: -1, unit: 's'}]
-      ).toString()).toBe('kg^-1 K^2 mol^1 N^-1 m^-1 s^-1');
+      ).toString()).toBe('kg^-1 K^2 mol N^-1 m^-1 s^-1');
       expect(new Units(
         [{exponent: 1, unit: 'mol'}, {exponent: -1, unit: 'kg'},
           {exponent: 1, unit: 'N'}, {exponent: 1, unit: 'm'},
           {exponent: -2, unit: 's'}]).toString()).toBe(
-        'mol^1 kg^-1 N^1 m^1 s^-2');
+        'mol kg^-1 N m s^-2');
     });
 
     it('should convert units from string to lexical format', function() {
@@ -76,13 +76,13 @@ describe('NumberWithUnitsObjectFactory', function() {
 
     it('should convert number with units object to a string', function() {
       expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
-      ), Units.fromRawInputString('m / s^2')).toString()).toBe('2.02 m^1 s^-2');
+      ), Units.fromRawInputString('m / s^2')).toString()).toBe('2.02 m s^-2');
       expect(new NumberWithUnits('real', 2.02, new Fraction(false, 0, 0, 1
       ), Units.fromRawInputString('Rs')).toString()).toBe('Rs 2.02');
       expect(new NumberWithUnits('real', 2, new Fraction(false, 0, 0, 1
       ), Units.fromRawInputString('')).toString()).toBe('2');
       expect(new NumberWithUnits('fraction', 0, new Fraction(true, 0, 4, 3
-      ), Units.fromRawInputString('m / s^2')).toString()).toBe('-4/3 m^1 s^-2');
+      ), Units.fromRawInputString('m / s^2')).toString()).toBe('-4/3 m s^-2');
       expect(new NumberWithUnits('fraction', 0, new Fraction(
         false, 0, 4, 3), Units.fromRawInputString('$ per hour')).toString(
       )).toBe('$ 4/3 hour^-1');

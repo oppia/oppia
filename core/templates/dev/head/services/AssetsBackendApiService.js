@@ -36,8 +36,12 @@ oppia.factory('AssetsBackendApiService', [
         ('https://storage.googleapis.com/' + GLOBALS.GCS_RESOURCE_BUCKET_NAME +
        '/<exploration_id>/assets/audio/<filename>') :
         '/audiohandler/<exploration_id>/audio/<filename>');
-    var IMAGE_DOWNLOAD_URL_TEMPLATE =
-      '/imagehandler/<exploration_id>/<filename>';
+    var IMAGE_DOWNLOAD_URL_TEMPLATE = (
+      (GLOBALS.GCS_RESOURCE_BUCKET_NAME &&
+        constants.ENABLE_GCS_STORAGE_FOR_IMAGES) ?
+        ('https://storage.googleapis.com/' + GLOBALS.GCS_RESOURCE_BUCKET_NAME +
+       '/<exploration_id>/assets/image/<filename>') :
+        '/imagehandler/<exploration_id>/<filename>');
 
     var AUDIO_UPLOAD_URL_TEMPLATE =
       '/createhandler/audioupload/<exploration_id>';
@@ -241,6 +245,9 @@ oppia.factory('AssetsBackendApiService', [
         return { audio: _audioFilesCurrentlyBeingRequested,
           image: _imageFilesCurrentlyBeingRequested
         };
+      },
+      getImageUrlForPreview: function(explorationId, filename) {
+        return _getDownloadUrl(explorationId, filename, ASSET_TYPE_IMAGE);
       }
     };
   }
