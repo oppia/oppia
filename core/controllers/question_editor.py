@@ -20,31 +20,9 @@ import logging
 
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import interaction_registry
-from core.domain import obj_services
 from core.domain import question_domain
 from core.domain import question_services
-from core.platform import models
-
-import jinja2
 import feconf
-
-(user_models,) = models.Registry.import_models([models.NAMES.user])
-
-
-def _require_valid_version(version_from_payload, question_version):
-    """Check that the payload version matches the given question
-    version.
-    """
-    if version_from_payload is None:
-        raise base.BaseHandler.InvalidInputException(
-            'Invalid POST request: a version must be specified.')
-
-    if version_from_payload != question_version:
-        raise base.BaseHandler.InvalidInputException(
-            'Trying to update version %s of question from version %s, '
-            'which is too old. Please reload the page and try again.'
-            % (question_version, version_from_payload))
 
 
 class QuestionEditorPage(base.BaseHandler):
@@ -64,25 +42,10 @@ class QuestionEditorPage(base.BaseHandler):
             raise self.PageNotFoundException(
                 'The question with the given id doesn\'t exist.')
 
-        interaction_ids = (
-            interaction_registry.Registry.get_all_question_specific_interaction_ids())
-
-        interaction_templates = (
-            interaction_registry.Registry.get_interaction_html(
-                interaction_ids))
-
         self.values.update({
-            'INTERACTION_SPECS': (
-                interaction_registry.Registry.get_all_question_editor_specs()),
-            'question_id': question.to_dict(),
+            'question': question.to_dict(),
             'can_edit': question_services.check_can_edit_question(
-                self.user.user_id, question_id),
-            'ALLOWED_QUESTION_INTERACTION_CATEGORIES': (
-                feconf.ALLOWED_QUESTION_INTERACTION_CATEGORIES),
-            'nav_mode': feconf.NAV_MODE_QUESTION_EDITOR,
-            'DEFAULT_OBJECT_VALUES': obj_services.get_default_object_values(),
-            'interaction_templates': jinja2.utils.Markup(
-                interaction_templates)
+                self.user.user_id, question_id)
         })
 
         self.render_template(
