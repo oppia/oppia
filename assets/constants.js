@@ -92,7 +92,9 @@ var constants = {
     "Puzzles": "#a8554a",
     "Sport": "#893327",
     "Welcome": "#992a2b",
+  },
 
+  "QUESTION_STATUS_COLORS": {
     "private": "#36748e",
     "approved": "#619912",
     "pending": "#d0cf00",
