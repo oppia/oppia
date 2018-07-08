@@ -257,7 +257,7 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
 
     libraryPage.get();
-    libraryPage.findExploration('Test Collection');
+    libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     // Click first exploration in collection.
     element.all(by.css(

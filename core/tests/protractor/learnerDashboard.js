@@ -227,7 +227,7 @@ describe('Learner dashboard functionality', function() {
       'learner4learnerDashboard');
     // Go to 'Test Collection' and play it.
     libraryPage.get();
-    libraryPage.findExploration('Test Collection');
+    libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     var firstExploration = element.all(
       by.css('.protractor-test-collection-exploration')).first();
@@ -255,7 +255,7 @@ describe('Learner dashboard functionality', function() {
       'Test Collection');
 
     libraryPage.get();
-    libraryPage.findExploration('Test Collection');
+    libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     var firstExploration = element.all(
       by.css('.protractor-test-collection-exploration')).first();
