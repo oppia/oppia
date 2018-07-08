@@ -23,7 +23,7 @@ oppia.directive('topicsList', [
         getTopicSummaries: '&topicSummaries',
         canDeleteTopic: '&userCanDeleteTopic',
         isInModal: '&inModal',
-        selectedTopicsIdAndVersionList: '='
+        selectedTopicIds: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/topics_list_directive.html'),
@@ -46,16 +46,10 @@ oppia.directive('topicsList', [
             return '/topic_editor/' + topicId;
           };
 
-          $scope.selectTopic = function(topicId, topicVersion) {
-            if ($scope.selectedTopicsIdAndVersionList) {
-              if (
-                $scope.selectedTopicsIdAndVersionList.map(function(topic) {
-                  return topic.id;
-                }).indexOf(topicId) === -1) {
-                $scope.selectedTopicsIdAndVersionList.push({
-                  id: topicId,
-                  version: topicVersion
-                });
+          $scope.selectTopic = function(topicId) {
+            if ($scope.selectedTopicIds) {
+              if ($scope.selectedTopicIds.indexOf(topicId) === -1) {
+                $scope.selectedTopicIds.push(topicId);
               }
             }
           };

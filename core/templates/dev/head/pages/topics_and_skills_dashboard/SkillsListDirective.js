@@ -48,10 +48,9 @@ oppia.directive('skillsList', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.topicSummaries = topicSummaries;
-                  $scope.selectedTopicsIdAndVersionList = [];
+                  $scope.selectedTopicIds = [];
                   $scope.done = function() {
-                    $uibModalInstance.close(
-                      $scope.selectedTopicsIdAndVersionList);
+                    $uibModalInstance.close($scope.selectedTopicIds);
                   };
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');
@@ -60,21 +59,27 @@ oppia.directive('skillsList', [
               ]
             });
 
-            modalInstance.result.then(function(topicList) {
+            modalInstance.result.then(function(topicIds) {
               var changeList = [{
                 cmd: 'add_uncategorized_skill_id',
                 new_uncategorized_skill_id: skillId,
                 change_affects_subtopic_page: false
               }];
-              for (var i = 0; i < topicList.length; i++) {
-                EditableTopicBackendApiService.updateTopic(
-                  topicList[i].id, topicList[i].version,
-                  'Added skill with id ' + skillId + ' to topic.',
-                  changeList
-                ).then(function() {
-                  $rootScope.$broadcast(
-                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
-                });
+              var topicSummaries = $scope.getEditableTopicSummaries();
+              for (var i = 0; i < topicIds.length; i++) {
+                var version = null;
+                for (var j = 0; j < topicSummaries.length; j++) {
+                  if (topicSummaries[j].id === topicIds[i]) {
+                    EditableTopicBackendApiService.updateTopic(
+                      topicIds[i], topicSummaries[j].version,
+                      'Added skill with id ' + skillId + ' to topic.',
+                      changeList
+                    ).then(function() {
+                      $rootScope.$broadcast(
+                        EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                    });
+                  }
+                }
               }
             });
           };

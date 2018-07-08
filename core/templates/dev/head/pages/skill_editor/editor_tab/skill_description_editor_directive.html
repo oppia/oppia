@@ -1,4 +1,4 @@
-<div class="oppia-editor-header" style="margin-left: 11vw;">
+<div class="oppia-editor-header">
   <span>
     <span ng-if="!skillDescriptionEditorIsShown" ng-click="openSkillDescriptionEditor()" class="oppia-editable-section">
       <strong style="font-size: 1.2em;"><[skill.getDescription()]></strong>
@@ -15,3 +15,8 @@
     </span>
   </span>
 </div>
+<style>
+  skill-description-editor .oppia-editor-header {
+    margin-left: 12vw;
+  }
+</style>
