@@ -34,29 +34,40 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
     def setUp(self):
         super(EditableQuestionDataHandlerTest, self).setUp()
 
-        self.question_id = 'dummy'
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
 
+        self.question_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
-            self.question_id,
-            self._create_valid_question_data('ABC'),
-            1, 'en', 'private')
+            'dummy', self.question_data, 1, 'en', 'private')
+
+        self.question_id = question_services.add_question(
+            self.admin_id, self.question)
 
     def test_get(self):
-        question_services.add_question(self.admin_id, self.question)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.ADMIN_EMAIL)
             response_dict = self.get_json('%s/%s' % (
                 feconf.QUESTION_DATA_URL, self.question_id))
-            self.assertEqual(response_dict['username'], 'adm')
-            self.assertEqual(response_dict['status'], 'private')
-            self.assertEqual(response_dict['question_data_schema_version'], 1)
-            self.assertEqual(response_dict['additional_angular_modules'], [])
-            self.assertEqual(response_dict['id'], self.question_id)
-            self.assertEqual(response_dict['user_email'], self.ADMIN_EMAIL)
-            self.assertEqual(response_dict['language_code'], 'en')
+            self.assertEqual(
+                response_dict['username'], 'adm')
+            self.assertEqual(
+                response_dict['question_dict']['status'], 'private')
+            self.assertEqual(
+                response_dict['question_dict']['question_data_schema_version'],
+                1)
+            self.assertEqual(
+                response_dict['additional_angular_modules'], [])
+            self.assertEqual(
+                response_dict['question_dict']['id'], self.question_id)
+            self.assertEqual(
+                response_dict['user_email'], self.ADMIN_EMAIL)
+            self.assertEqual(
+                response_dict['question_dict']['language_code'], 'en')
+            self.assertEqual(
+                response_dict['question_dict']['question_data'],
+                self.question_data)
 
             self.logout()
 
@@ -73,8 +84,6 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
             self.logout()
 
     def test_put(self):
-        question_id = question_services.add_question(
-            self.admin_id, self.question)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             payload = {}
             new_question_data = self._create_valid_question_data('DEF')
@@ -91,13 +100,22 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
                 '%s/%s' % (
                     feconf.QUESTION_DATA_URL, self.question_id),
                 payload, csrf_token, expect_errors=False)
-            self.assertIn('question_id', response_json.keys())
+
+            self.assertEqual(
+                response_json['question_dict']['status'], 'private')
+            self.assertEqual(
+                response_json['question_dict']['language_code'], 'en')
+            self.assertEqual(
+                response_json['question_dict']['question_data'],
+                new_question_data)
+            self.assertEqual(
+                response_json['question_dict']['id'], self.question_id)
 
             del payload['change_list']
             self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_DATA_URL,
-                    question_id), payload, csrf_token, expect_errors=True,
+                    self.question_id), payload, csrf_token, expect_errors=True,
                 expected_status_int=404)
 
             del payload['commit_message']
@@ -105,7 +123,7 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
             self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_DATA_URL,
-                    question_id), payload, csrf_token, expect_errors=True,
+                    self.question_id), payload, csrf_token, expect_errors=True,
                 expected_status_int=404)
 
             payload['commit_message'] = 'update question data'
@@ -130,13 +148,14 @@ class QuestionEditorPageTest(test_utils.GenericTestBase):
             'dummy',
             self._create_valid_question_data('ABC'),
             1, 'en', 'private')
+        self.question_id = question_services.add_question(
+            self.admin_id, self.question)
 
     def test_get(self):
-        question_id = question_services.add_question(
-            self.admin_id, self.question)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get('/question_editor/%s' % question_id)
+            response = self.testapp.get('%s/%s' % (
+                feconf.QUESTION_EDITOR_URL_PREFIX, self.question_id))
             self.assertEqual(response.status_int, 200)
             self.assertIn('', response.body)
 

@@ -63,10 +63,10 @@ class EditableQuestionDataHandler(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        question_data = question_services.get_question_by_id(
-            question_id, strict=False)
+        question_dict = question_services.get_question_by_id(
+            question_id, strict=False).to_dict()
 
-        self.values.update(question_data.to_dict())
+        self.values.update({'question_dict': question_dict})
         self.render_json(self.values)
 
     @acl_decorators.can_edit_question
@@ -88,8 +88,11 @@ class EditableQuestionDataHandler(base.BaseHandler):
         question_services.update_question(
             self.user_id, question_id, change_list,
             commit_message)
+
+        question_dict = question_services.get_question_by_id(
+            question_id, strict=False).to_dict()
         return self.render_json({
-            'question_id': question_id
+            'question_dict': question_dict
         })
 
     @acl_decorators.can_delete_question
