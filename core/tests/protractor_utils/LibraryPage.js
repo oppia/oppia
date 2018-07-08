@@ -159,7 +159,8 @@ var LibraryPage = function(){
       by.css('.protractor-test-search-input')).first();
     searchInput.clear();
     searchInput.sendKeys(explorationTitle);
-    browser.waitForAngular();
+    browser.wait(until.visibilityOf(allExplorationSummaryTile.first()), 15000,
+      'Library Page does not exploration ' + explorationTitle);
   };
 };
 
