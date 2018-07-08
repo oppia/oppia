@@ -19,7 +19,6 @@
 import HTMLParser
 import json
 import logging
-import re
 import urlparse
 
 import bleach
@@ -147,16 +146,6 @@ def get_rte_components(html_string):
     return components
 
 
-# Replace list to escape and unescape html strings.
-REPLACE_LIST = [
-    ('&', '&amp;'),
-    ('"', '&quot;'),
-    ('\'', '&#39;'),
-    ('<', '&lt;'),
-    ('>', '&gt;')
-]
-
-
 def escape_html(unescaped_html_data):
     """This functions escapes an unescaped HTML string.
 
@@ -166,8 +155,16 @@ def escape_html(unescaped_html_data):
     Returns:
         str. Escaped HTML string.
     """
+    # Replace list to escape html strings.
+    REPLACE_LIST_FOR_ESCAPING = [
+        ('&', '&amp;'),
+        ('"', '&quot;'),
+        ('\'', '&#39;'),
+        ('<', '&lt;'),
+        ('>', '&gt;')
+    ]
     escaped_html_data = unescaped_html_data
-    for replace_tuple in REPLACE_LIST:
+    for replace_tuple in REPLACE_LIST_FOR_ESCAPING:
         escaped_html_data = escaped_html_data.replace(
             replace_tuple[0], replace_tuple[1])
 
@@ -183,15 +180,18 @@ def unescape_html(escaped_html_data):
     Returns:
         str. Unescaped HTML string.
     """
-    # Some content erroneously contains un-escaped double quotes (&amp;quot;
-    # instead of \&amp;quot;) which breaks json parsing. This line ensures
-    # all double quotes are escaped.
-    unescaped_html_data = re.sub(
-        r'(font-family:)(&amp;quot;)(.*?)(&amp;quot;)',
-        r'\1\\\2\3\\\4', escaped_html_data)
-    for replace_tuple in REPLACE_LIST:
+    # Replace list to unescape html strings.
+    REPLACE_LIST_FOR_UNESCAPING = [
+        ('&quot;', '"'),
+        ('&#39;', '\''),
+        ('&lt;', '<'),
+        ('&gt;', '>'),
+        ('&amp;', '&')
+    ]
+    unescaped_html_data = escaped_html_data
+    for replace_tuple in REPLACE_LIST_FOR_UNESCAPING:
         unescaped_html_data = unescaped_html_data.replace(
-            replace_tuple[1], replace_tuple[0])
+            replace_tuple[0], replace_tuple[1])
 
     return unescaped_html_data
 
