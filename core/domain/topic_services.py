@@ -132,20 +132,18 @@ def get_all_topic_summaries():
     return topic_summaries
 
 
-def get_all_triaged_skills():
+def get_all_skill_ids_assigned_to_some_topic():
     """Returns the ids of all the skills that are linked to some topics.
 
     Returns:
-        list(str). The ids of all the skills linked to some topic.
+        set([str]). The ids of all the skills linked to some topic.
     """
-    skill_ids = []
+    skill_ids = set([])
     all_topic_models = topic_models.TopicModel.get_all()
-    for topic_model in all_topic_models:
-        skill_ids.extend(topic_model.uncategorized_skill_ids)
-        for subtopic in topic_model.subtopics:
-            skill_ids.extend(subtopic['skill_ids'])
-    unique_skill_ids = list(set(skill_ids))
-    return unique_skill_ids
+    all_topics = [get_topic_from_model(topic) for topic in all_topic_models]
+    for topic in all_topics:
+        skill_ids.update(topic.get_all_skill_ids())
+    return skill_ids
 
 
 def get_topic_summary_from_model(topic_summary_model):

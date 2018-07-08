@@ -48,9 +48,10 @@ oppia.directive('skillsList', [
                 '$scope', '$uibModalInstance',
                 function($scope, $uibModalInstance) {
                   $scope.topicSummaries = topicSummaries;
-                  $scope.selectedTopicList = [];
+                  $scope.selectedTopicsIdAndVersionList = [];
                   $scope.done = function() {
-                    $uibModalInstance.close($scope.selectedTopicList);
+                    $uibModalInstance.close(
+                      $scope.selectedTopicsIdAndVersionList);
                   };
                   $scope.cancel = function() {
                     $uibModalInstance.dismiss('cancel');

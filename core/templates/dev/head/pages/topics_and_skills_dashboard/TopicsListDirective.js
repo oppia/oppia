@@ -23,7 +23,7 @@ oppia.directive('topicsList', [
         getTopicSummaries: '&topicSummaries',
         canDeleteTopic: '&userCanDeleteTopic',
         isInModal: '&inModal',
-        selectedTopicList: '='
+        selectedTopicsIdAndVersionList: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/topics_list_directive.html'),
@@ -47,12 +47,12 @@ oppia.directive('topicsList', [
           };
 
           $scope.selectTopic = function(topicId, topicVersion) {
-            if ($scope.selectedTopicList) {
+            if ($scope.selectedTopicsIdAndVersionList) {
               if (
-                $scope.selectedTopicList.map(function(topic) {
+                $scope.selectedTopicsIdAndVersionList.map(function(topic) {
                   return topic.id;
                 }).indexOf(topicId) === -1) {
-                $scope.selectedTopicList.push({
+                $scope.selectedTopicsIdAndVersionList.push({
                   id: topicId,
                   version: topicVersion
                 });
@@ -82,10 +82,8 @@ oppia.directive('topicsList', [
             modalInstance.result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
                 function(status) {
-                  if (status === 200) {
-                    $rootScope.$broadcast(
-                      EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
-                  }
+                  $rootScope.$broadcast(
+                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 },
                 function(error) {
                   AlertsService.addWarning(
