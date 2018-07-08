@@ -509,9 +509,11 @@ def convert_to_ckeditor(html_data):
         while li.parent.name in ['li', 'p']:
             li.parent.unwrap()
 
+    LIST_TAGS = ['ol', 'ul']
+
     # Ensure li is wrapped in ol/ul.
     for li in soup.findAll('li'):
-        if li.parent.name not in ['ol', 'ul']:
+        if li.parent.name not in LIST_TAGS:
             new_parent = soup.new_tag('ul')
             next_sib = list(li.next_siblings)
             li.wrap(new_parent)
@@ -520,8 +522,6 @@ def convert_to_ckeditor(html_data):
                     sib.wrap(new_parent)
                 else:
                     break
-
-    LIST_TAGS = ['ol', 'ul']
 
     # Ensure that the children of ol/ul are li/pre.
     for tag_name in LIST_TAGS:
@@ -542,7 +542,7 @@ def convert_to_ckeditor(html_data):
     for p in soup.findAll('p'):
         if p.parent.name == 'pre':
             p.unwrap()
-        elif p.parent.name in ['ol', 'ul']:
+        elif p.parent.name in LIST_TAGS:
             p.wrap(soup.new_tag('li'))
 
     # Replaces <p><br></p> with <p>&nbsp;</p> and <pre>...<br>...</pre>
