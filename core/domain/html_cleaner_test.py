@@ -731,6 +731,15 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'expected_output': (
                 '<pre>Hello this is test case for br in pre tag\n</pre>'
             )
+        }, {
+            'html_content': (
+                '<p><li> Hello this is test case for li in p which results '
+                'in </li><li> in document </li><li> after unwrapping </li></p>'
+            ),
+            'expected_output': (
+                '<ul><li> Hello this is test case for li in p which results '
+                'in </li><li> in document </li><li> after unwrapping </li></ul>'
+            )
         }]
 
         for test_case in test_cases:
