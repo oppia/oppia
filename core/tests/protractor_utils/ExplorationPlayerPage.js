@@ -195,7 +195,10 @@ var ExplorationPlayerPage = function() {
     // it will get the supplemental interaction.
     interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
-    general.waitForSystem();
+    var waitingForResponseElem = element(by.css(
+      '[ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"]'));
+    browser.wait(until.invisibilityOf(waitingForResponseElem), 10000,
+      'Response takes too long to appear');
   };
 
   this.submitFeedback = function(feedback) {
