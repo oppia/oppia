@@ -1221,7 +1221,7 @@ def _match_line_breaks_in_controller_dependencies(all_files):
     listed in the controller of a directive or service exactly match those
     between the arguments of the controller function.
     """
-    print 'Starting controller dependency check'
+    print 'Starting controller dependency line break check'
     print '----------------------------------------'
     files_to_check = [
         filename for filename in all_files if not
@@ -1248,19 +1248,21 @@ def _match_line_breaks_in_controller_dependencies(all_files):
                 failed = True
                 print (
                     '%s --> Please ensure that line breaks between '
-                    'the stringfied dependencies,"%s" and the function '
-                    'parameters, "%s" for the corresponding controller '
+                    'the stringfied dependencies: "%s" and the function '
+                    'parameters: "%s" for the corresponding controller '
                     'in this file exactly match.' % (
                         filename, stringfied_dependencies, function_parameters))
 
     if failed:
-        summary_message = '%s   Controller dependency check failed' % (
-            _MESSAGE_TYPE_FAILED)
+        summary_message = (
+            '%s   Controller dependency line break check failed' % (
+                _MESSAGE_TYPE_FAILED))
         print summary_message
         summary_messages.append(summary_message)
     else:
-        summary_message = '%s  Controller dependency check passed' % (
-            _MESSAGE_TYPE_SUCCESS)
+        summary_message = (
+            '%s  Controller dependency line break check passed' % (
+                _MESSAGE_TYPE_SUCCESS))
         print summary_message
         summary_messages.append(summary_message)
 
