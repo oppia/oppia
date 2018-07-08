@@ -16,20 +16,24 @@
  * @fileoverview End-to-end tests for rich-text components and interactions.
  */
 
-var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 
 describe('rich-text components', function() {
+  var explorationEditorPage = null;
   var explorationPlayerPage = null;
 
   beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -39,7 +43,7 @@ describe('rich-text components', function() {
 
     workflow.createExploration();
 
-    editor.setContent(function(richTextEditor) {
+    explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
       richTextEditor.appendPlainText(' ');
       // TODO (Jacob) add test for image RTE component
@@ -59,7 +63,7 @@ describe('rich-text components', function() {
       }]);
     });
 
-    editor.navigateToPreviewTab();
+    explorationEditorPage.navigateToPreviewTab();
 
     explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('bold');
@@ -78,7 +82,7 @@ describe('rich-text components', function() {
       }]);
     });
 
-    editor.discardChanges();
+    explorationEditorPage.discardChanges();
     users.logout();
   });
 
@@ -108,6 +112,8 @@ describe('Interactions', function() {
   var explorationPlayerPage = null;
 
   beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -115,8 +121,8 @@ describe('Interactions', function() {
     users.createUser('user@interactions.com', 'userInteractions');
     users.login('user@interactions.com');
     workflow.createExploration();
-    editor.setStateName('first');
-    editor.setContent(forms.toRichText('some content'));
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     var defaultOutcomeSet = false;
 
@@ -125,20 +131,23 @@ describe('Interactions', function() {
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
 
-        editor.setInteraction.apply(
+        explorationEditorMainTab.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
-        editor.addResponse.apply(null, [
+        explorationEditorMainTab.addResponse.apply(null, [
           interactionId, forms.toRichText('yes'), null, false
         ].concat(test.ruleArguments));
 
         if (!defaultOutcomeSet) {
           // The default outcome will be preserved for subsequent tests.
-          editor.setDefaultOutcome(forms.toRichText('no'), null, false);
+          explorationEditorMainTab.getResponseEditor('default')
+            .setFeedback(forms.toRichText('no'));
+          explorationEditorMainTab.getResponseEditor('default')
+            .setDestination('(try again)', false, null);
           defaultOutcomeSet = true;
         }
 
-        editor.navigateToPreviewTab();
+        explorationEditorPage.navigateToPreviewTab();
         explorationPlayerPage.expectInteractionToMatch.apply(
           null, [interactionId].concat(test.expectedInteractionDetails));
         for (var j = 0; j < test.wrongAnswers.length; j++) {
@@ -153,11 +162,11 @@ describe('Interactions', function() {
           explorationPlayerPage.expectLatestFeedbackToMatch(
             forms.toRichText('yes'));
         }
-        editor.navigateToMainTab();
+        explorationEditorPage.navigateToMainTab();
+        explorationEditorMainTab.deleteInteraction();
       }
     }
-
-    editor.discardChanges();
+    explorationEditorPage.discardChanges();
     users.logout();
   });
 
