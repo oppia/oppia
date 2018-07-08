@@ -23,14 +23,10 @@ var until = protractor.ExpectedConditions;
 
 var LibraryPage = function(){
   var LIBRARY_URL_SUFFIX = '/library';
+  var allCollectionSummaryTile = element.all(
+    by.css('.protractor-test-collection-summary-tile'));
   var allExplorationSummaryTile = element.all(
     by.css('.protractor-test-exp-summary-tile'));
-  var languageSelector = forms.MultiSelectEditor(
-    element(by.css('.protractor-test-search-bar-language-selector'))
-  );
-  var categorySelector = forms.MultiSelectEditor(
-    element(by.css('.protractor-test-search-bar-category-selector'))
-  );
   var collectionTitled = function(collectionName) {
     return element.all(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', collectionName));
@@ -39,9 +35,18 @@ var LibraryPage = function(){
     return element.all(by.cssContainingText(
       '.protractor-test-exp-summary-tile-title', explorationName));
   };
+
+  var categorySelector = forms.MultiSelectEditor(
+    element(by.css('.protractor-test-search-bar-category-selector'))
+  );
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );
+  var languageSelector = forms.MultiSelectEditor(
+    element(by.css('.protractor-test-search-bar-language-selector'))
+  );
+  var searchInput = element.all(
+    by.css('.protractor-test-search-input')).first();
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(name) {
@@ -98,8 +103,6 @@ var LibraryPage = function(){
 
   this.playCollection = function(collectionName) {
     general.waitForLoadingMessage();
-    var allCollectionSummaryTile = element.all(
-      by.css('.protractor-test-collection-summary-tile'));
     browser.wait(until.visibilityOf(allCollectionSummaryTile.first()), 10000,
       'Library Page does not have any collection')
       .then(function(isVisible) {
@@ -155,12 +158,18 @@ var LibraryPage = function(){
 
   this.findExploration = function(explorationTitle) {
     general.waitForLoadingMessage();
-    var searchInput = element.all(
-      by.css('.protractor-test-search-input')).first();
     searchInput.clear();
     searchInput.sendKeys(explorationTitle);
     browser.wait(until.visibilityOf(allExplorationSummaryTile.first()), 15000,
-      'Library Page does not exploration ' + explorationTitle);
+      'Library Page does not have exploration ' + explorationTitle);
+  };
+
+  this.findCollection = function(collectionTitle) {
+    general.waitForLoadingMessage();
+    searchInput.clear();
+    searchInput.sendKeys(collectionTitle);
+    browser.wait(until.visibilityOf(allCollectionSummaryTile.first()), 15000,
+      'Library Page does not have exploration ' + collectionTitle);
   };
 };
 
