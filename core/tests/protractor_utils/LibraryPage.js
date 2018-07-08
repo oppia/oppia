@@ -160,16 +160,12 @@ var LibraryPage = function(){
     general.waitForLoadingMessage();
     searchInput.clear();
     searchInput.sendKeys(explorationTitle);
-    browser.wait(until.visibilityOf(allExplorationSummaryTile.first()), 15000,
-      'Library Page does not have exploration ' + explorationTitle);
   };
 
   this.findCollection = function(collectionTitle) {
     general.waitForLoadingMessage();
     searchInput.clear();
     searchInput.sendKeys(collectionTitle);
-    browser.wait(until.visibilityOf(allCollectionSummaryTile.first()), 15000,
-      'Library Page does not have exploration ' + collectionTitle);
   };
 };
 
