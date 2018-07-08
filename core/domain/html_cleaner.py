@@ -182,13 +182,9 @@ def unescape_html(escaped_html_data):
     Returns:
         str. Unescaped HTML string.
     """
-    # Some of the explorations having font-family in style tags
-    # include double quotes around the font name. This results
-    # in error while performing json.loads.
-    # Any such extra quotes are not rendered as \&quot; in html
-    # string. They are rendered in form of &amp;quot;. This line
-    # ensures that all such extra quotes are replaced with
-    # \&amp;quot; in the html string.
+    # Some content erroneously contains un-escaped double quotes (&amp;quot;
+    # instead of \&amp;quot;) which breaks json parsing. This line ensures
+    # all double quotes are escaped.
     unescaped_html_data = escaped_html_data.replace(
         '&amp;quot;', '\\&amp;quot;')
     for replace_tuple in REPLACE_LIST:
@@ -582,17 +578,15 @@ def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
 
     for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
         # To ensure that collapsible tags have content-with-value attribute.
-        if 'content-with-value' not in collapsible.attrs:
+        if 'content-with-value' not in collapsible.attrs or (
+                collapsible['content-with-value'] == ''):
             collapsible['content-with-value'] = escape_html(json.dumps(''))
-        else:
-            content_html = unescape_html(collapsible['content-with-value'])
-            # Empty html strings gives error on json.loads. This block ensures
-            # that json.loads is performed only if html string is not empty.
-            converted_html = (
-                rte_conversion_fn(
-                    json.loads(content_html)) if content_html else '')
-            collapsible['content-with-value'] = escape_html(
-                json.dumps(converted_html))
+
+        content_html = json.loads(
+            unescape_html(collapsible['content-with-value']))
+        collapsible['content-with-value'] = escape_html(
+            json.dumps(rte_conversion_fn(content_html)))
+
         # To ensure that collapsible tags have heading-with-value attribute.
         if 'heading-with-value' not in collapsible.attrs:
             collapsible['heading-with-value'] = escape_html(json.dumps(''))
@@ -652,16 +646,16 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
             err_dict['strings'].append(html_data)
 
         for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
-            if 'content-with-value' not in collapsible.attrs:
+            if 'content-with-value' not in collapsible.attrs or (
+                    collapsible['content-with-value'] == ''):
                 is_invalid = True
             else:
-                content_html = unescape_html(collapsible['content-with-value'])
-                if len(content_html):
-                    content_html = json.loads(content_html)
-                    soup_for_collapsible = bs4.BeautifulSoup(
-                        content_html.replace('<br>', '<br/>'), 'html.parser')
-                    is_invalid = _validate_soup_for_rte(
-                        soup_for_collapsible, rte_format, err_dict)
+                content_html = json.loads(
+                    unescape_html(collapsible['content-with-value']))
+                soup_for_collapsible = bs4.BeautifulSoup(
+                    content_html.replace('<br>', '<br/>'), 'html.parser')
+                is_invalid = _validate_soup_for_rte(
+                    soup_for_collapsible, rte_format, err_dict)
             if is_invalid:
                 err_dict['strings'].append(html_data)
 
