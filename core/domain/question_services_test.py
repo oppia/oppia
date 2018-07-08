@@ -64,7 +64,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question = question_services.get_question_by_id(
             question_id, strict=False)
 
-        self.assertEqual(question.question_id, question_id)
+        self.assertEqual(question.id, question_id)
 
     def test_get_questions_by_ids(self):
         question1_id = question_services.add_question(
@@ -78,8 +78,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         questions = question_services.get_questions_by_ids(
             [question1_id, question2_id])
         self.assertEqual(len(questions), 2)
-        self.assertEqual(questions[0].question_id, question1_id)
-        self.assertEqual(questions[1].question_id, question2_id)
+        self.assertEqual(questions[0].id, question1_id)
+        self.assertEqual(questions[1].id, question2_id)
 
     def test_add_question(self):
         question_id = question_services.add_question(

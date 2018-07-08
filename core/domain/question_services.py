@@ -40,7 +40,7 @@ def _create_new_question(committer_id, question, commit_message):
     """
     question.validate()
     model = question_models.QuestionModel(
-        id=question.question_id,
+        id=question.id,
         question_data=question.question_data,
         question_data_schema_version=question.question_data_schema_version,
         language_code=question.language_code,
@@ -155,7 +155,7 @@ def apply_change_list(question_id, change_list):
     Returns:
       Question. The resulting question domain object.
     """
-    question = get_question_by_id(question_id)
+    question = get_question_by_id(question_id, strict=False)
     try:
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
@@ -195,11 +195,11 @@ def _save_question(committer_id, question, change_list, commit_message):
     if not change_list:
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
-            'save question %s: %s' % (question.question_id, change_list))
+            'save question %s: %s' % (question.id, change_list))
 
     question.validate()
 
-    question_model = question_models.QuestionModel.get(question.question_id)
+    question_model = question_models.QuestionModel.get(question.id)
     question_model.question_data = question.question_data
     question_model.question_data_schema_version = (
         question.question_data_schema_version)
@@ -244,7 +244,7 @@ def create_question_summary(question_id, creator_id):
         question_id: str. ID of the question.
         creator_id: str. The user ID of the creator of the question.
     """
-    question = get_question_by_id(question_id)
+    question = get_question_by_id(question_id, strict=False)
     question_summary = compute_summary_of_question(question, creator_id)
     save_question_summary(question_summary)
 
@@ -263,7 +263,7 @@ def compute_summary_of_question(question, creator_id):
     """
     question_html_data = question.question_data['content']['html']
     question_summary = question_domain.QuestionSummary(
-        question.question_id, creator_id, question_html_data)
+        question.id, creator_id, question_html_data)
 
     return question_summary
 

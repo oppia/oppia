@@ -28,7 +28,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         expected_object = {
-            'question_id': 'col1.random',
+            'id': 'col1.random',
             'question_data': {},
             'question_data_schema_version': 1,
             'language_code': 'en',
@@ -36,7 +36,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
 
         observed_object = question_domain.Question(
-            expected_object['question_id'],
+            expected_object['id'],
             expected_object['question_data'],
             expected_object['question_data_schema_version'],
             expected_object['language_code'],
@@ -49,7 +49,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data = self._create_valid_question_data('ABC')
 
         test_object = {
-            'question_id': 'col1.random',
+            'id': 'col1.random',
             'question_data': question_data,
             'question_data_schema_version': 1,
             'language_code': 'en',
@@ -57,18 +57,18 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         }
 
         question = question_domain.Question(
-            test_object['question_id'],
+            test_object['id'],
             test_object['question_data'],
             test_object['question_data_schema_version'],
             test_object['language_code'],
             test_object['status'])
 
-        question.question_id = 123
+        question.id = 123
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected ID to be a string')):
             question.validate()
 
-        question.question_id = 'col1.random'
+        question.id = 'col1.random'
 
         question.update_question_data([])
         with self.assertRaisesRegexp(utils.ValidationError, (
@@ -99,7 +99,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data = state.to_dict()
 
         expected_object = {
-            'question_id': 'col1.random',
+            'id': 'col1.random',
             'question_data': question_data,
             'question_data_schema_version': 1,
             'language_code': 'en',
@@ -120,7 +120,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         default_question_data = exp_domain.State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
-        self.assertEqual(question.question_id, question_id)
+        self.assertEqual(question.id, question_id)
         self.assertEqual(question.question_data_schema_version, 1)
         self.assertEqual(question.question_data, default_question_data)
         self.assertEqual(question.language_code, 'en')
@@ -134,7 +134,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_data = state.to_dict()
 
         test_object = {
-            'question_id': 'col1.random',
+            'id': 'col1.random',
             'question_data': question_data,
             'question_data_schema_version': 1,
             'language_code': 'en',

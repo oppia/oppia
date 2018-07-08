@@ -54,7 +54,7 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(response_dict['status'], 'private')
             self.assertEqual(response_dict['question_data_schema_version'], 1)
             self.assertEqual(response_dict['additional_angular_modules'], [])
-            self.assertEqual(response_dict['question_id'], self.question_id)
+            self.assertEqual(response_dict['id'], self.question_id)
             self.assertEqual(response_dict['user_email'], self.ADMIN_EMAIL)
             self.assertEqual(response_dict['language_code'], 'en')
 

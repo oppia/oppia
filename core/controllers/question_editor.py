@@ -23,7 +23,6 @@ from core.domain import acl_decorators
 from core.domain import question_domain
 from core.domain import question_services
 import feconf
-import utils
 
 
 class QuestionEditorPage(base.BaseHandler):
@@ -36,7 +35,8 @@ class QuestionEditorPage(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        question = question_services.get_question_by_id(question_id)
+        question = question_services.get_question_by_id(
+            question_id, strict=False)
 
         if question is None:
             raise self.PageNotFoundException(
@@ -45,7 +45,7 @@ class QuestionEditorPage(base.BaseHandler):
         self.values.update({
             'question': question.to_dict(),
             'can_edit': question_services.check_can_edit_question(
-                self.user.user_id, question.question_id)
+                self.user.user_id, question_id)
         })
 
         self.render_template(
@@ -63,7 +63,8 @@ class EditableQuestionDataHandler(base.BaseHandler):
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
-        question_data = question_services.get_question_by_id(question_id)
+        question_data = question_services.get_question_by_id(
+            question_id, strict=False)
 
         self.values.update(question_data.to_dict())
         self.render_json(self.values)
@@ -101,7 +102,8 @@ class EditableQuestionDataHandler(base.BaseHandler):
             self.role, self.user_id, question_id)
         logging.debug(log_debug_string)
 
-        question = question_services.get_question_by_id(question_id)
+        question = question_services.get_question_by_id(
+            question_id, strict=False)
         if question is None:
             raise self.PageNotFoundException(
                 'The question with the given id doesn\'t exist.')

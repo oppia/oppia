@@ -127,7 +127,7 @@ class Question(object):
             status: str. The status of the question among approved, rejected,
                 pending or private.
         """
-        self.question_id = question_id
+        self.id = question_id
         self.question_data = question_data
         self.question_data_schema_version = question_data_schema_version
         self.language_code = language_code
@@ -140,7 +140,7 @@ class Question(object):
             dict. A dict representation of the Question instance.
         """
         return {
-            'question_id': self.question_id,
+            'id': self.id,
             'question_data': self.question_data,
             'question_data_schema_version': self.question_data_schema_version,
             'language_code': self.language_code,
@@ -150,9 +150,9 @@ class Question(object):
     def validate(self):
         """Validates the Question domain object before it is saved."""
 
-        if not isinstance(self.question_id, basestring):
+        if not isinstance(self.id, basestring):
             raise utils.ValidationError(
-                'Expected ID to be a string, received %s' % self.question_id)
+                'Expected ID to be a string, received %s' % self.id)
 
         if not isinstance(self.question_data, dict):
             raise utils.ValidationError(
@@ -226,7 +226,7 @@ class Question(object):
             Question. The corresponding Question domain object.
         """
         question = cls(
-            question_dict['question_id'],
+            question_dict['id'],
             question_dict['question_data'],
             question_dict['question_data_schema_version'],
             question_dict['language_code'],
