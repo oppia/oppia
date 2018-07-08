@@ -298,7 +298,7 @@ var ExplorationEditorMainTab = function() {
       expectRuleToBe: function(interactionId, ruleName, feedbackTextArray) {
         var ruleDescription = _getRuleDescription(interactionId, ruleName);
         // Replace selectors with feedbackTextArray's elements.
-        ruleDescription = _replaceAngularSelectors(
+        ruleDescription = _replaceRuleInputPlaceholders(
           ruleDescription, feedbackTextArray);
         ruleDescription += '...';
         // Adding "..." to end of string.
@@ -846,32 +846,32 @@ var ExplorationEditorMainTab = function() {
   };
 
   /**
-   * Parse for Angular selectors in ruleDescription and replace them.
+   * Parse for rule input placeholders in ruleDescription and replace them.
    * @param {string} [ruleDescription] - Interaction type.
    * @param {string[]} [providedText] - Feedback text to replace with.
    */
-  var _replaceAngularSelectors = function(ruleDescription, providedText) {
+  var _replaceRuleInputPlaceholders = function(ruleDescription, providedText) {
     // An example of rule description:
     // "is equal to {{a|NonnegativeInt}} and {{b|NonnegativeInt}}"
     // (from NumericInput).
     var re = /{{[a-z]+[\|](.*?)}}/ig;
     // Matched result = Array[{{a|NonnegativeInt}}}, {{b|NonnegativeInt}}]
-    var angularSelectors = ruleDescription.match(re);
+    var placeholders = ruleDescription.match(re);
     var textArray = [];
-    // Return as-is if string does not contain Angular selectors.
-    if (angularSelectors) {
-      // Replacing Angular selectors in ruleDescription with provided text.
-      angularSelectors.forEach(function(selector, index) {
+    // Return as-is if string does not contain placeholders.
+    if (placeholders) {
+      // Replacing placeholders in ruleDescription with given text.
+      placeholders.forEach(function(placeholderElement, index) {
         if (providedText[0] === '...') {
-          ruleDescription = ruleDescription.replace(selector, '...');
+          ruleDescription = ruleDescription.replace(placeholderElement, '...');
         } else {
-          if (providedText.length !== angularSelectors.length) {
+          if (providedText.length !== placeholders.length) {
             throw Error('# of feedback text(' + textArray.length +
-            ') is expected to match # of angular selectors(' +
-            (angularSelectors.length) + ')');
+            ') is expected to match # of placeholders(' +
+            (placeholders.length) + ')');
           }
           ruleDescription = ruleDescription.replace(
-            selector, providedText[index].toString());
+            placeholderElement, providedText[index].toString());
         }
       });
     }
@@ -883,7 +883,7 @@ var ExplorationEditorMainTab = function() {
   var _selectRule = function(ruleElem, interactionId, ruleName) {
     var ruleDescription = _getRuleDescription(interactionId, ruleName);
     // Replace selectors with "...".
-    ruleDescription = _replaceAngularSelectors(ruleDescription, ['...']);
+    ruleDescription = _replaceRuleInputPlaceholders(ruleDescription, ['...']);
     var ruleDescriptionInDropdown = ruleDescription;
     var answerDescription = element(
       by.css('.protractor-test-answer-description'));
