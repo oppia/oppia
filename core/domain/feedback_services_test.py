@@ -473,7 +473,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             feedback_services.create_message(
                 threads[0].id, self.owner_id, None, None, 'editor message')
             _, number_of_unread_threads = (
-                feedback_services.get_thread_summaries(self.user_id, thread_ids))
+                feedback_services.get_thread_summaries(
+                    self.user_id, thread_ids))
 
         # Check if the number of unread messages is equal to 1.
         self.assertEqual(number_of_unread_threads, 1)
@@ -824,7 +825,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
             with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
                 feedback_services.create_thread(
                     'exploration', self.exploration.id, 'a_state_name',
-                self.user_id_a, 'a subject', 'A message')
+                    self.user_id_a, 'a subject', 'A message')
                 # There are two jobs in the taskqueue: one for the realtime
                 # event associated with creating a thread, and one for sending
                 # the email.
@@ -843,9 +844,9 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 feedback_services.create_message(
                     thread_id, self.editor_id,
                     feedback_models.STATUS_CHOICES_FIXED, None, '')
-                # There are two jobs in the taskqueue: one for the realtime event
-                # associated with changing subject of thread, and one for sending
-                # the email.
+                # There are two jobs in the taskqueue: one for the realtime
+                # event associated with changing subject of thread, and one for
+                # sending the email.
                 self.assertEqual(
                     self.count_jobs_in_taskqueue(
                         taskqueue_services.QUEUE_NAME_EMAILS), 1)
@@ -1092,7 +1093,8 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
                     {'thread_id': thread_id}, csrf_token)
 
                 self.process_and_flush_pending_tasks()
-                messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
+                messages = self.mail_stub.get_sent_messages(
+                    to=self.EDITOR_EMAIL)
                 self.assertEqual(len(messages), 0)
 
 

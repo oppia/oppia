@@ -87,7 +87,7 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
         """Test if the job returns the correct message count."""
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
-                'exploration',  self.EXP_ID_1,
+                'exploration', self.EXP_ID_1,
                 self.EXPECTED_THREAD_DICT['state_name'], self.user_id,
                 self.EXPECTED_THREAD_DICT['subject'], 'not used here')
             feedback_services.create_thread(

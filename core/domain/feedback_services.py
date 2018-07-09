@@ -442,7 +442,7 @@ def _get_thread_from_model(thread_model):
         thread_model.state_name, thread_model.original_author_id,
         thread_model.status, thread_model.subject, thread_model.summary,
         thread_model.has_suggestion, message_count, thread_model.created_on,
-         thread_model.last_updated)
+        thread_model.last_updated)
 
 
 def get_thread_summaries(user_id, thread_ids):
