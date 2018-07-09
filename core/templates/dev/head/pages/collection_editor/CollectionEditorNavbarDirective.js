@@ -31,8 +31,9 @@ oppia.directive('collectionEditorNavbar', [
         'EVENT_COLLECTION_INITIALIZED', 'EVENT_COLLECTION_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
-            $scope, $uibModal, AlertsService, RouterService, UndoRedoService,
-            CollectionEditorStateService, CollectionValidationService,
+            $scope, $uibModal, AlertsService, RouterService,
+            UndoRedoService, CollectionEditorStateService,
+            CollectionValidationService,
             CollectionRightsBackendApiService,
             EditableCollectionBackendApiService,
             EVENT_COLLECTION_INITIALIZED, EVENT_COLLECTION_REINITIALIZED,
@@ -151,7 +152,7 @@ oppia.directive('collectionEditorNavbar', [
                   '$scope', '$uibModalInstance', 'CollectionEditorStateService',
                   'CollectionUpdateService', 'ALL_CATEGORIES',
                   function(
-                      $scope, $uibModalInstance, CollectionEditorStatesService,
+                      $scope, $uibModalInstance, CollectionEditorStateService,
                       CollectionUpdateService, ALL_CATEGORIES) {
                     var collection = (
                       CollectionEditorStateService.getCollection());
