@@ -102,6 +102,10 @@
             (try again, with refresher exploration "<[outcome.refresherExplorationId]>")
           </span>
         </span>
+        <div style="margin-top: 1em;" ng-if="outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
+          <strong> Attached prerequisite skill for the current state: </strong>
+          <[outcome.missingPrerequisiteSkillId]>
+        </div>
       </div>
     </div>
   </div>

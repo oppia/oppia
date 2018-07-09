@@ -42,6 +42,7 @@ oppia.directive('outcomeEditor', [
             stateInteractionIdService, COMPONENT_NAME_FEEDBACK,
             ExplorationCorrectnessFeedbackService, INTERACTION_SPECS) {
           $scope.editOutcomeForm = {};
+          $scope.canAddPrerequisiteSkill = constants.ENABLE_NEW_STRUCTURES;
           $scope.feedbackEditorIsOpen = false;
           $scope.destinationEditorIsOpen = false;
           $scope.correctnessLabelEditorIsOpen = false;
@@ -185,6 +186,8 @@ oppia.directive('outcomeEditor', [
             }
             $scope.savedOutcome.refresherExplorationId = (
               $scope.outcome.refresherExplorationId);
+            $scope.savedOutcome.missingPrerequisiteSkillId =
+              $scope.outcome.missingPrerequisiteSkillId;
 
             $scope.getOnSaveDestFn()($scope.savedOutcome);
           };
@@ -206,6 +209,8 @@ oppia.directive('outcomeEditor', [
             $scope.outcome.dest = angular.copy($scope.savedOutcome.dest);
             $scope.outcome.refresherExplorationId = (
               $scope.savedOutcome.refresherExplorationId);
+            $scope.outcome.missingPrerequisiteSkillId =
+              $scope.savedOutcome.missingPrerequisiteSkillId;
             $scope.destinationEditorIsOpen = false;
           };
 

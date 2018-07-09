@@ -453,5 +453,7 @@ var constants = {
 
   "IS_CURRENT_RTE_CKEDITOR": false,
 
-  "USE_NEW_SUGGESTION_FRAMEWORK": false
+  "USE_NEW_SUGGESTION_FRAMEWORK": false,
+
+  "ENABLE_NEW_STRUCTURES": false
 };
