@@ -64,23 +64,35 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
             self.assertEqual(len(json_response['topic_summary_dicts']), 1)
             self.assertEqual(
-                json_response['topic_summary_dicts'][0]['id'], self.topic_id)
-            self.assertEqual(len(json_response['skill_summary_dicts']), 1)
+                json_response['topic_summary_dicts'][0]['can_edit_topic'],
+                True)
             self.assertEqual(
-                json_response['skill_summary_dicts'][0]['id'], skill_id)
+                json_response['topic_summary_dicts'][0]['id'], self.topic_id)
+            self.assertEqual(
+                len(json_response['untriaged_skill_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['untriaged_skill_summary_dicts'][0]['id'],
+                skill_id)
             self.logout()
 
             # Check that topic managers can access the topics and skills
             # dashboard editable topic data.
-            self.login(self.ADMIN_EMAIL)
+            self.login(self.TOPIC_MANAGER_EMAIL)
             json_response = self.get_json(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
             self.assertEqual(len(json_response['topic_summary_dicts']), 1)
             self.assertEqual(
-                json_response['topic_summary_dicts'][0]['id'], self.topic_id)
-            self.assertEqual(len(json_response['skill_summary_dicts']), 1)
+                json_response['topic_summary_dicts'][0]['can_edit_topic'],
+                False)
             self.assertEqual(
-                json_response['skill_summary_dicts'][0]['id'], skill_id)
+                json_response['topic_summary_dicts'][0]['id'], self.topic_id)
+            self.assertEqual(
+                json_response['topic_summary_dicts'][0]['id'], self.topic_id)
+            self.assertEqual(
+                len(json_response['untriaged_skill_summary_dicts']), 1)
+            self.assertEqual(
+                json_response['untriaged_skill_summary_dicts'][0]['id'],
+                skill_id)
             self.logout()
 
 

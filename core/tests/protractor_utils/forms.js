@@ -34,6 +34,85 @@ var DictionaryEditor = function(elem) {
   };
 };
 
+var GraphEditor = function(graphInputContainer) {
+  if (!graphInputContainer) {
+    throw Error('Please provide Graph Input Container element');
+  }
+  var vertexElement = function(index) {
+    // Would throw incorrect element error if provided incorrect index number.
+    // Node index starts at 0.
+    return graphInputContainer.element(by.css(
+      '.protractor-test-graph-vertex-' + index));
+  };
+
+  var createVertex = function(xOffset, yOffset) {
+    var addNodeButton = graphInputContainer.element(
+      by.css('.protractor-test-Add-Node-button'));
+    addNodeButton.click();
+    // Offsetting from the graph container.
+    browser.actions()
+      .mouseMove(graphInputContainer, {x: xOffset, y: yOffset})
+      .click()
+      .perform();
+  };
+
+  var createEdge = function(vertexIndex1, vertexIndex2) {
+    var addEdgeButton = graphInputContainer.element(
+      by.css('.protractor-test-Add-Edge-button'));
+    addEdgeButton.click();
+    browser.actions()
+      .dragAndDrop(vertexElement(vertexIndex1), vertexElement(vertexIndex2))
+      .perform();
+  };
+  return {
+    setValue: function(graphDict) {
+      var nodeCoordinatesList = graphDict.vertices;
+      var edgesList = graphDict.edges;
+      if (nodeCoordinatesList) {
+        expect(nodeCoordinatesList.length).toBeGreaterThan(0);
+        // Assume x-coord is at index 0.
+        nodeCoordinatesList.forEach(function(coordinateElement) {
+          createVertex(coordinateElement[0], coordinateElement[1]);
+        });
+      }
+      if (edgesList) {
+        edgesList.forEach(function(edgeElement) {
+          createEdge(edgeElement[0], edgeElement[1]);
+        });
+      }
+    },
+    clearDefaultGraph: function() {
+      var deleteButton = graphInputContainer.element(
+        by.css('.protractor-test-Delete-button'));
+      deleteButton.click();
+      // Sample graph comes with 3 vertices.
+      for (i = 2; i >= 0; i--) {
+        vertexElement(i).click();
+      }
+    },
+    expectCurrentGraphToBe: function(graphDict) {
+      var nodeCoordinatesList = graphDict.vertices;
+      var edgesList = graphDict.edges;
+      if (nodeCoordinatesList) {
+        // Expecting total no. of vertices on the graph matches with the given
+        // dict's vertices.
+        nodeCoordinatesList.forEach(function(node, index) {
+          expect(vertexElement(index).isDisplayed()).toBe(true);
+        });
+      }
+      if (edgesList) {
+        // Expecting total no. of edges on the graph matches with the given
+        // dict's edges.
+        var allEdgesElement = element.all(by.css(
+          '.protractor-test-graph-edge'));
+        allEdgesElement.then(function(allEdges) {
+          expect(allEdges.length).toEqual(edgesList.length);
+        });
+      }
+    }
+  };
+};
+
 var ListEditor = function(elem) {
   // NOTE: this returns a promise, not an integer.
   var _getLength = function() {
@@ -622,6 +701,7 @@ var CodeMirrorChecker = function(elem) {
 // their entries dynamically.
 var FORM_EDITORS = {
   Dictionary: DictionaryEditor,
+  Graph: GraphEditor,
   List: ListEditor,
   Real: RealEditor,
   RichText: RichTextEditor,
@@ -646,6 +726,7 @@ exports.UnicodeEditor = UnicodeEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
 exports.MultiSelectEditor = MultiSelectEditor;
+exports.GraphEditor = GraphEditor;
 
 exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;
