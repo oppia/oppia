@@ -637,8 +637,14 @@ var CodeMirrorChecker = function(elem) {
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
       for (var i = 0; i < textArray.length; i += 2) {
-        var lineNumber = textArray[i];
+        var lineNumber = textArray[i].replace(/^\s+/g, '');
         var lineText = textArray[i + 1];
+        var copy = lineText
+        var lineTextWithoutStartSpaces = copy.replace(/^\s+/g, '')
+        if (lineTextWithoutStartSpaces.length == 1 && lineTextWithoutStartSpaces.match(/[0-9]/i)) {
+          lineText = '';
+          i -= 1;
+        }
         if (!compareDict.hasOwnProperty(lineNumber)) {
           throw Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
