@@ -32,7 +32,7 @@ EXPECTED_THREAD_KEYS = [
     'status', 'original_author_username', 'state_name', 'summary',
     'thread_id', 'subject', 'last_updated', 'message_count']
 EXPECTED_MESSAGE_KEYS = [
-    'author_username', 'created_on', 'exploration_id', 'message_id',
+    'author_username', 'created_on', 'entity_type', 'message_id', 'entity_id',
     'text', 'updated_status', 'updated_subject', 'received_via_email']
 
 
@@ -195,39 +195,42 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         response = self.testapp.get('/create/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        # First, create a thread.
-        self.post_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
-                'state_name': None,
-                'subject': u'New Thread ¡unicode!',
-                'text': u'Message 0 ¡unicode!',
-            }, csrf_token)
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            # First, create a thread.
+            self.post_json(
+                '%s/%s' % (
+                    feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
+                        'state_name': None,
+                        'subject': u'New Thread ¡unicode!',
+                    'text': u'Message 0 ¡unicode!',
+                }, csrf_token)
 
-        # Then, get the thread id.
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-        threadlist = response_dict['threads']
-        self.assertEqual(len(threadlist), 1)
-        thread_id = threadlist[0]['thread_id']
+            # Then, get the thread id.
+            response_dict = self.get_json(
+                '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
+            threadlist = response_dict['threads']
+            self.assertEqual(len(threadlist), 1)
+            thread_id = threadlist[0]['thread_id']
 
-        # Then, create a new message in that thread.
-        thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
-        self.post_json(
-            thread_url, {
-                'updated_status': None,
-                'updated_subject': None,
-                'text': 'Message 1'
-            }, csrf_token)
+            # Then, create a new message in that thread.
+            thread_url = '%s/%s' % (
+                feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
+            self.post_json(
+                thread_url, {
+                    'updated_status': None,
+                    'updated_subject': None,
+                    'text': 'Message 1'
+                }, csrf_token)
 
-        # The resulting thread should contain two messages.
-        response_dict = self.get_json(thread_url)
+            # The resulting thread should contain two messages.
+            response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 2)
         self.assertEqual(
             set(response_dict['messages'][0].keys()),
             set(EXPECTED_MESSAGE_KEYS))
         self.assertDictContainsSubset({
             'author_username': self.EDITOR_USERNAME,
-            'exploration_id': self.EXP_ID,
+            'entity_id': self.EXP_ID,
             'message_id': 0,
             'updated_status': 'open',
             'updated_subject': u'New Thread ¡unicode!',
@@ -235,7 +238,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         }, response_dict['messages'][0])
         self.assertDictContainsSubset({
             'author_username': self.EDITOR_USERNAME,
-            'exploration_id': self.EXP_ID,
+            'entity_id': self.EXP_ID,
             'message_id': 1,
             'updated_status': None,
             'updated_subject': None,
@@ -630,7 +633,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
 
         # Suggestion description should be the same as thread subject.
         self.assertEqual(
-            response_dict['suggestion']['description'],
+        response_dict['suggestion']['description'],
             threads[0]['subject'])
 
         # Get a list of all threads without suggestions.

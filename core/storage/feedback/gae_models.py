@@ -133,7 +133,7 @@ class FeedbackThreadModel(base_models.BaseModel):
             thread_id = entity_type + '.' + entity_id + '.'
         for _ in range(_MAX_RETRIES):
             thread_id = (
-                thread_id + 
+                thread_id +
                 utils.base64_from_int(utils.get_current_time_in_millisecs()) +
                 utils.base64_from_int(utils.get_random_int(_RAND_RANGE)))
             if not cls.get_by_id(thread_id):
@@ -176,7 +176,7 @@ class FeedbackThreadModel(base_models.BaseModel):
             list(FeedbackThreadModel). List of threads associated with the
                 exploration. Doesn't include deleted entries.
         """
-        
+
         if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
             return cls.get_all().filter(cls.exploration_id == entity_id).order(
                 cls.last_updated).fetch(limit)
@@ -224,13 +224,23 @@ class FeedbackMessageModel(base_models.BaseModel):
         return '.'.join([thread_id, str(message_id)])
 
     @property
-    def exploration_id(self):
-        """Returns the exploration id corresponding to this thread instance.
+    def entity_id(self):
+        """Returns the entity_id corresponding to this thread instance.
 
         Returns:
-            str. The exploration id.
+            str. The entity_id.
+        """
+        return self.id.split('.')[1]
+
+    @property
+    def entity_type(self):
+        """Returns the entity_type corresponding to this thread instance.
+
+        Returns:
+            str. The entity_type.
         """
         return self.id.split('.')[0]
+
 
     def get_thread_subject(self):
         """Returns the subject of the thread corresponding to this

@@ -157,7 +157,7 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
                 exploration_ids))
 
         return [feedback_domain.FeedbackAnalytics(
-            exploration_ids[i],
+            'exploration', exploration_ids[i],
             (realtime_models[i].num_open_threads
              if realtime_models[i] is not None else 0) +
             (feedback_thread_analytics_models[i].num_open_threads

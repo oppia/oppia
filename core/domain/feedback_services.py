@@ -50,16 +50,19 @@ def get_exp_id_from_thread_id(thread_id):
     Returns:
         str. The exploration id part of the thread_id.
     """
+    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        return thread_id.split('.')[1]
     return thread_id.split('.')[0]
 
 
 def _create_models_for_thread_and_first_message(
-        exploration_id, state_name, original_author_id, subject, text,
+        entity_type, entity_id, state_name, original_author_id, subject, text,
         has_suggestion):
     """Creates a feedback thread and its first message.
 
     Args:
-        exploration_id: str. The exploration id the thread belongs to.
+        entity_type: str. The type of entity the feedback thread is linked to.
+        entity_id: str. The id of the entity.
         state_name: str or None. The state name for the thread. If None,
             this indicates that the thread pertains to the exploration as a
             whole.
@@ -73,9 +76,15 @@ def _create_models_for_thread_and_first_message(
         The thread id we created.
     """
     thread_id = feedback_models.FeedbackThreadModel.generate_new_thread_id(
-        'exploration', exploration_id)
+        entity_type, entity_id)
     thread = feedback_models.FeedbackThreadModel.create(thread_id)
-    thread.exploration_id = exploration_id
+    thread.entity_type = entity_type
+    thread.entity_id = entity_id
+    # For backward compatibility. Will be removed after migration.
+    thread.exploration_id = entity_id
+    # TODO (nithesh: Audit how many threads actually use this field. Determine
+    # if it is actually useful to have. If so, determine similar use cases for
+    # other types of entities and choose a parameter name appropriately.
     thread.state_name = state_name
     thread.original_author_id = original_author_id
     # The feedback analytics jobs rely on the thread status being set to 'open'
@@ -93,11 +102,12 @@ def _create_models_for_thread_and_first_message(
 
 
 def create_thread(
-        exploration_id, state_name, original_author_id, subject, text):
+        entity_type, entity_id, state_name, original_author_id, subject, text):
     """Creates a thread and its first message.
 
     Args:
-        exploration_id: str. The exploration id the thread belongs to.
+        entity_type: str. The type of entity the feedback thread is linked to.
+        entity_id: str. The id of the entity.
         state_name: str or None. The state name for the thread. If None, this
             indicates that the thread pertains to the exploration as a whole.
         original_author_id: str. The author id who starts this thread.
@@ -108,7 +118,8 @@ def create_thread(
         str. The ID of the newly created thread.
     """
     thread_id = _create_models_for_thread_and_first_message(
-        exploration_id, state_name, original_author_id, subject, text, False)
+        entity_type, entity_id, state_name, original_author_id, subject, text,
+        False)
     return thread_id
 
 
@@ -372,7 +383,7 @@ def create_suggestion(
             the value of "value" is the actual content of the suggestion.
     """
     thread_id = _create_models_for_thread_and_first_message(
-        exploration_id, state_name, author_id, description,
+        'exploration', exploration_id, state_name, author_id, description,
         DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE, True)
     feedback_models.SuggestionModel.create(
         exploration_id, thread_id, author_id, exploration_version, state_name,
@@ -427,10 +438,11 @@ def _get_thread_from_model(thread_model):
         message_count = thread_model.message_count
 
     return feedback_domain.FeedbackThread(
-        thread_model.id, thread_model.exploration_id, thread_model.state_name,
-        thread_model.original_author_id, thread_model.status,
-        thread_model.subject, thread_model.summary, thread_model.has_suggestion,
-        message_count, thread_model.created_on, thread_model.last_updated)
+        thread_model.id, thread_model.entity_type, thread_model.entity_id,
+        thread_model.state_name, thread_model.original_author_id,
+        thread_model.status, thread_model.subject, thread_model.summary,
+        thread_model.has_suggestion, message_count, thread_model.created_on,
+         thread_model.last_updated)
 
 
 def get_thread_summaries(user_id, thread_ids):
@@ -472,7 +484,7 @@ def get_thread_summaries(user_id, thread_ids):
             user_id, thread_id)
          for thread_id in thread_ids])
 
-    exploration_ids = [thread_id.split('.')[0] for thread_id in thread_ids]
+    exploration_ids = [thread_id.split('.')[1] for thread_id in thread_ids]
 
     multiple_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(
@@ -596,17 +608,18 @@ def get_most_recent_messages(exp_id):
         for message_model in message_models]
 
 
-def get_threads(exploration_id):
-    """Fetches all the threads for the given exploration id.
+def get_threads(entity_type, entity_id):
+    """Fetches all the threads for the given entity id.
 
     Args:
-        exploration_id: str.
+        entity_type: str. The type of entity the feedback thread is linked to.
+        entity_id: str. The id of the entity.
 
     Returns:
         list of FeedbackThread. The corresponding Suggestion domain object.
     """
     thread_models = feedback_models.FeedbackThreadModel.get_threads(
-        'exploration', exploration_id)
+        entity_type, entity_id)
     return [_get_thread_from_model(model) for model in thread_models]
 
 
@@ -623,11 +636,12 @@ def get_thread(thread_id):
     return _get_thread_from_model(model)
 
 
-def get_open_threads(exploration_id, has_suggestion):
-    """Fetches all open threads for the given exploration id.
+def get_open_threads(entity_type, entity_id, has_suggestion):
+    """Fetches all open threads for the given entity id.
 
     Args:
-        exploration_id: str.
+        entity_type: str. The type of entity the feedback thread is linked to.
+        entity_id: str. The id of the entity.
         has_suggestion: bool. If it's True, return a list of all open threads
             that have a suggestion, otherwise return a list of all open threads
             that do not have a suggestion.
@@ -635,10 +649,7 @@ def get_open_threads(exploration_id, has_suggestion):
     Returns:
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
-    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        threads = get_threads(exploration_id)
-    else:
-        threads = get_threads('exploration', exploration_id)
+    threads = get_threads(entity_type, entity_id)
     open_threads = []
     for thread in threads:
         if (thread.has_suggestion == has_suggestion and
@@ -647,11 +658,12 @@ def get_open_threads(exploration_id, has_suggestion):
     return open_threads
 
 
-def get_closed_threads(exploration_id, has_suggestion):
-    """Fetches all closed threads of the given exploration id.
+def get_closed_threads(entity_type, entity_id, has_suggestion):
+    """Fetches all closed threads of the given entity id.
 
     Args:
-        exploration_id: str.
+        entity_type: str. The type of entity the feedback thread is linked to.
+        entity_id: str. The id of the entity.
         has_suggestion: bool. If it's True, return a list of all closed threads
             that have a suggestion, otherwise return a list of all closed
             threads that do not have a suggestion.
@@ -659,10 +671,7 @@ def get_closed_threads(exploration_id, has_suggestion):
     Returns:
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
-    if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        threads = get_threads(exploration_id)
-    else:
-        threads = get_threads('exploration', exploration_id)
+    threads = get_threads(entity_type, entity_id)
     closed_threads = []
     for thread in threads:
         if (thread.has_suggestion == has_suggestion and
@@ -671,12 +680,13 @@ def get_closed_threads(exploration_id, has_suggestion):
     return closed_threads
 
 
-def get_all_threads(exploration_id, has_suggestion):
+def get_all_threads(entity_type, entity_id, has_suggestion):
     """Fetches all threads (regardless of their status) that correspond to the
-    given exploration id.
+    given entity id.
 
     Args:
-        exploration_id: str.
+        entity_type: str. The type of entity the feedback thread is linked to.
+        entity_id: str. The id of the entity.
         has_suggestion: bool. If it's True, return a list of all threads
             that have a suggestion, otherwise return a list of all threads
             that do not have a suggestion.
@@ -684,7 +694,7 @@ def get_all_threads(exploration_id, has_suggestion):
     Returns:
         list of FeedbackThread. The resulting FeedbackThread domain objects.
     """
-    threads = get_threads(exploration_id)
+    threads = get_threads(entity_type, entity_id)
     all_threads = []
     for thread in threads:
         if thread.has_suggestion == has_suggestion:
@@ -789,8 +799,8 @@ def get_feedback_message_references(user_id):
         return []
 
     return [feedback_domain.FeedbackMessageReference(
-        reference['exploration_id'], reference['thread_id'],
-        reference['message_id']
+        reference['entity_type'], reference['entity_id'],
+        reference['thread_id'], reference['message_id']
     ) for reference in model.feedback_message_references]
 
 
@@ -876,7 +886,7 @@ def clear_feedback_message_references(user_id, exploration_id, thread_id):
 
     updated_references = []
     for reference in model.feedback_message_references:
-        if (reference['exploration_id'] != exploration_id or
+        if (reference['entity_id'] != exploration_id or
                 reference['thread_id'] != thread_id):
             updated_references.append(reference)
 
@@ -1046,11 +1056,11 @@ def _add_message_to_email_buffer(
         new_status: str. one of STATUS_CHOICES. Value of new thread status.
     """
     thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
-    exploration_id = thread.exploration_id
+    exploration_id = thread.entity_id
     has_suggestion = thread.has_suggestion
 
     feedback_message_reference = feedback_domain.FeedbackMessageReference(
-        exploration_id, thread_id, message_id)
+        thread.entity_type, thread.entity_id, thread_id, message_id)
     batch_recipient_ids, other_recipient_ids = (
         _get_all_recipient_ids(exploration_id, thread_id, author_id))
 
