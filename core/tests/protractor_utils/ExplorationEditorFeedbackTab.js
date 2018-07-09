@@ -89,6 +89,8 @@ var ExplorationEditorFeedbackTab = function () {
     return element.all(by.css(suggestionRowClassName)).then(function(rows) {
       rows.forEach(function(row) {
         row.click();
+        browser.wait(until.visibilityOf(explorationFeedback), 5000,
+          'Exploration Feedback text is not visible');
         explorationFeedback.getText().then(function(message) {
           messages.push(message);
         });
