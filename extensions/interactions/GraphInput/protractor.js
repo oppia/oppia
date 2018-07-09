@@ -85,5 +85,3 @@ exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
 exports.answerObjectType = answerObjectType;
 exports.testSuite = testSuite;
-
-
