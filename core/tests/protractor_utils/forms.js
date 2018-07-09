@@ -639,9 +639,10 @@ var CodeMirrorChecker = function(elem) {
       for (var i = 0; i < textArray.length; i += 2) {
         var lineNumber = textArray[i].replace(/^\s+/g, '');
         var lineText = textArray[i + 1];
-        var copy = lineText
-        var lineTextWithoutStartSpaces = copy.replace(/^\s+/g, '')
-        if (lineTextWithoutStartSpaces.length == 1 && lineTextWithoutStartSpaces.match(/[0-9]/i)) {
+        var copy = lineText;
+        var lineTextWithoutStartSpaces = copy.replace(/^\s+/g, '');
+        if ((lineTextWithoutStartSpaces.length === 1) && (
+          lineTextWithoutStartSpaces.match(/[0-9]/i))) {
           lineText = '';
           i -= 1;
         }
