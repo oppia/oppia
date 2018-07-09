@@ -372,8 +372,8 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
 /* eslint-enable angular/directive-restrict */
 
 oppia.directive('ckEditorRte', [
-  'RteHelperService',
-  function(RteHelperService) {
+  'RteHelperService', 'ExplorationContextService', 'PAGE_CONTEXT',
+  function(RteHelperService, ExplorationContextService, PAGE_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
@@ -388,6 +388,8 @@ oppia.directive('ckEditorRte', [
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
+        var canUseFs = ExplorationContextService.getPageContext() ===
+          PAGE_CONTEXT.EDITOR;
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!(scope.uiConfig() &&
                 scope.uiConfig().hide_complex_extensions &&
@@ -521,6 +523,12 @@ oppia.directive('ckEditorRte', [
             .css('height', '26px')
             .css('width', '26px');
           ck.setData(wrapComponents(ngModel.$viewValue));
+
+          if (!canUseFs) {
+            $('.cke_button__oppiaimage').attr('onclick', '').unbind('click');
+            $('.cke_button__oppiaimage')
+              .css('opacity', '0.5');
+          }
         });
 
         // Angular rendering of components confuses CKEditor's undo system, so
