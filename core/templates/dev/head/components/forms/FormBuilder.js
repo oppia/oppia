@@ -391,9 +391,10 @@ oppia.directive('ckEditorRte', [
         var canUseFs = ExplorationContextService.getPageContext() ===
           PAGE_CONTEXT.EDITOR;
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
-          if (!(scope.uiConfig() &&
-                scope.uiConfig().hide_complex_extensions &&
-                componentDefn.isComplex)) {
+          if (!((scope.uiConfig() &&
+            scope.uiConfig().hide_complex_extensions &&
+            componentDefn.isComplex) ||
+            (!canUseFs && componentDefn.requiresFs))) {
             names.push(componentDefn.id);
             icons.push(componentDefn.iconDataUrl);
           }
@@ -523,12 +524,6 @@ oppia.directive('ckEditorRte', [
             .css('height', '26px')
             .css('width', '26px');
           ck.setData(wrapComponents(ngModel.$viewValue));
-
-          if (!canUseFs) {
-            $('.cke_button__oppiaimage').attr('onclick', '').unbind('click');
-            $('.cke_button__oppiaimage')
-              .css('opacity', '0.5');
-          }
         });
 
         // Angular rendering of components confuses CKEditor's undo system, so
