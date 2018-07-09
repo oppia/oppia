@@ -47,26 +47,6 @@ var waitForLoadingMessage = function() {
     'Page takes more than 15 secs to load');
 };
 
-/**
- * Leaving exp/collections mid-play causes an alert window which cannot
- * be handled unless waitForAngular() is disabled. Re-enable waitForAngular()
- * once alert is accepted.
- */
-var safeAcceptAlert = function() {
-  // Disable waiting for Angular to accept alert.
-  browser.waitForAngularEnabled(false);
-  // Refresh page to simulate user leaving.
-  browser.navigate().refresh().then(function() {
-    browser.wait(until.alertIsPresent(), 5000);
-    return browser.switchTo().alert().then(function (alert) {
-      alert.accept().then(function() {
-      // Re-enable waiting for Angular.
-        return browser.waitForAngularEnabled(true);
-      });
-    });
-  });
-};
-
 var scrollToTop = function() {
   browser.executeScript('window.scrollTo(0,0);');
 };
