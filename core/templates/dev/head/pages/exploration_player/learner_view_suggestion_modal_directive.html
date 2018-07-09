@@ -3,7 +3,7 @@
 </div>
 
 <div class="modal-body protractor-test-exploration-suggestion-modal">
-  <ck-editor-rte ng-if="isCurrentRTECKEditor" ng-show="showEditor" ng-model="suggestionHtml"></ck-editor-rte>
+  <ck-editor-rte ng-if="isCurrentRTECKEditor" ng-show="showEditor" ng-model="suggest.suggestionHtml"></ck-editor-rte>
   <text-angular-rte ng-if="!isCurrentRTECKEditor" ng-show="showEditor" html-content="suggestionHtml"></text-angular-rte>
   <br>
   Briefly describe your changes (required):
@@ -12,7 +12,7 @@
 
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
-  <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(originalHtml == suggestionHtml) || !description">
+  <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(originalHtml == suggest.suggestionHtml) || !description">
     Submit Suggestion
   </button>
 </div>

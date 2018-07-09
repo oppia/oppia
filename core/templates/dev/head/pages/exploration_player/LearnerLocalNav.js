@@ -47,7 +47,8 @@ oppia.controller('LearnerLocalNav', [
               stateName);
             $scope.isCurrentRTECKEditor = IS_CURRENT_RTE_CKEDITOR;
             $scope.description = '';
-            $scope.suggestionHtml = $scope.originalHtml;
+            $scope.suggest = {};
+            $scope.suggest.suggestionHtml = $scope.originalHtml;
             $scope.showEditor = false;
             // Rte initially displays content unrendered for a split second
             $timeout(function() {
@@ -64,7 +65,7 @@ oppia.controller('LearnerLocalNav', [
                 version: ExplorationPlayerService.getExplorationVersion(),
                 stateName: stateName,
                 description: $scope.description,
-                suggestionHtml: $scope.suggestionHtml
+                suggestionHtml: $scope.suggest.suggestionHtml
               };
               if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
                 data = {
@@ -74,7 +75,7 @@ oppia.controller('LearnerLocalNav', [
                   suggestion_type: 'edit_exploration_state_content',
                   target_type: 'exploration',
                   description: $scope.description,
-                  suggestionHtml: $scope.suggestionHtml,
+                  suggestionHtml: $scope.suggest.suggestionHtml,
                 };
               }
               $uibModalInstance.close(data);
