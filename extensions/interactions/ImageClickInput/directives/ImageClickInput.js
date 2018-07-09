@@ -80,15 +80,12 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             };
             $scope.loadImage();
           } else {
-            $scope.isLoadingIndicatorShown = false;
-            $scope.isTryAgainShown = false;
-            // This is the case when user is in exploration editor. We don't
-            // have loading indicator or try again for showing images in the
-            // exploration editor. So we directly fetch the images from the
-            // AssetsBackendApiService's cache.
+            // This is the case when user is in exploration editor or in
+            // preview mode. We don't have loading indicator or try again for
+            // showing images in the exploration editor or in preview mode. So
+            // we directly assign the url to the imageUrl.
             $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-              ExplorationContextService.getExplorationId(),
-              $scope.filepath);
+              ExplorationContextService.getExplorationId(), $scope.filepath);
           }
 
           $scope.mouseX = 0;
