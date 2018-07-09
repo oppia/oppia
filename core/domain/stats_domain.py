@@ -1067,7 +1067,7 @@ class SubmittedAnswer(object):
                 'Expected answer_group_index to be an integer, received %s' %
                 str(self.answer_group_index))
 
-        if not isinstance(self.rule_spec_index, int):
+        if self.rule_spec_index and not isinstance(self.rule_spec_index, int):
             raise utils.ValidationError(
                 'Expected rule_spec_index to be an integer, received %s' %
                 str(self.rule_spec_index))
@@ -1077,7 +1077,7 @@ class SubmittedAnswer(object):
                 'Expected answer_group_index to be non-negative, received %d' %
                 self.answer_group_index)
 
-        if self.rule_spec_index < 0:
+        if self.rule_spec_index and self.rule_spec_index < 0:
             raise utils.ValidationError(
                 'Expected rule_spec_index to be non-negative, received %d' %
                 self.rule_spec_index)
