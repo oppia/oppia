@@ -3,6 +3,7 @@
 </div>
 
 <div class="modal-body protractor-test-exploration-suggestion-modal">
+  <!-- If there is a ng-model, you have to have a dot in there. -->
   <ck-editor-rte ng-if="isCurrentRTECKEditor" ng-show="showEditor" ng-model="suggest.suggestionHtml"></ck-editor-rte>
   <text-angular-rte ng-if="!isCurrentRTECKEditor" ng-show="showEditor" html-content="suggestionHtml"></text-angular-rte>
   <br>

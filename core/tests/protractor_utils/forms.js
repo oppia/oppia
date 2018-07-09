@@ -637,6 +637,11 @@ var CodeMirrorChecker = function(elem) {
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
       for (var i = 0; i < textArray.length; i += 2) {
+        // CKEditor pretifies html and adds new lines. Due to this there are
+        // extra lines in the output. Two continuos lines also contain two line
+        // numbers instead of a line number and text. This part of code checks
+        // if a line is valid text for previous line number or is next line
+        // number.
         var lineNumber = textArray[i].replace(/^\s+/g, '');
         var lineText = textArray[i + 1];
         var copy = lineText;

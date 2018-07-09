@@ -47,6 +47,11 @@ oppia.controller('LearnerLocalNav', [
               stateName);
             $scope.isCurrentRTECKEditor = IS_CURRENT_RTE_CKEDITOR;
             $scope.description = '';
+            // If there is a ng-model, you have to have a dot in there.
+            // Reference https://stackoverflow.com/questions/12618342/ng
+            // -model-does-not-update-controller-value/22768720#22768720.
+            // Due to this reason, suggestionHtml has been changed to
+            // suggest.suggestionHtml.
             $scope.suggest = {};
             $scope.suggest.suggestionHtml = $scope.originalHtml;
             $scope.showEditor = false;
