@@ -535,22 +535,11 @@ describe('Full exploration editor', function() {
       forms.toRichText('How are you feeling?'));
     explorationPlayerPage.expectInteractionToMatch('TextInput');
 
-    explorationPlayerPage.submitAnswer('TextInput', 'happy');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('You must be happy!'));
-
-    explorationPlayerPage.submitAnswer('TextInput', 'meh, I\'m okay');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('You must be happy!'));
-
-    // Wait statement is necessary here due to fast sequences of submitting
-    // answers that lead to default state.
-    general.waitForSystem();
-    explorationPlayerPage.submitAnswer('TextInput', 'NO I\'M SAD');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('No being sad!'));
-
     explorationPlayerPage.submitAnswer('TextInput', 'Fine...I\'m doing okay');
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('You must be happy!'));
+
+    explorationPlayerPage.submitAnswer('TextInput', 'meh, I\'m so-so');
     explorationPlayerPage.expectLatestFeedbackToMatch(
       forms.toRichText('You must be happy!'));
 
