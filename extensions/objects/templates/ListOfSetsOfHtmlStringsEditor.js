@@ -27,15 +27,22 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
         'list_of_sets_of_html_strings_editor_directive.html'),
       controller: ['$scope', function($scope) {
         var errorMessage = '';
-        $scope.selectedRank = '';
-        $scope.maxPrevIndex = 1;
+
+        if (!$scope.selectedRank) {
+          $scope.selectedRank = '';
+        }
+
+        if (!$scope.maxPrevIndex) {
+          $scope.maxPrevIndex = 1;
+        }
 
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
-
-        $scope.value = [[]];
-        for (var i = 0; i < $scope.choices.length; i++) {
-          $scope.value[0].push($scope.choices[i].id);
+        if ($scope.value[0] === undefined || $scope.value[0].length === 0) {
+          $scope.value = [[]];
+          for (var i = 0; i < $scope.choices.length; i++) {
+            $scope.value[0].push($scope.choices[i].id);
+          }
         }
 
         if ($scope.selectedRank !== '') {

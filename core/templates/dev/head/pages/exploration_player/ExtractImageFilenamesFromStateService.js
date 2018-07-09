@@ -21,6 +21,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var INTERACTION_TYPE_MULTIPLE_CHOICE = 'MultipleChoiceInput';
     var INTERACTION_TYPE_ITEM_SELECTION = 'ItemSelectionInput';
     var INTERACTION_TYPE_IMAGE_CLICK_INPUT = 'ImageClickInput';
+    var INTERACTION_TYPE_DRAG_AND_DROP_SORT = 'DragAndDropSort';
 
     var filenamesInState = [];
 
@@ -88,7 +89,8 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       _allHtmlInTheState.push(_getStateContentHtml(state));
 
       if (state.interaction.id === INTERACTION_TYPE_MULTIPLE_CHOICE ||
-          state.interaction.id === INTERACTION_TYPE_ITEM_SELECTION ) {
+          state.interaction.id === INTERACTION_TYPE_ITEM_SELECTION ||
+          state.interaction.id === INTERACTION_TYPE_DRAG_AND_DROP_SORT) {
         var customizationArgsHtml = '';
         state.interaction.customizationArgs.choices.value.forEach(
           function(value) {
