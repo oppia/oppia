@@ -211,7 +211,6 @@ oppia.factory('ImagePreloaderService', [
      * @param {string} stateName - The name of the state the user shifts to.
      */
     var _onStateChange = function(stateName) {
-      console.log("yes it entered it damns");
       if (stateName !== _exploration.getInitialState().name) {
         _imageLoadedCallback = {};
         var imageFilenamesInState = [];
