@@ -3,7 +3,7 @@
 </div>
 
 <div class="modal-body protractor-test-exploration-suggestion-modal">
-  <ck-editor-rte ng-if="isCurrentRTECKEditor" ng-model="suggestionHtml"></ck-editor-rte>
+  <ck-editor-rte ng-if="isCurrentRTECKEditor" ng-show="showEditor" ng-model="suggestionHtml"></ck-editor-rte>
   <text-angular-rte ng-if="!isCurrentRTECKEditor" ng-show="showEditor" html-content="suggestionHtml"></text-angular-rte>
   <br>
   Briefly describe your changes (required):

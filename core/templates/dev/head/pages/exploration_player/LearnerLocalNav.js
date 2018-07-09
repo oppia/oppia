@@ -41,7 +41,7 @@ oppia.controller('LearnerLocalNav', [
           'ExplorationPlayerService', 'IS_CURRENT_RTE_CKEDITOR',
           function(
               $scope, $uibModalInstance, $timeout, PlayerPositionService,
-              ExplorationPlayerService, 'IS_CURRENT_RTE_CKEDITOR) {
+              ExplorationPlayerService, IS_CURRENT_RTE_CKEDITOR) {
             var stateName = PlayerPositionService.getCurrentStateName();
             $scope.originalHtml = ExplorationPlayerService.getStateContentHtml(
               stateName);
