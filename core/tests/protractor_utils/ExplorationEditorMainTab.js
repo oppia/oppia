@@ -207,6 +207,7 @@ var ExplorationEditorMainTab = function() {
       nextTutorialStageButton.then(function(buttons) {
         if (buttons.length === 1) {
           buttons[0].click();
+          browser.wait(until.invisibilityOf(tutorialTabHeadingElement), 5000);
         } else {
           throw Error('There is more than one Next button!');
         }
