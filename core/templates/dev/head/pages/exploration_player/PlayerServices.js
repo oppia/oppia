@@ -159,7 +159,7 @@ oppia.factory('ExplorationPlayerService', [
 
     $rootScope.$on('playerStateChange', function(evt, newStateName) {
       // To restart the preloader for the new state if required.
-      if(!_editorPreviewMode) {
+      if (!_editorPreviewMode) {
         ImagePreloaderService.onStateChange(newStateName);
       }
       // Ensure the transition to a terminal state properly logs the end of the
