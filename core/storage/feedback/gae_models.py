@@ -62,10 +62,6 @@ class FeedbackThreadModel(base_models.BaseModel):
     # The ID of the entity the thread is linked to.
     entity_id = ndb.StringProperty(required=False, indexed=True)
 
-    # Additional params attached to the feedback thread. Needed for backward
-    # compatibility to store state_name for threads linked to explorations.
-    thread_params = ndb.JsonProperty(required=False, indexed=False)
-
     # ID of state the thread is for. Does not exist if the thread is about the
     # entire exploration (Deprecated).
     state_name = ndb.StringProperty(indexed=True)

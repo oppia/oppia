@@ -26,8 +26,10 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.platform import models
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+(suggestion_models, feedback_models, email_models, user_models) = (
+    models.Registry.import_models(
+        [models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.email,
+         models.NAMES.user]))
 
 
 class FeedbackThreadMessagesCountOneOffJob(jobs.BaseMapReduceOneOffJobManager):
@@ -182,3 +184,95 @@ class SuggestionMigrationValdiationOneOffJob(
     @staticmethod
     def reduce(key, value):
         yield (key, len(value))
+
+
+class GeneralizeFeedbackThreadMigrationOneOffJob(
+        jobs.BaseMapReduceOneOffJobManager):
+    """One off job to populate two new fields for instances of Feedback thread
+    model.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.FeedbackThreadModel]
+
+    @staticmethod
+    def map(thread):
+        thread.entity_type = 'exploration'
+        thread.entity_id = thread.exploration_id
+        thread.put()
+
+    @staticmethod
+    def reduce(thread):
+        pass
+
+
+class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
+    """One-off job for migrating instances of feedback thread model and related
+    models to have thread ID of the for entity_type.entity_id.random_str.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [feedback_models.FeedbackThreadModel,
+                feedback_models.FeedbackMessageModel,
+                feedback_models.FeedbackThreadUserModel,
+                email_models.FeedbackEmailReplyToIdModel,
+                user_models.UserSubscriptionsModel]
+
+    @staticmethod
+    def map(item):
+        if isinstance(item, feedback_models.FeedbackThreadModel):
+            old_id = item.id
+            # To make sure the job is idempotent, we create new instances with
+            # the new id. If the id has 2 parts, it needs to be migrated,
+            # else it has already been migrated.
+            if len(old_id.split('.')) == 2:
+                new_id = 'exploration.' + item.id
+                feedback_models.FeedbackThreadModel(
+                    id=new_id, entity_type=item.entity_type,
+                    entity_id=item.entity_id,
+                    exploration_id=item.exploration_id,
+                    state_name=item.state_name,
+                    original_author_id=item.original_author_id,
+                    status=item.status, subject=item.subject,
+                    summary=item.summary, has_suggestion=item.has_suggestion,
+                    message_count=item.message_count,
+                    last_updated=item.last_updated, created_on=item.created_on,
+                    deleted=item.deleted).put()
+        elif isinstance(item, feedback_models.FeedbackMessageModel):
+            old_id = item.id
+            if len(old_id.split('.')) == 3:
+                new_id = 'exploration.' + item.id
+                new_thread_id = 'exploration.' + item.thread_id
+                feedback_models.FeedbackMessageModel(
+                    id=new_id, thread_id=new_thread_id,
+                    message_id=item.message_id, author_id=item.author_id,
+                    updated_status=item.updated_status,
+                    updated_subject=item.updated_subject, text=item.text,
+                    received_via_email=item.received_via_email,
+                    last_updated=item.last_updated, created_on=item.created_on,
+                    deleted=item.deleted).put()
+        elif isinstance(item, feedback_models.FeedbackThreadUserModel):
+            old_id = item.id
+            if len(old_id.split('.')) == 3:
+                new_id = '.'.join(
+                    [old_id.split('.')[0], 'exploration', old_id.split('.')[1],
+                     old_id.split('.')[2]])
+                feedback_models.FeedbackThreadUserModel(
+                    id=new_id,
+                    message_ids_read_by_user=item.message_ids_read_by_user
+                ).put()
+        elif isinstance(item, email_models.FeedbackEmailReplyToIdModel):
+            old_id = item.id
+            if len(old_id.split('.')) == 3:
+                new_id = '.'.join(
+                    [old_id.split('.')[0], 'exploration', old_id.split('.')[1],
+                     old_id.split('.')[2]])
+                email_models.FeedbackEmailReplyToIdModel(
+                    id=new_id, reply_to_id=item.reply_to_id).put()
+        elif isinstance(item, user_models.UserSubscriptionsModel):
+            for thread_id in item.feedback_thread_ids:
+                if len(thread_id.split('.')) == 2:
+                    new_thread_id = 'exploration.' + thread_id
+                    if new_thread_id not in item.feedback_thread_ids:
+                        item.feedback_thread_ids.append(new_thread_id)
+            item.put()
