@@ -56,7 +56,7 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
     def test_get_last_two_message_ids(self):
         fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
         thread_1 = feedback_domain.FeedbackThread(
-            self.THREAD_ID, 'exploration', self.EXP_ID, u'a_state_name', 
+            self.THREAD_ID, 'exploration', self.EXP_ID, u'a_state_name',
             self.viewer_id, u'open', u'a subject', None, False, 5, fake_date,
             fake_date)
 
@@ -67,8 +67,8 @@ class FeedbackThreadDomainUnitTests(test_utils.GenericTestBase):
 
         # Check what happens in case the thread has only one message.
         thread_1 = feedback_domain.FeedbackThread(
-            self.THREAD_ID, 'exploration', self.EXP_ID, u'a_state_name', 
-            self.viewer_id, u'open', u'a subject', None, False, 1, fake_date, 
+            self.THREAD_ID, 'exploration', self.EXP_ID, u'a_state_name',
+            self.viewer_id, u'open', u'a subject', None, False, 1, fake_date,
             fake_date)
 
         last_two_message_ids = thread_1.get_last_two_message_ids()

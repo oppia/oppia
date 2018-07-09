@@ -85,50 +85,51 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
 
     def test_message_count(self):
         """Test if the job returns the correct message count."""
-        feedback_services.create_thread(
-            self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'],
-            self.user_id, self.EXPECTED_THREAD_DICT['subject'],
-            'not used here')
-        feedback_services.create_thread(
-            self.EXP_ID_2, self.EXPECTED_THREAD_DICT['state_name'],
-            self.user_id, self.EXPECTED_THREAD_DICT['subject'],
-            'not used here')
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            feedback_services.create_thread(
+                'exploration',  self.EXP_ID_1,
+                self.EXPECTED_THREAD_DICT['state_name'], self.user_id,
+                self.EXPECTED_THREAD_DICT['subject'], 'not used here')
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_2,
+                self.EXPECTED_THREAD_DICT['state_name'], self.user_id,
+                self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
-        thread_ids = subscription_services.get_all_threads_subscribed_to(
-            self.user_id)
+            thread_ids = subscription_services.get_all_threads_subscribed_to(
+                self.user_id)
 
-        self._run_one_off_job()
+            self._run_one_off_job()
 
-        thread_summaries, _ = feedback_services.get_thread_summaries(
-            self.user_id, thread_ids)
+            thread_summaries, _ = feedback_services.get_thread_summaries(
+                self.user_id, thread_ids)
 
-        # Check that the first message has only one message.
-        self.assertEqual(thread_summaries[0]['total_message_count'], 1)
-        # Check that the second message has only one message.
-        self.assertEqual(thread_summaries[1]['total_message_count'], 1)
+            # Check that the first message has only one message.
+            self.assertEqual(thread_summaries[0]['total_message_count'], 1)
+            # Check that the second message has only one message.
+            self.assertEqual(thread_summaries[1]['total_message_count'], 1)
 
-        feedback_services.create_message(
-            thread_ids[0], self.user_id, None, None, 'editor message')
+            feedback_services.create_message(
+                thread_ids[0], self.user_id, None, None, 'editor message')
 
-        self._run_one_off_job()
+            self._run_one_off_job()
 
-        thread_summaries, _ = feedback_services.get_thread_summaries(
-            self.user_id, thread_ids)
+            thread_summaries, _ = feedback_services.get_thread_summaries(
+                self.user_id, thread_ids)
 
-        # Check that the first message has two messages.
-        self.assertEqual(thread_summaries[0]['total_message_count'], 2)
+            # Check that the first message has two messages.
+            self.assertEqual(thread_summaries[0]['total_message_count'], 2)
 
-        # Get the first message so that we can delete it and check the error
-        # case.
-        first_message_model = (
-            feedback_models.FeedbackMessageModel.get(thread_ids[0], 0))
+            # Get the first message so that we can delete it and check the error
+            # case.
+            first_message_model = (
+                feedback_models.FeedbackMessageModel.get(thread_ids[0], 0))
 
-        first_message_model.delete()
+            first_message_model.delete()
 
-        output = self._run_one_off_job()
-        # Check if the quantities have the correct values.
-        self.assertEqual(output[0][1]['message_count'], 1)
-        self.assertEqual(output[0][1]['next_message_id'], 2)
+            output = self._run_one_off_job()
+            # Check if the quantities have the correct values.
+            self.assertEqual(output[0][1]['message_count'], 1)
+            self.assertEqual(output[0][1]['next_message_id'], 2)
 
 
 class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
@@ -203,41 +204,43 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
 
     def test_that_job_returns_correct_feedback_subject(self):
         """Test if the job returns the correct feedback subject."""
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT1['subject'],
-            self.EXPECTED_THREAD_DICT1['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT2['subject'],
-            self.EXPECTED_THREAD_DICT2['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT3['subject'],
-            self.EXPECTED_THREAD_DICT3['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT4['subject'],
-            self.EXPECTED_THREAD_DICT4['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT5['subject'],
-            self.EXPECTED_THREAD_DICT5['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT6['subject'],
-            self.EXPECTED_THREAD_DICT6['text'])
-        feedback_services.create_thread(
-            self.EXP_ID_1, 'unused_state_name', self.user_id,
-            self.EXPECTED_THREAD_DICT7['subject'],
-            self.EXPECTED_THREAD_DICT7['text'])
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
-            threads_old = feedback_services.get_threads(self.EXP_ID_1)
 
-        self._run_one_off_job()
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT1['subject'],
+                self.EXPECTED_THREAD_DICT1['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT2['subject'],
+                self.EXPECTED_THREAD_DICT2['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT3['subject'],
+                self.EXPECTED_THREAD_DICT3['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT4['subject'],
+                self.EXPECTED_THREAD_DICT4['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT5['subject'],
+                self.EXPECTED_THREAD_DICT5['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT6['subject'],
+                self.EXPECTED_THREAD_DICT6['text'])
+            feedback_services.create_thread(
+                'exploration', self.EXP_ID_1, 'unused_state_name',
+                self.user_id, self.EXPECTED_THREAD_DICT7['subject'],
+                self.EXPECTED_THREAD_DICT7['text'])
+            threads_old = feedback_services.get_threads(
+                'exploration', self.EXP_ID_1)
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
-            threads = feedback_services.get_threads(self.EXP_ID_1)
+            self._run_one_off_job()
+
+            threads = feedback_services.get_threads(
+                'exploration', self.EXP_ID_1)
 
         self.assertEqual(threads[0].subject, u'a small summary')
         self.assertEqual(threads[1].subject, u'Some subject')

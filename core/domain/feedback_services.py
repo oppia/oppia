@@ -483,8 +483,10 @@ def get_thread_summaries(user_id, thread_ids):
         [feedback_models.FeedbackThreadUserModel.generate_full_id(
             user_id, thread_id)
          for thread_id in thread_ids])
-
-    exploration_ids = [thread_id.split('.')[1] for thread_id in thread_ids]
+    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        exploration_ids = [thread_id.split('.')[1] for thread_id in thread_ids]
+    else:
+        exploration_ids = [thread_id.split('.')[0] for thread_id in thread_ids]
 
     multiple_models = (
         datastore_services.fetch_multiple_entities_by_ids_and_models(

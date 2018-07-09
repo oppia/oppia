@@ -202,8 +202,8 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                     feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
                         'state_name': None,
                         'subject': u'New Thread ¡unicode!',
-                    'text': u'Message 0 ¡unicode!',
-                }, csrf_token)
+                        'text': u'Message 0 ¡unicode!',
+                    }, csrf_token)
 
             # Then, get the thread id.
             response_dict = self.get_json(
@@ -633,8 +633,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
 
         # Suggestion description should be the same as thread subject.
         self.assertEqual(
-        response_dict['suggestion']['description'],
-            threads[0]['subject'])
+            response_dict['suggestion']['description'], threads[0]['subject'])
 
         # Get a list of all threads without suggestions.
         response_dict = self.get_json(
