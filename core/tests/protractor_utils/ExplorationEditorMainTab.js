@@ -989,6 +989,9 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.expectCurrentStateToBe = function(name) {
+    browser.wait(until.textToBePresentInElement(stateNameContainer, name), 5000,
+      'Expecting current state ' + stateNameContainer.getText() + ' to be ' +
+      name);
     expect(stateNameContainer.getText()).toMatch(name);
   };
 };
