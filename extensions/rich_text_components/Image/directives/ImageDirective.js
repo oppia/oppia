@@ -71,18 +71,14 @@ oppia.directive('oppiaNoninteractiveImage', [
           };
           $scope.loadImage();
         } else {
+          $scope.isLoadingIndicatorShown = false;
+          $scope.isTryAgainShown = false;
           // This is the case when user is in exploration editor. We don't have
           // loading indicator or try again button for showing images in the
           // exploration editor. So we directly fetch the images from the
           // AssetsBackendApiService's cache.
-          AssetsBackendApiService.loadImage(
-            ExplorationContextService.getExplorationId(), $scope.filepath)
-            .then(function(loadedImageFile) {
-              $scope.isLoadingIndicatorShown = false;
-              $scope.isTryAgainShown = false;
-              var objectUrl = URL.createObjectURL(loadedImageFile.data);
-              $scope.imageUrl = objectUrl;
-            });
+          $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+            ExplorationContextService.getExplorationId(), $scope.filepath);
         }
 
         $scope.imageCaption = '';
