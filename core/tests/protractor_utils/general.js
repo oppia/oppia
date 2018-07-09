@@ -208,7 +208,6 @@ var checkConsoleErrorsExist = function(expectedErrors) {
 };
 
 exports.acceptAlert = acceptAlert;
-exports.safeAcceptAlert = safeAcceptAlert;
 exports.waitForSystem = waitForSystem;
 exports.waitForLoadingMessage = waitForLoadingMessage;
 exports.scrollToTop = scrollToTop;
