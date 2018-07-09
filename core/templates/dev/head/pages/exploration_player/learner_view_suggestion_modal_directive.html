@@ -3,7 +3,8 @@
 </div>
 
 <div class="modal-body protractor-test-exploration-suggestion-modal">
-  <text-angular-rte ng-show="showEditor" html-content="suggestionHtml"></text-angular-rte>
+  <ck-editor-rte ng-if="isCurrentRTECKEditor" ng-model="suggestionHtml"></ck-editor-rte>
+  <text-angular-rte ng-if="!isCurrentRTECKEditor" ng-show="showEditor" html-content="suggestionHtml"></text-angular-rte>
   <br>
   Briefly describe your changes (required):
   <input type="text" ng-model="description" class="protractor-test-suggestion-description-input" style="width: 100%">

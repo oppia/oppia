@@ -38,13 +38,14 @@ oppia.controller('LearnerLocalNav', [
         resolve: {},
         controller: [
           '$scope', '$uibModalInstance', '$timeout', 'PlayerPositionService',
-          'ExplorationPlayerService',
+          'ExplorationPlayerService', 'IS_CURRENT_RTE_CKEDITOR',
           function(
               $scope, $uibModalInstance, $timeout, PlayerPositionService,
-              ExplorationPlayerService) {
+              ExplorationPlayerService, 'IS_CURRENT_RTE_CKEDITOR) {
             var stateName = PlayerPositionService.getCurrentStateName();
             $scope.originalHtml = ExplorationPlayerService.getStateContentHtml(
               stateName);
+            $scope.isCurrentRTECKEditor = IS_CURRENT_RTE_CKEDITOR;
             $scope.description = '';
             $scope.suggestionHtml = $scope.originalHtml;
             $scope.showEditor = false;
