@@ -172,9 +172,6 @@ if [ ! -d "$TOOLS_DIR/selenium-2.53.2" ]; then
   pip install selenium==2.53.2 --target="$TOOLS_DIR/selenium-2.53.2"
 fi
 
-pip install codecov
-pip install pyyaml
-
 # install pre-push script
 echo Installing pre-push hook for git
 $PYTHON_CMD $OPPIA_DIR/scripts/pre_push_hook.py --install
