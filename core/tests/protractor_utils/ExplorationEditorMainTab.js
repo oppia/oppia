@@ -468,9 +468,10 @@ var ExplorationEditorMainTab = function() {
       .then(function(isClickable) {
         if (isClickable) {
           stateEditContent.click();
-          var stateContentEditor = element(
+          var stateEditorTag = element(by.tagName('state-content-editor'));
+          var stateContentEditor = stateEditorTag.element(
             by.css('.protractor-test-state-content-editor'));
-          browser.wait(until.visibilityOf(stateContentEditor), 10000,
+          browser.wait(until.presenceOf(stateContentEditor), 5000,
             'stateContentEditor taking too long to appear to set content');
           var richTextEditor = forms.RichTextEditor(stateContentEditor);
           richTextEditor.clear();
@@ -968,7 +969,7 @@ var ExplorationEditorMainTab = function() {
 
   this.setStateName = function(name) {
     browser.wait(until.invisibilityOf(postTutorialPopover), 5000);
-    browser.wait(until.elementToBeClickable(stateNameContainer), 10000,
+    browser.wait(until.elementToBeClickable(stateNameContainer), 5000,
       'State Name Container takes too long to appear')
       .then(function (isClickable) {
         if (isClickable) {
