@@ -1323,6 +1323,23 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             column_number + len(tag) + 2)
         starttag_text = self.get_starttag_text()
 
+        # Check whether the values of all attributes are placed
+        # in double quotes.
+        for attr, value in attrs:
+            # Not all attributes will have a value.
+            # Therefore the check should run only for those
+            # attributes which have a value.
+            if value:
+                expected_value = '"' + value + '"'
+                if not expected_value in starttag_text:
+                    self.failed = True
+                    print (
+                        '%s --> The value %s of attribute '
+                        '%s for the tag %s on line %s should '
+                        'be enclosed within double quotes.' % (
+                            self.filename, value, attr,
+                            tag, line_number))
+
         for line_num, line in enumerate(
                 str.splitlines(starttag_text)):
             if line_num == 0:
@@ -1392,10 +1409,10 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                 self.indentation_level -= 1
 
 
-def _check_html_indent(all_files, debug=False):
+def _check_html_tags_and_attributes(all_files, debug=False):
     """This function checks the indentation of lines in HTML files."""
 
-    print 'Starting HTML indentation check'
+    print 'Starting HTML tag and attribute check'
     print '----------------------------------------'
 
     html_files_to_lint = [
@@ -1418,12 +1435,12 @@ def _check_html_indent(all_files, debug=False):
                 failed = True
 
     if failed:
-        summary_message = '%s   HTML indentation check failed' % (
+        summary_message = '%s   HTML tag and attribute check failed' % (
             _MESSAGE_TYPE_FAILED)
         print summary_message
         summary_messages.append(summary_message)
     else:
-        summary_message = '%s  HTML indentation check passed' % (
+        summary_message = '%s  HTML tag and attribute check passed' % (
             _MESSAGE_TYPE_SUCCESS)
         print summary_message
         summary_messages.append(summary_message)
@@ -1503,9 +1520,9 @@ def main():
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
-    # The html indent check has an additional debug mode which
-    # when enabled prints the tag_stack for each file.
-    html_indent_messages = _check_html_indent(all_files)
+    # The html tags and attributes check check has an additional
+    # debug mode which when enabled prints the tag_stack for each file.
+    html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
     html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
@@ -1514,7 +1531,7 @@ def main():
         directive_scope_messages + controller_dependency_messages +
         html_directive_name_messages + import_order_messages +
         newline_messages + docstring_messages + comment_messages +
-        html_indent_messages + html_linter_messages +
+        html_tag_and_attribute_messages + html_linter_messages +
         linter_messages + pattern_messages +
         copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
