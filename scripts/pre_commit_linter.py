@@ -1331,7 +1331,14 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
             # attributes which have a value.
             if value:
                 expected_value = '"' + value + '"'
-                if not expected_value in starttag_text:
+
+                # &quot; is rendered as a double quote by the parser.
+                if '&quot;' in starttag_text:
+                    rendered_text = starttag_text.replace('&quot;', '"')
+                else:
+                    rendered_text = starttag_text
+
+                if not expected_value in rendered_text:
                     self.failed = True
                     print (
                         '%s --> The value %s of attribute '
