@@ -43,9 +43,6 @@ var elementToBeClickable = function(element, errorMessage) {
  * @param {string} errorMessage - Error message when element is still visible.
  */
 var invisibilityOf = function(element, errorMessage) {
-  if (arguments.length === 3) {
-    DEFAULT_WAIT_TIME_MSECS = arguments[2];
-  }
   return browser.wait(
     until.invisibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
