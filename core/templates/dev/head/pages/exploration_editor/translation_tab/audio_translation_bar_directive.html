@@ -1,0 +1,96 @@
+<ng-audio-recorder id="<[RECORDER_ID]>" audio-model="abc" time-limit="recordingTimeLimit">
+  <div class="oppia-audio-recording-bar">
+    <div class="oppia-play-pause-button"
+       ng-click="recorder.status.isPlaying ? recorder.playbackPause() : recorder.playbackResume()"
+       ng-disabled="recorder.status.isRecording || !recorder.audioModel">
+      <i class="material-icons" ng-class="{'oppia-disabled-icon': recorder.status.isRecording || !recorder.audioModel}">
+        {{recorder.status.isStopped || recorder.status.isPaused ? '&#xE039;' : '&#xE035;'}}
+      </i> 
+    </div>
+     
+    <div class="oppia-audio-visulaizer">
+      <div class="oppia-audio-bar-info" 
+           ng-if="!recorder.status.isRecording && !recorder.audioModel && !recorder.status.isConverting">
+        No Audio Available Press <i class="material-icons">mic</i>  to start recording.
+      </div>
+      <div class="oppia-audio-bar-info" ng-if="isLoadingAudio">
+        Audio Loading <loading-dots></loading-dots>
+      </div>
+      <canvas-sizer id="analyser" >
+        <div class="oppia-recoding-analyzer" ng-show="recorder.isHtml5 && recorder.status.isRecording">
+             <ng-audio-recorder-analyzer height="120" wave-color="black" ></ng-audio-recorder-analyzer>
+        </div>
+
+        <div class="oppia-audio-wave-view" ng-if="!recorder.status.isRecording && recorder.audioModel" >
+          <ng-audio-recorder-wave-view fill-parent="true" progress-color="#ccc" wave-color="#009688"  height="50"></ng-audio-recorder-wave-view>
+        </div>
+      </canvas-sizer>
+    </div>
+    
+    <div class="oppia-audio-extra-buttons">
+      <div class="oppia-audio-extra-button" type="button"
+           ng-if="!recorder.status.isRecording && !recorder.audioModel && !recorder.status.isConverting"
+           ng-click="recorder.startRecord()">
+        <i class="material-icons">mic</i>
+      </div>
+      <div class="oppia-audio-extra-button" type="button"
+           ng-if="recorder.status.isRecording"
+           ng-click="recorder.stopRecord()">
+        <i class="material-icons">&#xE047;</i>
+      </div>
+      <div class="oppia-audio-extra-button"
+           ng-click="recorder.startRecord()">
+        <i class="material-icons">loop</i>
+      </div>
+      <div class="oppia-audio-extra-button" type="button"
+           ng-if="!recorder.status.isRecording && recorder.audioModel">
+        <i class="material-icons">cloud_upload</i>
+      </div>
+      <div class="oppia-audio-extra-button">
+        <i class="material-icons">&#xE5D2;</i>
+      </div>
+      <div class="oppia-audio-extra-button" ng-if="false">
+      </div>
+    </div>
+   </div>
+</ng-audio-recorder>
+
+<style>
+  .oppia-audio-recording-bar {
+    width: 100%;
+    height: 100%;
+    display: inline-block;
+  }
+  .oppia-play-pause-button {
+    color: #009688;
+    width: 7%;
+    float: left;
+    padding: 13px;
+    border-right: 1px solid;
+  }
+  .oppia-audio-bar-info {
+    text-align: center;
+    padding: 13px 0px 13px 0px;
+  }
+  .oppia-disabled-icon {
+    color: grey;
+  }
+  .oppia-audio-extra-button {
+    color: #009688;
+    float: left;
+    border-left: 1px solid;
+    padding: 14px;
+    width: -webkit-calc(100% / 3);
+    width: -moz-calc(100% / 3);
+    width: -o-calc(100% / 3);
+    width: calc(100% / 3);
+  }
+  .oppia-audio-extra-buttons {
+    width: 21%;
+    display: inline-block;  
+  }
+  .oppia-audio-visulaizer {
+    width: 72%;
+    float: left;
+  }
+</style>

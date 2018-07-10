@@ -37,6 +37,7 @@ oppia.factory('ContentIdsToAudioTranslationsObjectFactory', [
 
     ContentIdsToAudioTranslations.prototype.getAudioTranslation = function(
         contentId, langCode) {
+      console.log(this._contentIdsToAudioTranslations, contentId, langCode, "jhashdhasdhahsdas");
       return this._contentIdsToAudioTranslations[contentId][
         langCode];
     };
