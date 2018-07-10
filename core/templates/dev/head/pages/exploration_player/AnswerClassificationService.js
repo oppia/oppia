@@ -111,8 +111,7 @@ oppia.factory('AnswerClassificationService', [
         var interactionIsTrainable = INTERACTION_SPECS[
           oldState.interaction.id].is_trainable;
 
-        if (ruleBasedOutcomeIsDefault && interactionIsTrainable &&
-            ENABLE_ML_CLASSIFIERS) {
+        if (ruleBasedOutcomeIsDefault && interactionIsTrainable) {
           for (var i = 0; i < answerGroups.length; i++) {
             if (answerGroups[i].trainingData) {
               for (var j = 0; j < answerGroups[i].trainingData.length; j++) {
@@ -124,22 +123,25 @@ oppia.factory('AnswerClassificationService', [
               }
             }
           }
-          var classifier = StateClassifierMappingService.getClassifier(
-            stateName);
-          if (classifier && classifier.classifierData && (
-            classifier.algorithmId && classifier.dataSchemaVersion)) {
-            var predictionService = (
-              PredictionAlgorithmRegistryService.getPredictionService(
-                classifier.algorithmId, classifier.dataSchemaVersion));
-            // If prediction service exists, we run classifier. We return the
-            // default outcome otherwise.
-            if (predictionService) {
-              var predictedAnswerGroupIndex = predictionService.predict(
-                classifier.classifierData, answer);
-              answerClassificationResult = (
-                AnswerClassificationResultObjectFactory.createNew(
-                  answerGroups[predictedAnswerGroupIndex].outcome,
-                  predictedAnswerGroupIndex, null, STATISTICAL_CLASSIFICATION));
+          if (ENABLE_ML_CLASSIFIERS) {
+            var classifier = StateClassifierMappingService.getClassifier(
+              stateName);
+            if (classifier && classifier.classifierData && (
+              classifier.algorithmId && classifier.dataSchemaVersion)) {
+              var predictionService = (
+                PredictionAlgorithmRegistryService.getPredictionService(
+                  classifier.algorithmId, classifier.dataSchemaVersion));
+              // If prediction service exists, we run classifier. We return the
+              // default outcome otherwise.
+              if (predictionService) {
+                var predictedAnswerGroupIndex = predictionService.predict(
+                  classifier.classifierData, answer);
+                answerClassificationResult = (
+                  AnswerClassificationResultObjectFactory.createNew(
+                    answerGroups[predictedAnswerGroupIndex].outcome,
+                    predictedAnswerGroupIndex, null,
+                    STATISTICAL_CLASSIFICATION));
+              }
             }
           }
         }

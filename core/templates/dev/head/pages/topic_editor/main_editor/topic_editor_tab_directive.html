@@ -23,7 +23,8 @@
                 ng-model="editableDescription"
                 ng-change="updateTopicDescriptionStatus(editableDescription)"
                 ng-blur="updateTopicDescription(editableDescription)"
-                placeholder="Enter the description of the topic"></textarea>
+                placeholder="Enter the description of the topic">
+      </textarea>
       <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="help-block" style="font-size: smaller">
         What does this topic contain?
       </span>

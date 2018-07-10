@@ -16,6 +16,7 @@
 
 """Tests for the feedback controllers."""
 
+from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -625,8 +626,9 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
 
         # Get a suggestion.
         thread_id = threads[0]['thread_id']
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id))
+        with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', False):
+            response_dict = self.get_json(
+                '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id))
 
         # Suggestion description should be the same as thread subject.
         self.assertEqual(

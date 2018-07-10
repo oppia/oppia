@@ -147,7 +147,8 @@
                  height="100"
                  width="100"
                  ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>"
-                 xlink:href=""></image>
+                 xlink:href="">
+          </image>
           <text ng-if="!collectionPlaythrough.hasStartedCollection()"
                 x="210"
                 y="170"
@@ -156,7 +157,8 @@
                 font-size="15"
                 fill="#E14738"
                 text-anchor="middle"
-                translate="I18N_START_HERE"></text>
+                translate="I18N_START_HERE">
+          </text>
         </svg>
 
         <img ng-src="<[getStaticImageUrl('/general/collection_mascot.svg')]>" class="collection-mascot">
@@ -181,14 +183,16 @@
                        height="100"
                        width="100"
                        ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_paw.svg')]>"
-                       xlink:href=""></image>
+                       xlink:href="">
+                </image>
                 <image ng-if="!isCompletedExploration(node.getExplorationId())"
                        x="10"
                        y="30"
                        height="80"
                        width="80"
                        ng-attr-xlink:href="<[getStaticImageUrl(pathIconParameters[$index].thumbnailIconUrl)]>"
-                       xlink:href=""></image>
+                       xlink:href="">
+                </image>
               </pattern>
             </defs>
             <a xlink:href="<[getExplorationUrl(node.getExplorationId())]>"
@@ -248,7 +252,8 @@
                      height="80"
                      width="100"
                      ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_start_here_arrow.svg')]>"
-                     xlink:href=""></image>
+                     xlink:href="">
+              </image>
               <text ng-if="!collectionPlaythrough.hasStartedCollection() && $index===0"
                     x="50"
                     y="140"
@@ -257,7 +262,8 @@
                     font-size="11"
                     fill="#E14738"
                     text-anchor="middle"
-                    translate="I18N_START_HERE"></text>
+                    translate="I18N_START_HERE">
+              </text>
               <defs>
                 <pattern id="image0<[$index]>" patternUnits="userSpaceOnUse" height="150" width="100">
                   <circle cx="50"
@@ -270,14 +276,16 @@
                          height="100"
                          width="100"
                          ng-attr-xlink:href="<[getStaticImageUrl('/general/collection_paw.svg')]>"
-                         xlink:href=""></image>
+                         xlink:href="">
+                  </image>
                   <image ng-if="!isCompletedExploration(node.getExplorationId())"
                          x="10"
                          y="30"
                          height="80"
                          width="80"
                          ng-attr-xlink:href="<[getStaticImageUrl(pathIconParameters[$index].thumbnailIconUrl)]>"
-                         xlink:href=""></image>
+                         xlink:href="">
+                  </image>
                 </pattern>
               </defs>
               <circle ng-show="node.getExplorationId() === nextExplorationId &&

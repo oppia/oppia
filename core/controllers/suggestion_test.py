@@ -36,7 +36,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL = 'author@example.com'
     AUTHOR_EMAIL_2 = 'author2@example.com'
-    ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
     NORMAL_USER_EMAIL = 'user@example.com'
 
     def setUp(self):
@@ -45,15 +44,13 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.signup(self.AUTHOR_EMAIL, 'author')
         self.signup(self.AUTHOR_EMAIL_2, 'author2')
-        self.signup(self.ASSIGNED_REVIEWER_EMAIL, 'assignedReviewer')
         self.signup(self.NORMAL_USER_EMAIL, 'normalUser')
+
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.author_id_2 = self.get_user_id_from_email(self.AUTHOR_EMAIL_2)
         self.reviewer_id = self.editor_id
-        self.assigned_reviewer_id = self.get_user_id_from_email(
-            self.ASSIGNED_REVIEWER_EMAIL)
 
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
@@ -103,7 +100,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     },
                     'description': 'change to state 1',
                     'final_reviewer_id': self.reviewer_id,
-                    'assigned_reviewer_id': self.assigned_reviewer_id
                 }, csrf_token)
             self.logout()
 
@@ -127,7 +123,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     },
                     'description': 'change to state 2',
                     'final_reviewer_id': self.reviewer_id,
-                    'assigned_reviewer_id': self.assigned_reviewer_id
                 }, csrf_token)
 
             self.post_json(
@@ -146,7 +141,6 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     },
                     'description': 'change to state 3',
                     'final_reviewer_id': self.reviewer_id,
-                    'assigned_reviewer_id': self.assigned_reviewer_id
                 }, csrf_token)
             self.logout()
 

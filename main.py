@@ -385,9 +385,6 @@ URLS = MAPREDUCE_HANDLERS + [
         r'/createhandler/state_yaml/<exploration_id>',
         editor.StateYamlHandler),
     get_redirect_route(
-        r'/createhandler/training_data/<exploration_id>/<escaped_state_name>',
-        editor.UntrainedAnswersHandler),
-    get_redirect_route(
         r'/createhandler/resource_list/<exploration_id>',
         editor.ExplorationResourcesHandler),
     get_redirect_route(
