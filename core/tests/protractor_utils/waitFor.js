@@ -18,49 +18,42 @@
  */
 
 var until = protractor.ExpectedConditions;
-var waitTime = 5000;
+var DEFAULT_WAIT_TIME_MSECS = 5000;
 
 /**
  * @param {string} errorMessage - Error message when alert does not pop up.
- * @param {int} [waitTime] - Optional wait time (in milliseconds) parameter.
  */
-var alertIsPresent = function(errorMessage) {
-  if (arguments.length === 2) {
-    waitTime = arguments[1];
-  }
-  return browser.wait(until.alertIsPresent(), waitTime, errorMessage);
+var alertToBePresent = function(errorMessage) {
+  return browser.wait(
+    until.alertIsPresent(), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
 /**
  * @param {Object} element - Clickable element such as button, link or tab.
  * @param {string} errorMessage - Error message when element is not clickable.
- * @param {int} [waitTime] - Optional wait time (in milliseconds) parameter.
  */
 var elementToBeClickable = function(element, errorMessage) {
-  if (arguments.length === 3) {
-    waitTime = arguments[2];
-  }
-  return browser.wait(until.elementToBeClickable(element), waitTime,
-    errorMessage);
+  return browser.wait(
+    until.elementToBeClickable(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
 /**
  * @param {Object} element - Element expected to disappear from DOM and does not
  *                           have height or width.
  * @param {string} errorMessage - Error message when element is still visible.
- * @param {int} [waitTime] - Optional wait time (in milliseconds) parameter.
  */
 var invisibilityOf = function(element, errorMessage) {
   if (arguments.length === 3) {
-    waitTime = arguments[2];
+    DEFAULT_WAIT_TIME_MSECS = arguments[2];
   }
-  return browser.wait(until.invisibilityOf(element), waitTime, errorMessage);
+  return browser.wait(
+    until.invisibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
 /**
  * Consider adding this method after each browser.get() call.
  */
-var loadingMessage = function() {
+var pageToFullyLoad = function() {
   // Completely wait for page to load to avoid XMLHTTPReq error on page refresh:
   // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
   // and browser.waitForAngular()'s flakiness
@@ -77,10 +70,8 @@ var loadingMessage = function() {
  *                                provided text.
  */
 var textToBePresentInElement = function(element, text, errorMessage) {
-  if (arguments.length === 4) {
-    waitTime = arguments[3];
-  }
-  return browser.wait(until.textToBePresentInElement(element, text), waitTime,
+  return browser.wait(
+    until.textToBePresentInElement(element, text), DEFAULT_WAIT_TIME_MSECS,
     errorMessage);
 };
 
@@ -90,15 +81,13 @@ var textToBePresentInElement = function(element, text, errorMessage) {
  * @param {string} errorMessage - Error message when element is invisible.
  */
 var visibilityOf = function(element, errorMessage) {
-  if (arguments.length === 3) {
-    waitTime = arguments[2];
-  }
-  return browser.wait(until.visibilityOf(element), waitTime, errorMessage);
+  return browser.wait(
+    until.visibilityOf(element), DEFAULT_WAIT_TIME_MSECS, errorMessage);
 };
 
-exports.alertIsPresent = alertIsPresent;
+exports.alertToBePresent = alertToBePresent;
 exports.elementToBeClickable = elementToBeClickable;
 exports.invisibilityOf = invisibilityOf;
-exports.loadingMessage = loadingMessage;
+exports.pageToFullyLoad = pageToFullyLoad;
 exports.textToBePresentInElement = textToBePresentInElement;
 exports.visibilityOf = visibilityOf;
