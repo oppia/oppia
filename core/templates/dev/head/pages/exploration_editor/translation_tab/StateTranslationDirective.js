@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the state translation.
+ * @fileoverview Directive containing the exploration material to be translated.
  */
 
 oppia.directive('stateTranslation', [
@@ -35,7 +35,7 @@ oppia.directive('stateTranslation', [
           $scope.TAB_ID_SOLUTION = 'solution';
 
           // Activates Content tab by default.
-          $scope.ACTIVATED_TAB_ID = $scope.TAB_ID_CONTENT;
+          $scope.activatedTabId = $scope.TAB_ID_CONTENT;
 
           $scope.activeHintIndex = null;
           $scope.activeAnswerGroupIndex = null;
@@ -47,11 +47,11 @@ oppia.directive('stateTranslation', [
           $scope.stateSolution = null;
 
           $scope.isActive = function(tabId) {
-            return ($scope.ACTIVATED_TAB_ID === tabId);
+            return ($scope.activatedTabId === tabId);
           };
 
           $scope.onTabClick = function(tabId) {
-            $scope.ACTIVATED_TAB_ID = tabId;
+            $scope.activatedTabId = tabId;
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
           };
@@ -107,7 +107,7 @@ oppia.directive('stateTranslation', [
             $scope.initStateTranslation();
           });
           $scope.initStateTranslation = function() {
-            $scope.ACTIVATED_TAB_ID = $scope.TAB_ID_CONTENT;
+            $scope.activatedTabId = $scope.TAB_ID_CONTENT;
 
             var stateName = EditorStateService.getActiveStateName();
             $scope.stateContent = ExplorationStatesService
@@ -125,6 +125,8 @@ oppia.directive('stateTranslation', [
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
           };
+
+          $scope.initStateTranslation();
         }
       ]
     };
