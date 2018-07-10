@@ -77,69 +77,76 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
         self.logout()
 
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
-            self.login(self.AUTHOR_EMAIL)
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
+            with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+                self.login(self.AUTHOR_EMAIL)
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json(
-                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
-                    'suggestion_type': (
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                    'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
-                    'target_id': 'exp1',
-                    'target_version_at_submission': exploration.version,
-                    'change_cmd': {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'State 1',
-                        'old_value': self.old_content,
-                        'new_value': self.new_content
-                    },
-                    'description': 'change to state 1',
-                    'final_reviewer_id': self.reviewer_id,
-                }, csrf_token)
-            self.logout()
+                self.post_json(
+                    '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
+                        'suggestion_type': (
+                            suggestion_models
+                            .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                        'target_type': (
+                            suggestion_models.TARGET_TYPE_EXPLORATION),
+                        'target_id': 'exp1',
+                        'target_version_at_submission': exploration.version,
+                        'change_cmd': {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                            'state_name': 'State 1',
+                            'old_value': self.old_content,
+                            'new_value': self.new_content
+                        },
+                        'description': 'change to state 1',
+                        'final_reviewer_id': self.reviewer_id,
+                    }, csrf_token)
+                self.logout()
 
-            self.login(self.AUTHOR_EMAIL_2)
-            response = self.testapp.get('/explore/%s' % self.EXP_ID)
-            csrf_token = self.get_csrf_token_from_response(response)
+                self.login(self.AUTHOR_EMAIL_2)
+                response = self.testapp.get('/explore/%s' % self.EXP_ID)
+                csrf_token = self.get_csrf_token_from_response(response)
 
-            self.post_json(
-                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
-                    'suggestion_type': (
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                    'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
-                    'target_id': 'exp1',
-                    'target_version_at_submission': exploration.version,
-                    'change_cmd': {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'State 2',
-                        'old_value': self.old_content,
-                        'new_value': self.new_content
-                    },
-                    'description': 'change to state 2',
-                    'final_reviewer_id': self.reviewer_id,
-                }, csrf_token)
+                self.post_json(
+                    '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
+                        'suggestion_type': (
+                            suggestion_models
+                            .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                        'target_type': (
+                            suggestion_models.TARGET_TYPE_EXPLORATION),
+                        'target_id': 'exp1',
+                        'target_version_at_submission': exploration.version,
+                        'change_cmd': {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                            'state_name': 'State 2',
+                            'old_value': self.old_content,
+                            'new_value': self.new_content
+                        },
+                        'description': 'change to state 2',
+                        'final_reviewer_id': self.reviewer_id,
+                    }, csrf_token)
 
-            self.post_json(
-                '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
-                    'suggestion_type': (
-                        suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
-                    'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
-                    'target_id': 'exp1',
-                    'target_version_at_submission': exploration.version,
-                    'change_cmd': {
-                        'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
-                        'property_name': exp_domain.STATE_PROPERTY_CONTENT,
-                        'state_name': 'State 3',
-                        'old_value': self.old_content,
-                        'new_value': self.new_content
-                    },
-                    'description': 'change to state 3',
-                    'final_reviewer_id': self.reviewer_id,
-                }, csrf_token)
-            self.logout()
+                self.post_json(
+                    '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
+                        'suggestion_type': (
+                            suggestion_models
+                            .SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+                        'target_type': (
+                            suggestion_models.TARGET_TYPE_EXPLORATION),
+                        'target_id': 'exp1',
+                        'target_version_at_submission': exploration.version,
+                        'change_cmd': {
+                            'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                            'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                            'state_name': 'State 3',
+                            'old_value': self.old_content,
+                            'new_value': self.new_content
+                        },
+                        'description': 'change to state 3',
+                        'final_reviewer_id': self.reviewer_id,
+                    }, csrf_token)
+                self.logout()
 
     def test_create_suggestion(self):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):

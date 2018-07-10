@@ -249,7 +249,8 @@ class RecentUpdatesMRJobManager(
                 feconf.COMMIT_MESSAGE_EXPLORATION_DELETED))
 
         for exp_model in tracked_exp_models_for_feedback:
-            threads = feedback_services.get_all_threads(exp_model.id, False)
+            threads = feedback_services.get_all_threads(
+                'exploration', exp_model.id, False)
             for thread in threads:
                 if thread.id not in feedback_thread_ids_list:
                     feedback_thread_ids_list.append(thread.id)
@@ -273,9 +274,9 @@ class RecentUpdatesMRJobManager(
             yield (
                 reducer_key, {
                     'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-                    'activity_id': last_message.exploration_id,
+                    'activity_id': last_message.entity_id,
                     'activity_title': exp_models.ExplorationModel.get_by_id(
-                        last_message.exploration_id).title,
+                        last_message.entity_id).title,
                     'author_id': last_message.author_id,
                     'last_updated_ms': utils.get_time_in_millisecs(
                         last_message.created_on),

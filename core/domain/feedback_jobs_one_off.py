@@ -208,7 +208,7 @@ class GeneralizeFeedbackThreadMigrationOneOffJob(
 
 class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for migrating instances of feedback thread model and related
-    models to have thread ID of the for entity_type.entity_id.random_str.
+    models to have thread ID of the form entity_type.entity_id.random_str.
     """
     @classmethod
     def entity_classes_to_map_over(cls):

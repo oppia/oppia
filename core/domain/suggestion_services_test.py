@@ -48,13 +48,12 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_EMAIL = 'reviewer@example.com'
 
-    THREAD_ID = 'exp1.thread_1'
+    THREAD_ID = 'exploration.exp1.thread_1'
 
     COMMIT_MESSAGE = 'commit message'
     EMPTY_COMMIT_MESSAGE = ' '
 
-    suggestion_id = '.'.join(
-        [suggestion_models.TARGET_TYPE_EXPLORATION, THREAD_ID])
+    suggestion_id = THREAD_ID
 
     def setUp(self):
         super(SuggestionServicesUnitTests, self).setUp()
@@ -64,7 +63,7 @@ class SuggestionServicesUnitTests(test_utils.GenericTestBase):
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
 
-    def generate_thread_id(self, unused_exp_id):
+    def generate_thread_id(self, unused_entity_type, unused_entity_id):
         return self.THREAD_ID
 
     class MockExploration(object):
@@ -362,7 +361,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL_2 = 'author2@example.com'
     REVIEWER_EMAIL_2 = 'reviewer2@example.com'
 
-    def generate_thread_id(self, unused_exp_id):
+    def generate_thread_id(self, unused_entity_type, unused_entity_id):
         return self.THREAD_ID
 
     class MockExploration(object):
@@ -472,11 +471,11 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
         suggestion_models.SCORE_TYPE_CONTENT +
         suggestion_models.SCORE_CATEGORY_DELIMITER + 'Algebra')
 
-    THREAD_ID = 'exp1.thread_1'
+    THREAD_ID = 'exploration.exp1.thread_1'
 
     COMMIT_MESSAGE = 'commit message'
 
-    def generate_thread_id(self, unused_exp_id):
+    def generate_thread_id(self, unused_entity_type, unused_entity_id):
         return self.THREAD_ID
 
     def setUp(self):
@@ -542,7 +541,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.EXP_ID, self.target_version_at_submission,
                 self.author_id, self.change_cmd, 'test description', None)
 
-        suggestion_id = 'exploration.' + self.THREAD_ID
+        suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         suggestion_services.accept_suggestion(
@@ -566,7 +565,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.EXP_ID, self.target_version_at_submission,
                 self.author_id, self.change_cmd, 'test description', None)
 
-        suggestion_id = 'exploration.' + self.THREAD_ID
+        suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         suggestion_services.reject_suggestion(
@@ -593,7 +592,7 @@ class SuggestionIntegrationTests(test_utils.GenericTestBase):
                 self.EXP_ID, self.target_version_at_submission,
                 self.author_id, self.change_cmd, 'test description', None)
 
-        suggestion_id = 'exploration.' + self.THREAD_ID
+        suggestion_id = self.THREAD_ID
         suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
 
         suggestion_services.accept_suggestion(

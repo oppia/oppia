@@ -435,10 +435,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             ):
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                self.EXP_ID_1, None, self.user_b_id, 'subject', 'text')
+                'exploration', self.EXP_ID_1, None, self.user_b_id, 'subject',
+                'text')
             # User C adds to that thread.
             thread_id = feedback_services.get_all_threads(
-                self.EXP_ID_1, False)[0].id
+                'exploration', self.EXP_ID_1, False)[0].id
             feedback_services.create_message(
                 thread_id, self.user_c_id, None, None, 'more text')
 

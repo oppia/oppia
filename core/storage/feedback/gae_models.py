@@ -51,17 +51,12 @@ class FeedbackThreadModel(base_models.BaseModel):
     The id of instances of this class has the form
         [ENTITY_TYPE].[ENTITY_ID].[GENERATED_STRING]
     """
-    # TODO (nithesh): After migrating data to the new fields, set those fields
-    # as required and remove required from the other fields.
-
     # ID of the exploration the thread is about (Deprecated).
     exploration_id = ndb.StringProperty(required=False, indexed=True)
-
     # The type of entity the thread is linked to.
     entity_type = ndb.StringProperty(required=False, indexed=True)
     # The ID of the entity the thread is linked to.
     entity_id = ndb.StringProperty(required=False, indexed=True)
-
     # ID of state the thread is for. Does not exist if the thread is about the
     # entire exploration (Deprecated).
     state_name = ndb.StringProperty(indexed=True)
@@ -226,6 +221,8 @@ class FeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. The entity_id.
         """
+        if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            return self.id.split('.')[0]
         return self.id.split('.')[1]
 
     @property
@@ -235,6 +232,8 @@ class FeedbackMessageModel(base_models.BaseModel):
         Returns:
             str. The entity_type.
         """
+        if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            return 'exploration'
         return self.id.split('.')[0]
 
 
