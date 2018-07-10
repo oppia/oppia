@@ -420,42 +420,42 @@
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/widget/releases/widget_4.9.2.zip",
         "rootDir": "widget",
-        "targetDir": "ckeditor-widget"
+        "targetDirPrefix": "ckeditor-widget-"
       },
       "ckeditorLineutils": {
         "version": "4.9.2",
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/lineutils/releases/lineutils_4.9.2.zip",
         "rootDir": "lineutils",
-        "targetDir": "ckeditor-lineutils"
+        "targetDirPrefix": "ckeditor-lineutils-"
       },
       "ckeditorSharedspace": {
         "version": "4.9.2",
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/sharedspace/releases/sharedspace_4.9.2.zip",
         "rootDir": "sharedspace",
-        "targetDir": "ckeditor-sharedspace"
+        "targetDirPrefix": "ckeditor-sharedspace-"
       },
       "ckeditorBootstrapCK": {
         "version": "1.0",
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/bootstrapck/releases/bootstrapck_1.0_0.zip",
         "rootDir": "bootstrapck",
-        "targetDir": "ckeditor-bootstrapck"
+        "targetDirPrefix": "ckeditor-bootstrapck-"
       },
       "ckeditorIndentBlockPlugin" : {
         "version": "4.9.2",
         "downloadFormat": "zip",
         "url": "https://download.ckeditor.com/indentblock/releases/indentblock_4.9.2.zip",
         "rootDir": "indentblock",
-        "targetDir": "ckeditor-indentblock"
+        "targetDirPrefix": "ckeditor-indentblock-"
       },
       "ckeditorBlockquotePlugin" : {
         "version": "4.9.2",
         "downloadFormat": "zip",
         "url": "https://download.ckeditor.com/blockquote/releases/blockquote_4.9.2.zip",
         "rootDir": "blockquote",
-        "targetDir": "ckeditor-blockquote"
+        "targetDirPrefix": "ckeditor-blockquote-"
       },
       "uiBootstrap": {
         "version": "2.5.0",
