@@ -3547,6 +3547,24 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v23_dict_to_v24_dict(cls, states_dict):
+        """Converts from version 23 to 24. Version 24 converts all Rich Text
+        Editor content to be compatible with the CKEditor format.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for key, state_dict in states_dict.iteritems():
+            states_dict[key] = State.convert_html_fields_in_state(
+                state_dict, html_cleaner.convert_to_ckeditor)
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3577,7 +3595,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 28
+    CURRENT_EXP_SCHEMA_VERSION = 29
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4097,6 +4115,21 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v28_dict_to_v29_dict(cls, exploration_dict):
+        """Converts a v28 exploration dict into a v29 exploration dict.
+
+        Converts all Rich Text Editor content to be compatible with the
+        CKEditor format.
+        """
+        exploration_dict['schema_version'] = 29
+
+        exploration_dict['states'] = cls._convert_states_v23_dict_to_v24_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 24
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4267,6 +4300,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v27_dict_to_v28_dict(
                 exploration_dict)
             exploration_schema_version = 28
+
+        if exploration_schema_version == 28:
+            exploration_dict = cls._convert_v28_dict_to_v29_dict(
+                exploration_dict)
+            exploration_schema_version = 29
 
         return (exploration_dict, initial_schema_version)
 
