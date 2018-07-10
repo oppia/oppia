@@ -80,7 +80,7 @@ var textToBePresentInElement = function(element, text, errorMessage) {
   if (arguments.length === 4) {
     waitTime = arguments[3];
   }
-  browser.wait(until.textToBePresentInElement(element, text), waitTime,
+  return browser.wait(until.textToBePresentInElement(element, text), waitTime,
     errorMessage);
 };
 
