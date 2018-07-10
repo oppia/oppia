@@ -77,6 +77,7 @@ var ExplorationEditorMainTab = function() {
     by.css('.protractor-test-open-outcome-dest-editor'));
   var openOutcomeFeedBackEditor = element(
     by.css('.protractor-test-open-outcome-feedback-editor'));
+  var postTutorialPopover = element(by.css('.popover-content'));
   var responseBody = function(responseNum) {
     return element(by.css('.protractor-test-response-body-' + responseNum));
   };
@@ -460,7 +461,8 @@ var ExplorationEditorMainTab = function() {
   // can then use to alter the state content, for example by calling
   // .appendBoldText(...).
   this.setContent = function(richTextInstructions) {
-  // Wait for browser to completely load the rich text editor.
+    browser.wait(until.invisibilityOf(postTutorialPopover), 5000);
+    // Wait for browser to time out the popover, which is 5000 ms.
     browser.wait(until.elementToBeClickable(stateEditContent), 10000,
       'stateEditContent taking too long to appear to set content')
       .then(function(isClickable) {
@@ -960,11 +962,12 @@ var ExplorationEditorMainTab = function() {
       }
     });
     browser.wait(until.textToBePresentInElement(stateNameContainer, targetName),
-      5000, 'Current state name is:' + stateNameContainer.getText() +
-      'instead of expected ' + targetName);
+      5000, 'Current state name is:' + stateNameContainer.getAttribute(
+        'textContent') + 'instead of expected ' + targetName);
   };
 
   this.setStateName = function(name) {
+    browser.wait(until.invisibilityOf(postTutorialPopover), 5000);
     browser.wait(until.elementToBeClickable(stateNameContainer), 10000,
       'State Name Container takes too long to appear')
       .then(function (isClickable) {
@@ -984,15 +987,15 @@ var ExplorationEditorMainTab = function() {
         }
       });
     browser.wait(until.textToBePresentInElement(stateNameContainer, name),
-      5000, 'Current state name is:' + stateNameContainer.getText() +
-      'instead of expected ' + name);
+      5000, 'Current state name is:' + stateNameContainer.getAttribute(
+        'textContent') + 'instead of expected ' + name);
   };
 
   this.expectCurrentStateToBe = function(name) {
     browser.wait(until.textToBePresentInElement(stateNameContainer, name), 5000,
-      'Expecting current state ' + stateNameContainer.getText() + ' to be ' +
-      name);
-    expect(stateNameContainer.getText()).toMatch(name);
+      'Expecting current state ' + stateNameContainer.getAttribute(
+        'textContent') + ' to be ' + name);
+    expect(stateNameContainer.getAttribute('textContent')).toMatch(name);
   };
 };
 
