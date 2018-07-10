@@ -95,3 +95,10 @@ var visibilityOf = function(element, errorMessage) {
   }
   return browser.wait(until.visibilityOf(element), waitTime, errorMessage);
 };
+
+exports.alertIsPresent = alertIsPresent;
+exports.elementToBeClickable = elementToBeClickable;
+exports.invisibilityOf = invisibilityOf;
+exports.loadingMessage = loadingMessage;
+exports.textToBePresentInElement = textToBePresentInElement;
+exports.visibilityOf = visibilityOf;
