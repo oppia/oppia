@@ -147,6 +147,7 @@ class UserSettings(object):
         self.preferred_site_language_code = preferred_site_language_code
         self.preferred_audio_language_code = preferred_audio_language_code
 
+
     def validate(self):
         """Checks that user_id and email fields of this UserSettings domain
         object are valid.
@@ -646,7 +647,7 @@ def _save_user_settings(user_settings):
         preferred_site_language_code=(
             user_settings.preferred_site_language_code),
         preferred_audio_language_code=(
-            user_settings.preferred_audio_language_code)
+            user_settings.preferred_audio_language_code),
     ).put()
 
 

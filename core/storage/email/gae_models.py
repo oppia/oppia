@@ -59,6 +59,8 @@ class SentEmailModel(base_models.BaseModel):
         feconf.EMAIL_INTENT_DELETE_EXPLORATION,
         feconf.EMAIL_INTENT_REPORT_BAD_CONTENT,
         feconf.EMAIL_INTENT_QUERY_STATUS_NOTIFICATION,
+        feconf.EMAIL_INTENT_ONBOARD_REVIEWER,
+        feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS,
         feconf.BULK_EMAIL_INTENT_TEST
     ])
     # The subject line of the email.

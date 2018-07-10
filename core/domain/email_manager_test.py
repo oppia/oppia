@@ -1556,6 +1556,132 @@ class FlagExplorationEmailTest(test_utils.GenericTestBase):
                 feconf.EMAIL_INTENT_REPORT_BAD_CONTENT)
 
 
+class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
+    """Test that correct email is sent while onboarding reviewers.
+    """
+    REVIEWER_USERNAME = 'reviewer'
+    REVIEWER_EMAIL = 'reviewer@example.com'
+
+    def setUp(self):
+        super(OnboardingReviewerInstantEmailTests, self).setUp()
+        self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_id, True, False, False, False)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+
+    def test_that_correct_completion_email_is_sent(self):
+        expected_email_subject = 'Invitation to review suggestions'
+        expected_email_html_body = (
+            'Hi reviewer,<br>'
+            'You have been actively contributing quality suggestions for oppia '
+            'content in Algebra. We would like to have you review other '
+            'contributors suggestions in similar domains. If you would like to '
+            'help out the content creators to review suggestions, please visit'
+            ' your '
+            '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>. '
+            'And set the review preference for the category as yes. '
+            '<br>Note that if you do accept, you will recieve periodic '
+            'mails to review incoming suggestions.<br>'
+            'Looking forward to working with you! Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_onboard_new_reviewers(
+                self.reviewer_id, 'Algebra')
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.REVIEWER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+            #self.assertEqual(
+            #    messages[0].body.decode(), expected_email_text_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.reviewer_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.REVIEWER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_ONBOARD_REVIEWER)
+
+
+class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
+    """Test that correct email is sent while notifying reviewers.
+    """
+    REVIEWER_USERNAME = 'reviewer'
+    REVIEWER_EMAIL = 'reviewer@example.com'
+
+    def setUp(self):
+        super(NotifyReviewerInstantEmailTests, self).setUp()
+        self.signup(self.REVIEWER_EMAIL, self.REVIEWER_USERNAME)
+        self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
+        user_services.update_email_preferences(
+            self.reviewer_id, True, False, False, False)
+        self.can_send_emails_ctx = self.swap(feconf, 'CAN_SEND_EMAILS', True)
+
+    def test_that_correct_completion_email_is_sent(self):
+        expected_email_subject = 'Notification to review suggestions'
+        expected_email_html_body = (
+            'Hi reviewer,<br>'
+            'There are suggestions in category %s which need to be reviewed. '
+            'As you have mentioned that you would like to review suggestions'
+            ' in these domains, we have notified you about the same. '
+            'You can view all the suggestions that require your attention in '
+            'your '
+            '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>.'
+            '<br>Thanks!<br>'
+            '- The Oppia Team<br>'
+            '<br>'
+            'You can change your email preferences via the '
+            '<a href="https://www.example.com">Preferences</a> page.') % (
+                'Algebra')
+
+        with self.can_send_emails_ctx:
+            email_manager.send_mail_to_notify_users_to_review(
+                self.reviewer_id, 'Algebra')
+
+            # Make sure correct email is sent.
+            messages = self.mail_stub.get_sent_messages(to=self.REVIEWER_EMAIL)
+            self.assertEqual(len(messages), 1)
+            self.assertEqual(
+                messages[0].html.decode(), expected_email_html_body)
+            #self.assertEqual(
+            #    messages[0].body.decode(), expected_email_text_body)
+
+            # Make sure correct email model is stored.
+            all_models = email_models.SentEmailModel.get_all().fetch()
+            sent_email_model = all_models[0]
+            self.assertEqual(
+                sent_email_model.subject, expected_email_subject)
+            self.assertEqual(
+                sent_email_model.recipient_id, self.reviewer_id)
+            self.assertEqual(
+                sent_email_model.recipient_email, self.REVIEWER_EMAIL)
+            self.assertEqual(
+                sent_email_model.sender_id, feconf.SYSTEM_COMMITTER_ID)
+            self.assertEqual(
+                sent_email_model.sender_email,
+                'Site Admin <%s>' % feconf.NOREPLY_EMAIL_ADDRESS)
+            self.assertEqual(
+                sent_email_model.intent,
+                feconf.EMAIL_INTENT_REVIEW_SUGGESTIONS)
+
+
 class QueryStatusNotificationEmailTests(test_utils.GenericTestBase):
     """Test that email is send to submitter when query has completed
     or failed.
