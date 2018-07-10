@@ -453,7 +453,6 @@ class BaseHandler(webapp2.RequestHandler):
             return
 
         logging.info(''.join(traceback.format_exception(*sys.exc_info())))
-        logging.error('Exception raised: %s', exception)
 
         if isinstance(exception, self.PageNotFoundException):
             logging.warning('Invalid URL requested: %s', self.request.uri)
@@ -462,6 +461,8 @@ class BaseHandler(webapp2.RequestHandler):
                 404, {
                     'error': 'Could not find the page %s.' % self.request.uri})
             return
+
+        logging.error('Exception raised: %s', exception)
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
