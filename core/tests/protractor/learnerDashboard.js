@@ -129,13 +129,13 @@ describe('Learner dashboard functionality', function() {
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    // Refresh page to simulate user leaving and accept the alert.
-    general.safeAcceptAlert();
-    // Wait for exploration to re-load again.
+    // User clicks on Oppia logo to leave exploration.
+    var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
+    oppiaLogo.click();
+    general.acceptAlert();
+    // Wait for /learner_dashboard to load.
     general.waitForLoadingMessage();
 
-    // Learner Dashboard should display 'About Oppia' as incomplete.
-    learnerDashboardPage.get();
     learnerDashboardPage.navigateToInCompleteSection();
     learnerDashboardPage.navigateToIncompleteExplorationsSection();
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
@@ -242,13 +242,14 @@ describe('Learner dashboard functionality', function() {
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    // Refresh page to simulate user leaving and accept the alert.
-    general.safeAcceptAlert();
-    // Wait for exploration to re-load again.
+    // User clicks on Oppia logo to leave exploration.
+    var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
+    oppiaLogo.click();
+    general.acceptAlert();
+    // Wait for /learner_dashboard to load.
     general.waitForLoadingMessage();
 
     // Learner Dashboard should display 'Test Collection' as incomplete.
-    learnerDashboardPage.get();
     learnerDashboardPage.navigateToInCompleteSection();
     learnerDashboardPage.navigateToIncompleteCollectionsSection();
     learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
