@@ -278,8 +278,7 @@ oppia.factory('ResponsesService', [
 
         // If the interaction is ItemSelectionInput, update the answer groups
         // to refer to the new answer options.
-        if ((stateInteractionIdService.savedMemento === 'ItemSelectionInput' ||
-            stateInteractionIdService.savedMemento === 'DragAndDropSort') &&
+        if (stateInteractionIdService.savedMemento === 'ItemSelectionInput' &&
             oldAnswerChoices) {
           // We use an approximate algorithm here. If the length of the answer
           // choices array remains the same, and no choice is replicated at
@@ -333,6 +332,55 @@ oppia.factory('ResponsesService', [
                   }
                 });
                 rule.inputs[key] = newInputValue;
+              }
+            });
+
+            _updateAnswerGroup(answerGroupIndex, {
+              rules: newRules
+            });
+          });
+        }
+
+        // If the interaction is DragAndDropSort, update the answer groups
+        // to refer to the new answer options.
+        if (stateInteractionIdService.savedMemento === 'DragAndDropSort' &&
+            oldAnswerChoices) {
+          // If the length of the answer choices array changes, then there is
+          // surely any deletion or modification or addition in the array. We
+          // simply set answer groups to refer to default value. If the length
+          // of the answer choices array remains the same and all the choices in
+          // the previous array are present, then no change is required.
+          // However, if any of the choices is not present, we set answer groups
+          // to refer to the default value containing new answer choices.
+          var anyChangesHappened = false;
+          if (oldAnswerChoices.length !== newAnswerChoices.length) {
+            anyChangesHappened = true;
+          } else {
+            // Check if any modification happened in answer choices.
+            var numAnswerChoices = oldAnswerChoices.length;
+            for (var i = 0; i < numAnswerChoices; i++) {
+              var choiceIsPresent = false;
+              for (var j = 0; j < numAnswerChoices; j++) {
+                if (oldAnswerChoices[i].val === newAnswerChoices[j].val) {
+                  choiceIsPresent = true;
+                  break;
+                }
+              }
+              if (choiceIsPresent === false) {
+                anyChangesHappened = true;
+                break;
+              }
+            }
+          }
+
+          _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
+            var newRules = angular.copy(answerGroup.rules);
+            newRules.forEach(function(rule) {
+              for (var key in rule.inputs) {
+                var newInputValue = [];
+                if (anyChangesHappened) {
+                  rule.inputs[key] = newInputValue;
+                }
               }
             });
 
