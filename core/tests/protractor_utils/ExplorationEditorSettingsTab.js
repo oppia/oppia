@@ -95,7 +95,7 @@ var ExplorationEditorSettingsTab = function() {
     waitFor.invisibilityOf(confirmDeleteExplorationButton,
       'Delete Exploration modal takes too long to disappear');
     // Returning to /creator_dashboard.
-    waitFor.loadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.enableParameters = function() {
