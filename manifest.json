@@ -464,17 +464,6 @@
         "rootDir": "blockquote",
         "targetDir": "ckeditor-blockquote"
       },
-      "textAngular": {
-        "version": "1.4.5",
-        "downloadFormat": "zip",
-        "url": "https://github.com/fraywing/textAngular/archive/v1.4.5.zip",
-        "rootDirPrefix": "textAngular-",
-        "targetDirPrefix": "textAngular-",
-        "bundle": {
-          "css": ["dist/textAngular.css"],
-          "js": ["dist/textAngular.js", "dist/textAngularSetup.js"]
-        }
-      },
       "uiBootstrap": {
         "version": "2.5.0",
         "downloadFormat": "files",

@@ -38,22 +38,18 @@ oppia.controller('LearnerLocalNav', [
         resolve: {},
         controller: [
           '$scope', '$uibModalInstance', '$timeout', 'PlayerPositionService',
-          'ExplorationPlayerService', 'IS_CURRENT_RTE_CKEDITOR',
+          'ExplorationPlayerService',
           function(
               $scope, $uibModalInstance, $timeout, PlayerPositionService,
-              ExplorationPlayerService, IS_CURRENT_RTE_CKEDITOR) {
+              ExplorationPlayerService) {
             var stateName = PlayerPositionService.getCurrentStateName();
             $scope.originalHtml = ExplorationPlayerService.getStateContentHtml(
               stateName);
-            $scope.isCurrentRTECKEditor = IS_CURRENT_RTE_CKEDITOR;
             $scope.description = '';
-            // If there is a ng-model, you have to have a dot in there.
-            // Reference https://stackoverflow.com/questions/12618342/ng
-            // -model-does-not-update-controller-value/22768720#22768720.
-            // Due to this reason, suggestionHtml has been changed to
-            // suggest.suggestionHtml.
-            $scope.suggest = {};
-            $scope.suggest.suggestionHtml = $scope.originalHtml;
+            // ng-model needs to bind to a property of an object on
+            // the scope (the property cannot sit directly on the scope)
+            // Reference https://stackoverflow.com/q/12618342
+            $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
             $scope.showEditor = false;
             // Rte initially displays content unrendered for a split second
             $timeout(function() {
@@ -70,7 +66,7 @@ oppia.controller('LearnerLocalNav', [
                 version: ExplorationPlayerService.getExplorationVersion(),
                 stateName: stateName,
                 description: $scope.description,
-                suggestionHtml: $scope.suggest.suggestionHtml
+                suggestionHtml: $scope.suggestionData.suggestionHtml
               };
               if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
                 data = {
@@ -80,7 +76,7 @@ oppia.controller('LearnerLocalNav', [
                   suggestion_type: 'edit_exploration_state_content',
                   target_type: 'exploration',
                   description: $scope.description,
-                  suggestionHtml: $scope.suggest.suggestionHtml,
+                  suggestionHtml: $scope.suggestionData.suggestionHtml,
                 };
               }
               $uibModalInstance.close(data);
