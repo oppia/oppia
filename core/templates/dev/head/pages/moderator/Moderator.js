@@ -19,6 +19,7 @@
 oppia.controller('Moderator', [
   '$scope', '$http', '$rootScope', 'DateTimeFormatService', 'AlertsService',
   function($scope, $http, $rootScope, DateTimeFormatService, AlertsService) {
+    $rootScope.loadingMessage = 'Loading';
     $scope.getDatetimeAsString = function(millisSinceEpoch) {
       return DateTimeFormatService.getLocaleAbbreviatedDatetimeString(
         millisSinceEpoch);
@@ -76,6 +77,7 @@ oppia.controller('Moderator', [
         }
       }
       $scope.allCommits = data.results;
+      $rootScope.loadingMessage = '';
     });
 
     $http.get('/recent_feedback_messages').then(function(response) {

@@ -120,7 +120,6 @@ describe('Collections', function() {
       collectionEditorPage.setObjective('This is the second test collection.');
       collectionEditorPage.setCategory('Algebra');
       collectionEditorPage.saveChanges();
-      browser.waitForAngular();
       users.logout();
     });
   });
@@ -151,7 +150,6 @@ describe('Collections', function() {
     collectionEditorPage.setObjective('This is a test collection.');
     collectionEditorPage.setCategory('Algebra');
     collectionEditorPage.saveChanges();
-    browser.waitForAngular();
     users.logout();
   });
 
@@ -176,7 +174,6 @@ describe('Collections', function() {
     collectionEditorPage.saveDraft();
     collectionEditorPage.setCommitMessage('Add Exploration');
     collectionEditorPage.closeSaveModal();
-    browser.waitForAngular();
     browser.get('/collection/' + collectionId);
     general.waitForLoadingMessage();
     general.checkForConsoleErrors([]);
@@ -188,7 +185,6 @@ describe('Collections', function() {
     collectionEditorPage.saveDraft();
     collectionEditorPage.setCommitMessage('Add Exploration');
     collectionEditorPage.closeSaveModal();
-    browser.waitForAngular();
     browser.get('/collection/' + collectionId);
     general.waitForLoadingMessage();
     general.checkForConsoleErrors([]);

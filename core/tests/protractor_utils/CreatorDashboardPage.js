@@ -67,7 +67,7 @@ var CreatorDashboardPage = function() {
 
   this.clickCreateActivityButton = function() {
     browser.wait(until.elementToBeClickable(createActivityButton), 10000,
-      'Create Activity button takes too long to appear')
+      'Create Activity button takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           createActivityButton.click();
@@ -81,7 +81,7 @@ var CreatorDashboardPage = function() {
       'Activity Creation modal is not visible').then( function(isVisible) {
       if (isVisible) {
         browser.wait(until.elementToBeClickable(createCollectionButton), 10000,
-          'Create Collection button takes too long to appear')
+          'Create Collection button takes too long to be clickable')
           .then(function(isClickable) {
             if (isClickable) {
               createCollectionButton.click();
@@ -94,7 +94,7 @@ var CreatorDashboardPage = function() {
 
   this.clickCreateExplorationButton = function() {
     browser.wait(until.elementToBeClickable(createExplorationButton), 5000,
-      'Create Exploration button takes too long to appear')
+      'Create Exploration button takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           createExplorationButton.click();
@@ -105,7 +105,7 @@ var CreatorDashboardPage = function() {
 
   this.navigateToCollectionEditor = function() {
     browser.wait(until.elementToBeClickable(collectionCard), 5000,
-      'Collection Card tab takes too long to appear')
+      'Collection Card tab takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           collectionCard.click();
@@ -116,7 +116,7 @@ var CreatorDashboardPage = function() {
 
   this.navigateToSubscriptionDashboard = function() {
     browser.wait(until.elementToBeClickable(subscriptionTab), 5000,
-      'Subscription Dashboard tab takes too long to appear')
+      'Subscription Dashboard tab takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           subscriptionTab.click();
@@ -132,8 +132,8 @@ var CreatorDashboardPage = function() {
       }
       var explorationElement = elems[0].element(
         by.css('.protractor-test-title-mask'));
-      browser.wait(until.elementToBeClickable(explorationElement), 5000,
-        'Exploration tile takes too long to appear')
+      browser.wait(until.elementToBeClickable(explorationElement), 10000,
+        'Unable to click on exploration ' + explorationTitle)
         .then(function(isClickable) {
           if (isClickable) {
             explorationElement.click();

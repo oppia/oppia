@@ -150,8 +150,7 @@ BAD_PATTERNS_JS_REGEXP = [
         'message': "Please do not access parent properties " +
                    "using $parent. Use the scope object" +
                    "for this purpose.",
-        'excluded_files': (
-            'core/templates/dev/head/app.js'),
+        'excluded_files': (),
         'excluded_dirs': ()
     }
 ]
