@@ -81,7 +81,7 @@
         "MemberExpression": 1,
         "SwitchCase": 1,
         "ignoredNodes": [
-          "TernaryExpression"
+          "ConditionalExpression"
         ]
       }
     ],
