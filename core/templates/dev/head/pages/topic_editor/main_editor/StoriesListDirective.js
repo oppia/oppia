@@ -26,22 +26,42 @@ oppia.directive('storiesList', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/main_editor/stories_list_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'EditableTopicBackendApiService',
-        'UrlService', 'UrlInterpolationService', 'TopicUpdateService',
+        '$scope', '$rootScope', '$uibModal', '$window',
+        'EditableTopicBackendApiService', 'UrlService', 'UndoRedoService',
+        'UrlInterpolationService', 'TopicUpdateService',
         'EVENT_STORY_SUMMARIES_INITIALIZED',
         function(
-            $scope, $rootScope, $uibModal, EditableTopicBackendApiService,
-            UrlService, UrlInterpolationService, TopicUpdateService,
+            $scope, $rootScope, $uibModal, $window,
+            EditableTopicBackendApiService, UrlService, UndoRedoService,
+            UrlInterpolationService, TopicUpdateService,
             EVENT_STORY_SUMMARIES_INITIALIZED) {
           var topicId = UrlService.getTopicIdFromUrl();
           var STORY_EDITOR_URL_TEMPLATE = '/story_editor/<topic_id>/<story_id>';
           $scope.STORY_TABLE_COLUMN_HEADINGS = ['title', 'node_count'];
-          $scope.getStoryEditorUrl = function(storyId) {
-            return UrlInterpolationService.interpolateUrl(
-              STORY_EDITOR_URL_TEMPLATE, {
-                topic_id: topicId,
-                story_id: storyId
+          $scope.openStoryEditor = function(storyId) {
+            if (UndoRedoService.getChangeCount() > 0) {
+              $uibModal.open({
+                templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                  '/pages/topic_editor/main_editor/' +
+                  'save_pending_changes_modal_directive.html'),
+                backdrop: true,
+                controller: [
+                  '$scope', '$uibModalInstance',
+                  function($scope, $uibModalInstance) {
+                    $scope.cancel = function() {
+                      $uibModalInstance.dismiss('cancel');
+                    };
+                  }
+                ]
               });
+            } else {
+              $window.open(
+                UrlInterpolationService.interpolateUrl(
+                  STORY_EDITOR_URL_TEMPLATE, {
+                    topic_id: topicId,
+                    story_id: storyId
+                  }), '_self');
+            }
           };
 
           $scope.deleteCanonicalStory = function(storyId) {

@@ -1784,6 +1784,63 @@ class State(object):
                 default_dest_state_name),
             feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
 
+    @classmethod
+    def convert_html_fields_in_state(cls, state_dict, conversion_fn):
+        """Applies a conversion function on all the html strings in a state
+        to migrate them to a desired state.
+
+        Args:
+            state_dict: dict. The dict representation of State object.
+            conversion_fn: function. The conversion function to be applied on
+                the states_dict.
+
+        Returns:
+            dict. The converted state_dict.
+        """
+        state_dict['content']['html'] = (
+            conversion_fn(state_dict['content']['html']))
+        if state_dict['interaction']['default_outcome']:
+            interaction_feedback_html = state_dict[
+                'interaction']['default_outcome']['feedback']['html']
+            state_dict['interaction']['default_outcome']['feedback'][
+                'html'] = conversion_fn(interaction_feedback_html)
+
+        for answer_group_index, answer_group in enumerate(
+                state_dict['interaction']['answer_groups']):
+            answer_group_html = answer_group['outcome']['feedback']['html']
+            state_dict['interaction']['answer_groups'][
+                answer_group_index]['outcome']['feedback']['html'] = (
+                    conversion_fn(answer_group_html))
+            if state_dict['interaction']['id'] == 'ItemSelectionInput':
+                for rule_spec_index, rule_spec in enumerate(
+                        answer_group['rule_specs']):
+                    for x_index, x in enumerate(rule_spec['inputs']['x']):
+                        state_dict['interaction']['answer_groups'][
+                            answer_group_index]['rule_specs'][
+                                rule_spec_index]['inputs']['x'][x_index] = (
+                                    conversion_fn(x))
+        for hint_index, hint in enumerate(
+                state_dict['interaction']['hints']):
+            hint_html = hint['hint_content']['html']
+            state_dict['interaction']['hints'][hint_index][
+                'hint_content']['html'] = conversion_fn(hint_html)
+
+        if state_dict['interaction']['solution']:
+            solution_html = state_dict[
+                'interaction']['solution']['explanation']['html']
+            state_dict['interaction']['solution']['explanation']['html'] = (
+                conversion_fn(solution_html))
+
+        if state_dict['interaction']['id'] in (
+                'ItemSelectionInput', 'MultipleChoiceInput'):
+            for value_index, value in enumerate(
+                    state_dict['interaction']['customization_args'][
+                        'choices']['value']):
+                state_dict['interaction']['customization_args'][
+                    'choices']['value'][value_index] = conversion_fn(value)
+
+        return state_dict
+
 
 class ExplorationVersionsDiff(object):
     """Domain object for the difference between two versions of an Oppia
@@ -3475,54 +3532,44 @@ class Exploration(object):
         Returns:
             dict. The converted states_dict.
         """
-        for state_dict in states_dict.values():
-            state_dict['content']['html'] = (
-                html_cleaner.convert_to_textangular(
-                    state_dict['content']['html']))
-            if state_dict['interaction']['default_outcome']:
-                interaction_feedback_html = state_dict[
-                    'interaction']['default_outcome']['feedback']['html']
-                state_dict['interaction']['default_outcome']['feedback'][
-                    'html'] = html_cleaner.convert_to_textangular(
-                        interaction_feedback_html)
+        for key, state_dict in states_dict.iteritems():
+            states_dict[key] = State.convert_html_fields_in_state(
+                state_dict, html_cleaner.convert_to_textangular)
+        return states_dict
 
-            for answer_group_index, answer_group in enumerate(
-                    state_dict['interaction']['answer_groups']):
-                answer_group_html = answer_group['outcome']['feedback']['html']
-                state_dict['interaction']['answer_groups'][
-                    answer_group_index]['outcome']['feedback']['html'] = (
-                        html_cleaner.convert_to_textangular(
-                            answer_group_html))
-                if state_dict['interaction']['id'] == 'ItemSelectionInput':
-                    for rule_spec_index, rule_spec in enumerate(
-                            answer_group['rule_specs']):
-                        for x_index, x in enumerate(rule_spec['inputs']['x']):
-                            state_dict['interaction']['answer_groups'][
-                                answer_group_index]['rule_specs'][
-                                    rule_spec_index]['inputs']['x'][x_index] = (
-                                        html_cleaner.convert_to_textangular(x))
-            for hint_index, hint in enumerate(
-                    state_dict['interaction']['hints']):
-                hint_html = hint['hint_content']['html']
-                state_dict['interaction']['hints'][hint_index][
-                    'hint_content']['html'] = (
-                        html_cleaner.convert_to_textangular(hint_html))
+    @classmethod
+    def _convert_states_v22_dict_to_v23_dict(cls, states_dict):
+        """Converts from version 22 to 23. Version 23 ensures that all
+        all oppia-noninteractive-image tags have caption attribute.
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
 
-            if state_dict['interaction']['solution']:
-                solution_html = state_dict[
-                    'interaction']['solution']['explanation']['html']
-                state_dict['interaction']['solution']['explanation']['html'] = (
-                    html_cleaner.convert_to_textangular(solution_html))
+        Returns:
+            dict. The converted states_dict.
+        """
+        for key, state_dict in states_dict.iteritems():
+            states_dict[key] = State.convert_html_fields_in_state(
+                state_dict, html_cleaner.add_caption_attr_to_image)
+        return states_dict
 
-            if state_dict['interaction']['id'] in (
-                    'ItemSelectionInput', 'MultipleChoiceInput'):
-                for value_index, value in enumerate(
-                        state_dict['interaction']['customization_args'][
-                            'choices']['value']):
-                    state_dict['interaction']['customization_args'][
-                        'choices']['value'][value_index] = (
-                            html_cleaner.convert_to_textangular(value))
+    @classmethod
+    def _convert_states_v23_dict_to_v24_dict(cls, states_dict):
+        """Converts from version 23 to 24. Version 24 converts all Rich Text
+        Editor content to be compatible with the CKEditor format.
 
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for key, state_dict in states_dict.iteritems():
+            states_dict[key] = State.convert_html_fields_in_state(
+                state_dict, html_cleaner.convert_to_ckeditor)
         return states_dict
 
     @classmethod
@@ -3556,7 +3603,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 27
+    CURRENT_EXP_SCHEMA_VERSION = 29
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4062,6 +4109,35 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v27_dict_to_v28_dict(cls, exploration_dict):
+        """Converts a v27 exploration dict into a v28 exploration dict.
+
+        Adds caption attribute to all oppia-noninteractive-image tags.
+        """
+        exploration_dict['schema_version'] = 28
+
+        exploration_dict['states'] = cls._convert_states_v22_dict_to_v23_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 23
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v28_dict_to_v29_dict(cls, exploration_dict):
+        """Converts a v28 exploration dict into a v29 exploration dict.
+
+        Converts all Rich Text Editor content to be compatible with the
+        CKEditor format.
+        """
+        exploration_dict['schema_version'] = 29
+
+        exploration_dict['states'] = cls._convert_states_v23_dict_to_v24_dict(
+            exploration_dict['states'])
+        exploration_dict['states_schema_version'] = 24
+
+        return exploration_dict
+
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4227,6 +4303,16 @@ class Exploration(object):
             exploration_dict = cls._convert_v26_dict_to_v27_dict(
                 exploration_dict)
             exploration_schema_version = 27
+
+        if exploration_schema_version == 27:
+            exploration_dict = cls._convert_v27_dict_to_v28_dict(
+                exploration_dict)
+            exploration_schema_version = 28
+
+        if exploration_schema_version == 28:
+            exploration_dict = cls._convert_v28_dict_to_v29_dict(
+                exploration_dict)
+            exploration_schema_version = 29
 
         return (exploration_dict, initial_schema_version)
 

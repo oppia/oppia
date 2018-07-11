@@ -17,8 +17,8 @@
  * story node domain objects.
  */
 
-oppia.factory('StoryNodeObjectFactory', [
-  function() {
+oppia.factory('StoryNodeObjectFactory', ['NODE_ID_PREFIX',
+  function(NODE_ID_PREFIX) {
     var StoryNode = function(
         id, destinationNodeIds, prerequisiteSkillIds, acquiredSkillIds, outline,
         outlineIsFinalized, explorationId) {
@@ -29,6 +29,17 @@ oppia.factory('StoryNodeObjectFactory', [
       this._outline = outline;
       this._outlineIsFinalized = outlineIsFinalized;
       this._explorationId = explorationId;
+    };
+
+    var _checkValidNodeId = function(nodeId) {
+      if (typeof nodeId !== 'string') {
+        return false;
+      }
+      var nodeIdPattern = new RegExp(NODE_ID_PREFIX + '[0-9]+', 'g');
+      if (!nodeId.match(nodeIdPattern)) {
+        return false;
+      }
+      return true;
     };
 
     // Instance methods
@@ -63,6 +74,71 @@ oppia.factory('StoryNodeObjectFactory', [
 
     StoryNode.prototype.markOutlineAsNotFinalized = function() {
       this._outlineIsFinalized = false;
+    };
+
+    StoryNode.prototype.validate = function() {
+      var issues = [];
+
+      if (!_checkValidNodeId(this._id)) {
+        throw Error('The node id ' + this._id + ' is invalid.');
+      }
+      var prerequisiteSkillIds = this._prerequisiteSkillIds;
+      var acquiredSkillIds = this._acquiredSkillIds;
+      var destinationNodeIds = this._destinationNodeIds;
+
+      for (var i = 0; i < prerequisiteSkillIds.length; i++) {
+        var skillId = prerequisiteSkillIds[i];
+        if (prerequisiteSkillIds.indexOf(skillId) <
+          prerequisiteSkillIds.lastIndexOf(skillId)) {
+          issues.push(
+            'The prerequisite skill with id ' + skillId + ' is duplicated in' +
+            ' node with id ' + this._id);
+        }
+      }
+      for (var i = 0; i < acquiredSkillIds.length; i++) {
+        var skillId = acquiredSkillIds[i];
+        if (acquiredSkillIds.indexOf(skillId) <
+          acquiredSkillIds.lastIndexOf(skillId)) {
+          issues.push(
+            'The acquired skill with id ' + skillId + ' is duplicated in' +
+            ' node with id ' + this._id);
+        }
+      }
+      for (var i = 0; i < prerequisiteSkillIds.length; i++) {
+        if (acquiredSkillIds.indexOf(prerequisiteSkillIds[i]) !== -1) {
+          issues.push(
+            'The skill with id ' + prerequisiteSkillIds[i] + ' is common ' +
+            'to both the acquired and prerequisite skill id list in node with' +
+            ' id ' + this._id);
+        }
+      }
+      for (var i = 0; i < destinationNodeIds.length; i++) {
+        if (!_checkValidNodeId(destinationNodeIds[i])) {
+          throw Error(
+            'The destination node id ' + destinationNodeIds[i] + ' is ' +
+            'invalid in node with id ' + this._id);
+        }
+      }
+
+      var currentNodeId = this._id;
+      if (
+        destinationNodeIds.some(function(nodeId) {
+          return nodeId === currentNodeId;
+        })) {
+        issues.push(
+          'The destination node id of node with id ' + this._id +
+          ' points to itself.');
+      }
+      for (var i = 0; i < destinationNodeIds.length; i++) {
+        var nodeId = destinationNodeIds[i];
+        if (destinationNodeIds.indexOf(nodeId) <
+          destinationNodeIds.lastIndexOf(nodeId)) {
+          issues.push(
+            'The destination node with id ' + nodeId + ' is duplicated in' +
+            ' node with id ' + this._id);
+        }
+      }
+      return issues;
     };
 
     StoryNode.prototype.getDestinationNodeIds = function() {

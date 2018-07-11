@@ -96,6 +96,29 @@ oppia.filter('truncateAtFirstLine', [function() {
   };
 }]);
 
+/* Filter that trucates the input answer based on interaction type.
+ * @param {string} input - The answer to truncate.
+ * @param {string} interactionId - Interaction for which answer is to be
+    truncated.
+ * @param {integer} length - Truncated length of answer.
+ */
+oppia.filter('truncateInputBasedOnInteractionAnswerType', [
+  '$filter', 'INTERACTION_SPECS', function($filter, INTERACTION_SPECS) {
+    return function(input, interactionId, length) {
+      var answerType = INTERACTION_SPECS[interactionId].answer_type;
+      var actualInputToTruncate = '';
+      if (answerType === 'NormalizedString') {
+        actualInputToTruncate = input;
+      } else if (answerType === 'CodeEvaluation') {
+        actualInputToTruncate = input.code;
+      } else {
+        throw Error('Unknown interaction answer type');
+      }
+      return $filter('truncate')(actualInputToTruncate, length);
+    };
+  }
+]);
+
 // Filter that rounds a number to 1 decimal place.
 oppia.filter('round1', [function() {
   return function(input) {

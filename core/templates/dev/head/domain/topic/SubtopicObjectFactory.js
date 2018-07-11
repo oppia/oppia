@@ -54,6 +54,25 @@ oppia.factory('SubtopicObjectFactory', ['SkillSummaryObjectFactory',
       this._title = title;
     };
 
+    Subtopic.prototype.validate = function() {
+      var issues = [];
+      if (this._title === '') {
+        issues.push('Subtopic title should not be empty');
+      }
+      var skillIds = this._skillSummaries.map(function(skillSummary) {
+        return skillSummary.getId();
+      });
+      for (var i = 0; i < skillIds.length; i++) {
+        var skillId = skillIds[i];
+        if (skillIds.indexOf(skillId) < skillIds.lastIndexOf(skillId)) {
+          issues.push(
+            'The skill with id ' + skillId + ' is duplicated in' +
+            ' subtopic with id ' + this._id);
+        }
+      }
+      return issues;
+    };
+
     // Returns the summaries of the skills in the subtopic.
     Subtopic.prototype.getSkillSummaries = function() {
       return this._skillSummaries.slice();

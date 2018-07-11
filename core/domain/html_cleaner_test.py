@@ -609,12 +609,12 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             )
         }, {
             'html_content': (
-                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
                 'is test case to check image tag inside p tag</p>'
             ),
             'expected_output': (
-                '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image><p>Hello '
                 'this is test case to check image tag inside p tag</p>'
             )
@@ -643,13 +643,13 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }, {
             'html_content': (
                 '<pre>Hello this is <b> testing '
-                '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image> in '
                 '</b>progress</pre>'
             ),
             'expected_output': (
                 '<pre>Hello this is <strong> testing </strong></pre>'
-                '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
                 'random.png&amp;quot;"></oppia-noninteractive-image><pre>'
                 '<strong> in </strong>progress</pre>'
             )
@@ -684,14 +684,61 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</ol></ol></ol></ol>'
             ),
             'expected_output': (
-                '<ol><li>Item1<ol><li style="margin-left:80px;">Item2</li>'
-                '<li style="margin-left:80px;">Item3</li><li style="margin-'
-                'left:80px;">Item4<ol><li style="margin-left:80px;">Item5'
-                '</li><li style="margin-left:80px;">Item6</li></ol></li>'
-                '</ol></li><li>Item7<ol><li>Item8</li><li>Item9<ol>'
-                '<li style="margin-left:40px;">Item10</li>'
-                '<li style="margin-left:40px;">Item11</li></ol>'
-                '</li></ol></li></ol>'
+                '<ol><li>Item1<ol><li>Item2</li><li>Item3</li><li>Item4<ol>'
+                '<li>Item5</li><li>Item6</li></ol></li></ol></li><li>Item7'
+                '<ol><li>Item8</li><li>Item9<ol><li>Item10</li><li>Item11'
+                '</li></ol></li></ol></li></ol>'
+            )
+        }, {
+            'html_content': (
+                '<p><em><strong>this is </strong></em><br></p>'
+                '<oppia-noninteractive-collapsible content-with-value'
+                '="&amp;quot;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;&amp;'
+                'lt;p&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;'
+                '&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;li&amp;'
+                'gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;'
+                'oppia-noninteractive-image alt-with-value=\\&amp;quot;&amp;'
+                'amp;amp;quot;loremipsum&amp;amp;amp;quot;\\&amp;quot; '
+                'caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                'quot;\\&amp;quot; filepath-with-value=\\&amp;quot;&amp;amp;amp'
+                ';quot;loremipsum.png&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp'
+                ';lt;/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;&amp;'
+                'lt;br&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;&amp;lt;/ul'
+                '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;loremipusm'
+                '&amp;quot;"></oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                '<p><em><strong>this is </strong></em><br></p>'
+                '<oppia-noninteractive-collapsible content-with-value='
+                '"&amp;quot;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;'
+                'lt;/li&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;'
+                '&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;'
+                'li&amp;gt;&amp;lt;oppia-noninteractive-image alt-with-value'
+                '=\\&amp;quot;&amp;amp;amp;quot;loremipsum&amp;amp;amp;quot;'
+                '\\&amp;quot; caption-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+                '&amp;amp;amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot'
+                ';&amp;amp;amp;quot;loremipsum.png&amp;amp;amp;quot;\\&amp;quot'
+                ';&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
+                'p&amp;gt;&amp;amp;amp;nbsp;&amp;lt;/p&amp;gt;&amp;lt;/li&amp;'
+                'gt;&amp;lt;/ul&amp;gt;&amp;quot;" heading-with-value="&amp;'
+                'quot;loremipusm&amp;quot;"></oppia-noninteractive-collapsible>'
+            )
+        }, {
+            'html_content': (
+                '<pre><p>Hello this is test case for </p><p>br '
+                'in </p><p>pre </p><p>tag<br></p></pre>'
+            ),
+            'expected_output': (
+                '<pre>Hello this is test case for br in pre tag\n</pre>'
+            )
+        }, {
+            'html_content': (
+                '<p><li> Hello this is test case for li in p which results '
+                'in </li><li> in document </li><li> after unwrapping </li></p>'
+            ),
+            'expected_output': (
+                '<ul><li> Hello this is test case for li in p which results '
+                'in </li><li> in document </li><li> after unwrapping </li></ul>'
             )
         }]
 
@@ -699,3 +746,41 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 test_case['expected_output'],
                 html_cleaner.convert_to_ckeditor(test_case['html_content']))
+
+    def test_add_caption_to_image(self):
+        test_cases = [{
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that caption attribute is added to '
+                'image tags if it is missing.</p>'
+            ),
+            'expected_output': (
+                '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;'
+                'quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that caption attribute is added to '
+                'image tags if it is missing.</p>'
+            )
+        }, {
+            'html_content': (
+                '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                'abc&amp;quot;" filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that image tags that already have '
+                'caption attribute are not changed.</p>'
+            ),
+            'expected_output': (
+                '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                'abc&amp;quot;" filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that image tags that already have '
+                'caption attribute are not changed.</p>'
+            )
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                html_cleaner.add_caption_attr_to_image(
+                    test_case['html_content']),
+                test_case['expected_output'])

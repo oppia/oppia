@@ -978,7 +978,6 @@ class ExplorationMigrationValidationJobForTextAngularTest(
                 '</oppia-noninteractive-image></ol>\']]'
             )
         ]
-
         self.assertEqual(actual_output, expected_output)
 
 
@@ -1045,6 +1044,10 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
         exploration_dict = exploration.to_dict()
         updated_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
             exploration_dict)
+        # This is done to ensure that exploration is not passed through CKEditor
+        # Migration pipeline.
+        updated_dict['schema_version'] = 29
+        updated_dict['states_schema_version'] = 24
         updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
         updated_states = updated_dict['states']
 

@@ -37,9 +37,9 @@ oppia.directive('audioTranslationsEditor', [
         'ExplorationContextService', 'AssetsBackendApiService',
         function(
             $scope, $rootScope, $uibModal, $sce, stateContentService,
-            stateContentIdsToAudioTranslationsService, EditabilityService,
-            LanguageUtilService, AlertsService, ExplorationContextService,
-            AssetsBackendApiService) {
+            stateContentIdsToAudioTranslationsService,
+            EditabilityService, LanguageUtilService, AlertsService,
+            ExplorationContextService, AssetsBackendApiService) {
           $scope.isTranslatable = EditabilityService.isTranslatable;
 
           $scope.stateContentIdsToAudioTranslationsService =
