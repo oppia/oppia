@@ -719,7 +719,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;amp;amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot'
                 ';&amp;amp;amp;quot;loremipsum.png&amp;amp;amp;quot;\\&amp;quot'
                 ';&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
-                'p&amp;gt;&amp;amp;amp;nbsp;&amp;lt;/p&amp;gt;&amp;lt;/li&amp;'
+                'p&amp;gt;\\u00a0&amp;lt;/p&amp;gt;&amp;lt;/li&amp;'
                 'gt;&amp;lt;/ul&amp;gt;&amp;quot;" heading-with-value="&amp;'
                 'quot;loremipusm&amp;quot;"></oppia-noninteractive-collapsible>'
             )

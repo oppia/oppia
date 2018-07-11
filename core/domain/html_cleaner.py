@@ -548,9 +548,15 @@ def convert_to_ckeditor(html_data):
     # Replaces <p><br></p> with <p>&nbsp;</p> and <pre>...<br>...</pre>
     # with <pre>...\n...</pre>.
     for br in soup.findAll('br'):
-        if br.parent.name == 'p' and br.parent.get_text() == '':
-            br.replaceWith('&nbsp;')
-        elif br.parent.name == 'pre':
+        parent = br.parent
+        if parent.name == 'p' and parent.get_text() == '':
+            br.unwrap()
+            # BeautifulSoup automatically escapes &nbsp; to &amp;nbsp;.
+            # To safely add &nbsp in place of <br> tag we need the unicode
+            # string \xa0.
+            # Reference: https://stackoverflow.com/questions/26334461/.
+            parent.string = u'\xa0'
+        elif parent.name == 'pre':
             br.insert_after('\n')
             br.unwrap()
 
