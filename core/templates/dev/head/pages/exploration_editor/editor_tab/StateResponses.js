@@ -374,7 +374,8 @@ oppia.controller('StateResponses', [
     $scope.saveActiveAnswerGroupDest = function(updatedOutcome) {
       ResponsesService.updateActiveAnswerGroup({
         dest: updatedOutcome.dest,
-        refresherExplorationId: updatedOutcome.refresherExplorationId
+        refresherExplorationId: updatedOutcome.refresherExplorationId,
+        missingPrerequisiteSkillId: updatedOutcome.missingPrerequisiteSkillId
       });
     };
 
@@ -399,7 +400,8 @@ oppia.controller('StateResponses', [
     $scope.saveDefaultOutcomeDest = function(updatedOutcome) {
       ResponsesService.updateDefaultOutcome({
         dest: updatedOutcome.dest,
-        refresherExplorationId: updatedOutcome.refresherExplorationId
+        refresherExplorationId: updatedOutcome.refresherExplorationId,
+        missingPrerequisiteSkillId: updatedOutcome.missingPrerequisiteSkillId
       });
     };
 
