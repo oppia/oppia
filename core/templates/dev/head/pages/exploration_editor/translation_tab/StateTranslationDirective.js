@@ -21,6 +21,9 @@ oppia.directive('stateTranslation', [
     return {
       restrict: 'E',
       scope: {},
+      link: function(scope) {
+        scope.initStateTranslation();
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_directive.html'),
@@ -125,8 +128,6 @@ oppia.directive('stateTranslation', [
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
           };
-
-          $scope.initStateTranslation();
         }
       ]
     };
