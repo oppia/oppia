@@ -1797,7 +1797,7 @@ pre.oppia-pre-wrapped-text {
   z-index: 100;
 }
 
-.oppia-rule-sort-handle, .oppia-fallback-sort-handle, .oppia-hint-sort-handle, .oppia-learner-playlist-sort-handle {
+.oppia-rule-sort-handle, .oppia-fallback-sort-handle, .oppia-hint-sort-handle, .oppia-learner-playlist-sort-handle, .oppia-worked-example-sort-handle {
   cursor: move;
   left: 10px;
   margin-left: 5px;
@@ -2361,6 +2361,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .trained-feedback-selection-form-container {
   margin-top: -5px;
+  max-height: 250px; 
+  overflow-y: scroll;
 }
 
 .trained-feedback-selection-container {
@@ -2377,7 +2379,7 @@ md-card.preview-conversation-skin-supplemental-card {
   border: none;
   color: rgba(0,0,0,0.5);
   margin: 0;
-  padding-left: 0;
+  padding-left: 9px;
   padding-top: 9px;
   text-align: left;
   /* This is needed so that images stay bounded by the container in Firefox. */
@@ -2386,6 +2388,12 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .trained-feedback-selection:hover {
   color: #00897B;
+}
+
+.trained-feedback-selected {
+  color: #00897B;
+  background: whitesmoke;
+  border-radius: 5px;
 }
 
 .oppia-modal-information-card .modal-dialog {
@@ -3682,4 +3690,30 @@ md-card.preview-conversation-skin-supplemental-card {
   opacity: 0;
   padding: 0;
   width: 1px;
+}
+
+.oppia-rte-component-container {
+  position: relative;
+}
+
+
+.oppia-rte{
+  min-height: 80px;
+  height: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  padding: 8px;
+}
+
+.oppia-rte:focus {
+  min-height: 80px;
+  height: auto;
+  border: 1px solid #66afe9;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(102,175,233,0.6);
+  -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(102,175,233,0.6);
+  padding: 8px;
 }

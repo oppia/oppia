@@ -51,7 +51,8 @@
         <uib-tab heading="Recent Feedback Messages">
           <h3>Recent Feedback Messages</h3>
           (Note that some of these links may be to private explorations, and thus result in authorization errors.)
-          <br><br>
+          <br>
+          <br>
           <div ng-show="allFeedbackMessages.length">
             <table class="oppia-padded-table">
               <tr>
@@ -74,12 +75,14 @@
 
         <uib-tab heading="Featured Activities">
           <h3>Activities to feature in the library</h3>
-          <br><br>
+          <br>
+          <br>
 
           <schema-based-editor schema="FEATURED_ACTIVITY_REFERENCES_SCHEMA"
                                local-value="displayedFeaturedActivityReferences">
           </schema-based-editor>
-          <br><br>
+          <br>
+          <br>
 
           <button class="btn btn-success" ng-click="saveFeaturedActivityReferences()"
                   ng-disabled="isSaveFeaturedActivitiesButtonDisabled()">

@@ -39,7 +39,6 @@ class SuggestionHandler(base.BaseHandler):
             self.payload.get('target_version_at_submission'),
             self.user_id, self.payload.get('change_cmd'),
             self.payload.get('description'),
-            self.payload.get('assigned_reviewer_id'),
             self.payload.get('final_reviewer_id'))
         self.render_json(self.values)
 

@@ -19,17 +19,17 @@
   <div class="oppia-query-form">
     <form class="form" ng-submit="submitQuery()">
       Exploration ID: <input type="text" ng-model="expId" required="true">
-      <br/>
+      <br>
       Exploration version: <input type="number" min="0" ng-model="expVersion" required="true">
-      <br/>
+      <br>
       State name: <input type="text" ng-model="stateName" required="true">
-      <br/>
+      <br>
       Number of answers: <input type="number" min="0" ng-model="numAnswers" required="true">
-      <br/>
+      <br>
       <input type="submit" value="submit query">
-      <input type="reset" value="reset"">
+      <input type="reset" value="reset">
     </form>
-    <br/>
+    <br>
     <p> (To get all answers set number of answers to 0) </p>
     <p ng-if="showDataExtractionQueryStatus">Status: <[dataExtractionQueryStatusMessage]></p>
   </div>

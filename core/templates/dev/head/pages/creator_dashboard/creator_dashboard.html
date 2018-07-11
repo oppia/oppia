@@ -147,14 +147,14 @@
         <md-card layout="row"
                  class="oppia-dashboard-list-view-item">
           <table class="oppia-dashboard-table">
-              <colgroup>
-                <col style="width: 26%;">
-                <col style="width: 13%;">
-                <col style="width: 13%;">
-                <col style="width: 16%;">
-                <col style="width: 16%;">
-                <col style="width: 16%;">
-              </colgroup>
+            <colgroup>
+              <col style="width: 26%;">
+              <col style="width: 13%;">
+              <col style="width: 13%;">
+              <col style="width: 16%;">
+              <col style="width: 16%;">
+              <col style="width: 16%;">
+            </colgroup>
             <tr>
               <th ng-repeat="(key, value) in EXPLORATIONS_SORT_BY_KEYS"
                   class="oppia-dashboard-table-headings"
@@ -224,13 +224,14 @@
                 <span><[(exploration.title || DEFAULT_EMPTY_TITLE) | truncate:40]></span>
               </h2>
             </div>
-            <div class="mask-wrap">
+            <div class="mask-wrap protractor-test-title-mask">
               <div class="title-section-mask"></div>
             </div>
           </a>
           <div ng-attr-section="'<['right-section']>">
             <a ng-class="checkMobileView() ? 'oppia-dashboard-mobile-statistics-card-link': 'oppia-dashboard-statistics-card-link'"
-               ng-href="<[getExplorationUrl(exploration.id)]>"></a>
+               ng-href="<[getExplorationUrl(exploration.id)]>">
+            </a>
             <div class="exp-private-text" ng-if="exploration.status === 'private'">
               <[publishText]>
             </div>

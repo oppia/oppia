@@ -1,18 +1,19 @@
 <div class="modal-header">
-  <h3>Teach Oppia</h3>
+  <h3>Select Oppia's Response</h3>
 </div>
 
 <div class="modal-body">
   <form name="teachOppiaForm" class="form-inline">
     <div class="oppia-rule-details-header">
       <div>
-        <training-panel answer="trainingDataAnswer" answer-feedback="trainingDataFeedback" answer-outcome-dest="trainingDataOutcomeDest" classification="classification" on-finish-training="finishTraining()">
+        <training-panel answer="trainingDataAnswer"  classification="classification" on-finish-training="finishTraining()" adding-new-response="addingNewResponse">
         </training-panel>
       </div>
-    <div>
+    </div>
   </form>
 </div>
 
 <div class="modal-footer">
-  <button class="btn btn-success" ng-click="finishTraining()">Exit</button>
+  <button class="btn btn-default" ng-click="exitTrainer()">Cancel</button>
+  <button class="btn btn-default btn-success" ng-if="classification.answerGroupIndex >= 0 && !addingNewResponse" ng-click="onConfirm()">Confirm Response</button>
 </div>

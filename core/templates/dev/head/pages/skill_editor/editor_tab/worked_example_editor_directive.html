@@ -1,0 +1,51 @@
+<div style="height: 100%">
+  <div ng-if="!editorIsOpen"
+       style="height: 100%"
+       ng-attr-title="Edit worked example">
+    <div class="oppia-readonly-rule-title"
+         ng-class="{'oppia-editable-section': isEditable()}">
+      <div class="oppia-rule-preview">
+        <div class="oppia-click-to-start-editing" ng-click="openEditor()">
+          <i ng-if="isEditable()"
+             class="material-icons oppia-editor-edit-icon pull-right"
+             title="Edit Worked Example">&#xE254;
+          </i>
+        </div>
+
+        <strong>Worked Example</strong>
+        <angular-html-bind html-data="container.workedExample"></angular-html-bind>
+      </div>
+    </div>
+  </div>
+
+  <div ng-if="isEditable() && editorIsOpen">
+    <form role="form"
+          class="form-inline"
+          name="editWorkedExampleForm"
+          ng-submit="saveWorkedExample()">
+      <div class="oppia-rule-details-header">
+        <strong>Worked Example</strong>
+        <schema-based-editor schema="WORKED_EXAMPLE_FORM_SCHEMA"
+                             local-value="container.workedExample">
+        </schema-based-editor>
+      </div>
+    </form>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <div class="pull-right">
+        <button type="button"
+                class="btn btn-default"
+                ng-click="cancelEdit()">
+          Cancel
+        </button>
+        <button type="button"
+                class="btn btn-success"
+                ng-disabled="!container.workedExample || editWorkedExampleForm.$invalid"
+                ng-click="saveWorkedExample()">
+          Save
+        </button>
+      </div>
+      <div style="clear: both;"></div>
+    </div>
+  </div>
+</div>

@@ -27,7 +27,7 @@ oppia.factory('AudioLanguageObjectFactory', [
     AudioLanguage.createFromDict = function(audioLanguageDict) {
       return new AudioLanguage(
         audioLanguageDict.id,
-        audioLanguageDict.text,
+        audioLanguageDict.description,
         audioLanguageDict.related_languages);
     };
 

@@ -37,13 +37,11 @@ TARGET_TYPE_CHOICES = [
 # Constants defining the different possible statuses of a suggestion.
 STATUS_ACCEPTED = 'accepted'
 STATUS_IN_REVIEW = 'review'
-STATUS_RECEIVED = 'received'
 STATUS_REJECTED = 'rejected'
 
 STATUS_CHOICES = [
     STATUS_ACCEPTED,
     STATUS_IN_REVIEW,
-    STATUS_RECEIVED,
     STATUS_REJECTED
 ]
 
@@ -73,8 +71,8 @@ SCORE_TYPE_CHOICES = [
 SCORE_CATEGORY_DELIMITER = '.'
 
 ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
-                        'status', 'author_id', 'assigned_reviewer_id',
-                        'final_reviewer_id', 'score_category']
+                        'status', 'author_id', 'final_reviewer_id',
+                        'score_category']
 
 
 class GeneralSuggestionModel(base_models.BaseModel):
@@ -101,8 +99,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         required=True, indexed=True, choices=STATUS_CHOICES)
     # The ID of the author of the suggestion.
     author_id = ndb.StringProperty(required=True, indexed=True)
-    # The ID of the reviewer assigned to review the suggestion.
-    assigned_reviewer_id = ndb.StringProperty(indexed=True)
     # The ID of the reviewer who accepted/rejected the suggestion.
     final_reviewer_id = ndb.StringProperty(indexed=True)
     # The change command linked to the suggestion. Contains the details of the
@@ -117,7 +113,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     def create(
             cls, suggestion_type, target_type, target_id,
             target_version_at_submission, status, author_id,
-            assigned_reviewer_id, final_reviewer_id, change_cmd, score_category,
+            final_reviewer_id, change_cmd, score_category,
             thread_id):
         """Creates a new SuggestionModel entry.
 
@@ -129,8 +125,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 entity at the time of creation of the suggestion.
             status: str. The status of the suggestion.
             author_id: str. The ID of the user who submitted the suggestion.
-            assigned_reviewer_id: str. The ID of the user assigned to
-                review the suggestion.
             final_reviewer_id: str. The ID of the reviewer who has
                 accepted/rejected the suggestion.
             change_cmd: dict. The actual content of the suggestion.
@@ -151,7 +145,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_type=target_type, target_id=target_id,
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
-            assigned_reviewer_id=assigned_reviewer_id,
             final_reviewer_id=final_reviewer_id, change_cmd=change_cmd,
             score_category=score_category).put()
 

@@ -35,18 +35,29 @@ oppia.directive('storyEditorNavbar', [
           var topicId = UrlService.getTopicIdFromUrl();
           $scope.story = StoryEditorStateService.getStory();
           $scope.isSaveInProgress = StoryEditorStateService.isSavingStory;
+          $scope.validationIssues = [];
 
           $scope.getChangeListLength = function() {
             return UndoRedoService.getChangeCount();
           };
 
+          $scope.getWarningsCount = function() {
+            return $scope.validationIssues.length;
+          };
+
           $scope.isStorySaveable = function() {
-            return $scope.getChangeListLength() > 0;
+            return (
+              $scope.getChangeListLength() > 0 &&
+              $scope.getWarningsCount() === 0);
           };
 
           $scope.discardChanges = function() {
             UndoRedoService.clearChanges();
             StoryEditorStateService.loadStory(topicId, $scope.story.getId());
+          };
+
+          var _validateStory = function() {
+            $scope.validationIssues = $scope.story.validate();
           };
 
           $scope.saveChanges = function() {
@@ -71,6 +82,11 @@ oppia.directive('storyEditorNavbar', [
               StoryEditorStateService.saveStory(topicId, commitMessage);
             });
           };
+
+          $scope.$on(EVENT_STORY_INITIALIZED, _validateStory);
+          $scope.$on(EVENT_STORY_REINITIALIZED, _validateStory);
+          $scope.$on(
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateStory);
         }
       ]
     };
