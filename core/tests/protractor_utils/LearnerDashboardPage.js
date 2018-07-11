@@ -58,25 +58,27 @@ var LearnerDashboardPage = function() {
 
   this.navigateToCompletedSection = function() {
     browser.wait(until.elementToBeClickable(completedSection), 10000,
-      'Completed tab takes too long to appear').then(function(isClickable) {
-      if (isClickable) {
-        completedSection.click();
-      }
-    });
+      'Completed tab takes too long to be clickable')
+      .then(function(isClickable) {
+        if (isClickable) {
+          completedSection.click();
+        }
+      });
   };
 
   this.navigateToInCompleteSection = function() {
     browser.wait(until.elementToBeClickable(incompleteSection), 10000,
-      'In Progress tab takes too long to appear').then(function(isClickable) {
-      if (isClickable) {
-        incompleteSection.click();
-      }
-    });
+      'In Progress tab takes too long to be clickable')
+      .then(function(isClickable) {
+        if (isClickable) {
+          incompleteSection.click();
+        }
+      });
   };
 
   this.navigateToIncompleteCollectionsSection = function() {
     browser.wait(until.elementToBeClickable(incompleteCollectionsSection), 5000,
-      'Incomplete Collection Section tab takes too long to appear')
+      'Incomplete Collection Section tab takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           incompleteCollectionsSection.click();
@@ -86,7 +88,7 @@ var LearnerDashboardPage = function() {
 
   this.navigateToIncompleteExplorationsSection = function() {
     browser.wait(until.elementToBeClickable(incompleteExplorationsSection),
-      5000, 'Incomplete Collection Section tab takes too long to appear')
+      5000, 'Incomplete Collection Section tab takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           incompleteExplorationsSection.click();
@@ -96,7 +98,7 @@ var LearnerDashboardPage = function() {
 
   this.navigateToCompletedCollectionsSection = function() {
     browser.wait(until.elementToBeClickable(completedCollectionsSection), 5000,
-      'Completed Collection Section tab takes too long to appear')
+      'Completed Collection Section tab takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           completedCollectionsSection.click();
@@ -106,7 +108,7 @@ var LearnerDashboardPage = function() {
 
   this.navigateToCompletedExplorationsSection = function() {
     browser.wait(until.elementToBeClickable(completedExplorationsSection), 5000,
-      'Completed Collection Section tab takes too long to appear')
+      'Completed Collection Section tab takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           completedExplorationsSection.click();
@@ -116,7 +118,7 @@ var LearnerDashboardPage = function() {
 
   this.navigateToFeedbackSection = function() {
     browser.wait(until.elementToBeClickable(feedbackSection), 5000,
-      'Feedback Section tab takes too long to appear')
+      'Feedback Section tab takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           feedbackSection.click();
@@ -126,7 +128,7 @@ var LearnerDashboardPage = function() {
 
   this.navigateToFeedbackThread = function() {
     browser.wait(until.elementToBeClickable(feedbackThread), 5000,
-      'Feedback Thread tab takes too long to appear')
+      'Feedback Thread tab takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           feedbackThread.click();
@@ -136,7 +138,7 @@ var LearnerDashboardPage = function() {
 
   this.navigateToSubscriptionsSection = function() {
     browser.wait(until.elementToBeClickable(subscriptionsSection), 5000,
-      'Subscriptions Section tab takes too long to appear')
+      'Subscriptions Section tab takes too long to be clickable')
       .then(function(isClickable) {
         if (isClickable) {
           subscriptionsSection.click();

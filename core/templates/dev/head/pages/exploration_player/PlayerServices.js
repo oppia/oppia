@@ -159,7 +159,9 @@ oppia.factory('ExplorationPlayerService', [
 
     $rootScope.$on('playerStateChange', function(evt, newStateName) {
       // To restart the preloader for the new state if required.
-      ImagePreloaderService.onStateChange(newStateName);
+      if (!_editorPreviewMode) {
+        ImagePreloaderService.onStateChange(newStateName);
+      }
       // Ensure the transition to a terminal state properly logs the end of the
       // exploration.
       if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
@@ -233,8 +235,6 @@ oppia.factory('ExplorationPlayerService', [
               data.auto_tts_enabled);
             AudioPreloaderService.init(exploration);
             AudioPreloaderService.kickOffAudioPreloader(initStateName);
-            ImagePreloaderService.init(exploration);
-            ImagePreloaderService.kickOffImagePreloader(initStateName);
             PlayerCorrectnessFeedbackEnabledService.init(
               data.correctness_feedback_enabled);
             _loadInitialState(successCallback);

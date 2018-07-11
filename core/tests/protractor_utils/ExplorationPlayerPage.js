@@ -43,6 +43,8 @@ var ExplorationPlayerPage = function() {
 
   var suggestionSubmitButton = element(
     by.css('.protractor-test-suggestion-submit-btn'));
+  var feedbackCloseButton = element(
+    by.css('.protractor-test-exploration-feedback-close-button'));
   var feedbackSubmitButton = element(
     by.css('.protractor-test-exploration-feedback-submit-btn'));
   var explorationInfoIcon = element(
@@ -68,14 +70,14 @@ var ExplorationPlayerPage = function() {
 
   this.clickThroughToNextCard = function() {
     browser.wait(until.elementToBeClickable(nextCardButton), 5000,
-      ' Next Card button takes too long to appear');
+      ' Next Card button takes too long to be clickable');
     nextCardButton.click();
   };
 
   this.viewHint = function() {
     // We need to wait some time for the solution to activate.
     browser.wait(until.elementToBeClickable(viewHintButton), 5000,
-      ' View Hintbutton takes too long to appear');
+      ' View Hint button takes too long to be clickable');
     viewHintButton.click();
     clickGotItButton();
   };
@@ -83,36 +85,36 @@ var ExplorationPlayerPage = function() {
   this.viewSolution = function() {
     // We need to wait some time for the solution to activate.
     browser.wait(until.elementToBeClickable(viewSolutionButton), 5000,
-      ' Solution takes too long to appear');
+      ' View Solution button takes too long to be clickable');
     viewSolutionButton.click();
     browser.wait(until.elementToBeClickable(continueToSolutionButton), 5000,
-      ' Continue Solution button takes too long to appear');
+      ' Continue Solution button takes too long to be clickable');
     continueToSolutionButton.click();
     clickGotItButton();
   };
 
   var clickGotItButton = function() {
     browser.wait(until.elementToBeClickable(gotItButton), 5000,
-      ' Got It button takes too long to appear');
+      ' Got It button takes too long to be clickable');
     gotItButton.click();
   };
 
   this.clickConfirmRedirectionButton = function() {
     browser.wait(until.elementToBeClickable(confirmRedirectionButton), 5000,
-      ' Confirm Redirect button takes too long to appear');
+      ' Confirm Redirect button takes too long to be clickable');
     confirmRedirectionButton.click();
     general.waitForLoadingMessage();
   };
 
   this.clickCancelRedirectionButton = function() {
     browser.wait(until.elementToBeClickable(cancelRedirectionButton), 5000,
-      ' Cancel Redirect button takes too long to appear');
+      ' Cancel Redirect button takes too long to be clickable');
     cancelRedirectionButton.click();
   };
 
   this.clickOnReturnToParentButton = function() {
     browser.wait(until.elementToBeClickable(returnToParentButton), 5000,
-      ' Cancel Redirect button takes too long to appear');
+      ' Cancel Redirect button takes too long to be clickable');
     returnToParentButton.click();
     general.waitForLoadingMessage();
   };
@@ -176,8 +178,12 @@ var ExplorationPlayerPage = function() {
   this.rateExploration = function(ratingValue) {
     ratingStar.then(function(elements) {
       browser.wait(until.elementToBeClickable(elements[ratingValue - 1]), 5000,
-        'Rating Star takes too long to appear');
+        'Rating Star takes too long to be clickable');
       elements[ratingValue - 1].click();
+      browser.wait(until.elementToBeClickable(feedbackCloseButton),
+        5000, 'Close Feedback button is not clickable');
+      feedbackCloseButton.click();
+      browser.wait(until.invisibilityOf(feedbackCloseButton), 5000);
     });
   };
 
@@ -189,16 +195,19 @@ var ExplorationPlayerPage = function() {
     // it will get the supplemental interaction.
     interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
-    general.waitForSystem();
+    var waitingForResponseElem = element(by.css(
+      '[ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"]'));
+    browser.wait(until.invisibilityOf(waitingForResponseElem), 10000,
+      'Response takes too long to appear');
   };
 
   this.submitFeedback = function(feedback) {
     browser.wait(until.elementToBeClickable(feedbackPopupLink), 5000,
-      'Feedback Popup link takes too long to appear');
+      'Feedback Popup link takes too long to be clickable');
     feedbackPopupLink.click();
     feedbackTextArea.sendKeys(feedback);
     browser.wait(until.elementToBeClickable(feedbackSubmitButton), 5000,
-      'Feedback Submit button takes too long to appear');
+      'Feedback Submit button takes too long to be clickable');
     feedbackSubmitButton.click();
     browser.wait(until.invisibilityOf(feedbackSubmitButton), 5000);
   };
@@ -210,7 +219,7 @@ var ExplorationPlayerPage = function() {
     forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
     suggestionDescriptionInput.sendKeys(description);
     browser.wait(until.elementToBeClickable(suggestionSubmitButton), 5000,
-      'Suggestion Submit button takes too long to appear');
+      'Suggestion Submit button takes too long to be clickable');
     suggestionSubmitButton.click();
     browser.wait(until.invisibilityOf(suggestionSubmitButton), 5000);
   };
