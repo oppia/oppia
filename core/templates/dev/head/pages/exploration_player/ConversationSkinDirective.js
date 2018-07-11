@@ -303,6 +303,8 @@ oppia.directive('conversationSkin', [
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
           $scope.answerIsCorrect = false;
+          $scope.conceptCardShown = false;
+          $scope.conceptCardPending = false;
           $scope.pendingCardWasSeenBefore = false;
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
@@ -424,6 +426,11 @@ oppia.directive('conversationSkin', [
               FocusManagerService.setFocusIfOnDesktop(
                 $scope.getContentFocusLabel(index));
             }
+          };
+
+          $scope.returnToExploration = function() {
+            $scope.conceptCardShown = false;
+            _navigateToActiveCard();
           };
 
           var animateToTwoCards = function(doneCallback) {
@@ -599,7 +606,7 @@ oppia.directive('conversationSkin', [
               answer, interactionRulesService, function(
                   newStateName, refreshInteraction, feedbackHtml,
                   feedbackAudioTranslations, contentHtml, newParams,
-                  refresherExplorationId) {
+                  refresherExplorationId, missingPrerequisiteSkillId) {
                 // Do not wait if the interaction is supplemental -- there's
                 // already a delay bringing in the help card.
                 var millisecsLeftToWait = (
@@ -666,6 +673,11 @@ oppia.directive('conversationSkin', [
                               refresherExplorationId, confirmRedirection);
                         }
                       });
+                    }
+                    if (missingPrerequisiteSkillId) {
+                      $scope.conceptCardPending = true;
+                      $scope.missingPrerequisiteSkillId =
+                        missingPrerequisiteSkillId;
                     }
                     FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                     scrollToBottom();
@@ -778,6 +790,11 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.showUpcomingCard = function() {
+            if ($scope.conceptCardPending) {
+              $scope.conceptCardPending = false;
+              $scope.conceptCardShown = true;
+              return;
+            }
             /* This is for the following situation:
                if A->B->C is the arrangement of cards and C redirected to A,
                then after this, B and C are visited cards and hence

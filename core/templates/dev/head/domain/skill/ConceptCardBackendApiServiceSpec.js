@@ -49,7 +49,7 @@ describe('Concept card backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/concept_card_data_handler/1').respond(
+      $httpBackend.expect('GET', '/concept_card_handler/1').respond(
         sampleResponse);
       ConceptCardBackendApiService.fetchConceptCard('1').then(
         successHandler, failHandler);
@@ -64,7 +64,7 @@ describe('Concept card backend API service', function() {
       var successHandler = jasmine.createSpy('success');
       var failHandler = jasmine.createSpy('fail');
 
-      $httpBackend.expect('GET', '/concept_card_data_handler/1').respond(
+      $httpBackend.expect('GET', '/concept_card_handler/1').respond(
         500, 'Error loading skill 1.');
       ConceptCardBackendApiService.fetchConceptCard('1').then(
         successHandler, failHandler);

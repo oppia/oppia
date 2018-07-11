@@ -43,6 +43,7 @@ oppia.directive('tutorCard', [
         onSubmitAnswer: '&',
         isLearnAgainButton: '&',
         onDismiss: '&',
+        isConceptCardPending: '&conceptCardPending',
         startCardChangeAnimation: '=',
         onChangeInteractionAnswerValidity: '&'
       },

@@ -24,6 +24,7 @@ oppia.directive('progressNav', [
         onSubmit: '&',
         onClickContinueButton: '&',
         isLearnAgainButton: '&',
+        isConceptCardPending: '&conceptCardPending',
         isSubmitButtonShown: '&submitButtonIsShown',
         isSubmitButtonDisabled: '&submitButtonIsDisabled'
       },
@@ -103,9 +104,10 @@ oppia.directive('progressNav', [
             var lastPair = $scope.activeCard.inputResponsePairs[
               $scope.activeCard.inputResponsePairs.length - 1];
             return Boolean(
-              interactionIsInline &&
+              (interactionIsInline &&
               $scope.activeCard.destStateName &&
-              lastPair.oppiaResponse);
+              lastPair.oppiaResponse) ||
+              $scope.isConceptCardPending());
           };
         }
       ]

@@ -391,6 +391,7 @@ oppia.factory('ExplorationPlayerService', [
         var outcome = angular.copy(classificationResult.outcome);
         var newStateName = outcome.dest;
         var refresherExplorationId = outcome.refresherExplorationId;
+        var missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
         var newState = exploration.getState(newStateName);
 
         if (ENABLE_PLAYTHROUGH_RECORDING) {
@@ -470,7 +471,7 @@ oppia.factory('ExplorationPlayerService', [
         successCallback(
           newStateName, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, questionHtml, newParams,
-          refresherExplorationId);
+          refresherExplorationId, missingPrerequisiteSkillId);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {

@@ -65,7 +65,7 @@
       In addition, if the exploration is iframed, the terminal card will
       have no learner input section, so we do not show it.
     -->
-    <div ng-show="isInteractionInline && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
+    <div ng-show="isInteractionInline && !isConceptCardPending() && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
     ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">

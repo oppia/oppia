@@ -39,19 +39,28 @@
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card on-submit-answer="submitAnswer(answer, rulesService)"
                   is-learn-again-button="isLearnAgainButton()"
+                  ng-if="!conceptCardShown"
+                  concept-card-pending="conceptCardPending"
                   start-card-change-animation="startCardChangeAnimation"
                   on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
       </tutor-card>
+      <concept-card skill-id="missingPrerequisiteSkillId"
+                    ng-if="conceptCardShown"
+                    return-to-exploration="returnToExploration()">
+      </concept-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            is-learn-again-button="isLearnAgainButton()"
+                           ng-if="!conceptCardShown"
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
       </div>
       <progress-nav on-submit="submitAnswerFromProgressNav()"
                     is-learn-again-button="isLearnAgainButton()"
                     submit-button-is-disabled="!interactionAnswerIsValid"
+                    concept-card-pending="conceptCardPending"
                     submit-button-is-shown="!answerIsBeingProcessed"
+                    ng-if="!conceptCardShown"
                     on-click-continue-button="showUpcomingCard()">
       </progress-nav>
     </div>
@@ -60,12 +69,14 @@
          class="conversation-skin-supplemental-card-container">
       <supplemental-card on-click-continue-button="showUpcomingCard()"
                          is-learn-again-button="isLearnAgainButton()"
-                         on-submit-answer="submitAnswer(answer, rulesService)">
+                         on-submit-answer="submitAnswer(answer, rulesService)"
+                         ng-if="!conceptCardShown">
       </supplemental-card>
       <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown()">
         <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                    ng-click="submitAnswerFromProgressNav()"
                    ng-disabled="!interactionAnswerIsValid"
+                   ng-if="!conceptCardShown"
                    translate="I18N_INTERACTIONS_SUBMIT">
         </md-button>
       </div>

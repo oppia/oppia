@@ -42,11 +42,13 @@ class ConceptCardDataHandlerTest(test_utils.GenericTestBase):
             skill_contents=self.skill_contents)
 
     def test_get_concept_card(self):
-        json_response = self.get_json(
-            '%s/%s' % (
-                feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id))
-        self.assertEqual(
-            'Skill Explanation', json_response['concept_card']['explanation'])
-        self.assertEqual(
-            ['Example 1', 'Example 2'],
-            json_response['concept_card']['worked_examples'])
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            json_response = self.get_json(
+                '%s/%s' % (
+                    feconf.CONCEPT_CARD_DATA_URL_PREFIX, self.skill_id))
+            self.assertEqual(
+                'Skill Explanation',
+                json_response['concept_card']['explanation'])
+            self.assertEqual(
+                ['Example 1', 'Example 2'],
+                json_response['concept_card']['worked_examples'])
