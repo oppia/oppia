@@ -247,7 +247,6 @@ var RichTextEditor = function(elem) {
         null, args);
       modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
-      general.waitForSystem();
 
       // Ensure that focus is not on added component once it is added so that
       // the component is not overwritten by some other element.
@@ -576,7 +575,6 @@ var CodeMirrorChecker = function(elem) {
     browser.executeScript(
       "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
       ');');
-    general.waitForSystem();
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
         .then(function(lineNumber) {

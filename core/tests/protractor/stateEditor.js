@@ -43,16 +43,13 @@ describe('State editor', function() {
 
   it('should walk through the tutorial when user repeatedly clicks Next',
     function() {
-      var NUM_TUTORIAL_STAGES = 6;
       users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       users.login('userTutorial@stateEditor.com');
 
       workflow.createExplorationAndStartTutorial();
       explorationEditorMainTab.startTutorial();
-      for (var i = 0; i < NUM_TUTORIAL_STAGES; i++) {
-        explorationEditorMainTab.progressInTutorial();
-      }
+      explorationEditorMainTab.playTutorial();
       explorationEditorMainTab.finishTutorial();
       users.logout();
     }
