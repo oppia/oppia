@@ -62,7 +62,7 @@
   <ul class="nav oppia-navbar-nav oppia-navbar-profile">
     <li ng-class="{'open' : activeMenuName === 'profileMenu'}" uib-dropdown ng-if="username" class="protractor-test-profile-dropdown">
       <a uib-dropdown-toggle class="oppia-navbar-dropdown-toggle"
-         ng-mouseover="openSubmenu($event, 'profileMenu')"         
+         ng-mouseover="openSubmenu($event, 'profileMenu')"
          ng-mouseleave="closeSubmenuIfNotMobile($event)"
          ng-keydown="onMenuKeypress($event, 'profileMenu', {shiftTab: ACTION_CLOSE, enter: ACTION_OPEN})"
          role="menuitem"
@@ -151,7 +151,7 @@
         <hr class="oppia-top-right-menu-item-separator">
 
         <li>
-          <a ng-click="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()" ng-href="<[logoutUrl]>" 
+          <a ng-click="closeSubmenuIfNotMobile($event);onLogoutButtonClicked()" ng-href="<[logoutUrl]>"
              ng-keydown="onMenuKeypress($event, 'profileMenu', {tab: ACTION_CLOSE})">
             <span translate="I18N_TOPNAV_LOGOUT"></span>
           </a>
