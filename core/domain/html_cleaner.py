@@ -545,21 +545,6 @@ def convert_to_ckeditor(html_data):
         elif p.parent.name in LIST_TAGS:
             p.wrap(soup.new_tag('li'))
 
-    # Replaces <p><br></p> with <p>&nbsp;</p> and <pre>...<br>...</pre>
-    # with <pre>...\n...</pre>.
-    for br in soup.findAll('br'):
-        parent = br.parent
-        if parent.name == 'p' and parent.get_text() == '':
-            br.unwrap()
-            # BeautifulSoup automatically escapes &nbsp; to &amp;nbsp;.
-            # To safely add &nbsp in place of <br> tag we need the unicode
-            # string \xa0.
-            # Reference: https://stackoverflow.com/questions/26334461/.
-            parent.string = u'\xa0'
-        elif parent.name == 'pre':
-            br.insert_after('\n')
-            br.unwrap()
-
     # This block ensures that ol/ul tag is not a direct child of another ul/ol
     # tag. The conversion works as follows:
     # Invalid html: <ul><li>...</li><ul><ul><li>...</li></ul></ul></ul>
@@ -600,6 +585,21 @@ def convert_to_ckeditor(html_data):
     # html strings they are stored as <br>. Since both of these
     # should match and <br> and <br/> have same working,
     # so the tag has to be replaced in this way.
+
+    # Replaces <p><br></p> with <p>&nbsp;</p> and <pre>...<br>...</pre>
+    # with <pre>...\n...</pre>.
+    for br in soup.findAll('br'):
+        parent = br.parent
+        if parent.name == 'p' and len(parent.contents) == 1:
+            br.unwrap()
+            # BeautifulSoup automatically escapes &nbsp; to &amp;nbsp;.
+            # To safely add &nbsp in place of <br> tag we need the unicode
+            # string \xa0.
+            # Reference: https://stackoverflow.com/questions/26334461/.
+            parent.string = u'\xa0'
+        elif parent.name == 'pre':
+            br.insert_after('\n')
+            br.unwrap()
 
     return unicode(soup).replace('<br/>', '<br>')
 
