@@ -514,7 +514,7 @@ def publish_skill(skill_id, committer_id):
 
     if not skill_rights.skill_is_private:
         raise Exception('The skill is already published.')
-    skill_rights.skill_is_published = True
+    skill_rights.skill_is_private = False
     commit_cmds = [skill_domain.SkillRightsChange({
         'cmd': skill_domain.CMD_PUBLISH_SKILL
     })]
@@ -535,9 +535,9 @@ def save_skill_rights(skill_rights, committer_id, commit_message, commit_cmds):
 
     model = skill_models.SkillRightsModel.get(skill_rights.id, strict=False)
 
-    model.skill_is_published = skill_rights.skill_is_published
+    model.skill_is_private = skill_rights.skill_is_private
     model.creator_id = skill_rights.creator_id
-    commit_cmd_dicts = [commit_cmd.todict() for commit_cmd in commit_cmds]
+    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
 
 
@@ -553,7 +553,7 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
-    skill_rights_model = skill_mdoels.SkillRightsModel.get(skill_id)
+    skill_rights_model = skill_models.SkillRightsModel.get(skill_id)
     skill_rights_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_SKILL_DELETED,
         force_deletion=force_deletion)
@@ -652,7 +652,6 @@ def create_new_skill_rights(skill_id, committer_id):
     """
     skill_rights = skill_domain.SkillRights(skill_id, True, committer_id)
     commit_cmds = [{'cmd': skill_domain.CMD_CREATE_NEW}]
-    print committer_id
     skill_models.SkillRightsModel(
         id=skill_rights.id,
         creator_id=skill_rights.creator_id,
@@ -712,15 +711,22 @@ def check_can_edit_skill(user, skill_rights):
     Returns:
         bool. Whether the given user can edit the given skill.
     """
+    print 'a'
     if skill_rights is None:
+        print 'b'
         return False
     if role_services.ACTION_EDIT_PUBLIC_SKILLS not in user.actions:
+        print 'c'
         return False
     if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
+        print 'd'
         if not skill_rights.is_private():
+            print 'e'
             return True
         if skill_rights.is_private() and skill_rights.is_creator(user.user_id):
+            print 'f'
             return True
+    print 'g'
     return False
 
 

@@ -16,6 +16,7 @@
 
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
 import feconf
@@ -41,14 +42,17 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         self.signup('a@example.com', 'A')
         self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup('admin2@example.com', username='adm2')
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.set_admins([self.ADMIN_USERNAME])
+        self.user_id_admin_2 = self.get_user_id_from_email('admin2@example.com')
+        self.set_admins([self.ADMIN_USERNAME, 'adm2'])
         self.user_a = user_services.UserActionsInfo(self.user_id_a)
-        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)     
+        self.user_admin = user_services.UserActionsInfo(self.user_id_admin) 
+        self.user_admin_2 = user_services.UserActionsInfo(self.user_id_admin_2)    
 
-        self.save_new_skill(
+        self.skill = self.save_new_skill(
             self.SKILL_ID, self.user_id_admin, 'Description', misconceptions,
             skill_contents
         )
@@ -139,7 +143,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         )
         self.assertEqual(skill_commit_log_entry.commit_type, 'create')
         self.assertEqual(skill_commit_log_entry.skill_id, self.SKILL_ID)
-        self.assertEqual(skill_commit_log_entry.user_id, self.USER_ID)
+        self.assertEqual(skill_commit_log_entry.user_id, self.user_id_admin)
 
     def test_get_skill_summary_by_id(self):
         skill_summary = skill_services.get_skill_summary_by_id(self.SKILL_ID)
@@ -191,8 +195,24 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(skill_services.check_can_edit_skill(
             self.user_admin, skill_rights))
 
-    def test_admin_can_not_edit_other_skill(self):
-        ...
+    def test_admin_can_not_edit_other_private_skill(self):
+        skill_rights = skill_services.get_skill_rights(self.SKILL_ID)
+
+        self.assertFalse(skill_services.check_can_edit_skill(
+            self.user_admin_2, skill_rights))
+
+    def test_admin_can_edit_other_public_skill(self):
+        self.save_new_skill(
+            'other_skill', self.user_id_admin, 'Description', [],
+            skill_domain.SkillContents('Explanation', ['Example 1'])
+        )
+
+        skill_services.publish_skill('other_skill', self.user_id_admin)
+        skill_rights = skill_services.get_skill_rights('other_skill')
+        print skill_rights.skill_is_private
+        self.assertTrue(skill_services.check_can_edit_skill(
+            self.user_admin_2, skill_rights))
+
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
     """Test the skill mastery services module."""
