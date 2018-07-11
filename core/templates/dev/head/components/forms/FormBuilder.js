@@ -105,8 +105,8 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
     textFragments.forEach(function(fragment) {
       result += (
         fragment.type === 'text' ?
-          $filter('convertUnicodeToHtml')(fragment.data) :
-          '<oppia-parameter>' + fragment.data +
+        $filter('convertUnicodeToHtml')(fragment.data) :
+        '<oppia-parameter>' + fragment.data +
         '</oppia-parameter>');
     });
     return result;

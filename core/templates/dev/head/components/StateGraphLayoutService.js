@@ -244,7 +244,7 @@ oppia.factory('StateGraphLayoutService', [
                 nodeData[linkTarget].depth = nodeData[currNodeId].depth + 1;
                 nodeData[linkTarget].offset = (
                   nodeData[linkTarget].depth in maxOffsetInEachLevel ?
-                    maxOffsetInEachLevel[nodeData[linkTarget].depth] + 1 : 0);
+                  maxOffsetInEachLevel[nodeData[linkTarget].depth] + 1 : 0);
 
                 maxDepth = Math.max(maxDepth, nodeData[linkTarget].depth);
                 maxOffsetInEachLevel[nodeData[linkTarget].depth] = (
