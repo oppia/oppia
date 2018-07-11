@@ -373,21 +373,21 @@ oppia.factory('ResponsesService', [
             }
           }
 
-          _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
-            var newRules = angular.copy(answerGroup.rules);
-            newRules.forEach(function(rule) {
-              for (var key in rule.inputs) {
-                var newInputValue = [];
-                if (anyChangesHappened) {
+          if (anyChangesHappened) {
+            _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
+              var newRules = angular.copy(answerGroup.rules);
+              newRules.forEach(function(rule) {
+                for (var key in rule.inputs) {
+                  var newInputValue = [];
                   rule.inputs[key] = newInputValue;
                 }
-              }
-            });
+              });
 
-            _updateAnswerGroup(answerGroupIndex, {
-              rules: newRules
+              _updateAnswerGroup(answerGroupIndex, {
+                rules: newRules
+              });
             });
-          });
+          }
         }
       },
       getAnswerGroups: function() {
