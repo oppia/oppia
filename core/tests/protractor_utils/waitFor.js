@@ -53,7 +53,7 @@ var invisibilityOf = function(element, errorMessage) {
 var pageToFullyLoad = function() {
   // Completely wait for page to load to avoid XMLHTTPReq error on page refresh:
   // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
-  // and browser.waitForAngular()'s flakiness
+  // and browser.waitForAngular's flakiness
   // https://github.com/angular/protractor/issues/2954.
   var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
   return browser.wait(until.invisibilityOf(loadingMessage), 15000,

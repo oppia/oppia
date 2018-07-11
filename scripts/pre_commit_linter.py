@@ -113,6 +113,12 @@ BAD_PATTERNS_JS_REGEXP = [
         'excluded_dirs': ()
     },
     {
+        'regexp': r'\b(browser.waitForAngular)\(',
+        'message': "In tests, please do not use browser.waitForAngular().",
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
         'regexp': r'\b(ddescribe|fdescribe)\(',
         'message': "In tests, please use 'describe' instead of 'ddescribe'"
                    "or 'fdescribe'",
