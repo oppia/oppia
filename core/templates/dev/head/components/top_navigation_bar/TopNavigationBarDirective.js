@@ -30,10 +30,12 @@ oppia.directive('topNavigationBar', [
         '$scope', '$http', '$window', '$timeout', '$translate',
         'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS',
         'siteAnalyticsService', 'WindowDimensionsService', 'DebouncerService',
+        'DeviceInfoService',
         function(
             $scope, $http, $window, $timeout, $translate,
             SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
-            siteAnalyticsService, WindowDimensionsService, DebouncerService) {
+            siteAnalyticsService, WindowDimensionsService, DebouncerService,
+            DeviceInfoService) {
           if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
             $translate.use(GLOBALS.preferredSiteLanguageCode);
           }
@@ -109,6 +111,12 @@ oppia.directive('topNavigationBar', [
             $scope.activeMenuName = '';
             angular.element(evt.currentTarget).closest('li')
               .find('a').blur();
+          };
+          $scope.closeSubmenuIfNotMobile = function(evt) {
+            if (DeviceInfoService.isMobileDevice()) {
+              return;
+            }
+            $scope.closeSubmenu();
           };
           /**
            * Handles keydown events on menus.
