@@ -1093,6 +1093,11 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
         self.submitted_answer.rule_spec_index = '0'
         self._assert_validation_error(
             self.submitted_answer, 'Expected rule_spec_index to be an integer')
+        self.submitted_answer.rule_spec_index = ''
+        self._assert_validation_error(
+            self.submitted_answer, 'Expected rule_spec_index to be an integer')
+        self.submitted_answer.rule_spec_index = 0
+        self.submitted_answer.validate()
 
     def test_rule_spec_index_must_be_positive(self):
         self.submitted_answer.rule_spec_index = -1
