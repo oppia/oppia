@@ -20,12 +20,11 @@
 var until = protractor.ExpectedConditions;
 var DEFAULT_WAIT_TIME_MSECS = 5000;
 
-/**
- * @param {string} errorMessage - Error message when alert does not pop up.
- */
-var alertToBePresent = function(errorMessage) {
+var alertToBePresent = function() {
   return browser.wait(
-    until.alertIsPresent(), DEFAULT_WAIT_TIME_MSECS, errorMessage);
+    until.alertIsPresent(),
+    DEFAULT_WAIT_TIME_MSECS,
+    'Alert box took more than 5 secs to appear.');
 };
 
 /**

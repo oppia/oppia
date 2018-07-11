@@ -30,8 +30,8 @@ var ThanksPage = require('../protractor_utils/ThanksPage.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
-var until = protractor.ExpectedConditions;
 
 var ERROR_PAGE_URL_SUFFIX = '/console_errors';
 
@@ -71,15 +71,10 @@ describe('Basic user journeys', function() {
 
       users.login('mod@userManagement.com');
       browser.get(general.MODERATOR_URL_SUFFIX);
-      // There is no loading message for /moderator. Furthermore,
-      // browser.get() sometimes does not wait for Angular before page load
-      // https://github.com/angular/protractor/issues/2461
-      // which causes
-      // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
-      // which is a wont-fix from Angular team.
-      var profileDropdown = element(by.css(
-        '.protractor-test-profile-dropdown'));
-      browser.wait(until.elementToBeClickable(profileDropdown), 5000);
+      var profileDropdown = element(
+        by.css('.protractor-test-profile-dropdown'));
+      waitFor.elementToBeClickable(
+        profileDropdown, 'Could not click profile dropdown');
       profileDropdown.click();
       users.logout();
       general.checkForConsoleErrors([]);
@@ -110,7 +105,8 @@ describe('Basic user journeys', function() {
       classNames.forEach(function(className) {
         browser.actions().mouseMove(profileDropdown).perform();
         var dropdownElement = element.all(by.css(className)).first();
-        browser.wait(until.elementToBeClickable(dropdownElement), 5000);
+        waitFor.elementToBeClickable(
+          dropdownElement, 'Could not click topnav dropdown');
         dropdownElement.click();
         general.waitForLoadingMessage();
       });

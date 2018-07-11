@@ -20,7 +20,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -232,13 +232,9 @@ describe('Learner dashboard functionality', function() {
     var firstExploration = element.all(
       by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
-    browser.wait(until.elementToBeClickable(firstExploration), 10000,
-      'Could not click first exploration in collection')
-      .then(function(isClickable) {
-        if (isClickable) {
-          firstExploration.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      firstExploration, 'Could not click first exploration in collection');
+    firstExploration.click();
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.expectExplorationToNotBeOver();
 
@@ -261,13 +257,9 @@ describe('Learner dashboard functionality', function() {
     var firstExploration = element.all(
       by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
-    browser.wait(until.elementToBeClickable(firstExploration), 10000,
-      'Could not click first exploration in collection')
-      .then(function(isClickable) {
-        if (isClickable) {
-          firstExploration.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      firstExploration, 'Could not click first exploration in collection');
+    firstExploration.click();
 
     // Complete the exploration and rate it 5 stars!
     explorationPlayerPage.expectExplorationNameToBe('About Oppia');

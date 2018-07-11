@@ -18,6 +18,7 @@
  */
 var general = require('./general.js');
 var until = protractor.ExpectedConditions;
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator_dashboard';
@@ -66,63 +67,48 @@ var CreatorDashboardPage = function() {
   };
 
   this.clickCreateActivityButton = function() {
-    browser.wait(until.elementToBeClickable(createActivityButton), 10000,
-      'Create Activity button takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          createActivityButton.click();
-          general.waitForLoadingMessage();
-        }
-      });
+    waitFor.elementToBeClickable(
+      createActivityButton,
+      'Create Activity button takes too long to be clickable');
+    createActivityButton.click();
+    general.waitForLoadingMessage();
   };
 
   this.clickCreateCollectionButton = function() {
     browser.wait(until.visibilityOf(activityCreationModal), 5000,
       'Activity Creation modal is not visible').then( function(isVisible) {
       if (isVisible) {
-        browser.wait(until.elementToBeClickable(createCollectionButton), 10000,
-          'Create Collection button takes too long to be clickable')
-          .then(function(isClickable) {
-            if (isClickable) {
-              createCollectionButton.click();
-              general.waitForLoadingMessage();
-            }
-          });
+        waitFor.elementToBeClickable(
+          createCollectionButton,
+          'Create Collection button takes too long to be clickable');
+        createCollectionButton.click();
+        general.waitForLoadingMessage();
       }
     });
   };
 
   this.clickCreateExplorationButton = function() {
-    browser.wait(until.elementToBeClickable(createExplorationButton), 5000,
-      'Create Exploration button takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          createExplorationButton.click();
-          general.waitForLoadingMessage();
-        }
-      });
+    waitFor.elementToBeClickable(
+      createExplorationButton,
+      'Create Exploration button takes too long to be clickable');
+    createExplorationButton.click();
+    general.waitForLoadingMessage();
   };
 
   this.navigateToCollectionEditor = function() {
-    browser.wait(until.elementToBeClickable(collectionCard), 5000,
-      'Collection Card tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          collectionCard.click();
-          general.waitForLoadingMessage();
-        }
-      });
+    waitFor.elementToBeClickable(
+      collectionCard,
+      'Collection Card tab takes too long to be clickable');
+    collectionCard.click();
+    general.waitForLoadingMessage();
   };
 
   this.navigateToSubscriptionDashboard = function() {
-    browser.wait(until.elementToBeClickable(subscriptionTab), 5000,
-      'Subscription Dashboard tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          subscriptionTab.click();
-          general.waitForLoadingMessage();
-        }
-      });
+    waitFor.elementToBeClickable(
+      subscriptionTab,
+      'Subscription Dashboard tab takes too long to be clickable');
+    subscriptionTab.click();
+    general.waitForLoadingMessage();
   };
 
   this.editExploration = function(explorationTitle) {
@@ -132,14 +118,11 @@ var CreatorDashboardPage = function() {
       }
       var explorationElement = elems[0].element(
         by.css('.protractor-test-title-mask'));
-      browser.wait(until.elementToBeClickable(explorationElement), 10000,
-        'Unable to click on exploration ' + explorationTitle)
-        .then(function(isClickable) {
-          if (isClickable) {
-            explorationElement.click();
-            general.waitForLoadingMessage();
-          }
-        });
+      waitFor.elementToBeClickable(
+        explorationElement,
+        'Unable to click on exploration: ' + explorationTitle);
+      explorationElement.click();
+      general.waitForLoadingMessage();
     });
   };
 };

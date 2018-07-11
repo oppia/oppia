@@ -20,20 +20,7 @@
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
 var until = protractor.ExpectedConditions;
-
-// Time (in ms) to wait when the system needs time for some computations.
-var WAIT_TIME = 4000;
-
-// Optionally accepts a waitTime integer in milliseconds.
-var waitForSystem = function() {
-  var waitTime;
-  if (arguments.length === 1) {
-    waitTime = arguments[0];
-  } else {
-    waitTime = WAIT_TIME;
-  }
-  browser.sleep(waitTime);
-};
+var waitFor = require('./waitFor.js');
 
 var waitForLoadingMessage = function() {
   // Consider adding this method after each browser.get() call going to an
@@ -162,18 +149,8 @@ var ensurePageHasNoTranslationIds = function() {
 };
 
 var acceptAlert = function() {
-  browser.wait(until.alertIsPresent(), 5000).then( function(activeAlert) {
-    if (activeAlert) {
-      return browser.switchTo().alert().accept().then(
-        function() {
-          return true;
-        },
-        function() {
-          return false;
-        }
-      );
-    }
-  });
+  waitFor.alertToBePresent();
+  browser.switchTo().alert().accept();
 };
 
 var _getUniqueLogMessages = function(logs) {
@@ -208,7 +185,6 @@ var checkConsoleErrorsExist = function(expectedErrors) {
 };
 
 exports.acceptAlert = acceptAlert;
-exports.waitForSystem = waitForSystem;
 exports.waitForLoadingMessage = waitForLoadingMessage;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
