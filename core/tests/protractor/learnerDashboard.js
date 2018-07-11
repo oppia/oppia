@@ -99,7 +99,7 @@ describe('Learner dashboard functionality', function() {
     workflow.publishExploration();
   };
 
-  it('displays incomplete and completed explorations', function() {
+  it('displays completed explorations', function() {
     users.createAndLoginUser('originalCreator@learnerDashboard.com',
       'originalCreator');
     // Create exploration 'About Oppia'
@@ -120,31 +120,6 @@ describe('Learner dashboard functionality', function() {
     libraryPage.findExploration('Dummy Exploration');
     libraryPage.playExploration('Dummy Exploration');
     explorationPlayerPage.expectExplorationNameToBe('Dummy Exploration');
-
-    // Play exploration 'About Oppia'.
-    libraryPage.get();
-    libraryPage.findExploration('About Oppia');
-    libraryPage.playExploration('About Oppia');
-    explorationPlayerPage.expectExplorationNameToBe('About Oppia');
-    explorationPlayerPage.submitAnswer('Continue', null);
-    explorationPlayerPage.expectExplorationToNotBeOver();
-
-    // Refresh page to simulate user leaving and accept the alert.
-    general.safeAcceptAlert();
-    // Wait for exploration to re-load again.
-    general.waitForLoadingMessage();
-
-    // Learner Dashboard should display 'About Oppia' as incomplete.
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToInCompleteSection();
-    learnerDashboardPage.navigateToIncompleteExplorationsSection();
-    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-      'About Oppia');
-    // Learner Dashboard should display 'Dummy Exploration' as complete.
-    learnerDashboardPage.navigateToCompletedSection();
-    learnerDashboardPage.navigateToCompletedExplorationsSection();
-    learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
-      'Dummy Exploration');
 
     // Now play exploration 'About Oppia' completely.
     libraryPage.get();
@@ -192,7 +167,7 @@ describe('Learner dashboard functionality', function() {
     users.logout();
   });
 
-  it('displays incomplete and completed collections', function() {
+  it('displays completed collections', function() {
     users.createAndLoginUser('explorationCreator@learnerDashboard.com',
       'explorationCreator');
     // Create first exploration named 'Head of Collection'
@@ -227,34 +202,6 @@ describe('Learner dashboard functionality', function() {
     users.createAndLoginUser('learner4@learnerDashboard.com',
       'learner4learnerDashboard');
     // Go to 'Test Collection' and play it.
-    libraryPage.get();
-    libraryPage.findExploration('Test Collection');
-    libraryPage.playCollection('Test Collection');
-    var firstExploration = element.all(
-      by.css('.protractor-test-collection-exploration')).first();
-    // Click first exploration in collection.
-    browser.wait(until.elementToBeClickable(firstExploration), 10000,
-      'Could not click first exploration in collection')
-      .then(function(isClickable) {
-        if (isClickable) {
-          firstExploration.click();
-        }
-      });
-    explorationPlayerPage.submitAnswer('Continue', null);
-    explorationPlayerPage.expectExplorationToNotBeOver();
-
-    // Refresh page to simulate user leaving and accept the alert.
-    general.safeAcceptAlert();
-    // Wait for exploration to re-load again.
-    general.waitForLoadingMessage();
-
-    // Learner Dashboard should display 'Test Collection' as incomplete.
-    learnerDashboardPage.get();
-    learnerDashboardPage.navigateToInCompleteSection();
-    learnerDashboardPage.navigateToIncompleteCollectionsSection();
-    learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
-      'Test Collection');
-
     libraryPage.get();
     libraryPage.findExploration('Test Collection');
     libraryPage.playCollection('Test Collection');
