@@ -16,6 +16,8 @@
  * @fileoverview Service to retrieve read only information
  * about the concept card of a skill from the backend.
  */
+oppia.constant(
+  'CONCEPT_CARD_DATA_URL_TEMPLATE', '/concept_card_data_handler/<skill_id>');
 
 oppia.factory('ConceptCardBackendApiService', [
   '$http', '$q', 'CONCEPT_CARD_DATA_URL_TEMPLATE', 'UrlInterpolationService',
