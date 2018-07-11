@@ -50,7 +50,7 @@ describe('rich-text components', function() {
       // TODO (Jacob) add test for image RTE component
       richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       richTextEditor.addRteComponent('Math', 'abc');
-      richTextEditor.addRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextEditor.addRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
       richTextEditor.addRteComponent(
@@ -71,7 +71,7 @@ describe('rich-text components', function() {
       richTextChecker.readPlainText(' ');
       richTextChecker.readRteComponent('Link', 'http://google.com/', true);
       richTextChecker.readRteComponent('Math', 'abc');
-      richTextChecker.readRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextChecker.readRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
       richTextChecker.readRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       richTextChecker.readRteComponent('Tabs', [{
