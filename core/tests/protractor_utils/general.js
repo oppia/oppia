@@ -40,31 +40,11 @@ var waitForLoadingMessage = function() {
   // Angular page destination. Completely wait for page to load to
   // avoid XMLHTTPReq error on page refresh:
   // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
-  // and browser.waitForAngular()'s flakiness
+  // and browser.waitForAngular's flakiness
   // https://github.com/angular/protractor/issues/2954.
   var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
   return browser.wait(until.invisibilityOf(loadingMessage), 15000,
     'Page takes more than 15 secs to load');
-};
-
-/**
- * Leaving exp/collections mid-play causes an alert window which cannot
- * be handled unless waitForAngular() is disabled. Re-enable waitForAngular()
- * once alert is accepted.
- */
-var safeAcceptAlert = function() {
-  // Disable waiting for Angular to accept alert.
-  browser.waitForAngularEnabled(false);
-  // Refresh page to simulate user leaving.
-  browser.navigate().refresh().then(function() {
-    browser.wait(until.alertIsPresent(), 5000);
-    return browser.switchTo().alert().then(function (alert) {
-      alert.accept().then(function() {
-      // Re-enable waiting for Angular.
-        return browser.waitForAngularEnabled(true);
-      });
-    });
-  });
 };
 
 var scrollToTop = function() {
@@ -228,7 +208,6 @@ var checkConsoleErrorsExist = function(expectedErrors) {
 };
 
 exports.acceptAlert = acceptAlert;
-exports.safeAcceptAlert = safeAcceptAlert;
 exports.waitForSystem = waitForSystem;
 exports.waitForLoadingMessage = waitForLoadingMessage;
 exports.scrollToTop = scrollToTop;

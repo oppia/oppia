@@ -18,6 +18,8 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var until = protractor.ExpectedConditions;
+
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('screenreader and keyboard user accessibility features', function() {
@@ -28,11 +30,12 @@ describe('screenreader and keyboard user accessibility features', function() {
   });
 
   it('should skip to the main content element', function() {
-    var mainContent = element(by.css('.protractor-test-main-content'));
     libraryPage.get();
     browser.actions().sendKeys(protractor.Key.TAB).perform();
-    general.waitForSystem();
-    element(by.css('.protractor-test-skip-link')).click();
+    var skipLink = element(by.css('.protractor-test-skip-link'));
+    browser.wait(until.elementToBeClickable(skipLink), 5000);
+    skipLink.click();
+    var mainContent = element(by.css('.protractor-test-main-content'));
     expect(mainContent.getAttribute('id'))
       .toEqual(browser.driver.switchTo().activeElement().getAttribute('id'));
   });
