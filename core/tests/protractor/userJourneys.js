@@ -71,14 +71,8 @@ describe('Basic user journeys', function() {
 
       users.login('mod@userManagement.com');
       browser.get(general.MODERATOR_URL_SUFFIX);
-      // There is no loading message for /moderator. Furthermore,
-      // browser.get() sometimes does not wait for Angular before page load
-      // https://github.com/angular/protractor/issues/2461
-      // which causes
-      // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
-      // which is a wont-fix from Angular team.
-      var profileDropdown = element(by.css(
-        '.protractor-test-profile-dropdown'));
+      var profileDropdown = element(
+        by.css('.protractor-test-profile-dropdown'));
       waitFor.elementToBeClickable(
         profileDropdown, 'Could not click profile dropdown');
       profileDropdown.click();

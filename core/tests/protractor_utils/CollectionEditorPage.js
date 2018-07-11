@@ -66,7 +66,7 @@ var CollectionEditorPage = function() {
         addExplorationInput.sendKeys(query);
         // Need to wait for result to appear.
         waitFor.elementToBeClickable(
-          addExplorationInput, 'Unable to find exploration: ' + query);
+          addExplorationButton, 'Unable to find exploration: ' + query);
       }
     });
     var matched = false;
