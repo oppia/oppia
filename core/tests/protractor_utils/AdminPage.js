@@ -17,9 +17,10 @@
  * tests.
  */
 
-var general = require('./general.js');
 var forms = require('./forms.js');
+var general = require('./general.js');
 var until = protractor.ExpectedConditions;
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var AdminPage = function(){
   var ADMIN_URL_SUFFIX = '/admin';
@@ -71,12 +72,10 @@ var AdminPage = function(){
   };
 
   this.updateRole = function(name, newRole) {
-    browser.wait(until.elementToBeClickable(adminRolesTab), 5000,
-      'Admin Roles tab is not clickable').then(function(isClickable) {
-      if (isClickable) {
-        adminRolesTab.click();
-      }
-    });
+    waitFor.elementToBeClickable(
+      adminRolesTab, 'Admin Roles tab is not clickable');
+    adminRolesTab.click();
+
     // Change values for "update role" form, and submit it.
     browser.wait(until.visibilityOf(updateFormName), 5000,
       'Update Form Name is not visible');
