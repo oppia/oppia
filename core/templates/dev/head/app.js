@@ -35,6 +35,8 @@ for (var constantName in constants) {
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
 
+oppia.constant('EXPLORATION_AND_SKILL_ID_PATTERN', /^[a-zA-Z0-9_-]+$/);
+
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
 oppia.constant('INTERACTION_DISPLAY_MODE_INLINE', 'inline');
