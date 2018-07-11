@@ -700,6 +700,13 @@ def get_skill_rights(skill_id, strict=True):
     return get_skill_rights_from_model(model)
 
 
+def get_unpublished_skills_by_creator(user_id):
+    models = (
+        skill_models.SkillRightsModel.get_unpublished_skills_by_creator_id(
+            user_id))
+    return [get_skill_rights_from_model(skill_model) for skill_model in models]
+
+
 def check_can_edit_skill(user, skill_rights):
     """Checks whether the user can edit the given skill.
 

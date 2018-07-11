@@ -180,3 +180,7 @@ class SkillRightsModel(base_models.VersionedModel):
     # Whether the skill is private.
     skill_is_private = ndb.BooleanProperty(
         indexed=True, required=True, default=True)
+
+    @classmethod
+    def get_unpublished_skills_by_creator_id(cls, user_id):
+        return cls.query(cls.creator_id == user_id, cls.skill_is_private == True)

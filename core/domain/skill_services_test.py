@@ -209,9 +209,27 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
         skill_services.publish_skill('other_skill', self.user_id_admin)
         skill_rights = skill_services.get_skill_rights('other_skill')
-        print skill_rights.skill_is_private
         self.assertTrue(skill_services.check_can_edit_skill(
             self.user_admin_2, skill_rights))
+
+    def test_get_unpublished_skills_by_creator(self):
+        self.save_new_skill(
+            'skill_a', self.user_id_admin, 'Description A', [],
+            skill_domain.SkillContents('Explanation', ['Example 1']))
+        self.save_new_skill(
+            'skill_b', self.user_id_admin, 'Description B', [],
+            skill_domain.SkillContents('Explanation', ['Example 1']))
+
+        skills = skill_services.get_unpublished_skills_by_creator(
+            self.user_id_admin)
+        skill_ids = [skill.id for skill in skills]
+        self.assertListEqual(skill_ids, [self.SKILL_ID, 'skill_a', 'skill_b'])
+
+        skill_services.publish_skill(self.SKILL_ID, self.user_id_admin)
+        skills = skill_services.get_unpublished_skills_by_creator(
+            self.user_id_admin)
+        skill_ids = [skill.id for skill in skills]
+        self.assertListEqual(skill_ids, ['skill_a', 'skill_b'])
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):
