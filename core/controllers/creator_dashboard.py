@@ -317,22 +317,6 @@ class NewCollectionHandler(base.BaseHandler):
         })
 
 
-class NewQuestionHandler(base.BaseHandler):
-    """Creates a new question."""
-
-    @acl_decorators.can_create_question
-    def post(self):
-        """Handles POST requests."""
-        new_question_id = question_services.get_new_question_id()
-        question = question_domain.Question.create_default_question(
-            new_question_id)
-        question_services.add_new_question(self.user_id, question)
-
-        self.render_json({
-            QUESTION_ID_KEY: new_question_id
-        })
-
-
 class UploadExploration(base.BaseHandler):
     """Uploads a new exploration."""
 
