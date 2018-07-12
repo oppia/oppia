@@ -446,7 +446,6 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
         queries = [('final_reviewer_id', self.reviewer_id_2)]
         self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
 
-
     def test_get_by_target_id(self):
         queries = [
             ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
@@ -461,9 +460,7 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_by_status(self):
         queries = [('status', suggestion_models.STATUS_IN_REVIEW)]
-        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 4)
-        queries = [('status', suggestion_models.STATUS_RECEIVED)]
-        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 5)
 
     def test_get_by_type(self):
         queries = [(
@@ -483,9 +480,9 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
             ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
             ('target_id', self.target_id_1),
             ('author_id', self.author_id_1),
-            ('status', suggestion_models.STATUS_RECEIVED)
+            ('status', suggestion_models.STATUS_IN_REVIEW)
         ]
-        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 3)
 
         queries = [
             ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),

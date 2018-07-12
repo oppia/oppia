@@ -269,4 +269,3 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(
                 suggestion_models.GeneralSuggestionModel
                 .get_all_stale_suggestions()), 0)
-
