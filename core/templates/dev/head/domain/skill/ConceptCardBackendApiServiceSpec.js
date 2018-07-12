@@ -34,7 +34,7 @@ describe('Concept card backend API service', function() {
     };
 
     sampleResponse = {
-      concept_card: conceptCardDict
+      concept_card_dict: conceptCardDict
     };
   }));
 
@@ -55,7 +55,8 @@ describe('Concept card backend API service', function() {
         successHandler, failHandler);
       $httpBackend.flush();
 
-      expect(successHandler).toHaveBeenCalledWith(sampleResponse.concept_card);
+      expect(successHandler).toHaveBeenCalledWith(
+        sampleResponse.concept_card_dict);
       expect(failHandler).not.toHaveBeenCalled();
     });
 

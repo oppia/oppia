@@ -34,7 +34,7 @@ class ConceptCardDataHandler(base.BaseHandler):
 
         skill_dict = skill.to_dict()
         self.values.update({
-            'concept_card': skill_dict['skill_contents']
+            'concept_card_dict': skill_dict['skill_contents']
         })
 
         self.render_json(self.values)

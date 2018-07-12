@@ -33,7 +33,7 @@ oppia.factory('ConceptCardBackendApiService', [
         });
 
       $http.get(conceptCardDataUrl).then(function(response) {
-        var conceptCard = angular.copy(response.data.concept_card);
+        var conceptCard = angular.copy(response.data.concept_card_dict);
         if (successCallback) {
           successCallback(conceptCard);
         }
