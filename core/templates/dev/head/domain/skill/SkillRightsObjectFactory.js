@@ -38,6 +38,10 @@ oppia.factory('SkillRightsObjectFactory', [
       return this._skillIsPrivate;
     };
 
+    SkillRights.prototype.isPublic = function() {
+      return !this._skillIsPrivate;
+    };
+
     SkillRights.prototype.canEdit = function() {
       return this._skillIsEditable;
     };
@@ -54,7 +58,14 @@ oppia.factory('SkillRightsObjectFactory', [
       return new SkillRights(angular.copy(skillRightsBackendObject));
     };
 
-    SkillRights.createEmptySkillRights = function() {
+    SkillRights.prototype.copyFromSkillRights = function(otherSkillRights) {
+      this._skillId = otherSkillRights.getSkillId();
+      this._creatorId = otherSkillRights.getCreatorId();
+      this._skillIsPrivate = otherSkillRights.isPrivate();
+      this._skillIsEditable = otherSkillRights.canEdit();
+    };
+
+    SkillRights.createInterstitialSkillRights = function() {
       return new SkillRights({
         skill_id: null,
         creator_id: null,
@@ -62,4 +73,6 @@ oppia.factory('SkillRightsObjectFactory', [
         can_edit_skill: false
       });
     };
+
+    return SkillRights;
   }])

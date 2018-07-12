@@ -17,26 +17,42 @@
 * in the skill editor.
 */
 
+oppia.constant('EVENT_SKILL_INITIALIZED', 'skillInitialized');
+oppia.constant('EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
+
 oppia.factory('SkillEditorStateService', [
-  'SkillObjectFactory', 'SkillRightsObjectFactory', 
-  'EditableSkillBackendApiService', 'AlertsService', 'UndoRedoService',
+  '$rootScope', 'SkillObjectFactory', 'SkillRightsObjectFactory', 
+  'EditableSkillBackendApiService', 'SkillRightsBackendApiService',
+  'AlertsService', 'UndoRedoService', 'EVENT_SKILL_INITIALIZED',
+  'EVENT_SKILL_REINITIALIZED',
   function(
-      SkillObjectFactory, SkillRightsObjectFactory,
-      EditableSkillBackendApiService, AlertsService, UndoRedoService) {
+      $rootScope, SkillObjectFactory, SkillRightsObjectFactory,
+      EditableSkillBackendApiService, SkillRightsBackendApiService,
+      AlertsService, UndoRedoService, EVENT_SKILL_INITIALIZED,
+      EVENT_SKILL_REINITIALIZED) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
-    var _skillRights = SkillObjectFactory.createInterstitialSkillRights();
+    var _skillRights = SkillRightsObjectFactory.createInterstitialSkillRights();
     var _skillIsInitialized = false;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
 
     var _setSkill = function(skill) {
       _skill.copyFromSkill(skill);
+      if (_skillIsInitialized) {
+        $rootScope.$broadcast(EVENT_SKILL_REINITIALIZED);
+      } else {
+        $rootScope.$broadcast(EVENT_SKILL_INITIALIZED);
+      }
       _skillIsInitialized = true;
     };
 
     var _updateSkill = function(newBackendSkillObject) {
       _setSkill(SkillObjectFactory.createFromBackendDict(
         newBackendSkillObject));
+    };
+
+    var _setSkillRights = function(skillRights) {
+      _skillRights.copyFromSkillRights(skillRights);
     };
 
     var _updateSkillRights = function(newBackendSkillRightsObject) {
@@ -114,6 +130,10 @@ oppia.factory('SkillEditorStateService', [
 
       isSavingSkill: function() {
         return _skillIsBeingSaved;
+      },
+
+      setSkillRights: function(skillRights) {
+        _setSkillRights(skillRights);
       }
     };
   }]);

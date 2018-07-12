@@ -23,7 +23,7 @@ import feconf
 import utils
 
 
-def _require_valid_version(self, version_from_payload, skill_version):
+def _require_valid_version(version_from_payload, skill_version):
     """Check that the payload version matches the given skill
     version.
     """

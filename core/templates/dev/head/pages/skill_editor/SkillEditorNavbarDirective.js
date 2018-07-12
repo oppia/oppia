@@ -25,30 +25,62 @@ oppia.directive('skillEditorNavbar', [
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
-        'SkillRightsBackendApiService',
+        'SkillRightsBackendApiService', 'SkillValidationService',
+        'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
+        'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $uibModal, AlertsService,
             UndoRedoService, SkillEditorStateService,
-            SkillRightsBackendApiService) {
+            SkillRightsBackendApiService, SkillValidationService,
+            EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.skill = SkillEditorStateService.getSkill();
           $scope.skillRights = (
             SkillEditorStateService.getSkillRights());
 
           $scope.isLoadingSkill = SkillEditorStateService.isLoadingSkill;
+          $scope.validationIssues = [];
           $scope.isSaveInProgress = SkillEditorStateService.isSavingSkill;
 
           $scope.getChangeListCount = function() {
             return UndoRedoService.getChangeCount();
           };
 
-          $scope.isSkillSaveable = function() {
-            return $scope.getChangeListCount() > 0;
+          var _validateSkill = function() {
+            $scope.validationIssues =
+              SkillValidationService.findValidationIssues($scope.skill);
           };
 
-          $scope.isCollectionPublishable = function() {
+          $scope.getWarningsCount = function() {
+            return $scope.validationIssues.length;
+          };
+
+          $scope.$on(EVENT_SKILL_INITIALIZED, _validateSkill);
+          $scope.$on(EVENT_SKILL_REINITIALIZED, _validateSkill);
+          $scope.$on(
+            EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED, _validateSkill);
+
+          $scope.isSkillSaveable = function() {
+            return (
+              $scope.getChangeListCount() > 0 &&
+              $scope.validationIssues.length === 0);
+          };
+
+          $scope.isSkillPublishable = function() {
             return (
               $scope.skillRights.isPrivate() &&
+              $scope.validationIssues.length === 0 &&
               $scope.getChangeListCount() === 0);
+          };
+
+          var _publishSkill = function() {
+            SkillRightsBackendApiService.setSkillPublic(
+              $scope.skill.getId(), $scope.skill.getVersion()).then(
+              function() {
+                $scope.skillRights.setPublic();
+                SkillEditorStateService.setSkillRights(
+                  $scope.skillRights);
+              });
           };
 
           $scope.saveChanges = function() {
@@ -70,18 +102,31 @@ oppia.directive('skillEditorNavbar', [
               ]
             });
 
-            var _publishSkill = function() {
-              SkillRightsBackendApiService.setSkillPublic(
-                $scope.skill.getId(), $scope.skill.getVersion()).then(
-                function() {
-                  $scope.skillRights.setPublic();
-                  SkillEditorStateService.setSkillRights(
-                    $scope.skillRights);
-                });
-            };
-
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);
+            });
+          };
+
+          $scope.publishSkill = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/skill_editor/' +
+                'skill_editor_pre_publish_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function(
+                    $scope, $uibModalInstance) {
+                  $scope.save = function() {
+                    $uibModalInstance.close();
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }]
+            }).result.then(function() {
+              _publishSkill();
             });
           };
         }]
