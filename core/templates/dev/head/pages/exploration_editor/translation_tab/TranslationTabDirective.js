@@ -23,23 +23,6 @@ oppia.directive('translationTab', [
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
-        'translation_tab_directive.html'),
-      controller: [
-        '$scope', '$timeout', '$rootScope', 'ExplorationStatesService',
-        'EditorStateService', function(
-            $scope, $timeout, $rootScope, ExplorationStatesService,
-            EditorStateService) {
-          $rootScope.loadingMessage = 'Loading';
-          $scope.$on('refreshTranslationTab', function() {
-            if (ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName())) {
-              $scope.$broadcast('refreshStateTranslation');
-              $timeout(function() {
-                $rootScope.loadingMessage = '';
-              }, 500);
-            }
-          });
-        }
-      ]
+        'translation_tab_directive.html')
     };
   }]);

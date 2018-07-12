@@ -25,15 +25,17 @@ oppia.directive('stateTranslation', [
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_directive.html'),
       controller: [
-        '$scope', '$filter', '$timeout', 'ExplorationStatesService',
-        'EditorStateService', function(
-            $scope, $filter, $timeout, ExplorationStatesService,
-            EditorStateService) {
+        '$scope', '$filter', '$timeout', '$rootScope',
+        'ExplorationStatesService', 'EditorStateService',
+        'ExplorationInitStateNameService', function(
+            $scope, $filter, $timeout, $rootScope, ExplorationStatesService,
+            EditorStateService, ExplorationInitStateNameService) {
           // Define tab constants.
           $scope.TAB_ID_CONTENT = 'content';
           $scope.TAB_ID_FEEDBACK = 'feedback';
           $scope.TAB_ID_HINTS = 'hints';
           $scope.TAB_ID_SOLUTION = 'solution';
+          $rootScope.loadingMessage = 'Loading';
 
           // Activates Content tab by default.
           $scope.activatedTabId = $scope.TAB_ID_CONTENT;
@@ -111,7 +113,15 @@ oppia.directive('stateTranslation', [
           $scope.initStateTranslation = function() {
             $scope.activatedTabId = $scope.TAB_ID_CONTENT;
 
+            if (!EditorStateService.getActiveStateName() ||
+              !ExplorationStatesService.getState(
+                EditorStateService.getActiveStateName())) {
+              EditorStateService.setActiveStateName(
+                ExplorationInitStateNameService.displayed);
+            }
+
             var stateName = EditorStateService.getActiveStateName();
+
             $scope.stateContent = ExplorationStatesService
               .getStateContentMemento(stateName);
             $scope.stateSolution = ExplorationStatesService
@@ -126,11 +136,10 @@ oppia.directive('stateTranslation', [
               .getInteractionIdMemento(stateName);
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
+            $rootScope.loadingMessage = '';
           };
 
-          $timeout(function(){
-            $scope.initStateTranslation();
-          }, 100);
+          $scope.initStateTranslation();
         }
       ]
     };
