@@ -45,6 +45,7 @@ notifications:
     - henning.benmax@gmail.com
     - tzjiang1@gmail.com
     - apurvabajaj007@gmail.com
+    - hoangviet1993@gmail.com
     on_success: change
     on_failure: change
   irc:
