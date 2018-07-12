@@ -18,7 +18,6 @@
  */
 
 var objects = require('../../objects/protractor.js');
-var until = protractor.ExpectedConditions;
 
 var customizeInteraction = function(elem, buttonText) {
   if (buttonText) {
@@ -36,12 +35,9 @@ var expectInteractionDetailsToMatch = function(elem, buttonText) {
 
 var submitAnswer = function() {
   var continueButton = element(by.css('.protractor-test-continue-button'));
-  browser.wait(until.elementToBeClickable(continueButton), 10000,
-    'Continue button is not clickable').then(function(isClickable){
-    if (isClickable) {
-      continueButton.click();
-    }
-  });
+  waitFor.elementToBeClickable(
+    continueButton, 'Continue button is not clickable');
+  continueButton.click();
 };
 
 var testSuite = [];

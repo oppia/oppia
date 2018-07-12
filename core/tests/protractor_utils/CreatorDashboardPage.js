@@ -16,9 +16,7 @@
  * @fileoverview Page object for the creator dashboard, for use in Protractor
  * tests.
  */
-var general = require('./general.js');
-var until = protractor.ExpectedConditions;
-var waitFor = require('../protractor_utils/waitFor.js');
+var waitFor = require('./waitFor.js');
 
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator_dashboard';
@@ -52,7 +50,7 @@ var CreatorDashboardPage = function() {
 
   this.get = function() {
     browser.get(CREATOR_DASHBOARD_URL);
-    return general.waitForLoadingMessage();
+    return waitFor.pageToFullyLoad();
   };
 
   this.getNumberOfFeedbackMessages = function() {
@@ -63,7 +61,7 @@ var CreatorDashboardPage = function() {
 
   this.navigateToExplorationEditor = function() {
     explorationDashboardCard.click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.clickCreateActivityButton = function() {
@@ -71,20 +69,17 @@ var CreatorDashboardPage = function() {
       createActivityButton,
       'Create Activity button takes too long to be clickable');
     createActivityButton.click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.clickCreateCollectionButton = function() {
-    browser.wait(until.visibilityOf(activityCreationModal), 5000,
-      'Activity Creation modal is not visible').then( function(isVisible) {
-      if (isVisible) {
-        waitFor.elementToBeClickable(
-          createCollectionButton,
-          'Create Collection button takes too long to be clickable');
-        createCollectionButton.click();
-        general.waitForLoadingMessage();
-      }
-    });
+    waitFor.visibilityOf(
+      activityCreationModal, 'Activity Creation modal is not visible');
+    waitFor.elementToBeClickable(
+      createCollectionButton,
+      'Create Collection button takes too long to be clickable');
+    createCollectionButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.clickCreateExplorationButton = function() {
@@ -92,7 +87,7 @@ var CreatorDashboardPage = function() {
       createExplorationButton,
       'Create Exploration button takes too long to be clickable');
     createExplorationButton.click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.navigateToCollectionEditor = function() {
@@ -100,7 +95,7 @@ var CreatorDashboardPage = function() {
       collectionCard,
       'Collection Card tab takes too long to be clickable');
     collectionCard.click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.navigateToSubscriptionDashboard = function() {
@@ -108,7 +103,7 @@ var CreatorDashboardPage = function() {
       subscriptionTab,
       'Subscription Dashboard tab takes too long to be clickable');
     subscriptionTab.click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.editExploration = function(explorationTitle) {
@@ -122,7 +117,7 @@ var CreatorDashboardPage = function() {
         explorationElement,
         'Unable to click on exploration: ' + explorationTitle);
       explorationElement.click();
-      general.waitForLoadingMessage();
+      waitFor.pageToFullyLoad();
     });
   };
 };

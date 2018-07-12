@@ -19,8 +19,8 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
-var until = protractor.ExpectedConditions;
 
 var CollectionEditorPage =
   require('../protractor_utils/CollectionEditorPage.js');
@@ -120,7 +120,7 @@ describe('Full exploration editor', function() {
 
           browser.get('/explore/' + refresherExplorationId + '?parent=' +
             parentId1 + '&parent=' + parentId2);
-          general.waitForLoadingMessage();
+          waitFor.pageToFullyLoad();
 
           explorationPlayerPage.clickOnReturnToParentButton();
 

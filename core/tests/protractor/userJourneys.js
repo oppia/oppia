@@ -39,7 +39,7 @@ var _selectLanguage = function(language) {
   element(by.css('.protractor-test-i18n-language-selector')).
     element(by.cssContainingText('option', language)).click();
   // Wait for the language-change request to reach the backend.
-  general.waitForLoadingMessage();
+  waitFor.pageToFullyLoad();
 };
 
 
@@ -108,7 +108,7 @@ describe('Basic user journeys', function() {
         waitFor.elementToBeClickable(
           dropdownElement, 'Could not click topnav dropdown');
         dropdownElement.click();
-        general.waitForLoadingMessage();
+        waitFor.pageToFullyLoad();
       });
     });
 
@@ -169,7 +169,7 @@ describe('Basic user journeys', function() {
 
     var visitRecentlyPublishedPage = function() {
       browser.get('library/recently_published');
-      general.waitForLoadingMessage();
+      waitFor.pageToFullyLoad();
     };
 
     it('visits the search page', function() {
@@ -200,7 +200,7 @@ describe('Basic user journeys', function() {
 
       libraryPage.get();
       element(by.css('.protractor-test-library-top-rated')).click();
-      general.waitForLoadingMessage();
+      waitFor.pageToFullyLoad();
       expect(browser.getCurrentUrl()).toContain('library/top_rated');
       users.logout();
     });
@@ -221,7 +221,7 @@ describe('Oppia static pages tour', function() {
 
   beforeEach(function() {
     browser.get(general.SERVER_URL_PREFIX);
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   });
 
   it('visits the links in About dropdown', function() {
@@ -235,13 +235,13 @@ describe('Oppia static pages tour', function() {
       var dropdown = element(by.css('.protractor-test-about-oppia-list-item'));
       browser.actions().mouseMove(dropdown).perform();
       dropdown.element(by.css(className)).click();
-      general.waitForLoadingMessage();
+      waitFor.pageToFullyLoad();
     });
   });
 
   it('visits the donate link', function() {
     element(by.css('.protractor-test-donate-link')).click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   });
 
   it('visits the thanks for donating page', function() {
@@ -251,12 +251,12 @@ describe('Oppia static pages tour', function() {
 
   it('visits the terms page', function() {
     element(by.css('.protractor-test-terms-link')).click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   });
 
   it('visits the privacy page', function() {
     element(by.css('.protractor-test-privacy-policy-link')).click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   });
 
   afterEach(function() {
@@ -361,14 +361,14 @@ describe('Site language', function() {
   beforeEach(function() {
     // Starting language is English
     browser.get('/about');
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     _selectLanguage('English');
     expect(browser.getTitle()).toEqual('About us - Oppia');
   });
 
   it('should change after selecting a different language', function() {
     browser.get('/about');
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     _selectLanguage('Español');
     libraryPage.get();
     expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
@@ -390,7 +390,7 @@ describe('Site language', function() {
       users.createUser('feanor@example.com', 'Feanor');
       users.login('feanor@example.com');
       browser.get('/about');
-      general.waitForLoadingMessage();
+      waitFor.pageToFullyLoad();
       _selectLanguage('Español');
       libraryPage.get();
       expect(browser.getTitle()).toEqual('Biblioteca - Oppia');
@@ -407,7 +407,7 @@ describe('Site language', function() {
 
   it('should be used in titles of pages without controllers', function() {
     browser.get('/about');
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     _selectLanguage('English');
     expect(browser.getTitle()).toEqual('About us - Oppia');
     _selectLanguage('Español');
@@ -418,7 +418,7 @@ describe('Site language', function() {
   it('should not change in an exploration', function() {
     users.login('langCreator@explorations.com', true);
     browser.get('/about');
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     _selectLanguage('Español');
 
     general.openEditor(firstExplorationId);
@@ -434,19 +434,19 @@ describe('Site language', function() {
   it('should not change in exploration and collection player for guest users',
     function() {
       browser.get('/about');
-      general.waitForLoadingMessage();
+      waitFor.pageToFullyLoad();
       _selectLanguage('Español');
 
       // Checking collection player page.
       browser.get('/collection/' + collectionId);
-      general.waitForLoadingMessage();
+      waitFor.pageToFullyLoad();
       expect(element(by.css('.oppia-share-collection-footer')).getText())
         .toEqual('COMPARTIR ESTA COLECCIÓN');
       general.ensurePageHasNoTranslationIds();
 
       // Checking exploration player page.
       browser.get('/explore/' + firstExplorationId);
-      general.waitForLoadingMessage();
+      waitFor.pageToFullyLoad();
       expect(element(by.css('.author-profile-text')).getText())
         .toEqual('PERFILES DE AUTORES');
       general.ensurePageHasNoTranslationIds();
@@ -456,7 +456,7 @@ describe('Site language', function() {
   afterEach(function() {
     // Reset language back to English
     browser.get('/about');
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     _selectLanguage('English');
     general.checkForConsoleErrors([]);
   });
