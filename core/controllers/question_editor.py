@@ -43,9 +43,7 @@ class QuestionEditorPage(base.BaseHandler):
                 'The question with the given id doesn\'t exist.')
 
         self.values.update({
-            'question': question.to_dict(),
-            'can_edit': question_services.check_can_edit_question(
-                self.user.user_id, question_id)
+            'question': question.to_dict()
         })
 
         self.render_template(

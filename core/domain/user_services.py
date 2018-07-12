@@ -1613,7 +1613,7 @@ def is_topic_manager(user_id):
         user_id: str. The unique ID of the user.
 
     Returns:
-        bool. True if user is a topic manager, False otherwise.
+        bool. Whether the user is a topic manager.
     """
     user_role = get_user_role_from_id(user_id)
     if user_role == feconf.ROLE_ID_TOPIC_MANAGER:

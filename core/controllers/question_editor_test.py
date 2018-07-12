@@ -38,9 +38,9 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
         self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_USERNAME])
 
-        self.question_data = self._create_valid_question_data('ABC')
+        self.question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
-            'dummy', self.question_data, 1, 'en', 'private')
+            'dummy', self.question_state_data, 1, 'en')
 
         self.question_id = question_services.add_question(
             self.admin_id, self.question)
@@ -53,8 +53,6 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response_dict['username'], 'adm')
             self.assertEqual(
-                response_dict['question_dict']['status'], 'private')
-            self.assertEqual(
                 response_dict['question_dict']['question_data_schema_version'],
                 1)
             self.assertEqual(
@@ -66,8 +64,8 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response_dict['question_dict']['language_code'], 'en')
             self.assertEqual(
-                response_dict['question_dict']['question_data'],
-                self.question_data)
+                response_dict['question_dict']['question_state_data'],
+                self.question_state_data)
 
             self.logout()
 
@@ -88,9 +86,9 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
             payload = {}
             new_question_data = self._create_valid_question_data('DEF')
             change_list = [{'cmd': 'update_question_property',
-                            'property_name': 'question_data',
+                            'property_name': 'question_state_data',
                             'new_value': new_question_data,
-                            'old_value': self.question.question_data}]
+                            'old_value': self.question.question_state_data}]
             payload['change_list'] = json.dumps(change_list)
             payload['commit_message'] = 'update question data'
             self.login(self.ADMIN_EMAIL)
@@ -102,11 +100,9 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
                 payload, csrf_token, expect_errors=False)
 
             self.assertEqual(
-                response_json['question_dict']['status'], 'private')
-            self.assertEqual(
                 response_json['question_dict']['language_code'], 'en')
             self.assertEqual(
-                response_json['question_dict']['question_data'],
+                response_json['question_dict']['question_state_data'],
                 new_question_data)
             self.assertEqual(
                 response_json['question_dict']['id'], self.question_id)
@@ -146,8 +142,7 @@ class QuestionEditorPageTest(test_utils.GenericTestBase):
 
         self.question = question_domain.Question(
             'dummy',
-            self._create_valid_question_data('ABC'),
-            1, 'en', 'private')
+            self._create_valid_question_data('ABC'), 1, 'en')
         self.question_id = question_services.add_question(
             self.admin_id, self.question)
 

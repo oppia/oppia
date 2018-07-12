@@ -860,8 +860,11 @@ def can_edit_question(handler):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        if question_services.check_can_edit_question(
-                self.user.user_id, question_id):
+        question_rights = question_services.get_question_rights(
+            question_id)
+
+        if (question_services.check_can_edit_question(
+                self.user, question_rights)):
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -913,30 +916,6 @@ def can_delete_question(handler):
     return test_can_delete_question
 
 
-def can_change_question_publication_status(handler):
-    """Decorator to check whether the user can publish or unpublish a
-       question.
-    """
-
-    def test_can_change_question_publication_status(self, **kwargs):
-        if not self.user_id:
-            raise self.NotLoggedInException
-
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-
-        if (
-                role_services.ACTION_CHANGE_QUESTION_STATUS in
-                user_actions_info.actions):
-            return handler(self, **kwargs)
-        else:
-            raise self.UnauthorizedUserException(
-                '%s does not have enough rights to publish or unpublish the '
-                'question.' % self.user_id)
-    test_can_change_question_publication_status.__wrapped__ = True
-
-    return test_can_change_question_publication_status
-
-
 def can_create_question(handler):
     """Decorator to check whether the user can create an question."""
 
@@ -945,7 +924,7 @@ def can_create_question(handler):
         if self.user_id is None:
             raise self.NotLoggedInException
 
-        if role_services.ACTION_CREATE_QUESTION in self.user.actions:
+        if role_services.ACTION_CREATE_NEW_QUESTION in self.user.actions:
             return handler(self, **kwargs)
         else:
             raise base.UserFacingExceptions.UnauthorizedUserException(
