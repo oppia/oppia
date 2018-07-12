@@ -6,9 +6,11 @@
             ng-disabled="!isSkillSaveable()"
             ng-if="!isSaveInProgress()">
       <span ng-if="!isSaveInProgress()">
-        <i class="material-icons md-18 md-dark oppia-save-publish-button-icon" alt="Save Skill">
-          &#xE161;
-        </i>
+        <span ng-if="skillRights.isPrivate()">
+          <i class="material-icons md-18 md-dark oppia-save-publish-button-icon" alt="Save Skill">
+            &#xE161;
+          </i>
+        </span>
         <span class="oppia-save-publish-button-label">Save Draft</span>
         <span class="hidden-sm hidden-xs" style="opacity:0.5"
               ng-if="getChangeListCount() > 0">
@@ -17,7 +19,8 @@
       </span>
 
       <span ng-if="isSaveInProgress()">
-        <span class="oppia-save-publish-button-label">Saving</span>
+        <span ng-if="skillRights.isPrivate()" class="oppia-save-publish-button-label">Saving</span>
+        <span ng-if="skillRights.isPublic()" class="oppia-save-publish-button-label">Publishing</span>
         <loading-dots></loading-dots>
       </span>
     </button>

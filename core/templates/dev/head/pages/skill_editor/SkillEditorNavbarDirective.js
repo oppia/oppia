@@ -25,10 +25,14 @@ oppia.directive('skillEditorNavbar', [
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
+        'SkillRightsBackendApiService',
         function(
             $scope, $uibModal, AlertsService,
-            UndoRedoService, SkillEditorStateService) {
+            UndoRedoService, SkillEditorStateService,
+            SkillRightsBackendApiService) {
           $scope.skill = SkillEditorStateService.getSkill();
+          $scope.skillRights = (
+            SkillEditorStateService.getSkillRights());
 
           $scope.isLoadingSkill = SkillEditorStateService.isLoadingSkill;
           $scope.isSaveInProgress = SkillEditorStateService.isSavingSkill;
@@ -39,6 +43,12 @@ oppia.directive('skillEditorNavbar', [
 
           $scope.isSkillSaveable = function() {
             return $scope.getChangeListCount() > 0;
+          };
+
+          $scope.isCollectionPublishable = function() {
+            return (
+              $scope.skillRights.isPrivate() &&
+              $scope.getChangeListCount() === 0);
           };
 
           $scope.saveChanges = function() {
@@ -59,6 +69,16 @@ oppia.directive('skillEditorNavbar', [
                 }
               ]
             });
+
+            var _publishSkill = function() {
+              SkillRightsBackendApiService.setSkillPublic(
+                $scope.skill.getId(), $scope.skill.getVersion()).then(
+                function() {
+                  $scope.skillRights.setPublic();
+                  SkillEditorStateService.setSkillRights(
+                    $scope.skillRights);
+                });
+            };
 
             modalInstance.result.then(function(commitMessage) {
               SkillEditorStateService.saveSkill(commitMessage);

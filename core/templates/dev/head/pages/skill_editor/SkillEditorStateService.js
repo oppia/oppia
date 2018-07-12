@@ -18,12 +18,13 @@
 */
 
 oppia.factory('SkillEditorStateService', [
-  'SkillObjectFactory', 'EditableSkillBackendApiService',
-  'AlertsService', 'UndoRedoService',
+  'SkillObjectFactory', 'SkillRightsObjectFactory', 
+  'EditableSkillBackendApiService', 'AlertsService', 'UndoRedoService',
   function(
-      SkillObjectFactory, EditableSkillBackendApiService,
-      AlertsService, UndoRedoService) {
+      SkillObjectFactory, SkillRightsObjectFactory,
+      EditableSkillBackendApiService, AlertsService, UndoRedoService) {
     var _skill = SkillObjectFactory.createInterstitialSkill();
+    var _skillRights = SkillObjectFactory.createInterstitialSkillRights();
     var _skillIsInitialized = false;
     var _skillIsBeingLoaded = false;
     var _skillIsBeingSaved = false;
@@ -38,6 +39,11 @@ oppia.factory('SkillEditorStateService', [
         newBackendSkillObject));
     };
 
+    var _updateSkillRights = function(newBackendSkillRightsObject) {
+      _setSkillRights(SkillRightsObjectFactory.create(
+        newBackendSkillRightsObject));
+    };
+
     return {
       loadSkill: function(skillId) {
         _skillIsBeingLoaded = true;
@@ -48,6 +54,16 @@ oppia.factory('SkillEditorStateService', [
             _skillIsBeingLoaded = false;
           }, function(error) {
             AlertsService.addWarning();
+            _skillIsBeingLoaded = false;
+          });
+        SkillRightsBackendApiService.fetchSkillRights(
+          skillId).then(function(newBackendSkillRightsObject) {
+            _updateSkillRights(newBackendSkillRightsObject);
+            _skillIsBeingLoaded = false;
+          }, function(error) {
+            AlertsService.addWarning(
+              error ||
+              'There was an error when loading the skill rights.')
             _skillIsBeingLoaded = false;
           });
       },
@@ -90,6 +106,10 @@ oppia.factory('SkillEditorStateService', [
             _skillIsBeingSaved = false;
           });
         return true;
+      },
+
+      getSkillRights: function() {
+        return _skillRights;
       },
 
       isSavingSkill: function() {

@@ -23,6 +23,21 @@ import feconf
 import utils
 
 
+def _require_valid_version(self, version_from_payload, skill_version):
+    """Check that the payload version matches the given skill
+    version.
+    """
+    if version_from_payload is None:
+        raise base.BaseHandler.InvalidInputException(
+            'Invalid POST request: a version must be specified.')
+
+    if version_from_payload != skill_version:
+        raise base.BaseHandler.InvalidInputException(
+            'Trying to update version %s of skill from version %s, '
+            'which is too old. Please reload the page and try again.'
+            % (skill_version, version_from_payload))
+
+
 class SkillEditorPage(base.BaseHandler):
     """The editor page for a single skill."""
 
@@ -69,7 +84,8 @@ class SkillRightsHandler(base.BaseHandler):
         self.values.update({
             'skill_is_private': skill_rights.skill_is_private,
             'creator_id': skill_rights.creator_id,
-            'can_edit_skill': can_edit_skill
+            'can_edit_skill': can_edit_skill,
+            'skill_id': skill_id
         })
 
         self.render_json(self.values)
@@ -77,20 +93,6 @@ class SkillRightsHandler(base.BaseHandler):
 
 class EditableSkillDataHandler(base.BaseHandler):
     """A data handler for skills which supports writing."""
-
-    def _require_valid_version(self, version_from_payload, skill_version):
-        """Check that the payload version matches the given skill
-        version.
-        """
-        if version_from_payload is None:
-            raise base.BaseHandler.InvalidInputException(
-                'Invalid POST request: a version must be specified.')
-
-        if version_from_payload != skill_version:
-            raise base.BaseHandler.InvalidInputException(
-                'Trying to update version %s of skill from version %s, '
-                'which is too old. Please reload the page and try again.'
-                % (skill_version, version_from_payload))
 
     @acl_decorators.can_edit_skill
     def get(self, skill_id):
@@ -123,7 +125,7 @@ class EditableSkillDataHandler(base.BaseHandler):
                 Exception('The skill with the given id doesn\'t exist.'))
 
         version = self.payload.get('version')
-        self._require_valid_version(version, skill.version)
+        _require_valid_version(version, skill.version)
 
         commit_message = self.payload.get('commit_message')
         change_dicts = self.payload.get('change_dicts')
@@ -163,11 +165,26 @@ class SkillPublishHandler(base.BaseHandler):
     @acl_decorators.can_publish_skill
     def put(self, skill_id):
         """Publishes a skill."""
+        skill = skill_services.get_skill_by_id(skill_id)
+        version = self.payload.get('version')
+        _require_valid_version(version, skill.version)
+
         skill_domain.Skill.require_valid_skill_id(skill_id)
 
         try:
             skill_services.publish_skill(skill_id, self.user_id)
         except Exception as e:
             raise self.UnauthorizedUserException(e)
+
+        skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        can_edit_skill = skill_services.check_can_edit_skill(
+            user_actions_info, skill_rights)
+
+        self.values.update({
+            'skill_is_private': skill_rights.skill_is_private,
+            'creator_id': skill_rights.creator_id,
+            'can_edit_skill': can_edit_skill 
+        })
 
         self.render_json(self.values)

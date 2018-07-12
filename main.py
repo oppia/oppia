@@ -534,7 +534,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<skill_id>' % feconf.SKILL_RIGHTS_URL_PREFIX,
         skill_editor.SkillRightsHandler),
     get_redirect_route(
-        r'%s/<skill_id>' % feconf.SKILL_STATUS_URL_PREFIX,
+        r'%s/<skill_id>' % feconf.SKILL_PUBLISH_URL_PREFIX,
         skill_editor.SkillPublishHandler),
 
     get_redirect_route(
