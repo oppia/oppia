@@ -665,7 +665,7 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                         ALLOWED_IMAGE_EXTENSIONS) + '))$')
                 catched_groups = pattern.match(instance_id)
                 if not catched_groups:
-                    yield(WRONG_INSTANCE_ID, instance_id)
+                    yield (WRONG_INSTANCE_ID, instance_id)
                 else:
                     filename = catched_groups.group(2)
                     filepath = 'assets/' + filename
@@ -676,20 +676,20 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                         content = file_model.content
                         fs = fs_domain.AbstractFileSystem(
                             fs_domain.GcsFileSystem(exploration_id))
-                        if fs.isfile('image/%s' % (filename)):
-                            yield(FILE_ALREADY_EXISTS, file_model.id)
+                        if fs.isfile('image/%s' % filename):
+                            yield (FILE_ALREADY_EXISTS, file_model.id)
                         else:
                             fs.commit(
-                                'ADMIN', 'image/%s' % (filename),
-                                content, 'image/%s' % (filetype))
-                            yield(FILE_COPIED, 1)
+                                'ADMIN', 'image/%s' % filename,
+                                content, 'image/%s' % filetype)
+                            yield (FILE_COPIED, 1)
                     else:
-                        yield(FOUND_DELETED_FILE, file_model.id)
+                        yield (FOUND_DELETED_FILE, file_model.id)
 
 
     @staticmethod
     def reduce(status, values):
         if status == FILE_COPIED:
-            yield(status, len(values))
+            yield (status, len(values))
         else:
-            yield(status, values)
+            yield (status, values)

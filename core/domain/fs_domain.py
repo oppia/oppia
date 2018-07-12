@@ -457,7 +457,7 @@ class GcsFileSystem(object):
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            bool. Returns True if the file exists in GCS else False.
+            bool. Whether the file exists in GCS.
         """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
 
