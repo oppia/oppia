@@ -5,16 +5,12 @@
            ng-attr-placeholder="<[customPlaceholder !== '' ? customPlaceholder : (allowNonzeroIntegerPart ? ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER' | translate) : ('I18N_INTERACTIONS_FRACTIONS_INPUT_PLACEHOLDER_NO_INTEGER' | translate))]>">
   </ng-form>
 
-  <div class="oppia-form-error oppia-fraction-input-error">
+  <div class="oppia-form-error">
     <[getWarningText()]>
   </div>
 </form>
 
 <style>
-  .oppia-fraction-input-error {
-    margin-top: 10px;
-  }
-
   .ng-invalid {
     border-color: red;
     outline-color: red;
