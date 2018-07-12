@@ -18,7 +18,7 @@
  */
 
 // This will be removed after translation tab will be ready.
-oppia.constant('ENABLE_TRANSLATION_TAB', false);
+oppia.constant('ENABLE_TRANSLATION_TAB', true);
 
 oppia.directive('editorNavigation', [
   'UrlInterpolationService', function(UrlInterpolationService) {

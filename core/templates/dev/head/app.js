@@ -21,9 +21,9 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngMaterial', 'ngAnimate', 'ngAudio', 'angularAudioRecorder', 'ngSanitize', 
-    'ngTouch', 'ngResource', 'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 
-    'ngJoyRide', 'ngImgCrop', 'ui.validate', 'textAngular', 
+    'ngMaterial', 'ngAnimate', 'ngAudio', 'angularAudioRecorder', 'ngSanitize',
+    'ngTouch', 'ngResource', 'ui.bootstrap', 'ui.sortable', 'infinite-scroll',
+    'ngJoyRide', 'ngImgCrop', 'ui.validate', 'textAngular',
     'pascalprecht.translate', 'ngCookies', 'toastr', 'headroom', 'dndLists'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
@@ -503,6 +503,11 @@ oppia.config(['toastrConfig', function(toastrConfig) {
     tapToDismiss: true,
     titleClass: 'toast-title'
   });
+}]);
+
+oppia.config(['recorderServiceProvider', function (recorderServiceProvider) {
+  recorderServiceProvider.forceSwf(false);
+  recorderServiceProvider.withMp3Conversion(true);
 }]);
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend

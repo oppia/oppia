@@ -122,6 +122,13 @@
           "js": ["dist/angular-audio-recorder.min.js"]
         }
       },
+      "lameJs": {
+        "version": "1.2.0",
+        "downloadFormat": "files",
+        "url": "https://raw.githubusercontent.com/zhuker/lamejs/1.2.0",
+        "targetDirPrefix": "lamejs-",
+        "files": ["lame.min.js"]
+      },
       "angularTest": {
         "version": "1.5.8",
         "downloadFormat": "files",
@@ -304,9 +311,9 @@
         }
       },
       "waveSurferJs": {
-        "version": "2.0.6",
+        "version": "1.0.46",
         "downloadFormat": "files",
-        "url": "https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/2.0.6",
+        "url": "https://cdn.rawgit.com/katspaugh/wavesurfer.js/v1.0.46/dist/",
         "rootDirPrefix": "waveSurfer-js-",
         "targetDirPrefix": "wave-surfer-js-",
         "files": ["wavesurfer.min.js"],

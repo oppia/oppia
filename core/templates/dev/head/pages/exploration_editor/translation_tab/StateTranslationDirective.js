@@ -21,9 +21,6 @@ oppia.directive('stateTranslation', [
     return {
       restrict: 'E',
       scope: {},
-      link: function(scope) {
-        scope.initStateTranslation();
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_directive.html'),
@@ -49,7 +46,7 @@ oppia.directive('stateTranslation', [
           $scope.stateHints = [];
           $scope.stateSolution = null;
           $scope.activeContentId = null;
-          
+
           $scope.isActive = function(tabId) {
             return ($scope.ACTIVATED_TAB_ID === tabId);
           };
@@ -60,8 +57,13 @@ oppia.directive('stateTranslation', [
               $scope.activeContentId = $scope.stateContent.getContentId();
             } else if (tabId === $scope.TAB_ID_FEEDBACK) {
               $scope.activeAnswerGroupIndex = 0;
+              if ($scope.stateAnswerGroups.length > 0) {
                 $scope.activeContentId = $scope.stateAnswerGroups[0]
                   .outcome.feedback.getContentId();
+              } else {
+                $scope.activeContentId = $scope.stateDefaultOutcome
+                  .feedback.getContentId();
+              }
             } else if (tabId === $scope.TAB_ID_HINTS) {
               $scope.activeHintIndex = 0;
               $scope.activeContentId = $scope.stateHints[0]
@@ -69,7 +71,7 @@ oppia.directive('stateTranslation', [
             } else if (tabId === $scope.TAB_ID_SOLUTION) {
               $scope.activeContentId = $scope.stateSolution.explanation
                 .getContentId();
-            }  
+            }
           };
 
           $scope.isDisabled = function(tabId) {
@@ -116,7 +118,7 @@ oppia.directive('stateTranslation', [
               'formatRtePreview')(subtitledHtml.getHtml());
             return htmlAsPlainText;
           };
-          
+
           $scope.$on('refreshStateTranslation', function() {
             $scope.initStateTranslation();
           });

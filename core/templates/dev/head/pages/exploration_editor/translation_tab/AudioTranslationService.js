@@ -18,23 +18,39 @@
  */
 
 oppia.factory('AudioTranslationService', [
-  '$q', 'AssetsBackendApiService', 'ExplorationContextService', 
+  '$q', 'AssetsBackendApiService', 'ExplorationContextService',
   function($q, AssetsBackendApiService, ExplorationContextService){
   var _load = function(filename, successCallback, errorCallback) {
     AssetsBackendApiService.loadAudio(
       ExplorationContextService.getExplorationId(), filename)
         .then(function(loadedAudiofile) {
-          console.log(successCallback);
           successCallback(loadedAudiofile);
         }, function(reason) {
             errorCallback(reason);
         });
    };
+
+  var _upload = function(filename, audioFile, successCallback, errorCallback) {
+    console.log("asdasdasdasd", audioFile);
+   AssetsBackendApiService.saveAudio(
+     ExplorationContextService.getExplorationId(), filename, audioFile)
+      .then(function(){
+        successCallback();
+      }, function(errorResponse) {
+        errorCallback();
+      });
+  };
+
   return {
     load: function(filename) {
       return $q(function(resolve, reject) {
         _load(filename, resolve, reject);
       });
+    },
+    upload: function(filename, audioFile) {
+      return $q(function(resolve, reject) {
+        _upload(filename, audioFile, resolve, reject);
+      });
     }
-  }  
+  }
 }]);

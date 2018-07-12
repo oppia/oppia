@@ -21,6 +21,9 @@ oppia.directive('translationTab', [
     return {
       restrict: 'E',
       scope: {},
+      link: function(scope) {
+        scope.$broadcast('refreshTranslationTab');
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
@@ -34,8 +37,8 @@ oppia.directive('translationTab', [
               EditorStateService.getActiveStateName())) {
               $rootScope.$broadcast('refreshStateTranslation');
             }
+            $rootScope.loadingMessage = '';
           });
-          $rootScope.loadingMessage = '';
         }
       ]
     };
