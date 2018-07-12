@@ -164,7 +164,7 @@ class Question(object):
         or published.
         """
         self.validate()
-        self.exp_domain.State.validate()
+        exp_domain.State.validate(self, None, False)
 
 
     @classmethod
