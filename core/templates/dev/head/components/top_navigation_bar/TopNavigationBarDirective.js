@@ -116,7 +116,7 @@ oppia.directive('topNavigationBar', [
             if (DeviceInfoService.isMobileDevice()) {
               return;
             }
-            $scope.closeSubmenu();
+            $scope.closeSubmenu(evt);
           };
           /**
            * Handles keydown events on menus.
