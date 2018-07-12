@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to change the rights of collections in the backend.
+ * @fileoverview Service to change the rights of skills in the backend.
  */
 
 oppia.factory('SkillRightsBackendApiService', [
@@ -112,6 +112,14 @@ oppia.factory('SkillRightsBackendApiService', [
        */
       isCached: function(skillId) {
         return _isCached(skillId);
+      },
+
+      /**
+       * Replaces the current skill rights in the cache given by the
+       * specified skill ID with a new skill rights object.
+       */
+      cacheSkillRights: function(skillId, skillRights) {
+        skillRightsCache[skillId] = angular.copy(skillRights);
       },
 
       /**
