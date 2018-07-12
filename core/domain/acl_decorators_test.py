@@ -1496,7 +1496,7 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
 
 
 class EditQuestionDecoratorTest(test_utils.GenericTestBase):
-    """Tests the decorator can_edit_topic."""
+    """Tests the decorator can_edit_question."""
     question_id = 'question_id'
 
     class MockHandler(base.BaseHandler):
