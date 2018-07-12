@@ -99,33 +99,29 @@ class Question(object):
         question_id: str. The unique ID of the question.
         question_state_data: State. An object representing the question
             state data.
-        question_state_data_schema_version: int. The schema version for
-            the data.
         language_code: str. The ISO 639-1 code for the language this
             question is written in.
         status: str. The status of the question among approved, rejected,
             pending or private.
+        version: int. The version of the question.
     """
 
     def __init__(
-            self, question_id, question_state_data,
-            question_state_data_schema_version, language_code):
+            self, question_id, question_state_data, language_code, version):
         """Constructs a Question domain object.
 
         Args:
             question_id: str. The unique ID of the question.
             question_state_data: State. An object representing the question
                 state data.
-            question_state_data_schema_version: int. The schema version for
-                the data.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
+            version: int. The version of the question.
         """
         self.id = question_id
         self.question_state_data = question_state_data
-        self.question_state_data_schema_version = (
-            question_state_data_schema_version)
         self.language_code = language_code
+        self.version = version
 
     def to_dict(self):
         """Returns a dict representing this Question domain object.
@@ -136,9 +132,8 @@ class Question(object):
         return {
             'id': self.id,
             'question_state_data': self.question_state_data,
-            'question_state_data_schema_version': (
-                self.question_state_data_schema_version),
-            'language_code': self.language_code
+            'language_code': self.language_code,
+            'version': self.version
         }
 
     def validate(self, strict=False):
@@ -148,15 +143,15 @@ class Question(object):
             raise utils.ValidationError(
                 'Expected ID to be a string, received %s' % self.id)
 
-        if not isinstance(self.question_state_data_schema_version, int):
-            raise utils.ValidationError(
-                'Expected question_state_data_schema_version to be a integer,' +
-                'received %s' % self.question_state_data_schema_version)
-
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
+
+        if not isinstance(self.version, int):
+            raise utils.ValidationError(
+                'Expected version to be an integer, received %s' %
+                self.version)
 
         if not any([self.language_code == lc['code']
                     for lc in constants.ALL_LANGUAGE_CODES]):
@@ -199,7 +194,7 @@ class Question(object):
 
             question_state_data = exp_domain.State.from_dict(
                 self.question_state_data)
-            question_state_data.validate({}, True)
+            question_state_data.validate({}, False)
 
     @classmethod
     def from_dict(cls, question_dict):
@@ -211,8 +206,8 @@ class Question(object):
         question = cls(
             question_dict['id'],
             question_dict['question_state_data'],
-            question_dict['question_state_data_schema_version'],
-            question_dict['language_code'])
+            question_dict['language_code'],
+            question_dict['version'])
 
         return question
 
@@ -231,8 +226,7 @@ class Question(object):
 
         return cls(
             question_id, default_question_state_data,
-            feconf.CURRENT_QUESTION_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE)
+            constants.DEFAULT_LANGUAGE_CODE, feconf.CURRENT_QUESTION_VERSION)
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
@@ -350,8 +344,8 @@ class QuestionRights(object):
         """Returns a dict suitable for use by the frontend.
 
         Returns:
-            dict. A dict version of QuestionRights suitable for use by the
-                frontend.
+            dict. A dict representation of QuestionRights suitable for use
+                by the frontend.
         """
         return {
             'question_id': self.id,

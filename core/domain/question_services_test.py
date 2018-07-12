@@ -51,13 +51,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.question_state_data = self._create_valid_question_data('ABC')
         self.question_id = 'dummy'
-        self.question_state_data_schema_version = 1
         self.language_code = 'en'
+        self.version = 1
         self.question = question_domain.Question(
-            self.question_id, self.question_state_data,
-            self.question_state_data_schema_version, self.language_code)
-        question_services.add_question(
-            self.owner_id, self.question)
+            self.question_id, self.question_state_data, self.language_code,
+            self.version)
+        question_services.add_question(self.owner_id, self.question)
 
     def test_get_question_by_id(self):
         question = question_services.get_question_by_id(
@@ -66,27 +65,23 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertEqual(question.id, self.question_id)
 
     def test_get_questions_by_ids(self):
-        question1_id = question_services.add_question(
-            self.owner_id, self.question)
         question = question_domain.Question(
-            'dummy2', self._create_valid_question_data('ABC'), 1, 'en')
+            'dummy2', self._create_valid_question_data('ABC'), 'en', 1)
 
         question2_id = question_services.add_question(
             self.owner_id, question)
         questions = question_services.get_questions_by_ids(
-            [question1_id, question2_id])
+            [self.question_id, question2_id])
         self.assertEqual(len(questions), 2)
-        self.assertEqual(questions[0].id, question1_id)
+        self.assertEqual(questions[0].id, self.question_id)
         self.assertEqual(questions[1].id, question2_id)
 
     def test_add_question(self):
         model = question_models.QuestionModel.get(self.question_id)
 
         self.assertEqual(model.question_state_data, self.question_state_data)
-        self.assertEqual(
-            model.question_state_data_schema_version,
-            self.question_state_data_schema_version)
         self.assertEqual(model.language_code, self.language_code)
+        self.assertEqual(model.version, self.version + 1)
 
     def test_delete_question(self):
         question_services.delete_question(self.owner_id, self.question_id)
@@ -110,9 +105,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         model = question_models.QuestionModel.get(self.question_id)
         self.assertEqual(model.question_state_data, new_question_data)
-        self.assertEqual(
-            model.question_state_data_schema_version,
-            self.question_state_data_schema_version)
+        self.assertEqual(model.version, 3)
         self.assertEqual(
             model.language_code, self.language_code)
 
@@ -129,7 +122,6 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_question_summaries_by_creator_id(self):
         html_content = '<b>This is updated text.</b>'
-        question_services.add_question(self.owner_id, self.question)
         question_summaries = (
             question_services.get_question_summaries_by_creator_id(
                 self.owner_id))

@@ -40,7 +40,7 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
 
         self.question_state_data = self._create_valid_question_data('ABC')
         self.question = question_domain.Question(
-            'dummy', self.question_state_data, 1, 'en')
+            'dummy', self.question_state_data, 'en', 1)
 
         self.question_id = question_services.add_question(
             self.admin_id, self.question)
@@ -53,17 +53,11 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response_dict['username'], 'adm')
             self.assertEqual(
-                response_dict[
-                    'question_dict']['question_state_data_schema_version'],
-                1)
-            self.assertEqual(
-                response_dict['additional_angular_modules'], [])
-            self.assertEqual(
                 response_dict['question_dict']['id'], self.question_id)
             self.assertEqual(
                 response_dict['user_email'], self.ADMIN_EMAIL)
             self.assertEqual(
-                response_dict['question_dict']['language_code'], 'en')
+                response_dict['question_dict']['version'], 2)
             self.assertEqual(
                 response_dict['question_dict']['question_state_data'],
                 self.question_state_data)
@@ -71,7 +65,6 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
             self.logout()
 
     def test_delete(self):
-        question_services.add_question(self.admin_id, self.question)
         self.login(self.ADMIN_EMAIL)
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             response = self.testapp.get('%s/%s' % (
@@ -142,17 +135,15 @@ class QuestionEditorPageTest(test_utils.GenericTestBase):
         self.set_admins([self.ADMIN_USERNAME])
 
         self.question = question_domain.Question(
-            'dummy',
-            self._create_valid_question_data('ABC'), 1, 'en')
+            'dummy', self._create_valid_question_data('ABC'), 'en', 1)
         self.question_id = question_services.add_question(
             self.admin_id, self.question)
 
     def test_get(self):
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get('%s/%s' % (
+            response_dict = self.get_json('%s/%s' % (
                 feconf.QUESTION_EDITOR_URL_PREFIX, self.question_id))
-            self.assertEqual(response.status_int, 200)
-            self.assertIn('', response.body)
+            self.assertEqual(response_dict['question_id'], self.question_id)
 
             self.logout()

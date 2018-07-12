@@ -177,8 +177,8 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
 
-# The current version of the question schema.
-CURRENT_QUESTION_SCHEMA_VERSION = 1
+# The current version of the question.
+CURRENT_QUESTION_VERSION = 1
 
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.

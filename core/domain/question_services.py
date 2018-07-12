@@ -44,9 +44,8 @@ def _create_new_question(committer_id, question, commit_message):
     model = question_models.QuestionModel(
         id=question.id,
         question_state_data=question.question_state_data,
-        question_state_data_schema_version=(
-            question.question_state_data_schema_version),
-        language_code=question.language_code
+        language_code=question.language_code,
+        version=question.version
     )
 
     model.commit(
@@ -103,8 +102,7 @@ def get_question_from_model(question_model):
     """
     return question_domain.Question(
         question_model.id, question_model.question_state_data,
-        question_model.question_state_data_schema_version,
-        question_model.language_code)
+        question_model.language_code, question_model.version)
 
 
 def get_question_by_id(question_id, strict=True):
@@ -203,8 +201,6 @@ def _save_question(committer_id, question, change_list, commit_message):
 
     question_model = question_models.QuestionModel.get(question.id)
     question_model.question_state_data = question.question_state_data
-    question_model.question_state_data_schema_version = (
-        question.question_state_data_schema_version)
     question_model.language_code = question.language_code
     change_list_dict = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_list_dict)
@@ -423,15 +419,15 @@ def get_question_rights(question_id, strict=True):
 
     Args:
         question_id: str. ID of the question.
-        strict: bool. Whether to fail noisily if no question with a given id
-            exists in the datastore.
+        strict: bool. Whether to fail noisily if no question rights with a
+            given id exists in the datastore.
 
     Returns:
         QuestionRights. The rights object associated with the given question.
 
     Raises:
-        EntityNotFoundError. The question with ID question_id was not
-            found in the datastore.
+        EntityNotFoundError.The question rights for question with ID
+            question_id was not found in the datastore.
     """
 
     model = question_models.QuestionRightsModel.get(

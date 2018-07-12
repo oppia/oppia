@@ -43,12 +43,9 @@ class QuestionEditorPage(base.BaseHandler):
                 'The question with the given id doesn\'t exist.')
 
         self.values.update({
-            'question': question.to_dict()
+            'question_id': question.id
         })
-
-        self.render_template(
-            'pages/question_editor/question_editor.html',
-            redirect_url_on_logout='/')
+        self.render_json(self.values)
 
 
 class EditableQuestionDataHandler(base.BaseHandler):
