@@ -60,6 +60,17 @@ describe('Story object factory', function() {
     expect(story.getNotes()).toEqual('Story notes loading');
   });
 
+  it('should correctly validate a valid story', function() {
+    expect(_sampleStory.validate()).toEqual([]);
+  });
+
+  it('should correctly validate a story', function() {
+    _sampleStory.setTitle('');
+    expect(_sampleStory.validate()).toEqual([
+      'Story title should not be empty'
+    ]);
+  });
+
   it('should be able to copy from another story', function() {
     var secondStory = StoryObjectFactory.createFromBackendDict({
       id: 'sample_story_id_2s',

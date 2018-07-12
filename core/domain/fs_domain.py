@@ -451,14 +451,13 @@ class GcsFileSystem(object):
         return self._exploration_id
 
     def isfile(self, filepath):
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
+        """Checks if the file with the given filepath exists in the GCS.
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            bool. True or False.
+            bool. Whether the file exists in GCS.
         """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
 

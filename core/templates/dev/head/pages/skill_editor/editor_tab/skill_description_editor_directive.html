@@ -10,7 +10,13 @@
       <form class="form-horizontal" role="form" ng-submit="saveSkillDescription($parent.tmpSkillDescription)">
         <input type="text" ng-model="$parent.tmpSkillDescription" focus-on="skillDescriptionEditorOpened">
         <button type="submit" class="btn btn-success btn-sm">Save</button>
+        <button class="btn btn-default btn-sm" ng-click="closeSkillDescriptionEditor()">Cancel</button>
       </form>
     </span>
   </span>
 </div>
+<style>
+  skill-description-editor .oppia-editor-header {
+    margin-left: 12vw;
+  }
+</style>

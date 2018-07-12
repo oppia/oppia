@@ -37,7 +37,6 @@ var expectComponentDetailsToMatch = function(
   expect(headerElement.getText()).toMatch(heading);
   // Open the collapsible block so we can examine it.
   headerElement.click();
-  general.waitForSystem();
   forms.expectRichText(
     elem.element(by.css('.panel-body')).element(by.css(
       '.protractor-test-collapsible-content'))

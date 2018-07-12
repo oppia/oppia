@@ -39,6 +39,10 @@ oppia.directive('skillDescriptionEditor', [
             $scope.tmpSkillDescription = $scope.skill.getDescription();
           };
 
+          $scope.closeSkillDescriptionEditor = function() {
+            $scope.skillDescriptionEditorIsShown = false;
+          };
+
           $scope.saveSkillDescription = function(newSkillDescription) {
             if (SkillValidationService.isValidDescription(
               newSkillDescription)) {

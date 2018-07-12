@@ -103,11 +103,7 @@ describe('Collections', function() {
       users.logout();
 
       users.login('player@collections.com');
-      browser.get(general.SERVER_URL_PREFIX);
-      var dropdown = element(by.css('.protractor-test-profile-dropdown'));
-      browser.actions().mouseMove(dropdown).perform();
-      dropdown.element(by.css('.protractor-test-dashboard-link')).click();
-      browser.waitForAngular();
+      creatorDashboardPage.get();
       creatorDashboardPage.clickCreateActivityButton();
       creatorDashboardPage.clickCreateCollectionButton();
       browser.getCurrentUrl().then(function(url) {
@@ -115,7 +111,6 @@ describe('Collections', function() {
         // in the url a # is added at the end that is not part of collection ID
         collectionId = pathname[5].slice(0, -1);
       });
-      browser.waitForAngular();
       // Add existing explorations.
       collectionEditorPage.addExistingExploration(firstExplorationId);
       collectionEditorPage.saveDraft();
@@ -125,23 +120,15 @@ describe('Collections', function() {
       collectionEditorPage.setObjective('This is the second test collection.');
       collectionEditorPage.setCategory('Algebra');
       collectionEditorPage.saveChanges();
-      browser.waitForAngular();
       users.logout();
     });
   });
 
   it('visits the collection editor', function() {
     users.login('alice@collections.com');
-    browser.get(general.SERVER_URL_PREFIX);
-    var dropdown = element(by.css('.protractor-test-profile-dropdown'));
-    browser.actions().mouseMove(dropdown).perform();
-    dropdown.element(by.css('.protractor-test-dashboard-link')).click();
-    general.waitForSystem();
-    browser.waitForAngular();
+    creatorDashboardPage.get();
     creatorDashboardPage.clickCreateActivityButton();
     creatorDashboardPage.clickCreateCollectionButton();
-    general.waitForSystem();
-    browser.waitForAngular();
     // Add existing explorations.
     collectionEditorPage.addExistingExploration(firstExplorationId);
     collectionEditorPage.addExistingExploration(secondExplorationId);
@@ -163,14 +150,13 @@ describe('Collections', function() {
     collectionEditorPage.setObjective('This is a test collection.');
     collectionEditorPage.setCategory('Algebra');
     collectionEditorPage.saveChanges();
-    browser.waitForAngular();
     users.logout();
   });
 
   it('visits the collection player', function() {
     users.login('alice@collections.com');
     browser.get('/collection/' + collectionId);
-    browser.waitForAngular();
+    general.waitForLoadingMessage();
     users.logout();
   });
 
@@ -178,43 +164,40 @@ describe('Collections', function() {
     // Checking in a collection with one node.
     users.login('player@collections.com');
     browser.get('/collection/' + collectionId);
-    browser.waitForAngular();
+    general.waitForLoadingMessage();
     general.checkForConsoleErrors([]);
 
     // Checking in a collection with two nodes.
     browser.get('/collection_editor/create/' + collectionId);
-    browser.waitForAngular();
+    general.waitForLoadingMessage();
     collectionEditorPage.addExistingExploration(secondExplorationId);
     collectionEditorPage.saveDraft();
     collectionEditorPage.setCommitMessage('Add Exploration');
     collectionEditorPage.closeSaveModal();
-    browser.waitForAngular();
     browser.get('/collection/' + collectionId);
-    browser.waitForAngular();
+    general.waitForLoadingMessage();
     general.checkForConsoleErrors([]);
 
     // Checking in a collection with three nodes.
     browser.get('/collection_editor/create/' + collectionId);
-    browser.waitForAngular();
+    general.waitForLoadingMessage();
     collectionEditorPage.addExistingExploration(thirdExplorationId);
     collectionEditorPage.saveDraft();
     collectionEditorPage.setCommitMessage('Add Exploration');
     collectionEditorPage.closeSaveModal();
-    browser.waitForAngular();
     browser.get('/collection/' + collectionId);
-    browser.waitForAngular();
+    general.waitForLoadingMessage();
     general.checkForConsoleErrors([]);
 
     // Checking in a collection with four nodes.
     browser.get('/collection_editor/create/' + collectionId);
-    browser.waitForAngular();
+    general.waitForLoadingMessage();
     collectionEditorPage.addExistingExploration(fourthExplorationId);
     collectionEditorPage.saveDraft();
     collectionEditorPage.setCommitMessage('Add Exploration');
     collectionEditorPage.closeSaveModal();
-    browser.waitForAngular();
     browser.get('/collection/' + collectionId);
-    browser.waitForAngular();
+    general.waitForLoadingMessage();
     general.checkForConsoleErrors([]);
     users.logout();
   });

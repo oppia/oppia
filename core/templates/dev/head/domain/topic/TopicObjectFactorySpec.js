@@ -50,6 +50,23 @@ describe('Topic object factory', function() {
       sampleTopicBackendObject, skillIdToDescriptionDict);
   }));
 
+  it('should not find issues with a valid topic', function() {
+    expect(_sampleTopic.validate()).toEqual([]);
+  });
+
+  it('should validate the topic', function() {
+    _sampleTopic.setName('');
+    _sampleTopic.addCanonicalStoryId('story_2');
+    _sampleTopic.getSubtopics()[0].addSkill('skill_1');
+
+    expect(_sampleTopic.validate()).toEqual([
+      'Topic name should not be empty.',
+      'The story with id story_2 is present in both canonical ' +
+      'and additional stories.',
+      'The skill with id skill_1 is duplicated in the topic'
+    ]);
+  });
+
   it('should be able to create an interstitial topic object', function() {
     var topic = TopicObjectFactory.createInterstitialTopic();
     expect(topic.getId()).toEqual(null);

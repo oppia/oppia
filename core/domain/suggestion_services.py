@@ -62,7 +62,7 @@ def create_suggestion(
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         thread_id = feedback_services.create_thread(
             target_id, None, author_id, description,
-            DEFAULT_SUGGESTION_THREAD_SUBJECT)
+            DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
         # This line and the if..else will be removed after the feedback thread
         # migration is complete and the IDs for both models match.
         thread_id = suggestion_models.TARGET_TYPE_EXPLORATION + '.' + thread_id
@@ -191,6 +191,19 @@ def get_suggestions_by_target_id(target_type, target_id):
     return [get_suggestion_from_model(s)
             for s in suggestion_models.GeneralSuggestionModel
             .get_suggestions_by_target_id(target_type, target_id)]
+
+
+def get_all_stale_suggestions():
+    """Gets a list of suggestions without any activity on them for
+    THRESHOLD_TIME_BEFORE_ACCEPT time.
+
+    Returns:
+        list(Suggestion). A list of suggestions linked to the entity.
+    """
+
+    return [get_suggestion_from_model(s)
+            for s in suggestion_models.GeneralSuggestionModel
+            .get_all_stale_suggestions()]
 
 
 def _update_suggestion(suggestion):

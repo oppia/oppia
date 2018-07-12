@@ -247,11 +247,12 @@ oppia.controller('StateResponses', [
           '$scope', '$uibModalInstance', 'ResponsesService',
           'EditorStateService', 'EditorFirstTimeEventsService',
           'RuleObjectFactory', 'OutcomeObjectFactory',
-          'COMPONENT_NAME_FEEDBACK', 'GenerateContentIdService', function(
+          'COMPONENT_NAME_FEEDBACK', 'GenerateContentIdService',
+          function(
               $scope, $uibModalInstance, ResponsesService,
               EditorStateService, EditorFirstTimeEventsService,
-              RuleObjectFactory, OutcomeObjectFactory, COMPONENT_NAME_FEEDBACK,
-              GenerateContentIdService) {
+              RuleObjectFactory, OutcomeObjectFactory,
+              COMPONENT_NAME_FEEDBACK, GenerateContentIdService) {
             $scope.feedbackEditorIsOpen = false;
 
             $scope.openFeedbackEditor = function() {
@@ -373,7 +374,8 @@ oppia.controller('StateResponses', [
     $scope.saveActiveAnswerGroupDest = function(updatedOutcome) {
       ResponsesService.updateActiveAnswerGroup({
         dest: updatedOutcome.dest,
-        refresherExplorationId: updatedOutcome.refresherExplorationId
+        refresherExplorationId: updatedOutcome.refresherExplorationId,
+        missingPrerequisiteSkillId: updatedOutcome.missingPrerequisiteSkillId
       });
     };
 
@@ -398,7 +400,8 @@ oppia.controller('StateResponses', [
     $scope.saveDefaultOutcomeDest = function(updatedOutcome) {
       ResponsesService.updateDefaultOutcome({
         dest: updatedOutcome.dest,
-        refresherExplorationId: updatedOutcome.refresherExplorationId
+        refresherExplorationId: updatedOutcome.refresherExplorationId,
+        missingPrerequisiteSkillId: updatedOutcome.missingPrerequisiteSkillId
       });
     };
 
