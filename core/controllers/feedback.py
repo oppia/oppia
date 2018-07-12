@@ -33,9 +33,15 @@ class ThreadListHandler(base.BaseHandler):
 
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
-        self.values.update({
-            'threads': [t.to_dict() for t in feedback_services.get_all_threads(
-                exploration_id, False)]})
+        if constants.USE_NEW_SUGGESTION_FRAMEWORK:
+            self.values.update({
+                'threads': [t.to_dict() for t in feedback_services.get_threads(
+                    exploration_id)]})
+        else:
+            self.values.update({
+                'threads': [t.to_dict()
+                            for t in feedback_services.get_all_threads(
+                                exploration_id, False)]})
         self.render_json(self.values)
 
     @acl_decorators.can_create_feedback_thread
