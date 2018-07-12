@@ -48,7 +48,8 @@
                            on-submit-answer="submitAnswer(answer, rulesService)">
         </supplemental-card>
       </div>
-      <progress-nav on-submit="submitAnswerFromProgressNav()"
+      <progress-nav id="progressNav"
+                    on-submit="submitAnswerFromProgressNav()"
                     is-learn-again-button="isLearnAgainButton()"
                     submit-button-is-disabled="!interactionAnswerIsValid"
                     submit-button-is-shown="!answerIsBeingProcessed"
