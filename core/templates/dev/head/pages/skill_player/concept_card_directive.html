@@ -1,14 +1,14 @@
-<div class="conversation-skin-tutor-card">
-  <div class="conversation-skin-tutor-card-content">
-    <div class="conversation-skin-tutor-card-top-section">
+<div class="oppia-learner-view-card">
+  <div class="oppia-learner-view-card-content">
+    <div class="oppia-learner-view-card-top-section">
       <img class="conversation-skin-oppia-avatar"
            ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
-      <div class="rte-viewer conversation-skin-tutor-card-top-content">
-        <angular-html-bind html-data="skillExplanation">
+      <div class="rte-viewer oppia-learner-view-card-top-content">
+        <angular-html-bind html-data="conceptCard.getExplanation()">
         </angular-html-bind>
-        <div ng-if="workedExamples.length > 0" style="margin-top: 20px;">
+        <div ng-if="conceptCard.getWorkedExamples().length > 0" style="margin-top: 20px;">
           <h3> Worked Examples: </h3>
-          <p ng-repeat="workedExample in workedExamples track by $index"
+          <p ng-repeat="workedExample in conceptCard.getWorkedExamples() track by $index"
              class="worked-example"
              ng-if="$index <= maximumVisibleExampleIndex">
             <label> <[$index + 1]>: &nbsp;</label>
@@ -17,7 +17,7 @@
           </p>
           <button class="btn btn-primary add-worked-example"
                   ng-click="viewNextExample()"
-                  ng-if="maximumVisibleExampleIndex < (workedExamples.length - 1)">
+                  ng-if="maximumVisibleExampleIndex < (conceptCard.getWorkedExamples().length - 1)">
             <i class="material-icons"> add </i>
             <span translate="I18N_WORKED_EXAMPLE">Worked Example</span>
           </button>
@@ -42,38 +42,15 @@
     margin-top: 2vh;
   }
 
-  .conversation-skin-tutor-card {
-    max-width: 100vw;
-    padding-bottom: 18px;
-    background: #fff;
-    border-radius: 2px;
-    padding-top: 20px;
-    text-align: left;
-    margin-left: 87px;
-  }
-
-  .conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
+  .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
     height: 100px;
     left: -87px;
     top: -20px;
     width: 100px;
   }
 
-  .conversation-skin-tutor-card-top-section {
-    position: relative;
-    padding: 0 20px;
-  }
-
-  .conversation-skin-tutor-card-top-content p:not(:last-child) {
+  .oppia-learner-view-card-top-content p:not(:last-child) {
     line-height: 1.5;
     margin-bottom: 18px;
-  }
-
-  .conversation-skin-tutor-card-top-content {
-    width: 100%;
-  }
-
-  .conversation-skin-tutor-card-content {
-    word-wrap: break-word;
   }
 </style>

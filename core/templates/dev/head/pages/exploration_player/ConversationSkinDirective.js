@@ -121,7 +121,7 @@ oppia.animation('.conversation-skin-animate-tutor-card-content', function() {
     var currentHeight = element.height();
     var expectedNextHeight = $(
       '.conversation-skin-future-tutor-card ' +
-      '.conversation-skin-tutor-card-content'
+      '.oppia-learner-view-card-content'
     ).height();
 
     // Fix the current card height, so that it does not change during the

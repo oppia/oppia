@@ -26,14 +26,14 @@ oppia.directive('conceptCard', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill_player/concept_card_directive.html'),
       controller: [
-        '$scope', 'ConceptCardBackendApiService',
+        '$scope', 'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
         function(
-            $scope, ConceptCardBackendApiService) {
+            $scope, ConceptCardBackendApiService, ConceptCardObjectFactory) {
           ConceptCardBackendApiService.fetchConceptCard(
             $scope.getSkillId()
-          ).then(function(conceptCard) {
-            $scope.skillExplanation = conceptCard.explanation;
-            $scope.workedExamples = conceptCard.worked_examples;
+          ).then(function(conceptCardBackendDict) {
+            $scope.conceptCard = ConceptCardObjectFactory.createFromBackendDict(
+              conceptCardBackendDict);
             $scope.maximumVisibleExampleIndex = -1;
           });
 

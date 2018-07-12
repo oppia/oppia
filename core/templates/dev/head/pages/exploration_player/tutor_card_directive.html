@@ -1,12 +1,12 @@
 <audio-bar ng-if="!isIframed"></audio-bar>
-<div class="conversation-skin-tutor-card"
+<div class="oppia-learner-view-card"
      ng-class="{'animate-card-width': startCardChangeAnimation}">
-  <div class="conversation-skin-tutor-card-content conversation-skin-animate-tutor-card-content"
+  <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
        ng-class="{'animate-card-change': startCardChangeAnimation}">
-    <div class="conversation-skin-tutor-card-top-section">
+    <div class="oppia-learner-view-card-top-section">
       <img class="conversation-skin-oppia-avatar"
            ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
-      <div class="rte-viewer conversation-skin-tutor-card-top-content"
+      <div class="rte-viewer oppia-learner-view-card-top-content"
            ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">
         <div>
@@ -101,7 +101,7 @@
 </div>
 
 <style>
-  .conversation-skin-tutor-card {
+  .oppia-learner-view-card {
     max-width: 100vw;
     padding-bottom: 18px;
   }
@@ -110,7 +110,7 @@
     color: gray;
   }
 
-  .conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
+  .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
     height: 100px;
     left: -87px;
     top: -20px;
@@ -122,29 +122,20 @@
     display: none;
   }
 
-  .conversation-skin-tutor-card .instructions-button {
+  .oppia-learner-view-card .instructions-button {
     background: inherit;
     border: none;
     white-space: normal;
   }
 
-  .conversation-skin-tutor-card.animate-card-width {
+  .oppia-learner-view-card.animate-card-width {
     -webkit-transition: width 500ms;
     transition: width 500ms;
   }
 
-  .conversation-skin-tutor-card-top-section {
-    position: relative;
-    padding: 0 20px;
-  }
-
-  .conversation-skin-tutor-card-top-content p:not(:last-child) {
+  .oppia-learner-view-card-top-content p:not(:last-child) {
     line-height: 1.5;
     margin-bottom: 18px;
-  }
-
-  .conversation-skin-tutor-card-top-content {
-    width: 100%;
   }
 
   /* This should match the value defined in AUDIO_HIGHLIGHT_CSS_CLASS. */
@@ -152,7 +143,6 @@
     border: 3px solid #f3d140;
   }
 
-  .conversation-skin-tutor-card,
   .conversation-skin-future-tutor-card {
     background: #fff;
     border-radius: 2px;
@@ -174,13 +164,9 @@
     display: none;
   }
 
-  .conversation-skin-tutor-card.ng-hide {
+  .oppia-learner-view-card.ng-hide {
     opacity: 0;
     transform: translateX(-1000px);
-  }
-
-  .conversation-skin-tutor-card-content {
-    word-wrap: break-word;
   }
 
   .conversation-skin-responses-dropdown-container {
@@ -232,21 +218,21 @@
      Correctness footer and the page cannot be scrolled down further.
      So this padding allows to scroll down the tutor card. */
   @media(max-width: 770px) {
-    .conversation-skin-tutor-card {
+    .oppia-learner-view-card {
       padding-bottom: 30px;
     }
   }
 
   @media screen and (max-width: 959px) {
-    .conversation-skin-tutor-card .instructions-button {
+    .oppia-learner-view-card .instructions-button {
       background-color: #0D48A1;
       color: #ffffff;
       padding: 6px 12px;
       white-space: normal;
     }
 
-    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover {
+    .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:focus,
+    .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:hover {
       background-color: #115FD4;
     }
   }
