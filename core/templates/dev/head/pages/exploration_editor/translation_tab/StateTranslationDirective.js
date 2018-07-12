@@ -21,16 +21,14 @@ oppia.directive('stateTranslation', [
     return {
       restrict: 'E',
       scope: {},
-      link: function(scope) {
-        scope.initStateTranslation();
-      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_directive.html'),
       controller: [
-        '$scope', '$filter', 'ExplorationStatesService', 'EditorStateService',
-        function(
-            $scope, $filter, ExplorationStatesService, EditorStateService) {
+        '$scope', '$filter', '$timeout', 'ExplorationStatesService',
+        'EditorStateService', function(
+            $scope, $filter, $timeout, ExplorationStatesService,
+            EditorStateService) {
           // Define tab constants.
           $scope.TAB_ID_CONTENT = 'content';
           $scope.TAB_ID_FEEDBACK = 'feedback';
@@ -109,6 +107,7 @@ oppia.directive('stateTranslation', [
           $scope.$on('refreshStateTranslation', function() {
             $scope.initStateTranslation();
           });
+
           $scope.initStateTranslation = function() {
             $scope.activatedTabId = $scope.TAB_ID_CONTENT;
 
@@ -128,6 +127,10 @@ oppia.directive('stateTranslation', [
             $scope.activeHintIndex = null;
             $scope.activeAnswerGroupIndex = null;
           };
+
+          $timeout(function(){
+            $scope.initStateTranslation();
+          }, 100);
         }
       ]
     };
