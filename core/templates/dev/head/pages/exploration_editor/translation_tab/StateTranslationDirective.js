@@ -25,11 +25,11 @@ oppia.directive('stateTranslation', [
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_directive.html'),
       controller: [
-        '$scope', '$filter', '$timeout', '$rootScope',
-        'ExplorationStatesService', 'EditorStateService',
-        'ExplorationInitStateNameService', function(
-            $scope, $filter, $timeout, $rootScope, ExplorationStatesService,
-            EditorStateService, ExplorationInitStateNameService) {
+        '$scope', '$filter', '$timeout', '$rootScope', 'EditorStateService',
+        'ExplorationStatesService', 'ExplorationInitStateNameService',
+        function(
+            $scope, $filter, $timeout, $rootScope, EditorStateService,
+            ExplorationStatesService, ExplorationInitStateNameService) {
           // Define tab constants.
           $scope.TAB_ID_CONTENT = 'content';
           $scope.TAB_ID_FEEDBACK = 'feedback';
@@ -113,9 +113,7 @@ oppia.directive('stateTranslation', [
           $scope.initStateTranslation = function() {
             $scope.activatedTabId = $scope.TAB_ID_CONTENT;
 
-            if (!EditorStateService.getActiveStateName() ||
-              !ExplorationStatesService.getState(
-                EditorStateService.getActiveStateName())) {
+            if (!EditorStateService.getActiveStateName()) {
               EditorStateService.setActiveStateName(
                 ExplorationInitStateNameService.displayed);
             }
@@ -138,8 +136,9 @@ oppia.directive('stateTranslation', [
             $scope.activeAnswerGroupIndex = null;
             $rootScope.loadingMessage = '';
           };
-
-          $scope.initStateTranslation();
+          if (ExplorationStatesService.isInitialized()) {
+            $scope.initStateTranslation();
+          }
         }
       ]
     };
