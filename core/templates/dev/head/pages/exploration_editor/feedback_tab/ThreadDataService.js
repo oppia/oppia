@@ -58,6 +58,7 @@ oppia.factory('ThreadDataService', [
       };
       if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
         params = {
+          list_type: 'target',
           target_type: 'exploration',
           target_id: _expId
         };

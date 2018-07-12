@@ -80,7 +80,7 @@ var ExplorationEditorPage = function() {
   var saveChangesButton = element(by.css('.protractor-test-save-changes'));
   var saveDiscardToggleButton = element(
     by.css('.protractor-test-save-discard-toggle'));
-  var saveDraftButton = element(by.css('.protractor-test-close-save-modal'));
+  var saveDraftButton = element(by.css('.protractor-test-save-draft-button'));
 
   /*
    * Workflows

@@ -112,6 +112,12 @@ indexes:
   - name: exploration_id
   - name: last_updated
 
+- kind: GeneralSuggestionModel
+  properties:
+  - name: deleted
+  - name: status
+  - name: last_updated
+
 - kind: InteractionAnswerSummariesRealtimeModel
   properties:
   - name: realtime_layer

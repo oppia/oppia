@@ -19,7 +19,7 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('./waitFor.js');
 
 var ExplorationEditorSettingsTab = function() {
   /*
@@ -45,7 +45,7 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Buttons
    */
-  var addParamButon = element(by.css('.protractor-test-add-param-button'));
+  var addParamButton = element(by.css('.protractor-test-add-param-button'));
   var closePreviewSummaryButton = element(
     by.css('.protractor-test-close-preview-summary-modal'));
   var enableParametersSwitch = element(
@@ -68,7 +68,7 @@ var ExplorationEditorSettingsTab = function() {
   // the parameter if necessary.
   this.addExplorationLevelParameterChange = function(paramName, paramValue) {
     editParamChanges.click();
-    addParamButon.click();
+    addParamButton.click();
 
     var editorRowElem = element.all(by.css(
       '.protractor-test-param-changes-list')).last();
@@ -86,17 +86,16 @@ var ExplorationEditorSettingsTab = function() {
   };
 
   this.deleteExploration = function() {
-    browser.wait(until.elementToBeClickable(deleteExplorationButton), 5000,
+    waitFor.elementToBeClickable(deleteExplorationButton,
       'Delete Exploration button is not clickable');
     deleteExplorationButton.click();
-    browser.wait(until.elementToBeClickable(confirmDeleteExplorationButton),
-      5000,
+    waitFor.elementToBeClickable(confirmDeleteExplorationButton,
       'Confirm Delete Exploration button is not clickable');
     confirmDeleteExplorationButton.click();
-    browser.wait(until.invisibilityOf(confirmDeleteExplorationButton), 5000,
+    waitFor.invisibilityOf(confirmDeleteExplorationButton,
       'Delete Exploration modal takes too long to disappear');
     // Returning to /creator_dashboard.
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.enableParameters = function() {
@@ -113,11 +112,11 @@ var ExplorationEditorSettingsTab = function() {
 
   this.openAndClosePreviewSummaryTile = function() {
     openPreviewSummaryButton.click();
-    browser.wait(until.visibilityOf(explorationSummaryTile), 5000,
+    waitFor.visibilityOf(explorationSummaryTile,
       'Summary Tile takes too long to appear');
     expect(explorationSummaryTile.isPresent()).toBeTruthy();
     closePreviewSummaryButton.click();
-    browser.wait(until.invisibilityOf(explorationSummaryTile), 5000,
+    waitFor.invisibilityOf(explorationSummaryTile,
       'Summary Tile takes too long to disappear');
     expect((explorationSummaryTile.isPresent())).toBeFalsy();
   };

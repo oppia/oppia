@@ -307,6 +307,7 @@ oppia.controller('FeedbackTab', [
           break;
         }
       }
+      console.log(allThreads)
       $scope.tmpMessage.status = $scope.activeThread.status;
     };
 

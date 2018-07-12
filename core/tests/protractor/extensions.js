@@ -50,7 +50,7 @@ describe('rich-text components', function() {
       // TODO (Jacob) add test for image RTE component
       richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       richTextEditor.addRteComponent('Math', 'abc');
-      richTextEditor.addRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextEditor.addRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
       richTextEditor.addRteComponent(
@@ -71,7 +71,7 @@ describe('rich-text components', function() {
       richTextChecker.readPlainText(' ');
       richTextChecker.readRteComponent('Link', 'http://google.com/', true);
       richTextChecker.readRteComponent('Math', 'abc');
-      richTextChecker.readRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextChecker.readRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
       richTextChecker.readRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       richTextChecker.readRteComponent('Tabs', [{
@@ -93,17 +93,9 @@ describe('rich-text components', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([
-      // TODO (Jacob) Remove when
-      // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
-      'cast_sender.js - Failed to load resource: net::ERR_FAILED',
-      'Uncaught ReferenceError: ytcfg is not defined',
       // TODO (@pranavsid98) This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
-      'Error parsing header X-XSS-Protection: 1; mode=block; ' +
-      'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
-      'https://www.youtube.com/youtubei/v1/log_interaction?.* Failed to load ' +
-      'resource: the server responded with a status of 401 ()',
     ]);
   });
 });
