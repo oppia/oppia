@@ -202,3 +202,17 @@ class SuggestionModelUnitTests(test_utils.GenericTestBase):
                 .get_suggestions_by_target_id(
                     suggestion_models.TARGET_TYPE_EXPLORATION, 'exp_invalid')),
             0)
+
+    def test_get_all_stale_suggestions(self):
+        with self.swap(
+            suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS', 0):
+            self.assertEqual(len(
+                suggestion_models.GeneralSuggestionModel
+                .get_all_stale_suggestions()), 1)
+
+        with self.swap(
+            suggestion_models, 'THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS',
+            7 * 24 * 60 * 60 * 1000):
+            self.assertEqual(len(
+                suggestion_models.GeneralSuggestionModel
+                .get_all_stale_suggestions()), 0)
