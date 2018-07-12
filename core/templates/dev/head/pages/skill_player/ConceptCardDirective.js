@@ -30,7 +30,8 @@ oppia.directive('conceptCard', [
         function(
             $scope, ConceptCardBackendApiService) {
           ConceptCardBackendApiService.fetchConceptCard(
-            $scope.getSkillId()).then(function(conceptCard) {
+            $scope.getSkillId()
+          ).then(function(conceptCard) {
             $scope.skillExplanation = conceptCard.explanation;
             $scope.workedExamples = conceptCard.worked_examples;
             $scope.maximumVisibleExampleIndex = -1;

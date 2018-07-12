@@ -104,10 +104,10 @@ oppia.directive('progressNav', [
             var lastPair = $scope.activeCard.inputResponsePairs[
               $scope.activeCard.inputResponsePairs.length - 1];
             return Boolean(
-              (interactionIsInline &&
-              $scope.activeCard.destStateName &&
-              lastPair.oppiaResponse) ||
-              $scope.isConceptCardPending());
+              interactionIsInline &&
+              ($scope.activeCard.destStateName ||
+              $scope.isConceptCardPending()) &&
+              lastPair.oppiaResponse);
           };
         }
       ]

@@ -303,7 +303,7 @@ oppia.directive('conversationSkin', [
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
           $scope.answerIsCorrect = false;
-          $scope.conceptCardShown = false;
+          $scope.conceptCardIsBeingShown = false;
           $scope.conceptCardPending = false;
           $scope.pendingCardWasSeenBefore = false;
           $scope.isCorrectnessFeedbackEnabled = function() {
@@ -429,7 +429,7 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.returnToExploration = function() {
-            $scope.conceptCardShown = false;
+            $scope.conceptCardIsBeingShown = false;
             _navigateToActiveCard();
           };
 
@@ -632,12 +632,18 @@ oppia.directive('conversationSkin', [
                     HintsAndSolutionManagerService.recordWrongAnswer();
 
                     PlayerTranscriptService.addNewResponse(feedbackHtml);
+                    if (missingPrerequisiteSkillId) {
+                      $scope.conceptCardPending = true;
+                      $scope.missingPrerequisiteSkillId =
+                        missingPrerequisiteSkillId;
+                    }
+
                     if (feedbackHtml &&
                         !ExplorationPlayerStateService.isInteractionInline(
                           $scope.activeCard.stateName)) {
                       $scope.$broadcast('helpCardAvailable', {
                         helpCardHtml: feedbackHtml,
-                        hasContinueButton: false
+                        hasContinueButton: $scope.conceptCardPending
                       });
                     }
                     if (refreshInteraction) {
@@ -673,11 +679,6 @@ oppia.directive('conversationSkin', [
                               refresherExplorationId, confirmRedirection);
                         }
                       });
-                    }
-                    if (missingPrerequisiteSkillId) {
-                      $scope.conceptCardPending = true;
-                      $scope.missingPrerequisiteSkillId =
-                        missingPrerequisiteSkillId;
                     }
                     FocusManagerService.setFocusIfOnDesktop(_nextFocusLabel);
                     scrollToBottom();
@@ -792,7 +793,7 @@ oppia.directive('conversationSkin', [
           $scope.showUpcomingCard = function() {
             if ($scope.conceptCardPending) {
               $scope.conceptCardPending = false;
-              $scope.conceptCardShown = true;
+              $scope.conceptCardIsBeingShown = true;
               return;
             }
             /* This is for the following situation:

@@ -522,5 +522,6 @@
     "I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Sign in with Google",
     "I18N_TOPNAV_TEACH_WITH_OPPIA": "Teach with Oppia",
     "I18N_TOTAL_SUBSCRIBERS_TEXT": "You have a total of <[totalSubscribers]> subscribers.",
-    "I18N_UNSUBSCRIBE_BUTTON_TEXT": "Unsubscribe"
+    "I18N_UNSUBSCRIBE_BUTTON_TEXT": "Unsubscribe",
+    "I18N_WORKED_EXAMPLE": "Worked Example"
 }

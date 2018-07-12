@@ -15,6 +15,7 @@
 """Controllers for the Oppia skill's concept card viewer."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import skill_services
 import feconf
 
@@ -22,6 +23,7 @@ import feconf
 class ConceptCardDataHandler(base.BaseHandler):
     """A card that shows the explanation of a skill's concept."""
 
+    @acl_decorators.can_play_skill
     def get(self, skill_id):
         """Handles GET requests."""
 
@@ -29,8 +31,6 @@ class ConceptCardDataHandler(base.BaseHandler):
             raise self.PageNotFoundException
 
         skill = skill_services.get_skill_by_id(skill_id, strict=False)
-        if skill is None:
-            raise self.PageNotFoundException
 
         skill_dict = skill.to_dict()
         self.values.update({

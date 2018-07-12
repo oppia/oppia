@@ -20,6 +20,7 @@ from core.controllers import base
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import skill_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -63,6 +64,33 @@ def can_play_exploration(handler):
         if rights_manager.check_can_access_activity(
                 self.user, exploration_rights):
             return handler(self, exploration_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+    test_can_play.__wrapped__ = True
+
+    return test_can_play
+
+
+def can_play_skill(handler):
+    """Decorator to check whether user can play a given skill."""
+
+    def test_can_play(self, skill_id, **kwargs):
+        """Checks if the user can play the skill.
+
+        Args:
+            skill_id: str. The skill id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can play the given skill.
+        """
+        # This is a temporary check, since a decorator is required for every
+        # method. Once skill publishing is done, whether given skill is
+        # published should be checked here.
+        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+
+        if skill is not None:
+            return handler(self, skill_id, **kwargs)
         else:
             raise self.PageNotFoundException
     test_can_play.__wrapped__ = True
