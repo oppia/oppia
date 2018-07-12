@@ -376,6 +376,9 @@ ENABLE_MAINTENANCE_MODE = False
 # Disables all the new structures' pages, till they are completed.
 ENABLE_NEW_STRUCTURES = False
 
+# Whether to automatically accept suggestions after a threshold time.
+ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
+
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
 EMAIL_INTENT_EDITOR_ROLE_NOTIFICATION = 'editor_role_notification'
@@ -444,6 +447,11 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 # exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
+
+# User id and username for suggestion bot. This bot will be used to accept
+# suggestions automatically after a threshold time.
+SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
+SUGGESTION_BOT_USERNAME = 'OppiaSuggestionBot'
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
