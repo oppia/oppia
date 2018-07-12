@@ -3547,6 +3547,72 @@ class Exploration(object):
         return states_dict
 
     @classmethod
+    def _convert_states_v23_dict_to_v24_dict(cls, states_dict, exp_id):
+        """Converts from version 23 to 24. Version 24 adds the dimensions of
+        images in the oppia-noninteractive-image tags.
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+            exp_id: string. Exploration id
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for key, state_dict in states_dict.iteritems():
+            state_dict['content']['html'] = (
+                html_cleaner.add_dimensions_to_image(
+                    exp_id, (state_dict['content']['html']))
+            if state_dict['interaction']['default_outcome']:
+                interaction_feedback_html = state_dict[
+                    'interaction']['default_outcome']['feedback']['html']
+                state_dict['interaction']['default_outcome']['feedback'][
+                    'html'] = html_cleaner.add_dimensions_to_image(
+                        exp_id, (interaction_feedback_html))
+
+            for answer_group_index, answer_group in enumerate(
+                    state_dict['interaction']['answer_groups']):
+                answer_group_html = answer_group['outcome']['feedback']['html']
+                state_dict['interaction']['answer_groups'][
+                    answer_group_index]['outcome']['feedback']['html'] = (
+                        html_cleaner.add_dimensions_to_image(
+                            exp_id, (answer_group_html))
+                if state_dict['interaction']['id'] == 'ItemSelectionInput':
+                    for rule_spec_index, rule_spec in enumerate(
+                            answer_group['rule_specs']):
+                        for x_index, x in enumerate(rule_spec['inputs']['x']):
+                            state_dict['interaction']['answer_groups'][
+                                answer_group_index]['rule_specs'][
+                                    rule_spec_index]['inputs']['x'][x_index] = html_cleaner.add_dimensions_to_image(exp_id, (x))
+            for hint_index, hint in enumerate(
+                    state_dict['interaction']['hints']):
+                hint_html = hint['hint_content']['html']
+                state_dict['interaction']['hints'][hint_index][
+                    'hint_content']['html'] = (
+                        html_cleaner.add_dimensions_to_image(exp_id, (hint_html))
+
+            if state_dict['interaction']['solution']:
+                solution_html = state_dict[
+                    'interaction']['solution']['explanation']['html']
+                state_dict['interaction']['solution']['explanation']['html'] = (
+                    html_cleaner.add_dimensions_to_image(
+                        exp_id, (solution_html))
+
+            if state_dict['interaction']['id'] in (
+                    'ItemSelectionInput', 'MultipleChoiceInput'):
+                for value_index, value in enumerate(
+                        state_dict['interaction']['customization_args'][
+                            'choices']['value']):
+                    state_dict['interaction']['customization_args'][
+                        'choices']['value'][value_index] = (
+                            html_cleaner.add_dimensions_to_image(
+                                exp_id, (value)))
+
+            # states_dict[key] = State.convert_html_fields_in_state(
+            #     state_dict, html_cleaner.add_dimensions_to_image)
+        return states_dict
+
+    @classmethod
     def update_states_from_model(
             cls, versioned_exploration_states, current_states_schema_version):
         """Converts the states blob contained in the given
@@ -3577,7 +3643,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 28
+    CURRENT_EXP_SCHEMA_VERSION = 29
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4097,6 +4163,20 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v28_dict_to_v29_dict(cls, exploration_dict):
+        """Converts a v28 exploration dict into a v29 exploration dict.
+
+        Adds dimensions to all oppia-noninteractive-image tags.
+        """
+        exploration_dict['schema_version'] = 29
+
+        exploration_dict['states'] = cls._convert_states_v23_dict_to_v24_dict(
+            exploration_dict['states'], exploration_dict['id'])
+        exploration_dict['states_schema_version'] = 24
+
+        return exploration_dict
+    @classmethod
+
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
@@ -4267,6 +4347,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v27_dict_to_v28_dict(
                 exploration_dict)
             exploration_schema_version = 28
+
+        if exploration_schema_version == 28:
+            exploration_dict = cls._convert_v28_dict_to_v29_dict(
+                exploration_dict)
+            exploration_schema_version = 29
 
         return (exploration_dict, initial_schema_version)
 
