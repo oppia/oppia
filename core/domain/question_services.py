@@ -44,7 +44,8 @@ def _create_new_question(committer_id, question, commit_message):
     model = question_models.QuestionModel(
         id=question.id,
         question_state_data=question.question_state_data,
-        question_data_schema_version=question.question_data_schema_version,
+        question_state_data_schema_version=(
+            question.question_state_data_schema_version),
         language_code=question.language_code
     )
 
@@ -102,7 +103,7 @@ def get_question_from_model(question_model):
     """
     return question_domain.Question(
         question_model.id, question_model.question_state_data,
-        question_model.question_data_schema_version,
+        question_model.question_state_data_schema_version,
         question_model.language_code)
 
 
@@ -202,8 +203,8 @@ def _save_question(committer_id, question, change_list, commit_message):
 
     question_model = question_models.QuestionModel.get(question.id)
     question_model.question_state_data = question.question_state_data
-    question_model.question_data_schema_version = (
-        question.question_data_schema_version)
+    question_model.question_state_data_schema_version = (
+        question.question_state_data_schema_version)
     question_model.language_code = question.language_code
     change_list_dict = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_list_dict)

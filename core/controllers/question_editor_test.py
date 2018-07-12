@@ -53,7 +53,8 @@ class EditableQuestionDataHandlerTest(test_utils.GenericTestBase):
             self.assertEqual(
                 response_dict['username'], 'adm')
             self.assertEqual(
-                response_dict['question_dict']['question_data_schema_version'],
+                response_dict[
+                    'question_dict']['question_state_data_schema_version'],
                 1)
             self.assertEqual(
                 response_dict['additional_angular_modules'], [])

@@ -30,14 +30,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         expected_object = {
             'id': 'col1.random',
             'question_state_data': {},
-            'question_data_schema_version': 1,
+            'question_state_data_schema_version': 1,
             'language_code': 'en'
         }
 
         observed_object = question_domain.Question(
             expected_object['id'],
             expected_object['question_state_data'],
-            expected_object['question_data_schema_version'],
+            expected_object['question_state_data_schema_version'],
             expected_object['language_code'])
         self.assertEqual(expected_object, observed_object.to_dict())
 
@@ -49,14 +49,14 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_object = {
             'id': 'col1.random',
             'question_state_data': question_state_data,
-            'question_data_schema_version': 1,
+            'question_state_data_schema_version': 1,
             'language_code': 'en'
         }
 
         question = question_domain.Question(
             test_object['id'],
             test_object['question_state_data'],
-            test_object['question_data_schema_version'],
+            test_object['question_state_data_schema_version'],
             test_object['language_code'])
 
         question.id = 123
@@ -67,12 +67,12 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question.id = 'col1.random'
 
         question.update_question_state_data(question_state_data)
-        question.question_data_schema_version = 'abc'
+        question.question_state_data_schema_version = 'abc'
         with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected question_data_schema_version to be a integer')):
+            'Expected question_state_data_schema_version to be a integer')):
             question.validate()
 
-        question.question_data_schema_version = 1
+        question.question_state_data_schema_version = 1
 
         question.update_language_code('abc')
         with self.assertRaisesRegexp(utils.ValidationError, (
@@ -87,7 +87,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         expected_object = {
             'id': 'col1.random',
             'question_state_data': question_state_data,
-            'question_data_schema_version': 1,
+            'question_state_data_schema_version': 1,
             'language_code': 'en'
         }
 
@@ -106,7 +106,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
 
         self.assertEqual(question.id, question_id)
-        self.assertEqual(question.question_data_schema_version, 1)
+        self.assertEqual(question.question_state_data_schema_version, 1)
         self.assertEqual(
             question.question_state_data.to_dict(), default_question_data)
         self.assertEqual(question.language_code, 'en')
@@ -121,7 +121,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         test_object = {
             'id': 'col1.random',
             'question_state_data': question_state_data,
-            'question_data_schema_version': 1,
+            'question_state_data_schema_version': 1,
             'language_code': 'en'
         }
 

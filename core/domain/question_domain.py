@@ -99,7 +99,8 @@ class Question(object):
         question_id: str. The unique ID of the question.
         question_state_data: State. An object representing the question
             state data.
-        question_data_schema_version: int. The schema version for the data.
+        question_state_data_schema_version: int. The schema version for
+            the data.
         language_code: str. The ISO 639-1 code for the language this
             question is written in.
         status: str. The status of the question among approved, rejected,
@@ -108,20 +109,22 @@ class Question(object):
 
     def __init__(
             self, question_id, question_state_data,
-            question_data_schema_version, language_code):
+            question_state_data_schema_version, language_code):
         """Constructs a Question domain object.
 
         Args:
             question_id: str. The unique ID of the question.
             question_state_data: State. An object representing the question
                 state data.
-            question_data_schema_version: int. The schema version for the data.
+            question_state_data_schema_version: int. The schema version for
+                the data.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
         """
         self.id = question_id
         self.question_state_data = question_state_data
-        self.question_data_schema_version = question_data_schema_version
+        self.question_state_data_schema_version = (
+            question_state_data_schema_version)
         self.language_code = language_code
 
     def to_dict(self):
@@ -133,21 +136,22 @@ class Question(object):
         return {
             'id': self.id,
             'question_state_data': self.question_state_data,
-            'question_data_schema_version': self.question_data_schema_version,
+            'question_state_data_schema_version': (
+                self.question_state_data_schema_version),
             'language_code': self.language_code
         }
 
-    def validate(self):
+    def validate(self, strict=False):
         """Validates the Question domain object before it is saved."""
 
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(
                 'Expected ID to be a string, received %s' % self.id)
 
-        if not isinstance(self.question_data_schema_version, int):
+        if not isinstance(self.question_state_data_schema_version, int):
             raise utils.ValidationError(
-                'Expected question_data_schema_version to be a integer,' +
-                'received %s' % self.question_data_schema_version)
+                'Expected question_state_data_schema_version to be a integer,' +
+                'received %s' % self.question_state_data_schema_version)
 
         if not isinstance(self.language_code, basestring):
             raise utils.ValidationError(
@@ -159,13 +163,43 @@ class Question(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-    def validate_for_publishing_or_send_for_review(self):
-        """Validates the Question domain object before it is sent for review
-        or published.
-        """
-        self.validate()
-        exp_domain.State.validate(self, None, False)
+        if strict:
+            at_least_one_correct_answer = False
+            dest_is_specified = False
+            interaction = self.question_state_data['interaction']
+            for answer_group in interaction['answer_groups']:
+                if answer_group['labelled_as_correct']:
+                    at_least_one_correct_answer = True
+                if answer_group['dest'] is not None:
+                    dest_is_specified = True
 
+            if interaction['default_outcome']['labelled_as_correct']:
+                at_least_one_correct_answer = True
+
+            if interaction['default_outcome']['dest'] is not None:
+                dest_is_specified = True
+
+            if not at_least_one_correct_answer:
+                raise utils.ValidationError(
+                    'Expected at least one answer group to have a correct ' +
+                    'answer.'
+                )
+
+            if dest_is_specified:
+                raise utils.ValidationError(
+                    'Expected all answer groups to have destination as None.'
+                )
+
+            if (len(interaction['hints']) == 0) or (
+                    interaction['solution'] is None):
+                raise utils.ValidationError(
+                    'Expected the question to have at least one hint and a ' +
+                    'solution.'
+                )
+
+            question_state_data = exp_domain.State.from_dict(
+                self.question_state_data)
+            question_state_data.validate({}, True)
 
     @classmethod
     def from_dict(cls, question_dict):
@@ -177,7 +211,7 @@ class Question(object):
         question = cls(
             question_dict['id'],
             question_dict['question_state_data'],
-            question_dict['question_data_schema_version'],
+            question_dict['question_state_data_schema_version'],
             question_dict['language_code'])
 
         return question

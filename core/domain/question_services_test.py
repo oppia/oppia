@@ -51,11 +51,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.question_state_data = self._create_valid_question_data('ABC')
         self.question_id = 'dummy'
-        self.question_data_schema_version = 1
+        self.question_state_data_schema_version = 1
         self.language_code = 'en'
         self.question = question_domain.Question(
             self.question_id, self.question_state_data,
-            self.question_data_schema_version, self.language_code)
+            self.question_state_data_schema_version, self.language_code)
         question_services.add_question(
             self.owner_id, self.question)
 
@@ -84,8 +84,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(model.question_state_data, self.question_state_data)
         self.assertEqual(
-            model.question_data_schema_version,
-            self.question_data_schema_version)
+            model.question_state_data_schema_version,
+            self.question_state_data_schema_version)
         self.assertEqual(model.language_code, self.language_code)
 
     def test_delete_question(self):
@@ -111,8 +111,8 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         model = question_models.QuestionModel.get(self.question_id)
         self.assertEqual(model.question_state_data, new_question_data)
         self.assertEqual(
-            model.question_data_schema_version,
-            self.question_data_schema_version)
+            model.question_state_data_schema_version,
+            self.question_state_data_schema_version)
         self.assertEqual(
             model.language_code, self.language_code)
 

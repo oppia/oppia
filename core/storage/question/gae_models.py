@@ -47,7 +47,7 @@ class QuestionModel(base_models.VersionedModel):
     # An object representing the question state data.
     question_state_data = ndb.JsonProperty(indexed=False)
     # The schema version for the data.
-    question_data_schema_version = (
+    question_state_data_schema_version = (
         ndb.IntegerProperty(required=True, indexed=True))
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
@@ -113,14 +113,15 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-            cls, question_state_data, question_data_schema_version,
+            cls, question_state_data, question_state_data_schema_version,
             language_code):
         """Creates a new QuestionModel entry.
 
         Args:
             question_state_data: State. An object representing the question
                 state data.
-            question_data_schema_version: int. The schema version for the data.
+            question_state_data_schema_version: int. The schema version for
+                the data.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
 
@@ -134,9 +135,9 @@ class QuestionModel(base_models.VersionedModel):
         question_model_instance = cls(
             id=instance_id,
             question_state_data=question_state_data,
-            question_data_schema_version=question_data_schema_version,
-            language_code=language_code,
-            status=feconf.ACTIVITY_STATUS_PRIVATE)
+            question_state_data_schema_version=(
+                question_state_data_schema_version),
+            language_code=language_code)
 
         return question_model_instance
 
