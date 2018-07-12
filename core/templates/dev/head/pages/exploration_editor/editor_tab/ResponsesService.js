@@ -113,6 +113,10 @@ oppia.factory('ResponsesService', [
         answerGroup.outcome.refresherExplorationId = (
           updates.refresherExplorationId);
       }
+      if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
+        answerGroup.outcome.missingPrerequisiteSkillId = (
+          updates.missingPrerequisiteSkillId);
+      }
       if (updates.hasOwnProperty('labelledAsCorrect')) {
         answerGroup.outcome.labelledAsCorrect = updates.labelledAsCorrect;
       }
@@ -259,6 +263,10 @@ oppia.factory('ResponsesService', [
         }
         if (updates.hasOwnProperty('refresherExplorationId')) {
           outcome.refresherExplorationId = updates.refresherExplorationId;
+        }
+        if (updates.hasOwnProperty('missingPrerequisiteSkillId')) {
+          outcome.missingPrerequisiteSkillId =
+            updates.missingPrerequisiteSkillId;
         }
         if (updates.hasOwnProperty('labelledAsCorrect')) {
           outcome.labelledAsCorrect = updates.labelledAsCorrect;

@@ -20,17 +20,68 @@ oppia.directive('skillsList', [
     return {
       restrict: 'E',
       scope: {
-        getSkillSummaries: '&skillSummaries'
+        getSkillSummaries: '&skillSummaries',
+        getEditableTopicSummaries: '&editableTopicSummaries'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/skills_list_directive.html'),
-      controller: ['$scope',
-        function($scope) {
+      controller: [
+        '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
+        'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
+        function(
+            $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
+            EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           $scope.SKILL_HEADINGS = [
             'description', 'worked_examples_count', 'misconception_count'
           ];
           $scope.getSkillEditorUrl = function(skillId) {
             return '/skill_editor/' + skillId;
+          };
+          $scope.assignSkillToTopic = function(skillId) {
+            var topicSummaries = $scope.getEditableTopicSummaries();
+            var modalInstance = $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/topics_and_skills_dashboard/' +
+                'assign_skill_to_topic_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.topicSummaries = topicSummaries;
+                  $scope.selectedTopicIds = [];
+                  $scope.done = function() {
+                    $uibModalInstance.close($scope.selectedTopicIds);
+                  };
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                  };
+                }
+              ]
+            });
+
+            modalInstance.result.then(function(topicIds) {
+              var changeList = [{
+                cmd: 'add_uncategorized_skill_id',
+                new_uncategorized_skill_id: skillId,
+                change_affects_subtopic_page: false
+              }];
+              var topicSummaries = $scope.getEditableTopicSummaries();
+              for (var i = 0; i < topicIds.length; i++) {
+                var version = null;
+                for (var j = 0; j < topicSummaries.length; j++) {
+                  if (topicSummaries[j].id === topicIds[i]) {
+                    EditableTopicBackendApiService.updateTopic(
+                      topicIds[i], topicSummaries[j].version,
+                      'Added skill with id ' + skillId + ' to topic.',
+                      changeList
+                    ).then(function() {
+                      $rootScope.$broadcast(
+                        EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
+                    });
+                  }
+                }
+              }
+            });
           };
         }
       ]

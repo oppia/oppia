@@ -1,0 +1,22 @@
+<div class="oppia-editor-header">
+  <span>
+    <span ng-if="!skillDescriptionEditorIsShown" ng-click="openSkillDescriptionEditor()" class="oppia-editable-section">
+      <strong style="font-size: 1.2em;"><[skill.getDescription()]></strong>
+      <i class="material-icons oppia-editor-edit-icon"
+         title="Edit Skill Description">&#xE254;
+      </i>
+    </span>
+    <span ng-if="skillDescriptionEditorIsShown">
+      <form class="form-horizontal" role="form" ng-submit="saveSkillDescription($parent.tmpSkillDescription)">
+        <input type="text" ng-model="$parent.tmpSkillDescription" focus-on="skillDescriptionEditorOpened">
+        <button type="submit" class="btn btn-success btn-sm">Save</button>
+        <button class="btn btn-default btn-sm" ng-click="closeSkillDescriptionEditor()">Cancel</button>
+      </form>
+    </span>
+  </span>
+</div>
+<style>
+  skill-description-editor .oppia-editor-header {
+    margin-left: 12vw;
+  }
+</style>

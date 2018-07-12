@@ -41,7 +41,8 @@ class SkillEditorPage(base.BaseHandler):
                 Exception('The skill with the given id doesn\'t exist.'))
 
         self.values.update({
-            'skill_id': skill.id
+            'skill_id': skill.id,
+            'nav_mode': feconf.NAV_MODE_CREATE
         })
 
         self.render_template('pages/skill_editor/skill_editor.html')

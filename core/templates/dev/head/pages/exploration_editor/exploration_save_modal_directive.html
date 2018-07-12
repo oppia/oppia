@@ -22,7 +22,7 @@
 </div>
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-close-save-modal" ng-disabled="!isExplorationPrivate && !commitMessage" ng-click="save(commitMessage)">
+  <button class="btn btn-success protractor-test-save-draft-button" ng-disabled="!isExplorationPrivate && !commitMessage" ng-click="save(commitMessage)">
     <span ng-if="isExplorationPrivate">Save Draft</span>
     <span ng-if="!isExplorationPrivate">Publish Changes</span>
   </button>

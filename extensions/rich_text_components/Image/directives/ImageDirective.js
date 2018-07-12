@@ -44,7 +44,7 @@ oppia.directive('oppiaNoninteractiveImage', [
         if (ImagePreloaderService.inExplorationPlayer()) {
           $scope.isLoadingIndicatorShown = true;
           $scope.dimensions = (
-            ImagePreloaderService.getDimensionsOfImage($scope.filepath.name));
+            ImagePreloaderService.getDimensionsOfImage($scope.filepath));
           // For aligning the gif to the center of it's container
           var loadingIndicatorSize = (
             ($scope.dimensions.height < 124) ? 24 : 120);
@@ -59,7 +59,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           $scope.loadImage = function() {
             $scope.isLoadingIndicatorShown = true;
             $scope.isTryAgainShown = false;
-            ImagePreloaderService.getImageUrl($scope.filepath.name)
+            ImagePreloaderService.getImageUrl($scope.filepath)
               .then(function(objectUrl) {
                 $scope.isTryAgainShown = false;
                 $scope.isLoadingIndicatorShown = false;
@@ -71,18 +71,12 @@ oppia.directive('oppiaNoninteractiveImage', [
           };
           $scope.loadImage();
         } else {
-          // This is the case when user is in exploration editor. We don't have
-          // loading indicator or try again button for showing images in the
-          // exploration editor. So we directly fetch the images from the
-          // AssetsBackendApiService's cache.
-          AssetsBackendApiService.loadImage(
-            ExplorationContextService.getExplorationId(), $scope.filepath.name)
-            .then(function(loadedImageFile) {
-              $scope.isLoadingIndicatorShown = false;
-              $scope.isTryAgainShown = false;
-              var objectUrl = URL.createObjectURL(loadedImageFile.data);
-              $scope.imageUrl = objectUrl;
-            });
+          // This is the case when user is in exploration editor or in
+          // preview mode. We don't have loading indicator or try again for
+          // showing images in the exploration editor or in preview mode. So
+          // we directly assign the url to the imageUrl.
+          $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+            ExplorationContextService.getExplorationId(), $scope.filepath);
         }
 
         $scope.imageCaption = '';

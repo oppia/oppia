@@ -28,6 +28,6 @@ oppia.directive('schemaBasedHtmlEditor', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/components/forms/schema_editors/' +
         'schema_based_html_editor_directive.html'),
-      restrict: 'E'
+      restrict: 'E',
     };
   }]);

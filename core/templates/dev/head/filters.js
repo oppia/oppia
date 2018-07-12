@@ -92,9 +92,32 @@ oppia.filter('truncateAtFirstLine', [function() {
     var suffix = otherNonemptyLinesExist ? '...' : '';
     return (
       firstNonemptyLineIndex !== -1 ?
-        lines[firstNonemptyLineIndex] + suffix : '');
+      lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
+
+/* Filter that trucates the input answer based on interaction type.
+ * @param {string} input - The answer to truncate.
+ * @param {string} interactionId - Interaction for which answer is to be
+    truncated.
+ * @param {integer} length - Truncated length of answer.
+ */
+oppia.filter('truncateInputBasedOnInteractionAnswerType', [
+  '$filter', 'INTERACTION_SPECS', function($filter, INTERACTION_SPECS) {
+    return function(input, interactionId, length) {
+      var answerType = INTERACTION_SPECS[interactionId].answer_type;
+      var actualInputToTruncate = '';
+      if (answerType === 'NormalizedString') {
+        actualInputToTruncate = input;
+      } else if (answerType === 'CodeEvaluation') {
+        actualInputToTruncate = input.code;
+      } else {
+        throw Error('Unknown interaction answer type');
+      }
+      return $filter('truncate')(actualInputToTruncate, length);
+    };
+  }
+]);
 
 // Filter that rounds a number to 1 decimal place.
 oppia.filter('round1', [function() {
@@ -226,13 +249,13 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '(';
           replacementText += (
             inputs[varName][0] >= 0.0 ?
-              latitude.toFixed(2) + '°N' :
-              -latitude.toFixed(2) + '°S');
+            latitude.toFixed(2) + '°N' :
+            -latitude.toFixed(2) + '°S');
           replacementText += ', ';
           replacementText += (
             inputs[varName][1] >= 0.0 ?
-              longitude.toFixed(2) + '°E' :
-              -longitude.toFixed(2) + '°W');
+            longitude.toFixed(2) + '°E' :
+            -longitude.toFixed(2) + '°W');
           replacementText += ')';
         } else if (varType === 'NormalizedString') {
           replacementText = '"' + inputs[varName] + '"';

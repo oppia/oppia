@@ -18,6 +18,15 @@
 
   <div ng-if="isSelfLoop() && canEditRefresherExplorationId" style="margin-top: 12px;">
     <b>Refresher exploration ID (optional):</b>
-    <input type="text" name="refresherExplorationId" ng-model="outcome.refresherExplorationId" class="form-control protractor-test-add-refresher-exploration-id" tabindex="0" aria-invalid="false" ng-pattern="explorationIdPattern">
+    <input type="text" name="refresherExplorationId" ng-model="outcome.refresherExplorationId" class="form-control protractor-test-add-refresher-exploration-id" tabindex="0" aria-invalid="false" ng-pattern="globalIdPattern">
+  </div>
+  <div style="margin-top: 12px;" ng-if="canAddPrerequisiteSkill">
+    <b>Prerequisite skill ID (optional):&nbsp;</b>
+    <input type="text" name="missingPrerequisiteSkillId" ng-model="outcome.missingPrerequisiteSkillId" class="form-control" tabindex="0" aria-invalid="false" ng-pattern="explorationAndSkillIdPattern">
+    <p style="font-size: 0.8em;">
+      <i> Mention the skill that this state requires so that a learner who is stuck in the state can quickly learn the
+          required material and continue with the exploration.
+      </i>
+    </p>
   </div>
 </div>

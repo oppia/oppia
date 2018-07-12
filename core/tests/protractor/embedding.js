@@ -19,71 +19,87 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
-var editor = require('../protractor_utils/editor.js');
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 describe('Embedding', function() {
-  var adminPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
+
+  explorationEditorPage =
+  new ExplorationEditorPage.ExplorationEditorPage();
+  explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
   var createCountingExploration = function () {
     // Intro.
-    editor.setStateName('Intro');
-    editor.setContent(forms.toRichText(
+    explorationEditorMainTab.setStateName('Intro');
+    explorationEditorMainTab.setContent(forms.toRichText(
       'Given three balls of different colors. How many ways are there ' +
       'to arrange them in a straight line?')
     );
-    editor.setInteraction('NumericInput');
-    editor.addResponse(
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
       'NumericInput', null, 'correct but why', true, 'Equals', 6);
-    editor.addResponse('NumericInput', forms.toRichText('Describe solution!!')
+    explorationEditorMainTab.addResponse('NumericInput', forms.toRichText(
+      'Describe solution!!')
       , null, false, 'IsLessThanOrEqualTo', 0);
-    editor.setDefaultOutcome(null, 'Not 6', true);
+    var defaultResponseEditor = explorationEditorMainTab
+      .getResponseEditor('default');
+    defaultResponseEditor.setDestination(
+      'Not 6', true, null);
 
     // correct but why.
-    editor.moveToState('correct but why');
-    editor.setContent(forms.toRichText('Right! Why do you think it is 6?'));
-    editor.setInteraction('TextInput', 'Type your answer here.', 5);
-    editor.addResponse('TextInput', forms.toRichText(
+    explorationEditorMainTab.moveToState('correct but why');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Right! Why do you think it is 6?'));
+    explorationEditorMainTab.setInteraction(
+      'TextInput', 'Type your answer here.', 5);
+    explorationEditorMainTab.addResponse('TextInput', forms.toRichText(
       'Yes, 3! = 3 x 2 x 1. That\'s 3 x 2 = 6 ways.')
       , 'END', true, 'Contains', 'permutation');
-    editor.addResponse('TextInput', forms.toRichText(
+    explorationEditorMainTab.addResponse('TextInput', forms.toRichText(
       'Yes, 3 factorial, or 3 x 2 x 1. That\'s 3 x 2 = 6 ways.')
       , 'END', false, 'Contains', 'factorial');
-    editor.setDefaultOutcome(forms.toRichText('Figure out what the ' +
-      'answer for 4 balls is!')
-      , null, false);
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Figure out what the answer for 4 balls is!'));
 
     // Not 6.
-    editor.moveToState('Not 6');
-    editor.setContent(forms.toRichText('List the different ways?'));
-    editor.setInteraction('Continue', 'try again');
-    editor.setDefaultOutcome(null, 'Intro', false);
+    explorationEditorMainTab.moveToState('Not 6');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('List the different ways?'));
+    explorationEditorMainTab.setInteraction('Continue', 'try again');
+    defaultResponseEditor = explorationEditorMainTab
+      .getResponseEditor('default');
+    defaultResponseEditor.setDestination('Intro', false, null);
 
     // END.
-    editor.moveToState('END');
-    editor.setContent(forms.toRichText('Congratulations, you have finished!'));
-    editor.setInteraction('EndExploration');
+    explorationEditorMainTab.moveToState('END');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Congratulations, you have finished!'));
+    explorationEditorMainTab.setInteraction('EndExploration');
 
     // Save changes.
     title = 'Protractor Test';
     category = 'Mathematics';
     objective = 'learn how to count permutations' +
       ' accurately and systematically';
-    editor.setTitle(title);
-    editor.setCategory(category);
-    editor.setObjective(objective);
-    editor.saveChanges('Done!');
+    explorationEditorPage.navigateToSettingsTab();
 
+    explorationEditorSettingsTab.setTitle(title);
+    explorationEditorSettingsTab.setCategory(category);
+    explorationEditorSettingsTab.setObjective(objective);
+    explorationEditorPage.saveChanges('Done!');
     // Publish changes.
     workflow.publishExploration();
   };
 
   beforeEach(function() {
-    adminPage = new AdminPage.AdminPage();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -97,9 +113,7 @@ describe('Embedding', function() {
     }];
 
     var playCountingExploration = function(version) {
-      general.waitForSystem();
-      browser.waitForAngular();
-
+      general.waitForLoadingMessage();
       explorationPlayerPage.expectContentToMatch(
         forms.toRichText((version === 2) ?
           'Given three balls of different colors. How many ways are there ' +
@@ -133,8 +147,8 @@ describe('Embedding', function() {
       createCountingExploration();
 
       general.openEditor(explorationId);
-      editor.setContent(forms.toRichText('Version 3'));
-      editor.saveChanges('demonstration edit');
+      explorationEditorMainTab.setContent(forms.toRichText('Version 3'));
+      explorationEditorPage.saveChanges('demonstration edit');
 
       for (var i = 0; i < TEST_PAGES.length; i++) {
         // This is necessary as the pages are non-angular.
@@ -239,8 +253,7 @@ describe('Embedding', function() {
 
       browser.switchTo().frame(driver.findElement(
         by.css('.protractor-test-embedded-exploration > iframe')));
-      general.waitForSystem();
-      browser.waitForAngular();
+      general.waitForLoadingMessage();
       expect(driver.findElement(by.css('.protractor-test-float-form-input'))
         .getAttribute('placeholder')).toBe(expectedPlaceholder);
       browser.switchTo().defaultContent();
@@ -254,40 +267,49 @@ describe('Embedding', function() {
     general.getExplorationIdFromEditor().then(function(expId) {
       explorationId = expId;
 
-      editor.setContent(forms.toRichText('Language Test'));
-      editor.setInteraction('NumericInput');
-      editor.addResponse(
+      explorationEditorMainTab.setContent(forms.toRichText('Language Test'));
+      explorationEditorMainTab.setInteraction('NumericInput');
+      explorationEditorMainTab.addResponse(
         'NumericInput', forms.toRichText('Nice!!'),
         'END', true, 'IsLessThanOrEqualTo', 0);
-      editor.setDefaultOutcome(forms.toRichText('Ok!!'), null, false);
+      explorationEditorMainTab.getResponseEditor('default').setFeedback(
+        forms.toRichText('Ok!!'));
+      explorationEditorMainTab.getResponseEditor('default').setDestination(
+        '(try again)', null, false);
+      // editor.setDefaultOutcome(forms.toRichText('Ok!!'), null, false);
 
-      editor.moveToState('END');
-      editor.setContent(forms.toRichText('END'));
-      editor.setInteraction('EndExploration');
+      explorationEditorMainTab.moveToState('END');
+      explorationEditorMainTab.setContent(forms.toRichText('END'));
+      explorationEditorMainTab.setInteraction('EndExploration');
 
       // Save changes.
       title = 'Language Test';
       category = 'Languages';
       objective = 'This is a Language Test for valid and invalid.';
-      editor.setTitle(title);
-      editor.setCategory(category);
-      editor.setObjective(objective);
-      editor.saveChanges('Done!');
+      explorationEditorPage.navigateToSettingsTab();
+      explorationEditorSettingsTab.setTitle(title);
+      explorationEditorSettingsTab.setCategory(category);
+      explorationEditorSettingsTab.setObjective(objective);
+      explorationEditorPage.saveChanges('Done!');
 
       // Publish changes.
       workflow.publishExploration();
 
       // Change language to Thai, which is not a supported site language.
       general.openEditor(explorationId);
-      editor.setLanguage('ภาษาไทย');
-      editor.saveChanges('Changing the language to a not supported one.');
+      explorationEditorPage.navigateToSettingsTab();
+      explorationEditorSettingsTab.setLanguage('ภาษาไทย');
+      explorationEditorPage.saveChanges(
+        'Changing the language to a not supported one.');
       // We expect the default language, English.
       checkPlaceholder('Type a number');
 
       // Change language to Spanish, which is a supported site language.
       general.openEditor(explorationId);
-      editor.setLanguage('español');
-      editor.saveChanges('Changing the language to a supported one.');
+      explorationEditorPage.navigateToSettingsTab();
+      explorationEditorSettingsTab.setLanguage('español');
+      explorationEditorPage.saveChanges(
+        'Changing the language to a supported one.');
       checkPlaceholder('Ingresa un número');
 
       users.logout();

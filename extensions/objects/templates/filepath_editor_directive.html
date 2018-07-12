@@ -8,10 +8,14 @@
     <div class="filepath-editor-img-toolbar-resize">
       Resize to:
       <span class="filepath-editor-button filepath-editor-decrease-size"
-            ng-click="decreaseResizePercent(10)">-</span><span class="filepath-editor-resize-input">
+            ng-click="decreaseResizePercent(10)">-
+      </span>
+      <span class="filepath-editor-resize-input">
         <[getCurrentResizePercent()]> %
-      </span><span class="filepath-editor-button filepath-editor-increase-size"
-                   ng-click="increaseResizePercent(10)">+</span>
+      </span>
+      <span class="filepath-editor-button filepath-editor-increase-size"
+            ng-click="increaseResizePercent(10)">+
+      </span>
     </div>
     <div class="filepath-editor-img-toolbar-size">
       Image Size:
@@ -20,7 +24,9 @@
       <span><[calculateTargetImageDimensions().height]></span>
       <i class="material-icons"
          ng-if="getImageSizeHelp() !== null"
-         title="<[getImageSizeHelp()]>">&#xE887;</i>
+         title="<[getImageSizeHelp()]>">
+        &#xE887;
+      </i>
     </div>
   </div>
   <div class="filepath-editor-image-container"
@@ -33,19 +39,25 @@
          class="filepath-editor-image-crop-container"
          ng-mousemove="onMouseMoveOnImageArea($event)">
       <div ng-if="isUserCropping()"
-           class="filepath-editor-image-shade-overlay"></div>
+           class="filepath-editor-image-shade-overlay">
+      </div>
       <div class="filepath-editor-crop-area"
            ng-if="imageResizeRatio === 1"
            ng-attr-style="<[getCropAreaDynamicStyles()]>"
            ng-mousedown="onMouseDownOnCropArea($event)"
-           ng-mouseup="onMouseUpOnCropArea($event)"></div>
+           ng-mouseup="onMouseUpOnCropArea($event)">
+      </div>
       <div ng-if="isUserCropping()"
            class="filepath-editor-image-crop-button-bar"
            ng-attr-style="<[getCropButtonBarDynamicStyles()]>">
         <div class="filepath-editor-button filepath-editor-crop-button"
-             ng-click="confirmCropImage()">Crop</div>
+             ng-click="confirmCropImage()">
+          Crop
+        </div>
         <div class="filepath-editor-button filepath-editor-crop-button"
-             ng-click="cancelCropImage()">Cancel</div>
+             ng-click="cancelCropImage()">
+          Cancel
+        </div>
       </div>
       <img ng-src="<[data.metadata.uploadedImageData]>"
            ng-attr-style="<[getUploadedImageDynamicStyles()]>">
@@ -54,7 +66,9 @@
       <div class="filepath-editor-saved-image-container">
         <i class="material-icons filepath-editor-trash"
            ng-click="resetFilePathEditor()"
-           title="Delete this image">&#xE872;</i>
+           title="Delete this image">
+          &#xE872;
+        </i>
         <img ng-src="<[data.metadata.savedImageUrl]>">
       </div>
     </div>
@@ -63,11 +77,15 @@
     <button type="button"
             class="btn btn-success filepath-editor-use"
             ng-click="saveUploadedFile()"
-            ng-disabled="isUserCropping()">Use This Image</button>
+            ng-disabled="isUserCropping()">
+      Use This Image
+    </button>
     <button type="button"
             class="btn btn-default filepath-editor-discard"
             ng-click="discardUploadedFile()"
-            ng-disabled="isUserCropping()">Discard</button>
+            ng-disabled="isUserCropping()">
+      Discard
+    </button>
   </div>
 </div>
 

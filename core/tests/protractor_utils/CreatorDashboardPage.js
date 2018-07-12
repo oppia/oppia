@@ -16,9 +16,14 @@
  * @fileoverview Page object for the creator dashboard, for use in Protractor
  * tests.
  */
+var general = require('./general.js');
+var until = protractor.ExpectedConditions;
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator_dashboard';
+  var activityCreationModal = element(
+    by.css('.protractor-test-creation-modal'));
   var explorationFeedbackCount =
     element(by.css('.protractor-test-exploration-feedback-count'));
   var explorationDashboardCard =
@@ -32,9 +37,22 @@ var CreatorDashboardPage = function() {
   var createExplorationButton =
     element(by.css('.protractor-test-create-exploration'));
 
+    // Returns a promise of all explorations with the given name.
+  var _getExplorationElements = function(explorationTitle) {
+    var allExplorationDashboardCard = element.all(
+      by.css('.protractor-test-exploration-dashboard-card'));
+    return allExplorationDashboardCard.filter(function(tile) {
+      return tile.element(
+        by.css('.protractor-test-exp-summary-tile-title')).
+        getText().then(function(tileTitle) {
+          return (tileTitle === explorationTitle);
+        });
+    });
+  };
 
   this.get = function() {
-    return browser.get(CREATOR_DASHBOARD_URL);
+    browser.get(CREATOR_DASHBOARD_URL);
+    return general.waitForLoadingMessage();
   };
 
   this.getNumberOfFeedbackMessages = function() {
@@ -45,26 +63,67 @@ var CreatorDashboardPage = function() {
 
   this.navigateToExplorationEditor = function() {
     explorationDashboardCard.click();
+    general.waitForLoadingMessage();
   };
 
   this.clickCreateActivityButton = function() {
+    waitFor.elementToBeClickable(
+      createActivityButton,
+      'Create Activity button takes too long to be clickable');
     createActivityButton.click();
+    general.waitForLoadingMessage();
   };
 
   this.clickCreateCollectionButton = function() {
-    createCollectionButton.click();
+    browser.wait(until.visibilityOf(activityCreationModal), 5000,
+      'Activity Creation modal is not visible').then( function(isVisible) {
+      if (isVisible) {
+        waitFor.elementToBeClickable(
+          createCollectionButton,
+          'Create Collection button takes too long to be clickable');
+        createCollectionButton.click();
+        general.waitForLoadingMessage();
+      }
+    });
   };
 
   this.clickCreateExplorationButton = function() {
+    waitFor.elementToBeClickable(
+      createExplorationButton,
+      'Create Exploration button takes too long to be clickable');
     createExplorationButton.click();
+    general.waitForLoadingMessage();
   };
 
   this.navigateToCollectionEditor = function() {
+    waitFor.elementToBeClickable(
+      collectionCard,
+      'Collection Card tab takes too long to be clickable');
     collectionCard.click();
+    general.waitForLoadingMessage();
   };
 
   this.navigateToSubscriptionDashboard = function() {
+    waitFor.elementToBeClickable(
+      subscriptionTab,
+      'Subscription Dashboard tab takes too long to be clickable');
     subscriptionTab.click();
+    general.waitForLoadingMessage();
+  };
+
+  this.editExploration = function(explorationTitle) {
+    _getExplorationElements(explorationTitle).then(function(elems) {
+      if (elems.length === 0) {
+        throw 'Could not find exploration tile with name ' + explorationTitle;
+      }
+      var explorationElement = elems[0].element(
+        by.css('.protractor-test-title-mask'));
+      waitFor.elementToBeClickable(
+        explorationElement,
+        'Unable to click on exploration: ' + explorationTitle);
+      explorationElement.click();
+      general.waitForLoadingMessage();
+    });
   };
 };
 

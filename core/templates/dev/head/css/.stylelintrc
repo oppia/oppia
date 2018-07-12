@@ -1,6 +1,7 @@
 { 
   "extends": "stylelint-config-recommended",
   "rules": {
+    "indentation": 2,
     "no-descending-specificity": true,
     "no-duplicate-selectors": true,
     "selector-type-no-unknown": [
