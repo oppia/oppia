@@ -42,6 +42,7 @@
     max-width: 300px;
     margin: 10px 0 0 70px;
     min-height: 50px;
+    overflow: hidden;
     padding-left: 10px;
   }
 
@@ -53,6 +54,7 @@
     max-width: 300px;
     margin: -5px 0 0 50px;
     min-height: 50px;
+    overflow: hidden;
     padding-left: 10px;
     position: relative;
   }
@@ -65,7 +67,7 @@
 
 <div class="drag-and-drop-sort-form-container">
   <form ng-submit="submitAnswer()">
-    <div ui-tree class="drag-and-drop-sort-container" data-max-depth="2">
+    <div ui-tree="treeOptions" class="drag-and-drop-sort-container" data-max-depth="2">
       <ol ui-tree-nodes="" ng-model="list">
         <li ng-repeat="item in list" ui-tree-node data-scroll-container=".drag-and-drop-sort-container">
           <div ui-tree-handle class="drag-and-drop-item">

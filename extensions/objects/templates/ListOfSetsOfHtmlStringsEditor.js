@@ -36,12 +36,27 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
           $scope.maxPrevIndex = 1;
         }
 
+        $scope.initValues = [];
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
+
+        // Initialize the default values.
         if ($scope.value[0] === undefined || $scope.value[0].length === 0) {
           $scope.value = [[]];
           for (var i = 0; i < $scope.choices.length; i++) {
             $scope.value[0].push($scope.choices[i].id);
+            $scope.initValues.push(1);
+          }
+        } else {
+          for (var i = 0; i < $scope.choices.length; i++) {
+            for (var j = 0; j < $scope.value.length; j++) {
+              var choice = $scope.choices[i].id;
+              if ($scope.value[j].indexOf(choice) !== -1) {
+                $scope.initValues.push(j + 1);
+                $scope.maxPrevIndex = math.max($scope.maxPrevIndex, j + 1);
+                break;
+              }
+            }
           }
         }
 

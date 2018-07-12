@@ -46,6 +46,20 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
             $scope.list.push({title: $scope.choices[i], items: []});
           }
 
+          $scope.treeOptions = {
+            dragMove: function(e) {
+              var elem = document.getElementsByClassName(
+                'angular-ui-tree-placeholder');
+              // Change the color of the placeholder based on the position of
+              // the dragged item.
+              if (e.dest.nodesScope.$childNodesScope !== undefined) {
+                elem[0].style.borderColor = '#add8e6';
+              } else {
+                elem[0].style.borderColor = '#000000';
+              }
+            }
+          };
+
           $scope.submitAnswer = function() {
             // Converting list of dicts to list of lists to make it consistent
             // with the ListOfSetsOfHtmlStrings object.
@@ -140,7 +154,7 @@ oppia.factory('dragAndDropSortRulesService', [function() {
   };
   var checkEqualityWithIncorrectPositions = function(answer, inputs) {
     var noOfMismatches = 0;
-    for (var i = 0; i < answer.length; i++) {
+    for (var i = 0; i < math.min(inputs.x.length, answer.length); i++) {
       for (var j = 0; j < answer[i].length; j++) {
         if (inputs.x[i].indexOf(answer[i][j]) === -1) {
           noOfMismatches += 1;

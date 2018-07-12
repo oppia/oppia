@@ -21,7 +21,7 @@
     <div class="row">
       <div class="col-sm-1">
         <select ng-model="selectedRank" ng-change="selectedItem($index, selectedRank)" aria-label="choice"
-                id="{{$index}}" ng-init="selectedRank = 1" ng-options="index for index in allowedChoices()">
+                id="{{$index}}" ng-init="selectedRank = initValues[$index]" ng-options="index for index in allowedChoices()">
         </select>
       </div>
       <div class="col-sm-10">
