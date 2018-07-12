@@ -31,6 +31,7 @@ oppia.directive('stateTranslationStatusGraph', [
           $scope.getActiveStateName = function() {
             return EditorStateService.getActiveStateName();
           };
+          $rootScope.$broadcast('refreshStateTranslation');
           $scope.onClickStateInMap = function(newStateName) {
             EditorStateService.setActiveStateName(newStateName);
             $rootScope.$broadcast('refreshStateTranslation');
