@@ -155,9 +155,15 @@ oppia.factory('dragAndDropSortRulesService', [function() {
   var checkEqualityWithIncorrectPositions = function(answer, inputs) {
     var noOfMismatches = 0;
     for (var i = 0; i < math.min(inputs.x.length, answer.length); i++) {
-      for (var j = 0; j < answer[i].length; j++) {
-        if (inputs.x[i].indexOf(answer[i][j]) === -1) {
-          noOfMismatches += 1;
+      for (var j = 0; j < math.max(answer[i].length, inputs.x[i].length); j++) {
+        if (inputs.x[i].length > answer[i].length) {
+          if (answer[i].indexOf(inputs.x[i][j]) === -1) {
+            noOfMismatches += 1;
+          }
+        } else {
+          if (inputs.x[i].indexOf(answer[i][j]) === -1) {
+            noOfMismatches += 1;
+          }
         }
       }
     }

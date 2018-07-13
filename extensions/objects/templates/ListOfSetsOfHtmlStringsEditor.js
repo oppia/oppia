@@ -109,8 +109,8 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
                 $scope.value.pop();
               } else {
                 // Continuity error.
-                errorMessage = ('No item(s) is assigned at position ' +
-                  String(i + 1) + '. Please assign some item at this ' +
+                errorMessage = ('No choice(s) is assigned at position ' +
+                  String(i + 1) + '. Please assign some choice at this ' +
                   'position.');
               }
             }

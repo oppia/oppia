@@ -45,14 +45,14 @@ oppia.factory('DragAndDropSortValidationService', [
         if (areAnyChoicesEmpty) {
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
-            message: 'Please ensure the choices are nonempty.'
+            message: 'Please ensure that the choices are nonempty.'
           });
         }
 
         if (areAnyChoicesDuplicated) {
           warningsList.push({
             type: WARNING_TYPES.CRITICAL,
-            message: 'Please ensure the choices are unique.'
+            message: 'Please ensure that the choices are unique.'
           });
         }
 
@@ -62,16 +62,46 @@ oppia.factory('DragAndDropSortValidationService', [
           stateName, customizationArgs, answerGroups, defaultOutcome) {
         var warningsList = [];
         var seenItems = [];
+        var ranges = [];
         var areAnyItemsEmpty = false;
         var areAnyItemsDuplicated = false;
 
         warningsList = warningsList.concat(
           this.getCustomizationArgsWarnings(customizationArgs));
 
+        var checkRedundancy = function(earlierRule, laterRule) {
+          var noOfMismatches = 0;
+          inputs = earlierRule.inputs.x;
+          answer = laterRule.inputs.x;
+          for (var i = 0; i < math.min(inputs.length, answer.length); i++) {
+            for (var j = 0; j < math.max(answer[i].length, inputs[i].length);
+              j++) {
+              if (inputs[i].length > answer[i].length) {
+                if (answer[i].indexOf(inputs[i][j]) === -1) {
+                  noOfMismatches += 1;
+                }
+              } else {
+                if (inputs[i].indexOf(answer[i][j]) === -1) {
+                  noOfMismatches += 1;
+                }
+              }
+            }
+          }
+          return noOfMismatches === 1;
+        };
+
         for (var i = 0; i < answerGroups.length; i++) {
           var rules = answerGroups[i].rules;
           for (var j = 0; j < rules.length; j++) {
             var inputs = rules[j].inputs;
+            var rule = rules[j];
+            var range = {
+              answerGroupIndex: i + 1,
+              ruleIndex: j + 1
+            };
+            seenItems = [];
+            areAnyItemsEmpty = false;
+            areAnyItemsDuplicated = false;
 
             for (var k = 0; k < inputs.x.length; k++) {
               if (inputs.x[k].length === 0) {
@@ -103,6 +133,27 @@ oppia.factory('DragAndDropSortValidationService', [
                 message: 'Please ensure the items are unique.'
               });
             }
+
+            for (var k = 0; k < ranges.length; k++) {
+              var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
+                rules[ranges[k].ruleIndex - 1];
+              if (earlierRule.type ===
+                'IsEqualToOrderingWithOneItemAtIncorrectPosition' &&
+                rule.type === 'IsEqualToOrdering') {
+                if (checkRedundancy(earlierRule, rule)) {
+                  warningsList.push({
+                    type: WARNING_TYPES.ERROR,
+                    message: (
+                      'Rule ' + (j + 1) + ' from answer group ' +
+                      (i + 1) + ' will never be matched because it ' +
+                      'is made redundant by rule ' + ranges[k].ruleIndex +
+                      ' from answer group ' + ranges[k].answerGroupIndex +
+                      '.')
+                  });
+                }
+              }
+            }
+            ranges.push(range);
           }
         }
 

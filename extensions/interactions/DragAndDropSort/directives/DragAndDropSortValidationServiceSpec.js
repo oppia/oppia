@@ -18,7 +18,7 @@ describe('DragAndDropSortValidationService', function() {
   var currentState;
   var answerGroups, goodDefaultOutcome;
   var equalsListWithEmptyValuesRule, equalsListWithDuplicatesRule,
-    equalsListWithAllowedValuesRule;
+    equalsListWithAllowedValuesRule, equalsListWithValuesRule;
   var customizationArgs;
   var oof, agof, rof;
 
@@ -56,6 +56,13 @@ describe('DragAndDropSortValidationService', function() {
       rule_type: 'IsEqualToOrdering',
       inputs: {
         x: [['a', 'b'], ['d'], ['c']]
+      }
+    });
+
+    equalsListWithValuesRule = rof.createFromBackendDict({
+      rule_type: 'IsEqualToOrderingWithOneItemAtIncorrectPosition',
+      inputs: {
+        x: [['a'], ['d'], ['c'], ['b']]
       }
     });
 
@@ -118,7 +125,7 @@ describe('DragAndDropSortValidationService', function() {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.CRITICAL,
-      message: 'Please ensure the choices are nonempty.'
+      message: 'Please ensure that the choices are nonempty.'
     }]);
   });
 
@@ -130,7 +137,20 @@ describe('DragAndDropSortValidationService', function() {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.CRITICAL,
-      message: 'Please ensure the choices are unique.'
+      message: 'Please ensure that the choices are unique.'
+    }]);
+  });
+
+  it('should catch redundancy of rules', function() {
+    answerGroups[0].rules = [equalsListWithValuesRule,
+      equalsListWithAllowedValuesRule];
+
+    var warnings = validatorService.getAllWarnings(currentState,
+      customizationArgs, answerGroups, goodDefaultOutcome);
+    expect(warnings).toEqual([{
+      type: WARNING_TYPES.ERROR,
+      message: 'Rule 2 from answer group 1 will never be matched ' +
+          'because it is made redundant by rule 1 from answer group 1.'
     }]);
   });
 });
