@@ -51,7 +51,7 @@ oppia.directive('editorNavigation', [
               $timeout(function() {
                 $scope.popoverControlObject
                   .postTutorialHelpPopoverIsShown = false;
-              }, 5000);
+              }, 4000);
             } else {
               $scope.popoverControlObject
                 .postTutorialHelpPopoverIsShown = false;

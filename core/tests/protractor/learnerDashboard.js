@@ -64,7 +64,7 @@ describe('Learner dashboard functionality', function() {
   var createAboutOppiaExploration = function() {
     creatorDashboardPage.get();
     creatorDashboardPage.clickCreateActivityButton();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     explorationEditorMainTab.exitTutorial();
     explorationEditorMainTab.setStateName('First');
     explorationEditorMainTab.setContent(forms.toRichText(
@@ -134,7 +134,7 @@ describe('Learner dashboard functionality', function() {
     oppiaLogo.click();
     general.acceptAlert();
     // Wait for /learner_dashboard to load.
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
 
     learnerDashboardPage.navigateToInCompleteSection();
     learnerDashboardPage.navigateToIncompleteExplorationsSection();
@@ -150,7 +150,7 @@ describe('Learner dashboard functionality', function() {
     libraryPage.get();
     libraryPage.findExploration('About Oppia');
     libraryPage.playExploration('About Oppia');
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     explorationPlayerPage.expectExplorationNameToBe('About Oppia');
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.submitAnswer(
@@ -173,7 +173,7 @@ describe('Learner dashboard functionality', function() {
     libraryPage.findExploration('About Oppia');
     libraryPage.playExploration('About Oppia');
     // Wait for player page to completely load
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     general.getExplorationIdFromPlayer().then(function(explorationId) {
       general.openEditor(explorationId);
     });
@@ -223,8 +223,8 @@ describe('Learner dashboard functionality', function() {
     collectionEditorPage.saveChanges();
     users.logout();
 
-    users.createAndLoginUser('learner4@learnerDashboard.com',
-      'learner4learnerDashboard');
+    users.createAndLoginUser(
+      'learner4@learnerDashboard.com', 'learner4learnerDashboard');
     // Go to 'Test Collection' and play it.
     libraryPage.get();
     libraryPage.findCollection('Test Collection');
@@ -243,7 +243,7 @@ describe('Learner dashboard functionality', function() {
     oppiaLogo.click();
     general.acceptAlert();
     // Wait for /learner_dashboard to load.
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
 
     // Learner Dashboard should display 'Test Collection' as incomplete.
     learnerDashboardPage.navigateToInCompleteSection();
