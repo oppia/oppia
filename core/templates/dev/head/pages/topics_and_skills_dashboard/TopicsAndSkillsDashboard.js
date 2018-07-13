@@ -42,7 +42,8 @@ oppia.controller('TopicsAndSkillsDashboard', [
       EVENT_TYPE_SKILL_CREATION_ENABLED,
       EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
     $scope.TAB_NAME_TOPICS = 'topics';
-    $scope.TAB_NAME_SKILLS = 'untriagedSkills';
+    $scope.TAB_NAME_UNTRIAGED_SKILLS = 'untriagedSkills';
+    $scope.TAB_NAME_UNPUBLISHED_SKILLS = 'unpublishedSkills';
 
     var _initDashboard = function() {
       TopicsAndSkillsDashboardBackendApiService.fetchDashboardData().then(
@@ -55,6 +56,9 @@ oppia.controller('TopicsAndSkillsDashboard', [
           );
           $scope.untriagedSkillSummaries =
             response.data.untriaged_skill_summary_dicts;
+          $scope.unpublishedSkillSummaries =
+            response.data.unpublished_skill_summary_dicts;
+          console.log(angular.copy(response.data.unpublished_skill_summary_dicts));
           $scope.activeTab = $scope.TAB_NAME_TOPICS;
           $scope.userCanCreateTopic = response.data.can_create_topic;
           $scope.userCanCreateSkill = response.data.can_create_skill;
@@ -65,7 +69,11 @@ oppia.controller('TopicsAndSkillsDashboard', [
           $scope.userCanDeleteTopic = response.data.can_delete_topic;
           if ($scope.topicSummaries.length === 0 &&
               $scope.untriagedSkillSummaries.length !== 0) {
-            $scope.activeTab = $scope.TAB_NAME_SKILLS;
+            $scope.activeTab = $scope.TAB_NAME_UNTRIAGED_SKILLS;
+          } else if (
+              $scope.topicSummaries.length === 0 &&
+              $scope.unpublishedSkillSummaries.length !== 0) {
+            $scope.activeTab = $scope.TAB_NAME_UNPUBLISHED_SKILLS;
           }
         },
         function(errorResponse) {

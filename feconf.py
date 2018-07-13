@@ -374,7 +374,7 @@ ENABLE_PROMO_BAR = True
 ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
-ENABLE_NEW_STRUCTURES = True
+ENABLE_NEW_STRUCTURES = False
 
 # Whether to automatically accept suggestions after a threshold time.
 ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
