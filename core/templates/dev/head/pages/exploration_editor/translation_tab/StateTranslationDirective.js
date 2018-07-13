@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the state translation.
+ * @fileoverview Directive containing the exploration material to be translated.
  */
 
 oppia.directive('stateTranslation', [
@@ -25,17 +25,20 @@ oppia.directive('stateTranslation', [
         '/pages/exploration_editor/translation_tab/' +
         'state_translation_directive.html'),
       controller: [
-        '$scope', '$filter', 'ExplorationStatesService', 'EditorStateService',
+        '$scope', '$filter', '$rootScope', 'EditorStateService',
+        'ExplorationStatesService', 'ExplorationInitStateNameService',
         function(
-            $scope, $filter, ExplorationStatesService, EditorStateService) {
+            $scope, $filter, $rootScope, EditorStateService,
+            ExplorationStatesService, ExplorationInitStateNameService) {
           // Define tab constants.
           $scope.TAB_ID_CONTENT = 'content';
           $scope.TAB_ID_FEEDBACK = 'feedback';
           $scope.TAB_ID_HINTS = 'hints';
           $scope.TAB_ID_SOLUTION = 'solution';
+          $rootScope.loadingMessage = 'Loading';
 
           // Activates Content tab by default.
-          $scope.ACTIVATED_TAB_ID = $scope.TAB_ID_CONTENT;
+          $scope.activatedTabId = $scope.TAB_ID_CONTENT;
 
           $scope.activeHintIndex = null;
           $scope.activeAnswerGroupIndex = null;
@@ -48,7 +51,7 @@ oppia.directive('stateTranslation', [
           $scope.activeContentId = null;
 
           $scope.isActive = function(tabId) {
-            return ($scope.ACTIVATED_TAB_ID === tabId);
+            return ($scope.activatedTabId === tabId);
           };
 
           $scope.onTabClick = function(tabId) {
@@ -122,8 +125,14 @@ oppia.directive('stateTranslation', [
           $scope.$on('refreshStateTranslation', function() {
             $scope.initStateTranslation();
           });
+
           $scope.initStateTranslation = function() {
+            if (!EditorStateService.getActiveStateName()) {
+              EditorStateService.setActiveStateName(
+                ExplorationInitStateNameService.displayed);
+            }
             var stateName = EditorStateService.getActiveStateName();
+
             $scope.stateContent = ExplorationStatesService
               .getStateContentMemento(stateName);
             $scope.stateSolution = ExplorationStatesService
@@ -141,6 +150,10 @@ oppia.directive('stateTranslation', [
 
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
+
+          if (ExplorationStatesService.isInitialized()) {
+            $scope.initStateTranslation();
+          }
         }
       ]
     };

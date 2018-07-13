@@ -27,19 +27,11 @@ oppia.directive('translationTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
-      controller: [
-        '$scope', '$rootScope', 'ExplorationStatesService',
-        'EditorStateService', function(
-            $scope, $rootScope, ExplorationStatesService, EditorStateService) {
-          $rootScope.loadingMessage = 'Loading';
-          $scope.$on('refreshTranslationTab', function() {
-            if (ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName())) {
-              $rootScope.$broadcast('refreshStateTranslation');
-            }
-            $rootScope.loadingMessage = '';
-          });
-        }
-      ]
+      controller: ['$scope', '$rootScope', function($scope, $rootScope) {
+        $rootScope.loadingMessage = 'Loading';
+        $scope.$on('refreshTranslationTab', function() {
+          $scope.$broadcast('refreshStateTranslation');
+        });
+      }]
     };
   }]);

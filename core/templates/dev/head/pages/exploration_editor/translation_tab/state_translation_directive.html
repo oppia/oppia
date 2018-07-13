@@ -17,13 +17,13 @@
   </div>
 
   <div class="translation-state-contents">
-    <div ng-show="isActive(TAB_ID_CONTENT)" class="translation-state-content">
+    <div ng-if="isActive(TAB_ID_CONTENT)" class="translation-state-content">
       <span>
         <angular-html-bind html-data="stateContent.getHtml()" class="oppia-rte-editor">
         </angular-html-bind>
       </span>
     </div>
-    <div ng-show="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
+    <div ng-if="isActive(TAB_ID_FEEDBACK)" class="translation-state-content">
       <div>
         <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
           <li ng-repeat="answerGroup in stateAnswerGroups track by $index" ng-class="{'active': activeAnswerGroupIndex === $index}" class="oppia-rule-block oppia-prevent-selection" style="margin-top: 0;">
@@ -74,7 +74,7 @@
         </ul>
       </div>
     </div>
-    <div ng-show="isActive(TAB_ID_HINTS)" class="translation-state-content">
+    <div ng-if="isActive(TAB_ID_HINTS)" class="translation-state-content">
       <ul class="nav oppia-option-list nav-stacked nav-pills" role="tablist">
         <li ng-repeat="hint in stateHints track by $index"
             ng-class="{'active': activeHintIndex === $index}"
@@ -99,7 +99,7 @@
       </ul>
     </div>
 
-    <div ng-show="isActive(TAB_ID_SOLUTION)" class="translation-state-content">
+    <div ng-if="isActive(TAB_ID_SOLUTION)" class="translation-state-content">
       <span>
         <angular-html-bind html-data="stateSolution.explanation.getHtml()" class="oppia-rte-editor">
         </angular-html-bind>

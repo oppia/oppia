@@ -40,7 +40,7 @@ oppia.directive('audioTranslationBar', [
             AudioPlayerService, TranslationLanguageService, EditabilityService,
             AssetsBackendApiService, recorderService, AudioTranslationService) {
           $scope.RECORDER_ID = 'recorderId';
-          $scope.recordingTimeLimit = 1000;
+          $scope.recordingTimeLimit = 300;
           $scope.audioBlob = null;
           $scope.recorder = null;
           $scope.unsupportedBrowser = false;

@@ -51,7 +51,7 @@
     </div>
 
     <div class="oppia-recording-button" ng-if="recorder.status.isRecording">
-      05:00
+      {{(recorder.timeLimit - recorder.elapsedTime) | formatTimer}}
     </div>
     <div class="oppia-recording-button" type="button"
          uib-tooltip="Stop" tooltip-placement="bottom"

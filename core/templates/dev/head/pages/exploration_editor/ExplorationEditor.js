@@ -206,6 +206,7 @@ oppia.controller('ExplorationEditor', [
         if (ExplorationStatesService.getState(
           EditorStateService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
+          $scope.$broadcast('refreshStateTranslation');
         }
 
         if (successCallback) {
