@@ -313,7 +313,8 @@ class Skill(object):
             self, skill_id, description, misconceptions,
             skill_contents, misconceptions_schema_version,
             skill_contents_schema_version, language_code, version,
-            next_misconception_id, created_on=None, last_updated=None):
+            next_misconception_id, superseding_skill_id=None, 
+            all_questions_merged=None, created_on=None, last_updated=None):
         """Constructs a Skill domain object.
 
         Args:
@@ -348,6 +349,8 @@ class Skill(object):
         self.last_updated = last_updated
         self.version = version
         self.next_misconception_id = next_misconception_id
+        self.superseding_skill_id = superseding_skill_id
+        self.all_questions_merged = all_questions_merged
 
     @classmethod
     def require_valid_skill_id(cls, skill_id):
@@ -460,7 +463,9 @@ class Skill(object):
             'misconceptions_schema_version': self.misconceptions_schema_version,
             'skill_contents_schema_version': self.skill_contents_schema_version,
             'version': self.version,
-            'next_misconception_id': self.next_misconception_id
+            'next_misconception_id': self.next_misconception_id,
+            'superseding_skill_id': self.superseding_skill_id,
+            'all_questions_merged': self.all_questions_merged
         }
 
     @classmethod

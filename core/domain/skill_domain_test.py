@@ -142,7 +142,9 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             ),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
             'next_misconception_id': 0,
-            'version': 0
+            'version': 0,
+            'superseding_skill_id': None,
+            'all_questions_merged': None
         }
         self.assertEqual(skill.to_dict(), expected_skill_dict)
 
