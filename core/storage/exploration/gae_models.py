@@ -188,10 +188,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
-        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
+        default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            feconf.ACTIVITY_STATUS_PRIVATE,
-            feconf.ACTIVITY_STATUS_PUBLIC
+            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
 
@@ -260,7 +260,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_status=self.status,
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
-                    self.status == feconf.ACTIVITY_STATUS_PRIVATE)
+                    self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
 
@@ -395,10 +395,10 @@ class ExpSummaryModel(base_models.BaseModel):
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
-        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
+        default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            feconf.ACTIVITY_STATUS_PRIVATE,
-            feconf.ACTIVITY_STATUS_PUBLIC
+            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
 
@@ -432,7 +432,7 @@ class ExpSummaryModel(base_models.BaseModel):
             iterable. An iterable with non-private ExpSummary models.
         """
         return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
+            ExpSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -450,7 +450,7 @@ class ExpSummaryModel(base_models.BaseModel):
                 public in descending order of scaled_average_rating.
         """
         return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC
+            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).order(
@@ -470,7 +470,7 @@ class ExpSummaryModel(base_models.BaseModel):
                 viewable by the given user.
         """
         return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PRIVATE
+            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             ndb.OR(ExpSummaryModel.owner_ids == user_id,
                    ExpSummaryModel.editor_ids == user_id,
@@ -511,7 +511,7 @@ class ExpSummaryModel(base_models.BaseModel):
                 being first in the list.
         """
         return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == feconf.ACTIVITY_STATUS_PUBLIC
+            ExpSummaryModel.status == constants.ACTIVITY_STATUS_PUBLIC
         ).filter(
             ExpSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).order(

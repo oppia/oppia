@@ -18,6 +18,7 @@ import os
 
 import constants  # pylint: disable=relative-import
 from core.tests import test_utils  # pylint: disable=relative-import
+import feconf  # pylint: disable=relative-import
 
 
 class ConstantsTests(test_utils.GenericTestBase):
@@ -33,3 +34,13 @@ class ConstantsTests(test_utils.GenericTestBase):
             json = constants.parse_json_from_js(f)
             self.assertTrue(isinstance(json, dict))
             self.assertEqual(json['TESTING_CONSTANT'], 'test')
+
+    def test_constants_and_feconf_are_consistent(self):
+        """Test if constants that are related are consistent between feconf and
+        constants.js.
+        """
+        self.assertIn(
+            feconf.MIGRATION_BOT_USER_ID, constants.constants.SYSTEM_USER_IDS)
+        self.assertIn(
+            feconf.SYSTEM_COMMITTER_ID, constants.constants.SYSTEM_USER_IDS)
+        self.assertEqual(len(constants.constants.SYSTEM_USER_IDS), 2)
