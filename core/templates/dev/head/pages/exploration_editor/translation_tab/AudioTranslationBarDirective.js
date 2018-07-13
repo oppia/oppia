@@ -53,7 +53,7 @@ oppia.directive('audioTranslationBar', [
           $scope.cannotRecord = false;
           $scope.audioNeedsUpdate = false;
           $scope.AudioPlayerService = AudioPlayerService;
-          $scope.canTranslate = EditabilityService.isTranslatable();
+          $scope.canTranslate = false;
 
           recorderService.showPermission({
             onDenied: function() {
@@ -142,7 +142,8 @@ oppia.directive('audioTranslationBar', [
                 'Succesfuly uploaded recoded audio.');
               $scope.initAudioBar();
             }, function(errorResponse) {
-
+              AlertsService.addWarning(errorResponse.error);
+              $scope.initAudioBar();
             });
           };
 
@@ -157,6 +158,7 @@ oppia.directive('audioTranslationBar', [
           $scope.initAudioBar = function() {
             $scope.languageCode = TranslationLanguageService
               .getActiveLanguageCode();
+            $scope.canTranslate = EditabilityService.isTranslatable();
             var audioTranslationObject = getAvailableAudio(
               $scope.contentId, $scope.languageCode);
             if (audioTranslationObject) {

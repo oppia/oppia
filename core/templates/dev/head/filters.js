@@ -510,13 +510,13 @@ oppia.filter('formatRtePreview', ['$filter', function($filter) {
 }]);
 
 oppia.filter('formatTimer', [function () {
-return function (input) {
-    function formatNum(n) {
+  return function (input) {
+    var formatNum = function (n) {
       return (n < 10 ? '0' : '') + n;
-    }
+    };
 
     var seconds = input % 60;
     var minutes = Math.floor(input / 60);
     return (formatNum(minutes) + ':' + formatNum(seconds));
-};
+  };
 }]);
