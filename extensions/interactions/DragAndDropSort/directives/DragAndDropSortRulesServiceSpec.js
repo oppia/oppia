@@ -16,7 +16,7 @@
  * @fileoverview Unit tests for Drag and Drop Sorting rules.
  */
 
-fdescribe('Drag and Drop Sort rules service', function() {
+describe('Drag and Drop Sort rules service', function() {
   beforeEach(module('oppia'));
 
   var ddsrs = null;
@@ -24,7 +24,7 @@ fdescribe('Drag and Drop Sort rules service', function() {
     ddsrs = $injector.get('dragAndDropSortRulesService');
   }));
 
-  fit('should have a correct \'is equal to ordering\' rule', function() {
+  it('should have a correct \'is equal to ordering\' rule', function() {
     var RULE_INPUT = {
       x: [['a', 'b'], ['c'], ['de', 'f']]
     };
@@ -44,7 +44,7 @@ fdescribe('Drag and Drop Sort rules service', function() {
       [['a', 'b'], ['c']], RULE_INPUT)).toBe(false);
   });
 
-  fit('should have a correct \'is equal to ordering with one item at incorrect' +
+  it('should have a correct \'is equal to ordering with one item at incorrect' +
     ' position\' rule', function() {
     var RULE_INPUT = {
       x: [['a', 'b'], ['c'], ['de', 'f']]
