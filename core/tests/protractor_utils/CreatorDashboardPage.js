@@ -16,6 +16,7 @@
  * @fileoverview Page object for the creator dashboard, for use in Protractor
  * tests.
  */
+
 var waitFor = require('./waitFor.js');
 
 var CreatorDashboardPage = function() {
