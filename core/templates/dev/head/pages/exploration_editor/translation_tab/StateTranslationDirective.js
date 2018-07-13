@@ -102,17 +102,17 @@ oppia.directive('stateTranslation', [
           $scope.changeActiveHintIndex = function(newIndex) {
             $scope.activeHintIndex = newIndex;
             $scope.activeContentId = $scope.stateHints[newIndex]
-                .hintContent.getContentId();
+              .hintContent.getContentId();
           };
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
             $scope.activeAnswerGroupIndex = newIndex;
-            if(newIndex === $scope.stateAnswerGroups.length) {
+            if (newIndex === $scope.stateAnswerGroups.length) {
               $scope.activeContentId = $scope.stateDefaultOutcome
                 .feedback.getContentId();
             } else {
               $scope.activeContentId = $scope.stateAnswerGroups[newIndex]
-                  .outcome.feedback.getContentId();
+                .outcome.feedback.getContentId();
             }
           };
 

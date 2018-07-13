@@ -34,11 +34,13 @@ oppia.directive('audioTranslationBar', [
         'stateContentIdsToAudioTranslationsService', 'IdGenerationService',
         'AudioPlayerService', 'TranslationLanguageService',
         'EditabilityService', 'AssetsBackendApiService', 'recorderService',
-        'AudioTranslationService', function(
+        'ExplorationContextService',
+        function(
             $scope, $filter, $timeout, $uibModal, AlertsService,
             stateContentIdsToAudioTranslationsService, IdGenerationService,
-            AudioPlayerService, TranslationLanguageService, EditabilityService,
-            AssetsBackendApiService, recorderService, AudioTranslationService) {
+            AudioPlayerService, TranslationLanguageService,
+            EditabilityService, AssetsBackendApiService, recorderService,
+            ExplorationContextService) {
           $scope.RECORDER_ID = 'recorderId';
           $scope.recordingTimeLimit = 300;
           $scope.audioBlob = null;
@@ -69,10 +71,10 @@ oppia.directive('audioTranslationBar', [
           });
 
           $scope.checkAndStartRecording = function() {
-            if(!$scope.recorder.isAvailable) {
+            if (!$scope.recorder.isAvailable) {
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
-            } else if($scope.recorder.isAvailable) {
+            } else if ($scope.recorder.isAvailable) {
               $scope.unsupportedBrowser = false;
               $scope.cannotRecord = false;
               $scope.recordingPermissionDenied = false;
@@ -123,20 +125,22 @@ oppia.directive('audioTranslationBar', [
             var fileType = 'audio/mp3';
             var recodedAudioFile = new File(
               [$scope.audioBlob], filename, {type: fileType});
-            AudioTranslationService.upload(filename, recodedAudioFile)
-              .then(function() {
-                if($scope.isUpdatingAudio) {
-                  stateContentIdsToAudioTranslationsService.displayed
-                .deleteAudioTranslation($scope.contentId, $scope.languageCode);
-                $scope.isUpdatingAudio = false;
-                }
+            AssetsBackendApiService.saveAudio(
+              ExplorationContextService.getExplorationId(), filename,
+              recodedAudioFile).then(function() {
+              if ($scope.isUpdatingAudio) {
                 stateContentIdsToAudioTranslationsService.displayed
-                  .addAudioTranslation($scope.contentId, $scope.languageCode,
+                  .deleteAudioTranslation(
+                    $scope.contentId, $scope.languageCode);
+                $scope.isUpdatingAudio = false;
+              }
+              stateContentIdsToAudioTranslationsService.displayed
+                .addAudioTranslation($scope.contentId, $scope.languageCode,
                   filename, recodedAudioFile.size);
-                stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-                AlertsService.addSuccessMessage(
-                  "Succesfuly uploaded recoded audio.");
-                $scope.initAudioBar();
+              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              AlertsService.addSuccessMessage(
+                'Succesfuly uploaded recoded audio.');
+              $scope.initAudioBar();
             }, function(errorResponse) {
 
             });
@@ -154,8 +158,8 @@ oppia.directive('audioTranslationBar', [
             $scope.languageCode = TranslationLanguageService
               .getActiveLanguageCode();
             var audioTranslationObject = getAvailableAudio(
-              $scope.contentId, $scope.languageCode)
-            if(audioTranslationObject) {
+              $scope.contentId, $scope.languageCode);
+            if (audioTranslationObject) {
               $scope.isAudioAvailable = true;
               $scope.isLoadingAudio = true;
               $scope.selectedRecording = false;
@@ -238,7 +242,7 @@ oppia.directive('audioTranslationBar', [
 
                   $scope.isAudioTranslationValid = function() {
                     return (
-                     uploadedFile !== null &&
+                      uploadedFile !== null &&
                       uploadedFile.size !== null &&
                       uploadedFile.size > 0);
                   };
@@ -296,6 +300,6 @@ oppia.directive('audioTranslationBar', [
           $timeout(function(){
             $scope.initAudioBar();
           }, 100);
-      }]
-  };
-}]);
+        }]
+    };
+  }]);
