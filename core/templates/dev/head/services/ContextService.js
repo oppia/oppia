@@ -34,8 +34,16 @@ oppia.factory('ContextService', [
   function(UrlService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
     var pageContext = null;
     var explorationId = null;
+    var questionId = null;
+    var editorContext = null;
 
     return {
+      init: function(editorName) {
+        editorContext = editorName;
+      },
+      getEditorContext: function() {
+        return editorContext;
+      },
       // Returns a string representing the current tab of the editor (either
       // 'editor' or 'preview'), or null if the current tab is neither of these,
       // or the current page is not the editor.
@@ -141,6 +149,12 @@ oppia.factory('ContextService', [
         return (this.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR &&
             this.getEditorTabContext() === (
               EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR));
+      },
+
+      // Following variable helps to know whether question editor is
+      // in main editing mode or preview mode.
+      isInQuestionEditorMode: function() {
+        return (this.getPageContext() === PAGE_CONTEXT.QUESTION_EDITOR);
       }
     };
   }
