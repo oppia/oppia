@@ -38,24 +38,28 @@ oppia.directive('pieChart', [function() {
         if (!chart) {
           chart = new google.visualization.PieChart($element[0]);
         }
-        chart.draw(google.visualization.arrayToDataTable($scope.data()), {
-          title: options.title,
-          pieHole: options.pieHole,
-          pieSliceTextStyle: {
-            color: options.pieSliceTextStyleColor,
-          },
-          pieSliceBorderColor: options.pieSliceBorderColor,
-          pieSliceText: 'none',
-          chartArea: {
-            left: options.left,
-            width: options.chartAreaWidth
-          },
-          colors: options.colors,
-          height: options.height,
-          legend: {
-            position: options.legendPosition || 'none'
-          },
-          width: options.width
+        // Need to wait for load statement in editor template to finish.
+        // https://stackoverflow.com/questions/42714876/google-visualization-piechart-is-not-a-constructor
+        google.charts.setOnLoadCallback(function () {
+          chart.draw(google.visualization.arrayToDataTable($scope.data()), {
+            title: options.title,
+            pieHole: options.pieHole,
+            pieSliceTextStyle: {
+              color: options.pieSliceTextStyleColor,
+            },
+            pieSliceBorderColor: options.pieSliceBorderColor,
+            pieSliceText: 'none',
+            chartArea: {
+              left: options.left,
+              width: options.chartAreaWidth
+            },
+            colors: options.colors,
+            height: options.height,
+            legend: {
+              position: options.legendPosition || 'none'
+            },
+            width: options.width
+          });
         });
       };
 
