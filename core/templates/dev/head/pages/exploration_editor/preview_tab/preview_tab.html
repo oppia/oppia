@@ -20,7 +20,7 @@
         </tr>
       </table>
     </div>
-    <button class="btn-lg " ng-click="resetPreview()">
+    <button class="btn-lg" ng-click="resetPreview()">
       <i class="material-icons" style="margin-bottom: 2px;">&#xE5D5;</i>
       <span style="margin-left: 10px; padding-top: 20px;">Restart From Beginning</span>
     </button>
@@ -30,11 +30,13 @@
 
 <style>
   .oppia-preview-bottom-right-container {
-    bottom: 5px;
+    /* Fixed at bottom right corner (before footer) and appear on top of other div*/
+    bottom: 10px;
     display: block;
     position: fixed;
-    right: 5px;
+    right: 0;
     padding-bottom: 2em;
+    z-index: 1060;
   }
 
   .oppia-preview-bottom-right-container .oppia-parameter-summary {
