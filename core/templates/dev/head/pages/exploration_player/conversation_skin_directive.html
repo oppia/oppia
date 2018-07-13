@@ -45,6 +45,7 @@
                   on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
       </tutor-card>
       <concept-card skill-id="missingPrerequisiteSkillId"
+                    concept-card="activeCard.conceptCard"
                     ng-if="conceptCardIsBeingShown"
                     return-to-exploration="returnToExploration()">
       </concept-card>
@@ -59,7 +60,7 @@
                     submit-button-is-disabled="!interactionAnswerIsValid"
                     concept-card-pending="conceptCardPending"
                     submit-button-is-shown="!answerIsBeingProcessed"
-                    ng-if="!conceptCardIsBeingShown"
+                    ng-if="!conceptCardIsBeingShown || oldConceptCardIsBeingShown"
                     on-click-continue-button="showUpcomingCard()">
       </progress-nav>
     </div>

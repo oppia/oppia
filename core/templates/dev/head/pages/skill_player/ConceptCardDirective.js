@@ -21,21 +21,35 @@ oppia.directive('conceptCard', [
       restrict: 'E',
       scope: {
         returnToExploration: '&',
+        getConceptCard: '&conceptCard',
         getSkillId: '&skillId'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/skill_player/concept_card_directive.html'),
       controller: [
         '$scope', 'ConceptCardBackendApiService', 'ConceptCardObjectFactory',
+        'PlayerTranscriptService', 'PlayerPositionService',
         function(
-            $scope, ConceptCardBackendApiService, ConceptCardObjectFactory) {
-          ConceptCardBackendApiService.fetchConceptCard(
-            $scope.getSkillId()
-          ).then(function(conceptCardBackendDict) {
-            $scope.conceptCard = ConceptCardObjectFactory.createFromBackendDict(
-              conceptCardBackendDict);
-            $scope.maximumVisibleExampleIndex = -1;
-          });
+            $scope, ConceptCardBackendApiService, ConceptCardObjectFactory,
+            PlayerTranscriptService, PlayerPositionService) {
+          $scope.maximumVisibleExampleIndex = -1;
+          if ($scope.getConceptCard()) {
+            $scope.conceptCard = $scope.getConceptCard();
+            $scope.oldConceptCard = true;
+          } else {
+            $scope.oldConceptCard = false;
+            var currentCardIndex = PlayerPositionService.getActiveCardIndex();
+            var currentCard = PlayerTranscriptService.getCard(currentCardIndex);
+            ConceptCardBackendApiService.fetchConceptCard(
+              $scope.getSkillId()
+            ).then(function(conceptCardBackendDict) {
+              $scope.conceptCard =
+                ConceptCardObjectFactory.createFromBackendDict(
+                  conceptCardBackendDict);
+              currentCard.conceptCard = $scope.conceptCard;
+              PlayerTranscriptService.addExistingCard(currentCard);
+            });
+          }
 
           $scope.viewNextExample = function() {
             $scope.maximumVisibleExampleIndex++;

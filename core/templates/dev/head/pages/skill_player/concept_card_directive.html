@@ -24,7 +24,8 @@
         </div>
       </div>
     </div>
-    <continue-button on-click-continue-button="returnToExploration()"
+    <continue-button ng-if="!oldConceptCard"
+                     on-click-continue-button="returnToExploration()"
                      class="oppia-learner-confirm-button">
     </continue-button>
   </div>
