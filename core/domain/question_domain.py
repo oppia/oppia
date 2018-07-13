@@ -101,8 +101,6 @@ class Question(object):
             state data.
         language_code: str. The ISO 639-1 code for the language this
             question is written in.
-        status: str. The status of the question among approved, rejected,
-            pending or private.
         version: int. The version of the question.
     """
 

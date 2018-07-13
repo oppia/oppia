@@ -202,6 +202,7 @@ def _save_question(committer_id, question, change_list, commit_message):
     question_model = question_models.QuestionModel.get(question.id)
     question_model.question_state_data = question.question_state_data
     question_model.language_code = question.language_code
+    question_model.version += 1
     change_list_dict = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_list_dict)
 

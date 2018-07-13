@@ -25,8 +25,6 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
-from core.domain import question_domain
-from core.domain import question_services
 from core.domain import role_services
 from core.domain import subscription_services
 from core.domain import summary_services

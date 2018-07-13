@@ -26,8 +26,9 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         state = exp_domain.State.create_default_state('ABC')
         question_state_data = state.to_dict()
         language_code = 'en'
+        version = 1
         question_model = question_models.QuestionModel.create(
-            question_state_data, language_code)
+            question_state_data, language_code, version)
 
         self.assertEqual(
             question_model.question_state_data, question_state_data)

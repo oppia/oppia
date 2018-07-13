@@ -110,7 +110,7 @@ class QuestionModel(base_models.VersionedModel):
 
     @classmethod
     def create(
-            cls, question_state_data, language_code):
+            cls, question_state_data, language_code, version):
         """Creates a new QuestionModel entry.
 
         Args:
@@ -118,6 +118,7 @@ class QuestionModel(base_models.VersionedModel):
                 state data.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
+            version: str. The version of the question.
 
         Returns:
             QuestionModel. Instance of the new QuestionModel entry.
@@ -130,7 +131,7 @@ class QuestionModel(base_models.VersionedModel):
             id=instance_id,
             question_state_data=question_state_data,
             language_code=language_code,
-            version=feconf.CURRENT_QUESTION_VERSION)
+            version=version)
 
         return question_model_instance
 

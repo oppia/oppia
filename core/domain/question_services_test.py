@@ -81,7 +81,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertEqual(model.question_state_data, self.question_state_data)
         self.assertEqual(model.language_code, self.language_code)
-        self.assertEqual(model.version, self.version + 1)
+        self.assertEqual(model.version, 2)
 
     def test_delete_question(self):
         question_services.delete_question(self.owner_id, self.question_id)
@@ -105,7 +105,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         model = question_models.QuestionModel.get(self.question_id)
         self.assertEqual(model.question_state_data, new_question_data)
-        self.assertEqual(model.version, 3)
+        self.assertEqual(model.version, 4)
         self.assertEqual(
             model.language_code, self.language_code)
 
