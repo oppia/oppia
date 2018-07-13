@@ -43,10 +43,8 @@ var ExplorationEditorMainTab = function() {
     .first();
   var defaultResponseTab = element(
     by.css('.protractor-test-default-response-tab'));
-  var editorWelcomeModal = element.all(
-    by.css('.protractor-test-welcome-modal'));
-  var editOutcomeDestBubble = element(
-    by.css('.protractor-test-dest-bubble'));
+  var editorWelcomeModal = element(by.css('.protractor-test-welcome-modal'));
+  var editOutcomeDestBubble = element(by.css('.protractor-test-dest-bubble'));
   var editOutcomeDestStateInput = editOutcomeDestBubble.element(
     by.css('.protractor-test-add-state-input'));
   var editOutcomeDestAddExplorationId = element(
@@ -150,14 +148,12 @@ var ExplorationEditorMainTab = function() {
 
   this.exitTutorial = function() {
     // If the editor welcome modal shows up, exit it.
-    editorWelcomeModal.then(function(modals) {
-      if (modals.length === 1) {
+    editorWelcomeModal.isPresent().then(function(isVisible) {
+      if (isVisible) {
         waitFor.elementToBeClickable(
           dismissWelcomeModalButton,
-          'Tutorial modal taking too long to appear');
+          'Welcome modal is taking too long to appear');
         dismissWelcomeModalButton.click();
-      } else if (modals.length !== 0) {
-        throw 'Expected to find at most one \'welcome modal\'';
       }
     });
 
