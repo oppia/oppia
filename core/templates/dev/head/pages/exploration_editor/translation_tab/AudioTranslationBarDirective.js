@@ -33,11 +33,11 @@ oppia.directive('audioTranslationBar', [
         '$scope', '$filter', '$timeout', '$uibModal', 'AlertsService',
         'stateContentIdsToAudioTranslationsService', 'IdGenerationService',
         'AudioPlayerService', 'TranslationLanguageService',
-        'AssetsBackendApiService', 'recorderService', 'AudioTranslationService',
-        function(
+        'EditabilityService', 'AssetsBackendApiService', 'recorderService',
+        'AudioTranslationService', function(
             $scope, $filter, $timeout, $uibModal, AlertsService,
             stateContentIdsToAudioTranslationsService, IdGenerationService,
-            AudioPlayerService, TranslationLanguageService,
+            AudioPlayerService, TranslationLanguageService, EditabilityService,
             AssetsBackendApiService, recorderService, AudioTranslationService) {
           $scope.RECORDER_ID = 'recorderId';
           $scope.recordingTimeLimit = 1000;
@@ -49,10 +49,9 @@ oppia.directive('audioTranslationBar', [
           $scope.isUpdatingAudio = false;
           $scope.languageCode = null;
           $scope.cannotRecord = false;
+          $scope.audioNeedsUpdate = false;
           $scope.AudioPlayerService = AudioPlayerService;
-          if (GLOBALS.can_translate) {
-            $scope.canDeleteAudio = true;
-          }
+          $scope.canTranslate = EditabilityService.isTranslatable();
 
           recorderService.showPermission({
             onDenied: function() {
@@ -70,23 +69,26 @@ oppia.directive('audioTranslationBar', [
           });
 
           $scope.checkAndStartRecording = function() {
-            console.log("over!");
             if(!$scope.recorder.isAvailable) {
-              console.log("over!");
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
             } else if($scope.recorder.isAvailable) {
-               console.log("oover!");
               $scope.unsupportedBrowser = false;
               $scope.cannotRecord = false;
               $scope.recordingPermissionDenied = false;
               $scope.selectedRecording = true;
               $scope.recorder.startRecord();
             } else {
-              console.log("overr!");
               $scope.recordingPermissionDenied = true;
               $scope.cannotRecord = true;
             }
+          };
+          $scope.toggleAudioNeedsUpdate = function() {
+            stateContentIdsToAudioTranslationsService.displayed
+              .toggleNeedsUpdateAttribute(
+                $scope.contentId, $scope.languageCode);
+            stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+            $scope.audioNeedsUpdate = !$scope.audioNeedsUpdate;
           };
 
           $scope.getRecorderController = function() {
@@ -99,7 +101,7 @@ oppia.directive('audioTranslationBar', [
             }
           };
 
-          var generateNewFilename = function() {
+          $scope.generateNewFilename = function() {
             return $scope.contentId + '-' +
               $scope.languageCode + '-' +
               IdGenerationService.generateNewId() + '.mp3';
@@ -107,18 +109,17 @@ oppia.directive('audioTranslationBar', [
 
           $scope.reRecord = function() {
             $scope.initAudioBar();
-            $scope.recorder = recorderService.controller($scope.RECORDER_ID);
             $scope.recorder.startRecord();
           };
 
           $scope.updateAudio = function() {
             $scope.audioBlob = null;
             $scope.isUpdatingAudio = true;
-            $scope.recorder = recorderService.controller($scope.RECORDER_ID);
             $scope.recorder.startRecord();
           };
-         $scope.saveRecordedAudio = function() {
-            var filename = generateNewFilename();
+
+          $scope.saveRecordedAudio = function() {
+            var filename = $scope.generateNewFilename();
             var fileType = 'audio/mp3';
             var recodedAudioFile = new File(
               [$scope.audioBlob], filename, {type: fileType});
@@ -157,6 +158,8 @@ oppia.directive('audioTranslationBar', [
             if(audioTranslationObject) {
               $scope.isAudioAvailable = true;
               $scope.isLoadingAudio = true;
+              $scope.selectedRecording = false;
+              $scope.audioNeedsUpdate = audioTranslationObject.needsUpdate;
               AudioPlayerService.load(audioTranslationObject.filename)
                 .then(function(audioObject) {
                   $scope.isLoadingAudio = false;
@@ -197,6 +200,94 @@ oppia.directive('audioTranslationBar', [
             }).result.then(function(result) {
               stateContentIdsToAudioTranslationsService.displayed
                 .deleteAudioTranslation($scope.contentId, $scope.languageCode);
+              stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              $scope.initAudioBar();
+            });
+          };
+
+          $scope.openAddAudioTranslationModal = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration_editor/translation_tab/' +
+                'add_audio_translation_modal_directive.html'),
+              backdrop: 'static',
+              resolve: {
+                generatedFilename: function() {
+                  return $scope.generateNewFilename();
+                },
+                languageCode: function() {
+                  return $scope.languageCode;
+                }
+              },
+              controller: [
+                '$scope', '$uibModalInstance', 'AlertsService', 'languageCode',
+                'ExplorationContextService', 'generatedFilename',
+                function(
+                    $scope, $uibModalInstance, AlertsService, languageCode,
+                    ExplorationContextService, generatedFilename) {
+                  var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
+                    'There was an error uploading the audio file.');
+                  var BUTTON_TEXT_SAVE = 'Save';
+                  var BUTTON_TEXT_SAVING = 'Saving...';
+
+                  // Whether there was an error uploading the audio file.
+                  $scope.errorMessage = null;
+                  $scope.saveButtonText = BUTTON_TEXT_SAVE;
+                  $scope.saveInProgress = false;
+                  var uploadedFile = null;
+
+                  $scope.isAudioTranslationValid = function() {
+                    return (
+                     uploadedFile !== null &&
+                      uploadedFile.size !== null &&
+                      uploadedFile.size > 0);
+                  };
+
+                  $scope.updateUploadedFile = function(file) {
+                    $scope.errorMessage = null;
+                    uploadedFile = file;
+                  };
+
+                  $scope.clearUploadedFile = function() {
+                    $scope.errorMessage = null;
+                    uploadedFile = null;
+                  };
+
+                  $scope.save = function() {
+                    if ($scope.isAudioTranslationValid()) {
+                      $scope.saveButtonText = BUTTON_TEXT_SAVING;
+                      $scope.saveInProgress = true;
+                      var explorationId = (
+                        ExplorationContextService.getExplorationId());
+                      AssetsBackendApiService.saveAudio(
+                        explorationId, generatedFilename, uploadedFile
+                      ).then(function() {
+                        $uibModalInstance.close({
+                          languageCode: languageCode,
+                          filename: generatedFilename,
+                          fileSizeBytes: uploadedFile.size
+                        });
+                      }, function(errorResponse) {
+                        $scope.errorMessage = (
+                          errorResponse.error || ERROR_MESSAGE_BAD_FILE_UPLOAD);
+                        uploadedFile = null;
+                        $scope.saveButtonText = BUTTON_TEXT_SAVE;
+                        $scope.saveInProgress = false;
+                      });
+                    }
+                  };
+
+                  $scope.cancel = function() {
+                    $uibModalInstance.dismiss('cancel');
+                    AlertsService.clearWarnings();
+                  };
+                }
+              ]
+            }).result.then(function(result) {
+              stateContentIdsToAudioTranslationsService.displayed
+                .addAudioTranslation(
+                  $scope.contentId, $scope.languageCode, result.filename,
+                  result.fileSizeBytes);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
               $scope.initAudioBar();
             });

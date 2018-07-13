@@ -117,10 +117,7 @@
         "downloadFormat": "zip",
         "url": "https://github.com/logbon72/angular-recorder/archive/1.4.1.zip",
         "rootDirPrefix": "ngAudioRecorder-",
-        "targetDirPrefix": "angular-recorder-",
-        "bundle": {
-          "js": ["dist/angular-audio-recorder.min.js"]
-        }
+        "targetDirPrefix": "angular-recorder-"
       },
       "lameJs": {
         "version": "1.2.0",

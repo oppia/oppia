@@ -1,5 +1,5 @@
 <div class="oppia-audio-recording-bar" ng-show="!isAudioAvailable && !selectedRecording">
-    <div class="oppia-audio-button" type="button" ng-disabled>
+    <div class="oppia-audio-button oppia-disabled-icon" type="button">
       <i class="material-icons">&#xE039;</i>
     </div>
     <div class="oppia-audio-bar-info">
@@ -14,19 +14,23 @@
       </div>
     </div>
     <div class="oppia-audio-button" type="button"
-         ng-click="checkAndStartRecording()">
+         uib-tooltip="Record" tooltip-placement="bottom"
+         ng-click="checkAndStartRecording()"
+         ng-class="{'oppia-disabled-icon': !canTranslate || recordingPermissionDenied || unsupportedBrowser}">
       <i class="material-icons">mic</i>
     </div>
-    <div class="oppia-audio-button" type="button" ng-disabled>
+    <div class="oppia-audio-button" type="button"
+         uib-tooltip="Upload" tooltip-placement="bottom"
+         ng-click="openAddAudioTranslationModal()"
+         ng-class="{'oppia-disabled-icon': !canTranslate}">
       <i class="material-icons">add_circle_outline</i>
     </div>
 </div>
 
-<div class="oppia-audio-recording-bar" ng-show="!isAudioAvailable || selectedRecording || isUpdatingAudio">
+<div class="oppia-audio-recording-bar" ng-show="selectedRecording || isUpdatingAudio">
   <ng-audio-recorder id="<[RECORDER_ID]>" audio-model="audioBlob" time-limit="recordingTimeLimit">
     <div class="oppia-recording-button"
-       ng-click="recorder.status.isPlaying ? recorder.playbackPause() : recorder.playbackResume()"
-       ng-disabled="recorder.status.isRecording || !recorder.audioModel">
+       ng-click="recorder.status.isPlaying ? recorder.playbackPause() : recorder.playbackResume()">
       <i class="material-icons" ng-class="{'oppia-disabled-icon': recorder.status.isRecording || !recorder.audioModel}">
         {{recorder.status.isStopped || recorder.status.isPaused ? '&#xE039;' : '&#xE035;'}}
       </i>
@@ -46,17 +50,13 @@
       </canvas-sizer>
     </div>
 
-    <div class="record oppia-recording-button" type="button"
-         ng-if="!recorder.status.isRecording && !recorder.audioModel && !recorder.status.isConverting"
-         ng-click="recorder.startRecord()">
-      <i class="material-icons">mic</i>
-    </div>
     <div class="oppia-recording-button" ng-if="recorder.status.isRecording">
       05:00
     </div>
     <div class="oppia-recording-button" type="button"
-       ng-if="recorder.status.isRecording"
-       ng-click="recorder.stopRecord()">
+         uib-tooltip="Stop" tooltip-placement="bottom"
+         ng-if="recorder.status.isRecording"
+         ng-click="recorder.stopRecord()">
       <i class="material-icons">stop</i>
     </div>
   </ng-audio-recorder>
@@ -66,6 +66,7 @@
     <i class="material-icons">loop</i>
   </div>
   <div class="oppia-audio-button" type="button"
+       uib-tooltip="Upload" tooltip-placement="bottom"
        ng-if="!recorder.status.isRecording && audioBlob"
        ng-click="saveRecordedAudio()">
     <i class="material-icons">cloud_upload</i>
@@ -78,8 +79,8 @@
       <i class="material-icons"><[AudioPlayerService.isPlaying() ? '&#xE035;' : '&#xE039;']></i>
   </div>
   <div class="oppia-slider-section">
-    <div>
-
+    <div ng-if="isAudioLoading">
+      <md-progress-linear md-mode="indeterminate"></md-progress-linear>
     </div>
     <div>
       <md-slider ng-model="track.progress" ng-model-options="{ getterSetter: true }" aria-label="audio-slider">
@@ -87,23 +88,28 @@
     </div>
   </div>
   <div class="oppia-audio-extra-buttons">
-    <div class="oppia-audio-button" ng-click="updateAudio()">
+    <div class="oppia-audio-button"
+         ng-class="{'oppia-disabled-icon': !canTranslate}"
+         uib-tooltip="Record new" tooltip-placement="bottom"
+         ng-click="updateAudio()">
     <i class="material-icons">loop</i>
     </div>
-    <div class="oppia-audio-button" type="button"
+    <div class="oppia-audio-button"  type="button"
+         uib-tooltip="Delete" tooltip-placement="bottom"
+         ng-class="{'oppia-disabled-icon': !canTranslate}"
          ng-click="openDeleteAudioTranslationModal()">
       <i class="material-icons">delete</i>
     </div>
     <div class="oppia-audio-button">
-      <div class="dropdown-toggle" type="button" data-toggle="dropdown">
+      <div class="dropdown-toggle" type="button"
+           ng-class="{'oppia-disabled-icon': !canTranslate}">
         <i class="material-icons">&#xE5D2;</i>
       </div>
       <ul class="dropdown-menu dropdown-menu-right">
-        <li><a href="">Upload audio</a></li>
-        <li ng-if="!audioNeedsUpdate"><a href="">Mark need update</a></li>
-        <li ng-if="audioNeedsUpdate"><a href="">Unmark need update</a></li>
+        <li ng-click="openAddAudioTranslationModal()"><a href="">Upload audio</a></li>
+        <li ng-if="!audioNeedsUpdate" ng-click="toggleAudioNeedsUpdate()"><a href="">Mark need update</a></li>
+        <li ng-if="audioNeedsUpdate" ng-click="toggleAudioNeedsUpdate()"><a href="">Unmark need update</a></li>
       </ul>
-
     </div>
   </div>
 </div>
@@ -131,7 +137,9 @@
     border-right: 1px solid #009688;
   }
   .oppia-disabled-icon {
-    color: grey;
+    cursor: not-allowed;
+    pointer-events: none;
+    color: #ccc;
   }
   .oppia-audio-button {
     color: #009688;
