@@ -13,10 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Service to validate the consistency of a collection. These
- * checks are performable in the frontend to avoid sending a potentially invalid
- * collection to the backend, which performs similar validation checks to these
- * in collection_domain.Collection and subsequent domain objects.
+ * @fileoverview Service to validate a skill.
  */
 
 oppia.factory('SkillValidationService', [

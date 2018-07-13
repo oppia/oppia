@@ -43,7 +43,7 @@ oppia.factory('SkillRightsBackendApiService', [
     };
 
     var _setSkillPublic = function(
-      skillId, skillVersion, successCallback, errorCallback) {
+        skillId, skillVersion, successCallback, errorCallback) {
       var skillRightsPublishUrl = UrlInterpolationService.interpolateUrl(
         SKILL_PUBLISH_URL_TEMPLATE, {
           skill_id: skillId
@@ -92,7 +92,7 @@ oppia.factory('SkillRightsBackendApiService', [
         return $q(function(resolve, reject) {
           if (_isCached(skillId)) {
             if (resolve) {
-              resolve(skillRightsCache[skillId])
+              resolve(skillRightsCache[skillId]);
             }
           } else {
             _fetchSkillRights(skillId, function(skillRights) {
@@ -131,6 +131,6 @@ oppia.factory('SkillRightsBackendApiService', [
           _setSkillPublic(skillId, skillVersion, resolve, reject);
         });
       }
-    }
+    };
   }
 ]);

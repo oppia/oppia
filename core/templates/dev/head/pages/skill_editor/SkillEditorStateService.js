@@ -21,7 +21,7 @@ oppia.constant('EVENT_SKILL_INITIALIZED', 'skillInitialized');
 oppia.constant('EVENT_SKILL_REINITIALIZED', 'skillReinitialized');
 
 oppia.factory('SkillEditorStateService', [
-  '$rootScope', 'SkillObjectFactory', 'SkillRightsObjectFactory', 
+  '$rootScope', 'SkillObjectFactory', 'SkillRightsObjectFactory',
   'EditableSkillBackendApiService', 'SkillRightsBackendApiService',
   'AlertsService', 'UndoRedoService', 'EVENT_SKILL_INITIALIZED',
   'EVENT_SKILL_REINITIALIZED',
@@ -74,14 +74,14 @@ oppia.factory('SkillEditorStateService', [
           });
         SkillRightsBackendApiService.fetchSkillRights(
           skillId).then(function(newBackendSkillRightsObject) {
-            _updateSkillRights(newBackendSkillRightsObject);
-            _skillIsBeingLoaded = false;
-          }, function(error) {
-            AlertsService.addWarning(
-              error ||
-              'There was an error when loading the skill rights.')
-            _skillIsBeingLoaded = false;
-          });
+          _updateSkillRights(newBackendSkillRightsObject);
+          _skillIsBeingLoaded = false;
+        }, function(error) {
+          AlertsService.addWarning(
+            error ||
+            'There was an error when loading the skill rights.');
+          _skillIsBeingLoaded = false;
+        });
       },
 
       isLoadingSkill: function() {

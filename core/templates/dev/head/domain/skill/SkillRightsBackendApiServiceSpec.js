@@ -69,13 +69,12 @@ describe('Skill rights backend API service', function() {
     expect(failHandler).toHaveBeenCalled();
   });
 
-it('should report a cached skill rights after caching it', function() {
+  it('should report a cached skill rights after caching it', function() {
     var successHandler = jasmine.createSpy('success');
     var failHandler = jasmine.createSpy('fail');
 
     // The skill should not currently be cached.
     expect(SkillRightsBackendApiService.isCached('0')).toBe(false);
-
     // Cache a skill.
     SkillRightsBackendApiService.cacheSkillRights('0', {
       skill_id: '0',

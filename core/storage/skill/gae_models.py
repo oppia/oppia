@@ -183,4 +183,6 @@ class SkillRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_unpublished_skills_by_creator_id(cls, user_id):
-        return cls.query(cls.creator_id == user_id, cls.skill_is_private == True)
+        return cls.query(
+            cls.creator_id == user_id,
+            cls.skill_is_private is True)

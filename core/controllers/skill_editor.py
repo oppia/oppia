@@ -184,7 +184,7 @@ class SkillPublishHandler(base.BaseHandler):
         self.values.update({
             'skill_is_private': skill_rights.skill_is_private,
             'creator_id': skill_rights.creator_id,
-            'can_edit_skill': can_edit_skill 
+            'can_edit_skill': can_edit_skill
         })
 
         self.render_json(self.values)

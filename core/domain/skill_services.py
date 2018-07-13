@@ -178,8 +178,8 @@ def get_multi_skill_summaries(skill_ids):
     """Returns a list of skill summaries matching the skill IDs provided.
 
     Returns:
-        list(SkillSummary). The list of summaries of skills matching the provided
-            IDs.
+        list(SkillSummary). The list of summaries of skills matching the
+            provided IDs.
     """
     skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
     skill_summaries = [
@@ -715,10 +715,11 @@ def get_skill_rights(skill_id, strict=True):
 
 
 def get_unpublished_skills_by_creator(user_id):
-    models = (
+    skill_rights_models = (
         skill_models.SkillRightsModel.get_unpublished_skills_by_creator_id(
             user_id))
-    return [get_skill_rights_from_model(skill_model) for skill_model in models]
+    return [get_skill_rights_from_model(skill_rights_model)
+            for skill_rights_model in skill_rights_models]
 
 
 def check_can_edit_skill(user, skill_rights):
@@ -732,22 +733,15 @@ def check_can_edit_skill(user, skill_rights):
     Returns:
         bool. Whether the given user can edit the given skill.
     """
-    print 'a'
     if skill_rights is None:
-        print 'b'
         return False
     if role_services.ACTION_EDIT_PUBLIC_SKILLS not in user.actions:
-        print 'c'
         return False
     if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
-        print 'd'
         if not skill_rights.is_private():
-            print 'e'
             return True
         if skill_rights.is_private() and skill_rights.is_creator(user.user_id):
-            print 'f'
             return True
-    print 'g'
     return False
 
 

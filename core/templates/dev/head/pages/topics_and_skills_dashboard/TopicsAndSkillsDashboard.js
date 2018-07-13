@@ -58,7 +58,6 @@ oppia.controller('TopicsAndSkillsDashboard', [
             response.data.untriaged_skill_summary_dicts;
           $scope.unpublishedSkillSummaries =
             response.data.unpublished_skill_summary_dicts;
-          console.log(angular.copy(response.data.unpublished_skill_summary_dicts));
           $scope.activeTab = $scope.TAB_NAME_TOPICS;
           $scope.userCanCreateTopic = response.data.can_create_topic;
           $scope.userCanCreateSkill = response.data.can_create_skill;
@@ -71,8 +70,8 @@ oppia.controller('TopicsAndSkillsDashboard', [
               $scope.untriagedSkillSummaries.length !== 0) {
             $scope.activeTab = $scope.TAB_NAME_UNTRIAGED_SKILLS;
           } else if (
-              $scope.topicSummaries.length === 0 &&
-              $scope.unpublishedSkillSummaries.length !== 0) {
+            $scope.topicSummaries.length === 0 &&
+            $scope.unpublishedSkillSummaries.length !== 0) {
             $scope.activeTab = $scope.TAB_NAME_UNPUBLISHED_SKILLS;
           }
         },
