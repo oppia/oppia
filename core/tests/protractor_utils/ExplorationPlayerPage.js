@@ -38,7 +38,9 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-exploration-suggestion-modal'));
   var feedbackTextArea = element(
     by.css('.protractor-test-exploration-feedback-textarea'));
-  var ratingStar = element.all(by.css('.protractor-test-rating-star'));
+  var waitingForResponseElem = element(by.css(
+    '.protractor-test-input-response-loading-dots'));
+  var ratingStars = element.all(by.css('.protractor-test-rating-star'));
 
   var suggestionSubmitButton = element(
     by.css('.protractor-test-suggestion-submit-btn'));
@@ -180,7 +182,7 @@ var ExplorationPlayerPage = function() {
   };
 
   this.rateExploration = function(ratingValue) {
-    ratingStar.then(function(elements) {
+    ratingStars.then(function(elements) {
       waitFor.elementToBeClickable(
         elements[ratingValue - 1],
         'Rating Star takes too long to be clickable');
@@ -202,8 +204,6 @@ var ExplorationPlayerPage = function() {
     // it will get the supplemental interaction.
     interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
-    var waitingForResponseElem = element(by.css(
-      '[ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()"]'));
     waitFor.invisibilityOf(
       waitingForResponseElem, 'Response takes too long to appear');
   };

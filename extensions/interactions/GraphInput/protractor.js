@@ -18,7 +18,7 @@
 
 var forms = require('../../../core/tests/protractor_utils/forms.js');
 var objects = require('../../objects/protractor.js');
-var waitFor = require('../../,,/core/tests/protractor_utils/waitFor.js');
+var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 
 var customizeInteraction = function(interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.element(by.css(
