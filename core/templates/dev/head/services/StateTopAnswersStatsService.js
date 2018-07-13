@@ -19,11 +19,11 @@
 
 oppia.factory('StateTopAnswersStatsService', [
   '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'AnswerStatsObjectFactory', 'ExplorationContextService',
+  'AnswerStatsObjectFactory', 'ContextService',
   'ExplorationStatesService',
   function(
       $injector, AngularNameService, AnswerClassificationService,
-      AnswerStatsObjectFactory, ExplorationContextService,
+      AnswerStatsObjectFactory, ContextService,
       ExplorationStatesService) {
     /**
      * @typedef AnswerStatsCache
@@ -43,7 +43,7 @@ oppia.factory('StateTopAnswersStatsService', [
      * @param {string} stateName
      */
     var refreshAddressedInfo = function(stateName) {
-      var explorationId = ExplorationContextService.getExplorationId();
+      var explorationId = ContextService.getExplorationId();
       var state = ExplorationStatesService.getState(stateName);
       var interactionRulesService = $injector.get(
         AngularNameService.getNameOfInteractionRulesService(
