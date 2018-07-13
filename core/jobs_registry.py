@@ -48,6 +48,7 @@ ONE_OFF_JOB_MANAGERS = [
     exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular,
     exp_jobs_one_off.ExplorationContentValidationJobForCKEditor,
     exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor,
+    exp_jobs_one_off.ImageDataMigrationJob,
     feedback_jobs_one_off.FeedbackThreadMessagesCountOneOffJob,
     feedback_jobs_one_off.FeedbackSubjectOneOffJob,
     feedback_jobs_one_off.SuggestionMigrationOneOffJob,

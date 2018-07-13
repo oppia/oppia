@@ -19,8 +19,9 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
-var AdminPage = require('../protractor_utils/AdminPage.js');
+var until = protractor.ExpectedConditions;
 
+var AdminPage = require('../protractor_utils/AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
 
 var login = function(email, isSuperAdmin) {
@@ -47,15 +48,20 @@ var logout = function() {
 // that this will fail if the user already has a username.
 var _completeSignup = function(username) {
   browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
-  element(by.css('.protractor-test-username-input')).sendKeys(username);
-  element(by.css('.protractor-test-agree-to-terms-checkbox')).click();
-  element(by.css('.protractor-test-register-user')).click();
+  general.waitForLoadingMessage();
+  var usernameInput = element(by.css('.protractor-test-username-input'));
+  var agreeToTermsCheckbox = element(
+    by.css('.protractor-test-agree-to-terms-checkbox'));
+  var registerUser = element(by.css('.protractor-test-register-user'));
+  browser.wait(until.visibilityOf(usernameInput), 5000);
+  usernameInput.sendKeys(username);
+  agreeToTermsCheckbox.click();
+  registerUser.click();
+  general.waitForLoadingMessage();
 };
 
 var createUser = function(email, username) {
-  login(email);
-  _completeSignup(username);
-  general.waitForSystem();
+  createAndLoginUser(email, username);
   logout();
 };
 
@@ -67,6 +73,7 @@ var createAndLoginUser = function(email, username) {
 var createModerator = function(email, username) {
   login(email, true);
   _completeSignup(username);
+  adminPage.get();
   adminPage.updateRole(username, 'moderator');
   logout();
 };
@@ -79,6 +86,7 @@ var createAdmin = function(email, username) {
 var createAndLoginAdminUser = function(email, username) {
   login(email, true);
   _completeSignup(username);
+  adminPage.get();
   adminPage.updateRole(username, 'admin');
 };
 

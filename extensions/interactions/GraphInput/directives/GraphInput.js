@@ -408,6 +408,17 @@ oppia.directive('graphViz', [
             }
           };
 
+          var initViewboxSize = function() {
+            var svgContainer = $($element).find('.oppia-graph-viz-svg')[0];
+            var boundingBox = svgContainer.getBBox();
+            var viewBoxHeight = Math.max(
+              boundingBox.height + boundingBox.y,
+              svgContainer.getAttribute('height'));
+            $scope.svgViewBox = (
+              0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
+                ' ' + (viewBoxHeight));
+          };
+
           $scope.graphOptions = [{
             text: 'Labeled',
             option: 'isLabeled'
@@ -781,22 +792,10 @@ oppia.directive('graphViz', [
           };
 
           // Initial value of SVG view box.
-          $scope.svgViewBox = '';
+          $scope.svgViewBox = initViewboxSize();
 
           if ($scope.isInteractionActive()) {
             $scope.init();
-
-            // Set the SVG viewBox to appropriate size.
-            $timeout(function() {
-              var svgContainer = $($element).find('.oppia-graph-viz-svg')[0];
-              var boundingBox = svgContainer.getBBox();
-              var viewBoxHeight = Math.max(
-                boundingBox.height + boundingBox.y,
-                svgContainer.getAttribute('height'));
-              $scope.svgViewBox = (
-                0 + ' ' + 0 + ' ' + (boundingBox.width + boundingBox.x) +
-                ' ' + (viewBoxHeight));
-            }, 1000);
           }
         }
       ]

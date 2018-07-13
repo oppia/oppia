@@ -146,16 +146,6 @@ def get_rte_components(html_string):
     return components
 
 
-# Replace list to escape and unescape html strings.
-REPLACE_LIST = [
-    ('&', '&amp;'),
-    ('"', '&quot;'),
-    ('\'', '&#39;'),
-    ('<', '&lt;'),
-    ('>', '&gt;')
-]
-
-
 def escape_html(unescaped_html_data):
     """This functions escapes an unescaped HTML string.
 
@@ -165,8 +155,16 @@ def escape_html(unescaped_html_data):
     Returns:
         str. Escaped HTML string.
     """
+    # Replace list to escape html strings.
+    REPLACE_LIST_FOR_ESCAPING = [
+        ('&', '&amp;'),
+        ('"', '&quot;'),
+        ('\'', '&#39;'),
+        ('<', '&lt;'),
+        ('>', '&gt;')
+    ]
     escaped_html_data = unescaped_html_data
-    for replace_tuple in REPLACE_LIST:
+    for replace_tuple in REPLACE_LIST_FOR_ESCAPING:
         escaped_html_data = escaped_html_data.replace(
             replace_tuple[0], replace_tuple[1])
 
@@ -182,10 +180,18 @@ def unescape_html(escaped_html_data):
     Returns:
         str. Unescaped HTML string.
     """
+    # Replace list to unescape html strings.
+    REPLACE_LIST_FOR_UNESCAPING = [
+        ('&quot;', '"'),
+        ('&#39;', '\''),
+        ('&lt;', '<'),
+        ('&gt;', '>'),
+        ('&amp;', '&')
+    ]
     unescaped_html_data = escaped_html_data
-    for replace_tuple in REPLACE_LIST:
+    for replace_tuple in REPLACE_LIST_FOR_UNESCAPING:
         unescaped_html_data = unescaped_html_data.replace(
-            replace_tuple[1], replace_tuple[0])
+            replace_tuple[0], replace_tuple[1])
 
     return unescaped_html_data
 
@@ -498,19 +504,46 @@ def convert_to_ckeditor(html_data):
     for i in soup.findAll('i'):
         i.name = 'em'
 
+    # Ensures li is not wrapped in li or p.
+    for li in soup.findAll('li'):
+        while li.parent.name in ['li', 'p']:
+            li.parent.unwrap()
+
+    LIST_TAGS = ['ol', 'ul']
+
+    # Ensure li is wrapped in ol/ul.
+    for li in soup.findAll('li'):
+        if li.parent.name not in LIST_TAGS:
+            new_parent = soup.new_tag('ul')
+            next_sib = list(li.next_siblings)
+            li.wrap(new_parent)
+            for sib in next_sib:
+                if sib.name == 'li':
+                    sib.wrap(new_parent)
+                else:
+                    break
+
+    # Ensure that the children of ol/ul are li/pre.
+    for tag_name in LIST_TAGS:
+        for tag in soup.findAll(tag_name):
+            for child in tag.children:
+                if child.name not in ['li', 'pre', 'ol', 'ul']:
+                    new_parent = soup.new_tag('li')
+                    next_sib = list(child.next_siblings)
+                    child.wrap(new_parent)
+                    for sib in next_sib:
+                        if sib.name not in ['li', 'pre']:
+                            sib.wrap(new_parent)
+                        else:
+                            break
+
     # This block wraps p tag in li tag if the parent of p is ol/ul tag. Also,
     # if the parent of p tag is pre tag, it unwraps the p tag.
     for p in soup.findAll('p'):
         if p.parent.name == 'pre':
             p.unwrap()
-        elif p.parent.name in ['ol', 'ul']:
+        elif p.parent.name in LIST_TAGS:
             p.wrap(soup.new_tag('li'))
-
-    # Replaces <p><br><p> with <p>&nbsp;</p>.
-    for br in soup.findAll('br'):
-        parent_tag = br.parent
-        if parent_tag.name == 'p' and parent_tag.get_text() == '':
-            br.replaceWith('&nbsp;')
 
     # This block ensures that ol/ul tag is not a direct child of another ul/ol
     # tag. The conversion works as follows:
@@ -519,10 +552,9 @@ def convert_to_ckeditor(html_data):
     # i.e. if any ol/ul has parent as ol/ul and a previous sibling as li
     # it is wrapped in its previous sibling. If there is no previous sibling,
     # the tag is unwrapped.
-    list_tags = ['ol', 'ul']
-    for tag_name in list_tags:
+    for tag_name in LIST_TAGS:
         for tag in soup.findAll(tag_name):
-            if tag.parent.name in list_tags:
+            if tag.parent.name in LIST_TAGS:
                 prev_sib = tag.previous_sibling
                 if prev_sib and prev_sib.name == 'li':
                     prev_sib.append(tag)
@@ -554,6 +586,21 @@ def convert_to_ckeditor(html_data):
     # should match and <br> and <br/> have same working,
     # so the tag has to be replaced in this way.
 
+    # Replaces <p><br></p> with <p>&nbsp;</p> and <pre>...<br>...</pre>
+    # with <pre>...\n...</pre>.
+    for br in soup.findAll('br'):
+        parent = br.parent
+        if parent.name == 'p' and len(parent.contents) == 1:
+            br.unwrap()
+            # BeautifulSoup automatically escapes &nbsp; to &amp;nbsp;.
+            # To safely add &nbsp in place of <br> tag we need the unicode
+            # string \xa0.
+            # Reference: https://stackoverflow.com/questions/26334461/.
+            parent.string = u'\xa0'
+        elif parent.name == 'pre':
+            br.insert_after('\n')
+            br.unwrap()
+
     return unicode(soup).replace('<br/>', '<br>')
 
 
@@ -573,9 +620,19 @@ def convert_tag_contents_to_rte_format(html_data, rte_conversion_fn):
     soup = bs4.BeautifulSoup(html_data.encode('utf-8'), 'html.parser')
 
     for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
-        content_html = unescape_html(collapsible['content-with-value'])
+        # To ensure that collapsible tags have content-with-value attribute.
+        if 'content-with-value' not in collapsible.attrs or (
+                collapsible['content-with-value'] == ''):
+            collapsible['content-with-value'] = escape_html(json.dumps(''))
+
+        content_html = json.loads(
+            unescape_html(collapsible['content-with-value']))
         collapsible['content-with-value'] = escape_html(
-            json.dumps(rte_conversion_fn(json.loads(content_html))))
+            json.dumps(rte_conversion_fn(content_html)))
+
+        # To ensure that collapsible tags have heading-with-value attribute.
+        if 'heading-with-value' not in collapsible.attrs:
+            collapsible['heading-with-value'] = escape_html(json.dumps(''))
 
     for tabs in soup.findAll('oppia-noninteractive-tabs'):
         tab_content_json = unescape_html(tabs['tab_contents-with-value'])
@@ -632,12 +689,16 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
             err_dict['strings'].append(html_data)
 
         for collapsible in soup.findAll('oppia-noninteractive-collapsible'):
-            content_html = json.loads(
-                unescape_html(collapsible['content-with-value']))
-            soup_for_collapsible = bs4.BeautifulSoup(
-                content_html.replace('<br>', '<br/>'), 'html.parser')
-            is_invalid = _validate_soup_for_rte(
-                soup_for_collapsible, rte_format, err_dict)
+            if 'content-with-value' not in collapsible.attrs or (
+                    collapsible['content-with-value'] == ''):
+                is_invalid = True
+            else:
+                content_html = json.loads(
+                    unescape_html(collapsible['content-with-value']))
+                soup_for_collapsible = bs4.BeautifulSoup(
+                    content_html.replace('<br>', '<br/>'), 'html.parser')
+                is_invalid = _validate_soup_for_rte(
+                    soup_for_collapsible, rte_format, err_dict)
             if is_invalid:
                 err_dict['strings'].append(html_data)
 

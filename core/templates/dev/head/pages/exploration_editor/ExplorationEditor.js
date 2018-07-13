@@ -53,7 +53,7 @@ oppia.controller('ExplorationEditor', [
   'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
   'StateTopAnswersStatsService', 'StateTopAnswersStatsBackendApiService',
-  'ThreadDataService',
+  'ThreadDataService', 'StateClassifierMappingService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       ExplorationDataService, EditorStateService, ExplorationTitleService,
@@ -70,7 +70,7 @@ oppia.controller('ExplorationEditor', [
       ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
       UrlInterpolationService, ExplorationCorrectnessFeedbackService,
       StateTopAnswersStatsService, StateTopAnswersStatsBackendApiService,
-      ThreadDataService) {
+      ThreadDataService, StateClassifierMappingService) {
     $scope.EditabilityService = EditabilityService;
     $scope.EditorStateService = EditorStateService;
 
@@ -130,6 +130,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
         ExplorationCorrectnessFeedbackService.init(
           data.correctness_feedback_enabled);
+        StateClassifierMappingService.init(data.state_classifier_mapping);
 
         $scope.explorationTitleService = ExplorationTitleService;
         $scope.explorationCategoryService = ExplorationCategoryService;

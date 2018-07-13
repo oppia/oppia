@@ -46,7 +46,10 @@ oppia.controller('LearnerLocalNav', [
             $scope.originalHtml = ExplorationPlayerService.getStateContentHtml(
               stateName);
             $scope.description = '';
-            $scope.suggestionHtml = $scope.originalHtml;
+            // ng-model needs to bind to a property of an object on
+            // the scope (the property cannot sit directly on the scope)
+            // Reference https://stackoverflow.com/q/12618342
+            $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
             $scope.showEditor = false;
             // Rte initially displays content unrendered for a split second
             $timeout(function() {
@@ -63,7 +66,7 @@ oppia.controller('LearnerLocalNav', [
                 version: ExplorationPlayerService.getExplorationVersion(),
                 stateName: stateName,
                 description: $scope.description,
-                suggestionHtml: $scope.suggestionHtml
+                suggestionHtml: $scope.suggestionData.suggestionHtml
               };
               if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
                 data = {
@@ -73,7 +76,7 @@ oppia.controller('LearnerLocalNav', [
                   suggestion_type: 'edit_exploration_state_content',
                   target_type: 'exploration',
                   description: $scope.description,
-                  suggestionHtml: $scope.suggestionHtml,
+                  suggestionHtml: $scope.suggestionData.suggestionHtml,
                 };
               }
               $uibModalInstance.close(data);

@@ -1,11 +1,11 @@
-<md-card layout="row" class="list-view-item">
+<md-card layout="row" ng-class="{'list-view-item': !isInModal()}">
   <table class="dashboard-table">
     <colgroup>
       <col style="width: 25%;">
+      <col style="width: 20%;">
       <col style="width: 15%;">
-      <col style="width: 23%;">
-      <col style="width: 19%;">
-      <col style="width: 19%;">
+      <col style="width: 20%;">
+      <col style="width: 20%;">
     </colgroup>
     <tr>
       <th ng-repeat="key in TOPIC_HEADINGS"
@@ -18,30 +18,33 @@
       </th>
     </tr>
     <tr ng-repeat="topic in getTopicSummaries()"
-        class="list-item">
+        ng-class="{'list-item': !isInModal()}">
       <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
           <span> <[topic.name]> </span>
         </a>
       </td>
       <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
           <span> <[topic.subtopic_count]> </span>
         </a>
       </td>
       <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
           <span> <[topic.total_skill_count]> </span>
-          <span class="additional-text" ng-if="topic.uncategorized_skill_count > 0"> ( <[topic.uncategorized_skill_count]> uncategorized ) </span>
+          <span class="additional-text"
+                ng-if="topic.uncategorized_skill_count > 0 && isInModal() === false">
+            ( <[topic.uncategorized_skill_count]> uncategorized )
+          </span>
         </a>
       </td>
       <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
           <span> <[topic.canonical_story_count]> </span>
         </a>
       </td>
       <td>
-        <a ng-href="<[getTopicEditorUrl(topic.id)]>" class="list-summary">
+        <a ng-href="<[getTopicEditorUrl(topic.id)]>" ng-click="selectTopic(topic.id)" class="list-summary">
           <span ng-if="topic.is_published"> Published </span>
           <span ng-if="!topic.is_published"> Not Published </span>
         </a>

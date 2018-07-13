@@ -34,8 +34,7 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 def create_suggestion(
         suggestion_type, target_type, target_id, target_version_at_submission,
-        author_id, change_cmd, description,
-        assigned_reviewer_id, final_reviewer_id):
+        author_id, change_cmd, description, final_reviewer_id):
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
     Args:
@@ -51,8 +50,6 @@ def create_suggestion(
         author_id: str. The ID of the user who submitted the suggestion.
         change_cmd: dict. The details of the suggestion.
         description: str. The description of the changes provided by the author.
-        assigned_reviewer_id: str|None. The ID of the user assigned to
-            review the suggestion.
         final_reviewer_id: str|None. The ID of the reviewer who has
             accepted/rejected the suggestion.
     """
@@ -65,16 +62,14 @@ def create_suggestion(
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         thread_id = feedback_services.create_thread(
             target_id, None, author_id, description,
-            DEFAULT_SUGGESTION_THREAD_SUBJECT)
+            DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
         # This line and the if..else will be removed after the feedback thread
         # migration is complete and the IDs for both models match.
         thread_id = suggestion_models.TARGET_TYPE_EXPLORATION + '.' + thread_id
     else:
         raise Exception('Feedback threads can only be linked to explorations')
 
-    status = (
-        suggestion_models.STATUS_IN_REVIEW if assigned_reviewer_id else
-        suggestion_models.STATUS_RECEIVED)
+    status = suggestion_models.STATUS_IN_REVIEW
 
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         exploration = exp_services.get_exploration_by_id(target_id)
@@ -85,7 +80,7 @@ def create_suggestion(
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
-        target_version_at_submission, status, author_id, assigned_reviewer_id,
+        target_version_at_submission, status, author_id,
         final_reviewer_id, change_cmd, score_category, thread_id)
 
 
@@ -105,7 +100,6 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.id, suggestion_model.target_id,
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
-        suggestion_model.assigned_reviewer_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
         suggestion_model.score_category, suggestion_model.last_updated)
 
@@ -156,22 +150,6 @@ def get_suggestions_reviewed_by(reviewer_id):
         .get_suggestions_reviewed_by(reviewer_id)]
 
 
-def get_suggestions_assigned_to_reviewer(assigned_reviewer_id):
-    """Gets a list of suggestions assigned to the given user for review.
-
-    Args:
-        assigned_reviewer_id: str. The ID of the reviewer assigned to review the
-                suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions assigned to the given user
-            for review.
-    """
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_assigned_to_reviewer(assigned_reviewer_id)]
-
-
 def get_suggestions_by_status(status):
     """Gets a list of suggestions with the given status.
 
@@ -215,6 +193,19 @@ def get_suggestions_by_target_id(target_type, target_id):
             .get_suggestions_by_target_id(target_type, target_id)]
 
 
+def get_all_stale_suggestions():
+    """Gets a list of suggestions without any activity on them for
+    THRESHOLD_TIME_BEFORE_ACCEPT time.
+
+    Returns:
+        list(Suggestion). A list of suggestions linked to the entity.
+    """
+
+    return [get_suggestion_from_model(s)
+            for s in suggestion_models.GeneralSuggestionModel
+            .get_all_stale_suggestions()]
+
+
 def _update_suggestion(suggestion):
     """Updates the given suggestion.
 
@@ -227,7 +218,6 @@ def _update_suggestion(suggestion):
         suggestion.suggestion_id)
 
     suggestion_model.status = suggestion.status
-    suggestion_model.assigned_reviewer_id = suggestion.assigned_reviewer_id
     suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
     suggestion_model.change_cmd = suggestion.change_cmd.to_dict()
     suggestion_model.score_category = suggestion.score_category
@@ -250,20 +240,6 @@ def mark_review_completed(suggestion, status, reviewer_id):
 
     suggestion.status = status
     suggestion.final_reviewer_id = reviewer_id
-    suggestion.assigned_reviewer_id = None
-
-    _update_suggestion(suggestion)
-
-
-def assign_reviewer_to_suggestion(suggestion, assigned_reviewer_id):
-    """Assigns a user to review the suggestion.
-
-    Args:
-        suggestion: Suggestion. The suggestion to be updated.
-        assigned_reviewer_id: str. The ID of the user who is assigned to review.
-    """
-    suggestion.status = suggestion_models.STATUS_IN_REVIEW
-    suggestion.assigned_reviewer_id = assigned_reviewer_id
 
     _update_suggestion(suggestion)
 

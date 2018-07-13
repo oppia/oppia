@@ -28,8 +28,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     SKILL_ID = None
     USER_ID = 'user'
-    MISCONCEPTION_ID_1 = 'misconception_id_1'
-    MISCONCEPTION_ID_2 = 'misconception_id_2'
+    MISCONCEPTION_ID_1 = 1
+    MISCONCEPTION_ID_2 = 2
 
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
@@ -142,14 +142,19 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
-                'id': self.MISCONCEPTION_ID_2
+                'new_misconception_dict': {
+                    'id': 0,
+                    'name': 'test name',
+                    'notes': 'test notes',
+                    'feedback': 'test feedback'
+                }
             }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
-                'id': self.MISCONCEPTION_ID_2,
-                'old_value': '',
+                'id': 0,
+                'old_value': 'test name',
                 'new_value': 'Name'
             })
         ]

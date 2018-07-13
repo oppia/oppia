@@ -120,7 +120,7 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             suggestion_models.TARGET_TYPE_EXPLORATION + '.' + suggestion.id)
         thread = feedback_models.FeedbackThreadModel.get_by_id(suggestion.id)
         if thread.status == feedback_models.STATUS_CHOICES_OPEN:
-            status = suggestion_models.STATUS_RECEIVED
+            status = suggestion_models.STATUS_IN_REVIEW
         elif thread.status == feedback_models.STATUS_CHOICES_FIXED:
             status = suggestion_models.STATUS_ACCEPTED
         elif thread.status == feedback_models.STATUS_CHOICES_IGNORED:
@@ -153,9 +153,9 @@ class SuggestionMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             target_id=suggestion.exploration_id,
             target_version_at_submission=suggestion.exploration_version,
             status=status, author_id=suggestion.author_id,
-            assigned_reviewer_id=None, final_reviewer_id=None,
-            change_cmd=change_cmd, score_category=score_category,
-            created_on=suggestion.created_on, deleted=suggestion.deleted).put()
+            final_reviewer_id=None, change_cmd=change_cmd,
+            score_category=score_category, created_on=suggestion.created_on,
+            deleted=suggestion.deleted).put()
 
     @staticmethod
     def reduce(key, value):

@@ -367,10 +367,9 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         self.assertEqual(suggestion.target_id, self.EXP_ID)
         self.assertEqual(
             suggestion.target_version_at_submission, exploration.version)
-        self.assertEqual(suggestion.status, suggestion_models.STATUS_RECEIVED)
+        self.assertEqual(suggestion.status, suggestion_models.STATUS_IN_REVIEW)
         self.assertEqual(suggestion.author_id, self.author_id)
         self.assertEqual(suggestion.final_reviewer_id, None)
-        self.assertEqual(suggestion.assigned_reviewer_id, None)
         self.assertDictEqual(
             suggestion.change_cmd, expected_change_cmd)
         self.assertEqual(

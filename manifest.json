@@ -340,13 +340,6 @@
           "js": []
         }
       },
-      "jqueryThemes": {
-        "version": "1.10.3",
-        "downloadFormat": "zip",
-        "url": "http://jqueryui.com/resources/download/jquery-ui-themes-1.10.3.zip",
-        "rootDirPrefix": "jquery-ui-themes-",
-        "targetDirPrefix": "jquery-ui-themes-"
-      },
       "jqueryUITouchPunch": {
         "version": "0.3.1",
         "downloadFormat": "zip",
@@ -452,60 +445,42 @@
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/widget/releases/widget_4.9.2.zip",
         "rootDir": "widget",
-        "targetDir": "ckeditor-widget"
+        "targetDirPrefix": "ckeditor-widget-"
       },
       "ckeditorLineutils": {
         "version": "4.9.2",
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/lineutils/releases/lineutils_4.9.2.zip",
         "rootDir": "lineutils",
-        "targetDir": "ckeditor-lineutils"
+        "targetDirPrefix": "ckeditor-lineutils-"
       },
       "ckeditorSharedspace": {
         "version": "4.9.2",
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/sharedspace/releases/sharedspace_4.9.2.zip",
         "rootDir": "sharedspace",
-        "targetDir": "ckeditor-sharedspace"
+        "targetDirPrefix": "ckeditor-sharedspace-"
       },
       "ckeditorBootstrapCK": {
         "version": "1.0",
         "downloadFormat": "zip",
         "url": "http://download.ckeditor.com/bootstrapck/releases/bootstrapck_1.0_0.zip",
         "rootDir": "bootstrapck",
-        "targetDir": "ckeditor-bootstrapck"
-      },
-      "ckeditorInsertPrePlugin" : {
-        "version": "1.0.1",
-        "downloadFormat": "zip",
-        "url": "https://download.ckeditor.com/insertpre/releases/insertpre_1.0.1.zip",
-        "rootDir": "insertpre",
-        "targetDir": "ckeditor-insertpre"
+        "targetDirPrefix": "ckeditor-bootstrapck-"
       },
       "ckeditorIndentBlockPlugin" : {
         "version": "4.9.2",
         "downloadFormat": "zip",
         "url": "https://download.ckeditor.com/indentblock/releases/indentblock_4.9.2.zip",
         "rootDir": "indentblock",
-        "targetDir": "ckeditor-indentblock"
+        "targetDirPrefix": "ckeditor-indentblock-"
       },
       "ckeditorBlockquotePlugin" : {
         "version": "4.9.2",
         "downloadFormat": "zip",
         "url": "https://download.ckeditor.com/blockquote/releases/blockquote_4.9.2.zip",
         "rootDir": "blockquote",
-        "targetDir": "ckeditor-blockquote"
-      },
-      "textAngular": {
-        "version": "1.4.5",
-        "downloadFormat": "zip",
-        "url": "https://github.com/fraywing/textAngular/archive/v1.4.5.zip",
-        "rootDirPrefix": "textAngular-",
-        "targetDirPrefix": "textAngular-",
-        "bundle": {
-          "css": ["dist/textAngular.css"],
-          "js": ["dist/textAngular.js", "dist/textAngularSetup.js"]
-        }
+        "targetDirPrefix": "ckeditor-blockquote-"
       },
       "uiBootstrap": {
         "version": "2.5.0",

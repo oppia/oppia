@@ -21,16 +21,18 @@ oppia.directive('topicsList', [
       restrict: 'E',
       scope: {
         getTopicSummaries: '&topicSummaries',
-        canDeleteTopic: '&userCanDeleteTopic'
+        canDeleteTopic: '&userCanDeleteTopic',
+        isInModal: '&inModal',
+        selectedTopicIds: '='
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topics_and_skills_dashboard/topics_list_directive.html'),
       controller: [
         '$scope', '$uibModal', '$rootScope', 'EditableTopicBackendApiService',
-        'AlertsService', 'EVENT_TOPIC_DELETED',
+        'AlertsService', 'EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED',
         function(
             $scope, $uibModal, $rootScope, EditableTopicBackendApiService,
-            AlertsService, EVENT_TOPIC_DELETED) {
+            AlertsService, EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED) {
           // As additional stories are not supported initially, it's not
           // being shown, for now.
           $scope.TOPIC_HEADINGS = [
@@ -38,7 +40,18 @@ oppia.directive('topicsList', [
             'canonical_story_count', 'topic_status'
           ];
           $scope.getTopicEditorUrl = function(topicId) {
+            if ($scope.isInModal()) {
+              return;
+            }
             return '/topic_editor/' + topicId;
+          };
+
+          $scope.selectTopic = function(topicId) {
+            if ($scope.selectedTopicIds) {
+              if ($scope.selectedTopicIds.indexOf(topicId) === -1) {
+                $scope.selectedTopicIds.push(topicId);
+              }
+            }
           };
 
           $scope.deleteTopic = function(topicId) {
@@ -62,8 +75,9 @@ oppia.directive('topicsList', [
 
             modalInstance.result.then(function() {
               EditableTopicBackendApiService.deleteTopic(topicId).then(
-                function() {
-                  $rootScope.$broadcast(EVENT_TOPIC_DELETED, topicId);
+                function(status) {
+                  $rootScope.$broadcast(
+                    EVENT_TOPICS_AND_SKILLS_DASHBOARD_REINITIALIZED);
                 },
                 function(error) {
                   AlertsService.addWarning(

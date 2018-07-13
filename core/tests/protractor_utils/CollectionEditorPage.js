@@ -16,14 +16,17 @@
  * @fileoverview Page object for Collection Editor Page, for use in Protractor
  * tests.
  */
+var general = require('./general.js');
+var until = protractor.ExpectedConditions;
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var CollectionEditorPage = function() {
   var addExplorationButton = element(
     by.css('.protractor-test-add-exploration-button'));
   var addExplorationInput = element(
     by.css('.protractor-test-add-exploration-input'));
-  var closeSaveModal = element(
-    by.css('.protractor-test-close-save-modal'));
+  var closeSaveModalButton = element(
+    by.css('.protractor-test-close-save-modal-button'));
   var collectionEditorObjectiveInput = element(
     by.css('.protractor-collection-editor-objective-input'));
   var commitMessageInput = element(
@@ -44,22 +47,55 @@ var CollectionEditorPage = function() {
     by.css('.protractor-test-collection-save-changes-button'));
   var saveDraftButton = element(
     by.css('.protractor-test-save-draft-button'));
+  var saveModal = element(by.css('.protractor-test-save-modal'));
 
   this.addExistingExploration = function(explorationId) {
     addExplorationInput.sendKeys(explorationId);
     // Waits until the button becomes active after debouncing.
-    browser.driver.sleep(300);
+    waitFor.elementToBeClickable(
+      addExplorationButton,
+      'Unable to find exploration ID: ' + explorationId);
     addExplorationButton.click();
   };
 
   // Search and add existing exploration to the node graph.
   this.searchForAndAddExistingExploration = function(query) {
-    addExplorationInput.sendKeys(query);
-    // Waits until the button becomes active after debouncing.
-    browser.driver.sleep(300);
-    // Selects the exploration from dropdown.
-    addExplorationInput.sendKeys(protractor.Key.TAB);
-    addExplorationButton.click();
+    browser.wait(until.visibilityOf(addExplorationInput), 10000,
+      'Add Exploration Input is not visible').then(function(isVisible) {
+      if (isVisible) {
+        addExplorationInput.sendKeys(query);
+        // Need to wait for result to appear.
+        waitFor.elementToBeClickable(
+          addExplorationButton, 'Unable to find exploration: ' + query);
+      }
+    });
+    var matched = false;
+    var dropdownResultElements = element.all(by.css('.dropdown-menu'));
+    dropdownResultElements.map(function(dropdownResult) {
+      return dropdownResult.getText();
+    }).then(function(listOfResult) {
+      listOfResult.forEach(function(element, index) {
+        if (element.indexOf(query) >= 0) {
+          // Selects the exploration from dropdown.
+          dropdownResultElements.get(index).click();
+          matched = true;
+        }
+      });
+    });
+    if (!matched) {
+      // Press Tab to fill in the default result should one appear when
+      // none of the answer matches the given query.
+      addExplorationInput.sendKeys(protractor.Key.TAB);
+      // If query gets zero result, hitting Tab would not enable the
+      // addExplorationButton.
+    }
+    addExplorationButton.isEnabled().then( function(isEnabled) {
+      if (isEnabled) {
+        addExplorationButton.click();
+      } else {
+        throw Error ('Add Exploration Button is not clickable');
+      }
+    });
   };
 
   // Shift a node left in the node graph.
@@ -68,7 +104,16 @@ var CollectionEditorPage = function() {
   };
 
   this.setCommitMessage = function(message) {
-    commitMessageInput.sendKeys(message);
+    browser.wait(until.visibilityOf(saveModal), 5000,
+      'Save Modal takes too long to appear').then(function(isVisible) {
+      if (isVisible) {
+        waitFor.elementToBeClickable(
+          commitMessageInput,
+          'Commit Message input takes too long to appear');
+        commitMessageInput.click();
+        commitMessageInput.sendKeys(message);
+      }
+    });
   };
 
   // Shift a node right in the node graph.
@@ -83,16 +128,23 @@ var CollectionEditorPage = function() {
 
   // Save draft of the collection.
   this.saveDraft = function() {
+    waitFor.elementToBeClickable(
+      saveDraftButton, 'Collection Save Draft button is not clickable');
     saveDraftButton.click();
   };
 
   // Closes the save modal.
   this.closeSaveModal = function() {
-    closeSaveModal.click();
+    waitFor.elementToBeClickable(
+      closeSaveModalButton, 'Publish Changes button is not clickable');
+    closeSaveModalButton.click();
+    browser.wait(until.invisibilityOf(closeSaveModalButton), 5000);
   };
 
   // Click on publish collection.
   this.publishCollection = function() {
+    waitFor.elementToBeClickable(
+      editorPublishButton, 'Collection Publish button is not clickable');
     editorPublishButton.click();
   };
 
@@ -114,7 +166,10 @@ var CollectionEditorPage = function() {
 
   // Saves changes and publishes collection.
   this.saveChanges = function () {
+    waitFor.elementToBeClickable(
+      saveChangesButton, 'Save Changes button is not clickable');
     saveChangesButton.click();
+    browser.wait(until.invisibilityOf(saveChangesButton), 5000);
   };
 };
 

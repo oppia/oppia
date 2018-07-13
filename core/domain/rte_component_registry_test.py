@@ -37,7 +37,8 @@ _COMPONENT_CONFIG_SCHEMA = [
     ('backend_id', basestring), ('category', basestring),
     ('description', basestring), ('frontend_id', basestring),
     ('tooltip', basestring), ('icon_data_url', basestring),
-    ('preview_url_template', basestring), ('is_complex', bool),
+    ('preview_url_template_dev', basestring),
+    ('preview_url_template_prod', basestring), ('is_complex', bool),
     ('requires_fs', bool), ('is_block_element', bool),
     ('customization_arg_specs', list)]
 

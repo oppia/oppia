@@ -27,7 +27,7 @@ IMPORTANT NOTES:
     - four folders: /avatar, /general, /logo and /sidebar, containing
         images used for the avatar, general-purpose usage, logo and sidebar,
         respectively.
-    It should also contain a folder called /common, which should contain:
+    The folder should also contain:
     - favicon.ico and robots.txt.
     - one folder images/general which contains:
         - warning.png
@@ -98,7 +98,7 @@ THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 DEPLOY_DATA_PATH = os.path.join(
     os.getcwd(), os.pardir, 'release-scripts', 'deploy_data', APP_NAME)
 
-FILES_AT_ROOT_IN_COMMON = ['favicon.ico', 'robots.txt']
+FILES_AT_ROOT = ['favicon.ico', 'robots.txt']
 IMAGE_DIRS = ['avatar', 'general', 'sidebar', 'logo']
 
 # Denotes length for cache slug used in production mode. It consists of
@@ -127,10 +127,10 @@ def preprocess_release():
         raise Exception(
             'Could not find deploy_data directory at %s' % DEPLOY_DATA_PATH)
 
-    # Copies files in common folder to assets/common.
-    for filename in FILES_AT_ROOT_IN_COMMON:
-        src = os.path.join(DEPLOY_DATA_PATH, 'common', filename)
-        dst = os.path.join(os.getcwd(), 'assets', 'common', filename)
+    # Copies files in root folder to assets/.
+    for filename in FILES_AT_ROOT:
+        src = os.path.join(DEPLOY_DATA_PATH, filename)
+        dst = os.path.join(os.getcwd(), 'assets', filename)
         if not os.path.exists(src):
             raise Exception(
                 'Could not find source path %s. Please check your deploy_data '

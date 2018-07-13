@@ -14,6 +14,8 @@
 
 """Models for Oppia suggestions."""
 
+import datetime
+
 from core.platform import models
 import feconf
 
@@ -37,13 +39,11 @@ TARGET_TYPE_CHOICES = [
 # Constants defining the different possible statuses of a suggestion.
 STATUS_ACCEPTED = 'accepted'
 STATUS_IN_REVIEW = 'review'
-STATUS_RECEIVED = 'received'
 STATUS_REJECTED = 'rejected'
 
 STATUS_CHOICES = [
     STATUS_ACCEPTED,
     STATUS_IN_REVIEW,
-    STATUS_RECEIVED,
     STATUS_REJECTED
 ]
 
@@ -72,6 +72,17 @@ SCORE_TYPE_CHOICES = [
 # The delimiter to be used in score category field.
 SCORE_CATEGORY_DELIMITER = '.'
 
+# Threshold number of days after which suggestion will be accepted.
+THRESHOLD_DAYS_BEFORE_ACCEPT = 7
+
+# Threshold time after which suggestion is considered stale and auto-accepted.
+THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS = (
+    THRESHOLD_DAYS_BEFORE_ACCEPT * 24 * 60 * 60 * 1000)
+
+# The default message to be shown when accepting stale suggestions.
+DEFAULT_SUGGESTION_ACCEPT_MESSAGE = ('Automatically accepting suggestion after'
+                                     ' %d days' % THRESHOLD_DAYS_BEFORE_ACCEPT)
+
 
 class GeneralSuggestionModel(base_models.BaseModel):
     """Model to store suggestions made by Oppia users.
@@ -97,8 +108,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         required=True, indexed=True, choices=STATUS_CHOICES)
     # The ID of the author of the suggestion.
     author_id = ndb.StringProperty(required=True, indexed=True)
-    # The ID of the reviewer assigned to review the suggestion.
-    assigned_reviewer_id = ndb.StringProperty(indexed=True)
     # The ID of the reviewer who accepted/rejected the suggestion.
     final_reviewer_id = ndb.StringProperty(indexed=True)
     # The change command linked to the suggestion. Contains the details of the
@@ -113,7 +122,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
     def create(
             cls, suggestion_type, target_type, target_id,
             target_version_at_submission, status, author_id,
-            assigned_reviewer_id, final_reviewer_id, change_cmd, score_category,
+            final_reviewer_id, change_cmd, score_category,
             thread_id):
         """Creates a new SuggestionModel entry.
 
@@ -125,8 +134,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
                 entity at the time of creation of the suggestion.
             status: str. The status of the suggestion.
             author_id: str. The ID of the user who submitted the suggestion.
-            assigned_reviewer_id: str. The ID of the user assigned to
-                review the suggestion.
             final_reviewer_id: str. The ID of the reviewer who has
                 accepted/rejected the suggestion.
             change_cmd: dict. The actual content of the suggestion.
@@ -147,7 +154,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
             target_type=target_type, target_id=target_id,
             target_version_at_submission=target_version_at_submission,
             status=status, author_id=author_id,
-            assigned_reviewer_id=assigned_reviewer_id,
             final_reviewer_id=final_reviewer_id, change_cmd=change_cmd,
             score_category=score_category).put()
 
@@ -180,23 +186,6 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.author_id == author_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_suggestions_assigned_to_reviewer(cls, assigned_reviewer_id):
-        """Gets all suggestions assigned to the given user for review.
-
-        Args:
-            assigned_reviewer_id: str. The ID of the reviewer assigned to
-                review the suggestion.
-
-        Returns:
-            list(SuggestionModel). A list of suggestions assigned to the given
-                user for review, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
-                suggestions.
-        """
-        return cls.get_all().filter(
-            cls.assigned_reviewer_id == assigned_reviewer_id).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_suggestions_reviewed_by(cls, final_reviewer_id):
@@ -242,3 +231,17 @@ class GeneralSuggestionModel(base_models.BaseModel):
         """
         return cls.get_all().filter(cls.target_type == target_type).filter(
             cls.target_id == target_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_all_stale_suggestions(cls):
+        """Gets all suggestions which were last updated before the threshold
+        time.
+
+        Returns:
+            list(SuggestionModel). A list of suggestions that are stale.
+        """
+        threshold_time = (
+            datetime.datetime.utcnow() - datetime.timedelta(
+                0, 0, 0, THRESHOLD_TIME_BEFORE_ACCEPT_IN_MSECS))
+        return cls.get_all().filter(cls.status == STATUS_IN_REVIEW).filter(
+            cls.last_updated < threshold_time).fetch()
