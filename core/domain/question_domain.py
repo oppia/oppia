@@ -224,7 +224,7 @@ class Question(object):
 
         return cls(
             question_id, default_question_state_data,
-            constants.DEFAULT_LANGUAGE_CODE, feconf.CURRENT_QUESTION_VERSION)
+            constants.DEFAULT_LANGUAGE_CODE, 1)
 
     def update_language_code(self, language_code):
         """Updates the language code of the question.
