@@ -34,13 +34,15 @@ oppia.directive('pieChart', [function() {
       var options = $scope.options();
       var chart = null;
 
+      // Need to wait for load statement in editor template to finish.
+      // https://stackoverflow.com/questions/42714876/
+      google.charts.setOnLoadCallback(function () {
+        if (!chart) {
+          chart = new google.visualization.PieChart($element[0]);
+        }
+      });
       var redrawChart = function() {
-        // Need to wait for load statement in editor template to finish.
-        // https://stackoverflow.com/questions/42714876/google-visualization-piechart-is-not-a-constructor
-        google.charts.setOnLoadCallback(function () {
-          if (!chart) {
-            chart = new google.visualization.PieChart($element[0]);
-          }
+        if (chart !== null) {
           chart.draw(google.visualization.arrayToDataTable($scope.data()), {
             title: options.title,
             pieHole: options.pieHole,
@@ -60,7 +62,7 @@ oppia.directive('pieChart', [function() {
             },
             width: options.width
           });
-        });
+        }
       };
 
       $scope.$watch('data()', redrawChart);
