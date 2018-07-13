@@ -71,7 +71,7 @@ def can_play_exploration(handler):
     return test_can_play
 
 
-def can_play_skill(handler):
+def can_view_skill(handler):
     """Decorator to check whether user can play a given skill."""
 
     def test_can_play(self, skill_id, **kwargs):

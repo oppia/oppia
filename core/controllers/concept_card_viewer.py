@@ -23,7 +23,7 @@ import feconf
 class ConceptCardDataHandler(base.BaseHandler):
     """A card that shows the explanation of a skill's concept."""
 
-    @acl_decorators.can_play_skill
+    @acl_decorators.can_view_skill
     def get(self, skill_id):
         """Handles GET requests."""
 
