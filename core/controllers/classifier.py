@@ -107,7 +107,14 @@ class TrainedClassifierHandler(base.BaseHandler):
             raise self.UnauthorizedUserException
 
         job_id = message['job_id']
-        classifier_data = message['classifier_data']
+        # The classifier data received in the payload has all floating point
+        # values stored as strings. This is because floating point numbers
+        # are represented differently on GAE(Oppia) and GCE(Oppia-ml).
+        # Therefore, converting all floating point numbers to string keeps
+        # signature consistent on both Oppia and Oppia-ml.
+        classifier_data = (
+            classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
+                message['classifier_data']))
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (

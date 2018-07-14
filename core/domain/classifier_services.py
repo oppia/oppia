@@ -153,6 +153,44 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
         job_exploration_mappings)
 
 
+def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
+    """Converts all floating point numbers in classifier data to string.
+
+    Args:
+        classifier_data: dict. The trained classifier model in which float
+            values are stored as strings.
+
+    Returns:
+        Dict. Original dict with float values converted back from string to
+            float.
+    """
+    if isinstance(classifier_data, dict):
+        for k in classifier_data.keys():
+            if isinstance(classifier_data[k], (str, unicode)):
+                try:
+                    classifier_data[k] = float(classifier_data[k])
+                except TypeError:
+                    classifier_data[k] = classifier_data[k]
+            else:
+                classifier_data[k] = (
+                    convert_strings_to_float_numbers_in_classifier_data(
+                        classifier_data[k]))
+        return classifier_data
+    elif isinstance(classifier_data, (list, set, tuple)):
+        new_list = []
+        for item in classifier_data:
+            if isinstance(item, (str, unicode)):
+                try:
+                    new_list.append(float(item))
+                except TypeError:
+                    new_list.append(item)
+            else:
+                new_list.append(
+                    convert_strings_to_float_numbers_in_classifier_data(item))
+        return type(classifier_data)(new_list)
+    return classifier_data
+
+
 def get_classifier_training_job_from_model(classifier_training_job_model):
     """Gets a classifier training job domain object from a classifier
     training job model.

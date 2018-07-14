@@ -453,3 +453,52 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
             classifier_services.get_classifier_training_jobs(
                 exp_id, 1, [false_state_name]))
         self.assertEqual(classifier_training_jobs, [None])
+
+    def test_convert_strings_to_float_numbers_in_classifier_data(self):
+        """Make sure that all values are converted correctly."""
+        test_dict = {
+            'a': {
+                'ab': 'abcd',
+                'ac': '0.5'
+            },
+            'b': {
+                'ba': [1, 2, 3],
+                'bb': [['1.0', '0.0', '1.0'], ['0.0', '1.0', '1.0']],
+                'bc': ['-3.44757604341e-05', '-3.44757604341e-05'],
+                'bd': ['-2.48521656693', '-2.48521656693', '-2.48521656693'],
+                'be': {
+                    'bea': 'abcdef',
+                    'beb': '0.0',
+                    'bec': '0.142857142857',
+                    'bed': 3},
+                'bf': ['0.133432545', 1, 2, '3.1233']
+            },
+            'c': '1.123432',
+            'd': 21123
+        }
+
+        expected_dict = {
+            'a': {
+                'ab': 'abcd',
+                'ac': 0.5
+            },
+            'b': {
+                'ba': [1, 2, 3],
+                'bb': [[1.0, 0.0, 1.0], [0.0, 1.0, 1.0]],
+                'bc': [-3.44757604341e-05, -3.44757604341e-05],
+                'bd': [-2.48521656693, -2.48521656693, -2.48521656693],
+                'be': {
+                    'bea': 'abcdef',
+                    'beb': 0.0,
+                    'bec': 0.142857142857,
+                    'bed': 3},
+                'bf': [0.133432545, 1, 2, 3.1233]
+            },
+            'c': 1.123432,
+            'd': 21123
+        }
+
+        output_dict = (
+            classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
+                test_dict))
+        self.assertDictEqual(expected_dict, output_dict)
