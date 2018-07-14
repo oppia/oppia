@@ -109,6 +109,7 @@ oppia.directive('ckEditorRte', [
           'indentblock,pre,blockquote,widget,lineutils,sharedspace,' +
           pluginNames,
           startupFocus: true,
+          title: false,
           floatSpaceDockedOffsetY: 15,
           extraAllowedContent: extraAllowedContentRules,
           sharedSpaces: {
