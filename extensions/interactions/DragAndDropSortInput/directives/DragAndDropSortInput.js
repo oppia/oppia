@@ -48,14 +48,12 @@ oppia.directive('oppiaInteractiveDragAndDropSortInput', [
 
           $scope.treeOptions = {
             dragMove: function(e) {
-              var elem = document.getElementsByClassName(
-                'angular-ui-tree-placeholder');
               // Change the color of the placeholder based on the position of
               // the dragged item.
               if (e.dest.nodesScope.$childNodesScope !== undefined) {
-                elem[0].style.borderColor = '#add8e6';
+                e.elements.placeholder[0].style.borderColor = '#add8e6';
               } else {
-                elem[0].style.borderColor = '#000000';
+                e.elements.placeholder[0].style.borderColor = '#000000';
               }
             }
           };
