@@ -34,8 +34,9 @@ oppia.factory('ExplorationPlayerService', [
   'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
   'PlayerTranscriptService', 'PlaythroughService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService', 'WindowDimensionsService',
-  'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT', 'TWO_CARD_THRESHOLD_PX',
+  'StatsReportingService', 'UrlInterpolationService', 'UserService',
+  'WindowDimensionsService', 'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT',
+  'TWO_CARD_THRESHOLD_PX',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
@@ -47,8 +48,9 @@ oppia.factory('ExplorationPlayerService', [
       NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
       PlayerTranscriptService, PlaythroughService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService, WindowDimensionsService,
-      ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX,
+      StatsReportingService, UrlInterpolationService, UserService,
+      WindowDimensionsService, ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT,
+      TWO_CARD_THRESHOLD_PX,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
@@ -480,18 +482,9 @@ oppia.factory('ExplorationPlayerService', [
       // user is not logged in or has not uploaded a profile picture, or the
       // player is in preview mode.
       getUserProfileImage: function() {
-        var DEFAULT_PROFILE_IMAGE_PATH = (
-          UrlInterpolationService.getStaticImageUrl(
-            '/avatar/user_blue_72px.png'));
-
-        if (_isLoggedIn && !_editorPreviewMode) {
-          return $http.get(
-            '/preferenceshandler/profile_picture'
-          ).then(function(response) {
-            var profilePictureDataUrl = response.data.profile_picture_data_url;
-            return (
-              profilePictureDataUrl ? profilePictureDataUrl :
-              DEFAULT_PROFILE_IMAGE_PATH);
+        if (!_editorPreviewMode) {
+          return UserService.getProfileImageDataUrl().then(function(dataUrl) {
+            return dataUrl;
           });
         } else {
           return $q.resolve(DEFAULT_PROFILE_IMAGE_PATH);

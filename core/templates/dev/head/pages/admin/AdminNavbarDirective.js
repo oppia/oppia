@@ -27,7 +27,6 @@ oppia.directive('adminNavbar', [
       scope: {
         getUsername: '&username',
         getUserEmail: '&userEmail',
-        getProfilePictureDataUrl: '&profilePictureDataUrl',
         isModerator: '&isModerator',
         isSuperAdmin: '&isSuperAdmin',
         getLogoutUrl: '&logoutUrl'
@@ -35,7 +34,7 @@ oppia.directive('adminNavbar', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/admin/' +
         'admin_navbar_directive.html'),
-      controller: ['$scope', function($scope) {
+      controller: ['$scope', 'UserService', function($scope, UserService) {
         $scope.ADMIN_TAB_URLS = ADMIN_TAB_URLS;
         $scope.showTab = AdminRouterService.showTab;
         $scope.isActivitiesTabOpen = AdminRouterService.isActivitiesTabOpen;
@@ -43,6 +42,10 @@ oppia.directive('adminNavbar', [
         $scope.isConfigTabOpen = AdminRouterService.isConfigTabOpen;
         $scope.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
         $scope.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
+
+        UserService.getProfileImageDataUrl().then(function(dataUrl) {
+          $scope.profilePictureDataUrl = dataUrl;
+        });
 
         $scope.logoWhiteImgUrl = UrlInterpolationService.getStaticImageUrl(
           '/logo/288x128_logo_white.png');

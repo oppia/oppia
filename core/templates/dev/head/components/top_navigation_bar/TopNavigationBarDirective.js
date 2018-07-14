@@ -28,12 +28,12 @@ oppia.directive('topNavigationBar', [
         'top_navigation_bar_directive.html'),
       controller: [
         '$scope', '$http', '$window', '$timeout', '$translate',
-        'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS',
+        'SidebarStatusService', 'LABEL_FOR_CLEARING_FOCUS', 'UserService',
         'siteAnalyticsService', 'WindowDimensionsService', 'DebouncerService',
         'DeviceInfoService',
         function(
             $scope, $http, $window, $timeout, $translate,
-            SidebarStatusService, LABEL_FOR_CLEARING_FOCUS,
+            SidebarStatusService, LABEL_FOR_CLEARING_FOCUS, UserService,
             siteAnalyticsService, WindowDimensionsService, DebouncerService,
             DeviceInfoService) {
           if (GLOBALS.userIsLoggedIn && GLOBALS.preferredSiteLanguageCode) {
@@ -48,7 +48,9 @@ oppia.directive('topNavigationBar', [
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.activeMenuName = '';
           $scope.username = GLOBALS.username;
-          $scope.profilePictureDataUrl = GLOBALS.profilePictureDataUrl;
+          UserService.getProfileImageDataUrl().then(function(dataUrl) {
+            $scope.profilePictureDataUrl = dataUrl;
+          });
           $scope.isAdmin = GLOBALS.isAdmin;
           $scope.isModerator = GLOBALS.isModerator;
           $scope.isSuperAdmin = GLOBALS.isSuperAdmin;
