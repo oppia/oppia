@@ -43,11 +43,11 @@
  */
 
 var INTERACTIONS = {
-  // Continue: require('./Continue/protractor.js'),
-  // EndExploration: require('./EndExploration/protractor.js'),
-  // FractionInput: require('./FractionInput/protractor.js'),
-  // GraphInput: require('./GraphInput/protractor.js'),
-  // LogicProof: require('./LogicProof/protractor.js'),
+  Continue: require('./Continue/protractor.js'),
+  EndExploration: require('./EndExploration/protractor.js'),
+  FractionInput: require('./FractionInput/protractor.js'),
+  GraphInput: require('./GraphInput/protractor.js'),
+  LogicProof: require('./LogicProof/protractor.js'),
   MathExpressionInput: require('./MathExpressionInput/protractor.js'),
   MultipleChoiceInput: require('./MultipleChoiceInput/protractor.js'),
   NumericInput: require('./NumericInput/protractor.js'),
