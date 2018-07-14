@@ -486,7 +486,7 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
 
         # These lines invoke Pycodestyle.
         style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
-        pycodestyle_report = style_guide.check_files(current_files_to_lint)
+        pycodestyle_report = style_guide.check_files(path=current_files_to_lint)
         # This line prints Pycodestyle's output to the console.
         pycodestyle_report.print_statistics()
 

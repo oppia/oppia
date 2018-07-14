@@ -38,12 +38,12 @@ from pylint import testutils  # isort:skip
 # pylint: enable=relative-import
 
 
-class ExplicitKwargsCheckerTest(unittest.TestCase):
+class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
 
     def test_finds_non_explicit_kwargs(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
-            custom_lint_checks.ExplicitKwargsChecker)
+            custom_lint_checks.ExplicitKeywordArgsChecker)
         checker_test_object.setup_method()
         func_node = astroid.extract_node("""
         def test(test_var_one, test_var_two=4, test_var_three=5, test_var_four="test_checker"): #@
@@ -61,7 +61,7 @@ class ExplicitKwargsCheckerTest(unittest.TestCase):
         """))
         with checker_test_object.assertAddsMessages(
             testutils.Message(
-                msg_id='non-explicit-kwargs',
+                msg_id='non-explicit-keyword-args',
                 node=func_call_node_one,
             ),
         ):
@@ -72,7 +72,7 @@ class ExplicitKwargsCheckerTest(unittest.TestCase):
                 func_call_node_two)
         with checker_test_object.assertAddsMessages(
             testutils.Message(
-                msg_id='non-explicit-kwargs',
+                msg_id='non-explicit-keyword-args',
                 node=func_call_node_three,
             ),
         ):
