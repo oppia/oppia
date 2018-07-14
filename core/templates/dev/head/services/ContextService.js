@@ -54,7 +54,7 @@ oppia.factory('ContextService', [
       getEditorTabContext: function() {
         var hash = UrlService.getHash();
         if (hash.indexOf('#/gui') === 0) {
-          return EXPLORATION_EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR;
+          return EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR;
         } else if (hash.indexOf('#/preview') === 0) {
           return EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW;
         } else {
@@ -152,7 +152,7 @@ oppia.factory('ContextService', [
       isInExplorationEditorMode: function() {
         return (this.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR &&
             this.getEditorTabContext() === (
-              EXPLORATION_EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR));
+              EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR));
       }
     };
   }
