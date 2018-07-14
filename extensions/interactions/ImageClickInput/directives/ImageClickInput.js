@@ -23,13 +23,15 @@
 oppia.directive('oppiaInteractiveImageClickInput', [
   '$sce', 'HtmlEscaperService', 'ContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'ImagePreloaderService', 'AssetsBackendApiService', 'EDITOR_TAB_CONTEXT',
-  'EVENT_NEW_CARD_AVAILABLE', 'LOADING_INDICATOR_URL',
+  'ImagePreloaderService', 'AssetsBackendApiService',
+  'EXPLORATION_EDITOR_TAB_CONTEXT', 'EVENT_NEW_CARD_AVAILABLE',
+  'LOADING_INDICATOR_URL',
   function(
       $sce, HtmlEscaperService, ContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      ImagePreloaderService, AssetsBackendApiService, EDITOR_TAB_CONTEXT,
-      EVENT_NEW_CARD_AVAILABLE, LOADING_INDICATOR_URL) {
+      ImagePreloaderService, AssetsBackendApiService,
+      EXPLORATION_EDITOR_TAB_CONTEXT, EVENT_NEW_CARD_AVAILABLE,
+      LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {
@@ -140,7 +142,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           };
           $scope.getDotDisplay = function() {
             if (ContextService.getEditorTabContext() ===
-                EDITOR_TAB_CONTEXT.EDITOR) {
+                EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
               return 'none';
             }
             return 'inline';

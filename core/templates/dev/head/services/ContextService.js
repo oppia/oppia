@@ -24,14 +24,14 @@ oppia.constant('PAGE_CONTEXT', {
   OTHER: 'other'
 });
 
-oppia.constant('EDITOR_TAB_CONTEXT', {
-  EXPLORATION_EDITOR: 'editor',
+oppia.constant('EXPLORATION_EDITOR_TAB_CONTEXT', {
+  EDITOR: 'editor',
   PREVIEW: 'preview'
 });
 
 oppia.factory('ContextService', [
-  'UrlService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
-  function(UrlService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT) {
+  'UrlService', 'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
+  function(UrlService, PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT) {
     var pageContext = null;
     var explorationId = null;
     var questionId = null;
@@ -41,6 +41,10 @@ oppia.factory('ContextService', [
       init: function(editorName) {
         editorContext = editorName;
       },
+      // Following method helps to know the whether the context of editor is
+      // question editor or exploration editor. The variable editorContext is
+      // set from the init function that is called upon initialization in the
+      // respective editors.
       getEditorContext: function() {
         return editorContext;
       },
@@ -50,9 +54,9 @@ oppia.factory('ContextService', [
       getEditorTabContext: function() {
         var hash = UrlService.getHash();
         if (hash.indexOf('#/gui') === 0) {
-          return EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR;
+          return EXPLORATION_EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR;
         } else if (hash.indexOf('#/preview') === 0) {
-          return EDITOR_TAB_CONTEXT.PREVIEW;
+          return EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW;
         } else {
           return null;
         }
@@ -143,18 +147,12 @@ oppia.factory('ContextService', [
         }
       },
 
-      // Following variable helps to know whether exploration editor is
+      // Following method helps to know whether exploration editor is
       // in main editing mode or preview mode.
       isInExplorationEditorMode: function() {
         return (this.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR &&
             this.getEditorTabContext() === (
-              EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR));
-      },
-
-      // Following variable helps to know whether question editor is
-      // in main editing mode or preview mode.
-      isInQuestionEditorMode: function() {
-        return (this.getPageContext() === PAGE_CONTEXT.QUESTION_EDITOR);
+              EXPLORATION_EDITOR_TAB_CONTEXT.EXPLORATION_EDITOR));
       }
     };
   }

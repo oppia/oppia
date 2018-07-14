@@ -29,11 +29,11 @@ oppia.directive('oppiaInteractiveEndExploration', [
         'end_exploration_interaction_directive.html'),
       controller: [
         '$scope', '$http', '$attrs', '$q', 'UrlService',
-        'ContextService', 'PAGE_CONTEXT', 'EDITOR_TAB_CONTEXT',
+        'ContextService', 'PAGE_CONTEXT', 'EXPLORATION_EDITOR_TAB_CONTEXT',
         'HtmlEscaperService', 'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE',
         function(
             $scope, $http, $attrs, $q, UrlService,
-            ContextService, PAGE_CONTEXT, EDITOR_TAB_CONTEXT,
+            ContextService, PAGE_CONTEXT, EXPLORATION_EDITOR_TAB_CONTEXT,
             HtmlEscaperService, EXPLORATION_SUMMARY_DATA_URL_TEMPLATE) {
           var authorRecommendedExplorationIds = (
             HtmlEscaperService.escapedJsonToObj(
@@ -45,10 +45,10 @@ oppia.directive('oppiaInteractiveEndExploration', [
               PAGE_CONTEXT.EXPLORATION_EDITOR));
           $scope.isInEditorPreviewMode = $scope.isInEditorPage && (
             ContextService.getEditorTabContext() ===
-              EDITOR_TAB_CONTEXT.PREVIEW);
+              EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW);
           $scope.isInEditorMainTab = $scope.isInEditorPage && (
             ContextService.getEditorTabContext() ===
-              EDITOR_TAB_CONTEXT.EDITOR);
+              EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR);
 
           $scope.collectionId = GLOBALS.collectionId;
           $scope.getCollectionTitle = function() {
