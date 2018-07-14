@@ -122,6 +122,16 @@ oppia.factory('ResponsesService', [
       _saveAnswerGroups(_answerGroups);
     };
 
+    var updateAnswerGroupsAudioTranslation = function () {
+      stateContentIdsToAudioTranslationsService.displayed.
+        deleteAllFeedbackContentId();
+      for (i = 0; i < _answerGroups.length; i++) {
+        stateContentIdsToAudioTranslationsService.displayed.addContentId(
+          _answerGroups[i].outcome.feedback.getContentId());
+      }
+      stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+    };
+
     var _saveDefaultOutcome = function(newDefaultOutcome) {
       var oldDefaultOutcome = _defaultOutcomeMemento;
       if (!angular.equals(newDefaultOutcome, oldDefaultOutcome)) {
@@ -178,11 +188,8 @@ oppia.factory('ResponsesService', [
           _answerGroups = AnswerGroupsCacheService.get(newInteractionId);
         } else {
           _answerGroups = [];
-          stateContentIdsToAudioTranslationsService.displayed
-            .deleteAllFeedbackContentId();
-          stateContentIdsToAudioTranslationsService.saveDisplayedValue();
         }
-
+        updateAnswerGroupsAudioTranslation();
         // Preserve the default outcome unless the interaction is terminal.
         // Recreate the default outcome if switching away from a terminal
         // interaction.
