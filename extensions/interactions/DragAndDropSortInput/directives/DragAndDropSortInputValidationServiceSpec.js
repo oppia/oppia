@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-describe('DragAndDropSortValidationService', function() {
+describe('DragAndDropSortInputValidationService', function() {
   var validatorService, WARNING_TYPES;
 
   var currentState;
@@ -27,7 +27,7 @@ describe('DragAndDropSortValidationService', function() {
   });
 
   beforeEach(inject(function($injector) {
-    validatorService = $injector.get('DragAndDropSortValidationService');
+    validatorService = $injector.get('DragAndDropSortInputValidationService');
     oof = $injector.get('OutcomeObjectFactory');
     agof = $injector.get('AnswerGroupObjectFactory');
     rof = $injector.get('RuleObjectFactory');

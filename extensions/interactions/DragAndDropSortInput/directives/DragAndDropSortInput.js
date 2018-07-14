@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * Directive for the DragAndDropSort interaction.
+ * Directive for the DragAndDropSortInput interaction.
  */
 
-oppia.directive('oppiaInteractiveDragAndDropSort', [
-  'dragAndDropSortRulesService', 'HtmlEscaperService',
+oppia.directive('oppiaInteractiveDragAndDropSortInput', [
+  'dragAndDropSortInputRulesService', 'HtmlEscaperService',
   'UrlInterpolationService',
   function(
-      dragAndDropSortRulesService, HtmlEscaperService,
+      dragAndDropSortInputRulesService, HtmlEscaperService,
       UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -30,8 +30,8 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
         setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/DragAndDropSort/directives/' +
-        'drag_and_drop_sort_interaction_directive.html'),
+        '/interactions/DragAndDropSortInput/directives/' +
+        'drag_and_drop_sort_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
@@ -73,7 +73,7 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
 
             $scope.onSubmit({
               answer: answers,
-              rulesService: dragAndDropSortRulesService
+              rulesService: dragAndDropSortInputRulesService
             });
           };
 
@@ -84,15 +84,15 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
   }
 ]);
 
-oppia.directive('oppiaResponseDragAndDropSort', [
+oppia.directive('oppiaResponseDragAndDropSortInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/DragAndDropSort/directives/' +
-        'drag_and_drop_sort_response_directive.html'),
+        '/interactions/DragAndDropSortInput/directives/' +
+        'drag_and_drop_sort_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.chooseItemType = function(index) {
           if (index === 0) {
@@ -110,15 +110,15 @@ oppia.directive('oppiaResponseDragAndDropSort', [
   }
 ]);
 
-oppia.directive('oppiaShortResponseDragAndDropSort', [
+oppia.directive('oppiaShortResponseDragAndDropSortInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/DragAndDropSort/directives/' +
-        'drag_and_drop_sort_short_response_directive.html'),
+        '/interactions/DragAndDropSortInput/directives/' +
+        'drag_and_drop_sort_input_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.chooseItemType = function(index) {
           if (index === 0) {
@@ -136,8 +136,8 @@ oppia.directive('oppiaShortResponseDragAndDropSort', [
   }
 ]);
 
-// Rules Service for DragAndDropSort interaction.
-oppia.factory('dragAndDropSortRulesService', [function() {
+// Rules Service for DragAndDropSortInput interaction.
+oppia.factory('dragAndDropSortInputRulesService', [function() {
   var checkEquality = function(answer, inputs) {
     for (var i = 0; i < answer.length; i++) {
       if (answer[i].length === inputs.x[i].length) {

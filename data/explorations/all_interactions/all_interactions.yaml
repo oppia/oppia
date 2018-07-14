@@ -76,44 +76,6 @@ states:
       id: Continue
       solution: null
     param_changes: []
-  Drag And Drop Sort:
-    classifier_model_id: null
-    content:
-      audio_translations: {}
-      html: <p>Sort the following fractions in ascending order.</p>
-    interaction:
-      answer_groups:
-      - labelled_as_correct: false
-        outcome:
-          dest: Set Input
-          feedback:
-            audio_translations: {}
-            html: <p>Yes, well done!</p>
-          missing_prerequisite_skill_id: null
-          param_changes: []
-          refresher_exploration_id: null
-        rule_specs:
-        - inputs:
-            x: []
-          rule_type: IsEqualToOrdering
-      confirmed_unclassified_answers: []
-      customization_args:
-        choices:
-          value:
-          - <p>Choice 1</p>
-          - <p>Choice 2</p>
-      default_outcome:
-        dest: Drag And Drop Sort
-        feedback:
-          audio_translations: {}
-          html: <p>No, that's not right.</p>
-        missing_prerequisite_skill_id: null
-        param_changes: []
-        refresher_exploration_id: null
-      hints: []
-      id: DragAndDropSort
-      solution: null
-    param_changes: []
   End Exploration:
     classifier_model_id: null
     content:
@@ -793,7 +755,7 @@ states:
           rule_type: Equals
       - labelled_as_correct: false
         outcome:
-          dest: Drag And Drop Sort
+          dest: Multiple Choice
           feedback:
             audio_translations: {}
             html: <p>Hmm, not quite. Perhaps the right option is below this one.</p>

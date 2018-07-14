@@ -21,7 +21,7 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
     var INTERACTION_TYPE_MULTIPLE_CHOICE = 'MultipleChoiceInput';
     var INTERACTION_TYPE_ITEM_SELECTION = 'ItemSelectionInput';
     var INTERACTION_TYPE_IMAGE_CLICK_INPUT = 'ImageClickInput';
-    var INTERACTION_TYPE_DRAG_AND_DROP_SORT = 'DragAndDropSort';
+    var INTERACTION_TYPE_DRAG_AND_DROP_SORT = 'DragAndDropSortInput';
 
     var filenamesInState = [];
 

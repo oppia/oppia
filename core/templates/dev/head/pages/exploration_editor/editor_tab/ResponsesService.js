@@ -341,9 +341,9 @@ oppia.factory('ResponsesService', [
           });
         }
 
-        // If the interaction is DragAndDropSort, update the answer groups
+        // If the interaction is DragAndDropSortInput, update the answer groups
         // to refer to the new answer options.
-        if (stateInteractionIdService.savedMemento === 'DragAndDropSort' &&
+        if (stateInteractionIdService.savedMemento === 'DragAndDropSortInput' &&
             oldAnswerChoices) {
           // If the length of the answer choices array changes, then there is
           // surely any deletion or modification or addition in the array. We

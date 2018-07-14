@@ -16,7 +16,7 @@
  * @fileoverview Validator service for the drag and drop sorting interaction.
  */
 
-oppia.factory('DragAndDropSortValidationService', [
+oppia.factory('DragAndDropSortInputValidationService', [
   'baseInteractionValidationService', 'WARNING_TYPES',
   function(baseInteractionValidationService, WARNING_TYPES) {
     return {

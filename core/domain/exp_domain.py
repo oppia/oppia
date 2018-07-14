@@ -1277,7 +1277,7 @@ class InteractionInstance(object):
                     rule_spec_html = rule_spec.inputs['x']
                     html_list = html_list + rule_spec_html
 
-        if self.id == 'DragAndDropSort':
+        if self.id == 'DragAndDropSortInput':
             for answer_group in self.answer_groups:
                 for rule_spec in answer_group.rule_specs:
                     rule_spec_html_list = rule_spec.inputs['x']
@@ -1297,7 +1297,8 @@ class InteractionInstance(object):
             html_list = html_list + [solution_html]
 
         if self.id in (
-                'ItemSelectionInput', 'MultipleChoiceInput', 'DragAndDropSort'):
+                'ItemSelectionInput', 'MultipleChoiceInput',
+                'DragAndDropSortInput'):
             customization_args_html_list = (
                 self.customization_args['choices']['value'])
             html_list = html_list + customization_args_html_list
