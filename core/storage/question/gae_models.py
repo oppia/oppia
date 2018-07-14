@@ -14,9 +14,9 @@
 
 """Models for storing the question data models."""
 
+from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
-import feconf
 import utils
 
 from google.appengine.ext import ndb
@@ -46,6 +46,9 @@ class QuestionModel(base_models.VersionedModel):
 
     # An object representing the question state data.
     question_state_data = ndb.JsonProperty(indexed=False)
+    # The schema version for the question state data.
+    question_state_schema_version = ndb.IntegerProperty(
+        required=True, indexed=True)
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
 
@@ -103,7 +106,7 @@ class QuestionModel(base_models.VersionedModel):
         question_commit_log = QuestionCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            feconf.ACTIVITY_STATUS_PUBLIC, False
+            constants.ACTIVITY_STATUS_PUBLIC, False
         )
         question_commit_log.question_id = self.id
         question_commit_log.put()
@@ -158,8 +161,8 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             skill_id: str. The ID of the skill to which the question is linked.
 
         Returns:
-            QuestionSkillLinkModel. Instance of the new
-            QuestionSkillLinkModel entry.
+            QuestionSkillLinkModel. Instance of the new  QuestionSkillLinkModel
+                entry.
         """
 
         question_skill_link_model_instance = cls(
@@ -219,7 +222,7 @@ class QuestionSummaryModel(base_models.BaseModel):
     # model was created).
     question_model_created_on = ndb.DateTimeProperty(indexed=True)
     # The html content for the question.
-    question_content = ndb.StringProperty(indexed=False, required=True)
+    question_content = ndb.TextProperty(indexed=False, required=True)
 
     @classmethod
     def get_by_creator_id(cls, creator_id):
@@ -257,4 +260,4 @@ class QuestionRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user ID of the creator of the question.
-    creator_id = ndb.StringProperty(indexed=True)
+    creator_id = ndb.StringProperty(indexed=True, required=True)

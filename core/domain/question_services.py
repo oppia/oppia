@@ -1,6 +1,4 @@
-# coding: utf-8
-#
-# Copyright 2017 The Oppia Authors. All Rights Reserved.
+# Copyright 2018 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,9 +16,8 @@
 
 import logging
 
+from core.domain import exp_domain
 from core.domain import question_domain
-from core.domain import role_services
-from core.domain import skill_services
 from core.platform import models
 import feconf
 
@@ -35,24 +32,29 @@ def _create_new_question(committer_id, question, commit_message):
         committer_id: str. ID of the committer.
         question: Question. question domain object.
         commit_message: str. A description of changes made to the question.
-
-    Returns:
-        str. The ID of the model.
     """
     question.validate()
     create_new_question_rights(question.id, committer_id)
     model = question_models.QuestionModel(
         id=question.id,
-        question_state_data=question.question_state_data,
+        question_state_data=question.question_state_data.to_dict(),
         language_code=question.language_code,
-        version=question.version
+        version=question.version,
+        question_state_schema_version=question.question_state_schema_version
     )
-
     model.commit(
         committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
+    question.version += 1
+    create_question_summary(question.id, committer_id)
 
-    create_question_summary(model.id, committer_id)
-    return model.id
+
+def get_new_question_id():
+    """Returns a new question id.
+
+    Returns:
+        str. A new question id.
+    """
+    return question_models.QuestionModel.get_new_id('')
 
 
 def add_question(committer_id, question):
@@ -61,14 +63,9 @@ def add_question(committer_id, question):
     Args:
         committer_id: str. ID of the committer.
         question: Question. Question to be saved.
-
-    Returns:
-        str. The ID of the question.
     """
     commit_message = 'New question created'
-    question_id = _create_new_question(committer_id, question, commit_message)
-
-    return question_id
+    _create_new_question(committer_id, question, commit_message)
 
 
 def delete_question(
@@ -101,8 +98,11 @@ def get_question_from_model(question_model):
         Question. The domain object representing the question model.
     """
     return question_domain.Question(
-        question_model.id, question_model.question_state_data,
-        question_model.language_code, question_model.version)
+        question_model.id,
+        exp_domain.State.from_dict(question_model.question_state_data),
+        question_model.question_state_schema_version,
+        question_model.language_code, question_model.version,
+        question_model.created_on, question_model.last_updated)
 
 
 def get_question_by_id(question_id, strict=True):
@@ -139,7 +139,8 @@ def get_questions_by_ids(question_ids):
     question_model_list = question_models.QuestionModel.get_multi(question_ids)
     questions = []
     for question_model in question_model_list:
-        questions.append(get_question_from_model(question_model))
+        if question_model is not None:
+            questions.append(get_question_from_model(question_model))
     return questions
 
 
@@ -198,13 +199,14 @@ def _save_question(committer_id, question, change_list, commit_message):
             'save question %s: %s' % (question.id, change_list))
 
     question.validate()
-
     question_model = question_models.QuestionModel.get(question.id)
-    question_model.question_state_data = question.question_state_data
+    question_model.question_state_data = question.question_state_data.to_dict()
     question_model.language_code = question.language_code
-    question_model.version += 1
-    change_list_dict = [change.to_dict() for change in change_list]
-    question_model.commit(committer_id, commit_message, change_list_dict)
+    question_model.question_state_schema_version = (
+        question.question_state_schema_version)
+    change_dicts = [change.to_dict() for change in change_list]
+    question_model.commit(committer_id, commit_message, change_dicts)
+    question.version += 1
 
 
 def update_question(
@@ -220,19 +222,18 @@ def update_question(
             question.
         commit_message: str or None. A description of changes made to the
             question.
+
+    Raises:
+        ValueError: No commit message was provided.
     """
+    if not commit_message:
+        raise ValueError(
+            'Expected a commit message, received none.')
+
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)
-
-
-def get_new_question_id():
-    """Returns a new question id.
-
-    Returns:
-        str. A new question id.
-    """
-    return question_models.QuestionModel.get_new_id('')
+    create_question_summary(question_id, committer_id)
 
 
 def create_question_summary(question_id, creator_id):
@@ -259,10 +260,10 @@ def compute_summary_of_question(question, creator_id):
     Returns:
         QuestionSummary. The computed summary for the given question.
     """
-    question_content = question.question_state_data['content']['html']
+    question_content = question.question_state_data.content.html
     question_summary = question_domain.QuestionSummary(
-        creator_id, question.id, question_content)
-
+        creator_id, question.id, question_content,
+        question.created_on, question.last_updated)
     return question_summary
 
 
@@ -338,49 +339,6 @@ def get_question_summary_by_question_id(question_id, strict=False):
         question_models.QuestionSummaryModel.get(question_id, strict=strict))
 
 
-def get_skill_ids_linked_with_question(question_id):
-    """Gets linked skill IDs for given question.
-
-    Args:
-        question_id: str. The question ID for the given question.
-
-    Returns:
-        list(SkillSummary)|None. The list of skill summaries for all
-            linked skill ids or None if there exists no skill linked
-            for question.
-    """
-    question_skill_links = question_models.QuestionSkillLinkModel.get(
-        question_id, strict=False)
-
-    if question_skill_links is None:
-        return None
-    for question_skill_link in question_skill_links:
-        skill_ids = [
-            skill_id for skill_id in question_skill_link.skill_id]
-
-    return get_skill_summaries_from_skill_ids(skill_ids)
-
-
-def get_skill_summaries_from_skill_ids(skill_ids):
-    """Gets skill summaries for the goven skills.
-
-    Args:
-        skill_ids: list(str). The list of all linked skill ids.
-
-    Returns:
-        skill_summaries: list(SkillSummary). The skill summary for a skill.
-    """
-    skill_summaries = []
-    linked_skill_summaries = (
-        skill_models.SkillSummaryModel.get_multi(skill_ids, strict=False))
-
-    for linked_skill_summary in linked_skill_summaries:
-        skill_summaries = (
-            skill_services.get_skill_summary_from_model(linked_skill_summary))
-
-    return skill_summaries
-
-
 def get_question_rights_from_model(question_rights_model):
     """Constructs a QuestionRights object from the given question rights model.
 
@@ -438,40 +396,3 @@ def get_question_rights(question_id, strict=True):
         return None
 
     return get_question_rights_from_model(model)
-
-
-def get_all_question_rights():
-    """Returns the rights object of all questions present in the datastore.
-
-    Returns:
-        dict. The dict of rights objects of all questions present in
-            the datastore keyed by question id.
-    """
-    question_rights_models = question_models.QuestionRightsModel.get_all()
-    question_rights = {}
-    for model in question_rights_models:
-        rights = get_question_rights_from_model(model)
-        question_rights[rights.id] = rights
-    return question_rights
-
-
-def check_can_edit_question(user, question_rights):
-    """Checks whether the user can edit the given question.
-
-    Args:
-        user: UserActionsInfo. Object having user_id, role and actions for
-            given user.
-        question_rights: QuestionRights or None. Rights object for the given
-            question.
-
-    Returns:
-        bool. Whether the given user can edit the given question.
-    """
-    if question_rights is None:
-        return False
-    if role_services.ACTION_EDIT_ANY_QUESTION in user.actions:
-        return True
-    if question_rights.is_creator(user.user_id):
-        return True
-
-    return False

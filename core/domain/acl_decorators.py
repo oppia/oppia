@@ -861,10 +861,14 @@ def can_edit_question(handler):
             raise base.UserFacingExceptions.NotLoggedInException
 
         question_rights = question_services.get_question_rights(
-            question_id)
+            question_id, strict=False)
 
-        if (question_services.check_can_edit_question(
-                self.user, question_rights)):
+        if question_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if (
+                role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions or
+                question_rights.is_creator(self.user_id)):
             return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -874,25 +878,30 @@ def can_edit_question(handler):
     return test_can_edit
 
 
-def can_view_any_question_editor(handler):
+def can_view_question_editor(handler):
     """Decorator to check whether the user can view any question editor."""
 
-    def test_can_view_any_question_editor(self, **kwargs):
+    def test_can_view_question_editor(self, question_id, **kwargs):
         if not self.user_id:
             raise self.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
+        question_rights = question_services.get_question_rights(
+            question_id, strict=False)
 
-        if (role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in
-                user_actions_info.actions):
-            return handler(self, **kwargs)
+        if question_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if (
+                role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in
+                self.user.actions or question_rights.is_creator(self.user_id)):
+            return handler(self, question_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 '%s does not have enough rights to access the questions editor'
                 % self.user_id)
-    test_can_view_any_question_editor.__wrapped__ = True
+    test_can_view_question_editor.__wrapped__ = True
 
-    return test_can_view_any_question_editor
+    return test_can_view_question_editor
 
 
 def can_delete_question(handler):

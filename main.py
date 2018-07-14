@@ -364,10 +364,7 @@ URLS = MAPREDUCE_HANDLERS + [
         reader.RecommendationsHandler),
 
     get_redirect_route(
-        r'%s/<question_id>' % feconf.QUESTION_EDITOR_URL_PREFIX,
-        question_editor.QuestionEditorPage),
-    get_redirect_route(
-        r'%s/<question_id>' % feconf.QUESTION_DATA_URL,
+        r'%s/<question_id>' % feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
         question_editor.EditableQuestionDataHandler),
 
     get_redirect_route(

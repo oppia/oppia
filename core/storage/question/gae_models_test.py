@@ -35,6 +35,30 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
         self.assertEqual(question_model.language_code, language_code)
 
 
+class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
+    """Tests the QuestionSummaryModel class."""
+
+    def test_get_by_creator_id(self):
+        question_summary_model_1 = question_models.QuestionSummaryModel(
+            id='question_1',
+            creator_id='user',
+            question_content='Question 1'
+        )
+        question_summary_model_2 = question_models.QuestionSummaryModel(
+            id='question_2',
+            creator_id='user',
+            question_content='Question 2'
+        )
+        question_summary_model_1.put()
+        question_summary_model_2.put()
+
+        question_summaries = (
+            question_models.QuestionSummaryModel.get_by_creator_id('user'))
+        self.assertEqual(len(question_summaries), 2)
+        self.assertEqual(question_summaries[0].id, 'question_1')
+        self.assertEqual(question_summaries[1].id, 'question_2')
+
+
 class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
     """Tests the QuestionSkillLinkModel class."""
 
