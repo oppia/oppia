@@ -1525,6 +1525,7 @@ def _check_for_copyright_notice(all_files):
 
 def main():
     all_files = _get_all_files()
+    all_files = [filename for filename in all_files if filename.endswith('.py')]
     directive_scope_messages = _check_directive_scope(all_files)
     controller_dependency_messages = (
         _match_line_breaks_in_controller_dependencies(all_files))
