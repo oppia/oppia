@@ -177,6 +177,45 @@ describe('Interactions', function() {
     users.logout();
   });
 
+  it('publish exploration with math expression successfully', function() {
+    users.createAndLoginUser('mathEditor@interactions.com', 'mathEditor');
+    workflow.createExploration();
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'Please enter the equation of a straight line.'));
+    explorationEditorMainTab.setInteraction('MathExpressionInput');
+    explorationEditorMainTab.addResponse(
+      'MathExpressionInput', forms.toRichText('Good job!'), 'end', true,
+      'IsMathematicallyEquivalentTo', 'y = mx + c');
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText(
+      'A straight line equation comprises of a gradient (m), the y intercept ' +
+      '(c) and x,y variables!'));
+
+    explorationEditorMainTab.moveToState('end');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle('Math Exploration');
+    explorationEditorSettingsTab.setObjective(
+      'To publish and play this exploration');
+    explorationEditorSettingsTab.setCategory('Algebra');
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+    users.logout();
+
+    users.createAndLoginUser('mathLearner@interactions.com', 'mathLearner');
+    libraryPage.get();
+    libraryPage.findExploration('Math Exploration');
+    libraryPage.playExploration('Math Exploration');
+    explorationPlayerPage.expectExplorationNameToBe('Math Exploration');
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Please enter the equation of a straight line.'));
+    explorationPlayerPage.submitAnswer('MathExpressionInput', 'y = mx + c');
+    explorationPlayerPage.clickThroughToNextCard();
+    explorationPlayerPage.expectExplorationToBeOver();
+    users.logout();
+  });
+
   it('publish exploration with graph interaction successfully', function() {
     users.createAndLoginUser('graphEditor@interactions.com', 'graphEditor');
     workflow.createExploration();
