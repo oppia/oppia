@@ -173,5 +173,7 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   UNABLE_TO_END_EXPLORATION: (
     'There\'s no way to complete the exploration starting from this card.'),
   INCORRECT_SOLUTION: (
-    'The current solution does not lead to another card.')
+    'The current solution does not lead to another card.'),
+  UNRESOLVED_ANSWER: (
+    'There is an answer among the top 10 which has no explicit feedback.')
 });
