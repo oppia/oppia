@@ -743,3 +743,48 @@ def get_recently_published_exp_summary_dicts(limit):
         reverse=True)
 
     return get_displayable_exp_summary_dicts(summaries)
+
+
+def get_displayable_question_summary_dicts(question_summaries):
+    """Gets a summary of questions in human readable form.
+    Given a list of question summary domain objects, returns a list,
+    with the same number of elements, of the corresponding human-readable
+    question summary dicts.
+    This assumes that all the question summary domain objects passed in are
+    valid (i.e., none of them are None).
+    Args:
+        question_summaries: list(QuestionSummary). List of question
+        summary objects.
+    Return:
+        list(dict). A list of question summary dicts in human readable form.
+        Example:
+        [ {
+            'creator_id': u'185804764220139124118',
+            'language_code': u'en',
+            'id': 'F6chQwByyQVu',
+            'status': u'private',
+            'question_html_data': u'What is numerator in 2/3?',
+            'created_on': 1529409528663.468,
+            'last_updated': 1529409528663.472
+        }, ]
+    """
+    displayable_question_summaries = []
+
+    for question_summary in question_summaries:
+        if not question_summary:
+            continue
+        summary_dict = {
+            'id': question_summary.id,
+            'creator_id': question_summary.creator_id,
+            'created_on': utils.get_time_in_millisecs(
+                question_summary.created_on),
+            'language_code': question_summary.language_code,
+            'last_updated': utils.get_time_in_millisecs(
+                question_summary.last_updated),
+            'question_html_data': question_summary.question_html_data,
+            'status': question_summary.status,
+        }
+
+        displayable_question_summaries.append(summary_dict)
+
+    return displayable_question_summaries

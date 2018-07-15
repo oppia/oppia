@@ -509,6 +509,13 @@ ALLOWED_INTERACTION_CATEGORIES = [{
     ],
 }]
 
+ALLOWED_QUESTION_INTERACTION_CATEGORIES = copy.deepcopy(
+    ALLOWED_INTERACTION_CATEGORIES)
+
+ALLOWED_QUESTION_INTERACTION_CATEGORIES[0]['interaction_ids'].remove('Continue')
+ALLOWED_QUESTION_INTERACTION_CATEGORIES[0]['interaction_ids'].remove(
+    'EndExploration')
+
 # The list of interaction IDs which correspond to interactions that set their
 # is_linear property to true. Linear interactions do not support branching and
 # thus only allow for default answer classification. This value is guarded by a
@@ -626,13 +633,15 @@ LIBRARY_SEARCH_DATA_URL = '/searchhandler/data'
 LIBRARY_TOP_RATED_URL = '/library/top_rated'
 NEW_COLLECTION_URL = '/collection_editor_handler/create_new'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+NEW_QUESTION_URL = '/question_editor_handler/create_new'
 NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
-QUESTION_DATA_URL = '/questionhandler'
+QUESTION_CREATION_URL = '/question_editor_handler/create_new'
+QUESTION_DATA_URL = '/questionhandler/data'
+QUESTION_EDITOR_URL_PREFIX = '/question_editor'
 QUESTION_MANAGER_URL = '/questionmanagerhandler'
-QUESTION_CREATION_URL = '/questioncreationhandler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -674,6 +683,7 @@ NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LEARNER_DASHBOARD = 'learner_dashboard'
 NAV_MODE_LIBRARY = 'library'
 NAV_MODE_PROFILE = 'profile'
+NAV_MODE_QUESTION_EDITOR = 'question_editor'
 NAV_MODE_SIGNUP = 'signup'
 NAV_MODE_SPLASH = 'splash'
 NAV_MODE_STORY_EDITOR = 'story_editor'
@@ -712,6 +722,10 @@ COMMIT_MESSAGE_SKILL_DELETED = 'Skill deleted.'
 COMMIT_MESSAGE_STORY_DELETED = 'Story deleted.'
 COMMIT_MESSAGE_SUBTOPIC_PAGE_DELETED = 'Subtopic page deleted.'
 COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
+
+QUESTION_STATUS_APPROVED = 'approved'
+QUESTION_STATUS_PENDING = 'pending'
+QUESTION_STATUS_REJECTED = 'rejected'
 
 # Whether learner playthroughs visualization framework should be enabled.
 ENABLE_PLAYTHROUGHS = True

@@ -19,12 +19,13 @@
 import logging
 
 from core.domain import question_domain
+from core.domain import user_services
 from core.platform import models
 import feconf
 
-(question_models,) = models.Registry.import_models([models.NAMES.question])
-
-CMD_CREATE_NEW = 'create_new'
+memcache_services = models.Registry.import_memcache_services()
+(question_models, skill_models, user_models) = models.Registry.import_models(
+    [models.NAMES.question, models.NAMES.skill, models.NAMES.user])
 
 
 def _create_new_question(committer_id, question, commit_message):
@@ -38,13 +39,19 @@ def _create_new_question(committer_id, question, commit_message):
     Returns:
         str. The ID of the model.
     """
-    model = question_models.QuestionModel.create(
+    question.validate()
+    model = question_models.QuestionModel(
+        id=question.id,
         question_data=question.question_data,
         question_data_schema_version=question.question_data_schema_version,
         language_code=question.language_code,
+        status=question.status
     )
 
-    model.commit(committer_id, commit_message, [{'cmd': CMD_CREATE_NEW}])
+    model.commit(
+        committer_id, commit_message, [{'cmd': question_domain.CMD_CREATE_NEW}])
+
+    create_question_summary(model.id, committer_id)
     return model.id
 
 
@@ -58,7 +65,6 @@ def add_question(committer_id, question):
     Returns:
         str. The ID of the question.
     """
-    question.validate()
     commit_message = 'New question created'
     question_id = _create_new_question(committer_id, question, commit_message)
 
@@ -97,25 +103,59 @@ def get_question_from_model(question_model):
     return question_domain.Question(
         question_model.id, question_model.question_data,
         question_model.question_data_schema_version,
-        question_model.language_code)
+        question_model.language_code, question_model.status)
 
 
-def get_question_by_id(question_id):
-    """Returns a domain object representing a question.
+def _get_question_memcache_key(question_id, version=None):
+    """Returns a memcache key for an question.
 
     Args:
-        question_id: str. ID of the question.
+        question_id: str. The id of the question whose memcache key
+            is to be returned.
+        version: int or None. If specified, the version of the question
+            whose memcache key is to be returned.
 
     Returns:
-        Question or None. The domain object representing a question with the
-        given id, or None if it does not exist.
+        str. Memcache key for the given question (or question version).
     """
-    question_model = question_models.QuestionModel.get(question_id)
-    if question_model:
-        question = get_question_from_model(question_model)
-        return question
+
+    if version:
+        return 'question-version:%s:%s' % (question_id, version)
     else:
-        return None
+        return 'question:%s' % question_id
+
+
+def get_question_by_id(question_id, strict=True, version=None):
+    """Returns an question domain object.
+
+    Args:
+        question_id: str. The id of the question to be returned.
+        strict: bool. Whether to fail noisily if no question with a given id
+            exists.
+        version: int or None. The version of the question to be returned.
+            If None, the latest version of the question is returned.
+
+    Returns:
+        Question. The domain object corresponding to the given question.
+    """
+
+    question_memcache_key = _get_question_memcache_key(
+        question_id, version=version)
+    memcached_question = memcache_services.get_multi(
+        [question_memcache_key]).get(question_memcache_key)
+
+    if memcached_question is not None:
+        return memcached_question
+    else:
+        question_model = question_models.QuestionModel.get(
+            question_id, strict=strict, version=version)
+        if question_model:
+            question = get_question_from_model(question_model)
+            memcache_services.set_multi({
+                question_memcache_key: question})
+            return question
+        else:
+            return None
 
 
 def get_questions_by_ids(question_ids):
@@ -147,7 +187,7 @@ def apply_change_list(question_id, change_list):
     Returns:
       Question. The resulting question domain object.
     """
-    question = get_question_by_id(question_id)
+    question = get_question_by_id(question_id, strict=False)
     try:
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
@@ -187,15 +227,16 @@ def _save_question(committer_id, question, change_list, commit_message):
     if not change_list:
         raise Exception(
             'Unexpected error: received an invalid change list when trying to '
-            'save question %s: %s' % (question.question_id, change_list))
+            'save question %s: %s' % (question.id, change_list))
 
     question.validate()
 
-    question_model = question_models.QuestionModel.get(question.question_id)
+    question_model = question_models.QuestionModel.get(question.id)
     question_model.question_data = question.question_data
     question_model.question_data_schema_version = (
         question.question_data_schema_version)
     question_model.language_code = question.language_code
+    question_model.status = question.status
     change_list_dict = [change.to_dict() for change in change_list]
     question_model.commit(committer_id, commit_message, change_list_dict)
 
@@ -217,3 +258,141 @@ def update_question(
     updated_question = apply_change_list(question_id, change_list)
     _save_question(
         committer_id, updated_question, change_list, commit_message)
+
+
+def get_new_question_id():
+    """Returns a new question id.
+
+    Returns:
+        str. A new question id.
+    """
+    return question_models.QuestionModel.get_new_id('')
+
+
+def create_question_summary(question_id, creator_id):
+    """Creates and stores a summary of the given question.
+
+    Args:
+        question_id: str. ID of the question.
+        creator_id: str. The user ID of the creator of the question.
+    """
+    question = get_question_by_id(question_id, strict=False)
+    question_summary = compute_summary_of_question(question, creator_id)
+    save_question_summary(question_summary)
+
+
+def compute_summary_of_question(question, creator_id):
+    """Create a QuestionSummary domain object for a given Question domain
+    object and return it.
+
+    Args:
+        question: Question. The question object for which the summary
+            is to be computed.
+        creator_id: str. The user ID of the creator of the question.
+
+    Returns:
+        QuestionSummary. The computed summary for the given question.
+    """
+    question_html_data = question.question_data['content']['html']
+    question_summary = question_domain.QuestionSummary(
+        question.id, creator_id, question_html_data)
+
+    return question_summary
+
+
+def save_question_summary(question_summary):
+    """Save a question summary domain object as a QuestionSummaryModel
+    entity in the datastore.
+
+    Args:
+        question_summary: The question summary object to be saved in the
+            datastore.
+    """
+    question_summary_model = question_models.QuestionSummaryModel(
+        id=question_summary.id,
+        creator_id=question_summary.creator_id,
+        question_model_last_updated=question_summary.last_updated,
+        question_model_created_on=question_summary.created_on,
+        question_html_data=question_summary.question_html_data
+    )
+
+    question_summary_model.put()
+
+
+def get_question_summaries_by_creator_id(creator_id):
+    """Gets question summaries of questions created by the user.
+
+    Args:
+        creator_id: str. The user ID of the creator.
+
+    Returns:
+        QuestionSummaryModel. The QuestionSummaryModel for the given question.
+    """
+    return question_models.QuestionSummaryModel.get_by_creator_id(creator_id)
+
+
+def get_question_summary_by_question_id(question_id, strict=False):
+    """Gets question summaries of questions created by the user.
+
+    Args:
+        question_id: str. The user ID of the question.
+        strict: bool. Whether to fail noisily if no question summary for the
+            given question id exists in the datastore.
+
+    Returns:
+        QuestionSummaryModel. The QuestionSummaryModel for the given question.
+    """
+    return question_models.QuestionSummaryModel.get(question_id, strict=strict)
+
+
+def get_summaries_of_linked_skills(question_id):
+    """Gets linked skill IDs for given question.
+
+    Args:
+        question_id: str. The question ID for the given question.
+
+    Returns:
+        QuestionSkillLinkModel|None. The QuestionSkillModel for the given
+            question or None if there exists no skill linked for question.
+    """
+    linked_skill_summaries = []
+    question_skill_links = question_models.QuestionSkillLinkModel.get(
+        question_id, strict=False)
+
+    if question_skill_links is None:
+        return None
+    for question_skill_link in question_skill_links:
+        linked_skill_summaries = (
+            skill_models.SkillSummaryModel.get(
+                question_skill_link.skill_id, strict=False))
+
+    return linked_skill_summaries
+
+
+def check_can_edit_question(user_id, question_id):
+    """Checks if the user can edit the given question or not
+
+    Args:
+        user_id: str. The user ID of the user.
+        question_id: str. The question ID of the question.
+
+    Returns:
+        bool. Represents if the user can edit the question or not.
+    """
+    question_summary = get_question_summary_by_question_id(
+        question_id, strict=False)
+    question = get_question_by_id(question_id, strict=False)
+
+    if question_summary.creator_id == user_id:
+        if (question.status == feconf.ACTIVITY_STATUS_PRIVATE or
+                question.status == feconf.QUESTION_STATUS_REJECTED):
+            return True
+        return False
+
+    if (user_services.is_admin(user_id) or
+            user_services.is_topic_manager(user_id)):
+        if (question.status == feconf.QUESTION_STATUS_APPROVED or
+                question.status == feconf.QUESTION_STATUS_PENDING):
+            return True
+
+    return False
