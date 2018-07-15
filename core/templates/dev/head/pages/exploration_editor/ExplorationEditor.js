@@ -155,6 +155,10 @@ oppia.controller('ExplorationEditor', [
           data.email_preferences.mute_feedback_notifications,
           data.email_preferences.mute_suggestion_notifications);
 
+        if (ExplorationRightsService.isPublic()) {
+	  StateTopAnswersStatsService.init(data.stateTopStats);
+        }
+
         if (GLOBALS.can_edit) {
           EditabilityService.markEditable();
         }
@@ -216,14 +220,6 @@ oppia.controller('ExplorationEditor', [
 
         StateEditorTutorialFirstTimeService.init(
           data.show_state_editor_tutorial_on_load, $scope.explorationId);
-
-        if (ExplorationRightsService.isPublic()) {
-          // Stats are loaded asynchronously after the exploration data because
-          // they are not needed to interact with the editor.
-          StateTopAnswersStatsBackendApiService.fetchStats(
-            $scope.explorationId
-          ).then(StateTopAnswersStatsService.init);
-        }
       });
     };
 
