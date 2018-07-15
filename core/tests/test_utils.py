@@ -548,7 +548,7 @@ tags: []
             self.assertEqual(response.status_int, 200)
             csrf_token = self.get_csrf_token_from_response(response)
             response = self.testapp.post(
-                feconf.SIGNUP_DATA_URL, {
+                feconf.SIGNUP_DATA_URL, params={
                     'csrf_token': csrf_token,
                     'payload': json.dumps({
                         'username': username,
