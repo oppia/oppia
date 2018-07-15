@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import topic_domain
 from core.domain import topic_services
@@ -1490,5 +1491,66 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.topic_id, expect_errors=True,
+                expected_status_int=401)
+        self.logout()
+
+
+class EditQuestionDecoratorTest(test_utils.GenericTestBase):
+    """Tests the decorator can_edit_question."""
+    question_id = 'question_id'
+
+    class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_edit_question
+        def get(self, question_id):
+            self.render_json({'question_id': question_id})
+
+    def setUp(self):
+        super(EditQuestionDecoratorTest, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.manager_id = self.get_user_id_from_email('a@example.com')
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<question_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        question_services.create_new_question_rights(
+            self.question_id, self.ADMIN_EMAIL)
+
+    def test_admin_can_edit_question(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.question_id)
+        self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_topic_manager_can_edit_question(self):
+        self.login('a@example.com')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.question_id)
+        self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_any_user_cannot_edit_question(self):
+        self.login('b@example.com')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.question_id, expect_errors=True,
                 expected_status_int=401)
         self.logout()

@@ -18,6 +18,7 @@
 
 from core.controllers import base
 from core.domain import feedback_services
+from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
 from core.domain import topic_services
@@ -851,6 +852,77 @@ def can_edit_topic(handler):
     test_can_edit.__wrapped__ = True
 
     return test_can_edit
+
+
+def can_edit_question(handler):
+    """Decorator to check whether the user can edit given question."""
+    def test_can_edit(self, question_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        question_rights = question_services.get_question_rights(
+            question_id, strict=False)
+
+        if question_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if (
+                role_services.ACTION_EDIT_ANY_QUESTION in self.user.actions or
+                question_rights.is_creator(self.user_id)):
+            return handler(self, question_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this question.')
+    test_can_edit.__wrapped__ = True
+
+    return test_can_edit
+
+
+def can_view_question_editor(handler):
+    """Decorator to check whether the user can view any question editor."""
+
+    def test_can_view_question_editor(self, question_id, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        question_rights = question_services.get_question_rights(
+            question_id, strict=False)
+
+        if question_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if (
+                role_services.ACTION_VISIT_ANY_QUESTION_EDITOR in
+                self.user.actions or question_rights.is_creator(self.user_id)):
+            return handler(self, question_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to access the questions editor'
+                % self.user_id)
+    test_can_view_question_editor.__wrapped__ = True
+
+    return test_can_view_question_editor
+
+
+def can_delete_question(handler):
+    """Decorator to check whether the user can delete a question."""
+
+    def test_can_delete_question(self, question_id, **kwargs):
+        if not self.user_id:
+            raise self.NotLoggedInException
+
+        user_actions_info = user_services.UserActionsInfo(self.user_id)
+
+        if (role_services.ACTION_DELETE_ANY_QUESTION in
+                user_actions_info.actions):
+            return handler(self, question_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                '%s does not have enough rights to delete the'
+                ' question.' % self.user_id)
+    test_can_delete_question.__wrapped__ = True
+
+    return test_can_delete_question
 
 
 def can_edit_subtopic_page(handler):
