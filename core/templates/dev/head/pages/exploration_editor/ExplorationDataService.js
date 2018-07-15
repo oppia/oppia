@@ -107,33 +107,34 @@ oppia.factory('ExplorationDataService', [
           // (which is cached here) will be reused.
           return Promise.all([
             EditableExplorationBackendApiService.fetchApplyDraftExploration(
-              explorationId).then(function(response) {
-              $log.info('Retrieved exploration data.');
-              $log.info(response);
-              draftChangeListId = response.draft_change_list_id;
-              explorationData.data = response;
-              var draft = LocalStorageService.getExplorationDraft(
-                explorationId);
-              if (draft) {
-                if (draft.isValid(draftChangeListId)) {
-                  var changeList = draft.getChanges();
-                  explorationData.autosaveChangeList(changeList, function() {
-                    // A reload is needed so that the changelist just saved is
-                    // loaded as opposed to the exploration returned by this
-                    // response.
-                    $window.location.reload();
-                  });
-                } else {
-                  errorCallback(explorationId, draft.getChanges());
-                }
-              }
-              return response;
-            }),
+              explorationId),
             StateTopAnswersStatsBackendApiService.fetchStats(explorationId),
           ]).then(function(promisedValues) {
-            var response = promisedValues[0];
-            response.stateTopStats = promisedValues[1];
-            return response;
+            var explorationDataResponse = promisedValues[0];
+            var stateTopAnswersStatsResponse = promisedValues[1];
+            $log.info('Retrieved exploration data.');
+            $log.info(explorationDataResponse);
+            $log.info(stateTopAnswersStatsResponse);
+            draftChangeListId = explorationDataResponse.draft_change_list_id;
+            explorationData.data = explorationDataResponse;
+            var draft = LocalStorageService.getExplorationDraft(
+              explorationId);
+            if (draft) {
+              if (draft.isValid(draftChangeListId)) {
+                var changeList = draft.getChanges();
+                explorationData.autosaveChangeList(changeList, function() {
+                  // A reload is needed so that the changelist just saved is
+                  // loaded as opposed to the exploration returned by this
+                  // explorationDataResponse.
+                  $window.location.reload();
+                });
+              } else {
+                errorCallback(explorationId, draft.getChanges());
+              }
+            }
+            explorationDataResponse.stateTopAnswersStats =
+              stateTopAnswersStatsResponse;
+            return explorationDataResponse;
           });
         }
       },

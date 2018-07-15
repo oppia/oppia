@@ -164,7 +164,7 @@ oppia.controller('ExplorationEditor', [
         }
 
         if (ExplorationRightsService.isPublic()) {
-          StateTopAnswersStatsService.init(data.stateTopStats);
+          StateTopAnswersStatsService.init(data.stateTopAnswersStats);
         }
 
         GraphDataService.recompute();
