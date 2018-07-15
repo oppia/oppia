@@ -57,10 +57,17 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             self._create_valid_question_data('ABC'))
 
     def test_get_question_by_id(self):
-        question = question_services.get_question_by_id(
-            self.question_id, strict=False)
+        question = question_services.get_question_by_id(self.question_id)
 
         self.assertEqual(question.id, self.question_id)
+        question = question_services.get_question_by_id(
+            'question_id', strict=False)
+        self.assertIsNone(question)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Entity for class QuestionModel with id question_id '
+            'not found'):
+            question_services.get_question_by_id('question_id')
 
     def test_get_questions_by_ids(self):
         question_id_2 = question_services.get_new_question_id()
@@ -68,10 +75,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_id_2, self.editor_id,
             self._create_valid_question_data('DEF'))
         questions = question_services.get_questions_by_ids(
-            [self.question_id, question_id_2])
-        self.assertEqual(len(questions), 2)
+            [self.question_id, 'invalid_question_id', question_id_2])
+        self.assertEqual(len(questions), 3)
         self.assertEqual(questions[0].id, self.question_id)
-        self.assertEqual(questions[1].id, question_id_2)
+        self.assertIsNone(questions[1])
+        self.assertEqual(questions[2].id, question_id_2)
 
     def test_delete_question(self):
         question_services.delete_question(self.editor_id, self.question_id)
@@ -80,6 +88,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             'Entity for class QuestionModel with id %s not found' % (
                 self.question_id))):
             question_models.QuestionModel.get(self.question_id)
+
+        with self.assertRaisesRegexp(
+            Exception, 'Entity for class QuestionModel with id question_id '
+            'not found'):
+            question_services.delete_question(self.editor_id, 'question_id')
 
     def test_update_question(self):
         new_question_data = self._create_valid_question_data('DEF')
@@ -127,3 +140,10 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
         self.assertTrue(question_rights.is_creator(self.editor_id))
         self.assertEqual(question_rights.creator_id, self.editor_id)
+
+        self.assertIsNone(
+            question_services.get_question_rights('question_id', strict=False))
+        with self.assertRaisesRegexp(
+            Exception, 'Entity for class QuestionRightsModel with id '
+            'question_id not found'):
+            question_services.get_question_rights('question_id')

@@ -252,15 +252,15 @@ class Question(object):
         """
         self.language_code = language_code
 
-    def update_question_state_data(self, question_state_data):
+    def update_question_state_data(self, question_state_data_dict):
         """Updates the question data of the question.
 
         Args:
-            question_state_data: dict. A dict representing the question state
-                data.
+            question_state_data_dict: dict. A dict representing the question
+                state data.
         """
         self.question_state_data = exp_domain.State.from_dict(
-            question_state_data)
+            question_state_data_dict)
 
 
 class QuestionSummary(object):
@@ -360,7 +360,7 @@ class QuestionRights(object):
         }
 
     def is_creator(self, user_id):
-        """Checks whether given user is a manager of the question.
+        """Checks whether given user is a creator of the question.
 
         Args:
             user_id: str or None. ID of the user.

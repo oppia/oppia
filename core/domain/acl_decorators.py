@@ -925,24 +925,6 @@ def can_delete_question(handler):
     return test_can_delete_question
 
 
-def can_create_question(handler):
-    """Decorator to check whether the user can create an question."""
-
-    def test_can_create(self, **kwargs):
-        """Checks if the user can create an question."""
-        if self.user_id is None:
-            raise self.NotLoggedInException
-
-        if role_services.ACTION_CREATE_NEW_QUESTION in self.user.actions:
-            return handler(self, **kwargs)
-        else:
-            raise base.UserFacingExceptions.UnauthorizedUserException(
-                'You do not have credentials to create an question.')
-    test_can_create.__wrapped__ = True
-
-    return test_can_create
-
-
 def can_edit_subtopic_page(handler):
     """Decorator to check whether the user can edit a subtopic page of a topic.
     """

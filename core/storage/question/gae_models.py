@@ -45,7 +45,7 @@ class QuestionModel(base_models.VersionedModel):
     ALLOW_REVERT = True
 
     # An object representing the question state data.
-    question_state_data = ndb.JsonProperty(indexed=False)
+    question_state_data = ndb.JsonProperty(indexed=False, required=True)
     # The schema version for the question state data.
     question_state_schema_version = ndb.IntegerProperty(
         required=True, indexed=True)
@@ -117,7 +117,7 @@ class QuestionModel(base_models.VersionedModel):
         """Creates a new QuestionModel entry.
 
         Args:
-            question_state_data: State. An object representing the question
+            question_state_data: dict. An dict representing the question
                 state data.
             language_code: str. The ISO 639-1 code for the language this
                 question is written in.
@@ -161,7 +161,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             skill_id: str. The ID of the skill to which the question is linked.
 
         Returns:
-            QuestionSkillLinkModel. Instance of the new  QuestionSkillLinkModel
+            QuestionSkillLinkModel. Instance of the new QuestionSkillLinkModel
                 entry.
         """
 

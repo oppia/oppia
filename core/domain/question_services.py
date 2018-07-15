@@ -141,6 +141,8 @@ def get_questions_by_ids(question_ids):
     for question_model in question_model_list:
         if question_model is not None:
             questions.append(get_question_from_model(question_model))
+        else:
+            questions.append(None)
     return questions
 
 
@@ -156,7 +158,7 @@ def apply_change_list(question_id, change_list):
     Returns:
       Question. The resulting question domain object.
     """
-    question = get_question_by_id(question_id, strict=False)
+    question = get_question_by_id(question_id)
     try:
         for change in change_list:
             if change.cmd == question_domain.CMD_UPDATE_QUESTION_PROPERTY:
@@ -243,7 +245,7 @@ def create_question_summary(question_id, creator_id):
         question_id: str. ID of the question.
         creator_id: str. The user ID of the creator of the question.
     """
-    question = get_question_by_id(question_id, strict=False)
+    question = get_question_by_id(question_id)
     question_summary = compute_summary_of_question(question, creator_id)
     save_question_summary(question_summary)
 
