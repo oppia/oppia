@@ -16,16 +16,20 @@
  * @fileoverview A service that lists all the exploration warnings.
  */
 
+oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
+
 oppia.factory('ExplorationWarningsService', [
   '$injector', 'GraphDataService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'ExplorationParamChangesService',
   'ParameterMetadataService', 'StateTopAnswersStatsService',
-  'INTERACTION_SPECS', 'WARNING_TYPES', 'STATE_ERROR_MESSAGES',
+  'INTERACTION_SPECS', 'STATE_ERROR_MESSAGES',
+  'UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 'WARNING_TYPES',
   function(
       $injector, GraphDataService, ExplorationStatesService,
       ExpressionInterpolationService, ExplorationParamChangesService,
       ParameterMetadataService, StateTopAnswersStatsService,
-      INTERACTION_SPECS, WARNING_TYPES, STATE_ERROR_MESSAGES) {
+      INTERACTION_SPECS, STATE_ERROR_MESSAGES,
+      UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD, WARNING_TYPES) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -180,7 +184,8 @@ oppia.factory('ExplorationWarningsService', [
             StateTopAnswersStatsService.hasStateStats(stateName) &&
             StateTopAnswersStatsService.getUnresolvedStateStats(stateName).some(
               function(answerStats) {
-                return answerStats.frequency > 5;
+                return answerStats.frequency >=
+                  UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD;
               }));
         });
     };
