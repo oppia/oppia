@@ -100,7 +100,6 @@ oppia.factory('StateTopAnswersStatsService', [
        *    backend representation of the state top answers statistics.
        */
       init: function(stateTopAnswersStatsBackendDict) {
-        console.log(angular.toJson(stateTopAnswersStatsBackendDict));
         if (isInitialized) {
           return;
         }
