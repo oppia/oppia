@@ -15,6 +15,8 @@
 """Models for storing the question data models."""
 
 from core.platform import models
+import core.storage.user.gae_models as user_models
+import feconf
 import utils
 
 from google.appengine.ext import ndb
@@ -49,6 +51,17 @@ class QuestionModel(base_models.VersionedModel):
         ndb.IntegerProperty(required=True, indexed=True))
     # The ISO 639-1 code for the language this question is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
+    # The status of the question. It can be 'private', 'approved',
+    # 'rejected' and 'pending'.
+    status = ndb.StringProperty(
+        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
+        choices=[
+            feconf.ACTIVITY_STATUS_PRIVATE,
+            feconf.QUESTION_STATUS_APPROVED,
+            feconf.QUESTION_STATUS_REJECTED,
+            feconf.QUESTION_STATUS_PENDING
+        ]
+    )
 
     @classmethod
     def _get_new_id(cls):
@@ -74,6 +87,41 @@ class QuestionModel(base_models.VersionedModel):
             'The id generator for QuestionModel is producing too many '
             'collisions.')
 
+    def _trusted_commit(
+            self, committer_id, commit_type, commit_message, commit_cmds):
+        """Record the event to the commit log after the model commit.
+
+        Note that this extends the superclass method.
+
+        Args:
+            committer_id: str. The user_id of the user who committed the
+                change.
+            commit_type: str. The type of commit. Possible values are in
+                core.storage.base_models.COMMIT_TYPE_CHOICES.
+            commit_message: str. The commit description message.
+            commit_cmds: list(dict). A list of commands, describing changes
+                made in this model, which should give sufficient information to
+                reconstruct the commit. Each dict always contains:
+                    cmd: str. Unique command.
+                and then additional arguments for that command.
+        """
+        super(QuestionModel, self)._trusted_commit(
+            committer_id, commit_type, commit_message, commit_cmds)
+
+        committer_user_settings_model = (
+            user_models.UserSettingsModel.get_by_id(committer_id))
+        committer_username = (
+            committer_user_settings_model.username
+            if committer_user_settings_model else '')
+
+        question_commit_log = QuestionCommitLogEntryModel.create(
+            self.id, self.version, committer_id, committer_username,
+            commit_type, commit_message, commit_cmds,
+            feconf.ACTIVITY_STATUS_PUBLIC, False
+        )
+        question_commit_log.question_id = self.id
+        question_commit_log.put()
+
     @classmethod
     def create(
             cls, question_data, question_data_schema_version,
@@ -97,7 +145,8 @@ class QuestionModel(base_models.VersionedModel):
             id=instance_id,
             question_data=question_data,
             question_data_schema_version=question_data_schema_version,
-            language_code=language_code)
+            language_code=language_code,
+            status=feconf.ACTIVITY_STATUS_PRIVATE)
 
         return question_model_instance
 
@@ -132,3 +181,70 @@ class QuestionSkillLinkModel(base_models.BaseModel):
             question_id=question_id, skill_id=skill_id)
 
         return question_skill_link_model_instance
+
+
+class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
+    """Log of commits to questions.
+
+    A new instance of this model is created and saved every time a commit to
+    QuestionModel occurs.
+
+    The id for this model is of the form
+    'question-{{QUESTION_ID}}-{{QUESTION_VERSION}}'.
+    """
+    # The id of the question being edited.
+    question_id = ndb.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def _get_instance_id(cls, question_id, question_version):
+        """Returns ID of the question commit log entry model.
+
+        Args:
+            question_id: str. The question id whose states are mapped.
+            question_version: int. The version of the question.
+
+        Returns:
+            str. A string containing question ID and
+                question version.
+        """
+        return 'question-%s-%s' % (question_id, question_version)
+
+
+class QuestionSummaryModel(base_models.BaseModel):
+    """Summary model for an Oppia question.
+
+    This should be used whenever the content blob of the question is not
+    needed (e.g. in search results, etc).
+
+    A QuestionSummaryModel instance stores the following information:
+
+    creator_id, question_model_last_updated, question_model_created_on,
+    question_data.
+
+    The key of each instance is the question id.
+    """
+    # The user ID of the creator of the question.
+    creator_id = ndb.StringProperty(required=True)
+    # Time when the question model was last updated (not to be
+    # confused with last_updated, which is the time when the
+    # question *summary* model was last updated).
+    question_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    # Time when the question model was created (not to be confused
+    # with created_on, which is the time when the question *summary*
+    # model was created).
+    question_model_created_on = ndb.DateTimeProperty(indexed=True)
+    # The html content for the question.
+    question_html_data = ndb.StringProperty(indexed=False, required=True)
+
+    @classmethod
+    def get_by_creator_id(cls, creator_id):
+        """Gets QuestionSummaryModel by creator_id.
+
+        Args:
+            creator_id: str. The user ID of the creator of the question.
+
+        Returns:
+            QuestionSummaryModel. The summary model of the question.
+        """
+        return QuestionSummaryModel.query().filter(
+            cls.creator_id == creator_id).fetch()

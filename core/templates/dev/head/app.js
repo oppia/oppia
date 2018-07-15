@@ -471,6 +471,9 @@ oppia.factory('siteAnalyticsService', ['$window', function($window) {
     registerCreateNewExplorationEvent: function(explorationId) {
       _sendEventToGoogleAnalytics('NewExploration', 'create', explorationId);
     },
+    registerCreateNewQuestionEvent: function(questionId) {
+      _sendEventToGoogleAnalytics('NewQuestion', 'create', questionId);
+    },
     registerCreateNewExplorationInCollectionEvent: function(explorationId) {
       _sendEventToGoogleAnalytics(
         'NewExplorationFromCollection', 'create', explorationId);
