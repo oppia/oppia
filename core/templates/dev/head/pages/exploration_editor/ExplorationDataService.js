@@ -18,12 +18,14 @@
  */
 
 oppia.factory('ExplorationDataService', [
-  '$http', '$log', '$window', '$q', 'AlertsService',
+  '$http', '$log', '$q', '$window', 'AlertsService',
   'EditableExplorationBackendApiService', 'LocalStorageService',
-  'ReadOnlyExplorationBackendApiService', 'UrlService',
-  function($http, $log, $window, $q, AlertsService,
+  'ReadOnlyExplorationBackendApiService',
+  'StateTopAnswersStatsBackendApiService', 'UrlService',
+  function($http, $log, $q, $window, AlertsService,
       EditableExplorationBackendApiService, LocalStorageService,
-      ReadOnlyExplorationBackendApiService, UrlService) {
+      ReadOnlyExplorationBackendApiService,
+      StateTopAnswersStatsBackendApiService, UrlService) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var draftChangeListId = null;
