@@ -16,6 +16,8 @@
  * @fileoverview A service that lists all the exploration warnings.
  */
 
+// When an unresolved answer's frequency exceeds this threshold, an exploration
+// will be blocked from publishing until it gets resolved.
 oppia.constant('UNRESOLVED_ANSWER_FREQUENCY_THRESHOLD', 5);
 
 oppia.factory('ExplorationWarningsService', [
