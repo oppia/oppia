@@ -22,7 +22,6 @@ describe('Player transcript service', function() {
   var pts;
   beforeEach(inject(function($injector) {
     pts = $injector.get('PlayerTranscriptService');
-    ccof = $injector.get('ConceptCardObjectFactory');
   }));
 
   it('should reset the transcript correctly', function() {
@@ -58,14 +57,9 @@ describe('Player transcript service', function() {
   });
 
   it('should add a new card correctly', function() {
-    var conceptCard = ccof.createFromBackendDict({
-      explanation: 'Skill explanation',
-      worked_examples: ['Example 1', 'Example 2']
-    });
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
-    conceptCard);
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
 
     var firstCard = pts.getCard(0);
     expect(firstCard).toEqual({
@@ -76,24 +70,20 @@ describe('Player transcript service', function() {
       contentHtml: 'Content HTML',
       interactionHtml: '<oppia-text-input-html></oppia-text-input-html>',
       inputResponsePairs: [],
-      destStateName: null,
-      conceptCard: conceptCard
+      destStateName: null
     });
   });
 
-  it('should add an existing card correctly', function() {
-    var conceptCard = ccof.createFromBackendDict({
-      explanation: 'Skill explanation',
-      worked_examples: ['Example 1', 'Example 2']
-    });
+  it('should add a previous card correctly', function() {
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
-    conceptCard);
-    var firstCard = pts.getCard(0);
-    pts.addExistingCard(firstCard);
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addNewCard('Second state', {
+      a: 'b'
+    }, 'Content HTML 2', '<oppia-text-input-html></oppia-text-input-html>');
+    pts.addPreviousCard();
 
-    expect(pts.getNumCards()).toEqual(2);
+    expect(pts.getNumCards()).toEqual(3);
     expect(pts.getCard([0])).toEqual({
       stateName: 'First state',
       currentParams: {
@@ -102,10 +92,19 @@ describe('Player transcript service', function() {
       contentHtml: 'Content HTML',
       interactionHtml: '<oppia-text-input-html></oppia-text-input-html>',
       inputResponsePairs: [],
-      destStateName: null,
-      conceptCard: conceptCard
+      destStateName: null
     });
     expect(pts.getCard([1])).toEqual({
+      stateName: 'Second state',
+      currentParams: {
+        a: 'b'
+      },
+      contentHtml: 'Content HTML 2',
+      interactionHtml: '<oppia-text-input-html></oppia-text-input-html>',
+      inputResponsePairs: [],
+      destStateName: null
+    });
+    expect(pts.getCard([2])).toEqual({
       stateName: 'First state',
       currentParams: {
         a: 'b'
@@ -113,8 +112,7 @@ describe('Player transcript service', function() {
       contentHtml: 'Content HTML',
       interactionHtml: '<oppia-text-input-html></oppia-text-input-html>',
       inputResponsePairs: [],
-      destStateName: null,
-      conceptCard: conceptCard
+      destStateName: null
     });
   });
 

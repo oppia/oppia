@@ -28,14 +28,23 @@ oppia.factory('ExplorationPlayerStateService', [function() {
     },
 
     isInteractionInline: function(stateName) {
+      if (stateName === null) {
+        return true;
+      }
       return exploration.isInteractionInline(stateName);
     },
 
     getInteractionInstructions: function(stateName) {
+      if (stateName === null) {
+        return false;
+      }
       return exploration.getInteractionInstructions(stateName);
     },
 
     isStateTerminal: function(stateName) {
+      if (stateName === null) {
+        return false;
+      }
       return exploration.isStateTerminal(stateName);
     },
 

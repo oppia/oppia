@@ -66,20 +66,23 @@ oppia.factory('PlayerTranscriptService', ['$log', function($log) {
       return result;
     },
     addNewCard: function(
-        stateName, params, contentHtml, interactionHtml, conceptCard) {
+        stateName, params, contentHtml, interactionHtml) {
       transcript.push({
         stateName: stateName,
         currentParams: params,
         contentHtml: contentHtml,
         interactionHtml: interactionHtml,
         inputResponsePairs: [],
-        destStateName: null,
-        conceptCard: conceptCard
+        destStateName: null
       });
       numAnswersSubmitted = 0;
     },
-    addExistingCard: function(card) {
-      transcript.push(angular.copy(card));
+    addPreviousCard: function() {
+      if (transcript.length === 1) {
+        return;
+      }
+      var previousCard = transcript[transcript.length - 2];
+      transcript.push(angular.copy(previousCard));
     },
     setDestination: function(newDestStateName) {
       var lastCard = this.getLastCard();
@@ -130,7 +133,7 @@ oppia.factory('PlayerTranscriptService', ['$log', function($log) {
       return transcript[index];
     },
     getLastAnswerOnActiveCard: function(index) {
-      if (this.isLastCard(index)) {
+      if (this.isLastCard(index) || transcript[index].stateName === null) {
         return null;
       } else {
         return transcript[index].

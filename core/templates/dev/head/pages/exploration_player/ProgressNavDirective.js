@@ -24,7 +24,7 @@ oppia.directive('progressNav', [
         onSubmit: '&',
         onClickContinueButton: '&',
         isLearnAgainButton: '&',
-        isConceptCardPending: '&conceptCardPending',
+        isConceptCardPending: '&',
         isSubmitButtonShown: '&submitButtonIsShown',
         isSubmitButtonDisabled: '&submitButtonIsDisabled'
       },
@@ -56,14 +56,17 @@ oppia.directive('progressNav', [
 
             var interaction = ExplorationPlayerService.getInteraction(
               $scope.activeCard.stateName);
-            interactionIsInline = (
-              ExplorationPlayerStateService.isInteractionInline(
-                $scope.activeCard.stateName));
-            $scope.interactionCustomizationArgs = interaction.customizationArgs;
-            $scope.interactionId = interaction.id;
-            interactionHasNavSubmitButton = (
-              Boolean(interaction.id) &&
-              INTERACTION_SPECS[interaction.id].show_generic_submit_button);
+            if (interaction !== null) {
+              interactionIsInline = (
+                ExplorationPlayerStateService.isInteractionInline(
+                  $scope.activeCard.stateName));
+              $scope.interactionCustomizationArgs =
+                interaction.customizationArgs;
+              $scope.interactionId = interaction.id;
+              interactionHasNavSubmitButton = (
+                Boolean(interaction.id) &&
+                INTERACTION_SPECS[interaction.id].show_generic_submit_button);
+            }
 
             $scope.helpCardHasContinueButton = false;
           };
@@ -101,6 +104,9 @@ oppia.directive('progressNav', [
           };
 
           $scope.shouldContinueButtonBeShown = function() {
+            if ($scope.activeCard.stateName === null) {
+              return true;
+            }
             var lastPair = $scope.activeCard.inputResponsePairs[
               $scope.activeCard.inputResponsePairs.length - 1];
             return Boolean(

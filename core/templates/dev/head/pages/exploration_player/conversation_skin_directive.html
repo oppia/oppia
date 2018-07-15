@@ -39,17 +39,12 @@
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
       <tutor-card on-submit-answer="submitAnswer(answer, rulesService)"
                   is-learn-again-button="isLearnAgainButton()"
-                  ng-if="!conceptCardIsBeingShown"
-                  concept-card-pending="conceptCardPending"
+                  is-concept-card-pending="conceptCardPending"
+                  return-to-exploration="returnToExploration()"
                   start-card-change-animation="startCardChangeAnimation"
                   on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
       </tutor-card>
-      <concept-card skill-id="missingPrerequisiteSkillId"
-                    concept-card="activeCard.conceptCard"
-                    ng-if="conceptCardIsBeingShown"
-                    return-to-exploration="returnToExploration()">
-      </concept-card>
-      <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards() && !conceptCardIsBeingShown">
+      <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
                            is-learn-again-button="isLearnAgainButton()"
                            on-submit-answer="submitAnswer(answer, rulesService)">
@@ -57,21 +52,20 @@
       </div>
       <progress-nav on-submit="submitAnswerFromProgressNav()"
                     is-learn-again-button="isLearnAgainButton()"
+                    is-concept-card-pending="conceptCardPending"
                     submit-button-is-disabled="!interactionAnswerIsValid"
-                    concept-card-pending="conceptCardPending"
                     submit-button-is-shown="!answerIsBeingProcessed"
-                    ng-if="!conceptCardIsBeingShown || oldConceptCardIsBeingShown"
                     on-click-continue-button="showUpcomingCard()">
       </progress-nav>
     </div>
 
-    <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards() && !conceptCardIsBeingShown"
+    <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
       <supplemental-card on-click-continue-button="showUpcomingCard()"
                          is-learn-again-button="isLearnAgainButton()"
                          on-submit-answer="submitAnswer(answer, rulesService)">
       </supplemental-card>
-      <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown() && !conceptCardIsBeingShown">
+      <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown()">
         <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                    ng-click="submitAnswerFromProgressNav()"
                    ng-disabled="!interactionAnswerIsValid"
