@@ -173,6 +173,15 @@ oppia.factory('ExplorationWarningsService', [
       return results;
     };
 
+    var _getStatesWithUnresolvedAnswers = function() {
+      return ExplorationStatesService.getStates().filter(function(stateName) {
+        return (
+          StateTopAnswersStatsService.hasStateStats(stateName) &&
+          StateTopAnswersStatsService.getUnresolvedStateStats(
+            stateName).length > 0);
+      });
+    };
+
     var _updateWarningsList = function() {
       _warningsList = [];
       stateWarnings = {};
@@ -180,6 +189,14 @@ oppia.factory('ExplorationWarningsService', [
 
       GraphDataService.recompute();
       var _graphData = GraphDataService.getGraphData();
+
+      var _extendStateWarnings = function(stateName, newWarning) {
+        if (stateWarnings.hasOwnProperty(stateName)) {
+          stateWarnings[stateName].push(newWarning);
+        } else {
+          stateWarnings[stateName] = [newWarning];
+        }
+      };
 
       var _states = ExplorationStatesService.getStates();
       _states.getStateNames().forEach(function(stateName) {
@@ -193,11 +210,7 @@ oppia.factory('ExplorationWarningsService', [
             interaction.answerGroups, interaction.defaultOutcome);
 
           for (var j = 0; j < interactionWarnings.length; j++) {
-            if (stateWarnings.hasOwnProperty(stateName)) {
-              stateWarnings[stateName].push(interactionWarnings[j].message);
-            } else {
-              stateWarnings[stateName] = [interactionWarnings[j].message];
-            }
+            _extendStateWarnings(stateName, interactionWarnings[j].message);
 
             if (interactionWarnings[j].type === WARNING_TYPES.CRITICAL) {
               hasCriticalStateWarning = true;
@@ -209,22 +222,13 @@ oppia.factory('ExplorationWarningsService', [
       var statesWithoutInteractionIds = _getStatesWithoutInteractionIds();
       angular.forEach(statesWithoutInteractionIds, function(
           stateWithoutInteractionIds) {
-        if (stateWarnings.hasOwnProperty(stateWithoutInteractionIds)) {
-          stateWarnings[stateWithoutInteractionIds].push(
-            STATE_ERROR_MESSAGES.ADD_INTERACTION);
-        } else {
-          stateWarnings[stateWithoutInteractionIds] = [
-            STATE_ERROR_MESSAGES.ADD_INTERACTION];
-        }
+        _extendStateWarnings(
+          stateWithoutInteractionIds, STATE_ERROR_MESSAGES.ADD_INTERACTION);
       });
 
       var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
       angular.forEach(statesWithIncorrectSolution, function(state) {
-        if (stateWarnings.hasOwnProperty(state)) {
-          stateWarnings[state].push(STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
-        } else {
-          stateWarnings[state] = [STATE_ERROR_MESSAGES.INCORRECT_SOLUTION];
-        }
+        _extendStateWarnings(state, STATE_ERROR_MESSAGES.INCORRECT_SOLUTION);
       });
 
       if (_graphData) {
@@ -234,13 +238,8 @@ oppia.factory('ExplorationWarningsService', [
         if (unreachableStateNames.length) {
           angular.forEach(unreachableStateNames, function(
               unreachableStateName) {
-            if (stateWarnings.hasOwnProperty(unreachableStateName)) {
-              stateWarnings[unreachableStateName].push(
-                STATE_ERROR_MESSAGES.STATE_UNREACHABLE);
-            } else {
-              stateWarnings[unreachableStateName] =
-                [STATE_ERROR_MESSAGES.STATE_UNREACHABLE];
-            }
+            _extendStateWarnings(
+              unreachableStateName, STATE_ERROR_MESSAGES.STATE_UNREACHABLE);
           });
         } else {
           // Only perform this check if all states are reachable.
@@ -249,13 +248,8 @@ oppia.factory('ExplorationWarningsService', [
             _getReversedLinks(_graphData.links), false);
           if (deadEndStates.length) {
             angular.forEach(deadEndStates, function(deadEndState) {
-              if (stateWarnings.hasOwnProperty(deadEndState)) {
-                stateWarnings[deadEndState].push(
-                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
-              } else {
-                stateWarnings[deadEndState] = [
-                  STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION];
-              }
+              _extendStateWarnings(
+                deadEndState, STATE_ERROR_MESSAGES.UNABLE_TO_END_EXPLORATION);
             });
           }
         }
