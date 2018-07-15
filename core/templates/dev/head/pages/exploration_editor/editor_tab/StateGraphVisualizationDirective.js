@@ -185,9 +185,9 @@ oppia.directive('stateGraphViz', [
               return (
                 $scope.highlightStates &&
                 $scope.highlightStates.hasOwnProperty(nodeId)) || (
-                  StateTopAnswersStatsService.hasStateStats(nodeId) &&
-                  StateTopAnswersStatsService.getUnresolvedStateStats(
-                    nodeId).length > 0);
+                StateTopAnswersStatsService.hasStateStats(nodeId) &&
+                StateTopAnswersStatsService.getUnresolvedStateStats(
+                  nodeId).length > 0);
             };
 
             $scope.getNodeTitle = function(node) {
