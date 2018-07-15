@@ -24,7 +24,8 @@ oppia.factory('ResponsesService', [
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
   'ExplorationContextService', 'ExplorationWarningsService',
   'stateContentIdsToAudioTranslationsService',
-  'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
+  'COMPONENT_NAME_DEFAULT_OUTCOME', 'INFO_MESSAGE_SOLUTION_IS_VALID',
+  'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
   function(
       $rootScope, stateInteractionIdService, INTERACTION_SPECS,
@@ -33,7 +34,8 @@ oppia.factory('ResponsesService', [
       stateSolutionService, SolutionVerificationService, AlertsService,
       ExplorationContextService, ExplorationWarningsService,
       stateContentIdsToAudioTranslationsService,
-      INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
+      COMPONENT_NAME_DEFAULT_OUTCOME, INFO_MESSAGE_SOLUTION_IS_VALID,
+      INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
     var _answerGroupsMemento = null;
     var _defaultOutcomeMemento = null;
@@ -194,14 +196,18 @@ oppia.factory('ResponsesService', [
         // Recreate the default outcome if switching away from a terminal
         // interaction.
         if (newInteractionId) {
-          var defaultOutcomeContentId = 'default_outcome';
           if (INTERACTION_SPECS[newInteractionId].is_terminal) {
             _defaultOutcome = null;
+            stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
+              COMPONENT_NAME_DEFAULT_OUTCOME);
           } else if (!_defaultOutcome) {
             _defaultOutcome = OutcomeObjectFactory.createNew(
-              EditorStateService.getActiveStateName(), defaultOutcomeContentId,
-              '', []);
+              EditorStateService.getActiveStateName(),
+              COMPONENT_NAME_DEFAULT_OUTCOME, '', []);
+            stateContentIdsToAudioTranslationsService.displayed.addContentId(
+              COMPONENT_NAME_DEFAULT_OUTCOME);
           }
+          stateContentIdsToAudioTranslationsService.saveDisplayedValue();
         }
 
         _confirmedUnclassifiedAnswers = [];
