@@ -29,24 +29,20 @@ oppia.directive('unresolvedAnswersOverview', [
         '/pages/exploration_editor/editor_tab/' +
         'unresolved_answers_overview_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', 'EditorStateService',
-        'ExplorationStatesService', 'StateRulesStatsService',
-        'ExplorationRightsService', 'stateInteractionIdService',
-        'INTERACTION_SPECS', 'EditabilityService',
-        'StateTopAnswersStatsService',
+        '$rootScope', '$scope', '$uibModal', 'EditabilityService',
+        'EditorStateService', 'ExplorationRightsService',
+        'ExplorationStatesService', 'StateTopAnswersStatsService',
+        'stateInteractionIdService', 'INTERACTION_SPECS',
         'SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS',
         function(
-            $scope, $rootScope, $uibModal, EditorStateService,
-            ExplorationStatesService, StateRulesStatsService,
-            ExplorationRightsService, stateInteractionIdService,
-            INTERACTION_SPECS, EditabilityService,
-            StateTopAnswersStatsService,
+            $rootScope, $scope, $uibModal, EditabilityService,
+            EditorStateService, ExplorationRightsService,
+            ExplorationStatesService, StateTopAnswersStatsService,
+            stateInteractionIdService, INTERACTION_SPECS,
             SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS) {
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
-          $scope.unresolvedAnswersData = null;
-          $scope.latestRefreshDate = new Date();
           $scope.unresolvedAnswersOverviewIsShown = false;
 
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
@@ -56,19 +52,18 @@ oppia.directive('unresolvedAnswersOverview', [
            * @returns {boolean} - answers from this state can be rendered with
            * HTML.
            */
-          var isStateInteractionIdHtmlRenderable = function() {
-            var state = ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName());
+          var isStateInteractionIdHtmlRenderable = function(stateName) {
+            var state = ExplorationStatesService.getState(stateName);
             return (!!state &&
               SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS.indexOf(
                 state.interaction.id) !== -1);
           };
 
           $scope.isUnresolvedAnswersOverviewShown = function() {
+            var activeStateName = EditorStateService.getActiveStateName();
             return (
-              StateTopAnswersStatsService.hasStateStats(
-                EditorStateService.getActiveStateName()) &&
-              isStateInteractionIdHtmlRenderable());
+              StateTopAnswersStatsService.hasStateStats(activeStateName) &&
+              isStateInteractionIdHtmlRenderable(activeStateName));
           };
 
           $scope.getCurrentInteractionId = function() {

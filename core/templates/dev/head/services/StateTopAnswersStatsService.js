@@ -100,6 +100,7 @@ oppia.factory('StateTopAnswersStatsService', [
        *    backend representation of the state top answers statistics.
        */
       init: function(stateTopAnswersStatsBackendDict) {
+        console.log(angular.toJson(stateTopAnswersStatsBackendDict));
         if (isInitialized) {
           return;
         }
@@ -131,9 +132,8 @@ oppia.factory('StateTopAnswersStatsService', [
        * given state.
        */
       hasStateStats: function(stateName) {
-        return isInitialized &&
-          stateTopAnswersStatsCache.hasOwnProperty(stateName) &&
-          stateTopAnswersStatsCache[stateName].allAnswers.length > 0;
+        return (
+          isInitialized && stateTopAnswersStatsCache.hasOwnProperty(stateName));
       },
 
       /**

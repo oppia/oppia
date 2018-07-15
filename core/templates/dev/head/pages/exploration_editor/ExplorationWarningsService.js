@@ -19,13 +19,13 @@
 oppia.factory('ExplorationWarningsService', [
   '$injector', 'GraphDataService', 'ExplorationStatesService',
   'ExpressionInterpolationService', 'ExplorationParamChangesService',
-  'ParameterMetadataService', 'INTERACTION_SPECS',
-  'WARNING_TYPES', 'STATE_ERROR_MESSAGES',
+  'ParameterMetadataService', 'StateTopAnswersStatsService',
+  'INTERACTION_SPECS', 'WARNING_TYPES', 'STATE_ERROR_MESSAGES',
   function(
       $injector, GraphDataService, ExplorationStatesService,
       ExpressionInterpolationService, ExplorationParamChangesService,
-      ParameterMetadataService, INTERACTION_SPECS,
-      WARNING_TYPES, STATE_ERROR_MESSAGES) {
+      ParameterMetadataService, StateTopAnswersStatsService,
+      INTERACTION_SPECS, WARNING_TYPES, STATE_ERROR_MESSAGES) {
     var _warningsList = [];
     var stateWarnings = {};
     var hasCriticalStateWarning = false;
@@ -174,21 +174,19 @@ oppia.factory('ExplorationWarningsService', [
     };
 
     var _getStatesWithUnresolvedAnswers = function() {
-      return ExplorationStatesService.getStates().filter(function(stateName) {
-        return (
-          StateTopAnswersStatsService.hasStateStats(stateName) &&
-          StateTopAnswersStatsService.getUnresolvedStateStats(
-            stateName).length > 0);
-      });
+      return ExplorationStatesService.getStateNames().filter(
+        function(stateName) {
+          return (
+            StateTopAnswersStatsService.hasStateStats(stateName) &&
+            StateTopAnswersStatsService.getUnresolvedStateStats(
+              stateName).length > 0);
+        });
     };
 
     var _updateWarningsList = function() {
       _warningsList = [];
       stateWarnings = {};
       hasCriticalStateWarning = false;
-
-      GraphDataService.recompute();
-      var _graphData = GraphDataService.getGraphData();
 
       var _extendStateWarnings = function(stateName, newWarning) {
         if (stateWarnings.hasOwnProperty(stateName)) {
@@ -197,6 +195,9 @@ oppia.factory('ExplorationWarningsService', [
           stateWarnings[stateName] = [newWarning];
         }
       };
+
+      GraphDataService.recompute();
+      var _graphData = GraphDataService.getGraphData();
 
       var _states = ExplorationStatesService.getStates();
       _states.getStateNames().forEach(function(stateName) {
@@ -224,6 +225,11 @@ oppia.factory('ExplorationWarningsService', [
           stateWithoutInteractionIds) {
         _extendStateWarnings(
           stateWithoutInteractionIds, STATE_ERROR_MESSAGES.ADD_INTERACTION);
+      });
+
+      var statesWithUnresolvedAnswers = _getStatesWithUnresolvedAnswers();
+      angular.forEach(statesWithUnresolvedAnswers, function(stateName) {
+        _extendStateWarnings(stateName, STATE_ERROR_MESSAGES.UNRESOLVED_ANSWER);
       });
 
       var statesWithIncorrectSolution = _getStatesWithIncorrectSolution();
