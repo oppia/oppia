@@ -178,8 +178,10 @@ oppia.factory('ExplorationWarningsService', [
         function(stateName) {
           return (
             StateTopAnswersStatsService.hasStateStats(stateName) &&
-            StateTopAnswersStatsService.getUnresolvedStateStats(
-              stateName).length > 0);
+            StateTopAnswersStatsService.getUnresolvedStateStats(stateName).some(
+              function(answerStats) {
+                return answerStats.frequency > 5;
+              }));
         });
     };
 
