@@ -158,10 +158,10 @@ describe('StateTopAnswersStatsService', function() {
       expect(this.stass.hasStateStats('Hola')).toBe(true);
     });
 
-    it('is false when the state contains no answers', function() {
+    it('is true even when the state contains no answers', function() {
       this.stass.init({answers: {Hola: []}});
 
-      expect(this.stass.hasStateStats('Hola')).toBe(false);
+      expect(this.stass.hasStateStats('Hola')).toBe(true);
     });
 
     it('is false when the state does not exist', function() {
