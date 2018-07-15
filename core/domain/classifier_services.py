@@ -169,7 +169,7 @@ def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
             if isinstance(classifier_data[k], (str, unicode)):
                 try:
                     classifier_data[k] = float(classifier_data[k])
-                except TypeError:
+                except ValueError:
                     classifier_data[k] = classifier_data[k]
             else:
                 classifier_data[k] = (
@@ -182,7 +182,7 @@ def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
             if isinstance(item, (str, unicode)):
                 try:
                     new_list.append(float(item))
-                except TypeError:
+                except ValueError:
                     new_list.append(item)
             else:
                 new_list.append(
