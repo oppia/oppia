@@ -1,2 +1,3 @@
 # Per-directory ownership and automatic assignment for pull requests.
 /core/storage/ @BenHenning @seanlip
+manifest.json @vojtechjelinek @hoangviet1993
