@@ -52,10 +52,10 @@ var answerObjectType = 'UnicodeString';
 
 var testSuite = [{
   interactionArguments: [],
-  ruleArguments: ['IsMathematicallyEquivalentTo', '{x}^{y}'],
+  ruleArguments: ['IsMathematicallyEquivalentTo', '{x}^{3}'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['x', 'y', 'x+y', '2x^y'],
-  correctAnswers: ['x^y']
+  wrongAnswers: ['x', '3x', '2x^3'],
+  correctAnswers: ['x^3', 'xxx']
 }];
 
 exports.customizeInteraction = customizeInteraction;
