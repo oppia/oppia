@@ -46,7 +46,7 @@ describe('Audio preloader service', function() {
     aps = $injector.get('AudioPreloaderService');
     atls = $injector.get('AudioTranslationLanguageService');
     eof = $injector.get('ExplorationObjectFactory');
-    ecs = $injector.get('ExplorationContextService');
+    ecs = $injector.get('ContextService');
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
     $rootScope = $injector.get('$rootScope');
     explorationDict = {

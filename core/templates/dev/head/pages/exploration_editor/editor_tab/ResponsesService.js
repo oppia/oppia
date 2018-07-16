@@ -22,7 +22,7 @@ oppia.factory('ResponsesService', [
   'AnswerGroupsCacheService', 'EditorStateService', 'ChangeListService',
   'ExplorationStatesService', 'GraphDataService', 'OutcomeObjectFactory',
   'stateSolutionService', 'SolutionVerificationService', 'AlertsService',
-  'ExplorationContextService', 'ExplorationWarningsService',
+  'ContextService', 'ExplorationWarningsService',
   'stateContentIdsToAudioTranslationsService',
   'INFO_MESSAGE_SOLUTION_IS_VALID', 'INFO_MESSAGE_SOLUTION_IS_INVALID',
   'INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE',
@@ -31,7 +31,7 @@ oppia.factory('ResponsesService', [
       AnswerGroupsCacheService, EditorStateService, ChangeListService,
       ExplorationStatesService, GraphDataService, OutcomeObjectFactory,
       stateSolutionService, SolutionVerificationService, AlertsService,
-      ExplorationContextService, ExplorationWarningsService,
+      ContextService, ExplorationWarningsService,
       stateContentIdsToAudioTranslationsService,
       INFO_MESSAGE_SOLUTION_IS_VALID, INFO_MESSAGE_SOLUTION_IS_INVALID,
       INFO_MESSAGE_SOLUTION_IS_INVALID_FOR_CURRENT_RULE) {
@@ -75,7 +75,7 @@ oppia.factory('ResponsesService', [
               EditorStateService.getActiveStateName()));
           var solutionIsCurrentlyValid = (
             SolutionVerificationService.verifySolution(
-              ExplorationContextService.getExplorationId(),
+              ContextService.getExplorationId(),
               ExplorationStatesService.getState(currentStateName),
               stateSolutionService.savedMemento.correctAnswer));
 
@@ -347,6 +347,55 @@ oppia.factory('ResponsesService', [
               rules: newRules
             });
           });
+        }
+
+        // If the interaction is DragAndDropSortInput, update the answer groups
+        // to refer to the new answer options.
+        if (stateInteractionIdService.savedMemento === 'DragAndDropSortInput' &&
+            oldAnswerChoices) {
+          // If the length of the answer choices array changes, then there is
+          // surely any deletion or modification or addition in the array. We
+          // simply set answer groups to refer to default value. If the length
+          // of the answer choices array remains the same and all the choices in
+          // the previous array are present, then no change is required.
+          // However, if any of the choices is not present, we set answer groups
+          // to refer to the default value containing new answer choices.
+          var anyChangesHappened = false;
+          if (oldAnswerChoices.length !== newAnswerChoices.length) {
+            anyChangesHappened = true;
+          } else {
+            // Check if any modification happened in answer choices.
+            var numAnswerChoices = oldAnswerChoices.length;
+            for (var i = 0; i < numAnswerChoices; i++) {
+              var choiceIsPresent = false;
+              for (var j = 0; j < numAnswerChoices; j++) {
+                if (oldAnswerChoices[i].val === newAnswerChoices[j].val) {
+                  choiceIsPresent = true;
+                  break;
+                }
+              }
+              if (choiceIsPresent === false) {
+                anyChangesHappened = true;
+                break;
+              }
+            }
+          }
+
+          if (anyChangesHappened) {
+            _answerGroups.forEach(function(answerGroup, answerGroupIndex) {
+              var newRules = angular.copy(answerGroup.rules);
+              newRules.forEach(function(rule) {
+                for (var key in rule.inputs) {
+                  var newInputValue = [];
+                  rule.inputs[key] = newInputValue;
+                }
+              });
+
+              _updateAnswerGroup(answerGroupIndex, {
+                rules: newRules
+              });
+            });
+          }
         }
       },
       getAnswerGroups: function() {

@@ -449,6 +449,27 @@ var constants = {
 
   "FEEDBACK_SUBJECT_MAX_CHAR_LIMIT": 50,
 
+  "ACTIVITY_STATUS_PRIVATE": "private",
+  "ACTIVITY_STATUS_PUBLIC": "public",
+
+  "SYSTEM_USER_IDS": ["admin", "OppiaMigrationBot"],
+
+  "//": [
+    "A string containing the disallowed characters in state or exploration",
+    "names. The underscore is needed because spaces in names must be converted",
+    "to underscores when displayed as part of a URL or key. The other",
+    "conventions here are derived from the Wikipedia guidelines for naming",
+    "articles."
+  ],
+  "INVALID_NAME_CHARS": [
+    ":", "#", "/", "|", "_", "%", "<", ">", "[", "]", "{", "}", "\\ufffd",
+    "\\\\", "\\u007f", "\\u0000", "\\u0001", "\\u0002", "\\u0003", "\\u0004",
+    "\\u0005", "\\u0006", "\\u0007", "\\b", "\\t", "\\n", "\\u000b", "\\f",
+    "\\r", "\\u000e", "\\u000f", "\\u0010", "\\u0011", "\\u0012", "\\u0013",
+    "\\u0014", "\\u0015", "\\u0016", "\\u0017", "\\u0018", "\\u0019", "\\u001a",
+    "\\u001b", "\\u001c", "\\u001d", "\\u001e", "\\u001f"
+  ],
+
   "ENABLE_GCS_STORAGE_FOR_IMAGES": false,
 
   "USE_NEW_SUGGESTION_FRAMEWORK": false,

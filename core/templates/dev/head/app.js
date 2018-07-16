@@ -22,9 +22,9 @@
 var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
-    'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
-    'ui.validate', 'pascalprecht.translate', 'ngCookies',
-    'toastr', 'headroom', 'dndLists'
+    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'infinite-scroll', 'ngJoyRide',
+    'ngImgCrop', 'ui.validate', 'pascalprecht.translate', 'ngCookies', 'toastr',
+    'headroom', 'dndLists'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
@@ -95,6 +95,7 @@ oppia.constant('ISSUE_TYPE_EARLY_QUIT', 'EarlyQuit');
 oppia.constant(
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS', 'MultipleIncorrectSubmissions');
 oppia.constant('ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'CyclicStateTransitions');
+oppia.constant('SITE_NAME', 'Oppia.org');
 
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([

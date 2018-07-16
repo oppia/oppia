@@ -19,7 +19,7 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('./waitFor.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
 var adminPage = new AdminPage.AdminPage();
@@ -48,16 +48,16 @@ var logout = function() {
 // that this will fail if the user already has a username.
 var _completeSignup = function(username) {
   browser.get('/signup?return_url=http%3A%2F%2Flocalhost%3A9001%2F');
-  general.waitForLoadingMessage();
+  waitFor.pageToFullyLoad();
   var usernameInput = element(by.css('.protractor-test-username-input'));
   var agreeToTermsCheckbox = element(
     by.css('.protractor-test-agree-to-terms-checkbox'));
   var registerUser = element(by.css('.protractor-test-register-user'));
-  browser.wait(until.visibilityOf(usernameInput), 5000);
+  waitFor.visibilityOf(usernameInput, 'No username input field was displayed');
   usernameInput.sendKeys(username);
   agreeToTermsCheckbox.click();
   registerUser.click();
-  general.waitForLoadingMessage();
+  waitFor.pageToFullyLoad();
 };
 
 var createUser = function(email, username) {

@@ -30,6 +30,8 @@ from core.domain import collection_domain
 from core.domain import collection_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import question_domain
+from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import skill_domain
 from core.domain import skill_services
@@ -989,6 +991,27 @@ tags: []
         topic_services.save_new_topic(owner_id, topic)
         return topic
 
+    def save_new_question(
+            self, question_id, owner_id, question_state_data,
+            language_code=constants.DEFAULT_LANGUAGE_CODE):
+        """Creates an Oppia Question and saves it.
+
+        Args:
+            question_id: str. ID for the question to be created.
+            owner_id: str. The id of the user creating the question.
+            question_state_data: State. The state data for the question.
+            language_code: str. The ISO 639-1 code for the language this
+                question is written in.
+
+        Returns:
+            Question. A newly-created question.
+        """
+        question = question_domain.Question(
+            question_id, question_state_data,
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION, language_code, 0)
+        question_services.add_question(owner_id, question)
+        return question
+
     def save_new_skill(
             self, skill_id, owner_id,
             description, misconceptions=None, skill_contents=None,
@@ -1253,7 +1276,8 @@ class AppEngineTestBase(TestBase):
         Returns:
             dict. The default question_data dict.
         """
-        state = exp_domain.State.create_default_state(default_dest_state_name)
+        state = exp_domain.State.create_default_state(
+            default_dest_state_name, is_initial_state=True)
         solution_explanation = exp_domain.SubtitledHtml(
             'solution', 'Solution explanation')
         solution = exp_domain.Solution(
@@ -1271,7 +1295,6 @@ class AppEngineTestBase(TestBase):
         state.content_ids_to_audio_translations['hint_1'] = {}
         state.interaction.solution = solution
         state.content_ids_to_audio_translations['solution'] = {}
-        state = state.to_dict()
         return state
 
 

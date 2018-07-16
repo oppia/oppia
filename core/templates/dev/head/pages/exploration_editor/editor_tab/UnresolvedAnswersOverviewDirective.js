@@ -103,7 +103,7 @@ oppia.directive('unresolvedAnswersOverview', [
                 '$scope', '$injector', '$uibModalInstance', '$http', '$filter',
                 'ExplorationHtmlFormatterService', 'TrainingModalService',
                 'stateInteractionIdService', 'stateCustomizationArgsService',
-                'ExplorationContextService', 'EditorStateService',
+                'ContextService', 'EditorStateService',
                 'ExplorationStatesService', 'TrainingDataService',
                 'AnswerClassificationService', 'EXPLICIT_CLASSIFICATION',
                 'UrlInterpolationService', 'TRAINING_DATA_CLASSIFICATION',
@@ -113,14 +113,14 @@ oppia.directive('unresolvedAnswersOverview', [
                     $scope, $injector, $uibModalInstance, $http, $filter,
                     ExplorationHtmlFormatterService, TrainingModalService,
                     stateInteractionIdService, stateCustomizationArgsService,
-                    ExplorationContextService, EditorStateService,
+                    ContextService, EditorStateService,
                     ExplorationStatesService, TrainingDataService,
                     AnswerClassificationService, EXPLICIT_CLASSIFICATION,
                     UrlInterpolationService, TRAINING_DATA_CLASSIFICATION,
                     AngularNameService, DEFAULT_OUTCOME_CLASSIFICATION,
                     AlertsService) {
                   var _explorationId = (
-                    ExplorationContextService.getExplorationId());
+                    ContextService.getExplorationId());
                   var _stateName = EditorStateService.getActiveStateName();
                   var _state = ExplorationStatesService.getState(_stateName);
                   var interactionId = stateInteractionIdService.savedMemento;
