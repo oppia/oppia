@@ -391,8 +391,8 @@ oppia.directive('conversationSkin', [
 
           var isSupplementalCardNonempty = function(card) {
             if (
-                ExplorationPlayerStateService.isStateShowingConceptCard(
-                  card.stateName)) {
+              ExplorationPlayerStateService.isStateShowingConceptCard(
+                card.stateName)) {
               return false;
             }
             return !ExplorationPlayerStateService.isInteractionInline(
@@ -406,8 +406,8 @@ oppia.directive('conversationSkin', [
 
           $scope.isSupplementalNavShown = function() {
             if (
-                ExplorationPlayerStateService.isStateShowingConceptCard(
-                  $scope.activeCard.stateName)) {
+              ExplorationPlayerStateService.isStateShowingConceptCard(
+                $scope.activeCard.stateName)) {
               return false;
             }
             var interaction = ExplorationPlayerService.getInteraction(
