@@ -121,11 +121,12 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
                         except AttributeError:
                             func_name = node.func
 
-                    self.add_message('non-explicit-keyword-args', node=node,
-                                     args=(
-                                         display_name,
-                                         callable_name,
-                                         func_name))
+                    self.add_message(
+                        'non-explicit-keyword-args', node=node,
+                        args=(
+                            display_name,
+                            callable_name,
+                            func_name))
                     num_positional_args_unused -= 1
 
 
