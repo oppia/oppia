@@ -17,7 +17,8 @@
  */
 
 oppia.directive('profileLinkText', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'SYSTEM_USER_IDS',
+  function(UrlInterpolationService, SYSTEM_USER_IDS) {
     return {
       restrict: 'E',
       scope: {
@@ -28,7 +29,7 @@ oppia.directive('profileLinkText', [
         'profile_link_text_directive.html'),
       controller: ['$scope', function($scope) {
         $scope.isUsernameLinkable = function(username) {
-          return GLOBALS.SYSTEM_USERNAMES.indexOf(username) === -1;
+          return SYSTEM_USER_IDS.indexOf(username) === -1;
         };
       }]
     };

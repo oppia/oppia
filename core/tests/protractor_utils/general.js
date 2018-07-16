@@ -19,20 +19,7 @@
 
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
-var until = protractor.ExpectedConditions;
 var waitFor = require('./waitFor.js');
-
-var waitForLoadingMessage = function() {
-  // Consider adding this method after each browser.get() call going to an
-  // Angular page destination. Completely wait for page to load to
-  // avoid XMLHTTPReq error on page refresh:
-  // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
-  // and browser.waitForAngular's flakiness
-  // https://github.com/angular/protractor/issues/2954.
-  var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
-  return browser.wait(until.invisibilityOf(loadingMessage), 15000,
-    'Page takes more than 15 secs to load');
-};
 
 var scrollToTop = function() {
   browser.executeScript('window.scrollTo(0,0);');
@@ -103,7 +90,7 @@ var getExplorationIdFromPlayer = function() {
 // The explorationId here should be a string, not a promise.
 var openEditor = function(explorationId) {
   browser.get(EDITOR_URL_SLICE + explorationId);
-  waitForLoadingMessage();
+  waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorMainTab.exitTutorial();
@@ -111,7 +98,7 @@ var openEditor = function(explorationId) {
 
 var openPlayer = function(explorationId) {
   browser.get(PLAYER_URL_SLICE + explorationId);
-  waitForLoadingMessage();
+  waitFor.pageToFullyLoad();
 };
 
 // Takes the user from an exploration editor to its player.
@@ -185,7 +172,6 @@ var checkConsoleErrorsExist = function(expectedErrors) {
 };
 
 exports.acceptAlert = acceptAlert;
-exports.waitForLoadingMessage = waitForLoadingMessage;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 

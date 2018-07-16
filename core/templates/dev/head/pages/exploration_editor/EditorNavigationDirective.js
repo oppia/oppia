@@ -32,14 +32,14 @@ oppia.directive('editorNavigation', [
         'ExplorationWarningsService', 'ENABLE_TRANSLATION_TAB',
         'StateEditorTutorialFirstTimeService',
         'ThreadDataService', 'siteAnalyticsService',
-        'ExplorationContextService', 'WindowDimensionsService',
+        'ContextService', 'WindowDimensionsService',
         function(
             $scope, $rootScope, $timeout, $uibModal,
             RouterService, ExplorationRightsService,
             ExplorationWarningsService, ENABLE_TRANSLATION_TAB,
             StateEditorTutorialFirstTimeService,
             ThreadDataService, siteAnalyticsService,
-            ExplorationContextService, WindowDimensionsService) {
+            ContextService, WindowDimensionsService) {
           $scope.popoverControlObject = {
             postTutorialHelpPopoverIsShown: false
           };
@@ -51,7 +51,7 @@ oppia.directive('editorNavigation', [
               $timeout(function() {
                 $scope.popoverControlObject
                   .postTutorialHelpPopoverIsShown = false;
-              }, 5000);
+              }, 4000);
             } else {
               $scope.popoverControlObject
                 .postTutorialHelpPopoverIsShown = false;
@@ -63,7 +63,7 @@ oppia.directive('editorNavigation', [
           $scope.enableTranslationTab = ENABLE_TRANSLATION_TAB;
 
           $scope.showUserHelpModal = function() {
-            var explorationId = ExplorationContextService.getExplorationId();
+            var explorationId = ContextService.getExplorationId();
             siteAnalyticsService.registerClickHelpButtonEvent(explorationId);
             var modalInstance = $uibModal.open({
               templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
@@ -72,12 +72,12 @@ oppia.directive('editorNavigation', [
               backdrop: true,
               controller: [
                 '$scope', '$uibModalInstance',
-                'siteAnalyticsService', 'ExplorationContextService',
+                'siteAnalyticsService', 'ContextService',
                 function(
                     $scope, $uibModalInstance,
-                    siteAnalyticsService, ExplorationContextService) {
+                    siteAnalyticsService, ContextService) {
                   var explorationId = (
-                    ExplorationContextService.getExplorationId());
+                    ContextService.getExplorationId());
 
                   $scope.beginTutorial = function() {
                     siteAnalyticsService

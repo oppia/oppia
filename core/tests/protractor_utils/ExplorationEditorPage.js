@@ -16,8 +16,7 @@
  * @fileoverview Page object for the exploration editor, for use in Protractor
  * tests.
  */
-var general = require('./general.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('./waitFor.js');
 
 var ExplorationEditorFeedbackTab = require(
   '../protractor_utils/ExplorationEditorFeedbackTab.js');
@@ -94,15 +93,14 @@ var ExplorationEditorPage = function() {
       if (commitMessage) {
         commitMessageInput.sendKeys(commitMessage);
       }
-      browser.wait(until.elementToBeClickable(saveDraftButton), 5000,
-        'Save Draft button is not clickable').then(function(isClickable){
-        if (isClickable) {
-          saveDraftButton.click();
-        }
-      });
+      waitFor.elementToBeClickable(
+        saveDraftButton, 'Save Draft button is not clickable');
+      saveDraftButton.click();
+
       // This is necessary to give the page time to record the changes,
       // so that it does not attempt to stop the user leaving.
-      browser.wait(until.invisibilityOf(toastSuccessElement), 10000,
+      waitFor.invisibilityOf(
+        toastSuccessElement,
         'Toast message taking too long to disappear after saving changes');
       expect(toastSuccessElement.isPresent()).toBe(false);
     });
@@ -113,7 +111,7 @@ var ExplorationEditorPage = function() {
     discardChangesButton.click();
     confirmDiscardChangesButton.click();
     // Expect editor page to completely reload.
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.expectCannotSaveChanges = function() {
@@ -123,36 +121,42 @@ var ExplorationEditorPage = function() {
   // NAVIGATION
 
   this.navigateToHistoryTab = function() {
-    browser.wait(until.elementToBeClickable(navigateToHistoryTabButton), 5000);
+    waitFor.elementToBeClickable(
+      navigateToHistoryTabButton, 'History tab is not clickable');
     navigateToHistoryTabButton.click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.navigateToFeedbackTab = function() {
-    browser.wait(until.elementToBeClickable(navigateToFeedbackTabButton), 5000);
+    waitFor.elementToBeClickable(
+      navigateToFeedbackTabButton, 'Feedback tab is not clickable');
     navigateToFeedbackTabButton.click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.navigateToMainTab = function() {
-    browser.wait(until.elementToBeClickable(navigateToMainTabButton), 5000);
+    waitFor.elementToBeClickable(
+      navigateToMainTabButton, 'Main tab is not clickable');
     navigateToMainTabButton.click();
     neutralElement.click();
   };
 
   this.navigateToPreviewTab = function() {
-    browser.wait(until.elementToBeClickable(navigateToPreviewTabButton), 5000);
+    waitFor.elementToBeClickable(
+      navigateToPreviewTabButton, 'Preview tab is not clickable');
     navigateToPreviewTabButton.click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.navigateToSettingsTab = function() {
-    browser.wait(until.elementToBeClickable(navigateToSettingsTabButton), 5000);
+    waitFor.elementToBeClickable(
+      navigateToSettingsTabButton, 'Settings tab is not clickable');
     navigateToSettingsTabButton.click();
   };
 
   this.navigateToStatsTab = function() {
-    browser.wait(until.elementToBeClickable(navigateToStatsTabButton), 5000);
+    waitFor.elementToBeClickable(
+      navigateToStatsTabButton, 'Stats tab is not clickable');
     navigateToStatsTabButton.click();
   };
 };

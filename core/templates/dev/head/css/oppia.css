@@ -1565,7 +1565,8 @@ pre.oppia-pre-wrapped-text {
 
 /* Styles for the state graph vizualization. */
 
-.oppia-state-graph-container {
+.oppia-state-graph-container, 
+.oppia-translation-state-graph-container {
   border-radius: 4px;
   border: 1px solid #ccc;
   height: 400px;

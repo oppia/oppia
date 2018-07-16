@@ -16,8 +16,7 @@
  * @fileoverview Page object for the subscription dashboard,
  * for use in Protractor tests.
  */
-var general = require('./general.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('./waitFor.js');
 
 var SubscriptionDashboardPage = function() {
   var subscriptionButton = element(
@@ -27,44 +26,32 @@ var SubscriptionDashboardPage = function() {
 
   this.navigateToUserSubscriptionPage = function(userName) {
     browser.get('/profile/' + userName);
-    return general.waitForLoadingMessage();
+    return waitFor.pageToFullyLoad();
   };
 
   this.expectSubscriptionFirstNameToMatch = function(name) {
-    browser.wait(until.visibilityOf(subscriptionName.first()), 5000,
-      'First Subscriber Name is not visible').then(function(isVisible) {
-      if (isVisible) {
-        expect(subscriptionName.first().getText()).toMatch(name);
-      }
-    });
+    waitFor.visibilityOf(
+      subscriptionName.first(), 'First Subscriber Name is not visible');
+    expect(subscriptionName.first().getText()).toMatch(name);
   };
 
   this.expectSubscriptionLastNameToMatch = function(name) {
-    browser.wait(until.visibilityOf(subscriptionName.last()), 5000,
-      'Last Subscriber Name is not visible').then(function(isVisible) {
-      if (isVisible) {
-        expect(subscriptionName.last().getText()).toMatch(name);
-      }
-    });
+    waitFor.visibilityOf(
+      subscriptionName.last(), 'Last Subscriber Name is not visible');
+    expect(subscriptionName.last().getText()).toMatch(name);
   };
 
   this.expectSubscriptionCountToEqual = function(value) {
-    browser.wait(until.visibilityOf(subscriptionName.first()), 5000,
-      'Subscriber Name Card takes too long to appear')
-      .then(function(isVisible) {
-        if (isVisible) {
-          expect(subscriptionName.count()).toEqual(value);
-        }
-      });
+    waitFor.visibilityOf(
+      subscriptionName.first(),
+      'Subscriber Name Card takes too long to appear');
+    expect(subscriptionName.count()).toEqual(value);
   };
 
   this.navigateToSubscriptionButton = function() {
-    browser.wait(until.elementToBeClickable(subscriptionButton), 5000,
-      'Subscription button is not clickable').then(function(isClickable) {
-      if (isClickable) {
-        subscriptionButton.click();
-      }
-    });
+    waitFor.elementToBeClickable(
+      subscriptionButton, 'Subscription button is not clickable');
+    subscriptionButton.click();
   };
 };
 
