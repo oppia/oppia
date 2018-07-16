@@ -124,10 +124,10 @@ oppia.factory('ResponsesService', [
       _saveAnswerGroups(_answerGroups);
     };
 
-    var updateAnswerGroupsAudioTranslation = function () {
+    var _updateAnswerGroupsAudioTranslation = function () {
       stateContentIdsToAudioTranslationsService.displayed.
         deleteAllFeedbackContentId();
-      for (i = 0; i < _answerGroups.length; i++) {
+      for (var i = 0; i < _answerGroups.length; i++) {
         stateContentIdsToAudioTranslationsService.displayed.addContentId(
           _answerGroups[i].outcome.feedback.getContentId());
       }
@@ -191,7 +191,11 @@ oppia.factory('ResponsesService', [
         } else {
           _answerGroups = [];
         }
-        updateAnswerGroupsAudioTranslation();
+
+        // Update _answerGroups audio translation according to the above
+        // changes.
+        _updateAnswerGroupsAudioTranslation();
+
         // Preserve the default outcome unless the interaction is terminal.
         // Recreate the default outcome if switching away from a terminal
         // interaction.
