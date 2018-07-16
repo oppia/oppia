@@ -357,7 +357,8 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
 
         response_dict = self.get_json(
-            feconf.EXPLORATION_SUMMARIES_DATA_URL, params={
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
                 'stringified_exp_ids': json.dumps([
                     self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
                     self.PRIVATE_EXP_ID_VIEWER])
@@ -376,7 +377,8 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
         self.login(self.VIEWER_EMAIL)
 
         response_dict = self.get_json(
-            feconf.EXPLORATION_SUMMARIES_DATA_URL, params={
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
                 'stringified_exp_ids': json.dumps([
                     self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
                     self.PRIVATE_EXP_ID_VIEWER]),
@@ -399,7 +401,8 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
 
         response_dict = self.get_json(
-            feconf.EXPLORATION_SUMMARIES_DATA_URL, params={
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
                 'stringified_exp_ids': json.dumps([
                     self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
                     self.PRIVATE_EXP_ID_VIEWER]),
@@ -421,7 +424,8 @@ class ExplorationSummariesHandlerTest(test_utils.GenericTestBase):
 
     def test_cannot_get_private_exploration_summaries_when_logged_out(self):
         response_dict = self.get_json(
-            feconf.EXPLORATION_SUMMARIES_DATA_URL, params={
+            feconf.EXPLORATION_SUMMARIES_DATA_URL,
+            params={
                 'stringified_exp_ids': json.dumps([
                     self.PRIVATE_EXP_ID_EDITOR, self.PUBLIC_EXP_ID_EDITOR,
                     self.PRIVATE_EXP_ID_VIEWER]),

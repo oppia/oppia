@@ -38,7 +38,6 @@ from pylint import testutils  # isort:skip
 # pylint: enable=relative-import
 
 
-# TODO (apb7): Modify tests.
 class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
 
     def test_finds_non_explicit_keyword_args(self):
@@ -46,36 +45,44 @@ class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
         checker_test_object.CHECKER_CLASS = (
             custom_lint_checks.ExplicitKeywordArgsChecker)
         checker_test_object.setup_method()
-        func_node = astroid.extract_node("""
-        def test(test_var_one, test_var_two=4, test_var_three=5, test_var_four="test_checker"): #@
-            test_var_five = test_var_two + test_var_three
-            return test_var_five
-        """)
-        checker_test_object.checker.visit_functiondef(func_node)
-        func_args = func_node.args
-        checker_test_object.checker.visit_arguments(func_args)
         func_call_node_one, func_call_node_two, func_call_node_three = (
             astroid.extract_node("""
-        test(2, 5, 6) #@
+        def test(test_var_one, test_var_two=4, test_var_three=5, test_var_four="test_checker"):
+            test_var_five = test_var_two + test_var_three
+            return test_var_five
+
+        test(2, 5, test_var_three=6) #@
         test(2) #@
-        test(2, 5, 6, test_var_four="test_string") #@
+        test(2, 6, test_var_two=5, test_var_four="test_checker") #@
         """))
         with checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='non-explicit-keyword-args',
                 node=func_call_node_one,
+                args=(
+                    "'test_var_two'",
+                    'function',
+                    'test'
+                )
             ),
         ):
             checker_test_object.checker.visit_call(
                 func_call_node_one)
+
         with checker_test_object.assertNoMessages():
             checker_test_object.checker.visit_call(
                 func_call_node_two)
+
         with checker_test_object.assertAddsMessages(
             testutils.Message(
                 msg_id='non-explicit-keyword-args',
                 node=func_call_node_three,
-            ),
+                args=(
+                    "'test_var_three'",
+                    'function',
+                    'test'
+                )
+            )
         ):
             checker_test_object.checker.visit_call(
                 func_call_node_three)

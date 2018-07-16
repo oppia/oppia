@@ -75,7 +75,8 @@ class ExplicitKeywordArgsChecker(checkers.BaseChecker):
         already_filled_keywords = getattr(called, 'filled_keywords', {})
 
         keyword_args += list(already_filled_keywords)
-        num_positional_args += implicit_args + already_filled_positionals
+        num_positional_args += already_filled_positionals
+        num_positional_args += implicit_args
 
         # Analyze the list of formal parameters.
         num_mandatory_parameters = len(called.args.args) - len(
