@@ -192,8 +192,9 @@ oppia.factory('ResponsesService', [
           _answerGroups = [];
         }
 
-        // Update _answerGroups audio translation according to the above
-        // changes.
+        // This is necessary in order to keep the audio translations of the
+        // answer groups in sync with the answer groups that are fetched from
+        // the cache.
         _updateAnswerGroupsAudioTranslation();
 
         // Preserve the default outcome unless the interaction is terminal.
