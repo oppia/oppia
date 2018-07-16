@@ -37,10 +37,10 @@ from pylint import testutils  # isort:skip
 # pylint: enable=wrong-import-position
 # pylint: enable=relative-import
 
-
+# TODO (apb7): Modify tests
 class ExplicitKeywordArgsCheckerTest(unittest.TestCase):
 
-    def test_finds_non_explicit_kwargs(self):
+    def test_finds_non_explicit_keyword_args(self):
         checker_test_object = testutils.CheckerTestCase()
         checker_test_object.CHECKER_CLASS = (
             custom_lint_checks.ExplicitKeywordArgsChecker)
