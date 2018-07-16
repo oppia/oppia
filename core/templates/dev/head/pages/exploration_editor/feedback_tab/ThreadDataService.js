@@ -69,26 +69,16 @@ oppia.factory('ThreadDataService', [
 
       $q.all([fPromise, sPromise]).then(function(res) {
         _data.feedbackThreads = res[0].data.threads;
-        _data.suggestionThreads = [];
         if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+          _data.suggestionThreads = res[0].data.suggestion_threads;
           for (var i = 0; i < res[1].data.suggestions.length; i++) {
             suggestion = res[1].data.suggestions[i];
             suggestion.thread_id = suggestion.suggestion_id.slice(
               suggestion.suggestion_id.indexOf('.') + 1);
-            _data.suggestionThreads.push(suggestion);
-          }
-          for (var i = 0; i < _data.suggestionThreads.length; i++) {
-            for (var j = 0; j < _data.feedbackThreads.length; j++) {
-              if (_data.suggestionThreads[i].thread_id ===
-                  _data.feedbackThreads[j].thread_id) {
-                _data.suggestionThreads[i].subject = (
-                  _data.feedbackThreads[j].subject);
-                _data.suggestionThreads[i].description = (
-                  _data.feedbackThreads[j].description);
-                _data.feedbackThreads.splice(j, 1);
-                // As only one feedback thread can link to one suggestion thread
-                // We can stop the inner loop when we find a match and move on
-                // to the next suggestion thread.
+            for (var j = 0; j < _data.suggestionThreads.length; j++) {
+              if (suggestion.thread_id ===
+                  _data.suggestionThreads[j].thread_id) {
+                _data.suggestionThreads[j].suggestion = suggestion;
                 break;
               }
             }

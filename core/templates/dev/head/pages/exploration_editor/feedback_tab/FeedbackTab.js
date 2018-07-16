@@ -97,15 +97,14 @@ oppia.controller('FeedbackTab', [
     };
 
     var _isSuggestionHandled = function() {
-      return !($scope.activeThread.status === 'received' ||
-        $scope.activeThread.status === 'review' ||
+      return !($scope.activeThread.suggestion.status === 'review' ||
         $scope.activeThread.status === 'open');
     };
 
     var _isSuggestionValid = function() {
       if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
         return ExplorationStatesService.hasState(
-          $scope.activeThread.change_cmd.state_name);
+          $scope.activeThread.suggestion.change_cmd.state_name);
       } else {
         return ExplorationStatesService.hasState(
           $scope.activeThread.state_name);
@@ -140,7 +139,11 @@ oppia.controller('FeedbackTab', [
             return _hasUnsavedChanges();
           },
           suggestionStatus: function() {
-            return $scope.activeThread.status;
+            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+              return $scope.activeThread.suggestion.status;
+            } else {
+              return $scope.activeThread.status;
+            }
           },
           description: function() {
             if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
@@ -152,7 +155,7 @@ oppia.controller('FeedbackTab', [
           currentContent: function() {
             var stateName;
             if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              stateName = $scope.activeThread.change_cmd.state_name;
+              stateName = $scope.activeThread.suggestion.change_cmd.state_name;
             } else {
               stateName = $scope.activeThread.state_name;
             }
@@ -161,7 +164,7 @@ oppia.controller('FeedbackTab', [
           },
           newContent: function() {
             if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              return $scope.activeThread.change_cmd.new_value.html;
+              return $scope.activeThread.suggestion.change_cmd.new_value.html;
             }
             return $scope.activeThread.suggestion.suggestion_html;
           }
@@ -247,6 +250,7 @@ oppia.controller('FeedbackTab', [
               var suggestion = $scope.activeThread;
               var stateName;
               if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+                suggestion = $scope.activeThread.suggestion;
                 stateName = suggestion.change_cmd.state_name;
               } else {
                 stateName = suggestion.state_name;
@@ -298,7 +302,6 @@ oppia.controller('FeedbackTab', [
     $scope.setActiveThread = function(threadId) {
       ThreadDataService.fetchMessages(threadId);
       ThreadDataService.markThreadAsSeen(threadId);
-
       var allThreads = [].concat(
         $scope.threadData.feedbackThreads, $scope.threadData.suggestionThreads);
       for (var i = 0; i < allThreads.length; i++) {
