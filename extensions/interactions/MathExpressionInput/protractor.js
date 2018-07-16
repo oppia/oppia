@@ -52,10 +52,10 @@ var answerObjectType = 'UnicodeString';
 
 var testSuite = [{
   interactionArguments: [],
-  ruleArguments: ['IsMathematicallyEquivalentTo', 'e = mc^2'],
+  ruleArguments: ['IsMathematicallyEquivalentTo', '{x}^{y}'],
   expectedInteractionDetails: [],
-  wrongAnswers: ['y=2/x'],
-  correctAnswers: ['e = mc^2']
+  wrongAnswers: ['x', 'y', 'x+y', '2x^y'],
+  correctAnswers: ['x^y']
 }];
 
 exports.customizeInteraction = customizeInteraction;
