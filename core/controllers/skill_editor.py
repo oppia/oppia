@@ -33,6 +33,9 @@ def _require_valid_version(version_from_payload, skill_version):
             skill represents.
         skill_version: int. The latest version of the skill currently persisted
             in the backend.
+
+    Raises:
+        Exception: Invalid input.
     """
     if version_from_payload is None:
         raise base.BaseHandler.InvalidInputException(
