@@ -466,7 +466,7 @@ def fetch_gravatar(email):
         logging.error('Failed to fetch Gravatar from %s' % gravatar_url)
     else:
         if result.status_code == 200:
-            if imghdr.what(None, result.content) == 'png':
+            if imghdr.what(None, h=result.content) == 'png':
                 return utils.convert_png_binary_to_data_url(result.content)
         else:
             logging.error(
