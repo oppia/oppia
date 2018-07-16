@@ -153,12 +153,15 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
         job_exploration_mappings)
 
 
-def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
+def convert_strings_to_float_numbers_in_classifier_data(
+        classifier_data, strings_only_key_list):
     """Converts all floating point numbers in classifier data to string.
 
     Args:
         classifier_data: dict. The trained classifier model in which float
             values are stored as strings.
+        strings_only_key_list: list(str). A list of keys which are to be kept
+            in string format.
 
     Returns:
         Dict. Original dict with float values converted back from string to
@@ -166,15 +169,28 @@ def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
     """
     if isinstance(classifier_data, dict):
         for k in classifier_data.keys():
-            if isinstance(classifier_data[k], (str, unicode)):
-                try:
-                    classifier_data[k] = float(classifier_data[k])
-                except ValueError:
-                    classifier_data[k] = classifier_data[k]
+            if isinstance(classifier_data[k], dict):
+                new_key_list = [
+                    '.'.join(key.split('.')[1:])
+                    for key in strings_only_key_list if key.startswith(k)]
+                classifier_data[k] = (
+                    convert_strings_to_float_numbers_in_classifier_data(
+                        classifier_data[k], new_key_list))
+            elif isinstance(classifier_data[k], (list, set, tuple)):
+                if not k in strings_only_key_list:
+                    classifier_data[k] = (
+                        convert_strings_to_float_numbers_in_classifier_data(
+                            classifier_data[k], []))
+            elif isinstance(classifier_data[k], (str, unicode)):
+                if not k in strings_only_key_list:
+                    try:
+                        classifier_data[k] = float(classifier_data[k])
+                    except ValueError:
+                        classifier_data[k] = classifier_data[k]
             else:
                 classifier_data[k] = (
                     convert_strings_to_float_numbers_in_classifier_data(
-                        classifier_data[k]))
+                        classifier_data[k], strings_only_key_list))
         return classifier_data
     elif isinstance(classifier_data, (list, set, tuple)):
         new_list = []
@@ -186,7 +202,8 @@ def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
                     new_list.append(item)
             else:
                 new_list.append(
-                    convert_strings_to_float_numbers_in_classifier_data(item))
+                    convert_strings_to_float_numbers_in_classifier_data(
+                        item, strings_only_key_list))
         return type(classifier_data)(new_list)
     return classifier_data
 

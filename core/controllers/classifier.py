@@ -112,9 +112,10 @@ class TrainedClassifierHandler(base.BaseHandler):
         # are represented differently on GAE(Oppia) and GCE(Oppia-ml).
         # Therefore, converting all floating point numbers to string keeps
         # signature consistent on both Oppia and Oppia-ml.
+        # For more info visit: https://stackoverflow.com/q/40173295
         classifier_data = (
             classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
-                message['classifier_data']))
+                message['classifier_data'], message['strings_only_key_list']))
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (

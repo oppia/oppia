@@ -471,11 +471,14 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                     'beb': '0.0',
                     'bec': '0.142857142857',
                     'bed': 3},
-                'bf': ['0.133432545', 1, 2, '3.1233']
+                'bf': ['0.133432545', 1, 2, '3.1233'],
+                'bg': [['abc', 'def'], 'ghi']
             },
             'c': '1.123432',
             'd': 21123
         }
+
+        strings_only_key_list = ['a.ab', 'b.be.bea', 'b.bg']
 
         expected_dict = {
             'a': {
@@ -492,7 +495,8 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                     'beb': 0.0,
                     'bec': 0.142857142857,
                     'bed': 3},
-                'bf': [0.133432545, 1, 2, 3.1233]
+                'bf': [0.133432545, 1, 2, 3.1233],
+                'bg': [['abc', 'def'], 'ghi']
             },
             'c': 1.123432,
             'd': 21123
@@ -500,5 +504,5 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
 
         output_dict = (
             classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
-                test_dict))
+                test_dict, strings_only_key_list))
         self.assertDictEqual(expected_dict, output_dict)
