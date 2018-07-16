@@ -151,23 +151,22 @@ describe('Editable question backend API service', function() {
     }
   );
 
-  it('should use the rejection handler if the question to update doesn\'t exist',
-    function() {
-      var successHandler = jasmine.createSpy('success');
-      var failHandler = jasmine.createSpy('fail');
+  it('should use the rejection handler if the question to update ' +
+     'doesn\'t exist', function() {
+    var successHandler = jasmine.createSpy('success');
+    var failHandler = jasmine.createSpy('fail');
 
-      // Loading a question the first time should fetch it from the backend.
-      $httpBackend.expect('PUT', '/question_editor_handler/data/1').respond(
-        404, 'Question with given id doesn\'t exist.');
+    // Loading a question the first time should fetch it from the backend.
+    $httpBackend.expect('PUT', '/question_editor_handler/data/1').respond(
+      404, 'Question with given id doesn\'t exist.');
 
-      EditableQuestionBackendApiService.updateQuestion(
-        '1', '1', 'Update an invalid question.', []
-      ).then(successHandler, failHandler);
-      $httpBackend.flush();
+    EditableQuestionBackendApiService.updateQuestion(
+      '1', '1', 'Update an invalid question.', []
+    ).then(successHandler, failHandler);
+    $httpBackend.flush();
 
-      expect(successHandler).not.toHaveBeenCalled();
-      expect(failHandler).toHaveBeenCalledWith(
-        'Question with given id doesn\'t exist.');
-    }
-  );
+    expect(successHandler).not.toHaveBeenCalled();
+    expect(failHandler).toHaveBeenCalledWith(
+      'Question with given id doesn\'t exist.');
+  });
 });
