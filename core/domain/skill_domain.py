@@ -724,7 +724,7 @@ class SkillRights(object):
     """Domain object for skill rights."""
 
     def __init__(self, skill_id, skill_is_private, creator_id):
-        """ Constructor for a skill rights domain object.
+        """Constructor for a skill rights domain object.
 
         Args:
             skill_id: str. The id of the skill.
@@ -760,7 +760,7 @@ class SkillRights(object):
         return bool(user_id == self.creator_id)
 
     def is_private(self):
-        """ Returns whether the skill is private.
+        """Returns whether the skill is private.
 
         Returns:
             bool. Whether the skill is private.

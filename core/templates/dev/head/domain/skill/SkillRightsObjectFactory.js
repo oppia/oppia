@@ -23,7 +23,8 @@ oppia.factory('SkillRightsObjectFactory', [
       this._skillId = skillRightsObject.skill_id;
       this._creatorId = skillRightsObject.creator_id;
       this._skillIsPrivate = skillRightsObject.skill_is_private;
-      this._skillIsEditable = skillRightsObject.can_edit_skill;
+      this._skillDescriptionIsEditable =
+        skillRightsObject.can_edit_skill_description;
     };
 
     SkillRights.prototype.getSkillId = function() {
@@ -42,16 +43,12 @@ oppia.factory('SkillRightsObjectFactory', [
       return !this._skillIsPrivate;
     };
 
-    SkillRights.prototype.canEdit = function() {
-      return this._skillIsEditable;
+    SkillRights.prototype.canEditSkillDescription = function() {
+      return this._skillDescriptionIsEditable;
     };
 
     SkillRights.prototype.setPublic = function() {
-      if (this.canEdit()) {
-        this._skillIsPrivate = false;
-      } else {
-        throw new Error('User is not allowed to edit this skill.');
-      }
+      this._skillIsPrivate = false;
     };
 
     SkillRights.create = function(skillRightsBackendObject) {
@@ -62,7 +59,8 @@ oppia.factory('SkillRightsObjectFactory', [
       this._skillId = otherSkillRights.getSkillId();
       this._creatorId = otherSkillRights.getCreatorId();
       this._skillIsPrivate = otherSkillRights.isPrivate();
-      this._skillIsEditable = otherSkillRights.canEdit();
+      this._skillDescriptionIsEditable =
+        otherSkillRights.canEditSkillDescription();
     };
 
     SkillRights.createInterstitialSkillRights = function() {
@@ -70,7 +68,7 @@ oppia.factory('SkillRightsObjectFactory', [
         skill_id: null,
         creator_id: null,
         skill_is_private: true,
-        can_edit_skill: false
+        can_edit_skill_description: false
       });
     };
 

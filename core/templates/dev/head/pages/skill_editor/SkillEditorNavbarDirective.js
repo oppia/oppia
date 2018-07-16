@@ -25,13 +25,13 @@ oppia.directive('skillEditorNavbar', [
       controller: [
         '$scope', '$uibModal', 'AlertsService',
         'UndoRedoService', 'SkillEditorStateService',
-        'SkillRightsBackendApiService', 'SkillValidationService',
+        'SkillRightsBackendApiService',
         'EVENT_SKILL_INITIALIZED', 'EVENT_SKILL_REINITIALIZED',
         'EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED',
         function(
             $scope, $uibModal, AlertsService,
             UndoRedoService, SkillEditorStateService,
-            SkillRightsBackendApiService, SkillValidationService,
+            SkillRightsBackendApiService,
             EVENT_SKILL_INITIALIZED, EVENT_SKILL_REINITIALIZED,
             EVENT_UNDO_REDO_SERVICE_CHANGE_APPLIED) {
           $scope.skill = SkillEditorStateService.getSkill();
@@ -47,8 +47,7 @@ oppia.directive('skillEditorNavbar', [
           };
 
           var _validateSkill = function() {
-            $scope.validationIssues =
-              SkillValidationService.findValidationIssues($scope.skill);
+            $scope.validationIssues = $scope.skill.getValidationIssues();
           };
 
           $scope.getWarningsCount = function() {

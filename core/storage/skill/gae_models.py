@@ -176,13 +176,36 @@ class SkillRightsModel(base_models.VersionedModel):
     ALLOW_REVERT = False
 
     # The user_id of the creator this skill.
-    creator_id = ndb.StringProperty(indexed=True)
+    creator_id = ndb.StringProperty(indexed=True, required=True)
     # Whether the skill is private.
     skill_is_private = ndb.BooleanProperty(
         indexed=True, required=True, default=True)
 
     @classmethod
-    def get_unpublished_skills_by_creator_id(cls, user_id):
+    def get_unpublished_by_creator_id(cls, user_id):
+        """This function returns all skill rights that correspond to skills
+        that are private and are created by the provided user ID.
+
+        Args:
+            user_id: str. The user ID of the user that created the skill rights
+                being fetched.
+
+        Returns:
+            list(SkillRightsModel). A list of skill rights models that are
+                private and were created by the user with the provided
+                user ID.
+        """
         return cls.query(
             cls.creator_id == user_id,
-            cls.skill_is_private is True)
+            cls.skill_is_private == True) #pylint: disable
+
+    @classmethod
+    def get_unpublished(cls):
+        """This function returns all skill rights that correspond to skills
+        that are private.
+
+        Returns:
+            list(SkillRightsModel). A list of skill rights models that are
+            private.
+        """
+        return cls.query(cls.skill_is_private == True)

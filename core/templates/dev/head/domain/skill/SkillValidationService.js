@@ -23,8 +23,8 @@ oppia.factory('SkillValidationService', [
     var _isValidDescription = function(description) {
       var allowDescriptionToBeBlank = false;
       var showWarnings = true;
-      return ValidatorsService.isValidEntityName(description,
-        showWarnings, allowDescriptionToBeBlank);
+      return ValidatorsService.isValidEntityName(
+        description, showWarnings, allowDescriptionToBeBlank);
     };
 
     var _validateSkill = function(skill) {

@@ -18,7 +18,6 @@
 
 describe('Skill rights backend API service', function() {
   var SkillRightsBackendApiService = null;
-  var sampleDataResults = null;
   var $rootScope = null;
   var $scope = null;
   var $httpBackend = null;

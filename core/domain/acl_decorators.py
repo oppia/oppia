@@ -918,6 +918,29 @@ def can_edit_skill(handler):
     """Decorator to check whether the user can edit a skill, which can be
     independent or belong to a topic.
     """
+    def can_user_edit_skill(user, skill_rights):
+        """Checks whether the user can edit the given skill.
+
+        Args:
+            user: UserActionsInfo. Object having user id, role and actions for
+                given user.
+            skill_rights: SkillRights or None. Rights object for the given
+                skill.
+
+        Returns:
+            bool. Whether the given user can edit the given skill.
+        """
+
+        if skill_rights is None:
+            return False
+        if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
+            if not skill_rights.is_private():
+                return True
+            if skill_rights.is_private() and skill_rights.is_creator(
+                    user.user_id):
+                return True
+        return False
+
     def test_can_edit_skill(self, skill_id, **kwargs):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -926,7 +949,7 @@ def can_edit_skill(handler):
         if skill_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if skill_services.check_can_edit_skill(self.user, skill_rights):
+        if can_user_edit_skill(self.user, skill_rights):
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
@@ -974,7 +997,28 @@ def can_create_skill(handler):
 
 
 def can_publish_skill(handler):
-    """Decorate to check whether the user can publish a skill."""
+
+    def can_user_publish_skill(user, skill_rights):
+        """Checks whether the user can publish the given skill.
+
+        Args:
+            user: UserActionsInfo. Object having user id, role and actions
+                for given user.
+            skill_rights: SkillRights or None. Rights object for the given
+                skill.
+
+        Returns:
+            bool. Whether the given user can publish the given skill.
+        """
+
+        if skill_rights is None:
+            return False
+        if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
+            return False
+        if skill_rights.is_creator(user.user_id):
+            return True
+        return False
+
     def test_can_publish_skill(self, skill_id, **kwargs):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -983,7 +1027,7 @@ def can_publish_skill(handler):
         if skill_rights is None:
             raise base.UserFacingExceptions.PageNotFoundException
 
-        if skill_services.check_can_publish_skill(self.user, skill_rights):
+        if can_user_publish_skill(self.user, skill_rights):
             return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(

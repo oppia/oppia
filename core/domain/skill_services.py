@@ -177,14 +177,17 @@ def get_all_skill_summaries():
 def get_multi_skill_summaries(skill_ids):
     """Returns a list of skill summaries matching the skill IDs provided.
 
+    Args:
+        skill_ids: list(str). List of skill IDs to get skill summaries for.
+
     Returns:
         list(SkillSummary). The list of summaries of skills matching the
             provided IDs.
     """
     skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
     skill_summaries = [
-        get_skill_summary_from_model(summary)
-        for summary in skill_summaries_models]
+        get_skill_summary_from_model(skill_summary_model)
+        for skill_summary_model in skill_summaries_models]
     return skill_summaries
 
 
@@ -354,24 +357,30 @@ def save_new_skill(committer_id, skill):
             'cmd': skill_domain.CMD_CREATE_NEW
         })])
 
-
-def apply_change_list(skill_id, change_list):
+def apply_change_list(skill_id, change_list, committer_id):
     """Applies a changelist to a skill and returns the result.
 
     Args:
         skill_id: str. ID of the given skill.
         change_list: list(SkillChange). A change list to be applied to the given
             skill.
+        committer_id: str. The ID of the committer of this change list.
 
     Returns:
         Skill. The resulting skill domain object.
     """
     skill = get_skill_by_id(skill_id)
+    user = user_services.UserActionsInfo(committer_id)
     try:
         for change in change_list:
             if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_PROPERTY_DESCRIPTION):
+                    if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in (
+                            user.actions):
+                        raise Exception(
+                            'The user does not have enough rights to edit the '
+                            'skill description.')
                     skill.update_description(change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
@@ -501,7 +510,7 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
         raise ValueError(
             'Expected a commit message, received none.')
 
-    skill = apply_change_list(skill_id, change_list)
+    skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
 
@@ -543,7 +552,7 @@ def save_skill_rights(skill_rights, committer_id, commit_message, commit_cmds):
         skill_rights: SkillRights. The rights object for the given skill.
         committer_id: str. ID of the committer.
         commit_message: str. Descriptive message for the commit.
-        commit_cmds: list(TopicRightsChange). A list of commands describing
+        commit_cmds: list(SkillRightsChange). A list of commands describing
             what kind of commit was done.
     """
 
@@ -677,7 +686,7 @@ def get_skill_rights_from_model(skill_rights_model):
     """Constructs a SkillRights object from the given skill rights model.
 
     Args:
-        skill rights model: SkillRightsModel. Skill rights from the datastore.
+        skill_rights_model: SkillRightsModel. Skill rights from the datastore.
 
     Returns:
         SkillRights. The rights object created from the model.
@@ -702,7 +711,7 @@ def get_skill_rights(skill_id, strict=True):
         SkillRights. The rights object associated with the given skill.
 
     Raises:
-        EntityNotFoundError. The skill with ID skill id was not found
+        EntityNotFoundError. The skill with ID skill_id was not found
             in the datastore.
     """
 
@@ -714,56 +723,37 @@ def get_skill_rights(skill_id, strict=True):
     return get_skill_rights_from_model(model)
 
 
-def get_unpublished_skills_by_creator(user_id):
+def get_unpublished_skill_rights_by_creator(user_id):
+    """Retrives the rights objects that are private and were created by the
+    user with the provided user ID.
+
+    Args:
+        user_id: str. The user ID of the user that created the skills being
+            fetched.
+
+    Returns:
+        list(SkillRights). The list of skill rights objects that are private
+        and created by the provided user.
+    """
+
     skill_rights_models = (
-        skill_models.SkillRightsModel.get_unpublished_skills_by_creator_id(
+        skill_models.SkillRightsModel.get_unpublished_by_creator_id(
             user_id))
     return [get_skill_rights_from_model(skill_rights_model)
             for skill_rights_model in skill_rights_models]
 
 
-def check_can_edit_skill(user, skill_rights):
-    """Checks whether the user can edit the given skill.
-
-    Args:
-        user: UserActionsInfo. Object having user id, role and actions for
-            given user.
-        skill_rights: SkillRights or None. Rights object for the given skill.
+def get_all_unpublished_skill_rights():
+    """Retrieves the rights objects that are private
 
     Returns:
-        bool. Whether the given user can edit the given skill.
-    """
-    if skill_rights is None:
-        return False
-    if role_services.ACTION_EDIT_PUBLIC_SKILLS not in user.actions:
-        return False
-    if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
-        if not skill_rights.is_private():
-            return True
-        if skill_rights.is_private() and skill_rights.is_creator(user.user_id):
-            return True
-    return False
-
-
-def check_can_publish_skill(user, skill_rights):
-    """Checks whether the user can publish the given skill.
-
-    Args:
-        user: UserActionsInfo. Object having user id, role and actions for
-            given user.
-        skill_rights: SkillRights or None. Rights object for the given skill.
-
-    Returns:
-        bool. Whether the given user can publish the given skill.
+        list(SkillRights). The list of skill rights objects that are private.
     """
 
-    if skill_rights is None:
-        return False
-    if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
-        return False
-    if skill_rights.is_creator(user.user_id):
-        return True
-    return False
+    skill_rights_models = (
+        skill_models.SkillRightsModel.get_unpublished())
+    return [get_skill_rights_from_model(skill_rights_model)
+            for skill_rights_model in skill_rights_models]
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):

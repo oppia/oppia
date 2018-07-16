@@ -16,6 +16,7 @@
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import role_services
 from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import user_services
@@ -26,6 +27,12 @@ import utils
 def _require_valid_version(version_from_payload, skill_version):
     """Check that the payload version matches the given skill
     version.
+
+    Args:
+        version_from_payload: int. The version that the frontend instance of the
+            skill represents.
+        skill_version: int. The latest version of the skill currently persisted
+            in the backend.
     """
     if version_from_payload is None:
         raise base.BaseHandler.InvalidInputException(
@@ -64,6 +71,22 @@ class SkillEditorPage(base.BaseHandler):
         self.render_template('pages/skill_editor/skill_editor.html')
 
 
+def check_can_edit_skill_description(user):
+    """Checks whether the user can edit skill descriptions.
+
+    Args:
+        user: UserActionsInfo. Object having user id, role and actions for
+            given user.
+
+    Returns:
+        bool. Whether the given user can edit skill descriptions.
+    """
+
+    if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in user.actions:
+        return False
+    else:
+        return True
+
 class SkillRightsHandler(base.BaseHandler):
     """A handler for returning skill rights."""
 
@@ -78,13 +101,13 @@ class SkillRightsHandler(base.BaseHandler):
                 'Could not find skill rights associated with the provided '
                 'skill id')
         user_actions_info = user_services.UserActionsInfo(self.user_id)
-        can_edit_skill = skill_services.check_can_edit_skill(
-            user_actions_info, skill_rights)
+        can_edit_skill_description = check_can_edit_skill_description(
+            user_actions_info)
 
         self.values.update({
             'skill_is_private': skill_rights.skill_is_private,
             'creator_id': skill_rights.creator_id,
-            'can_edit_skill': can_edit_skill,
+            'can_edit_skill_description': can_edit_skill_description,
             'skill_id': skill_id
         })
 
@@ -178,13 +201,13 @@ class SkillPublishHandler(base.BaseHandler):
 
         skill_rights = skill_services.get_skill_rights(skill_id, strict=False)
         user_actions_info = user_services.UserActionsInfo(self.user_id)
-        can_edit_skill = skill_services.check_can_edit_skill(
-            user_actions_info, skill_rights)
+        can_edit_skill_description = check_can_edit_skill_description(
+            user_actions_info)
 
         self.values.update({
             'skill_is_private': skill_rights.skill_is_private,
             'creator_id': skill_rights.creator_id,
-            'can_edit_skill': can_edit_skill
+            'can_edit_skill_description': can_edit_skill_description
         })
 
         self.render_json(self.values)

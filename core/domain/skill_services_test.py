@@ -212,7 +212,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertTrue(skill_services.check_can_edit_skill(
             self.user_admin_2, skill_rights))
 
-    def test_get_unpublished_skills_by_creator(self):
+    def test_get_unpublished_skill_rights_by_creator(self):
         self.save_new_skill(
             'skill_a', self.user_id_admin, 'Description A', [],
             skill_domain.SkillContents('Explanation', ['Example 1']))
@@ -220,15 +220,15 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             'skill_b', self.user_id_admin, 'Description B', [],
             skill_domain.SkillContents('Explanation', ['Example 1']))
 
-        skills = skill_services.get_unpublished_skills_by_creator(
+        skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
             self.user_id_admin)
-        skill_ids = [skill.id for skill in skills]
+        skill_ids = [skill_rights_obj.id for skill_rights_obj in skill_rights]
         self.assertListEqual(skill_ids, [self.SKILL_ID, 'skill_a', 'skill_b'])
 
         skill_services.publish_skill(self.SKILL_ID, self.user_id_admin)
-        skills = skill_services.get_unpublished_skills_by_creator(
+        skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
             self.user_id_admin)
-        skill_ids = [skill.id for skill in skills]
+        skill_ids = [skill_rights_obj.id for skill_rights_obj in skill_rights]
         self.assertListEqual(skill_ids, ['skill_a', 'skill_b'])
 
 
