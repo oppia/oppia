@@ -137,7 +137,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
             response_json = self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
-                payload, csrf_token, expect_errors=False)
+                payload,
+                csrf_token=csrf_token,
+                expect_errors=False)
             self.assertEqual(
                 response_json['question_dict']['language_code'], 'en')
             self.assertEqual(
@@ -149,19 +151,25 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
             self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
-                    self.question_id), payload, csrf_token, expect_errors=True,
+                    self.question_id), payload,
+                csrf_token=csrf_token,
+                expect_errors=True,
                 expected_status_int=404)
             del payload['commit_message']
             payload['change_list'] = change_list
             self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX,
-                    self.question_id), payload, csrf_token, expect_errors=True,
+                    self.question_id), payload,
+                csrf_token=csrf_token,
+                expect_errors=True,
                 expected_status_int=404)
             payload['commit_message'] = 'update question data'
             self.put_json(
-                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, payload, csrf_token,
-                expect_errors=True, expected_status_int=404)
+                feconf.QUESTION_EDITOR_DATA_URL_PREFIX, payload,
+                csrf_token=csrf_token,
+                expect_errors=True,
+                expected_status_int=404)
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
@@ -180,7 +188,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
             response_json = self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
-                payload, csrf_token, expect_errors=False)
+                payload,
+                csrf_token=csrf_token,
+                expect_errors=False)
 
             self.assertEqual(
                 response_json['question_dict']['language_code'], 'en')
@@ -208,7 +218,9 @@ class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):
             response_json = self.put_json(
                 '%s/%s' % (
                     feconf.QUESTION_EDITOR_DATA_URL_PREFIX, self.question_id),
-                payload, csrf_token, expect_errors=False)
+                payload,
+                csrf_token=csrf_token,
+                expect_errors=False)
 
             self.assertEqual(
                 response_json['question_dict']['language_code'], 'en')
