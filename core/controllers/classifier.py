@@ -38,7 +38,8 @@ def generate_signature(secret, message):
         str. The signature of the payload data.
     """
     message_json = json.dumps(message, sort_keys=True)
-    return hmac.new(secret, message_json, digestmod=hashlib.sha256).hexdigest()
+    return hmac.new(
+        secret, msg=message_json, digestmod=hashlib.sha256).hexdigest()
 
 
 def validate_job_result_message_dict(message):
