@@ -87,6 +87,7 @@ def check_can_edit_skill_description(user):
     else:
         return True
 
+
 class SkillRightsHandler(base.BaseHandler):
     """A handler for returning skill rights."""
 

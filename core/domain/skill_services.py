@@ -357,6 +357,7 @@ def save_new_skill(committer_id, skill):
             'cmd': skill_domain.CMD_CREATE_NEW
         })])
 
+
 def apply_change_list(skill_id, change_list, committer_id):
     """Applies a changelist to a skill and returns the result.
 
