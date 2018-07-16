@@ -153,59 +153,73 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
         job_exploration_mappings)
 
 
-def convert_strings_to_float_numbers_in_classifier_data(
-        classifier_data, strings_only_key_list):
+FLOAT_INDICATOR_KEY = 'float_values'
+# pylint: disable=too-many-branches
+
+
+def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
     """Converts all floating point numbers in classifier data to string.
 
     Args:
-        classifier_data: dict. The trained classifier model in which float
+        classifier_data: dict|list. The trained classifier model in which float
             values are stored as strings.
-        strings_only_key_list: list(str). A list of keys which are to be kept
-            in string format.
 
     Returns:
-        Dict. Original dict with float values converted back from string to
-            float.
+        Dict. Original classifier data dict with float values converted back
+            from string to float.
     """
     if isinstance(classifier_data, dict):
-        for k in classifier_data.keys():
+        if not FLOAT_INDICATOR_KEY in classifier_data:
+            # If classifier data does not contain 'float_values' key then
+            # none of its key values need transformation.
+            return classifier_data
+
+        float_fields = classifier_data.pop(FLOAT_INDICATOR_KEY)
+        for k in classifier_data:
             if isinstance(classifier_data[k], dict):
-                new_key_list = [
-                    '.'.join(key.split('.')[1:])
-                    for key in strings_only_key_list if key.startswith(k)]
                 classifier_data[k] = (
                     convert_strings_to_float_numbers_in_classifier_data(
-                        classifier_data[k], new_key_list))
-            elif isinstance(classifier_data[k], (list, set, tuple)):
-                if not k in strings_only_key_list:
+                        classifier_data[k]))
+            elif isinstance(classifier_data[k], list):
+                if k in float_fields:
                     classifier_data[k] = (
                         convert_strings_to_float_numbers_in_classifier_data(
-                            classifier_data[k], []))
-            elif isinstance(classifier_data[k], (str, unicode)):
-                if not k in strings_only_key_list:
-                    try:
-                        classifier_data[k] = float(classifier_data[k])
-                    except ValueError:
-                        classifier_data[k] = classifier_data[k]
+                            classifier_data[k]))
+            elif isinstance(classifier_data[k], basestring):
+                if k in float_fields:
+                    classifier_data[k] = float(classifier_data[k])
+            elif isinstance(classifier_data[k], int):
+                classifier_data[k] = classifier_data[k]
             else:
-                classifier_data[k] = (
-                    convert_strings_to_float_numbers_in_classifier_data(
-                        classifier_data[k], strings_only_key_list))
+                raise Exception(
+                    'Expected all classifier data dict values to be dicts, '
+                    'lists, integers or strings but received %s.' % (
+                        type(classifier_data[k])))
+
         return classifier_data
-    elif isinstance(classifier_data, (list, set, tuple)):
+    elif isinstance(classifier_data, list):
         new_list = []
         for item in classifier_data:
-            if isinstance(item, (str, unicode)):
+            if isinstance(item, basestring):
                 try:
                     new_list.append(float(item))
                 except ValueError:
                     new_list.append(item)
-            else:
+            elif isinstance(item, (dict, list)):
                 new_list.append(
-                    convert_strings_to_float_numbers_in_classifier_data(
-                        item, strings_only_key_list))
-        return type(classifier_data)(new_list)
-    return classifier_data
+                    convert_strings_to_float_numbers_in_classifier_data(item))
+            elif isinstance(item, int):
+                new_list.append(item)
+            else:
+                raise Exception(
+                    'Expected list values to be either strings, '
+                    'lists, integers or dicts but received %s.' % (type(item)))
+        return new_list
+    else:
+        raise Exception(
+            'Expected all top-level classifier data objects to be lists or '
+            'dicts but received %s.' % (type(classifier_data)))
+# pylint: enable=too-many-branches
 
 
 def get_classifier_training_job_from_model(classifier_training_job_model):

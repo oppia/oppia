@@ -459,50 +459,62 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
         test_dict = {
             'a': {
                 'ab': 'abcd',
-                'ac': '0.5'
+                'ad': {
+                    'ada': 'abcdef',
+                    'adc': ['fghi', {
+                        'adca': 'abcd',
+                        'adcb': '0.1234',
+                        'adcc': ['ade', 'afd'],
+                        'float_values': ['adcb']
+                    }],
+                    'float_values': ['adc']
+                },
+                'ae': [['123', '0.123'], ['abc']],
+                'af': [['abcde'], ['0.871']],
+                'float_values': ['af']
             },
             'b': {
-                'ba': [1, 2, 3],
-                'bb': [['1.0', '0.0', '1.0'], ['0.0', '1.0', '1.0']],
-                'bc': ['-3.44757604341e-05', '-3.44757604341e-05'],
                 'bd': ['-2.48521656693', '-2.48521656693', '-2.48521656693'],
                 'be': {
                     'bea': 'abcdef',
-                    'beb': '0.0',
-                    'bec': '0.142857142857',
-                    'bed': 3},
-                'bf': ['0.133432545', 1, 2, '3.1233'],
-                'bg': [['abc', 'def'], 'ghi']
+                    'bed': 3,
+                    'float_values': []
+                },
+                'bg': ['abc', 'def', 'ghi'],
+                'bh': ['abc', 123],
+                'float_values': ['bd']
             },
             'c': '1.123432',
-            'd': 21123
+            'float_values': ['c']
         }
-
-        strings_only_key_list = ['a.ab', 'b.be.bea', 'b.bg']
 
         expected_dict = {
             'a': {
                 'ab': 'abcd',
-                'ac': 0.5
+                'ad': {
+                    'ada': 'abcdef',
+                    'adc': ['fghi', {
+                        'adca': 'abcd',
+                        'adcb': 0.1234,
+                        'adcc': ['ade', 'afd']
+                    }]
+                },
+                'ae': [['123', '0.123'], ['abc']],
+                'af': [['abcde'], [0.871]]
             },
             'b': {
-                'ba': [1, 2, 3],
-                'bb': [[1.0, 0.0, 1.0], [0.0, 1.0, 1.0]],
-                'bc': [-3.44757604341e-05, -3.44757604341e-05],
                 'bd': [-2.48521656693, -2.48521656693, -2.48521656693],
                 'be': {
                     'bea': 'abcdef',
-                    'beb': 0.0,
-                    'bec': 0.142857142857,
-                    'bed': 3},
-                'bf': [0.133432545, 1, 2, 3.1233],
-                'bg': [['abc', 'def'], 'ghi']
+                    'bed': 3
+                },
+                'bg': ['abc', 'def', 'ghi'],
+                'bh': ['abc', 123],
             },
             'c': 1.123432,
-            'd': 21123
         }
 
         output_dict = (
             classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
-                test_dict, strings_only_key_list))
+                test_dict))
         self.assertDictEqual(expected_dict, output_dict)

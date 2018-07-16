@@ -88,7 +88,6 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.job_result_dict = {
             'job_id': self.job_id,
             'classifier_data': self.classifier_data,
-            'strings_only_key_list': []
         }
 
         self.payload = {}
