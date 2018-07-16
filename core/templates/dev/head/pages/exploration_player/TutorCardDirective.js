@@ -41,7 +41,6 @@ oppia.directive('tutorCard', [
       restrict: 'E',
       scope: {
         onSubmitAnswer: '&',
-        returnToExploration: '&',
         isLearnAgainButton: '&',
         isConceptCardPending: '&',
         onDismiss: '&',
@@ -79,16 +78,21 @@ oppia.directive('tutorCard', [
 
             $scope.arePreviousResponsesShown = false;
             $scope.activeCard = PlayerTranscriptService.getCard(index);
-            $scope.conceptCardIsBeingShown = (
-              $scope.activeCard.stateName === null);
+            $scope.conceptCardIsBeingShown =
+              ExplorationPlayerStateService.isStateShowingConceptCard(
+                $scope.activeCard.stateName);
             $scope.interactionIsActive =
               PlayerTranscriptService.isLastCard(index);
             $scope.$on(EVENT_NEW_CARD_AVAILABLE, function(evt, data) {
               $scope.interactionIsActive = false;
             });
-            $scope.isInteractionInline = (
-              ExplorationPlayerStateService.isInteractionInline(
-                $scope.activeCard.stateName));
+            if ($scope.conceptCardIsBeingShown) {
+              $scope.isInteractionInline = true;
+            } else {
+              $scope.isInteractionInline = (
+                ExplorationPlayerStateService.isInteractionInline(
+                  $scope.activeCard.stateName));
+            }
             $scope.lastAnswer =
               PlayerTranscriptService.getLastAnswerOnActiveCard(index);
             if (!$scope.conceptCardIsBeingShown) {
@@ -170,6 +174,9 @@ oppia.directive('tutorCard', [
           };
 
           $scope.isContentAudioTranslationAvailable = function() {
+            if ($scope.conceptCardIsBeingShown) {
+              return false;
+            }
             return ExplorationPlayerService.isContentAudioTranslationAvailable(
               $scope.activeCard.stateName);
           };

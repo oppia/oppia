@@ -53,10 +53,12 @@ oppia.directive('progressNav', [
             $scope.hasPrevious = $scope.activeCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
               $scope.activeCardIndex);
-
-            var interaction = ExplorationPlayerService.getInteraction(
-              $scope.activeCard.stateName);
-            if (interaction !== null) {
+            $scope.isConceptCardShown =
+              ExplorationPlayerStateService.isStateShowingConceptCard(
+                $scope.activeCard.stateName);
+            if (!$scope.isConceptCardShown) {
+              var interaction = ExplorationPlayerService.getInteraction(
+                $scope.activeCard.stateName);
               interactionIsInline = (
                 ExplorationPlayerStateService.isInteractionInline(
                   $scope.activeCard.stateName));
@@ -104,7 +106,7 @@ oppia.directive('progressNav', [
           };
 
           $scope.shouldContinueButtonBeShown = function() {
-            if ($scope.activeCard.stateName === null) {
+            if ($scope.isConceptCardShown) {
               return true;
             }
             var lastPair = $scope.activeCard.inputResponsePairs[

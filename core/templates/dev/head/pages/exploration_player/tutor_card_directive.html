@@ -34,10 +34,10 @@
       </h4>
     </div>
 
-    <div ng-show="arePreviousResponsesShown"
+    <div ng-if="arePreviousResponsesShown && !conceptCardIsBeingShown"
          class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
       <div ng-repeat="responsePair in activeCard.inputResponsePairs track by $index">
-        <div ng-if="(!$last || !isInteractionInline) && !conceptCardIsBeingShown">
+        <div ng-if="(!$last || !isInteractionInline)">
           <input-response-pair data="responsePair"
                                profile-picture="profilePicture"
                                oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
