@@ -498,7 +498,6 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
     create_skill_summary(skill.id)
 
 
-
 def delete_skill(committer_id, skill_id, force_deletion=False):
     """Deletes the skill with the given skill_id.
 

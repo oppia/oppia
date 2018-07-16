@@ -45,9 +45,6 @@ CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY = (
 CMD_ADD_SKILL_MISCONCEPTION = 'add_skill_misconception'
 CMD_DELETE_SKILL_MISCONCEPTION = 'delete_skill_misconception'
 
-
-
-
 CMD_CREATE_NEW = 'create_new'
 CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION = (
     'migrate_contents_schema_to_latest_version')
@@ -344,10 +341,12 @@ class Skill(object):
                 created.
             last_updated: datetime.datetime. Date and time when the
                 skill was last updated.
-            superseding_skill_id: str. skill Id of the skill we
-                merge this skill into.
-            all_questions_merged: boolean. flag that indicates if all questions
-                are merged for the deduped skill.
+            superseding_skill_id: str|None. Skill ID of the skill we
+                merge this skill into. This is non null only if we indicate
+                that this skill is a duplicate and needs to be merged into
+                another one.
+            all_questions_merged: bool|None. Flag that indicates if all
+                questions are moved from this skill to the superseding skill.
         """
         self.id = skill_id
         self.description = description
@@ -456,6 +455,16 @@ class Skill(object):
                     'The misconception with id %s is out of bounds.'
                     % misconception.id)
             misconception.validate()
+        if (self.all_questions_merged is not None and
+                self.superseding_skill_id is None):
+            raise utils.ValidationError(
+                'Expected a value for superseding_skill_id when '
+                'all_questions_merged is set.')
+        if (self.superseding_skill_id is not None and
+                self.all_questions_merged is None):
+            raise utils.ValidationError(
+                'Expected a value for all_questions_merged when '
+                'superseding_skill_id is set.')
 
     def to_dict(self):
         """Returns a dict representing this Skill domain object.
@@ -568,10 +577,10 @@ class Skill(object):
         self.language_code = language_code
 
     def update_superseding_skill_id(self, superseding_skill_id):
-        """Updates the superseding skill id of the skill.
+        """Updates the superseding skill ID of the skill.
 
         Args:
-            superseding_skill_id: str. Id of the skill that supersedes this one.
+            superseding_skill_id: str. ID of the skill that supersedes this one.
         """
         self.superseding_skill_id = superseding_skill_id
 
@@ -579,8 +588,8 @@ class Skill(object):
         """Updates the flag value which indicates if all questions are merged.
 
         Args:
-            all_questions_merged: boolean.
-            Flag indicating if all questions are merged
+            all_questions_merged: bool. Flag indicating if all questions are
+            merged to the superseding skill.
         """
         self.all_questions_merged = all_questions_merged
 
