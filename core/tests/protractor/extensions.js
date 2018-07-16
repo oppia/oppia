@@ -177,49 +177,15 @@ describe('Interactions', function() {
     users.logout();
   });
 
-  it('publish exploration with math expression successfully', function() {
-    users.createAndLoginUser('mathEditor@interactions.com', 'mathEditor');
+  it('publish and play exploration successfully', function() {
+    /*
+     * This suite should be expanded as new interaction's e2e utility is added.
+     */
+    users.createAndLoginUser(
+      'explorationEditor@interactions.com', 'explorationEditor');
     workflow.createExploration();
-    explorationEditorMainTab.setStateName('first');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'Please enter the equation of a straight line.'));
-    explorationEditorMainTab.setInteraction('MathExpressionInput');
-    explorationEditorMainTab.addResponse(
-      'MathExpressionInput', forms.toRichText('Good job!'), 'end', true,
-      'IsMathematicallyEquivalentTo', 'y = mx + c');
-    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
-    responseEditor.setFeedback(forms.toRichText(
-      'A straight line equation comprises of a gradient (m), the y intercept ' +
-      '(c) and x,y variables!'));
 
-    explorationEditorMainTab.moveToState('end');
-    explorationEditorMainTab.setInteraction('EndExploration');
-    explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Math Exploration');
-    explorationEditorSettingsTab.setObjective(
-      'To publish and play this exploration');
-    explorationEditorSettingsTab.setCategory('Algebra');
-    explorationEditorPage.saveChanges();
-    workflow.publishExploration();
-    users.logout();
-
-    users.createAndLoginUser('mathLearner@interactions.com', 'mathLearner');
-    libraryPage.get();
-    libraryPage.findExploration('Math Exploration');
-    libraryPage.playExploration('Math Exploration');
-    explorationPlayerPage.expectExplorationNameToBe('Math Exploration');
-    explorationPlayerPage.expectContentToMatch(forms.toRichText(
-      'Please enter the equation of a straight line.'));
-    explorationPlayerPage.submitAnswer('MathExpressionInput', 'y = mx + c');
-    explorationPlayerPage.clickThroughToNextCard();
-    explorationPlayerPage.expectExplorationToBeOver();
-    users.logout();
-  });
-
-  it('publish exploration with graph interaction successfully', function() {
-    users.createAndLoginUser('graphEditor@interactions.com', 'graphEditor');
-    workflow.createExploration();
-    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setStateName('Graph');
     explorationEditorMainTab.setContent(forms.toRichText(
       'Draw a complete graph with the given vertices.'));
     var graphDict = {
@@ -230,38 +196,68 @@ describe('Interactions', function() {
       edges: [[0, 1], [1, 2], [0, 2]],
       vertices: [[277, 77], [248, 179], [405, 144]]
     };
-    explorationEditorMainTab.addResponse('GraphInput',
-      forms.toRichText('Good job!'), 'end', true, 'IsIsomorphicTo', graphDict);
+    explorationEditorMainTab.addResponse(
+      'GraphInput', forms.toRichText('Good job!'), 'MathExp',
+      true, 'IsIsomorphicTo', graphDict);
     var responseEditor = explorationEditorMainTab.getResponseEditor('default');
     responseEditor.setFeedback(forms.toRichText(
       'A complete graph is a graph in which each pair of graph vertices is ' +
       'connected by an edge.'));
 
-    explorationEditorMainTab.moveToState('end');
-    explorationEditorMainTab.setContent(forms.toRichText(
-      'Congratulations, you have finished!'));
+    explorationEditorMainTab.moveToState('MathExp');
+    explorationEditorMainTab.setContent(function(richTextEditor) {
+      richTextEditor.appendPlainText(
+        'Please simplify the following expression: ');
+      // Some Latex styling is expected here.
+      richTextEditor.addRteComponent(
+        'Math', '16x^{12}/4x^2');
+    });
+
+    explorationEditorMainTab.setInteraction('MathExpressionInput');
+    // Proper Latex styling for rule spec is required.
+    explorationEditorMainTab.addResponse(
+      'MathExpressionInput', forms.toRichText('Good job!'), 'End', true,
+      'IsMathematicallyEquivalentTo', '\\frac{16x^{12}}{4x^{2}}');
+    // Expecting answer to be 4x^10
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText(
+      'A simplified expression should be smaller than the original.'));
+
+    explorationEditorMainTab.moveToState('End');
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorPage.navigateToSettingsTab();
-    explorationEditorSettingsTab.setTitle('Graph Exploration');
+    explorationEditorSettingsTab.setTitle('Regression Test Exploration');
     explorationEditorSettingsTab.setObjective(
       'To publish and play this exploration');
-    explorationEditorSettingsTab.setCategory('Graph Theory');
+    explorationEditorSettingsTab.setCategory('Logic');
     explorationEditorPage.saveChanges();
     workflow.publishExploration();
     users.logout();
 
     users.createAndLoginUser('graphLearner@interactions.com', 'graphLearner');
     libraryPage.get();
-    libraryPage.findExploration('Graph Exploration');
-    libraryPage.playExploration('Graph Exploration');
-    explorationPlayerPage.expectExplorationNameToBe('Graph Exploration');
+    libraryPage.findExploration('Regression Test Exploration');
+    libraryPage.playExploration('Regression Test Exploration');
+    explorationPlayerPage.expectExplorationNameToBe(
+      'Regression Test Exploration');
+
+    // Play Graph Input interaction.
     explorationPlayerPage.expectContentToMatch(forms.toRichText(
       'Draw a complete graph with the given vertices.'));
     graphDict = {
       edges: [[1, 2], [1, 0], [0, 2]]
     };
     explorationPlayerPage.submitAnswer('GraphInput', graphDict);
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('Good job!'));
     explorationPlayerPage.clickThroughToNextCard();
+
+    // Play Math Expression Input interaction.
+    explorationPlayerPage.submitAnswer('MathExpressionInput', '4 * x^(10)');
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('Good job!'));
+    explorationPlayerPage.clickThroughToNextCard();
+
     explorationPlayerPage.expectExplorationToBeOver();
     users.logout();
   });
