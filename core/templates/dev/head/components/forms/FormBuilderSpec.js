@@ -54,6 +54,28 @@ describe('HTML to text', function() {
       expect(fn).toThrow();
     });
   }));
+
+  var validUnicodeStrings = [
+    '{{}}',
+    '{{abc}}',
+    '\\\\{{abc}}',
+    '\\{{{abc}}'
+  ];
+
+  it('should detect valid unicode strings', inject(function($filter) {
+    var results = [
+    '<oppia-parameter></oppia-parameter>',
+    '<oppia-parameter>abc</oppia-parameter>',
+    '\\<oppia-parameter>abc</oppia-parameter>',
+    '{<oppia-parameter>abc</oppia-parameter>',
+    ];
+    validUnicodeStrings.forEach(function(s, i) {
+      var fn = (function() {
+        return $filter('convertUnicodeWithParamsToHtml')(s);
+      })();
+      expect(fn).toBe(results[i]);
+    });
+  }));
 });
 
 describe('Normalizer tests', function() {
