@@ -447,8 +447,10 @@ tags: []
             data['csrf_token'] = csrf_token
 
         json_response = self._send_post_request(
-            self.testapp, url, data, expect_errors, expected_status_int,
-            upload_files)
+            self.testapp, url, data,
+            expect_errors=expect_errors,
+            expected_status_int=expected_status_int,
+            upload_files=upload_files)
         # Testapp takes in a status parameter which is the expected status of
         # the response. However this expected status is verified only when
         # expect_errors=False. For other situations we need to explicitly check
@@ -573,7 +575,7 @@ tags: []
                 'new_config_property_values': {
                     config_obj.name: new_config_value,
                 }
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
@@ -594,7 +596,7 @@ tags: []
             '/adminrolehandler', {
                 'username': username,
                 'role': user_role
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.logout()
 
         self._restore_stashed_user_env()
@@ -893,7 +895,10 @@ tags: []
                 exploration details.
         """
         collection = collection_domain.Collection.create_default_collection(
-            collection_id, title, category, objective,
+            collection_id,
+            title=title,
+            category=category,
+            objective=objective,
             language_code=language_code)
 
         # Check whether exploration with given exploration_id exists or not.
@@ -901,7 +906,10 @@ tags: []
             exploration_id, strict=False)
         if exploration is None:
             exploration = self.save_new_valid_exploration(
-                exploration_id, owner_id, title, category, objective,
+                exploration_id, owner_id,
+                title=title,
+                category=category,
+                objective=objective,
                 end_state_name=end_state_name)
         collection.add_node(exploration.id)
 
@@ -1179,7 +1187,7 @@ class AppEngineTestBase(TestBase):
 
     def count_jobs_in_taskqueue(self, queue_name):
         """Counts the jobs in the given queue."""
-        return len(self.get_pending_tasks(queue_name))
+        return len(self.get_pending_tasks(queue_name=queue_name))
 
     def get_pending_tasks(self, queue_name=None):
         """Returns the jobs in the given queue. If queue_name is None, defaults
