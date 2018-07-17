@@ -323,9 +323,9 @@
         "targetDirPrefix": "jquery-ui-touch-punch-"
       },
       "mathExpressions": {
-        "version": "v2.0.0-alpha1",
+        "version": "v1.7.0",
         "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/kisonecat/math-expressions/74149284d04562185c94baaf603637fd298d59bb/build/",
+        "url": "https://raw.githubusercontent.com/kisonecat/math-expressions/9b7a1d94329a6c73b7db6d513824be609fb1932f/build",
         "targetDirPrefix": "math-expressions-",
         "files": ["math-expressions.js"]
       },
