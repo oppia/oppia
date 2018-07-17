@@ -102,7 +102,6 @@ oppia.controller('FeedbackTab', [
     };
 
     var _isSuggestionValid = function() {
-      console.log($scope.activeThread)
       if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
         return ExplorationStatesService.hasState(
           $scope.activeThread.suggestion.stateName);
@@ -164,7 +163,6 @@ oppia.controller('FeedbackTab', [
             return state !== undefined ? state.content.getHtml() : null;
           },
           newContent: function() {
-            console.log($scope.activeThread);
             if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
               return $scope.activeThread.suggestion.newValue.html;
             }
