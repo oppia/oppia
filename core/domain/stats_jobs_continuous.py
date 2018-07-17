@@ -136,7 +136,7 @@ class InteractionAnswerSummariesMRJobManager(
         # contain the version they correspond to. Otherwise, if they map to
         # VERSION_ALL, then multiple versions may be included.
         if exploration_version != VERSION_ALL and (
-                len(versions) != 1 or versions[0] != exploration_version):
+                len(versions) != 1 or versions[0] != int(exploration_version)):
             yield (
                 'Expected a single version when aggregating answers for '
                 'exploration %s (v=%s), but found: %s' % (
