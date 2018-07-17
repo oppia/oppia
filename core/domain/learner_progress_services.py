@@ -344,7 +344,8 @@ def add_collection_to_learner_playlist(
 
         (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
             learner_playlist_services.mark_collection_to_be_played_later(
-                user_id, collection_id, position_to_be_inserted))
+                user_id, collection_id,
+                position_to_be_inserted=position_to_be_inserted))
 
         belongs_to_completed_or_incomplete_list = False
     else:
@@ -389,7 +390,8 @@ def add_exp_to_learner_playlist(
 
         (playlist_limit_exceeded, belongs_to_subscribed_activities) = (
             learner_playlist_services.mark_exploration_to_be_played_later(
-                user_id, exploration_id, position_to_be_inserted))
+                user_id, exploration_id,
+                position_to_be_inserted=position_to_be_inserted))
 
         belongs_to_completed_or_incomplete_list = False
 
@@ -1093,8 +1095,9 @@ def get_activity_progress(user_id):
     }
 
     _remove_activity_ids_from_incomplete_list(
-        user_id, nonexistent_incomplete_exp_ids,
-        nonexistent_incomplete_collection_ids)
+        user_id,
+        exploration_ids=nonexistent_incomplete_exp_ids,
+        collection_ids=nonexistent_incomplete_collection_ids)
     _remove_activity_ids_from_completed_list(
         user_id, nonexistent_completed_exp_ids,
         nonexistent_completed_collection_ids)

@@ -39,9 +39,9 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
             self.MISCONCEPTION_ID_1, 'name', 'description', 'default_feedback')]
         self.SKILL_ID = skill_services.get_new_skill_id()
         self.skill = self.save_new_skill(
-            self.SKILL_ID, self.USER_ID, 'Description', misconceptions,
-            skill_contents
-        )
+            self.SKILL_ID, self.USER_ID, 'Description',
+            misconceptions=misconceptions,
+            skill_contents=skill_contents)
 
     def test_compute_summary(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
@@ -84,13 +84,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_skill_descriptions_by_ids(self):
         self.save_new_skill(
-            'skill_2', self.USER_ID, 'Description 2', [],
-            skill_domain.SkillContents('Explanation', ['Example 1'])
-        )
+            'skill_2', self.USER_ID, 'Description 2', misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                'Explanation', ['Example 1']))
         self.save_new_skill(
-            'skill_3', self.USER_ID, 'Description 3', [],
-            skill_domain.SkillContents('Explanation', ['Example 1'])
-        )
+            'skill_3', self.USER_ID, 'Description 3', misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                'Explanation', ['Example 1']))
         with self.swap(feconf, 'CAN_SEND_EMAILS', True):
             skill_descriptions = skill_services.get_skill_descriptions_by_ids(
                 'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
@@ -171,9 +171,10 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
     def test_delete_skill(self):
         skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
         self.assertEqual(
-            skill_services.get_skill_by_id(self.SKILL_ID, False), None)
+            skill_services.get_skill_by_id(self.SKILL_ID, strict=False), None)
         self.assertEqual(
-            skill_services.get_skill_summary_by_id(self.SKILL_ID, False), None)
+            skill_services.get_skill_summary_by_id(
+                self.SKILL_ID, strict=False), None)
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):

@@ -23,6 +23,14 @@
     }
   },
   "Continue": {},
+  "DragAndDropSortInput": {
+    "IsEqualToOrdering": {
+      "description": "is equal to ordering {{x|ListOfSetsOfHtmlStrings}}"
+    },
+    "IsEqualToOrderingWithOneItemAtIncorrectPosition": {
+      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfHtmlStrings}}"
+    }
+  },
   "EndExploration": {},
   "FractionInput": {
     "IsExactlyEqualTo": {

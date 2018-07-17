@@ -18,18 +18,18 @@
  */
 
 oppia.factory('ExplorationRecommendationsService', [
-  '$http', 'UrlService', 'ExplorationContextService', 'PAGE_CONTEXT',
-  'EDITOR_TAB_CONTEXT',
+  '$http', 'UrlService', 'ContextService', 'PAGE_CONTEXT',
+  'EXPLORATION_EDITOR_TAB_CONTEXT',
   function(
-      $http, UrlService, ExplorationContextService, PAGE_CONTEXT,
-      EDITOR_TAB_CONTEXT) {
+      $http, UrlService, ContextService, PAGE_CONTEXT,
+      EXPLORATION_EDITOR_TAB_CONTEXT) {
     var isIframed = UrlService.isIframed();
     var isInEditorPage = (
-      ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+      ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR);
     var isInEditorPreviewMode = isInEditorPage && (
-      ExplorationContextService.getEditorTabContext() ===
-      EDITOR_TAB_CONTEXT.PREVIEW);
-    var explorationId = ExplorationContextService.getExplorationId();
+      ContextService.getEditorTabContext() ===
+      EXPLORATION_EDITOR_TAB_CONTEXT.PREVIEW);
+    var explorationId = ContextService.getExplorationId();
 
     return {
       getRecommendedSummaryDicts: function(
