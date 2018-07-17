@@ -102,9 +102,10 @@ oppia.controller('FeedbackTab', [
     };
 
     var _isSuggestionValid = function() {
+      console.log($scope.activeThread)
       if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
         return ExplorationStatesService.hasState(
-          $scope.activeThread.suggestion.change_cmd.state_name);
+          $scope.activeThread.suggestion.stateName);
       } else {
         return ExplorationStatesService.hasState(
           $scope.activeThread.state_name);
@@ -155,7 +156,7 @@ oppia.controller('FeedbackTab', [
           currentContent: function() {
             var stateName;
             if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              stateName = $scope.activeThread.suggestion.change_cmd.state_name;
+              stateName = $scope.activeThread.suggestion.stateName;
             } else {
               stateName = $scope.activeThread.state_name;
             }
@@ -163,8 +164,9 @@ oppia.controller('FeedbackTab', [
             return state !== undefined ? state.content.getHtml() : null;
           },
           newContent: function() {
+            console.log($scope.activeThread);
             if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              return $scope.activeThread.suggestion.change_cmd.new_value.html;
+              return $scope.activeThread.suggestion.newValue.html;
             }
             return $scope.activeThread.suggestion.suggestion_html;
           }
@@ -248,19 +250,17 @@ oppia.controller('FeedbackTab', [
             // Immediately update editor to reflect accepted suggestion.
             if (result.action === ACTION_ACCEPT_SUGGESTION) {
               var suggestion;
-              var stateName;
               if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
                 suggestion = $scope.activeThread.suggestion;
-                stateName = suggestion.change_cmd.state_name;
               } else {
                 suggestion = $scope.activeThread;
-                stateName = suggestion.state_name;
               }
+              var stateName = suggestion.stateName;
               var stateDict = ExplorationDataService.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
               if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-                state.content.setHtml(suggestion.change_cmd.new_value.html);
+                state.content.setHtml(suggestion.newValue.html);
               } else {
                 state.content.setHtml(suggestion.suggestion.suggestion_html);
               }

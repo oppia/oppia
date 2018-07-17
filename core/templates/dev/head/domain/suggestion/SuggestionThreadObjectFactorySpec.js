@@ -35,6 +35,7 @@ describe('Suggestion thread object factory', function() {
       subject: 'sample subject',
       summary: 'sample summary',
       message_count: 10,
+      state_name: 'state 1',
       thread_id: 'exp1.thread1'
     };
 
@@ -61,9 +62,10 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.subject).toEqual('sample subject');
     expect(suggestionThread.summary).toEqual('sample summary');
     expect(suggestionThread.originalAuthorName).toEqual('author');
-    expect(suggestionThread.lastUpdated).toEqual(1000);
+    expect(suggestionThread.last_updated).toEqual(1000);
     expect(suggestionThread.messageCount).toEqual(10);
-    expect(suggestionThread.threadId).toEqual('exp1.thread1');
+    expect(suggestionThread.stateName).toEqual('state 1');
+    expect(suggestionThread.thread_id).toEqual('exp1.thread1');
     expect(suggestionThread.suggestion.suggestionType).toEqual(
       'edit_exploration_state_content');
     expect(suggestionThread.suggestion.targetType).toEqual('exploration');

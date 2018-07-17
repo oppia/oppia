@@ -51,6 +51,7 @@ describe('Suggestion object factory', function() {
     expect(suggestion.suggestionId).toEqual('exploration.exp1.thread1');
     expect(suggestion.status).toEqual('accepted');
     expect(suggestion.authorName).toEqual('author');
+    expect(suggestion.stateName).toEqual('state_1');
     expect(suggestion.newValue).toEqual('new suggestion content');
     expect(suggestion.oldValue).toEqual('old suggestion content');
     expect(suggestion.lastUpdated).toEqual(1000);

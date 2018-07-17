@@ -20,13 +20,14 @@
 oppia.factory('SuggestionObjectFactory', [function() {
   var Suggestion = function(
       suggestionType, suggestionId, targetType, targetId, status, authorName,
-      newValue, oldValue, lastUpdated) {
+      stateName, newValue, oldValue, lastUpdated) {
     this.suggestionType = suggestionType;
     this.suggestionId = suggestionId;
     this.targetType = targetType;
     this.targetId = targetId;
     this.status = status;
     this.authorName = authorName;
+    this.stateName = stateName;
     this.newValue = newValue;
     this.oldValue = oldValue;
     this.lastUpdated = lastUpdated;
@@ -42,6 +43,7 @@ oppia.factory('SuggestionObjectFactory', [function() {
       SuggestionBackendDict.suggestion_id, SuggestionBackendDict.target_type,
       SuggestionBackendDict.target_id, SuggestionBackendDict.status,
       SuggestionBackendDict.author_name,
+      SuggestionBackendDict.change_cmd.state_name,
       SuggestionBackendDict.change_cmd.new_value,
       SuggestionBackendDict.change_cmd.old_value,
       SuggestionBackendDict.last_updated);

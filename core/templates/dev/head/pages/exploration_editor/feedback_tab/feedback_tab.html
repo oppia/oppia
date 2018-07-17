@@ -43,8 +43,8 @@
 
       <div style="float: right;" class="col-lg-5 col-md-5 col-sm-5">
         <div class="pull-right">
-          <span ng-if="activeThread.state_name" class="label label-info">
-            state: <[activeThread.state_name]>
+          <span ng-if="activeThread.stateName" class="label label-info">
+            state: <[activeThread.stateName]>
           </span>
           <span ng-class="getLabelClass(activeThread.status)">
             <[getHumanReadableStatus(activeThread.status)]>

@@ -21,14 +21,15 @@ oppia.factory('SuggestionThreadObjectFactory', [
   'SuggestionObjectFactory', function(SuggestionObjectFactory) {
     var SuggestionThread = function(
         status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-        threadId, suggestion) {
+        stateName, threadId, suggestion) {
       this.status = status;
       this.subject = subject;
       this.summary = summary;
       this.originalAuthorName = originalAuthorName;
-      this.lastUpdated = lastUpdated;
+      this.last_updated = lastUpdated;
       this.messageCount = messageCount;
-      this.threadId = threadId;
+      this.stateName = stateName;
+      this.thread_id = threadId;
       this.suggestion = suggestion;
     };
 
@@ -42,6 +43,7 @@ oppia.factory('SuggestionThreadObjectFactory', [
         SuggestionThreadBackendDict.original_author_username,
         SuggestionThreadBackendDict.last_updated,
         SuggestionThreadBackendDict.message_count,
+        SuggestionThreadBackendDict.state_name,
         SuggestionThreadBackendDict.thread_id, suggestion);
     };
 

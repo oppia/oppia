@@ -71,16 +71,18 @@ oppia.factory('ThreadDataService', [
 
       $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
         _data.feedbackThreads = res[0].data.threads;
+        _data.suggestionThreads = [];
         if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
           var suggestionThreads = res[0].data.suggestion_thread_dicts;
           for (var i = 0; i < res[1].data.suggestions.length; i++) {
             var suggestion = SuggestionObjectFactory.createFromBackendDict(
-              res[1].data.suggestion[i]);
+              res[1].data.suggestions[i]);
             for (var j = 0; j < suggestionThreads.length; j++) {
               if (suggestion.threadId() ===
                   suggestionThreads[j].thread_id) {
-                var suggestionThread = SuggestionThreadObjectFactory(
-                  suggestionThreads[j], res[1].data.suggestion[i]);
+                var suggestionThread = (
+                  SuggestionThreadObjectFactory.createFromBackendDict(
+                    suggestionThreads[j], res[1].data.suggestions[i]));
                 _data.suggestionThreads.push(suggestionThread);
                 break;
               }
@@ -101,7 +103,6 @@ oppia.factory('ThreadDataService', [
         for (var i = 0; i < allThreads.length; i++) {
           if (allThreads[i].thread_id === threadId) {
             allThreads[i].messages = response.data.messages;
-            allThreads[i].suggestion = response.data.suggestion;
             break;
           }
         }
