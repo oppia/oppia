@@ -568,6 +568,8 @@ describe('Full exploration editor', function() {
       'How are you feeling?'));
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorMainTab.deleteInteraction();
+    explorationEditorPage.navigateToPreviewTab();
+    explorationEditorPage.navigateToMainTab();
     explorationEditorMainTab.setInteraction('TextInput');
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Happy!'), null, false, 'Equals',
