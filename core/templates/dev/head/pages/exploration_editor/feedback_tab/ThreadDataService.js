@@ -51,7 +51,7 @@ oppia.factory('ThreadDataService', [
     var _openThreadsCount = 0;
 
     var _fetchThreads = function(successCallback) {
-      var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
+      var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
       var params = {
         list_type: 'all',
         has_suggestion: true
@@ -63,14 +63,14 @@ oppia.factory('ThreadDataService', [
           target_id: _expId
         };
       }
-      var sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
+      var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
         params: params
       });
 
-      $q.all([fPromise, sPromise]).then(function(res) {
+      $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
         _data.feedbackThreads = res[0].data.threads;
         if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-          _data.suggestionThreads = res[0].data.suggestion_threads;
+          _data.suggestionThreads = res[0].data.threads_with_suggestions;
           for (var i = 0; i < res[1].data.suggestions.length; i++) {
             suggestion = res[1].data.suggestions[i];
             suggestion.thread_id = suggestion.suggestion_id.slice(

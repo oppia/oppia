@@ -37,13 +37,11 @@ class ThreadListHandler(base.BaseHandler):
             'threads': [t.to_dict() for t in feedback_services.get_all_threads(
                 exploration_id, False)]})
         if constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            # These are the feedback threads that have a suggestion linked to
-            # them.
             self.values.update({
-                'suggestion_threads': [t.to_dict()
-                                       for t in
-                                       feedback_services.get_all_threads(
-                                           exploration_id, True)]})
+                'threads_with_suggestions': (
+                    [t.to_dict() for t in feedback_services.get_all_threads(
+                        exploration_id, True)])
+            })
         self.render_json(self.values)
 
     @acl_decorators.can_create_feedback_thread
