@@ -4365,7 +4365,7 @@ class Exploration(object):
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, title, category)
+            yaml_content, title=title, category=category)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 

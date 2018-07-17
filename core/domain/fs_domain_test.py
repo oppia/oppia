@@ -87,8 +87,9 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             file_stream.metadata.size, len('file_contents_2_abcdefg'))
 
-        self.assertEqual(fs.get('abc.png', 1), 'file_contents')
-        old_file_stream = fs.open('abc.png', 1)
+        self.assertEqual(
+            fs.get('abc.png', version=1), 'file_contents')
+        old_file_stream = fs.open('abc.png', version=1)
         self.assertEqual(old_file_stream.version, 1)
         self.assertEqual(old_file_stream.metadata.size, len('file_contents'))
 

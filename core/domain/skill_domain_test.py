@@ -166,7 +166,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             misconceptions_from_dict.to_dict(), misconceptions_dict)
 
-    def test_to_dict(self):
+    def test_skill_mastery_to_dict(self):
         expected_skill_mastery_dict = {
             'user_id': 'user',
             'skill_id': 'skill_id',
@@ -177,3 +177,17 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_skill_mastery_dict,
             observed_skill_mastery.to_dict())
+
+    def test_skill_rights_to_dict(self):
+        expected_dict = {
+            'creator_id': 'user',
+            'skill_is_private': True,
+            'skill_id': 'skill_id'
+        }
+        skill_rights = skill_domain.SkillRights('skill_id', True, 'user')
+        self.assertDictEqual(expected_dict, skill_rights.to_dict())
+
+    def test_skill_rights_is_creator(self):
+        skill_rights = skill_domain.SkillRights(self.SKILL_ID, True, 'user')
+        self.assertTrue(skill_rights.is_creator('user'))
+        self.assertFalse(skill_rights.is_creator('fakeuser'))

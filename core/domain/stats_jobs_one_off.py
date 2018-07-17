@@ -464,19 +464,19 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
 
                 StatisticsAuditV1.require_non_negative(
                     exp_id, exp_version, 'total_answers_count_v1',
-                    total_answers_count_v1, state_name)
+                    total_answers_count_v1, state_name=state_name)
                 StatisticsAuditV1.require_non_negative(
                     exp_id, exp_version, 'useful_feedback_count_v1',
-                    useful_feedback_count_v1, state_name)
+                    useful_feedback_count_v1, state_name=state_name)
                 StatisticsAuditV1.require_non_negative(
                     exp_id, exp_version, 'total_hit_count_v1',
-                    total_hit_count_v1, state_name)
+                    total_hit_count_v1, state_name=state_name)
                 StatisticsAuditV1.require_non_negative(
                     exp_id, exp_version, 'first_hit_count_v1',
-                    first_hit_count_v1, state_name)
+                    first_hit_count_v1, state_name=state_name)
                 StatisticsAuditV1.require_non_negative(
                     exp_id, exp_version, 'num_completions_v1',
-                    num_completions_v1, state_name)
+                    num_completions_v1, state_name=state_name)
 
                 # The total number of answers submitted can never be less than
                 # the number of submitted answers for which useful feedback was

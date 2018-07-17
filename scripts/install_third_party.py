@@ -96,7 +96,7 @@ def download_files(source_url_root, target_dir, source_filenames):
             print 'Downloading file %s to %s ...' % (filename, target_dir)
             urllib.urlretrieve(
                 '%s/%s' % (source_url_root, filename),
-                os.path.join(target_dir, filename))
+                filename=os.path.join(target_dir, filename))
 
             print 'Download of %s succeeded.' % filename
 
@@ -123,11 +123,11 @@ def download_and_unzip_files(
             zip_root_name, target_parent_dir)
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
+        urllib.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
 
         try:
             with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as zfile:
-                zfile.extractall(target_parent_dir)
+                zfile.extractall(path=target_parent_dir)
             os.remove(TMP_UNZIP_PATH)
         except Exception:
             if os.path.exists(TMP_UNZIP_PATH):
@@ -140,7 +140,7 @@ def download_and_unzip_files(
             # by zipfile.ZipFile.
             file_stream = StringIO.StringIO(urllib2.urlopen(req).read())
             with zipfile.ZipFile(file_stream, 'r') as zfile:
-                zfile.extractall(target_parent_dir)
+                zfile.extractall(path=target_parent_dir)
 
         # Rename the target directory.
         os.rename(
@@ -172,8 +172,9 @@ def download_and_untar_files(
             tar_root_name, target_parent_dir)
         common.ensure_directory_exists(target_parent_dir)
 
-        urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
-        with contextlib.closing(tarfile.open(TMP_UNZIP_PATH, 'r:gz')) as tfile:
+        urllib.urlretrieve(source_url, filename=TMP_UNZIP_PATH)
+        with contextlib.closing(tarfile.open(
+            name=TMP_UNZIP_PATH, mode='r:gz')) as tfile:
             tfile.extractall(target_parent_dir)
         os.remove(TMP_UNZIP_PATH)
 

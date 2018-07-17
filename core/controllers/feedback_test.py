@@ -60,7 +60,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
             'state_name': self._get_unicode_test_string('statename'),
             'subject': self._get_unicode_test_string('subject'),
             'text': self._get_unicode_test_string('text'),
-        }, self.csrf_token)
+        }, csrf_token=self.csrf_token)
         self.logout()
 
     def test_invalid_exploration_ids_return_page_not_found(self):
@@ -96,13 +96,15 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         }, response_dict['messages'][0])
 
     def test_non_logged_in_users_cannot_create_threads_and_messages(self):
-        self.post_json('%s/%s' % (
-            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID
-        ), {
-            'state_name': 'Welcome!',
-            'subject': self.UNICODE_TEST_STRING,
-            'text': self.UNICODE_TEST_STRING,
-        }, self.csrf_token, expect_errors=True, expected_status_int=401)
+        self.post_json(
+            '%s/%s' % (
+                feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
+            {
+                'state_name': 'Welcome!',
+                'subject': self.UNICODE_TEST_STRING,
+                'text': self.UNICODE_TEST_STRING,
+            }, csrf_token=self.csrf_token,
+            expect_errors=True, expected_status_int=401)
 
         thread_url = '%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX, '0.dummy_thread_id')
@@ -111,7 +113,8 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
             thread_url, {
                 'exploration_id': '0',
                 'text': self.UNICODE_TEST_STRING,
-            }, self.csrf_token, expect_errors=True, expected_status_int=401)
+            }, csrf_token=self.csrf_token,
+            expect_errors=True, expected_status_int=401)
 
 
 class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
@@ -137,7 +140,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'state_name': None,
                 'subject': u'New Thread ¡unicode!',
                 'text': u'Thread Text ¡unicode!',
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.logout()
 
         response_dict = self.get_json(
@@ -171,7 +174,8 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
                 'state_name': None,
                 'text': u'Thread Text ¡unicode!',
-            }, csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=400)
         self.assertEqual(
             response_dict['error'], 'A thread subject must be specified.')
         self.logout()
@@ -185,7 +189,8 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             {
                 'state_name': None,
                 'subject': u'New Thread ¡unicode!',
-            }, csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=400)
         self.assertEqual(
             response_dict['error'],
             'Text for the first message in the thread must be specified.')
@@ -202,7 +207,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'state_name': None,
                 'subject': u'New Thread ¡unicode!',
                 'text': u'Message 0 ¡unicode!',
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         # Then, get the thread id.
         response_dict = self.get_json(
@@ -218,7 +223,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'updated_status': None,
                 'updated_subject': None,
                 'text': 'Message 1'
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         # The resulting thread should contain two messages.
         response_dict = self.get_json(thread_url)
@@ -261,7 +266,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'subject': 'Test thread',
                 'feedback': 'Test thread text',
                 'include_author': False,
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, new_exp_id))
@@ -282,7 +287,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'state_name': None,
                 'subject': u'New Thread ¡unicode!',
                 'text': 'Message 0',
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.logout()
 
         # Get the thread id.
@@ -312,7 +317,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             self.post_json(
                 thread_url, {
                     'text': 'New Message %s' % num
-                }, csrf_token)
+                }, csrf_token=csrf_token)
             self.logout()
 
         # Get the message list.
@@ -398,7 +403,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             'state_name': 'statename',
             'subject': 'subject',
             'text': 'a sample message',
-        }, csrf_token)
+        }, csrf_token=csrf_token)
 
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
@@ -435,7 +440,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
                 'updated_status': None,
                 'updated_subject': None,
                 'text': 'Message 1'
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         # Both the messages in the thread should have been read by the user.
         self.assertEqual(
@@ -465,7 +470,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
                 'updated_status': None,
                 'updated_subject': None,
                 'text': 'Message 2'
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         # Check if the new message is also added to the read list.
         self.assertEqual(
@@ -554,42 +559,42 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
                 'state_name': u'State A',
                 'description': u'Suggestion for state A.',
                 'suggestion_html': 'new accepted suggestion for state A',
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.post_json(
             '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                 'exploration_version': 1,
                 'state_name': u'State 2',
                 'description': u'A new value.',
                 'suggestion_html': 'some new value',
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.post_json(
             '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                 'exploration_version': 2,
                 'state_name': u'State 3',
                 'description': u'Empty suggestion',
                 'suggestion_html': '',
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.post_json(
             '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                 'exploration_version': 2,
                 'state_name': u'State A',
                 'description': u'Just a space.',
                 'suggestion_html': ' ',
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.post_json(
             '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                 'exploration_version': 1,
                 'state_name': u'State 2',
                 'description': u'Random characters.',
                 'suggestion_html': '#!$%',
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.post_json(
             '%s/%s' % (feconf.SUGGESTION_URL_PREFIX, self.EXP_ID), {
                 'exploration_version': 2,
                 'state_name': u'State 3',
                 'description': u'Very bizarre characters.',
                 'suggestion_html': u'Ֆݓॵক',
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         self.logout()
 
     def _return_true(self, unused_thread_id, unused_exploration_id):
@@ -608,7 +613,7 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
                 'state_name': None,
                 'subject': u'New Thread ¡unicode!',
-                'text': 'Message 0'}, csrf_token)
+                'text': 'Message 0'}, csrf_token=csrf_token)
 
         # Get a list of open threads without suggestions.
         response_dict = self.get_json(
@@ -678,7 +683,8 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
                         'action': u'accept',
                         'commit_message': 'message',
                         'audio_update_required': audio_update_required,
-                    }, csrf_token, expect_errors=expect_errors,
+                    }, csrf_token=csrf_token,
+                    expect_errors=expect_errors,
                     expected_status_int=expected_status_int)
 
     def _reject_suggestion(
@@ -687,7 +693,8 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
         return self.put_json(
             '%s/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID, thread_id),
-            {'action': u'reject'}, csrf_token, expect_errors=expect_errors,
+            {'action': u'reject'}, csrf_token=csrf_token,
+            expect_errors=expect_errors,
             expected_status_int=expected_status_int)
 
     def test_actions_related_to_suggestions(self):
@@ -729,7 +736,8 @@ class SuggestionsIntegrationTests(test_utils.GenericTestBase):
             '%s/%s/%s' % (
                 feconf.SUGGESTION_ACTION_URL_PREFIX, self.EXP_ID,
                 rejected_suggestion_thread_id),
-            {'action': u'invalid'}, csrf_token, expect_errors=True,
+            {'action': u'invalid'}, csrf_token=csrf_token,
+            expect_errors=True,
             expected_status_int=400)
         self.assertIn('Invalid action.', response_dict['error'])
 

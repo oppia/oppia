@@ -180,7 +180,7 @@ class BaseModel(ndb.Model):
                 of attempts.
         """
         try:
-            entity_name = unicode(entity_name).encode('utf-8')
+            entity_name = unicode(entity_name).encode(encoding='utf-8')
         except Exception:
             entity_name = ''
 
