@@ -56,7 +56,7 @@ oppia.factory('SkillEditorStateService', [
     };
 
     var _updateSkillRights = function(newBackendSkillRightsObject) {
-      _setSkillRights(SkillRightsObjectFactory.create(
+      _setSkillRights(SkillRightsObjectFactory.createFromBackendDict(
         newBackendSkillRightsObject));
     };
 

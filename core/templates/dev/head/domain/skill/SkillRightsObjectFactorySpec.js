@@ -33,7 +33,7 @@ describe('Skill rights object factory', function() {
       skill_is_private: true
     };
 
-    var skillRights = SkillRightsObjectFactory.create(
+    var skillRights = SkillRightsObjectFactory.createFromBackendDict(
       initialSkillRightsBackendObject);
 
     expect(skillRights.isPublic()).toBe(false);
@@ -63,7 +63,7 @@ describe('Skill rights object factory', function() {
       skill_is_private: false
     };
 
-    var sampleSkillRights = SkillRightsObjectFactory.create(
+    var sampleSkillRights = SkillRightsObjectFactory.createFromBackendDict(
       sampleSkillRightsObject);
 
     var interstitialSkillRights =

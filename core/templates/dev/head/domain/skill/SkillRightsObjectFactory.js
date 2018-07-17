@@ -19,12 +19,12 @@
 
 oppia.factory('SkillRightsObjectFactory', [
   function() {
-    var SkillRights = function(skillRightsObject) {
-      this._skillId = skillRightsObject.skill_id;
-      this._creatorId = skillRightsObject.creator_id;
-      this._skillIsPrivate = skillRightsObject.skill_is_private;
-      this._skillDescriptionIsEditable =
-        skillRightsObject.can_edit_skill_description;
+    var SkillRights = function(
+        skillId, creatorId, skillIsPrivate, canEditSkillDescription) {
+      this._skillId = skillId;
+      this._creatorId = creatorId;
+      this._skillIsPrivate = skillIsPrivate;
+      this._skillDescriptionIsEditable = canEditSkillDescription;
     };
 
     SkillRights.prototype.getSkillId = function() {
@@ -51,8 +51,12 @@ oppia.factory('SkillRightsObjectFactory', [
       this._skillIsPrivate = false;
     };
 
-    SkillRights.create = function(skillRightsBackendObject) {
-      return new SkillRights(angular.copy(skillRightsBackendObject));
+    SkillRights.createFromBackendDict = function(skillRightsBackendDict) {
+      return new SkillRights(
+        skillRightsBackendDict.skill_id,
+        skillRightsBackendDict.creator_id,
+        skillRightsBackendDict.skill_is_private,
+        skillRightsBackendDict.can_edit_skill_description);
     };
 
     SkillRights.prototype.copyFromSkillRights = function(otherSkillRights) {

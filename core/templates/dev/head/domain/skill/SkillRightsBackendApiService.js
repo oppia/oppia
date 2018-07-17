@@ -32,8 +32,14 @@ oppia.factory('SkillRightsBackendApiService', [
         });
 
       $http.get(skillRightsUrl).then(function(response) {
+        var responseData = response.data;
         if (successCallback) {
-          successCallback(response.data);
+          successCallback({
+            skill_id: responseData.skill_id,
+            creator_id: responseData.creator_id,
+            can_edit_skill_description: responseData.can_edit_skill_description,
+            skill_is_private: responseData.skill_is_private
+          });
         }
       }, function(errorResponse) {
         if (errorCallback) {

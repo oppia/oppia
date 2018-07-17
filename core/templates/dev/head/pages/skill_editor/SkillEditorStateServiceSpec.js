@@ -264,7 +264,7 @@ describe('Skill editor state service', function() {
   it('should be able to set a new skill rights with an in-place copy',
     function() {
       var previousSkillRights = SkillEditorStateService.getSkillRights();
-      var expectedSkillRights = SkillRightsObjectFactory.create(
+      var expectedSkillRights = SkillRightsObjectFactory.createFromBackendDict(
         skillRightsObject);
       expect(previousSkillRights).not.toEqual(expectedSkillRights);
 
