@@ -23,9 +23,10 @@ oppia.factory('UserService', [
     var DEFAULT_PROFILE_IMAGE_PATH = (
       UrlInterpolationService.getStaticImageUrl(
         '/avatar/user_blue_72px.png'));
+    var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
     return {
-      getProfileImageDataUrl: function() {
+      getProfileImageDataUrlAsync: function() {
         if (_isLoggedIn) {
           return $http.get(
             '/preferenceshandler/profile_picture'
@@ -38,6 +39,12 @@ oppia.factory('UserService', [
         } else {
           return $q.resolve(DEFAULT_PROFILE_IMAGE_PATH);
         }
+      },
+      setProfileImageDataUrlAsync: function(newProfileImageDataUrl) {
+        return $http.put(PREFERENCES_DATA_URL, {
+          update_type: 'profile_picture_data_url',
+          data: newProfileImageDataUrl
+        });
       }
     };
   }

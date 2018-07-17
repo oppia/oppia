@@ -33,14 +33,14 @@ describe('User Service', function() {
       profile_picture_data_url: 'image data'
     });
 
-    UserService.getProfileImageDataUrl().then(function (dataUrl) {
+    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
       expect(dataUrl).toBe('image data');
     });
     $httpBackend.flush();
 
     $httpBackend.expect('GET', requestUrl).respond(404);
 
-    UserService.getProfileImageDataUrl().then(function (dataUrl) {
+    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
       expect(dataUrl).toBe(UrlInterpolationService.getStaticImageUrl(
         '/avatar/user_blue_72px.png'));
     });

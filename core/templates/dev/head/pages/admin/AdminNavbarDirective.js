@@ -43,7 +43,7 @@ oppia.directive('adminNavbar', [
         $scope.isRolesTabOpen = AdminRouterService.isRolesTabOpen;
         $scope.isMiscTabOpen = AdminRouterService.isMiscTabOpen;
 
-        UserService.getProfileImageDataUrl().then(function(dataUrl) {
+        UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
           $scope.profilePictureDataUrl = dataUrl;
         });
 

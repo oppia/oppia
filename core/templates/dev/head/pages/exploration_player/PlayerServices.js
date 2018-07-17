@@ -483,9 +483,10 @@ oppia.factory('ExplorationPlayerService', [
       // player is in preview mode.
       getUserProfileImage: function() {
         if (!_editorPreviewMode) {
-          return UserService.getProfileImageDataUrl().then(function(dataUrl) {
-            return dataUrl;
-          });
+          return UserService.getProfileImageDataUrlAsync()
+            .then(function(dataUrl) {
+              return dataUrl;
+            });
         } else {
           return $q.resolve(DEFAULT_PROFILE_IMAGE_PATH);
         }

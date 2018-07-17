@@ -99,7 +99,7 @@ oppia.controller('LearnerDashboard', [
     $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
     $scope.PAGE_SIZE = 8;
     $scope.Math = window.Math;
-    UserService.getProfileImageDataUrl().then(function(dataUrl) {
+    UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
       $scope.profilePictureDataUrl = dataUrl;
     });
     $scope.username = GLOBALS.username;

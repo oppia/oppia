@@ -48,7 +48,7 @@ oppia.directive('topNavigationBar', [
           $scope.getStaticImageUrl = UrlInterpolationService.getStaticImageUrl;
           $scope.activeMenuName = '';
           $scope.username = GLOBALS.username;
-          UserService.getProfileImageDataUrl().then(function(dataUrl) {
+          UserService.getProfileImageDataUrlAsync().then(function(dataUrl) {
             $scope.profilePictureDataUrl = dataUrl;
           });
           $scope.isAdmin = GLOBALS.isAdmin;
