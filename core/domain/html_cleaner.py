@@ -16,8 +16,8 @@
 
 """HTML sanitizing service."""
 
-import cStringIO
 import HTMLParser
+import cStringIO
 import json
 import logging
 import urllib
