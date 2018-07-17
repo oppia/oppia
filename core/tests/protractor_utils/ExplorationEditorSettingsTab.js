@@ -18,7 +18,6 @@
  */
 
 var forms = require('./forms.js');
-var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var ExplorationEditorSettingsTab = function() {
@@ -45,7 +44,7 @@ var ExplorationEditorSettingsTab = function() {
   /*
    * Buttons
    */
-  var addParamButon = element(by.css('.protractor-test-add-param-button'));
+  var addParamButton = element(by.css('.protractor-test-add-param-button'));
   var closePreviewSummaryButton = element(
     by.css('.protractor-test-close-preview-summary-modal'));
   var enableParametersSwitch = element(
@@ -68,7 +67,7 @@ var ExplorationEditorSettingsTab = function() {
   // the parameter if necessary.
   this.addExplorationLevelParameterChange = function(paramName, paramValue) {
     editParamChanges.click();
-    addParamButon.click();
+    addParamButton.click();
 
     var editorRowElem = element.all(by.css(
       '.protractor-test-param-changes-list')).last();

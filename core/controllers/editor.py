@@ -490,7 +490,8 @@ class ExplorationDownloadHandler(EditorHandler):
             self.response.headers['Content-Disposition'] = (
                 'attachment; filename=%s.zip' % str(filename))
             self.response.write(
-                exp_services.export_to_zip_file(exploration_id, version))
+                exp_services.export_to_zip_file(
+                    exploration_id, version=version))
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
                 exploration_id, version=version, width=width))

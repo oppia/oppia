@@ -177,9 +177,6 @@ CURRENT_MISCONCEPTIONS_SCHEMA_VERSION = 1
 # The current version of subtopics dict in the topic schema.
 CURRENT_SUBTOPIC_SCHEMA_VERSION = 1
 
-# The current version of the question schema.
-CURRENT_QUESTION_SCHEMA_VERSION = 1
-
 # This value should be updated in the event of any
 # StateAnswersModel.submitted_answer_list schema change.
 CURRENT_STATE_ANSWERS_SCHEMA_VERSION = 1
@@ -269,14 +266,6 @@ ACCEPTED_AUDIO_EXTENSIONS = {
     'mp3': ['audio/mp3']
 }
 
-
-# A string containing the disallowed characters in state or exploration names.
-# The underscore is needed because spaces in names must be converted to
-# underscores when displayed as part of a URL or key. The other conventions
-# here are derived from the Wikipedia guidelines for naming articles.
-INVALID_NAME_CHARS = u':#/|_%<>[]{}\ufffd\\' + chr(127)
-for ind in range(32):
-    INVALID_NAME_CHARS += chr(ind)
 # Prefix for data sent from the server to the client via JSON.
 XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters.
@@ -315,10 +304,11 @@ MAILGUN_API_KEY = None
 # If the Mailgun email API is used, the "None" below should be replaced
 # with the Mailgun domain name (ending with mailgun.org).
 MAILGUN_DOMAIN_NAME = None
-# Domain name for email address.
-INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
+
 # Committer id for system actions.
 SYSTEM_COMMITTER_ID = 'admin'
+# Domain name for email address.
+INCOMING_EMAILS_DOMAIN_NAME = 'example.com'
 SYSTEM_EMAIL_ADDRESS = 'system@example.com'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
 NOREPLY_EMAIL_ADDRESS = 'noreply@example.com'
@@ -375,6 +365,9 @@ ENABLE_MAINTENANCE_MODE = False
 
 # Disables all the new structures' pages, till they are completed.
 ENABLE_NEW_STRUCTURES = False
+
+# Whether to automatically accept suggestions after a threshold time.
+ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False
 
 EMAIL_INTENT_SIGNUP = 'signup'
 EMAIL_INTENT_DAILY_BATCH = 'daily_batch'
@@ -444,6 +437,11 @@ COMMIT_MESSAGE_ACCEPTED_SUGGESTION_PREFIX = 'Accepted suggestion by'
 # exploration commit log.
 MIGRATION_BOT_USER_ID = 'OppiaMigrationBot'
 MIGRATION_BOT_USERNAME = 'OppiaMigrationBot'
+
+# User id and username for suggestion bot. This bot will be used to accept
+# suggestions automatically after a threshold time.
+SUGGESTION_BOT_USER_ID = 'OppiaSuggestionBot'
+SUGGESTION_BOT_USERNAME = 'OppiaSuggestionBot'
 
 # Ids and locations of the permitted extensions.
 ALLOWED_RTE_EXTENSIONS = {
@@ -630,9 +628,9 @@ NEW_SKILL_URL = '/skill_editor_handler/create_new'
 TOPIC_EDITOR_STORY_URL = '/topic_editor_story_handler'
 NEW_TOPIC_URL = '/topic_editor_handler/create_new'
 PREFERENCES_DATA_URL = '/preferenceshandler/data'
-QUESTION_DATA_URL = '/questionhandler'
+QUESTION_CREATION_URL = '/question_editor_handler/create_new'
+QUESTION_EDITOR_DATA_URL_PREFIX = '/question_editor_handler/data'
 QUESTION_MANAGER_URL = '/questionmanagerhandler'
-QUESTION_CREATION_URL = '/questioncreationhandler'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 ROBOTS_TXT_URL = '/robots.txt'
@@ -642,6 +640,8 @@ SIGNUP_DATA_URL = '/signuphandler/data'
 SIGNUP_URL = '/signup'
 SKILL_EDITOR_DATA_URL_PREFIX = '/skill_editor_handler/data'
 SKILL_EDITOR_URL_PREFIX = '/skill_editor'
+SKILL_RIGHTS_URL_PREFIX = '/skill_editor_handler/rights'
+SKILL_PUBLISH_URL_PREFIX = '/skill_editor_handler/publish_skill'
 SPLASH_URL = '/splash'
 STORY_EDITOR_URL_PREFIX = '/story_editor'
 STORY_EDITOR_DATA_URL_PREFIX = '/story_editor_handler/data'
@@ -699,9 +699,6 @@ EVENT_TYPE_START_EXPLORATION = 'start'
 EVENT_TYPE_ACTUAL_START_EXPLORATION = 'actual_start'
 EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 EVENT_TYPE_COMPLETE_EXPLORATION = 'complete'
-
-ACTIVITY_STATUS_PRIVATE = 'private'
-ACTIVITY_STATUS_PUBLIC = 'public'
 
 # Play type constants.
 PLAY_TYPE_PLAYTEST = 'playtest'
@@ -825,9 +822,6 @@ LIBRARY_PAGE_MODE_SEARCH = 'search'
 DEFAULT_TOPIC_SIMILARITY = 0.5
 SAME_TOPIC_SIMILARITY = 1.0
 
-SYSTEM_USERNAMES = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
-SYSTEM_USER_IDS = [SYSTEM_COMMITTER_ID, MIGRATION_BOT_USERNAME]
-
 # The following are all page descriptions for the meta tag.
 ABOUT_PAGE_DESCRIPTION = (
     'Oppia is an open source learning platform that connects a community of '
@@ -878,7 +872,6 @@ TERMS_PAGE_DESCRIPTION = (
     'distributing learning material.')
 THANKS_PAGE_DESCRIPTION = (
     'Thank you for donating to The Oppia Foundation.')
-SITE_NAME = 'Oppia.org'
 
 # The type of the response returned by a handler when an exception is raised.
 HANDLER_TYPE_HTML = 'html'

@@ -17,7 +17,8 @@
  */
 
 oppia.directive('profileLinkImage', [
-  'UrlInterpolationService', function(UrlInterpolationService) {
+  'UrlInterpolationService', 'SYSTEM_USER_IDS',
+  function(UrlInterpolationService, SYSTEM_USER_IDS) {
     return {
       restrict: 'E',
       scope: {
@@ -34,7 +35,7 @@ oppia.directive('profileLinkImage', [
               '/avatar/user_blue_72px.png'));
 
           $scope.isUsernameLinkable = function(username) {
-            return GLOBALS.SYSTEM_USERNAMES.indexOf(username) === -1;
+            return SYSTEM_USER_IDS.indexOf(username) === -1;
           };
 
           $scope.profileImageUrl = (

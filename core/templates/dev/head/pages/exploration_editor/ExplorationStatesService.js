@@ -23,14 +23,14 @@ oppia.factory('ExplorationStatesService', [
   'ExplorationInitStateNameService', 'AlertsService', 'ChangeListService',
   'EditorStateService', 'ValidatorsService', 'StatesObjectFactory',
   'SolutionValidityService', 'AngularNameService',
-  'AnswerClassificationService', 'ExplorationContextService',
+  'AnswerClassificationService', 'ContextService',
   'UrlInterpolationService',
   function(
       $log, $uibModal, $filter, $location, $rootScope, $injector, $q,
       ExplorationInitStateNameService, AlertsService, ChangeListService,
       EditorStateService, ValidatorsService, StatesObjectFactory,
       SolutionValidityService, AngularNameService,
-      AnswerClassificationService, ExplorationContextService,
+      AnswerClassificationService, ContextService,
       UrlInterpolationService) {
     var _states = null;
 
@@ -167,7 +167,7 @@ oppia.factory('ExplorationStatesService', [
           if (solution) {
             var result = (
               AnswerClassificationService.getMatchingClassificationResult(
-                ExplorationContextService.getExplorationId(),
+                ContextService.getExplorationId(),
                 stateName,
                 _states.getState(stateName),
                 solution.correctAnswer,

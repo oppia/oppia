@@ -19,6 +19,7 @@
 
 var general = require('../protractor_utils/general.js');
 var until = protractor.ExpectedConditions;
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
@@ -33,7 +34,7 @@ describe('screenreader and keyboard user accessibility features', function() {
     libraryPage.get();
     browser.actions().sendKeys(protractor.Key.TAB).perform();
     var skipLink = element(by.css('.protractor-test-skip-link'));
-    browser.wait(until.elementToBeClickable(skipLink), 5000);
+    waitFor.elementToBeClickable(skipLink, 'Could not click skip link');
     skipLink.click();
     var mainContent = element(by.css('.protractor-test-main-content'));
     expect(mainContent.getAttribute('id'))

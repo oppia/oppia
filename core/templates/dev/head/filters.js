@@ -92,7 +92,7 @@ oppia.filter('truncateAtFirstLine', [function() {
     var suffix = otherNonemptyLinesExist ? '...' : '';
     return (
       firstNonemptyLineIndex !== -1 ?
-        lines[firstNonemptyLineIndex] + suffix : '');
+      lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
 
@@ -222,6 +222,23 @@ oppia.filter('parameterizeRuleDescription', [
               }
             }
             replacementText += ']';
+          } else if (varType === 'ListOfSetsOfHtmlStrings') {
+            replacementText = '[';
+            var key = inputs[varName];
+            for (var i = 0; i < key.length; i++) {
+              replacementText += '[';
+              for (var j = 0; j < key[i].length; j++) {
+                replacementText += $filter('formatRtePreview')(key[i][j]);
+                if (j < key[i].length - 1) {
+                  replacementText += ',';
+                }
+              }
+              replacementText += ']';
+              if (i < key.length - 1) {
+                replacementText += ',';
+              }
+            }
+            replacementText += ']';
           } else {
             // The following case is for MultipleChoiceInput
             for (var i = 0; i < choices.length; i++) {
@@ -249,13 +266,13 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '(';
           replacementText += (
             inputs[varName][0] >= 0.0 ?
-              latitude.toFixed(2) + '°N' :
-              -latitude.toFixed(2) + '°S');
+            latitude.toFixed(2) + '°N' :
+            -latitude.toFixed(2) + '°S');
           replacementText += ', ';
           replacementText += (
             inputs[varName][1] >= 0.0 ?
-              longitude.toFixed(2) + '°E' :
-              -longitude.toFixed(2) + '°W');
+            longitude.toFixed(2) + '°E' :
+            -longitude.toFixed(2) + '°W');
           replacementText += ')';
         } else if (varType === 'NormalizedString') {
           replacementText = '"' + inputs[varName] + '"';

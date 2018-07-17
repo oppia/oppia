@@ -13,7 +13,7 @@
 </div>
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-  <button class="btn btn-success protractor-test-close-save-modal" ng-disabled="!isCollectionPrivate && !commitMessage" ng-click="save(commitMessage)">
+  <button class="btn btn-success protractor-test-close-save-modal-button" ng-disabled="!isCollectionPrivate && !commitMessage" ng-click="save(commitMessage)">
     <span ng-if="isCollectionPrivate">Save Draft</span>
     <span ng-if="!isCollectionPrivate">Publish Changes</span>
   </button>

@@ -85,7 +85,7 @@ class ExpSummariesContributorsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if (item.commit_type != _COMMIT_TYPE_REVERT and
-                item.committer_id not in feconf.SYSTEM_USER_IDS):
+                item.committer_id not in constants.SYSTEM_USER_IDS):
             exp_id = item.get_unversioned_instance_id()
             yield (exp_id, item.committer_id)
 
@@ -178,7 +178,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
             else:
                 exploration.validate(strict=True)
         except utils.ValidationError as e:
-            yield (item.id, unicode(e).encode('utf-8'))
+            yield (item.id, unicode(e).encode(encoding='utf-8'))
 
     @staticmethod
     def reduce(key, values):
@@ -316,7 +316,7 @@ class ViewableExplorationsAuditJob(jobs.BaseMapReduceOneOffJobManager):
         if exploration_rights is None:
             return
 
-        if (exploration_rights.status == feconf.ACTIVITY_STATUS_PRIVATE
+        if (exploration_rights.status == constants.ACTIVITY_STATUS_PRIVATE
                 and exploration_rights.viewable_if_private):
             yield (item.id, item.title.encode('utf-8'))
 
@@ -665,7 +665,7 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                         ALLOWED_IMAGE_EXTENSIONS) + '))$')
                 catched_groups = pattern.match(instance_id)
                 if not catched_groups:
-                    yield(WRONG_INSTANCE_ID, instance_id)
+                    yield (WRONG_INSTANCE_ID, instance_id)
                 else:
                     filename = catched_groups.group(2)
                     filepath = 'assets/' + filename
@@ -676,20 +676,20 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                         content = file_model.content
                         fs = fs_domain.AbstractFileSystem(
                             fs_domain.GcsFileSystem(exploration_id))
-                        if fs.isfile('image/%s' % (filename)):
-                            yield(FILE_ALREADY_EXISTS, file_model.id)
+                        if fs.isfile('image/%s' % filename):
+                            yield (FILE_ALREADY_EXISTS, file_model.id)
                         else:
                             fs.commit(
-                                'ADMIN', 'image/%s' % (filename),
-                                content, 'image/%s' % (filetype))
-                            yield(FILE_COPIED, 1)
+                                'ADMIN', 'image/%s' % filename,
+                                content, mimetype='image/%s' % filetype)
+                            yield (FILE_COPIED, 1)
                     else:
-                        yield(FOUND_DELETED_FILE, file_model.id)
+                        yield (FOUND_DELETED_FILE, file_model.id)
 
 
     @staticmethod
     def reduce(status, values):
         if status == FILE_COPIED:
-            yield(status, len(values))
+            yield (status, len(values))
         else:
-            yield(status, values)
+            yield (status, values)

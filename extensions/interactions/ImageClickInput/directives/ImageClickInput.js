@@ -21,15 +21,17 @@
  */
 
 oppia.directive('oppiaInteractiveImageClickInput', [
-  '$sce', 'HtmlEscaperService', 'ExplorationContextService',
+  '$sce', 'HtmlEscaperService', 'ContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'ImagePreloaderService', 'AssetsBackendApiService', 'EDITOR_TAB_CONTEXT',
-  'EVENT_NEW_CARD_AVAILABLE', 'LOADING_INDICATOR_URL',
+  'ImagePreloaderService', 'AssetsBackendApiService',
+  'EXPLORATION_EDITOR_TAB_CONTEXT', 'EVENT_NEW_CARD_AVAILABLE',
+  'LOADING_INDICATOR_URL',
   function(
-      $sce, HtmlEscaperService, ExplorationContextService,
+      $sce, HtmlEscaperService, ContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      ImagePreloaderService, AssetsBackendApiService, EDITOR_TAB_CONTEXT,
-      EVENT_NEW_CARD_AVAILABLE, LOADING_INDICATOR_URL) {
+      ImagePreloaderService, AssetsBackendApiService,
+      EXPLORATION_EDITOR_TAB_CONTEXT, EVENT_NEW_CARD_AVAILABLE,
+      LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {
@@ -85,7 +87,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             // showing images in the exploration editor or in preview mode. So
             // we directly assign the url to the imageUrl.
             $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-              ExplorationContextService.getExplorationId(), $scope.filepath);
+              ContextService.getExplorationId(), $scope.filepath);
           }
 
           $scope.mouseX = 0;
@@ -139,8 +141,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             }
           };
           $scope.getDotDisplay = function() {
-            if (ExplorationContextService.getEditorTabContext() ===
-                EDITOR_TAB_CONTEXT.EDITOR) {
+            if (ContextService.getEditorTabContext() ===
+                EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
               return 'none';
             }
             return 'inline';

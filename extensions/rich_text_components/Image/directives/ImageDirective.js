@@ -20,11 +20,11 @@
  * followed by the name of the arg.
  */
 oppia.directive('oppiaNoninteractiveImage', [
-  '$rootScope', '$sce', 'HtmlEscaperService', 'ExplorationContextService',
+  '$rootScope', '$sce', 'HtmlEscaperService', 'ContextService',
   'UrlInterpolationService', 'ImagePreloaderService',
   'AssetsBackendApiService', 'LOADING_INDICATOR_URL',
   function(
-      $rootScope, $sce, HtmlEscaperService, ExplorationContextService,
+      $rootScope, $sce, HtmlEscaperService, ContextService,
       UrlInterpolationService, ImagePreloaderService, AssetsBackendApiService,
       LOADING_INDICATOR_URL) {
     return {
@@ -76,7 +76,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           // showing images in the exploration editor or in preview mode. So
           // we directly assign the url to the imageUrl.
           $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-            ExplorationContextService.getExplorationId(), $scope.filepath);
+            ContextService.getExplorationId(), $scope.filepath);
         }
 
         $scope.imageCaption = '';

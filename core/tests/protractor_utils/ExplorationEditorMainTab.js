@@ -22,7 +22,7 @@ var general = require('./general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var ruleTemplates = require(
   '../../../extensions/interactions/rule_templates.json');
-var until = protractor.ExpectedConditions;
+var waitFor = require('../protractor_utils/waitFor.js');
 
 var _NEW_STATE_OPTION = 'A New Card Called...';
 var _CURRENT_STATE_OPTION = '(try again)';
@@ -43,10 +43,8 @@ var ExplorationEditorMainTab = function() {
     .first();
   var defaultResponseTab = element(
     by.css('.protractor-test-default-response-tab'));
-  var editorWelcomeModal = element.all(
-    by.css('.protractor-test-welcome-modal'));
-  var editOutcomeDestBubble = element(
-    by.css('.protractor-test-dest-bubble'));
+  var editorWelcomeModal = element(by.css('.protractor-test-welcome-modal'));
+  var editOutcomeDestBubble = element(by.css('.protractor-test-dest-bubble'));
   var editOutcomeDestStateInput = editOutcomeDestBubble.element(
     by.css('.protractor-test-add-state-input'));
   var editOutcomeDestAddExplorationId = element(
@@ -99,7 +97,7 @@ var ExplorationEditorMainTab = function() {
   var addHintButton = element(by.css('.protractor-test-oppia-add-hint-button'));
   var addNewResponseButton = element(
     by.css('.protractor-test-add-new-response'));
-  var addParamButon = element(by.css('.protractor-test-add-param-button'));
+  var addParamButton = element(by.css('.protractor-test-add-param-button'));
   var addResponseButton = element(
     by.css('.protractor-test-open-add-response-modal'));
   var addSolutionButton = element(
@@ -150,17 +148,17 @@ var ExplorationEditorMainTab = function() {
 
   this.exitTutorial = function() {
     // If the editor welcome modal shows up, exit it.
-    editorWelcomeModal.then(function(modals) {
-      if (modals.length === 1) {
-        browser.wait(until.elementToBeClickable(dismissWelcomeModalButton),
-          5000, 'Tutorial modal taking too long to appear');
+    editorWelcomeModal.isPresent().then(function(isVisible) {
+      if (isVisible) {
+        waitFor.elementToBeClickable(
+          dismissWelcomeModalButton,
+          'Welcome modal is taking too long to appear');
         dismissWelcomeModalButton.click();
-      } else if (modals.length !== 0) {
-        throw 'Expected to find at most one \'welcome modal\'';
       }
     });
 
-    browser.wait(until.invisibilityOf(editorWelcomeModal), 5000);
+    waitFor.invisibilityOf(
+      editorWelcomeModal, 'Editor Welcome modal takes too long to disappear');
 
     // Otherwise, if the editor tutorial shows up, exit it.
     element.all(by.css('.skipBtn')).then(function(buttons) {
@@ -175,7 +173,8 @@ var ExplorationEditorMainTab = function() {
   this.finishTutorial = function() {
     // Finish the tutorial.
     var finishTutorialButton = element.all(by.buttonText('Finish'));
-    browser.wait(until.elementToBeClickable(finishTutorialButton.first()), 5000,
+    waitFor.elementToBeClickable(
+      finishTutorialButton.first(),
       'Finish Tutorial Stage button is not clickable');
     finishTutorialButton.then(function(buttons) {
       if (buttons.length === 1) {
@@ -198,17 +197,19 @@ var ExplorationEditorMainTab = function() {
     tutorialTabHeadings.forEach(function(heading) {
       var tutorialTabHeadingElement = element(by.cssContainingText(
         '.popover-title', heading));
-      browser.wait(until.visibilityOf(tutorialTabHeadingElement), 5000,
-        'Tutorial: ' + heading + 'is not visible');
+      waitFor.visibilityOf(
+        tutorialTabHeadingElement, 'Tutorial: ' + heading + 'is not visible');
       // Progress to the next instruction in the tutorial.
       var nextTutorialStageButton = element.all(by.css('.nextBtn'));
-      browser.wait(
-        until.elementToBeClickable(nextTutorialStageButton.first()), 5000,
+      waitFor.elementToBeClickable(
+        nextTutorialStageButton.first(),
         'Next Tutorial Stage button is not clickable');
       nextTutorialStageButton.then(function(buttons) {
         if (buttons.length === 1) {
           buttons[0].click();
-          browser.wait(until.invisibilityOf(tutorialTabHeadingElement), 5000);
+          waitFor.invisibilityOf(
+            tutorialTabHeadingElement,
+            'Tutorial stage takes too long to disappear');
         } else {
           throw Error('There is more than one Next button!');
         }
@@ -217,13 +218,12 @@ var ExplorationEditorMainTab = function() {
   };
 
   this.startTutorial = function() {
-    editorWelcomeModal.isPresent().then(function() {
-      element(by.css('.protractor-test-start-tutorial')).click().then(
-        function() {
-          browser.wait(until.visibilityOf(element(by.css('.ng-joyride-title'))),
-            5000, 'Tutorial modal taking too long to appear');
-        });
-    });
+    waitFor.visibilityOf(
+      editorWelcomeModal, 'Editor Welcome modal takes too long to appear');
+    element(by.css('.protractor-test-start-tutorial')).click();
+    waitFor.visibilityOf(
+      element(by.css('.ng-joyride-title')),
+      'Tutorial modal takes too long to appear');
   };
 
   // RESPONSE EDITOR
@@ -280,8 +280,8 @@ var ExplorationEditorMainTab = function() {
     // Close new response modal.
     expect(addNewResponseButton.isDisplayed()).toBe(true);
     addNewResponseButton.click();
-    browser.wait(until.invisibilityOf(addNewResponseButton), 5000,
-      'Add New Response Modal is not closed');
+    waitFor.invisibilityOf(
+      addNewResponseButton, 'Add New Response Modal is not closed');
   };
 
   // Rules are zero-indexed; 'default' denotes the default outcome.
@@ -297,13 +297,9 @@ var ExplorationEditorMainTab = function() {
     responseBody(responseNum).isPresent().then(function(isVisible) {
       if (!isVisible) {
         expect(headerElem.isDisplayed()).toBe(true);
-        browser.wait(until.elementToBeClickable(headerElem), 5000,
-          'Response Editor header is not clickable')
-          .then(function(isClickable) {
-            if (isClickable) {
-              headerElem.click();
-            }
-          });
+        waitFor.elementToBeClickable(
+          headerElem, 'Response Editor header is not clickable');
+        headerElem.click();
       }
     });
 
@@ -442,8 +438,9 @@ var ExplorationEditorMainTab = function() {
     } else {
       targetOption = destName;
     }
-    browser.wait(until.presenceOf(editOutcomeDestDropdownOptions(targetOption))
-      , 5000, 'editOutcomeDestDropdownOptions taking too long to appear');
+    waitFor.visibilityOf(
+      editOutcomeDestDropdownOptions(targetOption),
+      'editOutcomeDestDropdownOptions taking too long to appear');
     expect(editOutcomeDestDropdownOptions(targetOption).isDisplayed())
       .toBe(true);
     editOutcomeDestDropdownOptions(targetOption).click();
@@ -461,26 +458,28 @@ var ExplorationEditorMainTab = function() {
   // can then use to alter the state content, for example by calling
   // .appendBoldText(...).
   this.setContent = function(richTextInstructions) {
-    browser.wait(until.invisibilityOf(postTutorialPopover), 5000);
-    // Wait for browser to time out the popover, which is 5000 ms.
-    browser.wait(until.elementToBeClickable(stateEditContent), 10000,
-      'stateEditContent taking too long to appear to set content')
-      .then(function(isClickable) {
-        if (isClickable) {
-          stateEditContent.click();
-          var stateEditorTag = element(by.tagName('state-content-editor'));
-          var stateContentEditor = stateEditorTag.element(
-            by.css('.protractor-test-state-content-editor'));
-          browser.wait(until.presenceOf(stateContentEditor), 5000,
-            'stateContentEditor taking too long to appear to set content');
-          var richTextEditor = forms.RichTextEditor(stateContentEditor);
-          richTextEditor.clear();
-          richTextInstructions(richTextEditor);
-          expect(saveStateContentButton.isDisplayed()).toBe(true);
-          saveStateContentButton.click();
-          browser.wait(until.invisibilityOf(saveStateContentButton), 5000);
-        }
-      });
+    // Wait for browser to time out the popover, which is 4000 ms.
+    waitFor.invisibilityOf(
+      postTutorialPopover, 'Post-tutorial popover does not disappear.');
+
+    waitFor.elementToBeClickable(
+      stateEditContent,
+      'stateEditContent taking too long to appear to set content');
+    stateEditContent.click();
+    var stateEditorTag = element(by.tagName('state-content-editor'));
+    var stateContentEditor = stateEditorTag.element(
+      by.css('.protractor-test-state-content-editor'));
+    waitFor.visibilityOf(
+      stateContentEditor,
+      'stateContentEditor taking too long to appear to set content');
+    var richTextEditor = forms.RichTextEditor(stateContentEditor);
+    richTextEditor.clear();
+    richTextInstructions(richTextEditor);
+    expect(saveStateContentButton.isDisplayed()).toBe(true);
+    saveStateContentButton.click();
+    waitFor.invisibilityOf(
+      saveStateContentButton,
+      'State content editor takes too long to disappear');
   };
 
   // This receives a function richTextInstructions used to verify the display of
@@ -504,16 +503,18 @@ var ExplorationEditorMainTab = function() {
     addHintButton.click();
     var addHintModal = element(
       by.cssContainingText('.protractor-test-hint-modal', 'Add Hint'));
-    browser.wait(until.visibilityOf(addHintModal), 5000,
-      'Add hint modal takes too long to appear');
+    waitFor.visibilityOf(
+      addHintModal, 'Add hint modal takes too long to appear');
     element(by.css('.protractor-test-hint-text')).all(by.tagName('p'))
       .last().click();
     browser.switchTo().activeElement().sendKeys(hint);
-    browser.wait(until.elementToBeClickable(saveHintButton), 5000,
+
+    waitFor.elementToBeClickable(
+      saveHintButton,
       'Save Hint button takes too long to be clickable');
     saveHintButton.click();
-    browser.wait(until.invisibilityOf(addHintModal), 5000,
-      'Add Hint modal takes too long to close');
+    waitFor.invisibilityOf(
+      addHintModal, 'Add Hint modal takes too long to close');
   };
 
   // Hints are zero-indexed.
@@ -538,11 +539,12 @@ var ExplorationEditorMainTab = function() {
         editHintIcon.click();
         browser.switchTo().activeElement().clear();
         browser.switchTo().activeElement().sendKeys(hint);
-        browser.wait(until.elementToBeClickable(saveHintEditButton), 5000,
+        waitFor.elementToBeClickable(
+          saveHintEditButton,
           'Save Hint button takes too long to be clickable');
         saveHintEditButton.click();
-        browser.wait(until.visibilityOf(editHintIcon), 5000,
-          'Add Hint modal takes too long to close');
+        waitFor.visibilityOf(
+          editHintIcon, 'Add Hint modal takes too long to close');
       },
       deleteHint: function() {
         deleteHintIcon.click();
@@ -558,7 +560,8 @@ var ExplorationEditorMainTab = function() {
     addSolutionButton.click();
     var addOrUpdateSolutionModal = element(
       by.css('.protractor-test-add-or-update-solution-modal'));
-    browser.wait(until.visibilityOf(addOrUpdateSolutionModal), 5000,
+    waitFor.visibilityOf(
+      addOrUpdateSolutionModal,
       'Add/Update Solution modal takes to long to appear');
     interactions.getInteraction(interactionId).submitAnswer(
       element(by.css('.protractor-test-interaction-html')),
@@ -568,31 +571,30 @@ var ExplorationEditorMainTab = function() {
     browser.switchTo().activeElement().sendKeys(solution.explanation);
     var submitSolutionButton = element(
       by.css('.protractor-test-submit-solution-button'));
-    browser.wait(until.elementToBeClickable(submitSolutionButton), 5000,
+    waitFor.elementToBeClickable(
+      submitSolutionButton,
       'Submit Solution button takes too long to be clickable');
     submitSolutionButton.click();
-    browser.wait(until.invisibilityOf(addOrUpdateSolutionModal), 5000,
+    waitFor.invisibilityOf(
+      addOrUpdateSolutionModal,
       'Add/Update Solution modal takes too long to close');
   };
 
   // INTERACTIONS
 
   this.deleteInteraction = function() {
-    browser.wait(until.elementToBeClickable(deleteInteractionButton), 5000,
-      'Delete Interaction button is not clickable').then(
-      function(isClickable) {
-        if (isClickable) {
-          deleteInteractionButton.click();
-          // Click through the "are you sure?" warning.
-          browser.wait(until.elementToBeClickable(
-            confirmDeleteInteractionButton), 5000,
-          'Confirm Delete Interaction button takes too long to be clickable')
-            .then(function(){
-              confirmDeleteInteractionButton.click();
-            });
-        }
-      });
-    browser.wait(until.invisibilityOf(confirmDeleteInteractionButton), 5000,
+    waitFor.elementToBeClickable(
+      deleteInteractionButton, 'Delete Interaction button is not clickable');
+    deleteInteractionButton.click();
+
+    // Click through the "are you sure?" warning.
+    waitFor.elementToBeClickable(
+      confirmDeleteInteractionButton,
+      'Confirm Delete Interaction button takes too long to be clickable');
+    confirmDeleteInteractionButton.click();
+
+    waitFor.invisibilityOf(
+      confirmDeleteInteractionButton,
       'Delete Interaction modal takes too long to close');
   };
 
@@ -603,36 +605,39 @@ var ExplorationEditorMainTab = function() {
     createNewInteraction(interactionId);
     customizeInteraction.apply(null, arguments);
     closeAddResponseModal();
-    browser.wait(until.invisibilityOf(addResponseHeader), 5000);
+    waitFor.invisibilityOf(
+      addResponseHeader, 'Add Response modal takes too long to close');
   };
 
   // This function should not usually be invoked directly; please consider
   // using setInteraction instead.
   var createNewInteraction = function(interactionId) {
-    browser.wait(until.invisibilityOf(deleteInteractionButton), 5000,
-      'Please delete interaction before creating a new one').then(
-      function(deleteButtonNotVisible) {
-        if (deleteButtonNotVisible) {
-          browser.wait(until.elementToBeClickable(addInteractionButton), 5000,
-            'Add Interaction button takes too long to be clickable');
-          expect(addInteractionButton.isDisplayed()).toBe(true);
-          addInteractionButton.click();
-        }
-      });
+    waitFor.invisibilityOf(
+      deleteInteractionButton,
+      'Please delete interaction before creating a new one');
+
+    waitFor.elementToBeClickable(
+      addInteractionButton,
+      'Add Interaction button takes too long to be clickable');
+    expect(addInteractionButton.isDisplayed()).toBe(true);
+    addInteractionButton.click();
 
     var INTERACTION_ID_TO_TAB_NAME = {
       Continue: 'General',
       EndExploration: 'General',
       ImageClickInput: 'General',
+      ItemSelectionInput: 'General',
       MultipleChoiceInput: 'General',
       TextInput: 'General',
       FractionInput: 'Math',
       GraphInput: 'Math',
       LogicProof: 'Math',
       NumericInput: 'Math',
-      NumberWithUnits: 'Math',
       SetInput: 'Math',
+      MathExpressionInput: 'Math',
+      NumberWithUnits: 'Math',
       CodeRepl: 'Programming',
+      PencilCodeEditor: 'Programming',
       MusicNotesInput: 'Music',
       InteractiveMap: 'Geography'
     };
@@ -664,7 +669,8 @@ var ExplorationEditorMainTab = function() {
         saveInteractionButton.click();
       }
     });
-    browser.wait(until.invisibilityOf(saveInteractionButton), 5000,
+    waitFor.invisibilityOf(
+      saveInteractionButton,
       'Customize Interaction modal taking too long to close');
   };
 
@@ -710,19 +716,13 @@ var ExplorationEditorMainTab = function() {
   // This function adds a multiple-choice parameter change, creating the
   // parameter if necessary.
   this.addMultipleChoiceParameterChange = function(paramName, paramValues) {
-    browser.wait(until.elementToBeClickable(editParamChanges), 5000,
-      'Edit Param Changes is not clickable').then(function(isClickable) {
-      if (isClickable) {
-        editParamChanges.click().then(function() {
-          browser.wait(until.elementToBeClickable(addParamButon), 5000,
-            'Add Param button is not clickable').then(function(isClickable) {
-            if (isClickable) {
-              addParamButon.click();
-            }
-          });
-        });
-      }
-    });
+    waitFor.elementToBeClickable(
+      editParamChanges, 'Edit Param Changes is not clickable');
+    editParamChanges.click();
+
+    waitFor.elementToBeClickable(
+      addParamButton, 'Add Param button is not clickable');
+    addParamButton.click();
 
     var editorRowElem = element.all(by.css(
       '.protractor-test-param-changes-list')).last();
@@ -731,43 +731,33 @@ var ExplorationEditorMainTab = function() {
 
     var editorRowOption = editorRowElem.element(
       by.cssContainingText('option', 'to one of'));
-    browser.wait(until.elementToBeClickable(editorRowOption), 5000,
-      'Param Options are not clickable').then(function(isClickable) {
-      if (isClickable) {
-        editorRowOption.click();
-        paramValues.forEach(function(paramValue) {
-          var item = editorRowElem.all(by.tagName('input')).last();
-          item.clear();
-          item.sendKeys(paramValue);
-        });
-      }
+    waitFor.elementToBeClickable(
+      editorRowOption, 'Param Options are not clickable');
+    editorRowOption.click();
+    paramValues.forEach(function(paramValue) {
+      var item = editorRowElem.all(by.tagName('input')).last();
+      item.clear();
+      item.sendKeys(paramValue);
     });
 
-    browser.wait(until.elementToBeClickable(saveParamChangesButton), 5000,
-      'Save Param Changesbutton is not clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          saveParamChangesButton.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      saveParamChangesButton, 'Save Param Changes button is not clickable');
+    saveParamChangesButton.click();
 
-    browser.wait(until.invisibilityOf(saveParamChangesButton), 5000);
+    waitFor.invisibilityOf(
+      saveParamChangesButton,
+      'Param Changes editor takes too long to disappear');
   };
 
   // This function adds a parameter change, creating the parameter if necessary.
   this.addParameterChange = function(paramName, paramValue) {
-    browser.wait(until.elementToBeClickable(editParamChanges), 5000,
-      'Edit Param Changes is not clickable').then(function(isClickable) {
-      if (isClickable) {
-        editParamChanges.click();
-        browser.wait(until.elementToBeClickable(addParamButon), 5000,
-          'Add Param button is not clickable').then(function(isClickable) {
-          if (isClickable) {
-            addParamButon.click();
-          }
-        });
-      }
-    });
+    waitFor.elementToBeClickable(
+      editParamChanges, 'Param Changes editor is not clickable');
+    editParamChanges.click();
+
+    waitFor.elementToBeClickable(
+      addParamButton, 'Add Param button is not clickable');
+    addParamButton.click();
 
     var editorRowElem = element.all(by.css(
       '.protractor-test-param-changes-list')).last();
@@ -775,27 +765,21 @@ var ExplorationEditorMainTab = function() {
     forms.AutocompleteDropdownEditor(editorRowElem).setValue(paramName);
 
     var item = editorRowElem.all(by.tagName('input')).last();
-    browser.wait(until.elementToBeClickable(item), 5000,
-      'Param Options are not clickable').then(function(isClickable) {
-      if (isClickable) {
-        /* Setting parameter value is difficult via css since input fields
-    are dynamically generated. We isolate it as the last input in the
-    current parameter changes UI. */
-        item.click();
-        item.clear();
-        item.sendKeys(paramValue);
-      }
-    });
+    waitFor.elementToBeClickable(item, 'Param Options are not clickable');
+    // Setting parameter value is difficult via css since input fields
+    // are dynamically generated. We isolate it as the last input in the
+    // current parameter changes UI.
+    item.click();
+    item.clear();
+    item.sendKeys(paramValue);
 
-    browser.wait(until.elementToBeClickable(saveParamChangesButton), 5000,
-      'Save Param Changesbutton is not clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          saveParamChangesButton.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      saveParamChangesButton, 'Save Param Changes button is not clickable');
+    saveParamChangesButton.click();
 
-    browser.wait(until.invisibilityOf(saveParamChangesButton), 5000);
+    waitFor.invisibilityOf(
+      saveParamChangesButton,
+      'Param Changes editor takes too long to disappear');
   };
 
   // RULES
@@ -912,8 +896,8 @@ var ExplorationEditorMainTab = function() {
     answerDescription.click();
     var ruleDropdownElement = element.all(by.cssContainingText(
       '.select2-results__option', ruleDescriptionInDropdown)).first();
-    browser.wait(until.visibilityOf(ruleDropdownElement), 5000,
-      'Rule dropdown element taking too long to appear');
+    waitFor.visibilityOf(
+      ruleDropdownElement, 'Rule dropdown element takes too long to appear');
     ruleDropdownElement.click();
   };
 
@@ -923,13 +907,14 @@ var ExplorationEditorMainTab = function() {
     general.scrollToTop();
     var nodeElement = explorationGraph.all(
       by.cssContainingText('.protractor-test-node', stateName)).first();
-    browser.wait(until.visibilityOf(nodeElement), 5000, 'State ' + stateName +
-      ' takes too long to appear or does not exist');
+    waitFor.visibilityOf(
+      nodeElement,
+      'State ' + stateName + ' takes too long to appear or does not exist');
     nodeElement.element(by.css('.protractor-test-delete-node')).click();
     expect(confirmDeleteStateButton.isDisplayed());
     confirmDeleteStateButton.click();
-    browser.wait(until.invisibilityOf(confirmDeleteStateButton), 5000,
-      'Deleting state takes too long');
+    waitFor.invisibilityOf(
+      confirmDeleteStateButton, 'Deleting state takes too long');
   };
 
   // For this to work, there must be more than one name, otherwise the
@@ -962,38 +947,40 @@ var ExplorationEditorMainTab = function() {
           'State ' + targetName + ' not found by editorMainTab.moveToState.');
       }
     });
-    browser.wait(until.textToBePresentInElement(stateNameContainer, targetName),
-      5000, 'Current state name is:' + stateNameContainer.getAttribute(
-        'textContent') + 'instead of expected ' + targetName);
+
+    var errorMessage = (
+      'Current state name is:' +
+      stateNameContainer.getAttribute('textContent') +
+      'instead of expected ' + targetName);
+    waitFor.textToBePresentInElement(
+      stateNameContainer, targetName, errorMessage);
   };
 
   this.setStateName = function(name) {
-    browser.wait(until.invisibilityOf(postTutorialPopover), 5000);
-    browser.wait(until.elementToBeClickable(stateNameContainer), 5000,
-      'State Name Container takes too long to appear')
-      .then(function (isClickable) {
-        if (isClickable) {
-          stateNameContainer.click();
-          stateNameInput.clear();
-          stateNameInput.sendKeys(name);
-        }
-      });
-    browser.wait(until.elementToBeClickable(stateNameSubmitButton), 5000,
-      'State Name Submit button takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          stateNameSubmitButton.click();
-          // Wait for state name container to completely disappear
-          // and re-appear again.
-        }
-      });
-    browser.wait(until.textToBePresentInElement(stateNameContainer, name),
-      5000, 'Current state name is:' + stateNameContainer.getAttribute(
+    waitFor.invisibilityOf(
+      postTutorialPopover, 'Post-tutorial popover takes too long to disappear');
+    waitFor.elementToBeClickable(
+      stateNameContainer, 'State Name Container takes too long to appear');
+    stateNameContainer.click();
+    stateNameInput.clear();
+    stateNameInput.sendKeys(name);
+
+    waitFor.elementToBeClickable(
+      stateNameSubmitButton,
+      'State Name Submit button takes too long to be clickable');
+    stateNameSubmitButton.click();
+
+    // Wait for state name container to completely disappear
+    // and re-appear again.
+    waitFor.textToBePresentInElement(
+      stateNameContainer, name,
+      'Current state name is:' + stateNameContainer.getAttribute(
         'textContent') + 'instead of expected ' + name);
   };
 
   this.expectCurrentStateToBe = function(name) {
-    browser.wait(until.textToBePresentInElement(stateNameContainer, name), 5000,
+    waitFor.textToBePresentInElement(
+      stateNameContainer, name,
       'Expecting current state ' + stateNameContainer.getAttribute(
         'textContent') + ' to be ' + name);
     expect(stateNameContainer.getAttribute('textContent')).toMatch(name);

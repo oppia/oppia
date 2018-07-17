@@ -17,9 +17,9 @@
  * tests.
  */
 
-var general = require('./general.js');
 var forms = require('./forms.js');
-var until = protractor.ExpectedConditions;
+var general = require('./general.js');
+var waitFor = require('./waitFor.js');
 
 var AdminPage = function(){
   var ADMIN_URL_SUFFIX = '/admin';
@@ -43,8 +43,9 @@ var AdminPage = function(){
           saveAllConfigs.click();
           general.acceptAlert();
           // Waiting for success message.
-          browser.wait(until.textToBePresentInElement(statusMessage,
-            'saved successfully'), 5000, 'New config could not be saved');
+          waitFor.textToBePresentInElement(
+            statusMessage, 'saved successfully',
+            'New config could not be saved');
           return true;
         }
       });
@@ -52,7 +53,7 @@ var AdminPage = function(){
 
   this.get = function(){
     browser.get(ADMIN_URL_SUFFIX);
-    return general.waitForLoadingMessage();
+    return waitFor.pageToFullyLoad();
   };
 
   this.editConfigProperty = function(
@@ -71,22 +72,20 @@ var AdminPage = function(){
   };
 
   this.updateRole = function(name, newRole) {
-    browser.wait(until.elementToBeClickable(adminRolesTab), 5000,
-      'Admin Roles tab is not clickable').then(function(isClickable) {
-      if (isClickable) {
-        adminRolesTab.click();
-      }
-    });
+    waitFor.elementToBeClickable(
+      adminRolesTab, 'Admin Roles tab is not clickable');
+    adminRolesTab.click();
+
     // Change values for "update role" form, and submit it.
-    browser.wait(until.visibilityOf(updateFormName), 5000,
-      'Update Form Name is not visible');
+    waitFor.visibilityOf(updateFormName, 'Update Form Name is not visible');
     updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
     roleOption.click();
     updateFormSubmit.click();
-    browser.wait(until.textToBePresentInElement(statusMessage,
-      'successfully updated to'), 5000, 'Role was set unsuccessfully');
+    waitFor.textToBePresentInElement(
+      statusMessage, 'successfully updated to',
+      'Could not set role successfully');
     return true;
   };
 };

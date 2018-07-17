@@ -21,7 +21,6 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
-var general = require('./general.js');
 
 var DictionaryEditor = function(elem) {
   return {
