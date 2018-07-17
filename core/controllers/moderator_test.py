@@ -83,7 +83,8 @@ class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
                     'type': 'exploration',
                     'id': self.EXP_ID_2,
                 }],
-            }, csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=400)
         self.post_json(
             '/moderatorhandler/featured', {
                 'featured_activity_reference_dicts': [{
@@ -93,7 +94,8 @@ class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
                     'type': 'exploration',
                     'id': self.EXP_ID_2,
                 }],
-            }, csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token=csrf_token,
+            expect_errors=True, expected_status_int=400)
 
         # Posting a list that only contains public activities succeeds.
         self.post_json(
@@ -102,6 +104,6 @@ class FeaturedActivitiesHandlerTest(test_utils.GenericTestBase):
                     'type': 'exploration',
                     'id': self.EXP_ID_1,
                 }],
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         self.logout()

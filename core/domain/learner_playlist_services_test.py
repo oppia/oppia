@@ -114,14 +114,16 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
         # Add the first exploration in a different position.
         learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_0, 1)
+            self.user_id, self.EXP_ID_0,
+            position_to_be_inserted=1)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_1, self.EXP_ID_0])
 
         # Add the first exploration in the first position.
         learner_progress_services.add_exp_to_learner_playlist(
-            self.user_id, self.EXP_ID_0, 0)
+            self.user_id, self.EXP_ID_0,
+            position_to_be_inserted=0)
         self.assertEqual(
             self._get_all_learner_playlist_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1])
@@ -191,14 +193,16 @@ class LearnerPlaylistTests(test_utils.GenericTestBase):
 
         # Add the first collection in a different position.
         learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_0, 1)
+            self.user_id, self.COL_ID_0,
+            position_to_be_inserted=1)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_1, self.COL_ID_0])
 
         # Add the first collection in the first position.
         learner_progress_services.add_collection_to_learner_playlist(
-            self.user_id, self.COL_ID_0, 0)
+            self.user_id, self.COL_ID_0,
+            position_to_be_inserted=0)
         self.assertEqual(
             self._get_all_learner_playlist_collection_ids(
                 self.user_id), [self.COL_ID_0, self.COL_ID_1])

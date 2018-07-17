@@ -117,10 +117,12 @@ class BaseHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.get('/library/data/extra', expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
-        response = self.testapp.post('/library/extra', {}, expect_errors=True)
+        response = self.testapp.post(
+            '/library/extra', params={}, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
-        response = self.testapp.put('/library/extra', {}, expect_errors=True)
+        response = self.testapp.put(
+            '/library/extra', params={}, expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
     def test_redirect_in_logged_out_states(self):
@@ -292,7 +294,7 @@ class EscapingTest(test_utils.GenericTestBase):
             self.assertNotIn('x153y', response.body)
 
     def test_special_char_escaping(self):
-        response = self.testapp.post('/fake', {})
+        response = self.testapp.post('/fake', params={})
         self.assertEqual(response.status_int, 200)
 
         self.assertTrue(response.body.startswith(feconf.XSSI_PREFIX))

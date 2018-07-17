@@ -126,7 +126,7 @@ class SignupTest(test_utils.GenericTestBase):
             {'agreed_to_terms': True, 'username': 'creatoruser',
              'default_dashboard': constants.DASHBOARD_TYPE_CREATOR,
              'can_receive_email_updates': None},
-            csrf_token)
+            csrf_token=csrf_token)
 
         user_id = user_services.get_user_id_from_username('creatoruser')
         user_settings = user_services.get_user_settings(user_id)
@@ -145,7 +145,7 @@ class SignupTest(test_utils.GenericTestBase):
             {'agreed_to_terms': True, 'username': 'learneruser',
              'default_dashboard': constants.DASHBOARD_TYPE_LEARNER,
              'can_receive_email_updates': None},
-            csrf_token)
+            csrf_token=csrf_token)
 
         user_id = user_services.get_user_id_from_username('learneruser')
         user_settings = user_services.get_user_settings(user_id)
@@ -635,7 +635,7 @@ class SiteLanguageHandlerTests(test_utils.GenericTestBase):
             '/preferenceshandler/data', {
                 'update_type': 'preferred_site_language_code',
                 'data': language_code,
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         preferences = self.get_json('/preferenceshandler/data')
         self.assertIsNotNone(preferences)
@@ -661,7 +661,7 @@ class LongUserBioHandlerTests(test_utils.GenericTestBase):
             '/preferenceshandler/data', {
                 'update_type': 'user_bio',
                 'data': 'I am within 2000 char limit',
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         preferences = self.get_json('/preferenceshandler/data')
         self.assertIsNotNone(preferences)
         self.assertEqual(
