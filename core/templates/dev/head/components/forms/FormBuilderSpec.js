@@ -217,7 +217,7 @@ describe('Testing requireIsFloat directive', function() {
     testInput.$setViewValue('0.3.5');
     scope.$digest();
     expect(testInput.$valid).toEqual(false);
-  })
+  });
 });
 
 describe('RTE helper service', function() {
