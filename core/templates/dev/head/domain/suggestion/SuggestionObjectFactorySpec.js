@@ -56,4 +56,4 @@ describe('Suggestion object factory', function() {
     expect(suggestion.lastUpdated).toEqual(1000);
     expect(suggestion.threadId()).toEqual('exp1.thread1');
   });
-})
+});
