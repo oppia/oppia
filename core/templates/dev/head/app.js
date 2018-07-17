@@ -74,6 +74,7 @@ oppia.constant('COMPONENT_NAME_CONTENT', 'content');
 oppia.constant('COMPONENT_NAME_HINT', 'hint');
 oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
 oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
+oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
 
 // Enables recording playthroughs from learner sessions.
 oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', false);
