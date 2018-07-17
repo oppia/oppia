@@ -21,6 +21,7 @@ from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import skill_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -1323,27 +1324,39 @@ def can_edit_skill(handler):
     """Decorator to check whether the user can edit a skill, which can be
     independent or belong to a topic.
     """
-    def test_can_edit_skill(self, **kwargs):
-        """Checks whether the user can edit a skill, which can be
-        independent or belong to a topic.
+    def can_user_edit_skill(user, skill_rights):
+        """Checks whether the user can edit the given skill.
 
         Args:
-            **kwargs: *. Keyword arguments.
+            user: UserActionsInfo. Object having user id, role and actions for
+                given user.
+            skill_rights: SkillRights or None. Rights object for the given
+                skill.
 
         Returns:
-            *. The return value of the decorated function.
-
-        Raises:
-            NotLoggedInException: The user is not logged in.
-            UnauthorizedUserException: The user does not have
-                credentials to edit a given skill.
+            bool. Whether the given user can edit the given skill.
         """
+
+        if skill_rights is None:
+            return False
+        if role_services.ACTION_EDIT_PUBLIC_SKILLS in user.actions:
+            if not skill_rights.is_private():
+                return True
+            if skill_rights.is_private() and skill_rights.is_creator(
+                    user.user_id):
+                return True
+        return False
+
+    def test_can_edit_skill(self, skill_id, **kwargs):
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
-        user_actions_info = user_services.UserActionsInfo(self.user_id)
-        if role_services.ACTION_EDIT_ANY_SKILL in user_actions_info.actions:
-            return handler(self, **kwargs)
+        skill_rights = skill_services.get_skill_rights(skill_id)
+        if skill_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if can_user_edit_skill(self.user, skill_rights):
+            return handler(self, skill_id, **kwargs)
         else:
             raise self.UnauthorizedUserException(
                 'You do not have credentials to edit this skill.')
@@ -1414,6 +1427,47 @@ def can_create_skill(handler):
 
     test_can_create_skill.__wrapped__ = True
     return test_can_create_skill
+
+
+def can_publish_skill(handler):
+
+    def can_user_publish_skill(user, skill_rights):
+        """Checks whether the user can publish the given skill.
+
+        Args:
+            user: UserActionsInfo. Object having user id, role and actions
+                for given user.
+            skill_rights: SkillRights or None. Rights object for the given
+                skill.
+
+        Returns:
+            bool. Whether the given user can publish the given skill.
+        """
+
+        if skill_rights is None:
+            return False
+        if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
+            return False
+        if skill_rights.is_creator(user.user_id):
+            return True
+        return False
+
+    def test_can_publish_skill(self, skill_id, **kwargs):
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        skill_rights = skill_services.get_skill_rights(skill_id)
+        if skill_rights is None:
+            raise base.UserFacingExceptions.PageNotFoundException
+
+        if can_user_publish_skill(self.user, skill_rights):
+            return handler(self, skill_id, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to edit this skill.')
+    test_can_publish_skill.__wrapped__ = True
+
+    return test_can_publish_skill
 
 
 def can_delete_story(handler):
