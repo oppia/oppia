@@ -133,10 +133,10 @@ describe('NumberWithUnitsObjectFactory', function() {
         NumberWithUnits.fromRawInputString('3# m/s');
       }).toThrow(new Error(errors.INVALID_VALUE));
       expect(function() {
-        NumberWithUnits.fromRawInputString('$3');
+        NumberWithUnits.fromRawInputString('$s 3');
       }).toThrow(new Error(errors.INVALID_CURRENCY));
       expect(function() {
-        NumberWithUnits.fromRawInputString('Rs5');
+        NumberWithUnits.fromRawInputString('Rs');
       }).toThrow(new Error(errors.INVALID_CURRENCY));
       expect(function() {
         NumberWithUnits.fromRawInputString('$');
