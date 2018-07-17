@@ -68,12 +68,7 @@ oppia.factory('SkillRightsObjectFactory', [
     };
 
     SkillRights.createInterstitialSkillRights = function() {
-      return new SkillRights({
-        skill_id: null,
-        creator_id: null,
-        skill_is_private: true,
-        can_edit_skill_description: false
-      });
+      return new SkillRights(null, null, true, false);
     };
 
     return SkillRights;
