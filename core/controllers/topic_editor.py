@@ -18,7 +18,10 @@ are created.
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import question_domain
+from core.domain import question_services
 from core.domain import role_services
+from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
@@ -102,7 +105,8 @@ class TopicEditorQuestionHandler(base.BaseHandler):
         skill_ids = topic.get_all_skill_ids()
 
         question_summaries = (
-            topic_services.get_question_summaries_linked_to_skills(skill_ids))
+            question_services.get_question_summaries_linked_to_skills(skill_ids)
+        )
         question_summary_dicts = [
             summary.to_dict() for summary in question_summaries]
 

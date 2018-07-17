@@ -14,6 +14,7 @@
 
 """Tests for the topic editor page."""
 
+from core.domain import question_services
 from core.domain import skill_services
 from core.domain import story_services
 from core.domain import topic_domain
@@ -77,6 +78,54 @@ class TopicEditorStoryHandlerTest(BaseTopicEditorControllerTest):
             self.assertIsNotNone(
                 story_services.get_story_by_id(story_id, strict=False))
         self.logout()
+
+
+class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
+
+    def test_question_creation(self):
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            self.login(self.ADMIN_EMAIL)
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            csrf_token = self.get_csrf_token_from_response(response)
+            json_response = self.post_json(
+                '%s/%s' % (feconf.TOPIC_EDITOR_QUESTION_URL, self.skill_id),
+                {}, csrf_token=csrf_token)
+            question_id = json_response['questionId']
+            self.assertEqual(len(question_id), 12)
+            self.assertIsNotNone(
+                question_services.get_question_by_id(question_id, strict=False))
+            question_summaries = (
+                question_services.get_question_summaries_linked_to_skills([
+                    self.skill_id]))
+            self.assertEqual(len(question_summaries), 1)
+            self.assertEqual(question_summaries[0].id, question_id)
+            self.logout()
+
+            self.login(self.TOPIC_MANAGER_EMAIL)
+            response = self.testapp.get(
+                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
+            csrf_token = self.get_csrf_token_from_response(response)
+            json_response = self.post_json(
+                '%s/%s' % (feconf.TOPIC_EDITOR_QUESTION_URL, self.skill_id),
+                {}, csrf_token=csrf_token)
+            question_id = json_response['questionId']
+            self.assertEqual(len(question_id), 12)
+            self.assertIsNotNone(
+                question_services.get_question_by_id(question_id, strict=False))
+            question_summaries = (
+                question_services.get_question_summaries_linked_to_skills([
+                    self.skill_id]))
+            self.assertEqual(len(question_summaries), 2)
+            self.assertEqual(question_summaries[0].id, question_id)
+            self.logout()
+
+            self.login(self.NEW_USER_EMAIL)
+            response = self.testapp.post(
+                '%s/%s' % (feconf.TOPIC_EDITOR_QUESTION_URL, self.skill_id),
+                expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
 
 
 class SubtopicPageEditorTest(BaseTopicEditorControllerTest):
