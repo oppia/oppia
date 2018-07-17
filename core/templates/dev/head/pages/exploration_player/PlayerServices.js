@@ -481,7 +481,7 @@ oppia.factory('ExplorationPlayerService', [
       // Returns a promise for the user profile picture, or the default image if
       // user is not logged in or has not uploaded a profile picture, or the
       // player is in preview mode.
-      getUserProfileImage: function() {
+      getUserProfileImageAsync: function() {
         if (!_editorPreviewMode) {
           return UserService.getProfileImageDataUrlAsync()
             .then(function(dataUrl) {

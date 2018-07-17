@@ -128,9 +128,10 @@ oppia.directive('tutorCard', [
           $scope.profilePicture = UrlInterpolationService.getStaticImageUrl(
             '/avatar/user_blue_72px.png');
 
-          ExplorationPlayerService.getUserProfileImage().then(function(result) {
-            $scope.profilePicture = result;
-          });
+          ExplorationPlayerService.getUserProfileImageAsync()
+            .then(function(result) {
+              $scope.profilePicture = result;
+            });
 
           $scope.getContentFocusLabel = function(index) {
             return CONTENT_FOCUS_LABEL_PREFIX + index;
