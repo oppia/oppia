@@ -516,10 +516,10 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             }
             self.assertDictContainsSubset(
                 expected_thread_dict,
-                response['threads_with_suggestions'][0])
+                response['suggestion_thread_dicts'][0])
 
             thread_id = (
-                response['threads_with_suggestions'][0]['thread_id'])
+                response['suggestion_thread_dicts'][0]['thread_id'])
 
             response = self.get_json(
                 '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id))

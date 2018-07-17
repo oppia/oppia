@@ -19,9 +19,11 @@
 
 oppia.factory('ThreadDataService', [
   '$http', '$q', 'ExplorationDataService', 'AlertsService',
+  'SuggestionObjectFactory', 'SuggestionThreadObjectFactory',
   'ACTION_ACCEPT_SUGGESTION',
   function(
       $http, $q, ExplorationDataService, AlertsService,
+      SuggestionObjectFactory, SuggestionThreadObjectFactory,
       ACTION_ACCEPT_SUGGESTION) {
     var _expId = ExplorationDataService.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
@@ -70,15 +72,16 @@ oppia.factory('ThreadDataService', [
       $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
         _data.feedbackThreads = res[0].data.threads;
         if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-          _data.suggestionThreads = res[0].data.threads_with_suggestions;
+          var suggestionThreads = res[0].data.suggestion_thread_dicts;
           for (var i = 0; i < res[1].data.suggestions.length; i++) {
-            suggestion = res[1].data.suggestions[i];
-            suggestion.thread_id = suggestion.suggestion_id.slice(
-              suggestion.suggestion_id.indexOf('.') + 1);
-            for (var j = 0; j < _data.suggestionThreads.length; j++) {
-              if (suggestion.thread_id ===
-                  _data.suggestionThreads[j].thread_id) {
-                _data.suggestionThreads[j].suggestion = suggestion;
+            var suggestion = SuggestionObjectFactory.createFromBackendDict(
+              res[1].data.suggestion[i]);
+            for (var j = 0; j < suggestionThreads.length; j++) {
+              if (suggestion.threadId() ===
+                  suggestionThreads[j].thread_id) {
+                var suggestionThread = SuggestionThreadObjectFactory(
+                  suggestionThreads[j], res[1].data.suggestion[i]);
+                _data.suggestionThreads.push(suggestionThread);
                 break;
               }
             }

@@ -247,12 +247,13 @@ oppia.controller('FeedbackTab', [
             });
             // Immediately update editor to reflect accepted suggestion.
             if (result.action === ACTION_ACCEPT_SUGGESTION) {
-              var suggestion = $scope.activeThread;
+              var suggestion;
               var stateName;
               if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
                 suggestion = $scope.activeThread.suggestion;
                 stateName = suggestion.change_cmd.state_name;
               } else {
+                suggestion = $scope.activeThread;
                 stateName = suggestion.state_name;
               }
               var stateDict = ExplorationDataService.data.states[stateName];

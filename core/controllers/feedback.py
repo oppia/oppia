@@ -38,7 +38,7 @@ class ThreadListHandler(base.BaseHandler):
                 exploration_id, False)]})
         if constants.USE_NEW_SUGGESTION_FRAMEWORK:
             self.values.update({
-                'threads_with_suggestions': (
+                'suggestion_thread_dicts': (
                     [t.to_dict() for t in feedback_services.get_all_threads(
                         exploration_id, True)])
             })
@@ -73,7 +73,7 @@ class ThreadHandler(base.BaseHandler):
     @acl_decorators.can_view_feedback_thread
     def get(self, thread_id):
         if constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            suggestion_id = 'exploration.' + thread_id
+            suggestion_id = 'exploration.%s' % thread_id
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
         else:
             suggestion = feedback_services.get_suggestion(thread_id)
