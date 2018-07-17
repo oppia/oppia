@@ -59,10 +59,10 @@ ATTRS_WHITELIST = {
     'em': [],
     'hr': [],
     'i': [],
-    'li': [],
-    'ol': [],
-    'p': [],
-    'pre': [],
+    'li': ['style'],
+    'ol': ['style'],
+    'p': ['style'],
+    'pre': ['style'],
     'span': [],
     'strong': [],
     'table': ['border'],
@@ -70,7 +70,7 @@ ATTRS_WHITELIST = {
     'td': [],
     'tr': [],
     'u': [],
-    'ul': [],
+    'ul': ['style'],
 }
 
 
@@ -96,7 +96,9 @@ def clean(user_submitted_html):
     # TODO(sll): Alert the caller if the input was changed due to this call.
     # TODO(sll): Add a log message if bad HTML is detected.
     return bleach.clean(
-        user_submitted_html, tags=tag_names, attributes=core_tags, strip=True)
+        user_submitted_html,
+        tags=tag_names,
+        attributes=core_tags, styles=['margin-left'], strip=True)
 
 
 def strip_html_tags(html):
