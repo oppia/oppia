@@ -192,11 +192,13 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     def test_get_unpublished_skill_rights_by_creator(self):
         self.save_new_skill(
-            'skill_a', self.user_id_admin, 'Description A', [],
-            skill_domain.SkillContents('Explanation', ['Example 1']))
+            'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
+            skill_contents=(
+                skill_domain.SkillContents('Explanation', ['Example 1'])))
         self.save_new_skill(
-            'skill_b', self.user_id_admin, 'Description B', [],
-            skill_domain.SkillContents('Explanation', ['Example 1']))
+            'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
+            skill_contents=(
+                skill_domain.SkillContents('Explanation', ['Example 1'])))
 
         skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
             self.user_id_admin)
