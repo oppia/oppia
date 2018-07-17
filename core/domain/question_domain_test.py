@@ -109,7 +109,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question = question_domain.Question.create_default_question(
             question_id)
         default_question_data = exp_domain.State.create_default_state(
-            feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+            None, is_initial_state=True).to_dict()
 
         self.assertEqual(question.id, question_id)
         self.assertEqual(

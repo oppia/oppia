@@ -40,6 +40,8 @@ class TopicEditorStoryHandler(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
 
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
         topic = topic_services.get_topic_by_id(topic_id)
         canonical_story_summaries = story_services.get_story_summaries_by_ids(
             topic.canonical_story_ids)
@@ -81,6 +83,49 @@ class TopicEditorStoryHandler(base.BaseHandler):
         story_services.save_new_story(self.user_id, story)
         self.render_json({
             'storyId': new_story_id
+        })
+
+
+class TopicEditorQuestionHandler(base.BaseHandler):
+    """Manages the creation of a question and receiving of all question
+    summaries for display in topic editor page.
+    """
+
+    @acl_decorators.can_edit_topic
+    def get(self, topic_id):
+        """Handles GET requests."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+        topic_domain.Topic.require_valid_topic_id(topic_id)
+
+        topic = topic_services.get_topic_by_id(topic_id)
+        skill_ids = topic.get_all_skill_ids()
+
+        question_summaries = (
+            topic_services.get_question_summaries_linked_to_skills(skill_ids))
+        question_summary_dicts = [
+            summary.to_dict() for summary in question_summaries]
+
+        self.values.update({
+            'question_summary_dicts': question_summary_dicts
+        })
+        self.render_json(self.values)
+
+    @acl_decorators.can_edit_skill
+    def post(self, skill_id):
+        """Handles POST requests."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+        skill_domain.Skill.require_valid_skill_id(skill_id)
+
+        new_question_id = question_services.get_new_question_id()
+        question = question_domain.Question.create_default_question(
+            new_question_id)
+        question_services.add_question(self.user_id, question)
+        question_services.create_new_question_skill_link(
+            new_question_id, skill_id)
+        self.render_json({
+            'questionId': new_question_id
         })
 
 

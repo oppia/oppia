@@ -236,7 +236,7 @@ class Question(object):
             Question. A Question domain object with default values.
         """
         default_question_state_data = exp_domain.State.create_default_state(
-            feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True)
+            None, is_initial_state=True)
 
         return cls(
             question_id, default_question_state_data,
