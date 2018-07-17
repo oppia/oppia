@@ -53,7 +53,10 @@ def can_play_exploration(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can play the given exploration.
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise self.PageNotFoundException
@@ -82,7 +85,10 @@ def can_play_collection(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can play the given collection.
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id, strict=False)
@@ -110,7 +116,10 @@ def can_download_exploration(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can download the given exploration.
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -140,7 +149,10 @@ def can_view_exploration_stats(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can view the exploration stats.
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -168,7 +180,12 @@ def can_edit_collection(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can edit the collection.
+            *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to edit the collection.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -192,7 +209,19 @@ def can_manage_email_dashboard(handler):
     """Decorator to check whether user can access email dashboard."""
 
     def test_can_manage_emails(self, **kwargs):
-        """Checks if the user is logged in and can access email dashboard."""
+        """Checks if the user is logged in and can access email dashboard.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to access the email dashboard.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -210,7 +239,19 @@ def can_access_moderator_page(handler):
     """Decorator to check whether user can access moderator page."""
 
     def test_can_access_moderator_page(self, **kwargs):
-        """Checks if the user is logged in and can access moderater page."""
+        """Checks if the user is logged in and can access moderater page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to access the moderator page.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -228,7 +269,19 @@ def can_send_moderator_emails(handler):
     """Decorator to check whether user can send moderator emails."""
 
     def test_can_send_moderator_emails(self, **kwargs):
-        """Checks if the user is logged in and can send moderator emails."""
+        """Checks if the user is logged in and can send moderator emails.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to send moderator emails.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -246,7 +299,19 @@ def can_manage_own_profile(handler):
     """Decorator to check whether user can manage his profile."""
 
     def test_can_manage_profile(self, **kwargs):
-        """Checks if the user is logged in and can manage his profile."""
+        """Checks if the user is logged in and can manage his profile.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to manage profile or preferences.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -264,7 +329,19 @@ def can_access_admin_page(handler):
     """Decorator that checks if the current user is a super admin."""
 
     def test_super_admin(self, **kwargs):
-        """Checks if the user is logged in and is a super admin."""
+        """Checks if the user is logged in and is a super admin.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user is not a super admin
+                of the application.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -281,7 +358,19 @@ def can_upload_exploration(handler):
     """Decorator that checks if the current user can upload exploration."""
 
     def test_can_upload(self, **kwargs):
-        """Checks if the user can upload exploration."""
+        """Checks if the user can upload exploration.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to upload an exploration.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -298,7 +387,19 @@ def can_create_exploration(handler):
     """Decorator to check whether the user can create an exploration."""
 
     def test_can_create(self, **kwargs):
-        """Checks if the user can create an exploration."""
+        """Checks if the user can create an exploration.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to create an exploration.
+        """
         if self.user_id is None:
             raise self.NotLoggedInException
 
@@ -316,7 +417,19 @@ def can_create_collection(handler):
     """Decorator to check whether the user can create a collection."""
 
     def test_can_create(self, **kwargs):
-        """Checks if the user can create a collection."""
+        """Checks if the user can create a collection.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to create a collection.
+        """
         if self.user_id is None:
             raise self.NotLoggedInException
 
@@ -334,7 +447,19 @@ def can_access_creator_dashboard(handler):
     """Decorator to check whether the user can access creator dashboard page."""
 
     def test_can_access(self, **kwargs):
-        """Checks if the user can access the creator dashboard page."""
+        """Checks if the user can access the creator dashboard page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to access creator dashboard.
+        """
         if self.user_id is None:
             raise self.NotLoggedInException
 
@@ -362,6 +487,11 @@ def can_create_feedback_thread(handler):
 
         Returns:
             *. The return value of the decorated function.
+
+        Raises:
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to create an exploration feedback.
         """
         if exploration_id in feconf.DISABLED_EXPLORATION_IDS:
             raise base.UserFacingExceptions.PageNotFoundException
@@ -391,6 +521,12 @@ def can_view_feedback_thread(handler):
 
         Returns:
             *. The return value of the decorated function.
+
+        Raises:
+            InvalidInputException: The thread ID is not valid.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to view an exploration feedback.
         """
         if '.' not in thread_id:
             raise self.InvalidInputException('Thread ID must contain a .')
@@ -426,6 +562,13 @@ def can_comment_on_feedback_thread(handler):
 
         Returns:
             *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            InvalidInputException: The thread ID is not valid.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to comment on an exploration feedback.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -466,7 +609,11 @@ def can_rate_exploration(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can rate the exploration.
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to rate an exploration.
         """
         if (role_services.ACTION_RATE_ANY_PUBLIC_EXPLORATION in
                 self.user.actions):
@@ -490,7 +637,11 @@ def can_flag_exploration(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can flag the exploration.
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to flag an exploration.
         """
         if role_services.ACTION_FLAG_EXPLORATION in self.user.actions:
             return handler(self, exploration_id, **kwargs)
@@ -506,7 +657,18 @@ def can_subscribe_to_users(handler):
     """Decorator to check whether user can subscribe/unsubscribe a creator."""
 
     def test_can_subscribe(self, **kwargs):
-        """Checks if the user can subscribe/unsubscribe a creator."""
+        """Checks if the user can subscribe/unsubscribe a creator.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to manage subscriptions.
+        """
         if role_services.ACTION_SUBSCRIBE_TO_USERS in self.user.actions:
             return handler(self, **kwargs)
         else:
@@ -528,7 +690,13 @@ def can_edit_exploration(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can edit the exploration.
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to edit an exploration.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -560,7 +728,13 @@ def can_translate_exploration(handler):
             **kwargs: dict(str: *). Keyword arguments.
 
         Returns:
-            Return value of decorated function.
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to translate an exploration.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -592,7 +766,11 @@ def can_delete_exploration(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can delete the exploration.
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                permissions to delete an exploration.
         """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
@@ -625,8 +803,11 @@ def can_suggest_changes_to_exploration(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can make suggestions to an
-                exploration.
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to give suggestions to an exploration.
         """
         if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
             return handler(self, exploration_id, **kwargs)
@@ -650,6 +831,10 @@ def can_suggest_changes(handler):
 
         Returns:
             *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to make suggestions.
         """
         if role_services.ACTION_SUGGEST_CHANGES in self.user.actions:
             return handler(self, **kwargs)
@@ -673,7 +858,11 @@ def can_publish_exploration(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can publish the exploration.
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to publish an exploration.
         """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -703,7 +892,11 @@ def can_publish_collection(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can publish the collection.
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to publish a collection.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id)
@@ -732,7 +925,11 @@ def can_unpublish_collection(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can unpublish the collection.
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to unpublish a collection.
         """
         collection_rights = rights_manager.get_collection_rights(
             collection_id)
@@ -763,8 +960,11 @@ def can_modify_exploration_roles(handler):
             **kwargs: *. Keyword arguments.
 
         Returns:
-            bool. Whether the user can modify the rights related to
-                an exploration.
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to change the rights for an exploration.
         """
         exploration_rights = rights_manager.get_exploration_rights(
             exploration_id, strict=False)
@@ -789,6 +989,16 @@ def can_perform_cron_tasks(handler):
     def test_can_perform(self, **kwargs):
         """Checks if the handler is called by cron or by a superadmin of the
         application.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            UnauthorizedUserException: The user does not have
+                credentials to access the page.
         """
         if (self.request.headers.get('X-AppEngine-Cron') is None and
                 not self.is_super_admin):
@@ -805,7 +1015,17 @@ def can_access_learner_dashboard(handler):
     """Decorator to check access to learner dashboard."""
 
     def test_can_access(self, **kwargs):
-        """Checks if the user can access the learner dashboard."""
+        """Checks if the user can access the learner dashboard.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+        """
         if role_services.ACTION_ACCESS_LEARNER_DASHBOARD in self.user.actions:
             return handler(self, **kwargs)
         else:
@@ -824,6 +1044,12 @@ def require_user_id_else_redirect_to_homepage(handler):
     def test_login(self, **kwargs):
         """Checks if the user for the current session is logged in.
         If not, redirects the user to the home page.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
         """
         if not self.user_id:
             self.redirect('/')
@@ -837,6 +1063,21 @@ def require_user_id_else_redirect_to_homepage(handler):
 def can_edit_topic(handler):
     """Decorator to check whether the user can edit given topic."""
     def test_can_edit(self, topic_id, **kwargs):
+        """Checks whether the user can edit a given topic.
+
+        Args:
+            topic_id: str. The topic id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to edit a topic.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -857,6 +1098,21 @@ def can_edit_topic(handler):
 def can_edit_question(handler):
     """Decorator to check whether the user can edit given question."""
     def test_can_edit(self, question_id, **kwargs):
+        """Checks whether the user can edit the given question.
+
+        Args:
+            question_id: str. The question id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to edit a question.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -882,6 +1138,21 @@ def can_view_question_editor(handler):
     """Decorator to check whether the user can view any question editor."""
 
     def test_can_view_question_editor(self, question_id, **kwargs):
+        """Checks whether the user can view the question editor.
+
+        Args:
+            question_id: str. The question id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                enough rights to access the question editor.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -908,6 +1179,20 @@ def can_delete_question(handler):
     """Decorator to check whether the user can delete a question."""
 
     def test_can_delete_question(self, question_id, **kwargs):
+        """Checks whether the user can delete a given question.
+
+        Args:
+            question_id: str. The question id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                enough rights to delete the question.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -929,6 +1214,22 @@ def can_edit_subtopic_page(handler):
     """Decorator to check whether the user can edit a subtopic page of a topic.
     """
     def test_can_edit(self, topic_id, **kwargs):
+        """Checks whether the user can edit the subtopic page
+        of a given topic.
+
+        Args:
+            topic_id: str. The topic id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to edit the subtopic pages for
+                a given topic.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -946,6 +1247,22 @@ def can_edit_subtopic_page(handler):
 def can_add_new_story_to_topic(handler):
     """Decorator to check whether the user can add a story to a given topic."""
     def test_can_add_story(self, topic_id, **kwargs):
+        """Checks whether the user can add a story to
+        a given topic.
+
+        Args:
+            topic_id: str. The topic id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to add a story to a given topic.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -968,6 +1285,23 @@ def can_edit_story(handler):
     topic.
     """
     def test_can_edit_story(self, topic_id, **kwargs):
+        """Checks whether the user can edit a story belonging to
+        a given topic.
+
+        Args:
+            topic_id: str. The topic id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to edit a story belonging to a
+                given topic.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -990,6 +1324,20 @@ def can_edit_skill(handler):
     independent or belong to a topic.
     """
     def test_can_edit_skill(self, **kwargs):
+        """Checks whether the user can edit a skill, which can be
+        independent or belong to a topic.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to edit a given skill.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -1008,6 +1356,19 @@ def can_delete_skill(handler):
     """Decorator to check whether the user can delete a skill.
     """
     def test_can_delete_skill(self, **kwargs):
+        """Checks whether the user can delete a skill.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to delete a skill.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -1027,6 +1388,20 @@ def can_create_skill(handler):
     independent or added to a topic.
     """
     def test_can_create_skill(self, **kwargs):
+        """Checks whether the user can create a skill, which can be
+        independent or belong to a topic.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to create a skill.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -1045,6 +1420,22 @@ def can_delete_story(handler):
     """Decorator to check whether the user can delete a story in a given topic.
     """
     def test_can_delete_story(self, topic_id, **kwargs):
+        """Checks whether the user can delet a story in
+        a given topic.
+
+        Args:
+            topic_id: str. The topic id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            PageNotFoundException: The page is not found.
+            UnauthorizedUserException: The user does not have
+                credentials to delete a story.
+        """
         if not self.user_id:
             raise base.UserFacingExceptions.NotLoggedInException
 
@@ -1066,6 +1457,20 @@ def can_delete_topic(handler):
     """Decorator to check whether the user can delete a topic."""
 
     def test_can_delete_topic(self, topic_id, **kwargs):
+        """Checks whether the user can delete a given topic.
+
+        Args:
+            topic_id: str. The topic id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                enough rights to delete a given topic.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -1086,6 +1491,19 @@ def can_create_topic(handler):
     """Decorator to check whether the user can create a topic."""
 
     def test_can_create_topic(self, **kwargs):
+        """Checks whether the user can create a topic.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                enough rights to create a topic.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -1108,6 +1526,21 @@ def can_access_topics_and_skills_dashboard(handler):
     """
 
     def test_can_access_topics_and_skills_dashboard(self, **kwargs):
+        """Checks whether the user can access the topics and skills
+        dashboard.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                enough rights to access the topics and skills
+                dashboard.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -1130,6 +1563,19 @@ def can_view_any_topic_editor(handler):
     """Decorator to check whether the user can view any topic editor."""
 
     def test_can_view_any_topic_editor(self, **kwargs):
+        """Checks whether the user can view any topic editor.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                enough rights to view any topic editor.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -1141,8 +1587,8 @@ def can_view_any_topic_editor(handler):
             return handler(self, **kwargs)
         else:
             raise self.UnauthorizedUserException(
-                '%s does not have enough rights to access the topics and skills'
-                ' dashboard.' % self.user_id)
+                '%s does not have enough rights to view any topic editor.'
+                % self.user_id)
     test_can_view_any_topic_editor.__wrapped__ = True
 
     return test_can_view_any_topic_editor
@@ -1152,6 +1598,20 @@ def can_manage_rights_for_topic(handler):
     """Decorator to check whether the user can manage a topic's rights."""
 
     def test_can_manage_topic_rights(self, topic_id, **kwargs):
+        """Checks whether the user can manage a topic's rights.
+
+        Args:
+            topic_id: str. The topic id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                enough rights to assign roles for a given topic.
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
@@ -1174,6 +1634,19 @@ def can_change_topic_publication_status(handler):
     """Decorator to check whether the user can publish or unpublish a topic."""
 
     def test_can_change_topic_publication_status(self, **kwargs):
+        """Checks whether the user can can publish or unpublish a topic.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                enough rights to publish or unpublish the topic..
+        """
         if not self.user_id:
             raise self.NotLoggedInException
 
