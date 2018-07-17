@@ -195,8 +195,8 @@ class InteractionAnswerSummariesMRJobManager(
                 if latest_interaction_id != loaded_interaction_id and (
                         latest_version != exp.version):
                     yield (
-                        'Ignoring answers submitted to version %s and below '
-                        'since the latest exploration version is %s' % (
+                        'INFO: Ignoring answers submitted to version %s and '
+                        'below since the latest exploration version is %s' % (
                             latest_version, exp.version))
                     versions = []
 
