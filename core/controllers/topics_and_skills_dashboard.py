@@ -85,8 +85,9 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
 
         untriaged_skill_summary_dicts = []
         for skill_summary_dict in skill_summary_dicts:
-            if (skill_summary_dict['id'] not in skill_ids_assigned_to_some_topic) and ( #pylint: disable=line-too-long
-                    skill_summary_dict['id'] not in skill_ids_for_unpublished_skills): #pylint: disable=line-too-long
+            skill_id = skill_summary_dict['id']
+            if (skill_id not in skill_ids_assigned_to_some_topic) and (
+                    skill_id not in skill_ids_for_unpublished_skills):
                 untriaged_skill_summary_dicts.append(skill_summary_dict)
 
         unpublished_skill_summary_dicts = [

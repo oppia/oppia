@@ -745,7 +745,7 @@ def get_unpublished_skill_rights_by_creator(user_id):
 
 
 def get_all_unpublished_skill_rights():
-    """Retrieves the rights objects that are private
+    """Retrieves the rights objects that are private.
 
     Returns:
         list(SkillRights). The list of skill rights objects that are private.
