@@ -84,7 +84,8 @@ class TopicsAndSkillsDashboardPageDataHandlerTest(
             self.logout()
 
             # Check that topic managers can access the topics and skills
-            # dashboard editable topic data.
+            # dashboard editable topic data. Topic managers should not have
+            # access to any unpublished skills.
             self.login(self.TOPIC_MANAGER_EMAIL)
             json_response = self.get_json(
                 '%s' % feconf.TOPICS_AND_SKILLS_DASHBOARD_DATA_URL)
