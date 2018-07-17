@@ -64,16 +64,16 @@ describe('HTML to text', function() {
 
   it('should detect valid unicode strings', inject(function($filter) {
     var results = [
-    '<oppia-parameter></oppia-parameter>',
-    '<oppia-parameter>abc</oppia-parameter>',
-    '\\<oppia-parameter>abc</oppia-parameter>',
-    '{<oppia-parameter>abc</oppia-parameter>',
+      '<oppia-parameter></oppia-parameter>',
+      '<oppia-parameter>abc</oppia-parameter>',
+      '\\<oppia-parameter>abc</oppia-parameter>',
+      '{<oppia-parameter>abc</oppia-parameter>',
     ];
     validUnicodeStrings.forEach(function(s, i) {
       var fn = (function() {
         return $filter('convertUnicodeWithParamsToHtml')(s);
       })();
-      expect(fn).toBe(results[i]);
+      expect(fn).toEqual(results[i]);
     });
   }));
 });
@@ -166,6 +166,58 @@ describe('Normalizer tests', function() {
     expect(filter('3.0')).toBe(true);
     expect(filter('3.5')).toBe(false);
   }));
+});
+
+describe('Testing requireIsFloat directive', function() {
+  var $compile, scope, testInput;
+
+  beforeEach(module('oppia'));
+
+  beforeEach(inject(function($compile, $rootScope) {
+    scope = $rootScope.$new();
+    var element = '<form name="testForm">' +
+      '<input name="floatValue" type="number" ng-model="localValue.num" ' +
+      'require-is-float apply-validation="validators()">' +
+      '</form>';
+    $compile(element)(scope);
+    testInput = scope.testForm.floatValue;
+  }));
+
+  it('should validate if value is a float', function() {
+    testInput.$setViewValue('2');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('2.0');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('3.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('-3.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+  });
+
+  it('should invalidate if value is not a float', function() {
+    testInput.$setViewValue('-abc');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('3..5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('-2.abc');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('0.3.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+  })
 });
 
 describe('RTE helper service', function() {
