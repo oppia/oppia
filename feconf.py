@@ -741,6 +741,12 @@ SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 # is created or updated.
 ENABLE_STATE_ID_MAPPING = False
 
+# Each dict/subdict in classifier data should contain following key which
+# stores a list of keys whose values should undergo transformation on Oppia.
+# The value of following constant must be same with corresponding constant
+# on Oppia-ml stored at vmconf.py file.
+FLOAT_INDICATOR_KEY = 'float_values'
+
 # Current event models schema version. All event models with an
 # event_schema_version of 1 are the events collected before the rework of the
 # statistics framework which brought about the recording of new event models;

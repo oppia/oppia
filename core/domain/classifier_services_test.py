@@ -461,17 +461,22 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 'ab': 'abcd',
                 'ad': {
                     'ada': 'abcdef',
-                    'adc': ['fghi', {
+                    'adc': [{
                         'adca': 'abcd',
                         'adcb': '0.1234',
                         'adcc': ['ade', 'afd'],
+                        'float_values': ['adcb']
+                    }, {
+                        'adca': 'abce',
+                        'adcb': '0.34',
+                        'adcc': [],
                         'float_values': ['adcb']
                     }],
                     'float_values': ['adc']
                 },
                 'ae': [['123', '0.123'], ['abc']],
                 'af': [['abcde'], ['0.871']],
-                'float_values': ['af']
+                'float_values': []
             },
             'b': {
                 'bd': ['-2.48521656693', '-2.48521656693', '-2.48521656693'],
@@ -481,7 +486,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                     'float_values': []
                 },
                 'bg': ['abc', 'def', 'ghi'],
-                'bh': ['abc', 123],
+                'bh': ['abc', '123'],
                 'float_values': ['bd']
             },
             'c': '1.123432',
@@ -493,14 +498,18 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                 'ab': 'abcd',
                 'ad': {
                     'ada': 'abcdef',
-                    'adc': ['fghi', {
+                    'adc': [{
                         'adca': 'abcd',
                         'adcb': 0.1234,
                         'adcc': ['ade', 'afd']
+                    }, {
+                        'adca': 'abce',
+                        'adcb': 0.34,
+                        'adcc': []
                     }]
                 },
                 'ae': [['123', '0.123'], ['abc']],
-                'af': [['abcde'], [0.871]]
+                'af': [['abcde'], ['0.871']]
             },
             'b': {
                 'bd': [-2.48521656693, -2.48521656693, -2.48521656693],
@@ -509,7 +518,7 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                     'bed': 3
                 },
                 'bg': ['abc', 'def', 'ghi'],
-                'bh': ['abc', 123],
+                'bh': ['abc', '123'],
             },
             'c': 1.123432,
         }

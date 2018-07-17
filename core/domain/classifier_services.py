@@ -153,10 +153,6 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
         job_exploration_mappings)
 
 
-FLOAT_INDICATOR_KEY = 'float_values'
-# pylint: disable=too-many-branches
-
-
 def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
     """Converts all floating point numbers in classifier data to string.
 
@@ -165,16 +161,17 @@ def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
             values are stored as strings.
 
     Returns:
-        Dict. Original classifier data dict with float values converted back
+        dict. Original classifier data dict with float values converted back
             from string to float.
     """
+    # pylint: disable=too-many-branches
     if isinstance(classifier_data, dict):
-        if not FLOAT_INDICATOR_KEY in classifier_data:
-            # If classifier data does not contain 'float_values' key then
-            # none of its key values need transformation.
-            return classifier_data
+        if not feconf.FLOAT_INDICATOR_KEY in classifier_data:
+            raise Exception(
+                'Classifier data should contain \'%s\' key' %
+                feconf.FLOAT_INDICATOR_KEY)
 
-        float_fields = classifier_data.pop(FLOAT_INDICATOR_KEY)
+        float_fields = classifier_data.pop(feconf.FLOAT_INDICATOR_KEY)
         for k in classifier_data:
             if isinstance(classifier_data[k], dict):
                 classifier_data[k] = (
@@ -201,25 +198,20 @@ def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
         new_list = []
         for item in classifier_data:
             if isinstance(item, basestring):
-                try:
-                    new_list.append(float(item))
-                except ValueError:
-                    new_list.append(item)
+                new_list.append(float(item))
             elif isinstance(item, (dict, list)):
                 new_list.append(
                     convert_strings_to_float_numbers_in_classifier_data(item))
-            elif isinstance(item, int):
-                new_list.append(item)
             else:
                 raise Exception(
                     'Expected list values to be either strings, '
-                    'lists, integers or dicts but received %s.' % (type(item)))
+                    'lists or dicts but received %s.' % (type(item)))
         return new_list
     else:
         raise Exception(
             'Expected all top-level classifier data objects to be lists or '
-            'dicts but received %s.' % (type(classifier_data)))
-# pylint: enable=too-many-branches
+            'dicts but received %s.' % type(classifier_data))
+    # pylint: enable=too-many-branches
 
 
 def get_classifier_training_job_from_model(classifier_training_job_model):

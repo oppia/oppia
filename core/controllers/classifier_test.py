@@ -52,22 +52,23 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
         self.exploration = exp_services.get_exploration_by_id(self.exp_id)
 
         self.classifier_data = {
-            '_alpha': 0.1,
-            '_beta': 0.001,
-            '_prediction_threshold': 0.5,
+            '_alpha': '0.1',
+            '_beta': '0.001',
+            '_prediction_threshold': '0.5',
             '_training_iterations': 25,
             '_prediction_iterations': 5,
             '_num_labels': 10,
             '_num_docs': 12,
             '_num_words': 20,
-            '_label_to_id': {'text': 1},
-            '_word_to_id': {'hello': 2},
+            '_label_to_id': {'text': 1, 'float_values': []},
+            '_word_to_id': {'hello': 2, 'float_values': []},
             '_w_dp': [],
             '_b_dl': [],
             '_l_dp': [],
             '_c_dl': [],
             '_c_lw': [],
-            '_c_l': []
+            '_c_l': [],
+            'float_values': ['_alpha', '_beta', '_prediction_threshold']
         }
         classifier_training_jobs = (
             classifier_services.get_classifier_training_jobs(
@@ -106,10 +107,12 @@ class TrainedClassifierHandlerTest(test_utils.GenericTestBase):
             classifier_services.get_classifier_training_jobs(
                 self.exp_id, self.exploration.version, ['Home']))
         self.assertEqual(len(classifier_training_jobs), 1)
-
+        decoded_classifier_data = (
+            classifier_services.convert_strings_to_float_numbers_in_classifier_data( # pylint: disable=line-too-long
+                self.classifier_data))
         self.assertEqual(
             classifier_training_jobs[0].classifier_data,
-            self.classifier_data)
+            decoded_classifier_data)
         self.assertEqual(
             classifier_training_jobs[0].status,
             feconf.TRAINING_JOB_STATUS_COMPLETE)
