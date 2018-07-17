@@ -318,10 +318,10 @@ oppia.directive('conversationSkin', [
           };
 
           $scope.isLearnAgainButton = function() {
-            var isConceptCard =
+            var conceptCardIsBeingShown =
               ExplorationPlayerStateService.isStateShowingConceptCard(
                 $scope.activeCard.stateName);
-            if (isConceptCard) {
+            if (conceptCardIsBeingShown) {
               return false;
             }
             var interaction = ExplorationPlayerService.getInteraction(
@@ -661,6 +661,7 @@ oppia.directive('conversationSkin', [
                       });
                     }
                     if (missingPrerequisiteSkillId) {
+                      PlayerTranscriptService.setDestination('conceptCard');
                       ConceptCardBackendApiService.fetchConceptCard(
                         missingPrerequisiteSkillId
                       ).then(function(conceptCardBackendDict) {
@@ -822,10 +823,10 @@ oppia.directive('conversationSkin', [
 
           $scope.showUpcomingCard = function() {
             var currentIndex = PlayerPositionService.getActiveCardIndex();
-            var isConceptCardShown =
+            var conceptCardIsBeingShown =
               ExplorationPlayerStateService.isStateShowingConceptCard(
                 $scope.activeCard.stateName);
-            if (isConceptCardShown &&
+            if (conceptCardIsBeingShown &&
                 PlayerTranscriptService.isLastCard(currentIndex)) {
               $scope.returnToExplorationAfterConceptCard();
               return;

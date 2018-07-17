@@ -87,9 +87,9 @@ oppia.directive('tutorCard', [
               $scope.interactionIsActive = false;
             });
             if ($scope.conceptCardIsBeingShown) {
-              $scope.isInteractionInline = true;
+              $scope.interactionIsInline = true;
             } else {
-              $scope.isInteractionInline = (
+              $scope.interactionIsInline = (
                 ExplorationPlayerStateService.isInteractionInline(
                   $scope.activeCard.stateName));
             }

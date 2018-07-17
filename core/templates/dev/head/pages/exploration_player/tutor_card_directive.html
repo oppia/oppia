@@ -20,12 +20,12 @@
       </div>
     </div>
 
-    <div ng-if="(activeCard.inputResponsePairs.length > 1 && isInteractionInline) || (activeCard.inputResponsePairs.length > 0 && !isInteractionInline)">
+    <div ng-if="(activeCard.inputResponsePairs.length > 1 && interactionIsInline) || (activeCard.inputResponsePairs.length > 0 && !interactionIsInline)">
       <h4 class="conversation-skin-responses-dropdown-container"
           ng-click="toggleShowPreviousResponses()">
         <span class="conversation-skin-responses-dropdown-text">
           <span translate="I18N_PLAYER_PREVIOUS_RESPONSES"
-                translate-values="{previousResponses: <[activeCard.inputResponsePairs.length - (isInteractionInline ? 1 : 0)]>}">
+                translate-values="{previousResponses: <[activeCard.inputResponsePairs.length - (interactionIsInline ? 1 : 0)]>}">
           </span>
           <span class="conversation-skin-responses-dropdown-icon">
             <i class="material-icons conversation-skin-responses-dropdown-icon" ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">&#xE037;</i>
@@ -37,7 +37,7 @@
     <div ng-if="arePreviousResponsesShown && !conceptCardIsBeingShown"
          class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
       <div ng-repeat="responsePair in activeCard.inputResponsePairs track by $index">
-        <div ng-if="(!$last || !isInteractionInline)">
+        <div ng-if="(!$last || !interactionIsInline)">
           <input-response-pair data="responsePair"
                                profile-picture="profilePicture"
                                oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
@@ -49,7 +49,7 @@
     </div>
 
     <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
-    <div class="conversation-skin-tutor-card-bottom-section" ng-if="isInteractionInline && activeCard.inputResponsePairs.length > 0">
+    <div class="conversation-skin-tutor-card-bottom-section" ng-if="interactionIsInline && activeCard.inputResponsePairs.length > 0">
       <input-response-pair data="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1]"
                            profile-picture="profilePicture"
                            oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
@@ -65,15 +65,15 @@
       In addition, if the exploration is iframed, the terminal card will
       have no learner input section, so we do not show it.
     -->
-    <div ng-show="isInteractionInline && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback && !isConceptCardPending() &&
+    <div ng-show="interactionIsInline && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
     ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">
-        <!-- The seemingly redundant check for isInteractionInline is necessary
+        <!-- The seemingly redundant check for interactionIsInline is necessary
           because the parent ng-show does not remove the element from the DOM.
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
-        <div ng-if="isInteractionInline && activeCard.interactionHtml && !activeCard.destStateName && !conceptCardIsBeingShown">
+        <div ng-if="interactionIsInline && activeCard.interactionHtml && !activeCard.destStateName && !conceptCardIsBeingShown">
           <angular-html-bind class="protractor-test-conversation-input"
                              html-data="activeCard.interactionHtml">
           </angular-html-bind>
@@ -81,7 +81,7 @@
       </div>
     </div>
 
-    <div ng-if="!isInteractionInline && !conceptCardIsBeingShown"
+    <div ng-if="!interactionIsInline && !conceptCardIsBeingShown"
          class="conversation-skin-inline-interaction" style="opacity: 0.8;">
       <div style="padding: 6px 12px;">
         <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
