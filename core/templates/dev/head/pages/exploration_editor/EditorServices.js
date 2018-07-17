@@ -175,5 +175,6 @@ oppia.constant('STATE_ERROR_MESSAGES', {
   INCORRECT_SOLUTION: (
     'The current solution does not lead to another card.'),
   UNRESOLVED_ANSWER: (
-    'There is an answer among the top 10 which has no explicit feedback.')
+    'There is an answer that has been submitted at least 5 times, but has no ' +
+    'explicit feedback.')
 });
