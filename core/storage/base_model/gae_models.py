@@ -14,8 +14,8 @@
 
 """Base model class."""
 
+from constants import constants
 from core.platform import models
-import feconf
 import utils
 
 from google.appengine.datastore import datastore_query
@@ -304,7 +304,7 @@ class BaseCommitLogEntryModel(BaseModel):
             post_commit_status=status,
             post_commit_community_owned=community_owned,
             post_commit_is_private=(
-                status == feconf.ACTIVITY_STATUS_PRIVATE)
+                status == constants.ACTIVITY_STATUS_PRIVATE)
         )
 
     @classmethod

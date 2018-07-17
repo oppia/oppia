@@ -18,11 +18,10 @@
  */
 
 var forms = require('./forms.js');
-var general = require('./general.js');
+var waitFor = require('./waitFor.js');
 var CreatorDashboardPage = require('./CreatorDashboardPage.js');
 var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
-var until = protractor.ExpectedConditions;
 
 // Creates an exploration, opens its editor and skips the tutorial.
 var createExploration = function() {
@@ -49,13 +48,9 @@ var createCollectionAsAdmin = function() {
   creatorDashboardPage.clickCreateActivityButton();
   var activityCreationModal = element(
     by.css('.protractor-test-creation-modal'));
-  browser.wait(until.visibilityOf(activityCreationModal), 5000,
-    'Activity Creation modal takes too long to appear')
-    .then(function(isVisible) {
-      if (isVisible) {
-        creatorDashboardPage.clickCreateCollectionButton();
-      }
-    });
+  waitFor.visibilityOf(
+    activityCreationModal, 'Activity Creation modal takes too long to appear');
+  creatorDashboardPage.clickCreateCollectionButton();
 };
 
 /**
@@ -67,13 +62,9 @@ var createExplorationAsAdmin = function() {
   creatorDashboardPage.clickCreateActivityButton();
   var activityCreationModal = element(
     by.css('.protractor-test-creation-modal'));
-  browser.wait(until.visibilityOf(activityCreationModal), 5000,
-    'Activity Creation modal takes too long to appear')
-    .then(function(isVisible) {
-      if (isVisible) {
-        creatorDashboardPage.clickCreateExplorationButton();
-      }
-    });
+  waitFor.visibilityOf(
+    activityCreationModal, 'Activity Creation modal takes too long to appear');
+  creatorDashboardPage.clickCreateExplorationButton();
 };
 
 // This will only work if all changes have been saved and there are no
@@ -88,27 +79,21 @@ var publishExploration = function() {
   prePublicationButtonElem.isPresent().then(function() {
     prePublicationButtonElem.click();
   });
-  var until = protractor.ExpectedConditions;
-  browser.wait(until.invisibilityOf(prePublicationButtonElem), 5000,
+
+  waitFor.invisibilityOf(
+    prePublicationButtonElem,
     'prePublicationButtonElem taking too long to disappear while publishing');
-  element(by.css('.protractor-test-confirm-publish')).click().then(function(){
-    var sharePublishModal = element(
-      by.css('.protractor-test-share-publish-modal'));
-    var closePublishModalButton = element(
-      by.css('.protractor-test-share-publish-close'));
-    browser.wait(until.visibilityOf(sharePublishModal), 5000,
-      'Share Publish Modal takes too long to appear').then(function(isVisible){
-      if (isVisible) {
-        browser.wait(until.elementToBeClickable(closePublishModalButton), 5000
-          , 'Close Publish Modal button is not clickable')
-          .then(function(isClickable) {
-            if (isClickable) {
-              closePublishModalButton.click();
-            }
-          });
-      }
-    });
-  });
+  element(by.css('.protractor-test-confirm-publish')).click();
+
+  var sharePublishModal = element(
+    by.css('.protractor-test-share-publish-modal'));
+  var closePublishModalButton = element(
+    by.css('.protractor-test-share-publish-close'));
+  waitFor.visibilityOf(
+    sharePublishModal, 'Share Publish Modal takes too long to appear');
+  waitFor.elementToBeClickable(
+    closePublishModalButton, 'Close Publish Modal button is not clickable');
+  closePublishModalButton.click();
 };
 
 // Creates and publishes a minimal exploration

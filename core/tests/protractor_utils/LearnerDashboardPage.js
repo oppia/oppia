@@ -17,8 +17,7 @@
  * tests.
  */
 
-var general = require('./general.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('./waitFor.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner_dashboard';
@@ -53,97 +52,66 @@ var LearnerDashboardPage = function() {
 
   this.get = function() {
     browser.get(LEARNER_DASHBOARD_URL);
-    return general.waitForLoadingMessage();
+    return waitFor.pageToFullyLoad();
   };
 
   this.navigateToCompletedSection = function() {
-    browser.wait(until.elementToBeClickable(completedSection), 10000,
-      'Completed tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          completedSection.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      completedSection, 'Completed tab takes too long to be clickable');
+    completedSection.click();
   };
 
   this.navigateToInCompleteSection = function() {
-    browser.wait(until.elementToBeClickable(incompleteSection), 10000,
-      'In Progress tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          incompleteSection.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      incompleteSection, 'In Progress tab takes too long to be clickable');
+    incompleteSection.click();
   };
 
   this.navigateToIncompleteCollectionsSection = function() {
-    browser.wait(until.elementToBeClickable(incompleteCollectionsSection), 5000,
-      'Incomplete Collection Section tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          incompleteCollectionsSection.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      incompleteCollectionsSection,
+      'Incomplete Collection Section tab takes too long to be clickable');
+    incompleteCollectionsSection.click();
   };
 
   this.navigateToIncompleteExplorationsSection = function() {
-    browser.wait(until.elementToBeClickable(incompleteExplorationsSection),
-      5000, 'Incomplete Collection Section tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          incompleteExplorationsSection.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      incompleteExplorationsSection,
+      'Incomplete Collection Section tab takes too long to be clickable');
+    incompleteExplorationsSection.click();
   };
 
   this.navigateToCompletedCollectionsSection = function() {
-    browser.wait(until.elementToBeClickable(completedCollectionsSection), 5000,
-      'Completed Collection Section tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          completedCollectionsSection.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      completedCollectionsSection,
+      'Completed Collection Section tab takes too long to be clickable');
+    completedCollectionsSection.click();
   };
 
   this.navigateToCompletedExplorationsSection = function() {
-    browser.wait(until.elementToBeClickable(completedExplorationsSection), 5000,
-      'Completed Collection Section tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          completedExplorationsSection.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      completedExplorationsSection,
+      'Completed Collection Section tab takes too long to be clickable');
+    completedExplorationsSection.click();
   };
 
   this.navigateToFeedbackSection = function() {
-    browser.wait(until.elementToBeClickable(feedbackSection), 5000,
-      'Feedback Section tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          feedbackSection.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      feedbackSection, 'Feedback Section tab takes too long to be clickable');
+    feedbackSection.click();
   };
 
   this.navigateToFeedbackThread = function() {
-    browser.wait(until.elementToBeClickable(feedbackThread), 5000,
-      'Feedback Thread tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          feedbackThread.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      feedbackThread, 'Feedback Thread tab takes too long to be clickable');
+    feedbackThread.click();
   };
 
   this.navigateToSubscriptionsSection = function() {
-    browser.wait(until.elementToBeClickable(subscriptionsSection), 5000,
-      'Subscriptions Section tab takes too long to be clickable')
-      .then(function(isClickable) {
-        if (isClickable) {
-          subscriptionsSection.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      subscriptionsSection,
+      'Subscriptions Section tab takes too long to be clickable');
+    subscriptionsSection.click();
   };
 
   this.expectTitleOfCollectionSummaryTileToBeHidden = function(title) {
@@ -157,13 +125,9 @@ var LearnerDashboardPage = function() {
   this.expectTitleOfCollectionSummaryTileToMatch = function(title) {
     var collectionTitle = element(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', title));
-    browser.wait(until.visibilityOf(collectionTitle), 5000,
-      'Unable to find collection ' + title)
-      .then(function(isVisible) {
-        if (isVisible) {
-          expect(collectionTitle.isDisplayed()).toBe(true);
-        }
-      });
+    waitFor.visibilityOf(
+      collectionTitle, 'Unable to find collection ' + title);
+    expect(collectionTitle.isDisplayed()).toBe(true);
   };
 
   this.expectTitleOfExplorationSummaryTileToBeHidden = function(title) {
@@ -176,61 +140,36 @@ var LearnerDashboardPage = function() {
   this.expectTitleOfExplorationSummaryTileToMatch = function(title) {
     var explorationTitle = element(
       by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
-    browser.wait(until.visibilityOf(explorationTitle), 5000,
-      'Unable to find collection ' + title)
-      .then(function(isVisible) {
-        if (isVisible) {
-          expect(explorationTitle.isDisplayed()).toBe(true);
-        }
-      });
+    waitFor.visibilityOf(
+      explorationTitle, 'Unable to find collection ' + title);
+    expect(explorationTitle.isDisplayed()).toBe(true);
   };
 
   this.expectSubscriptionFirstNameToMatch = function(name) {
-    browser.wait(until.visibilityOf(subscriptionName.first()), 5000,
-      'Subscription First Name takes too long to appear')
-      .then(function(isVisible) {
-        if (isVisible) {
-          expect(
-            subscriptionName.first().getText()
-          ).toMatch(name);
-        }
-      });
+    waitFor.visibilityOf(
+      subscriptionName.first(),
+      'Subscription First Name takes too long to appear');
+    expect(subscriptionName.first().getText()).toMatch(name);
   };
 
   this.expectSubscriptionLastNameToMatch = function(name) {
-    browser.wait(until.visibilityOf(subscriptionName.last()), 5000,
-      'Subscription Last Name takes too long to appear')
-      .then(function(isVisible) {
-        if (isVisible) {
-          expect(
-            subscriptionName.last().getText()
-          ).toMatch(name);
-        }
-      });
+    waitFor.visibilityOf(
+      subscriptionName.last(),
+      'Subscription Last Name takes too long to appear');
+    expect(subscriptionName.last().getText()).toMatch(name);
   };
 
   this.expectFeedbackExplorationTitleToMatch = function(title) {
-    browser.wait(until.visibilityOf(feedbackExplorationTitle.first()), 5000,
-      'Feedback Exploration Title takes too long to appear')
-      .then(function(isVisible) {
-        if (isVisible) {
-          expect(
-            feedbackExplorationTitle.first().getText()
-          ).toMatch(title);
-        }
-      });
+    waitFor.visibilityOf(
+      feedbackExplorationTitle.first(),
+      'Feedback Exploration Title takes too long to appear');
+    expect(feedbackExplorationTitle.first().getText()).toMatch(title);
   };
 
   this.expectFeedbackMessageToMatch = function(message) {
-    browser.wait(until.visibilityOf(feedbackMessage.first()), 5000,
-      'Feedback Message takes too long to appear')
-      .then(function(isVisible) {
-        if (isVisible) {
-          expect(
-            feedbackMessage.first().getText()
-          ).toMatch(message);
-        }
-      });
+    waitFor.visibilityOf(
+      feedbackMessage.first(), 'Feedback Message takes too long to appear');
+    expect(feedbackMessage.first().getText()).toMatch(message);
   };
 };
 

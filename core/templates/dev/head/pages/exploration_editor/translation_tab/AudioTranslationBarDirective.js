@@ -34,13 +34,13 @@ oppia.directive('audioTranslationBar', [
         'stateContentIdsToAudioTranslationsService', 'IdGenerationService',
         'AudioPlayerService', 'TranslationLanguageService',
         'EditabilityService', 'AssetsBackendApiService', 'recorderService',
-        'ExplorationContextService',
+        'ContextService',
         function(
             $scope, $filter, $timeout, $uibModal, AlertsService,
             stateContentIdsToAudioTranslationsService, IdGenerationService,
             AudioPlayerService, TranslationLanguageService,
             EditabilityService, AssetsBackendApiService, recorderService,
-            ExplorationContextService) {
+            ContextService) {
           $scope.RECORDER_ID = 'recorderId';
           $scope.recordingTimeLimit = 300;
           $scope.audioBlob = null;
@@ -126,7 +126,7 @@ oppia.directive('audioTranslationBar', [
             var recodedAudioFile = new File(
               [$scope.audioBlob], filename, {type: fileType});
             AssetsBackendApiService.saveAudio(
-              ExplorationContextService.getExplorationId(), filename,
+              ContextService.getExplorationId(), filename,
               recodedAudioFile).then(function() {
               if ($scope.isUpdatingAudio) {
                 stateContentIdsToAudioTranslationsService.displayed
@@ -227,10 +227,10 @@ oppia.directive('audioTranslationBar', [
               },
               controller: [
                 '$scope', '$uibModalInstance', 'AlertsService', 'languageCode',
-                'ExplorationContextService', 'generatedFilename',
+                'ContextService', 'generatedFilename',
                 function(
                     $scope, $uibModalInstance, AlertsService, languageCode,
-                    ExplorationContextService, generatedFilename) {
+                    ContextService, generatedFilename) {
                   var ERROR_MESSAGE_BAD_FILE_UPLOAD = (
                     'There was an error uploading the audio file.');
                   var BUTTON_TEXT_SAVE = 'Save';
@@ -264,7 +264,7 @@ oppia.directive('audioTranslationBar', [
                       $scope.saveButtonText = BUTTON_TEXT_SAVING;
                       $scope.saveInProgress = true;
                       var explorationId = (
-                        ExplorationContextService.getExplorationId());
+                        ContextService.getExplorationId());
                       AssetsBackendApiService.saveAudio(
                         explorationId, generatedFilename, uploadedFile
                       ).then(function() {

@@ -17,8 +17,7 @@
  * tests.
  */
 var general = require('./general.js');
-var until = protractor.ExpectedConditions;
-var waitFor = require('../protractor_utils/waitFor.js');
+var waitFor = require('./waitFor.js');
 
 var CollectionEditorPage = function() {
   var addExplorationButton = element(
@@ -60,15 +59,13 @@ var CollectionEditorPage = function() {
 
   // Search and add existing exploration to the node graph.
   this.searchForAndAddExistingExploration = function(query) {
-    browser.wait(until.visibilityOf(addExplorationInput), 10000,
-      'Add Exploration Input is not visible').then(function(isVisible) {
-      if (isVisible) {
-        addExplorationInput.sendKeys(query);
-        // Need to wait for result to appear.
-        waitFor.elementToBeClickable(
-          addExplorationButton, 'Unable to find exploration: ' + query);
-      }
-    });
+    waitFor.visibilityOf(
+      addExplorationInput, 'Add Exploration Input is not visible');
+    addExplorationInput.sendKeys(query);
+    // Need to wait for result to appear.
+    waitFor.elementToBeClickable(
+      addExplorationButton, 'Unable to find exploration: ' + query);
+
     var matched = false;
     var dropdownResultElements = element.all(by.css('.dropdown-menu'));
     dropdownResultElements.map(function(dropdownResult) {
@@ -104,16 +101,11 @@ var CollectionEditorPage = function() {
   };
 
   this.setCommitMessage = function(message) {
-    browser.wait(until.visibilityOf(saveModal), 5000,
-      'Save Modal takes too long to appear').then(function(isVisible) {
-      if (isVisible) {
-        waitFor.elementToBeClickable(
-          commitMessageInput,
-          'Commit Message input takes too long to appear');
-        commitMessageInput.click();
-        commitMessageInput.sendKeys(message);
-      }
-    });
+    waitFor.visibilityOf(saveModal, 'Save Modal takes too long to appear');
+    waitFor.elementToBeClickable(
+      commitMessageInput, 'Commit Message input takes too long to appear');
+    commitMessageInput.click();
+    commitMessageInput.sendKeys(message);
   };
 
   // Shift a node right in the node graph.
@@ -138,7 +130,8 @@ var CollectionEditorPage = function() {
     waitFor.elementToBeClickable(
       closeSaveModalButton, 'Publish Changes button is not clickable');
     closeSaveModalButton.click();
-    browser.wait(until.invisibilityOf(closeSaveModalButton), 5000);
+    waitFor.invisibilityOf(
+      closeSaveModalButton, 'Save Modal takes too long to close');
   };
 
   // Click on publish collection.
@@ -169,7 +162,8 @@ var CollectionEditorPage = function() {
     waitFor.elementToBeClickable(
       saveChangesButton, 'Save Changes button is not clickable');
     saveChangesButton.click();
-    browser.wait(until.invisibilityOf(saveChangesButton), 5000);
+    waitFor.invisibilityOf(
+      saveChangesButton, 'Save Changes modal takes too long to close');
   };
 };
 

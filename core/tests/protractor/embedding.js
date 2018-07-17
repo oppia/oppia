@@ -19,6 +19,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var ExplorationEditorPage =
   require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
@@ -31,8 +32,7 @@ describe('Embedding', function() {
   var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
 
-  explorationEditorPage =
-  new ExplorationEditorPage.ExplorationEditorPage();
+  explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
 
@@ -113,7 +113,7 @@ describe('Embedding', function() {
     }];
 
     var playCountingExploration = function(version) {
-      general.waitForLoadingMessage();
+      waitFor.pageToFullyLoad();
       explorationPlayerPage.expectContentToMatch(
         forms.toRichText((version === 2) ?
           'Given three balls of different colors. How many ways are there ' +
@@ -253,7 +253,7 @@ describe('Embedding', function() {
 
       browser.switchTo().frame(driver.findElement(
         by.css('.protractor-test-embedded-exploration > iframe')));
-      general.waitForLoadingMessage();
+      waitFor.pageToFullyLoad();
       expect(driver.findElement(by.css('.protractor-test-float-form-input'))
         .getAttribute('placeholder')).toBe(expectedPlaceholder);
       browser.switchTo().defaultContent();

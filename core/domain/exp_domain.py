@@ -1277,6 +1277,13 @@ class InteractionInstance(object):
                     rule_spec_html = rule_spec.inputs['x']
                     html_list = html_list + rule_spec_html
 
+        if self.id == 'DragAndDropSortInput':
+            for answer_group in self.answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec_html_list = rule_spec.inputs['x']
+                    for rule_spec_html in rule_spec_html_list:
+                        html_list = html_list + rule_spec_html
+
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
             html_list = html_list + [default_outcome_html]
@@ -1289,7 +1296,9 @@ class InteractionInstance(object):
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
 
-        if self.id in ('ItemSelectionInput', 'MultipleChoiceInput'):
+        if self.id in (
+                'ItemSelectionInput', 'MultipleChoiceInput',
+                'DragAndDropSortInput'):
             customization_args_html_list = (
                 self.customization_args['choices']['value'])
             html_list = html_list + customization_args_html_list

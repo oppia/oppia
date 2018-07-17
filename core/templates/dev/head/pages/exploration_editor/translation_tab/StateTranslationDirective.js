@@ -151,6 +151,10 @@ oppia.directive('stateTranslation', [
             $scope.onTabClick($scope.TAB_ID_CONTENT);
           };
 
+          // TODO(DubeySandeep): We need to call initStateTranslation() here in
+          // case the listener that receives 'refreshStateTranslation' is not
+          // set by the time it is broadcasted from ExplorationEditor.js. Figure
+          // out a solution that does not rely on covering the race condition.
           if (ExplorationStatesService.isInitialized()) {
             $scope.initStateTranslation();
           }

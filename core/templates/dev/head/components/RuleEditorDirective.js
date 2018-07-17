@@ -95,6 +95,19 @@ oppia.directive('ruleEditor', [
                       type: 'checkboxes',
                       varName: finalInputArray[i + 1]
                     });
+                  } else if (finalInputArray[2] === 'ListOfSetsOfHtmlStrings') {
+                    $scope.ruleDescriptionChoices = answerChoices.map(
+                      function(choice) {
+                        return {
+                          id: choice.label,
+                          val: choice.label
+                        };
+                      }
+                    );
+                    result.push({
+                      type: 'dropdown',
+                      varName: finalInputArray[i + 1]
+                    });
                   } else {
                     $scope.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {

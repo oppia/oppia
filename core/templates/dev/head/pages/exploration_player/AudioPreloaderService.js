@@ -17,11 +17,11 @@
  */
 
 oppia.factory('AudioPreloaderService', [
-  '$uibModal', 'ExplorationContextService', 'AssetsBackendApiService',
+  '$uibModal', 'ContextService', 'AssetsBackendApiService',
   'ExplorationPlayerStateService', 'UrlInterpolationService',
   'AudioTranslationLanguageService', 'LanguageUtilService',
   'ComputeGraphService',
-  function($uibModal, ExplorationContextService, AssetsBackendApiService,
+  function($uibModal, ContextService, AssetsBackendApiService,
       ExplorationPlayerStateService, UrlInterpolationService,
       AudioTranslationLanguageService, LanguageUtilService,
       ComputeGraphService) {
@@ -59,7 +59,7 @@ oppia.factory('AudioPreloaderService', [
 
     var _loadAudio = function(audioFilename) {
       AssetsBackendApiService.loadAudio(
-        ExplorationContextService.getExplorationId(), audioFilename
+        ContextService.getExplorationId(), audioFilename
       ).then(function(loadedAudio) {
         for (var i = 0;
           i < _filenamesOfAudioCurrentlyDownloading.length; i++) {

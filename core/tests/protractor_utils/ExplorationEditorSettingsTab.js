@@ -18,7 +18,6 @@
  */
 
 var forms = require('./forms.js');
-var general = require('./general.js');
 var waitFor = require('./waitFor.js');
 
 var ExplorationEditorSettingsTab = function() {

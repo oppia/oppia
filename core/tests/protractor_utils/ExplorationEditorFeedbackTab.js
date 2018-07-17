@@ -18,7 +18,7 @@
  */
 
 var general = require('./general.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('./waitFor.js');
 
 var ExplorationEditorFeedbackTab = function () {
   /*
@@ -44,6 +44,7 @@ var ExplorationEditorFeedbackTab = function () {
     by.css('.protractor-test-oppia-feedback-response-send-btn'));
   var viewSuggestionButton = element(
     by.css('.protractor-test-view-suggestion-btn'));
+
   /*
    * Workflows
    */
@@ -60,7 +61,8 @@ var ExplorationEditorFeedbackTab = function () {
       viewSuggestionButton.click();
       expect(acceptSuggestionButton.isDisplayed()).toBe(true);
       acceptSuggestionButton.click();
-      browser.wait(until.invisibilityOf(acceptSuggestionButton), 5000);
+      waitFor.invisibilityOf(
+        acceptSuggestionButton, 'Suggestion modal takes too long to disappear');
     });
   };
 
@@ -70,8 +72,9 @@ var ExplorationEditorFeedbackTab = function () {
 
   this.getSuggestionThreads = function() {
     var threads = [];
-    browser.wait(until.visibilityOf(
-      element.all(by.css(suggestionRowClassName)).first()), 5000);
+    waitFor.visibilityOf(
+      element.all(by.css(suggestionRowClassName)).first(),
+      'No suggestion threads are visible');
     return element.all(by.css(suggestionRowClassName)).then(function(rows) {
       rows.forEach(function() {
         explorationFeedbackSubject.getText().then(function(subject) {
@@ -84,13 +87,14 @@ var ExplorationEditorFeedbackTab = function () {
 
   this.readFeedbackMessages = function() {
     var messages = [];
-    browser.wait(until.visibilityOf(
-      element.all(by.css(suggestionRowClassName)).first()), 5000);
+    waitFor.visibilityOf(
+      element.all(by.css(suggestionRowClassName)).first(),
+      'No feedback messages are visible.');
     return element.all(by.css(suggestionRowClassName)).then(function(rows) {
       rows.forEach(function(row) {
         row.click();
-        browser.wait(until.visibilityOf(explorationFeedback), 5000,
-          'Exploration Feedback text is not visible');
+        waitFor.visibilityOf(
+          explorationFeedback, 'Feedback message text is not visible');
         explorationFeedback.getText().then(function(message) {
           messages.push(message);
         });
