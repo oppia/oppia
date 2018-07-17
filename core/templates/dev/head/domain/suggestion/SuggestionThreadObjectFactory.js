@@ -19,31 +19,32 @@
 
 oppia.factory('SuggestionThreadObjectFactory', [
   'SuggestionObjectFactory', function(SuggestionObjectFactory) {
-  var SuggestionThread = function(
-      status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-      threadId, suggestion) {
-    this.status = status;
-    this.subject = subject;
-    this.summary = summary;
-    this.originalAuthorName = originalAuthorName;
-    this.lastUpdated = lastUpdated;
-    this.messageCount = messageCount;
-    this.threadId = threadId;
-    this.suggestion = suggestion;
-  };
+    var SuggestionThread = function(
+        status, subject, summary, originalAuthorName, lastUpdated, messageCount,
+        threadId, suggestion) {
+      this.status = status;
+      this.subject = subject;
+      this.summary = summary;
+      this.originalAuthorName = originalAuthorName;
+      this.lastUpdated = lastUpdated;
+      this.messageCount = messageCount;
+      this.threadId = threadId;
+      this.suggestion = suggestion;
+    };
 
-  SuggestionThread.createFromBackendDict = function(
-      SuggestionThreadBackendDict, SuggestionBackendDict) {
-    var suggestion = SuggestionObjectFactory.createFromBackendDict(
-      SuggestionBackendDict);
-    return new SuggestionThread(
-      SuggestionThreadBackendDict.status, SuggestionThreadBackendDict.subject,
-      SuggestionThreadBackendDict.summary,
-      SuggestionThreadBackendDict.original_author_username,
-      SuggestionThreadBackendDict.last_updated,
-      SuggestionThreadBackendDict.message_count,
-      SuggestionThreadBackendDict.thread_id, suggestion);
-  };
+    SuggestionThread.createFromBackendDict = function(
+        SuggestionThreadBackendDict, SuggestionBackendDict) {
+      var suggestion = SuggestionObjectFactory.createFromBackendDict(
+        SuggestionBackendDict);
+      return new SuggestionThread(
+        SuggestionThreadBackendDict.status, SuggestionThreadBackendDict.subject,
+        SuggestionThreadBackendDict.summary,
+        SuggestionThreadBackendDict.original_author_username,
+        SuggestionThreadBackendDict.last_updated,
+        SuggestionThreadBackendDict.message_count,
+        SuggestionThreadBackendDict.thread_id, suggestion);
+    };
 
-  return SuggestionThread;
-}]);
+    return SuggestionThread;
+  }
+]);

@@ -39,12 +39,12 @@ oppia.factory('SuggestionObjectFactory', [function() {
   Suggestion.createFromBackendDict = function(SuggestionBackendDict) {
     return new Suggestion(
       SuggestionBackendDict.suggestion_type,
-      SuggestionBackendDict.suggestion_id,  SuggestionBackendDict.target_type,
+      SuggestionBackendDict.suggestion_id, SuggestionBackendDict.target_type,
       SuggestionBackendDict.target_id, SuggestionBackendDict.status,
       SuggestionBackendDict.author_name,
       SuggestionBackendDict.change_cmd.new_value,
       SuggestionBackendDict.change_cmd.old_value,
-      SuggestionBackendDict.last_updated)
+      SuggestionBackendDict.last_updated);
   };
 
   return Suggestion;

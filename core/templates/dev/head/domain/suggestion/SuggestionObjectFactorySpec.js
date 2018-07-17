@@ -34,11 +34,11 @@ describe('Suggestion object factory', function() {
       status: 'accepted',
       author_name: 'author',
       change_cmd: {
-          cmd: 'edit_state_property',
-          property_name: 'content',
-          state_name: 'state_1',
-          new_value: 'new suggestion content',
-          old_value: 'old suggestion content'
+        cmd: 'edit_state_property',
+        property_name: 'content',
+        state_name: 'state_1',
+        new_value: 'new suggestion content',
+        old_value: 'old suggestion content'
       },
       last_updated: 1000
     };
