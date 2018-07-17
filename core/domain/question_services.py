@@ -186,6 +186,7 @@ def get_questions_by_ids(question_ids):
             questions.append(None)
     return questions
 
+
 def get_question_summaries_by_ids(question_ids):
     """Returns a list of domain objects representing question summaries.
 
