@@ -22,6 +22,8 @@ oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
     'Please ensure that value is either a fraction or a number',
   INVALID_CURRENCY:
     'Please enter a valid currency (e.g., $5 or Rs 5)',
+  INVALID_CURRENCY_FORMAT: 'Please write currency units at the beginning',
+  INVALID_RUPEE_FORMAT: 'Please enter a space after currency (e.g., Rs 5)',
   INVALID_UNIT_CHARS:
     'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, /, -'
 });
@@ -110,7 +112,7 @@ oppia.factory('NumberWithUnitsObjectFactory', [
       if (rawInput !== '' && rawInput !== null) {
         // Start with digit when there is no currency unit.
         if (rawInput.match(/^\d/)) {
-          var ind = rawInput.indexOf(rawInput.match(/[a-z(]/i));
+          var ind = rawInput.indexOf(rawInput.match(/[a-z(₹$]/i));
           if (ind === -1) {
             // There is value with no units.
             value = rawInput;
@@ -119,21 +121,33 @@ oppia.factory('NumberWithUnitsObjectFactory', [
             value = rawInput.substr(0, ind).trim();
             units = rawInput.substr(ind).trim();
           }
+
+          if (units.indexOf('$') !== -1 || units.indexOf('Rs') !== -1 ||
+            units.indexOf('₹') !== -1) {
+            throw new Error(
+              NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY_FORMAT);
+          }
         } else {
           if (!rawInput.startsWith('$') && !rawInput.startsWith('Rs') &&
             !rawInput.startsWith('₹')) {
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
+          }
+          if (rawInput.startsWith('Rs')) {
+            if (!rawInput.startsWith('Rs ')) {
+              throw new Error(
+                NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_RUPEE_FORMAT);
+            }
           }
           var ind = rawInput.indexOf(rawInput.match(/[0-9]/));
           if (ind === -1) {
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
           }
           units = rawInput.substr(0, ind).trim() + ' ';
-          if (!(units === '$ ') && !(units === 'Rs ') && !(units === '₹ ')) {
+          if (units !== '$ ' && units !== 'Rs ' && units !== '₹ ') {
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
           }
           var ind2 = rawInput.indexOf(
-            rawInput.substr(ind + 1).match(/[a-z(]/i));
+            rawInput.substr(ind).match(/[a-z(]/i));
           if (ind2 !== -1) {
             value = rawInput.substr(ind, ind2 - ind).trim();
             units += rawInput.substr(ind2).trim();

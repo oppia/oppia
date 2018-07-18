@@ -133,11 +133,11 @@ describe('NumberWithUnitsObjectFactory', function() {
         NumberWithUnits.fromRawInputString('3# m/s');
       }).toThrow(new Error(errors.INVALID_VALUE));
       expect(function() {
-        NumberWithUnits.fromRawInputString('$s 3');
-      }).toThrow(new Error(errors.INVALID_CURRENCY));
+        NumberWithUnits.fromRawInputString('3 $');
+      }).toThrow(new Error(errors.INVALID_CURRENCY_FORMAT));
       expect(function() {
-        NumberWithUnits.fromRawInputString('Rs');
-      }).toThrow(new Error(errors.INVALID_CURRENCY));
+        NumberWithUnits.fromRawInputString('Rs5');
+      }).toThrow(new Error(errors.INVALID_RUPEE_FORMAT));
       expect(function() {
         NumberWithUnits.fromRawInputString('$');
       }).toThrow(new Error(errors.INVALID_CURRENCY));
