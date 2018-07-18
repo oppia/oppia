@@ -211,7 +211,7 @@ def main():
     current_release = _get_current_version_tag()
     base_commit = _get_base_commit_with_develop(current_release)
     new_release_logs = _gather_logs(base_commit)
-    past_logs = _gather_logs(FIRST_OPPIA_COMMIT, base_commit)
+    past_logs = _gather_logs(FIRST_OPPIA_COMMIT, stop=base_commit)
     issue_links = _extract_issues(new_release_logs)
     feconf_version_changes = _check_versions(current_release)
     setup_changes = _check_setup_scripts(current_release)

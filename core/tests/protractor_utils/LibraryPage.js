@@ -18,30 +18,34 @@
  */
 
 var forms = require('./forms.js');
-var general = require('./general.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('./waitFor.js');
 
 var LibraryPage = function(){
   var LIBRARY_URL_SUFFIX = '/library';
+  var allCollectionSummaryTile = element.all(
+    by.css('.protractor-test-collection-summary-tile'));
   var allExplorationSummaryTile = element.all(
     by.css('.protractor-test-exp-summary-tile'));
-  var languageSelector = forms.MultiSelectEditor(
-    element(by.css('.protractor-test-search-bar-language-selector'))
-  );
-  var categorySelector = forms.MultiSelectEditor(
-    element(by.css('.protractor-test-search-bar-category-selector'))
-  );
-  var collectionTitled = function(collectionName) {
+  var allCollectionsTitled = function(collectionName) {
     return element.all(by.cssContainingText(
       '.protractor-test-collection-summary-tile-title', collectionName));
   };
-  var explorationTitled = function(explorationName) {
+  var allExplorationsTitled = function(explorationName) {
     return element.all(by.cssContainingText(
       '.protractor-test-exp-summary-tile-title', explorationName));
   };
+
+  var categorySelector = forms.MultiSelectEditor(
+    element(by.css('.protractor-test-search-bar-category-selector'))
+  );
   var createActivityButton = element(
     by.css('.protractor-test-create-activity')
   );
+  var languageSelector = forms.MultiSelectEditor(
+    element(by.css('.protractor-test-search-bar-language-selector'))
+  );
+  var searchInput = element.all(
+    by.css('.protractor-test-search-input')).first();
 
   // Returns a promise of all explorations with the given name.
   var _getExplorationElements = function(name) {
@@ -57,7 +61,7 @@ var LibraryPage = function(){
 
   this.get = function() {
     browser.get(LIBRARY_URL_SUFFIX);
-    return general.waitForLoadingMessage();
+    return waitFor.pageToFullyLoad();
   };
 
   this.selectLanguages = function(languages) {
@@ -97,35 +101,27 @@ var LibraryPage = function(){
   };
 
   this.playCollection = function(collectionName) {
-    general.waitForLoadingMessage();
-    var allCollectionSummaryTile = element.all(
-      by.css('.protractor-test-collection-summary-tile'));
-    browser.wait(until.visibilityOf(allCollectionSummaryTile.first()), 10000,
-      'Library Page does not have any collection')
-      .then(function(isVisible) {
-        if (isVisible) {
-          browser.wait(until.visibilityOf(
-            collectionTitled(collectionName).first()),
-          5000, 'Unable to find collection ' + collectionName);
-          collectionTitled(collectionName).click();
-        }
-      });
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
+    waitFor.visibilityOf(
+      allCollectionSummaryTile.first(),
+      'Library Page does not have any collections');
+    waitFor.visibilityOf(
+      allCollectionsTitled(collectionName).first(),
+      'Unable to find collection ' + collectionName);
+    allCollectionsTitled(collectionName).first().click();
+    waitFor.pageToFullyLoad();
   };
 
   this.playExploration = function(explorationName) {
-    general.waitForLoadingMessage();
-    browser.wait(until.visibilityOf(allExplorationSummaryTile.first()), 10000,
-      'Library Page does not have any exploration')
-      .then(function(isVisible) {
-        if (isVisible) {
-          browser.wait(until.visibilityOf(explorationTitled(
-            explorationName).first()),
-          5000, 'Unable to find exploration ' + explorationName);
-          explorationTitled(explorationName).first().click();
-        }
-      });
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
+    waitFor.visibilityOf(
+      allExplorationSummaryTile.first(),
+      'Library Page does not have any explorations');
+    waitFor.visibilityOf(
+      allExplorationsTitled(explorationName).first(),
+      'Unable to find exploration ' + explorationName);
+    allExplorationsTitled(explorationName).first().click();
+    waitFor.pageToFullyLoad();
   };
 
   this.getExplorationObjective = function(name) {
@@ -138,8 +134,7 @@ var LibraryPage = function(){
 
   this.expectExplorationRatingToEqual = function(name, ratingValue) {
     _getExplorationElements(name).then(function(elems) {
-      browser.wait(until.visibilityOf(elems[0]), 5000,
-        'Rating card takes too long to appear');
+      waitFor.visibilityOf(elems[0], 'Rating card takes too long to appear');
       elems[0].element(by.css(
         '.protractor-test-exp-summary-tile-rating'
       )).getText().then(function(value) {
@@ -150,16 +145,19 @@ var LibraryPage = function(){
 
   this.clickCreateActivity = function(){
     createActivityButton.click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.findExploration = function(explorationTitle) {
-    general.waitForLoadingMessage();
-    var searchInput = element.all(
-      by.css('.protractor-test-search-input')).first();
+    waitFor.pageToFullyLoad();
     searchInput.clear();
     searchInput.sendKeys(explorationTitle);
-    browser.waitForAngular();
+  };
+
+  this.findCollection = function(collectionTitle) {
+    waitFor.pageToFullyLoad();
+    searchInput.clear();
+    searchInput.sendKeys(collectionTitle);
   };
 };
 

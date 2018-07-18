@@ -110,7 +110,8 @@ class Registry(object):
             if name.endswith('_test'):
                 continue
             module = loader.find_module(name).load_module(name)
-            for _, clazz in inspect.getmembers(module, inspect.isclass):
+            for _, clazz in inspect.getmembers(
+                    module, predicate=inspect.isclass):
                 if issubclass(clazz, BaseValueGenerator):
                     if clazz.__name__ in cls.value_generators_dict:
                         raise Exception(

@@ -396,7 +396,8 @@ oppia.controller('StateInteraction', [
         }
 
         $rootScope.$broadcast('updateAnswerChoices', _answerChoices);
-      } else if ($scope.interactionId === 'ItemSelectionInput') {
+      } else if ($scope.interactionId === 'ItemSelectionInput' ||
+          $scope.interactionId === 'DragAndDropSortInput') {
         $rootScope.$broadcast(
           'updateAnswerChoices',
           currentCustomizationArgs.choices.value.map(function(val) {

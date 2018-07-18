@@ -100,7 +100,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     },
                     'description': 'change to state 1',
                     'final_reviewer_id': self.reviewer_id,
-                }, csrf_token)
+                }, csrf_token=csrf_token)
             self.logout()
 
             self.login(self.AUTHOR_EMAIL_2)
@@ -123,7 +123,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     },
                     'description': 'change to state 2',
                     'final_reviewer_id': self.reviewer_id,
-                }, csrf_token)
+                }, csrf_token=csrf_token)
 
             self.post_json(
                 '%s/' % feconf.GENERAL_SUGGESTION_URL_PREFIX, {
@@ -141,7 +141,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     },
                     'description': 'change to state 3',
                     'final_reviewer_id': self.reviewer_id,
-                }, csrf_token)
+                }, csrf_token=csrf_token)
             self.logout()
 
     def test_create_suggestion(self):
@@ -165,7 +165,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                         'new_value': self.new_content
                     },
                     'description': 'change again to state 3',
-                }, csrf_token)
+                }, csrf_token=csrf_token)
             suggestions = self.get_json(
                 '%s?list_type=author&author_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
@@ -194,7 +194,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'action': u'accept',
                     'commit_message': u'commit message',
                     'review_message': u'Accepted'
-                }, csrf_token)
+                }, csrf_token=csrf_token)
             suggestion_post_accept = self.get_json(
                 '%s?list_type=id&suggestion_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,

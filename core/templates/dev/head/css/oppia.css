@@ -503,7 +503,7 @@ textarea {
   margin-top: 5px;
 }
 
-  .oppia-footer-container a {
+.oppia-footer-container a {
   color: #fff;
 }
 
@@ -629,7 +629,7 @@ textarea {
   color: #009688;
 }
 .oppia-dashboard-container a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 .oppia-activity-summary-tile a:focus,
 .oppia-activity-summary-tile-mobile a:focus {
@@ -690,8 +690,8 @@ textarea {
 .oppia-navbar-nav > li > a:focus,
 .oppia-navbar-tabs > li > a:hover,
 .oppia-navbar-nav .open > a:hover {
-    background-color: #fff;
-    color: #009688;
+  background-color: #fff;
+  color: #009688;
 }
 
 .navbar-default .navbar-nav > .active > a {
@@ -931,7 +931,7 @@ textarea {
 }
 
 .btn:focus, .btn:active:focus {
-    outline: 0;
+  outline: 0;
 }
 
 @media (max-width: 767px) {
@@ -1565,7 +1565,8 @@ pre.oppia-pre-wrapped-text {
 
 /* Styles for the state graph vizualization. */
 
-.oppia-state-graph-container {
+.oppia-state-graph-container, 
+.oppia-translation-state-graph-container {
   border-radius: 4px;
   border: 1px solid #ccc;
   height: 400px;

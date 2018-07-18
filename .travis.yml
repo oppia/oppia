@@ -2,7 +2,6 @@ sudo: required
 # In order to install Chrome stable we need trusty distribution.
 dist: trusty
 language: python
-
 python:
 - 2.7
 
@@ -108,6 +107,8 @@ cache:
     - ../node_modules/
     - ../oppia_tools/
     - third_party/
+    - $HOME/.cache/pip
+
 
 before_cache:
   # Delete python bytecode to prevent cache rebuild.

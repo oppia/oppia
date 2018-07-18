@@ -103,7 +103,7 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             var setGuppyContentFromInput = function() {
               // Clear the Guppy instance by setting its content to the
               // output of get_content when empty.
-              guppyInstance.set_content('<m><e></e></m>');
+              guppyInstance.import_xml('<m><e></e></m>');
               guppyInstance.render(true);
 
               // Get content of the text input field as an array of characters.

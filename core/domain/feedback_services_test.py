@@ -442,7 +442,8 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EMAILS),
             1)
 
-        tasks = self.get_pending_tasks(taskqueue_services.QUEUE_NAME_EMAILS)
+        tasks = self.get_pending_tasks(
+            queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
         self.assertEqual(
             tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
 
@@ -463,7 +464,8 @@ class EmailsTaskqueueTests(test_utils.GenericTestBase):
             self.count_jobs_in_taskqueue(taskqueue_services.QUEUE_NAME_EMAILS),
             1)
 
-        tasks = self.get_pending_tasks(taskqueue_services.QUEUE_NAME_EMAILS)
+        tasks = self.get_pending_tasks(
+            queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
         payload = json.loads(tasks[0].payload)
         self.assertEqual(
             tasks[0].url, feconf.TASK_URL_INSTANT_FEEDBACK_EMAILS)
@@ -482,7 +484,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
         self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
         self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
@@ -633,7 +635,8 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 self.count_jobs_in_taskqueue(
                     taskqueue_services.QUEUE_NAME_EMAILS), 1)
 
-            tasks = self.get_pending_tasks(taskqueue_services.QUEUE_NAME_EMAILS)
+            tasks = self.get_pending_tasks(
+                queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
             self.assertEqual(
                 tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
             self.process_and_flush_pending_tasks()
@@ -833,7 +836,7 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
@@ -978,7 +981,8 @@ class FeedbackMessageBatchEmailHandlerTests(test_utils.GenericTestBase):
                 self.testapp.get('/create/%s' % self.exploration.id))
             self.post_json(
                 '%s/%s' % (feconf.FEEDBACK_THREAD_VIEW_EVENT_URL, thread_id),
-                {'thread_id': thread_id}, csrf_token)
+                {'thread_id': thread_id},
+                csrf_token=csrf_token)
 
             self.process_and_flush_pending_tasks()
             messages = self.mail_stub.get_sent_messages(to=self.EDITOR_EMAIL)
@@ -1001,7 +1005,7 @@ class SuggestionEmailHandlerTest(test_utils.GenericTestBase):
         self.editor = user_services.UserActionsInfo(self.editor_id)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
@@ -1167,7 +1171,7 @@ class FeedbackMessageInstantEmailHandlerTests(test_utils.GenericTestBase):
         self.new_user_id = self.get_user_id_from_email(self.NEW_USER_EMAIL)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)
         self.can_send_feedback_email_ctx = self.swap(
