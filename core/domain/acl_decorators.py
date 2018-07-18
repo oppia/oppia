@@ -1190,3 +1190,33 @@ def can_change_topic_publication_status(handler):
     test_can_change_topic_publication_status.__wrapped__ = True
 
     return test_can_change_topic_publication_status
+
+
+def can_access_topic_viewer_page(handler):
+    """Decorator to check whether user can access topic viewer page."""
+
+    def test_can_access(self, topic_id, **kwargs):
+        """Checks if the user can access topic viewer page.
+
+        Args:
+            topic_id: str. The topic id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can access topic viewer page.
+        """
+        topic = topic_services.get_topic_by_id(topic_id, strict=False)
+
+        if topic is None:
+            raise self.PageNotFoundException
+
+        topic_rights = topic_services.get_topic_rights(
+            topic_id, strict=False)
+
+        if topic_rights.topic_is_published:
+            return handler(self, topic_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+    test_can_access.__wrapped__ = True
+
+    return test_can_access

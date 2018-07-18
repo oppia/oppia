@@ -15,6 +15,7 @@
 """Controllers for the topics viewer page."""
 
 from core.controllers import base
+from core.domain import acl_decorators
 from core.domain import story_services
 from core.domain import topic_services
 import feconf
@@ -25,6 +26,7 @@ class TopicPageDataHandler(base.BaseHandler):
     viewer page.
     """
 
+    @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_id):
         """Handles GET requests."""
 
@@ -54,6 +56,7 @@ class TopicPageDataHandler(base.BaseHandler):
 class TopicViewerPage(base.BaseHandler):
     """Manages to render topic viewer page."""
 
+    @acl_decorators.can_access_topic_viewer_page
     def get(self, topic_id):
         """Handles GET requests."""
 
