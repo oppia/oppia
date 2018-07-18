@@ -102,6 +102,11 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         self.assertItemsEqual(
             question_ids, [self.question_id, question_id_2])
 
+        with self.assertRaisesRegexp(
+            Exception, 'The given question is already linked to given skill'):
+            question_services.create_new_question_skill_link(
+                self.question_id, 'skill_1')
+
     def test_get_question_summaries_by_ids(self):
         question_summaries = question_services.get_question_summaries_by_ids([
             self.question_id, 'question_2'])
