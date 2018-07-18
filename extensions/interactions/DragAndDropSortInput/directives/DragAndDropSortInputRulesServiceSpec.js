@@ -64,4 +64,35 @@ describe('Drag and Drop Sort Input rules service', function() {
     expect(ddsrs.IsEqualToOrderingWithOneItemAtIncorrectPosition(
       [['a', 'b'], ['c', 'de', 'f']], RULE_INPUT)).toBe(false);
   });
+
+  it('should have a correct \'has element X at position Y\' rule', function() {
+    var RULE_INPUT = {
+      x: 'b',
+      y: 1
+    };
+    expect(ddsrs.HasElementXAtPositionY(
+      [['a'], ['b', 'c']], RULE_INPUT)).toBe(true);
+    expect(ddsrs.HasElementXAtPositionY(
+      [['a', 'b'], ['c']], RULE_INPUT)).toBe(false);
+    expect(ddsrs.HasElementXAtPositionY(
+      [['a'], ['b']], RULE_INPUT)).toBe(true);
+    expect(ddsrs.HasElementXAtPositionY(
+      [['a'], ['d'], ['b', 'c']], RULE_INPUT)).toBe(false);
+  });
+
+  it('should have a correct \'has element X before element Y\' rule',
+    function() {
+      var RULE_INPUT = {
+        x: 'b',
+        y: 'd'
+      };
+      expect(ddsrs.HasElementXBeforeElementY(
+        [['a', 'b'], ['c', 'd']], RULE_INPUT)).toBe(true);
+      expect(ddsrs.HasElementXBeforeElementY(
+        [['a', 'd'], ['c', 'b']], RULE_INPUT)).toBe(false);
+      expect(ddsrs.HasElementXBeforeElementY(
+        [['a'], ['b'], ['c', 'd']], RULE_INPUT)).toBe(true);
+      expect(ddsrs.HasElementXBeforeElementY(
+        [['d', 'b'], ['c', 'a']], RULE_INPUT)).toBe(false);
+    });
 });

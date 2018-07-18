@@ -173,6 +173,29 @@ oppia.factory('dragAndDropSortInputRulesService', [function() {
     },
     IsEqualToOrderingWithOneItemAtIncorrectPosition: function(answer, inputs) {
       return checkEqualityWithIncorrectPositions(answer, inputs);
+    },
+    HasElementXAtPositionY: function(answer, inputs) {
+      for (var i = 0; i < answer.length; i++) {
+        var index = answer[i].indexOf(inputs.x);
+        if (index !== -1) {
+          return i === inputs.y;
+        }
+      }
+    },
+    HasElementXBeforeElementY: function(answer, inputs) {
+      var indX = -1;
+      var indY = -1;
+      for (var i = 0; i < answer.length; i++) {
+        var index = answer[i].indexOf(inputs.x);
+        if (index !== -1) {
+          indX = i;
+        }
+        index = answer[i].indexOf(inputs.y);
+        if (index !== -1) {
+          indY = i;
+        }
+      }
+      return indX < indY;
     }
   };
 }]);

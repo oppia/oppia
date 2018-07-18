@@ -824,3 +824,23 @@ class ListOfSetsOfHtmlStrings(BaseObject):
         'type': 'list',
         'items': SetOfHtmlString.SCHEMA,
     }
+
+
+class DragAndDropHtmlString(BaseObject):
+    """A drag and drop Html string class."""
+
+    description = 'A drag and drop Html string.'
+    default_value = ''
+
+    SCHEMA = {
+        'type': 'html'
+    }
+
+
+class DragAndDropPositiveInt(BaseObject):
+    """A drag and drop positive int class."""
+
+    description = 'A drag and drop positive int.'
+    default_value = 1
+
+    SCHEMA = PositiveInt.SCHEMA
