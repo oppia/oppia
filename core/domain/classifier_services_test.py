@@ -466,25 +466,14 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                         'adcb': '0.1234',
                         'adcc': ['ade', 'afd'],
                         'float_values': ['adcb']
-                    }, {
-                        'adca': 'abce',
-                        'adcb': '0.34',
-                        'adcc': [],
-                        'float_values': ['adcb']
                     }],
                     'float_values': ['adc']
                 },
                 'ae': [['123', '0.123'], ['abc']],
-                'af': [['abcde'], ['0.871']],
-                'float_values': []
+                'float_values': ['ae']
             },
             'b': {
                 'bd': ['-2.48521656693', '-2.48521656693', '-2.48521656693'],
-                'be': {
-                    'bea': 'abcdef',
-                    'bed': 3,
-                    'float_values': []
-                },
                 'bg': ['abc', 'def', 'ghi'],
                 'bh': ['abc', '123'],
                 'float_values': ['bd']
@@ -502,21 +491,12 @@ class ClassifierServicesTests(test_utils.GenericTestBase):
                         'adca': 'abcd',
                         'adcb': 0.1234,
                         'adcc': ['ade', 'afd']
-                    }, {
-                        'adca': 'abce',
-                        'adcb': 0.34,
-                        'adcc': []
                     }]
                 },
-                'ae': [['123', '0.123'], ['abc']],
-                'af': [['abcde'], ['0.871']]
+                'ae': [['123', 0.123], ['abc']],
             },
             'b': {
                 'bd': [-2.48521656693, -2.48521656693, -2.48521656693],
-                'be': {
-                    'bea': 'abcdef',
-                    'bed': 3
-                },
                 'bg': ['abc', 'def', 'ghi'],
                 'bh': ['abc', '123'],
             },

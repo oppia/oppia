@@ -16,6 +16,7 @@
 
 import datetime
 import logging
+import re
 
 from core.domain import classifier_domain
 from core.platform import models
@@ -198,13 +199,18 @@ def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
         new_list = []
         for item in classifier_data:
             if isinstance(item, basestring):
-                new_list.append(float(item))
+                if re.match(r'^([-+]?\d+\.\d+)$', item):
+                    new_list.append(float(item))
+                else:
+                    new_list.append(item)
             elif isinstance(item, (dict, list)):
                 new_list.append(
                     convert_strings_to_float_numbers_in_classifier_data(item))
+            elif isinstance(item, int):
+                new_list.append(item)
             else:
                 raise Exception(
-                    'Expected list values to be either strings, '
+                    'Expected list values to be either strings, integers, '
                     'lists or dicts but received %s.' % (type(item)))
         return new_list
     else:
