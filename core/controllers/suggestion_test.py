@@ -231,7 +231,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'commit_message': u'commit message',
                     'review_message': u'Accepted'
                 }, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=401)
+                          expected_status_int=401)
             self.logout()
 
             # Testing that author cannot accept own suggestion.
@@ -251,7 +251,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'commit_message': u'commit message',
                     'review_message': u'Accepted'
                 }, csrf_token=csrf_token, expect_errors=True,
-                expected_status_int=401)
+                          expected_status_int=401)
 
             # Testing users with scores above threshold can accept.
             self.login(self.AUTHOR_EMAIL)
