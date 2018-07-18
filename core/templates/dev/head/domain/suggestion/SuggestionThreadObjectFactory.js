@@ -26,26 +26,50 @@ oppia.factory('SuggestionThreadObjectFactory', [
       this.subject = subject;
       this.summary = summary;
       this.originalAuthorName = originalAuthorName;
-      this.last_updated = lastUpdated;
+      this.lastUpdated = lastUpdated;
       this.messageCount = messageCount;
       this.stateName = stateName;
-      this.thread_id = threadId;
+      this.threadId = threadId;
       this.suggestion = suggestion;
     };
 
-    SuggestionThread.createFromBackendDict = function(
-        SuggestionThreadBackendDict, SuggestionBackendDict) {
+    SuggestionThread.createFromBackendDicts = function(
+        suggestionThreadBackendDict, suggestionBackendDict) {
       var suggestion = SuggestionObjectFactory.createFromBackendDict(
-        SuggestionBackendDict);
+        suggestionBackendDict);
       return new SuggestionThread(
-        SuggestionThreadBackendDict.status, SuggestionThreadBackendDict.subject,
-        SuggestionThreadBackendDict.summary,
-        SuggestionThreadBackendDict.original_author_username,
-        SuggestionThreadBackendDict.last_updated,
-        SuggestionThreadBackendDict.message_count,
-        SuggestionThreadBackendDict.state_name,
-        SuggestionThreadBackendDict.thread_id, suggestion);
+        suggestionThreadBackendDict.status, suggestionThreadBackendDict.subject,
+        suggestionThreadBackendDict.summary,
+        suggestionThreadBackendDict.original_author_username,
+        suggestionThreadBackendDict.last_updated,
+        suggestionThreadBackendDict.message_count,
+        suggestionThreadBackendDict.state_name,
+        suggestionThreadBackendDict.thread_id, suggestion);
     };
+
+    SuggestionThread.prototype.isSuggestionHandled = function() {
+      return this.suggestion.status !== 'review';
+    }
+
+    SuggestionThread.prototype.getSuggestionStateName = function() {
+      return this.suggestion.stateName;
+    }
+
+    SuggestionThread.prototype.getSuggestionStatus = function() {
+      return this.suggestion.status;
+    }
+
+    SuggestionThread.prototype.getNewValueFromSuggestion = function() {
+      return this.suggestion.newValue;
+    }
+
+    SuggestionThread.prototype.isSuggestionThread = function() {
+      return true;
+    }
+
+    SuggestionThread.prototype.getSuggestion = function() {
+      return this.suggestion;
+    }
 
     return SuggestionThread;
   }

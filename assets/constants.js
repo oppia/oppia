@@ -451,7 +451,7 @@ var constants = {
 
   "ENABLE_GCS_STORAGE_FOR_IMAGES": false,
 
-  "USE_NEW_SUGGESTION_FRAMEWORK": false,
+  "USE_NEW_SUGGESTION_FRAMEWORK": true,
 
   "ENABLE_NEW_STRUCTURES": false
 };

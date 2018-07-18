@@ -79,14 +79,14 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         # Non-logged-in users can see the thread list.
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-        self.assertEqual(len(response_dict['threads']), 1)
+        self.assertEqual(len(response_dict['feedback_thread_dicts']), 1)
         self.assertDictContainsSubset({
             'status': 'open',
             'state_name': self._get_unicode_test_string('statename'),
-        }, response_dict['threads'][0])
+        }, response_dict['feedback_thread_dicts'][0])
 
         # Non-logged-in users can see individual messages.
-        first_thread_id = response_dict['threads'][0]['thread_id']
+        first_thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
         thread_url = '%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX, first_thread_id)
         response_dict = self.get_json(thread_url)
@@ -144,7 +144,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-        threadlist = response_dict['threads']
+        threadlist = response_dict['feedback_thread_dicts']
         self.assertEqual(len(threadlist), 1)
         self.assertEqual(
             set(threadlist[0].keys()), set(EXPECTED_THREAD_KEYS))
@@ -209,7 +209,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         # Then, get the thread id.
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-        threadlist = response_dict['threads']
+        threadlist = response_dict['feedback_thread_dicts']
         self.assertEqual(len(threadlist), 1)
         thread_id = threadlist[0]['thread_id']
 
@@ -267,7 +267,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, new_exp_id))
-        threadlist = response_dict['threads']
+        threadlist = response_dict['feedback_thread_dicts']
         self.assertIsNone(threadlist[0]['original_author_username'])
 
         response_dict = self.get_json('%s/%s' % (
@@ -290,7 +290,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         # Get the thread id.
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-        thread_id = response_dict['threads'][0]['thread_id']
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
         thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
 
         def _get_username(index):
@@ -406,7 +406,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
 
         # Get the id of the thread.
-        thread_id = response_dict['threads'][0]['thread_id']
+        thread_id = response_dict['feedback_thread_dicts'][0]['thread_id']
 
         # This user created the thread. The message should be there in
         # his/her read list.
@@ -508,7 +508,7 @@ class FeedbackThreadTests(test_utils.GenericTestBase):
         with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
             response = self.get_json(
                 '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-            self.assertEquals(response['threads'], [])
+            self.assertEquals(response['feedback_thread_dicts'], [])
             expected_thread_dict = {
                 'original_author_username': self.USER_USERNAME,
                 'status': feedback_models.STATUS_CHOICES_OPEN,

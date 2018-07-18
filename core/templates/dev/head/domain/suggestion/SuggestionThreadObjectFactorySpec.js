@@ -56,16 +56,16 @@ describe('Suggestion thread object factory', function() {
       },
       last_updated: 1000
     };
-    suggestionThread = SuggestionThreadObjectFactory.createFromBackendDict(
+    suggestionThread = SuggestionThreadObjectFactory.createFromBackendDicts(
       suggestionThreadBackendDict, suggestionBackendDict);
     expect(suggestionThread.status).toEqual('accepted');
     expect(suggestionThread.subject).toEqual('sample subject');
     expect(suggestionThread.summary).toEqual('sample summary');
     expect(suggestionThread.originalAuthorName).toEqual('author');
-    expect(suggestionThread.last_updated).toEqual(1000);
+    expect(suggestionThread.lastUpdated).toEqual(1000);
     expect(suggestionThread.messageCount).toEqual(10);
     expect(suggestionThread.stateName).toEqual('state 1');
-    expect(suggestionThread.thread_id).toEqual('exp1.thread1');
+    expect(suggestionThread.threadId).toEqual('exp1.thread1');
     expect(suggestionThread.suggestion.suggestionType).toEqual(
       'edit_exploration_state_content');
     expect(suggestionThread.suggestion.targetType).toEqual('exploration');
@@ -80,5 +80,13 @@ describe('Suggestion thread object factory', function() {
       'old suggestion content');
     expect(suggestionThread.suggestion.lastUpdated).toEqual(1000);
     expect(suggestionThread.suggestion.threadId()).toEqual('exp1.thread1');
+    expect(suggestionThread.isSuggestionThread()).toEqual(true);
+    expect(suggestionThread.isSuggestionHandled()).toEqual(true);
+    suggestionThread.suggestion.status = 'review';
+    expect(suggestionThread.isSuggestionHandled()).toEqual(false);
+    expect(suggestionThread.getSuggestionStatus()).toEqual('review');
+    expect(suggestionThread.getSuggestionStateName()).toEqual('state_1');
+    expect(suggestionThread.getNewValueFromSuggestion()).toEqual(
+      'new suggestion content');
   });
 });

@@ -37,16 +37,16 @@ oppia.factory('SuggestionObjectFactory', [function() {
     return this.suggestionId.slice(this.suggestionId.indexOf('.') + 1);
   };
 
-  Suggestion.createFromBackendDict = function(SuggestionBackendDict) {
+  Suggestion.createFromBackendDict = function(suggestionBackendDict) {
     return new Suggestion(
-      SuggestionBackendDict.suggestion_type,
-      SuggestionBackendDict.suggestion_id, SuggestionBackendDict.target_type,
-      SuggestionBackendDict.target_id, SuggestionBackendDict.status,
-      SuggestionBackendDict.author_name,
-      SuggestionBackendDict.change_cmd.state_name,
-      SuggestionBackendDict.change_cmd.new_value,
-      SuggestionBackendDict.change_cmd.old_value,
-      SuggestionBackendDict.last_updated);
+      suggestionBackendDict.suggestion_type,
+      suggestionBackendDict.suggestion_id, suggestionBackendDict.target_type,
+      suggestionBackendDict.target_id, suggestionBackendDict.status,
+      suggestionBackendDict.author_name,
+      suggestionBackendDict.change_cmd.state_name,
+      suggestionBackendDict.change_cmd.new_value,
+      suggestionBackendDict.change_cmd.old_value,
+      suggestionBackendDict.last_updated);
   };
 
   return Suggestion;

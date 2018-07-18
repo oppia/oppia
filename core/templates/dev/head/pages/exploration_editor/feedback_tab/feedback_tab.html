@@ -37,8 +37,8 @@
             <i class="material-icons oppia-vcenter" title="Return to list of feedback threads">&#xE5CB;</i>
           </button>
         </span>
-        <span style="font-size: larger" ng-show="!activeThread.suggestion">Feedback Thread: <[activeThread.subject]></span>
-        <span style="font-size: larger" ng-show="activeThread.suggestion">Suggestion Thread: <[activeThread.subject]></span>
+        <span style="font-size: larger" ng-show="!activeThread.isSuggestionThread()">Feedback Thread: <[activeThread.subject]></span>
+        <span style="font-size: larger" ng-show="activeThread.isSuggestionThread()">Suggestion Thread: <[activeThread.subject]></span>
       </div>
 
       <div style="float: right;" class="col-lg-5 col-md-5 col-sm-5">
@@ -84,7 +84,7 @@
               <div class="row">
                 <div class="col-lg-12 col-md-12 col-sm-12">
                   <div style="white-space: pre-wrap;" class="protractor-test-exploration-feedback"><[m.text]></div>
-                  <div ng-if="activeThread.suggestion && $index == 0">
+                  <div ng-if="activeThread.isSuggestionThread() && $index == 0">
                     <button class="btn btn-<[getSuggestionButtonType()]> protractor-test-view-suggestion-btn" style="margin-top: 6px; margin-bottom: 6px" ng-click="showSuggestionModal()">
                       View Suggestion
                     </button>
@@ -105,7 +105,7 @@
         <div>
           <label for="tmpMessageText">
             Add new message
-            <span ng-if="EditabilityService.isEditable() && !activeThread.suggestion && !activeThread.suggestion_id">(and/or change status)</span>
+            <span ng-if="EditabilityService.isEditable() && !activeThread.isSuggestionThread()">(and/or change status)</span>
           </label>
           <textarea class="form-control protractor-test-feedback-response-textarea" ng-model="tmpMessage.text"
                     id="tmpMessageText" rows="6"
@@ -114,7 +114,7 @@
         </div>
 
         <div>
-          <span ng-show="EditabilityService.isEditable() && !activeThread.suggestion && !activeThread.suggestion_id">
+          <span ng-show="EditabilityService.isEditable() && !activeThread.isSuggestionThread()">
             Change status (optional):
             <select ng-model="tmpMessage.status"
                     ng-options="choice.id as choice.text for choice in STATUS_CHOICES"
@@ -130,7 +130,7 @@
 
         <div>
           <button class="btn btn-success protractor-test-oppia-feedback-response-send-btn" style="margin-top: 10px;"
-                  ng-click="addNewMessage(activeThread.thread_id, tmpMessage.text, tmpMessage.status)"
+                  ng-click="addNewMessage(activeThread.threadId, tmpMessage.text, tmpMessage.status)"
                   ng-disabled="messageSendingInProgress || (!tmpMessage.text && activeThread.status === tmpMessage.status) || (!tmpMessage.text && (tmpMessage.status === 'ignored' || tmpMessage.status === 'not_actionable'))">
             <span ng-if="messageSendingInProgress">Sending...</span>
             <span ng-if="!messageSendingInProgress">Send</span>
