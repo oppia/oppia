@@ -18,34 +18,33 @@
  */
 
 oppia.factory('FeedbackThreadObjectFactory', [function() {
-    var FeedbackThread = function(
-        status, subject, summary, originalAuthorName, lastUpdated, messageCount,
-        stateName, threadId) {
-      this.status = status;
-      this.subject = subject;
-      this.summary = summary;
-      this.originalAuthorName = originalAuthorName;
-      this.lastUpdated = lastUpdated;
-      this.messageCount = messageCount;
-      this.stateName = stateName;
-      this.threadId = threadId;
-    };
+  var FeedbackThread = function(
+      status, subject, summary, originalAuthorName, lastUpdated, messageCount,
+      stateName, threadId) {
+    this.status = status;
+    this.subject = subject;
+    this.summary = summary;
+    this.originalAuthorName = originalAuthorName;
+    this.lastUpdated = lastUpdated;
+    this.messageCount = messageCount;
+    this.stateName = stateName;
+    this.threadId = threadId;
+  };
 
-    FeedbackThread.createFromBackendDict = function(feedbackThreadBackendDict) {
-      return new FeedbackThread(
-        feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
-        feedbackThreadBackendDict.summary,
-        feedbackThreadBackendDict.original_author_username,
-        feedbackThreadBackendDict.last_updated,
-        feedbackThreadBackendDict.message_count,
-        feedbackThreadBackendDict.state_name,
-        feedbackThreadBackendDict.thread_id);
-    };
+  FeedbackThread.createFromBackendDict = function(feedbackThreadBackendDict) {
+    return new FeedbackThread(
+      feedbackThreadBackendDict.status, feedbackThreadBackendDict.subject,
+      feedbackThreadBackendDict.summary,
+      feedbackThreadBackendDict.original_author_username,
+      feedbackThreadBackendDict.last_updated,
+      feedbackThreadBackendDict.message_count,
+      feedbackThreadBackendDict.state_name,
+      feedbackThreadBackendDict.thread_id);
+  };
 
-    FeedbackThread.prototype.isSuggestionThread = function() {
-      return false;
-    }
-
-    return FeedbackThread;
+  FeedbackThread.prototype.isSuggestionThread = function() {
+    return false;
   }
-]);
+
+  return FeedbackThread;
+}]);

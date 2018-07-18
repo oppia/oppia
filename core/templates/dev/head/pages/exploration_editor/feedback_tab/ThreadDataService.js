@@ -93,7 +93,6 @@ oppia.factory('ThreadDataService', [
         } else {
           _data.suggestionThreads = res[1].data.threads;
         }
-        console.log(_data)
         if (successCallback) {
           successCallback();
         }

@@ -49,27 +49,27 @@ oppia.factory('SuggestionThreadObjectFactory', [
 
     SuggestionThread.prototype.isSuggestionHandled = function() {
       return this.suggestion.status !== 'review';
-    }
+    };
 
     SuggestionThread.prototype.getSuggestionStateName = function() {
       return this.suggestion.stateName;
-    }
+    };
 
     SuggestionThread.prototype.getSuggestionStatus = function() {
       return this.suggestion.status;
-    }
+    };
 
     SuggestionThread.prototype.getNewValueFromSuggestion = function() {
       return this.suggestion.newValue;
-    }
+    };
 
     SuggestionThread.prototype.isSuggestionThread = function() {
       return true;
-    }
+    };
 
     SuggestionThread.prototype.getSuggestion = function() {
       return this.suggestion;
-    }
+    };
 
     return SuggestionThread;
   }
