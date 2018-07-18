@@ -1698,7 +1698,7 @@ def get_decorator_for_accepting_suggestion(decorator):
 
             suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
             if suggestion_services.check_user_can_review_in_category(
-                self.user_id, suggestion.score_category):
+                    self.user_id, suggestion.score_category):
                 return handler(self, target_id, suggestion_id, **kwargs)
 
             return decorator(handler)(self, target_id, suggestion_id, **kwargs)

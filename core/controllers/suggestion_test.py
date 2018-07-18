@@ -230,7 +230,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'action': u'accept',
                     'commit_message': u'commit message',
                     'review_message': u'Accepted'
-                }, csrf_token, expect_errors=True, expected_status_int=401)
+                }, csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=401)
             self.logout()
 
             # Testing that author cannot accept own suggestion.
@@ -249,7 +250,8 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'action': u'accept',
                     'commit_message': u'commit message',
                     'review_message': u'Accepted'
-                }, csrf_token, expect_errors=True, expected_status_int=401)
+                }, csrf_token=csrf_token, expect_errors=True,
+                expected_status_int=401)
 
             # Testing users with scores above threshold can accept.
             self.login(self.AUTHOR_EMAIL)
@@ -265,7 +267,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'action': u'accept',
                     'commit_message': u'commit message',
                     'review_message': u'Accepted'
-                }, csrf_token)
+                }, csrf_token=csrf_token)
 
             suggestion_post_accept = self.get_json(
                 '%s?list_type=id&suggestion_id=%s' % (
@@ -291,7 +293,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'action': u'accept',
                     'commit_message': u'commit message',
                     'review_message': u'Accepted'
-                }, csrf_token)
+                }, csrf_token=csrf_token)
             suggestion_post_accept = self.get_json(
                 '%s?list_type=id&suggestion_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
@@ -300,4 +302,3 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 suggestion_post_accept['status'],
                 suggestion_models.STATUS_ACCEPTED)
             self.logout()
-
