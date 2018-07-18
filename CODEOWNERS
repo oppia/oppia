@@ -1,3 +1,4 @@
 # Per-directory ownership and automatic assignment for pull requests.
+/core/domain/html_cleaner.py @seanlip
 /core/storage/ @BenHenning @seanlip
 manifest.json @vojtechjelinek @hoangviet1993
