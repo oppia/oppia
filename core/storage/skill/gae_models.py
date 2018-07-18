@@ -65,9 +65,9 @@ class SkillModel(base_models.VersionedModel):
     # This is an optional field.
     superseding_skill_id = ndb.StringProperty(indexed=True, required=False)
     # A flag indicating whether deduplication is complete for this skill.
-    # This is an optional field and is populated only when there is a value
-    # for superseding_skill_id.
-    all_questions_merged = ndb.BooleanProperty(indexed=True, required=False)
+    # It will always be False, and set to true only when there is a value
+    # for superseding_skill_id and the merge was completed.
+    all_questions_merged = ndb.BooleanProperty(indexed=True, required=True)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

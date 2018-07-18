@@ -317,8 +317,8 @@ class Skill(object):
             self, skill_id, description, misconceptions,
             skill_contents, misconceptions_schema_version,
             skill_contents_schema_version, language_code, version,
-            next_misconception_id, created_on=None, last_updated=None,
-            superseding_skill_id=None, all_questions_merged=None):
+            next_misconception_id, superseding_skill_id,
+            all_questions_merged, created_on=None, last_updated=None):
         """Constructs a Skill domain object.
 
         Args:
@@ -337,16 +337,16 @@ class Skill(object):
             version: int. The version of the skill.
             next_misconception_id: int. The misconception id to be used by
                 the next misconception added.
-            created_on: datetime.datetime. Date and time when the skill is
-                created.
-            last_updated: datetime.datetime. Date and time when the
-                skill was last updated.
             superseding_skill_id: str|None. Skill ID of the skill we
                 merge this skill into. This is non null only if we indicate
                 that this skill is a duplicate and needs to be merged into
                 another one.
             all_questions_merged: bool|None. Flag that indicates if all
                 questions are moved from this skill to the superseding skill.
+            created_on: datetime.datetime. Date and time when the skill is
+                created.
+            last_updated: datetime.datetime. Date and time when the
+                skill was last updated.
         """
         self.id = skill_id
         self.description = description
@@ -455,11 +455,11 @@ class Skill(object):
                     'The misconception with id %s is out of bounds.'
                     % misconception.id)
             misconception.validate()
-        if (self.all_questions_merged is not None and
+        if (self.all_questions_merged and
                 self.superseding_skill_id is None):
             raise utils.ValidationError(
                 'Expected a value for superseding_skill_id when '
-                'all_questions_merged is set.')
+                'all_questions_merged is True.')
         if (self.superseding_skill_id is not None and
                 self.all_questions_merged is None):
             raise utils.ValidationError(
@@ -506,7 +506,7 @@ class Skill(object):
             skill_id, description, [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, 0)
+            constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False)
 
     @classmethod
     def update_skill_contents_from_model(
@@ -584,7 +584,7 @@ class Skill(object):
         """
         self.superseding_skill_id = superseding_skill_id
 
-    def update_all_questions_merged(self, all_questions_merged):
+    def record_that_all_questions_are_merged(self, all_questions_merged):
         """Updates the flag value which indicates if all questions are merged.
 
         Args:

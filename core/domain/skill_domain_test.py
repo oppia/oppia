@@ -36,7 +36,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill = skill_domain.Skill(
             self.SKILL_ID, 'Description', misconceptions,
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
+            None, False
         )
 
     def _assert_validation_error(self, expected_error_substring):
@@ -123,19 +124,15 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
 
     def test_skill_migration_validation(self):
         self.skill.superseding_skill_id = 'TestSkillId'
+        self.skill.all_questions_merged = None
         self._assert_validation_error(
             'Expected a value for all_questions_merged when '
             'superseding_skill_id is set.')
         self.skill.superseding_skill_id = None
-        self.skill.all_questions_merged = False
-        self._assert_validation_error(
-            'Expected a value for superseding_skill_id when '
-            'all_questions_merged is set.')
-        self.skill.superseding_skill_id = None
         self.skill.all_questions_merged = True
         self._assert_validation_error(
             'Expected a value for superseding_skill_id when '
-            'all_questions_merged is set.')
+            'all_questions_merged is True.')
 
     def test_create_default_skill(self):
         """Test the create_default_skill function.
@@ -160,7 +157,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
             'next_misconception_id': 0,
             'version': 0,
             'superseding_skill_id': None,
-            'all_questions_merged': None
+            'all_questions_merged': False
         }
         self.assertEqual(skill.to_dict(), expected_skill_dict)
 
