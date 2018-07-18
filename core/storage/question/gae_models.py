@@ -152,23 +152,61 @@ class QuestionSkillLinkModel(base_models.BaseModel):
     skill_id = ndb.StringProperty(required=True, indexed=True)
 
     @classmethod
-    def create(
-            cls, question_id, skill_id):
-        """Creates a new QuestionSkillLinkModel entry.
+    def get_model_id(cls, question_id, skill_id):
+        """Returns the model id by combining the questions and skill id.
 
         Args:
             question_id: str. The ID of the question.
             skill_id: str. The ID of the skill to which the question is linked.
 
         Returns:
+            str. The calculated model id.
+        """
+        return question_id + ':' + skill_id
+
+    @classmethod
+    def create(cls, question_id, skill_id):
+        """Creates a new QuestionSkillLinkModel entry.
+
+        Args:
+            question_id: str. The ID of the question.
+            skill_id: str. The ID of the skill to which the question is linked.
+
+        Raises:
+            Exception. The given question is already linked to the given skill.
+
+        Returns:
             QuestionSkillLinkModel. Instance of the new QuestionSkillLinkModel
                 entry.
         """
+        question_skill_link_id = cls.get_model_id(question_id, skill_id)
+        if cls.get(question_skill_link_id, strict=False) is not None:
+            raise Exception(
+                'The given question is already linked to given skill')
 
         question_skill_link_model_instance = cls(
-            question_id=question_id, skill_id=skill_id)
-
+            id=question_skill_link_id,
+            question_id=question_id,
+            skill_id=skill_id
+        )
         return question_skill_link_model_instance
+
+    @classmethod
+    def get_question_ids_linked_to_skill_ids(cls, skill_ids):
+        """Creates a new QuestionSkillLinkModel entry.
+
+        Args:
+            skill_ids: list(str). The ids of skills for which the linked
+                question ids are to be retrieved.
+
+        Returns:
+            list(str). The question ids linked to given skills.
+        """
+        question_skill_link_models = cls.query(cls.skill_id.IN(skill_ids))
+        question_ids = [
+            model.question_id for model in question_skill_link_models
+        ]
+        return question_ids
 
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

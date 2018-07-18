@@ -15,6 +15,7 @@
 """Tests for the Question Editor controller."""
 
 from core.domain import question_services
+from core.domain import skill_services
 from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
@@ -54,6 +55,108 @@ class BaseQuestionEditorControllerTest(test_utils.GenericTestBase):
         self.question = self.save_new_question(
             self.question_id, self.editor_id,
             self._create_valid_question_data('ABC'))
+
+
+class QuestionSkillLinkHandlerTest(BaseQuestionEditorControllerTest):
+    """Tests link and unlink question from skills.
+    """
+
+    def setUp(self):
+        """Completes the setup for QuestionSkillLinkHandlerTest."""
+        super(QuestionSkillLinkHandlerTest, self).setUp()
+        self.skill_id = skill_services.get_new_skill_id()
+        self.save_new_skill(self.skill_id, self.admin_id, 'Skill Description')
+        self.question_id_2 = question_services.get_new_question_id()
+        self.save_new_question(
+            self.question_id_2, self.editor_id,
+            self._create_valid_question_data('ABC'))
+
+    def test_post(self):
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            self.login(self.NEW_USER_EMAIL)
+            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            response = self.testapp.post(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                    self.skill_id
+                ), expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
+
+            self.login(self.ADMIN_EMAIL)
+            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                    self.skill_id
+                ), {}, csrf_token=csrf_token, expect_errors=False,
+                expected_status_int=200)
+            question_summaries = (
+                question_services.get_question_summaries_linked_to_skills([
+                    self.skill_id]))
+            self.assertEqual(len(question_summaries), 1)
+            self.assertEqual(question_summaries[0].id, self.question_id)
+            self.logout()
+
+            self.login(self.TOPIC_MANAGER_EMAIL)
+            response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
+            csrf_token = self.get_csrf_token_from_response(response)
+            self.post_json(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id_2,
+                    self.skill_id
+                ), {}, csrf_token=csrf_token, expect_errors=False,
+                expected_status_int=200)
+            question_summaries = (
+                question_services.get_question_summaries_linked_to_skills([
+                    self.skill_id]))
+            self.assertEqual(len(question_summaries), 2)
+            question_ids = [summary.id for summary in question_summaries]
+            self.assertItemsEqual(
+                question_ids, [self.question_id, self.question_id_2])
+            self.logout()
+
+    def test_delete(self):
+        question_services.create_new_question_skill_link(
+            self.question_id, self.skill_id)
+        question_services.create_new_question_skill_link(
+            self.question_id_2, self.skill_id)
+        with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
+            self.login(self.NEW_USER_EMAIL)
+            response = self.testapp.delete(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                    self.skill_id
+                ), expect_errors=True)
+            self.assertEqual(response.status_int, 401)
+            self.logout()
+
+            self.login(self.ADMIN_EMAIL)
+            self.testapp.delete(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id,
+                    self.skill_id
+                ), expect_errors=False)
+            question_summaries = (
+                question_services.get_question_summaries_linked_to_skills([
+                    self.skill_id]))
+            self.assertEqual(len(question_summaries), 1)
+            self.assertEqual(question_summaries[0].id, self.question_id_2)
+            self.logout()
+
+            self.login(self.TOPIC_MANAGER_EMAIL)
+            self.testapp.delete(
+                '%s/%s/%s' % (
+                    feconf.QUESTION_SKILL_LINK_URL_PREFIX, self.question_id_2,
+                    self.skill_id
+                ), expect_errors=False)
+            question_summaries = (
+                question_services.get_question_summaries_linked_to_skills([
+                    self.skill_id]))
+            self.assertEqual(len(question_summaries), 0)
+            self.logout()
 
 
 class EditableQuestionDataHandlerTest(BaseQuestionEditorControllerTest):

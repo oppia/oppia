@@ -1036,6 +1036,40 @@ def can_access_learner_dashboard(handler):
     return test_can_access
 
 
+def can_manage_question_skill_status(handler):
+    """Decorator to check whether the user can publish a question and link it
+    to a skill.
+    """
+
+    def test_can_manage_question_skill_status(self, **kwargs):
+        """Checks if the user can publish a question directly.
+
+        Args:
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            *. The return value of the decorated function.
+
+        Raises:
+            NotLoggedInException: The user is not logged in.
+            UnauthorizedUserException: The user does not have
+                credentials to publish a question.
+        """
+        if not self.user_id:
+            raise base.UserFacingExceptions.NotLoggedInException
+
+        if (
+                role_services.ACTION_MANAGE_QUESTION_SKILL_STATUS in
+                self.user.actions):
+            return handler(self, **kwargs)
+        else:
+            raise self.UnauthorizedUserException(
+                'You do not have credentials to publish a question.')
+    test_can_manage_question_skill_status.__wrapped__ = True
+
+    return test_can_manage_question_skill_status
+
+
 def require_user_id_else_redirect_to_homepage(handler):
     """Decorator that checks if a user_id is associated to the current
     session. If not, the user is redirected to the main page.

@@ -14,7 +14,6 @@
 
 """Tests for question domain objects."""
 
-from core.domain import exp_domain
 from core.domain import question_domain
 from core.tests import test_utils
 import feconf
@@ -34,7 +33,7 @@ class QuestionDomainTest(test_utils.GenericTestBase):
 
     def test_to_and_from_dict(self):
         default_question_state_data = (
-            exp_domain.State.create_default_state(None))
+            question_domain.Question.create_default_question_state())
         question_dict = {
             'id': 'col1.random',
             'question_state_data': default_question_state_data.to_dict(),
@@ -108,8 +107,8 @@ class QuestionDomainTest(test_utils.GenericTestBase):
         question_id = 'col1.random'
         question = question_domain.Question.create_default_question(
             question_id)
-        default_question_data = exp_domain.State.create_default_state(
-            feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+        default_question_data = (
+            question_domain.Question.create_default_question_state().to_dict())
 
         self.assertEqual(question.id, question_id)
         self.assertEqual(
