@@ -254,6 +254,17 @@
           "js": ["d3.min.js"]
         }
       },
+      "fontAwesome": {
+        "version": "4.7.0",
+        "downloadFormat": "zip",
+        "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
+        "rootDirPrefix": "Font-Awesome-",
+        "targetDirPrefix": "font-awesome-",
+        "bundle": {
+          "css": ["css/font-awesome.css"],
+          "fontsPath": "fonts"
+        }
+      },
       "guppy": {
         "version": "b5055b963fdbea5c6c1e92dbf58fdaf3ea0cd8ba",
         "downloadFormat": "zip",
