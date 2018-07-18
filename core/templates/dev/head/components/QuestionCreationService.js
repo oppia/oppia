@@ -17,7 +17,7 @@
  */
 
 oppia.factory('QuestionCreationService', [
-  '$http', '$q',  'UrlInterpolationService',
+  '$http', '$q', 'UrlInterpolationService',
   function($http, $q, UrlInterpolationService) {
     var QUESTION_CREATOR_URL_TEMPLATE =
       '/topic_editor_question_handler/<topic_id>';
