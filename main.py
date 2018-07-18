@@ -43,6 +43,7 @@ from core.controllers import story_editor
 from core.controllers import subscriptions
 from core.controllers import suggestion
 from core.controllers import topic_editor
+from core.controllers import topic_viewer
 from core.controllers import topics_and_skills_dashboard
 from core.controllers import translator
 from core.domain import acl_decorators
@@ -219,6 +220,12 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_VIEWER_URL_PREFIX,
+        topic_viewer.TopicViewerPage),
+    get_redirect_route(
+        r'%s/<topic_id>' % feconf.TOPIC_DATA_HANDLER,
+        topic_viewer.TopicPageDataHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
         topics_and_skills_dashboard.NewTopicHandler),
