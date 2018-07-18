@@ -165,6 +165,9 @@ def get_question_summaries_linked_to_skills(skill_ids):
         list(QuestionSummary). The list of question summaries linked to the
             given skill_ids.
     """
+    if len(skill_ids) == 0:
+        return []
+
     question_ids = (
         question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids(skill_ids)) #pylint: disable=line-too-long
 

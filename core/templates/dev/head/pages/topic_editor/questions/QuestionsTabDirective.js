@@ -23,20 +23,41 @@ oppia.directive('questionsTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_editor/questions/questions_tab_directive.html'),
       controller: [
-        '$scope', '$uibModal', 'TopicEditorStateService', 'TopicUpdateService',
-        'UndoRedoService', 'UrlInterpolationService',
-        'EVENT_STORY_SUMMARIES_INITIALIZED', 'EVENT_TOPIC_INITIALIZED',
-        'EVENT_TOPIC_REINITIALIZED',
+        '$scope', 'AlertsService', 'TopicEditorStateService',
+        'QuestionCreationService', 'EditableQuestionBackendApiService',
+        'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
         function(
-            $scope, $uibModal, TopicEditorStateService, TopicUpdateService,
-            UndoRedoService, UrlInterpolationService,
-            EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
-            EVENT_TOPIC_REINITIALIZED) {
+            $scope, AlertsService, TopicEditorStateService,
+            QuestionCreationService, EditableQuestionBackendApiService,
+            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED) {
           var _initTab = function() {
+            $scope.topic = TopicEditorStateService.getTopic();
+            $scope.questionSummaries =
+              TopicEditorStateService.getQuestionSummaries();
           };
 
-          $scope.$on(EVENT_TOPIC_INITIALIZED, _initTab);
-          $scope.$on(EVENT_TOPIC_REINITIALIZED, _initTab);
+          $scope.createQuestion = function() {
+            QuestionCreationService.createNew($scope.topic.getId()).then(
+              function(questionId) {
+                EditableQuestionBackendApiService.fetchQuestion(
+                  questionId).then(
+                    function(questionBackendDict) {
+                      $scope.question =
+                        QuestionObjectFactory.createFromBackendDict(
+                          questionBackendDict);
+                    },
+                    function(error) {
+                      AlertsService.addWarning(
+                        error || 'There was an error when getting the question data.');
+                    });
+              },
+              function(error) {
+                AlertsService.addWarning(
+                  error || 'There was an error when creating the question.');
+              });
+          };
+
+          $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, _initTab);
 
           _initTab();
         }

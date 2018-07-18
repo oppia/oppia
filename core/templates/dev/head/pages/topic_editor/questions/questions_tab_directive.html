@@ -1,0 +1,31 @@
+<md-card class="oppia-page-card oppia-long-text">
+  <div class="questions">
+    <label class="form-heading"> Questions included in this topic </label>
+    <button class="btn btn-default"
+            ng-click="createQuestion()"
+            style="float: right;">
+      Create Question
+    </button>
+    <table class="dashboard-table">
+      <tr ng-repeat="question in questionSummaries"
+          class="list-item">
+        <td>
+          <a class="list-summary">
+            <span> <[question.question_content]> </span>
+          </a>
+        </td>
+      </tr>
+    </table>
+    <h4 ng-if="questionSummaries.length === 0" style="color: gray;">
+      Click on Create Question to create a new question and link it to a skill in this topic
+    </h4>
+  </div>
+</md-card>
+
+<style>
+questions-tab .oppia-page-card {
+  margin-top: 2%;
+  margin-left: 10%;
+  width: 80%;
+}
+</style>
