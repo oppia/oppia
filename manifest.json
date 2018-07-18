@@ -223,11 +223,11 @@
         }
       },
       "bowerMaterial": {
-        "version": "0.6.0-rc1",
-        "downloadFormat": "zip",
-        "url": "https://github.com/angular/bower-material/archive/v0.6.0-rc1.zip",
-        "rootDirPrefix": "bower-material-",
+        "version": "1.1.10-master-f8f13a8",
+        "downloadFormat": "files",
+        "url": "https://raw.github.com/angular/bower-material/5cd497bfdc65538bbaac2d3a1a5a00cbeebc0ca3/",
         "targetDirPrefix": "bower-material-",
+        "files": ["angular-material.css", "angular-material.js"],
         "bundle": {
           "css": ["angular-material.css"],
           "js": ["angular-material.js"]
@@ -252,17 +252,6 @@
         "files": ["d3.min.js"],
         "bundle": {
           "js": ["d3.min.js"]
-        }
-      },
-      "fontAwesome": {
-        "version": "4.7.0",
-        "downloadFormat": "zip",
-        "url": "https://github.com/FortAwesome/Font-Awesome/archive/v4.7.0.zip",
-        "rootDirPrefix": "Font-Awesome-",
-        "targetDirPrefix": "font-awesome-",
-        "bundle": {
-          "css": ["css/font-awesome.css"],
-          "fontsPath": "fonts"
         }
       },
       "guppy": {
@@ -325,7 +314,7 @@
       "mathExpressions": {
         "version": "1.7.0",
         "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/kisonecat/math-expressions/9b7a1d94329a6c73b7db6d513824be609fb1932f/build",
+        "url": "https://raw.github.com/kisonecat/math-expressions/9b7a1d94329a6c73b7db6d513824be609fb1932f/build",
         "targetDirPrefix": "math-expressions-",
         "files": ["math-expressions.js"]
       },
@@ -385,16 +374,6 @@
         "files": ["ng-infinite-scroll.min.js"],
         "bundle": {
           "js": ["ng-infinite-scroll.min.js"]
-        }
-      },
-      "rangy": {
-        "version": "1.3.1-dev",
-        "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/timdown/rangy/da644f19d273b5b6c30ffc52ec837a5a55d5bc86/lib",
-        "targetDirPrefix": "rangy-",
-        "files": ["rangy-core.js", "rangy-selectionsaverestore.js"],
-        "bundle": {
-          "js": ["rangy-core.js", "rangy-selectionsaverestore.js"]
         }
       },
       "select2": {
