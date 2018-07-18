@@ -70,24 +70,48 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
             question_services.get_question_by_id('question_id')
 
     def test_create_and_get_question_skill_link(self):
+        question_id_2 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_2, self.editor_id,
+            self._create_valid_question_data('ABC'))
+
+        question_id_3 = question_services.get_new_question_id()
+        self.save_new_question(
+            question_id_3, self.editor_id,
+            self._create_valid_question_data('ABC'))
         question_services.create_new_question_skill_link(
             self.question_id, 'skill_1')
+        question_services.create_new_question_skill_link(
+            question_id_2, 'skill_1')
+        question_services.create_new_question_skill_link(
+            question_id_3, 'skill_2')
 
         question_summaries = (
             question_services.get_question_summaries_linked_to_skills(
-                ['skill_1']))
-        self.assertEqual(len(question_summaries), 1)
-        self.assertEqual(question_summaries[0].id, self.question_id)
+                ['skill_1', 'skill_2', 'skill_3']))
+        question_ids = [summary.id for summary in question_summaries]
+        self.assertEqual(len(question_ids), 3)
+        self.assertItemsEqual(
+            question_ids, [self.question_id, question_id_2, question_id_3])
+
+        question_summaries = (
+            question_services.get_question_summaries_linked_to_skills(
+                ['skill_1', 'skill_3']))
+        question_ids = [summary.id for summary in question_summaries]
+        self.assertEqual(len(question_ids), 2)
+        self.assertItemsEqual(
+            question_ids, [self.question_id, question_id_2])
 
     def test_get_question_summaries_by_ids(self):
         question_summaries = question_services.get_question_summaries_by_ids([
-            self.question_id])
+            self.question_id, 'question_2'])
 
-        self.assertEqual(len(question_summaries), 1)
+        self.assertEqual(len(question_summaries), 2)
         self.assertEqual(question_summaries[0].id, self.question_id)
         self.assertEqual(
             question_summaries[0].question_content,
             feconf.DEFAULT_INIT_STATE_CONTENT_STR)
+        self.assertIsNone(question_summaries[1])
 
     def test_get_questions_by_ids(self):
         question_id_2 = question_services.get_new_question_id()

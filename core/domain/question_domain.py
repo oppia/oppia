@@ -136,6 +136,17 @@ class Question(object):
             'version': self.version
         }
 
+    @classmethod
+    def create_default_question_state(cls):
+        """Return a State domain object with default value for being used as
+        question state data.
+
+        Returns:
+            State. The corresponding State domain object.
+        """
+        return exp_domain.State.create_default_state(
+            None, is_initial_state=True)
+
     def validate(self, strict=False):
         """Validates the Question domain object before it is saved.
 
@@ -235,8 +246,7 @@ class Question(object):
         Returns:
             Question. A Question domain object with default values.
         """
-        default_question_state_data = exp_domain.State.create_default_state(
-            None, is_initial_state=True)
+        default_question_state_data = cls.create_default_question_state()
 
         return cls(
             question_id, default_question_state_data,

@@ -220,7 +220,7 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_id>' % feconf.TOPIC_EDITOR_STORY_URL,
         topic_editor.TopicEditorStoryHandler),
     get_redirect_route(
-        r'%s/<skill_id>' % feconf.TOPIC_EDITOR_QUESTION_URL,
+        r'%s/<topic_id>' % feconf.TOPIC_EDITOR_QUESTION_URL,
         topic_editor.TopicEditorQuestionHandler),
     get_redirect_route(
         r'%s' % feconf.NEW_TOPIC_URL,
@@ -523,6 +523,10 @@ URLS = MAPREDUCE_HANDLERS + [
     get_redirect_route(
         r'%s/<topic_id>' % feconf.TOPIC_STATUS_URL_PREFIX,
         topic_editor.TopicPublishHandler),
+
+    get_redirect_route(
+        r'%s/<question_id>/<skill_id>' % feconf.QUESTION_SKILL_LINK_URL_PREFIX,
+        question_editor.QuestionSkillLinkHandler),
 
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,

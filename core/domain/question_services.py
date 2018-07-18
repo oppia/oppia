@@ -55,12 +55,24 @@ def create_new_question_skill_link(question_id, skill_id):
         question_id: str. ID of the question linked to the skill.
         skill_id: str. ID of the skill to which the question is linked.
     """
-    model = question_models.QuestionSkillLinkModel(
-        id=question_id + ':' + skill_id,
-        question_id=question_id,
-        skill_id=skill_id
-    )
-    model.put()
+    question_skill_link_model = question_models.QuestionSkillLinkModel.create(
+        question_id, skill_id)
+    question_skill_link_model.put()
+
+
+def delete_question_skill_link(question_id, skill_id):
+    """Deleted a QuestionSkillLink model.
+
+    Args:
+        question_id: str. ID of the question linked to the skill.
+        skill_id: str. ID of the skill to which the question is linked.
+    """
+    question_skill_link_id = (
+        question_models.QuestionSkillLinkModel.get_model_id(
+            question_id, skill_id))
+    question_skill_link_model = question_models.QuestionSkillLinkModel.get(
+        question_skill_link_id)
+    question_skill_link_model.delete()
 
 
 def get_new_question_id():
@@ -153,15 +165,8 @@ def get_question_summaries_linked_to_skills(skill_ids):
         list(QuestionSummary). The list of question summaries linked to the
             given skill_ids.
     """
-    skill_ids_check_dict = {}
-    for skill_id in skill_ids:
-        skill_ids_check_dict[skill_id] = True
-
-    question_ids = []
-    all_models = question_models.QuestionSkillLinkModel.get_all()
-    for model in all_models:
-        if skill_ids_check_dict[model.skill_id]:
-            question_ids.append(model.question_id)
+    question_ids = (
+        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids(skill_ids)) #pylint: disable=line-too-long
 
     question_summaries = get_question_summaries_by_ids(question_ids)
     return question_summaries

@@ -21,7 +21,6 @@ from core.domain import acl_decorators
 from core.domain import question_domain
 from core.domain import question_services
 from core.domain import role_services
-from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import story_domain
 from core.domain import story_services
@@ -115,19 +114,17 @@ class TopicEditorQuestionHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-    @acl_decorators.can_edit_skill
-    def post(self, skill_id):
+    @acl_decorators.can_edit_topic
+    def post(self, topic_id):
         """Handles POST requests."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
-        skill_domain.Skill.require_valid_skill_id(skill_id)
+        topic_domain.Topic.require_valid_topic_id(topic_id)
 
         new_question_id = question_services.get_new_question_id()
         question = question_domain.Question.create_default_question(
             new_question_id)
         question_services.add_question(self.user_id, question)
-        question_services.create_new_question_skill_link(
-            new_question_id, skill_id)
         self.render_json({
             'questionId': new_question_id
         })
