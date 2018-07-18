@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the services and controllers of the exploration
+ * @fileoverview Unit tests for the services and controllers of the
  *   editor page.
  */
 
-describe('Exploration context service', function() {
+describe('Context service', function() {
   beforeEach(module('oppia'));
 
-  describe('behavior in the learner view', function() {
+  describe('behavior in the exploration learner view', function() {
     var ecs = null;
 
     beforeEach(function() {
@@ -36,8 +36,13 @@ describe('Exploration context service', function() {
     beforeEach(module('oppia', GLOBALS.TRANSLATOR_PROVIDER_FOR_TESTS));
 
     beforeEach(inject(function($injector) {
-      ecs = $injector.get('ExplorationContextService');
+      ecs = $injector.get('ContextService');
     }));
+
+    it('should correctly set editor context to exploration editor', function() {
+      ecs.init('exploration_editor');
+      expect(ecs.getEditorContext()).toBe('exploration_editor');
+    });
 
     it('should correctly retrieve the exploration id', function() {
       expect(ecs.getExplorationId()).toBe('123');
@@ -48,7 +53,7 @@ describe('Exploration context service', function() {
     });
   });
 
-  describe('behavior in the editor view', function() {
+  describe('behavior in the exploration editor view', function() {
     var ecs = null;
 
     beforeEach(function() {
@@ -56,13 +61,16 @@ describe('Exploration context service', function() {
         $provide.value('UrlService', {
           getPathname: function() {
             return '/create/123';
+          },
+          getHash: function() {
+            return '#/gui';
           }
         });
       });
     });
 
     beforeEach(inject(function($injector) {
-      ecs = $injector.get('ExplorationContextService');
+      ecs = $injector.get('ContextService');
     }));
 
     it('should correctly retrieve the exploration id', function() {
@@ -71,6 +79,45 @@ describe('Exploration context service', function() {
 
     it('should correctly retrieve the page context', function() {
       expect(ecs.getPageContext()).toBe('editor');
+    });
+
+    it('should correctly retrieve exploration editor mode', function() {
+      expect(ecs.isInExplorationEditorMode()).toBe(true);
+    });
+  });
+
+  describe('behavior in the question editor view', function() {
+    var ecs = null;
+
+    beforeEach(function() {
+      module(function($provide) {
+        $provide.value('UrlService', {
+          getPathname: function() {
+            return '/question_editor/123';
+          }
+        });
+      });
+    });
+
+    beforeEach(inject(function($injector) {
+      ecs = $injector.get('ContextService');
+    }));
+
+    it('should correctly set editor context to question editor', function() {
+      ecs.init('question_editor');
+      expect(ecs.getEditorContext()).toBe('question_editor');
+    });
+
+    it('should correctly retrieve the question id', function() {
+      expect(ecs.getQuestionId()).toBe('123');
+    });
+
+    it('should correctly retrieve the page context', function() {
+      expect(ecs.getPageContext()).toBe('question_editor');
+    });
+
+    it('should correctly tell the question editor context', function() {
+      expect(ecs.isInQuestionContext()).toBe(true);
     });
   });
 
@@ -88,12 +135,18 @@ describe('Exploration context service', function() {
     });
 
     beforeEach(inject(function($injector) {
-      ecs = $injector.get('ExplorationContextService');
+      ecs = $injector.get('ContextService');
     }));
 
     it('should throw an error when trying to retrieve the exploration id',
       function() {
         expect(ecs.getExplorationId).toThrow();
+      }
+    );
+
+    it('should throw an error when trying to retrieve the question id',
+      function() {
+        expect(ecs.getQuestionId).toThrow();
       }
     );
 

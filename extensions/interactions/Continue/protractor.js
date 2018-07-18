@@ -18,6 +18,7 @@
  */
 
 var objects = require('../../objects/protractor.js');
+var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 
 var customizeInteraction = function(elem, buttonText) {
   if (buttonText) {
@@ -33,8 +34,11 @@ var expectInteractionDetailsToMatch = function(elem, buttonText) {
   ).toBe(buttonText.toUpperCase());
 };
 
-var submitAnswer = function(elem) {
-  element(by.css('.protractor-test-continue-button')).click();
+var submitAnswer = function() {
+  var continueButton = element(by.css('.protractor-test-continue-button'));
+  waitFor.elementToBeClickable(
+    continueButton, 'Continue button is not clickable');
+  continueButton.click();
 };
 
 var testSuite = [];

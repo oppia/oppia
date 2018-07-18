@@ -108,7 +108,7 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         email_manager.send_instant_feedback_message_email(
             user_id, message.author_id, message.text, subject,
             exploration.title, reference_dict['entity_id'],
-            thread.subject, reply_to_id)
+            thread.subject, reply_to_id=reply_to_id)
 
 
 class FeedbackThreadStatusChangeEmailHandler(base.BaseHandler):

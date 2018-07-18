@@ -52,7 +52,7 @@ describe('StateTopAnswersStatsService', function() {
       }
     });
 
-    spyOn($injector.get('ExplorationContextService'), 'getExplorationId')
+    spyOn($injector.get('ContextService'), 'getExplorationId')
       .and.returnValue('7');
   }));
 

@@ -48,15 +48,11 @@ describe('Language util service', function() {
       // Chrome loads voices asynchronously.
       // https://stackoverflow.com/questions/21513706/
       window.speechSynthesis.onvoiceschanged = function() {
-        // Some browser will not support SpeechSynthesis API
-        // In such case, simulate supported browser
-        if (window.speechSynthesis.getVoices().length < 1) {
-          $provide.value('BrowserCheckerService'), {
-            supportsSpeechSynthesis: function() {
-              return true;
-            }
-          };
-        }
+        $provide.value('BrowserCheckerService'), {
+          supportsSpeechSynthesis: function() {
+            return true;
+          }
+        };
       };
     });
   });

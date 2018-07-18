@@ -79,7 +79,10 @@
           "parameters": 2
         },
         "MemberExpression": 1,
-        "SwitchCase": 1
+        "SwitchCase": 1,
+        "ignoredNodes": [
+          "ConditionalExpression"
+        ]
       }
     ],
     "key-spacing": "error",

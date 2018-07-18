@@ -54,7 +54,9 @@ class SubscriptionTest(test_utils.GenericTestBase):
         # Test that the subscriber ID is added to the list of subscribers
         # of the creator and the creator ID is added to the list of
         # subscriptions of the user.
-        self.post_json(feconf.SUBSCRIBE_URL_PREFIX, payload, csrf_token)
+        self.post_json(
+            feconf.SUBSCRIBE_URL_PREFIX, payload,
+            csrf_token=csrf_token)
         self.assertEqual(subscription_services.get_all_subscribers_of_creator(
             self.editor_id), [self.user_id])
         self.assertEqual(
@@ -62,7 +64,9 @@ class SubscriptionTest(test_utils.GenericTestBase):
                 self.user_id), [self.editor_id])
 
         # Subscribing again, has no effect.
-        self.post_json(feconf.SUBSCRIBE_URL_PREFIX, payload, csrf_token)
+        self.post_json(
+            feconf.SUBSCRIBE_URL_PREFIX, payload,
+            csrf_token=csrf_token)
         self.assertEqual(subscription_services.get_all_subscribers_of_creator(
             self.editor_id), [self.user_id])
         self.assertEqual(
@@ -76,7 +80,9 @@ class SubscriptionTest(test_utils.GenericTestBase):
         response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
-        self.post_json(feconf.SUBSCRIBE_URL_PREFIX, payload, csrf_token)
+        self.post_json(
+            feconf.SUBSCRIBE_URL_PREFIX, payload,
+            csrf_token=csrf_token)
         self.assertEqual(subscription_services.get_all_subscribers_of_creator(
             self.editor_id), [self.user_id, self.user_id_2])
         self.assertEqual(
@@ -95,19 +101,25 @@ class SubscriptionTest(test_utils.GenericTestBase):
         self.login(self.USER_EMAIL)
         response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(feconf.SUBSCRIBE_URL_PREFIX, payload, csrf_token)
+        self.post_json(
+            feconf.SUBSCRIBE_URL_PREFIX, payload,
+            csrf_token=csrf_token)
         self.logout()
 
         # Add another subscription.
         self.login(self.USER2_EMAIL)
         response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(feconf.SUBSCRIBE_URL_PREFIX, payload, csrf_token)
+        self.post_json(
+            feconf.SUBSCRIBE_URL_PREFIX, payload,
+            csrf_token=csrf_token)
 
         # Test that on unsubscription, the learner ID is removed from the
         # list of subscriber IDs of the creator and the creator ID is
         # removed from the list of subscriptions of the learner.
-        self.post_json(feconf.UNSUBSCRIBE_URL_PREFIX, payload, csrf_token)
+        self.post_json(
+            feconf.UNSUBSCRIBE_URL_PREFIX, payload,
+            csrf_token=csrf_token)
         self.assertEqual(subscription_services.get_all_subscribers_of_creator(
             self.editor_id), [self.user_id])
         self.assertEqual(
@@ -115,7 +127,9 @@ class SubscriptionTest(test_utils.GenericTestBase):
                 self.user_id_2), [])
 
         # Unsubscribing the same user has no effect.
-        self.post_json(feconf.UNSUBSCRIBE_URL_PREFIX, payload, csrf_token)
+        self.post_json(
+            feconf.UNSUBSCRIBE_URL_PREFIX, payload,
+            csrf_token=csrf_token)
         self.assertEqual(subscription_services.get_all_subscribers_of_creator(
             self.editor_id), [self.user_id])
         self.assertEqual(
@@ -128,7 +142,9 @@ class SubscriptionTest(test_utils.GenericTestBase):
         self.login(self.USER_EMAIL)
         response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
         csrf_token = self.get_csrf_token_from_response(response)
-        self.post_json(feconf.UNSUBSCRIBE_URL_PREFIX, payload, csrf_token)
+        self.post_json(
+            feconf.UNSUBSCRIBE_URL_PREFIX, payload,
+            csrf_token=csrf_token)
         self.assertEqual(subscription_services.get_all_subscribers_of_creator(
             self.editor_id), [])
         self.assertEqual(

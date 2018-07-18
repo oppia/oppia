@@ -19,6 +19,7 @@
 import json
 import os
 
+from constants import constants
 from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
@@ -387,7 +388,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertNotIn(
-            feconf.MIGRATION_BOT_USERNAME, exploration_summary.contributor_ids)
+            feconf.MIGRATION_BOT_USERNAME,
+            exploration_summary.contributor_ids)
 
 
 class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
@@ -533,7 +535,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
 
         # Create commits with all the system user ids.
-        for system_id in feconf.SYSTEM_USER_IDS:
+        for system_id in constants.SYSTEM_USER_IDS:
             exp_services.update_exploration(
                 system_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': 'edit_exploration_property',
@@ -552,7 +554,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
 
-        for system_id in feconf.SYSTEM_USER_IDS:
+        for system_id in constants.SYSTEM_USER_IDS:
             self.assertNotIn(
                 system_id,
                 exploration_summary.contributors_summary)
@@ -978,7 +980,6 @@ class ExplorationMigrationValidationJobForTextAngularTest(
                 '</oppia-noninteractive-image></ol>\']]'
             )
         ]
-
         self.assertEqual(actual_output, expected_output)
 
 
@@ -1045,6 +1046,10 @@ class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
         exploration_dict = exploration.to_dict()
         updated_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
             exploration_dict)
+        # This is done to ensure that exploration is not passed through CKEditor
+        # Migration pipeline.
+        updated_dict['schema_version'] = 29
+        updated_dict['states_schema_version'] = 24
         updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
         updated_states = updated_dict['states']
 

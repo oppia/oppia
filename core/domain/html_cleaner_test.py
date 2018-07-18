@@ -50,7 +50,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
-                '\n\nOriginal text: %s' % datum[0])
+                msg='\n\nOriginal text: %s' % datum[0])
 
     def test_bad_tags_suppressed(self):
         test_data = [(
@@ -79,7 +79,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
-                '\n\nOriginal text: %s' % datum[0])
+                msg='\n\nOriginal text: %s' % datum[0])
 
     def test_oppia_custom_tags(self):
         test_data = [(
@@ -99,7 +99,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
-                '\n\nOriginal text: %s' % datum[0])
+                msg='\n\nOriginal text: %s' % datum[0])
 
 
 class HtmlStripperUnitTests(test_utils.GenericTestBase):
@@ -221,11 +221,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for index, test_case in enumerate(test_cases):
             soup = bs4.BeautifulSoup(test_case['html_content'], 'html.parser')
             if index == 0:
-                tag = soup.findAll('i')[1]
+                tag = soup.findAll(name='i')[1]
             elif index == 1:
-                tag = soup.find('br')
+                tag = soup.find(name='br')
             elif index == 2:
-                tag = soup.find('b')
+                tag = soup.find(name='b')
             html_cleaner.wrap_with_siblings(tag, soup.new_tag('p'))
             self.assertEqual(str(soup), test_case['expected_output'])
 
@@ -688,6 +688,57 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '<li>Item5</li><li>Item6</li></ol></li></ol></li><li>Item7'
                 '<ol><li>Item8</li><li>Item9<ol><li>Item10</li><li>Item11'
                 '</li></ol></li></ol></li></ol>'
+            )
+        }, {
+            'html_content': (
+                '<p><em><strong>this is </strong></em><br></p>'
+                '<oppia-noninteractive-collapsible content-with-value'
+                '="&amp;quot;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;&amp;'
+                'lt;p&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;'
+                '&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;li&amp;'
+                'gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;'
+                'oppia-noninteractive-image alt-with-value=\\&amp;quot;&amp;'
+                'amp;amp;quot;loremipsum&amp;amp;amp;quot;\\&amp;quot; '
+                'caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                'quot;\\&amp;quot; filepath-with-value=\\&amp;quot;&amp;amp;amp'
+                ';quot;loremipsum.png&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp'
+                ';lt;/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;&amp;'
+                'lt;br&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;&amp;lt;/ul'
+                '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;loremipusm'
+                '&amp;quot;"></oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                '<p><em><strong>this is </strong></em><br></p>'
+                '<oppia-noninteractive-collapsible content-with-value='
+                '"&amp;quot;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;'
+                'lt;/li&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;'
+                '&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;'
+                'li&amp;gt;&amp;lt;oppia-noninteractive-image alt-with-value'
+                '=\\&amp;quot;&amp;amp;amp;quot;loremipsum&amp;amp;amp;quot;'
+                '\\&amp;quot; caption-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+                '&amp;amp;amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot'
+                ';&amp;amp;amp;quot;loremipsum.png&amp;amp;amp;quot;\\&amp;quot'
+                ';&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
+                'p&amp;gt;\\u00a0&amp;lt;/p&amp;gt;&amp;lt;/li&amp;'
+                'gt;&amp;lt;/ul&amp;gt;&amp;quot;" heading-with-value="&amp;'
+                'quot;loremipusm&amp;quot;"></oppia-noninteractive-collapsible>'
+            )
+        }, {
+            'html_content': (
+                '<pre><p>Hello this is test case for </p><p>br '
+                'in </p><p>pre </p><p>tag<br></p></pre>'
+            ),
+            'expected_output': (
+                '<pre>Hello this is test case for br in pre tag\n</pre>'
+            )
+        }, {
+            'html_content': (
+                '<p><li> Hello this is test case for li in p which results '
+                'in </li><li> in document </li><li> after unwrapping </li></p>'
+            ),
+            'expected_output': (
+                '<ul><li> Hello this is test case for li in p which results '
+                'in </li><li> in document </li><li> after unwrapping </li></ul>'
             )
         }]
 

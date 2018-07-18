@@ -20,11 +20,11 @@ oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 oppia.factory('RteHelperService', [
   '$filter', '$log', '$uibModal', '$interpolate', '$document',
-  'ExplorationContextService', 'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
+  'ContextService', 'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
   'UrlInterpolationService', 'FocusManagerService',
   function(
       $filter, $log, $uibModal, $interpolate, $document,
-      ExplorationContextService, RTE_COMPONENT_SPECS, HtmlEscaperService,
+      ContextService, RTE_COMPONENT_SPECS, HtmlEscaperService,
       UrlInterpolationService, FocusManagerService) {
     var _RICH_TEXT_COMPONENTS = [];
 
@@ -35,8 +35,10 @@ oppia.factory('RteHelperService', [
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
         id: RTE_COMPONENT_SPECS[componentId].frontend_id,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
-        previewUrlTemplate:
-        RTE_COMPONENT_SPECS[componentId].preview_url_template,
+        previewUrlTemplate: ((GLOBALS.DEV_MODE ||
+          !constants.ENABLE_GCS_STORAGE_FOR_IMAGES) ?
+          RTE_COMPONENT_SPECS[componentId].preview_url_template_dev :
+          RTE_COMPONENT_SPECS[componentId].preview_url_template_prod),
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
         isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
@@ -79,7 +81,7 @@ oppia.factory('RteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        if (ExplorationContextService.isInExplorationContext()) {
+        if (ContextService.isInExplorationContext()) {
           // TODO(sll): This extra key was introduced in commit
           // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66 in order to retrieve an
           // image for RTE previews. However, it has had the unfortunate side-
@@ -88,7 +90,8 @@ oppia.factory('RteHelperService', [
           // convertRteToHtml(), but we need to find a less invasive way to
           // handle previews.
           customizationArgsDict = angular.extend(customizationArgsDict, {
-            explorationId: ExplorationContextService.getExplorationId()
+            explorationId: ContextService.getExplorationId(),
+            bucketName: GLOBALS.GCS_RESOURCE_BUCKET_NAME
           });
         }
         var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
@@ -101,6 +104,9 @@ oppia.factory('RteHelperService', [
             componentPreviewUrlTemplate, false, null, true)(
             customizationArgsDict));
         }
+        // bucketName was added earlier so that previewUrlTemplate could be
+        // interpolated with the bucketName.
+        delete customizationArgsDict.bucketName;
 
         if (!interpolatedUrl) {
           $log.error(

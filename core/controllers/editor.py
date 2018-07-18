@@ -490,7 +490,8 @@ class ExplorationDownloadHandler(EditorHandler):
             self.response.headers['Content-Disposition'] = (
                 'attachment; filename=%s.zip' % str(filename))
             self.response.write(
-                exp_services.export_to_zip_file(exploration_id, version))
+                exp_services.export_to_zip_file(
+                    exploration_id, version=version))
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
                 exploration_id, version=version, width=width))
@@ -728,6 +729,10 @@ class ResolveIssueHandler(EditorHandler):
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
+    # The string to prefix to the filename (before tacking the whole thing on
+    # to the end of 'assets/').
+    _FILENAME_PREFIX = 'image'
+
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Saves an image uploaded by a content creator."""
@@ -765,14 +770,26 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-        # Save the file.
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        if fs.isfile(filename):
+        mimetype = 'image/%s' % (extension)
+
+        # Image files are stored to the datastore in the dev env, and to GCS
+        # in production.
+        file_system_class = (
+            fs_domain.ExplorationFileSystem if (
+                feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
+            else fs_domain.GcsFileSystem)
+        fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
+        filepath = (
+            filename if (
+                feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
+            else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
+
+        if fs.isfile(filepath):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
-        fs.commit(self.user_id, filename, raw)
+
+        fs.commit(self.user_id, filepath, raw, mimetype=mimetype)
 
         self.render_json({'filepath': filename})
 

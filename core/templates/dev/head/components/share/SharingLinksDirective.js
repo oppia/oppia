@@ -35,8 +35,8 @@ oppia.directive('sharingLinks', [
         '$scope', '$window', 'HtmlEscaperService',
         'ExplorationEmbedButtonService', 'siteAnalyticsService',
         function(
-            $scope, $window, HtmlEscaperService, ExplorationEmbedButtonService,
-            siteAnalyticsService) {
+            $scope, $window, HtmlEscaperService,
+            ExplorationEmbedButtonService, siteAnalyticsService) {
           $scope.registerShareEvent = null;
 
           if ($scope.shareType === 'exploration') {

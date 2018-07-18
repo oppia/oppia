@@ -17,25 +17,33 @@
  * tests.
  */
 
-var general = require('./general.js');
+var waitFor = require('./waitFor.js');
 
 var LearnerDashboardPage = function() {
   var LEARNER_DASHBOARD_URL = '/learner_dashboard';
   var completedSection =
     element(by.css('.protractor-test-completed-section'));
+  var incompleteSection =
+    element(by.css('.protractor-test-incomplete-section'));
   var feedbackSection =
     element(by.css('.protractor-test-feedback-section'));
   var feedbackThread =
     element(by.css('.protractor-test-feedback-thread'));
   var completedCollectionsSection =
     element(by.css('.protractor-test-completed-collection-section'));
+  var completedExplorationsSection =
+    element(by.css('.protractor-test-completed-exp-section'));
   var incompleteCollectionsSection =
     element(by.css('.protractor-test-incomplete-collection-section'));
+  var incompleteExplorationsSection =
+    element(by.css('.protractor-test-incomplete-exp-section'));
   var subscriptionsSection =
     element(by.css('.protractor-test-subscriptions-section'));
   var subscriptionName =
     element.all(by.css('.protractor-test-subscription-name'));
-  var titleOfSummaryTile =
+  var titleOfExplorationSummaryTile =
+    element.all(by.css('.protractor-test-exp-summary-tile-title'));
+  var titleOfCollectionSummaryTile =
     element.all(by.css('.protractor-test-collection-summary-tile-title'));
   var feedbackExplorationTitle =
     element.all(by.css('.protractor-test-feedback-exploration'));
@@ -43,69 +51,125 @@ var LearnerDashboardPage = function() {
     element.all(by.css('.protractor-test-feedback-message'));
 
   this.get = function() {
-    return browser.get(LEARNER_DASHBOARD_URL);
+    browser.get(LEARNER_DASHBOARD_URL);
+    return waitFor.pageToFullyLoad();
   };
 
   this.navigateToCompletedSection = function() {
+    waitFor.elementToBeClickable(
+      completedSection, 'Completed tab takes too long to be clickable');
     completedSection.click();
-    browser.waitForAngular();
+  };
+
+  this.navigateToInCompleteSection = function() {
+    waitFor.elementToBeClickable(
+      incompleteSection, 'In Progress tab takes too long to be clickable');
+    incompleteSection.click();
   };
 
   this.navigateToIncompleteCollectionsSection = function() {
+    waitFor.elementToBeClickable(
+      incompleteCollectionsSection,
+      'Incomplete Collection Section tab takes too long to be clickable');
     incompleteCollectionsSection.click();
-    browser.waitForAngular();
-    general.waitForSystem();
+  };
+
+  this.navigateToIncompleteExplorationsSection = function() {
+    waitFor.elementToBeClickable(
+      incompleteExplorationsSection,
+      'Incomplete Collection Section tab takes too long to be clickable');
+    incompleteExplorationsSection.click();
   };
 
   this.navigateToCompletedCollectionsSection = function() {
+    waitFor.elementToBeClickable(
+      completedCollectionsSection,
+      'Completed Collection Section tab takes too long to be clickable');
     completedCollectionsSection.click();
-    browser.waitForAngular();
-    general.waitForSystem();
+  };
+
+  this.navigateToCompletedExplorationsSection = function() {
+    waitFor.elementToBeClickable(
+      completedExplorationsSection,
+      'Completed Collection Section tab takes too long to be clickable');
+    completedExplorationsSection.click();
   };
 
   this.navigateToFeedbackSection = function() {
+    waitFor.elementToBeClickable(
+      feedbackSection, 'Feedback Section tab takes too long to be clickable');
     feedbackSection.click();
-    browser.waitForAngular();
   };
 
   this.navigateToFeedbackThread = function() {
+    waitFor.elementToBeClickable(
+      feedbackThread, 'Feedback Thread tab takes too long to be clickable');
     feedbackThread.click();
-    browser.waitForAngular();
   };
 
   this.navigateToSubscriptionsSection = function() {
+    waitFor.elementToBeClickable(
+      subscriptionsSection,
+      'Subscriptions Section tab takes too long to be clickable');
     subscriptionsSection.click();
-    browser.waitForAngular();
   };
 
-  this.expectTitleOfSummaryTileToMatch = function(title) {
-    expect(
-      titleOfSummaryTile.first().getText()
-    ).toMatch(title);
+  this.expectTitleOfCollectionSummaryTileToBeHidden = function(title) {
+    element.all(by.cssContainingText(
+      '.protractor-test-collection-summary-tile-title', title))
+      .then(function(items) {
+        expect(items.length).toBe(0);
+      });
+  };
+
+  this.expectTitleOfCollectionSummaryTileToMatch = function(title) {
+    var collectionTitle = element(by.cssContainingText(
+      '.protractor-test-collection-summary-tile-title', title));
+    waitFor.visibilityOf(
+      collectionTitle, 'Unable to find collection ' + title);
+    expect(collectionTitle.isDisplayed()).toBe(true);
+  };
+
+  this.expectTitleOfExplorationSummaryTileToBeHidden = function(title) {
+    element.all(by.cssContainingText(
+      '.protractor-test-exp-summary-tile-title', title)).then(function(items) {
+      expect(items.length).toBe(0);
+    });
+  };
+
+  this.expectTitleOfExplorationSummaryTileToMatch = function(title) {
+    var explorationTitle = element(
+      by.cssContainingText('.protractor-test-exp-summary-tile-title', title));
+    waitFor.visibilityOf(
+      explorationTitle, 'Unable to find collection ' + title);
+    expect(explorationTitle.isDisplayed()).toBe(true);
   };
 
   this.expectSubscriptionFirstNameToMatch = function(name) {
-    expect(
-      subscriptionName.first().getText()
-    ).toMatch(name);
+    waitFor.visibilityOf(
+      subscriptionName.first(),
+      'Subscription First Name takes too long to appear');
+    expect(subscriptionName.first().getText()).toMatch(name);
   };
 
   this.expectSubscriptionLastNameToMatch = function(name) {
-    expect(
-      subscriptionName.last().getText()
-    ).toMatch(name);
+    waitFor.visibilityOf(
+      subscriptionName.last(),
+      'Subscription Last Name takes too long to appear');
+    expect(subscriptionName.last().getText()).toMatch(name);
   };
 
   this.expectFeedbackExplorationTitleToMatch = function(title) {
-    expect(
-      feedbackExplorationTitle.first().getText()
-    ).toMatch(title);
+    waitFor.visibilityOf(
+      feedbackExplorationTitle.first(),
+      'Feedback Exploration Title takes too long to appear');
+    expect(feedbackExplorationTitle.first().getText()).toMatch(title);
   };
 
   this.expectFeedbackMessageToMatch = function(message) {
-    expect(
-      feedbackMessage.first().getText()
-    ).toMatch(message);
+    waitFor.visibilityOf(
+      feedbackMessage.first(), 'Feedback Message takes too long to appear');
+    expect(feedbackMessage.first().getText()).toMatch(message);
   };
 };
 

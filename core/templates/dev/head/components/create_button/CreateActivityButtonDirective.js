@@ -27,8 +27,9 @@ oppia.directive('createActivityButton', [
         'ExplorationCreationService', 'CollectionCreationService',
         'siteAnalyticsService', 'UrlService',
         function(
-            $scope, $timeout, $window, $uibModal, ExplorationCreationService,
-            CollectionCreationService, siteAnalyticsService, UrlService) {
+            $scope, $timeout, $window, $uibModal,
+            ExplorationCreationService, CollectionCreationService,
+            siteAnalyticsService, UrlService) {
           $scope.creationInProgress = false;
 
           $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;

@@ -77,7 +77,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
         self.assertEqual(
             collection_services.get_collection_titles_and_categories([]), {})
 
-        self.save_new_default_collection('A', self.owner_id, 'TitleA')
+        self.save_new_default_collection('A', self.owner_id, title='TitleA')
         self.assertEqual(
             collection_services.get_collection_titles_and_categories(['A']), {
                 'A': {
@@ -86,7 +86,7 @@ class CollectionQueriesUnitTests(CollectionServicesUnitTests):
                 }
             })
 
-        self.save_new_default_collection('B', self.owner_id, 'TitleB')
+        self.save_new_default_collection('B', self.owner_id, title='TitleB')
         self.assertEqual(
             collection_services.get_collection_titles_and_categories(
                 ['A']), {
@@ -420,7 +420,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             # Page 1: 2 initial collections.
             (col_ids, search_cursor) = (
                 collection_services.get_collection_ids_matching_query(
-                    '', None))
+                    ''))
             self.assertEqual(len(col_ids), 2)
             self.assertIsNotNone(search_cursor)
             found_col_ids += col_ids
@@ -428,7 +428,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             # Page 2: 2 more collections.
             (col_ids, search_cursor) = (
                 collection_services.get_collection_ids_matching_query(
-                    '', search_cursor))
+                    '', cursor=search_cursor))
             self.assertEqual(len(col_ids), 2)
             self.assertIsNotNone(search_cursor)
             found_col_ids += col_ids
@@ -436,7 +436,7 @@ class CollectionSummaryQueriesUnitTests(CollectionServicesUnitTests):
             # Page 3: 1 final collection.
             (col_ids, search_cursor) = (
                 collection_services.get_collection_ids_matching_query(
-                    '', search_cursor))
+                    '', cursor=search_cursor))
             self.assertEqual(len(col_ids), 1)
             self.assertIsNone(search_cursor)
             found_col_ids += col_ids
@@ -1414,7 +1414,7 @@ class CollectionSearchTests(CollectionServicesUnitTests):
             self.save_new_valid_collection(
                 all_collection_ids[ind],
                 self.owner_id,
-                all_collection_titles[ind],
+                title=all_collection_titles[ind],
                 category=all_collection_categories[ind])
 
         # We're only publishing the first 4 collections, so we're not

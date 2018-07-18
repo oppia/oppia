@@ -30,11 +30,14 @@ oppia.directive('outcomeDestinationEditor', [
         '$scope', 'EditorStateService', 'ExplorationStatesService',
         'StateGraphLayoutService', 'PLACEHOLDER_OUTCOME_DEST',
         'FocusManagerService', 'EditorFirstTimeEventsService',
+        'EXPLORATION_AND_SKILL_ID_PATTERN',
         function(
             $scope, EditorStateService, ExplorationStatesService,
             StateGraphLayoutService, PLACEHOLDER_OUTCOME_DEST,
-            FocusManagerService, EditorFirstTimeEventsService) {
+            FocusManagerService, EditorFirstTimeEventsService,
+            EXPLORATION_AND_SKILL_ID_PATTERN) {
           var currentStateName = null;
+          $scope.canAddPrerequisiteSkill = constants.ENABLE_NEW_STRUCTURES;
 
           $scope.$on('saveOutcomeDestDetails', function() {
             // Create new state if specified.
@@ -55,7 +58,8 @@ oppia.directive('outcomeDestinationEditor', [
           // development.
           $scope.canEditRefresherExplorationId = (
             GLOBALS.isAdmin || GLOBALS.isModerator);
-          $scope.explorationIdPattern = /^[a-zA-Z0-9_-]+$/;
+          $scope.explorationAndSkillIdPattern =
+            EXPLORATION_AND_SKILL_ID_PATTERN;
 
           $scope.isSelfLoop = function() {
             return $scope.outcome.dest === currentStateName;

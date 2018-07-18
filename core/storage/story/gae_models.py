@@ -14,8 +14,8 @@
 
 """Models for storing the story data models."""
 
+from constants import constants
 from core.platform import models
-import feconf
 
 from google.appengine.ext import ndb
 
@@ -89,7 +89,7 @@ class StoryModel(base_models.VersionedModel):
         story_commit_log_entry = StoryCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            feconf.ACTIVITY_STATUS_PUBLIC, False
+            constants.ACTIVITY_STATUS_PUBLIC, False
         )
         story_commit_log_entry.story_id = self.id
         story_commit_log_entry.put()

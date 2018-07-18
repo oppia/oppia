@@ -27,7 +27,7 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.factory('ExplorationPlayerService', [
   '$http', '$rootScope', '$q', 'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService',
-  'EditableExplorationBackendApiService', 'ExplorationContextService',
+  'EditableExplorationBackendApiService', 'ContextService',
   'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'GuestCollectionProgressService',
   'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
@@ -40,7 +40,7 @@ oppia.factory('ExplorationPlayerService', [
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService,
-      EditableExplorationBackendApiService, ExplorationContextService,
+      EditableExplorationBackendApiService, ContextService,
       ExplorationHtmlFormatterService, ExplorationObjectFactory,
       ExpressionInterpolationService, GuestCollectionProgressService,
       ImagePreloaderService, LanguageUtilService, LearnerParamsService,
@@ -50,9 +50,9 @@ oppia.factory('ExplorationPlayerService', [
       StatsReportingService, UrlInterpolationService, WindowDimensionsService,
       ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
-    var _explorationId = ExplorationContextService.getExplorationId();
+    var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = (
-      ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+      ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR);
     var _isLoggedIn = GLOBALS.userIsLoggedIn;
     var answerIsBeingProcessed = false;
 
@@ -159,7 +159,9 @@ oppia.factory('ExplorationPlayerService', [
 
     $rootScope.$on('playerStateChange', function(evt, newStateName) {
       // To restart the preloader for the new state if required.
-      ImagePreloaderService.onStateChange(newStateName);
+      if (!_editorPreviewMode) {
+        ImagePreloaderService.onStateChange(newStateName);
+      }
       // Ensure the transition to a terminal state properly logs the end of the
       // exploration.
       if (!_editorPreviewMode && exploration.isStateTerminal(newStateName)) {
@@ -233,8 +235,6 @@ oppia.factory('ExplorationPlayerService', [
               data.auto_tts_enabled);
             AudioPreloaderService.init(exploration);
             AudioPreloaderService.kickOffAudioPreloader(initStateName);
-            ImagePreloaderService.init(exploration);
-            ImagePreloaderService.kickOffImagePreloader(initStateName);
             PlayerCorrectnessFeedbackEnabledService.init(
               data.correctness_feedback_enabled);
             _loadInitialState(successCallback);

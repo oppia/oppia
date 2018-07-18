@@ -18,57 +18,102 @@
  */
 
 var forms = require('./forms.js');
-var editor = require('./editor.js');
-var general = require('./general.js');
+var waitFor = require('./waitFor.js');
+var CreatorDashboardPage = require('./CreatorDashboardPage.js');
+var ExplorationEditorPage = require('./ExplorationEditorPage.js');
 var LibraryPage = require('./LibraryPage.js');
 
-// Creates an exploration and opens its editor.
+// Creates an exploration, opens its editor and skips the tutorial.
 var createExploration = function() {
   createExplorationAndStartTutorial();
-  editor.exitTutorialIfNecessary();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.exitTutorial();
 };
 
 // Creates a new exploration and wait for the exploration tutorial to start.
 var createExplorationAndStartTutorial = function() {
-  libraryPage = new LibraryPage.LibraryPage();
-  libraryPage.get();
-  libraryPage.clickCreateActivity();
-
+  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  creatorDashboardPage.get();
   // Wait for the dashboard to transition the creator into the editor page.
-  browser.waitForAngular();
+  creatorDashboardPage.clickCreateActivityButton();
+};
+
+/**
+ * Only Admin users can create collections.
+ */
+var createCollectionAsAdmin = function() {
+  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  creatorDashboardPage.get();
+  creatorDashboardPage.clickCreateActivityButton();
+  var activityCreationModal = element(
+    by.css('.protractor-test-creation-modal'));
+  waitFor.visibilityOf(
+    activityCreationModal, 'Activity Creation modal takes too long to appear');
+  creatorDashboardPage.clickCreateCollectionButton();
+};
+
+/**
+ * Creating exploration for Admin users.
+ */
+var createExplorationAsAdmin = function() {
+  creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage;
+  creatorDashboardPage.get();
+  creatorDashboardPage.clickCreateActivityButton();
+  var activityCreationModal = element(
+    by.css('.protractor-test-creation-modal'));
+  waitFor.visibilityOf(
+    activityCreationModal, 'Activity Creation modal takes too long to appear');
+  creatorDashboardPage.clickCreateExplorationButton();
 };
 
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = function() {
-  element(by.css('.protractor-test-publish-exploration')).click();
-  browser.waitForAngular();
-  general.waitForSystem();
-
+  element(by.css('.protractor-test-publish-exploration')).isDisplayed().then(
+    function() {
+      element(by.css('.protractor-test-publish-exploration')).click();
+    });
   var prePublicationButtonElem = element(by.css(
     '.protractor-test-confirm-pre-publication'));
   prePublicationButtonElem.isPresent().then(function() {
     prePublicationButtonElem.click();
-    general.waitForSystem();
   });
 
+  waitFor.invisibilityOf(
+    prePublicationButtonElem,
+    'prePublicationButtonElem taking too long to disappear while publishing');
   element(by.css('.protractor-test-confirm-publish')).click();
+
+  var sharePublishModal = element(
+    by.css('.protractor-test-share-publish-modal'));
+  var closePublishModalButton = element(
+    by.css('.protractor-test-share-publish-close'));
+  waitFor.visibilityOf(
+    sharePublishModal, 'Share Publish Modal takes too long to appear');
+  waitFor.elementToBeClickable(
+    closePublishModalButton, 'Close Publish Modal button is not clickable');
+  closePublishModalButton.click();
 };
 
 // Creates and publishes a minimal exploration
 var createAndPublishExploration = function(
     title, category, objective, language) {
   createExploration();
-  editor.setContent(forms.toRichText('new exploration'));
-  editor.setInteraction('EndExploration');
-  editor.setTitle(title);
-  editor.setCategory(category);
-  editor.setObjective(objective);
-  if (language) {
-    editor.setLanguage(language);
-  }
-  editor.saveChanges();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.setContent(forms.toRichText('new exploration'));
+  explorationEditorMainTab.setInteraction('EndExploration');
 
+  var explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+  explorationEditorPage.navigateToSettingsTab();
+  explorationEditorSettingsTab.setTitle(title);
+  explorationEditorSettingsTab.setCategory(category);
+  explorationEditorSettingsTab.setObjective(objective);
+  if (language) {
+    explorationEditorSettingsTab.setLanguage(language);
+  }
+  explorationEditorPage.saveChanges();
   publishExploration();
 };
 
@@ -76,13 +121,11 @@ var createAndPublishExploration = function(
 
 // Here, 'roleName' is the user-visible form of the role name (e.g. 'Manager').
 var _addExplorationRole = function(roleName, username) {
-  editor.runFromSettingsTab(function() {
-    element(by.css('.protractor-test-edit-roles')).click();
-    element(by.css('.protractor-test-role-username')).sendKeys(username);
-    element(by.css('.protractor-test-role-select')).
-      element(by.cssContainingText('option', roleName)).click();
-    element(by.css('.protractor-test-save-role')).click();
-  });
+  element(by.css('.protractor-test-edit-roles')).click();
+  element(by.css('.protractor-test-role-username')).sendKeys(username);
+  element(by.css('.protractor-test-role-select')).
+    element(by.cssContainingText('option', roleName)).click();
+  element(by.css('.protractor-test-save-role')).click();
 };
 
 var addExplorationManager = function(username) {
@@ -103,16 +146,13 @@ var addExplorationPlaytester = function(username) {
 
 // Here, roleName is the server-side form of the name (e.g. 'owner').
 var _getExplorationRoles = function(roleName) {
-  var result = editor.runFromSettingsTab(function() {
-    var itemName = roleName + 'Name';
-    var listName = roleName + 'Names';
-    return element.all(by.repeater(
-      itemName + ' in ExplorationRightsService.' + listName + ' track by $index'
-    )).map(function(elem) {
-      return elem.getText();
-    });
+  var itemName = roleName + 'Name';
+  var listName = roleName + 'Names';
+  return element.all(by.repeater(
+    itemName + ' in ExplorationRightsService.' + listName + ' track by $index'
+  )).map(function(elem) {
+    return elem.getText();
   });
-  return result;
 };
 
 var getExplorationManagers = function() {
@@ -135,6 +175,8 @@ exports.createExploration = createExploration;
 exports.createExplorationAndStartTutorial = createExplorationAndStartTutorial;
 exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
+exports.createCollectionAsAdmin = createCollectionAsAdmin;
+exports.createExplorationAsAdmin = createExplorationAsAdmin;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;

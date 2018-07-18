@@ -18,8 +18,10 @@
 
 oppia.directive('skillDescriptionEditor', [
   'UrlInterpolationService', 'SkillUpdateService', 'SkillEditorStateService',
+  'SkillObjectFactory',
   function(
-      UrlInterpolationService, SkillUpdateService, SkillEditorStateService) {
+      UrlInterpolationService, SkillUpdateService, SkillEditorStateService,
+      SkillObjectFactory) {
     return {
       restrict: 'E',
       scope: {},
@@ -30,18 +32,32 @@ oppia.directive('skillDescriptionEditor', [
         '$scope',
         function($scope) {
           $scope.skill = SkillEditorStateService.getSkill();
+          $scope.skillRights = SkillEditorStateService.getSkillRights();
           $scope.skillDescriptionEditorIsShown = false;
 
           $scope.openSkillDescriptionEditor = function() {
-            $scope.skillDescriptionEditorIsShown = true;
-            $scope.tmpSkillDescription = $scope.skill.getDescription();
+            if ($scope.canEditSkillDescription()) {
+              $scope.skillDescriptionEditorIsShown = true;
+              $scope.tmpSkillDescription = $scope.skill.getDescription();
+            }
+          };
+
+          $scope.closeSkillDescriptionEditor = function() {
+            $scope.skillDescriptionEditorIsShown = false;
+          };
+
+          $scope.canEditSkillDescription = function() {
+            return $scope.skillRights.canEditSkillDescription();
           };
 
           $scope.saveSkillDescription = function(newSkillDescription) {
-            $scope.skillDescriptionEditorIsShown = false;
-            SkillUpdateService.setSkillDescription(
-              $scope.skill,
-              newSkillDescription);
+            if (SkillObjectFactory.hasValidDescription(
+              newSkillDescription)) {
+              $scope.skillDescriptionEditorIsShown = false;
+              SkillUpdateService.setSkillDescription(
+                $scope.skill,
+                newSkillDescription);
+            }
           };
         }
       ]

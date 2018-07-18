@@ -18,7 +18,7 @@
  */
 
 var forms = require('./forms.js');
-var general = require('./general.js');
+var waitFor = require('./waitFor.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 
 var ExplorationPlayerPage = function() {
@@ -38,10 +38,14 @@ var ExplorationPlayerPage = function() {
     by.css('.protractor-test-exploration-suggestion-modal'));
   var feedbackTextArea = element(
     by.css('.protractor-test-exploration-feedback-textarea'));
-  var ratingStar = element.all(by.css('.protractor-test-rating-star'));
+  var waitingForResponseElem = element(by.css(
+    '.protractor-test-input-response-loading-dots'));
+  var ratingStars = element.all(by.css('.protractor-test-rating-star'));
 
   var suggestionSubmitButton = element(
     by.css('.protractor-test-suggestion-submit-btn'));
+  var feedbackCloseButton = element(
+    by.css('.protractor-test-exploration-feedback-close-button'));
   var feedbackSubmitButton = element(
     by.css('.protractor-test-exploration-feedback-submit-btn'));
   var explorationInfoIcon = element(
@@ -66,34 +70,59 @@ var ExplorationPlayerPage = function() {
     element(by.css('.protractor-test-exploration-suggestion-popup-link'));
 
   this.clickThroughToNextCard = function() {
+    waitFor.elementToBeClickable(
+      nextCardButton, '"Next Card" button takes too long to be clickable');
     nextCardButton.click();
   };
 
   this.viewHint = function() {
+    // We need to wait some time for the solution to activate.
+    waitFor.elementToBeClickable(
+      viewHintButton, '"View Hint" button takes too long to be clickable');
     viewHintButton.click();
+    clickGotItButton();
   };
 
   this.viewSolution = function() {
+    // We need to wait some time for the solution to activate.
+    waitFor.elementToBeClickable(
+      viewSolutionButton,
+      '"View Solution" button takes too long to be clickable');
     viewSolutionButton.click();
-    general.waitForSystem();
+    waitFor.elementToBeClickable(
+      continueToSolutionButton,
+      '"Continue Solution" button takes too long to be clickable');
     continueToSolutionButton.click();
-    general.waitForSystem();
+    clickGotItButton();
   };
 
-  this.clickGotItButton = function() {
+  var clickGotItButton = function() {
+    waitFor.elementToBeClickable(
+      gotItButton, '"Got It" button takes too long to be clickable');
     gotItButton.click();
   };
 
   this.clickConfirmRedirectionButton = function() {
+    waitFor.elementToBeClickable(
+      confirmRedirectionButton,
+      '"Confirm Redirect" button takes too long to be clickable');
     confirmRedirectionButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.clickCancelRedirectionButton = function() {
+    waitFor.elementToBeClickable(
+      cancelRedirectionButton,
+      '"Cancel Redirect" button takes too long to be clickable');
     cancelRedirectionButton.click();
   };
 
   this.clickOnReturnToParentButton = function() {
+    waitFor.elementToBeClickable(
+      returnToParentButton,
+      '"Return to Parent" button takes too long to be clickable');
     returnToParentButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   // This verifies the question just asked, including formatting and
@@ -153,8 +182,17 @@ var ExplorationPlayerPage = function() {
   };
 
   this.rateExploration = function(ratingValue) {
-    ratingStar.then(function(elements) {
+    ratingStars.then(function(elements) {
+      waitFor.elementToBeClickable(
+        elements[ratingValue - 1],
+        'Rating Star takes too long to be clickable');
       elements[ratingValue - 1].click();
+      waitFor.elementToBeClickable(
+        feedbackCloseButton, 'Close Feedback button is not clickable');
+      feedbackCloseButton.click();
+
+      waitFor.invisibilityOf(
+        feedbackCloseButton, 'Close Feedback button does not disappear');
     });
   };
 
@@ -166,21 +204,35 @@ var ExplorationPlayerPage = function() {
     // it will get the supplemental interaction.
     interactions.getInteraction(interactionId).submitAnswer(
       conversationInput, answerData);
-    general.waitForSystem();
+    waitFor.invisibilityOf(
+      waitingForResponseElem, 'Response takes too long to appear');
   };
 
   this.submitFeedback = function(feedback) {
+    waitFor.elementToBeClickable(
+      feedbackPopupLink, 'Feedback Popup link takes too long to be clickable');
     feedbackPopupLink.click();
     feedbackTextArea.sendKeys(feedback);
+    waitFor.elementToBeClickable(
+      feedbackSubmitButton,
+      'Feedback Submit button takes too long to be clickable');
     feedbackSubmitButton.click();
+    waitFor.invisibilityOf(
+      feedbackSubmitButton, 'Feedback popup takes too long to disappear');
   };
 
   this.submitSuggestion = function(suggestion, description) {
+    waitFor.elementToBeClickable(
+      suggestionPopupLink, 'Suggestion Popup link takes too long to appear');
     suggestionPopupLink.click();
     forms.RichTextEditor(explorationSuggestionModal).setPlainText(suggestion);
     suggestionDescriptionInput.sendKeys(description);
+    waitFor.elementToBeClickable(
+      suggestionSubmitButton,
+      'Suggestion Submit button takes too long to be clickable');
     suggestionSubmitButton.click();
-    general.waitForSystem();
+    waitFor.invisibilityOf(
+      suggestionSubmitButton, 'Suggestion popup takes too long to disappear');
   };
 };
 

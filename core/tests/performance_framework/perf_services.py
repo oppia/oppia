@@ -123,7 +123,8 @@ class SeleniumPerformanceDataFetcher(object):
         server, proxy = self._setup_proxy_server()
         driver = self._setup_driver(proxy=proxy, use_proxy=True)
 
-        proxy.new_har(page_url, options={'captureHeaders': True})
+        proxy.new_har(
+            ref=page_url, options={'captureHeaders': True})
         driver.get(page_url)
 
         self._wait_until_page_load_is_finished()
@@ -151,7 +152,8 @@ class SeleniumPerformanceDataFetcher(object):
         self._wait_until_page_load_is_finished()
 
         # Start recording har data for the next page fetch.
-        proxy.new_har(page_url, options={'captureHeaders': True})
+        proxy.new_har(
+            ref=page_url, options={'captureHeaders': True})
         driver.get(page_url)
 
         self._wait_until_page_load_is_finished()
@@ -320,7 +322,8 @@ class SeleniumPerformanceDataFetcher(object):
         driver.find_element_by_css_selector(
             '.protractor-test-reload-all-explorations-button').click()
         driver.switch_to.alert.accept()
-        self._wait_until_page_load_is_finished(20)
+        self._wait_until_page_load_is_finished(
+            time_duration_secs=20)
 
     def _reload_first_exploration(self, driver):
         driver.get(self.BASE_URL + feconf.ADMIN_URL)
@@ -336,13 +339,15 @@ class SeleniumPerformanceDataFetcher(object):
         driver.find_element_by_css_selector(
             '.protractor-test-reload-collection-button').click()
         driver.switch_to.alert.accept()
-        self._wait_until_page_load_is_finished(5)
+        self._wait_until_page_load_is_finished(
+            time_duration_secs=5)
 
     def _create_exploration(self, driver):
         driver.get(self.BASE_URL + feconf.CREATOR_DASHBOARD_URL)
         driver.find_element_by_css_selector(
             '.protractor-test-create-activity').click()
-        self._wait_until_page_load_is_finished(1)
+        self._wait_until_page_load_is_finished(
+            time_duration_secs=1)
         driver.find_element_by_css_selector(
             '.protractor-test-create-exploration').click()
         self._wait_until_page_load_is_finished()

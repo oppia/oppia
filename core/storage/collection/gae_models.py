@@ -156,10 +156,10 @@ class CollectionRightsModel(base_models.VersionedModel):
 
     # The publication status of this collection.
     status = ndb.StringProperty(
-        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
+        default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            feconf.ACTIVITY_STATUS_PRIVATE,
-            feconf.ACTIVITY_STATUS_PUBLIC
+            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
 
@@ -224,7 +224,7 @@ class CollectionRightsModel(base_models.VersionedModel):
                 post_commit_status=self.status,
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
-                    self.status == feconf.ACTIVITY_STATUS_PRIVATE)
+                    self.status == constants.ACTIVITY_STATUS_PRIVATE)
             ).put_async()
 
 
@@ -338,10 +338,10 @@ class CollectionSummaryModel(base_models.BaseModel):
 
     # The publication status of this collection.
     status = ndb.StringProperty(
-        default=feconf.ACTIVITY_STATUS_PRIVATE, indexed=True,
+        default=constants.ACTIVITY_STATUS_PRIVATE, indexed=True,
         choices=[
-            feconf.ACTIVITY_STATUS_PRIVATE,
-            feconf.ACTIVITY_STATUS_PUBLIC
+            constants.ACTIVITY_STATUS_PRIVATE,
+            constants.ACTIVITY_STATUS_PUBLIC
         ]
     )
 
@@ -375,7 +375,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             iterable. An iterable with non-private collection summary models.
         """
         return CollectionSummaryModel.query().filter(
-            CollectionSummaryModel.status != feconf.ACTIVITY_STATUS_PRIVATE
+            CollectionSummaryModel.status != constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             CollectionSummaryModel.deleted == False  # pylint: disable=singleton-comparison
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
@@ -393,7 +393,7 @@ class CollectionSummaryModel(base_models.BaseModel):
             are at least viewable by the given user.
         """
         return CollectionSummaryModel.query().filter(
-            CollectionSummaryModel.status == feconf.ACTIVITY_STATUS_PRIVATE
+            CollectionSummaryModel.status == constants.ACTIVITY_STATUS_PRIVATE
         ).filter(
             ndb.OR(CollectionSummaryModel.owner_ids == user_id,
                    CollectionSummaryModel.editor_ids == user_id,
