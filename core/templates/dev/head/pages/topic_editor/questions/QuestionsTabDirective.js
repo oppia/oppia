@@ -41,15 +41,16 @@ oppia.directive('questionsTab', [
               function(questionId) {
                 EditableQuestionBackendApiService.fetchQuestion(
                   questionId).then(
-                    function(questionBackendDict) {
-                      $scope.question =
-                        QuestionObjectFactory.createFromBackendDict(
-                          questionBackendDict);
-                    },
-                    function(error) {
-                      AlertsService.addWarning(
-                        error || 'There was an error when getting the question data.');
-                    });
+                  function(questionBackendDict) {
+                    $scope.question =
+                      QuestionObjectFactory.createFromBackendDict(
+                        questionBackendDict);
+                  },
+                  function(error) {
+                    AlertsService.addWarning(
+                      error ||
+                      'There was an error when getting the question data.');
+                  });
               },
               function(error) {
                 AlertsService.addWarning(
