@@ -305,7 +305,6 @@ oppia.directive('conversationSkin', [
           $scope.hasFullyLoaded = false;
           $scope.recommendedExplorationSummaries = null;
           $scope.answerIsCorrect = false;
-          $scope.conceptCardPending = false;
           $scope.pendingCardWasSeenBefore = false;
           $scope.isCorrectnessFeedbackEnabled = function() {
             return PlayerCorrectnessFeedbackEnabledService.isEnabled();
@@ -478,7 +477,7 @@ oppia.directive('conversationSkin', [
           var _addNewCard = function(
               stateName, newParams, contentHtml, interactionHtml) {
             PlayerTranscriptService.addNewCard(
-              stateName, newParams, contentHtml, interactionHtml);
+              stateName, newParams, contentHtml, interactionHtml, false);
 
             if (newParams) {
               LearnerParamsService.init(newParams);
@@ -661,11 +660,10 @@ oppia.directive('conversationSkin', [
                       });
                     }
                     if (missingPrerequisiteSkillId) {
-                      PlayerTranscriptService.setDestination('conceptCard');
+                      $scope.activeCard.leadsToConceptCard = true;
                       ConceptCardBackendApiService.fetchConceptCard(
                         missingPrerequisiteSkillId
                       ).then(function(conceptCardBackendDict) {
-                        $scope.conceptCardPending = true;
                         $scope.conceptCard =
                           ConceptCardObjectFactory.createFromBackendDict(
                             conceptCardBackendDict);
@@ -831,8 +829,7 @@ oppia.directive('conversationSkin', [
               $scope.returnToExplorationAfterConceptCard();
               return;
             }
-            if ($scope.conceptCardPending) {
-              $scope.conceptCardPending = false;
+            if ($scope.activeCard.leadsToConceptCard) {
               _addNewCard(
                 null, null, $scope.conceptCard.getExplanation(), null);
               return;

@@ -66,14 +66,15 @@ oppia.factory('PlayerTranscriptService', ['$log', function($log) {
       return result;
     },
     addNewCard: function(
-        stateName, params, contentHtml, interactionHtml) {
+        stateName, params, contentHtml, interactionHtml, leadsToConceptCard) {
       transcript.push({
         stateName: stateName,
         currentParams: params,
         contentHtml: contentHtml,
         interactionHtml: interactionHtml,
         inputResponsePairs: [],
-        destStateName: null
+        destStateName: null,
+        leadsToConceptCard: leadsToConceptCard
       });
       numAnswersSubmitted = 0;
     },
@@ -85,8 +86,9 @@ oppia.factory('PlayerTranscriptService', ['$log', function($log) {
       }
       // TODO(aks681): Once worked examples are introduced, modify the below
       // line to take into account the number of worked examples displayed.
-      var previousCard = transcript[transcript.length - 2];
-      transcript.push(angular.copy(previousCard));
+      var previousCard = angular.copy(transcript[transcript.length - 2]);
+      previousCard.leadsToConceptCard = false;
+      transcript.push(previousCard);
     },
     setDestination: function(newDestStateName) {
       var lastCard = this.getLastCard();

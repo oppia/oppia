@@ -27,10 +27,12 @@ describe('Player transcript service', function() {
   it('should reset the transcript correctly', function() {
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     pts.addNewCard('Second state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
 
     expect(pts.getNumCards()).toBe(2);
 
@@ -38,20 +40,24 @@ describe('Player transcript service', function() {
     expect(pts.getNumCards()).toBe(0);
     pts.addNewCard('Third state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     expect(pts.getCard(0).stateName).toBe('Third state');
   });
 
   it('should compute the state history correctly', function() {
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     pts.addNewCard('Second state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     expect(pts.getStateHistory()).toEqual([
       'First state', 'Second state', 'First state']);
   });
@@ -59,7 +65,8 @@ describe('Player transcript service', function() {
   it('should add a new card correctly', function() {
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
 
     var firstCard = pts.getCard(0);
     expect(firstCard).toEqual({
@@ -70,17 +77,20 @@ describe('Player transcript service', function() {
       contentHtml: 'Content HTML',
       interactionHtml: '<oppia-text-input-html></oppia-text-input-html>',
       inputResponsePairs: [],
-      destStateName: null
+      destStateName: null,
+      leadsToConceptCard: false
     });
   });
 
   it('should add a previous card correctly', function() {
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     pts.addNewCard('Second state', {
       a: 'b'
-    }, 'Content HTML 2', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML 2', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     pts.addPreviousCard();
 
     expect(pts.getNumCards()).toEqual(3);
@@ -92,7 +102,8 @@ describe('Player transcript service', function() {
       contentHtml: 'Content HTML',
       interactionHtml: '<oppia-text-input-html></oppia-text-input-html>',
       inputResponsePairs: [],
-      destStateName: null
+      destStateName: null,
+      leadsToConceptCard: false
     });
     expect(pts.getCard([1])).toEqual({
       stateName: 'Second state',
@@ -102,7 +113,8 @@ describe('Player transcript service', function() {
       contentHtml: 'Content HTML 2',
       interactionHtml: '<oppia-text-input-html></oppia-text-input-html>',
       inputResponsePairs: [],
-      destStateName: null
+      destStateName: null,
+      leadsToConceptCard: false
     });
     expect(pts.getCard([2])).toEqual({
       stateName: 'First state',
@@ -112,21 +124,24 @@ describe('Player transcript service', function() {
       contentHtml: 'Content HTML',
       interactionHtml: '<oppia-text-input-html></oppia-text-input-html>',
       inputResponsePairs: [],
-      destStateName: null
+      destStateName: null,
+      leadsToConceptCard: false
     });
   });
 
   it('should set lastAnswer correctly', function() {
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     var lastAnswer = pts.getLastAnswerOnActiveCard(0);
     expect(lastAnswer).toEqual(null);
 
     pts.addNewInput('first answer', false);
     pts.addNewCard('Second state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     lastAnswer = pts.getLastAnswerOnActiveCard(0);
     expect(lastAnswer).toEqual('first answer');
   });
@@ -134,7 +149,8 @@ describe('Player transcript service', function() {
   it('should record answer/feedback pairs in the correct order', function() {
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     pts.addNewInput('first answer', false);
     expect(function() {
       pts.addNewInput('invalid answer');
@@ -167,7 +183,8 @@ describe('Player transcript service', function() {
   it('should set a destination name correctly', function() {
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     expect(pts.getCard(0).destStateName).toBeNull();
     pts.setDestination('New destination');
     expect(pts.getCard(0).destStateName).toBe('New destination');
@@ -180,10 +197,12 @@ describe('Player transcript service', function() {
   it('should retrieve the last card of the transcript correctly', function() {
     pts.addNewCard('First state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     pts.addNewCard('Second state', {
       a: 'b'
-    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>');
+    }, 'Content HTML', '<oppia-text-input-html></oppia-text-input-html>',
+    false);
     expect(pts.getNumCards()).toBe(2);
     expect(pts.getLastCard().stateName).toBe('Second state');
     expect(pts.isLastCard(0)).toBe(false);
