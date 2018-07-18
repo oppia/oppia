@@ -44,7 +44,7 @@ oppia.factory('FeedbackThreadObjectFactory', [function() {
 
   FeedbackThread.prototype.isSuggestionThread = function() {
     return false;
-  }
+  };
 
   return FeedbackThread;
 }]);
