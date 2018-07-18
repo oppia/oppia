@@ -59,11 +59,12 @@ class FeedbackThreadSummariesLoadTest(test_utils.GenericTestBase):
         # Create 100 threads.
         for _ in range(100):
             feedback_services.create_thread(
-                self.EXP_ID_1, self.EXPECTED_THREAD_DICT['state_name'],
+                'exploration', self.EXP_ID_1,
+                self.EXPECTED_THREAD_DICT['state_name'],
                 self.user_id, self.EXPECTED_THREAD_DICT['subject'],
                 'not used here')
         threadlist = feedback_services.get_all_threads(
-            self.EXP_ID_1, False)
+            'exploration', self.EXP_ID_1, False)
 
         thread_ids = []
         for thread in threadlist:
