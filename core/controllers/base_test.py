@@ -571,11 +571,11 @@ class GetItemsEscapedCharactersTest(test_utils.GenericTestBase):
             self.render_json(self.values)
 
     def test_get_items(self):
-        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+        mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
             [webapp2.Route('/mock', self.MockHandler)],
             debug=feconf.DEBUG,
         ))
-        with self.swap(self, 'testapp', self.mock_testapp):
+        with self.swap(self, 'testapp', mock_testapp):
             params = {
                 'param1': 'value1',
                 'param2': 'value2'
@@ -589,5 +589,3 @@ class GetItemsEscapedCharactersTest(test_utils.GenericTestBase):
             }
             result = self.get_json('/mock', params=params)
             self.assertDictContainsSubset(params, result)
-
-
