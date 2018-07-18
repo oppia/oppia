@@ -32,7 +32,8 @@ class Registry(object):
         cls.calculations_dict.clear()
 
         # Add new visualization instances to the registry.
-        for name, clazz in inspect.getmembers(models, inspect.isclass):
+        for name, clazz in inspect.getmembers(
+                models, predicate=inspect.isclass):
             if name.endswith('_test') or name == 'BaseCalculation':
                 continue
 

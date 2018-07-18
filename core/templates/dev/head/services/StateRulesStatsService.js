@@ -18,10 +18,10 @@
 
 oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ExplorationContextService', 'UrlInterpolationService',
+  'ContextService', 'UrlInterpolationService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      ExplorationContextService, UrlInterpolationService) {
+      ContextService, UrlInterpolationService) {
     return {
       /**
        * TODO(brianrodri): Consider moving this into a visualization domain
@@ -45,7 +45,7 @@ oppia.factory('StateRulesStatsService', [
         var interactionRulesService = $injector.get(
           AngularNameService.getNameOfInteractionRulesService(
             state.interaction.id));
-        var explorationId = ExplorationContextService.getExplorationId();
+        var explorationId = ContextService.getExplorationId();
 
         return $http.get(
           UrlInterpolationService.interpolateUrl(

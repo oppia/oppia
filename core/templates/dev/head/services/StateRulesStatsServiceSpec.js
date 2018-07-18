@@ -46,9 +46,9 @@ describe('State Rules Stats Service', function() {
     });
 
     var EXPLORATION_ID = '7';
-    beforeEach(inject(function(ExplorationContextService) {
+    beforeEach(inject(function(ContextService) {
       spyOn(
-        ExplorationContextService, 'getExplorationId'
+        ContextService, 'getExplorationId'
       ).and.returnValue(EXPLORATION_ID);
     }));
 
