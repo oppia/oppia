@@ -21,6 +21,7 @@ from core.domain import feedback_services
 from core.domain import question_services
 from core.domain import rights_manager
 from core.domain import role_services
+from core.domain import suggestion_services
 from core.domain import topic_services
 from core.domain import user_services
 from core.platform import models
@@ -1677,7 +1678,12 @@ def get_decorator_for_accepting_suggestion(decorator):
 
     Returns:
         function. The new decorator which includes all the permission checks for
-            accepting/rejecting suggestions.
+            accepting/rejecting suggestions. These permissions include:
+            - Admins can accpet/reject any suggestion.
+            - Users with scores above threshold can accept/reject any suggesiton
+            in that category.
+            - Any user with edit permissions to the target entity being
+            suggested to can accept/reject suggestions for that entity.
     """
     def generate_decorator_for_handler(handler):
         def test_can_accept_suggestion(
@@ -1690,8 +1696,11 @@ def get_decorator_for_accepting_suggestion(decorator):
                     user_actions_info.actions):
                 return handler(self, target_id, suggestion_id, **kwargs)
 
-            # TODO (nithesh): Add checks based on user scores once those models
-            # are setup.
+            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            if suggestion_services.check_user_can_review_in_category(
+                self.user_id, suggestion.score_category):
+                return handler(self, target_id, suggestion_id, **kwargs)
+
             return decorator(handler)(self, target_id, suggestion_id, **kwargs)
 
         test_can_accept_suggestion.__wrapped__ = True

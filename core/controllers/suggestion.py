@@ -1,3 +1,4 @@
+
 # coding: utf-8
 #
 # Copyright 2018 The Oppia Authors. All Rights Reserved.
@@ -49,9 +50,6 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
     ACTION_TYPE_ACCEPT = 'accept'
     ACTION_TYPE_REJECT = 'reject'
 
-    # TODO (nithesh): Add permissions for users with enough scores to review
-    # Will be added as part of milestone 2 of the generalized review system
-    # project.
     @acl_decorators.get_decorator_for_accepting_suggestion(
         acl_decorators.can_edit_exploration)
     def put(self, target_id, suggestion_id):
