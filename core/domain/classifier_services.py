@@ -154,7 +154,8 @@ def handle_non_retrainable_states(exploration, state_names, exp_versions_diff):
         job_exploration_mappings)
 
 
-def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
+def convert_strings_to_float_numbers_in_classifier_data(
+        classifier_data_with_floats_stringified):
     """Converts all floating point numbers in classifier data to string.
 
     The following function iterates through entire classifier data and converts
@@ -162,39 +163,44 @@ def convert_strings_to_float_numbers_in_classifier_data(classifier_data):
     numbers to corresponding float values.
 
     Args:
-        classifier_data: dict|list|string|int. The original classifier
-            data which needs conversion of floats from strings to floats.
+        classifier_data_with_floats_stringified: dict|list|string|int.
+            The original classifier data which needs conversion of floats from
+            strings to floats.
 
     Raises:
         Exception. If classifier data contains an object whose type is other
             than integer, string, dict or list.
 
     Returns:
-        dict|list|string|int. Original classifier data dict with float values
-            converted back from string to float.
+        dict|list|string|int|float. Original classifier data dict with
+            float values converted back from string to float.
     """
-    if isinstance(classifier_data, dict):
-        for k in classifier_data:
+    if isinstance(classifier_data_with_floats_stringified, dict):
+        classifier_data = {}
+        for k in classifier_data_with_floats_stringified:
             classifier_data[k] = (
                 convert_strings_to_float_numbers_in_classifier_data(
-                    classifier_data[k]))
+                    classifier_data_with_floats_stringified[k]))
         return classifier_data
-    elif isinstance(classifier_data, list):
-        new_list = []
-        for item in classifier_data:
-            new_list.append(
+    elif isinstance(classifier_data_with_floats_stringified, list):
+        classifier_data = []
+        for item in classifier_data_with_floats_stringified:
+            classifier_data.append(
                 convert_strings_to_float_numbers_in_classifier_data(item))
-        return new_list
-    elif isinstance(classifier_data, basestring):
-        if re.match(r'^([-+]?\d+\.\d+)$', classifier_data):
-            return float(classifier_data)
         return classifier_data
-    elif isinstance(classifier_data, int):
-        return classifier_data
+    elif isinstance(classifier_data_with_floats_stringified, basestring):
+        if re.match(
+                feconf.FLOAT_VERIFIER_REGEX,
+                classifier_data_with_floats_stringified):
+            return float(classifier_data_with_floats_stringified)
+        return classifier_data_with_floats_stringified
+    elif isinstance(classifier_data_with_floats_stringified, int):
+        return classifier_data_with_floats_stringified
     else:
         raise Exception(
             'Expected all classifier data objects to be lists, dicts, '
-            'strings, integers but received %s.' % (type(classifier_data)))
+            'strings, integers but received %s.' % type(
+                classifier_data_with_floats_stringified))
 
 
 def get_classifier_training_job_from_model(classifier_training_job_model):
