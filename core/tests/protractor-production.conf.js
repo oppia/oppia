@@ -133,7 +133,10 @@ exports.config = {
     'browserstack.user': process.env.USERNAME,
     'browserstack.key': process.env.ACCESS_KEY,
     'browserstack.local': true,
+    'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
     browserName: 'chrome',
+    browserVersion: 67,
+    platform: 'WINDOWS',
     chromeOptions: {
       args: ['--lang=en-EN', '--window-size=1285x1000']
     },
