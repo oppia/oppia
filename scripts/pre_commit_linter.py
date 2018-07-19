@@ -216,6 +216,7 @@ GENERATED_FILE_PATHS = (
 
 CONFIG_FILE_PATHS = (
     'core/tests/protractor.conf.js',
+    'core/tests/protractor-production.conf.js'
     'core/tests/karma.conf.js',
     'core/templates/dev/head/mathjaxConfig.js',
     'assets/constants.js',
