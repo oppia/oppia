@@ -137,7 +137,7 @@ describe('NumberWithUnitsObjectFactory', function() {
       }).toThrow(new Error(errors.INVALID_CURRENCY_FORMAT));
       expect(function() {
         NumberWithUnits.fromRawInputString('Rs5');
-      }).toThrow(new Error(errors.INVALID_RUPEE_FORMAT));
+      }).toThrow(new Error(errors.INVALID_CURRENCY));
       expect(function() {
         NumberWithUnits.fromRawInputString('$');
       }).toThrow(new Error(errors.INVALID_CURRENCY));

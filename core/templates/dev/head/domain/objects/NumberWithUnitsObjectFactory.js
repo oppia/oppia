@@ -23,7 +23,6 @@ oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
   INVALID_CURRENCY:
     'Please enter a valid currency (e.g., $5 or Rs 5)',
   INVALID_CURRENCY_FORMAT: 'Please write currency units at the beginning',
-  INVALID_RUPEE_FORMAT: 'Please enter a space after currency (e.g., Rs 5)',
   INVALID_UNIT_CHARS:
     'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, /, -'
 });
@@ -128,15 +127,9 @@ oppia.factory('NumberWithUnitsObjectFactory', [
               NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY_FORMAT);
           }
         } else {
-          if (!rawInput.startsWith('$') && !rawInput.startsWith('Rs') &&
+          if (!rawInput.startsWith('$') && !rawInput.startsWith('Rs ') &&
             !rawInput.startsWith('₹')) {
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
-          }
-          if (rawInput.startsWith('Rs')) {
-            if (!rawInput.startsWith('Rs ')) {
-              throw new Error(
-                NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_RUPEE_FORMAT);
-            }
           }
           var ind = rawInput.indexOf(rawInput.match(/[0-9]/));
           if (ind === -1) {
