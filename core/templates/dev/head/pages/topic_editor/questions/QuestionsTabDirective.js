@@ -32,6 +32,8 @@ oppia.directive('questionsTab', [
             UndoRedoService, UrlInterpolationService,
             EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
+          // TODO(aks681): Continue with the questions editor frontend in this
+          // file.
           var _initTab = function() {
           };
 

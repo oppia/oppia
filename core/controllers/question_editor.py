@@ -25,12 +25,47 @@ from core.domain import skill_services
 import feconf
 
 
+class QuestionCreationHandler(base.BaseHandler):
+    """A handler that creates the question model given a question dict."""
+
+    @acl_decorators.can_manage_question_skill_status
+    def get(self):
+        """Handles GET requests."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        new_question_id = question_services.get_new_question_id()
+        self.render_json({
+            'questionId': new_question_id
+        })
+
+    @acl_decorators.can_manage_question_skill_status
+    def post(self):
+        """Handles POST requests."""
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
+        question_dict = self.payload.get('question_dict')
+        if (
+                ('id' not in question_dict) or
+                ('question_state_data' not in question_dict) or
+                ('language_code' not in question_dict)):
+            raise self.InvalidInputException
+
+        question_dict['version'] = 1
+        question_dict['question_state_schema_version'] = (
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)
+        question = question_domain.Question.from_dict(question_dict)
+        question_services.add_question(self.user_id, question)
+        self.render_json(self.values)
+
+
 class QuestionSkillLinkHandler(base.BaseHandler):
     """A handler for linking and unlinking questions to or from a skill."""
 
     @acl_decorators.can_manage_question_skill_status
     def post(self, question_id, skill_id):
-        """Publishes a question by linking it to a skill."""
+        """Links a question to a skill."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 
@@ -46,7 +81,7 @@ class QuestionSkillLinkHandler(base.BaseHandler):
 
     @acl_decorators.can_manage_question_skill_status
     def delete(self, question_id, skill_id):
-        """Unpublishes a question by unlinking it from a skill."""
+        """Unlinks a question from a skill."""
         if not feconf.ENABLE_NEW_STRUCTURES:
             raise self.PageNotFoundException
 

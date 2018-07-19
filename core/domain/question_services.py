@@ -161,10 +161,18 @@ def get_question_summaries_linked_to_skills(skill_ids):
         skill_ids: list(str). The ids of skills for which the linked questions
             are to be retrieved.
 
+    Raises:
+        Exception. Querying linked question summaries for more than 3 skills at
+        a time is not supported currently.
+
     Returns:
         list(QuestionSummary). The list of question summaries linked to the
             given skill_ids.
     """
+    if len(skill_ids) > 3:
+        raise Exception(
+            'Querying linked question summaries for more than 3 skills at a '
+            'time is not supported currently.')
     question_ids = (
         question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids(skill_ids)) #pylint: disable=line-too-long
 

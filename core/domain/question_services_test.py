@@ -89,6 +89,12 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
         question_summaries = (
             question_services.get_question_summaries_linked_to_skills(
                 ['skill_1', 'skill_2', 'skill_3']))
+
+        with self.assertRaisesRegexp(
+            Exception, 'Querying linked question summaries for more than 3 '
+            'skills at a time is not supported currently.'):
+            question_services.get_question_summaries_linked_to_skills(
+                ['skill_1', 'skill_2', 'skill_3', 'skill_4'])
         question_ids = [summary.id for summary in question_summaries]
         self.assertEqual(len(question_ids), 3)
         self.assertItemsEqual(
@@ -109,7 +115,7 @@ class QuestionServicesUnitTest(test_utils.GenericTestBase):
 
     def test_get_question_summaries_by_ids(self):
         question_summaries = question_services.get_question_summaries_by_ids([
-            self.question_id, 'question_2'])
+            self.question_id, 'invalid_question_id'])
 
         self.assertEqual(len(question_summaries), 2)
         self.assertEqual(question_summaries[0].id, self.question_id)

@@ -307,8 +307,8 @@ class QuestionSummary(object):
             'id': self.id,
             'creator_id': self.creator_id,
             'question_content': self.question_content,
-            'last_updated': self.last_updated,
-            'created_on': self.created_on
+            'last_updated': utils.get_time_in_millisecs(self.last_updated),
+            'created_on': utils.get_time_in_millisecs(self.created_on)
         }
 
 

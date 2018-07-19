@@ -162,7 +162,7 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         Returns:
             str. The calculated model id.
         """
-        return question_id + ':' + skill_id
+        return '%s:%s' % (question_id, skill_id)
 
     @classmethod
     def create(cls, question_id, skill_id):
