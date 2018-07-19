@@ -425,8 +425,8 @@
       "ckeditorBootstrapCK": {
         "version": "1.0.0",
         "downloadFormat": "zip",
-        "url": "https://github.com/Kunstmaan/BootstrapCK4-Skin/archive/v1.0.0.zip",
-        "rootDirPrefix": "BootstrapCK4-Skin-",
+        "url": "http://download.ckeditor.com/bootstrapck/releases/bootstrapck_1.0_0.zip",
+        "rootDir": "bootstrapck",
         "targetDirPrefix": "ckeditor-bootstrapck-"
       },
       "uiBootstrap": {
