@@ -20,11 +20,11 @@ oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 oppia.factory('RteHelperService', [
   '$filter', '$log', '$uibModal', '$interpolate', '$document',
-  'ExplorationContextService', 'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
+  'ContextService', 'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
   'UrlInterpolationService', 'FocusManagerService',
   function(
       $filter, $log, $uibModal, $interpolate, $document,
-      ExplorationContextService, RTE_COMPONENT_SPECS, HtmlEscaperService,
+      ContextService, RTE_COMPONENT_SPECS, HtmlEscaperService,
       UrlInterpolationService, FocusManagerService) {
     var _RICH_TEXT_COMPONENTS = [];
 
@@ -81,7 +81,7 @@ oppia.factory('RteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        if (ExplorationContextService.isInExplorationContext()) {
+        if (ContextService.isInExplorationContext()) {
           // TODO(sll): This extra key was introduced in commit
           // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66 in order to retrieve an
           // image for RTE previews. However, it has had the unfortunate side-
@@ -90,7 +90,7 @@ oppia.factory('RteHelperService', [
           // convertRteToHtml(), but we need to find a less invasive way to
           // handle previews.
           customizationArgsDict = angular.extend(customizationArgsDict, {
-            explorationId: ExplorationContextService.getExplorationId(),
+            explorationId: ContextService.getExplorationId(),
             bucketName: GLOBALS.GCS_RESOURCE_BUCKET_NAME
           });
         }

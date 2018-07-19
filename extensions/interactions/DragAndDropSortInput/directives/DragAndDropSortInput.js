@@ -13,14 +13,14 @@
 // limitations under the License.
 
 /**
- * Directive for the DragAndDropSort interaction.
+ * Directive for the DragAndDropSortInput interaction.
  */
 
-oppia.directive('oppiaInteractiveDragAndDropSort', [
-  'dragAndDropSortRulesService', 'HtmlEscaperService',
+oppia.directive('oppiaInteractiveDragAndDropSortInput', [
+  'dragAndDropSortInputRulesService', 'HtmlEscaperService',
   'UrlInterpolationService',
   function(
-      dragAndDropSortRulesService, HtmlEscaperService,
+      dragAndDropSortInputRulesService, HtmlEscaperService,
       UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -30,8 +30,8 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
         setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/DragAndDropSort/directives/' +
-        'drag_and_drop_sort_interaction_directive.html'),
+        '/interactions/DragAndDropSortInput/directives/' +
+        'drag_and_drop_sort_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
         function(
@@ -46,19 +46,32 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
             $scope.list.push({title: $scope.choices[i], items: []});
           }
 
+          $scope.treeOptions = {
+            dragMove: function(e) {
+              // Change the color of the placeholder based on the position of
+              // the dragged item.
+              if (e.dest.nodesScope.$childNodesScope !== undefined) {
+                e.elements.placeholder[0].style.borderColor = '#add8e6';
+              } else {
+                e.elements.placeholder[0].style.borderColor = '#000000';
+              }
+            }
+          };
+
           $scope.submitAnswer = function() {
             // Converting list of dicts to list of lists to make it consistent
             // with the ListOfSetsOfHtmlStrings object.
+            answers = [];
             for (var i = 0; i < $scope.list.length; i++) {
               answers.push([$scope.list[i].title]);
-              for (var j = 0; j < $scope.list[i].items; j++) {
+              for (var j = 0; j < $scope.list[i].items.length; j++) {
                 answers[i].push($scope.list[i].items[j].title);
               }
             }
 
             $scope.onSubmit({
               answer: answers,
-              rulesService: dragAndDropSortRulesService
+              rulesService: dragAndDropSortInputRulesService
             });
           };
 
@@ -69,21 +82,21 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
   }
 ]);
 
-oppia.directive('oppiaResponseDragAndDropSort', [
+oppia.directive('oppiaResponseDragAndDropSortInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/DragAndDropSort/directives/' +
-        'drag_and_drop_sort_response_directive.html'),
+        '/interactions/DragAndDropSortInput/directives/' +
+        'drag_and_drop_sort_input_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.chooseItemType = function(index) {
           if (index === 0) {
-            $scope.itemtype = 'drag-and-drop-item';
+            $scope.itemtype = 'drag-and-drop-response-item';
           } else {
-            $scope.itemtype = 'drag-and-drop-subitem';
+            $scope.itemtype = 'drag-and-drop-response-subitem';
           }
           return true;
         };
@@ -95,21 +108,21 @@ oppia.directive('oppiaResponseDragAndDropSort', [
   }
 ]);
 
-oppia.directive('oppiaShortResponseDragAndDropSort', [
+oppia.directive('oppiaShortResponseDragAndDropSortInput', [
   'HtmlEscaperService', 'UrlInterpolationService',
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
-        '/interactions/DragAndDropSort/directives/' +
-        'drag_and_drop_sort_short_response_directive.html'),
+        '/interactions/DragAndDropSortInput/directives/' +
+        'drag_and_drop_sort_input_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.chooseItemType = function(index) {
           if (index === 0) {
-            $scope.itemtype = 'drag-and-drop-item';
+            $scope.itemtype = 'drag-and-drop-response-item';
           } else {
-            $scope.itemtype = 'drag-and-drop-subitem';
+            $scope.itemtype = 'drag-and-drop-response-subitem';
           }
           return true;
         };
@@ -121,7 +134,45 @@ oppia.directive('oppiaShortResponseDragAndDropSort', [
   }
 ]);
 
-// TODO(Vibhor): Rules Service for DragAndDropSort interaction.
-oppia.factory('dragAndDropSortRulesService', ['$filter', function($filter) {
-  return {};
+// Rules Service for DragAndDropSortInput interaction.
+oppia.factory('dragAndDropSortInputRulesService', [function() {
+  var checkEquality = function(answer, inputs) {
+    for (var i = 0; i < answer.length; i++) {
+      if (answer[i].length === inputs.x[i].length) {
+        for (var j = 0; j < answer[i].length; j++) {
+          if (inputs.x[i].indexOf(answer[i][j]) === -1) {
+            return false;
+          }
+        }
+      } else {
+        return false;
+      }
+    }
+    return true;
+  };
+  var checkEqualityWithIncorrectPositions = function(answer, inputs) {
+    var noOfMismatches = 0;
+    for (var i = 0; i < math.min(inputs.x.length, answer.length); i++) {
+      for (var j = 0; j < math.max(answer[i].length, inputs.x[i].length); j++) {
+        if (inputs.x[i].length > answer[i].length) {
+          if (answer[i].indexOf(inputs.x[i][j]) === -1) {
+            noOfMismatches += 1;
+          }
+        } else {
+          if (inputs.x[i].indexOf(answer[i][j]) === -1) {
+            noOfMismatches += 1;
+          }
+        }
+      }
+    }
+    return noOfMismatches === 1;
+  };
+  return {
+    IsEqualToOrdering: function(answer, inputs) {
+      return answer.length === inputs.x.length && checkEquality(answer, inputs);
+    },
+    IsEqualToOrderingWithOneItemAtIncorrectPosition: function(answer, inputs) {
+      return checkEqualityWithIncorrectPositions(answer, inputs);
+    }
+  };
 }]);

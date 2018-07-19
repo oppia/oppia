@@ -22,9 +22,9 @@
 var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
-    'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
-    'ui.validate', 'pascalprecht.translate', 'ngCookies',
-    'toastr', 'headroom', 'dndLists'
+    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'infinite-scroll', 'ngJoyRide',
+    'ngImgCrop', 'ui.validate', 'pascalprecht.translate', 'ngCookies', 'toastr',
+    'headroom', 'dndLists'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
@@ -74,6 +74,7 @@ oppia.constant('COMPONENT_NAME_CONTENT', 'content');
 oppia.constant('COMPONENT_NAME_HINT', 'hint');
 oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
 oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
+oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
 
 // Enables recording playthroughs from learner sessions.
 oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', false);

@@ -178,7 +178,7 @@ class ExplorationValidityJobManager(jobs.BaseMapReduceOneOffJobManager):
             else:
                 exploration.validate(strict=True)
         except utils.ValidationError as e:
-            yield (item.id, unicode(e).encode('utf-8'))
+            yield (item.id, unicode(e).encode(encoding='utf-8'))
 
     @staticmethod
     def reduce(key, values):
@@ -681,7 +681,7 @@ class ImageDataMigrationJob(jobs.BaseMapReduceOneOffJobManager):
                         else:
                             fs.commit(
                                 'ADMIN', 'image/%s' % filename,
-                                content, 'image/%s' % filetype)
+                                content, mimetype='image/%s' % filetype)
                             yield (FILE_COPIED, 1)
                     else:
                         yield (FOUND_DELETED_FILE, file_model.id)

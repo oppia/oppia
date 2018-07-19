@@ -239,6 +239,16 @@ describe('ContentIdsToAudioTranslations object factory', function() {
       });
     });
 
+    it('should delete all feedback audio translation', function(){
+      var contentIdList = [
+        'content', 'default_outcome', 'feedback_1', 'feedback_2', 'hint_1',
+        'hint_2', 'solution'];
+      expect(citat.getAllContentId()).toEqual(contentIdList);
+      citat.deleteAllFeedbackContentId();
+      expect(citat.getAllContentId()).toEqual([
+        'content', 'default_outcome', 'hint_1', 'hint_2', 'solution']);
+    });
+
     it('should toggle needs update attribute in a given content id', function(){
       citat.toggleNeedsUpdateAttribute('content', 'hi');
       expect(citat.getAudioTranslation('content', 'hi')).toEqual(

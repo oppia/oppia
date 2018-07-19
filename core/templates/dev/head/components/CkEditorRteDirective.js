@@ -17,8 +17,8 @@
  */
 
 oppia.directive('ckEditorRte', [
-  'RteHelperService', 'ExplorationContextService', 'PAGE_CONTEXT',
-  function(RteHelperService, ExplorationContextService, PAGE_CONTEXT) {
+  'RteHelperService', 'ContextService', 'PAGE_CONTEXT',
+  function(RteHelperService, ContextService, PAGE_CONTEXT) {
     return {
       restrict: 'E',
       scope: {
@@ -33,8 +33,8 @@ oppia.directive('ckEditorRte', [
         var _RICH_TEXT_COMPONENTS = RteHelperService.getRichTextComponents();
         var names = [];
         var icons = [];
-        var canUseFs = ExplorationContextService.getPageContext() ===
-          PAGE_CONTEXT.EDITOR;
+        var canUseFs = ContextService.getPageContext() ===
+          PAGE_CONTEXT.EXPLORATION_EDITOR;
         _RICH_TEXT_COMPONENTS.forEach(function(componentDefn) {
           if (!((scope.uiConfig() &&
             scope.uiConfig().hide_complex_extensions &&
@@ -107,6 +107,7 @@ oppia.directive('ckEditorRte', [
           pluginNames,
           startupFocus: true,
           removePlugins: 'indentblock',
+          title: false,
           floatSpaceDockedOffsetY: 15,
           extraAllowedContent: extraAllowedContentRules,
           sharedSpaces: {

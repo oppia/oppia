@@ -27,7 +27,7 @@ oppia.constant('INTERACTION_SPECS', GLOBALS.INTERACTION_SPECS);
 oppia.factory('ExplorationPlayerService', [
   '$http', '$rootScope', '$q', 'AlertsService', 'AnswerClassificationService',
   'AudioPreloaderService', 'AudioTranslationLanguageService',
-  'EditableExplorationBackendApiService', 'ExplorationContextService',
+  'EditableExplorationBackendApiService', 'ContextService',
   'ExplorationHtmlFormatterService', 'ExplorationObjectFactory',
   'ExpressionInterpolationService', 'GuestCollectionProgressService',
   'ImagePreloaderService', 'LanguageUtilService', 'LearnerParamsService',
@@ -40,7 +40,7 @@ oppia.factory('ExplorationPlayerService', [
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
       AudioPreloaderService, AudioTranslationLanguageService,
-      EditableExplorationBackendApiService, ExplorationContextService,
+      EditableExplorationBackendApiService, ContextService,
       ExplorationHtmlFormatterService, ExplorationObjectFactory,
       ExpressionInterpolationService, GuestCollectionProgressService,
       ImagePreloaderService, LanguageUtilService, LearnerParamsService,
@@ -50,9 +50,9 @@ oppia.factory('ExplorationPlayerService', [
       StatsReportingService, UrlInterpolationService, WindowDimensionsService,
       ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
-    var _explorationId = ExplorationContextService.getExplorationId();
+    var _explorationId = ContextService.getExplorationId();
     var _editorPreviewMode = (
-      ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+      ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR);
     var _isLoggedIn = GLOBALS.userIsLoggedIn;
     var answerIsBeingProcessed = false;
 
@@ -391,6 +391,7 @@ oppia.factory('ExplorationPlayerService', [
         var outcome = angular.copy(classificationResult.outcome);
         var newStateName = outcome.dest;
         var refresherExplorationId = outcome.refresherExplorationId;
+        var missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
         var newState = exploration.getState(newStateName);
 
         if (ENABLE_PLAYTHROUGH_RECORDING) {
@@ -470,7 +471,7 @@ oppia.factory('ExplorationPlayerService', [
         successCallback(
           newStateName, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, questionHtml, newParams,
-          refresherExplorationId);
+          refresherExplorationId, missingPrerequisiteSkillId);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {

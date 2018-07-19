@@ -20,6 +20,14 @@ oppia.constant(
   'EDITABLE_SKILL_DATA_URL_TEMPLATE',
   '/skill_editor_handler/data/<skill_id>');
 
+oppia.constant(
+  'SKILL_RIGHTS_URL_TEMPLATE',
+  '/skill_editor_handler/rights/<skill_id>');
+
+oppia.constant(
+  'SKILL_PUBLISH_URL_TEMPLATE',
+  '/skill_editor_handler/publish_skill/<skill_id>');
+
 oppia.controller('SkillEditor', [
   'SkillEditorStateService', 'UrlService',
   function(SkillEditorStateService, UrlService) {

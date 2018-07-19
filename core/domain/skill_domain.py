@@ -49,6 +49,8 @@ CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION = (
 CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION = (
     'migrate_misconceptions_schema_to_latest_version')
 
+CMD_PUBLISH_SKILL = 'publish_skill'
+
 
 class SkillChange(object):
     """Domain object for changes made to skill object."""
@@ -716,6 +718,93 @@ class SkillSummary(object):
             'skill_model_last_updated': utils.get_time_in_millisecs(
                 self.skill_model_last_updated)
         }
+
+
+class SkillRights(object):
+    """Domain object for skill rights."""
+
+    def __init__(self, skill_id, skill_is_private, creator_id):
+        """Constructor for a skill rights domain object.
+
+        Args:
+            skill_id: str. The id of the skill.
+            skill_is_private: bool. Whether the skill is private.
+            creator_id: str. The id of the creator of this skill.
+        """
+        self.id = skill_id
+        self.skill_is_private = skill_is_private
+        self.creator_id = creator_id
+
+    def to_dict(self):
+        """Returns a dict suitable for use by the frontend.
+
+        Returns:
+            dict. A dict version of SkillRights suitable for use by the
+                frontend.
+        """
+        return {
+            'skill_id': self.id,
+            'skill_is_private': self.skill_is_private,
+            'creator_id': self.creator_id
+        }
+
+    def is_creator(self, user_id):
+        """Checks whether the given user is the creator of this skill.
+
+        Args:
+            user_id: str. Id of the user.
+
+        Returns:
+            bool. Whether the user is the creator of this skill.
+        """
+        return bool(user_id == self.creator_id)
+
+    def is_private(self):
+        """Returns whether the skill is private.
+
+        Returns:
+            bool. Whether the skill is private.
+        """
+        return self.skill_is_private
+
+
+class SkillRightsChange(object):
+    """Domain object for changes made to a skill rights object."""
+
+    def __init__(self, change_dict):
+        """Initialize a SkillRightsChange object from a dict.
+
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd'
+                key, and one or more other keys. The keys depend on what the
+                value for 'cmd' is. The possible values for 'cmd' are listed
+                below, together with the other keys in the dict:
+                - 'create_new'
+                - 'publish_skill'
+
+        Raises:
+            Exception. The given change dict is not valid.
+        """
+        if 'cmd' not in change_dict:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == CMD_PUBLISH_SKILL:
+            pass
+        elif self.cmd == CMD_CREATE_NEW:
+            pass
+        else:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the SkillRightsChange domain object.
+
+        Returns:
+            A dict, mapping all fields of SkillRightsChange instance.
+        """
+        skill_rights_change_dict = {}
+        skill_rights_change_dict['cmd'] = self.cmd
+        return skill_rights_change_dict
 
 
 class UserSkillMastery(object):

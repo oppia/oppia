@@ -52,7 +52,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         # Create a new, collection that should not be affected by the
         # job.
         collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, 'A title', 'A Category', 'An Objective')
+            self.COLLECTION_ID, title='A title',
+            category='A Category', objective='An Objective')
         collection_services.save_new_collection(self.albert_id, collection)
         self.assertEqual(
             collection.schema_version,
@@ -79,7 +80,8 @@ class CollectionMigrationJobTest(test_utils.GenericTestBase):
         and does not attempt to migrate.
         """
         collection = collection_domain.Collection.create_default_collection(
-            self.COLLECTION_ID, 'A title', 'A Category', 'An Objective')
+            self.COLLECTION_ID, title='A title',
+            category='A Category', objective='An Objective')
         collection_services.save_new_collection(self.albert_id, collection)
 
         # Note: This creates a summary based on the upgraded model (which is

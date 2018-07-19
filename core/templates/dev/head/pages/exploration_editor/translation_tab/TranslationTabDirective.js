@@ -1,4 +1,4 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
+// Copyright 2018 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,13 +24,11 @@ oppia.directive('translationTab', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/translation_tab/' +
         'translation_tab_directive.html'),
-      controller: [
-        '$scope', function($scope) {
-          $scope.$on('refreshTranslationTab', $scope.refreshTranslationTab);
-          $scope.refreshTranslationTab = function() {
-            // This will be used in future to intialize translation services.
-          };
-        }
-      ]
+      controller: ['$scope', '$rootScope', function($scope, $rootScope) {
+        $rootScope.loadingMessage = 'Loading';
+        $scope.$on('refreshTranslationTab', function() {
+          $scope.$broadcast('refreshStateTranslation');
+        });
+      }]
     };
   }]);

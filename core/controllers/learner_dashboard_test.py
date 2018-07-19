@@ -260,7 +260,7 @@ class LearnerDashboardFeedbackThreadHandlerTest(test_utils.GenericTestBase):
             'state_name': self._get_unicode_test_string('statename'),
             'subject': self._get_unicode_test_string('subject'),
             'text': 'a sample message',
-        }, self.csrf_token)
+        }, csrf_token=self.csrf_token)
         self.logout()
 
     def test_get_message_summaries(self):
@@ -292,7 +292,7 @@ class LearnerDashboardFeedbackThreadHandlerTest(test_utils.GenericTestBase):
                 'updated_status': None,
                 'updated_subject': None,
                 'text': 'Message 1'
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
 
         # Again fetch the thread message summary.
         thread_url = '%s/%s' % (
