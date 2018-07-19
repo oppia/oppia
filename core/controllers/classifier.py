@@ -51,11 +51,12 @@ def validate_job_result_message_dict(message):
         bool. Whether the payload dict is valid.
     """
     job_id = message.get('job_id')
-    classifier_data = message.get('classifier_data')
+    classifier_data_with_floats_stringified = message.get(
+        'classifier_data_with_floats_stringified')
 
     if not isinstance(job_id, basestring):
         return False
-    if not isinstance(classifier_data, dict):
+    if not isinstance(classifier_data_with_floats_stringified, dict):
         return False
     return True
 
@@ -115,7 +116,7 @@ class TrainedClassifierHandler(base.BaseHandler):
         # For more info visit: https://stackoverflow.com/q/40173295
         classifier_data = (
             classifier_services.convert_strings_to_float_numbers_in_classifier_data( #pylint: disable=line-too-long
-                message['classifier_data']))
+                message['classifier_data_with_floats_stringified']))
         classifier_training_job = (
             classifier_services.get_classifier_training_job_by_id(job_id))
         if classifier_training_job.status == (
