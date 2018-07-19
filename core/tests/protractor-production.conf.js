@@ -136,7 +136,7 @@ exports.config = {
     'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
     browserName: 'chrome',
     browserVersion: 67,
-    platform: 'LINUX',
+    platform: 'MAC',
     chromeOptions: {
       args: ['--lang=en-EN', '--window-size=1285x1000']
     },
