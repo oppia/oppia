@@ -190,8 +190,16 @@ done
 # Isolated tests do not work properly unless no sharding parameters are passed
 # in at all.
 # TODO(bhenning): Figure out if this is a bug with protractor.
-if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
+if [ "$FORCE_PROD_MODE" == "False" ]; then
+  if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --suite "$SUITE"
+  else
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+  fi
 else
-  $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+  if [ "$SHARDING" = "false" ] || [ "$SHARD_INSTANCES" = "1" ]; then
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor-production.conf.js --suite "$SUITE"
+  else
+    $NODE_MODULE_DIR/.bin/protractor core/tests/protractor-production.conf.js --capabilities.shardTestFiles="$SHARDING" --capabilities.maxInstances=$SHARD_INSTANCES --suite "$SUITE"
+  fi
 fi
