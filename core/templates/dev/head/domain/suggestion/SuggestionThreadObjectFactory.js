@@ -59,8 +59,8 @@ oppia.factory('SuggestionThreadObjectFactory', [
       return this.suggestion.status;
     };
 
-    SuggestionThread.prototype.getNewValueFromSuggestion = function() {
-      return this.suggestion.newValue;
+    SuggestionThread.prototype.getReplacementHtmlFromSuggestion = function() {
+      return this.suggestion.newValue.html;
     };
 
     SuggestionThread.prototype.isSuggestionThread = function() {

@@ -18,11 +18,11 @@
  */
 
 oppia.factory('ThreadDataService', [
-  '$http', '$q', 'ExplorationDataService', 'AlertsService',
+  '$http', '$log', '$q', 'ExplorationDataService', 'AlertsService',
   'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',
   'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION',
   function(
-      $http, $q, ExplorationDataService, AlertsService,
+      $http, $log, $q, ExplorationDataService, AlertsService,
       FeedbackThreadObjectFactory, SuggestionObjectFactory,
       SuggestionThreadObjectFactory, ACTION_ACCEPT_SUGGESTION) {
     var _expId = ExplorationDataService.explorationId;
@@ -76,6 +76,10 @@ oppia.factory('ThreadDataService', [
         _data.suggestionThreads = [];
         if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
           var suggestionThreads = res[0].data.suggestion_thread_dicts;
+          if (suggestionThreads.length !== res[1].data.suggestions.length) {
+            $log.error('Number of suggestion threads doesn\'t match number of' +
+                       'suggestion objects');
+          }
           for (var i = 0; i < res[1].data.suggestions.length; i++) {
             var suggestion = SuggestionObjectFactory.createFromBackendDict(
               res[1].data.suggestions[i]);
@@ -91,7 +95,8 @@ oppia.factory('ThreadDataService', [
             }
           }
         } else {
-          _data.suggestionThreads = res[1].data.threads;
+          _data.suggestionThreads = res[1].data.threads.map(
+            FeedbackThreadObjectFactory.createFromBackendDict);
         }
         if (successCallback) {
           successCallback();
@@ -106,7 +111,7 @@ oppia.factory('ThreadDataService', [
           if (allThreads[i].threadId === threadId) {
             allThreads[i].messages = response.data.messages;
             if (!constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              allThreads[i].suggestions = response.data.suggestions;
+              allThreads[i].suggestion = response.data.suggestion;
             }
             break;
           }

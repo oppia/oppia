@@ -51,7 +51,9 @@ describe('Suggestion thread object factory', function() {
         cmd: 'edit_state_property',
         property_name: 'content',
         state_name: 'state_1',
-        new_value: 'new suggestion content',
+        new_value: {
+          html: 'new suggestion content'
+        },
         old_value: 'old suggestion content'
       },
       last_updated: 1000
@@ -86,7 +88,7 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.isSuggestionHandled()).toEqual(false);
     expect(suggestionThread.getSuggestionStatus()).toEqual('review');
     expect(suggestionThread.getSuggestionStateName()).toEqual('state_1');
-    expect(suggestionThread.getNewValueFromSuggestion()).toEqual(
+    expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
       'new suggestion content');
   });
 });

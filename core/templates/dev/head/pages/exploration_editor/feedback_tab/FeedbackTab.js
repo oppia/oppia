@@ -110,7 +110,7 @@ oppia.controller('FeedbackTab', [
           $scope.activeThread.getSuggestionStateName());
       } else {
         return ExplorationStatesService.hasState(
-          $scope.activeThread.state_name);
+          $scope.activeThread.stateName);
       }
     };
 
@@ -157,17 +157,18 @@ oppia.controller('FeedbackTab', [
           },
           currentContent: function() {
             var stateName;
+            console.log($scope.activeThread)
             if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
               stateName = $scope.activeThread.getSuggestionStateName();
             } else {
-              stateName = $scope.activeThread.state_name;
+              stateName = $scope.activeThread.stateName;
             }
             var state = ExplorationStatesService.getState(stateName);
             return state !== undefined ? state.content.getHtml() : null;
           },
           newContent: function() {
             if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-              return $scope.activeThread.getNewValueFromSuggestion().html;
+              return $scope.activeThread.getReplacementHtmlFromSuggestion();
             }
             return $scope.activeThread.suggestion.suggestion_html;
           }
@@ -262,7 +263,7 @@ oppia.controller('FeedbackTab', [
                 stateName, stateDict);
               if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
                 state.content.setHtml(
-                  $scope.activeThread.getNewValueFromSuggestion().html);
+                  $scope.activeThread.getReplacementHtmlFromSuggestion());
               } else {
                 state.content.setHtml(suggestion.suggestion.suggestion_html);
               }
