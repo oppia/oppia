@@ -17,27 +17,28 @@
  */
 
 oppia.factory('UserService', [
-  '$http', '$q', 'UrlInterpolationService',
-  function($http, $q, UrlInterpolationService) {
+  '$http', '$q', 'UrlInterpolationService', 'DEFAULT_PROFILE_IMAGE_PATH',
+  function($http, $q, UrlInterpolationService, DEFAULT_PROFILE_IMAGE_PATH) {
     var _isLoggedIn = GLOBALS.userIsLoggedIn;
-    var DEFAULT_PROFILE_IMAGE_PATH = (
-      UrlInterpolationService.getStaticImageUrl(
-        '/avatar/user_blue_72px.png'));
     var PREFERENCES_DATA_URL = '/preferenceshandler/data';
 
     return {
       getProfileImageDataUrlAsync: function() {
+        var profilePictureDataUrl = (
+          UrlInterpolationService.getStaticImageUrl(
+            DEFAULT_PROFILE_IMAGE_PATH));
+
         if (_isLoggedIn) {
           return $http.get(
             '/preferenceshandler/profile_picture'
           ).then(function(response) {
-            var profilePictureDataUrl = response.data.profile_picture_data_url;
-            return (
-              profilePictureDataUrl ? profilePictureDataUrl :
-              DEFAULT_PROFILE_IMAGE_PATH);
+            if (response.data.profile_picture_data_url) {
+              profilePictureDataUrl = response.data.profile_picture_data_url;
+            }
+            return profilePictureDataUrl;
           });
         } else {
-          return $q.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+          return $q.resolve(profilePictureDataUrl);
         }
       },
       setProfileImageDataUrlAsync: function(newProfileImageDataUrl) {

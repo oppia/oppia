@@ -96,6 +96,8 @@ oppia.constant(
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS', 'MultipleIncorrectSubmissions');
 oppia.constant('ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'CyclicStateTransitions');
 
+oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
+
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([
   '$timeout', '$compile', '$rootScope', '$uibModal', 'RteHelperService',

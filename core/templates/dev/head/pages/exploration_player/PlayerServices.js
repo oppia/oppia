@@ -35,8 +35,8 @@ oppia.factory('ExplorationPlayerService', [
   'PlayerTranscriptService', 'PlaythroughService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
   'StatsReportingService', 'UrlInterpolationService', 'UserService',
-  'WindowDimensionsService', 'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT',
-  'TWO_CARD_THRESHOLD_PX',
+  'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH',
+  'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT', 'TWO_CARD_THRESHOLD_PX',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
       $http, $rootScope, $q, AlertsService, AnswerClassificationService,
@@ -49,8 +49,8 @@ oppia.factory('ExplorationPlayerService', [
       PlayerTranscriptService, PlaythroughService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
       StatsReportingService, UrlInterpolationService, UserService,
-      WindowDimensionsService, ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT,
-      TWO_CARD_THRESHOLD_PX,
+      WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH,
+      ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ExplorationContextService.getExplorationId();
     var _editorPreviewMode = (
@@ -488,7 +488,8 @@ oppia.factory('ExplorationPlayerService', [
               return dataUrl;
             });
         } else {
-          return $q.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+          return $q.resolve(UrlInterpolationService.getStaticImageUrl(
+            DEFAULT_PROFILE_IMAGE_PATH));
         }
       },
       recordSolutionHit: function(stateName) {
