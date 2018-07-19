@@ -415,20 +415,6 @@
         "rootDir": "ckeditor",
         "targetDirPrefix": "ckeditor-"
       },
-      "ckeditorWidget": {
-        "version": "4.9.2",
-        "downloadFormat": "zip",
-        "url": "http://download.ckeditor.com/widget/releases/widget_4.9.2.zip",
-        "rootDir": "widget",
-        "targetDirPrefix": "ckeditor-widget-"
-      },
-      "ckeditorLineutils": {
-        "version": "4.9.2",
-        "downloadFormat": "zip",
-        "url": "http://download.ckeditor.com/lineutils/releases/lineutils_4.9.2.zip",
-        "rootDir": "lineutils",
-        "targetDirPrefix": "ckeditor-lineutils-"
-      },
       "ckeditorSharedspace": {
         "version": "4.9.2",
         "downloadFormat": "zip",
@@ -442,13 +428,6 @@
         "url": "http://download.ckeditor.com/bootstrapck/releases/bootstrapck_1.0_0.zip",
         "rootDir": "bootstrapck",
         "targetDirPrefix": "ckeditor-bootstrapck-"
-      },
-      "ckeditorBlockquotePlugin" : {
-        "version": "4.9.2",
-        "downloadFormat": "zip",
-        "url": "https://download.ckeditor.com/blockquote/releases/blockquote_4.9.2.zip",
-        "rootDir": "blockquote",
-        "targetDirPrefix": "ckeditor-blockquote-"
       },
       "uiBootstrap": {
         "version": "2.5.0",

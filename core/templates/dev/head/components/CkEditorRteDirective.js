@@ -85,25 +85,17 @@ oppia.directive('ckEditorRte', [
 
         // Add external plugins.
         CKEDITOR.plugins.addExternal(
-          'widget', '/third_party/static/ckeditor-widget-4.9.2/', 'plugin.js');
-        CKEDITOR.plugins.addExternal(
-          'lineutils',
-          '/third_party/static/ckeditor-lineutils-4.9.2/', 'plugin.js');
-        CKEDITOR.plugins.addExternal(
           'sharedspace',
           '/third_party/static/ckeditor-sharedspace-4.9.2/', 'plugin.js');
         // Pre plugin is not available for 4.9.2 version of CKEditor. This is
         // a self created plugin (other plugins are provided by CKEditor).
         CKEDITOR.plugins.addExternal(
           'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
-        CKEDITOR.plugins.addExternal(
-          'blockquote',
-          '/third_party/static/ckeditor-blockquote-4.9.2/', 'plugin.js');
 
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
           extraPlugins: (
-            'pre,blockquote,widget,lineutils,sharedspace,' + pluginNames),
+            'pre,sharedspace,' + pluginNames),
           startupFocus: true,
           removePlugins: 'indentblock',
           title: false,
