@@ -282,7 +282,7 @@ install_node_module() {
       echo Version of $1 does not match $2. Reinstalling $1...
       $NPM_INSTALL $1@$2
       # Regenerate the list of installed modules.
-      NPM_INSTALLED_MODULES="$($NPM_CMD list)"
+      NPM_INSTALLED_MODULES="$($NPM_CMD list --depth=0)"
     fi
   fi
 }
