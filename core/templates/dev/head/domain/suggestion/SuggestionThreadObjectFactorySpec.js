@@ -76,7 +76,7 @@ describe('Suggestion thread object factory', function() {
       'exploration.exp1.thread1');
     expect(suggestionThread.suggestion.status).toEqual('accepted');
     expect(suggestionThread.suggestion.authorName).toEqual('author');
-    expect(suggestionThread.suggestion.newValue).toEqual(
+    expect(suggestionThread.suggestion.newValue.html).toEqual(
       'new suggestion content');
     expect(suggestionThread.suggestion.oldValue).toEqual(
       'old suggestion content');
