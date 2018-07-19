@@ -1,8 +1,9 @@
 <div class="oppia-editor-header">
   <span>
-    <span ng-if="!skillDescriptionEditorIsShown" ng-click="openSkillDescriptionEditor()" class="oppia-editable-section">
+    <span ng-if="!skillDescriptionEditorIsShown" ng-click="openSkillDescriptionEditor()" class="canEditSkillDescription()">
       <strong style="font-size: 1.2em;"><[skill.getDescription()]></strong>
-      <i class="material-icons oppia-editor-edit-icon"
+      <i ng-if="canEditSkillDescription()"
+         class="material-icons oppia-editor-edit-icon"
          title="Edit Skill Description">&#xE254;
       </i>
     </span>
