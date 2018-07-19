@@ -157,7 +157,6 @@ oppia.controller('FeedbackTab', [
           },
           currentContent: function() {
             var stateName;
-            console.log($scope.activeThread)
             if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
               stateName = $scope.activeThread.getSuggestionStateName();
             } else {

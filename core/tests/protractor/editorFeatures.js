@@ -37,7 +37,7 @@ var ExplorationPlayerPage =
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 
-fdescribe('Exploration history', function() {
+describe('Exploration history', function() {
   var explorationEditorPage = null;
   var explorationPlayerPage = null;
   var explorationEditorHistoryTab = null;
