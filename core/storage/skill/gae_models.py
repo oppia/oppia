@@ -65,7 +65,7 @@ class SkillModel(base_models.VersionedModel):
     # This is an optional field.
     superseding_skill_id = ndb.StringProperty(indexed=True)
     # A flag indicating whether deduplication is complete for this skill.
-    # It will always be False, and set to true only when there is a value
+    # It will initially be False, and set to true only when there is a value
     # for superseding_skill_id and the merge was completed.
     all_questions_merged = ndb.BooleanProperty(indexed=True, required=True)
 
