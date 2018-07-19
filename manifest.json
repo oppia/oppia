@@ -443,13 +443,6 @@
         "rootDir": "bootstrapck",
         "targetDirPrefix": "ckeditor-bootstrapck-"
       },
-      "ckeditorIndentBlockPlugin" : {
-        "version": "4.9.2",
-        "downloadFormat": "zip",
-        "url": "https://download.ckeditor.com/indentblock/releases/indentblock_4.9.2.zip",
-        "rootDir": "indentblock",
-        "targetDirPrefix": "ckeditor-indentblock-"
-      },
       "ckeditorBlockquotePlugin" : {
         "version": "4.9.2",
         "downloadFormat": "zip",

@@ -97,18 +97,16 @@ oppia.directive('ckEditorRte', [
         CKEDITOR.plugins.addExternal(
           'pre', '/extensions/ckeditor_plugins/pre/', 'plugin.js');
         CKEDITOR.plugins.addExternal(
-          'indentblock',
-          '/third_party/static/ckeditor-indentblock-4.9.2/', 'plugin.js');
-        CKEDITOR.plugins.addExternal(
           'blockquote',
           '/third_party/static/ckeditor-blockquote-4.9.2/', 'plugin.js');
 
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
           extraPlugins:
-          'indentblock,pre,blockquote,widget,lineutils,sharedspace,' +
+          'pre,blockquote,widget,lineutils,sharedspace,' +
           pluginNames,
           startupFocus: true,
+          removePlugins: 'indentblock',
           floatSpaceDockedOffsetY: 15,
           extraAllowedContent: extraAllowedContentRules,
           sharedSpaces: {
@@ -186,7 +184,6 @@ oppia.directive('ckEditorRte', [
             .css('height', '22px');
 
           $('.cke_button_icon')
-            .css('opacity', '1.0')
             .css('height', '26px')
             .css('width', '26px');
           ck.setData(wrapComponents(ngModel.$viewValue));
