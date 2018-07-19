@@ -343,7 +343,7 @@ class Skill(object):
                 merge this skill into. This is non null only if we indicate
                 that this skill is a duplicate and needs to be merged into
                 another one.
-            all_questions_merged: bool|None. Flag that indicates if all
+            all_questions_merged: bool. Flag that indicates if all
                 questions are moved from this skill to the superseding skill.
             created_on: datetime.datetime. Date and time when the skill is
                 created.
