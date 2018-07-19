@@ -11,51 +11,28 @@
 
 {% block content %}
   <background-banner></background-banner>
-  <div ng-controller="TopicViewer" class="oppia-topic-viewer-container" style="position: relative; padding-top: 163px;">
-    <ul class="oppia-dashboard-tabs">
-      <li ng-class="{'oppia-dashboard-tabs-active': activeTab === 'story'}">
-        <a class="oppia-dashboard-tabs-text" ng-click="setActiveTab('story')" translate="I18N_DASHBOARD_STORY">
-        </a>
-      </li>
-      <li ng-class="{'oppia-dashboard-tabs-active': activeTab === 'practice'}">
-        <a class="oppia-dashboard-tabs-text" ng-click="setActiveTab('practice')" translate="I18N_DASHBOARD_PRACTICE">
-        </a>
-      </li>
-    </ul>
-    <div ng-if="activeTab === 'story'">
-      <div ng-if="canonicalStoryList.length === 0" class="oppia-dashboard-empty-text">
-        <em>There are no stories to display.</em>
-      </div>
-
-      <div ng-if="activeTab === 'story'">
-        <md-card ng-repeat="canonicalStory in canonicalStoryList" class="oppia-story-summary-tile">
-          <canonical-story-summary-tile story-id="canonicalStory.id"
-                                        title="canonicalStory.title"
-                                        description="canonicalStory.description">
-          </canonical-story-summary-tile>
-        </md-card>
-      </div>
+  <div ng-controller="TopicViewer" class="oppia-topic-viewer-container" style="position: relative;">
+    <div class="oppia-topic-name">
+      {{ topic_name }}
     </div>
-    <div ng-if="!userIsLoggedIn" class="oppia-login-banner">
-      <div><img ng-src="<[oppiaBlackImgUrl]>" alt="" style="width: 70px; margin: 10px 0"></div>
-      <div>Sign in to save your progress!</div>
-      <div><button class="btn oppia-navbar-button"><span translate="I18N_TOPNAV_SIGN_IN"></span></button></div>
+    <div class="oppia-topic-viewer-tabs">
+      <span ng-class="{'oppia-topic-viewer-tabs-active': activeTab === 'story'}">
+        <a class="oppia-topic-viewer-tabs-text" ng-click="setActiveTab('story')" translate="I18N_TOPIC_VIEWER_STORY">
+        </a>
+      </span>
+      <span ng-class="{'oppia-topic-viewer-tabs-active': activeTab === 'practice'}">
+        <a class="oppia-topic-viewer-tabs-text" ng-click="setActiveTab('practice')" translate="I18N_TOPIC_VIEWER_PRACTICE">
+        </a>
+      </span>
+    </div>
+    <div ng-if="activeTab === 'story'" class="oppia-story-tab">
+      <stories-list topic-id="topicId" canonical-story-list="canonicalStoryList"></stories-list>
     </div>
   </div>
   <style>
-    .oppia-login-banner {
-      border: #009688 solid 3px;
-      border-radius: 5px;
-      max-width: 60%;
-      position: fixed;
-      bottom: -5px;
-      left: 35%;
+    .oppia-story-tab {
+      width: fit-content;
       margin: 0 auto;
-    }
-    .oppia-login-banner div {
-      display: inline;
-      font-size: 1.4em;
-      margin: 20px;
     }
 
     .oppia-topic-viewer-container .oppia-topic-name {
@@ -68,38 +45,22 @@
       text-align: center;
     }
 
-    .oppia-story-summary-tile {
-      background-color: #fff;
-      cursor: pointer;
-      display: inline-block;
-      margin: 25px;
-      padding: 0;
-      position: relative;
-      text-align: left;
-      transition: all 300ms;
-      vertical-align: top;
-      -webkit-transition: all 300ms;
-      white-space: normal;
-      width: 268px;
-    }
-
     .oppia-topic-viewer-container {
-      max-width: 80%;
+      max-width: 70%;
       color: black;
       text-decoration: none;
       margin: 0 auto;
       font-family: 'Roboto', Arial, sans-serif;
     }
 
-    .oppia-dashboard-tabs li {
+    .oppia-topic-viewer-tabs span {
       display: -webkit-flex;
       display: inline-flex;
       margin-bottom: 0;
       width: 200px;
-      background-color: #7e7e7e;
     }
 
-    .oppia-dashboard-tabs .oppia-dashboard-tabs-text {
+    .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text {
       color: white;
       font-size: 1em;
       padding: 10px;
@@ -108,14 +69,20 @@
       width: 100%;
     }
 
-    .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text,
-    .oppia-dashboard-tabs-active .oppia-dashboard-tabs-text:hover {
+    .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text,
+    .oppia-topic-viewer-tabs-active .oppia-topic-viewer-tabs-text:hover {
       border-top: 4px solid #009688;
       color: #009688;
       background-color: #e7e7e2;
     }
 
-    .oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover {
+    .oppia-topic-viewer-tabs {
+      width: fit-content;
+      background-color: #7e7e7e;
+      margin: 0 auto 0 10%;
+    }
+
+    .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover {
       color: #009688;
       font-size: 1em;
       padding: 10px;
@@ -124,18 +91,35 @@
       width: 100%;
     }
 
-    .oppia-dashboard-tabs .oppia-dashboard-tabs-text:hover,
-    .oppia-dashboard-tabs .oppia-dashboard-tabs-text:focus {
+    .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:hover,
+    .oppia-topic-viewer-tabs .oppia-topic-viewer-tabs-text:focus {
       text-decoration: none;
     }
 
     @media(max-width: 815px) {
-      .oppia-dashboard-container .oppia-dashboard-tabs {
+      .oppia-topic-viewer-tabs {
+        margin: 0 auto;
+      }
+
+      .oppia-topic-viewer-container .oppia-topic-viewer-tabs {
         justify-content: center;
       }
 
-      .oppia-dashboard-container .oppia-dashboard-tabs li {
+      .oppia-topic-viewer-container .oppia-topic-viewer-tabs li {
         width: auto;
+      }
+
+      .oppia-topic-viewer-container {
+        max-width: 95%;
+      }
+    }
+
+    @media(max-width: 649px) {
+      .oppia-topic-viewer-container {
+        max-width: 100%;
+      }
+      stories-list {
+        display: inline-grid;
       }
     }
   </style>
@@ -151,5 +135,6 @@
   <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic_viewer/TopicViewerBackendApiService.js"></script>
 
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_viewer/TopicViewerNavbarBreadcrumbDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_viewer/StoriesListDirective.js"></script>
   <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topic_viewer/TopicViewer.js"></script>
 {% endblock footer_js %}

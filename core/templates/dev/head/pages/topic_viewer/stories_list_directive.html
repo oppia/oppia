@@ -1,0 +1,26 @@
+<div ng-if="canonicalStoryList.length === 0">
+<em>There are no stories to display.</em>
+</div>
+
+<md-card ng-repeat="canonicalStory in canonicalStories" class="oppia-story-summary-tile">
+    <canonical-story-summary-tile story-id="canonicalStory.id"
+                                title="canonicalStory.title"
+                                description="canonicalStory.description">
+    </canonical-story-summary-tile>
+</md-card>
+<style>
+  .oppia-story-tab .oppia-story-summary-tile {
+    background-color: #fff;
+    cursor: pointer;
+    display: inline-block;
+    margin: 25px;
+    padding: 0;
+    position: relative;
+    text-align: left;
+    transition: all 300ms;
+    vertical-align: top;
+    -webkit-transition: all 300ms;
+    white-space: normal;
+    width: 268px;
+  }
+</style>

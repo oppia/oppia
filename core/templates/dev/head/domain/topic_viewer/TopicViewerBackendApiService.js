@@ -22,12 +22,12 @@ oppia.factory('TopicViewerBackendApiService', [
   '$http', '$q', 'TOPIC_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($http, $q, TOPIC_DATA_URL_TEMPLATE, UrlInterpolationService) {
     var _fetchTopicData = function(topicId, successCallback, errorCallback) {
-      var storiesDataUrl = UrlInterpolationService.interpolateUrl(
+      var topicDataUrl = UrlInterpolationService.interpolateUrl(
         TOPIC_DATA_URL_TEMPLATE, {
           topic_id: topicId
         });
 
-      $http.get(storiesDataUrl).then(function(response) {
+      $http.get(topicDataUrl).then(function(response) {
         var topicData = angular.copy(response.data);
         if (successCallback) {
           successCallback(topicData);

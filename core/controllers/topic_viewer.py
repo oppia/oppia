@@ -30,6 +30,9 @@ class TopicPageDataHandler(base.BaseHandler):
     def get(self, topic_id):
         """Handles GET requests."""
 
+        if not feconf.ENABLE_NEW_STRUCTURES:
+            raise self.PageNotFoundException
+
         topic = topic_services.get_topic_by_id(topic_id)
         canonical_stories = [
             story_services.get_story_by_id(
@@ -40,10 +43,17 @@ class TopicPageDataHandler(base.BaseHandler):
                 additional_story_id) for additional_story_id
             in topic.additional_story_ids]
 
-        canonical_story_dicts = [
-            story.to_dict() for story in canonical_stories]
-        additional_story_dicts = [
-            story.to_dict() for story in additional_stories]
+        canonical_story_dicts = [{
+            'id': story.id,
+            'title': story.title,
+            'description': story.description
+        } for story in canonical_stories]
+
+        additional_story_dicts = [{
+            'id': story.id,
+            'title': story.title,
+            'description': story.description
+        } for story in additional_stories]
 
         self.values.update({
             'topic_name': topic.name,

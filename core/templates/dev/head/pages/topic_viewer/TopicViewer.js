@@ -31,10 +31,6 @@ oppia.controller('TopicViewer', [
       return ($window.innerWidth < 500);
     };
     $scope.topicId = UrlService.getPathname().split('/')[2];
-    $scope.userIsLoggedIn = GLOBALS.userIsLoggedIn;
-
-    $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
-      '/avatar/oppia_avatar_100px.svg');
 
     $rootScope.loadingMessage = 'Loading';
     TopicViewerBackendApiService.fetchTopicData($scope.topicId).then(
