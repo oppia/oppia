@@ -436,6 +436,7 @@
     "I18N_SIDEBAR_FORUM": "Forum",
     "I18N_SIDEBAR_GET_STARTED": "Get Started",
     "I18N_SIDEBAR_LIBRARY_LINK": "Library",
+    "I18N_SIDEBAR_OPPIA_FOUNDATION": "Oppia Foundation",
     "I18N_SIDEBAR_TEACH_WITH_OPPIA": "Teach with Oppia",
     "I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "By checking the box to the left of this text, you acknowledge, agree, and accept to be bound by the <[sitename]> Terms of Use, found <a href=\"/terms\" target=\"_blank\">here</a>.",
     "I18N_SIGNUP_BUTTON_SUBMIT": "Submit and start contributing",

@@ -436,6 +436,7 @@
 	"I18N_SIDEBAR_FORUM": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the forum (an external page)\n{{Identical|Forum}}",
 	"I18N_SIDEBAR_GET_STARTED": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Get Started page.\n{{Identical|Get started}}",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Library page.\n{{Identical|Library}}",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Oppia Foundation site.\n{{Identical|Oppia Foundation}}",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Teach page.",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "Text displayed in the signup page. - This text in on the left of a checkbox. If the user clicks the checkbox, he agrees to the terms and conditions of the page.",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "Text displayed inside a confirmation button in the signup page. - When the user clicks the button, the registration is completed and no more action is needed.",
