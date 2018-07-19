@@ -411,8 +411,8 @@
       "ckeditor": {
         "version": "4.9.2",
         "downloadFormat": "zip",
-        "url": "https://github.com/ckeditor/ckeditor-releases/archive/full/4.9.2.zip",
-        "rootDirPrefix": "ckeditor-releases-full-",
+        "url": "http://download.cksource.com/CKEditor/CKEditor/CKEditor%204.9.2/ckeditor_4.9.2_full.zip",
+        "rootDir": "ckeditor",
         "targetDirPrefix": "ckeditor-"
       },
       "ckeditorSharedspace": {
