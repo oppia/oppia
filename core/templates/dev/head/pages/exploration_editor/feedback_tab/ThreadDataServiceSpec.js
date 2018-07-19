@@ -187,8 +187,8 @@ describe('retrieving threads service new framework', function() {
     });
 
     httpBackend.whenGET(
-      '/generalsuggestionlisthandler?list_type=target&' +
-      'target_type=exploration&target_id=' + expId).respond({
+      '/generalsuggestionlisthandler?target_type=exploration' +
+      '&target_id=' + expId).respond({
       suggestions: mockGeneralSuggestionThreads
     });
 

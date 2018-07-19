@@ -76,6 +76,33 @@ def can_play_exploration(handler):
     return test_can_play
 
 
+def can_view_skill(handler):
+    """Decorator to check whether user can play a given skill."""
+
+    def test_can_play(self, skill_id, **kwargs):
+        """Checks if the user can play the skill.
+
+        Args:
+            skill_id: str. The skill id.
+            **kwargs: *. Keyword arguments.
+
+        Returns:
+            bool. Whether the user can play the given skill.
+        """
+        # This is a temporary check, since a decorator is required for every
+        # method. Once skill publishing is done, whether given skill is
+        # published should be checked here.
+        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+
+        if skill is not None:
+            return handler(self, skill_id, **kwargs)
+        else:
+            raise self.PageNotFoundException
+    test_can_play.__wrapped__ = True
+
+    return test_can_play
+
+
 def can_play_collection(handler):
     """Decorator to check whether user can play given collection."""
 

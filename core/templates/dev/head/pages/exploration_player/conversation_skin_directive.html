@@ -3,9 +3,9 @@
   height for the card content transition animation.
 -->
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
-  <div class="conversation-skin-tutor-card-content">
-    <div class="conversation-skin-tutor-card-top-section">
-      <angular-html-bind class="rte-viewer conversation-skin-tutor-card-top-content"
+  <div class="oppia-learner-view-card-content">
+    <div class="oppia-learner-view-card-top-section">
+      <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content"
                          html-data="upcomingContentHtml">
       </angular-html-bind>
     </div>
@@ -265,25 +265,18 @@ otherwise they will interfere with the iframed conversation skin directive.
     text-align: left;
   }
 
-  .conversation-skin-tutor-card-top-content,
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-learner-answer-content {
     margin-bottom: 12px;
-  }
-
-
-  .conversation-skin-tutor-card-top-content,
-  .conversation-skin-help-card-content {
-    padding: 12px;
-  }
-
-  .conversation-skin-oppia-feedback-content,
-  .conversation-skin-learner-answer-content {
     padding: 8px 12px;
     word-wrap: break-word;
   }
 
-  .conversation-skin-tutor-card-top-content,
+
+  .conversation-skin-help-card-content {
+    padding: 12px;
+  }
+
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-help-card-content {
     background-color: rgba(224,242,241,1);
@@ -438,7 +431,7 @@ otherwise they will interfere with the iframed conversation skin directive.
       opacity: 0.8;
     }
 
-    .conversation-skin-tutor-card {
+    .oppia-learner-view-card {
       padding-bottom: 0;
       padding-left: 0;
       margin-left: 0;

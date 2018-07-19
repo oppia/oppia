@@ -170,7 +170,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'description': 'change again to state 3',
                 }, csrf_token=csrf_token)
             suggestions = self.get_json(
-                '%s?list_type=author&author_id=%s' % (
+                '%s?author_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
                     self.author_id_2))['suggestions']
             self.assertEqual(len(suggestions), 3)
@@ -186,7 +186,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             csrf_token = self.get_csrf_token_from_response(response)
 
             suggestion_to_accept = self.get_json(
-                '%s?list_type=author&author_id=%s' % (
+                '%s?author_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
                     self.author_id))['suggestions'][0]
 
@@ -201,9 +201,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'review_message': u'Accepted'
                 }, csrf_token=csrf_token)
             suggestion_post_accept = self.get_json(
-                '%s?list_type=id&suggestion_id=%s' % (
+                '%s?author_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    suggestion_to_accept['suggestion_id']))['suggestions'][0]
+                    self.author_id))['suggestions'][0]
             self.assertEqual(
                 suggestion_post_accept['status'],
                 suggestion_models.STATUS_ACCEPTED)
@@ -217,7 +217,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             # Testing user without permissions cannot accept.
             self.login(self.NORMAL_USER_EMAIL)
             suggestion_to_accept = self.get_json(
-                '%s?list_type=author&author_id=%s' % (
+                '%s?author_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
                     self.author_id_2))['suggestions'][0]
 
@@ -237,7 +237,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             # Testing that author cannot accept own suggestion.
             self.login(self.AUTHOR_EMAIL_2)
             suggestion_to_accept = self.get_json(
-                '%s?list_type=author&author_id=%s' % (
+                '%s?author_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
                     self.author_id_2))['suggestions'][0]
 
@@ -270,9 +270,9 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                 }, csrf_token=csrf_token)
 
             suggestion_post_accept = self.get_json(
-                '%s?list_type=id&suggestion_id=%s' % (
+                '%s?author_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    suggestion_to_accept['suggestion_id']))['suggestions'][0]
+                    self.author_id_2))['suggestions'][0]
             self.assertEqual(
                 suggestion_post_accept['status'],
                 suggestion_models.STATUS_ACCEPTED)
@@ -283,7 +283,7 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
             response = self.testapp.get('/explore/%s' % self.EXP_ID)
             csrf_token = self.get_csrf_token_from_response(response)
             suggestion_to_accept = self.get_json(
-                '%s?list_type=author&author_id=%s' % (
+                '%s?author_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
                     self.author_id_2))['suggestions'][1]
             self.put_json('%s/exploration/%s/%s' % (
@@ -295,10 +295,19 @@ class SuggestionUnitTests(test_utils.GenericTestBase):
                     'review_message': u'Accepted'
                 }, csrf_token=csrf_token)
             suggestion_post_accept = self.get_json(
-                '%s?list_type=id&suggestion_id=%s' % (
+                '%s?author_id=%s' % (
                     feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX,
-                    suggestion_to_accept['suggestion_id']))['suggestions'][0]
+                    self.author_id_2))['suggestions'][1]
             self.assertEqual(
                 suggestion_post_accept['status'],
                 suggestion_models.STATUS_ACCEPTED)
             self.logout()
+
+    def test_suggestion_list_handler(self):
+        with self.swap(constants, 'USE_NEW_SUGGESTION_FRAMEWORK', True):
+            suggestions = self.get_json(
+                '%s?author_id=%s&target_type=%s&target_id=%s' % (
+                    feconf.GENERAL_SUGGESTION_LIST_URL_PREFIX, self.author_id_2,
+                    suggestion_models.TARGET_TYPE_EXPLORATION, self.EXP_ID)
+                )['suggestions']
+            self.assertEqual(len(suggestions), 2)

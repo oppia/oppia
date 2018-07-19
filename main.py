@@ -23,6 +23,7 @@ from core.controllers import base
 from core.controllers import classifier
 from core.controllers import collection_editor
 from core.controllers import collection_viewer
+from core.controllers import concept_card_viewer
 from core.controllers import creator_dashboard
 from core.controllers import custom_landing_pages
 from core.controllers import editor
@@ -521,6 +522,9 @@ URLS = MAPREDUCE_HANDLERS + [
         r'%s/<topic_id>' % feconf.TOPIC_STATUS_URL_PREFIX,
         topic_editor.TopicPublishHandler),
 
+    get_redirect_route(
+        r'%s/<skill_id>' % feconf.CONCEPT_CARD_DATA_URL_PREFIX,
+        concept_card_viewer.ConceptCardDataHandler),
     get_redirect_route(
         r'%s/<skill_id>' % feconf.SKILL_EDITOR_URL_PREFIX,
         skill_editor.SkillEditorPage),
