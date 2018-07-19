@@ -52,17 +52,22 @@ oppia.directive('progressNav', [
             $scope.hasPrevious = $scope.activeCardIndex > 0;
             $scope.hasNext = !PlayerTranscriptService.isLastCard(
               $scope.activeCardIndex);
-
-            var interaction = ExplorationPlayerService.getInteraction(
-              $scope.activeCard.stateName);
-            interactionIsInline = (
-              ExplorationPlayerStateService.isInteractionInline(
-                $scope.activeCard.stateName));
-            $scope.interactionCustomizationArgs = interaction.customizationArgs;
-            $scope.interactionId = interaction.id;
-            interactionHasNavSubmitButton = (
-              Boolean(interaction.id) &&
-              INTERACTION_SPECS[interaction.id].show_generic_submit_button);
+            $scope.conceptCardIsBeingShown =
+              ExplorationPlayerStateService.isStateShowingConceptCard(
+                $scope.activeCard.stateName);
+            if (!$scope.conceptCardIsBeingShown) {
+              var interaction = ExplorationPlayerService.getInteraction(
+                $scope.activeCard.stateName);
+              interactionIsInline = (
+                ExplorationPlayerStateService.isInteractionInline(
+                  $scope.activeCard.stateName));
+              $scope.interactionCustomizationArgs =
+                interaction.customizationArgs;
+              $scope.interactionId = interaction.id;
+              interactionHasNavSubmitButton = (
+                Boolean(interaction.id) &&
+                INTERACTION_SPECS[interaction.id].show_generic_submit_button);
+            }
 
             $scope.helpCardHasContinueButton = false;
           };
@@ -100,11 +105,15 @@ oppia.directive('progressNav', [
           };
 
           $scope.shouldContinueButtonBeShown = function() {
+            if ($scope.conceptCardIsBeingShown) {
+              return true;
+            }
             var lastPair = $scope.activeCard.inputResponsePairs[
               $scope.activeCard.inputResponsePairs.length - 1];
             return Boolean(
               interactionIsInline &&
-              $scope.activeCard.destStateName &&
+              ($scope.activeCard.destStateName ||
+              $scope.activeCard.leadsToConceptCard) &&
               lastPair.oppiaResponse);
           };
         }
