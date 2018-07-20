@@ -3583,19 +3583,20 @@ class Exploration(object):
                         for x_index, x in enumerate(rule_spec['inputs']['x']):
                             state_dict['interaction']['answer_groups'][
                                 answer_group_index]['rule_specs'][
-                                    rule_spec_index]['inputs']['x'][x_index] = html_cleaner.add_dimensions_to_image(exp_id, (x))
+                                    rule_spec_index]['inputs']['x'][x_index] = html_cleaner.add_dimensions_to_image(exp_id, (x)) # pylint: disable=line-too-long
             for hint_index, hint in enumerate(
                     state_dict['interaction']['hints']):
                 hint_html = hint['hint_content']['html']
                 state_dict['interaction']['hints'][hint_index][
                     'hint_content']['html'] = (
-                        html_cleaner.add_dimensions_to_image(exp_id, (hint_html)))
+                        html_cleaner.add_dimensions_to_image(exp_id, (
+                            hint_html)))
 
             if state_dict['interaction']['solution']:
                 solution_html = state_dict[
                     'interaction']['solution']['explanation']['html']
-                state_dict['interaction']['solution']['explanation']['html'] = (
-                    html_cleaner.add_dimensions_to_image(
+                state_dict['interaction']['solution']['explanation'][
+                    'html'] = (html_cleaner.add_dimensions_to_image(
                         exp_id, (solution_html)))
 
             if state_dict['interaction']['id'] in (
@@ -3608,8 +3609,6 @@ class Exploration(object):
                             html_cleaner.add_dimensions_to_image(
                                 exp_id, (value)))
 
-            # states_dict[key] = State.convert_html_fields_in_state(
-            #     state_dict, html_cleaner.add_dimensions_to_image)
         return states_dict
 
     @classmethod

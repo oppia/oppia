@@ -32,6 +32,7 @@ import feconf
 
 app_identity_services = models.Registry.import_app_identity_services()
 
+
 def filter_a(name, value):
     """Returns whether the described attribute of an anchor ('a') tag should be
     whitelisted.
@@ -804,14 +805,15 @@ def add_dimensions_to_image(exp_id, html_string):
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
 
     for image in soup.findAll('oppia-noninteractive-image'):
-        attrs = image.attrs
         filename = unescape_html(image['filepath-with-value'])
         filename = filename[1:-1]
-        URL = 'https://storage.googleapis.com/' + app_identity_services.get_gcs_resource_bucket_name() + '/' + exp_id + '/assets/image/' + filename
+        URL = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
+            app_identity_services.get_gcs_resource_bucket_name(), exp_id,
+            filename))
         imageFile = cStringIO.StringIO(urllib.urlopen(URL).read())
         img = Image.open(imageFile)
         width, height = img.size
         image['filepath-with-value'] = escape_html(json.dumps(
-                {'filename': filename, 'height': height , 'width': width }))
+            {'filename': filename, 'height': height, 'width': width}))
 
     return unicode(soup)

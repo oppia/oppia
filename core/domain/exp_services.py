@@ -75,7 +75,7 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
     for that new version.
 
     Args:
-        versioned_exploration_states: A dict with two keys:
+        versioned_exploration_states: dict. A dict with two keys:
             states_schema_version: int. the states schema version for the
                 exploration.
             states: the dict of states comprising the exploration. The keys in
@@ -100,7 +100,8 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
     while (states_schema_version <
            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
         exp_domain.Exploration.update_states_from_model(
-            versioned_exploration_states, states_schema_version, exploration_id)
+            versioned_exploration_states, states_schema_version,
+            exploration_id)
         states_schema_version += 1
 
 
