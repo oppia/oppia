@@ -125,6 +125,7 @@ describe('Normalizer tests', function() {
     expect(filter('2+3')).toBeUndefined();
     expect(filter('--1.23')).toBeUndefined();
     expect(filter('=1.23')).toBeUndefined();
+    expect(filter(undefined)).toBeUndefined();
   }));
 
   it('should impose minimum bounds', inject(function($filter) {
@@ -176,8 +177,8 @@ describe('Testing requireIsFloat directive', function() {
   beforeEach(inject(function($compile, $rootScope) {
     scope = $rootScope.$new();
     var element = '<form name="testForm">' +
-      '<input name="floatValue" type="number" ng-model="localValue.num" ' +
-      'require-is-float apply-validation="validators()">' +
+      '<input name="floatValue" type="number" ng-model="localValue" ' +
+      'require-is-float apply-validation>' +
       '</form>';
     $compile(element)(scope);
     testInput = scope.testForm.floatValue;
@@ -216,6 +217,10 @@ describe('Testing requireIsFloat directive', function() {
 
     testInput.$setViewValue('0.3.5');
     scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue(undefined);
+    scope.$digest()
     expect(testInput.$valid).toEqual(false);
   });
 });
