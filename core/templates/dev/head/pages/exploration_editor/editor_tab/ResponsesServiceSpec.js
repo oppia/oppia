@@ -29,5 +29,9 @@ describe('Responses Service', function() {
       rs = $injector.get('ResponsesService');
       scope = $rootScope.$new();
     }));
+
+    it('should return -1 if no answer group is active', function() {
+      expect(rs.getActiveAnswerGroupIndex()).toEqual(-1)
+    });
   })
 })
