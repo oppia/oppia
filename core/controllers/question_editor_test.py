@@ -72,29 +72,35 @@ class QuestionCreationHandlerTest(BaseQuestionEditorControllerTest):
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
-            self.question.id = question_services.get_new_question_id()
             question_dict = self.question.to_dict()
             self.post_json(
                 '%s' % feconf.NEW_QUESTION_URL, {
                     'question_dict': question_dict
                 }, csrf_token=csrf_token, expect_errors=False,
                 expected_status_int=200)
-            question = question_services.get_question_by_id(self.question.id)
-            self.assertIsNotNone(question)
+            all_models = question_models.QuestionModel.get_all()
+            questions = [
+                question_services.get_question_from_model(model)
+                for model in all_models
+            ]
+            self.assertEqual(len(questions), 2)
             self.logout()
 
-            self.login(self.ADMIN_EMAIL)
+            self.login(self.TOPIC_MANAGER_EMAIL)
             response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
-            self.question.id = question_services.get_new_question_id()
             question_dict = self.question.to_dict()
             self.post_json(
                 '%s' % feconf.NEW_QUESTION_URL, {
                     'question_dict': question_dict
                 }, csrf_token=csrf_token, expect_errors=False,
                 expected_status_int=200)
-            question = question_services.get_question_by_id(self.question.id)
-            self.assertIsNotNone(question)
+            all_models = question_models.QuestionModel.get_all()
+            questions = [
+                question_services.get_question_from_model(model)
+                for model in all_models
+            ]
+            self.assertEqual(len(questions), 3)
             self.logout()
 
 

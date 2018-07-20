@@ -29,17 +29,6 @@ class QuestionCreationHandler(base.BaseHandler):
     """A handler that creates the question model given a question dict."""
 
     @acl_decorators.can_manage_question_skill_status
-    def get(self):
-        """Handles GET requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-
-        new_question_id = question_services.get_new_question_id()
-        self.render_json({
-            'questionId': new_question_id
-        })
-
-    @acl_decorators.can_manage_question_skill_status
     def post(self):
         """Handles POST requests."""
         if not feconf.ENABLE_NEW_STRUCTURES:
@@ -47,11 +36,11 @@ class QuestionCreationHandler(base.BaseHandler):
 
         question_dict = self.payload.get('question_dict')
         if (
-                ('id' not in question_dict) or
                 ('question_state_data' not in question_dict) or
                 ('language_code' not in question_dict)):
             raise self.InvalidInputException
 
+        question_dict['id'] = question_services.get_new_question_id()
         question_dict['version'] = 1
         question_dict['question_state_schema_version'] = (
             feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION)

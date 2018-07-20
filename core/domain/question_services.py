@@ -33,7 +33,7 @@ def _create_new_question(committer_id, question, commit_message):
         question: Question. question domain object.
         commit_message: str. A description of changes made to the question.
     """
-    question.validate()
+    question.validate(strict=True)
     create_new_question_rights(question.id, committer_id)
     model = question_models.QuestionModel(
         id=question.id,

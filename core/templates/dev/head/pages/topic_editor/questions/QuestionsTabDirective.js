@@ -32,8 +32,8 @@ oppia.directive('questionsTab', [
             UndoRedoService, UrlInterpolationService,
             EVENT_STORY_SUMMARIES_INITIALIZED, EVENT_TOPIC_INITIALIZED,
             EVENT_TOPIC_REINITIALIZED) {
-          // TODO(aks681): Continue with the questions editor frontend in this
-          // file.
+          // TODO(aks681): Continue with the questions tab for topic editor here
+          // and create another questions editor directive to be used here.
           var _initTab = function() {
           };
 
