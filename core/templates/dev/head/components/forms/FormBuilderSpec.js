@@ -220,7 +220,7 @@ describe('Testing requireIsFloat directive', function() {
     expect(testInput.$valid).toEqual(false);
 
     testInput.$setViewValue(undefined);
-    scope.$digest()
+    scope.$digest();
     expect(testInput.$valid).toEqual(false);
   });
 });
@@ -241,8 +241,8 @@ describe('Testing apply-validation directive', function() {
   it('should apply isAtLeast validation', inject(function($compile) {
     scope.validators = function() {
       return [{
-          id: 'isAtLeast',
-          minValue: -2.5
+        id: 'isAtLeast',
+        minValue: -2.5
       }];
     };
     $compile(element)(scope);
@@ -268,8 +268,8 @@ describe('Testing apply-validation directive', function() {
   it('should apply isAtMost validation', inject(function($compile) {
     scope.validators = function() {
       return [{
-          id: 'isAtMost',
-          maxValue: 5
+        id: 'isAtMost',
+        maxValue: 5
       }];
     };
     $compile(element)(scope);
@@ -295,7 +295,7 @@ describe('Testing apply-validation directive', function() {
   it('should apply isNonempty validation', inject(function($compile) {
     scope.validators = function() {
       return [{
-          id: 'isNonempty'
+        id: 'isNonempty'
       }];
     };
     $compile(element)(scope);
@@ -321,7 +321,7 @@ describe('Testing apply-validation directive', function() {
   it('should apply isInteger validation', inject(function($compile) {
     scope.validators = function() {
       return [{
-          id: 'isInteger'
+        id: 'isInteger'
       }];
     };
     $compile(element)(scope);
@@ -347,7 +347,7 @@ describe('Testing apply-validation directive', function() {
   it('should apply isFloat validation', inject(function($compile) {
     scope.validators = function() {
       return [{
-          id: 'isFloat'
+        id: 'isFloat'
       }];
     };
     $compile(element)(scope);
