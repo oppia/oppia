@@ -40,7 +40,12 @@ describe('Responses Service', function() {
     });
 
     it('should return -1 if no answer group is active', function() {
-      expect(rs.getActiveAnswerGroupIndex()).toEqual(-1)
+      expect(rs.getActiveAnswerGroupIndex()).toEqual(-1);
     });
+
+    it('should be able to change answer group index', function() {
+      rs.changeActiveAnswerGroupIndex(5);
+      expect(rs.getActiveAnswerGroupIndex()).toEqual(5);
+    })
   })
 })
