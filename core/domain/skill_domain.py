@@ -25,6 +25,8 @@ import utils
 # compatibility with previous change dicts.
 SKILL_PROPERTY_DESCRIPTION = 'description'
 SKILL_PROPERTY_LANGUAGE_CODE = 'language_code'
+SKILL_PROPERTY_SUPERSEDING_SKILL_ID = 'superseding_skill_id'
+SKILL_PROPERTY_ALL_QUESTIONS_MERGED = 'all_questions_merged'
 
 SKILL_CONTENTS_PROPERTY_EXPLANATION = 'explanation'
 SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES = 'worked_examples'
@@ -55,7 +57,9 @@ CMD_PUBLISH_SKILL = 'publish_skill'
 class SkillChange(object):
     """Domain object for changes made to skill object."""
     SKILL_PROPERTIES = (
-        SKILL_PROPERTY_DESCRIPTION, SKILL_PROPERTY_LANGUAGE_CODE)
+        SKILL_PROPERTY_DESCRIPTION, SKILL_PROPERTY_LANGUAGE_CODE,
+        SKILL_PROPERTY_SUPERSEDING_SKILL_ID,
+        SKILL_PROPERTY_ALL_QUESTIONS_MERGED)
 
     SKILL_CONTENTS_PROPERTIES = (
         SKILL_CONTENTS_PROPERTY_EXPLANATION,
@@ -315,7 +319,8 @@ class Skill(object):
             self, skill_id, description, misconceptions,
             skill_contents, misconceptions_schema_version,
             skill_contents_schema_version, language_code, version,
-            next_misconception_id, created_on=None, last_updated=None):
+            next_misconception_id, superseding_skill_id,
+            all_questions_merged, created_on=None, last_updated=None):
         """Constructs a Skill domain object.
 
         Args:
@@ -334,6 +339,12 @@ class Skill(object):
             version: int. The version of the skill.
             next_misconception_id: int. The misconception id to be used by
                 the next misconception added.
+            superseding_skill_id: str|None. Skill ID of the skill we
+                merge this skill into. This is non null only if we indicate
+                that this skill is a duplicate and needs to be merged into
+                another one.
+            all_questions_merged: bool. Flag that indicates if all
+                questions are moved from this skill to the superseding skill.
             created_on: datetime.datetime. Date and time when the skill is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -350,6 +361,8 @@ class Skill(object):
         self.last_updated = last_updated
         self.version = version
         self.next_misconception_id = next_misconception_id
+        self.superseding_skill_id = superseding_skill_id
+        self.all_questions_merged = all_questions_merged
 
     @classmethod
     def require_valid_skill_id(cls, skill_id):
@@ -444,6 +457,16 @@ class Skill(object):
                     'The misconception with id %s is out of bounds.'
                     % misconception.id)
             misconception.validate()
+        if (self.all_questions_merged and
+                self.superseding_skill_id is None):
+            raise utils.ValidationError(
+                'Expected a value for superseding_skill_id when '
+                'all_questions_merged is True.')
+        if (self.superseding_skill_id is not None and
+                self.all_questions_merged is None):
+            raise utils.ValidationError(
+                'Expected a value for all_questions_merged when '
+                'superseding_skill_id is set.')
 
     def to_dict(self):
         """Returns a dict representing this Skill domain object.
@@ -462,7 +485,9 @@ class Skill(object):
             'misconceptions_schema_version': self.misconceptions_schema_version,
             'skill_contents_schema_version': self.skill_contents_schema_version,
             'version': self.version,
-            'next_misconception_id': self.next_misconception_id
+            'next_misconception_id': self.next_misconception_id,
+            'superseding_skill_id': self.superseding_skill_id,
+            'all_questions_merged': self.all_questions_merged
         }
 
     @classmethod
@@ -483,7 +508,7 @@ class Skill(object):
             skill_id, description, [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0, 0)
+            constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False)
 
     @classmethod
     def update_skill_contents_from_model(
@@ -552,6 +577,23 @@ class Skill(object):
             language_code: str. The new language code of the skill.
         """
         self.language_code = language_code
+
+    def update_superseding_skill_id(self, superseding_skill_id):
+        """Updates the superseding skill ID of the skill.
+
+        Args:
+            superseding_skill_id: str. ID of the skill that supersedes this one.
+        """
+        self.superseding_skill_id = superseding_skill_id
+
+    def record_that_all_questions_are_merged(self, all_questions_merged):
+        """Updates the flag value which indicates if all questions are merged.
+
+        Args:
+            all_questions_merged: bool. Flag indicating if all questions are
+            merged to the superseding skill.
+        """
+        self.all_questions_merged = all_questions_merged
 
     def update_explanation(self, explanation):
         """Updates the explanation of the skill.

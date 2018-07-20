@@ -182,6 +182,51 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.misconceptions[1].name, 'Name')
 
+    def test_merge_skill(self):
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'id': 0,
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
+                'id': 0,
+                'old_value': None,
+                'new_value': False
+            })
+        ]
+        skill_services.update_skill(
+            self.USER_ID, self.SKILL_ID, changelist,
+            'Merging skill.')
+        skill = skill_services.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.version, 2)
+        self.assertEqual(skill.superseding_skill_id, 'TestSkillId')
+        self.assertEqual(skill.all_questions_merged, False)
+
+    def test_set_merge_complete_for_skill(self):
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
+                'id': 0,
+                'old_value': False,
+                'new_value': True
+            })
+        ]
+        skill_services.update_skill(
+            self.USER_ID, self.SKILL_ID, changelist,
+            'Setting merge complete for skill.')
+        skill = skill_services.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.version, 2)
+        self.assertEqual(skill.all_questions_merged, True)
+
     def test_delete_skill(self):
         skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
         self.assertEqual(

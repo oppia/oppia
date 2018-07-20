@@ -562,3 +562,35 @@ class CheckAllHandlersHaveDecorator(test_utils.GenericTestBase):
 
         for (name, method, handler_is_decorated) in handlers_checked:
             self.assertTrue(handler_is_decorated)
+
+
+class GetItemsEscapedCharactersTest(test_utils.GenericTestBase):
+    """Test that request.GET.items() correctly retrieves escaped characters."""
+    class MockHandler(base.BaseHandler):
+
+        def get(self):
+            self.values.update(self.request.GET.items())
+            self.render_json(self.values)
+
+    def test_get_items(self):
+        mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        with self.swap(self, 'testapp', mock_testapp):
+            params = {
+                'param1': 'value1',
+                'param2': 'value2'
+            }
+            result = self.get_json('/mock?param1=value1&param2=value2')
+            self.assertDictContainsSubset(params, result)
+            params = {
+                'param1': 'value with space',
+                'param2': 'value with & + - /',
+                'param3': 'value with . % @ 123 = ! <>'
+            }
+            result = self.get_json(
+                r'/mock?param1=value%20with%20space&'
+                'param2=value%20with%20%26%20%2B%20-%20/&'
+                'param3=value%20with%20.%20%%20@%20123%20=%20!%20%3C%3E')
+            self.assertDictContainsSubset(params, result)
