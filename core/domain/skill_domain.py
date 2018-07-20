@@ -25,6 +25,8 @@ import utils
 # compatibility with previous change dicts.
 SKILL_PROPERTY_DESCRIPTION = 'description'
 SKILL_PROPERTY_LANGUAGE_CODE = 'language_code'
+SKILL_PROPERTY_SUPERSEDING_SKILL_ID = 'superseding_skill_id'
+SKILL_PROPERTY_ALL_QUESTIONS_MERGED = 'all_questions_merged'
 
 SKILL_CONTENTS_PROPERTY_EXPLANATION = 'explanation'
 SKILL_CONTENTS_PROPERTY_WORKED_EXAMPLES = 'worked_examples'
@@ -49,11 +51,15 @@ CMD_MIGRATE_CONTENTS_SCHEMA_TO_LATEST_VERSION = (
 CMD_MIGRATE_MISCONCEPTIONS_SCHEMA_TO_LATEST_VERSION = (
     'migrate_misconceptions_schema_to_latest_version')
 
+CMD_PUBLISH_SKILL = 'publish_skill'
+
 
 class SkillChange(object):
     """Domain object for changes made to skill object."""
     SKILL_PROPERTIES = (
-        SKILL_PROPERTY_DESCRIPTION, SKILL_PROPERTY_LANGUAGE_CODE)
+        SKILL_PROPERTY_DESCRIPTION, SKILL_PROPERTY_LANGUAGE_CODE,
+        SKILL_PROPERTY_SUPERSEDING_SKILL_ID,
+        SKILL_PROPERTY_ALL_QUESTIONS_MERGED)
 
     SKILL_CONTENTS_PROPERTIES = (
         SKILL_CONTENTS_PROPERTY_EXPLANATION,
@@ -92,7 +98,7 @@ class SkillChange(object):
         self.cmd = change_dict['cmd']
 
         if self.cmd == CMD_ADD_SKILL_MISCONCEPTION:
-            self.misconception_id = change_dict['id']
+            self.new_value = change_dict['new_misconception_dict']
         elif self.cmd == CMD_DELETE_SKILL_MISCONCEPTION:
             self.misconception_id = change_dict['id']
         elif self.cmd == CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY:
@@ -146,7 +152,7 @@ class Misconception(object):
         """Initializes a Misconception domain object.
 
         Args:
-            misconception_id: str. The unique id of each misconception.
+            misconception_id: int. The unique id of each misconception.
             name: str. The name of the misconception.
             notes: str. General advice for creators about the
                 misconception (including examples) and general notes. This
@@ -206,6 +212,18 @@ class Misconception(object):
             feconf.DEFAULT_MISCONCEPTION_NOTES,
             feconf.DEFAULT_MISCONCEPTION_FEEDBACK)
 
+    @classmethod
+    def require_valid_misconception_id(cls, misconception_id):
+        """Validates the misconception id for a Misconception object.
+
+        Args:
+            misconception_id: str. The misconception id to be validated.
+        """
+        if not isinstance(misconception_id, int):
+            raise utils.ValidationError(
+                'Expected misconception ID to be an integer, received %s' %
+                misconception_id)
+
     def validate(self):
         """Validates various properties of the Misconception object.
 
@@ -213,6 +231,7 @@ class Misconception(object):
             ValidationError: One or more attributes of the misconception are
                 invalid.
         """
+        self.require_valid_misconception_id(self.id)
         if not isinstance(self.name, basestring):
             raise utils.ValidationError(
                 'Expected misconception name to be a string, received %s' %
@@ -300,7 +319,8 @@ class Skill(object):
             self, skill_id, description, misconceptions,
             skill_contents, misconceptions_schema_version,
             skill_contents_schema_version, language_code, version,
-            created_on=None, last_updated=None):
+            next_misconception_id, superseding_skill_id,
+            all_questions_merged, created_on=None, last_updated=None):
         """Constructs a Skill domain object.
 
         Args:
@@ -317,6 +337,14 @@ class Skill(object):
             language_code: str. The ISO 639-1 code for the language this
                 skill is written in.
             version: int. The version of the skill.
+            next_misconception_id: int. The misconception id to be used by
+                the next misconception added.
+            superseding_skill_id: str|None. Skill ID of the skill we
+                merge this skill into. This is non null only if we indicate
+                that this skill is a duplicate and needs to be merged into
+                another one.
+            all_questions_merged: bool. Flag that indicates if all
+                questions are moved from this skill to the superseding skill.
             created_on: datetime.datetime. Date and time when the skill is
                 created.
             last_updated: datetime.datetime. Date and time when the
@@ -332,6 +360,9 @@ class Skill(object):
         self.created_on = created_on
         self.last_updated = last_updated
         self.version = version
+        self.next_misconception_id = next_misconception_id
+        self.superseding_skill_id = superseding_skill_id
+        self.all_questions_merged = all_questions_merged
 
     @classmethod
     def require_valid_skill_id(cls, skill_id):
@@ -366,6 +397,8 @@ class Skill(object):
             ValidationError: One or more attributes of skill are invalid.
         """
         self.require_valid_description(self.description)
+
+        Misconception.require_valid_misconception_id(self.next_misconception_id)
 
         if not isinstance(self.misconceptions_schema_version, int):
             raise utils.ValidationError(
@@ -419,7 +452,21 @@ class Skill(object):
                 raise utils.ValidationError(
                     'Expected each misconception to be a Misconception '
                     'object, received %s' % misconception)
+            if int(misconception.id) >= int(self.next_misconception_id):
+                raise utils.ValidationError(
+                    'The misconception with id %s is out of bounds.'
+                    % misconception.id)
             misconception.validate()
+        if (self.all_questions_merged and
+                self.superseding_skill_id is None):
+            raise utils.ValidationError(
+                'Expected a value for superseding_skill_id when '
+                'all_questions_merged is True.')
+        if (self.superseding_skill_id is not None and
+                self.all_questions_merged is None):
+            raise utils.ValidationError(
+                'Expected a value for all_questions_merged when '
+                'superseding_skill_id is set.')
 
     def to_dict(self):
         """Returns a dict representing this Skill domain object.
@@ -437,7 +484,10 @@ class Skill(object):
             'language_code': self.language_code,
             'misconceptions_schema_version': self.misconceptions_schema_version,
             'skill_contents_schema_version': self.skill_contents_schema_version,
-            'version': self.version
+            'version': self.version,
+            'next_misconception_id': self.next_misconception_id,
+            'superseding_skill_id': self.superseding_skill_id,
+            'all_questions_merged': self.all_questions_merged
         }
 
     @classmethod
@@ -458,7 +508,7 @@ class Skill(object):
             skill_id, description, [], skill_contents,
             feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
             feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION,
-            constants.DEFAULT_LANGUAGE_CODE, 0)
+            constants.DEFAULT_LANGUAGE_CODE, 0, 0, None, False)
 
     @classmethod
     def update_skill_contents_from_model(
@@ -528,6 +578,23 @@ class Skill(object):
         """
         self.language_code = language_code
 
+    def update_superseding_skill_id(self, superseding_skill_id):
+        """Updates the superseding skill ID of the skill.
+
+        Args:
+            superseding_skill_id: str. ID of the skill that supersedes this one.
+        """
+        self.superseding_skill_id = superseding_skill_id
+
+    def record_that_all_questions_are_merged(self, all_questions_merged):
+        """Updates the flag value which indicates if all questions are merged.
+
+        Args:
+            all_questions_merged: bool. Flag indicating if all questions are
+            merged to the superseding skill.
+        """
+        self.all_questions_merged = all_questions_merged
+
     def update_explanation(self, explanation):
         """Updates the explanation of the skill.
 
@@ -560,15 +627,23 @@ class Skill(object):
                 return ind
         return None
 
-    def add_misconception(self, misconception_id):
+    def add_misconception(self, misconception_dict):
         """Adds a new misconception to the skill.
 
         Args:
-            misconception_id: str. The id of the new misconception to be added.
+            misconception_dict: dict. The misconception to be added.
         """
-        misconception = Misconception.create_default_misconception(
-            misconception_id)
+        misconception = Misconception(
+            misconception_dict['id'],
+            misconception_dict['name'],
+            misconception_dict['notes'],
+            misconception_dict['feedback'])
         self.misconceptions.append(misconception)
+        self.next_misconception_id = self.get_incremented_misconception_id(
+            misconception_dict['id'])
+
+    def get_incremented_misconception_id(self, misconception_id):
+        return misconception_id + 1
 
     def delete_misconception(self, misconception_id):
         """Removes a misconception with the given id.
@@ -685,6 +760,93 @@ class SkillSummary(object):
             'skill_model_last_updated': utils.get_time_in_millisecs(
                 self.skill_model_last_updated)
         }
+
+
+class SkillRights(object):
+    """Domain object for skill rights."""
+
+    def __init__(self, skill_id, skill_is_private, creator_id):
+        """Constructor for a skill rights domain object.
+
+        Args:
+            skill_id: str. The id of the skill.
+            skill_is_private: bool. Whether the skill is private.
+            creator_id: str. The id of the creator of this skill.
+        """
+        self.id = skill_id
+        self.skill_is_private = skill_is_private
+        self.creator_id = creator_id
+
+    def to_dict(self):
+        """Returns a dict suitable for use by the frontend.
+
+        Returns:
+            dict. A dict version of SkillRights suitable for use by the
+                frontend.
+        """
+        return {
+            'skill_id': self.id,
+            'skill_is_private': self.skill_is_private,
+            'creator_id': self.creator_id
+        }
+
+    def is_creator(self, user_id):
+        """Checks whether the given user is the creator of this skill.
+
+        Args:
+            user_id: str. Id of the user.
+
+        Returns:
+            bool. Whether the user is the creator of this skill.
+        """
+        return bool(user_id == self.creator_id)
+
+    def is_private(self):
+        """Returns whether the skill is private.
+
+        Returns:
+            bool. Whether the skill is private.
+        """
+        return self.skill_is_private
+
+
+class SkillRightsChange(object):
+    """Domain object for changes made to a skill rights object."""
+
+    def __init__(self, change_dict):
+        """Initialize a SkillRightsChange object from a dict.
+
+        Args:
+            change_dict: dict. Represents a command. It should have a 'cmd'
+                key, and one or more other keys. The keys depend on what the
+                value for 'cmd' is. The possible values for 'cmd' are listed
+                below, together with the other keys in the dict:
+                - 'create_new'
+                - 'publish_skill'
+
+        Raises:
+            Exception. The given change dict is not valid.
+        """
+        if 'cmd' not in change_dict:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+        self.cmd = change_dict['cmd']
+
+        if self.cmd == CMD_PUBLISH_SKILL:
+            pass
+        elif self.cmd == CMD_CREATE_NEW:
+            pass
+        else:
+            raise Exception('Invalid change_dict: %s' % change_dict)
+
+    def to_dict(self):
+        """Returns a dict representing the SkillRightsChange domain object.
+
+        Returns:
+            A dict, mapping all fields of SkillRightsChange instance.
+        """
+        skill_rights_change_dict = {}
+        skill_rights_change_dict['cmd'] = self.cmd
+        return skill_rights_change_dict
 
 
 class UserSkillMastery(object):

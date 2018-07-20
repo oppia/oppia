@@ -20,6 +20,10 @@ describe('Validators service', function() {
   beforeEach(module('oppia'));
 
   describe('validators service', function() {
+    beforeEach(module(function($provide) {
+      $provide.constant('INVALID_NAME_CHARS', '#xyz');
+    }));
+
     var vs = null;
 
     beforeEach(inject(function($injector) {
@@ -27,8 +31,6 @@ describe('Validators service', function() {
     }));
 
     it('should correctly validate entity names', function() {
-      GLOBALS.INVALID_NAME_CHARS = 'xyz';
-
       expect(vs.isValidEntityName('b')).toBe(true);
       expect(vs.isValidEntityName('b   ')).toBe(true);
       expect(vs.isValidEntityName('   b')).toBe(true);
@@ -42,8 +44,6 @@ describe('Validators service', function() {
     });
 
     it('should correctly validate exploration titles', function() {
-      GLOBALS.INVALID_NAME_CHARS = '#';
-
       expect(vs.isValidExplorationTitle('b')).toBe(true);
       expect(vs.isValidExplorationTitle('abc def')).toBe(true);
 
@@ -53,7 +53,7 @@ describe('Validators service', function() {
       expect(vs.isValidExplorationTitle(
         'A title with invalid characters #')).toBe(false);
       expect(vs.isValidExplorationTitle(
-        'A title that is way way way way way way way too long.')).toBe(false);
+        'A title that is toooooooooooooooooooooooooo too long.')).toBe(false);
     });
 
     it('should correctly validate non-emptiness', function() {

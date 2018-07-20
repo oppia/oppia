@@ -30,20 +30,20 @@ describe('Story contents object factory', function() {
       nodes: [
         {
           id: 'node_1',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: [],
-          destination_node_ids: [],
+          prerequisite_skill_ids: ['skill_1'],
+          acquired_skill_ids: ['skill_2'],
+          destination_node_ids: ['node_2'],
           outline: 'Outline',
           exploration_id: null,
           outline_is_finalized: false
         }, {
           id: 'node_2',
-          prerequisite_skill_ids: [],
-          acquired_skill_ids: [],
+          prerequisite_skill_ids: ['skill_2'],
+          acquired_skill_ids: ['skill_3', 'skill_4'],
           destination_node_ids: [],
           outline: 'Outline 2',
-          exploration_id: null,
-          outline_is_finalized: false
+          exploration_id: 'exp_1',
+          outline_is_finalized: true
         }],
       next_node_id: 'node_3'
     };
@@ -55,6 +55,39 @@ describe('Story contents object factory', function() {
      'based on id', function() {
     expect(_sampleStoryContents.getNodeIndex('node_1')).toEqual(0);
     expect(_sampleStoryContents.getNodeIndex('node_10')).toEqual(-1);
+  });
+
+  it('should correctly correctly validate valid story contents', function() {
+    expect(_sampleStoryContents.validate()).toEqual([]);
+  });
+
+  it('should correctly correctly validate case where prerequisite skills ' +
+     'are not acquired by the user', function() {
+    _sampleStoryContents.addNode();
+    _sampleStoryContents.addDestinationNodeIdToNode('node_1', 'node_3');
+    _sampleStoryContents.addPrerequisiteSkillIdToNode('node_3', 'skill_3');
+    expect(_sampleStoryContents.validate()).toEqual([
+      'The prerequisite skill with id skill_3 was not completed before node ' +
+      'with id node_3 was unlocked'
+    ]);
+  });
+
+  it('should correctly correctly validate the case where the story graph ' +
+    'has loops', function() {
+    _sampleStoryContents.addNode();
+    _sampleStoryContents.addDestinationNodeIdToNode('node_2', 'node_3');
+    _sampleStoryContents.addDestinationNodeIdToNode('node_3', 'node_1');
+    expect(_sampleStoryContents.validate()).toEqual([
+      'Loops are not allowed in the node graph'
+    ]);
+  });
+
+  it('should correctly correctly validate the case where the story graph is' +
+    ' disconnected.', function() {
+    _sampleStoryContents.addNode();
+    expect(_sampleStoryContents.validate()).toEqual([
+      'The node with id node_3 is disconnected from the graph'
+    ]);
   });
 
   it('should correctly throw error when node id is invalid for any function',

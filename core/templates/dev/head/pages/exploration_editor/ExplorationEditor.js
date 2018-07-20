@@ -46,14 +46,14 @@ oppia.controller('ExplorationEditor', [
   'EditabilityService', 'ExplorationStatesService', 'RouterService',
   'GraphDataService', 'StateEditorTutorialFirstTimeService',
   'ExplorationParamSpecsService', 'ExplorationParamChangesService',
-  'ExplorationWarningsService', '$templateCache', 'ExplorationContextService',
+  'ExplorationWarningsService', '$templateCache', 'ContextService',
   'ExplorationAdvancedFeaturesService', '$uibModal', 'ChangeListService',
   'AutosaveInfoModalsService', 'siteAnalyticsService',
   'UserEmailPreferencesService', 'ParamChangesObjectFactory',
   'ParamSpecsObjectFactory', 'ExplorationAutomaticTextToSpeechService',
   'UrlInterpolationService', 'ExplorationCorrectnessFeedbackService',
   'StateTopAnswersStatsService', 'StateTopAnswersStatsBackendApiService',
-  'ThreadDataService',
+  'ThreadDataService', 'StateClassifierMappingService',
   function(
       $scope, $http, $window, $rootScope, $log, $timeout,
       ExplorationDataService, EditorStateService, ExplorationTitleService,
@@ -63,14 +63,14 @@ oppia.controller('ExplorationEditor', [
       EditabilityService, ExplorationStatesService, RouterService,
       GraphDataService, StateEditorTutorialFirstTimeService,
       ExplorationParamSpecsService, ExplorationParamChangesService,
-      ExplorationWarningsService, $templateCache, ExplorationContextService,
+      ExplorationWarningsService, $templateCache, ContextService,
       ExplorationAdvancedFeaturesService, $uibModal, ChangeListService,
       AutosaveInfoModalsService, siteAnalyticsService,
       UserEmailPreferencesService, ParamChangesObjectFactory,
       ParamSpecsObjectFactory, ExplorationAutomaticTextToSpeechService,
       UrlInterpolationService, ExplorationCorrectnessFeedbackService,
       StateTopAnswersStatsService, StateTopAnswersStatsBackendApiService,
-      ThreadDataService) {
+      ThreadDataService, StateClassifierMappingService) {
     $scope.EditabilityService = EditabilityService;
     $scope.EditorStateService = EditorStateService;
 
@@ -79,7 +79,7 @@ oppia.controller('ExplorationEditor', [
      *********************************************************/
     $rootScope.loadingMessage = 'Loading';
 
-    $scope.explorationId = ExplorationContextService.getExplorationId();
+    $scope.explorationId = ContextService.getExplorationId();
     $scope.explorationUrl = '/create/' + $scope.explorationId;
     $scope.explorationDownloadUrl = (
       '/createhandler/download/' + $scope.explorationId);
@@ -130,6 +130,7 @@ oppia.controller('ExplorationEditor', [
         ExplorationAutomaticTextToSpeechService.init(data.auto_tts_enabled);
         ExplorationCorrectnessFeedbackService.init(
           data.correctness_feedback_enabled);
+        StateClassifierMappingService.init(data.state_classifier_mapping);
 
         $scope.explorationTitleService = ExplorationTitleService;
         $scope.explorationCategoryService = ExplorationCategoryService;
@@ -206,6 +207,7 @@ oppia.controller('ExplorationEditor', [
         if (ExplorationStatesService.getState(
           EditorStateService.getActiveStateName())) {
           $scope.$broadcast('refreshStateEditor');
+          $scope.$broadcast('refreshStateTranslation');
         }
 
         if (successCallback) {
@@ -404,10 +406,10 @@ oppia.controller('ExplorationEditor', [
         backdrop: true,
         controller: [
           '$scope', '$uibModalInstance', 'siteAnalyticsService',
-          'ExplorationContextService',
+          'ContextService',
           function($scope, $uibModalInstance, siteAnalyticsService,
-              ExplorationContextService) {
-            var explorationId = ExplorationContextService.getExplorationId();
+              ContextService) {
+            var explorationId = ContextService.getExplorationId();
 
             siteAnalyticsService.registerTutorialModalOpenEvent(explorationId);
 

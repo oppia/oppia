@@ -451,17 +451,25 @@ class GcsFileSystem(object):
         return self._exploration_id
 
     def isfile(self, filepath):
-        """Raises NotImplementedError if the method is not implemented in the
-        derived classes.
+        """Checks if the file with the given filepath exists in the GCS.
 
         Args:
             filepath: str. The path to the relevant file within the exploration.
 
-        Raises:
-            NotImplementedError. The method is not implemented in the derived
-                classes.
+        Returns:
+            bool. Whether the file exists in GCS.
         """
-        raise NotImplementedError
+        bucket_name = app_identity_services.get_gcs_resource_bucket_name()
+
+        # Upload to GCS bucket with filepath
+        # "<bucket>/<exploration-id>/assets/<filepath>".
+        gcs_file_url = (
+            '/%s/%s/assets/%s' % (
+                bucket_name, self._exploration_id, filepath))
+        try:
+            return cloudstorage.stat(gcs_file_url, retry_params=None)
+        except cloudstorage.NotFoundError:
+            return False
 
     def get(self, filepath, version=None, mode='r'):  # pylint: disable=unused-argument
         """Raises NotImplementedError if the method is not implemented in the
@@ -493,7 +501,7 @@ class GcsFileSystem(object):
             '/%s/%s/assets/%s' % (
                 bucket_name, self._exploration_id, filepath))
         gcs_file = cloudstorage.open(
-            gcs_file_url, 'w', content_type=mimetype)
+            gcs_file_url, mode='w', content_type=mimetype)
         gcs_file.write(raw_bytes)
         gcs_file.close()
 

@@ -22,8 +22,7 @@ oppia.constant(
 oppia.controller('LearnerLocalNav', [
   '$scope', '$uibModal', '$http', 'ExplorationPlayerService', 'AlertsService',
   'FocusManagerService', 'UrlInterpolationService',
-  'FLAG_EXPLORATION_URL_TEMPLATE',
-  function(
+  'FLAG_EXPLORATION_URL_TEMPLATE', function(
       $scope, $uibModal, $http, ExplorationPlayerService, AlertsService,
       FocusManagerService, UrlInterpolationService,
       FLAG_EXPLORATION_URL_TEMPLATE) {
@@ -47,7 +46,10 @@ oppia.controller('LearnerLocalNav', [
             $scope.originalHtml = ExplorationPlayerService.getStateContentHtml(
               stateName);
             $scope.description = '';
-            $scope.suggestionHtml = $scope.originalHtml;
+            // ng-model needs to bind to a property of an object on
+            // the scope (the property cannot sit directly on the scope)
+            // Reference https://stackoverflow.com/q/12618342
+            $scope.suggestionData = {suggestionHtml: $scope.originalHtml};
             $scope.showEditor = false;
             // Rte initially displays content unrendered for a split second
             $timeout(function() {
@@ -59,22 +61,56 @@ oppia.controller('LearnerLocalNav', [
             };
 
             $scope.submitSuggestion = function() {
-              $uibModalInstance.close({
+              var data = {
                 id: ExplorationPlayerService.getExplorationId(),
                 version: ExplorationPlayerService.getExplorationVersion(),
                 stateName: stateName,
                 description: $scope.description,
-                suggestionHtml: $scope.suggestionHtml
-              });
+                suggestionHtml: $scope.suggestionData.suggestionHtml
+              };
+              if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+                data = {
+                  target_id: ExplorationPlayerService.getExplorationId(),
+                  version: ExplorationPlayerService.getExplorationVersion(),
+                  stateName: stateName,
+                  suggestion_type: 'edit_exploration_state_content',
+                  target_type: 'exploration',
+                  description: $scope.description,
+                  suggestionHtml: $scope.suggestionData.suggestionHtml,
+                };
+              }
+              $uibModalInstance.close(data);
             };
           }]
       }).result.then(function(result) {
-        $http.post('/suggestionhandler/' + result.id, {
+        var data = {
           exploration_version: result.version,
           state_name: result.stateName,
           description: result.description,
           suggestion_html: result.suggestionHtml
-        }).error(function(res) {
+        };
+        url = '/suggestionhandler/' + result.id;
+        if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+          data = {
+            suggestion_type: result.suggestion_type,
+            target_type: result.target_type,
+            target_id: result.target_id,
+            target_version_at_submission: result.version,
+            assigned_reviewer_id: null,
+            final_reviewer_id: null,
+            description: result.description,
+            change_cmd: {
+              cmd: 'edit_state_property',
+              property_name: 'content',
+              state_name: result.stateName,
+              new_value: {
+                html: result.suggestionHtml
+              }
+            }
+          };
+          url = '/generalsuggestionhandler/';
+        }
+        $http.post(url, data).error(function(res) {
           AlertsService.addWarning(res);
         });
         $uibModal.open({

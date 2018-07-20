@@ -218,6 +218,7 @@ class BaseInteraction(object):
             'id': self.id,
             'name': self.name,
             'description': self.description,
+            'answer_type': self.answer_type,
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
             'is_trainable': self.is_trainable,

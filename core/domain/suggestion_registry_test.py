@@ -14,10 +14,13 @@
 
 """Tests for suggestion registry classes."""
 
+import datetime
+
 from core.domain import exp_domain
 from core.domain import suggestion_registry
 from core.platform import models
 from core.tests import test_utils
+import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
 
@@ -43,6 +46,7 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
     AUTHOR_EMAIL = 'author@example.com'
     REVIEWER_EMAIL = 'reviewer@example.com'
     ASSIGNED_REVIEWER_EMAIL = 'assigned_reviewer@example.com'
+    fake_date = datetime.datetime(2016, 4, 10, 0, 0, 0, 0)
 
     def setUp(self):
         super(SuggestionEditStateContentUnitTests, self).setUp()
@@ -51,9 +55,6 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
         self.author_id = self.get_user_id_from_email(self.AUTHOR_EMAIL)
         self.signup(self.REVIEWER_EMAIL, 'reviewer')
         self.reviewer_id = self.get_user_id_from_email(self.REVIEWER_EMAIL)
-        self.signup(self.ASSIGNED_REVIEWER_EMAIL, 'assignedReviewer')
-        self.assigned_reviewer_id = self.get_user_id_from_email(
-            self.ASSIGNED_REVIEWER_EMAIL)
         self.suggestion_dict = {
             'suggestion_id': 'exploration.exp1.thread1',
             'suggestion_type': (
@@ -62,9 +63,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             'target_id': 'exp1',
             'target_version_at_submission': 1,
             'status': suggestion_models.STATUS_ACCEPTED,
-            'author_id': self.author_id,
+            'author_name': 'author',
             'final_reviewer_id': self.reviewer_id,
-            'assigned_reviewer_id': self.assigned_reviewer_id,
             'change_cmd': {
                 'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
                 'property_name': exp_domain.STATE_PROPERTY_CONTENT,
@@ -72,7 +72,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
                 'new_value': 'new suggestion content',
                 'old_value': None
             },
-            'score_category': 'content.Algebra'
+            'score_category': 'content.Algebra',
+            'last_updated': utils.get_time_in_millisecs(self.fake_date)
         }
 
     def test_create_suggestion_edit_state_content(self):
@@ -83,17 +84,36 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.assigned_reviewer_id, self.reviewer_id,
-            expected_suggestion_dict['change_cmd'],
-            expected_suggestion_dict['score_category'])
+            self.reviewer_id, expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'], self.fake_date)
 
         self.assertDictEqual(
             observed_suggestion.to_dict(), expected_suggestion_dict)
 
     def test_from_dict_suggestion_edit_state_content(self):
+        suggestion_dict_to_be_passed = {
+            'suggestion_id': 'exploration.exp1.thread1',
+            'suggestion_type': (
+                suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT),
+            'target_type': suggestion_models.TARGET_TYPE_EXPLORATION,
+            'target_id': 'exp1',
+            'target_version_at_submission': 1,
+            'status': suggestion_models.STATUS_ACCEPTED,
+            'author_id': self.author_id,
+            'final_reviewer_id': self.reviewer_id,
+            'change_cmd': {
+                'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,
+                'property_name': exp_domain.STATE_PROPERTY_CONTENT,
+                'state_name': 'state_1',
+                'new_value': 'new suggestion content',
+                'old_value': None
+            },
+            'score_category': 'content.Algebra',
+            'last_updated': self.fake_date
+        }
         observed_suggestion = (
             suggestion_registry.SuggestionEditStateContent.from_dict(
-                self.suggestion_dict))
+                suggestion_dict_to_be_passed))
         self.assertDictEqual(
             observed_suggestion.to_dict(), self.suggestion_dict)
         self.assertIsInstance(
@@ -107,9 +127,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.assigned_reviewer_id, self.reviewer_id,
-            expected_suggestion_dict['change_cmd'],
-            expected_suggestion_dict['score_category'])
+            self.reviewer_id, expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'], self.fake_date)
 
         suggestion.validate()
 
@@ -121,9 +140,8 @@ class SuggestionEditStateContentUnitTests(test_utils.GenericTestBase):
             expected_suggestion_dict['target_id'],
             expected_suggestion_dict['target_version_at_submission'],
             expected_suggestion_dict['status'], self.author_id,
-            self.assigned_reviewer_id, self.reviewer_id,
-            expected_suggestion_dict['change_cmd'],
-            expected_suggestion_dict['score_category'])
+            self.reviewer_id, expected_suggestion_dict['change_cmd'],
+            expected_suggestion_dict['score_category'], self.fake_date)
 
         self.assertEqual(suggestion.get_score_type(), 'content')
         self.assertEqual(suggestion.get_score_sub_type(), 'Algebra')

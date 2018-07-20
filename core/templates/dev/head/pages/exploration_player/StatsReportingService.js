@@ -46,15 +46,17 @@ oppia.constant('STATS_REPORTING_URLS', {
 });
 
 oppia.factory('StatsReportingService', [
-  '$http', '$interval', 'StopwatchObjectFactory', 'MessengerService',
-  'UrlInterpolationService', 'STATS_REPORTING_URLS', 'siteAnalyticsService',
-  'STATS_EVENT_TYPES', 'ExplorationContextService', 'PAGE_CONTEXT',
-  'DEFAULT_OUTCOME_CLASSIFICATION', 'PlaythroughService', 'ENABLE_PLAYTHROUGHS',
+  '$http', '$interval', 'ContextService', 'MessengerService',
+  'PlaythroughService', 'siteAnalyticsService', 'StopwatchObjectFactory',
+  'UrlInterpolationService', 'DEFAULT_OUTCOME_CLASSIFICATION',
+  'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT', 'STATS_EVENT_TYPES',
+  'STATS_REPORTING_URLS',
   function(
-      $http, $interval, StopwatchObjectFactory, MessengerService,
-      UrlInterpolationService, STATS_REPORTING_URLS, siteAnalyticsService,
-      STATS_EVENT_TYPES, ExplorationContextService, PAGE_CONTEXT,
-      DEFAULT_OUTCOME_CLASSIFICATION, PlaythroughService, ENABLE_PLAYTHROUGHS) {
+      $http, $interval, ContextService, MessengerService,
+      PlaythroughService, siteAnalyticsService, StopwatchObjectFactory,
+      UrlInterpolationService, DEFAULT_OUTCOME_CLASSIFICATION,
+      ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, STATS_EVENT_TYPES,
+      STATS_REPORTING_URLS) {
     var explorationId = null;
     var explorationTitle = null;
     var explorationVersion = null;
@@ -66,7 +68,7 @@ oppia.factory('StatsReportingService', [
     var explorationIsComplete = false;
 
     var _editorPreviewMode = (
-      ExplorationContextService.getPageContext() === PAGE_CONTEXT.EDITOR);
+      ContextService.getPageContext() === PAGE_CONTEXT.EXPLORATION_EDITOR);
 
     // The following dict will contain all stats data accumulated over the
     // interval time and will be reset when the dict is sent to backend for
@@ -173,7 +175,7 @@ oppia.factory('StatsReportingService', [
           session_id: sessionId
         });
 
-        if (ENABLE_PLAYTHROUGHS) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
           PlaythroughService.recordExplorationStartAction(stateName);
         }
       },
@@ -271,7 +273,7 @@ oppia.factory('StatsReportingService', [
         explorationIsComplete = true;
 
         postStatsToBackend();
-        if (ENABLE_PLAYTHROUGHS) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
           PlaythroughService.recordExplorationQuitAction(
             stateName, stateStopwatch.getTimeInSecs());
 
@@ -313,13 +315,13 @@ oppia.factory('StatsReportingService', [
 
         postStatsToBackend();
 
-        if (ENABLE_PLAYTHROUGHS) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
           PlaythroughService.recordPlaythrough();
         }
       },
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback) {
-        if (ENABLE_PLAYTHROUGHS) {
+        if (ENABLE_PLAYTHROUGH_RECORDING) {
           PlaythroughService.recordAnswerSubmitAction(
             stateName, destStateName, interactionId, answer, feedback,
             stateStopwatch.getTimeInSecs());

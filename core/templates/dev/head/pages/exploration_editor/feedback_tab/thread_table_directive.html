@@ -13,7 +13,7 @@
     <th class="col-lg-3 col-md-3 col-sm-3">Original author</th>
     <th class="col-lg-2 col-md-2 col-sm-2">Last updated</th>
   </tr>
-  <tr ng-repeat="thread in getThreads()|orderBy:'-last_updated'" ng-click="onClickRow(thread.thread_id)" class="oppia-feedback-tab-row protractor-test-oppia-feedback-tab-row">
+  <tr ng-repeat="thread in getThreads()|orderBy:'-last_updated'" ng-click="onClickRow(thread.threadId)" class="oppia-feedback-tab-row protractor-test-oppia-feedback-tab-row">
     <td class="col-lg-1 col-md-1 col-sm-1">
       <span ng-class="getLabelClass(thread.status)"><[getHumanReadableStatus(thread.status)]></span>
     </td>
@@ -21,10 +21,10 @@
       <div class="protractor-test-exploration-feedback-subject"><[thread.subject | truncate:40]></div>
     </td>
     <td class="col-lg-3 col-md-3 col-sm-3">
-      <span ng-if="thread.original_author_username"><[thread.original_author_username]></span>
+      <span ng-if="thread.originalAuthorName"><[thread.originalAuthorName]></span>
     </td>
     <td class="col-lg-2 col-md-2 col-sm-2">
-      <span><[getLocaleAbbreviatedDatetimeString(thread.last_updated)]></span>
+      <span><[getLocaleAbbreviatedDatetimeString(thread.lastUpdated)]></span>
     </td>
     <td class="col-lg-2 col-md-2 col-sm-2">
     </td>

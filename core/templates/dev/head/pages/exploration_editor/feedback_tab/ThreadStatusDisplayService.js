@@ -33,12 +33,24 @@ oppia.factory('ThreadStatusDisplayService', [function() {
   }, {
     id: 'not_actionable',
     text: 'Not Actionable'
+  }, {
+    id: 'received',
+    text: 'open'
+  }, {
+    id: 'review',
+    text: 'open'
+  }, {
+    id: 'accepted',
+    text: 'Fixed'
+  }, {
+    id: 'rejected',
+    text: 'Ignored'
   }];
 
   return {
     STATUS_CHOICES: angular.copy(_STATUS_CHOICES),
     getLabelClass: function(status) {
-      if (status === 'open') {
+      if (status === 'open' || status === 'received' || status === 'review') {
         return 'label label-info';
       } else {
         return 'label label-default';

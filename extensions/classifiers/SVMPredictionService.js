@@ -103,8 +103,12 @@ oppia.factory('SVMPredictionService', ['$log', function($log) {
           for (var k = 0; k < cj; k++) {
             sum += kvalues[sj + k] * coef2[sj + k];
           }
-          // TODO(prasanna08): Verify why libsvm uses subtraction
-          // instead of addition.
+
+          // NOTE: libsvm substracts the intercept from sum in its prediction
+          // function. Here intercept is added because sci-kit negates the
+          // intercept before passing it on to libsvm for prediction.
+          // For more info see github following issue:
+          // https://github.com/oppia/oppia/issues/4166
           sum += intercept[p];
           if (sum > 0) {
             votes[i]++;

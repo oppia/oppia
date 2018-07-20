@@ -21,26 +21,25 @@ oppia.constant(
   '/explorehandler/store_playthrough/<exploration_id>');
 
 oppia.factory('PlaythroughService', [
-  '$http', 'PAGE_CONTEXT', 'PlaythroughObjectFactory',
-  'LearnerActionObjectFactory', 'STORE_PLAYTHROUGH_URL',
-  'UrlInterpolationService', 'StopwatchObjectFactory',
-  'CURRENT_ISSUE_SCHEMA_VERSION', 'ISSUE_TYPE_EARLY_QUIT',
+  '$http', 'LearnerActionObjectFactory', 'PlaythroughObjectFactory',
+  'StopwatchObjectFactory', 'UrlInterpolationService',
+  'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_START',
+  'ACTION_TYPE_EXPLORATION_QUIT', 'CURRENT_ACTION_SCHEMA_VERSION',
+  'CURRENT_ISSUE_SCHEMA_VERSION', 'EARLY_QUIT_THRESHOLD_IN_SECS',
+  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'ISSUE_TYPE_EARLY_QUIT',
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS',
-  'ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'EARLY_QUIT_THRESHOLD_IN_SECS',
   'NUM_INCORRECT_ANSWERS_THRESHOLD', 'NUM_REPEATED_CYCLES_THRESHOLD',
-  'CURRENT_ACTION_SCHEMA_VERSION', 'ACTION_TYPE_EXPLORATION_START',
-  'ACTION_TYPE_ANSWER_SUBMIT', 'ACTION_TYPE_EXPLORATION_QUIT',
-  'RECORD_PLAYTHROUGH_PROBABILITY',
+  'PAGE_CONTEXT', 'RECORD_PLAYTHROUGH_PROBABILITY', 'STORE_PLAYTHROUGH_URL',
   function(
-      $http, PAGE_CONTEXT, PlaythroughObjectFactory, LearnerActionObjectFactory,
-      STORE_PLAYTHROUGH_URL, UrlInterpolationService, StopwatchObjectFactory,
-      CURRENT_ISSUE_SCHEMA_VERSION, ISSUE_TYPE_EARLY_QUIT,
+      $http, LearnerActionObjectFactory, PlaythroughObjectFactory,
+      StopwatchObjectFactory, UrlInterpolationService,
+      ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_START,
+      ACTION_TYPE_EXPLORATION_QUIT, CURRENT_ACTION_SCHEMA_VERSION,
+      CURRENT_ISSUE_SCHEMA_VERSION, EARLY_QUIT_THRESHOLD_IN_SECS,
+      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, ISSUE_TYPE_EARLY_QUIT,
       ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS,
-      ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS, EARLY_QUIT_THRESHOLD_IN_SECS,
       NUM_INCORRECT_ANSWERS_THRESHOLD, NUM_REPEATED_CYCLES_THRESHOLD,
-      CURRENT_ACTION_SCHEMA_VERSION, ACTION_TYPE_EXPLORATION_START,
-      ACTION_TYPE_ANSWER_SUBMIT, ACTION_TYPE_EXPLORATION_QUIT,
-      RECORD_PLAYTHROUGH_PROBABILITY) {
+      PAGE_CONTEXT, RECORD_PLAYTHROUGH_PROBABILITY, STORE_PLAYTHROUGH_URL) {
     var playthrough = null;
     var expStopwatch = null;
     var isPlayerInSamplePopulation = null;
@@ -197,11 +196,20 @@ oppia.factory('PlaythroughService', [
       isPlayerExcludedFromSamplePopulation: function() {
         return !isPlayerInSamplePopulation;
       },
+      isExplorationWhitelisted: function(expId) {
+        var whiteListedExpIds =
+          constants.WHITELISTED_EXPLORATION_IDS_FOR_SAVING_PLAYTHROUGHS;
+        if (whiteListedExpIds.indexOf(expId) !== -1) {
+          return true;
+        }
+        return false;
+      },
       getPlaythrough: function() {
         return playthrough;
       },
       recordExplorationStartAction: function(initStateName) {
-        if (this.isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation() ||
+            !this.isExplorationWhitelisted(playthrough.expId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -223,7 +231,8 @@ oppia.factory('PlaythroughService', [
       recordAnswerSubmitAction: function(
           stateName, destStateName, interactionId, answer, feedback,
           timeSpentInStateSecs) {
-        if (this.isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation() ||
+            !this.isExplorationWhitelisted(playthrough.explorationId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -262,7 +271,8 @@ oppia.factory('PlaythroughService', [
       },
       recordExplorationQuitAction: function(
           stateName, timeSpentInStateSecs) {
-        if (this.isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation() ||
+            !this.isExplorationWhitelisted(playthrough.explorationId)) {
           return;
         }
         playthrough.actions.push(LearnerActionObjectFactory.createNew(
@@ -279,7 +289,8 @@ oppia.factory('PlaythroughService', [
         ));
       },
       recordPlaythrough: function(isExplorationComplete) {
-        if (this.isPlayerExcludedFromSamplePopulation()) {
+        if (this.isPlayerExcludedFromSamplePopulation() ||
+            !this.isExplorationWhitelisted(playthrough.explorationId)) {
           return;
         }
         if (isExplorationComplete) {

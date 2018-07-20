@@ -16,6 +16,7 @@
  * @fileoverview Page object for the subscription dashboard,
  * for use in Protractor tests.
  */
+var waitFor = require('./waitFor.js');
 
 var SubscriptionDashboardPage = function() {
   var subscriptionButton = element(
@@ -23,25 +24,33 @@ var SubscriptionDashboardPage = function() {
   var subscriptionName = element.all(
     by.css('.protractor-test-subscription-name'));
 
+  this.navigateToUserSubscriptionPage = function(userName) {
+    browser.get('/profile/' + userName);
+    return waitFor.pageToFullyLoad();
+  };
+
   this.expectSubscriptionFirstNameToMatch = function(name) {
-    expect(
-      subscriptionName.first().getText()
-    ).toMatch(name);
+    waitFor.visibilityOf(
+      subscriptionName.first(), 'First Subscriber Name is not visible');
+    expect(subscriptionName.first().getText()).toMatch(name);
   };
 
   this.expectSubscriptionLastNameToMatch = function(name) {
-    expect(
-      subscriptionName.last().getText()
-    ).toMatch(name);
+    waitFor.visibilityOf(
+      subscriptionName.last(), 'Last Subscriber Name is not visible');
+    expect(subscriptionName.last().getText()).toMatch(name);
   };
 
   this.expectSubscriptionCountToEqual = function(value) {
-    expect(
-      subscriptionName.count()
-    ).toEqual(value);
+    waitFor.visibilityOf(
+      subscriptionName.first(),
+      'Subscriber Name Card takes too long to appear');
+    expect(subscriptionName.count()).toEqual(value);
   };
 
-  this.navigateToSubscriptionButton = function(name) {
+  this.navigateToSubscriptionButton = function() {
+    waitFor.elementToBeClickable(
+      subscriptionButton, 'Subscription button is not clickable');
     subscriptionButton.click();
   };
 };

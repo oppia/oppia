@@ -17,21 +17,9 @@
  * with protractor.
  */
 
-var editor = require('./editor.js');
-
-// Time (in ms) to wait when the system needs time for some computations.
-var WAIT_TIME = 4000;
-
-// Optionally accepts a waitTime integer in milliseconds.
-var waitForSystem = function() {
-  var waitTime;
-  if (arguments.length === 1) {
-    waitTime = arguments[0];
-  } else {
-    waitTime = WAIT_TIME;
-  }
-  browser.sleep(waitTime);
-};
+var ExplorationEditorPage = require(
+  '../protractor_utils/ExplorationEditorPage.js');
+var waitFor = require('./waitFor.js');
 
 var scrollToTop = function() {
   browser.executeScript('window.scrollTo(0,0);');
@@ -102,13 +90,15 @@ var getExplorationIdFromPlayer = function() {
 // The explorationId here should be a string, not a promise.
 var openEditor = function(explorationId) {
   browser.get(EDITOR_URL_SLICE + explorationId);
-  browser.waitForAngular();
-  editor.exitTutorialIfNecessary();
+  waitFor.pageToFullyLoad();
+  var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+  var explorationEditorMainTab = explorationEditorPage.getMainTab();
+  explorationEditorMainTab.exitTutorial();
 };
 
 var openPlayer = function(explorationId) {
   browser.get(PLAYER_URL_SLICE + explorationId);
-  browser.waitForAngular();
+  waitFor.pageToFullyLoad();
 };
 
 // Takes the user from an exploration editor to its player.
@@ -146,16 +136,8 @@ var ensurePageHasNoTranslationIds = function() {
 };
 
 var acceptAlert = function() {
-  browser.wait(function() {
-    return browser.switchTo().alert().accept().then(
-      function() {
-        return true;
-      },
-      function() {
-        return false;
-      }
-    );
-  });
+  waitFor.alertToBePresent();
+  browser.switchTo().alert().accept();
 };
 
 var _getUniqueLogMessages = function(logs) {
@@ -190,7 +172,6 @@ var checkConsoleErrorsExist = function(expectedErrors) {
 };
 
 exports.acceptAlert = acceptAlert;
-exports.waitForSystem = waitForSystem;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 

@@ -396,7 +396,8 @@ oppia.controller('StateInteraction', [
         }
 
         $rootScope.$broadcast('updateAnswerChoices', _answerChoices);
-      } else if ($scope.interactionId === 'ItemSelectionInput') {
+      } else if ($scope.interactionId === 'ItemSelectionInput' ||
+          $scope.interactionId === 'DragAndDropSortInput') {
         $rootScope.$broadcast(
           'updateAnswerChoices',
           currentCustomizationArgs.choices.value.map(function(val) {
@@ -428,17 +429,28 @@ oppia.directive('testInteractionPanel', [
       controller: [
         '$scope', 'EditorStateService', 'ExplorationStatesService',
         'INTERACTION_SPECS', 'INTERACTION_DISPLAY_MODE_INLINE',
+        'EVENT_PROGRESS_NAV_SUBMITTED',
         function($scope, EditorStateService, ExplorationStatesService,
-            INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE) {
+            INTERACTION_SPECS, INTERACTION_DISPLAY_MODE_INLINE,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           var _stateName = EditorStateService.getActiveStateName();
           var _state = ExplorationStatesService.getState(_stateName);
           $scope.interactionIsInline = (
             INTERACTION_SPECS[_state.interaction.id].display_mode ===
             INTERACTION_DISPLAY_MODE_INLINE);
+          $scope.interactionAnswerIsValid = true;
           $scope.submitAnswer = function(answer) {
             $scope.onSubmitAnswer({
               answer: answer
             });
+          };
+
+          $scope.onSubmitAnswerFromButton = function() {
+            $scope.$broadcast(EVENT_PROGRESS_NAV_SUBMITTED);
+          };
+
+          $scope.setInteractionAnswerValidity = function(answerValidity) {
+            $scope.interactionAnswerIsValid = answerValidity;
           };
         }
       ]

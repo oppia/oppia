@@ -14,10 +14,12 @@
 
 """Controllers for the feedback thread page."""
 
+from constants import constants
 from core.controllers import base
 from core.domain import acl_decorators
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import suggestion_services
 from core.platform import models
 import feconf
 
@@ -32,8 +34,16 @@ class ThreadListHandler(base.BaseHandler):
     @acl_decorators.can_play_exploration
     def get(self, exploration_id):
         self.values.update({
-            'threads': [t.to_dict() for t in feedback_services.get_all_threads(
-                exploration_id, False)]})
+            'feedback_thread_dicts': (
+                [t.to_dict() for t in feedback_services.get_all_threads(
+                    exploration_id, False)])
+            })
+        if constants.USE_NEW_SUGGESTION_FRAMEWORK:
+            self.values.update({
+                'suggestion_thread_dicts': (
+                    [t.to_dict() for t in feedback_services.get_all_threads(
+                        exploration_id, True)])
+            })
         self.render_json(self.values)
 
     @acl_decorators.can_create_feedback_thread
@@ -64,7 +74,12 @@ class ThreadHandler(base.BaseHandler):
 
     @acl_decorators.can_view_feedback_thread
     def get(self, thread_id):
-        suggestion = feedback_services.get_suggestion(thread_id)
+        if constants.USE_NEW_SUGGESTION_FRAMEWORK:
+            suggestion_id = 'exploration.%s' % thread_id
+            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        else:
+            suggestion = feedback_services.get_suggestion(thread_id)
+
         messages = [m.to_dict() for m in feedback_services.get_messages(
             thread_id)]
         message_ids = [message['message_id'] for message in messages]

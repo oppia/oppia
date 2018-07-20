@@ -24,18 +24,39 @@ class QuestionModelUnitTests(test_utils.GenericTestBase):
 
     def test_create_question(self):
         state = exp_domain.State.create_default_state('ABC')
-        question_data = state.to_dict()
-        question_data_schema_version = 1
+        question_state_data = state.to_dict()
         language_code = 'en'
+        version = 1
         question_model = question_models.QuestionModel.create(
-            question_data, question_data_schema_version,
-            language_code)
+            question_state_data, language_code, version)
 
-        self.assertEqual(question_model.question_data, question_data)
         self.assertEqual(
-            question_model.question_data_schema_version,
-            question_data_schema_version)
+            question_model.question_state_data, question_state_data)
         self.assertEqual(question_model.language_code, language_code)
+
+
+class QuestionSummaryModelUnitTests(test_utils.GenericTestBase):
+    """Tests the QuestionSummaryModel class."""
+
+    def test_get_by_creator_id(self):
+        question_summary_model_1 = question_models.QuestionSummaryModel(
+            id='question_1',
+            creator_id='user',
+            question_content='Question 1'
+        )
+        question_summary_model_2 = question_models.QuestionSummaryModel(
+            id='question_2',
+            creator_id='user',
+            question_content='Question 2'
+        )
+        question_summary_model_1.put()
+        question_summary_model_2.put()
+
+        question_summaries = (
+            question_models.QuestionSummaryModel.get_by_creator_id('user'))
+        self.assertEqual(len(question_summaries), 2)
+        self.assertEqual(question_summaries[0].id, 'question_1')
+        self.assertEqual(question_summaries[1].id, 'question_2')
 
 
 class QuestionSkillLinkModelUnitTests(test_utils.GenericTestBase):
