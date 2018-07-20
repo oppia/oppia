@@ -31,6 +31,7 @@ oppia.factory('SuggestionThreadObjectFactory', [
       this.stateName = stateName;
       this.threadId = threadId;
       this.suggestion = suggestion;
+      this.messages = null;
     };
 
     SuggestionThread.createFromBackendDicts = function(
@@ -45,6 +46,10 @@ oppia.factory('SuggestionThreadObjectFactory', [
         suggestionThreadBackendDict.message_count,
         suggestionThreadBackendDict.state_name,
         suggestionThreadBackendDict.thread_id, suggestion);
+    };
+
+    SuggestionThread.prototype.setMessages = function(messages) {
+      this.messages = messages;
     };
 
     SuggestionThread.prototype.isSuggestionHandled = function() {

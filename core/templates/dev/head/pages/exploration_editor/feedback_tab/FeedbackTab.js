@@ -43,7 +43,7 @@ oppia.controller('FeedbackTab', [
       status: null,
       text: ''
     };
-
+    $scope.useNewSuggestionsFramework = constants.USE_NEW_SUGGESTION_FRAMEWORK;
     var _resetTmpMessageFields = function() {
       $scope.tmpMessage.status = $scope.activeThread ?
         $scope.activeThread.status : null;

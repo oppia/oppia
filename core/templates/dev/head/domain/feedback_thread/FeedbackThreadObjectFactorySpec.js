@@ -47,5 +47,13 @@ describe('Feedback thread object factory', function() {
     expect(feedbackThread.stateName).toEqual('state 1');
     expect(feedbackThread.threadId).toEqual('exp1.thread1');
     expect(feedbackThread.isSuggestionThread()).toEqual(false);
+
+    messages = [{
+      text: 'message1'
+    }, {
+      text: 'message2'
+    }];
+    feedbackThread.setMessages(messages);
+    expect(feedbackThread.messages).toEqual(messages);
   });
 });

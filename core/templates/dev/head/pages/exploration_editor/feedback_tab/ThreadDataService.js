@@ -109,7 +109,7 @@ oppia.factory('ThreadDataService', [
         var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
         for (var i = 0; i < allThreads.length; i++) {
           if (allThreads[i].threadId === threadId) {
-            allThreads[i].messages = response.data.messages;
+            allThreads[i].setMessages(response.data.messages);
             if (!constants.USE_NEW_SUGGESTION_FRAMEWORK) {
               allThreads[i].suggestion = response.data.suggestion;
             }

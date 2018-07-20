@@ -54,7 +54,9 @@ describe('Suggestion thread object factory', function() {
         new_value: {
           html: 'new suggestion content'
         },
-        old_value: 'old suggestion content'
+        old_value: {
+          html: 'old suggestion content'
+        }
       },
       last_updated: 1000
     };
@@ -78,7 +80,7 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.suggestion.authorName).toEqual('author');
     expect(suggestionThread.suggestion.newValue.html).toEqual(
       'new suggestion content');
-    expect(suggestionThread.suggestion.oldValue).toEqual(
+    expect(suggestionThread.suggestion.oldValue.html).toEqual(
       'old suggestion content');
     expect(suggestionThread.suggestion.lastUpdated).toEqual(1000);
     expect(suggestionThread.suggestion.threadId()).toEqual('exp1.thread1');
@@ -90,5 +92,13 @@ describe('Suggestion thread object factory', function() {
     expect(suggestionThread.getSuggestionStateName()).toEqual('state_1');
     expect(suggestionThread.getReplacementHtmlFromSuggestion()).toEqual(
       'new suggestion content');
+
+    messages = [{
+      text: 'message1'
+    }, {
+      text: 'message2'
+    }];
+    suggestionThread.setMessages(messages);
+    expect(suggestionThread.messages).toEqual(messages);
   });
 });

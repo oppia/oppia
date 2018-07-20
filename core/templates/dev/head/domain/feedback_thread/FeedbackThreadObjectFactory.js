@@ -29,6 +29,11 @@ oppia.factory('FeedbackThreadObjectFactory', [function() {
     this.messageCount = messageCount;
     this.stateName = stateName;
     this.threadId = threadId;
+    this.messages = null;
+  };
+
+  FeedbackThread.prototype.setMessages = function(messages) {
+    this.messages = messages;
   };
 
   FeedbackThread.createFromBackendDict = function(feedbackThreadBackendDict) {
