@@ -1760,11 +1760,11 @@ def get_decorator_for_accepting_suggestion(decorator):
     Returns:
         function. The new decorator which includes all the permission checks for
             accepting/rejecting suggestions. These permissions include:
-            - Admins can accpet/reject any suggestion.
-            - Users with scores above threshold can accept/reject any suggesiton
+            - Admins can accept/reject any suggestion.
+            - Users with scores above threshold can accept/reject any suggestion
             in that category.
-            - Any user with edit permissions to the target entity being
-            suggested to can accept/reject suggestions for that entity.
+            - Any user with edit permissions to the target entity can
+            accept/reject suggestions for that entity.
     """
     def generate_decorator_for_handler(handler):
         def test_can_accept_suggestion(
