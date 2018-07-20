@@ -22,10 +22,22 @@ describe('Responses Service', function() {
       module('oppia');
     });
 
+    let scope;
+    let rs;
+
     beforeEach(inject(function($injector, $rootScope) {
-      const rs = $injector.get('ResponsesService');
-      const scope = $rootScope.$new();
+      rs = $injector.get('ResponsesService');
+      scope = $rootScope.$new();
     }));
+
+    beforeEach(function() {
+      rs.init({
+        interactionId: 1,
+        answerGroups: 'some value',
+        defaultOutcome: 'some default outcome',
+        confirmedUnclassifiedAnswers: 'some value'
+      })
+    });
 
     it('should return -1 if no answer group is active', function() {
       expect(rs.getActiveAnswerGroupIndex()).toEqual(-1)
