@@ -325,5 +325,6 @@
 	"I18N_TOPNAV_PREFERENCES": "Preferências",
 	"I18N_TOPNAV_SIGN_IN": "Entrar",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Ensine com Oppia",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Cancelar inscrição"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Cancelar inscrição",
+	"I18N_WORKED_EXAMPLE": "Exemplo de trabalho"
 }

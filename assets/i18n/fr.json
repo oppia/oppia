@@ -436,6 +436,7 @@
 	"I18N_SIDEBAR_FORUM": "Forum",
 	"I18N_SIDEBAR_GET_STARTED": "Démarrer",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Bibliothèque",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "La fondation Oppia",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "Enseigner avec Oppia",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "En cochant la case à gauche de ce texte, vous reconnaissez et acceptez d’être lié par les Conditions d’utilisation de <[sitename]>, trouvées <a href=\"/terms\" target=\"_blank\">ici</a>.",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "Soumettre et commencer à contribuer",
@@ -522,5 +523,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Se connecter avec Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Enseigner avec Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Vous avez un total de <[totalSubscribers]> abonnés.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Se désabonner"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Se désabonner",
+	"I18N_WORKED_EXAMPLE": "Exemple travaillé"
 }

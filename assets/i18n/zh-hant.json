@@ -522,5 +522,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "使用 Google 帳號登入",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "以 Oppia 教學",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "您一共擁有<[totalSubscribers]>位訂閱者。",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "取消訂閱"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "取消訂閱",
+	"I18N_WORKED_EXAMPLE": "處理範例"
 }

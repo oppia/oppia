@@ -522,5 +522,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "الدخول عن طريق جوجل",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "التعليم مع أوبيا",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "لديك ما مجموعه <[totalSubscribers]> مشترك.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "إلغاء الاشتراك"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "إلغاء الاشتراك",
+	"I18N_WORKED_EXAMPLE": "مثال على العمل"
 }

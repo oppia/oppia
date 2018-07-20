@@ -322,5 +322,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Σύνδεση με τη Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Διδάξτε με την Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Έχετε ένα σύνολο <[totalSubscribers]> συνδρομητών.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Κατάργηση συνδρομής"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Κατάργηση συνδρομής",
+	"I18N_WORKED_EXAMPLE": "Δουλεμένο παράδειγμα"
 }
