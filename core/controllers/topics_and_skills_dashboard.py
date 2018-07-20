@@ -60,12 +60,40 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         skill_summary_dicts = [
             summary.to_dict() for summary in skill_summaries]
 
+        skill_ids_assigned_to_some_topic = (
+            topic_services.get_all_skill_ids_assigned_to_some_topic())
         topic_rights_dict = topic_services.get_all_topic_rights()
         for topic_summary in topic_summary_dicts:
-            topic_rights = topic_rights_dict[topic_summary['id']]
-            if topic_rights:
-                topic_summary['is_published'] = (
-                    topic_rights.topic_is_published)
+            if topic_rights_dict[topic_summary['id']]:
+                topic_rights = topic_rights_dict[topic_summary['id']]
+                if topic_rights:
+                    topic_summary['is_published'] = (
+                        topic_rights.topic_is_published)
+                    topic_summary['can_edit_topic'] = (
+                        topic_services.check_can_edit_topic(
+                            self.user, topic_rights)
+                    )
+
+        skill_ids_for_private_skills_by_user = [
+            skill_rights.id for skill_rights in (
+                skill_services.get_unpublished_skill_rights_by_creator(
+                    self.user_id))]
+
+        skill_ids_for_unpublished_skills = [
+            skill_rights.id for skill_rights in (
+                skill_services.get_all_unpublished_skill_rights())]
+
+        untriaged_skill_summary_dicts = []
+        for skill_summary_dict in skill_summary_dicts:
+            skill_id = skill_summary_dict['id']
+            if (skill_id not in skill_ids_assigned_to_some_topic) and (
+                    skill_id not in skill_ids_for_unpublished_skills):
+                untriaged_skill_summary_dicts.append(skill_summary_dict)
+
+        unpublished_skill_summary_dicts = [
+            summary.to_dict() for summary in (
+                skill_services.get_multi_skill_summaries(
+                    skill_ids_for_private_skills_by_user))]
 
         can_delete_topic = (
             role_services.ACTION_DELETE_TOPIC in self.user.actions)
@@ -73,11 +101,16 @@ class TopicsAndSkillsDashboardPageDataHandler(base.BaseHandler):
         can_create_topic = (
             role_services.ACTION_CREATE_NEW_TOPIC in self.user.actions)
 
+        can_create_skill = (
+            role_services.ACTION_CREATE_NEW_SKILL in self.user.actions)
+
         self.values.update({
-            'skill_summary_dicts': skill_summary_dicts,
+            'untriaged_skill_summary_dicts': untriaged_skill_summary_dicts,
+            'unpublished_skill_summary_dicts': unpublished_skill_summary_dicts,
             'topic_summary_dicts': topic_summary_dicts,
             'can_delete_topic': can_delete_topic,
-            'can_create_topic': can_create_topic
+            'can_create_topic': can_create_topic,
+            'can_create_skill': can_create_skill
         })
         self.render_json(self.values)
 

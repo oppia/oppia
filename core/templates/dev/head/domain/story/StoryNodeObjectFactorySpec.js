@@ -49,6 +49,21 @@ describe('Story node object factory', function() {
     expect(storyNode.getExplorationId()).toEqual(null);
   });
 
+  it('should correctly validate a valid story node', function() {
+    expect(_sampleStoryNode.validate()).toEqual([]);
+  });
+
+  it('should correctly validate story nodes', function() {
+    _sampleStoryNode.addPrerequisiteSkillId('skill_2');
+    _sampleStoryNode.addDestinationNodeId('node_1');
+
+    expect(_sampleStoryNode.validate()).toEqual([
+      'The skill with id skill_2 is common to both the acquired and' +
+      ' prerequisite skill id list in node with id node_1',
+      'The destination node id of node with id node_1 points to itself.'
+    ]);
+  });
+
   it('should correctly throw error when duplicate values are added to arrays',
     function() {
       expect(function() {

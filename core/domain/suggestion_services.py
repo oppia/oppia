@@ -19,12 +19,14 @@ suggestions.
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import suggestion_registry
+from core.domain import user_domain
 from core.domain import user_services
 from core.platform import models
 import feconf
 
-(feedback_models, suggestion_models) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.suggestion])
+(feedback_models, suggestion_models, user_models) = (
+    models.Registry.import_models(
+        [models.NAMES.feedback, models.NAMES.suggestion, models.NAMES.user]))
 
 DEFAULT_SUGGESTION_THREAD_SUBJECT = 'Suggestion from a user'
 DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
@@ -32,8 +34,7 @@ DEFAULT_SUGGESTION_THREAD_INITIAL_MESSAGE = ''
 
 def create_suggestion(
         suggestion_type, target_type, target_id, target_version_at_submission,
-        author_id, change_cmd, description,
-        assigned_reviewer_id, final_reviewer_id):
+        author_id, change_cmd, description, final_reviewer_id):
     """Creates a new SuggestionModel and the corresponding FeedbackThread.
 
     Args:
@@ -49,8 +50,6 @@ def create_suggestion(
         author_id: str. The ID of the user who submitted the suggestion.
         change_cmd: dict. The details of the suggestion.
         description: str. The description of the changes provided by the author.
-        assigned_reviewer_id: str|None. The ID of the user assigned to
-            review the suggestion.
         final_reviewer_id: str|None. The ID of the reviewer who has
             accepted/rejected the suggestion.
     """
@@ -63,16 +62,14 @@ def create_suggestion(
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         thread_id = feedback_services.create_thread(
             target_id, None, author_id, description,
-            DEFAULT_SUGGESTION_THREAD_SUBJECT)
+            DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
         # This line and the if..else will be removed after the feedback thread
         # migration is complete and the IDs for both models match.
         thread_id = suggestion_models.TARGET_TYPE_EXPLORATION + '.' + thread_id
     else:
         raise Exception('Feedback threads can only be linked to explorations')
 
-    status = (
-        suggestion_models.STATUS_IN_REVIEW if assigned_reviewer_id else
-        suggestion_models.STATUS_RECEIVED)
+    status = suggestion_models.STATUS_IN_REVIEW
 
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         exploration = exp_services.get_exploration_by_id(target_id)
@@ -83,7 +80,7 @@ def create_suggestion(
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
-        target_version_at_submission, status, author_id, assigned_reviewer_id,
+        target_version_at_submission, status, author_id,
         final_reviewer_id, change_cmd, score_category, thread_id)
 
 
@@ -103,7 +100,6 @@ def get_suggestion_from_model(suggestion_model):
         suggestion_model.id, suggestion_model.target_id,
         suggestion_model.target_version_at_submission,
         suggestion_model.status, suggestion_model.author_id,
-        suggestion_model.assigned_reviewer_id,
         suggestion_model.final_reviewer_id, suggestion_model.change_cmd,
         suggestion_model.score_category, suggestion_model.last_updated)
 
@@ -123,94 +119,34 @@ def get_suggestion_by_id(suggestion_id):
     return get_suggestion_from_model(model) if model else None
 
 
-def get_suggestions_by_author(author_id):
-    """Gets a list of suggestions by the given author.
+def query_suggestions(query_fields_and_values):
+    """Queries for suggestions.
 
     Args:
-        author_id: str. The ID of the author of the suggestions.
+        query_fields_and_values: list(tuple(str, str)). A list of queries. The
+            first element in each tuple is the field to be queried, and the
+            second element is its value.
 
     Returns:
-        list(Suggestion). A list of suggestions by the given author.
-    """
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_suggestions_by_author(
-            author_id)]
-
-
-def get_suggestions_reviewed_by(reviewer_id):
-    """Gets a list of suggestions that have been reviewed by the given user.
-
-    Args:
-        reviewer_id: str. The ID of the reviewer of the suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions reviewed by the given user.
-    """
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_suggestions_reviewed_by(reviewer_id)]
-
-
-def get_suggestions_assigned_to_reviewer(assigned_reviewer_id):
-    """Gets a list of suggestions assigned to the given user for review.
-
-    Args:
-        assigned_reviewer_id: str. The ID of the reviewer assigned to review the
-                suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions assigned to the given user
-            for review.
+        list(Suggestion). A list of suggestions that match the given query
+        values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
     """
     return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_assigned_to_reviewer(assigned_reviewer_id)]
+            for s in suggestion_models.GeneralSuggestionModel.query_suggestions(
+                query_fields_and_values)]
 
 
-def get_suggestions_by_status(status):
-    """Gets a list of suggestions with the given status.
-
-    Args:
-        status: str. The status of the suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions with the given status.
-    """
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_by_status(status)]
-
-
-def get_suggestion_by_type(suggestion_type):
-    """Gets a list of suggestions with the given type.
-
-    Args:
-        suggestion_type: str. The type of the suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions of the given type.
-    """
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_by_type(suggestion_type)]
-
-
-def get_suggestions_by_target_id(target_type, target_id):
-    """Gets a list of suggestions to the entity with the given ID.
-
-    Args:
-        target_type: str. The type of target entity the suggestion is linked to.
-        target_id: str. The ID of the target entity the suggestion is linked to.
+def get_all_stale_suggestions():
+    """Gets a list of suggestions without any activity on them for
+    THRESHOLD_TIME_BEFORE_ACCEPT time.
 
     Returns:
         list(Suggestion). A list of suggestions linked to the entity.
     """
+
     return [get_suggestion_from_model(s)
             for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_by_target_id(target_type, target_id)]
+            .get_all_stale_suggestions()]
 
 
 def _update_suggestion(suggestion):
@@ -225,7 +161,6 @@ def _update_suggestion(suggestion):
         suggestion.suggestion_id)
 
     suggestion_model.status = suggestion.status
-    suggestion_model.assigned_reviewer_id = suggestion.assigned_reviewer_id
     suggestion_model.final_reviewer_id = suggestion.final_reviewer_id
     suggestion_model.change_cmd = suggestion.change_cmd.to_dict()
     suggestion_model.score_category = suggestion.score_category
@@ -248,20 +183,6 @@ def mark_review_completed(suggestion, status, reviewer_id):
 
     suggestion.status = status
     suggestion.final_reviewer_id = reviewer_id
-    suggestion.assigned_reviewer_id = None
-
-    _update_suggestion(suggestion)
-
-
-def assign_reviewer_to_suggestion(suggestion, assigned_reviewer_id):
-    """Assigns a user to review the suggestion.
-
-    Args:
-        suggestion: Suggestion. The suggestion to be updated.
-        assigned_reviewer_id: str. The ID of the user who is assigned to review.
-    """
-    suggestion.status = suggestion_models.STATUS_IN_REVIEW
-    suggestion.assigned_reviewer_id = assigned_reviewer_id
 
     _update_suggestion(suggestion)
 
@@ -355,3 +276,106 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
     feedback_services.create_message(
         get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
         feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
+
+
+def get_user_contribution_scoring_from_model(userContributionScoringModel):
+    """Returns the UserContributionScoring domain object corresponding to the
+    UserContributionScoringModel
+
+    Args:
+        userContributionScoringModel: UserContributionScoringModel. The model
+            instance.
+
+    Returns:
+        UserContributionScoring. The corresponding domain object.
+    """
+    return user_domain.UserContributionScoring(
+        userContributionScoringModel.user_id,
+        userContributionScoringModel.score_category,
+        userContributionScoringModel.score)
+
+
+def get_all_scores_of_user(user_id):
+    """Gets all scores for a given user.
+
+    Args:
+        user_id: str. The id of the user.
+
+    Returns:
+        dict. A dict containing all the scores of the user. The keys of the dict
+            are the score categories and the values are the scores.
+    """
+    scores = {}
+    for model in (
+            user_models.UserContributionScoringModel.get_all_scores_of_user(
+                user_id)):
+        scores[model.score_category] = model.score
+
+    return scores
+
+
+def check_user_can_review_in_category(user_id, score_category):
+    """Checks if user can review suggestions in category score_category.
+    If the user has score above the minimum required score, then the user is
+    allowed to review.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The category to check the user's score.
+
+    Returns:
+        bool. Whether the user can review suggestions under category
+            score_category
+    """
+    score = (
+        user_models.UserContributionScoringModel.get_score_of_user_for_category(
+            user_id, score_category))
+    if not score:
+        return False
+    return score >= feconf.MINIMUM_SCORE_REQUIRED_TO_REVIEW
+
+
+def get_all_user_ids_who_are_allowed_to_review(score_category):
+    """Gets all user_ids of users who are allowed to review (as per their
+    scores) suggestions to a particular category.
+
+    Args:
+        score_category: str. The category of the suggestion.
+
+    Returns:
+        list(str). All user_ids of users who are allowed to review in the given
+            category.
+    """
+    return [model.user_id for model in
+            user_models.UserContributionScoringModel
+            .get_all_users_with_score_above_minimum_for_category(
+                score_category)]
+
+
+def increment_score_for_user(user_id, score_category, increment_by):
+    """Increment the score of the user in the category by the given amount.
+
+    In the first version of the scoring system, the increment_by quantity will
+    be +1, i.e, each user gains a point for a successful contribution and
+    doesn't lose score in any way.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The category of the suggestion.
+        increment_by: float. The amount to increase the score of the user by.
+    """
+    user_models.UserContributionScoringModel.increment_score_for_user(
+        user_id, score_category, increment_by)
+
+
+def create_new_user_contribution_scoring_model(user_id, score_category, score):
+    """Create a new UserContributionScoringModel instance for the user and the
+    given category with a score of 0.
+
+    Args:
+        user_id: str. The id of the user.
+        score_category: str. The category of the suggestion.
+        score: float. The score of the user for the given category.
+    """
+    user_models.UserContributionScoringModel.create(
+        user_id, score_category, score)

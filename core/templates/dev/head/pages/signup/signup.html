@@ -1,6 +1,8 @@
 {% extends 'pages/base.html' %}
 
-{% block maintitle %}I18N_SIGNUP_PAGE_TITLE{% endblock maintitle %}
+{% block maintitle %}
+  I18N_SIGNUP_PAGE_TITLE
+{% endblock maintitle %}
 
 {% block navbar_breadcrumb %}
   <ul class="nav navbar-nav oppia-navbar-breadcrumb">
@@ -91,7 +93,7 @@
           <label>
             <input type="checkbox" ng-model="hasAgreedToLatestTerms"
                    class="protractor-test-agree-to-terms-checkbox">
-            <span translate="I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION" translate-value-sitename="{{SITE_NAME}}">
+            <span translate="I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION" translate-value-sitename="<[siteName]>">
             </span>
           </label>
         </div>

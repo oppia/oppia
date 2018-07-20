@@ -19,11 +19,13 @@
 oppia.constant('RTE_COMPONENT_SPECS', richTextComponents);
 
 oppia.factory('RteHelperService', [
-  '$filter', '$log', '$interpolate', 'ExplorationContextService',
-  'RTE_COMPONENT_SPECS', 'HtmlEscaperService', 'UrlInterpolationService',
+  '$filter', '$log', '$uibModal', '$interpolate', '$document',
+  'ContextService', 'RTE_COMPONENT_SPECS', 'HtmlEscaperService',
+  'UrlInterpolationService', 'FocusManagerService',
   function(
-      $filter, $log, $interpolate, ExplorationContextService,
-      RTE_COMPONENT_SPECS, HtmlEscaperService, UrlInterpolationService) {
+      $filter, $log, $uibModal, $interpolate, $document,
+      ContextService, RTE_COMPONENT_SPECS, HtmlEscaperService,
+      UrlInterpolationService, FocusManagerService) {
     var _RICH_TEXT_COMPONENTS = [];
 
     Object.keys(RTE_COMPONENT_SPECS).sort().forEach(function(componentId) {
@@ -33,8 +35,10 @@ oppia.factory('RteHelperService', [
           RTE_COMPONENT_SPECS[componentId].customization_arg_specs),
         id: RTE_COMPONENT_SPECS[componentId].frontend_id,
         iconDataUrl: RTE_COMPONENT_SPECS[componentId].icon_data_url,
-        previewUrlTemplate:
-        RTE_COMPONENT_SPECS[componentId].preview_url_template,
+        previewUrlTemplate: ((GLOBALS.DEV_MODE ||
+          !constants.ENABLE_GCS_STORAGE_FOR_IMAGES) ?
+          RTE_COMPONENT_SPECS[componentId].preview_url_template_dev :
+          RTE_COMPONENT_SPECS[componentId].preview_url_template_prod),
         isComplex: RTE_COMPONENT_SPECS[componentId].is_complex,
         isBlockElement: RTE_COMPONENT_SPECS[componentId].is_block_element,
         requiresFs: RTE_COMPONENT_SPECS[componentId].requires_fs,
@@ -77,7 +81,7 @@ oppia.factory('RteHelperService', [
       // Returns a DOM node.
       createRteElement: function(componentDefn, customizationArgsDict) {
         var el = $('<img/>');
-        if (ExplorationContextService.isInExplorationContext()) {
+        if (ContextService.isInExplorationContext()) {
           // TODO(sll): This extra key was introduced in commit
           // 19a934ce20d592a3fc46bd97a2f05f41d33e3d66 in order to retrieve an
           // image for RTE previews. However, it has had the unfortunate side-
@@ -86,7 +90,8 @@ oppia.factory('RteHelperService', [
           // convertRteToHtml(), but we need to find a less invasive way to
           // handle previews.
           customizationArgsDict = angular.extend(customizationArgsDict, {
-            explorationId: ExplorationContextService.getExplorationId()
+            explorationId: ContextService.getExplorationId(),
+            bucketName: GLOBALS.GCS_RESOURCE_BUCKET_NAME
           });
         }
         var componentPreviewUrlTemplate = componentDefn.previewUrlTemplate;
@@ -99,6 +104,9 @@ oppia.factory('RteHelperService', [
             componentPreviewUrlTemplate, false, null, true)(
             customizationArgsDict));
         }
+        // bucketName was added earlier so that previewUrlTemplate could be
+        // interpolated with the bucketName.
+        delete customizationArgsDict.bucketName;
 
         if (!interpolatedUrl) {
           $log.error(
@@ -209,7 +217,78 @@ oppia.factory('RteHelperService', [
       },
       getRichTextComponents: function() {
         return angular.copy(_RICH_TEXT_COMPONENTS);
+      },
+      isInlineComponent: function(richTextComponent) {
+        var inlineComponents = ['link', 'math'];
+        return inlineComponents.indexOf(richTextComponent) !== -1;
+      },
+      // The refocusFn arg is a function that restores focus to the text editor
+      // after exiting the modal, and moves the cursor back to where it was
+      // before the modal was opened.
+      _openCustomizationModal: function(
+          customizationArgSpecs, attrsCustomizationArgsDict, onSubmitCallback,
+          onDismissCallback, refocusFn) {
+        $document[0].execCommand('enableObjectResizing', false, false);
+        var modalDialog = $uibModal.open({
+          templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+            '/components/forms/customize_rte_component_modal_directive.html'),
+          backdrop: 'static',
+          resolve: {},
+          controller: [
+            '$scope', '$uibModalInstance', '$timeout',
+            function($scope, $uibModalInstance, $timeout) {
+              $scope.customizationArgSpecs = customizationArgSpecs;
+
+              // Without this code, the focus will remain in the background RTE
+              // even after the modal loads. This switches the focus to a
+              // temporary field in the modal which is then removed from the
+              // DOM.
+              // TODO(sll): Make this switch to the first input field in the
+              // modal instead.
+              $scope.modalIsLoading = true;
+              FocusManagerService.setFocus('tmpFocusPoint');
+              $timeout(function() {
+                $scope.modalIsLoading = false;
+              });
+
+              $scope.tmpCustomizationArgs = [];
+              for (var i = 0; i < customizationArgSpecs.length; i++) {
+                var caName = customizationArgSpecs[i].name;
+                $scope.tmpCustomizationArgs.push({
+                  name: caName,
+                  value: (
+                    attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                      angular.copy(attrsCustomizationArgsDict[caName]) :
+                      customizationArgSpecs[i].default_value)
+                });
+              }
+
+              $scope.cancel = function() {
+                $uibModalInstance.dismiss('cancel');
+              };
+
+              $scope.save = function() {
+                $scope.$broadcast('externalSave');
+
+                var customizationArgsDict = {};
+                for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+                  var caName = $scope.tmpCustomizationArgs[i].name;
+                  customizationArgsDict[caName] = (
+                    $scope.tmpCustomizationArgs[i].value);
+                }
+
+                $uibModalInstance.close(customizationArgsDict);
+              };
+            }
+          ]
+        });
+
+        modalDialog.result.then(onSubmitCallback, onDismissCallback);
+        // 'finally' is a JS keyword. If it is just used in its ".finally" form,
+        // the minification process throws an error.
+        modalDialog.result['finally'](refocusFn);
       }
+
     };
   }
 ]);

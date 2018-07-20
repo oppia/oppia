@@ -50,7 +50,7 @@ class InformSubscribersTest(test_utils.GenericTestBase):
         self.user_id_2 = self.get_user_id_from_email(self.USER_EMAIL_2)
 
         self.exploration = self.save_new_default_exploration(
-            'A', self.editor_id, 'Title')
+            'A', self.editor_id, title='Title')
 
         self.can_send_emails_ctx = self.swap(
             feconf, 'CAN_SEND_EMAILS', True)

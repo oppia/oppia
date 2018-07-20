@@ -17,8 +17,9 @@
  * tests.
  */
 
-var general = require('./general.js');
 var forms = require('./forms.js');
+var general = require('./general.js');
+var waitFor = require('./waitFor.js');
 
 var AdminPage = function(){
   var ADMIN_URL_SUFFIX = '/admin';
@@ -31,30 +32,7 @@ var AdminPage = function(){
   var updateFormName = element(by.css('.protractor-update-form-name'));
   var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
-  var explorationElements = element.all(by.css(
-    '.protractor-test-reload-exploration-row'
-  ));
-  var reloadAllExplorationsButtons = element.all(by.css(
-    '.protractor-test-reload-all-explorations-button'
-  ));
-  var reloadCollectionButton = element.all(by.css(
-    '.protractor-test-reload-collection-button')).first();
-
-  var roleOption = function(role){
-    return roleSelect.element(by.cssContainingText('option', role));
-  };
-
-  var explorationTitleElement = function(explorationElement) {
-    return explorationElement.element(
-      by.css('.protractor-test-reload-exploration-title')
-    );
-  };
-
-  var explorationElementReloadButton = function(explorationElement) {
-    return explorationElement.element(
-      by.css('.protractor-test-reload-exploration-button')
-    );
-  };
+  var statusMessage = element(by.css('[ng-if="statusMessage"]'));
 
   var saveConfigProperty = function(configProperty) {
     return configProperty.element(by.css('.protractor-test-config-title'))
@@ -64,20 +42,22 @@ var AdminPage = function(){
           editingInstructions(forms.getEditor(objectType)(configProperty));
           saveAllConfigs.click();
           general.acceptAlert();
-          // Time is needed for the saving to complete.
-          browser.waitForAngular();
+          // Waiting for success message.
+          waitFor.textToBePresentInElement(
+            statusMessage, 'saved successfully',
+            'New config could not be saved');
           return true;
         }
       });
   };
 
   this.get = function(){
-    return browser.get(ADMIN_URL_SUFFIX);
+    browser.get(ADMIN_URL_SUFFIX);
+    return waitFor.pageToFullyLoad();
   };
 
   this.editConfigProperty = function(
       propertyName, objectType, editingInstructions) {
-    general.waitForSystem();
     this.get();
     configTab.click();
     configProperties.map(saveConfigProperty).then(function(results) {
@@ -92,46 +72,21 @@ var AdminPage = function(){
   };
 
   this.updateRole = function(name, newRole) {
-    general.waitForSystem();
-    this.get();
+    waitFor.elementToBeClickable(
+      adminRolesTab, 'Admin Roles tab is not clickable');
     adminRolesTab.click();
-    browser.waitForAngular();
+
     // Change values for "update role" form, and submit it.
+    waitFor.visibilityOf(updateFormName, 'Update Form Name is not visible');
     updateFormName.sendKeys(name);
-    roleOption(newRole).click();
+    var roleOption = roleSelect.element(
+      by.cssContainingText('option', newRole));
+    roleOption.click();
     updateFormSubmit.click();
-    general.waitForSystem();
+    waitFor.textToBePresentInElement(
+      statusMessage, 'successfully updated to',
+      'Could not set role successfully');
     return true;
-  };
-
-  this.reloadCollection = function() {
-    reloadCollectionButton.click();
-  };
-
-  // The name should be as given in the admin page (including '.yaml' if
-  // necessary).
-  this.reloadExploration = function(name) {
-    this.get();
-    explorationElements.map(function(explorationElement) {
-      explorationTitleElement(explorationElement)
-        .getText().then(function(title) {
-          // We use match here in case there is whitespace around the name
-          if (title.match(name)) {
-            explorationElementReloadButton(explorationElement).click();
-            general.acceptAlert();
-            // Time is needed for the reloading to complete.
-            browser.waitForAngular();
-          }
-        });
-    });
-  };
-
-  // Imports all the demo explorations.
-  this.reloadAllExplorations = function(name) {
-    this.get();
-    reloadAllExplorationsButtons.click();
-    general.acceptAlert();
-    browser.waitForAngular();
   };
 };
 

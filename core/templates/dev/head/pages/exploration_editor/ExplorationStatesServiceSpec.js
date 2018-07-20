@@ -22,7 +22,7 @@ describe('ExplorationStatesService', function() {
   beforeEach(inject(function($injector) {
     this.ess = $injector.get('ExplorationStatesService');
 
-    spyOn($injector.get('ExplorationContextService'), 'getExplorationId')
+    spyOn($injector.get('ContextService'), 'getExplorationId')
       .and.returnValue('7');
   }));
 
@@ -72,28 +72,6 @@ describe('ExplorationStatesService', function() {
         this.ess.addState('Me Llamo');
 
         expect(callbackSpy).toHaveBeenCalledWith('Me Llamo');
-      });
-    });
-
-    describe('.registerOnStateDeletedCallback', function() {
-      beforeEach(inject(function($injector) {
-        spyOn(this.cls, 'deleteState');
-        // When ExplorationStatesService tries to show the confirm-delete
-        // modal, have it immediately confirm.
-        spyOn($injector.get('$uibModal'), 'open').and.callFake(
-          function(stateName) {
-            return {result: Promise.resolve(stateName)};
-          });
-      }));
-
-      it('callsback when a state is deleted', function() {
-        var callbackSpy = jasmine.createSpy('callback');
-
-        this.ess.registerOnStateDeletedCallback(callbackSpy);
-
-        this.ess.deleteState('Hola').then(function() {
-          expect(callbackSpy).toHaveBeenCalledWith('Hola');
-        });
       });
     });
 

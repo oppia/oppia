@@ -39,6 +39,13 @@ oppia.factory('ExplorationPlayerStateService', [function() {
       return exploration.isStateTerminal(stateName);
     },
 
+    isStateShowingConceptCard: function(stateName) {
+      if (stateName === null) {
+        return true;
+      }
+      return false;
+    },
+
     getAuthorRecommendedExpIds: function(stateName) {
       return exploration.getAuthorRecommendedExpIds(stateName);
     },

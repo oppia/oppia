@@ -18,7 +18,10 @@
 import copy
 import logging
 
+from core.domain import email_manager
+from core.domain import role_services
 from core.domain import skill_domain
+from core.domain import user_services
 from core.platform import models
 import feconf
 
@@ -153,8 +156,9 @@ def get_skill_from_model(skill_model, run_conversion=True):
         versioned_misconceptions['schema_version'],
         versioned_skill_contents['schema_version'],
         skill_model.language_code,
-        skill_model.version, skill_model.created_on,
-        skill_model.last_updated)
+        skill_model.version, skill_model.next_misconception_id,
+        skill_model.superseding_skill_id, skill_model.all_questions_merged,
+        skill_model.created_on, skill_model.last_updated)
 
 
 def get_all_skill_summaries():
@@ -168,6 +172,23 @@ def get_all_skill_summaries():
     skill_summaries = [
         get_skill_summary_from_model(summary)
         for summary in skill_summaries_models]
+    return skill_summaries
+
+
+def get_multi_skill_summaries(skill_ids):
+    """Returns a list of skill summaries matching the skill IDs provided.
+
+    Args:
+        skill_ids: list(str). List of skill IDs to get skill summaries for.
+
+    Returns:
+        list(SkillSummary). The list of summaries of skills matching the
+            provided IDs.
+    """
+    skill_summaries_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
+    skill_summaries = [
+        get_skill_summary_from_model(skill_summary_model)
+        for skill_summary_model in skill_summaries_models]
     return skill_summaries
 
 
@@ -246,6 +267,45 @@ def get_skill_summary_by_id(skill_id, strict=True):
         return None
 
 
+def get_skill_descriptions_by_ids(topic_id, skill_ids):
+    """Returns a list of skill descriptions corresponding to given skill ids.
+
+    Args:
+        topic_id: str. The id of the topic that these skills are a part of.
+        skill_ids: list(str). The list of skill ids.
+
+    Returns:
+        dict. The skill descriptions of skills keyed by their corresponding ids.
+    """
+    skill_summary_models = skill_models.SkillSummaryModel.get_multi(skill_ids)
+    skill_id_to_description_dict = {}
+
+    for skill_summary_model in skill_summary_models:
+        if skill_summary_model is not None:
+            skill_id_to_description_dict[skill_summary_model.id] = (
+                skill_summary_model.description)
+
+    deleted_skill_ids = []
+    for skill_id in skill_ids:
+        if skill_id not in skill_id_to_description_dict:
+            skill_id_to_description_dict[skill_id] = None
+            deleted_skill_ids.append(skill_id)
+
+    if deleted_skill_ids:
+        deleted_skills_string = ', '.join(deleted_skill_ids)
+        logging.error(
+            'The deleted skills: %s are still present in topic with id %s'
+            % (deleted_skills_string, topic_id)
+        )
+        if feconf.CAN_SEND_EMAILS:
+            email_manager.send_mail_to_admin(
+                'Deleted skills present in topic',
+                'The deleted skills: %s are still present in topic with id %s'
+                % (deleted_skills_string, topic_id))
+
+    return skill_id_to_description_dict
+
+
 def get_new_skill_id():
     """Returns a new skill id.
 
@@ -265,6 +325,7 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
         commit_cmds: list(SkillChange). A list of change commands made to the
             given skill.
     """
+    create_new_skill_rights(skill.id, committer_id)
     model = skill_models.SkillModel(
         id=skill.id,
         description=skill.description,
@@ -274,8 +335,11 @@ def _create_skill(committer_id, skill, commit_message, commit_cmds):
             for misconception in skill.misconceptions
         ],
         skill_contents=skill.skill_contents.to_dict(),
+        next_misconception_id=skill.next_misconception_id,
         misconceptions_schema_version=skill.misconceptions_schema_version,
-        skill_contents_schema_version=skill.skill_contents_schema_version
+        skill_contents_schema_version=skill.skill_contents_schema_version,
+        superseding_skill_id=skill.superseding_skill_id,
+        all_questions_merged=skill.all_questions_merged
     )
     commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
     model.commit(committer_id, commit_message, commit_cmd_dicts)
@@ -297,27 +361,40 @@ def save_new_skill(committer_id, skill):
         })])
 
 
-def apply_change_list(skill_id, change_list):
+def apply_change_list(skill_id, change_list, committer_id):
     """Applies a changelist to a skill and returns the result.
 
     Args:
         skill_id: str. ID of the given skill.
         change_list: list(SkillChange). A change list to be applied to the given
             skill.
+        committer_id: str. The ID of the committer of this change list.
 
     Returns:
         Skill. The resulting skill domain object.
     """
     skill = get_skill_by_id(skill_id)
+    user = user_services.UserActionsInfo(committer_id)
     try:
         for change in change_list:
             if change.cmd == skill_domain.CMD_UPDATE_SKILL_PROPERTY:
                 if (change.property_name ==
                         skill_domain.SKILL_PROPERTY_DESCRIPTION):
+                    if role_services.ACTION_EDIT_SKILL_DESCRIPTION not in (
+                            user.actions):
+                        raise Exception(
+                            'The user does not have enough rights to edit the '
+                            'skill description.')
                     skill.update_description(change.new_value)
                 elif (change.property_name ==
                       skill_domain.SKILL_PROPERTY_LANGUAGE_CODE):
                     skill.update_language_code(change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID):
+                    skill.update_superseding_skill_id(change.new_value)
+                elif (change.property_name ==
+                      skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED):
+                    skill.record_that_all_questions_are_merged(change.new_value)
                 else:
                     raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_UPDATE_SKILL_CONTENTS_PROPERTY:
@@ -330,7 +407,7 @@ def apply_change_list(skill_id, change_list):
                 else:
                     raise Exception('Invalid change dict.')
             elif change.cmd == skill_domain.CMD_ADD_SKILL_MISCONCEPTION:
-                skill.add_misconception(change.misconception_id)
+                skill.add_misconception(change.new_value)
             elif change.cmd == skill_domain.CMD_DELETE_SKILL_MISCONCEPTION:
                 skill.delete_misconception(change.misconception_id)
             elif (change.cmd ==
@@ -409,6 +486,8 @@ def _save_skill(committer_id, skill, commit_message, change_list):
 
     skill_model.description = skill.description
     skill_model.language_code = skill.language_code
+    skill_model.superseding_skill_id = skill.superseding_skill_id
+    skill_model.all_questions_merged = skill.all_questions_merged
     skill_model.misconceptions_schema_version = (
         skill.misconceptions_schema_version)
     skill_model.skill_contents_schema_version = (
@@ -443,9 +522,58 @@ def update_skill(committer_id, skill_id, change_list, commit_message):
         raise ValueError(
             'Expected a commit message, received none.')
 
-    skill = apply_change_list(skill_id, change_list)
+    skill = apply_change_list(skill_id, change_list, committer_id)
     _save_skill(committer_id, skill, commit_message, change_list)
     create_skill_summary(skill.id)
+
+
+def publish_skill(skill_id, committer_id):
+    """Marks the given skill as published.
+
+    Args:
+        skill_id: str. The id of the given skill.
+        committer_id: str. The user id of the committer.
+
+    Raises:
+        Exception. The given skill does not exist.
+        Exception. The skill is already published.
+        Exception. The user does not have permissions to publish the skill.
+    """
+    skill_rights = get_skill_rights(skill_id, strict=False)
+    if skill_rights is None:
+        raise Exception('The given skill does not exist.')
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_PUBLISH_OWNED_SKILL not in user.actions:
+        raise Exception(
+            'The user does not have enough rights to publish the skill.')
+
+    if not skill_rights.skill_is_private:
+        raise Exception('The skill is already published.')
+    skill_rights.skill_is_private = False
+    commit_cmds = [skill_domain.SkillRightsChange({
+        'cmd': skill_domain.CMD_PUBLISH_SKILL
+    })]
+    save_skill_rights(
+        skill_rights, committer_id, 'Published the skill', commit_cmds)
+
+
+def save_skill_rights(skill_rights, committer_id, commit_message, commit_cmds):
+    """Saves a SkillRights domain object to the datastore.
+
+    Args:
+        skill_rights: SkillRights. The rights object for the given skill.
+        committer_id: str. ID of the committer.
+        commit_message: str. Descriptive message for the commit.
+        commit_cmds: list(SkillRightsChange). A list of commands describing
+            what kind of commit was done.
+    """
+
+    model = skill_models.SkillRightsModel.get(skill_rights.id, strict=False)
+
+    model.skill_is_private = skill_rights.skill_is_private
+    model.creator_id = skill_rights.creator_id
+    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmd_dicts)
 
 
 def delete_skill(committer_id, skill_id, force_deletion=False):
@@ -460,6 +588,11 @@ def delete_skill(committer_id, skill_id, force_deletion=False):
             still retained in the datastore. This last option is the preferred
             one.
     """
+    skill_rights_model = skill_models.SkillRightsModel.get(skill_id)
+    skill_rights_model.delete(
+        committer_id, feconf.COMMIT_MESSAGE_SKILL_DELETED,
+        force_deletion=force_deletion)
+
     skill_model = skill_models.SkillModel.get(skill_id)
     skill_model.delete(
         committer_id, feconf.COMMIT_MESSAGE_SKILL_DELETED,
@@ -543,6 +676,96 @@ def save_skill_summary(skill_summary):
     )
 
     skill_summary_model.put()
+
+
+def create_new_skill_rights(skill_id, committer_id):
+    """Creates a new skill rights object and saves it to the datastore.
+
+    Args:
+        skill_id: str. ID of the skill.
+        committer_id: str. ID of the committer.
+    """
+    skill_rights = skill_domain.SkillRights(skill_id, True, committer_id)
+    commit_cmds = [{'cmd': skill_domain.CMD_CREATE_NEW}]
+    skill_models.SkillRightsModel(
+        id=skill_rights.id,
+        creator_id=skill_rights.creator_id,
+        skill_is_private=skill_rights.skill_is_private
+    ).commit(committer_id, 'Created new skill rights', commit_cmds)
+
+
+def get_skill_rights_from_model(skill_rights_model):
+    """Constructs a SkillRights object from the given skill rights model.
+
+    Args:
+        skill_rights_model: SkillRightsModel. Skill rights from the datastore.
+
+    Returns:
+        SkillRights. The rights object created from the model.
+    """
+
+    return skill_domain.SkillRights(
+        skill_rights_model.id,
+        skill_rights_model.skill_is_private,
+        skill_rights_model.creator_id
+    )
+
+
+def get_skill_rights(skill_id, strict=True):
+    """Retrieves the rights object for the given skill.
+
+    Args:
+        skill_id: str. ID of the skill.
+        strict: bool. Whether to fail noisily if no skill with the given id
+            exists in the datastore.
+
+    Returns:
+        SkillRights. The rights object associated with the given skill.
+
+    Raises:
+        EntityNotFoundError. The skill with ID skill_id was not found
+            in the datastore.
+    """
+
+    model = skill_models.SkillRightsModel.get(skill_id, strict=strict)
+
+    if model is None:
+        return None
+
+    return get_skill_rights_from_model(model)
+
+
+def get_unpublished_skill_rights_by_creator(user_id):
+    """Retrives the rights objects that are private and were created by the
+    user with the provided user ID.
+
+    Args:
+        user_id: str. The user ID of the user that created the skills being
+            fetched.
+
+    Returns:
+        list(SkillRights). The list of skill rights objects that are private
+        and created by the provided user.
+    """
+
+    skill_rights_models = (
+        skill_models.SkillRightsModel.get_unpublished_by_creator_id(
+            user_id))
+    return [get_skill_rights_from_model(skill_rights_model)
+            for skill_rights_model in skill_rights_models]
+
+
+def get_all_unpublished_skill_rights():
+    """Retrieves the rights objects that are private.
+
+    Returns:
+        list(SkillRights). The list of skill rights objects that are private.
+    """
+
+    skill_rights_models = (
+        skill_models.SkillRightsModel.get_unpublished())
+    return [get_skill_rights_from_model(skill_rights_model)
+            for skill_rights_model in skill_rights_models]
 
 
 def create_user_skill_mastery(user_id, skill_id, degree_of_mastery):

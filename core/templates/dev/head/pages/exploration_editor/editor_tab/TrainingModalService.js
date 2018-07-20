@@ -14,19 +14,22 @@
 
 /**
  * @fileoverview Service which handles opening and closing
- * the training modal used for both unresolved answers
- * and answers within the training data of a classifier.
+ * the training modal used for unresolved answers.
  */
 
 oppia.factory('TrainingModalService', [
   '$rootScope', '$uibModal', 'AlertsService', 'UrlInterpolationService',
   function($rootScope, $uibModal, AlertsService, UrlInterpolationService) {
     return {
-      openTrainUnresolvedAnswerModal: function(unhandledAnswer, externalSave) {
+      /**
+      * Opens unresolved answer trainer modal for given answer.
+      * @param {Object} unhandledAnswer - The answer to be trained.
+      * @param {requestCallback} finishTrainingCallback - Function to call when
+          answer has been trained.
+      */
+      openTrainUnresolvedAnswerModal: function(
+          unhandledAnswer, finishTrainingCallback) {
         AlertsService.clearWarnings();
-        if (externalSave) {
-          $rootScope.$broadcast('externalSave');
-        }
         $uibModal.open({
           templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
             '/pages/exploration_editor/editor_tab/' +
@@ -35,15 +38,19 @@ oppia.factory('TrainingModalService', [
           controller: [
             '$scope', '$injector', '$uibModalInstance',
             'ExplorationStatesService', 'EditorStateService',
-            'AnswerClassificationService', 'ExplorationContextService',
+            'AnswerClassificationService', 'ContextService',
             'stateInteractionIdService', 'AngularNameService',
+            'ResponsesService', 'TrainingDataService',
+            'stateContentIdsToAudioTranslationsService',
+            'AnswerGroupObjectFactory',
             function($scope, $injector, $uibModalInstance,
                 ExplorationStatesService, EditorStateService,
-                AnswerClassificationService, ExplorationContextService,
-                stateInteractionIdService, AngularNameService) {
+                AnswerClassificationService, ContextService,
+                stateInteractionIdService, AngularNameService,
+                ResponsesService, TrainingDataService,
+                stateContentIdsToAudioTranslationsService,
+                AnswerGroupObjectFactory) {
               $scope.trainingDataAnswer = '';
-              $scope.trainingDataFeedback = '';
-              $scope.trainingDataOutcomeDest = '';
 
               // See the training panel directive in StateEditor for an
               // explanation on the structure of this object.
@@ -51,14 +58,49 @@ oppia.factory('TrainingModalService', [
                 answerGroupIndex: 0,
                 newOutcome: null
               };
+              $scope.addingNewResponse = false;
 
-              $scope.finishTraining = function() {
+              var _saveNewAnswerGroup = function(newAnswerGroup) {
+                var answerGroups = ResponsesService.getAnswerGroups();
+                var translationService = (
+                  stateContentIdsToAudioTranslationsService);
+                answerGroups.push(newAnswerGroup);
+                ResponsesService.save(
+                  answerGroups, ResponsesService.getDefaultOutcome());
+                translationService.displayed.addContentId(
+                  newAnswerGroup.outcome.feedback.getContentId());
+                translationService.saveDisplayedValue();
+              };
+
+              $scope.exitTrainer = function() {
+                $uibModalInstance.dismiss();
+              };
+
+              $scope.onConfirm = function() {
+                var index = $scope.classification.answerGroupIndex;
+
+                if (index > ResponsesService.getAnswerGroupCount()) {
+                  var newOutcome = $scope.classification.newOutcome;
+                  var newAnswerGroup = AnswerGroupObjectFactory.createNew(
+                    [], angular.copy(newOutcome), [unhandledAnswer], null);
+                  _saveNewAnswerGroup(newAnswerGroup);
+                  TrainingDataService.associateWithAnswerGroup(
+                    ResponsesService.getAnswerGroupCount() - 1,
+                    unhandledAnswer);
+                } else if (index === ResponsesService.getAnswerGroupCount()) {
+                  TrainingDataService.associateWithDefaultResponse(
+                    unhandledAnswer);
+                } else {
+                  TrainingDataService.associateWithAnswerGroup(
+                    index, unhandledAnswer);
+                }
                 $uibModalInstance.close();
+                finishTrainingCallback();
               };
 
               $scope.init = function() {
                 var explorationId =
-                  ExplorationContextService.getExplorationId();
+                  ContextService.getExplorationId();
                 var currentStateName =
                   EditorStateService.getActiveStateName();
                 var state = ExplorationStatesService.getState(currentStateName);
@@ -95,8 +137,6 @@ oppia.factory('TrainingModalService', [
                 // specific feedback of the outcome (for instance, it
                 // includes the destination state within the feedback).
                 $scope.trainingDataAnswer = unhandledAnswer;
-                $scope.trainingDataFeedback = feedback;
-                $scope.trainingDataOutcomeDest = dest;
                 $scope.classification.answerGroupIndex = (
                   classificationResult.answerGroupIndex);
               };
@@ -104,6 +144,8 @@ oppia.factory('TrainingModalService', [
               $scope.init();
             }]
         });
+        // Save the modified training data externally in state content.
+        $rootScope.$broadcast('externalSave');
       }
     };
   }

@@ -27,14 +27,38 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
         'list_of_sets_of_html_strings_editor_directive.html'),
       controller: ['$scope', function($scope) {
         var errorMessage = '';
-        $scope.selectedRank = '';
-        $scope.maxPrevIndex = 0;
 
-        if (!$scope.value) {
-          $scope.value = [];
+        if (!$scope.selectedRank) {
+          $scope.selectedRank = '';
         }
+
+        if (!$scope.maxPrevIndex) {
+          $scope.maxPrevIndex = 1;
+        }
+
+        $scope.initValues = [];
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
+
+        // Initialize the default values.
+        if ($scope.value[0] === undefined || $scope.value[0].length === 0) {
+          $scope.value = [[]];
+          for (var i = 0; i < $scope.choices.length; i++) {
+            $scope.value[0].push($scope.choices[i].id);
+            $scope.initValues.push(1);
+          }
+        } else {
+          for (var i = 0; i < $scope.choices.length; i++) {
+            for (var j = 0; j < $scope.value.length; j++) {
+              var choice = $scope.choices[i].id;
+              if ($scope.value[j].indexOf(choice) !== -1) {
+                $scope.initValues.push(j + 1);
+                $scope.maxPrevIndex = math.max($scope.maxPrevIndex, j + 1);
+                break;
+              }
+            }
+          }
+        }
 
         if ($scope.selectedRank !== '') {
           $scope.maxPrevIndex = math.max(parseInt($scope.selectedRank),
@@ -43,26 +67,27 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
 
         $scope.allowedChoices = function() {
           var allowedList = [];
-          for (var i = 0; i <= $scope.maxPrevIndex; i++) {
+          for (var i = 0; i <= math.min(
+            $scope.maxPrevIndex, $scope.choices.length - 1); i++) {
             allowedList.push(i + 1);
           }
           return allowedList;
         };
 
-        $scope.selectedItem = function(choiceListIndex) {
+        $scope.selectedItem = function(choiceListIndex, selectedRank) {
           var choiceHtml = $scope.choices[choiceListIndex].id;
-          var selectedRank = parseInt($scope.selectedRank) - 1;
+          var selectedRank = parseInt(selectedRank) - 1;
+          errorMessage = '';
           // Reorder the $scope.choices array to make it consistent with the
           // selected rank.
-          $scope.choices.splice(selectedRank, 0, $scope.choices.splice(
-            choiceListIndex, 1)[0]);
+          // $scope.choices.splice(selectedRank, 0, $scope.choices.splice(
+          // choiceListIndex, 1)[0]);
           var choiceHtmlHasBeenAdded = false;
-          $scope.maxPrevIndex = math.max(parseInt($scope.selectedRank),
+          $scope.maxPrevIndex = math.max(parseInt(selectedRank + 1),
             $scope.maxPrevIndex);
 
           for (var i = 0; i < $scope.value.length; i++) {
             choiceHtmlHasBeenAdded = false;
-            errorMessage = '';
             var choiceHtmlIndex = $scope.value[i].indexOf(choiceHtml);
             if (choiceHtmlIndex > -1) {
               if (i !== selectedRank) {
@@ -72,15 +97,21 @@ oppia.directive('listOfSetsOfHtmlStringsEditor', [
                 } else {
                   $scope.value[selectedRank].push(choiceHtml);
                 }
-
-                if ($scope.value[i] === []) {
-                  // Continuity error.
-                  errorMessage = ('No item(s) is assigned at position ' +
-                    String(i + 1) + '. Please assign some item at this ' +
-                    'position.');
-                }
-                choiceHtmlHasBeenAdded = true;
-                break;
+              }
+              choiceHtmlHasBeenAdded = true;
+              break;
+            }
+          }
+          for (var i = 0; i < $scope.value.length; i++) {
+            if ($scope.value[i].length === 0) {
+              if (i === $scope.value.length - 1) {
+                // If it is empty list at the last, pop it out.
+                $scope.value.pop();
+              } else {
+                // Continuity error.
+                errorMessage = ('No choice(s) is assigned at position ' +
+                  String(i + 1) + '. Please assign some choice at this ' +
+                  'position.');
               }
             }
           }

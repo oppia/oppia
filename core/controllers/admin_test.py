@@ -73,7 +73,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                     self.UNICODE_TEST_STRING),
             }
         }
-        self.post_json('/adminhandler', payload, csrf_token)
+        self.post_json('/adminhandler', payload, csrf_token=csrf_token)
 
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
@@ -99,7 +99,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 'new_config_property_values': {
                     base.BEFORE_END_HEAD_TAG_HOOK.name: new_config_value
                 }
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         response = self.testapp.get('/about')
         self.assertIn(new_config_value, response.body)
@@ -118,7 +118,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
                 'action': 'generate_dummy_explorations',
                 'num_dummy_exps_to_generate': 10,
                 'num_dummy_exps_to_publish': 3
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(len(generated_exps), 10)
@@ -134,7 +134,7 @@ class GenerateDummyExplorationsTest(test_utils.GenericTestBase):
                 'action': 'generate_dummy_explorations',
                 'num_dummy_exps_to_generate': 2,
                 'num_dummy_exps_to_publish': 2
-            }, csrf_token)
+            }, csrf_token=csrf_token)
         generated_exps = exp_services.get_all_exploration_summaries()
         published_exps = exp_services.get_recently_published_exp_summaries(5)
         self.assertEqual(len(generated_exps), 2)
@@ -180,7 +180,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         # Check normal user has expected role. Viewing by username.
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            {'method': 'username', 'username': 'user1'})
+            params={'method': 'username', 'username': 'user1'})
         self.assertEqual(
             response_dict, {'user1': feconf.ROLE_ID_EXPLORATION_EDITOR})
 
@@ -197,7 +197,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         # Viewing by role.
         response_dict = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            {'method': 'role', 'role': feconf.ROLE_ID_MODERATOR})
+            params={'method': 'role', 'role': feconf.ROLE_ID_MODERATOR})
         self.assertEqual(response_dict, {'user1': feconf.ROLE_ID_MODERATOR})
         self.logout()
 
@@ -209,7 +209,7 @@ class AdminRoleHandlerTest(test_utils.GenericTestBase):
         # Trying to view role of non-existent user.
         response = self.get_json(
             feconf.ADMIN_ROLE_HANDLER_URL,
-            {'method': 'username', 'username': username},
+            params={'method': 'username', 'username': username},
             expected_status_int=400, expect_errors=True)
 
         # Trying to update role of non-existent user.
@@ -264,7 +264,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         }
 
         response = self.get_json(
-            '/explorationdataextractionhandler', payload)
+            '/explorationdataextractionhandler', params=payload)
         extracted_answers = response['data']
         self.assertEqual(len(extracted_answers), 2)
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
@@ -279,7 +279,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         }
 
         response = self.get_json(
-            '/explorationdataextractionhandler', payload)
+            '/explorationdataextractionhandler', params=payload)
         extracted_answers = response['data']
         self.assertEqual(len(extracted_answers), 1)
         self.assertEqual(extracted_answers[0]['answer'], 'first answer')
@@ -294,7 +294,7 @@ class DataExtractionQueryHandlerTests(test_utils.GenericTestBase):
         }
 
         response = self.get_json(
-            '/explorationdataextractionhandler', payload,
+            '/explorationdataextractionhandler', params=payload,
             expected_status_int=400, expect_errors=True)
 
         self.assertEqual(

@@ -1,4 +1,5 @@
 {% extends 'pages/base.html' %}
+
 {% block maintitle %}
   Topics and Skills Dashboard - Oppia
 {% endblock maintitle %}
@@ -20,7 +21,7 @@
     <div>
       <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"></h2>
     </div>
-    <div ng-if="topicSummaries.length > 0 || skillSummaries.length > 0">
+    <div ng-if="topicSummaries.length > 0 || untriagedSkillSummaries.length > 0 || unpublishedSkillSummaries.length > 0">
       <ul class="dashboard-tabs">
         <li ng-if="topicSummaries.length > 0"
             ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
@@ -29,26 +30,43 @@
              Topics
           </a>
         </li>
-        <li ng-if="skillSummaries.length > 0"
-            ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_SKILLS}">
+        <li ng-if="untriagedSkillSummaries.length > 0"
+            ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNTRIAGED_SKILLS}">
           <a class="dashboard-tabs-text"
-             ng-click="setActiveTab(TAB_NAME_SKILLS)">
-             Skills
+             ng-click="setActiveTab(TAB_NAME_UNTRIAGED_SKILLS)">
+             Untriaged Skills
+          </a>
+        </li>
+        <li ng-if="unpublishedSkillSummaries.length > 0"
+            ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNPUBLISHED_SKILLS}">
+          <a class="dashboard-tabs-text"
+             ng-click="setActiveTab(TAB_NAME_UNPUBLISHED_SKILLS)">
+             Unpublished Skills
           </a>
         </li>
       </ul>
 
       <div ng-if="activeTab === TAB_NAME_TOPICS">
-        <topics-list topic-summaries="topicSummaries" user-can-delete-topic="userCanDeleteTopic"></topics-list>
+        <topics-list topic-summaries="topicSummaries"
+                     user-can-delete-topic="userCanDeleteTopic"
+                     in-modal="false">
+        </topics-list>
       </div>
 
-      <div ng-if="activeTab === TAB_NAME_SKILLS">
-        <skills-list skill-summaries="skillSummaries"></skills-list>
+      <div ng-if="activeTab === TAB_NAME_UNTRIAGED_SKILLS">
+        <skills-list skill-summaries="untriagedSkillSummaries"
+                     editable-topic-summaries="editableTopicSummaries">
+        </skills-list>
+      </div>
+
+      <div ng-if="activeTab === TAB_NAME_UNPUBLISHED_SKILLS">
+        <skills-list skill-summaries="unpublishedSkillSummaries"
+                     editable-topic-summaries="editableTopicSummaries">
+        </skills-list>
       </div>
     </div>
 
-
-    <div class="col-sm-8" ng-if="topicSummaries.length === 0 && skillSummaries.length === 0">
+    <div class="col-sm-8" ng-if="topicSummaries.length === 0 && untriagedSkillSummaries.length === 0 && unpublishedSkillSummaries.length === 0">
       <blockquote class="intro-card">
         <p class="intro-card-message" style="padding-top: 6px;">
           No topics or skills have been created yet.

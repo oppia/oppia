@@ -462,95 +462,6 @@ class UserExplorationEmailsHandler(EditorHandler):
         })
 
 
-class UntrainedAnswersHandler(EditorHandler):
-    """Returns answers that learners have submitted, but that Oppia hasn't been
-    explicitly trained to respond to by an exploration author.
-    """
-    NUMBER_OF_TOP_ANSWERS_PER_RULE = 50
-
-    GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
-
-    @acl_decorators.can_play_exploration
-    def get(self, exploration_id, escaped_state_name):
-        """Handles GET requests."""
-        try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-        except:
-            raise self.PageNotFoundException
-
-        state_name = utils.unescape_encoded_uri_component(escaped_state_name)
-        if state_name not in exploration.states:
-            # If trying to access a non-existing state, there is no training
-            # data associated with it.
-            self.render_json({'unhandled_answers': []})
-            return
-
-        state = exploration.states[state_name]
-
-        # TODO(bhenning): Answers should be bound to a particular exploration
-        # version or interaction ID.
-
-        # TODO(bhenning): If the top 100 answers have already been classified,
-        # then this handler will always return an empty list.
-
-        # TODO(bhenning): This entire function will not work as expected until
-        # the answers storage backend stores answers in a non-lossy way.
-        # Currently, answers are stored as HTML strings and they are not able
-        # to be converted back to the original objects they started as, so the
-        # normalization calls in this function will not work correctly on those
-        # strings. Once this happens, this handler should also be tested.
-
-        # The total number of possible answers is 100 because it requests the
-        # top 50 answers matched to the default rule and the top 50 answers
-        # matched to the classifier individually.
-
-        # TODO(sll): Functionality for retrieving untrained answers was removed
-        # in PR 3489 due to infeasibility of the calculation approach. It needs
-        # to be reinstated in the future so that the training interface can
-        # function.
-        submitted_answers = []
-
-        interaction = state.interaction
-        unhandled_answers = []
-        if feconf.SHOW_TRAINABLE_UNRESOLVED_ANSWERS and interaction.id:
-            interaction_instance = (
-                interaction_registry.Registry.get_interaction_by_id(
-                    interaction.id))
-
-            try:
-                # Normalize the answers.
-                for answer in submitted_answers:
-                    answer['answer'] = interaction_instance.normalize_answer(
-                        answer['answer'])
-
-                trained_answers = set()
-                for answer_group in interaction.answer_groups:
-                    trained_answers.update(
-                        interaction_instance.normalize_answer(trained)
-                        for trained
-                        in answer_group['training_data'])
-
-                # Include all the answers which have been confirmed to be
-                # associated with the default outcome.
-                trained_answers.update(set(
-                    interaction_instance.normalize_answer(confirmed)
-                    for confirmed
-                    in interaction.confirmed_unclassified_answers))
-
-                unhandled_answers = [
-                    answer for answer in submitted_answers
-                    if answer['answer'] not in trained_answers
-                ]
-            except Exception as e:
-                logging.warning(
-                    'Error loading untrained answers for interaction %s: %s.' %
-                    (interaction.id, e))
-
-        self.render_json({
-            'unhandled_answers': unhandled_answers
-        })
-
-
 class ExplorationDownloadHandler(EditorHandler):
     """Downloads an exploration as a zip file, or dict of YAML strings
     representing states.
@@ -579,7 +490,8 @@ class ExplorationDownloadHandler(EditorHandler):
             self.response.headers['Content-Disposition'] = (
                 'attachment; filename=%s.zip' % str(filename))
             self.response.write(
-                exp_services.export_to_zip_file(exploration_id, version))
+                exp_services.export_to_zip_file(
+                    exploration_id, version=version))
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(exp_services.export_states_to_yaml(
                 exploration_id, version=version, width=width))
@@ -817,6 +729,10 @@ class ResolveIssueHandler(EditorHandler):
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
+    # The string to prefix to the filename (before tacking the whole thing on
+    # to the end of 'assets/').
+    _FILENAME_PREFIX = 'image'
+
     @acl_decorators.can_edit_exploration
     def post(self, exploration_id):
         """Saves an image uploaded by a content creator."""
@@ -854,14 +770,26 @@ class ImageUploadHandler(EditorHandler):
                 'Expected a filename ending in .%s, received %s' %
                 (file_format, filename))
 
-        # Save the file.
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        if fs.isfile(filename):
+        mimetype = 'image/%s' % (extension)
+
+        # Image files are stored to the datastore in the dev env, and to GCS
+        # in production.
+        file_system_class = (
+            fs_domain.ExplorationFileSystem if (
+                feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
+            else fs_domain.GcsFileSystem)
+        fs = fs_domain.AbstractFileSystem(file_system_class(exploration_id))
+        filepath = (
+            filename if (
+                feconf.DEV_MODE or not constants.ENABLE_GCS_STORAGE_FOR_IMAGES)
+            else ('%s/%s' % (self._FILENAME_PREFIX, filename)))
+
+        if fs.isfile(filepath):
             raise self.InvalidInputException(
                 'A file with the name %s already exists. Please choose a '
                 'different name.' % filename)
-        fs.commit(self.user_id, filename, raw)
+
+        fs.commit(self.user_id, filepath, raw, mimetype=mimetype)
 
         self.render_json({'filepath': filename})
 
@@ -938,7 +866,7 @@ class TopUnresolvedAnswersHandler(EditorHandler):
     def get(self, exploration_id):
         """Handles GET requests for unresolved answers."""
         try:
-            state_name = self.payload.get('state_name')
+            state_name = self.request.get('state_name')
         except Exception:
             raise self.PageNotFoundException
 
