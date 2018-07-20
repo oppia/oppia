@@ -16,3 +16,18 @@
  * @fileoverview Unit tests for Responses Service.
  */
 
+describe('Responses Service', function() {
+  describe('ResponsesService', function() {
+    beforeEach(function() {
+      module('oppia');
+    });
+
+    var scope;
+    var rs;
+
+    beforeEach(inject(function($injector, $rootScope) {
+      rs = $injector.get('ResponsesService');
+      scope = $rootScope.$new();
+    }));
+  })
+})
