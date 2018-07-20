@@ -103,7 +103,7 @@ oppia.directive('ckEditorRte', [
           sharedSpaces: {
             top: el[0].children[0].children[0]
           },
-          skin: 'bootstrapck,/third_party/static/ckeditor-bootstrapck-1.0.0/',
+          skin: 'bootstrapck,/third_party/static/ckeditor-bootstrapck-1.0/',
           toolbar: [
             {
               name: 'basicstyles',

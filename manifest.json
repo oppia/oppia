@@ -423,7 +423,7 @@
         "targetDirPrefix": "ckeditor-sharedspace-"
       },
       "ckeditorBootstrapCK": {
-        "version": "1.0.0",
+        "version": "1.0",
         "downloadFormat": "zip",
         "url": "https://download.ckeditor.com/bootstrapck/releases/bootstrapck_1.0_0.zip",
         "rootDir": "bootstrapck",
