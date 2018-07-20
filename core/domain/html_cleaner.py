@@ -20,14 +20,19 @@ import HTMLParser
 import cStringIO
 import json
 import logging
+from PIL import Image
 import urllib
 import urlparse
 
 import bleach
 import bs4
 from core.domain import rte_component_registry
-from core.platform.app_identity import gae_app_identity_services
+from core.platform import models
+
+# from core.platform.app_identity import gae_app_identity_services
 import feconf
+
+app_identity_services = models.Registry.import_app_identity_services()
 
 def filter_a(name, value):
     """Returns whether the described attribute of an anchor ('a') tag should be
@@ -800,18 +805,24 @@ def add_dimensions_to_image(exp_id, html_string):
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
 
+    print 'ENTERED ADD DIMENSIONS HTML CLEANER FUNCTION'
     for image in soup.findAll('oppia-noninteractive-image'):
         attrs = image.attrs
-        filename = image['filepath-with-value']
-        URL = 'https://storage.googleapis.com/' +
-            gae_app_identity_services.get_gcs_resource_bucket_name() + '/' +
-            exp_id +'/assets/image/' + filename
+        filename = unescape_html(image['filepath-with-value'])
+        filename = filename[1:-1]
+        print 'bucket name  ' +str(app_identity_services.get_gcs_resource_bucket_name())
+        print 'exp id' +str(exp_id)
+        print 'filename ' +str(filename)
+        # URL = 'https://storage.googleapis.com/' + app_identity_services.get_gcs_resource_bucket_name() + '/' + exp_id + '/assets/image/' + filename
+        print 'UUUUUUUUUUUUUUUUUUUUURRRRRRRRRRRRRRRRRRRRRRLLLLLLLLLLLLLLLL'
+        # print URL
+        # imageFile = cStringIO.StringIO(urllib.urlopen(URL).read())
+        # img = Image.open(imageFile)
+        # width, height = img.size
+        width = 120
+        height = 160
+        image['filepath-with-value'] = escape_html(json.dumps(
+                {'filename': filename, 'height': height , 'width': width }))
 
-        imageFile = cStringIO.StringIO(urllib.urlopen(URL).read())
-        img = Image.open(imageFile)
-        width, height = img.size
-        if 'dimensions-with-value' not in attrs:
-            image['dimensions-with-value'] = escape_html(json.dumps(
-                {'height': height , 'width': width }))
-
+        print image['filepath-with-value']
     return unicode(soup)

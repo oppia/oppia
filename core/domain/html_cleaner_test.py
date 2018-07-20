@@ -784,3 +784,28 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_cleaner.add_caption_attr_to_image(
                     test_case['html_content']),
                 test_case['expected_output'])
+
+    def test_add_dimensions_to_image(self):
+        test_cases = [{
+            'html_content': (
+                '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;'
+                'quot;"></oppia-noninteractive-image>Hello this'
+                'is test case to check that caption attribute is added to'
+                'image tags if it is missing.</p>'
+            ),
+            'expected_output': (
+                u'<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                '&amp;quot;" filepath-with-value="{&amp;quot;width&amp;quot;:'
+                ' 120, &amp;quot;height&amp;quot;: 160, &amp;quot;'
+                'filename&amp;quot;: &amp;quot;random.png&amp;quot;}">'
+                '</oppia-noninteractive-image>Hello thisis test case to check'
+                ' that caption attribute is added toimage tags if it is missing.</p>'
+                )
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                html_cleaner.add_dimensions_to_image('1',
+                    test_case['html_content']),
+                test_case['expected_output'])

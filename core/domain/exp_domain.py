@@ -2807,7 +2807,7 @@ class Exploration(object):
         return trainable_states_dict
 
     @classmethod
-    def _convert_states_v0_dict_to_v1_dict(cls, states_dict):
+    def _convert_states_v0_dict_to_v1_dict(cls, states_dict, exp_id):
         """Converts old states schema to the modern v1 schema. v1 contains the
         schema version 1 and does not contain any old constructs, such as
         widgets. This is a complete migration of everything previous to the
@@ -2836,7 +2836,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v1_dict_to_v2_dict(cls, states_dict):
+    def _convert_states_v1_dict_to_v2_dict(cls, states_dict, exp_id):
         """Converts from version 1 to 2. Version 1 assumes the existence of an
         implicit 'END' state, but version 2 does not. As a result, the
         conversion process involves introducing a proper ending state for all
@@ -2910,7 +2910,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v2_dict_to_v3_dict(cls, states_dict):
+    def _convert_states_v2_dict_to_v3_dict(cls, states_dict, exp_id):
         """Converts from version 2 to 3. Version 3 introduces a triggers list
         within interactions.
         Note that the states_dict being passed in is modified in-place.
@@ -2932,7 +2932,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v3_dict_to_v4_dict(cls, states_dict):
+    def _convert_states_v3_dict_to_v4_dict(cls, states_dict, exp_id):
         """Converts from version 3 to 4. Version 4 introduces a new structure
         for rules by organizing them into answer groups instead of handlers.
         This migration involves a 1:1 mapping from rule specs to answer groups
@@ -3032,7 +3032,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v4_dict_to_v5_dict(cls, states_dict):
+    def _convert_states_v4_dict_to_v5_dict(cls, states_dict, exp_id):
         """Converts from version 4 to 5. Version 5 removes the triggers list
         within interactions, and replaces it with a fallbacks list.
         Note that the states_dict being passed in is modified in-place.
@@ -3056,7 +3056,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v5_dict_to_v6_dict(cls, states_dict):
+    def _convert_states_v5_dict_to_v6_dict(cls, states_dict, exp_id):
         """Converts from version 5 to 6. Version 6 introduces a list of
         confirmed unclassified answers. Those are answers which are confirmed
         to be associated with the default outcome during classification.
@@ -3077,7 +3077,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v6_dict_to_v7_dict(cls, states_dict):
+    def _convert_states_v6_dict_to_v7_dict(cls, states_dict, exp_id):
         """Converts from version 6 to 7. Version 7 forces all CodeRepl
         interactions to use Python.
 
@@ -3100,7 +3100,7 @@ class Exploration(object):
     # TODO(bhenning): Remove pre_v4_states_conversion_func when the answer
     # migration is completed.
     @classmethod
-    def _convert_states_v7_dict_to_v8_dict(cls, states_dict):
+    def _convert_states_v7_dict_to_v8_dict(cls, states_dict, exp_id):
         """Converts from version 7 to 8. Version 8 contains classifier
         model id.
 
@@ -3117,7 +3117,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v8_dict_to_v9_dict(cls, states_dict):
+    def _convert_states_v8_dict_to_v9_dict(cls, states_dict, exp_id):
         """Converts from version 8 to 9. Version 9 contains 'correct'
         field in answer groups.
 
@@ -3136,7 +3136,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v9_dict_to_v10_dict(cls, states_dict):
+    def _convert_states_v9_dict_to_v10_dict(cls, states_dict, exp_id):
         """Converts from version 9 to 10. Version 10 contains hints
         and solution in each interaction.
 
@@ -3162,7 +3162,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v10_dict_to_v11_dict(cls, states_dict):
+    def _convert_states_v10_dict_to_v11_dict(cls, states_dict, exp_id):
         """Converts from version 10 to 11. Version 11 refactors the content to
         be an HTML string with audio translations.
 
@@ -3183,7 +3183,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v11_dict_to_v12_dict(cls, states_dict):
+    def _convert_states_v11_dict_to_v12_dict(cls, states_dict, exp_id):
         """Converts from version 11 to 12. Version 12 refactors audio
         translations from a list to a dict keyed by language code.
 
@@ -3208,7 +3208,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v12_dict_to_v13_dict(cls, states_dict):
+    def _convert_states_v12_dict_to_v13_dict(cls, states_dict, exp_id):
         """Converts from version 12 to 13. Version 13 sets empty
         solutions to None and removes fallbacks.
 
@@ -3228,7 +3228,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v13_dict_to_v14_dict(cls, states_dict):
+    def _convert_states_v13_dict_to_v14_dict(cls, states_dict, exp_id):
         """Converts from version 13 to 14. Version 14 adds
         audio translations to feedback, hints, and solutions.
 
@@ -3277,7 +3277,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v14_dict_to_v15_dict(cls, states_dict):
+    def _convert_states_v14_dict_to_v15_dict(cls, states_dict, exp_id):
         """Converts from version 14 to 15. Version 15 renames the "correct"
         field in answer groups to "labelled_as_correct" and (for safety) resets
         all "labelled_as_correct" values to False.
@@ -3298,7 +3298,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v15_dict_to_v16_dict(cls, states_dict):
+    def _convert_states_v15_dict_to_v16_dict(cls, states_dict, exp_id):
         """Converts from version 15 to 16. Version 16 adds a
         refresher_exploration_id field to each outcome.
 
@@ -3321,7 +3321,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v16_dict_to_v17_dict(cls, states_dict):
+    def _convert_states_v16_dict_to_v17_dict(cls, states_dict, exp_id):
         """Converts from version 16 to 17. Version 17 moves the
         labelled_as_correct field to the outcome dict (so that it also appears
         for the default outcome) and adds two new customization args to
@@ -3361,7 +3361,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v17_dict_to_v18_dict(cls, states_dict):
+    def _convert_states_v17_dict_to_v18_dict(cls, states_dict, exp_id):
         """Converts from version 17 to 18. Version 18 adds a new
         customization arg to FractionInput interactions which allows
         you to add custom placeholders.
@@ -3387,7 +3387,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v18_dict_to_v19_dict(cls, states_dict):
+    def _convert_states_v18_dict_to_v19_dict(cls, states_dict, exp_id):
         """Converts from version 18 to 19. Version 19 adds training_data
         parameter to each answer group to store training data of that
         answer group.
@@ -3434,7 +3434,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v19_dict_to_v20_dict(cls, states_dict):
+    def _convert_states_v19_dict_to_v20_dict(cls, states_dict, exp_id):
         """Converts from version 19 to 20. Version 20 adds
         tagged_misconception field to answer groups and
         missing_prerequisite_skill_id field to outcomes.
@@ -3460,7 +3460,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v20_dict_to_v21_dict(cls, states_dict):
+    def _convert_states_v20_dict_to_v21_dict(cls, states_dict, exp_id):
         """Converts from version 20 to 21. Version 21 moves audio_translations
         from SubtitledHTML to content_ids_to_audio_translations.
 
@@ -3512,7 +3512,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v21_dict_to_v22_dict(cls, states_dict):
+    def _convert_states_v21_dict_to_v22_dict(cls, states_dict, exp_id):
         """Converts from version 21 to 22. Version 22 converts all Rich Text
         Editor content to be compatible with the textAngular format.
 
@@ -3530,7 +3530,7 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v22_dict_to_v23_dict(cls, states_dict):
+    def _convert_states_v22_dict_to_v23_dict(cls, states_dict, exp_id):
         """Converts from version 22 to 23. Version 23 ensures that all
         all oppia-noninteractive-image tags have caption attribute.
         Args:
@@ -3554,7 +3554,6 @@ class Exploration(object):
             states_dict: dict. A dict where each key-value pair represents,
                 respectively, a state name and a dict used to initialize a
                 State domain object.
-            exp_id: string. Exploration id
 
         Returns:
             dict. The converted states_dict.
@@ -3562,7 +3561,8 @@ class Exploration(object):
         for key, state_dict in states_dict.iteritems():
             state_dict['content']['html'] = (
                 html_cleaner.add_dimensions_to_image(
-                    exp_id, (state_dict['content']['html']))
+                    exp_id, (state_dict['content']['html'])))
+
             if state_dict['interaction']['default_outcome']:
                 interaction_feedback_html = state_dict[
                     'interaction']['default_outcome']['feedback']['html']
@@ -3576,7 +3576,7 @@ class Exploration(object):
                 state_dict['interaction']['answer_groups'][
                     answer_group_index]['outcome']['feedback']['html'] = (
                         html_cleaner.add_dimensions_to_image(
-                            exp_id, (answer_group_html))
+                            exp_id, (answer_group_html)))
                 if state_dict['interaction']['id'] == 'ItemSelectionInput':
                     for rule_spec_index, rule_spec in enumerate(
                             answer_group['rule_specs']):
@@ -3589,14 +3589,14 @@ class Exploration(object):
                 hint_html = hint['hint_content']['html']
                 state_dict['interaction']['hints'][hint_index][
                     'hint_content']['html'] = (
-                        html_cleaner.add_dimensions_to_image(exp_id, (hint_html))
+                        html_cleaner.add_dimensions_to_image(exp_id, (hint_html)))
 
             if state_dict['interaction']['solution']:
                 solution_html = state_dict[
                     'interaction']['solution']['explanation']['html']
                 state_dict['interaction']['solution']['explanation']['html'] = (
                     html_cleaner.add_dimensions_to_image(
-                        exp_id, (solution_html))
+                        exp_id, (solution_html)))
 
             if state_dict['interaction']['id'] in (
                     'ItemSelectionInput', 'MultipleChoiceInput'):
@@ -3614,7 +3614,7 @@ class Exploration(object):
 
     @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version):
+            cls, versioned_exploration_states, current_states_schema_version, exploration_id):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -3630,14 +3630,16 @@ class Exploration(object):
                     initialize a State domain object.
             current_states_schema_version: int. The current states
                 schema version.
+            exploration_id: str. id of the exploration
         """
+        print 'ENTERED update states in exp_domain'
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
 
         conversion_fn = getattr(cls, '_convert_states_v%s_dict_to_v%s_dict' % (
             current_states_schema_version, current_states_schema_version + 1))
         versioned_exploration_states['states'] = conversion_fn(
-            versioned_exploration_states['states'])
+            versioned_exploration_states['states'], exploration_id)
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
@@ -3760,11 +3762,11 @@ class Exploration(object):
 
         # Ensure this exploration is up-to-date with states schema v3.
         exploration_dict['states'] = cls._convert_states_v0_dict_to_v1_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states'] = cls._convert_states_v1_dict_to_v2_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states'] = cls._convert_states_v2_dict_to_v3_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         # Update the states schema version to reflect the above conversions to
         # the states dict.
@@ -3788,7 +3790,7 @@ class Exploration(object):
 
         # Ensure this exploration is up-to-date with states schema v4.
         exploration_dict['states'] = cls._convert_states_v3_dict_to_v4_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         # Update the states schema version to reflect the above conversions to
         # the states dict.
@@ -3812,7 +3814,7 @@ class Exploration(object):
 
         # Ensure this exploration is up-to-date with states schema v5.
         exploration_dict['states'] = cls._convert_states_v4_dict_to_v5_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         # Update the states schema version to reflect the above conversions to
         # the states dict.
@@ -3836,7 +3838,7 @@ class Exploration(object):
 
         # Ensure this exploration is up-to-date with states schema v6.
         exploration_dict['states'] = cls._convert_states_v5_dict_to_v6_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         # Update the states schema version to reflect the above conversions to
         # the states dict.
@@ -3880,7 +3882,7 @@ class Exploration(object):
 
         # Ensure this exploration is up-to-date with states schema v7.
         exploration_dict['states'] = cls._convert_states_v6_dict_to_v7_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         # Update the states schema version to reflect the above conversions to
         # the states dict.
@@ -3904,7 +3906,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 11
 
         exploration_dict['states'] = cls._convert_states_v7_dict_to_v8_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         exploration_dict['states_schema_version'] = 8
 
@@ -3926,7 +3928,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 12
 
         exploration_dict['states'] = cls._convert_states_v8_dict_to_v9_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         exploration_dict['states_schema_version'] = 9
 
@@ -3939,7 +3941,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 13
 
         exploration_dict['states'] = cls._convert_states_v9_dict_to_v10_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         exploration_dict['states_schema_version'] = 10
 
@@ -3952,7 +3954,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 14
 
         exploration_dict['states'] = cls._convert_states_v10_dict_to_v11_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         exploration_dict['states_schema_version'] = 11
 
@@ -3965,7 +3967,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 15
 
         exploration_dict['states'] = cls._convert_states_v11_dict_to_v12_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         exploration_dict['states_schema_version'] = 12
 
@@ -3977,7 +3979,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 16
 
         exploration_dict['states'] = cls._convert_states_v12_dict_to_v13_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
 
         exploration_dict['states_schema_version'] = 13
 
@@ -4020,7 +4022,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 19
 
         exploration_dict['states'] = cls._convert_states_v13_dict_to_v14_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states_schema_version'] = 14
 
         return exploration_dict
@@ -4035,7 +4037,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 20
 
         exploration_dict['states'] = cls._convert_states_v14_dict_to_v15_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states_schema_version'] = 15
 
         exploration_dict['correctness_feedback_enabled'] = False
@@ -4052,7 +4054,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 21
 
         exploration_dict['states'] = cls._convert_states_v15_dict_to_v16_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states_schema_version'] = 16
 
         return exploration_dict
@@ -4068,7 +4070,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 22
 
         exploration_dict['states'] = cls._convert_states_v16_dict_to_v17_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states_schema_version'] = 17
 
         return exploration_dict
@@ -4083,7 +4085,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 23
 
         exploration_dict['states'] = cls._convert_states_v17_dict_to_v18_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states_schema_version'] = 18
 
         return exploration_dict
@@ -4098,7 +4100,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 24
 
         exploration_dict['states'] = cls._convert_states_v18_dict_to_v19_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states_schema_version'] = 19
 
         return exploration_dict
@@ -4114,7 +4116,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 25
 
         exploration_dict['states'] = cls._convert_states_v19_dict_to_v20_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states_schema_version'] = 20
 
         return exploration_dict
@@ -4128,7 +4130,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 26
 
         exploration_dict['states'] = cls._convert_states_v20_dict_to_v21_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states_schema_version'] = 21
 
         return exploration_dict
@@ -4143,7 +4145,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 27
 
         exploration_dict['states'] = cls._convert_states_v21_dict_to_v22_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states_schema_version'] = 22
 
         return exploration_dict
@@ -4157,7 +4159,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 28
 
         exploration_dict['states'] = cls._convert_states_v22_dict_to_v23_dict(
-            exploration_dict['states'])
+            exploration_dict['states'], exploration_dict['id'])
         exploration_dict['states_schema_version'] = 23
 
         return exploration_dict
@@ -4168,6 +4170,7 @@ class Exploration(object):
 
         Adds dimensions to all oppia-noninteractive-image tags.
         """
+        print 'ENTERED   CONVERT 28 to 29'
         exploration_dict['schema_version'] = 29
 
         exploration_dict['states'] = cls._convert_states_v23_dict_to_v24_dict(

@@ -130,6 +130,8 @@ handlers:
 libraries:
 - name: jinja2
   version: '2.6'
+- name: PIL
+  version: '1.1.7'
 # This is needed for sending requests to a mailgun HTTPS URL.
 - name: ssl
   version: '2.7.11'
