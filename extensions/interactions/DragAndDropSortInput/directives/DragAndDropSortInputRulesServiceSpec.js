@@ -68,7 +68,7 @@ describe('Drag and Drop Sort Input rules service', function() {
   it('should have a correct \'has element X at position Y\' rule', function() {
     var RULE_INPUT = {
       x: 'b',
-      y: 1
+      y: 2
     };
     expect(ddsrs.HasElementXAtPositionY(
       [['a'], ['b', 'c']], RULE_INPUT)).toBe(true);

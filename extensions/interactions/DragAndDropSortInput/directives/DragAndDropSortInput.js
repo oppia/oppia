@@ -178,7 +178,7 @@ oppia.factory('dragAndDropSortInputRulesService', [function() {
       for (var i = 0; i < answer.length; i++) {
         var index = answer[i].indexOf(inputs.x);
         if (index !== -1) {
-          return i === inputs.y;
+          return ((i + 1) === inputs.y);
         }
       }
     },

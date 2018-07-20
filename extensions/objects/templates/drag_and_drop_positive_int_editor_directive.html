@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <select ng-model="selectedRank" aria-label="choice" ng-init="selectedRank = value"
-          ng-options="rank for rank in allowedRanks">
+  <select ng-model="selectedRank" ng-change="selection(selectedRank)" id="choice"
+          ng-init="selectedRank = value" ng-options="rank for rank in allowedRanks">
   </select>
 </div>

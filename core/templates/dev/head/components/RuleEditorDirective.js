@@ -108,7 +108,8 @@ oppia.directive('ruleEditor', [
                       type: 'dropdown',
                       varName: finalInputArray[i + 1]
                     });
-                  } else if (finalInputArray[2] === 'DragAndDropHtmlString') {
+                  } else if (
+                    finalInputArray[i + 2] === 'DragAndDropHtmlString') {
                     $scope.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {
                         return {
@@ -121,7 +122,8 @@ oppia.directive('ruleEditor', [
                       type: 'dragAndDropSelect',
                       varName: finalInputArray[i + 1]
                     });
-                  } else if (finalInputArray[2] === 'DragAndDropPositiveInt') {
+                  } else if (
+                    finalInputArray[i + 2] === 'DragAndDropPositiveInt') {
                     $scope.ruleDescriptionChoices = answerChoices.map(
                       function(choice) {
                         return {

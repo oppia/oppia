@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 oppia.directive('dragAndDropHtmlStringEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
@@ -33,7 +34,9 @@ oppia.directive('dragAndDropHtmlStringEditor', [
         if ($scope.selectedItem === '' || !$scope.selectedItem) {
           $scope.selectedItem = $scope.choices[0].id;
         }
-        $scope.value = $scope.selectedItem;
+        $scope.selection = function(selectedItem) {
+          $scope.value = selectedItem;
+        };
       }]
     };
   }]);

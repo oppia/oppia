@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
 oppia.directive('dragAndDropPositiveIntEditor', [
   'UrlInterpolationService', 'OBJECT_EDITOR_URL_PREFIX',
   function(UrlInterpolationService, OBJECT_EDITOR_URL_PREFIX) {
@@ -24,7 +25,7 @@ oppia.directive('dragAndDropPositiveIntEditor', [
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/objects/templates/drag_and_drop_positive_int_editor_directive.html'),
       controller: ['$scope', function($scope) {
-        if (!$scope.value) {
+        if (!parseInt($scope.value)) {
           $scope.value = 1;
         }
         if (!$scope.selectedRank) {
@@ -36,8 +37,9 @@ oppia.directive('dragAndDropPositiveIntEditor', [
         for (var i = 0; i < $scope.choices.length; i++) {
           $scope.allowedRanks.push(i + 1);
         }
-
-        $scope.value = parseInt($scope.selectedRank) - 1;
+        $scope.selection = function(selectedRank) {
+          $scope.value = parseInt(selectedRank);
+        };
       }]
     };
   }]);
