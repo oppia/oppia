@@ -6,9 +6,6 @@ python:
 - 2.7
 
 addons:
-  browserstack:
-    username: $USERNAME
-    access_key: $ACCESS_KEY
   chrome: stable
 
 branches:
