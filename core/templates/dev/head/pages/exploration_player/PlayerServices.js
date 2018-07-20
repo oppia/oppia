@@ -385,6 +385,12 @@ oppia.factory('ExplorationPlayerService', [
             classificationResult.ruleIndex,
             classificationResult.classificationCategorization,
             feedbackIsUseful);
+
+          if (ENABLE_PLAYTHROUGH_RECORDING) {
+            StatsReportingService.recordAnswerSubmitAction(
+              oldStateName, newStateName, oldState.interaction.id, answer,
+              outcome.feedback);
+          }
         }
 
         // Use angular.copy() to clone the object
@@ -395,12 +401,6 @@ oppia.factory('ExplorationPlayerService', [
         var refresherExplorationId = outcome.refresherExplorationId;
         var missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
         var newState = exploration.getState(newStateName);
-
-        if (ENABLE_PLAYTHROUGH_RECORDING) {
-          StatsReportingService.recordAnswerSubmitAction(
-            oldStateName, newStateName, oldState.interaction.id, answer,
-            outcome.feedback);
-        }
 
         // Compute the data for the next state.
         var oldParams = LearnerParamsService.getAllParams();
