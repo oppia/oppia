@@ -3729,11 +3729,11 @@ class Exploration(object):
 
         # Ensure this exploration is up-to-date with states schema v3.
         exploration_dict['states'] = cls._convert_states_v0_dict_to_v1_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states'] = cls._convert_states_v1_dict_to_v2_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states'] = cls._convert_states_v2_dict_to_v3_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         # Update the states schema version to reflect the above conversions to
         # the states dict.
@@ -3757,7 +3757,7 @@ class Exploration(object):
 
         # Ensure this exploration is up-to-date with states schema v4.
         exploration_dict['states'] = cls._convert_states_v3_dict_to_v4_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         # Update the states schema version to reflect the above conversions to
         # the states dict.
@@ -3781,7 +3781,7 @@ class Exploration(object):
 
         # Ensure this exploration is up-to-date with states schema v5.
         exploration_dict['states'] = cls._convert_states_v4_dict_to_v5_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         # Update the states schema version to reflect the above conversions to
         # the states dict.
@@ -3805,7 +3805,7 @@ class Exploration(object):
 
         # Ensure this exploration is up-to-date with states schema v6.
         exploration_dict['states'] = cls._convert_states_v5_dict_to_v6_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         # Update the states schema version to reflect the above conversions to
         # the states dict.
@@ -3849,7 +3849,7 @@ class Exploration(object):
 
         # Ensure this exploration is up-to-date with states schema v7.
         exploration_dict['states'] = cls._convert_states_v6_dict_to_v7_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         # Update the states schema version to reflect the above conversions to
         # the states dict.
@@ -3873,7 +3873,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 11
 
         exploration_dict['states'] = cls._convert_states_v7_dict_to_v8_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         exploration_dict['states_schema_version'] = 8
 
@@ -3895,7 +3895,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 12
 
         exploration_dict['states'] = cls._convert_states_v8_dict_to_v9_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         exploration_dict['states_schema_version'] = 9
 
@@ -3908,7 +3908,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 13
 
         exploration_dict['states'] = cls._convert_states_v9_dict_to_v10_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         exploration_dict['states_schema_version'] = 10
 
@@ -3921,7 +3921,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 14
 
         exploration_dict['states'] = cls._convert_states_v10_dict_to_v11_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         exploration_dict['states_schema_version'] = 11
 
@@ -3934,7 +3934,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 15
 
         exploration_dict['states'] = cls._convert_states_v11_dict_to_v12_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         exploration_dict['states_schema_version'] = 12
 
@@ -3946,7 +3946,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 16
 
         exploration_dict['states'] = cls._convert_states_v12_dict_to_v13_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
 
         exploration_dict['states_schema_version'] = 13
 
@@ -3989,7 +3989,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 19
 
         exploration_dict['states'] = cls._convert_states_v13_dict_to_v14_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 14
 
         return exploration_dict
@@ -4004,7 +4004,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 20
 
         exploration_dict['states'] = cls._convert_states_v14_dict_to_v15_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 15
 
         exploration_dict['correctness_feedback_enabled'] = False
@@ -4021,7 +4021,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 21
 
         exploration_dict['states'] = cls._convert_states_v15_dict_to_v16_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 16
 
         return exploration_dict
@@ -4037,7 +4037,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 22
 
         exploration_dict['states'] = cls._convert_states_v16_dict_to_v17_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 17
 
         return exploration_dict
@@ -4052,7 +4052,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 23
 
         exploration_dict['states'] = cls._convert_states_v17_dict_to_v18_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 18
 
         return exploration_dict
@@ -4067,7 +4067,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 24
 
         exploration_dict['states'] = cls._convert_states_v18_dict_to_v19_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 19
 
         return exploration_dict
@@ -4083,7 +4083,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 25
 
         exploration_dict['states'] = cls._convert_states_v19_dict_to_v20_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 20
 
         return exploration_dict
@@ -4097,7 +4097,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 26
 
         exploration_dict['states'] = cls._convert_states_v20_dict_to_v21_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 21
 
         return exploration_dict
@@ -4112,7 +4112,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 27
 
         exploration_dict['states'] = cls._convert_states_v21_dict_to_v22_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 22
 
         return exploration_dict
@@ -4126,7 +4126,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 28
 
         exploration_dict['states'] = cls._convert_states_v22_dict_to_v23_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 23
 
         return exploration_dict
