@@ -205,7 +205,6 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
 
         # Do not upgrade explorations that fail non-strict validation.
         print 'ENTERED EXPLORTAION MIGRATION JOB'
-        # yield('checking', 'chalri hai')
         old_exploration = exp_services.get_exploration_by_id(item.id)
         try:
             old_exploration.validate()
