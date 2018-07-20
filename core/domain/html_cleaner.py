@@ -258,11 +258,12 @@ OPPIA_BLOCK_COMPONENTS = [
 ]
 
 
-def convert_to_textangular(html_data):
+def convert_to_textangular(html_data, unused_exp_id):
     """This function converts the html to TextAngular supported format.
 
     Args:
         html_data: str. HTML string to be converted.
+        unused_exp_id. str: Unused argument.
 
     Returns:
         str. The converted HTML string.
@@ -769,12 +770,13 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
     return is_invalid
 
 
-def add_caption_attr_to_image(html_string):
+def add_caption_attr_to_image(html_string, unused_exp_id):
     """Adds caption attribute to all oppia-noninteractive-image tags.
 
     Args:
         html_string. str: HTML string in which the caption attribute is to be
             added.
+        unused_exp_id. str: Unused argument.
 
     Returns:
         str. Updated HTML string with the caption attribute for all
@@ -790,7 +792,7 @@ def add_caption_attr_to_image(html_string):
     return unicode(soup)
 
 
-def add_dimensions_to_image(exp_id, html_string):
+def add_dimensions_to_noninteractive_image_tag(html_string, exp_id):
     """Adds dimensions to all oppia-noninteractive-image tags.
 
     Args:
@@ -807,13 +809,29 @@ def add_dimensions_to_image(exp_id, html_string):
     for image in soup.findAll('oppia-noninteractive-image'):
         filename = unescape_html(image['filepath-with-value'])
         filename = filename[1:-1]
-        URL = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
-            app_identity_services.get_gcs_resource_bucket_name(), exp_id,
-            filename))
-        imageFile = cStringIO.StringIO(urllib.urlopen(URL).read())
-        img = Image.open(imageFile)
-        width, height = img.size
-        image['filepath-with-value'] = escape_html(json.dumps(
-            {'filename': filename, 'height': height, 'width': width}))
+        image['filepath-with-value'] = get_filepath_of_object_image(
+            filename, exp_id)
 
     return unicode(soup)
+
+
+def get_filepath_of_object_image(filename, exp_id):
+    """Gets the dimensions of the image file.
+
+    Args:
+        filename. str: Name of the file whose dimensions need to be
+            calculated.
+        exp_id. str: Exploration id.
+
+    Returns:
+        object. filepath object of the image.
+    """
+    URL = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
+        app_identity_services.get_gcs_resource_bucket_name(), exp_id,
+        filename))
+    imageFile = cStringIO.StringIO(urllib.urlopen(URL).read())
+    img = Image.open(imageFile)
+    width, height = img.size
+
+    return escape_html(json.dumps(
+        {'filename': filename, 'height': height, 'width': width}))
