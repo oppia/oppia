@@ -29,7 +29,7 @@ oppia.factory('FeedbackThreadObjectFactory', [function() {
     this.messageCount = messageCount;
     this.stateName = stateName;
     this.threadId = threadId;
-    this.messages = null;
+    this.messages = [];
   };
 
   FeedbackThread.prototype.setMessages = function(messages) {

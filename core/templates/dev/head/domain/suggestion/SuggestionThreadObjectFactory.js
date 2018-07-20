@@ -31,7 +31,7 @@ oppia.factory('SuggestionThreadObjectFactory', [
       this.stateName = stateName;
       this.threadId = threadId;
       this.suggestion = suggestion;
-      this.messages = null;
+      this.messages = [];
     };
 
     SuggestionThread.createFromBackendDicts = function(
