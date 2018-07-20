@@ -60,6 +60,14 @@ class SkillModel(base_models.VersionedModel):
     skill_contents = ndb.JsonProperty(indexed=False)
     # The id to be used by the next misconception added.
     next_misconception_id = ndb.IntegerProperty(required=True, indexed=False)
+    # The id that the skill is merged into, in case the skill has been
+    # marked as duplicate to another one and needs to be merged.
+    # This is an optional field.
+    superseding_skill_id = ndb.StringProperty(indexed=True)
+    # A flag indicating whether deduplication is complete for this skill.
+    # It will initially be False, and set to true only when there is a value
+    # for superseding_skill_id and the merge was completed.
+    all_questions_merged = ndb.BooleanProperty(indexed=True, required=True)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
