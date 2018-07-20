@@ -99,17 +99,20 @@ class TopicEditorQuestionHandler(base.BaseHandler):
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
+        start_cursor = self.request.get('cursor')
         topic = topic_services.get_topic_by_id(topic_id)
         skill_ids = topic.get_all_skill_ids()
 
-        question_summaries = (
-            question_services.get_question_summaries_linked_to_skills(skill_ids)
+        question_summaries, next_start_cursor = (
+            question_services.get_question_summaries_linked_to_skills(
+                skill_ids, start_cursor)
         )
         question_summary_dicts = [
             summary.to_dict() for summary in question_summaries]
 
         self.values.update({
-            'question_summary_dicts': question_summary_dicts
+            'question_summary_dicts': question_summary_dicts,
+            'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
 

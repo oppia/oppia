@@ -153,31 +153,36 @@ def get_question_by_id(question_id, strict=True):
         return None
 
 
-def get_question_summaries_linked_to_skills(skill_ids):
+def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
     """Returns the list of question summaries linked to all the skills given by
     skill_ids.
 
     Args:
         skill_ids: list(str). The ids of skills for which the linked questions
             are to be retrieved.
+        start_cursor: str. The starting point from which the batch of
+            questions are to be returned.
 
     Raises:
         Exception. Querying linked question summaries for more than 3 skills at
         a time is not supported currently.
 
     Returns:
-        list(QuestionSummary). The list of question summaries linked to the
-            given skill_ids.
+        list(QuestionSummary), str. The list of question summaries linked to the
+            given skill_ids and the next cursor value to be used for the next
+            page.
     """
     if len(skill_ids) > 3:
         raise Exception(
             'Querying linked question summaries for more than 3 skills at a '
             'time is not supported currently.')
-    question_ids = (
-        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids(skill_ids)) #pylint: disable=line-too-long
+    question_ids, next_cursor = (
+        question_models.QuestionSkillLinkModel.get_question_ids_linked_to_skill_ids( #pylint: disable=line-too-long
+            skill_ids, start_cursor)
+    )
 
     question_summaries = get_question_summaries_by_ids(question_ids)
-    return question_summaries
+    return question_summaries, next_cursor
 
 
 def get_questions_by_ids(question_ids):

@@ -17,7 +17,9 @@
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
+from google.appengine.datastore.datastore_query import Cursor
 import utils
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -192,21 +194,37 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         return question_skill_link_model_instance
 
     @classmethod
-    def get_question_ids_linked_to_skill_ids(cls, skill_ids):
+    def get_question_ids_linked_to_skill_ids(cls, skill_ids, start_cursor):
         """Creates a new QuestionSkillLinkModel entry.
 
         Args:
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
+            start_cursor: str. The starting point from which the batch of
+                questions are to be returned.
 
         Returns:
-            list(str). The question ids linked to given skills.
+            list(str), str. The question ids linked to given skills and the next
+                cursor value to be used for the next page.
         """
-        question_skill_link_models = cls.query(cls.skill_id.IN(skill_ids))
+        if not start_cursor == '':
+            cursor = Cursor(urlsafe=start_cursor)
+            question_skill_link_models, next_cursor, more = cls.query(
+                cls.skill_id.IN(skill_ids)
+            ).order(cls.key).fetch_page(
+                feconf.NO_OF_QUESTIONS_DISPLAYED_IN_A_PAGE,
+                start_cursor=cursor
+            )
+        else:
+            question_skill_link_models, next_cursor, more = cls.query(
+                cls.skill_id.IN(skill_ids)
+            ).order(cls.key).fetch_page(
+                feconf.NO_OF_QUESTIONS_DISPLAYED_IN_A_PAGE
+            )
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
-        return question_ids
+        return question_ids, next_cursor.urlsafe()
 
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):
