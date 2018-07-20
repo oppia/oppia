@@ -411,51 +411,23 @@
       "ckeditor": {
         "version": "4.9.2",
         "downloadFormat": "zip",
-        "url": "http://download.cksource.com/CKEditor/CKEditor/CKEditor%204.9.2/ckeditor_4.9.2_full.zip",
+        "url": "https://download.cksource.com/CKEditor/CKEditor/CKEditor%204.9.2/ckeditor_4.9.2_full.zip",
         "rootDir": "ckeditor",
         "targetDirPrefix": "ckeditor-"
-      },
-      "ckeditorWidget": {
-        "version": "4.9.2",
-        "downloadFormat": "zip",
-        "url": "http://download.ckeditor.com/widget/releases/widget_4.9.2.zip",
-        "rootDir": "widget",
-        "targetDirPrefix": "ckeditor-widget-"
-      },
-      "ckeditorLineutils": {
-        "version": "4.9.2",
-        "downloadFormat": "zip",
-        "url": "http://download.ckeditor.com/lineutils/releases/lineutils_4.9.2.zip",
-        "rootDir": "lineutils",
-        "targetDirPrefix": "ckeditor-lineutils-"
       },
       "ckeditorSharedspace": {
         "version": "4.9.2",
         "downloadFormat": "zip",
-        "url": "http://download.ckeditor.com/sharedspace/releases/sharedspace_4.9.2.zip",
+        "url": "https://download.ckeditor.com/sharedspace/releases/sharedspace_4.9.2.zip",
         "rootDir": "sharedspace",
         "targetDirPrefix": "ckeditor-sharedspace-"
       },
       "ckeditorBootstrapCK": {
         "version": "1.0",
         "downloadFormat": "zip",
-        "url": "http://download.ckeditor.com/bootstrapck/releases/bootstrapck_1.0_0.zip",
+        "url": "https://download.ckeditor.com/bootstrapck/releases/bootstrapck_1.0_0.zip",
         "rootDir": "bootstrapck",
         "targetDirPrefix": "ckeditor-bootstrapck-"
-      },
-      "ckeditorIndentBlockPlugin" : {
-        "version": "4.9.2",
-        "downloadFormat": "zip",
-        "url": "https://download.ckeditor.com/indentblock/releases/indentblock_4.9.2.zip",
-        "rootDir": "indentblock",
-        "targetDirPrefix": "ckeditor-indentblock-"
-      },
-      "ckeditorBlockquotePlugin" : {
-        "version": "4.9.2",
-        "downloadFormat": "zip",
-        "url": "https://download.ckeditor.com/blockquote/releases/blockquote_4.9.2.zip",
-        "rootDir": "blockquote",
-        "targetDirPrefix": "ckeditor-blockquote-"
       },
       "uiBootstrap": {
         "version": "2.5.0",
