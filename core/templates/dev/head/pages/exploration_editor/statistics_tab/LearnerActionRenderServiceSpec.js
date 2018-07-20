@@ -268,16 +268,19 @@ describe('Learner Action Render Service', function() {
           displayBlocks[0]);
 
         expect(finalBlockHTML).toEqual(
-          'Started exploration at card "stateName1".<br><br>' +
-          'Submitted the following answers in card "stateName1"<br><br>' +
-          '<table><tr><th>Answer</th><th>Feedback</th></tr>' +
+          '<span class="learner-action">Started exploration at card ' +
+          '"stateName1".</span>' +
+          '<span class="learner-action">Submitted the following answers in ' +
+          'card "stateName1"</span>' +
+          '<table class="learner-actions-table"><tr><th>Answer</th>' +
+          '<th>Feedback</th></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
           '<tr><td>Hello</td><td>Try again</td></tr>' +
-          '<tr><td>Hello</td><td>Try again</td></tr></table><br><br>' +
-          'Left the exploration after spending a total of 120 seconds on card' +
-          ' "stateName1".<br><br>'
+          '<tr><td>Hello</td><td>Try again</td></tr></table>' +
+          '<span class="learner-action">Left the exploration after spending ' +
+          'a total of 120 seconds on card "stateName1".</span>'
         );
       });
 
@@ -298,12 +301,14 @@ describe('Learner Action Render Service', function() {
       var blockHTML = this.lars.renderDisplayBlockHTML(displayBlocks[0]);
 
       expect(blockHTML).toEqual(
-        'Started exploration at card "stateName1".<br><br>' +
-        'Pressed "Continue" to move to card "stateName2" after 30 seconds.' +
-        '<br><br>' +
-        'Submitted answer "Hello" in card "stateName2".<br><br>' +
-        'Left the exploration after spending a total of 120 seconds on card ' +
-        '"stateName2".<br><br>'
+        '<span class="learner-action">Started exploration at card ' +
+        '"stateName1".</span>' +
+        '<span class="learner-action">Pressed "Continue" to move to card ' +
+        '"stateName2" after 30 seconds.</span>' +
+        '<span class="learner-action">Submitted answer "Hello" in card ' +
+        '"stateName2".</span>' +
+        '<span class="learner-action">Left the exploration after spending a ' +
+        'total of 120 seconds on card "stateName2".</span>'
       );
     });
   });

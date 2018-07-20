@@ -3683,3 +3683,7 @@ md-card.preview-conversation-skin-supplemental-card {
   padding: 0;
   width: 1px;
 }
+
+span.learner-action {
+  margin-bottom: 2em;
+}

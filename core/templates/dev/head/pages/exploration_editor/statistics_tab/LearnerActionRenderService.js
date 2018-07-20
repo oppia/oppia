@@ -24,24 +24,25 @@ oppia.factory('LearnerActionRenderService', [
       ACTION_TYPE_EXPLORATION_QUIT, ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS) {
     var renderExplorationStartActionHTML = function(stateName) {
       var htmlString =
-        'Started exploration at card "' + stateName + '".<br><br>';
+        '<span class="learner-action">Started exploration at card "' +
+        stateName + '".</span>';
       return htmlString;
     };
 
     var renderExplorationQuitActionHTML = function(
         stateName, timeSpentInStateSecs) {
       var htmlString =
-        'Left the exploration after spending a total of ' +
-        timeSpentInStateSecs + ' seconds on card "' + stateName +
-        '".<br><br>';
+        '<span class="learner-action">Left the exploration after spending a ' +
+        'total of ' + timeSpentInStateSecs + ' seconds on card "' + stateName +
+        '".</span>';
       return htmlString;
     };
 
     var renderContinueButtonSubmitActionHTML = function(
         stateName, timeSpentInStateSecs) {
       var htmlString =
-        'Pressed "Continue" to move to card "' + stateName + '" after ' +
-        timeSpentInStateSecs + ' seconds.<br><br>';
+        '<span class="learner-action">Pressed "Continue" to move to card "' +
+        stateName + '" after ' + timeSpentInStateSecs + ' seconds.</span>';
       return htmlString;
     };
 
@@ -50,13 +51,14 @@ oppia.factory('LearnerActionRenderService', [
       var htmlString;
       if (currentStateName === destStateName) {
         htmlString =
-          'Submitted answer "' + answer + '" in card "' + currentStateName +
-          '".<br><br>';
+          '<span class="learner-action">Submitted answer "' + answer +
+          '" in card "' + currentStateName + '".</span>';
       } else {
         htmlString =
-          'Submitted answer "' + answer + '" and moved to card "' +
-          destStateName + '" after spending ' + timeSpentInStateSecs +
-          ' seconds on card "' + currentStateName + '".<br><br>';
+          '<span class="learner-action">Submitted answer "' + answer +
+          '" and moved to card "' + destStateName + '" after spending ' +
+          timeSpentInStateSecs + ' seconds on card "' + currentStateName +
+          '".</span>';
       }
       return htmlString;
     };
@@ -67,7 +69,9 @@ oppia.factory('LearnerActionRenderService', [
       var stateName =
         finalBlock[index].actionCustomizationArgs.state_name.value;
 
-      var tableHTML = '<table><tr><th>Answer</th><th>Feedback</th></tr>';
+      var tableHTML =
+        '<table class="learner-actions-table"><tr><th>Answer</th>' +
+        '<th>Feedback</th></tr>';
       for (var i = 0; i < index; i++) {
         if (finalBlock[i].actionType !== ACTION_TYPE_ANSWER_SUBMIT) {
           continue;
@@ -84,12 +88,12 @@ oppia.factory('LearnerActionRenderService', [
     var renderLearnerActionHTML = function(learnerAction) {
       var actionType = learnerAction.actionType;
       var custArgs = learnerAction.actionCustomizationArgs;
-      if (actionType === ACTION_TYPE_EXPLORATION_START) {
+      if (actionType == ACTION_TYPE_EXPLORATION_START) {
         return renderExplorationStartActionHTML(custArgs.state_name.value);
-      } else if (actionType === ACTION_TYPE_EXPLORATION_QUIT) {
+      } else if (actionType == ACTION_TYPE_EXPLORATION_QUIT) {
         return renderExplorationQuitActionHTML(
           custArgs.state_name.value, custArgs.time_spent_in_state_secs.value);
-      } else if (actionType === ACTION_TYPE_ANSWER_SUBMIT) {
+      } else if (actionType == ACTION_TYPE_ANSWER_SUBMIT) {
         interactionId =
           custArgs.interaction_id.value;
         if (interactionId === 'Continue') {
@@ -116,9 +120,9 @@ oppia.factory('LearnerActionRenderService', [
           htmlString += renderLearnerActionHTML(block[i]);
         }
         htmlString +=
-          'Submitted the following answers in card "' + stateName + '"<br><br>';
+          '<span class="learner-action">Submitted the following answers in ' +
+          'card "' + stateName + '"</span>';
         htmlString += renderLearnerActionsTableForMultipleIncorrectIssue(block);
-        htmlString += '<br><br>';
         htmlString += renderLearnerActionHTML(block[index]);
         return htmlString;
       },
