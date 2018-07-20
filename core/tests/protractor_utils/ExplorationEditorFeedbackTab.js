@@ -35,6 +35,8 @@ var ExplorationEditorFeedbackTab = function () {
   var feedbackResponseTextArea = element(
     by.css('.protractor-test-feedback-response-textarea'));
   var suggestionRowClassName = '.protractor-test-oppia-feedback-tab-row';
+  var suggestionCommitMessageInput = element(
+    by.css('.protractor-test-suggestion-commit-message'));
   /*
    * Buttons
    */
@@ -59,6 +61,7 @@ var ExplorationEditorFeedbackTab = function () {
       expect(viewSuggestionButton.isDisplayed()).toBe(true);
       viewSuggestionButton.click();
       expect(acceptSuggestionButton.isDisplayed()).toBe(true);
+      suggestionCommitMessageInput.sendKeys('Commit message');
       acceptSuggestionButton.click();
       browser.wait(until.invisibilityOf(acceptSuggestionButton), 5000);
     });
