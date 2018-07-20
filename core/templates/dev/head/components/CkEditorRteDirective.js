@@ -94,8 +94,7 @@ oppia.directive('ckEditorRte', [
 
         // Initialize CKEditor.
         var ck = CKEDITOR.inline(el[0].children[0].children[1], {
-          extraPlugins: (
-            'pre,sharedspace,' + pluginNames),
+          extraPlugins: 'pre,sharedspace,' + pluginNames,
           startupFocus: true,
           removePlugins: 'indentblock',
           title: false,
