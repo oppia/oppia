@@ -84,7 +84,7 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
 
     def test_get(self):
         # Create 5 questions linked to the same skill.
-        for i in range(0, 3):
+        for i in range(0, 3): #pylint: disable=unused-variable
             question_id = question_services.get_new_question_id()
             self.save_new_question(
                 question_id, self.admin_id,

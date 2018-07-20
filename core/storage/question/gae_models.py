@@ -17,10 +17,10 @@
 from constants import constants
 from core.platform import models
 import core.storage.user.gae_models as user_models
-from google.appengine.datastore.datastore_query import Cursor
-import utils
 import feconf
+import utils
 
+from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -208,15 +208,15 @@ class QuestionSkillLinkModel(base_models.BaseModel):
                 cursor value to be used for the next page.
         """
         if not start_cursor == '':
-            cursor = Cursor(urlsafe=start_cursor)
-            question_skill_link_models, next_cursor, more = cls.query(
+            cursor = datastore_query.Cursor(urlsafe=start_cursor)
+            question_skill_link_models, next_cursor, more = cls.query( #pylint: disable=unused-variable
                 cls.skill_id.IN(skill_ids)
             ).order(cls.key).fetch_page(
                 feconf.NO_OF_QUESTIONS_DISPLAYED_IN_A_PAGE,
                 start_cursor=cursor
             )
         else:
-            question_skill_link_models, next_cursor, more = cls.query(
+            question_skill_link_models, next_cursor, more = cls.query( #pylint: disable=unused-variable
                 cls.skill_id.IN(skill_ids)
             ).order(cls.key).fetch_page(
                 feconf.NO_OF_QUESTIONS_DISPLAYED_IN_A_PAGE
