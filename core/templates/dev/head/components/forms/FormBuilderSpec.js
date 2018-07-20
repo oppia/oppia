@@ -256,6 +256,10 @@ describe('Testing apply-validation directive', function() {
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
 
+    testInput.$setViewValue(-2.5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
     testInput.$setViewValue(-3);
     scope.$digest();
     expect(testInput.$valid).toEqual(false);
@@ -280,6 +284,10 @@ describe('Testing apply-validation directive', function() {
     expect(testInput.$valid).toEqual(true);
 
     testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue(5);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
 
@@ -312,10 +320,6 @@ describe('Testing apply-validation directive', function() {
     testInput.$setViewValue('');
     scope.$digest();
     expect(testInput.$valid).toEqual(false);
-
-    testInput.$setViewValue(undefined);
-    scope.$digest();
-    expect(testInput.$valid).toEqual(false);
   }));
 
   it('should apply isInteger validation', inject(function($compile) {
@@ -335,7 +339,7 @@ describe('Testing apply-validation directive', function() {
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
 
-    testInput.$setViewValue('3');
+    testInput.$setViewValue('3.0');
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
 
@@ -357,11 +361,15 @@ describe('Testing apply-validation directive', function() {
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
 
+    testInput.$setViewValue('0.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
     testInput.$setViewValue('1.0');
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
 
-    testInput.$setViewValue('0.5');
+    testInput.$setViewValue(2);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
 
