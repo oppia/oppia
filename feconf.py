@@ -587,6 +587,7 @@ COLLECTION_PUBLISH_PREFIX = '/collection_editor_handler/publish'
 COLLECTION_UNPUBLISH_PREFIX = '/collection_editor_handler/unpublish'
 COLLECTION_EDITOR_URL_PREFIX = '/collection_editor/create'
 COLLECTION_URL_PREFIX = '/collection'
+CONCEPT_CARD_DATA_URL_PREFIX = '/concept_card_handler'
 CREATOR_DASHBOARD_DATA_URL = '/creatordashboardhandler/data'
 CREATOR_DASHBOARD_URL = '/creator_dashboard'
 DASHBOARD_CREATE_MODE_URL = '%s?mode=create' % CREATOR_DASHBOARD_URL
@@ -739,6 +740,15 @@ SHOW_COLLECTION_NAVIGATION_TAB_STATS = False
 # Whether state id mapping model should be generated and stored when exploration
 # is created or updated.
 ENABLE_STATE_ID_MAPPING = False
+
+# The regular expression used to identify whether a string contains float value.
+# The regex must match with regex that is stored in vmconf.py file of Oppia-ml.
+# If this regex needs to be modified then first of all shutdown Oppia-ml VM.
+# Then update the regex constant in here and Oppia both.
+# Run any migration job that is required to migrate existing trained models
+# before starting Oppia-ml again.
+FLOAT_VERIFIER_REGEX = (
+    '^([-+]?\\d*\\.\\d+)$|^([-+]?(\\d*\\.?\\d+|\\d+\\.?\\d*)e[-+]?\\d*)$')
 
 # Current event models schema version. All event models with an
 # event_schema_version of 1 are the events collected before the rework of the
