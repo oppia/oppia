@@ -22,12 +22,9 @@ describe('Responses Service', function() {
       module('oppia');
     });
 
-    var scope;
-    var rs;
-
     beforeEach(inject(function($injector, $rootScope) {
-      rs = $injector.get('ResponsesService');
-      scope = $rootScope.$new();
+      const rs = $injector.get('ResponsesService');
+      const scope = $rootScope.$new();
     }));
 
     it('should return -1 if no answer group is active', function() {
