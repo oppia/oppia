@@ -3632,7 +3632,6 @@ class Exploration(object):
                 schema version.
             exploration_id: str. id of the exploration
         """
-        print 'ENTERED update states in exp_domain'
         versioned_exploration_states['states_schema_version'] = (
             current_states_schema_version + 1)
 
@@ -4170,7 +4169,6 @@ class Exploration(object):
 
         Adds dimensions to all oppia-noninteractive-image tags.
         """
-        print 'ENTERED   CONVERT 28 to 29'
         exploration_dict['schema_version'] = 29
 
         exploration_dict['states'] = cls._convert_states_v23_dict_to_v24_dict(
