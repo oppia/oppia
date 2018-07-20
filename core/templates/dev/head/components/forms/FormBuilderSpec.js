@@ -225,6 +225,156 @@ describe('Testing requireIsFloat directive', function() {
   });
 });
 
+describe('Testing apply-validation directive', function() {
+  var $compile, element, scope, testInput;
+
+  beforeEach(module('oppia'));
+
+  beforeEach(inject(function($rootScope) {
+    scope = $rootScope.$new();
+    element = '<form name="testForm">' +
+      '<input name="inputValue" type="number" ng-model="localValue" ' +
+      'apply-validation>' +
+      '</form>';
+  }));
+
+  it('should apply isAtLeast validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+          id: 'isAtLeast',
+          minValue: -2.5
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-1);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue(-3);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('-3');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+  }));
+
+  it('should apply isAtMost validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+          id: 'isAtMost',
+          maxValue: 5
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-1);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue(6);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('10');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+  }));
+
+  it('should apply isNonempty validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+          id: 'isNonempty'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-1);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue(undefined);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+  }));
+
+  it('should apply isInteger validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+          id: 'isInteger'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-3);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('3');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue(3.5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+  }));
+
+  it('should apply isFloat validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+          id: 'isFloat'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-3.5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('1.0');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('0.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('-3..5');
+    scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
+
+    testInput.$setViewValue(undefined);
+    scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
+  }));
+});
+
 describe('RTE helper service', function() {
   var _IMAGE_URL = '/rich_text_components/Some/Some.png';
   var _INTERPOLATED_IMAGE_URL = '/extensions' + _IMAGE_URL;
