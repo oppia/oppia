@@ -153,10 +153,10 @@ oppia.filter('isFloat', [function() {
     // All examples above with '.' replaced with ',' are also valid.
     // Expressions containing % are also valid (5.1% etc).
 
-    var viewValue = "";
+    var viewValue = '';
     try {
       var viewValue = input.toString().trim();
-    } catch(e) {
+    } catch (e) {
       return undefined;
     }
 
