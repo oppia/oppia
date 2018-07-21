@@ -57,5 +57,8 @@ describe('Responses Service', function() {
       expect(rs.getActiveRuleIndex()).toEqual(5);
     });
 
+    it('should return null if no answer choices provided', function() {
+      expect(rs.getAnswerChoices()).toEqual(null)
+    });
   })
 })
