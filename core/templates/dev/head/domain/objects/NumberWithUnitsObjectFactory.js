@@ -27,6 +27,18 @@ oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
     'Please ensure that unit only contains numbers, alphabets, (, ), *, ^, /, -'
 });
 
+/* Guidelines for adding new custom currency units in Number with Units
+  interaction:
+
+  Simply add currency unit to the dict of CURRENCY_UNITS constant and it will
+  be automatically added to the allowed custom units. Following are the keys
+  to be defined within the unit dict:
+    name:  The name of the custom currency unit.
+    aliases: Other allowed canonical forms of the currency unit.
+    front_units: A list of all the currency symbols that are added to the front
+      (like- $, Rs, ₹). Keep it an empty list if no symbol is needed.
+    base_unit: Define the unit in terms of base unit only if the defined custom
+      unit is a sub unit else assign it 'null' value.*/
 oppia.constant('CURRENCY_UNITS', {
   dollar: {
     name: 'dollar',
@@ -160,40 +172,40 @@ oppia.factory('NumberWithUnitsObjectFactory', [
             }
           }
         } else {
-          var startsWithCurrencyUnits = false;
+          var startsWithCorrectCurrencyUnit = false;
           var keys = Object.keys(CURRENCY_UNITS);
           for (var i = 0; i < keys.length; i++) {
             for (var j = 0;
               j < CURRENCY_UNITS[keys[i]].front_units.length; j++) {
               if (rawInput.startsWith(CURRENCY_UNITS[keys[i]].front_units[j])) {
-                startsWithCurrencyUnits = true;
+                startsWithCorrectCurrencyUnit = true;
                 break;
               }
             }
           }
-          if (startsWithCurrencyUnits === false) {
+          if (startsWithCorrectCurrencyUnit === false) {
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
           }
           var ind = rawInput.indexOf(rawInput.match(/[0-9]/));
           if (ind === -1) {
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
           }
-          units = rawInput.substr(0, ind).trim() + ' ';
+          units = rawInput.substr(0, ind).trim();
 
-          startsWithCurrencyUnits = false;
+          startsWithCorrectCurrencyUnit = false;
           for (var i = 0; i < keys.length; i++) {
             for (var j = 0;
               j < CURRENCY_UNITS[keys[i]].front_units.length; j++) {
-              if (
-                units === CURRENCY_UNITS[keys[i]].front_units[j].trim() + ' ') {
-                startsWithCurrencyUnits = true;
+              if (units === CURRENCY_UNITS[keys[i]].front_units[j].trim()) {
+                startsWithCorrectCurrencyUnit = true;
                 break;
               }
             }
           }
-          if (startsWithCurrencyUnits === false) {
+          if (startsWithCorrectCurrencyUnit === false) {
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
           }
+          units = units + ' ';
 
           var ind2 = rawInput.indexOf(
             rawInput.substr(ind).match(/[a-z(]/i));
