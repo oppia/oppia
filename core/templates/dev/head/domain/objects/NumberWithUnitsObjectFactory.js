@@ -28,10 +28,30 @@ oppia.constant('NUMBER_WITH_UNITS_PARSING_ERRORS', {
 });
 
 oppia.constant('CURRENCY_UNITS', {
-  dollar: ['$', 'dollars', 'Dollars', 'Dollar', 'USD'],
-  rupee: ['Rs', 'rupees', '₹', 'Rupees', 'Rupee'],
-  cent: ['cents', 'Cent', 'Cents'],
-  paise: ['paisa', 'Paise', 'Paisa']
+  dollar: {
+    name: 'dollar',
+    aliases: ['$', 'dollars', 'Dollars', 'Dollar', 'USD'],
+    front_units: ['$'],
+    base_unit: null
+  },
+  rupee: {
+    name: 'rupee',
+    aliases: ['Rs', 'rupees', '₹', 'Rupees', 'Rupee'],
+    front_units: ['Rs ', '₹'],
+    base_unit: null
+  },
+  cent: {
+    name: 'cent',
+    aliases: ['cents', 'Cents', 'Cent'],
+    front_units: [],
+    base_unit: '0.01 dollar'
+  },
+  paise: {
+    name: 'paise',
+    aliases: ['paisa', 'Paise', 'Paisa'],
+    front_units: [],
+    base_unit: '0.01 rupee'
+  }
 });
 
 oppia.factory('NumberWithUnitsObjectFactory', [
@@ -128,14 +148,30 @@ oppia.factory('NumberWithUnitsObjectFactory', [
             units = rawInput.substr(ind).trim();
           }
 
-          if (units.indexOf('$') !== -1 || units.indexOf('Rs') !== -1 ||
-            units.indexOf('₹') !== -1) {
-            throw new Error(
-              NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY_FORMAT);
+          var keys = Object.keys(CURRENCY_UNITS);
+          for (var i = 0; i < keys.length; i++) {
+            for (var j = 0;
+              j < CURRENCY_UNITS[keys[i]].front_units.length; j++) {
+              if (units.indexOf(
+                CURRENCY_UNITS[keys[i]].front_units[j]) !== -1) {
+                throw new Error(
+                  NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY_FORMAT);
+              }
+            }
           }
         } else {
-          if (!rawInput.startsWith('$') && !rawInput.startsWith('Rs ') &&
-            !rawInput.startsWith('₹')) {
+          var startsWithCurrencyUnits = false;
+          var keys = Object.keys(CURRENCY_UNITS);
+          for (var i = 0; i < keys.length; i++) {
+            for (var j = 0;
+              j < CURRENCY_UNITS[keys[i]].front_units.length; j++) {
+              if (rawInput.startsWith(CURRENCY_UNITS[keys[i]].front_units[j])) {
+                startsWithCurrencyUnits = true;
+                break;
+              }
+            }
+          }
+          if (startsWithCurrencyUnits === false) {
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
           }
           var ind = rawInput.indexOf(rawInput.match(/[0-9]/));
@@ -143,9 +179,22 @@ oppia.factory('NumberWithUnitsObjectFactory', [
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
           }
           units = rawInput.substr(0, ind).trim() + ' ';
-          if (units !== '$ ' && units !== 'Rs ' && units !== '₹ ') {
+
+          startsWithCurrencyUnits = false;
+          for (var i = 0; i < keys.length; i++) {
+            for (var j = 0;
+              j < CURRENCY_UNITS[keys[i]].front_units.length; j++) {
+              if (
+                units === CURRENCY_UNITS[keys[i]].front_units[j].trim() + ' ') {
+                startsWithCurrencyUnits = true;
+                break;
+              }
+            }
+          }
+          if (startsWithCurrencyUnits === false) {
             throw new Error(NUMBER_WITH_UNITS_PARSING_ERRORS.INVALID_CURRENCY);
           }
+
           var ind2 = rawInput.indexOf(
             rawInput.substr(ind).match(/[a-z(]/i));
           if (ind2 !== -1) {
@@ -321,12 +370,19 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
 
     Units.createCurrencyUnits = function() {
       // Creates user-defined currency (base + sub) units.
-      math.createUnit('dollar', {aliases: CURRENCY_UNITS.dollar});
-      math.createUnit('cent', {
-        definition: '0.01 dollar', aliases: CURRENCY_UNITS.cent});
-      math.createUnit('rupee', {aliases: CURRENCY_UNITS.rupee});
-      math.createUnit('paise', {
-        definition: '0.01 rupee', aliases: CURRENCY_UNITS.paise});
+      var keys = Object.keys(CURRENCY_UNITS);
+      for (var i = 0; i < keys.length; i++) {
+        if (CURRENCY_UNITS[keys[i]].base_unit === null) {
+          // Base unit (like: rupees, dollar etc.).
+          math.createUnit(CURRENCY_UNITS[keys[i]].name, {
+            aliases: CURRENCY_UNITS[keys[i]].aliases});
+        } else {
+          // Sub unit (like: paise, cents etc.).
+          math.createUnit(CURRENCY_UNITS[keys[i]].name, {
+            definition: CURRENCY_UNITS[keys[i]].base_unit,
+            aliases: CURRENCY_UNITS[keys[i]].aliases});
+        }
+      }
     };
 
     Units.toMathjsCompatibleString = function(units) {
@@ -336,25 +392,20 @@ oppia.factory('UnitsObjectFactory', ['CURRENCY_UNITS',
       // Special symbols need to be replaced as math.js doesn't support custom
       // units starting with special symbols. Also, it doesn't allow units
       // followed by a number as in the case of currency units.
-      if (units.includes('$')) {
-        units = units.replace('$', '');
-        units = 'dollar ' + units;
-      }
-      if (units.includes('Rs') || units.includes('₹')) {
-        units = units.replace('Rs', '');
-        units = units.replace('₹', '');
-        units = 'rupee ' + units;
-      }
-
-      for (var i = 0; i < CURRENCY_UNITS.dollar.length; i++) {
-        if (units.includes(CURRENCY_UNITS.dollar[i])) {
-          units = units.replace(CURRENCY_UNITS.dollar[i], 'dollar');
+      var keys = Object.keys(CURRENCY_UNITS);
+      for (var i = 0; i < keys.length; i++) {
+        for (var j = 0; j < CURRENCY_UNITS[keys[i]].front_units.length; j++) {
+          if (units.includes(CURRENCY_UNITS[keys[i]].front_units[j])) {
+            units = units.replace(CURRENCY_UNITS[keys[i]].front_units[j], '');
+            units = CURRENCY_UNITS[keys[i]].name + units;
+          }
         }
-      }
 
-      for (var i = 0; i < CURRENCY_UNITS.rupee.length; i++) {
-        if (units.includes(CURRENCY_UNITS.rupee[i])) {
-          units = units.replace(CURRENCY_UNITS.rupee[i], 'rupee');
+        for (var j = 0; j < CURRENCY_UNITS[keys[i]].aliases.length; j++) {
+          if (units.includes(CURRENCY_UNITS[keys[i]].aliases[j])) {
+            units = units.replace(CURRENCY_UNITS[keys[i]].aliases[j],
+              CURRENCY_UNITS[keys[i]].name);
+          }
         }
       }
       return units.trim();
