@@ -231,7 +231,7 @@ oppia.controller('StatisticsTab', [
                 AlertsService.clearWarnings();
               };
 
-              $scope.$on("$destroy", function() {
+              $scope.$on('$destroy', function() {
                 isStateStatsModalOpen = false;
               });
 
