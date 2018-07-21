@@ -397,6 +397,20 @@ describe('Testing apply-validation directive', function() {
     scope.$digest();
     expect(Object.keys(testInput.$error).length).not.toEqual(0);
   }));
+
+  it('should not apply nonexistent validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'testFilterFilter'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue('-abc');
+    scope.$digest();
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+  }));
 });
 
 describe('RTE helper service', function() {
