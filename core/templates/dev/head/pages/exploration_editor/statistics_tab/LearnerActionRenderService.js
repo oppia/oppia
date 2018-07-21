@@ -88,12 +88,12 @@ oppia.factory('LearnerActionRenderService', [
     var renderLearnerActionHTML = function(learnerAction) {
       var actionType = learnerAction.actionType;
       var custArgs = learnerAction.actionCustomizationArgs;
-      if (actionType == ACTION_TYPE_EXPLORATION_START) {
+      if (actionType === ACTION_TYPE_EXPLORATION_START) {
         return renderExplorationStartActionHTML(custArgs.state_name.value);
-      } else if (actionType == ACTION_TYPE_EXPLORATION_QUIT) {
+      } else if (actionType === ACTION_TYPE_EXPLORATION_QUIT) {
         return renderExplorationQuitActionHTML(
           custArgs.state_name.value, custArgs.time_spent_in_state_secs.value);
-      } else if (actionType == ACTION_TYPE_ANSWER_SUBMIT) {
+      } else if (actionType === ACTION_TYPE_ANSWER_SUBMIT) {
         interactionId =
           custArgs.interaction_id.value;
         if (interactionId === 'Continue') {
