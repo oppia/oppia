@@ -116,15 +116,8 @@
         "version": "1.4.1",
         "downloadFormat": "zip",
         "url": "https://github.com/logbon72/angular-recorder/archive/1.4.1.zip",
-        "rootDirPrefix": "ngAudioRecorder-",
+        "rootDirPrefix": "angular-recorder-",
         "targetDirPrefix": "angular-recorder-"
-      },
-      "lameJs": {
-        "version": "1.2.0",
-        "downloadFormat": "files",
-        "url": "https://raw.githubusercontent.com/zhuker/lamejs/1.2.0",
-        "targetDirPrefix": "lamejs-",
-        "files": ["lame.min.js"]
       },
       "angularTest": {
         "version": "1.5.8",
@@ -315,7 +308,7 @@
         "targetDirPrefix": "wave-surfer-js-",
         "files": ["wavesurfer.min.js"],
         "bundle": {
-          "js": []
+          "js": ["wavesurfer.min.js"]
         }
       },
       "jquery": {

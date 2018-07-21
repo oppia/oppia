@@ -13,8 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the state translation.
+ * @fileoverview Directive for the audio translation bar.
  */
+// Constant for audio recording time limit.
+oppia.constant('RECORDING_TIME_LIMIT', 300);
 
 oppia.directive('audioTranslationBar', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -34,21 +36,21 @@ oppia.directive('audioTranslationBar', [
         'stateContentIdsToAudioTranslationsService', 'IdGenerationService',
         'AudioPlayerService', 'TranslationLanguageService',
         'EditabilityService', 'AssetsBackendApiService', 'recorderService',
-        'ContextService',
+        'ContextService', 'RECORDING_TIME_LIMIT',
         function(
             $scope, $filter, $timeout, $uibModal, AlertsService,
             stateContentIdsToAudioTranslationsService, IdGenerationService,
             AudioPlayerService, TranslationLanguageService,
             EditabilityService, AssetsBackendApiService, recorderService,
-            ContextService) {
+            ContextService, RECORDING_TIME_LIMIT) {
           $scope.RECORDER_ID = 'recorderId';
-          $scope.recordingTimeLimit = 300;
+          $scope.recordingTimeLimit = RECORDING_TIME_LIMIT;
           $scope.audioBlob = null;
           $scope.recorder = null;
           $scope.unsupportedBrowser = false;
           $scope.selectedRecording = false;
           $scope.isAudioAvailable = false;
-          $scope.isUpdatingAudio = false;
+          $scope.audioIsUpdating = false;
           $scope.languageCode = null;
           $scope.cannotRecord = false;
           $scope.audioNeedsUpdate = false;
@@ -58,7 +60,6 @@ oppia.directive('audioTranslationBar', [
           recorderService.showPermission({
             onDenied: function() {
               $scope.recordingPermissionDenied = true;
-              $scope.cannotRecord = true;
             },
             onAllowed: function() {
               $scope.recordingPermissionDenied = false;
@@ -66,7 +67,6 @@ oppia.directive('audioTranslationBar', [
             },
             onClosed: function() {
               $scope.recordingPermissionDenied = true;
-              $scope.cannotRecord = true;
             },
           });
 
@@ -74,15 +74,14 @@ oppia.directive('audioTranslationBar', [
             if (!$scope.recorder.isAvailable) {
               $scope.unsupportedBrowser = true;
               $scope.cannotRecord = true;
+            } else if ($scope.recordingPermissionDenied){
+              $scope.cannotRecord = true;
             } else if ($scope.recorder.isAvailable) {
               $scope.unsupportedBrowser = false;
               $scope.cannotRecord = false;
               $scope.recordingPermissionDenied = false;
               $scope.selectedRecording = true;
               $scope.recorder.startRecord();
-            } else {
-              $scope.recordingPermissionDenied = true;
-              $scope.cannotRecord = true;
             }
           };
           $scope.toggleAudioNeedsUpdate = function() {
@@ -103,7 +102,7 @@ oppia.directive('audioTranslationBar', [
             }
           };
 
-          $scope.generateNewFilename = function() {
+          var generateNewFilename = function() {
             return $scope.contentId + '-' +
               $scope.languageCode + '-' +
               IdGenerationService.generateNewId() + '.mp3';
@@ -111,35 +110,43 @@ oppia.directive('audioTranslationBar', [
 
           $scope.reRecord = function() {
             $scope.initAudioBar();
+            $scope.selectedRecording = true;
             $scope.recorder.startRecord();
+          };
+
+          $scope.cancelRecording = function() {
+            $scope.initAudioBar();
+            $scope.selectedRecording = false;
+            $scope.audioIsUpdating = false;
+            $scope.audioBlob = null;
           };
 
           $scope.updateAudio = function() {
             $scope.audioBlob = null;
-            $scope.isUpdatingAudio = true;
+            $scope.audioIsUpdating = true;
             $scope.recorder.startRecord();
           };
 
           $scope.saveRecordedAudio = function() {
-            var filename = $scope.generateNewFilename();
+            var filename = generateNewFilename();
             var fileType = 'audio/mp3';
-            var recodedAudioFile = new File(
+            var recordedAudioFile = new File(
               [$scope.audioBlob], filename, {type: fileType});
             AssetsBackendApiService.saveAudio(
               ContextService.getExplorationId(), filename,
-              recodedAudioFile).then(function() {
-              if ($scope.isUpdatingAudio) {
+              recordedAudioFile).then(function() {
+              if ($scope.audioIsUpdating) {
                 stateContentIdsToAudioTranslationsService.displayed
                   .deleteAudioTranslation(
                     $scope.contentId, $scope.languageCode);
-                $scope.isUpdatingAudio = false;
+                $scope.audioIsUpdating = false;
               }
               stateContentIdsToAudioTranslationsService.displayed
                 .addAudioTranslation($scope.contentId, $scope.languageCode,
-                  filename, recodedAudioFile.size);
+                  filename, recordedAudioFile.size);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
               AlertsService.addSuccessMessage(
-                'Succesfuly uploaded recoded audio.');
+                'Succesfuly uploaded recorded audio.');
               $scope.initAudioBar();
             }, function(errorResponse) {
               AlertsService.addWarning(errorResponse.error);
@@ -173,6 +180,7 @@ oppia.directive('audioTranslationBar', [
             } else {
               $scope.isAudioAvailable = false;
               $scope.audioBlob = null;
+              $scope.selectedRecording = false;
             }
           };
 
@@ -219,7 +227,7 @@ oppia.directive('audioTranslationBar', [
               backdrop: 'static',
               resolve: {
                 generatedFilename: function() {
-                  return $scope.generateNewFilename();
+                  return generateNewFilename();
                 },
                 languageCode: function() {
                   return $scope.languageCode;

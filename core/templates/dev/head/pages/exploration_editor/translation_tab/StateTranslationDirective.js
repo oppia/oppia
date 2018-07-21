@@ -55,7 +55,7 @@ oppia.directive('stateTranslation', [
           };
 
           $scope.onTabClick = function(tabId) {
-            $scope.ACTIVATED_TAB_ID = tabId;
+            $scope.activatedTabId = tabId;
             if (tabId === $scope.TAB_ID_CONTENT) {
               $scope.activeContentId = $scope.stateContent.getContentId();
             } else if (tabId === $scope.TAB_ID_FEEDBACK) {
@@ -132,7 +132,6 @@ oppia.directive('stateTranslation', [
                 ExplorationInitStateNameService.displayed);
             }
             var stateName = EditorStateService.getActiveStateName();
-
             $scope.stateContent = ExplorationStatesService
               .getStateContentMemento(stateName);
             $scope.stateSolution = ExplorationStatesService
@@ -149,6 +148,7 @@ oppia.directive('stateTranslation', [
             $scope.activeAnswerGroupIndex = null;
 
             $scope.onTabClick($scope.TAB_ID_CONTENT);
+            $scope.$broadcast('refreshAudioTranslationBar');
           };
 
           // TODO(DubeySandeep): We need to call initStateTranslation() here in
