@@ -153,7 +153,12 @@ oppia.filter('isFloat', [function() {
     // All examples above with '.' replaced with ',' are also valid.
     // Expressions containing % are also valid (5.1% etc).
 
-    var viewValue = input.toString().trim();
+    var viewValue = "";
+    try {
+      var viewValue = input.toString().trim();
+    } catch(e) {
+      return undefined;
+    }
 
     if (viewValue !== '' && FLOAT_REGEXP.test(viewValue)) {
       if (viewValue.slice(-1) === '%') {
