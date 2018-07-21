@@ -16,12 +16,16 @@
  * @fileoverview Factory for calculating the statistics of a particular state.
  */
 
+oppia.constant(
+  'STATE_RULES_STATS_URL',
+  '/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>')
+
 oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ContextService', 'UrlInterpolationService',
+  'ContextService', 'UrlInterpolationService', 'STATE_RULES_STATS_URL',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      ContextService, UrlInterpolationService) {
+      ContextService, UrlInterpolationService, STATE_RULES_STATS_URL) {
     return {
       /**
        * TODO(brianrodri): Consider moving this into a visualization domain
@@ -48,11 +52,10 @@ oppia.factory('StateRulesStatsService', [
         var explorationId = ContextService.getExplorationId();
 
         return $http.get(
-          UrlInterpolationService.interpolateUrl(
-            '/createhandler/state_rules_stats/<exploration_id>/<state_name>', {
-              exploration_id: explorationId,
-              state_name: encodeURIComponent(state.name),
-            })
+          UrlInterpolationService.interpolateUrl(STATE_RULES_STATS_URL, {
+            exploration_id: explorationId,
+            escaped_state_name: encodeURIComponent(state.name),
+          })
         ).then(function(response) {
           return {
             state_name: state.name,
