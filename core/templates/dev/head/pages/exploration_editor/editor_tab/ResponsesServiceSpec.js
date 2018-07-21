@@ -33,9 +33,9 @@ describe('Responses Service', function() {
     beforeEach(function() {
       rs.init({
         interactionId: 1,
-        answerGroups: 'some value',
+        answerGroups: ['some value'],
         defaultOutcome: 'some default outcome',
-        confirmedUnclassifiedAnswers: 'some value'
+        confirmedUnclassifiedAnswers: ['some value']
       })
     });
 
@@ -46,6 +46,10 @@ describe('Responses Service', function() {
     it('should be able to change answer group index', function() {
       rs.changeActiveAnswerGroupIndex(5);
       expect(rs.getActiveAnswerGroupIndex()).toEqual(5);
-    })
+    });
+
+    it('should return 0 for active rule index by default', function() {
+      expect(rs.getActiveRuleIndex()).toEqual(0)
+    });
   })
 })
