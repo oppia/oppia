@@ -19,20 +19,16 @@
 oppia.factory('QuestionCreationService', [
   '$http', '$q', 'UrlInterpolationService',
   function($http, $q, UrlInterpolationService) {
-    var QUESTION_CREATOR_URL_TEMPLATE =
-      '/topic_editor_question_handler/<topic_id>';
+    var QUESTION_CREATOR_URL = '/question_editor_handler/create_new';
 
     var _createNew = function(
-        topicId, successCallback, errorCallback) {
-      var questionCreationurl = UrlInterpolationService.interpolateUrl(
-        QUESTION_CREATOR_URL_TEMPLATE, {
-          topic_id: topicId
-        });
-
-      $http.post(questionCreationurl).then(function(response) {
-        var questionId = angular.copy(response.data.questionId);
+        backendQuestionDict, successCallback, errorCallback) {
+      var postData = {
+        question_dict: backendQuestionDict
+      };
+      $http.post(QUESTION_CREATOR_URL, postData).then(function(response) {
         if (successCallback) {
-          successCallback(questionId);
+          successCallback();
         }
       }, function(errorResponse) {
         if (errorCallback) {
@@ -42,9 +38,9 @@ oppia.factory('QuestionCreationService', [
     };
 
     return {
-      createNew: function(topicId) {
+      createNew: function(backendQuestionDict) {
         return $q(function(resolve, reject) {
-          _createNew(topicId, resolve, reject);
+          _createNew(backendQuestionDict, resolve, reject);
         });
       }
     };

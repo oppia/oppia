@@ -31,31 +31,14 @@ oppia.directive('questionsTab', [
             QuestionCreationService, EditableQuestionBackendApiService,
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED) {
           var _initTab = function() {
+            $scope.showEditor = false;
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.questionSummaries =
               TopicEditorStateService.getQuestionSummaries();
           };
 
           $scope.createQuestion = function() {
-            QuestionCreationService.createNew($scope.topic.getId()).then(
-              function(questionId) {
-                EditableQuestionBackendApiService.fetchQuestion(
-                  questionId).then(
-                  function(questionBackendDict) {
-                    $scope.question =
-                      QuestionObjectFactory.createFromBackendDict(
-                        questionBackendDict);
-                  },
-                  function(error) {
-                    AlertsService.addWarning(
-                      error ||
-                      'There was an error when getting the question data.');
-                  });
-              },
-              function(error) {
-                AlertsService.addWarning(
-                  error || 'There was an error when creating the question.');
-              });
+            $scope.showEditor = true;
           };
 
           $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, _initTab);

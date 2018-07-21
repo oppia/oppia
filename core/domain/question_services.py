@@ -170,8 +170,12 @@ def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
     Returns:
         list(QuestionSummary), str. The list of question summaries linked to the
             given skill_ids and the next cursor value to be used for the next
-            page. The returned next cursor value is urlsafe.
+            page (or None if no more pages are left). The returned next cursor
+            value is urlsafe.
     """
+    if len(skill_ids) == 0:
+        return [], None
+
     if len(skill_ids) > 3:
         raise Exception(
             'Querying linked question summaries for more than 3 skills at a '
