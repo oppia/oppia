@@ -18,10 +18,10 @@
 
 oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
-  'ContextService', 'UrlInterpolationService', 'STATE_RULES_STATS_URL',
+  'ContextService', 'UrlInterpolationService',
   function(
       $http, $injector, AngularNameService, AnswerClassificationService,
-      ContextService, UrlInterpolationService, STATE_RULES_STATS_URL) {
+      ContextService, UrlInterpolationService) {
     return {
       /**
        * TODO(brianrodri): Consider moving this into a visualization domain
