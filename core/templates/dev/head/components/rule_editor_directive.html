@@ -21,10 +21,10 @@
         <span ng-if="item.type == 'dropdown'" style="color: black;">
           <object-editor obj-type="ListOfSetsOfHtmlStrings" init-args="{choices: ruleDescriptionChoices}" value="rule.inputs[item.varName]"></object-editor>
         </span>
-        <span ng-if="item.type == 'dragAndDropSelect'" style="color: black;">
+        <span ng-if="item.type == 'dragAndDropHtmlStringSelect'" style="color: black;">
           <object-editor obj-type="DragAndDropHtmlString" init-args="{choices: ruleDescriptionChoices}" value="rule.inputs[item.varName]"></object-editor>
         </span>
-        <span ng-if="item.type == 'dragAndDropDropdown'" style="color: black;">
+        <span ng-if="item.type == 'dragAndDropPositiveIntSelect'" style="color: black;">
           <object-editor obj-type="DragAndDropPositiveInt" init-args="{choices: ruleDescriptionChoices}" value="rule.inputs[item.varName]"></object-editor>
         </span>
         <span ng-if="item.type != 'select' && item.type != 'noneditable'">

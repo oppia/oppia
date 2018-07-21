@@ -134,6 +134,15 @@ oppia.factory('DragAndDropSortInputValidationService', [
               });
             }
 
+            if (rule.type === 'HasElementXBeforeElementY') {
+              if (inputs.x === inputs.y) {
+                warningsList.push({
+                  type: WARNING_TYPES.ERROR,
+                  message: 'Please ensure both the elements are distinct.'
+                });
+              }
+            }
+
             for (var k = 0; k < ranges.length; k++) {
               var earlierRule = answerGroups[ranges[k].answerGroupIndex - 1].
                 rules[ranges[k].ruleIndex - 1];

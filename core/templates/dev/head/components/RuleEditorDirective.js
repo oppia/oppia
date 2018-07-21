@@ -119,7 +119,7 @@ oppia.directive('ruleEditor', [
                       }
                     );
                     result.push({
-                      type: 'dragAndDropSelect',
+                      type: 'dragAndDropHtmlStringSelect',
                       varName: finalInputArray[i + 1]
                     });
                   } else if (
@@ -133,7 +133,7 @@ oppia.directive('ruleEditor', [
                       }
                     );
                     result.push({
-                      type: 'dragAndDropDropdown',
+                      type: 'dragAndDropPositiveIntSelect',
                       varName: finalInputArray[i + 1]
                     });
                   } else {
