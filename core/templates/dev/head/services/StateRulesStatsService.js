@@ -52,10 +52,9 @@ oppia.factory('StateRulesStatsService', [
         var explorationId = ContextService.getExplorationId();
 
         return $http.get(
-          UrlInterpolationService.interpolateUrl(STATE_RULES_STATS_URL, {
-            exploration_id: explorationId,
-            escaped_state_name: encodeURIComponent(state.name),
-          })
+          '/createhandler/state_rules_stats/' +
+          encodeURIComponent(explorationId) + '/' +
+          encodeURIComponent(state.name)
         ).then(function(response) {
           return {
             state_name: state.name,
