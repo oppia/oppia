@@ -125,7 +125,6 @@ describe('Normalizer tests', function() {
     expect(filter('2+3')).toBeUndefined();
     expect(filter('--1.23')).toBeUndefined();
     expect(filter('=1.23')).toBeUndefined();
-    expect(filter(undefined)).toBeUndefined();
   }));
 
   it('should impose minimum bounds', inject(function($filter) {
@@ -216,10 +215,6 @@ describe('Testing requireIsFloat directive', function() {
     expect(testInput.$valid).toEqual(false);
 
     testInput.$setViewValue('0.3.5');
-    scope.$digest();
-    expect(testInput.$valid).toEqual(false);
-
-    testInput.$setViewValue(undefined);
     scope.$digest();
     expect(testInput.$valid).toEqual(false);
   });
@@ -394,10 +389,6 @@ describe('Testing apply-validation directive', function() {
     expect(Object.keys(testInput.$error)).not.toEqual(0);
 
     testInput.$setViewValue('-3..5');
-    scope.$digest();
-    expect(Object.keys(testInput.$error)).not.toEqual(0);
-
-    testInput.$setViewValue(undefined);
     scope.$digest();
     expect(Object.keys(testInput.$error)).not.toEqual(0);
   }));
