@@ -40,23 +40,21 @@ class ConfigServicesDomainUnitTests(test_utils.GenericTestBase):
             self.cfg_schemas[x]['schema']['type'] == self.schema_unicode)
 
     def test_set_property(self):
-        try:
+        with self.assertRaisesRegexp(Exception,
+                                     'No config property with name.+'):
             config_services.set_property(
                 self.committer_id, self.invalid_property_name,
                 self.property_dummy_value)
-        except Exception:
-            pass
 
         config_services.set_property(
             self.committer_id, self.property_name,
             self.property_dummy_value)
 
     def test_revert_property(self):
-        try:
+        with self.assertRaisesRegexp(Exception,
+                                     'No config property with name.+'):
             config_services.revert_property(
                 self.committer_id, self.invalid_property_name)
-        except Exception:
-            pass
 
         config_services.revert_property(self.committer_id, self.property_name)
         updated_schemas = config_domain.Registry.get_config_property_schemas()
