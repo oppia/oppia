@@ -344,7 +344,7 @@ describe('Testing apply-validation directive', function() {
 
     testInput.$setViewValue('O');
     scope.$digest();
-    expect(Object.keys(testInput.$error)).not.toEqual(0);
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
   }));
 
   it('should apply isFloat validation', inject(function($compile) {
@@ -382,15 +382,15 @@ describe('Testing apply-validation directive', function() {
 
     testInput.$setViewValue('abc');
     scope.$digest();
-    expect(Object.keys(testInput.$error)).not.toEqual(0);
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
 
     testInput.$setViewValue('1.2.3');
     scope.$digest();
-    expect(Object.keys(testInput.$error)).not.toEqual(0);
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
 
     testInput.$setViewValue('-3..5');
     scope.$digest();
-    expect(Object.keys(testInput.$error)).not.toEqual(0);
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
   }));
 });
 
