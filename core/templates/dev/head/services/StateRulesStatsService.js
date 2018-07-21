@@ -16,10 +16,6 @@
  * @fileoverview Factory for calculating the statistics of a particular state.
  */
 
-oppia.constant(
-  'STATE_RULES_STATS_URL',
-  '/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>');
-
 oppia.factory('StateRulesStatsService', [
   '$http', '$injector', 'AngularNameService', 'AnswerClassificationService',
   'ContextService', 'UrlInterpolationService', 'STATE_RULES_STATS_URL',
