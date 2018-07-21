@@ -195,36 +195,41 @@ class QuestionSkillLinkModel(base_models.BaseModel):
 
     @classmethod
     def get_question_ids_linked_to_skill_ids(cls, skill_ids, start_cursor):
-        """Creates a new QuestionSkillLinkModel entry.
+        """Fetches the list of question ids linked to the skill in batches.
 
         Args:
             skill_ids: list(str). The ids of skills for which the linked
                 question ids are to be retrieved.
             start_cursor: str. The starting point from which the batch of
-                questions are to be returned.
+                questions are to be returned. This value should be urlsafe.
 
         Returns:
             list(str), str. The question ids linked to given skills and the next
-                cursor value to be used for the next page.
+                cursor value to be used for the next page. The returned next
+                cursor value is urlsafe.
         """
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
-            question_skill_link_models, next_cursor, more = cls.query( #pylint: disable=unused-variable
+            question_skill_link_models, next_cursor, _ = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(cls.key).fetch_page(
-                feconf.NO_OF_QUESTIONS_DISPLAYED_IN_A_PAGE,
+                feconf.NUM_QUESTIONS_PER_PAGE,
                 start_cursor=cursor
             )
         else:
-            question_skill_link_models, next_cursor, more = cls.query( #pylint: disable=unused-variable
+            question_skill_link_models, next_cursor, _ = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(cls.key).fetch_page(
-                feconf.NO_OF_QUESTIONS_DISPLAYED_IN_A_PAGE
+                feconf.NUM_QUESTIONS_PER_PAGE
             )
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
-        return question_ids, next_cursor.urlsafe()
+        if next_cursor is None:
+            next_cursor_str = ''
+        else:
+            next_cursor_str = next_cursor.urlsafe()
+        return question_ids, next_cursor_str
 
 
 class QuestionCommitLogEntryModel(base_models.BaseCommitLogEntryModel):

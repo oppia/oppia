@@ -367,7 +367,7 @@ ENABLE_MAINTENANCE_MODE = False
 ENABLE_NEW_STRUCTURES = False
 
 # No. of questions to be displayed on a page in the topic editor.
-NO_OF_QUESTIONS_DISPLAYED_IN_A_PAGE = 10
+NUM_QUESTIONS_PER_PAGE = 10
 
 # Whether to automatically accept suggestions after a threshold time.
 ENABLE_AUTO_ACCEPT_OF_SUGGESTIONS = False

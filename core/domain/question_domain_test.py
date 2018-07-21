@@ -52,28 +52,22 @@ class QuestionDomainTest(test_utils.GenericTestBase):
             utils.ValidationError, expected_error_substring):
             self.question.validate()
 
-    def _assert_strict_validation_error(self, expected_error_substring):
-        """Checks that the skill passes strict validation."""
-        with self.assertRaisesRegexp(
-            utils.ValidationError, expected_error_substring):
-            self.question.validate(strict=True)
-
     def test_strict_validation(self):
         """Test to verify validate method of Question domain object with
         strict as True.
         """
         state = self.question.question_state_data
         state.interaction.solution = None
-        self._assert_strict_validation_error(
+        self._assert_validation_error(
             'Expected the question to have a solution')
         state.interaction.hints = []
-        self._assert_strict_validation_error(
+        self._assert_validation_error(
             'Expected the question to have at least one hint')
         state.interaction.default_outcome.dest = 'abc'
-        self._assert_strict_validation_error(
+        self._assert_validation_error(
             'Expected all answer groups to have destination as None.')
         state.interaction.default_outcome.labelled_as_correct = False
-        self._assert_strict_validation_error(
+        self._assert_validation_error(
             'Expected at least one answer group to have a correct answer')
 
     def test_not_strict_validation(self):

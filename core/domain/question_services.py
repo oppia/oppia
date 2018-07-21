@@ -33,7 +33,7 @@ def _create_new_question(committer_id, question, commit_message):
         question: Question. question domain object.
         commit_message: str. A description of changes made to the question.
     """
-    question.validate(strict=True)
+    question.validate()
     create_new_question_rights(question.id, committer_id)
     model = question_models.QuestionModel(
         id=question.id,
@@ -161,7 +161,7 @@ def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
         skill_ids: list(str). The ids of skills for which the linked questions
             are to be retrieved.
         start_cursor: str. The starting point from which the batch of
-            questions are to be returned.
+            questions are to be returned. This value should be urlsafe.
 
     Raises:
         Exception. Querying linked question summaries for more than 3 skills at
@@ -170,7 +170,7 @@ def get_question_summaries_linked_to_skills(skill_ids, start_cursor):
     Returns:
         list(QuestionSummary), str. The list of question summaries linked to the
             given skill_ids and the next cursor value to be used for the next
-            page.
+            page. The returned next cursor value is urlsafe.
     """
     if len(skill_ids) > 3:
         raise Exception(

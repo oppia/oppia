@@ -94,7 +94,7 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
 
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.ADMIN_EMAIL)
-            with self.swap(feconf, 'NO_OF_QUESTIONS_DISPLAYED_IN_A_PAGE', 1):
+            with self.swap(feconf, 'NUM_QUESTIONS_PER_PAGE', 1):
                 json_response = self.get_json(
                     '%s/%s?cursor=' % (
                         feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
@@ -129,7 +129,7 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
 
             self.login(self.TOPIC_MANAGER_EMAIL)
             json_response = self.get_json(
-                '%s/%s?cursor=' % (
+                '%s/%s' % (
                     feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
                 ))
             question_summary_dicts = json_response['question_summary_dicts']
