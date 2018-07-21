@@ -49,7 +49,13 @@ describe('Responses Service', function() {
     });
 
     it('should return 0 for active rule index by default', function() {
-      expect(rs.getActiveRuleIndex()).toEqual(0)
+      expect(rs.getActiveRuleIndex()).toEqual(0);
     });
+
+    it('should be able to change active rule index', function() {
+      rs.changeActiveRuleIndex(5);
+      expect(rs.getActiveRuleIndex()).toEqual(5);
+    });
+
   })
 })
