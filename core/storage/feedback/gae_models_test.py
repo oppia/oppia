@@ -30,14 +30,12 @@ class FeedbackThreadModelTest(test_utils.GenericTestBase):
     """Tests for the FeedbackThreadModel class."""
 
     def test_put_function(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
-            feedback_thread_model = feedback_models.FeedbackThreadModel(
-                exploration_id='exp_id_1')
-            feedback_thread_model.put()
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            feedback_thread_model = feedback_models.FeedbackThreadModel(
-                entity_type='exploration', entity_id='exp_id_1')
-            feedback_thread_model.put()
+        feedback_thread_model = feedback_models.FeedbackThreadModel(
+            exploration_id='exp_id_1')
+        feedback_thread_model.put()
+        feedback_thread_model = feedback_models.GeneralFeedbackThreadModel(
+            entity_type='exploration', entity_id='exp_id_1')
+        feedback_thread_model.put()
 
         last_updated = feedback_thread_model.last_updated
 
