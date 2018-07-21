@@ -210,14 +210,14 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         """
         if not start_cursor == '':
             cursor = datastore_query.Cursor(urlsafe=start_cursor)
-            question_skill_link_models, next_cursor, _ = cls.query(
+            question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(cls.key).fetch_page(
                 feconf.NUM_QUESTIONS_PER_PAGE,
                 start_cursor=cursor
             )
         else:
-            question_skill_link_models, next_cursor, _ = cls.query(
+            question_skill_link_models, next_cursor, more = cls.query(
                 cls.skill_id.IN(skill_ids)
             ).order(cls.key).fetch_page(
                 feconf.NUM_QUESTIONS_PER_PAGE
@@ -225,10 +225,9 @@ class QuestionSkillLinkModel(base_models.BaseModel):
         question_ids = [
             model.question_id for model in question_skill_link_models
         ]
-        if next_cursor is None:
-            next_cursor_str = ''
-        else:
-            next_cursor_str = next_cursor.urlsafe()
+        next_cursor_str = (
+            next_cursor.urlsafe() if (next_cursor and more) else None
+        )
         return question_ids, next_cursor_str
 
 
