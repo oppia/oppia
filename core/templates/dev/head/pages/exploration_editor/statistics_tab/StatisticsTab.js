@@ -111,8 +111,13 @@ oppia.controller('StatisticsTab', [
       });
     };
 
+    var isStateStatsModalOpen = false;
     $scope.onClickStateInStatsGraph = function(stateName) {
-      $scope.showStateStatsModal(stateName, $scope.highlightStates[stateName]);
+      if (!isStateStatsModalOpen) {
+        isStateStatsModalOpen = true;
+        $scope.showStateStatsModal(
+          stateName, $scope.highlightStates[stateName]);
+      }
     };
 
     $scope.showStateStatsModal = function(stateName, improvementType) {
@@ -225,6 +230,10 @@ oppia.controller('StatisticsTab', [
                 $uibModalInstance.dismiss('cancel');
                 AlertsService.clearWarnings();
               };
+
+              $scope.$on("$destroy", function() {
+                isStateStatsModalOpen = false;
+              });
 
               $scope.navigateToStateEditor = function() {
                 $scope.cancel();
