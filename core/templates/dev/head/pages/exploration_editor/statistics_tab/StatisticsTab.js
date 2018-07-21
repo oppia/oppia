@@ -111,10 +111,10 @@ oppia.controller('StatisticsTab', [
       });
     };
 
-    var isStateStatsModalOpen = false;
+    var stateStatsModalIsOpen = false;
     $scope.onClickStateInStatsGraph = function(stateName) {
-      if (!isStateStatsModalOpen) {
-        isStateStatsModalOpen = true;
+      if (!stateStatsModalIsOpen) {
+        stateStatsModalIsOpen = true;
         $scope.showStateStatsModal(
           stateName, $scope.highlightStates[stateName]);
       }
@@ -232,7 +232,7 @@ oppia.controller('StatisticsTab', [
               };
 
               $scope.$on('$destroy', function() {
-                isStateStatsModalOpen = false;
+                stateStatsModalIsOpen = false;
               });
 
               $scope.navigateToStateEditor = function() {
