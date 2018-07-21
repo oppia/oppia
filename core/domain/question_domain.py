@@ -147,13 +147,8 @@ class Question(object):
         return exp_domain.State.create_default_state(
             None, is_initial_state=True)
 
-    def validate(self, strict=False):
-        """Validates the Question domain object before it is saved.
-
-        Args:
-            strict: bool. Whether the complete validation has to be done to the
-                question, which is usually done before question submission.
-        """
+    def validate(self):
+        """Validates the Question domain object before it is saved."""
 
         if not isinstance(self.id, basestring):
             raise utils.ValidationError(
@@ -184,42 +179,41 @@ class Question(object):
             raise utils.ValidationError(
                 'Invalid language code: %s' % self.language_code)
 
-        if strict:
-            at_least_one_correct_answer = False
-            dest_is_specified = False
-            interaction = self.question_state_data.interaction
-            for answer_group in interaction.answer_groups:
-                if answer_group.labelled_as_correct:
-                    at_least_one_correct_answer = True
-                if answer_group.dest is not None:
-                    dest_is_specified = True
-
-            if interaction.default_outcome.labelled_as_correct:
+        at_least_one_correct_answer = False
+        dest_is_specified = False
+        interaction = self.question_state_data.interaction
+        for answer_group in interaction.answer_groups:
+            if answer_group.labelled_as_correct:
                 at_least_one_correct_answer = True
-
-            if interaction.default_outcome.dest is not None:
+            if answer_group.dest is not None:
                 dest_is_specified = True
 
-            if not at_least_one_correct_answer:
-                raise utils.ValidationError(
-                    'Expected at least one answer group to have a correct ' +
-                    'answer.'
-                )
+        if interaction.default_outcome.labelled_as_correct:
+            at_least_one_correct_answer = True
 
-            if dest_is_specified:
-                raise utils.ValidationError(
-                    'Expected all answer groups to have destination as None.'
-                )
+        if interaction.default_outcome.dest is not None:
+            dest_is_specified = True
 
-            if not interaction.hints:
-                raise utils.ValidationError(
-                    'Expected the question to have at least one hint')
+        if not at_least_one_correct_answer:
+            raise utils.ValidationError(
+                'Expected at least one answer group to have a correct ' +
+                'answer.'
+            )
 
-            if interaction.solution is None:
-                raise utils.ValidationError(
-                    'Expected the question to have a solution'
-                )
-            self.question_state_data.validate({}, False)
+        if dest_is_specified:
+            raise utils.ValidationError(
+                'Expected all answer groups to have destination as None.'
+            )
+
+        if not interaction.hints:
+            raise utils.ValidationError(
+                'Expected the question to have at least one hint')
+
+        if interaction.solution is None:
+            raise utils.ValidationError(
+                'Expected the question to have a solution'
+            )
+        self.question_state_data.validate({}, False)
 
     @classmethod
     def from_dict(cls, question_dict):
@@ -307,8 +301,8 @@ class QuestionSummary(object):
             'id': self.id,
             'creator_id': self.creator_id,
             'question_content': self.question_content,
-            'last_updated': self.last_updated,
-            'created_on': self.created_on
+            'last_updated_msec': utils.get_time_in_millisecs(self.last_updated),
+            'created_on_msec': utils.get_time_in_millisecs(self.created_on)
         }
 
 

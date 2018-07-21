@@ -82,25 +82,44 @@ class TopicEditorStoryHandlerTest(BaseTopicEditorControllerTest):
 
 class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
 
-    def test_question_creation(self):
+    def test_get(self):
+        # Create 5 questions linked to the same skill.
+        for i in range(0, 3): #pylint: disable=unused-variable
+            question_id = question_services.get_new_question_id()
+            self.save_new_question(
+                question_id, self.admin_id,
+                self._create_valid_question_data('ABC'))
+            question_services.create_new_question_skill_link(
+                question_id, self.skill_id)
+
         with self.swap(feconf, 'ENABLE_NEW_STRUCTURES', True):
             self.login(self.ADMIN_EMAIL)
-            response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            csrf_token = self.get_csrf_token_from_response(response)
-            json_response = self.post_json(
-                '%s/%s' % (feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id),
-                {}, csrf_token=csrf_token)
-            question_id = json_response['questionId']
-            self.assertEqual(len(question_id), 12)
-            self.assertIsNotNone(
-                question_services.get_question_by_id(question_id, strict=False))
+            with self.swap(feconf, 'NUM_QUESTIONS_PER_PAGE', 1):
+                json_response = self.get_json(
+                    '%s/%s?cursor=' % (
+                        feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
+                    ))
+                question_summary_dicts = json_response['question_summary_dicts']
+                self.assertEqual(len(question_summary_dicts), 1)
+                next_start_cursor = json_response['next_start_cursor']
+                json_response = self.get_json(
+                    '%s/%s?cursor=%s' % (
+                        feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id,
+                        next_start_cursor
+                    ))
+                question_summary_dicts_2 = (
+                    json_response['question_summary_dicts'])
+                self.assertEqual(len(question_summary_dicts_2), 1)
+                self.assertNotEqual(
+                    question_summary_dicts[0]['id'],
+                    question_summary_dicts_2[0]['id'])
             self.logout()
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.post(
-                '%s/%s' % (feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id),
-                expect_errors=True)
+            response = self.testapp.get(
+                '%s/%s?cursor=' % (
+                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
+                ), expect_errors=True)
             self.assertEqual(response.status_int, 401)
             self.logout()
 
@@ -109,23 +128,19 @@ class TopicEditorQuestionHandlerTest(BaseTopicEditorControllerTest):
                 self.topic_id)
 
             self.login(self.TOPIC_MANAGER_EMAIL)
-            response = self.testapp.get(
-                '%s/%s' % (feconf.TOPIC_EDITOR_URL_PREFIX, self.topic_id))
-            csrf_token = self.get_csrf_token_from_response(response)
-            json_response = self.post_json(
-                '%s/%s' % (feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id),
-                {}, csrf_token=csrf_token)
-            new_question_id = json_response['questionId']
-            self.assertEqual(len(new_question_id), 12)
-            self.assertIsNotNone(
-                question_services.get_question_by_id(
-                    new_question_id, strict=False))
+            json_response = self.get_json(
+                '%s/%s' % (
+                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
+                ))
+            question_summary_dicts = json_response['question_summary_dicts']
+            self.assertEqual(len(question_summary_dicts), 3)
             self.logout()
 
             self.login(self.NEW_USER_EMAIL)
-            response = self.testapp.post(
-                '%s/%s' % (feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id),
-                expect_errors=True)
+            response = self.testapp.get(
+                '%s/%s?cursor=' % (
+                    feconf.TOPIC_EDITOR_QUESTION_URL, self.topic_id
+                ), expect_errors=True)
             self.assertEqual(response.status_int, 401)
             self.logout()
 

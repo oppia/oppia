@@ -18,7 +18,6 @@ are created.
 
 from core.controllers import base
 from core.domain import acl_decorators
-from core.domain import question_domain
 from core.domain import question_services
 from core.domain import role_services
 from core.domain import skill_services
@@ -100,34 +99,22 @@ class TopicEditorQuestionHandler(base.BaseHandler):
             raise self.PageNotFoundException
         topic_domain.Topic.require_valid_topic_id(topic_id)
 
+        start_cursor = self.request.get('cursor')
         topic = topic_services.get_topic_by_id(topic_id)
         skill_ids = topic.get_all_skill_ids()
 
-        question_summaries = (
-            question_services.get_question_summaries_linked_to_skills(skill_ids)
+        question_summaries, next_start_cursor = (
+            question_services.get_question_summaries_linked_to_skills(
+                skill_ids, start_cursor)
         )
         question_summary_dicts = [
             summary.to_dict() for summary in question_summaries]
 
         self.values.update({
-            'question_summary_dicts': question_summary_dicts
+            'question_summary_dicts': question_summary_dicts,
+            'next_start_cursor': next_start_cursor
         })
         self.render_json(self.values)
-
-    @acl_decorators.can_edit_topic
-    def post(self, topic_id):
-        """Handles POST requests."""
-        if not feconf.ENABLE_NEW_STRUCTURES:
-            raise self.PageNotFoundException
-        topic_domain.Topic.require_valid_topic_id(topic_id)
-
-        new_question_id = question_services.get_new_question_id()
-        question = question_domain.Question.create_default_question(
-            new_question_id)
-        question_services.add_question(self.user_id, question)
-        self.render_json({
-            'questionId': new_question_id
-        })
 
 
 class TopicEditorPage(base.BaseHandler):
