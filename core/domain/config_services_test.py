@@ -16,7 +16,7 @@
 
 import collections
 
-from core.domain import config_domain as cd
+from core.domain import config_domain
 from core.domain import config_services
 from core.tests import test_utils
 
@@ -33,7 +33,7 @@ class ConfigServicesDomainUnitTests(test_utils.GenericTestBase):
         self.invalid_property_name = u'_no_such_property_name'
         self.property_dummy_value = u'TEST_VALUE'
         self.schema_unicode = 'unicode'
-        self.cfg_schemas = cd.Registry.get_config_property_schemas()
+        self.cfg_schemas = config_domain.Registry.get_config_property_schemas()
         # Get first property name, with unicode as schema type.
         self.property_name = next(
             x for x in self.cfg_schemas if
@@ -44,7 +44,7 @@ class ConfigServicesDomainUnitTests(test_utils.GenericTestBase):
             config_services.set_property(
                 self.committer_id, self.invalid_property_name,
                 self.property_dummy_value)
-        except ValueError:
+        except Exception:
             pass
 
         config_services.set_property(
@@ -55,9 +55,11 @@ class ConfigServicesDomainUnitTests(test_utils.GenericTestBase):
         try:
             config_services.revert_property(
                 self.committer_id, self.invalid_property_name)
-        except ValueError:
+        except Exception:
             pass
+
         config_services.revert_property(self.committer_id, self.property_name)
+        updated_schemas = config_domain.Registry.get_config_property_schemas()
+        updated_property_config = updated_schemas[self.property_name]
         self.assertEqual(
-            cd.Registry.get_config_property_schemas()[self.property_name],
-            self.cfg_schemas[self.property_name])
+            updated_property_config, self.cfg_schemas[self.property_name])

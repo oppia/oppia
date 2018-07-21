@@ -35,7 +35,7 @@ def set_property(committer_id, name, value):
 
     config_property = config_domain.Registry.get_config_property(name)
     if config_property is None:
-        raise ValueError('No config property with name %s found.' % name)
+        raise Exception('No config property with name %s found.' % name)
 
     config_property.set_value(committer_id, value)
 
@@ -51,6 +51,6 @@ def revert_property(committer_id, name):
 
     config_property = config_domain.Registry.get_config_property(name)
     if config_property is None:
-        raise ValueError('No config property with name %s found.' % name)
+        raise Exception('No config property with name %s found.' % name)
 
     set_property(committer_id, name, config_property.default_value)
