@@ -25,6 +25,7 @@ describe('Learner Action Render Service', function() {
       this.ps = $injector.get('PlaythroughService');
       spyOn(this.ps, 'isPlayerExcludedFromSamplePopulation').and.returnValue(
         false);
+      spyOn(this.ps, 'isExplorationWhitelisted').and.returnValue(true);
       this.lars = $injector.get('LearnerActionRenderService');
       this.ps.initSession('expId1', 1);
     }));
