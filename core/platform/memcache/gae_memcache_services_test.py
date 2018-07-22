@@ -21,7 +21,7 @@ from core.tests import test_utils
 
 
 class GaeMemcacheServicesUnitTests(test_utils.GenericTestBase):
-    """Tests for gae_memcache_services"""
+    """Tests for gae_memcache_services."""
 
     def setUp(self):
         super(GaeMemcacheServicesUnitTests, self).setUp()
