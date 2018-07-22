@@ -32,6 +32,7 @@ oppia.directive('questionsTab', [
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED) {
           var _initTab = function() {
             $scope.showEditor = false;
+            $scope.questionId = null;
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.questionSummaries =
               TopicEditorStateService.getQuestionSummaries();
@@ -39,6 +40,11 @@ oppia.directive('questionsTab', [
 
           $scope.createQuestion = function() {
             $scope.showEditor = true;
+          };
+
+          $scope.showQuestionEditor = function(id) {
+            $scope.showEditor = true;
+            $scope.questionId = id;
           };
 
           $scope.$on(EVENT_QUESTION_SUMMARIES_INITIALIZED, _initTab);

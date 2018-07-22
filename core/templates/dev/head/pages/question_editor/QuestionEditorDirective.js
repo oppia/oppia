@@ -19,7 +19,9 @@ oppia.directive('questionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {},
+      scope: {
+        getQuestionId: '&questionId'
+      },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
       controller: [
@@ -30,7 +32,16 @@ oppia.directive('questionEditor', [
             $scope, AlertsService, QuestionCreationService,
             EditableQuestionBackendApiService, QuestionObjectFactory,
             EVENT_QUESTION_SUMMARIES_INITIALIZED) {
-
+          $scope.question = null;
+          if ($scope.getQuestionId() === null) {
+            // TODO (aks681)
+          } else {
+            EditableQuestionBackendApiService.fetchQuestion(
+              $scope.getQuestionId()).then(function(questionBackendDict) {
+              $scope.question = QuestionObjectFactory.createFromBackendDict(
+                questionBackendDict);
+            });
+          }
         }
       ]
     };
