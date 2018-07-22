@@ -96,6 +96,18 @@ describe('URL Interpolation Service', function() {
     })).toBe('/test_url/');
   });
 
+  it('should interpolate URLs when parameters have brackets', function() {
+    expect(uis.interpolateUrl('/test_url/<param>', {
+      param: 'value (1'
+    })).toBe('/test_url/value%20(1');
+    expect(uis.interpolateUrl('/test_url/<param>', {
+      param: 'value 1)'
+    })).toBe('/test_url/value%201)');
+    expect(uis.interpolateUrl('/test_url/<param>', {
+      param: 'value (1)'
+    })).toBe('/test_url/value%20(1)');
+  });
+
   it('should interpolate URLs requiring one or more parameters', function() {
     expect(uis.interpolateUrl('/test_url/<fparam>', {
       fparam: 'value'
