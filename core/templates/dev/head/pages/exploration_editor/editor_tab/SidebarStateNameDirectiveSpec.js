@@ -27,6 +27,7 @@ describe('Sidebar state name controller', function() {
       is_version_of_draft_valid: true
     };
 
+    beforeEach(module('directiveTemplates'));
     beforeEach(function() {
       module('oppia');
     });
@@ -43,8 +44,8 @@ describe('Sidebar state name controller', function() {
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function($controller, $filter, $injector, $rootScope) {
-      scope = $rootScope.$new();
+    beforeEach(inject(function(
+        $controller, $filter, $compile, $injector, $rootScope, $templateCache) {
       filter = $filter;
       rootScope = $rootScope;
       ecs = $injector.get('EditorStateService');
@@ -131,20 +132,18 @@ describe('Sidebar state name controller', function() {
         }
       });
 
-      ctrl = $controller('SidebarStateName', {
-        $scope: scope,
-        $filter: filter,
-        $rootScope: rootScope,
-        EditabilityService: {
-          isEditable: function() {
-            return true;
-          }
-        },
-        EditorStateService: ecs,
-        FocusManagerService: fs,
-        ExplorationStatesService: ess,
-        RouterService: {}
-      });
+      var templateHtml = $templateCache.get(
+        '/pages/exploration_editor/editor_tab/' +
+        'sidebar_state_name_directive.html');
+      $compile(templateHtml, $rootScope);
+      $rootScope.$digest();
+
+      outerScope = $rootScope.$new();
+      var elem = angular.element(
+        '<sidebar-state-name></sidebar-state-name>');
+      var compiledElem = $compile(elem)(outerScope);
+      outerScope.$digest();
+      scope = compiledElem[0].getControllerScope();
     }));
 
     it('should correctly normalize whitespace in a state name', function() {
