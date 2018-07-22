@@ -112,8 +112,8 @@ oppia.directive('stateSolution', [
                       ExplorationStatesService
                         .getInteractionCustomizationArgsMemento(
                           EditorStateService.getActiveStateName()),
-                        false,
-                        $scope.SOLUTION_EDITOR_FOCUS_LABEL));
+                      false,
+                      $scope.SOLUTION_EDITOR_FOCUS_LABEL));
                   $scope.EXPLANATION_FORM_SCHEMA = {
                     type: 'html',
                     ui_config: {}
