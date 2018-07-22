@@ -259,7 +259,7 @@ OPPIA_BLOCK_COMPONENTS = [
 ]
 
 
-def convert_to_textangular(html_data, unused_exp_id):
+def convert_to_textangular(html_data, unused_exp_id=''):
     """This function converts the html to TextAngular supported format.
 
     Args:
@@ -771,7 +771,7 @@ def _validate_soup_for_rte(soup, rte_format, err_dict):
     return is_invalid
 
 
-def add_caption_attr_to_image(html_string, unused_exp_id):
+def add_caption_attr_to_image(html_string, unused_exp_id=''):
     """Adds caption attribute to all oppia-noninteractive-image tags.
 
     Args:

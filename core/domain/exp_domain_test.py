@@ -3393,7 +3393,116 @@ tags: []
 title: Title
 """)
 
-    _LATEST_YAML_CONTENT = YAML_CONTENT_V28
+    YAML_CONTENT_V29 = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 29
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 24
+tags: []
+title: Title
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V29
 
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
@@ -3563,6 +3672,12 @@ title: Title
             'eid', self.YAML_CONTENT_V28)
         self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
+    def test_load_from_v29(self):
+        """Test direct loading from a v29 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', self.YAML_CONTENT_V29)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
 
 class HTMLMigrationUnitTests(test_utils.GenericTestBase):
     """Test HTML migration."""
@@ -3721,7 +3836,7 @@ states:
           feedback:
             content_id: outcome
             html: Here is the image1 <i><oppia-noninteractive-image
-                filepath-with-value="amp;quot;startBlue.png&amp;quot;">
+                filepath-with-value="&amp;quot;startBlue.png&amp;quot;">
                 </oppia-noninteractive-image></i>Here is the image2
                 <div><oppia-noninteractive-image filepath-with-value="
                 amp;quot;startBlue.png&amp;quot;">
@@ -3771,7 +3886,7 @@ title: title
 """)
 
 # pylint: disable=line-too-long
-    YAML_CONTENT_V28_TEXTANGULAR = ("""author_notes: ''
+    YAML_CONTENT_V29_TEXTANGULAR = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: category
@@ -3781,7 +3896,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 28
+schema_version: 29
 states:
   Introduction:
     classifier_model_id: null
@@ -3922,10 +4037,13 @@ states:
           dest: state1
           feedback:
             content_id: outcome
-            html: <p>Here is the image1 <i><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-              filepath-with-value="amp;quot;startBlue.png&amp;quot;"> </oppia-noninteractive-image></i>Here
-              is the image2 </p><p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-              filepath-with-value=" amp;quot;startBlue.png&amp;quot;"> </oppia-noninteractive-image></p>
+            html: \'<p>Here is the image1 <i><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+              filepath-with-value="{&amp;quot;width&amp;quot;: 120, &amp;quot;height&amp;quot;:
+              490, &amp;quot;filename&amp;quot;: &amp;quot;startBlue.png&amp;quot;}">
+              </oppia-noninteractive-image></i>Here is the image2 </p><p><oppia-noninteractive-image
+              caption-with-value="&amp;quot;&amp;quot;" filepath-with-value="{&amp;quot;width&amp;quot;:
+              120, &amp;quot;height&amp;quot;: 490, &amp;quot;filename&amp;quot;:
+              &amp;quot;amp;quot;startBlue.png&amp;quot;}"> </oppia-noninteractive-image></p>\'
           labelled_as_correct: false
           missing_prerequisite_skill_id: null
           param_changes: []
@@ -3965,7 +4083,7 @@ states:
       id: ItemSelectionInput
       solution: null
     param_changes: []
-states_schema_version: 23
+states_schema_version: 24
 tags: []
 title: title
 """)
@@ -4081,7 +4199,119 @@ tags: []
 title: Title
 """)
 
-    YAML_CONTENT_V28_WITH_IMAGE_CAPTION = ("""author_notes: ''
+    YAML_CONTENT_V29_WITH_IMAGE_CAPTION = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 29
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: \'<p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="{&amp;quot;width&amp;quot;: 120, &amp;quot;height&amp;quot;:
+        490, &amp;quot;filename&amp;quot;: &amp;quot;random.png &amp;quot;}"></oppia-noninteractive-image>Hello
+        this is test case to check image tag inside p tag</p>\'
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 24
+tags: []
+title: Title
+""")
+
+    YAML_CONTENT_V28_WITHOUT_IMAGE_DIMENSIONS = ("""author_notes: ''
 auto_tts_enabled: true
 blurb: ''
 category: Category
@@ -4098,8 +4328,9 @@ states:
     content:
       content_id: content
       html: <p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
-        filepath-with-value="&amp;quot;random.png &amp;quot;"></oppia-noninteractive-image>Hello
-        this is test case to check image tag inside p tag</p>
+        filepath-with-value="&amp;quot;random.png&amp;quot;">
+        </oppia-noninteractive-image>Hello this is test case to check image tag
+        inside p tag</p>
     content_ids_to_audio_translations:
       content: {}
       default_outcome: {}
@@ -4191,21 +4422,166 @@ states_schema_version: 23
 tags: []
 title: Title
 """)
+
+    YAML_CONTENT_V29_WITH_IMAGE_DIMENSIONS = ("""author_notes: ''
+auto_tts_enabled: true
+blurb: ''
+category: Category
+correctness_feedback_enabled: false
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 29
+states:
+  (untitled state):
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: \'<p><oppia-noninteractive-image caption-with-value="&amp;quot;&amp;quot;"
+        filepath-with-value="{&amp;quot;width&amp;quot;: 120, &amp;quot;height&amp;quot;:
+        490, &amp;quot;filename&amp;quot;: &amp;quot;random.png&amp;quot;}"> </oppia-noninteractive-image>Hello
+        this is test case to check image tag inside p tag</p>\'
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+      feedback_1: {}
+    interaction:
+      answer_groups:
+      - outcome:
+          dest: END
+          feedback:
+            content_id: feedback_1
+            html: <p>Correct!</p>
+          labelled_as_correct: false
+          missing_prerequisite_skill_id: null
+          param_changes: []
+          refresher_exploration_id: null
+        rule_specs:
+        - inputs:
+            x: InputString
+          rule_type: Equals
+        tagged_misconception_id: null
+        training_data: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: (untitled state)
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+  END:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: <p>Congratulations, you have finished!</p>
+    content_ids_to_audio_translations:
+      content: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        recommendedExplorationIds:
+          value: []
+      default_outcome: null
+      hints: []
+      id: EndExploration
+      solution: null
+    param_changes: []
+  New state:
+    classifier_model_id: null
+    content:
+      content_id: content
+      html: ''
+    content_ids_to_audio_translations:
+      content: {}
+      default_outcome: {}
+    interaction:
+      answer_groups: []
+      confirmed_unclassified_answers: []
+      customization_args:
+        placeholder:
+          value: ''
+        rows:
+          value: 1
+      default_outcome:
+        dest: END
+        feedback:
+          content_id: default_outcome
+          html: ''
+        labelled_as_correct: false
+        missing_prerequisite_skill_id: null
+        param_changes: []
+        refresher_exploration_id: null
+      hints: []
+      id: TextInput
+      solution: null
+    param_changes: []
+states_schema_version: 24
+tags: []
+title: Title
+""")
 # pylint: enable=line-too-long
+
+
 
     def test_load_from_v26_textangular(self):
         """Test direct loading from a v26 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
-        self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V28_TEXTANGULAR)
+        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+            return html_cleaner.escape_html(json.dumps(
+                {'filename': filename, 'height': 490, 'width': 120}))
+
+        with self.swap(
+            html_cleaner, 'get_filepath_of_object_image',
+            _mock_get_filepath_of_object_image):
+
+            exploration = exp_domain.Exploration.from_yaml(
+                'eid', self.YAML_CONTENT_V26_TEXTANGULAR)
+            self.assertEqual(
+                exploration.to_yaml(), self.YAML_CONTENT_V29_TEXTANGULAR)
 
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
-        exploration = exp_domain.Exploration.from_yaml(
-            'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
-        self.assertEqual(
-            exploration.to_yaml(), self.YAML_CONTENT_V28_WITH_IMAGE_CAPTION)
+        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+            return html_cleaner.escape_html(json.dumps(
+                {'filename': filename, 'height': 490, 'width': 120}))
+
+        with self.swap(
+            html_cleaner, 'get_filepath_of_object_image',
+            _mock_get_filepath_of_object_image):
+
+            exploration = exp_domain.Exploration.from_yaml(
+                'eid', self.YAML_CONTENT_V27_WITHOUT_IMAGE_CAPTION)
+            self.assertEqual(
+                exploration.to_yaml(), self.YAML_CONTENT_V29_WITH_IMAGE_CAPTION)
+
+    def test_load_from_v28_without_image_dimensions(self):
+        """Test direct loading from a v27 yaml file."""
+        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+            return html_cleaner.escape_html(json.dumps(
+                {'filename': filename, 'height': 490, 'width': 120}))
+
+        with self.swap(
+            html_cleaner, 'get_filepath_of_object_image',
+            _mock_get_filepath_of_object_image):
+
+            exploration = exp_domain.Exploration.from_yaml(
+                'eid', self.YAML_CONTENT_V28_WITHOUT_IMAGE_DIMENSIONS)
+            self.assertEqual(
+                exploration.to_yaml(), self.YAML_CONTENT_V29_WITH_IMAGE_DIMENSIONS)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -4552,13 +4928,13 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             exp_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_cleaner.convert_to_textangular, 'unused'),
+                html_cleaner.convert_to_textangular),
             state_dict_in_textangular)
 
         self.assertEqual(
             exp_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_cleaner.add_caption_attr_to_image, 'unused'),
+                html_cleaner.add_caption_attr_to_image),
             state_dict_with_image_caption)
 
         def _mock_get_filepath_of_object_image(filename, unused_exp_id):

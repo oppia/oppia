@@ -202,6 +202,7 @@ class ExplorationMigrationJobManager(jobs.BaseMapReduceOneOffJobManager):
     def map(item):
         if item.deleted:
             return
+
         # Do not upgrade explorations that fail non-strict validation.
         old_exploration = exp_services.get_exploration_by_id(item.id)
         try:

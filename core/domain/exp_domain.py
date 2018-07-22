@@ -1777,7 +1777,8 @@ class State(object):
             feconf.DEFAULT_CONTENT_IDS_TO_AUDIO_TRANSLATIONS)
 
     @classmethod
-    def convert_html_fields_in_state(cls, state_dict, conversion_fn, exp_id):
+    def convert_html_fields_in_state(
+        cls, state_dict, conversion_fn, additional_data={}):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 
@@ -1785,11 +1786,18 @@ class State(object):
             state_dict: dict. The dict representation of State object.
             conversion_fn: function. The conversion function to be applied on
                 the states_dict.
-            exp_id: str. ID of the exploration.
+            additional_data: dict. A dict which contains any additional
+                argument required.
 
         Returns:
             dict. The converted state_dict.
         """
+        # We need exp_id only for adding dimensions to the images. So for other
+        # conversion_fn we assign exp_id as 'unused'.
+        exp_id = 'unused'
+        if 'exp_id' in additional_data:
+            exp_id = additional_data['exp_id']
+
         state_dict['content']['html'] = (
             conversion_fn(state_dict['content']['html'], exp_id))
         if state_dict['interaction']['default_outcome']:
@@ -3528,7 +3536,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.convert_to_textangular, 'unused')
+                state_dict, html_cleaner.convert_to_textangular)
         return states_dict
 
     @classmethod
@@ -3546,7 +3554,7 @@ class Exploration(object):
         """
         for key, state_dict in states_dict.iteritems():
             states_dict[key] = State.convert_html_fields_in_state(
-                state_dict, html_cleaner.add_caption_attr_to_image, 'unused')
+                state_dict, html_cleaner.add_caption_attr_to_image)
         return states_dict
 
     @classmethod
@@ -3567,7 +3575,7 @@ class Exploration(object):
             states_dict[key] = State.convert_html_fields_in_state(
                 state_dict,
                 html_cleaner.add_dimensions_to_noninteractive_image_tag,
-                exp_id)
+                additional_data={'exp_id': exp_id})
             if state_dict['interaction']['id'] == 'ImageClickInput':
                 filename = state_dict['interaction']['customization_args'][
                     'imageAndRegions']['value']['imagePath']
