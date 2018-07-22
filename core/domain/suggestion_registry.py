@@ -19,6 +19,8 @@ subclasses for each type of suggestion.
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import question_domain
+from core.domain import skill_services
 from core.domain import user_services
 from core.platform import models
 import utils
@@ -71,12 +73,6 @@ class BaseSuggestion(object):
             'score_category': self.score_category,
             'last_updated': utils.get_time_in_millisecs(self.last_updated)
         }
-
-    @classmethod
-    def from_dict(cls):
-        """Return a Suggestion object from a dict."""
-        raise NotImplementedError(
-            'Subclasses of BaseSuggestion should implement from_dict.')
 
     def get_score_type(self):
         """Returns the first part of the score category. The first part refers
@@ -319,30 +315,124 @@ class SuggestionEditStateContent(BaseSuggestion):
             self.final_reviewer_id, self.target_id, change_list,
             commit_message, is_suggestion=True)
 
-    @classmethod
-    def from_dict(cls, suggestion_dict):
-        """Return a Suggestion object of type SUGGESTION_TYPE_EDIT_STATE_CONTENT
-        from a dict.
+
+class SuggestionAddQuestion(BaseSuggestion):
+    """Domain object for a suggestion of type SUGGESTION_TYPE_ADD_QUESTION."""
+
+    def __init__( # pylint: disable=super-init-not-called
+            self, suggestion_id, target_id, target_version_at_submission,
+            status, author_id, final_reviewer_id,
+            change_cmd, score_category, last_updated):
+        """Initializes an object of type SuggestionEditStateContent
+        corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
+        """
+        self.suggestion_id = suggestion_id
+        self.suggestion_type = suggestion_models.SUGGESTION_TYPE_ADD_QUESTION
+        self.target_type = suggestion_models.TARGET_TYPE_TOPIC
+        self.target_id = target_id
+        self.target_version_at_submission = target_version_at_submission
+        self.status = status
+        self.author_id = author_id
+        self.final_reviewer_id = final_reviewer_id
+        self.change_cmd = change_cmd
+        self.score_category = score_category
+        self.last_updated = last_updated
+
+    def validate(self):
+        """Validates a suggestion object of type SuggestionAddQuestion.
+
+        Raises:
+            ValidationError: One or more attributes of the SuggestionAddQuestion
+                object are invalid.
+        """
+        super(SuggestionAddQuestion, self).validate()
+
+        if self.get_score_type() != suggestion_models.SCORE_TYPE_QUESTION:
+            raise utils.ValidationError(
+                'Expected the first part of score_category to be %s '
+                ', received %s' % (
+                    suggestion_models.SCORE_TYPE_QUESTION,
+                    self.get_score_type()))
+
+        if 'question_dict' not in self.change_cmd:
+            raise utils.ValidationError(
+                'Expected change_cmd to contain question dict')
+
+        if 'question_state_data' not in self.change_cmd['question_dict']:
+            raise utils.ValidationError(
+                'Expected question dict to contain question_state_data')
+
+        if 'language_code' not in self.change_cmd['question_dict']:
+            raise utils.ValidationError(
+                'Expected question dict to contain language_code')
+
+        if (
+            'question_state_schema_version' not in
+            self.change_cmd['question_dict']):
+            raise utils.ValidationError(
+                'Expected question dict to contain'
+                ' question_state_schema_version')
+
+        if 'skill_id' not in self.change_cmd:
+            raise utils.ValidationError(
+                'Expected change_cmd to contain skill id')
+
+    def pre_accept_validate(self):
+        """Performs referential validation. This function needs to be called
+        before accepting the suggestion.
+        """
+        self.validate()
+        if (
+            self.change_cmd['question_dict']['question_state_schema_version'] !=
+            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+            raise utils.ValidationError(
+                'Question state schema version is not up to date.')
+
+        skill_services.require_valid_skill_id(self.change_cmd['skill_id'])
+        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        if skill is None:
+            raise utils.ValidationError(
+                'The skill with the given id doesn\'t exist.')
+
+
+    def get_change_list_for_accepting_suggestion(self):
+        pass
+
+    def accept(self, commit_message):
+        """Accepts the suggestion.
 
         Args:
-            suggestion_dict: dict. The dict representation of the suggestion.
+            commit_message: str. The commit message.
+        """
+        self.change_cmd['question_dict']['version'] = 1
+        question_dict['id'] = question_services.get_new_question_id()
+        question = question_domain.Question.from_dict(question_dict)
+        question_services.add_question(self.author_id, question)
+        question_services.create_new_question_skill_link(
+            question_id, skill_id)
+
+    def to_dict(self):
+        """Returns a dict representation of a suggestion object.
 
         Returns:
-            SuggestionEditStateContent. The corresponding Suggestion domain
-                object.
+            dict. A dict representation of a suggestion object.
         """
-        suggestion = cls(
-            suggestion_dict['suggestion_id'],
-            suggestion_dict['target_id'],
-            suggestion_dict['target_version_at_submission'],
-            suggestion_dict['status'], suggestion_dict['author_id'],
-            suggestion_dict['final_reviewer_id'], suggestion_dict['change_cmd'],
-            suggestion_dict['score_category'], suggestion_dict['last_updated'])
-
-        return suggestion
-
+        return {
+            'suggestion_id': self.suggestion_id,
+            'suggestion_type': self.suggestion_type,
+            'target_type': self.target_type,
+            'target_id': self.target_id,
+            'target_version_at_submission': self.target_version_at_submission,
+            'status': self.status,
+            'author_name': self.get_author_name(),
+            'final_reviewer_id': self.final_reviewer_id,
+            'change_cmd': self.change_cmd,
+            'score_category': self.score_category,
+            'last_updated': utils.get_time_in_millisecs(self.last_updated)
+        }
 
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT: (
-        SuggestionEditStateContent)
+        SuggestionEditStateContent),
+    suggestion_models.SUGGESTION_TYPE_ADD_QUESTION: SuggestionAddQuestion
 }

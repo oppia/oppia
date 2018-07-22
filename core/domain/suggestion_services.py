@@ -54,6 +54,7 @@ def create_suggestion(
             accepted/rejected the suggestion.
     """
 
+    thread_id = None
     # TODO(nithesh): Remove the check for target type once the feedback threads
     # are generalised for all types of entities. As at the moment feedback
     # threads can only be linked to explorations, we have this check.
@@ -66,8 +67,13 @@ def create_suggestion(
         # This line and the if..else will be removed after the feedback thread
         # migration is complete and the IDs for both models match.
         thread_id = suggestion_models.TARGET_TYPE_EXPLORATION + '.' + thread_id
-    else:
-        raise Exception('Feedback threads can only be linked to explorations')
+    elif feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        # TODO (nithesh): Refactor the thread creation logic after #5235 is
+        # merged.
+        thread_id = feedback_services.create_thread(
+            target_id, None, author_id, description,
+            DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
+        thread_id = suggestion_models.TARGET_TYPE_TOPIC + '.' + thread_id
 
     status = suggestion_models.STATUS_IN_REVIEW
 
@@ -77,6 +83,10 @@ def create_suggestion(
         score_category = (
             suggestion_models.SCORE_TYPE_CONTENT +
             suggestion_models.SCORE_CATEGORY_DELIMITER + exploration.category)
+    elif suggestion_type == suggestion_models.SUGGESTION_TYPE_ADD_QUESTION:
+        score_category = (
+            suggestion_models.SCORE_TYPE_QUESTION +
+            suggestion_models.SCORE_CATEGORY_DELIMITER + target_id)
 
     suggestion_models.GeneralSuggestionModel.create(
         suggestion_type, target_type, target_id,
@@ -250,9 +260,12 @@ def accept_suggestion(suggestion, reviewer_id, commit_message, review_message):
         suggestion, suggestion_models.STATUS_ACCEPTED, reviewer_id)
     suggestion.accept(commit_message)
 
-    feedback_services.create_message(
-        get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
-        feedback_models.STATUS_CHOICES_FIXED, None, review_message)
+    # TODO: Remove check for target being exploration after completing #5235.
+    if suggestion.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+        feedback_services.create_message(
+            get_thread_id_from_suggestion_id(suggestion.suggestion_id),
+            reviewer_id, feedback_models.STATUS_CHOICES_FIXED, None,
+            review_message)
 
 
 def reject_suggestion(suggestion, reviewer_id, review_message):
@@ -273,9 +286,12 @@ def reject_suggestion(suggestion, reviewer_id, review_message):
         raise Exception('Review message cannot be empty.')
     mark_review_completed(
         suggestion, suggestion_models.STATUS_REJECTED, reviewer_id)
-    feedback_services.create_message(
-        get_thread_id_from_suggestion_id(suggestion.suggestion_id), reviewer_id,
-        feedback_models.STATUS_CHOICES_IGNORED, None, review_message)
+    # TODO: Remove check for target being exploration after completing #5235.
+    if suggestion.target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
+        feedback_services.create_message(
+            get_thread_id_from_suggestion_id(suggestion.suggestion_id),
+            reviewer_id, feedback_models.STATUS_CHOICES_IGNORED, None,
+            review_message)
 
 
 def get_user_contribution_scoring_from_model(userContributionScoringModel):

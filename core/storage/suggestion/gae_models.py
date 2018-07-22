@@ -49,9 +49,11 @@ STATUS_CHOICES = [
 
 # Constants defining various suggestion types.
 SUGGESTION_TYPE_EDIT_STATE_CONTENT = 'edit_exploration_state_content'
+SUGGESTION_TYPE_ADD_QUESTION = 'add_question'
 
 SUGGESTION_TYPE_CHOICES = [
-    SUGGESTION_TYPE_EDIT_STATE_CONTENT
+    SUGGESTION_TYPE_EDIT_STATE_CONTENT,
+    SUGGESTION_TYPE_ADD_QUESTION
 ]
 
 # Defines what is the minimum role required to review suggestions
@@ -63,10 +65,12 @@ SUGGESTION_MINIMUM_ROLE_FOR_REVIEW = {
 # Constants defining various contribution types.
 SCORE_TYPE_CONTENT = 'content'
 SCORE_TYPE_TRANSLATION = 'translation'
+SCORE_TYPE_QUESTION = 'question'
 
 SCORE_TYPE_CHOICES = [
     SCORE_TYPE_CONTENT,
-    SCORE_TYPE_TRANSLATION
+    SCORE_TYPE_TRANSLATION,
+    SCORE_TYPE_QUESTION
 ]
 
 # The delimiter to be used in score category field.

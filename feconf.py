@@ -366,6 +366,9 @@ ENABLE_MAINTENANCE_MODE = False
 # Disables all the new structures' pages, till they are completed.
 ENABLE_NEW_STRUCTURES = False
 
+# Enable use of general feedback threads.
+ENABLE_GENERALIZED_FEEDBACK_THREADS = False
+
 # No. of questions to be displayed on a page in the topic editor.
 NUM_QUESTIONS_PER_PAGE = 10
 

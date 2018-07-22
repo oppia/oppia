@@ -88,6 +88,51 @@ class SuggestionToExplorationActionHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class SuggestionToTopicActionHandler(base.BaseHandler):
+    """Handles actions performed on suggestions to topics."""
+
+    ACTION_TYPE_ACCEPT = 'accept'
+    ACTION_TYPE_REJECT = 'reject'
+
+
+    # TODO (nithesh): Add permissions for users with enough scores to review
+    # Will be added as part of milestone 2 of the generalized review system
+    # project.
+    @acl_decorators.can_edit_topic
+    def put(self, topic_id, suggestion_id):
+        if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
+            raise self.PageNotFoundException
+
+        if len(suggestion_id.split('.')) != 3:
+            raise self.InvalidInputException('Invalid format for suggestion_id.'
+                                             ' It must contain 3 parts'
+                                             ' separated by \'.\'')
+
+        if suggestion_id.split('.')[0] != 'topic':
+            raise self.InvalidInputException('This handler allows actions only'
+                                             ' on suggestions to topics.')
+
+        if suggestion_id.split('.')[1] != topic_id:
+            raise self.InvalidInputException('The topic id provided does '
+                                             'not match the topic id '
+                                             'present as part of the '
+                                             'suggestion_id')
+
+        action = self.payload.get('action')
+        suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+        if action == self.ACTION_TYPE_ACCEPT:
+            suggestion_services.accept_suggestion(
+                suggestion, self.user_id, self.payload.get('commit_message'),
+                self.payload.get('review_message'))
+        elif action == self.ACTION_TYPE_REJECT:
+            suggestion_services.reject_suggestion(
+                suggestion, self.user_id, self.payload.get('review_message'))
+        else:
+            raise self.InvalidInputException('Invalid action.')
+
+        self.render_json(self.values)
+
+
 class SuggestionListHandler(base.BaseHandler):
     """Handles list operations on suggestions."""
 
