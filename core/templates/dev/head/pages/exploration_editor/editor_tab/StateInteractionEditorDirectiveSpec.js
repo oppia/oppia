@@ -53,7 +53,7 @@ describe('State Interaction controller', function() {
     });
 
     beforeEach(inject(function(
-        $controller, $injector, $rootScope, $compile, $templateCache) {
+        $compile, $controller, $injector, $rootScope, $templateCache) {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
       cls = $injector.get('ChangeListService');

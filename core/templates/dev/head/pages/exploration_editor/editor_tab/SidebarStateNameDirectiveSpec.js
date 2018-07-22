@@ -45,7 +45,7 @@ describe('Sidebar state name controller', function() {
     });
 
     beforeEach(inject(function(
-        $controller, $filter, $compile, $injector, $rootScope, $templateCache) {
+        $compile, $filter, $injector, $rootScope, $templateCache) {
       filter = $filter;
       rootScope = $rootScope;
       ecs = $injector.get('EditorStateService');
