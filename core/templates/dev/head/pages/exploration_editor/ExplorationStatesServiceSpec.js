@@ -76,23 +76,38 @@ describe('ExplorationStatesService', function() {
     });
 
     describe('.registerOnStateDeletedCallback', function() {
+      var STATE_NAME = 'Hola';
+
       beforeEach(inject(function($injector) {
         spyOn(this.cls, 'deleteState');
+
+        var modalArgs = {
+          resolve: {
+            deleteStateName: function() {
+              return STATE_NAME;
+            }
+          }
+        };
+
         // When ExplorationStatesService tries to show the confirm-delete
         // modal, have it immediately confirm.
         spyOn($injector.get('$uibModal'), 'open').and.callFake(
-          function(stateName) {
-            return {result: Promise.resolve(stateName)};
-          });
+          function(modalArgs) {
+            return {
+              result: Promise.resolve(STATE_NAME)
+            };
+          }
+        );
       }));
 
-      it('callsback when a state is deleted', function() {
+      it('callsback when a state is deleted', function(done) {
         var callbackSpy = jasmine.createSpy('callback');
 
         this.ess.registerOnStateDeletedCallback(callbackSpy);
 
-        this.ess.deleteState('Hola').then(function() {
-          expect(callbackSpy).toHaveBeenCalledWith('Hola');
+        this.ess.deleteState(STATE_NAME).then(function() {
+          expect(callbackSpy).toHaveBeenCalledWith(STATE_NAME);
+          done();
         });
       });
     });
