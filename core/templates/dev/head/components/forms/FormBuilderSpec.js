@@ -251,22 +251,27 @@ describe('Testing apply-validation directive', function() {
     testInput.$setViewValue(-1);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue('1');
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue(-2.5);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue(-3);
     scope.$digest();
     expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
 
     testInput.$setViewValue('-3');
     scope.$digest();
     expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
   }));
 
   it('should apply isAtMost validation', inject(function($compile) {
@@ -282,22 +287,27 @@ describe('Testing apply-validation directive', function() {
     testInput.$setViewValue(-1);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue('1');
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue(5);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue(6);
     scope.$digest();
     expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
 
     testInput.$setViewValue('10');
     scope.$digest();
     expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
   }));
 
   it('should apply isNonempty validation', inject(function($compile) {
@@ -312,14 +322,17 @@ describe('Testing apply-validation directive', function() {
     testInput.$setViewValue(-1);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue('1');
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue('');
     scope.$digest();
     expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
   }));
 
   it('should apply isInteger validation', inject(function($compile) {
@@ -334,21 +347,26 @@ describe('Testing apply-validation directive', function() {
     testInput.$setViewValue(-3);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue('1');
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue('3.0');
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue(3.5);
     scope.$digest();
     expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
 
     testInput.$setViewValue('O');
     scope.$digest();
+    expect(testInput.$valid).toEqual(false);
     expect(Object.keys(testInput.$error).length).not.toEqual(0);
   }));
 
@@ -364,37 +382,46 @@ describe('Testing apply-validation directive', function() {
     testInput.$setViewValue(-3.5);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue('0.5');
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue('1.0');
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue(2);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue(3);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue(4);
     scope.$digest();
     expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
 
     testInput.$setViewValue('abc');
     scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
     expect(Object.keys(testInput.$error).length).not.toEqual(0);
 
     testInput.$setViewValue('1.2.3');
     scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
     expect(Object.keys(testInput.$error).length).not.toEqual(0);
 
     testInput.$setViewValue('-3..5');
     scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
     expect(Object.keys(testInput.$error).length).not.toEqual(0);
   }));
 
