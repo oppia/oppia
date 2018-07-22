@@ -24,18 +24,20 @@ oppia.directive('stateResponses', [
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/state_responses_directive.html'),
       controller: [
-        '$scope', '$rootScope', '$uibModal', '$filter', 'stateInteractionIdService',
-        'EditorStateService', 'AlertsService', 'ResponsesService', 'RouterService',
-        'ContextService', 'TrainingDataService', 'EditabilityService',
-        'stateContentIdsToAudioTranslationsService', 'stateCustomizationArgsService',
-        'PLACEHOLDER_OUTCOME_DEST', 'INTERACTION_SPECS', 'UrlInterpolationService',
-        'AnswerGroupObjectFactory', function(
-            $scope, $rootScope, $uibModal, $filter, stateInteractionIdService,
-            EditorStateService, AlertsService, ResponsesService, RouterService,
-            ContextService, TrainingDataService, EditabilityService,
-            stateContentIdsToAudioTranslationsService, stateCustomizationArgsService,
-            PLACEHOLDER_OUTCOME_DEST, INTERACTION_SPECS, UrlInterpolationService,
-            AnswerGroupObjectFactory) {
+        '$scope', '$rootScope', '$uibModal', '$filter',
+        'stateInteractionIdService', 'EditorStateService', 'AlertsService',
+        'ResponsesService', 'RouterService', 'ContextService',
+        'TrainingDataService', 'EditabilityService',
+        'stateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
+        'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
+        'UrlInterpolationService', 'AnswerGroupObjectFactory', function(
+            $scope, $rootScope, $uibModal, $filter,
+            stateInteractionIdService, EditorStateService, AlertsService,
+            ResponsesService, RouterService, ContextService,
+            TrainingDataService, EditabilityService,
+            stateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
+            stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
+            UrlInterpolationService, AnswerGroupObjectFactory) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditorStateService = EditorStateService;
@@ -80,9 +82,9 @@ oppia.directive('stateResponses', [
                 customizationArgs.maxAllowableSelectionCount.value);
               if (maxSelectionCount === 1) {
                 var numChoices = $scope.getAnswerChoices().length;
-                // This array contains a list of booleans, one for each answer choice.
-                // Each boolean is true if the corresponding answer has been
-                // covered by at least one rule, and false otherwise.
+                // This array contains a list of booleans, one for each answer
+                // choice. Each boolean is true if the corresponding answer has
+                // been covered by at least one rule, and false otherwise.
                 handledAnswersArray = [];
                 for (var i = 0; i < numChoices; i++) {
                   handledAnswersArray.push(false);
@@ -120,7 +122,8 @@ oppia.directive('stateResponses', [
                     return handledAnswer;
                   });
                 // We only suppress the default warning if each choice text has
-                // been handled by at least one answer group, based on rule type.
+                // been handled by at least one answer group, based on rule
+                // type.
                 return areAllChoicesCovered;
               }
             }
@@ -138,7 +141,9 @@ oppia.directive('stateResponses', [
               return false;
             }
             var currentStateName = EditorStateService.getActiveStateName();
-            return ((outcome.dest === currentStateName) && outcome.labelledAsCorrect);
+            return (
+              (outcome.dest === currentStateName) &&
+              outcome.labelledAsCorrect);
           };
 
           $scope.changeActiveAnswerGroupIndex = function(newIndex) {
@@ -163,7 +168,8 @@ oppia.directive('stateResponses', [
           };
 
           $scope.isLinearWithNoFeedback = function(outcome) {
-            // Returns false if current interaction is linear and has no feedback
+            // Returns false if current interaction is linear and has no
+            // feedback
             if (!outcome) {
               return false;
             }
@@ -191,8 +197,8 @@ oppia.directive('stateResponses', [
             $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
             // If the creator selects an interaction which has only one possible
-            // answer, automatically expand the default response. Otherwise, default
-            // to having no responses initially selected.
+            // answer, automatically expand the default response. Otherwise,
+            // default to having no responses initially selected.
             if ($scope.isCurrentInteractionLinear()) {
               ResponsesService.changeActiveAnswerGroupIndex(0);
             }
@@ -205,22 +211,24 @@ oppia.directive('stateResponses', [
             $rootScope.$broadcast('externalSave');
           });
 
-          $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
+          $scope.$on('onInteractionIdChanged', function(
+              evt, newInteractionId) {
             $rootScope.$broadcast('externalSave');
-            ResponsesService.onInteractionIdChanged(newInteractionId, function() {
-              $scope.answerGroups = ResponsesService.getAnswerGroups();
-              $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
+            ResponsesService.onInteractionIdChanged(
+              newInteractionId, function() {
+                $scope.answerGroups = ResponsesService.getAnswerGroups();
+                $scope.defaultOutcome = ResponsesService.getDefaultOutcome();
 
-              // Reinitialize training data if the interaction ID is changed.
-              _initializeTrainingData();
+                // Reinitialize training data if the interaction ID is changed.
+                _initializeTrainingData();
 
-              $scope.activeAnswerGroupIndex = (
-                ResponsesService.getActiveAnswerGroupIndex());
-            });
+                $scope.activeAnswerGroupIndex = (
+                  ResponsesService.getActiveAnswerGroupIndex());
+              });
 
             // Prompt the user to create a new response if it is not a linear or
-            // non-terminal interaction and if an actual interaction is specified
-            // (versus one being deleted).
+            // non-terminal interaction and if an actual interaction is
+            // specified (versus one being deleted).
             if (newInteractionId &&
                 !INTERACTION_SPECS[newInteractionId].is_linear &&
                 !INTERACTION_SPECS[newInteractionId].is_terminal) {
@@ -269,12 +277,13 @@ oppia.directive('stateResponses', [
                     COMPONENT_NAME_FEEDBACK);
 
                   $scope.tmpOutcome = OutcomeObjectFactory.createNew(
-                    EditorStateService.getActiveStateName(), feedbackContentId, '',
-                    []);
+                    EditorStateService.getActiveStateName(),
+                    feedbackContentId, '', []);
 
                   $scope.isSelfLoopWithNoFeedback = function(tmpOutcome) {
                     return (
-                      tmpOutcome.dest === EditorStateService.getActiveStateName() &&
+                      tmpOutcome.dest ===
+                      EditorStateService.getActiveStateName() &&
                       !tmpOutcome.hasNonemptyFeedback());
                   };
 
@@ -308,9 +317,11 @@ oppia.directive('stateResponses', [
               stateContentIdsToAudioTranslationsService.displayed.addContentId(
                 result.tmpOutcome.feedback.getContentId());
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
-              $scope.changeActiveAnswerGroupIndex($scope.answerGroups.length - 1);
+              $scope.changeActiveAnswerGroupIndex(
+                $scope.answerGroups.length - 1);
 
-              // After saving it, check if the modal should be reopened right away.
+              // After saving it, check if the modal should be reopened right
+              // away.
               if (result.reopen) {
                 $scope.openAddAnswerGroupModal();
               }
@@ -318,9 +329,9 @@ oppia.directive('stateResponses', [
           };
 
           // When the page is scrolled so that the top of the page is above the
-          // browser viewport, there are some bugs in the positioning of the helper.
-          // This is a bug in jQueryUI that has not been fixed yet. For more details,
-          // see http://stackoverflow.com/q/5791886
+          // browser viewport, there are some bugs in the positioning of the
+          // helper. This is a bug in jQueryUI that has not been fixed yet. For
+          // more details, see http://stackoverflow.com/q/5791886
           $scope.ANSWER_GROUP_LIST_SORTABLE_OPTIONS = {
             axis: 'y',
             cursor: 'move',
@@ -339,8 +350,8 @@ oppia.directive('stateResponses', [
           };
 
           $scope.deleteAnswerGroup = function(index, evt) {
-            // Prevent clicking on the delete button from also toggling the display
-            // state of the answer group.
+            // Prevent clicking on the delete button from also toggling the
+            // display state of the answer group.
             evt.stopPropagation();
 
             AlertsService.clearWarnings();
@@ -350,7 +361,8 @@ oppia.directive('stateResponses', [
                 'delete_answer_group_modal_directive.html'),
               backdrop: true,
               controller: [
-                '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
+                '$scope', '$uibModalInstance', function(
+                    $scope, $uibModalInstance) {
                   $scope.reallyDelete = function() {
                     $uibModalInstance.close();
                   };
@@ -362,11 +374,13 @@ oppia.directive('stateResponses', [
                 }
               ]
             }).result.then(function() {
-              var deletedOutcome = ResponsesService.getAnswerGroup(index).outcome;
+              var deletedOutcome =
+                ResponsesService.getAnswerGroup(index).outcome;
               ResponsesService.deleteAnswerGroup(index);
-              var deletedFeedbackContentId = deletedOutcome.feedback.getContentId();
-              stateContentIdsToAudioTranslationsService.displayed.deleteContentId(
-                deletedFeedbackContentId);
+              var deletedFeedbackContentId =
+                deletedOutcome.feedback.getContentId();
+              stateContentIdsToAudioTranslationsService.
+                displayed.deleteContentId(deletedFeedbackContentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
             });
           };
@@ -381,11 +395,13 @@ oppia.directive('stateResponses', [
             ResponsesService.updateActiveAnswerGroup({
               dest: updatedOutcome.dest,
               refresherExplorationId: updatedOutcome.refresherExplorationId,
-              missingPrerequisiteSkillId: updatedOutcome.missingPrerequisiteSkillId
+              missingPrerequisiteSkillId:
+                updatedOutcome.missingPrerequisiteSkillId
             });
           };
 
-          $scope.saveActiveAnswerGroupCorrectnessLabel = function(updatedOutcome) {
+          $scope.saveActiveAnswerGroupCorrectnessLabel = function(
+              updatedOutcome) {
             ResponsesService.updateActiveAnswerGroup({
               labelledAsCorrect: updatedOutcome.labelledAsCorrect
             });
@@ -407,7 +423,8 @@ oppia.directive('stateResponses', [
             ResponsesService.updateDefaultOutcome({
               dest: updatedOutcome.dest,
               refresherExplorationId: updatedOutcome.refresherExplorationId,
-              missingPrerequisiteSkillId: updatedOutcome.missingPrerequisiteSkillId
+              missingPrerequisiteSkillId:
+                updatedOutcome.missingPrerequisiteSkillId
             });
           };
 
