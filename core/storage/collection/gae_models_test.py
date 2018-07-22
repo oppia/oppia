@@ -22,7 +22,7 @@ from core.platform import models
 from core.tests import test_utils
 
 (collection_models,) = models.Registry.import_models(
-        [models.NAMES.collection])
+    [models.NAMES.collection])
 
 
 class CollectionModelUnitTest(test_utils.GenericTestBase):
