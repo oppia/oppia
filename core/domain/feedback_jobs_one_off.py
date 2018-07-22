@@ -201,52 +201,43 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     @staticmethod
     def map(item):
         if isinstance(item, feedback_models.FeedbackThreadModel):
-            old_id = item.id
-            # To make sure the job is idempotent, we create new instances with
-            # the new id. If the id has 2 parts, it needs to be migrated,
-            # else it has already been migrated.
-            if len(old_id.split('.')) == 2:
-                new_id = 'exploration.' + item.id
-                feedback_models.GeneralFeedbackThreadModel(
-                    id=new_id, entity_type=item.entity_type,
-                    entity_id=item.entity_id,
-                    original_author_id=item.original_author_id,
-                    status=item.status, subject=item.subject,
-                    summary=item.summary, has_suggestion=item.has_suggestion,
-                    message_count=item.message_count,
-                    last_updated=item.last_updated, created_on=item.created_on,
-                    deleted=item.deleted).put()
+            new_id = 'exploration.' + item.id
+            feedback_models.GeneralFeedbackThreadModel(
+                id=new_id, entity_type='exploration',
+                entity_id=item.exploration_id,
+                original_author_id=item.original_author_id,
+                status=item.status, subject=item.subject,
+                summary=item.summary, has_suggestion=item.has_suggestion,
+                message_count=item.message_count,
+                last_updated=item.last_updated, created_on=item.created_on,
+                deleted=item.deleted).put(update_last_updated_time=False)
         elif isinstance(item, feedback_models.FeedbackMessageModel):
-            old_id = item.id
-            if len(old_id.split('.')) == 3:
-                new_id = 'exploration.' + item.id
-                new_thread_id = 'exploration.' + item.thread_id
-                feedback_models.GeneralFeedbackMessageModel(
-                    id=new_id, thread_id=new_thread_id,
-                    message_id=item.message_id, author_id=item.author_id,
-                    updated_status=item.updated_status,
-                    updated_subject=item.updated_subject, text=item.text,
-                    received_via_email=item.received_via_email,
-                    last_updated=item.last_updated, created_on=item.created_on,
-                    deleted=item.deleted).put()
+            new_id = 'exploration.' + item.id
+            new_thread_id = 'exploration.' + item.thread_id
+            feedback_models.GeneralFeedbackMessageModel(
+                id=new_id, thread_id=new_thread_id,
+                message_id=item.message_id, author_id=item.author_id,
+                updated_status=item.updated_status,
+                updated_subject=item.updated_subject, text=item.text,
+                received_via_email=item.received_via_email,
+                last_updated=item.last_updated, created_on=item.created_on,
+                deleted=item.deleted).put()
         elif isinstance(item, feedback_models.FeedbackThreadUserModel):
-            old_id = item.id
-            if len(old_id.split('.')) == 3:
-                new_id = '.'.join(
-                    [old_id.split('.')[0], 'exploration', old_id.split('.')[1],
-                     old_id.split('.')[2]])
-                feedback_models.GeneralFeedbackThreadUserModel(
-                    id=new_id,
-                    message_ids_read_by_user=item.message_ids_read_by_user
-                ).put()
+            old_id_parts = item.id.split('.')
+            new_id = '.'.join(
+                [old_id_parts[0], 'exploration', old_id_parts[1],
+                 old_id_parts[2]])
+            feedback_models.GeneralFeedbackThreadUserModel(
+                id=new_id,
+                message_ids_read_by_user=item.message_ids_read_by_user
+            ).put()
         elif isinstance(item, email_models.FeedbackEmailReplyToIdModel):
-            old_id = item.id
-            if len(old_id.split('.')) == 3:
-                new_id = '.'.join(
-                    [old_id.split('.')[0], 'exploration', old_id.split('.')[1],
-                     old_id.split('.')[2]])
-                email_models.FeedbackEmailReplyToIdModel(
-                    id=new_id, reply_to_id=item.reply_to_id).put()
+            old_id_parts = item.id.split('.')
+            new_id = '.'.join(
+                [old_id_parts[0], 'exploration', old_id_parts[1],
+                 old_id_parts[2]])
+            email_models.FeedbackEmailReplyToIdModel(
+                id=new_id, reply_to_id=item.reply_to_id).put()
         elif isinstance(item, user_models.UserSubscriptionsModel):
             for thread_id in item.feedback_thread_ids:
                 if len(thread_id.split('.')) == 2:
@@ -254,3 +245,7 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                     if new_thread_id not in item.feedback_thread_ids:
                         item.feedback_thread_ids.append(new_thread_id)
             item.put()
+
+    @staticmethod
+    def reduce(key, value):
+        pass

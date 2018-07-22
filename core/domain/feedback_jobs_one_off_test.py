@@ -17,6 +17,7 @@
 """Tests for feedback-related jobs."""
 
 import ast
+import datetime
 
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -394,3 +395,70 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         output = self._run_validation_job()
         self.assertEqual(output[0][1], output[1][1])
         self.assertEqual(output[0][1], 10)
+
+
+class FeedbackThreadIdMigrationJobTest(test_utils.GenericTestBase):
+    """Tests for FeedbackThreadIdMigrationOneOffJob class."""
+    def setUp(self):
+        super(FeedbackThreadIdMigrationJobTest, self).setUp()
+        feedback_models.FeedbackThreadModel(
+            id='exp1.thread1', exploration_id='exp1', state_name='state1',
+            original_author_id='author',
+            status=feedback_models.STATUS_CHOICES_OPEN,
+            subject='subject', summary='summary', has_suggestion=False,
+            last_updated=datetime.datetime.utcnow()).put()
+        feedback_models.FeedbackMessageModel(
+            id='exp1.thread1.1', thread_id='exp1.thread1', message_id=1,
+            author_id='author', text='message text').put()
+        feedback_models.FeedbackThreadUserModel(
+            id='author.exp1.thread1', message_ids_read_by_user=[1]).put()
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = (
+            feedback_jobs_one_off
+            .FeedbackThreadIdMigrationOneOffJob.create_new())
+        feedback_jobs_one_off.FeedbackThreadIdMigrationOneOffJob.enqueue(
+            job_id)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
+        self.process_and_flush_pending_tasks()
+
+    def test_migration_function(self):
+        self._run_one_off_job()
+        new_thread_model = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+            'exploration.exp1.thread1')
+        old_thread_model = feedback_models.FeedbackThreadModel.get_by_id(
+            'exp1.thread1')
+        self.assertEqual(new_thread_model.entity_type, 'exploration')
+        self.assertEqual(new_thread_model.entity_id, 'exp1')
+        self.assertEqual(new_thread_model.original_author_id, 'author')
+        self.assertEqual(
+            new_thread_model.status, feedback_models.STATUS_CHOICES_OPEN)
+        self.assertEqual(new_thread_model.subject, 'subject')
+        self.assertEqual(new_thread_model.summary, 'summary')
+        self.assertEqual(new_thread_model.has_suggestion, False)
+        self.assertEqual(
+            new_thread_model.last_updated, old_thread_model.last_updated)
+
+        new_message_model = (
+            feedback_models.GeneralFeedbackMessageModel.get_by_id(
+                'exploration.exp1.thread1.1'))
+        old_message_model = feedback_models.FeedbackMessageModel.get_by_id(
+            'exp1.thread1.1')
+        self.assertEqual(
+            new_message_model.thread_id, 'exploration.exp1.thread1')
+        self.assertEqual(new_message_model.message_id, 1)
+        self.assertEqual(new_message_model.author_id, 'author')
+        self.assertEqual(new_message_model.text, 'message text')
+        self.assertEqual(
+            new_message_model.last_updated, old_message_model.last_updated)
+
+        new_thread_user_model = (
+            feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
+                'author.exploration.exp1.thread1'))
+        self.assertEqual(new_thread_user_model.message_ids_read_by_user, [1])
+
+
+
