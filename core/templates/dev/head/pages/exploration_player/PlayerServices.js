@@ -370,6 +370,12 @@ oppia.factory('ExplorationPlayerService', [
             interactionRulesService));
         var answerIsCorrect = classificationResult.outcome.labelledAsCorrect;
 
+        // Use angular.copy() to clone the object
+        // since classificationResult.outcome points
+        // at oldState.interaction.default_outcome
+        var outcome = angular.copy(classificationResult.outcome);
+        var newStateName = outcome.dest;
+
         if (!_editorPreviewMode) {
           var feedbackIsUseful = (
             AnswerClassificationService.isClassifiedExplicitlyOrGoesToNewState(
@@ -391,11 +397,6 @@ oppia.factory('ExplorationPlayerService', [
           }
         }
 
-        // Use angular.copy() to clone the object
-        // since classificationResult.outcome points
-        // at oldState.interaction.default_outcome
-        var outcome = angular.copy(classificationResult.outcome);
-        var newStateName = outcome.dest;
         var refresherExplorationId = outcome.refresherExplorationId;
         var newState = exploration.getState(newStateName);
 
