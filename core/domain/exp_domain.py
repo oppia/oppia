@@ -4319,6 +4319,7 @@ class Exploration(object):
             exploration_schema_version = 28
 
         if exploration_schema_version == 28:
+            exploration_dict['id'] = 'default'
             exploration_dict = cls._convert_v28_dict_to_v29_dict(
                 exploration_dict)
             exploration_schema_version = 29

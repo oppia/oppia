@@ -17,6 +17,7 @@
 """Tests for exploration domain objects and methods defined on them."""
 
 import copy
+import json
 import os
 
 from core.domain import exp_domain
@@ -4514,17 +4515,66 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             }
         }
 
+        state_dict_with_image_dimensions = {
+            'content': {
+                'content_id': 'content', 'html': '<p>Hello!</p>'
+            },
+            'param_changes': [],
+            'content_ids_to_audio_translations': {'content': {}},
+            'classifier_model_id': None,
+            'interaction': {
+                'solution': None,
+                'answer_groups': [],
+                'default_outcome': {
+                    'param_changes': [], 'feedback': {
+                        'content_id': 'default_outcome', 'html': (
+                            u'<p><oppia-noninteractive-image '
+                            'caption-with-value="&amp;quot;&amp;quot;" '
+                            'filepath-with-value="{&amp;quot;width&amp;quot;:'
+                            ' 120, &amp;quot;height&amp;quot;: 490, &amp;quot;'
+                            'filename&amp;quot;: &amp;quot;random.png&amp;'
+                            'quot;}"></oppia-noninteractive-image>Hello this '
+                            'is test case to check image tag inside p tag</p>'
+                        )
+                    },
+                    'dest': 'Introduction',
+                    'refresher_exploration_id': None,
+                    'missing_prerequisite_skill_id': None,
+                    'labelled_as_correct': False
+                },
+                'customization_args': {},
+                'confirmed_unclassified_answers': [],
+                'id': None,
+                'hints': []
+            }
+        }
+
         self.assertEqual(
             exp_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_cleaner.convert_to_textangular),
+                html_cleaner.convert_to_textangular, 'unused'),
             state_dict_in_textangular)
 
         self.assertEqual(
             exp_domain.State.convert_html_fields_in_state(
                 state_dict,
-                html_cleaner.add_caption_attr_to_image),
+                html_cleaner.add_caption_attr_to_image, 'unused'),
             state_dict_with_image_caption)
+
+        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+            return html_cleaner.escape_html(json.dumps(
+                {'filename': filename, 'height': 490, 'width': 120}))
+
+        with self.swap(
+            html_cleaner, 'get_filepath_of_object_image',
+            _mock_get_filepath_of_object_image):
+
+          self.assertEqual(
+              exp_domain.State.convert_html_fields_in_state(
+                  state_dict,
+                  html_cleaner.add_dimensions_to_noninteractive_image_tag,
+                  'unused'),
+              state_dict_with_image_dimensions)
 
 
 class StateIdMappingTests(test_utils.GenericTestBase):
