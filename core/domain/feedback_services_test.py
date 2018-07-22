@@ -36,39 +36,38 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
     def test_feedback_ids(self):
         """Test various conventions for thread and message ids."""
         exp_id = '0'
-        feedback_services.create_thread(
-            'exploration', exp_id, 'a_state_name', None, 'a subject',
-            'some text')
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            feedback_services.create_thread(
+                'exploration', exp_id, 'a_state_name', None, 'a subject',
+                'some text')
             threadlist = feedback_services.get_all_threads(
                 'exploration', exp_id, False)
-        self.assertEqual(len(threadlist), 1)
-        thread_id = threadlist[0].id
+            self.assertEqual(len(threadlist), 1)
+            thread_id = threadlist[0].id
 
-        messages = feedback_services.get_messages(thread_id)
-        self.assertEqual(len(messages), 1)
-        message_id = messages[0].message_id
-        self.assertTrue(isinstance(message_id, int))
-
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
+            messages = feedback_services.get_messages(thread_id)
+            self.assertEqual(len(messages), 1)
+            message_id = messages[0].message_id
+            self.assertTrue(isinstance(message_id, int))
             threadlist = feedback_services.get_all_threads(
                 'exploration', exp_id, False)
-        self.assertEqual(len(threadlist), 1)
-        thread_id = threadlist[0].id
+            self.assertEqual(len(threadlist), 1)
+            thread_id = threadlist[0].id
 
-        messages = feedback_services.get_messages(thread_id)
-        self.assertEqual(len(messages), 1)
-        message_id = messages[0].message_id
-        self.assertTrue(isinstance(message_id, int))
+            messages = feedback_services.get_messages(thread_id)
+            self.assertEqual(len(messages), 1)
+            message_id = messages[0].message_id
+            self.assertTrue(isinstance(message_id, int))
 
-        # Retrieve the message instance from the storage layer.
-        datastore_id = feedback_models.FeedbackMessageModel.get_messages(
-            thread_id)[0].id
+            # Retrieve the message instance from the storage layer.
+            datastore_id = (
+                feedback_models.GeneralFeedbackMessageModel.get_messages(
+                    thread_id)[0].id)
 
-        # The message id should be prefixed with the thread id and a full
-        # stop, followed by the message id.
-        self.assertEqual(
-            datastore_id, '%s.%s' % (thread_id, message_id))
+            # The message id should be prefixed with the thread id and a full
+            # stop, followed by the message id.
+            self.assertEqual(
+                datastore_id, '%s.%s' % (thread_id, message_id))
 
     def test_create_message_fails_if_invalid_thread_id(self):
         with self.assertRaises(
@@ -79,20 +78,14 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
 
     def test_status_of_newly_created_thread_is_open(self):
         exp_id = '0'
-        feedback_services.create_thread(
-            'exploration', exp_id, 'a_state_name', None, 'a subject',
-            'some text')
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+            feedback_services.create_thread(
+                'exploration', exp_id, 'a_state_name', None, 'a subject',
+                'some text')
             threadlist = feedback_services.get_all_threads(
                 'exploration', exp_id, False)
-        thread_status = threadlist[0].status
-        self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)
-
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
-            threadlist = feedback_services.get_all_threads(
-                'exploration', exp_id, False)
-        thread_status = threadlist[0].status
-        self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)
+            thread_status = threadlist[0].status
+            self.assertEqual(thread_status, feedback_models.STATUS_CHOICES_OPEN)
 
     def test_get_exp_id_from_thread_id(self):
         thread_id = 'exp1.1234'
@@ -103,19 +96,19 @@ class FeedbackServicesUnitTests(test_utils.GenericTestBase):
 class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
     """Test learner suggestion query functions in feedback_services."""
 
-    THREAD_ID1 = 'exploration.exp_id1.1111'
-    THREAD_ID2 = 'exploration.exp_id1.2222'
-    THREAD_ID3 = 'exploration.exp_id1.3333'
-    THREAD_ID4 = 'exploration.exp_id1.4444'
-    THREAD_ID5 = 'exploration.exp_id1.5555'
-    THREAD_ID6 = 'exploration.exp_id2.1111'
+    THREAD_ID1 = 'exp_id1.1111'
+    THREAD_ID2 = 'exp_id1.2222'
+    THREAD_ID3 = 'exp_id1.3333'
+    THREAD_ID4 = 'exp_id1.4444'
+    THREAD_ID5 = 'exp_id1.5555'
+    THREAD_ID6 = 'exp_id2.1111'
     EXP_ID1 = 'exp_id1'
     EXP_ID2 = 'exp_id2'
     USER_EMAIL = 'abc@xyz.com'
     USERNAME = 'user123'
     CURRENT_TIME_IN_MSEC = 12345678
 
-    def _generate_thread_id(self, unused_entity_type, unused_entity_id):
+    def _generate_thread_id(self, unused_exploration_id):
         return self.THREAD_ID6
 
     def setUp(self):
@@ -126,33 +119,31 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         self.signup(self.USER_EMAIL, self.USERNAME)
         # Open thread with suggestion.
         thread1 = feedback_models.FeedbackThreadModel(
-            id=self.THREAD_ID1, entity_type='exploration',
-            entity_id=self.EXP_ID1, state_name='state_name',
-            original_author_id=self.user_id, subject='SUGGESTION',
-            has_suggestion=True)
+            id=self.THREAD_ID1, exploration_id=self.EXP_ID1,
+            state_name='state_name', original_author_id=self.user_id,
+            subject='SUGGESTION', has_suggestion=True)
         # Closed threads with suggestion.
         thread2 = feedback_models.FeedbackThreadModel(
-            id=self.THREAD_ID2, entity_type='exploration',
-            entity_id=self.EXP_ID1, state_name='state_name',
-            original_author_id=self.user_id, subject='SUGGESTION',
-            status=feedback_models.STATUS_CHOICES_FIXED, has_suggestion=True)
+            id=self.THREAD_ID2, exploration_id=self.EXP_ID1,
+            state_name='state_name', original_author_id=self.user_id,
+            subject='SUGGESTION', status=feedback_models.STATUS_CHOICES_FIXED,
+            has_suggestion=True)
         thread3 = feedback_models.FeedbackThreadModel(
-            id=self.THREAD_ID3, entity_type='exploration',
-            entity_id=self.EXP_ID1, state_name='state_name',
-            original_author_id=self.user_id, subject='SUGGESTION',
-            status=feedback_models.STATUS_CHOICES_IGNORED, has_suggestion=True)
+            id=self.THREAD_ID3, exploration_id=self.EXP_ID1,
+            state_name='state_name', original_author_id=self.user_id,
+            subject='SUGGESTION', status=feedback_models.STATUS_CHOICES_IGNORED,
+            has_suggestion=True)
         # Closed thread without suggestion.
         thread4 = feedback_models.FeedbackThreadModel(
-            id=self.THREAD_ID4, entity_type='exploration',
-            entity_id=self.EXP_ID1, state_name='state_name',
-            original_author_id=self.user_id, subject='NO SUGGESTION',
+            id=self.THREAD_ID4, exploration_id=self.EXP_ID1,
+            state_name='state_name', original_author_id=self.user_id,
+            subject='NO SUGGESTION',
             status=feedback_models.STATUS_CHOICES_IGNORED)
         # Open thread without suggestion.
         thread5 = feedback_models.FeedbackThreadModel(
-            id=self.THREAD_ID5, entity_type='exploration',
-            entity_id=self.EXP_ID1, state_name='state_name',
-            original_author_id=self.user_id, subject='NO SUGGESTION',
-            status=feedback_models.STATUS_CHOICES_OPEN)
+            id=self.THREAD_ID5, exploration_id=self.EXP_ID1,
+            state_name='state_name', original_author_id=self.user_id,
+            subject='NO SUGGESTION', status=feedback_models.STATUS_CHOICES_OPEN)
 
         for thread in [thread1, thread2, thread3, thread4, thread5]:
             thread.put()
@@ -177,47 +168,41 @@ class SuggestionQueriesUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(expected_suggestion_dict, suggestion.to_dict())
 
     def test_get_open_threads_with_suggestions(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            threads = feedback_services.get_open_threads(
-                'exploration', self.EXP_ID1, True)
+        threads = feedback_services.get_open_threads(
+            'exploration', self.EXP_ID1, True)
         self.assertEqual(len(threads), 1)
         self.assertEqual(threads[0].id, self.THREAD_ID1)
 
     def test_get_open_threads_without_suggestions(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            threads = feedback_services.get_open_threads(
-                'exploration', self.EXP_ID1, False)
+        threads = feedback_services.get_open_threads(
+            'exploration', self.EXP_ID1, False)
         self.assertEqual(len(threads), 1)
         self.assertEqual(threads[0].id, self.THREAD_ID5)
 
     def test_get_closed_threads_with_suggestions(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            threads = feedback_services.get_closed_threads(
-                'exploration', self.EXP_ID1, True)
+        threads = feedback_services.get_closed_threads(
+            'exploration', self.EXP_ID1, True)
         self.assertEqual(len(threads), 2)
         self.assertEqual(threads[0].id, self.THREAD_ID2)
         self.assertEqual(threads[1].id, self.THREAD_ID3)
 
     def test_get_closed_threads_without_suggestions(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            threads = feedback_services.get_closed_threads(
-                'exploration', self.EXP_ID1, False)
+        threads = feedback_services.get_closed_threads(
+            'exploration', self.EXP_ID1, False)
         self.assertEqual(len(threads), 1)
         self.assertEqual(threads[0].id, self.THREAD_ID4)
 
     def test_get_all_threads_with_suggestion(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            threads = feedback_services.get_all_threads(
-                'exploration', self.EXP_ID1, True)
+        threads = feedback_services.get_all_threads(
+            'exploration', self.EXP_ID1, True)
         self.assertEqual(len(threads), 3)
         self.assertEqual(threads[0].id, self.THREAD_ID1)
         self.assertEqual(threads[1].id, self.THREAD_ID2)
         self.assertEqual(threads[2].id, self.THREAD_ID3)
 
     def test_get_all_threads_without_suggestion(self):
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
-            threads = feedback_services.get_all_threads(
-                'exploration', self.EXP_ID1, False)
+        threads = feedback_services.get_all_threads(
+            'exploration', self.EXP_ID1, False)
         self.assertEqual(len(threads), 2)
         self.assertEqual(threads[0].id, self.THREAD_ID4)
         self.assertEqual(threads[1].id, self.THREAD_ID5)
@@ -232,14 +217,12 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
     EXPECTED_THREAD_DICT = {
         'status': u'open',
-        'state_name': u'a_state_name',
         'summary': None,
         'original_author_username': None,
         'subject': u'a subject'
     }
     EXPECTED_THREAD_DICT_VIEWER = {
         'status': u'open',
-        'state_name': u'a_state_name_second',
         'summary': None,
         'original_author_username': None,
         'subject': u'a subject second'
@@ -296,7 +279,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.assertEqual(len(threads), 0)
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
-                self.EXPECTED_THREAD_DICT['state_name'], None,
+                'state_name', None,
                 self.EXPECTED_THREAD_DICT['subject'], 'not used here')
             threads = feedback_services.get_threads(
                 'exploration', self.EXP_ID_1)
@@ -309,7 +292,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
-                self.EXPECTED_THREAD_DICT['state_name'], None,
+                'state_name', None,
                 self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
             threads = feedback_services.get_all_threads(
@@ -325,7 +308,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             # Viewer creates feedback thread.
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
-                self.EXPECTED_THREAD_DICT_VIEWER['state_name'],
+                'state_name',
                 self.viewer_id, self.EXPECTED_THREAD_DICT_VIEWER['subject'],
                 'not used here')
 
@@ -343,7 +326,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
-                self.EXPECTED_THREAD_DICT['state_name'], None,
+                'state_name', None,
                 self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
             threads = feedback_services.get_all_threads(
@@ -358,7 +341,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
-                self.EXPECTED_THREAD_DICT['state_name'], None,
+                'state_name', None,
                 self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
             threads = feedback_services.get_all_threads(
@@ -374,11 +357,11 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
-                self.EXPECTED_THREAD_DICT['state_name'], None,
+                'state_name', None,
                 self.EXPECTED_THREAD_DICT['subject'], 'not used here')
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_2,
-                self.EXPECTED_THREAD_DICT['state_name'], None,
+                'state_name', None,
                 self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
             threads_exp_1 = feedback_services.get_all_threads(
@@ -389,7 +372,8 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
             self.assertEqual(1, len(threads_exp_2))
 
         def _close_thread(thread_id):
-            thread = feedback_models.FeedbackThreadModel.get_by_id(thread_id)
+            thread = feedback_models.GeneralFeedbackThreadModel.get_by_id(
+                thread_id)
             thread.status = feedback_models.STATUS_CHOICES_FIXED
             thread.put()
 
@@ -409,21 +393,19 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
-                self.EXPECTED_THREAD_DICT['state_name'], self.user_id,
+                'state_name', self.user_id,
                 self.EXPECTED_THREAD_DICT['subject'], 'not used here')
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_2,
-                self.EXPECTED_THREAD_DICT['state_name'], self.user_id,
+                'state_name', self.user_id,
                 self.EXPECTED_THREAD_DICT['subject'], 'not used here')
 
             # The message count parameter is missing for this thread. The thread
             # summaries function should account for this and function
             # flawlessly.
-            thread_3 = feedback_models.FeedbackThreadModel(
+            thread_3 = feedback_models.GeneralFeedbackThreadModel(
                 id='exploration.' + self.EXP_ID_3 + '.' + self.THREAD_ID,
-                exploration_id=self.EXP_ID_3,
                 entity_type='exploration', entity_id=self.EXP_ID_3,
-                state_name='state_name',
                 original_author_id=self.user_id,
                 subject='Feedback',
                 status=feedback_models.STATUS_CHOICES_OPEN,
@@ -483,7 +465,7 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
-                self.EXPECTED_THREAD_DICT['state_name'], self.user_id,
+                'state_name', self.user_id,
                 self.EXPECTED_THREAD_DICT['subject'], 'not used here')
             threads = feedback_services.get_all_threads(
                 'exploration', self.EXP_ID_1, False)

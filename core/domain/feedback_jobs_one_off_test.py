@@ -85,7 +85,7 @@ class FeedbackThreadMessagesCountOneOffJobTest(test_utils.GenericTestBase):
 
     def test_message_count(self):
         """Test if the job returns the correct message count."""
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1,
                 self.EXPECTED_THREAD_DICT['state_name'], self.user_id,
@@ -205,7 +205,7 @@ class FeedbackSubjectOneOffJobTest(test_utils.GenericTestBase):
     def test_that_job_returns_correct_feedback_subject(self):
         """Test if the job returns the correct feedback subject."""
 
-        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
+        with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', False):
             feedback_services.create_thread(
                 'exploration', self.EXP_ID_1, 'unused_state_name',
                 self.user_id, self.EXPECTED_THREAD_DICT1['subject'],
@@ -394,34 +394,3 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
         output = self._run_validation_job()
         self.assertEqual(output[0][1], output[1][1])
         self.assertEqual(output[0][1], 10)
-
-
-class GeneralizeFeedbackThreadMigrationOneOffJobTest(
-        test_utils.GenericTestBase):
-
-    def _run_one_off_job(self):
-        """Runs the one-off MapReduce job."""
-        job_id = (
-            feedback_jobs_one_off.GeneralizeFeedbackThreadMigrationOneOffJob
-            .create_new())
-        (
-            feedback_jobs_one_off.GeneralizeFeedbackThreadMigrationOneOffJob
-            .enqueue(job_id))
-
-        self.assertEqual(
-            self.count_jobs_in_taskqueue(
-                taskqueue_services.QUEUE_NAME_ONE_OFF_JOBS), 1)
-        self.process_and_flush_pending_tasks()
-
-    def test_migration_job(self):
-        feedback_models.FeedbackThreadModel(
-            id='exploration.exp1.thread1', exploration_id='exp1',
-            status=feedback_models.STATUS_CHOICES_OPEN).put()
-
-        self._run_one_off_job()
-
-        thread_model = feedback_models.FeedbackThreadModel.get_by_id(
-            'exploration.exp1.thread1')
-
-        self.assertEqual(thread_model.entity_type, 'exploration')
-        self.assertEqual(thread_model.entity_id, 'exp1')

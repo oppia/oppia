@@ -186,26 +186,6 @@ class SuggestionMigrationValdiationOneOffJob(
         yield (key, len(value))
 
 
-class GeneralizeFeedbackThreadMigrationOneOffJob(
-        jobs.BaseMapReduceOneOffJobManager):
-    """One off job to populate two new fields for instances of Feedback thread
-    model.
-    """
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [feedback_models.FeedbackThreadModel]
-
-    @staticmethod
-    def map(thread):
-        thread.entity_type = 'exploration'
-        thread.entity_id = thread.exploration_id
-        thread.put()
-
-    @staticmethod
-    def reduce(thread):
-        pass
-
-
 class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
     """One-off job for migrating instances of feedback thread model and related
     models to have thread ID of the form entity_type.entity_id.random_str.
@@ -227,11 +207,9 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             # else it has already been migrated.
             if len(old_id.split('.')) == 2:
                 new_id = 'exploration.' + item.id
-                feedback_models.FeedbackThreadModel(
+                feedback_models.GeneralFeedbackThreadModel(
                     id=new_id, entity_type=item.entity_type,
                     entity_id=item.entity_id,
-                    exploration_id=item.exploration_id,
-                    state_name=item.state_name,
                     original_author_id=item.original_author_id,
                     status=item.status, subject=item.subject,
                     summary=item.summary, has_suggestion=item.has_suggestion,
@@ -243,7 +221,7 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             if len(old_id.split('.')) == 3:
                 new_id = 'exploration.' + item.id
                 new_thread_id = 'exploration.' + item.thread_id
-                feedback_models.FeedbackMessageModel(
+                feedback_models.GeneralFeedbackMessageModel(
                     id=new_id, thread_id=new_thread_id,
                     message_id=item.message_id, author_id=item.author_id,
                     updated_status=item.updated_status,
@@ -257,7 +235,7 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                 new_id = '.'.join(
                     [old_id.split('.')[0], 'exploration', old_id.split('.')[1],
                      old_id.split('.')[2]])
-                feedback_models.FeedbackThreadUserModel(
+                feedback_models.GeneralFeedbackThreadUserModel(
                     id=new_id,
                     message_ids_read_by_user=item.message_ids_read_by_user
                 ).put()

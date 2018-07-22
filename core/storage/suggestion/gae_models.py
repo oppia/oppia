@@ -149,7 +149,7 @@ class GeneralSuggestionModel(base_models.BaseModel):
             Exception: There is already a suggestion with the given id.
         """
         instance_id = thread_id
-
+        print instance_id
         if cls.get_by_id(instance_id):
             raise Exception('There is already a suggestion with the given'
                             ' id: %s' % instance_id)

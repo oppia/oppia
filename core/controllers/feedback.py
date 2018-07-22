@@ -42,7 +42,7 @@ class ThreadListHandler(base.BaseHandler):
             self.values.update({
                 'suggestion_thread_dicts': (
                     [t.to_dict() for t in feedback_services.get_all_threads(
-                        exploration_id, True)])
+                        'exploration', exploration_id, True)])
             })
         self.render_json(self.values)
 

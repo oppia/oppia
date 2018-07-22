@@ -53,14 +53,11 @@ def create_suggestion(
         final_reviewer_id: str|None. The ID of the reviewer who has
             accepted/rejected the suggestion.
     """
-    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
-        thread_id = feedback_services.create_thread(
-            target_type, target_id, None, author_id, description,
-            DEFAULT_SUGGESTION_THREAD_SUBJECT)
-    else:
-        thread_id = feedback_services.create_thread(
-            target_id, None, author_id, description,
-            DEFAULT_SUGGESTION_THREAD_SUBJECT)
+
+    thread_id = feedback_services.create_thread(
+        target_type, target_id, None, author_id, description,
+        DEFAULT_SUGGESTION_THREAD_SUBJECT)
+
     status = suggestion_models.STATUS_IN_REVIEW
 
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:

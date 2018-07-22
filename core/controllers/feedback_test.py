@@ -203,7 +203,6 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         response = self.testapp.get('/create/%s' % self.EXP_ID)
         csrf_token = self.get_csrf_token_from_response(response)
 
-<<<<<<< HEAD
         with self.swap(feconf, 'ENABLE_GENERALIZED_FEEDBACK_THREADS', True):
             # First, create a thread.
             self.post_json(
@@ -217,7 +216,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             # Then, get the thread id.
             response_dict = self.get_json(
                 '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-            threadlist = response_dict['threads']
+            threadlist = response_dict['feedback_thread_dicts']
             self.assertEqual(len(threadlist), 1)
             thread_id = threadlist[0]['thread_id']
 
@@ -230,31 +229,6 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                     'updated_subject': None,
                     'text': 'Message 1'
                 }, csrf_token=csrf_token)
-=======
-        # First, create a thread.
-        self.post_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
-                'state_name': None,
-                'subject': u'New Thread ¡unicode!',
-                'text': u'Message 0 ¡unicode!',
-            }, csrf_token=csrf_token)
-
-        # Then, get the thread id.
-        response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
-        threadlist = response_dict['feedback_thread_dicts']
-        self.assertEqual(len(threadlist), 1)
-        thread_id = threadlist[0]['thread_id']
-
-        # Then, create a new message in that thread.
-        thread_url = '%s/%s' % (feconf.FEEDBACK_THREAD_URL_PREFIX, thread_id)
-        self.post_json(
-            thread_url, {
-                'updated_status': None,
-                'updated_subject': None,
-                'text': 'Message 1'
-            }, csrf_token=csrf_token)
->>>>>>> origin/develop
 
             # The resulting thread should contain two messages.
             response_dict = self.get_json(thread_url)
