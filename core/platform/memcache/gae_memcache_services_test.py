@@ -42,4 +42,4 @@ class GaeMemcacheServicesUnitTests(test_utils.GenericTestBase):
 
     def test_delete_multi(self):
         return_value = gae_memcache_services.delete_multi(self.keys)
-        self.assertTrue(type(return_value) is bool)
+        self.assertTrue(isinstance(return_value, bool))
