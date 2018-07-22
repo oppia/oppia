@@ -29,7 +29,7 @@ oppia.directive('stateInteractionEditor', [
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
-        'state_editor_interaction_directive.html'),
+        'state_interaction_editor_directive.html'),
       controller: [
         '$scope', '$http', '$rootScope', '$uibModal', '$injector', '$filter',
         'AlertsService', 'EditorStateService', 'HtmlEscaperService',
@@ -58,6 +58,7 @@ oppia.directive('stateInteractionEditor', [
           // interaction preview.
           $scope.submitAnswer = function() {};
           $scope.adjustPageHeight = function() {};
+          $scope.EditabilityService = EditabilityService;
 
           $scope.stateInteractionIdService = stateInteractionIdService;
           $scope.hasLoaded = false;

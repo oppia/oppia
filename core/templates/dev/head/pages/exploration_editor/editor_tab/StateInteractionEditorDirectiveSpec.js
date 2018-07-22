@@ -163,7 +163,7 @@ describe('State Interaction controller', function() {
 
       var templateHtml = $templateCache.get(
         '/pages/exploration_editor/editor_tab/' +
-        'state_editor_interaction_directive.html');
+        'state_interaction_editor_directive.html');
       $compile(templateHtml, $rootScope);
       $rootScope.$digest();
 

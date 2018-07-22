@@ -16,14 +16,14 @@
  * @fileoverview Controllers for the state parameter changes section
  * of the editor sidebar.
  */
-oppia.directive('stateParamChangesEditor', [
+oppia.directive('stateParamChanges', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
-        'state_parameter_changes_directive.html'),
+        'state_param_changes_directive.html'),
       controller: [
         '$scope', 'EditorStateService', 'stateParamChangesService',
         function($scope, EditorStateService, stateParamChangesService) {
