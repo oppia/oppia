@@ -36,10 +36,6 @@ oppia.factory('QuestionObjectFactory', ['StateObjectFactory',
       return this._stateData;
     };
 
-    Question.prototype.setDefaultStateData = function() {
-
-    };
-
     Question.prototype.getLanguageCode = function() {
       return this._languageCode;
     };
