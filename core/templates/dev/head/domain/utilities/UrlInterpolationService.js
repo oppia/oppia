@@ -130,8 +130,8 @@ oppia.factory('UrlInterpolationService', [
           if (!value.match(VALID_URL_PARAMETER_VALUE_REGEX)) {
             AlertsService.fatalWarning(
               'Parameter values passed into interpolateUrl must only contain ' +
-              'alphanumerical characters, hyphens, underscores, brackets or ' +
-              'spaces: \'' + value + '\'');
+              'alphanumerical characters, hyphens, underscores, parentheses ' +
+              'or spaces: \'' + value + '\'');
             return null;
           }
 

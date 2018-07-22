@@ -96,7 +96,7 @@ describe('URL Interpolation Service', function() {
     })).toBe('/test_url/');
   });
 
-  it('should interpolate URLs when parameters have brackets', function() {
+  it('should interpolate URLs when parameters have parentheses', function() {
     expect(uis.interpolateUrl('/test_url/<param>', {
       param: 'value (1'
     })).toBe('/test_url/value%20(1');
@@ -190,22 +190,22 @@ describe('URL Interpolation Service', function() {
       name: '<value>'
     })).toThrow(new Error(
       'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores, brackets or spaces: ' +
-      "'<value>'"));
+      'alphanumerical characters, hyphens, underscores, parentheses or ' +
+      'spaces: \'<value>\''));
 
     expect(uis.interpolateUrl.bind(null, '/test_url/<name>', {
       name: '<<value>>'
     })).toThrow(new Error(
       'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores, brackets or spaces: ' +
-      "'<<value>>'"));
+      'alphanumerical characters, hyphens, underscores, parentheses or ' +
+      'spaces: \'<<value>>\''));
 
     expect(uis.interpolateUrl.bind(null, '/test_url/<name>', {
       name: '<>'
     })).toThrow(new Error(
       'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores, brackets or spaces: ' +
-      '\'<>\''));
+      'alphanumerical characters, hyphens, underscores, parentheses or ' +
+      'spaces: \'<>\''));
 
     // Values cannot contain non-alphanumerical characters or spaces, including
     // newlines or website symbols.
@@ -216,8 +216,8 @@ describe('URL Interpolation Service', function() {
       });
     }).toThrow(new Error(
       'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores, brackets or spaces: ' +
-      '\'https://www.oppia.org/\''));
+      'alphanumerical characters, hyphens, underscores, parentheses or ' +
+      'spaces: \'https://www.oppia.org/\''));
 
     expect(function() {
       uis.interpolateUrl('/test_url/<name>', {
@@ -225,8 +225,8 @@ describe('URL Interpolation Service', function() {
       });
     }).toThrow(new Error(
       'Parameter values passed into interpolateUrl must only contain ' +
-      'alphanumerical characters, hyphens, underscores, brackets or spaces: ' +
-      '\'value\nmultiple lines\''));
+      'alphanumerical characters, hyphens, underscores, parentheses or ' +
+      'spaces: \'value\nmultiple lines\''));
   });
 
   it('should throw an error for missing parameters', function() {
