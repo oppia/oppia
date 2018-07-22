@@ -18,11 +18,11 @@
 
 oppia.controller('Preferences', [
   '$scope', '$http', '$rootScope', '$uibModal', '$timeout', '$translate',
-  'AlertsService', 'UrlInterpolationService', 'UtilsService',
+  'AlertsService', 'UrlInterpolationService', 'UserService', 'UtilsService',
   'DASHBOARD_TYPE_CREATOR', 'DASHBOARD_TYPE_LEARNER',
   function(
       $scope, $http, $rootScope, $uibModal, $timeout, $translate,
-      AlertsService, UrlInterpolationService, UtilsService,
+      AlertsService, UrlInterpolationService, UserService, UtilsService,
       DASHBOARD_TYPE_CREATOR, DASHBOARD_TYPE_LEARNER) {
     var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
     $rootScope.loadingMessage = 'Loading';
@@ -189,14 +189,12 @@ oppia.controller('Preferences', [
           }
         ]
       }).result.then(function(newProfilePictureDataUrl) {
-        $http.put(_PREFERENCES_DATA_URL, {
-          update_type: 'profile_picture_data_url',
-          data: newProfilePictureDataUrl
-        }).then(function() {
-          // The reload is needed in order to update the profile picture in the
-          // top-right corner.
-          location.reload();
-        });
+        UserService.setProfileImageDataUrlAsync(newProfilePictureDataUrl)
+          .then(function() {
+            // The reload is needed in order to update the profile picture in
+            // the top-right corner.
+            location.reload();
+          });
       });
     };
 

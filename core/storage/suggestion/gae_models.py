@@ -72,6 +72,10 @@ SCORE_TYPE_CHOICES = [
 # The delimiter to be used in score category field.
 SCORE_CATEGORY_DELIMITER = '.'
 
+ALLOWED_QUERY_FIELDS = ['suggestion_type', 'target_type', 'target_id',
+                        'status', 'author_id', 'final_reviewer_id',
+                        'score_category']
+
 # Threshold number of days after which suggestion will be accepted.
 THRESHOLD_DAYS_BEFORE_ACCEPT = 7
 
@@ -158,79 +162,26 @@ class GeneralSuggestionModel(base_models.BaseModel):
             score_category=score_category).put()
 
     @classmethod
-    def get_suggestions_by_type(cls, suggestion_type):
-        """Gets all suggestions of a particular type.
+    def query_suggestions(cls, query_fields_and_values):
+        """Queries for suggestions.
 
         Args:
-            suggestion_type: str. The type of the suggestions.
+            query_fields_and_values: list(tuple(str, str)). A list of queries.
+                The first element in each tuple is the field to be queried, and
+                the second element is the corresponding value to query for.
 
         Returns:
-            list(SuggestionModel). A list of suggestions of the given
-                type, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
-                suggestions.
+            list(SuggestionModel). A list of suggestions that match the given
+            query values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
+            suggestions.
         """
-        return cls.get_all().filter(
-            cls.suggestion_type == suggestion_type).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
+        query = cls.query()
+        for (field, value) in query_fields_and_values:
+            if field not in ALLOWED_QUERY_FIELDS:
+                raise Exception('Not allowed to query on field %s' % field)
+            query = query.filter(getattr(cls, field) == value)
 
-    @classmethod
-    def get_suggestions_by_author(cls, author_id):
-        """Gets all suggestions created by the given author.
-
-        Args:
-            author_id: str. The ID of the author of the suggestion.
-
-        Returns:
-            list(SuggestionModel). A list of suggestions by the given author,
-            up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
-        """
-        return cls.get_all().filter(
-            cls.author_id == author_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_suggestions_reviewed_by(cls, final_reviewer_id):
-        """Gets all suggestions that have been reviewed by the given user.
-
-        Args:
-            final_reviewer_id: str. The ID of the reviewer of the suggestion.
-
-        Returns:
-            list(SuggestionModel). A list of suggestions reviewed by the given
-                user, up to a maximum of feconf.DEFAULT_QUERY_LIMIT
-                suggestions.
-        """
-        return cls.get_all().filter(
-            cls.final_reviewer_id == final_reviewer_id).fetch(
-                feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_suggestions_by_status(cls, status):
-        """Gets all suggestions with the given status.
-
-        Args:
-            status: str. The status of the suggestion.
-
-        Returns:
-            list(SuggestionModel) or None. A list of suggestions with the given
-            status, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
-        """
-        return cls.get_all().filter(
-            cls.status == status).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_suggestions_by_target_id(cls, target_type, target_id):
-        """Gets all suggestions to the target with the given ID.
-
-        Args:
-            target_type: str. The type of target.
-            target_id: str. The ID of the target.
-
-        Returns:
-            list(SuggestionModel). A list of suggestions to the target with the
-            given id, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
-        """
-        return cls.get_all().filter(cls.target_type == target_type).filter(
-            cls.target_id == target_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+        return query.fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_all_stale_suggestions(cls):

@@ -34,7 +34,8 @@ oppia.factory('ExplorationPlayerService', [
   'NumberAttemptsService', 'PlayerCorrectnessFeedbackEnabledService',
   'PlayerTranscriptService', 'PlaythroughService',
   'ReadOnlyExplorationBackendApiService', 'StateClassifierMappingService',
-  'StatsReportingService', 'UrlInterpolationService', 'WindowDimensionsService',
+  'StatsReportingService', 'UrlInterpolationService', 'UserService',
+  'WindowDimensionsService', 'DEFAULT_PROFILE_IMAGE_PATH',
   'ENABLE_PLAYTHROUGH_RECORDING', 'PAGE_CONTEXT', 'TWO_CARD_THRESHOLD_PX',
   'WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS',
   function(
@@ -47,7 +48,8 @@ oppia.factory('ExplorationPlayerService', [
       NumberAttemptsService, PlayerCorrectnessFeedbackEnabledService,
       PlayerTranscriptService, PlaythroughService,
       ReadOnlyExplorationBackendApiService, StateClassifierMappingService,
-      StatsReportingService, UrlInterpolationService, WindowDimensionsService,
+      StatsReportingService, UrlInterpolationService, UserService,
+      WindowDimensionsService, DEFAULT_PROFILE_IMAGE_PATH,
       ENABLE_PLAYTHROUGH_RECORDING, PAGE_CONTEXT, TWO_CARD_THRESHOLD_PX,
       WHITELISTED_COLLECTION_IDS_FOR_SAVING_GUEST_PROGRESS) {
     var _explorationId = ContextService.getExplorationId();
@@ -383,6 +385,12 @@ oppia.factory('ExplorationPlayerService', [
             classificationResult.ruleIndex,
             classificationResult.classificationCategorization,
             feedbackIsUseful);
+
+          if (ENABLE_PLAYTHROUGH_RECORDING) {
+            StatsReportingService.recordAnswerSubmitAction(
+              oldStateName, newStateName, oldState.interaction.id, answer,
+              outcome.feedback);
+          }
         }
 
         // Use angular.copy() to clone the object
@@ -391,13 +399,8 @@ oppia.factory('ExplorationPlayerService', [
         var outcome = angular.copy(classificationResult.outcome);
         var newStateName = outcome.dest;
         var refresherExplorationId = outcome.refresherExplorationId;
+        var missingPrerequisiteSkillId = outcome.missingPrerequisiteSkillId;
         var newState = exploration.getState(newStateName);
-
-        if (ENABLE_PLAYTHROUGH_RECORDING) {
-          StatsReportingService.recordAnswerSubmitAction(
-            oldStateName, newStateName, oldState.interaction.id, answer,
-            outcome.feedback);
-        }
 
         // Compute the data for the next state.
         var oldParams = LearnerParamsService.getAllParams();
@@ -470,7 +473,7 @@ oppia.factory('ExplorationPlayerService', [
         successCallback(
           newStateName, refreshInteraction, feedbackHtml,
           feedbackAudioTranslations, questionHtml, newParams,
-          refresherExplorationId);
+          refresherExplorationId, missingPrerequisiteSkillId);
         return answerIsCorrect;
       },
       isAnswerBeingProcessed: function() {
@@ -479,22 +482,15 @@ oppia.factory('ExplorationPlayerService', [
       // Returns a promise for the user profile picture, or the default image if
       // user is not logged in or has not uploaded a profile picture, or the
       // player is in preview mode.
-      getUserProfileImage: function() {
-        var DEFAULT_PROFILE_IMAGE_PATH = (
-          UrlInterpolationService.getStaticImageUrl(
-            '/avatar/user_blue_72px.png'));
-
-        if (_isLoggedIn && !_editorPreviewMode) {
-          return $http.get(
-            '/preferenceshandler/profile_picture'
-          ).then(function(response) {
-            var profilePictureDataUrl = response.data.profile_picture_data_url;
-            return (
-              profilePictureDataUrl ? profilePictureDataUrl :
-              DEFAULT_PROFILE_IMAGE_PATH);
-          });
+      getUserProfileImageAsync: function() {
+        if (!_editorPreviewMode) {
+          return UserService.getProfileImageDataUrlAsync()
+            .then(function(dataUrl) {
+              return dataUrl;
+            });
         } else {
-          return $q.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+          return $q.resolve(UrlInterpolationService.getStaticImageUrl(
+            DEFAULT_PROFILE_IMAGE_PATH));
         }
       },
       recordSolutionHit: function(stateName) {

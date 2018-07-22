@@ -75,6 +75,28 @@ describe('ExplorationStatesService', function() {
       });
     });
 
+    describe('.registerOnStateDeletedCallback', function() {
+      beforeEach(inject(function($injector) {
+        spyOn(this.cls, 'deleteState');
+        // When ExplorationStatesService tries to show the confirm-delete
+        // modal, have it immediately confirm.
+        spyOn($injector.get('$uibModal'), 'open').and.callFake(
+          function(stateName) {
+            return {result: Promise.resolve(stateName)};
+          });
+      }));
+
+      it('callsback when a state is deleted', function() {
+        var callbackSpy = jasmine.createSpy('callback');
+
+        this.ess.registerOnStateDeletedCallback(callbackSpy);
+
+        this.ess.deleteState('Hola').then(function() {
+          expect(callbackSpy).toHaveBeenCalledWith('Hola');
+        });
+      });
+    });
+
     describe('.registerOnStateRenamedCallback', function() {
       beforeEach(function() {
         spyOn(this.cls, 'renameState');

@@ -348,10 +348,12 @@ class SuggestionMigrationOneOffJobTest(test_utils.GenericTestBase):
             'description', 'new_value')
 
         self._run_one_off_job()
-
-        suggestion = (
-            suggestion_models.GeneralSuggestionModel
-            .get_suggestions_by_target_id('exploration', self.EXP_ID)[0])
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.EXP_ID)
+        ]
+        suggestion = suggestion_models.GeneralSuggestionModel.query_suggestions(
+            queries)[0]
 
         expected_change_cmd = {
             'cmd': exp_domain.CMD_EDIT_STATE_PROPERTY,

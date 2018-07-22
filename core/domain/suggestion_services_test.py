@@ -434,30 +434,63 @@ class SuggestionGetServicesUnitTests(test_utils.GenericTestBase):
                 self.reviewer_id_2)
 
     def test_get_by_author(self):
-        self.assertEqual(len(suggestion_services.get_suggestions_by_author(
-            self.author_id_1)), 3)
-        self.assertEqual(len(suggestion_services.get_suggestions_by_author(
-            self.author_id_2)), 2)
+        queries = [('author_id', self.author_id_1)]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 3)
+        queries = [('author_id', self.author_id_2)]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
 
     def test_get_by_reviewer(self):
-        self.assertEqual(len(suggestion_services.get_suggestions_reviewed_by(
-            self.reviewer_id_1)), 1)
-        self.assertEqual(len(suggestion_services.get_suggestions_reviewed_by(
-            self.reviewer_id_2)), 2)
+        queries = [('final_reviewer_id', self.reviewer_id_1)]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
+        queries = [('final_reviewer_id', self.reviewer_id_2)]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 2)
 
     def test_get_by_target_id(self):
-        self.assertEqual(len(suggestion_services.get_suggestions_by_target_id(
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.target_id_1)), 4)
-        self.assertEqual(len(suggestion_services.get_suggestions_by_target_id(
-            suggestion_models.TARGET_TYPE_EXPLORATION, self.target_id_2)), 1)
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id_1)
+        ]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 4)
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id_2)
+        ]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
 
     def test_get_by_status(self):
-        self.assertEqual(len(suggestion_services.get_suggestions_by_status(
-            suggestion_models.STATUS_IN_REVIEW)), 5)
+        queries = [('status', suggestion_models.STATUS_IN_REVIEW)]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 5)
 
     def test_get_by_type(self):
-        self.assertEqual(len(suggestion_services.get_suggestion_by_type(
-            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)), 5)
+        queries = [(
+            'suggestion_type',
+            suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT)]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 5)
+
+    def test_query_suggestions(self):
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id_1),
+            ('author_id', self.author_id_2)
+        ]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 1)
+
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id_1),
+            ('author_id', self.author_id_1),
+            ('status', suggestion_models.STATUS_IN_REVIEW)
+        ]
+        self.assertEqual(len(suggestion_services.query_suggestions(queries)), 3)
+
+        queries = [
+            ('target_type', suggestion_models.TARGET_TYPE_EXPLORATION),
+            ('target_id', self.target_id_1),
+            ('invalid_field', 'value')
+        ]
+        with self.assertRaisesRegexp(
+            Exception, 'Not allowed to query on field invalid_field'):
+            suggestion_services.query_suggestions(queries)
 
 
 class SuggestionIntegrationTests(test_utils.GenericTestBase):
