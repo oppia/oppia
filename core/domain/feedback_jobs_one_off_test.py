@@ -459,6 +459,3 @@ class FeedbackThreadIdMigrationJobTest(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
                 'author.exploration.exp1.thread1'))
         self.assertEqual(new_thread_user_model.message_ids_read_by_user, [1])
-
-
-
