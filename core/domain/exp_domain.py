@@ -3580,7 +3580,8 @@ class Exploration(object):
 
     @classmethod
     def update_states_from_model(
-            cls, versioned_exploration_states, current_states_schema_version, exploration_id):
+            cls, versioned_exploration_states, current_states_schema_version,
+            exploration_id):
         """Converts the states blob contained in the given
         versioned_exploration_states dict from current_states_schema_version to
         current_states_schema_version + 1.
@@ -4144,8 +4145,8 @@ class Exploration(object):
         exploration_dict['states_schema_version'] = 24
 
         return exploration_dict
-    @classmethod
 
+    @classmethod
     def _migrate_to_latest_yaml_version(
             cls, yaml_content, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema

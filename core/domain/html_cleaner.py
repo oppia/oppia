@@ -20,7 +20,6 @@ import HTMLParser
 import cStringIO
 import json
 import logging
-from PIL import Image
 import urllib
 import urlparse
 
@@ -29,6 +28,8 @@ import bs4
 from core.domain import rte_component_registry
 from core.platform import models
 import feconf
+
+from PIL import Image
 
 app_identity_services = models.Registry.import_app_identity_services()
 
@@ -263,7 +264,7 @@ def convert_to_textangular(html_data, unused_exp_id):
 
     Args:
         html_data: str. HTML string to be converted.
-        unused_exp_id. str: Unused argument.
+        unused_exp_id: str. Unused argument.
 
     Returns:
         str. The converted HTML string.
@@ -671,7 +672,7 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
     for html_data in html_list:
         if run_migration:
             if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
-                soup_data = convert_to_textangular(html_data)
+                soup_data = convert_to_textangular(html_data, 'unused')
             else:
                 soup_data = convert_to_ckeditor(html_data)
         else:
@@ -796,9 +797,9 @@ def add_dimensions_to_noninteractive_image_tag(html_string, exp_id):
     """Adds dimensions to all oppia-noninteractive-image tags.
 
     Args:
-        html_string. str: HTML string in which the dimensions is to be
+        html_string: str. HTML string in which the dimensions is to be
             added.
-        exp_id. str: Exploration id.
+        exp_id: str. Exploration id.
 
     Returns:
         str. Updated HTML string with the dimensions for all
@@ -819,16 +820,17 @@ def get_filepath_of_object_image(filename, exp_id):
     """Gets the dimensions of the image file.
 
     Args:
-        filename. str: Name of the file whose dimensions need to be
+        filename: str. Name of the file whose dimensions need to be
             calculated.
-        exp_id. str: Exploration id.
+        exp_id: str. Exploration id.
 
     Returns:
         object. filepath object of the image.
     """
     URL = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
         app_identity_services.get_gcs_resource_bucket_name(), exp_id,
-        filename))
+        filename)) if not feconf.DEV_MODE else (
+            'http://localhost:8181/imagehandler/%s/%s' % (exp_id, filename))
     imageFile = cStringIO.StringIO(urllib.urlopen(URL).read())
     img = Image.open(imageFile)
     width, height = img.size
