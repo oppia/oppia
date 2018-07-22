@@ -537,7 +537,8 @@ def get_thread_summaries(user_id, thread_ids):
             datastore_services.fetch_multiple_entities_by_ids_and_models(
                 [
                     ('GeneralFeedbackThreadModel', thread_ids),
-                    ('GeneralFeedbackThreadUserModel',
+                    (
+                        'GeneralFeedbackThreadUserModel',
                         feedback_thread_user_model_ids),
                     ('ExplorationModel', exploration_ids),
                 ]))

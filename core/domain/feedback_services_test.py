@@ -709,7 +709,7 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                         taskqueue_services.QUEUE_NAME_EMAILS), 1)
 
                 tasks = self.get_pending_tasks(
-                    taskqueue_services.QUEUE_NAME_EMAILS)
+                    queue_name=taskqueue_services.QUEUE_NAME_EMAILS)
                 self.assertEqual(
                     tasks[0].url, feconf.TASK_URL_FEEDBACK_MESSAGE_EMAILS)
                 self.process_and_flush_pending_tasks()

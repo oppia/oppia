@@ -36,7 +36,7 @@ class ThreadListHandler(base.BaseHandler):
         self.values.update({
             'feedback_thread_dicts': (
                 [t.to_dict() for t in feedback_services.get_all_threads(
-                'exploration', exploration_id, False)])
+                    'exploration', exploration_id, False)])
             })
         if constants.USE_NEW_SUGGESTION_FRAMEWORK:
             self.values.update({
