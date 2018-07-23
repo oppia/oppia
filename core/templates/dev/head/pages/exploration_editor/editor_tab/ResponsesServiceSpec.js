@@ -75,6 +75,22 @@ describe('Responses Service', function() {
       expect(rs.getAnswerGroup(1)).toEqual(updates);
     });
 
+    it('should delete answer group', function() {
+      let initialLegth = rs.getAnswerGroupCount();
+      let updates = {
+        rules: 'rules',
+        feedback: 'feedback',
+        dest: 'dest',
+        refresherExplorationId: 1,
+        missingPrerequisiteSkillId: 2,
+        labelledAsCorrect: true,
+        trainingData: 'data'
+      };
+      rs.updateAnswerGroup(initialLength, updates);
+      rs.deleteAnswerGroup(initialLength);
+      expect(rs.AnswerGroupCount()).toEqual(initialLength);
+    });
+
     it('should be able to update answer choices', function() {
       rs.updateAnswerChoices('some answer');
       expect(rs.getAnswerChoices()).toEqual('some answer');
