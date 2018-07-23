@@ -18,7 +18,7 @@
  */
 
 var until = protractor.ExpectedConditions;
-var DEFAULT_WAIT_TIME_MSECS = 10000;
+var DEFAULT_WAIT_TIME_MSECS = browser.isMobile ? 20000 : 10000;
 
 var alertToBePresent = function() {
   return browser.wait(
