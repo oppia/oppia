@@ -37,20 +37,17 @@
                       !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty(),
                     'conversation-skin-tutor-card-alone':
                       !canWindowShowTwoCards() && !isCurrentSupplementalCardNonempty()}">
-      <tutor-card on-submit-answer="submitAnswer(answer, rulesService)"
-                  is-learn-again-button="isLearnAgainButton()"
-                  start-card-change-animation="startCardChangeAnimation"
-                  on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
+      <tutor-card is-learn-again-button="isLearnAgainButton()"
+                  start-card-change-animation="startCardChangeAnimation">
       </tutor-card>
       <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
         <supplemental-card on-click-continue-button="showUpcomingCard()"
-                           is-learn-again-button="isLearnAgainButton()"
-                           on-submit-answer="submitAnswer(answer, rulesService)">
+                           is-learn-again-button="isLearnAgainButton()">
         </supplemental-card>
       </div>
       <progress-nav on-submit="submitAnswerFromProgressNav()"
                     is-learn-again-button="isLearnAgainButton()"
-                    submit-button-is-disabled="!interactionAnswerIsValid"
+                    submit-button-is-disabled="isSubmitButtonDisabled()"
                     submit-button-is-shown="!answerIsBeingProcessed"
                     on-click-continue-button="showUpcomingCard()">
       </progress-nav>
@@ -59,13 +56,12 @@
     <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
          class="conversation-skin-supplemental-card-container">
       <supplemental-card on-click-continue-button="showUpcomingCard()"
-                         is-learn-again-button="isLearnAgainButton()"
-                         on-submit-answer="submitAnswer(answer, rulesService)">
+                         is-learn-again-button="isLearnAgainButton()">
       </supplemental-card>
       <div class="conversation-skin-supplemental-nav" ng-if="isSupplementalNavShown()">
         <md-button type="submit" class="oppia-learner-confirm-button protractor-test-submit-answer-button conversation-skin-supplemental-nav-submit-button"
                    ng-click="submitAnswerFromProgressNav()"
-                   ng-disabled="!interactionAnswerIsValid"
+                   ng-disabled="isSubmitButtonDisabled()"
                    translate="I18N_INTERACTIONS_SUBMIT">
         </md-button>
       </div>

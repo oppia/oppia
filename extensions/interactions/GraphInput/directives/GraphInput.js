@@ -31,20 +31,17 @@ oppia.directive('oppiaInteractiveGraphInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&',
         getLastAnswer: '&lastAnswer',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/GraphInput/directives/' +
         'graph_input_interaction_directive.html'),
       controller: [
         '$scope', '$element', '$attrs', 'WindowDimensionsService',
-        'ExplorationPlayerService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'ExplorationPlayerService', 'CurrentInteractionService',
         function(
             $scope, $element, $attrs, WindowDimensionsService,
-            ExplorationPlayerService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            ExplorationPlayerService, CurrentInteractionService) {
           $scope.errorMessage = '';
           $scope.graph = {
             vertices: [],
@@ -55,12 +52,9 @@ oppia.directive('oppiaInteractiveGraphInput', [
           };
           $scope.submitGraph = function() {
             // Here, angular.copy is needed to strip $$hashkey from the graph.
-            $scope.onSubmit({
-              answer: angular.copy($scope.graph),
-              rulesService: graphInputRulesService
-            });
+            CurrentInteractionService.onSubmit(
+              angular.copy($scope.graph), graphInputRulesService);
           };
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitGraph);
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
           $scope.$on(EVENT_NEW_CARD_AVAILABLE, function() {
             $scope.interactionIsActive = false;
@@ -114,13 +108,12 @@ oppia.directive('oppiaInteractiveGraphInput', [
             return Boolean(graph);
           };
 
-          $scope.$watch(function() {
-            return $scope.graph;
-          }, function() {
-            $scope.setAnswerValidity({
-              answerValidity: checkValidGraph($scope.graph)
-            });
-          });
+          var validityCheckFn = function() {
+            return checkValidGraph($scope.graph);
+          };
+
+          CurrentInteractionService.registerCurrentInteraction(
+            $scope.submitGraph, validityCheckFn);
 
           init();
         }

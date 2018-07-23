@@ -28,14 +28,14 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&',
         getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/InteractiveMap/directives/' +
         'interactive_map_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', '$timeout', function($scope, $attrs, $timeout) {
+        '$scope', '$attrs', '$timeout', 'CurrentInteractionService',
+        function($scope, $attrs, $timeout, CurrentInteractionService) {
           $scope.coords = [
             HtmlEscaperService.escapedJsonToObj($attrs.latitudeWithValue),
             HtmlEscaperService.escapedJsonToObj($attrs.longitudeWithValue)];
@@ -124,10 +124,8 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
               position: ll
             }));
 
-            $scope.onSubmit({
-              answer: [ll.lat(), ll.lng()],
-              rulesService: interactiveMapRulesService
-            });
+            CurrentInteractionService.onSubmit(
+              [ll.lat(), ll.lng()], interactiveMapRulesService);
           };
 
           refreshMap();

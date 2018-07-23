@@ -24,18 +24,16 @@ oppia.directive('oppiaInteractiveContinue', [
   function(HtmlEscaperService, continueRulesService, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/Continue/directives/' +
         'continue_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'WindowDimensionsService',
-        'EVENT_PROGRESS_NAV_SUBMITTED',
+        'CurrentInteractionService',
         function(
             $scope, $attrs, WindowDimensionsService,
-            EVENT_PROGRESS_NAV_SUBMITTED) {
+            CurrentInteractionService) {
           $scope.buttonText = HtmlEscaperService.escapedJsonToObj(
             $attrs.buttonTextWithValue);
 
@@ -53,13 +51,12 @@ oppia.directive('oppiaInteractiveContinue', [
               humanReadableAnswer = $scope.buttonText;
             }
 
-            $scope.onSubmit({
-              answer: humanReadableAnswer,
-              rulesService: continueRulesService
-            });
+            CurrentInteractionService.onSubmit(
+              humanReadableAnswer, continueRulesService);
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
+          CurrentInteractionService.registerCurrentInteraction(
+            $scope.submitAnswer);
         }
       ]
     };

@@ -17,21 +17,17 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
         'numberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
-        'EVENT_PROGRESS_NAV_SUBMITTED', function(
+        'CurrentInteractionService', function(
             $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
             numberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
-            EVENT_PROGRESS_NAV_SUBMITTED) {
+            CurrentInteractionService) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -69,10 +65,8 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
             try {
               var numberWithUnits =
                 NumberWithUnitsObjectFactory.fromRawInputString(answer);
-              $scope.onSubmit({
-                answer: numberWithUnits,
-                rulesService: numberWithUnitsRulesService
-              });
+              CurrentInteractionService.onSubmit(
+                numberWithUnits, numberWithUnitsRulesService);
             } catch (parsingError) {
               errorMessage = parsingError.message;
               $scope.NumberWithUnitsForm.answer.$setValidity(
@@ -80,22 +74,17 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
             }
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
-            $scope.submitAnswer($scope.answer);
-          });
-
           $scope.isAnswerValid = function() {
             return (!$scope.NumberWithUnitsForm.$invalid &&
               $scope.answer !== '');
           };
 
-          $scope.$watch(function() {
-            return $scope.answer;
-          }, function() {
-            $scope.setAnswerValidity({
-              answerValidity: $scope.isAnswerValid()
-            });
-          });
+          var submitAnswerFn = function() {
+            $scope.submitAnswer($scope.answer);
+          };
+
+          CurrentInteractionService.registerCurrentInteraction(
+            submitAnswerFn, $scope.isAnswerValid);
 
           $scope.showHelp = function() {
             $uibModal.open({

@@ -35,14 +35,14 @@ oppia.directive('oppiaInteractiveImageClickInput', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&',
         getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/ImageClickInput/directives/' +
         'image_click_input_interaction_directive.html'),
       controller: [
-        '$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+        '$scope', '$element', '$attrs', 'CurrentInteractionService',
+        function($scope, $element, $attrs, CurrentInteractionService) {
           var imageAndRegions = HtmlEscaperService.escapedJsonToObj(
             $attrs.imageAndRegionsWithValue);
           $scope.highlightRegionsOnHover =
@@ -184,14 +184,15 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             $scope.updateCurrentlyHoveredRegions();
           };
           $scope.onClickImage = function() {
-            $scope.onSubmit({
-              answer: {
-                clickPosition: [$scope.mouseX, $scope.mouseY],
-                clickedRegions: $scope.currentlyHoveredRegions
-              },
-              rulesService: imageClickInputRulesService
-            });
+            var answer = {
+              clickPosition: [$scope.mouseX, $scope.mouseY],
+              clickedRegions: $scope.currentlyHoveredRegions
+            };
+            CurrentInteractionService.onSubmit(
+              answer, imageClickInputRulesService);
           };
+
+          CurrentInteractionService.registerCurrentInteraction();
         }
       ]
     };

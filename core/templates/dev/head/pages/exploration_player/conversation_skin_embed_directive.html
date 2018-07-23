@@ -24,17 +24,14 @@
       <div class="conversation-skin-main-tutor-card-embed"
            ng-class="{ 'conversation-skin-animate-tutor-card-on-narrow': !canWindowShowTwoCards() && isCurrentSupplementalCardNonempty()}"
            style="margin-bottom: 100px">
-        <tutor-card on-submit-answer="submitAnswer(answer, rulesService)"
-                    start-card-change-animation="startCardChangeAnimation"
-                    on-change-interaction-answer-validity="setInteractionAnswerValidity(answerValidity)">
+        <tutor-card start-card-change-animation="startCardChangeAnimation">
         </tutor-card>
         <div ng-if="isCurrentSupplementalCardNonempty() && !canWindowShowTwoCards()">
-          <supplemental-card on-click-continue-button="showUpcomingCard()"
-                             on-submit-answer="submitAnswer(answer, rulesService)">
+          <supplemental-card on-click-continue-button="showUpcomingCard()">
           </supplemental-card>
         </div>
         <progress-nav on-submit="submitAnswerFromProgressNav()"
-                      submit-button-is-disabled="!interactionAnswerIsValid"
+                      submit-button-is-disabled="submitButtonIsDisabled()"
                       submit-button-is-shown="!answerIsBeingProcessed"
                       on-click-continue-button="showUpcomingCard()">
         </progress-nav>
@@ -42,8 +39,7 @@
 
       <div ng-if="isCurrentSupplementalCardNonempty() && canWindowShowTwoCards()"
            class="conversation-skin-supplemental-card-container">
-        <supplemental-card on-click-continue-button="showUpcomingCard()"
-                           on-submit-answer="submitAnswer(answer, rulesService)">
+        <supplemental-card on-click-continue-button="showUpcomingCard()">
         </supplemental-card>
       </div>
     </div>

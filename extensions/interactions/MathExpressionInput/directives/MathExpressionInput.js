@@ -27,22 +27,18 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
       UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MathExpressionInput/directives/' +
         'math_expression_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', '$timeout', '$element', 'LABEL_FOR_CLEARING_FOCUS',
         'DebouncerService', 'DeviceInfoService', 'WindowDimensionsService',
-        'EVENT_PROGRESS_NAV_SUBMITTED',
+        'CurrentInteractionService',
         function(
             $scope, $attrs, $timeout, $element, LABEL_FOR_CLEARING_FOCUS,
             DebouncerService, DeviceInfoService, WindowDimensionsService,
-            EVENT_PROGRESS_NAV_SUBMITTED) {
+            CurrentInteractionService) {
           var guppyDivElt = $element[0].querySelector('.guppy-div');
 
           // Dynamically assigns a unique id to the guppy-div
@@ -150,18 +146,11 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
                 $scope.submitAnswer();
               },
               change: function(e) {
-                $scope.setAnswerValidity({
-                  answerValidity: $scope.isCurrentAnswerValid()
-                });
                 // Need to manually trigger the digest cycle
                 // to make any 'watchers' aware of changes in answer.
                 $scope.$apply();
               },
               ready: function() {
-                $scope.setAnswerValidity({
-                  answerValidity: false
-                });
-
                 if (DeviceInfoService.isMobileUserAgent() &&
                   DeviceInfoService.hasTouchEvents()) {
                   $scope.mobileOverlayIsShown = true;
@@ -215,13 +204,12 @@ oppia.directive('oppiaInteractiveMathExpressionInput', [
             }
             answer.latex = guppyInstance.latex();
             answer.ascii = guppyInstance.text();
-            $scope.onSubmit({
-              answer: answer,
-              rulesService: mathExpressionInputRulesService
-            });
+            CurrentInteractionService.onSubmit(
+              answer, mathExpressionInputRulesService);
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
+          CurrentInteractionService.registerCurrentInteraction(
+            $scope.submitAnswer, $scope.isCurrentAnswerValid);
         }
       ]
     };

@@ -27,7 +27,6 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&',
         getLastAnswer: '&lastAnswer'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
@@ -36,8 +35,10 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
       controller: [
         '$scope', '$attrs', '$element', '$timeout', '$uibModal',
         'FocusManagerService', 'pencilCodeEditorRulesService',
+        'CurrentInteractionService',
         function($scope, $attrs, $element, $timeout, $uibModal,
-            FocusManagerService, pencilCodeEditorRulesService) {
+            FocusManagerService, pencilCodeEditorRulesService,
+            CurrentInteractionService) {
           $scope.interactionIsActive = ($scope.getLastAnswer() === null);
 
           $scope.initialCode = $scope.interactionIsActive ?
@@ -141,15 +142,12 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
                 }).join('\n');
 
               hasSubmittedAnswer = true;
-              $scope.onSubmit({
-                answer: {
-                  code: normalizedCode,
-                  output: output || '',
-                  evaluation: '',
-                  error: ''
-                },
-                rulesService: pencilCodeEditorRulesService
-              });
+              CurrentInteractionService.onSubmit({
+                code: normalizedCode,
+                output: output || '',
+                evaluation: '',
+                error: ''
+              }, pencilCodeEditorRulesService);
             }, true);
           });
 
@@ -163,20 +161,19 @@ oppia.directive('oppiaInteractivePencilCodeEditor', [
             errorIsHappening = true;
             hasSubmittedAnswer = true;
 
-            $scope.onSubmit({
-              answer: {
-                code: normalizedCode,
-                output: '',
-                evaluation: '',
-                error: error.message
-              },
-              rulesService: pencilCodeEditorRulesService
-            });
+            CurrentInteractionService.onSubmit({
+              code: normalizedCode,
+              output: '',
+              evaluation: '',
+              error: error.message
+            }, pencilCodeEditorRulesService);
 
             $timeout(function() {
               errorIsHappening = false;
             }, 1000);
           });
+
+          CurrentInteractionService.registerCurrentInteraction();
         }]
     };
   }

@@ -24,18 +24,14 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
       UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/DragAndDropSort/directives/' +
         'drag_and_drop_sort_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'UrlService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        '$scope', '$attrs', 'UrlService', 'CurrentInteractionService',
         function(
-            $scope, $attrs, UrlService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            $scope, $attrs, UrlService, CurrentInteractionService) {
           $scope.choices = HtmlEscaperService.escapedJsonToObj(
             $attrs.choicesWithValue);
 
@@ -62,7 +58,7 @@ oppia.directive('oppiaInteractiveDragAndDropSort', [
             });
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitAnswer);
+          $scope.$on(CurrentInteractionService, $scope.submitAnswer);
         }
       ]
     };

@@ -23,20 +23,16 @@ oppia.directive('oppiaInteractiveNumericInput', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumericInput/directives/' +
         'numeric_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'numericInputRulesService',
-        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'WindowDimensionsService', 'CurrentInteractionService',
         function(
             $scope, $attrs, FocusManagerService, numericInputRulesService,
-            WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            WindowDimensionsService, CurrentInteractionService) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -45,32 +41,25 @@ oppia.directive('oppiaInteractiveNumericInput', [
             ui_config: {}
           };
 
-          $scope.submitAnswer = function(answer) {
-            if (answer !== undefined && answer !== null && answer !== '') {
-              $scope.onSubmit({
-                answer: answer,
-                rulesService: numericInputRulesService
-              });
-            }
-          };
-
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
-            $scope.submitAnswer($scope.answer);
-          });
-
-          $scope.isAnswerValid = function() {
+          var isAnswerValid = function() {
             return (
               $scope.answer !== undefined &&
               $scope.answer !== null && $scope.answer !== '');
           };
 
-          $scope.$watch(function() {
-            return $scope.answer;
-          }, function() {
-            $scope.setAnswerValidity({
-              answerValidity: $scope.isAnswerValid()
-            });
-          });
+          $scope.submitAnswer = function(answer) {
+            if (isAnswerValid()) {
+              CurrentInteractionService.onSubmit(
+                answer, numericInputRulesService);
+            }
+          };
+
+          var submitAnswerFn = function() {
+            $scope.submitAnswer($scope.answer);
+          };
+
+          CurrentInteractionService.registerCurrentInteraction(
+            submitAnswerFn, isAnswerValid);
         }
       ]
     };

@@ -17,22 +17,18 @@ oppia.directive('oppiaInteractiveFractionInput', [
   function(HtmlEscaperService, UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        onSubmit: '&',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/FractionInput/directives/' +
         'fraction_input_interaction_directive.html'),
       controller: [
         '$scope', '$attrs', 'FocusManagerService', 'fractionInputRulesService',
         'FractionObjectFactory', 'FRACTION_PARSING_ERRORS',
-        'WindowDimensionsService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'WindowDimensionsService', 'CurrentInteractionService',
         function(
             $scope, $attrs, FocusManagerService, fractionInputRulesService,
             FractionObjectFactory, FRACTION_PARSING_ERRORS,
-            WindowDimensionsService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            WindowDimensionsService, CurrentInteractionService) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -120,10 +116,8 @@ oppia.directive('oppiaInteractiveFractionInput', [
                 $scope.FractionInputForm.answer.$setValidity(
                   FORM_ERROR_TYPE, false);
               } else {
-                $scope.onSubmit({
-                  answer: fraction,
-                  rulesService: fractionInputRulesService
-                });
+                CurrentInteractionService.onSubmit(
+                  fraction, fractionInputRulesService);
               }
             } catch (parsingError) {
               errorMessage = parsingError.message;
@@ -132,21 +126,19 @@ oppia.directive('oppiaInteractiveFractionInput', [
             }
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, function() {
-            $scope.submitAnswer($scope.answer);
-          });
-
           $scope.isAnswerValid = function() {
+            if (typeof $scope.FractionInputForm === 'undefined') {
+              return false;
+            }
             return (!$scope.FractionInputForm.$invalid && $scope.answer !== '');
           };
 
-          $scope.$watch(function() {
-            return $scope.answer;
-          }, function() {
-            $scope.setAnswerValidity({
-              answerValidity: $scope.isAnswerValid()
-            });
-          });
+          var submitAnswerFn = function() {
+            $scope.submitAnswer($scope.answer);
+          };
+
+          CurrentInteractionService.registerCurrentInteraction(
+            submitAnswerFn, $scope.isAnswerValid);
         }
       ]
     };

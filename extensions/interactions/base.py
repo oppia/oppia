@@ -113,8 +113,10 @@ class BaseInteraction(object):
     can_have_solution = None
     # Whether to show a Submit button in the progress navigation area. This is
     # a generic submit button so do not use this if special interaction-specific
-    # behavior is required. The interaction JS must also handle the
-    # EVENT_PROGRESS_NAV_SUBMITTED event broadcast by this Submit button.
+    # behavior is required. The interaction directive must also register
+    # callbacks with CurrentInteractionService which handle answer submission
+    # when the button is clicked and control the enabling/disabling of the
+    # submit button.
     show_generic_submit_button = False
 
     # Temporary cache for the rule definitions.

@@ -23,7 +23,6 @@ oppia.directive('supplementalCard', [
       scope: {
         onClickContinueButton: '&',
         isLearnAgainButton: '&',
-        onSubmitAnswer: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_player/supplemental_card_directive.html'),
@@ -88,19 +87,8 @@ oppia.directive('supplementalCard', [
             return Math.max(container.height() - helpCard.height() / 2, 0);
           };
 
-          $scope.submitAnswer = function(answer, interactionRulesService) {
-            // Do not clear the help card or submit an answer if there is an
-            // upcoming card.
-            if ($scope.activeCard.destStateName) {
-              return;
-            }
-
-            $scope.clearHelpCard();
-            $scope.onSubmitAnswer({
-              answer: answer,
-              rulesService: interactionRulesService
-            });
-          };
+          // TODO(allanz): Old code would clear help card on submit.
+          // How to do it now?
 
           $scope.$on(EVENT_ACTIVE_CARD_CHANGED, function() {
             updateActiveCard();

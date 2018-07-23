@@ -19,10 +19,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&',
         getLastAnswer: '&lastAnswer',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/LogicProof/directives/' +
@@ -30,16 +27,16 @@ oppia.directive('oppiaInteractiveLogicProof', [
       controller: [
         '$scope', '$attrs', '$uibModal', 'logicProofRulesService',
         'WindowDimensionsService', 'UrlService',
-        'ExplorationPlayerService', 'EVENT_PROGRESS_NAV_SUBMITTED',
+        'ExplorationPlayerService', 'CurrentInteractionService',
         function(
             $scope, $attrs, $uibModal, logicProofRulesService,
             WindowDimensionsService, UrlService,
-            ExplorationPlayerService, EVENT_PROGRESS_NAV_SUBMITTED) {
+            ExplorationPlayerService, CurrentInteractionService) {
           $scope.localQuestionData = HtmlEscaperService.escapedJsonToObj(
             $attrs.questionWithValue);
 
           // This is the information about how to mark a question (e.g. the
-          // permited line templates) that is stored in defaultData.js within
+          // permitted line templates) that is stored in defaultData.js within
           // the dependencies.
           $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
 
@@ -254,13 +251,12 @@ oppia.directive('oppiaInteractiveLogicProof', [
               submission.displayed_proof = $scope.displayProof(
                 $scope.proofString);
             }
-            $scope.onSubmit({
-              answer: submission,
-              rulesService: logicProofRulesService
-            });
+            CurrentInteractionService.onSubmit(
+              submission, logicProofRulesService);
           };
 
-          $scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, $scope.submitProof);
+          CurrentInteractionService.registerCurrentInteraction(
+            $scope.submitProof);
 
           $scope.showHelp = function() {
             $uibModal.open({

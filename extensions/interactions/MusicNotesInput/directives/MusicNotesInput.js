@@ -79,19 +79,16 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
   'HtmlEscaperService', 'NOTE_NAMES_TO_MIDI_VALUES',
   'musicNotesInputRulesService', 'musicPhrasePlayerService',
   'UrlInterpolationService', 'EVENT_NEW_CARD_AVAILABLE',
-  'EVENT_PROGRESS_NAV_SUBMITTED', 'WindowDimensionsService',
+  'CurrentInteractionService', 'WindowDimensionsService',
   function(
       HtmlEscaperService, NOTE_NAMES_TO_MIDI_VALUES,
       musicNotesInputRulesService, musicPhrasePlayerService,
       UrlInterpolationService, EVENT_NEW_CARD_AVAILABLE,
-      EVENT_PROGRESS_NAV_SUBMITTED, WindowDimensionsService) {
+      CurrentInteractionService, WindowDimensionsService) {
     return {
       restrict: 'E',
       scope: {
-        onSubmit: '&',
         getLastAnswer: '&lastAnswer',
-        // This should be called whenever the answer changes.
-        setAnswerValidity: '&'
       },
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/MusicNotesInput/directives/' +
@@ -776,13 +773,12 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
               _convertNoteToReadableNote(scope.noteSequence[i].note));
           }
           readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
-          scope.onSubmit({
-            answer: readableSequence,
-            rulesService: musicNotesInputRulesService
-          });
+          CurrentInteractionService.onSubmit(
+            readableSequence, musicNotesInputRulesService);
         };
 
-        scope.$on(EVENT_PROGRESS_NAV_SUBMITTED, scope.submitAnswer);
+        CurrentInteractionService.registerCurrentInteraction(
+          scope.submitAnswer);
 
         /** *****************************************************************
          * Functions involving MIDI playback.
