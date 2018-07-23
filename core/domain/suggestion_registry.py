@@ -20,9 +20,12 @@ from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import question_domain
+from core.domain import question_services
+from core.domain import skill_domain
 from core.domain import skill_services
 from core.domain import user_services
 from core.platform import models
+import feconf
 import utils
 
 (suggestion_models,) = models.Registry.import_models([models.NAMES.suggestion])
@@ -367,8 +370,8 @@ class SuggestionAddQuestion(BaseSuggestion):
                 'Expected question dict to contain language_code')
 
         if (
-            'question_state_schema_version' not in
-            self.change_cmd['question_dict']):
+                'question_state_schema_version' not in
+                self.change_cmd['question_dict']):
             raise utils.ValidationError(
                 'Expected question dict to contain'
                 ' question_state_schema_version')
@@ -381,15 +384,17 @@ class SuggestionAddQuestion(BaseSuggestion):
         """Performs referential validation. This function needs to be called
         before accepting the suggestion.
         """
+        question_dict = self.change_cmd['question_dict']
         self.validate()
         if (
-            self.change_cmd['question_dict']['question_state_schema_version'] !=
-            feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
+                question_dict['question_state_schema_version'] !=
+                feconf.CURRENT_EXPLORATION_STATES_SCHEMA_VERSION):
             raise utils.ValidationError(
                 'Question state schema version is not up to date.')
 
-        skill_services.require_valid_skill_id(self.change_cmd['skill_id'])
-        skill = skill_services.get_skill_by_id(skill_id, strict=False)
+        skill_domain.Skill.require_valid_skill_id(self.change_cmd['skill_id'])
+        skill = skill_services.get_skill_by_id(
+            self.change_cmd['skill_id'], strict=False)
         if skill is None:
             raise utils.ValidationError(
                 'The skill with the given id doesn\'t exist.')
@@ -398,18 +403,16 @@ class SuggestionAddQuestion(BaseSuggestion):
     def get_change_list_for_accepting_suggestion(self):
         pass
 
-    def accept(self, commit_message):
-        """Accepts the suggestion.
-
-        Args:
-            commit_message: str. The commit message.
-        """
-        self.change_cmd['question_dict']['version'] = 1
-        question_dict['id'] = question_services.get_new_question_id()
+    def accept(self, unused_commit_message):
+        """Accepts the suggestion."""
+        question_dict = self.change_cmd['question_dict']
+        question_dict['version'] = 1
+        question_dict['id'] = (
+            question_services.get_new_question_id())
         question = question_domain.Question.from_dict(question_dict)
         question_services.add_question(self.author_id, question)
         question_services.create_new_question_skill_link(
-            question_id, skill_id)
+            question_dict['id'], self.change_cmd['skill_id'])
 
     def to_dict(self):
         """Returns a dict representation of a suggestion object.

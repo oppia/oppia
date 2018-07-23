@@ -318,7 +318,10 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
 
     AUTHOR_EMAIL = 'author@example.com'
     AUTHOR_EMAIL_2 = 'author2@example.com'
-    SKILL_ID = 'skill'
+
+    # Needs to be 12 characteds long.
+    SKILL_ID = 'skill1234567'
+
     SKILL_DESCRIPTION = 'skill to link question to'
     TOPIC_ID = 'topic'
 
@@ -376,8 +379,6 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
                     suggestion_models.SUGGESTION_TYPE_ADD_QUESTION)
                 )['suggestions'][0]
 
-            suggestion_id = suggestion_to_accept['suggestion_id']
-
             self.login(self.ADMIN_EMAIL)
             response = self.testapp.get(feconf.CREATOR_DASHBOARD_URL)
             csrf_token = self.get_csrf_token_from_response(response)
@@ -398,11 +399,11 @@ class QuestionSuggestionTests(test_utils.GenericTestBase):
             self.assertEqual(
                 suggestion_post_accept['status'],
                 suggestion_models.STATUS_ACCEPTED)
-            questions = (
+            questions, _ = (
                 question_services.get_question_summaries_linked_to_skills(
                     [self.SKILL_ID], ''))
             self.assertEqual(len(questions), 1)
             self.assertEqual(questions[0].creator_id, self.author_id)
             self.assertEqual(
-                questions[0].content,
+                questions[0].question_content,
                 self.question_dict['question_state_data']['content']['html'])

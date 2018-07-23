@@ -97,12 +97,9 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
     ACTION_TYPE_ACCEPT = 'accept'
     ACTION_TYPE_REJECT = 'reject'
 
-
-    # TODO (nithesh): Add permissions for users with enough scores to review
-    # Will be added as part of milestone 2 of the generalized review system
-    # project.
-    @acl_decorators.can_edit_topic
-    def put(self, topic_id, suggestion_id):
+    @acl_decorators.get_decorator_for_accepting_suggestion(
+        acl_decorators.can_edit_topic)
+    def put(self, target_id, suggestion_id):
         if not constants.USE_NEW_SUGGESTION_FRAMEWORK:
             raise self.PageNotFoundException
 
@@ -115,7 +112,7 @@ class SuggestionToTopicActionHandler(base.BaseHandler):
             raise self.InvalidInputException('This handler allows actions only'
                                              ' on suggestions to topics.')
 
-        if suggestion_id.split('.')[1] != topic_id:
+        if suggestion_id.split('.')[1] != target_id:
             raise self.InvalidInputException('The topic id provided does '
                                              'not match the topic id '
                                              'present as part of the '
@@ -158,6 +155,5 @@ class SuggestionListHandler(base.BaseHandler):
 
         suggestions = suggestion_services.query_suggestions(
             query_fields_and_values)
-
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)
