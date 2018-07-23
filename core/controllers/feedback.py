@@ -36,13 +36,13 @@ class ThreadListHandler(base.BaseHandler):
         self.values.update({
             'feedback_thread_dicts': (
                 [t.to_dict() for t in feedback_services.get_all_threads(
-                    'exploration', exploration_id, False)])
+                    feconf.ENTITY_TYPE_EXPLORATION, exploration_id, False)])
             })
         if constants.USE_NEW_SUGGESTION_FRAMEWORK:
             self.values.update({
                 'suggestion_thread_dicts': (
                     [t.to_dict() for t in feedback_services.get_all_threads(
-                        'exploration', exploration_id, True)])
+                        feconf.ENTITY_TYPE_EXPLORATION, exploration_id, True)])
             })
         self.render_json(self.values)
 
@@ -59,8 +59,8 @@ class ThreadListHandler(base.BaseHandler):
                 'Text for the first message in the thread must be specified.')
 
         feedback_services.create_thread(
-            'exploration', exploration_id, self.payload.get('state_name'),
-            self.user_id, subject, text)
+            feconf.ENTITY_TYPE_EXPLORATION, exploration_id,
+            self.payload.get('state_name'), self.user_id, subject, text)
         self.render_json(self.values)
 
 
@@ -219,13 +219,13 @@ class SuggestionListHandler(base.BaseHandler):
                 'Invalid value for has_suggestion.')
         if list_type == self._LIST_TYPE_OPEN:
             threads = feedback_services.get_open_threads(
-                'exploration', exploration_id, has_suggestion)
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, has_suggestion)
         elif list_type == self._LIST_TYPE_CLOSED:
             threads = feedback_services.get_closed_threads(
-                'exploration', exploration_id, has_suggestion)
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, has_suggestion)
         elif list_type == self._LIST_TYPE_ALL:
             threads = feedback_services.get_all_threads(
-                'exploration', exploration_id, has_suggestion)
+                feconf.ENTITY_TYPE_EXPLORATION, exploration_id, has_suggestion)
         else:
             raise self.InvalidInputException('Invalid list type.')
 

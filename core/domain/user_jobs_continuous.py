@@ -250,7 +250,7 @@ class RecentUpdatesMRJobManager(
 
         for exp_model in tracked_exp_models_for_feedback:
             threads = feedback_services.get_all_threads(
-                'exploration', exp_model.id, False)
+                feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS, exp_model.id, False)
             for thread in threads:
                 if thread.id not in feedback_thread_ids_list:
                     feedback_thread_ids_list.append(thread.id)

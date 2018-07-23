@@ -663,7 +663,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
         include_author = self.payload.get('include_author')
 
         feedback_services.create_thread(
-            'exploration',
+            feconf.ENTITY_TYPE_EXPLORATION,
             exploration_id,
             state_name,
             self.user_id if include_author else None,

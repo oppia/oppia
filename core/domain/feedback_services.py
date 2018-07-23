@@ -596,8 +596,6 @@ def get_thread_summaries(user_id, thread_ids):
     else:
         messages = feedback_models.FeedbackMessageModel.get_multi(
             last_two_messages_ids)
-    print feedback_thread_user_model_ids
-    print feedback_thread_user_models
     last_two_messages = [messages[i:i + 2] for i in range(0, len(messages), 2)]
 
     thread_summaries = []
@@ -668,16 +666,16 @@ def get_thread_summaries(user_id, thread_ids):
         }
 
         thread_summaries.append(thread_summary)
-    print thread_summaries
     return thread_summaries, number_of_unread_threads
 
 
-def get_most_recent_messages(exp_id):
-    """Fetch the most recently updated feedback threads for a given exploration,
+def get_most_recent_messages(entity_type, entity_id):
+    """Fetch the most recently updated feedback threads for a given entity,
     and then get the latest feedback message out of each thread.
 
     Args:
-        exp_id: str.
+        entity_type: str. The type of entity.
+        entity_id: str. The ID of the entity.
 
     Returns:
        A list of FeedbackMessage.
@@ -685,11 +683,11 @@ def get_most_recent_messages(exp_id):
     if not feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         thread_models = (
             feedback_models.FeedbackThreadModel.get_threads(
-                exp_id, limit=feconf.OPEN_FEEDBACK_COUNT_DASHBOARD))
+                entity_id, limit=feconf.OPEN_FEEDBACK_COUNT_DASHBOARD))
     else:
         thread_models = (
             feedback_models.GeneralFeedbackThreadModel.get_threads(
-                'exploration', exp_id,
+                entity_type, entity_id,
                 limit=feconf.OPEN_FEEDBACK_COUNT_DASHBOARD))
 
     message_models = []
@@ -1175,7 +1173,8 @@ def _add_message_to_email_buffer(
     else:
 
         feedback_message_reference = feedback_domain.FeedbackMessageReference(
-            'exploration', thread.exploration_id, thread_id, message_id)
+            feconf.ENTITY_TYPE_EXPLORATION, thread.exploration_id, thread_id,
+            message_id)
     batch_recipient_ids, other_recipient_ids = (
         _get_all_recipient_ids(exploration_id, thread_id, author_id))
 

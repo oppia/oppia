@@ -50,11 +50,11 @@ class IncomingReplyEmailTests(test_utils.GenericTestBase):
         with self.can_send_emails_ctx, self.can_send_feedback_email_ctx:
             # Create thread.
             feedback_services.create_thread(
-                'exploration', self.exploration.id, 'a_state_name',
-                self.user_id_a, 'a subject', 'some text')
+                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id,
+                'a_state_name', self.user_id_a, 'a subject', 'some text')
 
             threadlist = feedback_services.get_all_threads(
-                'exploration', self.exploration.id, False)
+                feconf.ENTITY_TYPE_EXPLORATION, self.exploration.id, False)
             thread_id = threadlist[0].id
 
             # Create another message.

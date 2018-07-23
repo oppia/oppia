@@ -589,7 +589,7 @@ class CreatorDashboardHandlerTest(test_utils.GenericTestBase):
 
         def mock_get_thread_analytics_multi(unused_exploration_ids):
             return [feedback_domain.FeedbackAnalytics(
-                'exploration', self.EXP_ID, 2, 3)]
+                feconf.ENTITY_TYPE_EXPLORATION, self.EXP_ID, 2, 3)]
 
         with self.swap(
             feedback_services, 'get_thread_analytics_multi',
