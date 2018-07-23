@@ -45,10 +45,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             $attrs.imageAndRegionsWithValue);
           $scope.highlightRegionsOnHover =
             ($attrs.highlightRegionsOnHoverWithValue === 'true');
-          console.log("attr  "+$attrs.imageAndRegionsWithValue);
-          console.log("imageRedions.imagePath.filename is  "+imageAndRegions.imagePath.filename);
           $scope.filepath = imageAndRegions.imagePath;
-          console.log(" filepath inside ImageClickInput is "+$scope.filepath);
           $scope.imageUrl = '';
           $scope.loadingIndicatorUrl = UrlInterpolationService
             .getStaticImageUrl(LOADING_INDICATOR_URL);
