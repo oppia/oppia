@@ -138,7 +138,10 @@ oppia.factory('DragAndDropSortInputValidationService', [
               if (inputs.x === inputs.y) {
                 warningsList.push({
                   type: WARNING_TYPES.ERROR,
-                  message: 'Please ensure both the elements are distinct.'
+                  message: (
+                    'Rule ' + (j + 1) + ' from answer group ' +
+                    (i + 1) + ' will never be matched because both the ' +
+                    'selected elements are not distinct.')
                 });
               }
             }

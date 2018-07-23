@@ -14,7 +14,7 @@
         <label class="container">
           <div class="col-sm-1">
             <input type="radio" ng-model="selectedItem" ng-click="selection(selectedItem)"
-                   checked="value" ng-value="choice.id" name="radio">
+                   ng-value="choice.id" name="{{name}}">
           </div>
           <div class="col-sm-10">
             <angular-html-bind html-data="choice.id" ></angular-html-bind>

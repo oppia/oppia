@@ -28,7 +28,8 @@ oppia.directive('dragAndDropHtmlStringEditor', [
         if (!$scope.value) {
           $scope.value = '';
         }
-
+        $scope.selectedItem = $scope.value;
+        $scope.name = math.random().toString(36).substring(7);
         $scope.initArgs = $scope.getInitArgs();
         $scope.choices = $scope.initArgs.choices;
         if ($scope.selectedItem === '' || !$scope.selectedItem) {

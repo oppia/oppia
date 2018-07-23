@@ -169,7 +169,8 @@ describe('DragAndDropSortInputValidationService', function() {
       currentState, customizationArgs, answerGroups, goodDefaultOutcome);
     expect(warnings).toEqual([{
       type: WARNING_TYPES.ERROR,
-      message: 'Please ensure both the elements are distinct.'
+      message: 'Rule 1 from answer group 1 will never be matched ' +
+          'because both the selected elements are not distinct.'
     }]);
   });
 });
