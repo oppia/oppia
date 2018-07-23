@@ -155,5 +155,6 @@ class SuggestionListHandler(base.BaseHandler):
 
         suggestions = suggestion_services.query_suggestions(
             query_fields_and_values)
+
         self.values.update({'suggestions': [s.to_dict() for s in suggestions]})
         self.render_json(self.values)

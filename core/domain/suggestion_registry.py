@@ -326,7 +326,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             self, suggestion_id, target_id, target_version_at_submission,
             status, author_id, final_reviewer_id,
             change_cmd, score_category, last_updated):
-        """Initializes an object of type SuggestionEditStateContent
+        """Initializes an object of type SuggestionAddQuestion
         corresponding to the SUGGESTION_TYPE_ADD_QUESTION choice.
         """
         self.suggestion_id = suggestion_id
