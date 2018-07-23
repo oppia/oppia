@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for collection models"""
+"""Tests for collection models."""
 from constants import constants
 from core.domain import collection_domain
 from core.domain import collection_services
@@ -26,7 +26,7 @@ from core.tests import test_utils
 
 
 class CollectionModelUnitTest(test_utils.GenericTestBase):
-    """Test the CollectionModel class"""
+    """Test the CollectionModel class."""
 
     def test_get_collection_count(self):
         collection = collection_domain.Collection.create_default_collection(
@@ -40,7 +40,7 @@ class CollectionModelUnitTest(test_utils.GenericTestBase):
 
 
 class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
-    """Test the CollectionCommitLogEntryModel class"""
+    """Test the CollectionCommitLogEntryModel class."""
 
     def test_get_all_non_private_commits(self):
         private_commit = collection_models.CollectionCommitLogEntryModel.create(
@@ -60,7 +60,7 @@ class CollectionCommitLogEntryModelUnitTest(test_utils.GenericTestBase):
 
 
 class CollectionSummaryModel(test_utils.GenericTestBase):
-    """Tests for the CollectionSummaryModel"""
+    """Tests for the CollectionSummaryModel."""
 
     def test_get_all_non_private(self):
         public_collection_summary_model = (
