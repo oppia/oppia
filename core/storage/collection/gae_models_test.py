@@ -204,5 +204,5 @@ class CollectionSummaryModel(test_utils.GenericTestBase):
         uneditable_collection_summary_model.put()
         commits = (
             collection_models.CollectionSummaryModel
-            .get_private_at_least_editable('a'))
+            .get_at_least_editable('a'))
         self.assertEqual(1, len(commits))
