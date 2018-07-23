@@ -13,6 +13,12 @@
       ],
     "angular/di-order": "error",
     "angular/di-unused": "error",
+    "angular/directive-restrict": [
+      "error",
+      {
+        "restrict": "E"
+      }
+    ],
     "angular/no-inline-template": [
       "error",
       {
@@ -73,7 +79,10 @@
           "parameters": 2
         },
         "MemberExpression": 1,
-        "SwitchCase": 1
+        "SwitchCase": 1,
+        "ignoredNodes": [
+          "ConditionalExpression"
+        ]
       }
     ],
     "key-spacing": "error",

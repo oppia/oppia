@@ -3,7 +3,8 @@
 </div>
 
 <div class="modal-body protractor-test-exploration-suggestion-modal">
-  <text-angular-rte ng-show="showEditor" html-content="suggestionHtml"></text-angular-rte>
+  <!-- ng-model needs to bind to a property of an object on the scope (the property cannot sit directly on the scope). -->
+  <ck-editor-rte ng-show="showEditor" ng-model="suggestionData.suggestionHtml"></ck-editor-rte>
   <br>
   Briefly describe your changes (required):
   <input type="text" ng-model="description" class="protractor-test-suggestion-description-input" style="width: 100%">
@@ -11,7 +12,7 @@
 
 <div class="modal-footer">
   <button class="btn btn-default" ng-click="cancelSuggestion()">Cancel</button>
-  <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(originalHtml == suggestionHtml) || !description">
+  <button class="btn btn-success protractor-test-suggestion-submit-btn" ng-click="submitSuggestion()" ng-disabled="(originalHtml == suggestionData.suggestionHtml) || !description">
     Submit Suggestion
   </button>
 </div>

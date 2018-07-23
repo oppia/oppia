@@ -1,0 +1,36 @@
+<style>
+  .col-sm-1 {
+    margin-right: 10px;
+  }
+
+  .col-sm-10 {
+    border: 1px solid #000000;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    margin-left: 10px;
+  }
+
+  p {
+    margin-bottom: 10px;
+  }
+</style>
+
+<div class="container-fluid">
+  <p>NOTE: Two or more items may occupy the same slot.</p>
+  <div ng-repeat="choice in choices track by $index">
+    <div class="row">
+      <div class="col-sm-1">
+        <select ng-model="selectedRank" ng-change="selectedItem($index, selectedRank)" aria-label="choice"
+                id="{{$index}}" ng-init="selectedRank = initValues[$index]" ng-options="index for index in allowedChoices()">
+        </select>
+      </div>
+      <div class="col-sm-10">
+        <angular-html-bind html-data="choice.id"></angular-html-bind>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="oppia-form-error">
+  <[getWarningText()]>
+</div>

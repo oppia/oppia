@@ -25,24 +25,23 @@ describe('Exploration rights service', function() {
 
     beforeEach(inject(function($injector) {
       ers = $injector.get('ExplorationRightsService');
-
-      GLOBALS.ACTIVITY_STATUS_PRIVATE = 'private';
-      GLOBALS.ACTIVITY_STATUS_PUBLIC = 'public';
     }));
 
     it('correctly initializes the service', function() {
       expect(ers.ownerNames).toBeUndefined();
       expect(ers.editorNames).toBeUndefined();
+      expect(ers.translatorNames).toBeUndefined();
       expect(ers.viewerNames).toBeUndefined();
       expect(ers._status).toBeUndefined();
       expect(ers._clonedFrom).toBeUndefined();
       expect(ers._isCommunityOwned).toBeUndefined();
       expect(ers._viewableIfPrivate).toBeUndefined();
 
-      ers.init(['abc'], [], [], 'private', 'e1234', true, true);
+      ers.init(['abc'], [], [], [], 'private', 'e1234', true, true);
 
       expect(ers.ownerNames).toEqual(['abc']);
       expect(ers.editorNames).toEqual([]);
+      expect(ers.translatorNames).toEqual([]);
       expect(ers.viewerNames).toEqual([]);
       expect(ers._status).toEqual('private');
       expect(ers._clonedFrom).toEqual('e1234');
@@ -51,29 +50,29 @@ describe('Exploration rights service', function() {
     });
 
     it('reports the correct cloning status', function() {
-      ers.init(['abc'], [], [], 'public', '1234', true);
+      ers.init(['abc'], [], [], [], 'public', '1234', true);
       expect(ers.isCloned()).toBe(true);
       expect(ers.clonedFrom()).toEqual('1234');
 
-      ers.init(['abc'], [], [], 'public', null, true);
+      ers.init(['abc'], [], [], [], 'public', null, true);
       expect(ers.isCloned()).toBe(false);
       expect(ers.clonedFrom()).toBeNull();
     });
 
     it('reports the correct community-owned status', function() {
-      ers.init(['abc'], [], [], 'public', '1234', false);
+      ers.init(['abc'], [], [], [], 'public', '1234', false);
       expect(ers.isCommunityOwned()).toBe(false);
 
-      ers.init(['abc'], [], [], 'public', '1234', true);
+      ers.init(['abc'], [], [], [], 'public', '1234', true);
       expect(ers.isCommunityOwned()).toBe(true);
     });
 
     it('reports the correct derived statuses', function() {
-      ers.init(['abc'], [], [], 'private', 'e1234', true);
+      ers.init(['abc'], [], [], [], 'private', 'e1234', true);
       expect(ers.isPrivate()).toBe(true);
       expect(ers.isPublic()).toBe(false);
 
-      ers.init(['abc'], [], [], 'public', 'e1234', true);
+      ers.init(['abc'], [], [], [], 'public', 'e1234', true);
       expect(ers.isPrivate()).toBe(false);
       expect(ers.isPublic()).toBe(true);
     });

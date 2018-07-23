@@ -16,20 +16,25 @@
  * @fileoverview End-to-end tests for rich-text components and interactions.
  */
 
-var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var interactions = require('../../../extensions/interactions/protractor.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
+var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('rich-text components', function() {
+  var explorationEditorPage = null;
   var explorationPlayerPage = null;
 
   beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -39,13 +44,13 @@ describe('rich-text components', function() {
 
     workflow.createExploration();
 
-    editor.setContent(function(richTextEditor) {
+    explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold');
       richTextEditor.appendPlainText(' ');
       // TODO (Jacob) add test for image RTE component
       richTextEditor.addRteComponent('Link', 'http://google.com/', true);
       richTextEditor.addRteComponent('Math', 'abc');
-      richTextEditor.addRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextEditor.addRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
       // We put these last as otherwise Protractor sometimes fails to scroll to
       // and click on them.
       richTextEditor.addRteComponent(
@@ -59,14 +64,14 @@ describe('rich-text components', function() {
       }]);
     });
 
-    editor.navigateToPreviewTab();
+    explorationEditorPage.navigateToPreviewTab();
 
     explorationPlayerPage.expectContentToMatch(function(richTextChecker) {
       richTextChecker.readBoldText('bold');
       richTextChecker.readPlainText(' ');
       richTextChecker.readRteComponent('Link', 'http://google.com/', true);
       richTextChecker.readRteComponent('Math', 'abc');
-      richTextChecker.readRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextChecker.readRteComponent('Video', 'M7lc1UVf-VE', 10, 100, false);
       richTextChecker.readRteComponent(
         'Collapsible', 'title', forms.toRichText('inner'));
       richTextChecker.readRteComponent('Tabs', [{
@@ -75,11 +80,10 @@ describe('rich-text components', function() {
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
-      }]
-      );
+      }]);
     });
 
-    editor.discardChanges();
+    explorationEditorPage.discardChanges();
     users.logout();
   });
 
@@ -89,35 +93,35 @@ describe('rich-text components', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([
-      // TODO (Jacob) Remove when
-      // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
-      'cast_sender.js - Failed to load resource: net::ERR_FAILED',
-      'Uncaught ReferenceError: ytcfg is not defined',
       // TODO (@pranavsid98) This error is caused by the upgrade from Chrome 60
       // to Chrome 61. Chrome version at time of recording this is 61.0.3163.
       'chrome-extension://invalid/ - Failed to load resource: net::ERR_FAILED',
-      'Error parsing header X-XSS-Protection: 1; mode=block; ' +
-      'report=https:\/\/www.google.com\/appserve\/security-bugs\/log\/youtube:',
-      'https://www.youtube.com/youtubei/v1/log_interaction?.* Failed to load ' +
-      'resource: the server responded with a status of 401 ()',
     ]);
   });
 });
 
 
 describe('Interactions', function() {
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
+  var explorationEditorSettingsTab = null;
   var explorationPlayerPage = null;
+  var libraryPage = null;
 
   beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+    libraryPage = new LibraryPage.LibraryPage();
   });
 
   it('should pass their own test suites', function() {
     users.createUser('user@interactions.com', 'userInteractions');
     users.login('user@interactions.com');
     workflow.createExploration();
-    editor.setStateName('first');
-    editor.setContent(forms.toRichText('some content'));
+    explorationEditorMainTab.setStateName('first');
+    explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     var defaultOutcomeSet = false;
 
@@ -126,20 +130,23 @@ describe('Interactions', function() {
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
 
-        editor.setInteraction.apply(
+        explorationEditorMainTab.setInteraction.apply(
           null, [interactionId].concat(test.interactionArguments));
 
-        editor.addResponse.apply(null, [
+        explorationEditorMainTab.addResponse.apply(null, [
           interactionId, forms.toRichText('yes'), null, false
         ].concat(test.ruleArguments));
 
         if (!defaultOutcomeSet) {
           // The default outcome will be preserved for subsequent tests.
-          editor.setDefaultOutcome(forms.toRichText('no'), null, false);
+          explorationEditorMainTab.getResponseEditor('default')
+            .setFeedback(forms.toRichText('no'));
+          explorationEditorMainTab.getResponseEditor('default')
+            .setDestination('(try again)', false, null);
           defaultOutcomeSet = true;
         }
 
-        editor.navigateToPreviewTab();
+        explorationEditorPage.navigateToPreviewTab();
         explorationPlayerPage.expectInteractionToMatch.apply(
           null, [interactionId].concat(test.expectedInteractionDetails));
         for (var j = 0; j < test.wrongAnswers.length; j++) {
@@ -148,17 +155,110 @@ describe('Interactions', function() {
           explorationPlayerPage.expectLatestFeedbackToMatch(
             forms.toRichText('no'));
         }
+        // Dismiss conversation help card.
+        var clearHelpcardButton = element(by.css(
+          '.protractor-test-close-help-card-button'));
+        clearHelpcardButton.isPresent().then(function(isPresent) {
+          if (isPresent) {
+            clearHelpcardButton.click();
+          }
+        });
         for (var j = 0; j < test.correctAnswers.length; j++) {
           explorationPlayerPage.submitAnswer(
             interactionId, test.correctAnswers[j]);
           explorationPlayerPage.expectLatestFeedbackToMatch(
             forms.toRichText('yes'));
         }
-        editor.navigateToMainTab();
+        explorationEditorPage.navigateToMainTab();
+        explorationEditorMainTab.deleteInteraction();
       }
     }
+    explorationEditorPage.discardChanges();
+    users.logout();
+  });
 
-    editor.discardChanges();
+  it('publish and play exploration successfully', function() {
+    /*
+     * This suite should be expanded as new interaction's e2e utility is added.
+     */
+    users.createAndLoginUser(
+      'explorationEditor@interactions.com', 'explorationEditor');
+    workflow.createExploration();
+
+    explorationEditorMainTab.setStateName('Graph');
+    explorationEditorMainTab.setContent(forms.toRichText(
+      'Draw a complete graph with the given vertices.'));
+    var graphDict = {
+      vertices: [[277, 77], [248, 179], [405, 144]]
+    };
+    explorationEditorMainTab.setInteraction('GraphInput', graphDict);
+    graphDict = {
+      edges: [[0, 1], [1, 2], [0, 2]],
+      vertices: [[277, 77], [248, 179], [405, 144]]
+    };
+    explorationEditorMainTab.addResponse(
+      'GraphInput', forms.toRichText('Good job!'), 'MathExp',
+      true, 'IsIsomorphicTo', graphDict);
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText(
+      'A complete graph is a graph in which each pair of graph vertices is ' +
+      'connected by an edge.'));
+
+    explorationEditorMainTab.moveToState('MathExp');
+    explorationEditorMainTab.setContent(function(richTextEditor) {
+      richTextEditor.appendPlainText(
+        'Please simplify the following expression: ');
+      // Some Latex styling is expected here.
+      richTextEditor.addRteComponent(
+        'Math', '16x^{12}/4x^2');
+    });
+
+    explorationEditorMainTab.setInteraction('MathExpressionInput');
+    // Proper Latex styling for rule spec is required.
+    explorationEditorMainTab.addResponse(
+      'MathExpressionInput', forms.toRichText('Good job!'), 'End', true,
+      'IsMathematicallyEquivalentTo', '\\frac{16x^{12}}{4x^{2}}');
+    // Expecting answer to be 4x^10
+    var responseEditor = explorationEditorMainTab.getResponseEditor('default');
+    responseEditor.setFeedback(forms.toRichText(
+      'A simplified expression should be smaller than the original.'));
+
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle('Regression Test Exploration');
+    explorationEditorSettingsTab.setObjective(
+      'To publish and play this exploration');
+    explorationEditorSettingsTab.setCategory('Logic');
+    explorationEditorPage.saveChanges();
+    workflow.publishExploration();
+    users.logout();
+
+    users.createAndLoginUser('graphLearner@interactions.com', 'graphLearner');
+    libraryPage.get();
+    libraryPage.findExploration('Regression Test Exploration');
+    libraryPage.playExploration('Regression Test Exploration');
+    explorationPlayerPage.expectExplorationNameToBe(
+      'Regression Test Exploration');
+
+    // Play Graph Input interaction.
+    explorationPlayerPage.expectContentToMatch(forms.toRichText(
+      'Draw a complete graph with the given vertices.'));
+    graphDict = {
+      edges: [[1, 2], [1, 0], [0, 2]]
+    };
+    explorationPlayerPage.submitAnswer('GraphInput', graphDict);
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('Good job!'));
+    explorationPlayerPage.clickThroughToNextCard();
+
+    // Play Math Expression Input interaction.
+    explorationPlayerPage.submitAnswer('MathExpressionInput', '4 * x^(10)');
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('Good job!'));
+    explorationPlayerPage.clickThroughToNextCard();
+
+    explorationPlayerPage.expectExplorationToBeOver();
     users.logout();
   });
 

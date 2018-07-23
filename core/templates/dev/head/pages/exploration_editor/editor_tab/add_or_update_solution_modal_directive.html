@@ -1,4 +1,4 @@
-<div class="modal-header">
+<div class="modal-header protractor-test-add-or-update-solution-modal">
   <h3><[stateSolutionService.savedMemento !== null ? 'Update Solution' : 'Add Solution']></h3>
 </div>
 
@@ -12,8 +12,10 @@
       </select> <strong>solution is...</strong>
       <br>
       <br>
-      <div class="protractor-test-interaction-html"
-           angular-html-bind="correctAnswerEditorHtml">
+      <div>
+        <angular-html-bind class="protractor-test-interaction-html"
+                           html-data="correctAnswerEditorHtml">
+        </angular-html-bind>
       </div>
       <br>
       <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"

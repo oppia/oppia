@@ -266,3 +266,12 @@ class LearnerPlaylist(object):
         collection_id: str. The id of the collection to be removed.
         """
         self.collection_ids.remove(collection_id)
+
+
+class UserContributionScoring(object):
+    """Domain object for UserContributionScoringModel."""
+
+    def __init__(self, user_id, score_category, score):
+        self.user_id = user_id
+        self.score_category = score_category
+        self.score = score

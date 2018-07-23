@@ -10,7 +10,6 @@
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         USERNAME: JSON.parse('{{username|js_string}}'),
         USER_EMAIL: JSON.parse('{{user_email|js_string}}'),
-        PROFILE_PICTURE_DATA_URL: JSON.parse('{{profile_picture_data_url|js_string}}'),
         IS_MODERATOR: JSON.parse('{{is_moderator|js_string}}'),
         IS_SUPER_ADMIN: JSON.parse('{{is_super_admin|js_string}}'),
         LOGOUT_URL: JSON.parse('{{logout_url|js_string}}'),
@@ -29,7 +28,8 @@
         UPDATABLE_ROLES: JSON.parse('{{updatable_roles|js_string}}'),
         VIEWABLE_ROLES: JSON.parse('{{viewable_roles|js_string}}'),
         ROLE_GRAPH_DATA: JSON.parse('{{role_graph_data|js_string}}'),
-        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}')
+        DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
+        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
       }
     </script>
 
@@ -38,7 +38,6 @@
 
   <body>
     <admin-navbar username="username" user-email="userEmail"
-                  profile-picture-data-url="profilePictureDataUrl"
                   is-moderator="isModerator" is-super-admin="isSuperAdmin"
                   logout-url="logoutUrl">
     </admin-navbar>
@@ -99,7 +98,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/admin/misc_tab/AdminMiscTabDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/directives.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/AlertsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ExplorationContextService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ContextService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/UtilsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/IdGenerationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
@@ -108,6 +107,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaDefaultValueService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/SchemaUndefinedLastElementService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/NestedDirectivesRecursionTimeoutPreventionService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/UserService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/stateful/FocusManagerService.js"></script>

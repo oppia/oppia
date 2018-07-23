@@ -314,8 +314,10 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # the default mute values.
         user_services.set_email_preferences_for_exploration(
             user_id, exploration_id,
-            feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE,
-            feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE)
+            mute_feedback_notifications=(
+                feconf.DEFAULT_FEEDBACK_NOTIFICATIONS_MUTED_PREFERENCE),
+            mute_suggestion_notifications=(
+                feconf.DEFAULT_SUGGESTION_NOTIFICATIONS_MUTED_PREFERENCE))
 
         email_preferences = user_services.get_email_preferences_for_exploration(
             user_id, exploration_id)

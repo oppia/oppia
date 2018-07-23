@@ -26,11 +26,12 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
         '/interactions/NumberWithUnits/directives/' +
         'number_with_units_interaction_directive.html'),
       controller: [
-        '$scope', '$attrs', 'NumberWithUnitsObjectFactory',
-        'NUMBER_WITH_UNITS_PARSING_ERRORS', 'EVENT_PROGRESS_NAV_SUBMITTED',
-        function(
-            $scope, $attrs, NumberWithUnitsObjectFactory,
-            NUMBER_WITH_UNITS_PARSING_ERRORS, EVENT_PROGRESS_NAV_SUBMITTED) {
+        '$scope', '$attrs', '$uibModal', 'NumberWithUnitsObjectFactory',
+        'numberWithUnitsRulesService', 'NUMBER_WITH_UNITS_PARSING_ERRORS',
+        'EVENT_PROGRESS_NAV_SUBMITTED', function(
+            $scope, $attrs, $uibModal, NumberWithUnitsObjectFactory,
+            numberWithUnitsRulesService, NUMBER_WITH_UNITS_PARSING_ERRORS,
+            EVENT_PROGRESS_NAV_SUBMITTED) {
           $scope.answer = '';
           $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
@@ -45,6 +46,10 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
           $scope.getWarningText = function() {
             return errorMessage;
           };
+
+          try {
+            NumberWithUnitsObjectFactory.createCurrencyUnits();
+          } catch (parsingError) {}
 
           $scope.$watch('answer', function(newValue) {
             try {
@@ -91,8 +96,24 @@ oppia.directive('oppiaInteractiveNumberWithUnits', [
               answerValidity: $scope.isAnswerValid()
             });
           });
-        }
-      ]
+
+          $scope.showHelp = function() {
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/interactions/NumberWithUnits/directives/' +
+                'number_with_units_help_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$uibModalInstance',
+                function($scope, $uibModalInstance) {
+                  $scope.close = function() {
+                    $uibModalInstance.close();
+                  };
+                }
+              ]
+            }).result.then(function() {});
+          };
+        }]
     };
   }
 ]);
@@ -106,7 +127,7 @@ oppia.directive('oppiaResponseNumberWithUnits', [
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
-        'number_with_units_directive.html'),
+        'number_with_units_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.answer = NumberWithUnitsObjectFactory.fromDict(
@@ -125,7 +146,7 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
       scope: {},
       templateUrl: UrlInterpolationService.getExtensionResourceUrl(
         '/interactions/NumberWithUnits/directives/' +
-        'number_with_units_directive.html'),
+        'number_with_units_short_response_directive.html'),
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var answer = HtmlEscaperService.escapedJsonToObj($attrs.answer);
         $scope.answer = NumberWithUnitsObjectFactory.fromDict(
@@ -135,9 +156,44 @@ oppia.directive('oppiaShortResponseNumberWithUnits', [
   }
 ]);
 
-// Rule evaluation for number with units (will be implemented in M1.3).
+// Rules service for number with units interaction.
 oppia.factory('numberWithUnitsRulesService', [
   'NumberWithUnitsObjectFactory', 'FractionObjectFactory',
   function(NumberWithUnitsObjectFactory, FractionObjectFactory) {
+    try {
+      NumberWithUnitsObjectFactory.createCurrencyUnits();
+    } catch (parsingError) {}
+
+    return {
+      IsEqualTo: function(answer, inputs) {
+        // Returns true only if input is exactly equal to answer.
+        answer = NumberWithUnitsObjectFactory.fromDict(answer);
+        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
+
+        answerString = answer.toMathjsCompatibleString();
+        inputsString = inputs.toMathjsCompatibleString();
+
+        answerList = NumberWithUnitsObjectFactory.fromRawInputString(
+          answerString).toDict();
+        inputsList = NumberWithUnitsObjectFactory.fromRawInputString(
+          inputsString).toDict();
+        return angular.equals(answerList, inputsList);
+      },
+      IsEquivalentTo: function(answer, inputs) {
+        answer = NumberWithUnitsObjectFactory.fromDict(answer);
+        inputs = NumberWithUnitsObjectFactory.fromDict(inputs.f);
+        if (answer.type === 'fraction') {
+          answer.type = 'real';
+          answer.real = answer.fraction.toFloat();
+        }
+        if (inputs.type === 'fraction') {
+          inputs.type = 'real';
+          inputs.real = inputs.fraction.toFloat();
+        }
+        answerString = answer.toMathjsCompatibleString();
+        inputsString = inputs.toMathjsCompatibleString();
+        return math.unit(answerString).equals(math.unit(inputsString));
+      }
+    };
   }
 ]);

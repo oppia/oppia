@@ -16,12 +16,13 @@
  * @fileoverview End-to-end tests of the state editor.
  */
 
-var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
@@ -30,25 +31,26 @@ var CreatorDashboardPage =
 
 describe('State editor', function() {
   var explorationPlayerPage = null;
+  var explorationEditorPage = null;
+  var explorationEditorMainTab = null;
 
   beforeEach(function() {
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
   it('should walk through the tutorial when user repeatedly clicks Next',
     function() {
-      var NUM_TUTORIAL_STAGES = 7;
       users.createUser(
         'userTutorial@stateEditor.com', 'userTutorialStateEditor');
       users.login('userTutorial@stateEditor.com');
 
       workflow.createExplorationAndStartTutorial();
-      editor.startTutorial();
-      for (var i = 0; i < NUM_TUTORIAL_STAGES - 1; i++) {
-        editor.progressInTutorial();
-        general.waitForSystem();
-      }
-      editor.finishTutorial();
+      explorationEditorMainTab.startTutorial();
+      explorationEditorMainTab.playTutorial();
+      explorationEditorMainTab.finishTutorial();
       users.logout();
     }
   );
@@ -58,14 +60,15 @@ describe('State editor', function() {
     users.login('user1@stateEditor.com');
 
     workflow.createExploration();
-    editor.setContent(forms.toRichText('plain text'));
-    editor.setInteraction('Continue', 'click here');
-    editor.setDefaultOutcome(null, 'final card', true);
+    explorationEditorMainTab.setContent(forms.toRichText('plain text'));
+    explorationEditorMainTab.setInteraction('Continue', 'click here');
+    explorationEditorMainTab.getResponseEditor('default')
+      .setDestination('final card', true, null);
 
-    // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    // Setup a terminating state.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
 
     general.moveToPlayer();
     explorationPlayerPage.expectContentToMatch(forms.toRichText('plain text'));
@@ -81,7 +84,7 @@ describe('State editor', function() {
     users.createUser('user2@stateEditor.com', 'user2StateEditor');
     users.login('user2@stateEditor.com');
     workflow.createExploration();
-    editor.setContent(function(richTextEditor) {
+    explorationEditorMainTab.setContent(function(richTextEditor) {
       richTextEditor.appendBoldText('bold text');
       richTextEditor.appendPlainText(' ');
       richTextEditor.appendItalicText('italic text');
@@ -90,15 +93,16 @@ describe('State editor', function() {
       richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
       richTextEditor.appendUnorderedList(['an entry', 'another entry']);
     });
-    editor.setInteraction(
+    explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
-    editor.setDefaultOutcome(null, 'final card', true);
+    explorationEditorMainTab.getResponseEditor('default').setDestination(
+      'final card', true, null);
 
-    // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    // Setup a terminating state.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
 
     general.moveToPlayer();
     explorationPlayerPage.expectExplorationToNotBeOver();
@@ -115,17 +119,28 @@ describe('State editor', function() {
     users.login('user3@stateEditor.com');
 
     workflow.createExploration();
-    editor.setContent(forms.toRichText('some content'));
-    editor.setInteraction('NumericInput');
-    editor.addResponse('NumericInput', function(richTextEditor) {
-      richTextEditor.appendBoldText('correct');
-    }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
-    editor.setDefaultOutcome(forms.toRichText('out of bounds'), null, false);
+    explorationEditorMainTab.setContent(forms.toRichText('some content'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse('NumericInput',
+      function(richTextEditor) {
+        richTextEditor.appendBoldText('correct');
+      }, 'final card', true, 'IsInclusivelyBetween', -1, 3);
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'NumericInput', 'IsInclusivelyBetween', [-1, 3]);
+    explorationEditorMainTab.getResponseEditor(0)
+      .expectFeedbackInstructionToBe('correct');
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('out of bounds'));
+    explorationEditorMainTab.getResponseEditor('default')
+      .expectFeedbackInstructionToBe('out of bounds');
+    explorationEditorMainTab.getResponseEditor('default').setDestination(
+      null, false, null);
 
-    // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    // Setup a terminating state.
+
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
 
     general.moveToPlayer();
     explorationPlayerPage.submitAnswer('NumericInput', 5);
@@ -152,21 +167,16 @@ describe('State editor', function() {
     users.login('user4@stateEditor.com');
 
     workflow.createExploration();
-    editor.setContent(forms.toRichText('some content'));
+    explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore the
     // customization modal and the save interaction button does not appear.
-    editor.openInteraction('NumericInput');
-    var saveInteractionBtn = element(
-      by.css('.protractor-test-save-interaction'));
-    expect(saveInteractionBtn.isPresent()).toBe(false);
-
-    editor.closeAddResponseModal();
-
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.deleteInteraction();
     // The Continue input has customization options. Therefore the
     // customization modal does appear and so does the save interaction button.
-    editor.openInteraction('Continue');
-    expect(saveInteractionBtn.isPresent()).toBe(true);
+    explorationEditorMainTab.setInteraction('Continue');
+
     users.logout();
   });
 
@@ -176,13 +186,13 @@ describe('State editor', function() {
     users.login('user5@stateEditor.com');
 
     workflow.createExploration();
-    editor.setContent(forms.toRichText('some content'));
+    explorationEditorMainTab.setContent(forms.toRichText('some content'));
 
     // Numeric input does not have any customization arguments. Therefore, on
     // re-clicking, a modal opens up informing the user that this interaction
     // does not have any customization options. To dismiss this modal, user
     // clicks 'Okay' implying that he/she has got the message.
-    editor.setInteraction('NumericInput');
+    explorationEditorMainTab.setInteraction('NumericInput');
     element(by.css('.protractor-test-interaction')).click();
     var okayBtn = element(
       by.css('.protractor-test-close-no-customization-modal'));
@@ -193,7 +203,8 @@ describe('State editor', function() {
     // modal opens up containing the customization arguments for this input.
     // The user can dismiss this modal by clicking the 'Save Interaction'
     // button.
-    editor.setInteraction('Continue');
+    explorationEditorMainTab.deleteInteraction();
+    explorationEditorMainTab.setInteraction('Continue');
     element(by.css('.protractor-test-interaction')).click();
     var saveInteractionBtn = element(
       by.css('.protractor-test-save-interaction'));
@@ -203,24 +214,39 @@ describe('State editor', function() {
     users.logout();
   });
 
-  it('should preserve input value when rule type changes in' +
-      ' add response modal', function() {
+  it('should correctly display contents, rule parameters, feedback' +
+  ' instructions and newly created state', function() {
     users.createUser('stateEditorUser1@example.com', 'stateEditorUser1');
     users.login('stateEditorUser1@example.com');
     workflow.createExploration();
-    editor.setContent(forms.toRichText('some content'));
-
-    editor.openInteraction('TextInput');
-    editor.customizeInteraction('TextInput', 'My PlaceHolder', 2);
-    editor.selectRuleInAddResponseModal('TextInput', 'Equals');
-    editor.setRuleParametersInAddResponseModal('TextInput',
-      'Equals', 'Some Text');
-    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
-    editor.selectRuleInAddResponseModal('TextInput', 'Contains');
-    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
-    editor.closeAddResponseModal();
-
-    editor.saveChanges();
+    // Verify exploration's text content.
+    explorationEditorMainTab.setContent(forms.toRichText('Happiness Checker'));
+    explorationEditorMainTab.expectContentToMatch(
+      forms.toRichText('Happiness Checker'));
+    // Verify interaction's details.
+    explorationEditorMainTab.setInteraction('TextInput', 'How are you?', 5);
+    explorationEditorMainTab.expectInteractionToMatch(
+      'TextInput', 'How are you?', 5);
+    // Verify rule parameter input by checking editor's response tab.
+    // Create new state 'I am happy' for 'happy' rule.
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('You must be happy!'),
+      'I am happy', true, 'FuzzyEquals', 'happy');
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'TextInput', 'FuzzyEquals', ['"happy"']);
+    explorationEditorMainTab.getResponseEditor(0)
+      .expectFeedbackInstructionToBe('You must be happy!');
+    // Verify newly created state.
+    explorationEditorMainTab.moveToState('I am happy');
+    explorationEditorMainTab.expectCurrentStateToBe('I am happy');
+    // Go back, create default response (try again) and verify response.
+    explorationEditorMainTab.moveToState('Introduction');
+    explorationEditorMainTab.addResponse(
+      'TextInput', forms.toRichText('You cannot be sad!'),
+      '(try again)', false, 'FuzzyEquals', 'sad');
+    explorationEditorMainTab.getResponseEditor(1).expectRuleToBe(
+      'TextInput', 'FuzzyEquals', ['"sad"']);
+    explorationEditorPage.saveChanges();
     users.logout();
   });
 
@@ -231,42 +257,44 @@ describe('State editor', function() {
     users.login('user4@parameters.com');
 
     workflow.createExploration();
-    editor.enableParameters();
-    editor.addExplorationLevelParameterChange('z', 2);
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.enableParameters();
+    explorationEditorSettingsTab.addExplorationLevelParameterChange('z', 2);
 
-    editor.setStateName('card 1');
-    editor.addParameterChange('a', 2);
-    editor.setContent(forms.toRichText(
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.setStateName('card 1');
+    explorationEditorMainTab.addParameterChange('a', 2);
+    explorationEditorMainTab.setContent(forms.toRichText(
       'Change value of a from {{a}} to'));
-    editor.setInteraction('NumericInput');
-    editor.addResponse(
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
       'NumericInput', null, 'card 2', true, 'IsGreaterThan', 0);
 
-    editor.moveToState('card 2');
-    editor.addParameterChange('a', '{{answer}}');
-    editor.addMultipleChoiceParameterChange('b', [3]);
-    editor.setContent(forms.toRichText(
+    explorationEditorMainTab.moveToState('card 2');
+    explorationEditorMainTab.addParameterChange('a', '{{answer}}');
+    explorationEditorMainTab.addMultipleChoiceParameterChange('b', [3]);
+    explorationEditorMainTab.setContent(forms.toRichText(
       'Change value of b from {{b}} to'));
-    editor.setInteraction('NumericInput');
-    editor.addResponse(
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.addResponse(
       'NumericInput', null, 'card 3', true, 'IsGreaterThan', 0);
 
-    editor.moveToState('card 3');
-    editor.addParameterChange('b', '{{answer}}');
-    editor.setContent(forms.toRichText(
+    explorationEditorMainTab.moveToState('card 3');
+    explorationEditorMainTab.addParameterChange('b', '{{answer}}');
+    explorationEditorMainTab.setContent(forms.toRichText(
       'sum of {{z}} and {{b}} is {{z + b}},' +
       ' sum of {{a}} and {{b}} is {{a + b}}'));
-    editor.setInteraction(
+    explorationEditorMainTab.setInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('return'), forms.toRichText('complete')]);
-    editor.addResponse('MultipleChoiceInput', null, 'card 2', false,
-      'Equals', 'return');
-    editor.setDefaultOutcome(null, 'final card', true);
-
-    // Setup a terminating state
-    editor.moveToState('final card');
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    explorationEditorMainTab.addResponse(
+      'MultipleChoiceInput', null, 'card 2', false, 'Equals', 'return');
+    explorationEditorMainTab.getResponseEditor('default').setDestination(
+      'final card', true, null);
+    // Setup a terminating state.
+    explorationEditorMainTab.moveToState('final card');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
 
     general.moveToPlayer();
     explorationPlayerPage.expectContentToMatch(forms.toRichText(
@@ -298,22 +326,24 @@ describe('State editor', function() {
     users.createUser('stateEditorUser2@example.com', 'stateEditorUser2');
     users.login('stateEditorUser2@example.com');
     workflow.createExploration();
-    editor.setContent(forms.toRichText('some content'));
-
-    editor.openInteraction('TextInput');
-    editor.customizeInteraction('TextInput', 'My PlaceHolder', 2);
-    editor.selectRuleInAddResponseModal('TextInput', 'Equals');
-    editor.setRuleParametersInAddResponseModal('TextInput',
-      'Equals', 'Some Text');
-    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
-    editor.selectRuleInAddResponseModal('TextInput', 'Contains');
-    editor.expectRuleParametersToBe('TextInput', 'Equals', 'Some Text');
-    editor.closeAddResponseModal();
-    editor.addHint('hint one');
-    editor.HintEditor(0).setHint('modified hint one');
-    editor.HintEditor(0).deleteHint();
-    general.waitForSystem();
-    editor.saveChanges();
+    // Verify interaction and response is created correctly.
+    explorationEditorMainTab.setStateName('1st Question');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Exploration w/ Hint'));
+    explorationEditorMainTab.expectContentToMatch(
+      forms.toRichText('Exploration w/ Hint'));
+    explorationEditorMainTab.setInteraction('NumericInput');
+    explorationEditorMainTab.expectInteractionToMatch('NumericInput');
+    explorationEditorMainTab.addResponse(
+      'NumericInput', forms.toRichText('What is the product of 8 and 8?'),
+      '2nd Question', true, 'Equals', 64);
+    // Verify rule parameter input by checking editor's response tab.
+    explorationEditorMainTab.getResponseEditor(0).expectRuleToBe(
+      'NumericInput', 'Equals', ['64']);
+    explorationEditorMainTab.addHint('hint one');
+    explorationEditorMainTab.getHintEditor(0).setHint('modified hint one');
+    explorationEditorMainTab.getHintEditor(0).deleteHint();
+    explorationEditorPage.saveChanges();
     users.logout();
   });
 
@@ -321,22 +351,20 @@ describe('State editor', function() {
     users.createUser('stateEditorUser3@example.com', 'stateEditorUser3');
     users.login('stateEditorUser3@example.com');
     workflow.createExploration();
-    editor.setContent(forms.toRichText('some content'));
-
-    editor.openInteraction('TextInput');
-    editor.customizeInteraction('TextInput', 'My PlaceHolder', 2);
-    editor.addResponse('TextInput', function(richTextEditor) {
+    explorationEditorMainTab.setContent(forms.toRichText('some content'));
+    explorationEditorMainTab.setInteraction('TextInput', 'My PlaceHolder', 2);
+    explorationEditorMainTab.addResponse('TextInput', function(richTextEditor) {
       richTextEditor.appendBoldText('correct');
     }, 'final card', true, 'Equals', 'Some Text');
 
-    editor.addHint('hint one');
-    editor.addSolution('TextInput', {
+    explorationEditorMainTab.addHint('hint one');
+    explorationEditorMainTab.addSolution('TextInput', {
       answerIsExclusive: true,
       correctAnswer: 'Some Text',
       explanation: 'sample explanation'
     });
 
-    editor.saveChanges();
+    explorationEditorPage.saveChanges();
     users.logout();
   });
 
@@ -345,46 +373,35 @@ describe('State editor', function() {
       new ExplorationPlayerPage.ExplorationPlayerPage());
     users.createUser('user1@hintsAndSolutions.com', 'hintsAndSolutions');
 
-    // Creator creates and publishes an exploration
+    // Creator creates and publishes an exploration.
     users.login('user1@hintsAndSolutions.com');
     workflow.createExploration();
 
-    editor.setStateName('Introduction');
-    editor.setContent(forms.toRichText('What language is Oppia?'));
-    editor.setInteraction('TextInput');
-    editor.addResponse(
+    explorationEditorMainTab.setStateName('Introduction');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('What language is Oppia?'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
       'Finnish');
-    editor.setDefaultOutcome(forms.toRichText('Try again'));
-    editor.addHint('Try language of Finland');
-    editor.addSolution('TextInput', {
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+    explorationEditorMainTab.addHint('Try language of Finland');
+    explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'Finnish',
       explanation: 'Finland language'
     });
-    editor.moveToState('End');
-
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
-
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
     general.moveToPlayer();
     explorationPlayerPage.expectContentToMatch(
       forms.toRichText('What language is Oppia?'));
     explorationPlayerPage.submitAnswer('TextInput', 'Roman');
-    // We need to wait some time for the hint to activate.
-    general.waitForSystem();
-    general.waitForSystem();
-    general.waitForSystem();
-
     explorationPlayerPage.viewHint();
-    explorationPlayerPage.clickGotItButton();
     explorationPlayerPage.submitAnswer('TextInput', 'Greek');
-    // We need to wait some time for the solution to activate.
-    general.waitForSystem();
-    general.waitForSystem();
-    general.waitForSystem();
 
     explorationPlayerPage.viewSolution();
-    explorationPlayerPage.clickGotItButton();
     explorationPlayerPage.expectExplorationToNotBeOver();
     explorationPlayerPage.submitAnswer('TextInput', 'Finnish');
     explorationPlayerPage.clickThroughToNextCard();
@@ -407,49 +424,56 @@ describe('State editor', function() {
     var creatorDashboardPage = new CreatorDashboardPage.CreatorDashboardPage();
     var explorationPlayerPage =
       new ExplorationPlayerPage.ExplorationPlayerPage();
+    var explorationStatsTab = explorationEditorPage.getStatsTab();
 
-    // Creator creates and publishes an exploration
+    // Creator creates and publishes an exploration.
     users.login('user1@statisticsTab.com');
     workflow.createExploration();
 
-    editor.setTitle(EXPLORATION_TITLE);
-    editor.setCategory(EXPLORATION_CATEGORY);
-    editor.setObjective(EXPLORATION_OBJECTIVE);
-    if (EXPLORATION_LANGUAGE) {
-      editor.setLanguage(EXPLORATION_LANGUAGE);
-    }
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setTitle(EXPLORATION_TITLE);
+    explorationEditorSettingsTab.setCategory(EXPLORATION_CATEGORY);
+    explorationEditorSettingsTab.setObjective(EXPLORATION_OBJECTIVE);
+    explorationEditorSettingsTab.setLanguage(EXPLORATION_LANGUAGE);
 
-    editor.setStateName('One');
-    editor.setContent(forms.toRichText('Please write 1 in words.'));
-    editor.setInteraction('TextInput');
-    editor.addResponse(
+    explorationEditorPage.navigateToMainTab();
+    explorationEditorMainTab.setStateName('One');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 1 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Good job'), 'Two', true, 'Equals',
       'One');
-    editor.setDefaultOutcome(forms.toRichText('Try again'));
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
 
-    editor.moveToState('Two');
-    editor.setContent(forms.toRichText('Please write 2 in words.'));
-    editor.setInteraction('TextInput');
-    editor.addResponse(
+    explorationEditorMainTab.moveToState('Two');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 2 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Good job'), 'Three', true, 'Equals',
       'Two');
-    editor.setDefaultOutcome(forms.toRichText('Try again'));
-    editor.addHint('The number 2 in words.');
-    editor.addSolution('TextInput', {
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
+    explorationEditorMainTab.addHint('The number 2 in words.');
+    explorationEditorMainTab.addSolution('TextInput', {
       correctAnswer: 'Two',
       explanation: 'The English equivalent of 2'
     });
-    editor.moveToState('Three');
-    editor.setContent(forms.toRichText('Please write 3 in words.'));
-    editor.setInteraction('TextInput');
-    editor.addResponse(
+    explorationEditorMainTab.moveToState('Three');
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Please write 3 in words.'));
+    explorationEditorMainTab.setInteraction('TextInput');
+    explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Good job'), 'End', true, 'Equals',
       'Three');
-    editor.setDefaultOutcome(forms.toRichText('Try again'));
+    explorationEditorMainTab.getResponseEditor('default').setFeedback(
+      forms.toRichText('Try again'));
 
-    editor.moveToState('End');
-    editor.setInteraction('EndExploration');
-    editor.saveChanges();
+    explorationEditorMainTab.moveToState('End');
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.saveChanges();
     workflow.publishExploration();
 
     users.logout();
@@ -457,16 +481,15 @@ describe('State editor', function() {
     // Learner 1 completes the exploration.
     users.login('user2@statisticsTab.com');
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
     explorationPlayerPage.submitAnswer('TextInput', 'One');
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.submitAnswer('TextInput', '2');
     explorationPlayerPage.viewHint();
-    explorationPlayerPage.clickGotItButton();
     explorationPlayerPage.submitAnswer('TextInput', '3');
     explorationPlayerPage.viewSolution();
-    explorationPlayerPage.clickGotItButton();
     explorationPlayerPage.submitAnswer('TextInput', 'Two');
     explorationPlayerPage.clickThroughToNextCard();
     explorationPlayerPage.expectExplorationToNotBeOver();
@@ -479,6 +502,7 @@ describe('State editor', function() {
     // Learner 2 starts the exploration and immediately quits it.
     users.login('user3@statisticsTab.com');
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_TITLE);
     libraryPage.playExploration(EXPLORATION_TITLE);
 
     explorationPlayerPage.expectExplorationToNotBeOver();
@@ -489,20 +513,16 @@ describe('State editor', function() {
     users.login('user1@statisticsTab.com');
     creatorDashboardPage.get();
     creatorDashboardPage.navigateToExplorationEditor();
-    editor.navigateToStatsTab();
+    explorationEditorPage.navigateToStatsTab();
 
     // Now, there should be one passerby for this exploration since only learner
     // 3 quit at the first state.
-    editor.expectNumPassersbyToBe('1');
+    explorationStatsTab.expectNumPassersbyToBe('1');
 
     users.logout();
   });
 
   afterEach(function() {
-    // TODO(pranavsid98): Remove this checked error once we figure out and fix
-    // the cause.
-    general.checkForConsoleErrors([
-      'TypeError: google.visualization.PieChart is not a constructor'
-    ]);
+    general.checkForConsoleErrors([]);
   });
 });

@@ -16,8 +16,8 @@
 
 """Models for topics and related constructs."""
 
+from constants import constants
 from core.platform import models
-import feconf
 
 from google.appengine.ext import ndb
 
@@ -97,7 +97,7 @@ class TopicModel(base_models.VersionedModel):
         topic_commit_log_entry = TopicCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            feconf.ACTIVITY_STATUS_PUBLIC, False
+            constants.ACTIVITY_STATUS_PUBLIC, False
         )
         topic_commit_log_entry.topic_id = self.id
         topic_commit_log_entry.put()
@@ -160,6 +160,9 @@ class TopicSummaryModel(base_models.BaseModel):
     canonical_story_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of additional stories that are part of this topic.
     additional_story_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The total number of skills in the topic (including those that are
+    # uncategorized).
+    total_skill_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of skills that are not part of any subtopic.
     uncategorized_skill_count = ndb.IntegerProperty(required=True, indexed=True)
     # The number of subtopics of the topic.
@@ -222,7 +225,7 @@ class SubtopicPageModel(base_models.VersionedModel):
         subtopic_page_commit_log_entry = SubtopicPageCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            feconf.ACTIVITY_STATUS_PUBLIC, False
+            constants.ACTIVITY_STATUS_PUBLIC, False
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
         subtopic_page_commit_log_entry.put()
@@ -278,3 +281,6 @@ class TopicRightsModel(base_models.VersionedModel):
 
     # The user_ids of the managers of this topic.
     manager_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # Whether this topic is published.
+    topic_is_published = ndb.BooleanProperty(
+        indexed=True, required=True, default=False)

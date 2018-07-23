@@ -37,7 +37,8 @@ _COMPONENT_CONFIG_SCHEMA = [
     ('backend_id', basestring), ('category', basestring),
     ('description', basestring), ('frontend_id', basestring),
     ('tooltip', basestring), ('icon_data_url', basestring),
-    ('preview_url_template', basestring), ('is_complex', bool),
+    ('preview_url_template_dev', basestring),
+    ('preview_url_template_prod', basestring), ('is_complex', bool),
     ('requires_fs', bool), ('is_block_element', bool),
     ('customization_arg_specs', list)]
 
@@ -77,8 +78,6 @@ class RteComponentUnitTests(test_utils.GenericTestBase):
             if ca_spec['schema']['type'] == 'custom':
                 obj_class = obj_services.Registry.get_object_class_by_type(
                     ca_spec['schema']['obj_type'])
-                self.assertIsNotNone(obj_class.edit_html_filename)
-                self.assertIsNotNone(obj_class.edit_js_filename)
                 self.assertEqual(
                     ca_spec['default_value'],
                     obj_class.normalize(ca_spec['default_value']))

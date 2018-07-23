@@ -19,6 +19,7 @@ subclasses for each type of suggestion.
 from constants import constants
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import user_services
 from core.platform import models
 import utils
 
@@ -37,13 +38,13 @@ class BaseSuggestion(object):
             entity at the time of creation of the suggestion.
         status: str. The status of the suggestion.
         author_id: str. The ID of the user who submitted the suggestion.
-        assigned_reviewer_id: str. The ID of the user assigned to
-            review the suggestion.
         final_reviewer_id: str. The ID of the reviewer who has accepted/rejected
             the suggestion.
         change_cmd: Change. The details of the suggestion. This should be an
             object of type ExplorationChange, TopicChange, etc.
         score_category: str. The scoring category for the suggestion.
+        last_updated: datetime.datetime. Date and time when the suggestion
+            was last updated.
     """
 
     def __init__(self):
@@ -64,11 +65,11 @@ class BaseSuggestion(object):
             'target_id': self.target_id,
             'target_version_at_submission': self.target_version_at_submission,
             'status': self.status,
-            'author_id': self.author_id,
+            'author_name': self.get_author_name(),
             'final_reviewer_id': self.final_reviewer_id,
-            'assigned_reviewer_id': self.assigned_reviewer_id,
             'change_cmd': self.change_cmd.to_dict(),
-            'score_category': self.score_category
+            'score_category': self.score_category,
+            'last_updated': utils.get_time_in_millisecs(self.last_updated)
         }
 
     @classmethod
@@ -87,6 +88,14 @@ class BaseSuggestion(object):
         """
         return self.score_category.split(
             suggestion_models.SCORE_CATEGORY_DELIMITER)[0]
+
+    def get_author_name(self):
+        """Returns the author's username.
+
+        Returns:
+            str. The username of the author of the suggestion.
+        """
+        return user_services.get_username(self.author_id)
 
     def get_score_sub_type(self):
         """Returns the second part of the score category. The second part refers
@@ -141,12 +150,6 @@ class BaseSuggestion(object):
             raise utils.ValidationError(
                 'Expected author_id to be a string, received %s' % type(
                     self.author_id))
-
-        if not isinstance(self.assigned_reviewer_id, basestring):
-            if self.assigned_reviewer_id:
-                raise utils.ValidationError(
-                    'Expected assigned_reviewer_id to be a string,'
-                    ' received %s' % type(self.assigned_reviewer_id))
 
         if not isinstance(self.final_reviewer_id, basestring):
             if self.final_reviewer_id:
@@ -211,8 +214,7 @@ class BaseSuggestion(object):
         Returns:
             bool. Whether the suggestion has been handled or not.
         """
-        return (self.status not in [suggestion_models.STATUS_IN_REVIEW,
-                                    suggestion_models.STATUS_RECEIVED])
+        return self.status != suggestion_models.STATUS_IN_REVIEW
 
 
 class SuggestionEditStateContent(BaseSuggestion):
@@ -222,8 +224,8 @@ class SuggestionEditStateContent(BaseSuggestion):
 
     def __init__( # pylint: disable=super-init-not-called
             self, suggestion_id, target_id, target_version_at_submission,
-            status, author_id, assigned_reviewer_id, final_reviewer_id,
-            change_cmd, score_category):
+            status, author_id, final_reviewer_id,
+            change_cmd, score_category, last_updated):
         """Initializes an object of type SuggestionEditStateContent
         corresponding to the SUGGESTION_TYPE_EDIT_STATE_CONTENT choice.
         """
@@ -235,10 +237,10 @@ class SuggestionEditStateContent(BaseSuggestion):
         self.target_version_at_submission = target_version_at_submission
         self.status = status
         self.author_id = author_id
-        self.assigned_reviewer_id = assigned_reviewer_id
         self.final_reviewer_id = final_reviewer_id
         self.change_cmd = exp_domain.ExplorationChange(change_cmd)
         self.score_category = score_category
+        self.last_updated = last_updated
 
     def validate(self):
         """Validates a suggestion object of type SuggestionEditStateContent.
@@ -334,9 +336,8 @@ class SuggestionEditStateContent(BaseSuggestion):
             suggestion_dict['target_id'],
             suggestion_dict['target_version_at_submission'],
             suggestion_dict['status'], suggestion_dict['author_id'],
-            suggestion_dict['assigned_reviewer_id'],
             suggestion_dict['final_reviewer_id'], suggestion_dict['change_cmd'],
-            suggestion_dict['score_category'])
+            suggestion_dict['score_category'], suggestion_dict['last_updated'])
 
         return suggestion
 

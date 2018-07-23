@@ -291,8 +291,8 @@ def update_exp_issues_for_new_exp_version(
 
     Args:
         exploration: Exploration. Domain object for the exploration.
-        exp_versions_diff: ExplorationVersionsDiff. The domain object for the
-            exploration versions difference.
+        exp_versions_diff: ExplorationVersionsDiff|None. The domain object for
+            the exploration versions difference, None if it is a revert.
         revert_to_version: int|None. If the change is a revert, the version.
             Otherwise, None.
     """
@@ -305,8 +305,12 @@ def update_exp_issues_for_new_exp_version(
     # Handling reverts.
     if revert_to_version:
         old_exp_issues = get_exp_issues(exploration.id, revert_to_version)
-        exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
-        exp_issues.exp_version += 1
+        # If the old exploration issues model doesn't exist, the current model
+        # is carried over (this is a fallback case for some tests, and can
+        # never happen in production.)
+        if old_exp_issues:
+            exp_issues.unresolved_issues = old_exp_issues.unresolved_issues
+        exp_issues.exp_version = exploration.version + 1
         create_exp_issues_model(exp_issues)
         return
 
@@ -569,8 +573,8 @@ def get_playthrough_from_model(playthrough_model):
         _migrate_to_latest_action_schema(action_dict)
         actions.append(stats_domain.LearnerAction.from_dict(action_dict))
     return stats_domain.Playthrough(
-        playthrough_model.id, playthrough_model.exp_id,
-        playthrough_model.exp_version, playthrough_model.issue_type,
+        playthrough_model.exp_id, playthrough_model.exp_version,
+        playthrough_model.issue_type,
         playthrough_model.issue_customization_args, actions)
 
 
@@ -931,10 +935,13 @@ def get_top_state_unresolved_answers(exploration_id, state_name):
     Returns:
         list(*). A list of the top 10 answers, sorted by decreasing frequency.
     """
-    calculation_output = (
-        _get_calc_output(
-            exploration_id, state_name, 'TopNUnresolvedAnswersByFrequency')
-        .calculation_output.to_raw_type())
+    calc_output_model = _get_calc_output(
+        exploration_id, state_name, 'TopNUnresolvedAnswersByFrequency')
+
+    if not calc_output_model:
+        return []
+
+    calculation_output = calc_output_model.calculation_output.to_raw_type()
     return [
         {'answer': output['answer'], 'frequency': output['frequency']}
         for output in calculation_output

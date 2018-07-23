@@ -1,0 +1,73 @@
+<div role="form" class="form-horizontal topic-editor">
+  <md-card class="oppia-page-card oppia-long-text">
+    <div class="topic-name">
+      <span ng-if="!topicNameEditorIsShown" ng-click="openTopicNameEditor()"
+            class="oppia-editable-section">
+        <strong class="form-heading"><[topic.getName()]></strong>
+        <i ng-if="topicRights.canEditName()" class="material-icons oppia-editor-edit-icon"
+           title="Edit Topic Name">&#xE254;
+        </i>
+      </span>
+      <span ng-if="topicNameEditorIsShown">
+        <form class="form-horizontal" role="form" ng-submit="updateTopicName(editableName)">
+          <input type="text" ng-model="editableName">
+          <button type="submit" class="btn btn-success btn-sm">Save</button>
+          <button class="btn btn-default btn-sm" ng-click="closeTopicNameEditor()">Cancel</button>
+        </form>
+      </span>
+    </div>
+
+    <div class="topic-description" ng-class="{'has-error': editableDescriptionIsEmpty && topicDescriptionChanged}">
+      <label for="topicDescription" class="form-heading">Description</label>
+      <textarea type="text" class="form-control"
+                ng-model="editableDescription"
+                ng-change="updateTopicDescriptionStatus(editableDescription)"
+                ng-blur="updateTopicDescription(editableDescription)"
+                placeholder="Enter the description of the topic">
+      </textarea>
+      <span ng-if="editableDescriptionIsEmpty && topicDescriptionChanged" class="help-block" style="font-size: smaller">
+        What does this topic contain?
+      </span>
+    </div>
+
+    <div class="canonical-stories">
+      <label class="form-heading"> Canonical Stories </label>
+      <button class="btn btn-default"
+              ng-click="createCanonicalStory()"
+              style="float: right;">
+        Create Story
+      </button>
+      <stories-list ng-if="topic.getCanonicalStoryIds().length > 0"
+                    story-summaries="canonicalStorySummaries"
+                    topic="topic">
+      </stories-list>
+      <h4 ng-if="topic.getCanonicalStoryIds().length === 0" style="color: gray;">
+        Click on Create Story to create a new canonical story for the topic
+      </h4>
+    </div>
+  </md-card>
+</div>
+
+<style>
+  .topic-editor {
+    margin-top: 2%;
+    margin-left: 10%;
+    width: 80%;
+  }
+
+  .topic-editor .form-heading {
+    font-size: 1.2em;
+  }
+
+  .topic-editor .topic-name {
+    margin-bottom: 1.5%;
+  }
+
+  .topic-editor .canonical-stories {
+    margin-top: 2%;
+  }
+
+  .topic-editor .topic-description textarea{
+    height: 20vh;
+  }
+</style>

@@ -1,1 +1,228 @@
 {% extends 'pages/base.html' %}
+
+{% block maintitle %}
+  Topics and Skills Dashboard - Oppia
+{% endblock maintitle %}
+
+{% block navbar_breadcrumb %}
+  <topics-and-skills-dashboard-navbar-breadcrumb>
+  </topics-and-skills-dashboard-navbar-breadcrumb>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <topics-and-skills-dashboard-navbar>
+  </topics-and-skills-dashboard-navbar>
+{% endblock local_top_nav_options %}
+
+
+{% block content %}
+  <background-banner></background-banner>
+  <div class="oppia-topics-and-skills-dashboard" ng-controller="TopicsAndSkillsDashboard" style="position: relative;">
+    <div>
+      <h2 class="dashboard-title" translate="I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD"></h2>
+    </div>
+    <div ng-if="topicSummaries.length > 0 || untriagedSkillSummaries.length > 0 || unpublishedSkillSummaries.length > 0">
+      <ul class="dashboard-tabs">
+        <li ng-if="topicSummaries.length > 0"
+            ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_TOPICS}">
+          <a class="dashboard-tabs-text"
+             ng-click="setActiveTab(TAB_NAME_TOPICS)">
+             Topics
+          </a>
+        </li>
+        <li ng-if="untriagedSkillSummaries.length > 0"
+            ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNTRIAGED_SKILLS}">
+          <a class="dashboard-tabs-text"
+             ng-click="setActiveTab(TAB_NAME_UNTRIAGED_SKILLS)">
+             Untriaged Skills
+          </a>
+        </li>
+        <li ng-if="unpublishedSkillSummaries.length > 0"
+            ng-class="{'dashboard-tabs-active': activeTab === TAB_NAME_UNPUBLISHED_SKILLS}">
+          <a class="dashboard-tabs-text"
+             ng-click="setActiveTab(TAB_NAME_UNPUBLISHED_SKILLS)">
+             Unpublished Skills
+          </a>
+        </li>
+      </ul>
+
+      <div ng-if="activeTab === TAB_NAME_TOPICS">
+        <topics-list topic-summaries="topicSummaries"
+                     user-can-delete-topic="userCanDeleteTopic"
+                     in-modal="false">
+        </topics-list>
+      </div>
+
+      <div ng-if="activeTab === TAB_NAME_UNTRIAGED_SKILLS">
+        <skills-list skill-summaries="untriagedSkillSummaries"
+                     editable-topic-summaries="editableTopicSummaries">
+        </skills-list>
+      </div>
+
+      <div ng-if="activeTab === TAB_NAME_UNPUBLISHED_SKILLS">
+        <skills-list skill-summaries="unpublishedSkillSummaries"
+                     editable-topic-summaries="editableTopicSummaries">
+        </skills-list>
+      </div>
+    </div>
+
+    <div class="col-sm-8" ng-if="topicSummaries.length === 0 && untriagedSkillSummaries.length === 0 && unpublishedSkillSummaries.length === 0">
+      <blockquote class="intro-card">
+        <p class="intro-card-message" style="padding-top: 6px;">
+          No topics or skills have been created yet.
+        </p>
+        <button class="btn oppia-dashboard-intro-button oppia-transition-200"
+                style="color: white; text-decoration: none;"
+                ng-click="createTopic()"
+                ng-if="userCanCreateTopic">
+          Create Topic
+        </button>
+      </blockquote>
+    </div>
+  </div>
+  <style>
+    .oppia-topics-and-skills-dashboard .dashboard-tabs {
+      border-bottom: 1px solid #eee;
+      display: -webkit-flex;
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 0;
+      margin-left: 12.5%;
+      padding-left: 0;
+      padding-top: 6%;
+      text-align: center;
+    }
+
+    .oppia-topics-and-skills-dashboard .dashboard-tabs li {
+      display: -webkit-flex;
+      display: flex;
+      margin-bottom: 0;
+      width: 200px;
+    }
+    .oppia-topics-and-skills-dashboard .dashboard-title {
+      color: #01645c;
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 3em;
+      margin-top: 0px;
+      margin-bottom: 25px;
+      padding-top: 78.5px;
+      text-align: center;
+    }
+
+    .oppia-topics-and-skills-dashboard .intro-card {
+      background: #fff;
+      border-left: none;
+      border-radius: 5px;
+      margin: 1em 0 0;
+      margin-left: 25%;
+      margin-right: 25%;
+      padding: 37px 30px;
+      text-align: center;
+      width: 100%;
+    }
+
+    .oppia-topics-and-skills-dashboard .intro-card:before {
+      background: #fff;
+      border-bottom-right-radius: 80px 50px;
+      bottom: -1.7em;
+      content: "";
+      display: block;
+      height: 30px;
+      position: absolute;
+      width: 50px;
+      z-index: 10;
+    }
+
+    .oppia-topics-and-skills-dashboard .intro-card:after {
+      background: #eee;
+      border-bottom-right-radius: 40px 50px;
+      bottom: -1.7em;
+      content: "";
+      display: block;
+      height: 30px;
+      position: absolute;
+      width: 20px;
+      z-index: 10;
+    }
+
+    .oppia-topics-and-skills-dashboard .intro-card-message {
+      font-family: 'Capriola', 'Roboto', Arial, sans-serif;
+      font-size: 18px;
+      text-align: center;
+    }
+
+    .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text {
+      color: #009688;
+      font-size: 1em;
+      padding: 10px;
+      text-decoration: none;
+      text-transform: uppercase;
+      width: 100%;
+    }
+
+    .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text,
+    .oppia-topics-and-skills-dashboard .dashboard-tabs-active .dashboard-tabs-text:hover {
+      border-bottom: 4px solid #009688;
+      color: #009688;
+      margin-left: 7.5px;
+    }
+
+    .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:hover {
+      color: #009688;
+      font-size: 1em;
+      padding: 10px;
+      text-decoration: none;
+      text-transform: uppercase;
+      width: 100%;
+    }
+
+    .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:hover,
+    .oppia-topics-and-skills-dashboard .dashboard-tabs .dashboard-tabs-text:focus {
+      text-decoration: none;
+    }
+
+    .oppia-topics-and-skills-dashboard .dashboard-tabs .list-card-view-toggle {
+      margin-left: auto;
+      margin-right: 7.5px;
+      width: auto;
+    }
+
+    @media(max-width: 815px) {
+      .oppia-topics-and-skills-dashboard .dashboard-tabs {
+        justify-content: center;
+      }
+
+      .oppia-topics-and-skills-dashboard .intro-card {
+        width: auto;
+      }
+
+      .oppia-topics-and-skills-dashboard .dashboard-tabs li {
+        width: auto;
+      }
+
+      .oppia-topics-and-skills-dashboard .oppia-dashboard-intro-button {
+        display: none;
+      }
+
+      .oppia-topics-and-skills-dashboard .dashboard-tabs .sort-explorations-select {
+        margin-top: 8px;
+        width: 100%;
+      }
+    }
+  </style>
+{% endblock %}
+
+
+{% block footer_js %}
+  {{ super() }}
+  <script src="{{TEMPLATE_DIR_PREFIX}}/components/background/BackgroundBannerDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/SkillsListDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboard.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarBreadcrumbDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsAndSkillsDashboardNavbarDirective.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/pages/topics_and_skills_dashboard/TopicsListDirective.js"></script>
+
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topic/EditableTopicBackendApiService.js"></script>
+  <script src="{{TEMPLATE_DIR_PREFIX}}/domain/topics_and_skills_dashboard/TopicsAndSkillsDashboardBackendApiService.js"></script>
+{% endblock footer_js %}

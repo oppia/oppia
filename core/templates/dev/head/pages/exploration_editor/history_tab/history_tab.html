@@ -3,7 +3,7 @@
     <h3>List of Changes</h3>
     <div ng-repeat="versionNumber in versionNumbersToDisplay" class="row">
       <div class="col-sm-4 col-md-4 col-lg-4">
-        <input type="checkbox" name="compareVer" ng-model="versionCheckboxArray[versionNumber].selected" ng-init="init()" ng-click="changeSelectedVersions($event, versionNumber)" ng-disabled="isCheckboxDisabled(versionNumber)" ng-hide="comparisonsAreDisabled" class='protractor-test-history-checkbox-selector'>
+        <input type="checkbox" name="compareVer" ng-model="versionCheckboxArray[versionNumber].selected" ng-init="init()" ng-click="changeSelectedVersions($event, versionNumber)" ng-disabled="isCheckboxDisabled(versionNumber)" ng-hide="comparisonsAreDisabled" class="protractor-test-history-checkbox-selector">
         [<[versionNumber]>]
         <strong><profile-link-text username="explorationVersionMetadata[versionNumber].committerId"></profile-link-text></strong>
       </div>
@@ -14,7 +14,7 @@
         <span>
           <em><[explorationVersionMetadata[versionNumber].createdOnStr]></em>
           <span ng-if="versionNumber !== currentVersion && EditabilityService.isEditable()">
-            | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
+            | <a href="#" class="protractor-test-revert-version" ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
           </span>
           <span>
             | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>

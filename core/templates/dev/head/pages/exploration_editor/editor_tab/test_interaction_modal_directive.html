@@ -1,14 +1,10 @@
-<div class="form-inline" style="margin-bottom: 20px;">
-  <table class="preview-conversation-skin-card-row-container">
-    <tr class="preview-conversation-skin-card-row">
-      <td class="preview-conversation-skin-row-avatar" valign="top">
-        <img class="preview-conversation-skin-row-avatar-img" ng-src="<[userBlackImgUrl]>">
-      </td>
-      <td class="preview-conversation-skin-oppia-content">
-        <div angular-html-bind="stateContent()"></div>
-      </td>
-    </tr>
-  </table>
+<style>
+  .test-interaction-modal .submit-answer-btn {
+    text-align: right;
+  }
+</style>
+
+<div class="form-inline test-interaction-modal" style="margin-bottom: 20px;">
   <div ng-if="interactionIsInline">
     <div class="preview-conversation-skin-inline-interaction">
       <table class="preview-conversation-skin-card-row-container" style="margin-bottom: 0;">
@@ -16,7 +12,8 @@
           <td class="preview-conversation-skin-row-avatar" valign="top">
             <img class="preview-conversation-skin-row-avatar-img img-circle" ng-src="<[userBlueImgUrl]>" >
           </td>
-          <td class="preview-conversation-skin-learner-input" angular-html-bind="inputTemplate()">
+          <td class="preview-conversation-skin-learner-input">
+            <angular-html-bind html-data="inputTemplate()"></angular-html-bind>
           </td>
         </tr>
       </table>
@@ -25,9 +22,19 @@
   <div class="preview-conversation-skin-supplemental-interaction" ng-if="!interactionIsInline">
     <div>
       <md-card class="preview-conversation-skin-supplemental-card">
-        <div angular-html-bind="inputTemplate()">
+        <div>
+          <angular-html-bind html-data="inputTemplate()">
+          </angular-html-bind>
         </div>
       </md-card>
     </div>
+  </div>
+  <br>
+  <div class="submit-answer-btn">
+    <md-button class="oppia-learner-confirm-button protractor-test-submit-answer-button"
+               ng-disabled="!interactionAnswerIsValid"
+               ng-click="onSubmitAnswerFromButton()"
+               translate="I18N_INTERACTIONS_SUBMIT">
+    </md-button>
   </div>
 </div>

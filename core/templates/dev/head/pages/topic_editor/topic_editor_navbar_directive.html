@@ -1,0 +1,96 @@
+<ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak"
+    ng-if="topicRights.canEditTopic()">
+  <li style="margin-right: 20px; margin-top: 8px;">
+    <button class="btn btn-default oppia-save-draft-button"
+            ng-class="{'btn-success': isTopicSaveable()}"
+            ng-click="saveChanges()"
+            ng-disabled="!isTopicSaveable()">
+      <span ng-if="!isSaveInProgress()">
+        <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+           alt="Save Topic">
+          &#xE161;
+        </i>
+        <span class="oppia-save-publish-button-label">Save Changes</span>
+        <span class="hidden-sm hidden-xs" style="opacity: 0.5"
+              ng-if="getChangeListLength() > 0">
+          (<[getChangeListLength()]>)
+        </span>
+      </span>
+
+      <span ng-if="isSaveInProgress()">
+        <span class="oppia-save-publish-button-label">Saving</span>
+        <loading-dots></loading-dots>
+      </span>
+    </button>
+
+    <button type="button" ng-if="isTopicSaveable()"
+            class="btn btn-default"
+            ng-click="discardChanges()">
+      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+         alt="Discard current draft">
+        &#xE2C3;
+      </i>
+      Discard Changes
+    </button>
+
+    <button type="button" ng-if="!topicRights.isPublished() && topicRights.canPublishTopic()"
+            class="btn btn-default oppia-editor-publish-button"
+            ng-click="publishTopic()"
+            ng-class="{'btn-success': !isTopicSaveable()}"
+            ng-disabled="isTopicSaveable() || getWarningsCount() > 0">
+      <i class="material-icons md-18 md-dark oppia-save-publish-button-icon"
+         alt="Publish to Oppia Library">
+        &#xE2C3;
+      </i>
+      <span class="oppia-save-publish-button-label">Publish Topic</span>
+    </button>
+    <button type="button" ng-click="unpublishTopic()"
+            ng-if="topicRights.isPublished() && topicRights.canPublishTopic()"
+            class="btn btn-default"
+            ng-disabled="isTopicSaveable()">
+      Unpublish Topic
+    </button>
+  </li>
+  <li ng-class="{'active': getTabStatuses().active === 'main', 'uib-dropdown': getWarningsCount()}" ng-attr-uib-dropdown="<[getWarningsCount()]>" class="icon">
+    <a uib-tooltip="Main Editor" tooltip-placement="bottom" ng-click="selectMainTab()">
+      <i class="material-icons">&#xE254;</i>
+    </a>
+    <div ng-show="getWarningsCount()"
+         class="oppia-editor-warnings-indicator oppia-editor-warnings-error-color"
+         ng-click="selectMainTab()">
+      <span class="oppia-editor-warnings-count">
+        <[getWarningsCount()]>
+      </span>
+    </div>
+    <ul uib-dropdown-menu class="uib-dropdown-menu oppia-editor-warnings-box">
+      <span class="oppia-editor-warnings-header">Warnings</span>
+      <li class="oppia-editor-warnings-text"
+          ng-repeat="issue in validationIssues track by $index">
+        <hr class="oppia-editor-warnings-separator">
+        <[issue]>
+      </li>
+    </ul>
+  </li>
+
+  <li ng-class="{'active': getTabStatuses().active === 'subtopics'}" class="icon">
+    <a uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
+      <i class="material-icons">library_books</i>
+    </a>
+  </li>
+
+  <li ng-class="{'active': getTabStatuses().active === 'questions'}" class="icon">
+    <a uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
+      <i class="material-icons">question_answer</i>
+    </a>
+  </li>
+</ul>
+
+<style>
+  topic-editor-navbar .icon {
+    width: 2.5em;
+  }
+  topic-editor-navbar .icon .material-icons {
+    font-size: 1.4em;
+    margin-left: 0.3vw;
+  }
+</style>

@@ -3,11 +3,14 @@
        ng-style="!isHelpCardTall() ? {'top': getHelpCardBottomPosition()} : {}">
     <img class="conversation-skin-oppia-avatar"
          ng-src="<[::OPPIA_AVATAR_IMAGE_URL]>" alt="">
-    <button type="button" class="conversation-skin-close-help-card-button"
+    <button type="button" class="conversation-skin-close-help-card-button protractor-test-close-help-card-button"
             ng-click="clearHelpCard()" ng-if="!helpCardHasContinueButton">
       <i class="material-icons md-18">&#xE5CD;</i>
     </button>
-    <div class="rte-viewer conversation-skin-help-card-content" angular-html-bind="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()"></div>
+    <div>
+      <angular-html-bind class="rte-viewer conversation-skin-help-card-content protractor-test-conversation-feedback" html-data="helpCardHtml" ng-class="getFeedbackAudioHighlightClass()">
+      </angular-html-bind>
+    </div>
     <br>
     <continue-button ng-if="helpCardHasContinueButton"
                      focus-on="<[::CONTINUE_BUTTON_FOCUS_LABEL]>"
@@ -16,8 +19,10 @@
     </continue-button>
   </div>
 
-  <div class="protractor-test-conversation-input"
-       angular-html-bind="activeCard.interactionHtml">
+  <div>
+    <angular-html-bind class="protractor-test-conversation-input"
+                       html-data="activeCard.interactionHtml">
+    </angular-html-bind>
   </div>
 </div>
 

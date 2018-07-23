@@ -1,16 +1,18 @@
 <audio-bar ng-if="!isIframed"></audio-bar>
-<div class="conversation-skin-tutor-card"
+<div class="oppia-learner-view-card"
      ng-class="{'animate-card-width': startCardChangeAnimation}">
-  <div class="conversation-skin-tutor-card-content conversation-skin-animate-tutor-card-content"
+  <div class="oppia-learner-view-card-content conversation-skin-animate-tutor-card-content"
        ng-class="{'animate-card-change': startCardChangeAnimation}">
-    <div class="conversation-skin-tutor-card-top-section">
+    <div class="oppia-learner-view-card-top-section">
       <img class="conversation-skin-oppia-avatar"
            ng-src="<[OPPIA_AVATAR_IMAGE_URL]>" alt="">
-      <div class="rte-viewer conversation-skin-tutor-card-top-content"
+      <div class="rte-viewer oppia-learner-view-card-top-content"
            ng-class="getContentAudioHighlightClass()"
            focus-on="<[getContentFocusLabel($index)]>">
-        <div class="protractor-test-conversation-content"
-             angular-html-bind="activeCard.contentHtml">
+        <div>
+          <angular-html-bind class="protractor-test-conversation-content"
+                             html-data="activeCard.contentHtml">
+          </angular-html-bind>
         </div>
         <div ng-if="isContentAudioTranslationAvailable()"
              class="conversation-skin-audio-controls">
@@ -18,12 +20,12 @@
       </div>
     </div>
 
-    <div ng-if="(activeCard.inputResponsePairs.length > 1 && isInteractionInline) || (activeCard.inputResponsePairs.length > 0 && !isInteractionInline)">
+    <div ng-if="(activeCard.inputResponsePairs.length > 1 && interactionIsInline) || (activeCard.inputResponsePairs.length > 0 && !interactionIsInline)">
       <h4 class="conversation-skin-responses-dropdown-container"
           ng-click="toggleShowPreviousResponses()">
         <span class="conversation-skin-responses-dropdown-text">
           <span translate="I18N_PLAYER_PREVIOUS_RESPONSES"
-                translate-values="{previousResponses: <[activeCard.inputResponsePairs.length - (isInteractionInline ? 1 : 0)]>}">
+                translate-values="{previousResponses: <[activeCard.inputResponsePairs.length - (interactionIsInline ? 1 : 0)]>}">
           </span>
           <span class="conversation-skin-responses-dropdown-icon">
             <i class="material-icons conversation-skin-responses-dropdown-icon" ng-class="{'conversation-skin-responses-dropdown-icon-rotated': arePreviousResponsesShown}">&#xE037;</i>
@@ -32,10 +34,10 @@
       </h4>
     </div>
 
-    <div ng-show="arePreviousResponsesShown"
+    <div ng-if="arePreviousResponsesShown && !conceptCardIsBeingShown"
          class="conversation-skin-tutor-card-middle-section conversation-skin-responses-animate-slide">
       <div ng-repeat="responsePair in activeCard.inputResponsePairs track by $index">
-        <div ng-if="!$last || !isInteractionInline">
+        <div ng-if="(!$last || !interactionIsInline)">
           <input-response-pair data="responsePair"
                                profile-picture="profilePicture"
                                oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
@@ -47,7 +49,7 @@
     </div>
 
     <!-- If the interaction is inline, always show the most recent response pair, if there is one. -->
-    <div class="conversation-skin-tutor-card-bottom-section" ng-if="isInteractionInline && activeCard.inputResponsePairs.length > 0">
+    <div class="conversation-skin-tutor-card-bottom-section" ng-if="interactionIsInline && activeCard.inputResponsePairs.length > 0">
       <input-response-pair data="activeCard.inputResponsePairs[activeCard.inputResponsePairs.length - 1]"
                            profile-picture="profilePicture"
                            oppia-avatar-image-url="OPPIA_AVATAR_IMAGE_URL"
@@ -63,23 +65,23 @@
       In addition, if the exploration is iframed, the terminal card will
       have no learner input section, so we do not show it.
     -->
-    <div ng-show="isInteractionInline && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
+    <div ng-show="interactionIsInline && isCurrentCardAtEndOfTranscript() && !waitingForOppiaFeedback &&
     ((activeCard.interactionHtml && !activeCard.destStateName) || activeCard.destStateName) &&
     (!isOnTerminalCard() || !isIframed || activeCard.destStateName)">
       <div class="conversation-skin-inline-interaction">
-        <!-- The seemingly redundant check for isInteractionInline is necessary
+        <!-- The seemingly redundant check for interactionIsInline is necessary
           because the parent ng-show does not remove the element from the DOM.
           This can lead to two conflicting copies of the interaction for
           non-inline interactions. -->
-        <div ng-if="isInteractionInline && activeCard.interactionHtml && !activeCard.destStateName">
-          <div class="protractor-test-conversation-input"
-               angular-html-bind="activeCard.interactionHtml">
-          </div>
+        <div ng-if="interactionIsInline && activeCard.interactionHtml && !activeCard.destStateName && !conceptCardIsBeingShown && !activeCard.leadsToConceptCard">
+          <angular-html-bind class="protractor-test-conversation-input"
+                             html-data="activeCard.interactionHtml">
+          </angular-html-bind>
         </div>
       </div>
     </div>
 
-    <div ng-if="!isInteractionInline"
+    <div ng-if="!interactionIsInline && !conceptCardIsBeingShown"
          class="conversation-skin-inline-interaction" style="opacity: 0.8;">
       <div style="padding: 6px 12px;">
         <span ng-class="{'conversation-skin-instruction-disabled': !interactionIsActive}"> <[interactionInstructions]> </span>
@@ -88,7 +90,7 @@
       </div>
     </div>
 
-    <div ng-if="!activeCard.interactionHtml && !isOnTerminalCard()">
+    <div ng-if="!activeCard.interactionHtml && !isOnTerminalCard() && !conceptCardIsBeingShown">
       <div class="conversation-skin-inline-interaction">
         <span style="color: red;">
           <strong>Error</strong>: No interaction specified for '<[activeCard.stateName]>'.
@@ -99,7 +101,11 @@
 </div>
 
 <style>
-  .conversation-skin-tutor-card {
+  .oppia-learner-view-card-content .oppia-learner-confirm-button {
+    margin-left: 10px;
+    margin-bottom: 10px;
+  }
+  .oppia-learner-view-card {
     max-width: 100vw;
     padding-bottom: 18px;
   }
@@ -108,7 +114,7 @@
     color: gray;
   }
 
-  .conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
+  .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
     height: 100px;
     left: -87px;
     top: -20px;
@@ -120,29 +126,20 @@
     display: none;
   }
 
-  .conversation-skin-tutor-card .instructions-button {
+  .oppia-learner-view-card .instructions-button {
     background: inherit;
     border: none;
     white-space: normal;
   }
 
-  .conversation-skin-tutor-card.animate-card-width {
+  .oppia-learner-view-card.animate-card-width {
     -webkit-transition: width 500ms;
     transition: width 500ms;
   }
 
-  .conversation-skin-tutor-card-top-section {
-    position: relative;
-    padding: 0 20px;
-  }
-
-  .conversation-skin-tutor-card-top-content p:not(:last-child) {
+  .oppia-learner-view-card-top-content p:not(:last-child) {
     line-height: 1.5;
     margin-bottom: 18px;
-  }
-
-  .conversation-skin-tutor-card-top-content {
-    width: 100%;
   }
 
   /* This should match the value defined in AUDIO_HIGHLIGHT_CSS_CLASS. */
@@ -150,7 +147,6 @@
     border: 3px solid #f3d140;
   }
 
-  .conversation-skin-tutor-card,
   .conversation-skin-future-tutor-card {
     background: #fff;
     border-radius: 2px;
@@ -172,13 +168,9 @@
     display: none;
   }
 
-  .conversation-skin-tutor-card.ng-hide {
+  .oppia-learner-view-card.ng-hide {
     opacity: 0;
     transform: translateX(-1000px);
-  }
-
-  .conversation-skin-tutor-card-content {
-    word-wrap: break-word;
   }
 
   .conversation-skin-responses-dropdown-container {
@@ -216,7 +208,7 @@
   .conversation-skin-inline-interaction {
     border-bottom-left-radius: 2px;
     border-bottom-right-radius: 2px;
-    padding: 8px 20px 0;
+    padding: 8px 20px 25px;
     position: relative;
   }
 
@@ -230,21 +222,21 @@
      Correctness footer and the page cannot be scrolled down further.
      So this padding allows to scroll down the tutor card. */
   @media(max-width: 770px) {
-    .conversation-skin-tutor-card {
+    .oppia-learner-view-card {
       padding-bottom: 30px;
     }
   }
 
   @media screen and (max-width: 959px) {
-    .conversation-skin-tutor-card .instructions-button {
+    .oppia-learner-view-card .instructions-button {
       background-color: #0D48A1;
       color: #ffffff;
       padding: 6px 12px;
       white-space: normal;
     }
 
-    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:focus,
-    .conversation-skin-tutor-card button.md-button.md-default-theme.instructions-button:hover {
+    .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:focus,
+    .oppia-learner-view-card button.md-button.md-default-theme.instructions-button:hover {
       background-color: #115FD4;
     }
   }

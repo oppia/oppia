@@ -88,7 +88,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories([]), {})
 
-        self.save_new_default_exploration('A', self.owner_id, 'TitleA')
+        self.save_new_default_exploration('A', self.owner_id, title='TitleA')
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
@@ -97,7 +97,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                 }
             })
 
-        self.save_new_default_exploration('B', self.owner_id, 'TitleB')
+        self.save_new_default_exploration('B', self.owner_id, title='TitleB')
         self.assertEqual(
             exp_services.get_exploration_titles_and_categories(['A']), {
                 'A': {
@@ -285,7 +285,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             # Page 1: 3 initial explorations.
             (exp_ids, search_cursor) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', None))
+                    ''))
             self.assertEqual(len(exp_ids), 3)
             self.assertIsNotNone(search_cursor)
             found_exp_ids += exp_ids
@@ -293,7 +293,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             # Page 2: 3 more explorations.
             (exp_ids, search_cursor) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', search_cursor))
+                    '', cursor=search_cursor))
             self.assertEqual(len(exp_ids), 3)
             self.assertIsNotNone(search_cursor)
             found_exp_ids += exp_ids
@@ -301,7 +301,7 @@ class ExplorationSummaryQueriesUnitTests(ExplorationServicesUnitTests):
             # Page 3: 1 final exploration.
             (exp_ids, search_cursor) = (
                 exp_services.get_exploration_ids_matching_query(
-                    '', search_cursor))
+                    '', cursor=search_cursor))
             self.assertEqual(len(exp_ids), 1)
             self.assertIsNone(search_cursor)
             found_exp_ids += exp_ids
@@ -869,6 +869,235 @@ title: Title
         self.assertEqual(solution_translations, {})
 
 
+class GetImageFilenamesFromExplorationTests(ExplorationServicesUnitTests):
+
+    def test_get_image_filenames_from_exploration(self):
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'eid', title='title', category='category')
+        exploration.add_states(['state1', 'state2', 'state3'])
+        state1 = exploration.states['state1']
+        state2 = exploration.states['state2']
+        state3 = exploration.states['state3']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<blockquote>Hello, this is state1</blockquote><p>'
+                '<oppia-noninteractive-image filepath-with-value='
+                '"&amp;quot;s1Content.png&amp;quot;" caption-with-value='
+                '"&amp;quot;&amp;quot;" alt-with-value="&amp;quot;&amp;quot;">'
+                '</oppia-noninteractive-image></p>')
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': '<pre>Hello, this is state2</pre>'
+        }
+        content3_dict = {
+            'content_id': 'content',
+            'html': '<p>Hello, this is state3</p>'
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+        state3.update_content(content3_dict)
+
+        state1.update_interaction_id('ImageClickInput')
+        state2.update_interaction_id('MultipleChoiceInput')
+        state3.update_interaction_id('ItemSelectionInput')
+
+        customization_args_dict1 = {
+            'highlightRegionsOnHover': {'value': True},
+            'imageAndRegions': {
+                'value': {
+                    'imagePath': 's1ImagePath.png',
+                    'labeledRegions': [{
+                        'label': 'classdef',
+                        'region': {
+                            'area': [
+                                [0.004291845493562232, 0.004692192192192192],
+                                [0.40987124463519314, 0.05874624624624625]
+                            ],
+                            'regionType': 'Rectangle'
+                        }
+                    }]
+                }
+            }
+        }
+        customization_args_dict2 = {
+            'choices': {'value': [
+                (
+                    '<p>This is value1 for MultipleChoice'
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&amp;quot;s2Choice1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image></p>'
+                ),
+                (
+                    '<p>This is value2 for MultipleChoice'
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&amp;quot;s2Choice2.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '</p></p>')
+            ]}
+        }
+        customization_args_dict3 = {
+            'choices': {'value': [
+                (
+                    '<p>This is value1 for ItemSelection'
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&amp;quot;s3Choice1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>'),
+                (
+                    '<p>This is value2 for ItemSelection'
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&amp;quot;s3Choice2.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>'),
+                (
+                    '<p>This is value3 for ItemSelection'
+                    '<oppia-noninteractive-image filepath-with-value='
+                    '"&amp;quot;s3Choice3.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>')
+            ]}
+        }
+        state1.update_interaction_customization_args(customization_args_dict1)
+        state2.update_interaction_customization_args(customization_args_dict2)
+        state3.update_interaction_customization_args(customization_args_dict3)
+
+        default_outcome_dict1 = {
+            'dest': 'state2',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': '<p>Default outcome for state1</p>'
+            },
+            'param_changes': [],
+            'labelled_as_correct': False,
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+
+        hint_list2 = [{
+            'hint_content': {
+                'content_id': 'hint_1',
+                'html': (
+                    '<p>Hello, this is html1 for state2'
+                    '<oppia-noninteractive-image filepath-with-value="'
+                    '&amp;quot;s2Hint1.png&amp;quot;" caption-with-value='
+                    '"&amp;quot;&amp;quot;" alt-with-value='
+                    '"&amp;quot;&amp;quot;"></oppia-noninteractive-image>'
+                    '</p>')
+            }
+        }, {
+            'hint_content': {
+                'content_id': 'hint_2',
+                'html': '<p>Hello, this is html2 for state2</p>'
+            }
+        }]
+        state2.update_interaction_hints(hint_list2)
+
+        answer_group_list2 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': 1}
+            }],
+            'outcome': {
+                'dest': 'state1',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': (
+                        '<p>Outcome1 for state2<oppia-noninteractive-image'
+                        ' filepath-with-value='
+                        '"&amp;quot;s2AnswerGroup.png&amp;quot;"'
+                        ' caption-with-value="&amp;quot;&amp;quot;"'
+                        ' alt-with-value="&amp;quot;&amp;quot;">'
+                        '</oppia-noninteractive-image></p>')
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_misconception_id': None
+        }, {
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': 0}
+            }],
+            'outcome': {
+                'dest': 'state3',
+                'feedback': {
+                    'content_id': 'feedback_2',
+                    'html': '<p>Outcome2 for state2</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+        answer_group_list3 = [{
+            'rule_specs': [{
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    (
+                        '<p>This is value1 for ItemSelection'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s3Choice1.png&amp;quot;"'
+                        ' caption-with-value="&amp;quot;&amp;quot;" '
+                        'alt-with-value="&amp;quot;&amp;quot;">'
+                        '</oppia-noninteractive-image></p>')
+                ]}
+            }, {
+                'rule_type': 'Equals',
+                'inputs': {'x': [
+                    (
+                        '<p>This is value3 for ItemSelection'
+                        '<oppia-noninteractive-image filepath-with-value='
+                        '"&amp;quot;s3Choice3.png&amp;quot;"'
+                        ' caption-with-value="&amp;quot;&amp;quot;" '
+                        'alt-with-value="&amp;quot;&amp;quot;">'
+                        '</oppia-noninteractive-image></p>')
+                ]}
+            }],
+            'outcome': {
+                'dest': 'state1',
+                'feedback': {
+                    'content_id': 'feedback_1',
+                    'html': '<p>Outcome for state3</p>'
+                },
+                'param_changes': [],
+                'labelled_as_correct': False,
+                'refresher_exploration_id': None,
+                'missing_prerequisite_skill_id': None
+            },
+            'training_data': [],
+            'tagged_misconception_id': None
+        }]
+        state2.update_interaction_answer_groups(answer_group_list2)
+        state3.update_interaction_answer_groups(answer_group_list3)
+
+        filenames = (
+            exp_services.get_image_filenames_from_exploration(exploration))
+        expected_output = ['s1ImagePath.png', 's1Content.png', 's2Choice1.png',
+                           's2Choice2.png', 's3Choice1.png', 's3Choice2.png',
+                           's3Choice3.png', 's2Hint1.png',
+                           's2AnswerGroup.png']
+        self.assertEqual(len(filenames), len(expected_output))
+        for filename in expected_output:
+            self.assertIn(filename, filenames)
+
+
 # pylint: disable=protected-access
 class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
@@ -1115,13 +1344,15 @@ title: A title
         self.assertEqual(exploration.version, 3)
 
         # Download version 2.
-        zip_file_output = exp_services.export_to_zip_file(self.EXP_ID, 2)
+        zip_file_output = exp_services.export_to_zip_file(
+            self.EXP_ID, version=2)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
 
         # Download version 3.
-        zip_file_output = exp_services.export_to_zip_file(self.EXP_ID, 3)
+        zip_file_output = exp_services.export_to_zip_file(
+            self.EXP_ID, version=3)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
         self.assertEqual(
             zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)
@@ -2239,7 +2470,7 @@ class ExplorationSearchTests(ExplorationServicesUnitTests):
             self.save_new_valid_exploration(
                 all_exp_ids[i],
                 self.owner_id,
-                all_exp_titles[i],
+                title=all_exp_titles[i],
                 category=all_exp_categories[i])
 
         # We're only publishing the first 4 explorations, so we're not
@@ -2612,7 +2843,7 @@ states:
     classifier_model_id: null
     content:
       content_id: content
-      html: Congratulations, you have finished!
+      html: <p>Congratulations, you have finished!</p>
     content_ids_to_audio_translations:
       content: {}
     interaction:

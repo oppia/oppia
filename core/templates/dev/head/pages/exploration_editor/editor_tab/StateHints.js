@@ -33,7 +33,7 @@ oppia.controller('StateHints', [
     $scope.EditorStateService = EditorStateService;
     $scope.stateHintsService = stateHintsService;
     $scope.activeHintIndex = null;
-    $scope.isLoggedIn = ExplorationPlayerService.isLoggedIn();
+    $scope.canEdit = GLOBALS.can_edit;
 
     $scope.dragDotsImgUrl = UrlInterpolationService.getStaticImageUrl(
       '/general/drag_dots.png');

@@ -43,7 +43,7 @@ oppia.controller('FeedbackTab', [
       status: null,
       text: ''
     };
-
+    $scope.useNewSuggestionsFramework = constants.USE_NEW_SUGGESTION_FRAMEWORK;
     var _resetTmpMessageFields = function() {
       $scope.tmpMessage.status = $scope.activeThread ?
         $scope.activeThread.status : null;
@@ -96,13 +96,22 @@ oppia.controller('FeedbackTab', [
       });
     };
 
-    var _isSuggestionOpen = function() {
-      return $scope.activeThread.status === 'open';
+    var _isSuggestionHandled = function() {
+      if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+        return $scope.activeThread.isSuggestionHandled();
+      }
+      return !($scope.activeThread.suggestion.status === 'review' ||
+        $scope.activeThread.status === 'open');
     };
 
     var _isSuggestionValid = function() {
-      return ExplorationStatesService.hasState(
-        $scope.activeThread.suggestion.state_name);
+      if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+        return ExplorationStatesService.hasState(
+          $scope.activeThread.getSuggestionStateName());
+      } else {
+        return ExplorationStatesService.hasState(
+          $scope.activeThread.stateName);
+      }
     };
 
     var _hasUnsavedChanges = function() {
@@ -110,7 +119,7 @@ oppia.controller('FeedbackTab', [
     };
 
     $scope.getSuggestionButtonType = function() {
-      return (_isSuggestionOpen() && _isSuggestionValid() &&
+      return (!_isSuggestionHandled() && _isSuggestionValid() &&
               !_hasUnsavedChanges() ? 'primary' : 'default');
     };
 
@@ -123,8 +132,8 @@ oppia.controller('FeedbackTab', [
         backdrop: true,
         size: 'lg',
         resolve: {
-          suggestionIsOpen: function() {
-            return _isSuggestionOpen();
+          suggestionIsHandled: function() {
+            return _isSuggestionHandled();
           },
           suggestionIsValid: function() {
             return _isSuggestionValid();
@@ -133,26 +142,42 @@ oppia.controller('FeedbackTab', [
             return _hasUnsavedChanges();
           },
           suggestionStatus: function() {
-            return $scope.activeThread.status;
+            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+              return $scope.activeThread.getSuggestionStatus();
+            } else {
+              return $scope.activeThread.status;
+            }
           },
           description: function() {
-            return $scope.activeThread.suggestion.description;
+            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+              return $scope.activeThread.description;
+            } else {
+              return $scope.activeThread.suggestion.description;
+            }
           },
           currentContent: function() {
-            var state = ExplorationStatesService.getState(
-              $scope.activeThread.suggestion.state_name);
+            var stateName;
+            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+              stateName = $scope.activeThread.getSuggestionStateName();
+            } else {
+              stateName = $scope.activeThread.stateName;
+            }
+            var state = ExplorationStatesService.getState(stateName);
             return state !== undefined ? state.content.getHtml() : null;
           },
           newContent: function() {
+            if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+              return $scope.activeThread.getReplacementHtmlFromSuggestion();
+            }
             return $scope.activeThread.suggestion.suggestion_html;
           }
         },
         controller: [
-          '$scope', '$log', '$uibModalInstance', 'suggestionIsOpen',
+          '$scope', '$log', '$uibModalInstance', 'suggestionIsHandled',
           'suggestionIsValid', 'unsavedChangesExist', 'suggestionStatus',
           'description', 'currentContent', 'newContent', 'EditabilityService',
           function(
-              $scope, $log, $uibModalInstance, suggestionIsOpen,
+              $scope, $log, $uibModalInstance, suggestionIsHandled,
               suggestionIsValid, unsavedChangesExist, suggestionStatus,
               description, currentContent, newContent, EditabilityService) {
             var SUGGESTION_ACCEPTED_MSG = 'This suggestion has already been ' +
@@ -164,16 +189,17 @@ oppia.controller('FeedbackTab', [
             var UNSAVED_CHANGES_MSG = 'You have unsaved changes to ' +
               'this exploration. Please save/discard your unsaved changes if ' +
               'you wish to accept.';
-            $scope.isOpen = suggestionIsOpen;
+            $scope.isNotHandled = !suggestionIsHandled;
             $scope.canEdit = EditabilityService.isEditable();
-            $scope.canReject = $scope.canEdit && $scope.isOpen;
-            $scope.canAccept = $scope.canEdit && $scope.isOpen &&
+            $scope.canReject = $scope.canEdit && $scope.isNotHandled;
+            $scope.canAccept = $scope.canEdit && $scope.isNotHandled &&
               suggestionIsValid && !unsavedChangesExist;
 
             if (!$scope.canEdit) {
               $scope.errorMessage = '';
-            } else if (!$scope.isOpen) {
-              $scope.errorMessage = suggestionStatus === 'fixed' ?
+            } else if (!$scope.isNotHandled) {
+              $scope.errorMessage = (suggestionStatus === 'accepted' ||
+                suggestionStatus === 'fixed') ?
                 SUGGESTION_ACCEPTED_MSG : SUGGESTION_REJECTED_MSG;
             } else if (!suggestionIsValid) {
               $scope.errorMessage = SUGGESTION_INVALID_MSG;
@@ -186,11 +212,13 @@ oppia.controller('FeedbackTab', [
             $scope.currentContent = currentContent;
             $scope.newContent = newContent;
             $scope.commitMessage = description;
+            $scope.reviewMessage = null;
 
             $scope.acceptSuggestion = function() {
               $uibModalInstance.close({
                 action: ACTION_ACCEPT_SUGGESTION,
                 commitMessage: $scope.commitMessage,
+                reviewMessage: $scope.reviewMessage,
                 // TODO(sll): If audio files exist for the content being
                 // replaced, implement functionality in the modal for the
                 // exploration creator to indicate whether this change
@@ -203,7 +231,8 @@ oppia.controller('FeedbackTab', [
 
             $scope.rejectSuggestion = function() {
               $uibModalInstance.close({
-                action: ACTION_REJECT_SUGGESTION
+                action: ACTION_REJECT_SUGGESTION,
+                reviewMessage: $scope.reviewMessage
               });
             };
 
@@ -214,20 +243,29 @@ oppia.controller('FeedbackTab', [
         ]
       }).result.then(function(result) {
         ThreadDataService.resolveSuggestion(
-          $scope.activeThread.thread_id, result.action, result.commitMessage,
-          result.audioUpdateRequired,
-          function() {
+          $scope.activeThread.threadId, result.action, result.commitMessage,
+          result.reviewMessage, result.audioUpdateRequired, function() {
             ThreadDataService.fetchThreads(function() {
-              $scope.setActiveThread($scope.activeThread.thread_id);
+              $scope.setActiveThread($scope.activeThread.threadId);
             });
             // Immediately update editor to reflect accepted suggestion.
             if (result.action === ACTION_ACCEPT_SUGGESTION) {
-              var suggestion = $scope.activeThread.suggestion;
-              var stateName = suggestion.state_name;
+              var suggestion;
+              if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+                suggestion = $scope.activeThread.getSuggestion();
+              } else {
+                suggestion = $scope.activeThread;
+              }
+              var stateName = suggestion.stateName;
               var stateDict = ExplorationDataService.data.states[stateName];
               var state = StateObjectFactory.createFromBackendDict(
                 stateName, stateDict);
-              state.content.setHtml(suggestion.suggestion_html);
+              if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+                state.content.setHtml(
+                  $scope.activeThread.getReplacementHtmlFromSuggestion());
+              } else {
+                state.content.setHtml(suggestion.suggestion.suggestion_html);
+              }
               if (result.audioUpdateRequired) {
                 state.contentIdsToAudioTranslations.markAllAudioAsNeedingUpdate(
                   state.content.getContentId());
@@ -267,16 +305,14 @@ oppia.controller('FeedbackTab', [
     $scope.setActiveThread = function(threadId) {
       ThreadDataService.fetchMessages(threadId);
       ThreadDataService.markThreadAsSeen(threadId);
-
       var allThreads = [].concat(
         $scope.threadData.feedbackThreads, $scope.threadData.suggestionThreads);
       for (var i = 0; i < allThreads.length; i++) {
-        if (allThreads[i].thread_id === threadId) {
+        if (allThreads[i].threadId === threadId) {
           $scope.activeThread = allThreads[i];
           break;
         }
       }
-
       $scope.tmpMessage.status = $scope.activeThread.status;
     };
 

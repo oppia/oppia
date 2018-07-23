@@ -18,9 +18,10 @@
 
 oppia.controller('Base', [
   '$scope', '$rootScope', '$document', 'AlertsService', 'BackgroundMaskService',
-  'SidebarStatusService',
+  'SidebarStatusService', 'SITE_NAME',
   function($scope, $rootScope, $document, AlertsService, BackgroundMaskService,
-      SidebarStatusService) {
+      SidebarStatusService, SITE_NAME) {
+    $scope.siteName = SITE_NAME;
     $scope.AlertsService = AlertsService;
     $scope.currentLang = 'en';
     $scope.iframed = GLOBALS.iframed;

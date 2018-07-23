@@ -4,12 +4,12 @@
     <div ng-if="getShortAnswerHtml()"
          popover-placement="bottom" uib-popover-template="'popover/answer'"
          popover-trigger="click" style="cursor: pointer;">
-      <div class="rte-viewer conversation-skin-learner-answer-content" angular-html-bind="getShortAnswerHtml()">
-      </div>
+      <angular-html-bind class="rte-viewer conversation-skin-learner-answer-content" html-data="getShortAnswerHtml()">
+      </angular-html-bind>
     </div>
     <div ng-if="!getShortAnswerHtml()">
-      <div class="rte-viewer conversation-skin-learner-answer-content" angular-html-bind="getAnswerHtml()">
-      </div>
+      <angular-html-bind class="rte-viewer conversation-skin-learner-answer-content" html-data="getAnswerHtml()">
+      </angular-html-bind>
     </div>
   </div>
   <div ng-if="data.isHint">
@@ -21,17 +21,19 @@
 
 <div class="conversation-skin-oppia-feedback-container" ng-if="data.oppiaResponse !== ''">
   <img class="conversation-skin-oppia-avatar img-circle" ng-src="<[oppiaAvatarImageUrl()]>" alt="">
-    <div ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()">
-      <div class="conversation-skin-feedback-dot-one"></div>
-      <div class="conversation-skin-feedback-dot-two"></div>
-      <div class="conversation-skin-feedback-dot-three"></div>
-    </div>
-    <span id="<[getInputResponsePairId()]>"></span>
-    <div ng-if="data.oppiaResponse !== null"
-         angular-html-bind="data.oppiaResponse"
-         class="rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
-         ng-class="getFeedbackAudioHighlightClass()">
-    </div>
+  <div ng-if="!data.oppiaResponse && isCurrentCardAtEndOfTranscript()" class="protractor-test-input-response-loading-dots">
+    <div class="conversation-skin-feedback-dot-one"></div>
+    <div class="conversation-skin-feedback-dot-two"></div>
+    <div class="conversation-skin-feedback-dot-three"></div>
+  </div>
+  <span id="<[getInputResponsePairId()]>"></span>
+  <div>
+    <angular-html-bind ng-if="data.oppiaResponse !== null"
+                       html-data="data.oppiaResponse"
+                       class="rte-viewer conversation-skin-oppia-feedback-content protractor-test-conversation-feedback"
+                       ng-class="getFeedbackAudioHighlightClass()">
+    </angular-html-bind>
+  </div>
 </div>
 
 <style>
@@ -69,5 +71,8 @@
 </style>
 
 <script type="text/ng-template" id="popover/answer">
-  <div angular-html-bind="answer()"></div>
+  <div>
+    <angular-html-bind html-data="answer()">
+    </angular-html-bind>
+  </div>
 </script>

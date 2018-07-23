@@ -118,6 +118,34 @@ def get_topic_from_model(topic_model, run_conversion=True):
         topic_model.last_updated)
 
 
+def get_all_topic_summaries():
+    """Returns the summaries of all topics present in the datastore.
+
+    Returns:
+        list(TopicSummary). The list of summaries of all topics present in the
+            datastore.
+    """
+    topic_summaries_models = topic_models.TopicSummaryModel.get_all()
+    topic_summaries = [
+        get_topic_summary_from_model(summary)
+        for summary in topic_summaries_models]
+    return topic_summaries
+
+
+def get_all_skill_ids_assigned_to_some_topic():
+    """Returns the ids of all the skills that are linked to some topics.
+
+    Returns:
+        set([str]). The ids of all the skills linked to some topic.
+    """
+    skill_ids = set([])
+    all_topic_models = topic_models.TopicModel.get_all()
+    all_topics = [get_topic_from_model(topic) for topic in all_topic_models]
+    for topic in all_topics:
+        skill_ids.update(topic.get_all_skill_ids())
+    return skill_ids
+
+
 def get_topic_summary_from_model(topic_summary_model):
     """Returns a domain object for an Oppia topic summary given a
     topic summary model.
@@ -136,6 +164,7 @@ def get_topic_summary_from_model(topic_summary_model):
         topic_summary_model.additional_story_count,
         topic_summary_model.uncategorized_skill_count,
         topic_summary_model.subtopic_count,
+        topic_summary_model.total_skill_count,
         topic_summary_model.topic_model_created_on,
         topic_summary_model.topic_model_last_updated
     )
@@ -329,9 +358,6 @@ def apply_change_list(topic_id, change_list):
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_ADDITIONAL_STORY_IDS):
                     topic.update_additional_story_ids(change.new_value)
-                elif (change.property_name ==
-                      topic_domain.TOPIC_PROPERTY_SKILL_IDS):
-                    topic.update_skill_ids(change.new_value)
                 elif (change.property_name ==
                       topic_domain.TOPIC_PROPERTY_LANGUAGE_CODE):
                     topic.update_language_code(change.new_value)
@@ -629,12 +655,16 @@ def compute_summary_of_topic(topic):
     topic_model_uncategorized_skill_count = len(topic.uncategorized_skill_ids)
     topic_model_subtopic_count = len(topic.subtopics)
 
+    total_skill_count = topic_model_uncategorized_skill_count
+    for subtopic in topic.subtopics:
+        total_skill_count = total_skill_count + len(subtopic.skill_ids)
+
     topic_summary = topic_domain.TopicSummary(
         topic.id, topic.name, topic.language_code,
         topic.version, topic_model_canonical_story_count,
         topic_model_additional_story_count,
         topic_model_uncategorized_skill_count, topic_model_subtopic_count,
-        topic.created_on, topic.last_updated
+        total_skill_count, topic.created_on, topic.last_updated
     )
 
     return topic_summary
@@ -657,6 +687,7 @@ def save_topic_summary(topic_summary):
         canonical_story_count=topic_summary.canonical_story_count,
         uncategorized_skill_count=topic_summary.uncategorized_skill_count,
         subtopic_count=topic_summary.subtopic_count,
+        total_skill_count=topic_summary.total_skill_count,
         topic_model_last_updated=topic_summary.topic_model_last_updated,
         topic_model_created_on=topic_summary.topic_model_created_on
     )
@@ -677,8 +708,69 @@ def get_topic_rights_from_model(topic_rights_model):
 
     return topic_domain.TopicRights(
         topic_rights_model.id,
-        topic_rights_model.manager_ids
+        topic_rights_model.manager_ids,
+        topic_rights_model.topic_is_published
     )
+
+
+def publish_topic(topic_id, committer_id):
+    """Marks the given topic as published.
+
+    Args:
+        topic_id: str. The id of the given topic.
+        committer_id: str. ID of the committer.
+
+    Raises:
+        Exception. The given topic does not exist.
+        Exception. The topic is already published.
+        Exception. The user does not have enough rights to publish the topic.
+    """
+    topic_rights = get_topic_rights(topic_id, strict=False)
+    if topic_rights is None:
+        raise Exception('The given topic does not exist')
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
+        raise Exception(
+            'The user does not have enough rights to publish the topic.')
+
+    if topic_rights.topic_is_published:
+        raise Exception('The topic is already published.')
+    topic_rights.topic_is_published = True
+    commit_cmds = [topic_domain.TopicRightsChange({
+        'cmd': topic_domain.CMD_PUBLISH_TOPIC
+    })]
+    save_topic_rights(
+        topic_rights, committer_id, 'Published the topic', commit_cmds)
+
+
+def unpublish_topic(topic_id, committer_id):
+    """Marks the given topic as unpublished.
+
+    Args:
+        topic_id: str. The id of the given topic.
+        committer_id: str. ID of the committer.
+
+    Raises:
+        Exception. The given topic does not exist.
+        Exception. The topic is already unpublished.
+        Exception. The user does not have enough rights to unpublish the topic.
+    """
+    topic_rights = get_topic_rights(topic_id, strict=False)
+    if topic_rights is None:
+        raise Exception('The given topic does not exist')
+    user = user_services.UserActionsInfo(committer_id)
+    if role_services.ACTION_CHANGE_TOPIC_STATUS not in user.actions:
+        raise Exception(
+            'The user does not have enough rights to unpublish the topic.')
+
+    if not topic_rights.topic_is_published:
+        raise Exception('The topic is already unpublished.')
+    topic_rights.topic_is_published = False
+    commit_cmds = [topic_domain.TopicRightsChange({
+        'cmd': topic_domain.CMD_UNPUBLISH_TOPIC
+    })]
+    save_topic_rights(
+        topic_rights, committer_id, 'Unpublished the topic', commit_cmds)
 
 
 def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
@@ -689,15 +781,16 @@ def save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds):
             topic.
         committer_id: str. ID of the committer.
         commit_message: str. Descriptive message for the commit.
-        commit_cmds: list(dict). A list of commands describing what kind of
-            commit was done.
+        commit_cmds: list(TopicRightsChange). A list of commands describing
+            what kind of commit was done.
     """
 
     model = topic_models.TopicRightsModel.get(topic_rights.id, strict=False)
 
     model.manager_ids = topic_rights.manager_ids
-
-    model.commit(committer_id, commit_message, commit_cmds)
+    model.topic_is_published = topic_rights.topic_is_published
+    commit_cmd_dicts = [commit_cmd.to_dict() for commit_cmd in commit_cmds]
+    model.commit(committer_id, commit_message, commit_cmd_dicts)
 
 
 def create_new_topic_rights(topic_id, committer_id):
@@ -707,12 +800,13 @@ def create_new_topic_rights(topic_id, committer_id):
         topic_id: str. ID of the topic.
         committer_id: str. ID of the committer.
     """
-    topic_rights = topic_domain.TopicRights(topic_id, [])
+    topic_rights = topic_domain.TopicRights(topic_id, [], False)
     commit_cmds = [{'cmd': topic_domain.CMD_CREATE_NEW}]
 
     topic_models.TopicRightsModel(
         id=topic_rights.id,
-        manager_ids=topic_rights.manager_ids
+        manager_ids=topic_rights.manager_ids,
+        topic_is_published=topic_rights.topic_is_published
     ).commit(committer_id, 'Created new topic rights', commit_cmds)
 
 
@@ -738,6 +832,21 @@ def get_topic_rights(topic_id, strict=True):
         return None
 
     return get_topic_rights_from_model(model)
+
+
+def get_all_topic_rights():
+    """Returns the rights object of all topics present in the datastore.
+
+    Returns:
+        dict. The dict of rights objects of all topics present in
+            the datastore keyed by topic id.
+    """
+    topic_rights_models = topic_models.TopicRightsModel.get_all()
+    topic_rights = {}
+    for model in topic_rights_models:
+        rights = get_topic_rights_from_model(model)
+        topic_rights[rights.id] = rights
+    return topic_rights
 
 
 def check_can_edit_topic(user, topic_rights):
@@ -831,11 +940,11 @@ def assign_role(committer, assignee, new_role, topic_id):
 
     commit_message = 'Changed role of %s from %s to %s' % (
         assignee_username, old_role, new_role)
-    commit_cmds = [{
+    commit_cmds = [topic_domain.TopicRightsChange({
         'cmd': topic_domain.CMD_CHANGE_ROLE,
         'assignee_id': assignee.user_id,
         'old_role': old_role,
         'new_role': new_role
-    }]
+    })]
 
     save_topic_rights(topic_rights, committer_id, commit_message, commit_cmds)

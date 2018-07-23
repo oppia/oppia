@@ -16,6 +16,10 @@
 
 """Tests for Exploration-related jobs."""
 
+import json
+import os
+
+from constants import constants
 from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_jobs_one_off
@@ -384,7 +388,8 @@ class ExpSummariesContributorsOneOffJobTest(test_utils.GenericTestBase):
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
         self.assertNotIn(
-            feconf.MIGRATION_BOT_USERNAME, exploration_summary.contributor_ids)
+            feconf.MIGRATION_BOT_USERNAME,
+            exploration_summary.contributor_ids)
 
 
 class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
@@ -530,7 +535,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
             self.EXP_ID, feconf.SYSTEM_COMMITTER_ID, title='Original Title')
 
         # Create commits with all the system user ids.
-        for system_id in feconf.SYSTEM_USER_IDS:
+        for system_id in constants.SYSTEM_USER_IDS:
             exp_services.update_exploration(
                 system_id, self.EXP_ID, [exp_domain.ExplorationChange({
                     'cmd': 'edit_exploration_property',
@@ -549,7 +554,7 @@ class ExplorationContributorsSummaryOneOffJobTest(test_utils.GenericTestBase):
         exploration_summary = exp_services.get_exploration_summary_by_id(
             exploration.id)
 
-        for system_id in feconf.SYSTEM_USER_IDS:
+        for system_id in constants.SYSTEM_USER_IDS:
             self.assertNotIn(
                 system_id,
                 exploration_summary.contributors_summary)
@@ -758,7 +763,8 @@ class ExplorationStateIdMappingJobTest(test_utils.GenericTestBase):
         self.assertDictEqual(mapping.state_names_to_ids, expected_mapping)
 
 
-class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
+class ExplorationContentValidationJobForTextAngularTest(
+        test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -768,7 +774,7 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ExplorationContentValidationJobTest, self).setUp()
+        super(ExplorationContentValidationJobForTextAngularTest, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -811,12 +817,13 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.albert_id, exploration)
 
         # Start validation job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationContentValidationJob.create_new()
-        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        job_id = exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+            job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output(job_id)) # pylint: disable=line-too-long
         expected_output = []
 
         self.assertEqual(actual_output, expected_output)
@@ -844,12 +851,13 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         state1.update_interaction_default_outcome(default_outcome_dict)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        job_id = exp_jobs_one_off.ExplorationContentValidationJob.create_new()
-        exp_jobs_one_off.ExplorationContentValidationJob.enqueue(job_id)
+        job_id = exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+            job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.ExplorationContentValidationJob.get_output(job_id))
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output(job_id)) # pylint: disable=line-too-long
 
         expected_output = [
             "[u'br', [u'[document]']]",
@@ -870,7 +878,8 @@ class ExplorationContentValidationJobTest(test_utils.GenericTestBase):
         self.assertEqual(actual_output, expected_output)
 
 
-class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
+class ExplorationMigrationValidationJobForTextAngularTest(
+        test_utils.GenericTestBase):
 
     ALBERT_EMAIL = 'albert@example.com'
     ALBERT_NAME = 'albert'
@@ -880,7 +889,8 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
     EXP_TITLE = 'title'
 
     def setUp(self):
-        super(ExplorationMigrationValidationJobTest, self).setUp()
+        super(
+            ExplorationMigrationValidationJobForTextAngularTest, self).setUp()
 
         # Setup user who will own the test explorations.
         self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
@@ -888,9 +898,7 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
 
     def test_for_migration_job(self):
-        """Tests that the exploration validation job validates the content
-        without skipping any tags.
-        """
+        """Validates migration process for TextAngular."""
         exploration = exp_domain.Exploration.create_default_exploration(
             self.VALID_EXP_ID, title='title', category='category')
         exploration.add_states(['State1', 'State2'])
@@ -954,13 +962,14 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
         state2.update_interaction_default_outcome(default_outcome_dict2)
         exp_services.save_new_exploration(self.albert_id, exploration)
 
-        # Start validation job on sample exploration.
-        job_id = exp_jobs_one_off.ExplorationMigrationValidationJob.create_new()
-        exp_jobs_one_off.ExplorationMigrationValidationJob.enqueue(job_id)
+        # Start MigrationValidation job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.enqueue( # pylint: disable=line-too-long
+            job_id)
         self.process_and_flush_pending_tasks()
 
         actual_output = (
-            exp_jobs_one_off.ExplorationMigrationValidationJob.get_output(
+            exp_jobs_one_off.ExplorationMigrationValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
                 job_id))
         expected_output = [
             "[u'oppia-noninteractive-image', [u'ol']]",
@@ -970,6 +979,363 @@ class ExplorationMigrationValidationJobTest(test_utils.GenericTestBase):
                 'filepath-with-value="&amp;quot;2tree.png&amp;quot;">'
                 '</oppia-noninteractive-image></ol>\']]'
             )
+        ]
+        self.assertEqual(actual_output, expected_output)
+
+
+class TextAngularValidationAndMigrationTest(test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(TextAngularValidationAndMigrationTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_textangular_validation_and_migration(self):
+        """Tests that the exploration validation and migration job for
+        TextAngular RTE.
+        """
+        test_file_path = os.path.join(
+            feconf.TESTS_DATA_DIR, 'test_cases_for_rte.json')
+        with open(test_file_path, 'r') as f:
+            json_data = json.load(f)
+        test_cases = json_data['RTE_TYPE_TEXTANGULAR']['TEST_CASES']
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+
+        state_list = []
+        for index in range(len(test_cases)):
+            state_list.append('State%d' % index)
+
+        exploration.add_states(state_list)
+
+        for index, state_name in enumerate(state_list):
+            state = exploration.states[state_name]
+            content_dict = {
+                'html': test_cases[index]['html_content'],
+                'content_id': 'content'
+            }
+            state.update_content(content_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start validation job on exploration.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                job_id))
+
+        # Test that validation fails before migration.
+        self.assertGreater(len(actual_output), 0)
+
+        exploration_dict = exploration.to_dict()
+        updated_dict = exp_domain.Exploration._convert_v26_dict_to_v27_dict( # pylint: disable=protected-access
+            exploration_dict)
+        # This is done to ensure that exploration is not passed through CKEditor
+        # Migration pipeline.
+        updated_dict['schema_version'] = 29
+        updated_dict['states_schema_version'] = 24
+        updated_exploration = exp_domain.Exploration.from_dict(updated_dict)
+        updated_states = updated_dict['states']
+
+        for index, state_name in enumerate(state_list):
+            updated_html = updated_states[state_name]['content']['html']
+
+            # Test that html matches the expected format after migration.
+            self.assertEqual(
+                updated_html, unicode(test_cases[index]['expected_output']))
+
+        exp_services.save_new_exploration(
+            self.albert_id, updated_exploration)
+
+        # Start validation job on updated exploration.
+        job_id = (
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.create_new()) # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJobForTextAngular.get_output( # pylint: disable=line-too-long
+                job_id))
+
+        # Test that validation passes after migration.
+        self.assertEqual(actual_output, [])
+
+
+class ExplorationContentValidationJobForCKEditorTest(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(ExplorationContentValidationJobForCKEditorTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_validation_job(self):
+        """Tests that the exploration validation job validates the content
+        without skipping any tags.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p>Lorem ipsum </p><p> Hello this is oppia </p>'
+            )
+        }
+
+        state1.update_content(content1_dict)
+
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start validation job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
+        expected_output = []
+
+        self.assertEqual(actual_output, expected_output)
+
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p>Lorem <span>ipsum </span></p> Hello this is '
+                '<code>oppia </code>'
+            )
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check image tag inside p tag</p>'
+            )
+        }
+        content3_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&'
+                'amp;lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;" heading-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
+            )
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+        state3.update_content(content3_dict)
+
+        default_outcome_dict1 = {
+            'dest': 'State2',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        default_outcome_dict2 = {
+            'dest': 'State1',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<pre>Hello this is <b> testing '
+                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
+                    '</b>progress</pre>'
+
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        job_id = exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.enqueue(
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationContentValidationJobForCKEditor.get_output(job_id)) # pylint: disable=line-too-long
+
+        expected_output = [
+            "[u'invalidTags', [u'span', u'code', u'b']]",
+            "[u'ol', [u'ol']]",
+            "[u'oppia-noninteractive-image', [u'p', u'b']]",
+            "[u'p', [u'pre']]",
+            (
+                '[u\'strings\', '
+                '[u\'<p>Lorem <span>ipsum </span></p> Hello this is <code>'
+                'oppia </code>\', u\'<pre>Hello this is <b> testing <oppia-'
+                'noninteractive-image filepath-with-value="amp;quot;random.'
+                'png&amp;quot;"></oppia-noninteractive-image>'
+                ' in </b>progress</pre>\', '
+                'u\'<ol><ol><li>Item1</li></ol><li>Item2</li></ol>\', '
+                'u\'<p><oppia-noninteractive-image filepath-with-value="'
+                'amp;quot;random.png&amp;quot;"></oppia-noninteractive-image>'
+                'Hello this is test case to check '
+                'image tag inside p tag</p>\', '
+                'u\'<oppia-noninteractive-collapsible content-'
+                'with-value="&amp;quot;&amp;lt;pre&amp;gt;&amp;lt;'
+                'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;lt;/pre&amp;'
+                'gt;&amp;quot;" heading-with-value="&amp;quot;lorem '
+                'ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
+                '</oppia-noninteractive-collapsible>\']]'
+            )
+        ]
+
+        self.assertEqual(actual_output, expected_output)
+
+
+class ExplorationMigrationValidationJobForCKEditorTest(
+        test_utils.GenericTestBase):
+
+    ALBERT_EMAIL = 'albert@example.com'
+    ALBERT_NAME = 'albert'
+
+    VALID_EXP_ID = 'exp_id0'
+    NEW_EXP_ID = 'exp_id1'
+    EXP_TITLE = 'title'
+
+    def setUp(self):
+        super(
+            ExplorationMigrationValidationJobForCKEditorTest, self).setUp()
+
+        # Setup user who will own the test explorations.
+        self.albert_id = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.process_and_flush_pending_tasks()
+
+    def test_for_migration_job(self):
+        """Validates migration process for CKEditor."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.VALID_EXP_ID, title='title', category='category')
+        exploration.add_states(['State1', 'State2', 'State3'])
+        state1 = exploration.states['State1']
+        state2 = exploration.states['State2']
+        state3 = exploration.states['State3']
+        content1_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p>Lorem <span>ipsum </span></p> Hello this is '
+                '<code>oppia </code>'
+            )
+        }
+        content2_dict = {
+            'content_id': 'content',
+            'html': (
+                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check image tag inside p tag</p>'
+            )
+        }
+        content3_dict = {
+            'content_id': 'content',
+            'html': (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;" heading-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
+            )
+        }
+        state1.update_content(content1_dict)
+        state2.update_content(content2_dict)
+        state3.update_content(content3_dict)
+
+        default_outcome_dict1 = {
+            'dest': 'State2',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<ol><ol><li>Item1</li></ol><li>Item2</li></ol>'
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+        default_outcome_dict2 = {
+            'dest': 'State1',
+            'feedback': {
+                'content_id': 'default_outcome',
+                'html': (
+                    '<pre>Hello this is <b> testing '
+                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
+                    '</b>progress</pre>'
+
+                )
+            },
+            'labelled_as_correct': False,
+            'param_changes': [],
+            'refresher_exploration_id': None,
+            'missing_prerequisite_skill_id': None
+        }
+
+        state1.update_interaction_default_outcome(default_outcome_dict1)
+        state2.update_interaction_default_outcome(default_outcome_dict2)
+        exp_services.save_new_exploration(self.albert_id, exploration)
+
+        # Start migrationvalidation job on sample exploration.
+        job_id = exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.create_new() # pylint: disable=line-too-long
+        exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.enqueue( # pylint: disable=line-too-long
+            job_id)
+        self.process_and_flush_pending_tasks()
+
+        actual_output = (
+            exp_jobs_one_off.ExplorationMigrationValidationJobForCKEditor.get_output( # pylint: disable=line-too-long
+                job_id))
+        expected_output = [
+            "[u'invalidTags', [u'code', u'span']]",
+            "[u'strings', [u'<p>Lorem <span>ipsum </span>"
+            "</p> Hello this is <code>oppia </code>']]"
         ]
 
         self.assertEqual(actual_output, expected_output)

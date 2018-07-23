@@ -3,15 +3,15 @@
   height for the card content transition animation.
   -->
 <div class="conversation-skin-future-tutor-card" aria-hidden="true">
-  <div class="conversation-skin-tutor-card-content">
-    <div class="conversation-skin-tutor-card-top-section">
-      <div class="rte-viewer conversation-skin-tutor-card-top-content" angular-html-bind="upcomingContentHtml">
-      </div>
+  <div class="oppia-learner-view-card-content">
+    <div class="oppia-learner-view-card-top-section">
+      <angular-html-bind class="rte-viewer oppia-learner-view-card-top-content" html-data="upcomingContentHtml">
+      </angular-html-bind>
     </div>
     <div ng-if="upcomingInlineInteractionHtml">
       <div class="conversation-skin-inline-interaction">
-        <div angular-html-bind="upcomingInlineInteractionHtml">
-        </div>
+        <angular-html-bind html-data="upcomingInlineInteractionHtml">
+        </angular-html-bind>
       </div>
     </div>
   </div>
@@ -120,16 +120,16 @@ directive. -->
 
   .bottom-nav-row:before,
   .bottom-nav-row:after {
-     content:"";
-     display: table ;
-     clear:both;
+    content: "";
+    display: table;
+    clear: both;
   }
 
   [class*='col-'] {
-     float: left;
-     min-height: 1px;
-     padding: 0;
-     padding-right: 20px;
+    float: left;
+    min-height: 1px;
+    padding: 0;
+    padding-right: 20px;
   }
 
   [class*='col-']:last-of-type {
@@ -137,10 +137,10 @@ directive. -->
   }
 
   .col-1-2 {
-   width: 50%;
+    width: 50%;
   }
   .col-1-4{
-   width: 25%;
+    width: 25%;
   }
   .col-lg-12,
   .col-md-12,
@@ -214,7 +214,7 @@ directive. -->
     left: -20px;
   }
 
-  .conversation-skin-tutor-card-top-section .conversation-skin-oppia-avatar {
+  .oppia-learner-view-card-top-section .conversation-skin-oppia-avatar {
     height: 48px;
     left: -28px;
     top: -20px;
@@ -349,6 +349,7 @@ directive. -->
 
   .conversation-skin-help-card-content {
     width: 270px;
+    padding: 12px;
   }
 
   .conversation-skin-close-help-card-button {
@@ -376,7 +377,6 @@ directive. -->
     top: -30000px;
   }
 
-  .conversation-skin-tutor-card-top-section,
   .conversation-skin-oppia-feedback-container,
   .conversation-skin-learner-answer-container {
     position: relative;
@@ -411,28 +411,13 @@ directive. -->
     text-align: left;
   }
 
-  .conversation-skin-tutor-card-top-content,
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-learner-answer-content {
     margin-bottom: 12px;
-  }
-
-  .conversation-skin-tutor-card-top-content {
-    width: 100%;
-  }
-
-  .conversation-skin-tutor-card-top-content,
-  .conversation-skin-help-card-content {
-    padding: 12px;
-  }
-
-  .conversation-skin-oppia-feedback-content,
-  .conversation-skin-learner-answer-content {
     padding: 8px 12px;
     word-wrap: break-word;
   }
 
-  .conversation-skin-tutor-card-top-content,
   .conversation-skin-oppia-feedback-content,
   .conversation-skin-help-card-content {
     background-color: rgba(224, 242, 241, 1);
@@ -457,7 +442,7 @@ directive. -->
     background-color: rgba(224, 242, 241, 0.4);
   }
 
-  .conversation-skin-tutor-card-top-content::before,
+  .oppia-learner-view-card-top-content::before,
   .conversation-skin-oppia-feedback-content::before,
   .conversation-skin-help-card-content::before {
     border-left: 8px solid transparent;
@@ -667,10 +652,10 @@ directive. -->
     }
 
     .col-1-2 {
-     width: 60%;
+      width: 60%;
     }
     .col-1-4{
-     width: 20%;
+      width: 20%;
     }
     .replay-nav-icon {
       font-size: 40px;

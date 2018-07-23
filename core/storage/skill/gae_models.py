@@ -14,8 +14,8 @@
 
 """Models for storing the skill data models."""
 
+from constants import constants
 from core.platform import models
-import feconf
 
 from google.appengine.ext import ndb
 
@@ -58,6 +58,16 @@ class SkillModel(base_models.VersionedModel):
         required=True, indexed=True)
     # A dict representing the skill contents.
     skill_contents = ndb.JsonProperty(indexed=False)
+    # The id to be used by the next misconception added.
+    next_misconception_id = ndb.IntegerProperty(required=True, indexed=False)
+    # The id that the skill is merged into, in case the skill has been
+    # marked as duplicate to another one and needs to be merged.
+    # This is an optional field.
+    superseding_skill_id = ndb.StringProperty(indexed=True)
+    # A flag indicating whether deduplication is complete for this skill.
+    # It will initially be False, and set to true only when there is a value
+    # for superseding_skill_id and the merge was completed.
+    all_questions_merged = ndb.BooleanProperty(indexed=True, required=True)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -89,7 +99,7 @@ class SkillModel(base_models.VersionedModel):
         skill_commit_log_entry = SkillCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            feconf.ACTIVITY_STATUS_PUBLIC, False
+            constants.ACTIVITY_STATUS_PUBLIC, False
         )
         skill_commit_log_entry.skill_id = self.id
         skill_commit_log_entry.put()
@@ -139,6 +149,8 @@ class SkillSummaryModel(base_models.BaseModel):
     description = ndb.StringProperty(required=True, indexed=True)
     # The number of misconceptions associated with the skill.
     misconception_count = ndb.IntegerProperty(required=True, indexed=True)
+    # The number of worked examples in the skill.
+    worked_examples_count = ndb.IntegerProperty(required=True, indexed=True)
     # The ISO 639-1 code for the language this skill is written in.
     language_code = ndb.StringProperty(required=True, indexed=True)
     # Time when the skill model was last updated (not to be
@@ -150,3 +162,58 @@ class SkillSummaryModel(base_models.BaseModel):
     # model was created).
     skill_model_created_on = ndb.DateTimeProperty(required=True, indexed=True)
     version = ndb.IntegerProperty(required=True)
+
+
+class SkillRightsSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
+    """Storage model for the metadata for a skill rights snapshot."""
+    pass
+
+
+class SkillRightsSnapshotContentModel(base_models.BaseSnapshotContentModel):
+    """Storage model for the content of a skill rights snapshot."""
+    pass
+
+
+class SkillRightsModel(base_models.VersionedModel):
+    """Storage model for the rights related to a skill.
+
+    The id of each instance is the id of the corresponding skill.
+    """
+    SNAPSHOT_METADATA_CLASS = SkillRightsSnapshotMetadataModel
+    SNAPSHOT_CONTENT_CLASS = SkillRightsSnapshotContentModel
+    ALLOW_REVERT = False
+
+    # The user_id of the creator this skill.
+    creator_id = ndb.StringProperty(indexed=True, required=True)
+    # Whether the skill is private.
+    skill_is_private = ndb.BooleanProperty(
+        indexed=True, required=True, default=True)
+
+    @classmethod
+    def get_unpublished_by_creator_id(cls, user_id):
+        """This function returns all skill rights that correspond to skills
+        that are private and are created by the provided user ID.
+
+        Args:
+            user_id: str. The user ID of the user that created the skill rights
+                being fetched.
+
+        Returns:
+            list(SkillRightsModel). A list of skill rights models that are
+                private and were created by the user with the provided
+                user ID.
+        """
+        return cls.query(
+            cls.creator_id == user_id,
+            cls.skill_is_private == True) #pylint: disable=singleton-comparison
+
+    @classmethod
+    def get_unpublished(cls):
+        """This function returns all skill rights that correspond to skills
+        that are private.
+
+        Returns:
+            list(SkillRightsModel). A list of skill rights models that are
+            private.
+        """
+        return cls.query(cls.skill_is_private == True) #pylint: disable=singleton-comparison

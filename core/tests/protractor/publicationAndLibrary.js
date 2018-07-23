@@ -17,22 +17,27 @@
  * the resultant display of explorations in the library.
  */
 
-var editor = require('../protractor_utils/editor.js');
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
+var ExplorationEditorPage =
+  require('../protractor_utils/ExplorationEditorPage.js');
 var ExplorationPlayerPage =
   require('../protractor_utils/ExplorationPlayerPage.js');
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
 describe('Library index page', function() {
   var libraryPage = null;
+  var explorationEditorPage = null;
   var explorationPlayerPage = null;
 
   beforeEach(function() {
     libraryPage = new LibraryPage.LibraryPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
     explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
   });
 
@@ -67,19 +72,24 @@ describe('Library index page', function() {
 
     users.login('varda@publicationAndLibrary.com');
     libraryPage.get();
+    libraryPage.findExploration(EXPLORATION_VINGILOT);
     libraryPage.playExploration(EXPLORATION_VINGILOT);
     general.moveToEditor();
     // Moderators can edit explorations.
-    editor.setLanguage(LANGUAGE_FRANCAIS);
-    editor.saveChanges('change language');
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setLanguage(LANGUAGE_FRANCAIS);
+    explorationEditorPage.saveChanges('change language');
     users.logout();
 
     users.login('celebrimor@publicationAndLibrary.com');
     workflow.createExploration();
-    editor.setContent(forms.toRichText('Celebrimbor wrote this'));
-    editor.setInteraction('EndExploration');
-    editor.setObjective('preserve the works of the elves');
-    editor.saveChanges();
+    explorationEditorMainTab.setContent(
+      forms.toRichText('Celebrimbor wrote this'));
+    explorationEditorMainTab.setInteraction('EndExploration');
+    explorationEditorPage.navigateToSettingsTab();
+    explorationEditorSettingsTab.setObjective(
+      'preserve the works of the elves');
+    explorationEditorPage.saveChanges();
 
     // There are now two non-private explorations whose titles, categories
     // and languages are, respectively:
@@ -148,10 +158,11 @@ describe('Library index page', function() {
     // Private explorations are not shown in the library.
     libraryPage.expectExplorationToBeHidden('Vilya');
 
+    libraryPage.findExploration(EXPLORATION_VINGILOT);
     // The first letter of the objective is automatically capitalized.
     expect(libraryPage.getExplorationObjective(EXPLORATION_VINGILOT)).toBe(
       'Seek the aid of the Valar');
-    general.waitForSystem();
+    libraryPage.findExploration(EXPLORATION_SILMARILS);
     libraryPage.playExploration(EXPLORATION_SILMARILS);
     explorationPlayerPage.expectExplorationNameToBe('silmarils');
 
@@ -190,6 +201,15 @@ describe('Library index page', function() {
 
 
 describe('Permissions for private explorations', function() {
+  var explorationEditorPage = null;
+
+  beforeEach(function() {
+    libraryPage = new LibraryPage.LibraryPage();
+    explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
+    explorationEditorMainTab = explorationEditorPage.getMainTab();
+    explorationEditorSettingsTab = explorationEditorPage.getSettingsTab();
+    explorationPlayerPage = new ExplorationPlayerPage.ExplorationPlayerPage();
+  });
   it('should be correct for collaborators', function() {
     users.createUser('alice@privileges.com', 'alicePrivileges');
     users.createUser('bob@privileges.com', 'bobPrivileges');
@@ -197,6 +217,7 @@ describe('Permissions for private explorations', function() {
 
     users.login('alice@privileges.com');
     workflow.createExploration();
+    explorationEditorPage.navigateToSettingsTab();
     workflow.addExplorationCollaborator('bobPrivileges');
     expect(workflow.getExplorationManagers()).toEqual(['alicePrivileges']);
     expect(workflow.getExplorationCollaborators()).toEqual(['bobPrivileges']);
@@ -206,12 +227,45 @@ describe('Permissions for private explorations', function() {
 
       users.login('bob@privileges.com');
       general.openEditor(explorationId);
-      editor.setContent(forms.toRichText('I love you'));
-      editor.setInteraction('TextInput');
-      editor.saveChanges();
+      explorationEditorMainTab.setContent(forms.toRichText('I love you'));
+      explorationEditorMainTab.setInteraction('TextInput');
+      explorationEditorPage.saveChanges();
       users.logout();
 
       users.login('eve@privileges.com');
+      general.openEditor(explorationId);
+      general.expect404Error();
+      users.logout();
+    });
+  });
+
+  it('should be correct for translators', function() {
+    users.createUser('expOwner@oppia.tests', 'expOwner');
+    users.createUser('translator@oppia.tests', 'translator');
+    users.createUser('guestUser@oppia.tests', 'guestUser');
+
+    users.login('expOwner@oppia.tests');
+    workflow.createExploration();
+    explorationEditorMainTab.setContent(forms.toRichText('this is card 1'));
+    explorationEditorPage.saveChanges('Added content to first card.');
+    explorationEditorPage.navigateToSettingsTab();
+    workflow.addExplorationTranslator('translator');
+    expect(workflow.getExplorationManagers()).toEqual(['expOwner']);
+    expect(workflow.getExplorationCollaborators()).toEqual([]);
+    expect(workflow.getExplorationTranslators()).toEqual(['translator']);
+    expect(workflow.getExplorationPlaytesters()).toEqual([]);
+    general.getExplorationIdFromEditor().then(function(explorationId) {
+      users.logout();
+
+      users.login('translator@oppia.tests');
+      general.openEditor(explorationId);
+      explorationEditorMainTab.expectContentToMatch(
+        forms.toRichText('this is card 1'));
+      expect(element(by.css(
+        '.protractor-test-save-changes')).isPresent()).toBeTruthy();
+      users.logout();
+
+      users.login('guestUser@oppia.tests');
       general.openEditor(explorationId);
       general.expect404Error();
       users.logout();

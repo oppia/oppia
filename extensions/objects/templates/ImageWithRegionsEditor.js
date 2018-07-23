@@ -18,22 +18,19 @@
 
 // TODO(czx): Uniquify the labels of image regions
 oppia.directive('imageWithRegionsEditor', [
-  '$sce', '$compile', 'AlertsService', '$document', 'ExplorationContextService',
+  '$sce', 'UrlInterpolationService', 'AlertsService', '$document',
+  'ContextService', 'AssetsBackendApiService',
   'OBJECT_EDITOR_URL_PREFIX',
-  function($sce, $compile, AlertsService, $document, ExplorationContextService,
+  function($sce, UrlInterpolationService, AlertsService, $document,
+      ContextService, AssetsBackendApiService,
       OBJECT_EDITOR_URL_PREFIX) {
     return {
-      link: function(scope, element) {
-        scope.getTemplateUrl = function() {
-          return OBJECT_EDITOR_URL_PREFIX + 'ImageWithRegions';
-        };
-        $compile(element.contents())(scope);
-      },
       restrict: 'E',
       scope: {
         value: '='
       },
-      template: '<div ng-include="getTemplateUrl()"></div>',
+      templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+        '/objects/templates/image_with_regions_editor_directive.html'),
       controller: [
         '$scope', '$element', '$uibModal',
         function($scope, $element, $uibModal) {
@@ -161,10 +158,9 @@ oppia.directive('imageWithRegionsEditor', [
           };
 
           $scope.getPreviewUrl = function(imageUrl) {
-            return $sce.trustAsResourceUrl(
-              '/imagehandler/' + ExplorationContextService.getExplorationId() +
-              '/' + encodeURIComponent(imageUrl)
-            );
+            return AssetsBackendApiService.getImageUrlForPreview(
+              ContextService.getExplorationId(),
+              encodeURIComponent(imageUrl));
           };
 
           // Called when the image is changed to calculate the required
@@ -173,7 +169,7 @@ oppia.directive('imageWithRegionsEditor', [
             if (newVal !== '') {
               // Loads the image in hanging <img> tag so as to get the
               // width and height.
-              $('<img/>').attr('src', $scope.getPreviewUrl(newVal.name)).on(
+              $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).on(
                 'load', function() {
                   $scope.originalImageWidth = this.width;
                   $scope.originalImageHeight = this.height;
@@ -495,7 +491,9 @@ oppia.directive('imageWithRegionsEditor', [
           };
           $scope.resetEditor = function() {
             $uibModal.open({
-              templateUrl: 'modals/imageRegionsResetConfirmation',
+              templateUrl: UrlInterpolationService.getExtensionResourceUrl(
+                '/objects/templates/' +
+                'image_with_regions_reset_confirmation_directive.html'),
               backdrop: 'static',
               keyboard: false,
               controller: [

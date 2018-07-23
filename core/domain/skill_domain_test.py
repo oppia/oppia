@@ -25,7 +25,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
     """Test the skill domain object."""
 
     SKILL_ID = 'skill_id'
-    MISCONCEPTION_ID = 'misconception_id'
+    MISCONCEPTION_ID = 0
 
     def setUp(self):
         super(SkillDomainUnitTests, self).setUp()
@@ -36,7 +36,8 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.skill = skill_domain.Skill(
             self.SKILL_ID, 'Description', misconceptions,
             skill_contents, feconf.CURRENT_MISCONCEPTIONS_SCHEMA_VERSION,
-            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0
+            feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION, 'en', 0, 1,
+            None, False
         )
 
     def _assert_validation_error(self, expected_error_substring):
@@ -121,6 +122,18 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self._assert_validation_error(
             'Expected skill_contents to be a SkillContents object')
 
+    def test_skill_migration_validation(self):
+        self.skill.superseding_skill_id = 'TestSkillId'
+        self.skill.all_questions_merged = None
+        self._assert_validation_error(
+            'Expected a value for all_questions_merged when '
+            'superseding_skill_id is set.')
+        self.skill.superseding_skill_id = None
+        self.skill.all_questions_merged = True
+        self._assert_validation_error(
+            'Expected a value for superseding_skill_id when '
+            'all_questions_merged is True.')
+
     def test_create_default_skill(self):
         """Test the create_default_skill function.
         """
@@ -141,7 +154,10 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
                 feconf.CURRENT_SKILL_CONTENTS_SCHEMA_VERSION
             ),
             'language_code': constants.DEFAULT_LANGUAGE_CODE,
-            'version': 0
+            'next_misconception_id': 0,
+            'version': 0,
+            'superseding_skill_id': None,
+            'all_questions_merged': False
         }
         self.assertEqual(skill.to_dict(), expected_skill_dict)
 
@@ -165,7 +181,7 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             misconceptions_from_dict.to_dict(), misconceptions_dict)
 
-    def test_to_dict(self):
+    def test_skill_mastery_to_dict(self):
         expected_skill_mastery_dict = {
             'user_id': 'user',
             'skill_id': 'skill_id',
@@ -176,3 +192,17 @@ class SkillDomainUnitTests(test_utils.GenericTestBase):
         self.assertDictEqual(
             expected_skill_mastery_dict,
             observed_skill_mastery.to_dict())
+
+    def test_skill_rights_to_dict(self):
+        expected_dict = {
+            'creator_id': 'user',
+            'skill_is_private': True,
+            'skill_id': 'skill_id'
+        }
+        skill_rights = skill_domain.SkillRights('skill_id', True, 'user')
+        self.assertDictEqual(expected_dict, skill_rights.to_dict())
+
+    def test_skill_rights_is_creator(self):
+        skill_rights = skill_domain.SkillRights(self.SKILL_ID, True, 'user')
+        self.assertTrue(skill_rights.is_creator('user'))
+        self.assertFalse(skill_rights.is_creator('fakeuser'))

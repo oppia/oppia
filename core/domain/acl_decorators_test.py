@@ -16,7 +16,9 @@
 
 from core.controllers import base
 from core.domain import acl_decorators
+from core.domain import question_services
 from core.domain import rights_manager
+from core.domain import skill_services
 from core.domain import topic_domain
 from core.domain import topic_services
 from core.domain import user_services
@@ -1102,7 +1104,7 @@ class DeleteExplorationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class SuggestChangesTest(test_utils.GenericTestBase):
+class SuggestChangesToExplorationTest(test_utils.GenericTestBase):
     """Tests for can_suggest_changes_to_exploration decorator."""
     username = 'user'
     user_email = 'user@example.com'
@@ -1119,7 +1121,7 @@ class SuggestChangesTest(test_utils.GenericTestBase):
             self.render_json({'exploration_id': exploration_id})
 
     def setUp(self):
-        super(SuggestChangesTest, self).setUp()
+        super(SuggestChangesToExplorationTest, self).setUp()
         self.signup(self.user_email, self.username)
         self.signup(self.banned_user_email, self.banned_username)
         self.set_banned_users([self.banned_username])
@@ -1141,6 +1143,45 @@ class SuggestChangesTest(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             response = self.get_json('/mock/%s' % self.exploration_id)
         self.assertEqual(response['exploration_id'], self.exploration_id)
+        self.logout()
+
+
+class SuggestChangesDecoratorsTest(test_utils.GenericTestBase):
+    """Tests for can_suggest_changes decorator."""
+    username = 'user'
+    user_email = 'user@example.com'
+    banned_username = 'banneduser'
+    banned_user_email = 'banned@example.com'
+    exploration_id = 'exp_id'
+
+    class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_suggest_changes
+        def get(self):
+            self.render_json({})
+
+    def setUp(self):
+        super(SuggestChangesDecoratorsTest, self).setUp()
+        self.signup(self.user_email, self.username)
+        self.signup(self.banned_user_email, self.banned_username)
+        self.set_banned_users([self.banned_username])
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+
+    def test_banned_user_cannot_suggest_changes(self):
+        self.login(self.banned_user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock', expect_errors=True, expected_status_int=401)
+        self.logout()
+
+    def test_normal_user_can_suggest_changes(self):
+        self.login(self.user_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json('/mock', expected_status_int=200)
         self.logout()
 
 
@@ -1451,5 +1492,153 @@ class EditTopicDecoratorTest(test_utils.GenericTestBase):
         with self.swap(self, 'testapp', self.mock_testapp):
             self.get_json(
                 '/mock/%s' % self.topic_id, expect_errors=True,
+                expected_status_int=401)
+        self.logout()
+
+
+class EditSkillDecoratorTest(test_utils.GenericTestBase):
+    """Tests permissions for accessing the skill editor."""
+    second_admin_username = 'adm2'
+    second_admin_email = 'adm2@example.com'
+    manager_username = 'topicmanager'
+    manager_email = 'topicmanager@example.com'
+    viewer_username = 'viewer'
+    viewer_email = 'viewer@example.com'
+    skill_id = '1'
+
+    class MockHandler(base.BaseHandler):
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_edit_skill
+        def get(self, skill_id):
+            self.render_json({'skill_id': skill_id})
+
+    def setUp(self):
+        super(EditSkillDecoratorTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.second_admin_email, self.second_admin_username)
+        self.signup(self.manager_email, self.manager_username)
+        self.signup(self.viewer_email, self.viewer_username)
+        self.set_admins([self.ADMIN_USERNAME, self.second_admin_username])
+        self.set_topic_managers([self.manager_username])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.second_admin_id = self.get_user_id_from_email(
+            self.second_admin_email)
+        self.manager_id = self.get_user_id_from_email(self.manager_email)
+        self.admin = user_services.UserActionsInfo(self.admin_id)
+        self.manager = user_services.UserActionsInfo(self.manager_id)
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<skill_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        skill_services.create_new_skill_rights(self.skill_id, self.admin_id)
+
+    def test_admin_can_edit_skill(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.skill_id)
+        self.assertEqual(response['skill_id'], self.skill_id)
+        self.logout()
+
+    def test_admin_can_edit_other_public_skill(self):
+        skill_services.publish_skill(self.skill_id, self.admin_id)
+        self.login(self.second_admin_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.skill_id)
+        self.assertEqual(response['skill_id'], self.skill_id)
+        self.logout()
+
+    def test_admin_can_not_edit_other_private_skill(self):
+        self.login(self.second_admin_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.skill_id, expect_errors=True,
+                expected_status_int=401)
+        self.logout()
+
+    def test_topic_manager_can_not_edit_private_skill(self):
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.skill_id, expect_errors=True,
+                expected_status_int=401)
+        self.logout()
+
+    def test_topic_manager_can_edit_public_skill(self):
+        skill_services.publish_skill(self.skill_id, self.admin_id)
+        self.login(self.manager_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.skill_id)
+        self.assertEqual(response['skill_id'], self.skill_id)
+        self.logout()
+
+    def test_normal_user_can_not_edit_public_skill(self):
+        skill_services.publish_skill(self.skill_id, self.admin_id)
+        self.login(self.viewer_email)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.skill_id, expect_errors=True,
+                expected_status_int=401)
+
+
+class EditQuestionDecoratorTest(test_utils.GenericTestBase):
+    """Tests the decorator can_edit_question."""
+    question_id = 'question_id'
+
+    class MockHandler(base.BaseHandler):
+
+        GET_HANDLER_ERROR_RETURN_TYPE = feconf.HANDLER_TYPE_JSON
+
+        @acl_decorators.can_edit_question
+        def get(self, question_id):
+            self.render_json({'question_id': question_id})
+
+    def setUp(self):
+        super(EditQuestionDecoratorTest, self).setUp()
+
+        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup('a@example.com', 'A')
+        self.signup('b@example.com', 'B')
+
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_b = self.get_user_id_from_email('b@example.com')
+
+        self.set_admins([self.ADMIN_USERNAME])
+        self.set_topic_managers([user_services.get_username(self.user_id_a)])
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.manager_id = self.get_user_id_from_email('a@example.com')
+
+        self.mock_testapp = webtest.TestApp(webapp2.WSGIApplication(
+            [webapp2.Route('/mock/<question_id>', self.MockHandler)],
+            debug=feconf.DEBUG,
+        ))
+        question_services.create_new_question_rights(
+            self.question_id, self.ADMIN_EMAIL)
+
+    def test_admin_can_edit_question(self):
+        self.login(self.ADMIN_EMAIL)
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.question_id)
+        self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_topic_manager_can_edit_question(self):
+        self.login('a@example.com')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            response = self.get_json('/mock/%s' % self.question_id)
+        self.assertEqual(response['question_id'], self.question_id)
+        self.logout()
+
+    def test_any_user_cannot_edit_question(self):
+        self.login('b@example.com')
+        with self.swap(self, 'testapp', self.mock_testapp):
+            self.get_json(
+                '/mock/%s' % self.question_id, expect_errors=True,
                 expected_status_int=401)
         self.logout()

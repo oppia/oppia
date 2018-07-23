@@ -21,7 +21,6 @@ var interactions = require('../../../extensions/interactions/protractor.js');
 var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
-var general = require('./general.js');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -30,6 +29,85 @@ var DictionaryEditor = function(elem) {
         row(index));
       var editor = getEditor(objectType);
       return editor(entry);
+    }
+  };
+};
+
+var GraphEditor = function(graphInputContainer) {
+  if (!graphInputContainer) {
+    throw Error('Please provide Graph Input Container element');
+  }
+  var vertexElement = function(index) {
+    // Would throw incorrect element error if provided incorrect index number.
+    // Node index starts at 0.
+    return graphInputContainer.element(by.css(
+      '.protractor-test-graph-vertex-' + index));
+  };
+
+  var createVertex = function(xOffset, yOffset) {
+    var addNodeButton = graphInputContainer.element(
+      by.css('.protractor-test-Add-Node-button'));
+    addNodeButton.click();
+    // Offsetting from the graph container.
+    browser.actions()
+      .mouseMove(graphInputContainer, {x: xOffset, y: yOffset})
+      .click()
+      .perform();
+  };
+
+  var createEdge = function(vertexIndex1, vertexIndex2) {
+    var addEdgeButton = graphInputContainer.element(
+      by.css('.protractor-test-Add-Edge-button'));
+    addEdgeButton.click();
+    browser.actions()
+      .dragAndDrop(vertexElement(vertexIndex1), vertexElement(vertexIndex2))
+      .perform();
+  };
+  return {
+    setValue: function(graphDict) {
+      var nodeCoordinatesList = graphDict.vertices;
+      var edgesList = graphDict.edges;
+      if (nodeCoordinatesList) {
+        expect(nodeCoordinatesList.length).toBeGreaterThan(0);
+        // Assume x-coord is at index 0.
+        nodeCoordinatesList.forEach(function(coordinateElement) {
+          createVertex(coordinateElement[0], coordinateElement[1]);
+        });
+      }
+      if (edgesList) {
+        edgesList.forEach(function(edgeElement) {
+          createEdge(edgeElement[0], edgeElement[1]);
+        });
+      }
+    },
+    clearDefaultGraph: function() {
+      var deleteButton = graphInputContainer.element(
+        by.css('.protractor-test-Delete-button'));
+      deleteButton.click();
+      // Sample graph comes with 3 vertices.
+      for (i = 2; i >= 0; i--) {
+        vertexElement(i).click();
+      }
+    },
+    expectCurrentGraphToBe: function(graphDict) {
+      var nodeCoordinatesList = graphDict.vertices;
+      var edgesList = graphDict.edges;
+      if (nodeCoordinatesList) {
+        // Expecting total no. of vertices on the graph matches with the given
+        // dict's vertices.
+        nodeCoordinatesList.forEach(function(node, index) {
+          expect(vertexElement(index).isDisplayed()).toBe(true);
+        });
+      }
+      if (edgesList) {
+        // Expecting total no. of edges on the graph matches with the given
+        // dict's edges.
+        var allEdgesElement = element.all(by.css(
+          '.protractor-test-graph-edge'));
+        allEdgesElement.then(function(allEdges) {
+          expect(allEdges.length).toEqual(edgesList.length);
+        });
+      }
     }
   };
 };
@@ -99,17 +177,17 @@ var RealEditor = function(elem) {
 
 var RichTextEditor = function(elem) {
   // Set focus in the RTE.
-  elem.all(by.model('html')).first().click();
+  elem.all(by.css('.oppia-rte')).first().click();
 
   var _appendContentText = function(text) {
-    elem.all(by.model('html')).first().sendKeys(text);
+    elem.all(by.css('.oppia-rte')).first().sendKeys(text);
   };
   var _clickToolbarButton = function(buttonName) {
-    elem.element(by.css('[name="' + buttonName + '"]')).click();
+    elem.element(by.css('.' + buttonName)).click();
   };
   var _clearContent = function() {
-    expect(elem.all(by.model('html')).first().isPresent()).toBe(true);
-    elem.all(by.model('html')).first().clear();
+    expect(elem.all(by.css('.oppia-rte')).first().isPresent()).toBe(true);
+    elem.all(by.css('.oppia-rte')).first().clear();
   };
 
   return {
@@ -124,36 +202,36 @@ var RichTextEditor = function(elem) {
       _appendContentText(text);
     },
     appendBoldText: function(text) {
-      _clickToolbarButton('bold');
+      _clickToolbarButton('cke_button__bold');
       _appendContentText(text);
-      _clickToolbarButton('bold');
+      _clickToolbarButton('cke_button__bold');
     },
     appendItalicText: function(text) {
-      _clickToolbarButton('italics');
+      _clickToolbarButton('cke_button__italic');
       _appendContentText(text);
-      _clickToolbarButton('italics');
+      _clickToolbarButton('cke_button__italic');
     },
     appendOrderedList: function(textArray) {
       _appendContentText('\n');
-      _clickToolbarButton('ol');
+      _clickToolbarButton('cke_button__numberedlist');
       for (var i = 0; i < textArray.length; i++) {
         _appendContentText(textArray[i] + '\n');
       }
-      _clickToolbarButton('ol');
+      _clickToolbarButton('cke_button__numberedlist');
     },
     appendUnorderedList: function(textArray) {
       _appendContentText('\n');
-      _clickToolbarButton('ul');
+      _clickToolbarButton('cke_button__bulletedlist');
       for (var i = 0; i < textArray.length; i++) {
         _appendContentText(textArray[i] + '\n');
       }
-      _clickToolbarButton('ul');
+      _clickToolbarButton('cke_button__bulletedlist');
     },
     // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant RTE component editor.
     addRteComponent: function(componentName) {
-      _clickToolbarButton(componentName.toLowerCase());
+      _clickToolbarButton('cke_button__oppia' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = element.all(by.css('.modal-dialog')).last();
@@ -168,10 +246,15 @@ var RichTextEditor = function(elem) {
         null, args);
       modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
-      general.waitForSystem();
+
+      // Ensure that focus is not on added component once it is added so that
+      // the component is not overwritten by some other element.
+      if (['Video', 'Image', 'Collapsible', 'Tabs'].includes(componentName)) {
+        elem.all(by.css('.oppia-rte')).first().sendKeys(protractor.Key.DOWN);
+      }
 
       // Ensure that the cursor is at the end of the RTE.
-      elem.all(by.model('html')).first().sendKeys(
+      elem.all(by.css('.oppia-rte')).first().sendKeys(
         protractor.Key.chord(protractor.Key.CONTROL, protractor.Key.END));
     }
   };
@@ -316,7 +399,7 @@ var MultiSelectEditor = function(elem) {
 // <div>
 //   plain
 //   <b>bold</b>
-//   <oppia-nointeractive-math> ... </oppia-noninteractive-math>
+//   <oppia-noninteractive-math> ... </oppia-noninteractive-math>
 // <div>
 // The richTextInstructions function will be supplied with a 'handler' argument
 // which it should then use to read through the rich-text area using the
@@ -332,7 +415,6 @@ var expectRichText = function(elem) {
     // surround, e.g., <i> tags, so we can't just ignore the <p> elements
     // altogether.)
     var XPATH_SELECTOR = './p/*|./*[not(self::p)]';
-
     elem.all(by.xpath(XPATH_SELECTOR)).map(function(entry) {
       // It is necessary to obtain the texts of the elements in advance since
       // applying .getText() while the RichTextChecker is running would be
@@ -405,10 +487,10 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       justPassedRteComponent = false;
     },
     readBoldText: function(text) {
-      _readFormattedText(text, 'b');
+      _readFormattedText(text, 'strong');
     },
     readItalicText: function(text) {
-      _readFormattedText(text, 'i');
+      _readFormattedText(text, 'em');
     },
     // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
@@ -492,7 +574,6 @@ var CodeMirrorChecker = function(elem) {
     browser.executeScript(
       "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) +
       ');');
-    general.waitForSystem();
     elem.all(by.xpath('./div')).map(function(lineElement) {
       return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
         .then(function(lineNumber) {
@@ -553,8 +634,29 @@ var CodeMirrorChecker = function(elem) {
       // (2i+1)th line contains the text on that line.
       var textArray = text.split('\n');
       for (var i = 0; i < textArray.length; i += 2) {
-        var lineNumber = textArray[i];
+        // CKEditor prettifies html and adds new lines.
+        // Due to this there are extra lines in the output.
+        // This creates a deviation from the usual case where--
+        // (2i)th line contains a line number and the
+        // (2i+1)th line contains the text on that line.
+        // In this case both the (2i)th and (2i+1)th lines
+        // contain line numbers since the html text spans
+        // multiple lines.
+        // This block checks whether (2i+1)th contains a line
+        // number or text for (2i)th line.
+
+        // Spaces are trimmed from line numbers since extra spaces
+        // span multiple lines due to html being prettified by CKEditor.
+        var lineNumber = textArray[i].replace(/^\s+/g, '');
         var lineText = textArray[i + 1];
+        var copy = lineText;
+        var lineTextWithoutStartSpaces = copy.replace(/^\s+/g, '');
+        // Checks if the line only contains a single digit.
+        if ((lineTextWithoutStartSpaces.length === 1) && (
+          lineTextWithoutStartSpaces.match(/[0-9]/i))) {
+          lineText = '';
+          i -= 1;
+        }
         if (!compareDict.hasOwnProperty(lineNumber)) {
           throw Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
@@ -617,6 +719,7 @@ var CodeMirrorChecker = function(elem) {
 // their entries dynamically.
 var FORM_EDITORS = {
   Dictionary: DictionaryEditor,
+  Graph: GraphEditor,
   List: ListEditor,
   Real: RealEditor,
   RichText: RichTextEditor,
@@ -641,6 +744,7 @@ exports.UnicodeEditor = UnicodeEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
 exports.MultiSelectEditor = MultiSelectEditor;
+exports.GraphEditor = GraphEditor;
 
 exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;

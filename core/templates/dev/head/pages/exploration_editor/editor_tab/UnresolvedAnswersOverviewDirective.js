@@ -16,6 +16,10 @@
  * @fileoverview Directive for the state graph visualization.
  */
 
+// TODO(brianrodri): Add all other interaction IDs to this list, then remove
+// the list altogether.
+oppia.constant('SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS', ['TextInput']);
+
 oppia.directive('unresolvedAnswersOverview', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
@@ -25,11 +29,19 @@ oppia.directive('unresolvedAnswersOverview', [
         '/pages/exploration_editor/editor_tab/' +
         'unresolved_answers_overview_directive.html'),
       controller: [
-        '$scope', 'EditorStateService', 'ExplorationStatesService',
-        'StateRulesStatsService', 'ExplorationRightsService',
+        '$scope', '$rootScope', '$uibModal', 'EditorStateService',
+        'ExplorationStatesService', 'StateRulesStatsService',
+        'ExplorationRightsService', 'stateInteractionIdService',
+        'INTERACTION_SPECS', 'EditabilityService',
+        'StateTopAnswersStatsService',
+        'SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS',
         function(
-            $scope, EditorStateService, ExplorationStatesService,
-            StateRulesStatsService, ExplorationRightsService) {
+            $scope, $rootScope, $uibModal, EditorStateService,
+            ExplorationStatesService, StateRulesStatsService,
+            ExplorationRightsService, stateInteractionIdService,
+            INTERACTION_SPECS, EditabilityService,
+            StateTopAnswersStatsService,
+            SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS) {
           var MAXIMUM_UNRESOLVED_ANSWERS = 5;
           var MINIMUM_UNRESOLVED_ANSWER_FREQUENCY = 2;
 
@@ -37,60 +49,213 @@ oppia.directive('unresolvedAnswersOverview', [
           $scope.latestRefreshDate = new Date();
           $scope.unresolvedAnswersOverviewIsShown = false;
 
-          $scope.computeUnresolvedAnswers = function() {
+          $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
+            GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
+
+          /**
+           * @returns {boolean} - answers from this state can be rendered with
+           * HTML.
+           */
+          var isStateInteractionIdHtmlRenderable = function() {
             var state = ExplorationStatesService.getState(
-              EditorStateService.getActiveStateName()
-            );
-
-            if (!StateRulesStatsService.stateSupportsIssuesOverview(state)) {
-              $scope.unresolvedAnswersData = [];
-            } else {
-              StateRulesStatsService.computeStateRulesStats(
-                state
-              ).then(function(stats) {
-                var calculatedUnresolvedAnswersData = [];
-
-                for (var i = 0; i < stats.visualizations_info.length; ++i) {
-                  var vizInfo = stats.visualizations_info[i];
-                  if (!vizInfo.addressed_info_is_supported) {
-                    continue;
-                  }
-
-                  // NOTE: vizInfo.data is already sorted in descending order by
-                  // frequency.
-                  for (var j = 0; j < vizInfo.data.length; ++j) {
-                    var answer = vizInfo.data[j];
-                    if (answer.is_addressed ||
-                        answer.frequency <
-                          MINIMUM_UNRESOLVED_ANSWER_FREQUENCY) {
-                      continue;
-                    }
-
-                    calculatedUnresolvedAnswersData.push(answer);
-                    if (calculatedUnresolvedAnswersData.length >=
-                          MAXIMUM_UNRESOLVED_ANSWERS) {
-                      break;
-                    }
-                  }
-
-                  // Will only take the answers from first eligible
-                  // visualization.
-                  break;
-                }
-
-                $scope.unresolvedAnswersData = calculatedUnresolvedAnswersData;
-                $scope.latestRefreshDate = new Date();
-              });
-            }
+              EditorStateService.getActiveStateName());
+            return (!!state &&
+              SUPPORTED_HTML_RENDERINGS_FOR_INTERACTION_IDS.indexOf(
+                state.interaction.id) !== -1);
           };
 
-          $scope.$on('refreshStateEditor', function() {
-            $scope.unresolvedAnswersOverviewIsShown = (
-              ExplorationRightsService.isPublic());
-            if ($scope.unresolvedAnswersOverviewIsShown) {
-              $scope.computeUnresolvedAnswers();
-            }
-          });
+          $scope.isUnresolvedAnswersOverviewShown = function() {
+            return (
+              StateTopAnswersStatsService.hasStateStats(
+                EditorStateService.getActiveStateName()) &&
+              isStateInteractionIdHtmlRenderable());
+          };
+
+          $scope.getCurrentInteractionId = function() {
+            return stateInteractionIdService.savedMemento;
+          };
+
+          $scope.isCurrentInteractionLinear = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return interactionId && INTERACTION_SPECS[interactionId].is_linear;
+          };
+
+          $scope.isCurrentInteractionTrainable = function() {
+            var interactionId = $scope.getCurrentInteractionId();
+            return (
+              interactionId &&
+              INTERACTION_SPECS[interactionId].is_trainable);
+          };
+
+          $scope.isEditableOutsideTutorialMode = function() {
+            return EditabilityService.isEditableOutsideTutorialMode();
+          };
+
+          $scope.openTeachOppiaModal = function() {
+            $rootScope.$broadcast('externalSave');
+
+            $uibModal.open({
+              templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
+                '/pages/exploration_editor/editor_tab/' +
+                'teach_oppia_modal_directive.html'),
+              backdrop: true,
+              controller: [
+                '$scope', '$injector', '$uibModalInstance', '$http', '$filter',
+                'ExplorationHtmlFormatterService', 'TrainingModalService',
+                'stateInteractionIdService', 'stateCustomizationArgsService',
+                'ContextService', 'EditorStateService',
+                'ExplorationStatesService', 'TrainingDataService',
+                'AnswerClassificationService', 'EXPLICIT_CLASSIFICATION',
+                'UrlInterpolationService', 'TRAINING_DATA_CLASSIFICATION',
+                'AngularNameService', 'DEFAULT_OUTCOME_CLASSIFICATION',
+                'AlertsService',
+                function(
+                    $scope, $injector, $uibModalInstance, $http, $filter,
+                    ExplorationHtmlFormatterService, TrainingModalService,
+                    stateInteractionIdService, stateCustomizationArgsService,
+                    ContextService, EditorStateService,
+                    ExplorationStatesService, TrainingDataService,
+                    AnswerClassificationService, EXPLICIT_CLASSIFICATION,
+                    UrlInterpolationService, TRAINING_DATA_CLASSIFICATION,
+                    AngularNameService, DEFAULT_OUTCOME_CLASSIFICATION,
+                    AlertsService) {
+                  var _explorationId = (
+                    ContextService.getExplorationId());
+                  var _stateName = EditorStateService.getActiveStateName();
+                  var _state = ExplorationStatesService.getState(_stateName);
+                  var interactionId = stateInteractionIdService.savedMemento;
+
+                  var rulesServiceName = (
+                    AngularNameService.getNameOfInteractionRulesService(
+                      interactionId));
+
+                  // Inject RulesService dynamically.
+                  var rulesService = $injector.get(rulesServiceName);
+
+                  // Timeout for the toast that is shown when a response has
+                  // been confirmed or fixed.
+                  var TOAST_TIMEOUT = 2000;
+
+                  var fetchAndShowUnresolvedAnswers = function(
+                      expId, stateName) {
+                    var unresolvedAnswersUrl = (
+                      UrlInterpolationService.interpolateUrl(
+                        '/createhandler/get_top_unresolved_answers/' +
+                        '<exploration_id>', {
+                          exploration_id: expId
+                        }));
+                    $http.get(unresolvedAnswersUrl, {
+                      params: {
+                        state_name: stateName
+                      }
+                    }).success(function(response) {
+                      $scope.showUnresolvedAnswers(response.unresolved_answers);
+                    }).error(function(response) {
+                      $log.error(
+                        'Error occurred while fetching unresolved answers ' +
+                        'for exploration ' + _explorationId + 'state ' +
+                        _stateName + ': ' + response);
+                      $scope.showUnresolvedAnswers([]);
+                    });
+                  };
+
+                  $scope.showUnresolvedAnswers = function(unresolvedAnswers) {
+                    $scope.loadingDotsAreShown = false;
+                    $scope.unresolvedAnswers = [];
+
+                    unresolvedAnswers.forEach(function(item) {
+                      var acs = AnswerClassificationService;
+                      var answer = item.answer;
+                      var classificationResult = (
+                        acs.getMatchingClassificationResult(
+                          _explorationId, _stateName, _state, answer,
+                          rulesService));
+                      var classificationType = (
+                        classificationResult.classificationCategorization);
+                      if (classificationType !== EXPLICIT_CLASSIFICATION &&
+                        classificationType !== TRAINING_DATA_CLASSIFICATION &&
+                        !TrainingDataService.isConfirmedUnclassifiedAnswer(
+                          answer)) {
+                        var answerTemplate = (
+                          ExplorationHtmlFormatterService.getAnswerHtml(
+                            answer, stateInteractionIdService.savedMemento,
+                            stateCustomizationArgsService.savedMemento));
+                        var feedbackHtml = (
+                          classificationResult.outcome.feedback.getHtml());
+                        $scope.unresolvedAnswers.push({
+                          answer: answer,
+                          answerTemplate: answerTemplate,
+                          classificationResult: classificationResult,
+                          feedbackHtml: feedbackHtml
+                        });
+                      }
+                    });
+                  };
+
+                  $scope.confirmAnswerAssignment = function(answerIndex) {
+                    answer = $scope.unresolvedAnswers[answerIndex];
+                    $scope.unresolvedAnswers.splice(answerIndex, 1);
+
+                    var classificationType = (
+                      answer.classificationResult.classificationCategorization);
+                    var truncatedAnswer = $filter(
+                      'truncateInputBasedOnInteractionAnswerType')(
+                      answer.answer, interactionId, 12);
+                    var successToast = (
+                      'The answer ' + truncatedAnswer +
+                      ' has been successfully trained.');
+
+                    if (classificationType === DEFAULT_OUTCOME_CLASSIFICATION) {
+                      TrainingDataService.associateWithDefaultResponse(
+                        answer.answer);
+                      AlertsService.addSuccessMessage(
+                        successToast, TOAST_TIMEOUT);
+                      return;
+                    }
+
+                    TrainingDataService.associateWithAnswerGroup(
+                      answer.classificationResult.answerGroupIndex,
+                      answer.answer);
+                    AlertsService.addSuccessMessage(
+                      successToast, TOAST_TIMEOUT);
+                  };
+
+                  $scope.openTrainUnresolvedAnswerModal = function(
+                      answerIndex) {
+                    var selectedAnswerIndex = answerIndex;
+                    var unresolvedAnswer = (
+                      $scope.unresolvedAnswers[answerIndex]);
+                    var answer = unresolvedAnswer.answer;
+                    var answerGroupIndex = (
+                      unresolvedAnswer.classificationResult.answerGroupIndex);
+                    return TrainingModalService.openTrainUnresolvedAnswerModal(
+                      answer, function() {
+                        $scope.unresolvedAnswers.splice(selectedAnswerIndex, 1);
+                        var truncatedAnswer = $filter(
+                          'truncateInputBasedOnInteractionAnswerType')(
+                          answer, interactionId, 12);
+                        var successToast = (
+                          'The response for ' + truncatedAnswer +
+                          ' has been fixed.');
+                        AlertsService.addSuccessMessage(
+                          successToast, TOAST_TIMEOUT);
+                      });
+                  };
+
+                  $scope.finishTeaching = function(reopen) {
+                    $uibModalInstance.dismiss();
+                  };
+
+                  $scope.loadingDotsAreShown = true;
+                  fetchAndShowUnresolvedAnswers(_explorationId, _stateName);
+                }]
+            });
+          };
+
+          $scope.getUnresolvedStateStats = function() {
+            return StateTopAnswersStatsService.getUnresolvedStateStats(
+              EditorStateService.getActiveStateName());
+          };
         }
       ]
     };

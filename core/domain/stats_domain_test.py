@@ -386,7 +386,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
 
     def test_to_dict(self):
         playthrough = stats_domain.Playthrough(
-            'playthrough_id1', 'exp_id1', 1, 'EarlyQuit', {
+            'exp_id1', 1, 'EarlyQuit', {
                 'state_name': {
                     'value': 'state_name1'
                 },
@@ -405,7 +405,6 @@ class PlaythroughTests(test_utils.GenericTestBase):
 
         playthrough_dict = playthrough.to_dict()
 
-        self.assertEqual(playthrough_dict['id'], 'playthrough_id1')
         self.assertEqual(playthrough_dict['exp_id'], 'exp_id1')
         self.assertEqual(playthrough_dict['exp_version'], 1)
         self.assertEqual(playthrough_dict['issue_type'], 'EarlyQuit')
@@ -432,7 +431,6 @@ class PlaythroughTests(test_utils.GenericTestBase):
 
     def test_from_dict(self):
         playthrough_dict = {
-            'id': 'playthrough_id1',
             'exp_id': 'exp_id1',
             'exp_version': 1,
             'issue_type': 'EarlyQuit',
@@ -457,7 +455,6 @@ class PlaythroughTests(test_utils.GenericTestBase):
 
         playthrough = stats_domain.Playthrough.from_dict(playthrough_dict)
 
-        self.assertEqual(playthrough.id, 'playthrough_id1')
         self.assertEqual(playthrough.exp_id, 'exp_id1')
         self.assertEqual(playthrough.exp_version, 1)
         self.assertEqual(playthrough.issue_type, 'EarlyQuit')
@@ -498,7 +495,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
 
     def test_validate(self):
         playthrough = stats_domain.Playthrough(
-            'playthrough_id1', 'exp_id1', 1, 'EarlyQuit', {
+            'exp_id1', 1, 'EarlyQuit', {
                 'state_name': {
                     'value': 'state_name1'
                 },
@@ -516,14 +513,7 @@ class PlaythroughTests(test_utils.GenericTestBase):
             })])
         playthrough.validate()
 
-        # Change ID to int.
-        playthrough.id = 5
-        with self.assertRaisesRegexp(utils.ValidationError, (
-            'Expected ID to be a string, received %s' % (type(5)))):
-            playthrough.validate()
-
         # Change exp_version to string.
-        playthrough.id = 'playthrough_id1'
         playthrough.exp_version = '1'
         with self.assertRaisesRegexp(utils.ValidationError, (
             'Expected exp_version to be an int, received %s' % (type('1')))):
@@ -1095,10 +1085,19 @@ class SubmittedAnswerValidationTests(test_utils.GenericTestBase):
             self.submitted_answer,
             'Expected answer_group_index to be non-negative')
 
+    def test_rule_spec_index_can_be_none(self):
+        self.submitted_answer.rule_spec_index = None
+        self.submitted_answer.validate()
+
     def test_rule_spec_index_must_be_integer(self):
         self.submitted_answer.rule_spec_index = '0'
         self._assert_validation_error(
             self.submitted_answer, 'Expected rule_spec_index to be an integer')
+        self.submitted_answer.rule_spec_index = ''
+        self._assert_validation_error(
+            self.submitted_answer, 'Expected rule_spec_index to be an integer')
+        self.submitted_answer.rule_spec_index = 0
+        self.submitted_answer.validate()
 
     def test_rule_spec_index_must_be_positive(self):
         self.submitted_answer.rule_spec_index = -1

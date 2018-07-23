@@ -22,11 +22,15 @@
   <div class="section">
     <div style="display: inline-block;">
       <p>
-        <strong>Card entered</strong>: <[stateStats.total_hit_count]> <strong> times. </strong>
+        <strong>Card entered</strong>
+        : <[stateStats.total_hit_count]>
+        <strong> times. </strong>
       </p>
     </div>
     <div style="display: inline-block; padding-left: 170px;">
-      <strong>Quit at this card</strong>: <[stateStats.total_hit_count - stateStats.num_completions]> <strong> times. </strong>
+      <strong>Quit at this card</strong>
+      : <[stateStats.total_hit_count - stateStats.num_completions]>
+      <strong> times. </strong>
     </div>
   </div>
 
@@ -43,7 +47,10 @@
     </div>
   </div>
 
-  <div class="section" angular-html-bind="visualizationsHtml"></div>
+  <div>
+    <angular-html-bind class="section" html-data="visualizationsHtml">
+    </angular-html-bind>
+  </div>
 </div>
 
 <div class="modal-footer">

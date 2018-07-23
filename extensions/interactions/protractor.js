@@ -44,11 +44,15 @@
 
 var INTERACTIONS = {
   Continue: require('./Continue/protractor.js'),
+  EndExploration: require('./EndExploration/protractor.js'),
   FractionInput: require('./FractionInput/protractor.js'),
+  GraphInput: require('./GraphInput/protractor.js'),
+  LogicProof: require('./LogicProof/protractor.js'),
+  MathExpressionInput: require('./MathExpressionInput/protractor.js'),
   MultipleChoiceInput: require('./MultipleChoiceInput/protractor.js'),
   NumericInput: require('./NumericInput/protractor.js'),
-  TextInput: require('./TextInput/protractor.js'),
-  LogicProof: require('./LogicProof/protractor.js')
+  NumberWithUnits: require('./NumberWithUnits/protractor.js'),
+  TextInput: require('./TextInput/protractor.js')
 };
 
 var getInteraction = function(interactionName) {

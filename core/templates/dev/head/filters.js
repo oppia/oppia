@@ -92,9 +92,32 @@ oppia.filter('truncateAtFirstLine', [function() {
     var suffix = otherNonemptyLinesExist ? '...' : '';
     return (
       firstNonemptyLineIndex !== -1 ?
-        lines[firstNonemptyLineIndex] + suffix : '');
+      lines[firstNonemptyLineIndex] + suffix : '');
   };
 }]);
+
+/* Filter that trucates the input answer based on interaction type.
+ * @param {string} input - The answer to truncate.
+ * @param {string} interactionId - Interaction for which answer is to be
+    truncated.
+ * @param {integer} length - Truncated length of answer.
+ */
+oppia.filter('truncateInputBasedOnInteractionAnswerType', [
+  '$filter', 'INTERACTION_SPECS', function($filter, INTERACTION_SPECS) {
+    return function(input, interactionId, length) {
+      var answerType = INTERACTION_SPECS[interactionId].answer_type;
+      var actualInputToTruncate = '';
+      if (answerType === 'NormalizedString') {
+        actualInputToTruncate = input;
+      } else if (answerType === 'CodeEvaluation') {
+        actualInputToTruncate = input.code;
+      } else {
+        throw Error('Unknown interaction answer type');
+      }
+      return $filter('truncate')(actualInputToTruncate, length);
+    };
+  }
+]);
 
 // Filter that rounds a number to 1 decimal place.
 oppia.filter('round1', [function() {
@@ -148,7 +171,8 @@ oppia.filter('wrapTextWithEllipsis', [
 // multiple-choice input and image-click input.
 oppia.filter('parameterizeRuleDescription', [
   '$filter', 'INTERACTION_SPECS', 'FractionObjectFactory',
-  function( $filter, INTERACTION_SPECS, FractionObjectFactory) {
+  'NumberWithUnitsObjectFactory', function( $filter, INTERACTION_SPECS,
+      FractionObjectFactory, NumberWithUnitsObjectFactory) {
     return function(rule, interactionId, choices) {
       if (!rule) {
         return '';
@@ -198,6 +222,23 @@ oppia.filter('parameterizeRuleDescription', [
               }
             }
             replacementText += ']';
+          } else if (varType === 'ListOfSetsOfHtmlStrings') {
+            replacementText = '[';
+            var key = inputs[varName];
+            for (var i = 0; i < key.length; i++) {
+              replacementText += '[';
+              for (var j = 0; j < key[i].length; j++) {
+                replacementText += $filter('formatRtePreview')(key[i][j]);
+                if (j < key[i].length - 1) {
+                  replacementText += ',';
+                }
+              }
+              replacementText += ']';
+              if (i < key.length - 1) {
+                replacementText += ',';
+              }
+            }
+            replacementText += ']';
           } else {
             // The following case is for MultipleChoiceInput
             for (var i = 0; i < choices.length; i++) {
@@ -225,13 +266,13 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '(';
           replacementText += (
             inputs[varName][0] >= 0.0 ?
-              latitude.toFixed(2) + '°N' :
-              -latitude.toFixed(2) + '°S');
+            latitude.toFixed(2) + '°N' :
+            -latitude.toFixed(2) + '°S');
           replacementText += ', ';
           replacementText += (
             inputs[varName][1] >= 0.0 ?
-              longitude.toFixed(2) + '°E' :
-              -longitude.toFixed(2) + '°W');
+            longitude.toFixed(2) + '°E' :
+            -longitude.toFixed(2) + '°W');
           replacementText += ')';
         } else if (varType === 'NormalizedString') {
           replacementText = '"' + inputs[varName] + '"';
@@ -239,6 +280,9 @@ oppia.filter('parameterizeRuleDescription', [
           replacementText = '[reference graph]';
         } else if (varType === 'Fraction') {
           replacementText = FractionObjectFactory
+            .fromDict(inputs[varName]).toString();
+        } else if (varType === 'NumberWithUnits') {
+          replacementText = NumberWithUnitsObjectFactory
             .fromDict(inputs[varName]).toString();
         } else if (
           varType === 'SetOfUnicodeString' ||

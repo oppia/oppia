@@ -19,6 +19,7 @@
 import bs4
 from core.domain import html_cleaner
 from core.tests import test_utils
+import feconf
 
 
 class HtmlCleanerUnitTests(test_utils.GenericTestBase):
@@ -49,7 +50,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
-                '\n\nOriginal text: %s' % datum[0])
+                msg='\n\nOriginal text: %s' % datum[0])
 
     def test_bad_tags_suppressed(self):
         test_data = [(
@@ -78,7 +79,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
-                '\n\nOriginal text: %s' % datum[0])
+                msg='\n\nOriginal text: %s' % datum[0])
 
     def test_oppia_custom_tags(self):
         test_data = [(
@@ -98,7 +99,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
-                '\n\nOriginal text: %s' % datum[0])
+                msg='\n\nOriginal text: %s' % datum[0])
 
 
 class HtmlStripperUnitTests(test_utils.GenericTestBase):
@@ -183,9 +184,9 @@ class RteComponentExtractorUnitTests(test_utils.GenericTestBase):
             self.assertIn(component, expected_components)
 
 
-class ContentMigrationToTextAngular(test_utils.GenericTestBase):
+class ContentMigrationTests(test_utils.GenericTestBase):
     """ Tests the function associated with the migration of html
-    strings to valid TextAngular format.
+    strings to valid RTE format.
     """
 
     def test_wrap_with_siblings(self):
@@ -220,15 +221,15 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
         for index, test_case in enumerate(test_cases):
             soup = bs4.BeautifulSoup(test_case['html_content'], 'html.parser')
             if index == 0:
-                tag = soup.findAll('i')[1]
+                tag = soup.findAll(name='i')[1]
             elif index == 1:
-                tag = soup.find('br')
+                tag = soup.find(name='br')
             elif index == 2:
-                tag = soup.find('b')
+                tag = soup.find(name='b')
             html_cleaner.wrap_with_siblings(tag, soup.new_tag('p'))
             self.assertEqual(str(soup), test_case['expected_output'])
 
-    def test_convert_to_text_angular(self):
+    def test_convert_to_textangular(self):
         test_cases = [{
             'html_content': (
                 '<div><i>hello</i></div> this is<i>test case1</i> for '
@@ -287,7 +288,7 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
                 '</td></tr></tbody></table>'
             ),
             'expected_output': (
-                '<p>January  $100  200</p><p>February  $80  400</p>'
+                '<p>January $100 200</p><p>February $80 400</p>'
             )
         }, {
             'html_content': (
@@ -312,10 +313,10 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
         for test_case in test_cases:
             self.assertEqual(
                 test_case['expected_output'],
-                html_cleaner.convert_to_text_angular(test_case['html_content']))
+                html_cleaner.convert_to_textangular(test_case['html_content']))
 
-    def test_validate_text_angular(self):
-        test_cases = [
+    def test_validate_rte_format(self):
+        test_cases_for_textangular = [
             (
                 'This is for <i>testing</i> the validate <b>text</b> '
                 'angular function.'
@@ -327,19 +328,20 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
                 '</oppia-noninteractive-link></a><p> testing completed</p>'
             )
         ]
-        actual_output_with_migration = (
-            html_cleaner.validate_textangular_format(
-                test_cases, True))
-        actual_output_without_migration = (
-            html_cleaner.validate_textangular_format(
-                test_cases))
+        actual_output_with_migration_for_textangular = (
+            html_cleaner.validate_rte_format(
+                test_cases_for_textangular,
+                feconf.RTE_FORMAT_TEXTANGULAR, run_migration=True))
+        actual_output_without_migration_for_textangular = (
+            html_cleaner.validate_rte_format(
+                test_cases_for_textangular, feconf.RTE_FORMAT_TEXTANGULAR))
 
-        expected_output_with_migration = {'strings': []}
-        expected_output_without_migration = {
-            u'i': [u'[document]'],
-            'invalidTags': [u'a'],
-            u'oppia-noninteractive-link': [u'a'],
-            u'b': [u'[document]'],
+        expected_output_with_migration_for_textangular = {'strings': []}
+        expected_output_without_migration_for_textangular = {
+            'i': ['[document]'],
+            'invalidTags': ['a'],
+            'oppia-noninteractive-link': ['a'],
+            'b': ['[document]'],
             'strings': [
                 (
                     'This is for <i>testing</i> the validate '
@@ -355,8 +357,430 @@ class ContentMigrationToTextAngular(test_utils.GenericTestBase):
         }
 
         self.assertEqual(
-            actual_output_with_migration,
-            expected_output_with_migration)
+            actual_output_with_migration_for_textangular,
+            expected_output_with_migration_for_textangular)
         self.assertEqual(
-            actual_output_without_migration,
-            expected_output_without_migration)
+            actual_output_without_migration_for_textangular,
+            expected_output_without_migration_for_textangular)
+
+        test_cases_for_ckeditor = [
+            (
+                '<pre>Hello this is <b> testing '
+                '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image> in '
+                '</b>progress</pre>'
+            ),
+            (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;" heading-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
+            )
+        ]
+
+        actual_output_with_migration_for_ckeditor = (
+            html_cleaner.validate_rte_format(
+                test_cases_for_ckeditor, feconf.RTE_FORMAT_CKEDITOR,
+                run_migration=True))
+        actual_output_without_migration_for_ckeditor = (
+            html_cleaner.validate_rte_format(
+                test_cases_for_ckeditor, feconf.RTE_FORMAT_CKEDITOR))
+
+        expected_output_with_migration_for_ckeditor = {'strings': []}
+        expected_output_without_migration_for_ckeditor = {
+            'invalidTags': ['b'],
+            'oppia-noninteractive-image': ['b'],
+            'p': ['pre'],
+            'strings': [
+                (
+                    '<pre>Hello this is <b> testing '
+                    '<oppia-noninteractive-image filepath-with-value="amp;quot;'
+                    'random.png&amp;quot;"></oppia-noninteractive-image> in '
+                    '</b>progress</pre>'
+                ),
+                (
+                    '<oppia-noninteractive-collapsible content-with-value="&amp'
+                    ';quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&amp;'
+                    'lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                    '&amp;quot;" heading-with-value="&amp;quot;'
+                    'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
+                    '</oppia-noninteractive-collapsible>'
+                ),
+            ]
+        }
+
+        self.assertEqual(
+            actual_output_with_migration_for_ckeditor,
+            expected_output_with_migration_for_ckeditor)
+        self.assertEqual(
+            actual_output_without_migration_for_ckeditor,
+            expected_output_without_migration_for_ckeditor)
+
+    def test_validate_soup_for_rte(self):
+        test_cases_for_textangular = [
+            (
+                '<p>Hello <b>this </b>is </p><p><br></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;Hello oppia&amp;quot;\" '
+                'heading-with-value=\"&amp;quot;Learn more about APIs&'
+                'amp;quot;\"></oppia-noninteractive-collapsible><br></p><p>'
+                'for migration testing</p>'
+            ),
+            (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            ),
+            (
+                '<p>Hello</p><p>oppia</p><p>testing <i>in progress</i>!</p>'
+            )
+        ]
+
+        expected_output_for_textangular = [False, True, False]
+        err_dict = {}
+
+        for index, test_case in enumerate(test_cases_for_textangular):
+            actual_output_for_textangular = (
+                html_cleaner._validate_soup_for_rte( # pylint: disable=protected-access
+                    bs4.BeautifulSoup(test_case, 'html.parser'),
+                    feconf.RTE_FORMAT_TEXTANGULAR, err_dict))
+
+            self.assertEqual(
+                actual_output_for_textangular,
+                expected_output_for_textangular[index])
+
+        test_cases_for_ckeditor = [
+            (
+                '<p>Lorem ipsum </p><p> Hello this is oppia </p>'
+            ),
+            (
+                '<p>Lorem <span>ipsum </span></p> Hello this is '
+                '<code>oppia </code>'
+            ),
+            (
+                '<p><oppia-noninteractive-image filepath-with-value="amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check image tag inside p tag</p>'
+            )
+        ]
+
+        expected_output_for_ckeditor = [False, True, True]
+        err_dict = {}
+
+        for index, test_case in enumerate(test_cases_for_ckeditor):
+            actual_output_for_ckeditor = (
+                html_cleaner._validate_soup_for_rte( # pylint: disable=protected-access
+                    bs4.BeautifulSoup(test_case, 'html.parser'),
+                    feconf.RTE_FORMAT_CKEDITOR, err_dict))
+
+            self.assertEqual(
+                actual_output_for_ckeditor,
+                expected_output_for_ckeditor[index])
+
+    def test_convert_tag_contents_to_rte_format(self):
+        test_cases_for_textangular = [{
+            'html_content': (
+                '<div>Hello <b>this </b>is </div><p><br></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;Hello oppia&amp;quot;\" '
+                'heading-with-value=\"&amp;quot;Learn more about APIs&amp;'
+                'quot;\"></oppia-noninteractive-collapsible><br></p><p>'
+                'for migration testing</p>'
+            ),
+            'expected_output': (
+                '<div>Hello <b>this </b>is </div><p><br/></p><p>test <b>case '
+                '</b>for </p><p><oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;&amp;lt;p&amp;gt;Hello oppia'
+                '&amp;lt;/p&amp;gt;&amp;quot;\" heading-with-value=\"'
+                '&amp;quot;Learn more about APIs&amp;quot;\">'
+                '</oppia-noninteractive-collapsible><br/></p><p>'
+                'for migration testing</p>'
+            )
+        }, {
+            'html_content': (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            ),
+            'expected_output': (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            )
+        }, {
+            'html_content': (
+                '<span><b>Hello </b></span><div><b><span>this is '
+                'test case</span></b></div><div><b><br></b></div>'
+                '<div><oppia-noninteractive-tabs tab_contents-with-value'
+                '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;span '
+                'style=\\&amp;quot;line-height: 21px; background-color: '
+                'rgb(255, 255, 255);\\&amp;quot;&amp;gt;lorem ipsum&amp;lt;'
+                '/span&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;'
+                'quot;hello&amp;quot;},{&amp;quot;content&amp;quot;:&amp;'
+                'quot;&amp;lt;span style=\\&amp;quot;color: rgb(0, 0, 0); '
+                'font-family: &amp;#39;Times New Roman&amp;#39;; font-size: '
+                'medium; line-height: normal;\\&amp;quot;&amp;gt;&amp;lt;'
+                'font size=\\&amp;quot;3\\&amp;quot; face=\\&amp;quot;Times '
+                'New Roman CE\\&amp;quot;&amp;gt;oppia&amp;lt;/font&amp;gt;'
+                '&amp;lt;/span&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:'
+                '&amp;quot;Savjet 1&amp;quot;}]\"></oppia-noninteractive-tabs>'
+                '<b><br></b></div><div><span></span><b><br></b><div>'
+                '<span><b><br></b></span></div></div>'
+            ),
+            'expected_output': (
+                '<span><b>Hello </b></span><div><b><span>this is '
+                'test case</span></b></div><div><b><br/></b></div>'
+                '<div><oppia-noninteractive-tabs tab_contents-with-value='
+                '\"[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;'
+                'p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, '
+                '&amp;quot;title&amp;quot;: &amp;quot;hello&amp;quot;}, '
+                '{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;'
+                'quot;: &amp;quot;Savjet 1&amp;quot;}]\">'
+                '</oppia-noninteractive-tabs><b><br/></b></div>'
+                '<div><span></span><b><br/></b><div>'
+                '<span><b><br/></b></span></div></div>'
+            )
+        }]
+
+        for test_case in test_cases_for_textangular:
+            actual_output_for_textangular = (
+                html_cleaner.convert_tag_contents_to_rte_format(
+                    test_case['html_content'],
+                    html_cleaner.convert_to_textangular))
+            self.assertEqual(
+                actual_output_for_textangular,
+                test_case['expected_output'])
+
+        test_cases_for_ckeditor = [{
+            'html_content': (
+                '<oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;&amp;lt;pre&amp;gt;&amp;'
+                'lt;p&amp;gt;Hello oppia&amp;lt;/p&amp;gt;&amp;lt;'
+                '/pre&amp;gt;&amp;quot;\" '
+                'heading-with-value=\"&amp;quot;Learn more about APIs&amp;'
+                'quot;\"></oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-collapsible '
+                'content-with-value=\"&amp;quot;&amp;lt;pre&amp;gt;Hello oppia'
+                '&amp;lt;/pre&amp;gt;&amp;quot;\" heading-with-value=\"'
+                '&amp;quot;Learn more about APIs&amp;quot;\">'
+                '</oppia-noninteractive-collapsible>'
+            )
+        }, {
+            'html_content': (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            ),
+            'expected_output': (
+                'Hello<div>oppia</div>testing <i>in progess</i>!'
+            )
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-tabs tab_contents-with-value'
+                '=\"[{&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;'
+                '&amp;lt;i&amp;gt;lorem ipsum&amp;lt;/i&amp;gt;&amp;lt;/p'
+                '&amp;gt;&amp;quot;,&amp;quot;title&amp;quot;:&amp;'
+                'quot;hello&amp;quot;}]\"></oppia-noninteractive-tabs>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-tabs tab_contents-with-value'
+                '=\"[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                '&amp;lt;em&amp;gt;lorem ipsum&amp;lt;/em&amp;gt;&amp;lt;/p'
+                '&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: &amp;'
+                'quot;hello&amp;quot;}]\"></oppia-noninteractive-tabs>'
+            )
+        }]
+
+        for test_case in test_cases_for_ckeditor:
+            actual_output_for_ckeditor = (
+                html_cleaner.convert_tag_contents_to_rte_format(
+                    test_case['html_content'],
+                    html_cleaner.convert_to_ckeditor))
+            self.assertEqual(
+                actual_output_for_ckeditor,
+                test_case['expected_output'])
+
+    def test_convert_to_ckeditor(self):
+        test_cases = [{
+            'html_content': (
+                '<p>Lorem <span>ipsum </span></p> Hello this is '
+                '<code>oppia </code>'
+            ),
+            'expected_output': (
+                '<p>Lorem <span>ipsum </span></p> Hello this is '
+                '<code>oppia </code>'
+            )
+        }, {
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check image tag inside p tag</p>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image><p>Hello '
+                'this is test case to check image tag inside p tag</p>'
+            )
+        }, {
+            'html_content': '<p>hello <i> this is case4 for </i> testing</p>',
+            'expected_output': (
+                '<p>hello <em> this is case4 for </em> testing</p>'
+            )
+        }, {
+            'html_content': (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;&amp;lt;p&amp;gt;lorem ipsum&'
+                'amp;lt;/p&amp;gt;&amp;lt;/pre&amp;gt;'
+                '&amp;quot;" heading-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                '<oppia-noninteractive-collapsible content-with-value="&amp;'
+                'quot;&amp;lt;pre&amp;gt;lorem ipsum'
+                '&amp;lt;/pre&amp;gt;'
+                '&amp;quot;" heading-with-value="&amp;quot;'
+                'lorem ipsum&amp;quot;lorem ipsum&amp;quot;?&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
+            )
+        }, {
+            'html_content': (
+                '<pre>Hello this is <b> testing '
+                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image> in '
+                '</b>progress</pre>'
+            ),
+            'expected_output': (
+                '<pre>Hello this is <strong> testing </strong></pre>'
+                '<oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image><pre>'
+                '<strong> in </strong>progress</pre>'
+            )
+        }, {
+            'html_content': (
+                '<blockquote><p> Here is another<b>example'
+                '</b></p></blockquote>'
+            ),
+            'expected_output': (
+                '<blockquote><p> Here is another<strong>example'
+                '</strong></p></blockquote>'
+            )
+        }, {
+            'html_content': (
+                '<p>Hello </p><p>this </p><p>is test case.</p>'
+                '<ul><li>Item1</li><li>Item2</li>'
+                '<ul><li>This is for <b>testing </b>migration.</li>'
+                '<li>Item3</li></ul></ul><p></p>'
+            ),
+            'expected_output': (
+                '<p>Hello </p><p>this </p><p>is test case.</p>'
+                '<ul><li>Item1</li><li>Item2'
+                '<ul><li>This is for <strong>testing </strong>migration.</li>'
+                '<li>Item3</li></ul></li></ul><p></p>'
+            )
+        }, {
+            'html_content': (
+                '<ol><li>Item1</li><ol><ol><ol><li>Item2</li><li>Item3</li>'
+                '<li>Item4</li><ol><ol><ol><li>Item5</li><li>Item6</li></ol>'
+                '</ol></ol></ol></ol></ol><li>Item7</li><ol><li>Item8</li>'
+                '<li>Item9</li><ol><ol><li>Item10</li><li>Item11</li>'
+                '</ol></ol></ol></ol>'
+            ),
+            'expected_output': (
+                '<ol><li>Item1<ol><li>Item2</li><li>Item3</li><li>Item4<ol>'
+                '<li>Item5</li><li>Item6</li></ol></li></ol></li><li>Item7'
+                '<ol><li>Item8</li><li>Item9<ol><li>Item10</li><li>Item11'
+                '</li></ol></li></ol></li></ol>'
+            )
+        }, {
+            'html_content': (
+                '<p><em><strong>this is </strong></em><br></p>'
+                '<oppia-noninteractive-collapsible content-with-value'
+                '="&amp;quot;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;&amp;'
+                'lt;p&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;'
+                '&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;li&amp;'
+                'gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;'
+                'oppia-noninteractive-image alt-with-value=\\&amp;quot;&amp;'
+                'amp;amp;quot;loremipsum&amp;amp;amp;quot;\\&amp;quot; '
+                'caption-with-value=\\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;'
+                'quot;\\&amp;quot; filepath-with-value=\\&amp;quot;&amp;amp;amp'
+                ';quot;loremipsum.png&amp;amp;amp;quot;\\&amp;quot;&amp;gt;&amp'
+                ';lt;/oppia-noninteractive-image&amp;gt;&amp;lt;p&amp;gt;&amp;'
+                'lt;br&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;/li&amp;gt;&amp;lt;/ul'
+                '&amp;gt;&amp;quot;" heading-with-value="&amp;quot;loremipusm'
+                '&amp;quot;"></oppia-noninteractive-collapsible>'
+            ),
+            'expected_output': (
+                '<p><em><strong>this is </strong></em><br></p>'
+                '<oppia-noninteractive-collapsible content-with-value='
+                '"&amp;quot;&amp;lt;ul&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;'
+                'lt;/li&amp;gt;&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;'
+                '&amp;lt;li&amp;gt;loremipsum&amp;lt;/li&amp;gt;&amp;lt;'
+                'li&amp;gt;&amp;lt;oppia-noninteractive-image alt-with-value'
+                '=\\&amp;quot;&amp;amp;amp;quot;loremipsum&amp;amp;amp;quot;'
+                '\\&amp;quot; caption-with-value=\\&amp;quot;&amp;amp;amp;quot;'
+                '&amp;amp;amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot'
+                ';&amp;amp;amp;quot;loremipsum.png&amp;amp;amp;quot;\\&amp;quot'
+                ';&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
+                'p&amp;gt;\\u00a0&amp;lt;/p&amp;gt;&amp;lt;/li&amp;'
+                'gt;&amp;lt;/ul&amp;gt;&amp;quot;" heading-with-value="&amp;'
+                'quot;loremipusm&amp;quot;"></oppia-noninteractive-collapsible>'
+            )
+        }, {
+            'html_content': (
+                '<pre><p>Hello this is test case for </p><p>br '
+                'in </p><p>pre </p><p>tag<br></p></pre>'
+            ),
+            'expected_output': (
+                '<pre>Hello this is test case for br in pre tag\n</pre>'
+            )
+        }, {
+            'html_content': (
+                '<p><li> Hello this is test case for li in p which results '
+                'in </li><li> in document </li><li> after unwrapping </li></p>'
+            ),
+            'expected_output': (
+                '<ul><li> Hello this is test case for li in p which results '
+                'in </li><li> in document </li><li> after unwrapping </li></ul>'
+            )
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                test_case['expected_output'],
+                html_cleaner.convert_to_ckeditor(test_case['html_content']))
+
+    def test_add_caption_to_image(self):
+        test_cases = [{
+            'html_content': (
+                '<p><oppia-noninteractive-image filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that caption attribute is added to '
+                'image tags if it is missing.</p>'
+            ),
+            'expected_output': (
+                '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;'
+                'quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that caption attribute is added to '
+                'image tags if it is missing.</p>'
+            )
+        }, {
+            'html_content': (
+                '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                'abc&amp;quot;" filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that image tags that already have '
+                'caption attribute are not changed.</p>'
+            ),
+            'expected_output': (
+                '<p><oppia-noninteractive-image caption-with-value="&amp;quot;'
+                'abc&amp;quot;" filepath-with-value="&amp;quot;'
+                'random.png&amp;quot;"></oppia-noninteractive-image>Hello this '
+                'is test case to check that image tags that already have '
+                'caption attribute are not changed.</p>'
+            )
+        }]
+
+        for test_case in test_cases:
+            self.assertEqual(
+                html_cleaner.add_caption_attr_to_image(
+                    test_case['html_content']),
+                test_case['expected_output'])

@@ -30,7 +30,8 @@
           <em>Nothing</em>
         </span>
         <span ng-if="outcome.hasNonemptyFeedback()" style="word-wrap: break-word;">
-          <span class="oppia-rte-editor" angular-html-bind="outcome.feedback.getHtml()"></span>
+          <angular-html-bind class="oppia-rte-editor" html-data="outcome.feedback.getHtml()">
+          </angular-html-bind>
         </span>
       </div>
     </div>
@@ -101,6 +102,10 @@
             (try again, with refresher exploration "<[outcome.refresherExplorationId]>")
           </span>
         </span>
+        <div style="margin-top: 1em;" ng-if="outcome.missingPrerequisiteSkillId && canAddPrerequisiteSkill">
+          <strong> Attached prerequisite skill for the current state: </strong>
+          <[outcome.missingPrerequisiteSkillId]>
+        </div>
       </div>
     </div>
   </div>

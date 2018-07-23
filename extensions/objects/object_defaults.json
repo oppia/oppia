@@ -13,6 +13,7 @@
     "ListOfCodeEvaluation": [],
     "ListOfCoordTwoDim": [],
     "ListOfGraph": [],
+    "ListOfSetsOfHtmlStrings": [],
     "LogicErrorCategory": "mistake",
     "MusicPhrase": [],
     "NonnegativeInt": 0,
@@ -27,5 +28,16 @@
       "wholeNumber": 0,
       "numerator": 0,
       "denominator": 1
+    },
+    "NumberWithUnits": {
+      "type": "real",
+      "real": 0.0,
+      "fraction": {
+        "isNegative": false,
+        "wholeNumber": 0,
+        "numerator": 0,
+        "denominator": 1
+      },
+      "units": []
     }
 }

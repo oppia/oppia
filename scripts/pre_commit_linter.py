@@ -101,20 +101,38 @@ BAD_PATTERNS = {
 
 BAD_PATTERNS_JS_REGEXP = [
     {
-        'regexp': r"\b(ddescribe|fdescribe)\(",
+        'regexp': r'\b(browser.explore)\(',
+        'message': "In tests, please do not use browser.explore().",
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': r'\b(browser.pause)\(',
+        'message': "In tests, please do not use browser.pause().",
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': r'\b(browser.waitForAngular)\(',
+        'message': "In tests, please do not use browser.waitForAngular().",
+        'excluded_files': (),
+        'excluded_dirs': ()
+    },
+    {
+        'regexp': r'\b(ddescribe|fdescribe)\(',
         'message': "In tests, please use 'describe' instead of 'ddescribe'"
                    "or 'fdescribe'",
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r"\b(iit|fit)\(",
+        'regexp': r'\b(iit|fit)\(',
         'message': "In tests, please use 'it' instead of 'iit' or 'fit'",
         'excluded_files': (),
         'excluded_dirs': ()
     },
     {
-        'regexp': r"templateUrl: \'",
+        'regexp': r'templateUrl: \'',
         'message': "The directives must be directly referenced.",
         'excluded_files': (
             'core/templates/dev/head/pages/exploration_player/'
@@ -124,24 +142,22 @@ BAD_PATTERNS_JS_REGEXP = [
             'extensions/answer_summarizers/',
             'extensions/classifiers/',
             'extensions/dependencies/',
-            'extensions/objects/',
             'extensions/value_generators/',
             'extensions/visualizations/')
     },
     {
-        'regexp': r"\$parent",
+        'regexp': r'\$parent',
         'message': "Please do not access parent properties " +
                    "using $parent. Use the scope object" +
                    "for this purpose.",
-        'excluded_files': (
-            'core/templates/dev/head/app.js'),
+        'excluded_files': (),
         'excluded_dirs': ()
     }
 ]
 
 BAD_LINE_PATTERNS_HTML_REGEXP = [
     {
-        'regexp': r"text\/ng-template",
+        'regexp': r'text\/ng-template',
         'message': "The directives must be directly referenced.",
         'excluded_files': (
             'core/templates/dev/head/pages/exploration_player/'
@@ -156,7 +172,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
             'extensions/value_generators/')
     },
     {
-        'regexp': r"[ \t]+$",
+        'regexp': r'[ \t]+$',
         'message': "There should not be any trailing whitespaces.",
         'excluded_files': (),
         'excluded_dirs': ()
@@ -165,7 +181,7 @@ BAD_LINE_PATTERNS_HTML_REGEXP = [
 
 BAD_PATTERNS_PYTHON_REGEXP = [
     {
-        'regexp': r"print \'",
+        'regexp': r'print \'',
         'message': "Please do not use print statement.",
         'excluded_files': (
             'core/tests/test_utils.py',
@@ -193,6 +209,17 @@ EXCLUDED_PATHS = (
     '*.png', '*.zip', '*.ico', '*.jpg', '*.min.js',
     'assets/scripts/*', 'core/tests/data/*', '*.mp3')
 
+GENERATED_FILE_PATHS = (
+    'extensions/interactions/LogicProof/static/js/generatedDefaultData.js',
+    'extensions/interactions/LogicProof/static/js/generatedParser.js',
+    'core/templates/dev/head/expressions/ExpressionParserService.js')
+
+CONFIG_FILE_PATHS = (
+    'core/tests/protractor.conf.js',
+    'core/tests/karma.conf.js',
+    'core/templates/dev/head/mathjaxConfig.js',
+    'assets/constants.js',
+    'assets/rich_text_components_definitions.js')
 
 if not os.getcwd().endswith('oppia'):
     print ''
@@ -320,10 +347,12 @@ def _get_all_files_in_directory(dir_path, excluded_glob_patterns):
     return files_in_directory
 
 
-def _lint_css_files(stylelint_path, config_path, files_to_lint, stdout, result):
+def _lint_css_files(
+        node_path, stylelint_path, config_path, files_to_lint, stdout, result):
     """Prints a list of lint errors in the given list of CSS files.
 
     Args:
+        node_path: str. Path to the node binary.
         stylelint_path: str. Path to the Stylelint binary.
         config_path: str. Path to the configuration file.
         files_to_lint: list(str). A list of filepaths to lint.
@@ -341,7 +370,7 @@ def _lint_css_files(stylelint_path, config_path, files_to_lint, stdout, result):
 
     print 'Total css files: ', num_css_files
     stylelint_cmd_args = [
-        stylelint_path, '--config=' + config_path]
+        node_path, stylelint_path, '--config=' + config_path]
     for _, filename in enumerate(files_to_lint):
         print 'Linting: ', filename
         proc_args = stylelint_cmd_args + [filename]
@@ -457,7 +486,8 @@ def _lint_py_files(config_pylint, config_pycodestyle, files_to_lint, result):
 
         # These lines invoke Pycodestyle.
         style_guide = pycodestyle.StyleGuide(config_file=config_pycodestyle)
-        pycodestyle_report = style_guide.check_files(current_files_to_lint)
+        pycodestyle_report = style_guide.check_files(
+            paths=current_files_to_lint)
         # This line prints Pycodestyle's output to the console.
         pycodestyle_report.print_statistics()
 
@@ -617,6 +647,7 @@ def _pre_commit_linter(all_files):
     linting_processes = []
     linting_processes.append(multiprocessing.Process(
         target=_lint_css_files, args=(
+            node_path,
             stylelint_path,
             config_path_for_css_in_html,
             html_files_to_lint_for_css, css_in_html_stdout,
@@ -627,6 +658,7 @@ def _pre_commit_linter(all_files):
 
     linting_processes.append(multiprocessing.Process(
         target=_lint_css_files, args=(
+            node_path,
             stylelint_path,
             config_path_for_oppia_css,
             css_files_to_lint, css_stdout,
@@ -1015,7 +1047,6 @@ def _check_html_directive_name(all_files):
     print '----------------------------------------'
     total_files_checked = 0
     total_error_count = 0
-    summary_messages = []
     files_to_check = [
         filename for filename in all_files if not
         any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
@@ -1024,8 +1055,8 @@ def _check_html_directive_name(all_files):
     summary_messages = []
     # For RegExp explanation, please see https://regex101.com/r/gU7oT6/37.
     pattern_to_match = (
-        r"templateUrl: UrlInterpolationService\.[A-z\(]+" +
-        r"(?P<directive_name>[^\)]+)")
+        r'templateUrl: UrlInterpolationService\.[A-z\(]+' +
+        r'(?P<directive_name>[^\)]+)')
     for filename in files_to_check:
         with open(filename) as f:
             content = f.read()
@@ -1069,7 +1100,6 @@ def _check_directive_scope(all_files):
     """
     print 'Starting directive scope check'
     print '----------------------------------------'
-    summary_messages = []
     # Select JS files which need to be checked.
     files_to_check = [
         filename for filename in all_files if not
@@ -1192,45 +1222,136 @@ def _check_directive_scope(all_files):
     return summary_messages
 
 
+def _match_line_breaks_in_controller_dependencies(all_files):
+    """This function checks whether the line breaks between the dependencies
+    listed in the controller of a directive or service exactly match those
+    between the arguments of the controller function.
+    """
+    print 'Starting controller dependency line break check'
+    print '----------------------------------------'
+    files_to_check = [
+        filename for filename in all_files if not
+        any(fnmatch.fnmatch(filename, pattern) for pattern in EXCLUDED_PATHS)
+        and filename.endswith('.js')]
+    failed = False
+    summary_messages = []
+
+    # For RegExp explanation, please see https://regex101.com/r/T85GWZ/2/.
+    pattern_to_match = (
+        r'controller: \[(?P<stringfied_dependencies>[\S\s]*?)' +
+        r'function\((?P<function_parameters>[\S\s]*?)\)')
+    for filename in files_to_check:
+        with open(filename) as f:
+            content = f.read()
+        matched_patterns = re.findall(pattern_to_match, content)
+        for matched_pattern in matched_patterns:
+            stringfied_dependencies, function_parameters = matched_pattern
+            stringfied_dependencies = (
+                stringfied_dependencies.strip().replace(
+                    "'", '').replace(' ', ''))[:-1]
+            function_parameters = function_parameters.strip().replace(' ', '')
+            if stringfied_dependencies != function_parameters:
+                failed = True
+                print (
+                    '%s --> Please ensure that line breaks between '
+                    'the stringfied dependencies: "%s" and the function '
+                    'parameters: "%s" for the corresponding controller '
+                    'in this file exactly match.' % (
+                        filename, stringfied_dependencies, function_parameters))
+
+    if failed:
+        summary_message = (
+            '%s   Controller dependency line break check failed' % (
+                _MESSAGE_TYPE_FAILED))
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = (
+            '%s  Controller dependency line break check passed' % (
+                _MESSAGE_TYPE_SUCCESS))
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
+
+class TagMismatchException(Exception):
+    """Error class for mismatch between start and end tags."""
+
+
 class CustomHTMLParser(HTMLParser.HTMLParser):
     """Custom HTML parser to check indentation."""
 
-    def __init__(self, filename, file_lines, failed=False):
+    def __init__(self, filename, file_lines, debug, failed=False):
         HTMLParser.HTMLParser.__init__(self)
+        self.tag_stack = []
+        self.debug = debug
         self.failed = failed
         self.filename = filename
-        self.previous_tag_line_number = None
         self.file_lines = file_lines
+        self.indentation_level = 0
+        self.indentation_width = 2
+        self.void_elements = [
+            'area', 'base', 'br', 'col', 'embed',
+            'hr', 'img', 'input', 'link', 'meta',
+            'param', 'source', 'track', 'wbr']
 
     def handle_starttag(self, tag, attrs):
         line_number, column_number = self.getpos()
         # Check the indentation of the tag.
+        expected_indentation = self.indentation_level * self.indentation_width
         tag_line = self.file_lines[line_number - 1].lstrip()
         opening_tag = '<' + tag
-        if tag_line.startswith(opening_tag):
-            if self.previous_tag_line_number is None:
-                if column_number % 2 != 0:
-                    print (
-                        '%s --> Indentation level for %s '
-                        'tag on line %s should be a '
-                        'multiple of 2 ' % (
-                            self.filename, tag, line_number))
-                    self.failed = True
-            else:
-                if column_number % 2 != 0 and (
-                        line_number != self.previous_tag_line_number):
-                    print (
-                        '%s --> Indentation level for %s '
-                        'tag on line %s should be a '
-                        'multiple of 2 ' % (
-                            self.filename, tag, line_number))
-                    self.failed = True
-            self.previous_tag_line_number = line_number
+        if tag_line.startswith(opening_tag) and (
+                column_number != expected_indentation):
+            print (
+                '%s --> Expected indentation '
+                'of %s, found indentation of %s '
+                'for %s tag on line %s ' % (
+                    self.filename, expected_indentation,
+                    column_number, tag, line_number))
+            self.failed = True
+
+        if tag not in self.void_elements:
+            self.tag_stack.append((tag, line_number, column_number))
+            self.indentation_level += 1
+
+        if self.debug:
+            print 'DEBUG MODE: Start tag_stack'
+            print self.tag_stack
 
         # Check the indentation of the attributes of the tag.
         indentation_of_first_attribute = (
             column_number + len(tag) + 2)
         starttag_text = self.get_starttag_text()
+
+        # Check whether the values of all attributes are placed
+        # in double quotes.
+        for attr, value in attrs:
+            # Not all attributes will have a value.
+            # Therefore the check should run only for those
+            # attributes which have a value.
+            if value:
+                expected_value = '"' + value + '"'
+
+                # &quot; is rendered as a double quote by the parser.
+                if '&quot;' in starttag_text:
+                    rendered_text = starttag_text.replace('&quot;', '"')
+                else:
+                    rendered_text = starttag_text
+
+                if not expected_value in rendered_text:
+                    self.failed = True
+                    print (
+                        '%s --> The value %s of attribute '
+                        '%s for the tag %s on line %s should '
+                        'be enclosed within double quotes.' % (
+                            self.filename, value, attr,
+                            tag, line_number))
 
         for line_num, line in enumerate(
                 str.splitlines(starttag_text)):
@@ -1257,11 +1378,54 @@ class CustomHTMLParser(HTMLParser.HTMLParser):
                         line_num_of_error, line_number))
                 self.failed = True
 
+    def handle_endtag(self, tag):
+        line_number, _ = self.getpos()
+        tag_line = self.file_lines[line_number - 1]
+        leading_spaces_count = len(tag_line) - len(tag_line.lstrip())
 
-def _check_html_indent(all_files):
+        try:
+            last_starttag, last_starttag_line_num, last_starttag_col_num = (
+                self.tag_stack.pop())
+        except IndexError:
+            raise TagMismatchException('Error in line %s of file %s' % (
+                line_number, self.filename))
+
+        if last_starttag != tag:
+            raise TagMismatchException('Error in line %s of file %s' % (
+                line_number, self.filename))
+
+        if leading_spaces_count != last_starttag_col_num and (
+                last_starttag_line_num != line_number):
+            print (
+                '%s --> Indentation for end tag %s on line '
+                '%s does not match the indentation of the '
+                'start tag %s on line %s ' % (
+                    self.filename, tag, line_number,
+                    last_starttag, last_starttag_line_num))
+            self.failed = True
+
+        self.indentation_level -= 1
+
+        if self.debug:
+            print 'DEBUG MODE: End tag_stack'
+            print self.tag_stack
+
+    def handle_data(self, data):
+        data_lines = data.split('\n')
+        opening_block = tuple(['{% block', '{% macro', '{% if'])
+        ending_block = tuple(['{% end', '{%- end'])
+        for data_line in data_lines:
+            data_line = data_line.lstrip()
+            if data_line.startswith(opening_block):
+                self.indentation_level += 1
+            elif data_line.startswith(ending_block):
+                self.indentation_level -= 1
+
+
+def _check_html_tags_and_attributes(all_files, debug=False):
     """This function checks the indentation of lines in HTML files."""
 
-    print 'Starting HTML indentation check'
+    print 'Starting HTML tag and attribute check'
     print '----------------------------------------'
 
     html_files_to_lint = [
@@ -1274,19 +1438,80 @@ def _check_html_indent(all_files):
         with open(filename, 'r') as f:
             file_content = f.read()
             file_lines = file_content.split('\n')
-            parser = CustomHTMLParser(filename, file_lines)
+            parser = CustomHTMLParser(filename, file_lines, debug)
             parser.feed(file_content)
+
+            if len(parser.tag_stack) != 0:
+                raise TagMismatchException('Error in file %s' % filename)
 
             if parser.failed:
                 failed = True
 
     if failed:
-        summary_message = '%s   HTML indentation check failed' % (
+        summary_message = '%s   HTML tag and attribute check failed' % (
             _MESSAGE_TYPE_FAILED)
         print summary_message
         summary_messages.append(summary_message)
     else:
-        summary_message = '%s  HTML indentation check passed' % (
+        summary_message = '%s  HTML tag and attribute check passed' % (
+            _MESSAGE_TYPE_SUCCESS)
+        print summary_message
+        summary_messages.append(summary_message)
+
+    print ''
+    print '----------------------------------------'
+    print ''
+
+    return summary_messages
+
+
+def _check_for_copyright_notice(all_files):
+    """This function checks whether the copyright notice
+    is present at the beginning of files.
+    """
+    print 'Starting copyright notice check'
+    print '----------------------------------------'
+    js_files_to_check = [
+        filename for filename in all_files if filename.endswith('.js') and (
+            not filename.endswith(GENERATED_FILE_PATHS)) and (
+                not filename.endswith(CONFIG_FILE_PATHS))]
+    py_files_to_check = [
+        filename for filename in all_files if filename.endswith('.py') and (
+            not filename.endswith('__init__.py'))]
+    sh_files_to_check = [
+        filename for filename in all_files if filename.endswith('.sh')]
+    all_files_to_check = (
+        js_files_to_check + py_files_to_check + sh_files_to_check)
+    regexp_to_check = (
+        r'Copyright \d{4} The Oppia Authors\. All Rights Reserved\.')
+
+    failed = False
+    summary_messages = []
+
+    for filename in all_files_to_check:
+        has_copyright_notice = False
+        with open(filename, 'r') as f:
+            for line_num, line in enumerate(f):
+                if line_num < 5:
+                    if re.search(regexp_to_check, line):
+                        has_copyright_notice = True
+                        break
+                else:
+                    break
+
+        if not has_copyright_notice:
+            failed = True
+            print (
+                '%s --> Please add a proper copyright notice to this file.' % (
+                    filename))
+
+    if failed:
+        summary_message = '%s   Copyright notice check failed' % (
+            _MESSAGE_TYPE_FAILED)
+        print summary_message
+        summary_messages.append(summary_message)
+    else:
+        summary_message = '%s  Copyright notice check passed' % (
             _MESSAGE_TYPE_SUCCESS)
         print summary_message
         summary_messages.append(summary_message)
@@ -1301,21 +1526,27 @@ def _check_html_indent(all_files):
 def main():
     all_files = _get_all_files()
     directive_scope_messages = _check_directive_scope(all_files)
+    controller_dependency_messages = (
+        _match_line_breaks_in_controller_dependencies(all_files))
     html_directive_name_messages = _check_html_directive_name(all_files)
     import_order_messages = _check_import_order(all_files)
     newline_messages = _check_newline_character(all_files)
     docstring_messages = _check_docstrings(all_files)
     comment_messages = _check_comments(all_files)
-    html_indent_messages = _check_html_indent(all_files)
+    # The html tags and attributes check check has an additional
+    # debug mode which when enabled prints the tag_stack for each file.
+    html_tag_and_attribute_messages = _check_html_tags_and_attributes(all_files)
     html_linter_messages = _lint_html_files(all_files)
     linter_messages = _pre_commit_linter(all_files)
     pattern_messages = _check_bad_patterns(all_files)
+    copyright_notice_messages = _check_for_copyright_notice(all_files)
     all_messages = (
-        directive_scope_messages + html_directive_name_messages +
-        import_order_messages + newline_messages +
-        docstring_messages + comment_messages +
-        html_indent_messages + html_linter_messages +
-        linter_messages + pattern_messages)
+        directive_scope_messages + controller_dependency_messages +
+        html_directive_name_messages + import_order_messages +
+        newline_messages + docstring_messages + comment_messages +
+        html_tag_and_attribute_messages + html_linter_messages +
+        linter_messages + pattern_messages +
+        copyright_notice_messages)
     if any([message.startswith(_MESSAGE_TYPE_FAILED) for message in
             all_messages]):
         sys.exit(1)

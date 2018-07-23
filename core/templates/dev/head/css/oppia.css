@@ -95,6 +95,7 @@ md-input-group.md-default-theme label {
 
 .md-button.oppia-learner-confirm-button,
 .md-button.oppia-learner-got-it-button,
+.md-button.oppia-learner-try-again-button,
 .md-button.oppia-learner-hint-solution-button {
   background: #0D48A1;
   color: #ffffff;
@@ -105,6 +106,8 @@ md-input-group.md-default-theme label {
 .md-button.md-default-theme.oppia-learner-confirm-button:hover,
 .md-button.md-default-theme.oppia-learner-got-it-button:focus,
 .md-button.md-default-theme.oppia-learner-got-it-button:hover,
+.md-button.md-default-theme.oppia-learner-try-again-button:focus,
+.md-button.md-default-theme.oppia-learner-try-again-button:hover,
 .md-button.md-default-theme.oppia-learner-hint-solution-button:focus,
 .md-button.md-default-theme.oppia-learner-hint-solution-button:hover {
   background-color: #115FD4;
@@ -500,7 +503,7 @@ textarea {
   margin-top: 5px;
 }
 
-  .oppia-footer-container a {
+.oppia-footer-container a {
   color: #fff;
 }
 
@@ -626,7 +629,7 @@ textarea {
   color: #009688;
 }
 .oppia-dashboard-container a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 .oppia-activity-summary-tile a:focus,
 .oppia-activity-summary-tile-mobile a:focus {
@@ -687,8 +690,8 @@ textarea {
 .oppia-navbar-nav > li > a:focus,
 .oppia-navbar-tabs > li > a:hover,
 .oppia-navbar-nav .open > a:hover {
-    background-color: #fff;
-    color: #009688;
+  background-color: #fff;
+  color: #009688;
 }
 
 .navbar-default .navbar-nav > .active > a {
@@ -928,7 +931,7 @@ textarea {
 }
 
 .btn:focus, .btn:active:focus {
-    outline: 0;
+  outline: 0;
 }
 
 @media (max-width: 767px) {
@@ -1562,7 +1565,8 @@ pre.oppia-pre-wrapped-text {
 
 /* Styles for the state graph vizualization. */
 
-.oppia-state-graph-container {
+.oppia-state-graph-container, 
+.oppia-translation-state-graph-container {
   border-radius: 4px;
   border: 1px solid #ccc;
   height: 400px;
@@ -1580,16 +1584,48 @@ pre.oppia-pre-wrapped-text {
   opacity: 0;
 }
 
-/* Styles for the loading indicator shown while image is loading */
-.oppia-image-loading-indicator-container {
+/* Styles for the loading indicator or try again shown while image is loading or failed to load respectively */
+.oppia-image-container {
+  align-items: center;
   background-color: rgba(224,242,241,1);
+  display: flex;
 }
 
-/* Style to center an image */
-.center-image-horizontally {
+/* Style to center an element */
+.center-element-horizontally {
   display: block;
   margin-left: auto;
   margin-right: auto;
+}
+
+/* Styles for the exploration learner view */
+
+.oppia-learner-view-card-top-section {
+  position: relative;
+  padding: 0 20px;
+}
+
+.oppia-learner-view-card {
+  padding-left: 0;
+  max-width: 100vw;
+  padding-bottom: 18px;
+  background: #fff;
+  border-radius: 2px;
+  padding-top: 20px;
+  text-align: left;
+  margin-left: 87px;
+}
+
+.oppia-learner-view-card-top-content {
+  margin-bottom: 12px;
+  padding: 12px;
+  background-color: rgba(224,242,241,1);
+  border-top-left-radius: 0;
+  width: 100%;
+}
+
+.oppia-learner-view-card-content {
+  word-wrap: break-word;
 }
 
 /* Styles for the collections learner view */
@@ -1792,7 +1828,7 @@ pre.oppia-pre-wrapped-text {
   z-index: 100;
 }
 
-.oppia-rule-sort-handle, .oppia-fallback-sort-handle, .oppia-hint-sort-handle, .oppia-learner-playlist-sort-handle {
+.oppia-rule-sort-handle, .oppia-fallback-sort-handle, .oppia-hint-sort-handle, .oppia-learner-playlist-sort-handle, .oppia-worked-example-sort-handle {
   cursor: move;
   left: 10px;
   margin-left: 5px;
@@ -2356,6 +2392,8 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .trained-feedback-selection-form-container {
   margin-top: -5px;
+  max-height: 250px;
+  overflow-y: scroll;
 }
 
 .trained-feedback-selection-container {
@@ -2372,7 +2410,7 @@ md-card.preview-conversation-skin-supplemental-card {
   border: none;
   color: rgba(0,0,0,0.5);
   margin: 0;
-  padding-left: 0;
+  padding-left: 9px;
   padding-top: 9px;
   text-align: left;
   /* This is needed so that images stay bounded by the container in Firefox. */
@@ -2381,6 +2419,12 @@ md-card.preview-conversation-skin-supplemental-card {
 
 .trained-feedback-selection:hover {
   color: #00897B;
+}
+
+.trained-feedback-selected {
+  color: #00897B;
+  background: whitesmoke;
+  border-radius: 5px;
 }
 
 .oppia-modal-information-card .modal-dialog {
@@ -3677,4 +3721,30 @@ md-card.preview-conversation-skin-supplemental-card {
   opacity: 0;
   padding: 0;
   width: 1px;
+}
+
+.oppia-rte-component-container {
+  position: relative;
+}
+
+
+.oppia-rte{
+  min-height: 80px;
+  height: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+  padding: 8px;
+}
+
+.oppia-rte:focus {
+  min-height: 80px;
+  height: auto;
+  border: 1px solid #66afe9;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(102,175,233,0.6);
+  -moz-box-shadow: inset 0 1px 1px rgba(0,0,0,0.075),0 0 8px rgba(102,175,233,0.6);
+  box-shadow: inset 0 1px 1px rgba(0,0,0,0.075), 0 0 8px rgba(102,175,233,0.6);
+  padding: 8px;
 }

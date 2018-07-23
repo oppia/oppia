@@ -23,6 +23,14 @@
     }
   },
   "Continue": {},
+  "DragAndDropSortInput": {
+    "IsEqualToOrdering": {
+      "description": "is equal to ordering {{x|ListOfSetsOfHtmlStrings}}"
+    },
+    "IsEqualToOrderingWithOneItemAtIncorrectPosition": {
+      "description": "is equal to ordering with one item at incorrect position {{x|ListOfSetsOfHtmlStrings}}"
+    }
+  },
   "EndExploration": {},
   "FractionInput": {
     "IsExactlyEqualTo": {
@@ -124,6 +132,14 @@
     },
     "IsTranspositionOfExceptFor": {
       "description": "is a transposition of {{x|MusicPhrase}} by {{y|Int}} semitones except for {{k|NonnegativeInt}} notes"
+    }
+  },
+  "NumberWithUnits": {
+    "IsEqualTo": {
+        "description": "is equal to {{f|NumberWithUnits}}"
+    },
+    "IsEquivalentTo": {
+        "description": "is equivalent to {{f|NumberWithUnits}}"
     }
   },
   "NumericInput": {

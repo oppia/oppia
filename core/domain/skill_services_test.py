@@ -16,8 +16,10 @@
 
 from core.domain import skill_domain
 from core.domain import skill_services
+from core.domain import user_services
 from core.platform import models
 from core.tests import test_utils
+import feconf
 
 (skill_models,) = models.Registry.import_models([models.NAMES.skill])
 
@@ -27,8 +29,8 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
 
     SKILL_ID = None
     USER_ID = 'user'
-    MISCONCEPTION_ID_1 = 'misconception_id_1'
-    MISCONCEPTION_ID_2 = 'misconception_id_2'
+    MISCONCEPTION_ID_1 = 1
+    MISCONCEPTION_ID_2 = 2
 
     def setUp(self):
         super(SkillServicesUnitTests, self).setUp()
@@ -37,10 +39,23 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         misconceptions = [skill_domain.Misconception(
             self.MISCONCEPTION_ID_1, 'name', 'description', 'default_feedback')]
         self.SKILL_ID = skill_services.get_new_skill_id()
+
+        self.signup('a@example.com', 'A')
+        self.signup(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.signup('admin2@example.com', username='adm2')
+
+        self.user_id_a = self.get_user_id_from_email('a@example.com')
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.user_id_admin_2 = self.get_user_id_from_email('admin2@example.com')
+        self.set_admins([self.ADMIN_USERNAME, 'adm2'])
+        self.user_a = user_services.UserActionsInfo(self.user_id_a)
+        self.user_admin = user_services.UserActionsInfo(self.user_id_admin)
+        self.user_admin_2 = user_services.UserActionsInfo(self.user_id_admin_2)
+
         self.skill = self.save_new_skill(
-            self.SKILL_ID, self.USER_ID, 'Description', misconceptions,
-            skill_contents
-        )
+            self.SKILL_ID, self.USER_ID, 'Description',
+            misconceptions=misconceptions,
+            skill_contents=skill_contents)
 
     def test_compute_summary(self):
         skill_summary = skill_services.compute_summary_of_skill(self.skill)
@@ -48,6 +63,7 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
+        self.assertEqual(skill_summary.worked_examples_count, 1)
 
     def test_get_new_skill_id(self):
         new_skill_id = skill_services.get_new_skill_id()
@@ -69,6 +85,52 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill_summary.id, self.SKILL_ID)
         self.assertEqual(skill_summary.description, 'Description')
         self.assertEqual(skill_summary.misconception_count, 1)
+        self.assertEqual(skill_summary.worked_examples_count, 1)
+
+    def test_get_all_skill_summaries(self):
+        skill_summaries = skill_services.get_all_skill_summaries()
+
+        self.assertEqual(len(skill_summaries), 1)
+        self.assertEqual(skill_summaries[0].id, self.SKILL_ID)
+        self.assertEqual(skill_summaries[0].description, 'Description')
+        self.assertEqual(skill_summaries[0].misconception_count, 1)
+        self.assertEqual(skill_summaries[0].worked_examples_count, 1)
+
+    def test_get_skill_descriptions_by_ids(self):
+        self.save_new_skill(
+            'skill_2', self.USER_ID, 'Description 2', misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                'Explanation', ['Example 1']))
+        self.save_new_skill(
+            'skill_3', self.USER_ID, 'Description 3', misconceptions=[],
+            skill_contents=skill_domain.SkillContents(
+                'Explanation', ['Example 1']))
+        with self.swap(feconf, 'CAN_SEND_EMAILS', True):
+            skill_descriptions = skill_services.get_skill_descriptions_by_ids(
+                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            self.assertEqual(len(messages), 0)
+
+            skill_services.delete_skill(self.USER_ID, 'skill_2')
+            skill_descriptions = skill_services.get_skill_descriptions_by_ids(
+                'topic_id', [self.SKILL_ID, 'skill_2', 'skill_3'])
+            messages = self.mail_stub.get_sent_messages(
+                to=feconf.ADMIN_EMAIL_ADDRESS)
+            expected_email_html_body = (
+                'The deleted skills: skill_2 are still'
+                ' present in topic with id topic_id')
+            self.assertEqual(len(messages), 1)
+            self.assertIn(
+                expected_email_html_body,
+                messages[0].html.decode())
+            self.assertEqual(
+                skill_descriptions, {
+                    self.SKILL_ID: 'Description',
+                    'skill_2': None,
+                    'skill_3': 'Description 3'
+                }
+            )
 
     def test_get_skill_by_id(self):
         expected_skill = self.skill.to_dict()
@@ -94,14 +156,19 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         changelist = [
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_ADD_SKILL_MISCONCEPTION,
-                'id': self.MISCONCEPTION_ID_2
+                'new_misconception_dict': {
+                    'id': 0,
+                    'name': 'test name',
+                    'notes': 'test notes',
+                    'feedback': 'test feedback'
+                }
             }),
             skill_domain.SkillChange({
                 'cmd': skill_domain.CMD_UPDATE_SKILL_MISCONCEPTIONS_PROPERTY,
                 'property_name': (
                     skill_domain.SKILL_MISCONCEPTIONS_PROPERTY_NAME),
-                'id': self.MISCONCEPTION_ID_2,
-                'old_value': '',
+                'id': 0,
+                'old_value': 'test name',
                 'new_value': 'Name'
             })
         ]
@@ -115,12 +182,79 @@ class SkillServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(skill.version, 2)
         self.assertEqual(skill.misconceptions[1].name, 'Name')
 
+    def test_merge_skill(self):
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_SUPERSEDING_SKILL_ID),
+                'id': 0,
+                'old_value': '',
+                'new_value': 'TestSkillId'
+            }),
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
+                'id': 0,
+                'old_value': None,
+                'new_value': False
+            })
+        ]
+        skill_services.update_skill(
+            self.USER_ID, self.SKILL_ID, changelist,
+            'Merging skill.')
+        skill = skill_services.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.version, 2)
+        self.assertEqual(skill.superseding_skill_id, 'TestSkillId')
+        self.assertEqual(skill.all_questions_merged, False)
+
+    def test_set_merge_complete_for_skill(self):
+        changelist = [
+            skill_domain.SkillChange({
+                'cmd': skill_domain.CMD_UPDATE_SKILL_PROPERTY,
+                'property_name': (
+                    skill_domain.SKILL_PROPERTY_ALL_QUESTIONS_MERGED),
+                'id': 0,
+                'old_value': False,
+                'new_value': True
+            })
+        ]
+        skill_services.update_skill(
+            self.USER_ID, self.SKILL_ID, changelist,
+            'Setting merge complete for skill.')
+        skill = skill_services.get_skill_by_id(self.SKILL_ID)
+        self.assertEqual(skill.version, 2)
+        self.assertEqual(skill.all_questions_merged, True)
+
     def test_delete_skill(self):
         skill_services.delete_skill(self.USER_ID, self.SKILL_ID)
         self.assertEqual(
-            skill_services.get_skill_by_id(self.SKILL_ID, False), None)
+            skill_services.get_skill_by_id(self.SKILL_ID, strict=False), None)
         self.assertEqual(
-            skill_services.get_skill_summary_by_id(self.SKILL_ID, False), None)
+            skill_services.get_skill_summary_by_id(
+                self.SKILL_ID, strict=False), None)
+
+    def test_get_unpublished_skill_rights_by_creator(self):
+        self.save_new_skill(
+            'skill_a', self.user_id_admin, 'Description A', misconceptions=[],
+            skill_contents=(
+                skill_domain.SkillContents('Explanation', ['Example 1'])))
+        self.save_new_skill(
+            'skill_b', self.user_id_admin, 'Description B', misconceptions=[],
+            skill_contents=(
+                skill_domain.SkillContents('Explanation', ['Example 1'])))
+
+        skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
+            self.user_id_admin)
+        skill_ids = [skill_rights_obj.id for skill_rights_obj in skill_rights]
+        self.assertListEqual(skill_ids, ['skill_a', 'skill_b'])
+
+        skill_services.publish_skill(self.SKILL_ID, self.user_id_admin)
+        skill_rights = skill_services.get_unpublished_skill_rights_by_creator(
+            self.user_id_admin)
+        skill_ids = [skill_rights_obj.id for skill_rights_obj in skill_rights]
+        self.assertListEqual(skill_ids, ['skill_a', 'skill_b'])
 
 
 class SkillMasteryServicesUnitTests(test_utils.GenericTestBase):

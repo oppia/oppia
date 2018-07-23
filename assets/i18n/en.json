@@ -104,6 +104,7 @@
     "I18N_DASHBOARD_TABLE_HEADING_PLAYS": "Plays",
     "I18N_DASHBOARD_TABLE_HEADING_RATING": "Rating",
     "I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Unresolved Answers",
+    "I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD": "Topics and Skills Dashboard",
     "I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Drag an image into this area",
     "I18N_DIRECTIVES_UPLOAD_A_FILE": "Upload a file",
     "I18N_ERROR_DISABLED_EXPLORATION": "Disabled Exploration",
@@ -194,6 +195,7 @@
     "I18N_INTERACTIONS_MUSIC_CLEAR": "Clear",
     "I18N_INTERACTIONS_MUSIC_PLAY": "Play",
     "I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "Play Target Sequence",
+    "I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Possible unit formats",
     "I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Are you sure you want to reset your code?",
     "I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Cancel",
     "I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Confirmation Required",
@@ -434,6 +436,7 @@
     "I18N_SIDEBAR_FORUM": "Forum",
     "I18N_SIDEBAR_GET_STARTED": "Get Started",
     "I18N_SIDEBAR_LIBRARY_LINK": "Library",
+    "I18N_SIDEBAR_OPPIA_FOUNDATION": "Oppia Foundation",
     "I18N_SIDEBAR_TEACH_WITH_OPPIA": "Teach with Oppia",
     "I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "By checking the box to the left of this text, you acknowledge, agree, and accept to be bound by the <[sitename]> Terms of Use, found <a href=\"/terms\" target=\"_blank\">here</a>.",
     "I18N_SIGNUP_BUTTON_SUBMIT": "Submit and start contributing",
@@ -520,5 +523,6 @@
     "I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Sign in with Google",
     "I18N_TOPNAV_TEACH_WITH_OPPIA": "Teach with Oppia",
     "I18N_TOTAL_SUBSCRIBERS_TEXT": "You have a total of <[totalSubscribers]> subscribers.",
-    "I18N_UNSUBSCRIBE_BUTTON_TEXT": "Unsubscribe"
+    "I18N_UNSUBSCRIBE_BUTTON_TEXT": "Unsubscribe",
+    "I18N_WORKED_EXAMPLE": "Worked Example"
 }

@@ -83,10 +83,10 @@ oppia.factory('ExplorationSaveService', [
         backdrop: true,
         controller: [
           '$scope', '$window', '$uibModalInstance',
-          'ExplorationContextService',
+          'ContextService',
           function(
               $scope, $window, $uibModalInstance,
-              ExplorationContextService) {
+              ContextService) {
             $scope.congratsImgUrl = UrlInterpolationService.getStaticImageUrl(
               '/general/congrats.svg');
             $scope.DEFAULT_TWITTER_SHARE_MESSAGE_EDITOR = (
@@ -95,7 +95,7 @@ oppia.factory('ExplorationSaveService', [
               $uibModalInstance.dismiss('cancel');
             };
             $scope.explorationId = (
-              ExplorationContextService.getExplorationId());
+              ContextService.getExplorationId());
             $scope.explorationLink = (
               $window.location.protocol + '//' +
               $window.location.host + '/explore/' + $scope.explorationId);

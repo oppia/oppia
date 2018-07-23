@@ -17,10 +17,10 @@
  */
 
 oppia.factory('ImagePreloaderService', [
-  '$q', '$uibModal', 'ExplorationContextService', 'AssetsBackendApiService',
+  '$q', '$uibModal', 'ContextService', 'AssetsBackendApiService',
   'ExplorationPlayerStateService', 'UrlInterpolationService',
   'ComputeGraphService', 'ExtractImageFilenamesFromStateService',
-  function($q, $uibModal, ExplorationContextService, AssetsBackendApiService,
+  function($q, $uibModal, ContextService, AssetsBackendApiService,
       ExplorationPlayerStateService, UrlInterpolationService,
       ComputeGraphService, ExtractImageFilenamesFromStateService) {
     var MAX_NUM_IMAGE_FILES_TO_DOWNLOAD_SIMULTANEOUSLY = 3;
@@ -66,15 +66,17 @@ oppia.factory('ImagePreloaderService', [
      * @param {function} onLoadCallback - Function that is called when the
      *                                    Url of the loaded image is obtained.
      */
-    var _getImageUrl = function(filename, onLoadCallback) {
+    var _getImageUrl = function(filename, onLoadCallback, onErrorCallback) {
       AssetsBackendApiService.loadImage(
-        ExplorationContextService.getExplorationId(), filename)
+        ContextService.getExplorationId(), filename)
         .then(function(loadedImageFile) {
           if (_isInFailedDownload(loadedImageFile.filename)) {
             _removeFromFailedDownload(loadedImageFile.filename);
           }
           var objectUrl = URL.createObjectURL(loadedImageFile.data);
           onLoadCallback(objectUrl);
+        }, function(filename) {
+          onErrorCallback();
         });
     };
 
@@ -150,7 +152,7 @@ oppia.factory('ImagePreloaderService', [
      */
     var _loadImage = function(imageFilename) {
       AssetsBackendApiService.loadImage(
-        ExplorationContextService.getExplorationId(), imageFilename)
+        ContextService.getExplorationId(), imageFilename)
         .then(function(loadedImage) {
           _removeCurrentAndLoadNextImage(loadedImage.filename);
           if (_imageLoadedCallback[loadedImage.filename]) {
@@ -161,6 +163,12 @@ oppia.factory('ImagePreloaderService', [
             _imageLoadedCallback[loadedImage.filename] = null;
           }
         }, function(filename) {
+          if (_imageLoadedCallback[filename]) {
+            var onFailedDownload = (
+              (_imageLoadedCallback[filename]).rejectMethod);
+            onFailedDownload();
+            _imageLoadedCallback[filename] = null;
+          }
           _filenamesOfImageFailedToDownload.push(filename);
           _removeCurrentAndLoadNextImage(filename);
         });
@@ -254,9 +262,8 @@ oppia.factory('ImagePreloaderService', [
       getImageUrl: function(filename) {
         return $q(function(resolve, reject){
           if (AssetsBackendApiService.isCached(filename) ||
-              !_hasImagePreloaderServiceStarted ||
               _isInFailedDownload(filename)) {
-            _getImageUrl(filename, resolve);
+            _getImageUrl(filename, resolve, reject);
           } else {
             _imageLoadedCallback[filename] = {
               resolveMethod: resolve,
