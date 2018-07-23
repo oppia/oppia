@@ -44,7 +44,8 @@ oppia.directive('oppiaNoninteractiveImage', [
         if (ImagePreloaderService.inExplorationPlayer()) {
           $scope.isLoadingIndicatorShown = true;
           $scope.dimensions = (
-            ImagePreloaderService.getDimensionsOfImage($scope.filepath));
+            ImagePreloaderService.getDimensionsOfImage(
+              $scope.filepath.filename));
           // For aligning the gif to the center of it's container
           var loadingIndicatorSize = (
             ($scope.dimensions.height < 124) ? 24 : 120);
@@ -59,7 +60,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           $scope.loadImage = function() {
             $scope.isLoadingIndicatorShown = true;
             $scope.isTryAgainShown = false;
-            ImagePreloaderService.getImageUrl($scope.filepath)
+            ImagePreloaderService.getImageUrl($scope.filepath.filename)
               .then(function(objectUrl) {
                 $scope.isTryAgainShown = false;
                 $scope.isLoadingIndicatorShown = false;
@@ -76,7 +77,8 @@ oppia.directive('oppiaNoninteractiveImage', [
           // exploration editor. So we directly fetch the images from the
           // AssetsBackendApiService's cache.
           AssetsBackendApiService.loadImage(
-            ExplorationContextService.getExplorationId(), $scope.filepath)
+            ExplorationContextService.getExplorationId(),
+            $scope.filepath.filename)
             .then(function(loadedImageFile) {
               $scope.isLoadingIndicatorShown = false;
               $scope.isTryAgainShown = false;
