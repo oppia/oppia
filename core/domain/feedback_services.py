@@ -242,12 +242,23 @@ def update_messages_read_by_the_user(user_id, thread_id, message_ids):
         message_ids: list(int). The ids of the messages in the thread read by
             the user.
     """
-    feedback_thread_user_model = feedback_models.FeedbackThreadUserModel.get(
-        user_id, thread_id)
-
-    if not feedback_thread_user_model:
+    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         feedback_thread_user_model = (
-            feedback_models.FeedbackThreadUserModel.create(user_id, thread_id))
+            feedback_models.GeneralFeedbackThreadUserModel.get(
+                user_id, thread_id))
+
+        if not feedback_thread_user_model:
+            feedback_thread_user_model = (
+                feedback_models.GeneralFeedbackThreadUserModel.create(
+                    user_id, thread_id))
+    else:
+        feedback_thread_user_model = (
+            feedback_models.FeedbackThreadUserModel.get(user_id, thread_id))
+
+        if not feedback_thread_user_model:
+            feedback_thread_user_model = (
+                feedback_models.FeedbackThreadUserModel.create(
+                    user_id, thread_id))
 
     feedback_thread_user_model.message_ids_read_by_user = message_ids
     feedback_thread_user_model.put()
@@ -261,12 +272,23 @@ def add_message_id_to_read_by_list(thread_id, user_id, message_id):
         user_id: str. The id of the user reading the messages,
         message_id: int. The id of the message.
     """
-    feedback_thread_user_model = feedback_models.FeedbackThreadUserModel.get(
-        user_id, thread_id)
-
-    if not feedback_thread_user_model:
+    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
         feedback_thread_user_model = (
-            feedback_models.FeedbackThreadUserModel.create(user_id, thread_id))
+            feedback_models.GeneralFeedbackThreadUserModel.get(
+                user_id, thread_id))
+
+        if not feedback_thread_user_model:
+            feedback_thread_user_model = (
+                feedback_models.GeneralFeedbackThreadUserModel.create(
+                    user_id, thread_id))
+    else:
+        feedback_thread_user_model = (
+            feedback_models.FeedbackThreadUserModel.get(user_id, thread_id))
+
+        if not feedback_thread_user_model:
+            feedback_thread_user_model = (
+                feedback_models.FeedbackThreadUserModel.create(
+                    user_id, thread_id))
 
     feedback_thread_user_model.message_ids_read_by_user.append(message_id)
     feedback_thread_user_model.put()
@@ -574,7 +596,8 @@ def get_thread_summaries(user_id, thread_ids):
     else:
         messages = feedback_models.FeedbackMessageModel.get_multi(
             last_two_messages_ids)
-
+    print feedback_thread_user_model_ids
+    print feedback_thread_user_models
     last_two_messages = [messages[i:i + 2] for i in range(0, len(messages), 2)]
 
     thread_summaries = []
@@ -620,9 +643,14 @@ def get_thread_summaries(user_id, thread_ids):
         # TODO(Arunabh): Remove else clause after each thread has a message
         # count.
         else:
-            total_message_count = (
-                feedback_models.FeedbackMessageModel.get_message_count(
-                    thread_ids[index]))
+            if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+                total_message_count = (
+                    feedback_models.GeneralFeedbackMessageModel
+                    .get_message_count(thread_ids[index]))
+            else:
+                total_message_count = (
+                    feedback_models.FeedbackMessageModel.get_message_count(
+                        thread_ids[index]))
 
         thread_summary = {
             'status': thread.status,
@@ -640,7 +668,7 @@ def get_thread_summaries(user_id, thread_ids):
         }
 
         thread_summaries.append(thread_summary)
-
+    print thread_summaries
     return thread_summaries, number_of_unread_threads
 
 

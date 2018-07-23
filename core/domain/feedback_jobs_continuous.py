@@ -152,10 +152,10 @@ class FeedbackAnalyticsAggregator(jobs.BaseContinuousComputationManager):
             exploration_ids)
         realtime_models = cls._get_realtime_datastore_class().get_multi(
             realtime_model_ids)
+        exploration_ids = ['exploration.%s' % exp_id for exp_id in exploration_ids]
         feedback_thread_analytics_models = (
             feedback_models.FeedbackAnalyticsModel.get_multi(
                 exploration_ids))
-        print feedback_thread_analytics_models
         return [feedback_domain.FeedbackAnalytics(
             'exploration', exploration_ids[i],
             (realtime_models[i].num_open_threads

@@ -3136,10 +3136,10 @@ class SuggestionActionUnitTests(test_utils.GenericTestBase):
     COMMIT_MESSAGE = 'commit message'
     EMPTY_COMMIT_MESSAGE = ' '
 
-    def _generate_thread_id_1(self, unused_entity_type, unused_entity_id):
+    def _generate_thread_id_1(self, unused_exp_id):
         return self.THREAD_ID1
 
-    def _generate_thread_id_2(self, unused_entity_type, unused_entity_id):
+    def _generate_thread_id_2(self, unused_exp_id):
         return self.THREAD_ID2
 
     def _return_true(self, unused_thread_id, unused_exploration_id=''):

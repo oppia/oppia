@@ -56,7 +56,7 @@ def create_suggestion(
 
     thread_id = feedback_services.create_thread(
         target_type, target_id, None, author_id, description,
-        DEFAULT_SUGGESTION_THREAD_SUBJECT)
+        DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
 
     status = suggestion_models.STATUS_IN_REVIEW
 

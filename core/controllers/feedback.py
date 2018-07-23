@@ -72,8 +72,7 @@ class ThreadHandler(base.BaseHandler):
     @acl_decorators.can_view_feedback_thread
     def get(self, thread_id):
         if constants.USE_NEW_SUGGESTION_FRAMEWORK:
-            suggestion_id = 'exploration.%s' % thread_id
-            suggestion = suggestion_services.get_suggestion_by_id(suggestion_id)
+            suggestion = suggestion_services.get_suggestion_by_id(thread_id)
         else:
             suggestion = feedback_services.get_suggestion(thread_id)
 

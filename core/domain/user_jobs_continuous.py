@@ -274,9 +274,9 @@ class RecentUpdatesMRJobManager(
             yield (
                 reducer_key, {
                     'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-                    'activity_id': last_message.entity_id,
+                    'activity_id': last_message.exploration_id,
                     'activity_title': exp_models.ExplorationModel.get_by_id(
-                        last_message.entity_id).title,
+                        last_message.exploration_id).title,
                     'author_id': last_message.author_id,
                     'last_updated_ms': utils.get_time_in_millisecs(
                         last_message.created_on),
