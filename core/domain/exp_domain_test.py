@@ -31,6 +31,9 @@ import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
+def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+    return html_cleaner.escape_html(json.dumps(
+        {'filename': filename, 'height': 490, 'width': 120}))
 
 class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration versions difference domain object."""
@@ -4540,10 +4543,6 @@ title: Title
 
     def test_load_from_v26_textangular(self):
         """Test direct loading from a v26 yaml file."""
-        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
-            return html_cleaner.escape_html(json.dumps(
-                {'filename': filename, 'height': 490, 'width': 120}))
-
         with self.swap(
             html_cleaner, 'get_filepath_of_object_image',
             _mock_get_filepath_of_object_image):
@@ -4555,10 +4554,6 @@ title: Title
 
     def test_load_from_v27_without_image_caption(self):
         """Test direct loading from a v27 yaml file."""
-        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
-            return html_cleaner.escape_html(json.dumps(
-                {'filename': filename, 'height': 490, 'width': 120}))
-
         with self.swap(
             html_cleaner, 'get_filepath_of_object_image',
             _mock_get_filepath_of_object_image):
@@ -4570,10 +4565,6 @@ title: Title
 
     def test_load_from_v28_without_image_dimensions(self):
         """Test direct loading from a v27 yaml file."""
-        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
-            return html_cleaner.escape_html(json.dumps(
-                {'filename': filename, 'height': 490, 'width': 120}))
-
         with self.swap(
             html_cleaner, 'get_filepath_of_object_image',
             _mock_get_filepath_of_object_image):
@@ -4936,10 +4927,6 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
                 state_dict,
                 html_cleaner.add_caption_attr_to_image),
             state_dict_with_image_caption)
-
-        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
-            return html_cleaner.escape_html(json.dumps(
-                {'filename': filename, 'height': 490, 'width': 120}))
 
         with self.swap(
             html_cleaner, 'get_filepath_of_object_image',

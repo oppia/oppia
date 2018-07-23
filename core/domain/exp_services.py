@@ -1495,6 +1495,15 @@ def save_new_exploration_from_yaml_and_assets(
         raise Exception('Invalid YAML file: missing schema version')
     exp_schema_version = yaml_dict['schema_version']
 
+    # The assets are commited before the exploration is created because the
+    # migrating to state schema version 24 involves adding dimensions to the
+    # So we need to have images in the datastore before we could perform the
+    # migration.
+    for (asset_filename, asset_content) in assets_list:
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(exploration_id))
+        fs.commit(committer_id, asset_filename, asset_content)
+
     if (exp_schema_version <=
             exp_domain.Exploration.LAST_UNTITLED_SCHEMA_VERSION):
         # The schema of the YAML file for older explorations did not include
@@ -1524,10 +1533,6 @@ def save_new_exploration_from_yaml_and_assets(
                 'category': exploration.category,
             })])
 
-    for (asset_filename, asset_content) in assets_list:
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration_id))
-        fs.commit(committer_id, asset_filename, asset_content)
 
 
 def delete_demo(exploration_id):

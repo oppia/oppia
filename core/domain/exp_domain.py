@@ -4156,7 +4156,7 @@ class Exploration(object):
 
     @classmethod
     def _migrate_to_latest_yaml_version(
-            cls, yaml_content, title=None, category=None):
+            cls, yaml_content, exp_id, title=None, category=None):
         """Return the YAML content of the exploration in the latest schema
         format.
 
@@ -4164,6 +4164,7 @@ class Exploration(object):
             yaml_content: str. The YAML representation of the exploration.
             title: str. The exploration title.
             category: str. The exploration category.
+            exp_id: str. ID of the exploration.
 
         Returns:
             tuple(dict, int). The dict 'exploration_dict' is the representation
@@ -4327,7 +4328,7 @@ class Exploration(object):
             exploration_schema_version = 28
 
         if exploration_schema_version == 28:
-            exploration_dict['id'] = 'default'
+            exploration_dict['id'] = exp_id
             exploration_dict = cls._convert_v28_dict_to_v29_dict(
                 exploration_dict)
             exploration_schema_version = 29
@@ -4350,7 +4351,8 @@ class Exploration(object):
             Exception: The initial schema version of exploration is less than
                 or equal to 9.
         """
-        migration_result = cls._migrate_to_latest_yaml_version(yaml_content)
+        migration_result = cls._migrate_to_latest_yaml_version(
+            yaml_content, exploration_id)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 
@@ -4382,7 +4384,7 @@ class Exploration(object):
                 or equal to 9.
         """
         migration_result = cls._migrate_to_latest_yaml_version(
-            yaml_content, title, category)
+            yaml_content, exploration_id, title, category)
         exploration_dict = migration_result[0]
         initial_schema_version = migration_result[1]
 

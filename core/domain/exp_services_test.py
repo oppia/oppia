@@ -17,6 +17,7 @@
 import StringIO
 import copy
 import datetime
+import json
 import os
 import zipfile
 
@@ -25,6 +26,7 @@ from core.domain import exp_jobs_one_off
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import html_cleaner
 from core.domain import param_domain
 from core.domain import rating_services
 from core.domain import rights_manager
@@ -609,29 +611,37 @@ class LoadingAndDeletionOfExplorationDemosTest(ExplorationServicesUnitTests):
             len(demo_exploration_ids), 1,
             msg='There must be at least one demo exploration.')
 
-        for exp_id in demo_exploration_ids:
-            start_time = datetime.datetime.utcnow()
+        def _mock_get_filepath_of_object_image(filename, unused_exp_id):
+            return html_cleaner.escape_html(json.dumps(
+                {'filename': filename, 'height': 490, 'width': 120}))
 
-            exp_services.load_demo(exp_id)
-            exploration = exp_services.get_exploration_by_id(exp_id)
-            warnings = exploration.validate(strict=True)
-            if warnings:
-                raise Exception(warnings)
+        with self.swap(
+            html_cleaner, 'get_filepath_of_object_image',
+            _mock_get_filepath_of_object_image):
 
-            duration = datetime.datetime.utcnow() - start_time
-            processing_time = duration.seconds + duration.microseconds / 1E6
-            self.log_line(
-                'Loaded and validated exploration %s (%.2f seconds)' %
-                (exploration.title.encode('utf-8'), processing_time))
+            for exp_id in demo_exploration_ids:
+                start_time = datetime.datetime.utcnow()
 
-        self.assertEqual(
-            exp_models.ExplorationModel.get_exploration_count(),
-            len(demo_exploration_ids))
+                exp_services.load_demo(exp_id)
+                exploration = exp_services.get_exploration_by_id(exp_id)
+                warnings = exploration.validate(strict=True)
+                if warnings:
+                    raise Exception(warnings)
 
-        for exp_id in demo_exploration_ids:
-            exp_services.delete_demo(exp_id)
-        self.assertEqual(
-            exp_models.ExplorationModel.get_exploration_count(), 0)
+                duration = datetime.datetime.utcnow() - start_time
+                processing_time = duration.seconds + duration.microseconds / 1E6
+                self.log_line(
+                    'Loaded and validated exploration %s (%.2f seconds)' %
+                    (exploration.title.encode('utf-8'), processing_time))
+
+            self.assertEqual(
+                exp_models.ExplorationModel.get_exploration_count(),
+                len(demo_exploration_ids))
+
+            for exp_id in demo_exploration_ids:
+                exp_services.delete_demo(exp_id)
+            self.assertEqual(
+                exp_models.ExplorationModel.get_exploration_count(), 0)
 
 
 class ExplorationYamlImportingTests(test_utils.GenericTestBase):
