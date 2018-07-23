@@ -13,9 +13,10 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the 'state name' section of the editor sidebar.
+ * @fileoverview Directive for the state name editor section of the state
+ * editor.
  */
-oppia.directive('sidebarStateName', [
+oppia.directive('stateNameEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
@@ -29,7 +30,7 @@ oppia.directive('sidebarStateName', [
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
-        'sidebar_state_name_directive.html'),
+        'state_name_editor_directive.html'),
       controller: [
         '$scope', '$filter', '$rootScope', 'EditabilityService',
         'EditorStateService', 'FocusManagerService', 'ExplorationStatesService',

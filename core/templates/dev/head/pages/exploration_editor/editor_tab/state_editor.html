@@ -1,10 +1,10 @@
 <div ng-controller="StateEditor" class="oppia-editor-cards-container">
   <div class="oppia-editor-header">
-    <sidebar-state-name></sidebar-state-name>
+    <state-name-editor></state-name-editor>
   </div>
 
   <div ng-if="areParametersEnabled()">
-    <state-param-changes></state-param-changes>
+    <state-param-changes-editor></state-param-changes-editor>
   </div>
 
   <md-card class="oppia-editor-card-with-avatar">
@@ -25,10 +25,10 @@
   <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
     <state-responses></state-responses>
     <div>
-      <state-hints></state-hints>
+      <state-hints-editor></state-hints-editor>
     </div>
     <div ng-if="currentInteractionCanHaveSolution">
-      <state-solution></state-solution>
+      <state-solution-editor></state-solution-editor>
     </div>
   </div>
 </div>

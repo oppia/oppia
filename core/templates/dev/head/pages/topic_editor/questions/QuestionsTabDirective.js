@@ -31,7 +31,7 @@ oppia.directive('questionsTab', [
             QuestionCreationService, EditableQuestionBackendApiService,
             QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED) {
           var _initTab = function() {
-            $scope.showEditor = false;
+            $scope.questionEditorIsShown = false;
             $scope.questionId = null;
             $scope.topic = TopicEditorStateService.getTopic();
             $scope.questionSummaries =
@@ -39,11 +39,14 @@ oppia.directive('questionsTab', [
           };
 
           $scope.createQuestion = function() {
-            $scope.showEditor = true;
+            // TODO (aks681): Add the necessary steps to be done when creating
+            // question here.
+            $scope.questionEditorIsShown = true;
+            $scope.questionId = null;
           };
 
           $scope.showQuestionEditor = function(id) {
-            $scope.showEditor = true;
+            $scope.questionEditorIsShown = true;
             $scope.questionId = id;
           };
 

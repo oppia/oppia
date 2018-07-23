@@ -13,15 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers, services and filters for hints.
+ * @fileoverview Directive for the add and view hints section of the state
+ * editor.
  */
-oppia.directive('stateHints', [
+oppia.directive('stateHintsEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/state_hints_directive.html'),
+        '/pages/exploration_editor/editor_tab/' +
+        'state_hints_editor_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
         'GenerateContentIdService', 'AlertsService', 'INTERACTION_SPECS',

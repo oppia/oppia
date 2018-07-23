@@ -134,13 +134,13 @@ describe('Sidebar state name controller', function() {
 
       var templateHtml = $templateCache.get(
         '/pages/exploration_editor/editor_tab/' +
-        'sidebar_state_name_directive.html');
+        'state_name_editor_directive.html');
       $compile(templateHtml, $rootScope);
       $rootScope.$digest();
 
       outerScope = $rootScope.$new();
       var elem = angular.element(
-        '<sidebar-state-name></sidebar-state-name>');
+        '<state-name-editor></state-name-editor>');
       var compiledElem = $compile(elem)(outerScope);
       outerScope.$digest();
       scope = compiledElem[0].getControllerScope();

@@ -13,17 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the state parameter changes section
- * of the editor sidebar.
+ * @fileoverview Directive for the param changes editor section of the
+ * state editor.
  */
-oppia.directive('stateParamChanges', [
+oppia.directive('stateParamChangesEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
-        'state_param_changes_directive.html'),
+        'state_param_changes_editor_directive.html'),
       controller: [
         '$scope', 'EditorStateService', 'stateParamChangesService',
         function($scope, EditorStateService, stateParamChangesService) {

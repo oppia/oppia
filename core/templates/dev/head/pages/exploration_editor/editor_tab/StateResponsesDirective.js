@@ -13,8 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers and filters for responses corresponding
- * to a state's interaction and answer groups.
+ * @fileoverview Directive for managing the state responses in the state editor.
  */
 oppia.directive('stateResponses', [
   'UrlInterpolationService', function(UrlInterpolationService) {
@@ -30,14 +29,16 @@ oppia.directive('stateResponses', [
         'TrainingDataService', 'EditabilityService',
         'stateContentIdsToAudioTranslationsService', 'INTERACTION_SPECS',
         'stateCustomizationArgsService', 'PLACEHOLDER_OUTCOME_DEST',
-        'UrlInterpolationService', 'AnswerGroupObjectFactory', function(
+        'UrlInterpolationService', 'AnswerGroupObjectFactory',
+        'RULE_SUMMARY_WRAP_CHARACTER_COUNT', function(
             $scope, $rootScope, $uibModal, $filter,
             stateInteractionIdService, EditorStateService, AlertsService,
             ResponsesService, RouterService, ContextService,
             TrainingDataService, EditabilityService,
             stateContentIdsToAudioTranslationsService, INTERACTION_SPECS,
             stateCustomizationArgsService, PLACEHOLDER_OUTCOME_DEST,
-            UrlInterpolationService, AnswerGroupObjectFactory) {
+            UrlInterpolationService, AnswerGroupObjectFactory,
+            RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
           $scope.SHOW_TRAINABLE_UNRESOLVED_ANSWERS = (
             GLOBALS.SHOW_TRAINABLE_UNRESOLVED_ANSWERS);
           $scope.EditorStateService = EditorStateService;
@@ -438,6 +439,67 @@ oppia.directive('stateResponses', [
             return ResponsesService.getAnswerChoices();
           };
 
+          $scope.summarizeAnswerGroup = function(
+              answerGroup, interactionId, answerChoices, shortenRule) {
+            var summary = '';
+            var outcome = answerGroup.outcome;
+            var hasFeedback = outcome.hasNonemptyFeedback();
+
+            if (answerGroup.rules) {
+              var firstRule = $filter('convertToPlainText')(
+                $filter('parameterizeRuleDescription')(
+                  answerGroup.rules[0], interactionId, answerChoices));
+              summary = 'Answer ' + firstRule;
+
+              if (hasFeedback && shortenRule) {
+                summary = $filter('wrapTextWithEllipsis')(
+                  summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+              }
+              summary = '[' + summary + '] ';
+            }
+
+            if (hasFeedback) {
+              summary += (
+                shortenRule ?
+                  $filter('truncate')(outcome.feedback.getHtml(), 30) :
+                  $filter('convertToPlainText')(outcome.feedback.getHtml()));
+            }
+            return summary;
+          };
+
+          $scope.summarizeDefaultOutcome = function(
+              defaultOutcome, interactionId, answerGroupCount, shortenRule) {
+            if (!defaultOutcome) {
+              return '';
+            }
+
+            var summary = '';
+            var hasFeedback = defaultOutcome.hasNonemptyFeedback();
+
+            if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
+              summary =
+                INTERACTION_SPECS[interactionId].default_outcome_heading;
+            } else if (answerGroupCount > 0) {
+              summary = 'All other answers';
+            } else {
+              summary = 'All answers';
+            }
+
+            if (hasFeedback && shortenRule) {
+              summary = $filter('wrapTextWithEllipsis')(
+                summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
+            }
+            summary = '[' + summary + '] ';
+
+            if (hasFeedback) {
+              summary +=
+                $filter(
+                  'convertToPlainText'
+                )(defaultOutcome.feedback.getHtml());
+            }
+            return summary;
+          };
+
           $scope.isOutcomeLooping = function(outcome) {
             var activeStateName = EditorStateService.getActiveStateName();
             return outcome && (outcome.dest === activeStateName);
@@ -450,70 +512,3 @@ oppia.directive('stateResponses', [
       ]
     };
   }]);
-
-oppia.filter('summarizeAnswerGroup', [
-  '$filter', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
-  function($filter, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
-    return function(answerGroup, interactionId, answerChoices, shortenRule) {
-      var summary = '';
-      var outcome = answerGroup.outcome;
-      var hasFeedback = outcome.hasNonemptyFeedback();
-
-      if (answerGroup.rules) {
-        var firstRule = $filter('convertToPlainText')(
-          $filter('parameterizeRuleDescription')(
-            answerGroup.rules[0], interactionId, answerChoices));
-        summary = 'Answer ' + firstRule;
-
-        if (hasFeedback && shortenRule) {
-          summary = $filter('wrapTextWithEllipsis')(
-            summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
-        }
-        summary = '[' + summary + '] ';
-      }
-
-      if (hasFeedback) {
-        summary += (
-          shortenRule ?
-            $filter('truncate')(outcome.feedback.getHtml(), 30) :
-            $filter('convertToPlainText')(outcome.feedback.getHtml()));
-      }
-      return summary;
-    };
-  }
-]);
-
-oppia.filter('summarizeDefaultOutcome', [
-  '$filter', 'INTERACTION_SPECS', 'RULE_SUMMARY_WRAP_CHARACTER_COUNT',
-  function($filter, INTERACTION_SPECS, RULE_SUMMARY_WRAP_CHARACTER_COUNT) {
-    return function(
-        defaultOutcome, interactionId, answerGroupCount, shortenRule) {
-      if (!defaultOutcome) {
-        return '';
-      }
-
-      var summary = '';
-      var hasFeedback = defaultOutcome.hasNonemptyFeedback();
-
-      if (interactionId && INTERACTION_SPECS[interactionId].is_linear) {
-        summary = INTERACTION_SPECS[interactionId].default_outcome_heading;
-      } else if (answerGroupCount > 0) {
-        summary = 'All other answers';
-      } else {
-        summary = 'All answers';
-      }
-
-      if (hasFeedback && shortenRule) {
-        summary = $filter('wrapTextWithEllipsis')(
-          summary, RULE_SUMMARY_WRAP_CHARACTER_COUNT);
-      }
-      summary = '[' + summary + '] ';
-
-      if (hasFeedback) {
-        summary +=
-          $filter('convertToPlainText')(defaultOutcome.feedback.getHtml());
-      }
-      return summary;
-    };
-  }
-]);

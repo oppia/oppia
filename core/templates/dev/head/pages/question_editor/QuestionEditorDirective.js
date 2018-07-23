@@ -34,7 +34,8 @@ oppia.directive('questionEditor', [
             EVENT_QUESTION_SUMMARIES_INITIALIZED) {
           $scope.question = null;
           if ($scope.getQuestionId() === null) {
-            // TODO (aks681)
+            // TODO (aks681): Add the necessary steps to be done when creating
+            // question here.
           } else {
             EditableQuestionBackendApiService.fetchQuestion(
               $scope.getQuestionId()).then(function(questionBackendDict) {

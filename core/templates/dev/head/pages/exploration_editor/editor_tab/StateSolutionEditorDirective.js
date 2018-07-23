@@ -13,15 +13,16 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controller for solution.
+ * @fileoverview Directive for the solution viewer and editor in state editor.
  */
-oppia.directive('stateSolution', [
+oppia.directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
       scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
-        '/pages/exploration_editor/editor_tab/state_solution_directive.html'),
+        '/pages/exploration_editor/editor_tab/' +
+        'state_solution_editor_directive.html'),
       controller: [
         '$scope', '$rootScope', '$uibModal', '$filter', 'EditorStateService',
         'AlertsService', 'INTERACTION_SPECS', 'stateSolutionService',
