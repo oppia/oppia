@@ -264,6 +264,7 @@
 	"I18N_SIDEBAR_FORUM": "Fórum",
 	"I18N_SIDEBAR_GET_STARTED": "Começar",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Biblioteca",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "Fundação Oppia",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "Ensine com Oppia",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "Ao marcar a caixa à esquerda deste texto, você reconhece, concorda e aceita vincular-se aos Termos de Uso de <[sitename]>, encontrados <a href=\"/terms\" target=\"_blank\">aqui</a>.",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "Enviar e começar a contribuir",

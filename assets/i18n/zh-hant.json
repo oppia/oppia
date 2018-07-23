@@ -436,6 +436,7 @@
 	"I18N_SIDEBAR_FORUM": "論壇",
 	"I18N_SIDEBAR_GET_STARTED": "入門",
 	"I18N_SIDEBAR_LIBRARY_LINK": "圖書館",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "Oppia 基金會",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "以 Oppia 教學",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "根據勾選此文字左邊的框，代表您承認、同意、接受可<a href=\"/terms\" target=\"_blank\">於此</a>找到的<[sitename]>使用條款要求。",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "提交並開始貢獻",

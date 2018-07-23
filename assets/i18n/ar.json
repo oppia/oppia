@@ -436,6 +436,7 @@
 	"I18N_SIDEBAR_FORUM": "المنتدى",
 	"I18N_SIDEBAR_GET_STARTED": "ابدأ",
 	"I18N_SIDEBAR_LIBRARY_LINK": "المكتبة",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "مؤسسة أوبيا",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "التعليم مع أوبيا",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "من خلال تحديد المربع الموجود على يمين هذا النص، فإنك تقر وتوافق وتقبل الالتزام ببنود <[sitename]>شروط الاستخدام، الموجودة<a href=\"/terms\" target=\"_blank\">هنا</a>.",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "إرسال والبدء في المساهمة",
