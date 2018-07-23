@@ -1,10 +1,10 @@
 <div ng-controller="StateEditor" class="oppia-editor-cards-container">
   <div class="oppia-editor-header">
-    {% include 'pages/exploration_editor/editor_tab/sidebar_state_name.html' %}
+    <state-name-editor></state-name-editor>
   </div>
 
   <div ng-if="areParametersEnabled()">
-    {% include 'pages/exploration_editor/editor_tab/state_parameter_changes.html' %}
+    <state-param-changes-editor></state-param-changes-editor>
   </div>
 
   <md-card class="oppia-editor-card-with-avatar">
@@ -19,16 +19,16 @@
   </md-card>
 
   <div ng-show="interactionIsShown">
-    {% include 'pages/exploration_editor/editor_tab/state_editor_interaction.html' %}
+    <state-interaction-editor></state-interaction-editor>
   </div>
 
   <div ng-hide="!interactionIdIsSet || currentStateIsTerminal">
-    {% include 'pages/exploration_editor/editor_tab/state_editor_responses.html' %}
+    <state-responses></state-responses>
     <div>
-      {% include 'pages/exploration_editor/editor_tab/state_editor_hints.html' %}
+      <state-hints-editor></state-hints-editor>
     </div>
     <div ng-if="currentInteractionCanHaveSolution">
-      {% include 'pages/exploration_editor/editor_tab/state_editor_solution.html' %}
+      <state-solution-editor></state-solution-editor>
     </div>
   </div>
 </div>
