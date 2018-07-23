@@ -1778,7 +1778,7 @@ class State(object):
 
     @classmethod
     def convert_html_fields_in_state(
-        cls, state_dict, conversion_fn, additional_data={}):
+            cls, state_dict, conversion_fn, additional_data=None):
         """Applies a conversion function on all the html strings in a state
         to migrate them to a desired state.
 
@@ -1795,7 +1795,7 @@ class State(object):
         # We need exp_id only for adding dimensions to the images. So for other
         # conversion_fn we assign exp_id as 'unused'.
         exp_id = 'unused'
-        if 'exp_id' in additional_data:
+        if additional_data and 'exp_id' in additional_data:
             exp_id = additional_data['exp_id']
 
         state_dict['content']['html'] = (

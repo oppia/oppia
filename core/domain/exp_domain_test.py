@@ -31,9 +31,11 @@ import utils
 
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
+
 def _mock_get_filepath_of_object_image(filename, unused_exp_id):
     return html_cleaner.escape_html(json.dumps(
         {'filename': filename, 'height': 490, 'width': 120}))
+
 
 class ExplorationVersionsDiffDomainUnitTests(test_utils.GenericTestBase):
     """Test the exploration versions difference domain object."""
@@ -4572,7 +4574,8 @@ title: Title
             exploration = exp_domain.Exploration.from_yaml(
                 'eid', self.YAML_CONTENT_V28_WITHOUT_IMAGE_DIMENSIONS)
             self.assertEqual(
-                exploration.to_yaml(), self.YAML_CONTENT_V29_WITH_IMAGE_DIMENSIONS)
+                exploration.to_yaml(),
+                self.YAML_CONTENT_V29_WITH_IMAGE_DIMENSIONS)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -4932,12 +4935,12 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             html_cleaner, 'get_filepath_of_object_image',
             _mock_get_filepath_of_object_image):
 
-          self.assertEqual(
-              exp_domain.State.convert_html_fields_in_state(
-                  state_dict,
-                  html_cleaner.add_dimensions_to_noninteractive_image_tag,
-                  'unused'),
-              state_dict_with_image_dimensions)
+            self.assertEqual(
+                exp_domain.State.convert_html_fields_in_state(
+                    state_dict,
+                    html_cleaner.add_dimensions_to_noninteractive_image_tag,
+                    'unused'),
+                state_dict_with_image_dimensions)
 
 
 class StateIdMappingTests(test_utils.GenericTestBase):
