@@ -720,6 +720,8 @@ COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
 ENABLE_PLAYTHROUGHS = True
+# Max number of playthroughs for an issue.
+MAX_PLAYTHROUGHS_FOR_ISSUE = 5
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
