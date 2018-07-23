@@ -24,7 +24,6 @@ import urlparse
 import bleach
 import bs4
 from core.domain import rte_component_registry
-from extensions.objects.models import objects
 import feconf
 
 
@@ -803,30 +802,43 @@ def validate_customization_args(html_list):
         dict: Dictionary of all the invalid customisation args where
         key is a Rich Text Component and value is the invalid html string.
     """
+    # Importing this at the top of the file causes a circular dependency.
+    # So this is needed here.
+    from extensions.objects.models import objects # pylint: disable=relative-import
 
     rich_text_components = feconf.RICH_TEXT_COMPONENTS
+
+    class_dict = {
+        'SanitizedUrl': objects.SanitizedUrl,
+        'UnicodeString': objects.UnicodeString,
+        'MathLatexString': objects.MathLatexString,
+        'Filepath': objects.Filepath,
+        'Int': objects.Int,
+        'Boolean': objects.Boolean,
+        'Html': objects.Html
+    }
 
     err_dict = {}
 
     for html_string in html_list:
-        is_invalid = False
         soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
 
         for component in rich_text_components:
+            is_invalid = False
             tag_name = component['name']
             customization_args = component['customization_args']
             required_attrs_names = [arg['name'] for arg in customization_args]
             for tag in soup.findAll(name=tag_name):
                 attrs = tag.attrs
                 attrs_names = attrs.keys()
-                if attrs_names != required_attrs_names:
+                if set(attrs_names) != set(required_attrs_names):
                     is_invalid = True
                     break
                 for customization_arg in customization_args:
                     arg_name = customization_arg['name']
-                    arg_type = customization_arg['type']
-                    arg_value = attrs[arg_name]
-                    if arg_type != 'custom':
+                    arg_value = json.loads(unescape_html(attrs[arg_name]))
+                    if customization_arg['type'] != 'custom':
+                        arg_type = class_dict[customization_arg['type']]
                         try:
                             arg_type.normalize(arg_value)
                         except Exception:
@@ -837,24 +849,28 @@ def validate_customization_args(html_list):
                                     arg_value))):
                             for value in arg_value:
                                 value_keys = value.keys()
-                                if value_keys != ['content', 'title']:
+                                if set(value_keys) != set(['content', 'title']):
                                     is_invalid = True
                                 else:
                                     content = value['content']
                                     title = value['title']
                                     try:
-                                        objects.Html.normalize(content)
-                                        objects.UnicodeString.normalize(title)
+                                        title_type = class_dict[
+                                            customization_arg['title_type']]
+                                        content_type = class_dict[
+                                            customization_arg['content_type']]
+                                        title_type.normalize(title)
+                                        content_type.normalize(content)
                                     except Exception:
                                         is_invalid = True
 
                         else:
                             is_invalid = True
 
-        if is_invalid:
-            if tag_name in err_dict:
-                err_dict[tag_name] = [html_string]
-            else:
-                err_dict[tag_name].append(html_string)
+            if is_invalid:
+                if tag_name not in err_dict:
+                    err_dict[tag_name] = [html_string]
+                else:
+                    err_dict[tag_name].append(html_string)
 
-        return err_dict
+    return err_dict
