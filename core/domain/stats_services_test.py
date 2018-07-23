@@ -316,9 +316,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'cmd': 'add_state',
             'state_name': 'New state 2'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -344,9 +345,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'old_state_name': 'New state 2',
             'new_state_name': 'Renamed state'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -362,9 +364,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'cmd': 'delete_state',
             'state_name': 'New state'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -389,9 +392,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'cmd': 'delete_state',
             'state_name': 'Renamed state 2'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -417,9 +421,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'old_state_name': 'New state 3',
             'new_state_name': 'New state 4'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
@@ -460,9 +465,10 @@ class StatisticsServicesTest(test_utils.GenericTestBase):
             'old_state_name': 'New state',
             'new_state_name': 'New state 4'
         })]
+        exp_versions_diff = exp_domain.ExplorationVersionsDiff(change_list)
         stats_services.handle_stats_creation_for_new_exp_version(
             exploration.id, exploration.version, exploration.states,
-            change_list)
+            exp_versions_diff)
 
         exploration_stats = stats_services.get_exploration_stats_by_id(
             exploration.id, exploration.version)
