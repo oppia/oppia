@@ -941,8 +941,7 @@ def send_test_email_for_bulk_emails(tester_id, email_subject, email_body):
 
 
 def send_mail_to_onboard_new_reviewers(user_id, category):
-    """Sends an email to users who have attained high scores by contributing
-    suggestions.
+    """Sends an email to users who have crossed the threshold score.
 
     Args:
         user_id: str. The ID of the user who is being offered to become a
@@ -955,8 +954,11 @@ def send_mail_to_onboard_new_reviewers(user_id, category):
     email_body_template = (
         'Hi %s,<br>'
         'You have been actively contributing quality suggestions for oppia '
-        'content in %s. We would like to have you review other contributors '
-        'suggestions in similar domains. If you would like to help out the '
+        'content in category %s. In recognition of your contributions, we would'
+        ' like to have you as one of our reviewers. As a reviewer, you would be'
+        ' responsible for regularly reviewing the suggestions in the same '
+        'category and ensuring that the accepted content meets the quality bar.'
+        ' If you would like to help out the '
         'content creators to review suggestions, please visit your '
         '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>. '
         'And set the review preference for the category as yes. '
@@ -1002,7 +1004,7 @@ def send_mail_to_notify_users_to_review(user_id, category):
         'There are suggestions in category %s which need to be reviewed. '
         'As you have mentioned that you would like to review suggestions'
         ' in these domains, we have notified you about the same. '
-        'You can view all the suggestions that require your attention in '
+        'You can view all the suggestions that need to be reviewed on '
         'your '
         '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>.<br>'
         'Thanks!<br>'

@@ -1575,10 +1575,12 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
         expected_email_html_body = (
             'Hi reviewer,<br>'
             'You have been actively contributing quality suggestions for oppia '
-            'content in Algebra. We would like to have you review other '
-            'contributors suggestions in similar domains. If you would like to '
-            'help out the content creators to review suggestions, please visit'
-            ' your '
+            'content in category Algebra. In recognition of your contributions, '
+            'we would like to have you as one of our reviewers. As a reviewer, '
+            'you would be responsible for regularly reviewing the suggestions '
+            'in the same category and ensuring that the accepted content meets '
+            'the quality bar. If you would like to help out the '
+            'content creators to review suggestions, please visit your '
             '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>. '
             'And set the review preference for the category as yes. '
             '<br>Note that if you do accept, you will recieve periodic '
@@ -1598,8 +1600,6 @@ class OnboardingReviewerInstantEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
-            #self.assertEqual(
-            #    messages[0].body.decode(), expected_email_text_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
@@ -1641,7 +1641,7 @@ class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
             'There are suggestions in category %s which need to be reviewed. '
             'As you have mentioned that you would like to review suggestions'
             ' in these domains, we have notified you about the same. '
-            'You can view all the suggestions that require your attention in '
+            'You can view all the suggestions that need to be reviewed on '
             'your '
             '<a href="https://www.oppia.org/creator_dashboard/">dashboard</a>.'
             '<br>Thanks!<br>'
