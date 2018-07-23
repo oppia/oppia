@@ -60,5 +60,10 @@ describe('Responses Service', function() {
     it('should return null if no answer choices provided', function() {
       expect(rs.getAnswerChoices()).toEqual(null)
     });
+
+    it('should be able to update answer choices', function() {
+      rs.updateAnswerChoices('some answer');
+      expect(rs.getAnswerChoices()).toEqual('some answer');
+    });
   })
 })
