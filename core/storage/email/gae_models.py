@@ -543,7 +543,7 @@ class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
         instance_id = cls._generate_id(user_id, thread_id)
         return super(
             GeneralFeedbackEmailReplyToIdModel, cls).get(
-            instance_id, strict=strict)
+                instance_id, strict=strict)
 
     @classmethod
     def get_multi_by_user_ids(cls, user_ids, thread_id):
