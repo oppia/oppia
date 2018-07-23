@@ -79,8 +79,8 @@ describe('Responses Service', function() {
         labelledAsCorrect: true,
         trainingData: 'data'
       };
-      rs.updateAnswerGroup(1, updates);
-      expect(rs.getAnswerGroup(1)).toEqual(updates);
+      rs.updateAnswerGroup(0, updates);
+      expect(rs.getAnswerGroup(0)).toEqual(updates);
     });
 
     it('should delete answer group', function() {
