@@ -21,6 +21,7 @@ oppia.constant(
 oppia.factory('TopicViewerBackendApiService', [
   '$http', '$q', 'TOPIC_DATA_URL_TEMPLATE', 'UrlInterpolationService',
   function($http, $q, TOPIC_DATA_URL_TEMPLATE, UrlInterpolationService) {
+    var topicData = null;
     var _fetchTopicData = function(topicId, successCallback, errorCallback) {
       var topicDataUrl = UrlInterpolationService.interpolateUrl(
         TOPIC_DATA_URL_TEMPLATE, {
@@ -28,7 +29,7 @@ oppia.factory('TopicViewerBackendApiService', [
         });
 
       $http.get(topicDataUrl).then(function(response) {
-        var topicData = angular.copy(response.data);
+        topicData = angular.copy(response.data);
         if (successCallback) {
           successCallback(topicData);
         }
@@ -41,6 +42,9 @@ oppia.factory('TopicViewerBackendApiService', [
 
     return {
       fetchTopicData: function(topicId) {
+        if (topicData) {
+          return topicData;
+        }
         return $q(function(resolve, reject) {
           _fetchTopicData(topicId, resolve, reject);
         });

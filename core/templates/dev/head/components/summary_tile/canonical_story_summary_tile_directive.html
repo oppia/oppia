@@ -1,6 +1,6 @@
 <a ng-href="<[getStoryLink()]>">
   <div class="oppia-story-image">
-    <img src="https://d30y9cdsu7xlg0.cloudfront.net/png/396915-200.png" alt="">
+    <img src="https://image.ibb.co/iUeEUJ/Screenshot_from_2018_07_21_11_07_04.png" alt="">
   </div>
   <div class="oppia-story-details">
     <div class="oppia-story-title">
@@ -12,8 +12,12 @@
   </div>
 </a>
 <style>
+  canonical-story-summary-tile a {
+    padding: 20px;
+  }
+
   canonical-story-summary-tile .oppia-story-image {
-    padding: 34px;
+    padding: 0 34px 0 34px;
   }
 
   canonical-story-summary-tile .oppia-story-details {
@@ -22,15 +26,24 @@
 
   canonical-story-summary-tile .oppia-story-title {
     display: block;
-    color: black;
+    color: #4a4a4a;
     text-align: center;
-    font-size: 1.3em;
-    padding-bottom: 10px;
+    font-size: 1.4em;
+    font-weight: bold;
+    padding-bottom: 20px;
   }
 
   canonical-story-summary-tile .oppia-story-description {
     display: block;
-    color: black;
+    color: #4a4a4a;
     text-align: center;
+    font-size: 1.1em;
+    position: absolute;
+    bottom: 10px;
+    padding-right: 10px;
+  }
+
+  a:hover {
+    text-decoration: none;
   }
 </style>
