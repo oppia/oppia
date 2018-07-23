@@ -1660,8 +1660,6 @@ class NotifyReviewerInstantEmailTests(test_utils.GenericTestBase):
             self.assertEqual(len(messages), 1)
             self.assertEqual(
                 messages[0].html.decode(), expected_email_html_body)
-            #self.assertEqual(
-            #    messages[0].body.decode(), expected_email_text_body)
 
             # Make sure correct email model is stored.
             all_models = email_models.SentEmailModel.get_all().fetch()
