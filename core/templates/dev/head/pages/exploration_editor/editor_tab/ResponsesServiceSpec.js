@@ -35,11 +35,13 @@ describe('Responses Service', function() {
         interactionId: 1,
         answerGroups: [{
           rules: 'rules',
-          feedback: 'feedback',
-          dest: 'dest',
-          refresherExplorationId: 1,
-          missingPrerequisiteSkillId: 2,
-          labelledAsCorrect: true,
+          outcome: {
+            feedback: 'feedback',
+            dest: 'dest',
+            refresherExplorationId: 1,
+            missingPrerequisiteSkillId: 2,
+            labelledAsCorrect: true
+          },
           trainingData: 'data'
         }],
         defaultOutcome: 'some default outcome',
