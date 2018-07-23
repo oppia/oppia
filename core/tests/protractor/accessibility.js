@@ -18,7 +18,6 @@
  */
 
 var general = require('../protractor_utils/general.js');
-var until = protractor.ExpectedConditions;
 var waitFor = require('../protractor_utils/waitFor.js');
 
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
