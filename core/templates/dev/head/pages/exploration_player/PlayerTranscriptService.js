@@ -65,16 +65,30 @@ oppia.factory('PlayerTranscriptService', ['$log', function($log) {
       });
       return result;
     },
-    addNewCard: function(stateName, params, contentHtml, interactionHtml) {
+    addNewCard: function(
+        stateName, params, contentHtml, interactionHtml, leadsToConceptCard) {
       transcript.push({
         stateName: stateName,
         currentParams: params,
         contentHtml: contentHtml,
         interactionHtml: interactionHtml,
         inputResponsePairs: [],
-        destStateName: null
+        destStateName: null,
+        leadsToConceptCard: leadsToConceptCard
       });
       numAnswersSubmitted = 0;
+    },
+    addPreviousCard: function() {
+      if (transcript.length === 1) {
+        throw Error(
+          'Exploration player is on the first card and hence no previous ' +
+          'card exists.');
+      }
+      // TODO(aks681): Once worked examples are introduced, modify the below
+      // line to take into account the number of worked examples displayed.
+      var previousCard = angular.copy(transcript[transcript.length - 2]);
+      previousCard.leadsToConceptCard = false;
+      transcript.push(previousCard);
     },
     setDestination: function(newDestStateName) {
       var lastCard = this.getLastCard();
@@ -125,7 +139,7 @@ oppia.factory('PlayerTranscriptService', ['$log', function($log) {
       return transcript[index];
     },
     getLastAnswerOnActiveCard: function(index) {
-      if (this.isLastCard(index)) {
+      if (this.isLastCard(index) || transcript[index].stateName === null) {
         return null;
       } else {
         return transcript[index].

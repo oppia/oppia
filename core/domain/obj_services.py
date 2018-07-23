@@ -34,7 +34,8 @@ class Registry(object):
         cls.objects_dict.clear()
 
         # Add new object instances to the registry.
-        for name, clazz in inspect.getmembers(objects, inspect.isclass):
+        for name, clazz in inspect.getmembers(
+                objects, predicate=inspect.isclass):
             if name.endswith('_test') or name == 'BaseObject':
                 continue
 

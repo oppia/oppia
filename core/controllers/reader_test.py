@@ -284,7 +284,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 2
-            }, csrf_token
+            }, csrf_token=csrf_token
         )
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], 2)
@@ -297,7 +297,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 5
-            }, csrf_token
+            }, csrf_token=csrf_token
         )
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], 5)
@@ -324,7 +324,8 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 1
-            }, csrf_token, expected_status_int=401, expect_errors=True
+            }, csrf_token=csrf_token,
+            expected_status_int=401, expect_errors=True
         )
 
     def test_ratings_by_different_users(self):
@@ -339,7 +340,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 4
-            }, csrf_token
+            }, csrf_token=csrf_token
         )
         self.logout()
 
@@ -351,7 +352,7 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.put_json(
             '/explorehandler/rating/%s' % self.EXP_ID, {
                 'user_rating': 4
-            }, csrf_token
+            }, csrf_token=csrf_token
         )
         ratings = self.get_json('/explorehandler/rating/%s' % self.EXP_ID)
         self.assertEqual(ratings['user_rating'], 4)
@@ -418,7 +419,8 @@ class RecommendationsHandlerTests(test_utils.GenericTestBase):
 
         response = self.testapp.get('/explore/%s' % exploration_id)
         csrf_token = self.get_csrf_token_from_response(response)
-        summaries = self.get_json(recommendations_url, csrf_token)['summaries']
+        summaries = self.get_json(
+            recommendations_url, params=csrf_token)['summaries']
         return self._get_exploration_ids_from_summaries(summaries)
 
     # TODO(bhenning): Add tests for ensuring system explorations are properly
@@ -847,7 +849,7 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.post_json(
             '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
                 'report_text': self.REPORT_TEXT,
-            }, csrf_token)
+            }, csrf_token=csrf_token)
 
         self.logout()
 
@@ -904,7 +906,8 @@ class FlagExplorationHandlerTests(test_utils.GenericTestBase):
         self.post_json(
             '%s/%s' % (feconf.FLAG_EXPLORATION_URL_PREFIX, self.EXP_ID), {
                 'report_text': self.REPORT_TEXT,
-            }, csrf_token, expected_status_int=401, expect_errors=True)
+            }, csrf_token=csrf_token,
+            expected_status_int=401, expect_errors=True)
 
 
 class LearnerProgressTest(test_utils.GenericTestBase):
@@ -996,7 +999,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # collection, it is just added to the completed explorations list.
         self.post_json(
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_0,
-            payload, csrf_token)
+            payload, csrf_token=csrf_token)
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0])
         self.assertEqual(
@@ -1006,7 +1009,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Test another exploration.
         self.post_json(
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
-            payload, csrf_token)
+            payload, csrf_token=csrf_token)
         self.assertEqual(learner_progress_services.get_all_completed_exp_ids(
             self.user_id), [self.EXP_ID_0, self.EXP_ID_1_0])
         self.assertEqual(
@@ -1039,7 +1042,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Here we test the case when the collection is partially completed.
         self.post_json(
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_0,
-            payload, csrf_token)
+            payload, csrf_token=csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [self.COL_ID_1])
@@ -1049,7 +1052,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Now we test the case when the collection is completed.
         self.post_json(
             '/explorehandler/exploration_complete_event/%s' % self.EXP_ID_1_1,
-            payload, csrf_token)
+            payload, csrf_token=csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_collection_ids(
                 self.user_id), [])
@@ -1078,7 +1081,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Add the incomplete exploration id to the incomplete list.
         self.post_json(
             '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
-            payload, csrf_token)
+            payload, csrf_token=csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0])
@@ -1086,7 +1089,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # Adding the exploration again has no effect.
         self.post_json(
             '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_0,
-            payload, csrf_token)
+            payload, csrf_token=csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0])
@@ -1104,7 +1107,7 @@ class LearnerProgressTest(test_utils.GenericTestBase):
         # collection is also added to the incomplete list.
         self.post_json(
             '/explorehandler/exploration_maybe_leave_event/%s' % self.EXP_ID_1_0, # pylint: disable=line-too-long
-            payload, csrf_token)
+            payload, csrf_token=csrf_token)
         self.assertEqual(
             learner_progress_services.get_all_incomplete_exp_ids(
                 self.user_id), [self.EXP_ID_0, self.EXP_ID_1_0])
@@ -1271,7 +1274,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': None
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1291,7 +1294,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': None
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1360,7 +1363,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': None
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1429,7 +1432,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': None
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1453,7 +1456,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': None
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1470,7 +1473,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
         }
         self.post_json(
             '/explorehandler/store_playthrough/%s' % (self.exp_id),
-            payload_dict_without_schema_version, self.csrf_token,
+            payload_dict_without_schema_version,
+            csrf_token=self.csrf_token,
             expect_errors=True, expected_status_int=400)
 
     def test_error_on_invalid_playthrough_dict(self):
@@ -1483,7 +1487,8 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': None
-            }, self.csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token=self.csrf_token,
+            expect_errors=True, expected_status_int=400)
 
     def test_playthrough_id_is_returned(self):
         """Test that playthrough ID is returned when it is stored for the first
@@ -1495,7 +1500,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': None
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
@@ -1515,7 +1520,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': None
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         playthrough_id = response['playthrough_id']
@@ -1529,7 +1534,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': playthrough_id
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 1)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 2)
@@ -1549,7 +1554,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': None
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         self.process_and_flush_pending_tasks()
 
         playthrough_id = response['playthrough_id']
@@ -1567,7 +1572,7 @@ class StorePlaythroughHandlerTest(test_utils.GenericTestBase):
                 'playthrough_data': self.playthrough_data,
                 'issue_schema_version': 1,
                 'playthrough_id': playthrough_id
-            }, self.csrf_token)
+            }, csrf_token=self.csrf_token)
         model = stats_models.ExplorationIssuesModel.get_model(self.exp_id, 1)
         self.assertEqual(len(model.unresolved_issues), 2)
         self.assertEqual(len(model.unresolved_issues[0]['playthrough_ids']), 1)

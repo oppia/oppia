@@ -40,6 +40,7 @@ describe('State Interaction controller', function() {
     var $httpBackend;
     var mockExplorationData;
 
+    beforeEach(module('directiveTemplates'));
     beforeEach(function() {
       mockExplorationData = {
         explorationId: 0,
@@ -51,7 +52,8 @@ describe('State Interaction controller', function() {
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
 
-    beforeEach(inject(function($controller, $injector, $rootScope) {
+    beforeEach(inject(function(
+        $compile, $controller, $injector, $rootScope, $templateCache) {
       scope = $rootScope.$new();
       ecs = $injector.get('EditorStateService');
       cls = $injector.get('ChangeListService');
@@ -159,21 +161,18 @@ describe('State Interaction controller', function() {
         INTERACTION_SPECS: IS
       });
 
-      var interactionCtrl = $controller('StateInteraction', {
-        $scope: scope,
-        EditorStateService: ecs,
-        ChangeListService: cls,
-        ExplorationStatesService: ess,
-        EditabilityService: {
-          isEditable: function() {
-            return true;
-          }
-        },
-        stateInteractionIdService: siis,
-        stateCustomizationArgsService: scas,
-        InteractionDetailsCacheService: idc,
-        INTERACTION_SPECS: IS
-      });
+      var templateHtml = $templateCache.get(
+        '/pages/exploration_editor/editor_tab/' +
+        'state_interaction_editor_directive.html');
+      $compile(templateHtml, $rootScope);
+      $rootScope.$digest();
+
+      outerScope = $rootScope.$new();
+      var elem = angular.element(
+        '<state-interaction-editor></state-interaction-editor>');
+      var compiledElem = $compile(elem)(outerScope);
+      outerScope.$digest();
+      directiveScope = compiledElem[0].getControllerScope();
     }));
 
     it('should keep non-empty content when setting a terminal interaction',
@@ -189,7 +188,7 @@ describe('State Interaction controller', function() {
           state.interaction, 'widget_customization_args');
 
         siis.displayed = 'TerminalInteraction';
-        scope.onCustomizationModalSavePostHook();
+        directiveScope.onCustomizationModalSavePostHook();
 
         expect(ess.getState('First State').content.getHtml()).toEqual(
           'First State Content');
@@ -211,7 +210,7 @@ describe('State Interaction controller', function() {
           state.interaction, 'widget_customization_args');
 
         siis.displayed = 'TerminalInteraction';
-        scope.onCustomizationModalSavePostHook();
+        directiveScope.onCustomizationModalSavePostHook();
 
         expect(state.content.getHtml()).toEqual('');
         expect(ess.getState('End State').content.getHtml()).toEqual(
@@ -234,7 +233,7 @@ describe('State Interaction controller', function() {
           state.interaction, 'widget_customization_args');
 
         siis.displayed = 'TextInput';
-        scope.onCustomizationModalSavePostHook();
+        directiveScope.onCustomizationModalSavePostHook();
 
         expect(state.content.getHtml()).toEqual('');
         expect(ess.getState('End State').content.getHtml()).toEqual('');

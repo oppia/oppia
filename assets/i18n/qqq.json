@@ -436,6 +436,7 @@
 	"I18N_SIDEBAR_FORUM": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the forum (an external page)\n{{Identical|Forum}}",
 	"I18N_SIDEBAR_GET_STARTED": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Get Started page.\n{{Identical|Get started}}",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Library page.\n{{Identical|Library}}",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Oppia Foundation site.\n{{Identical|Oppia Foundation}}",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "Text displayed in the side navigation bar. - When the user clicks the link, they are redirected to the Teach page.",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "Text displayed in the signup page. - This text in on the left of a checkbox. If the user clicks the checkbox, he agrees to the terms and conditions of the page.",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "Text displayed inside a confirmation button in the signup page. - When the user clicks the button, the registration is completed and no more action is needed.",
@@ -524,5 +525,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Text displayed inside the Sign In dropdown. - When clicked, the user is signed in with Google Oauth - The text in the button needs to be less than 25 characters long",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Text displayed inside drop-down menu - The list is shown after the user hovers over the I18N_TOPNAV_ABOUT button. When the option is clicked, the teach with oppia page is loaded which contains information specific for teachers who would like to create explorations.",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Text displayed under the subscribers tab in creator dashboard. Tells the creator the total number of subscribers he/she has.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "The text that appears on the unsubscribe button, which allows users to unsubscribe from creators.\n{{Identical|Unsubscribe}}"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "The text that appears on the unsubscribe button, which allows users to unsubscribe from creators.\n{{Identical|Unsubscribe}}",
+	"I18N_WORKED_EXAMPLE": "The text that is displayed on the button to view another worked example when a skill concept card is displayed in the exploration player."
 }
