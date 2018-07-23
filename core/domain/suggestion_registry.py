@@ -434,6 +434,7 @@ class SuggestionAddQuestion(BaseSuggestion):
             'last_updated': utils.get_time_in_millisecs(self.last_updated)
         }
 
+
 SUGGESTION_TYPES_TO_DOMAIN_CLASSES = {
     suggestion_models.SUGGESTION_TYPE_EDIT_STATE_CONTENT: (
         SuggestionEditStateContent),
