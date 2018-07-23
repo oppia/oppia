@@ -723,16 +723,8 @@ COMMIT_MESSAGE_TOPIC_DELETED = 'Topic deleted.'
 
 # Whether learner playthroughs visualization framework should be enabled.
 ENABLE_PLAYTHROUGHS = True
-# Threshold for early quit playthrough.
-EARLY_QUIT_THRESHOLD_IN_SECS = 45
-# Threshold for multiple incorrect answers playthrough.
-NUM_INCORRECT_ANSWERS_THRESHOLD = 5
-# Threshold for repeated cyclic state transitions playthrough.
-NUM_REPEATED_CYCLES_THRESHOLD = 3
 # Max number of playthroughs for an issue.
 MAX_PLAYTHROUGHS_FOR_ISSUE = 5
-# Probability of recording a playthrough.
-RECORD_PLAYTHROUGH_PROBABILITY = 0.2
 
 # Unfinished features.
 SHOW_TRAINABLE_UNRESOLVED_ANSWERS = False
