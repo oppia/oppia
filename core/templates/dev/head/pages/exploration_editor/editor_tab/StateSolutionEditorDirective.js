@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directive for the solution viewer and editor in state editor.
+ * @fileoverview Directive for the solution viewer and editor section in the
+ * state editor.
  */
 oppia.directive('stateSolutionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {

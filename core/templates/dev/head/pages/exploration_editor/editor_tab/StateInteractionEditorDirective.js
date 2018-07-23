@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for a state's interaction editor.
+ * @fileoverview Directive for the interaction editor section in the state
+ * editor.
  */
 oppia.directive('stateInteractionEditor', [
   'UrlInterpolationService', function(UrlInterpolationService) {
