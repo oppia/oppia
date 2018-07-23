@@ -33,7 +33,15 @@ describe('Responses Service', function() {
     beforeEach(function() {
       rs.init({
         interactionId: 1,
-        answerGroups: ['some value'],
+        answerGroups: [{
+          rules: 'rules',
+          feedback: 'feedback',
+          dest: 'dest',
+          refresherExplorationId: 1,
+          missingPrerequisiteSkillId: 2,
+          labelledAsCorrect: true,
+          trainingData: 'data'
+        }],
         defaultOutcome: 'some default outcome',
         confirmedUnclassifiedAnswers: ['some value']
       })
