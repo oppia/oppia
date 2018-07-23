@@ -61,6 +61,20 @@ describe('Responses Service', function() {
       expect(rs.getAnswerChoices()).toEqual(null)
     });
 
+    it('should update answer group', function() {
+      let updates = {
+        rules: 'rules',
+        feedback: 'feedback',
+        dest: 'dest',
+        refresherExplorationId: 1,
+        missingPrerequisiteSkillId: 2,
+        labelledAsCorrect: true,
+        trainingData: 'data'
+      };
+      rs.updateAnswerGroup(1, updates);
+      expect(rs.getAnswerGroup(1)).toEqual(updates);
+    });
+
     it('should be able to update answer choices', function() {
       rs.updateAnswerChoices('some answer');
       expect(rs.getAnswerChoices()).toEqual('some answer');
