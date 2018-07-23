@@ -161,9 +161,8 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
         // The Image Click Input interaction has an image whose filename,
         // height, is directly stored in the customizationArgs.imageAndRegion
         // .value.imagePath as a dict.
-        var fileInfo = HtmlEscaperService.escapedStrToUnescapedStr(
+        var fileInfo = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
-        fileInfo = JSON.parse(fileInfo);
         fileDimensions[fileInfo.filename] = {
           width: fileInfo.width,
           height: fileInfo.height
@@ -188,9 +187,8 @@ oppia.factory('ExtractImageFilenamesFromStateService', [
       // directly stored in the customizationArgs.imageAndRegion.value
       // .imagePath
       if (state.interaction.id === INTERACTION_TYPE_IMAGE_CLICK_INPUT) {
-        var fileInfo = HtmlEscaperService.escapedStrToUnescapedStr(
+        var fileInfo = (
           state.interaction.customizationArgs.imageAndRegions.value.imagePath);
-        fileInfo = JSON.parse(fileInfo);
         filenamesInState.push(fileInfo.filename);
       }
       allHtmlOfState = _getAllHtmlOfState(state);

@@ -149,11 +149,15 @@ describe('Image preloader service', function() {
               choices: {
                 value: [
                   '<p> Go to ItemSelection <oppia-noninteractive-image' +
-                  ' filepath-with-value="&amp;quot;sIMChoice1.png&amp;' +
-                  'quot;"></oppia-noninteractive-image></p>',
+                  ' filepath-with-value="{&amp;quot;width&amp;quot;: 120' +
+                  ', &amp;quot;height&amp;quot;: 490, &amp;quot;filename' +
+                  '&amp;quot;: &amp;quot;sIMChoice1.png&amp;' +
+                  'quot;}"></oppia-noninteractive-image></p>',
                   '<p> Go to ImageAndRegion<oppia-noninteractive-image' +
-                  ' filepath-with-value="&amp;quot;sIMChoice2.png&amp;' +
-                  'quot;"></oppia-noninteractive-image></p>'
+                  ' filepath-with-value="{&amp;quot;width&amp;quot;: 120,' +
+                  ' &amp;quot;height&amp;quot;: 490, &amp;quot;filename&amp' +
+                  ';quot;: &amp;quot;sIMChoice2.png&amp;' +
+                  'quot;}"></oppia-noninteractive-image></p>'
                 ]
               }
             },
@@ -166,8 +170,10 @@ describe('Image preloader service', function() {
                     content_id: 'feedback_1',
                     html: '<p>We are going to ItemSelection' +
                           '<oppia-noninteractive-image filepath-with-value=' +
-                          '"&amp;quot;sIOFeedback.png&amp;quot;">' +
-                          '</oppia-noninteractive-image></p>'
+                          '"{&amp;quot;width&amp;quot;: 120, &amp;quot;' +
+                          'height&amp;quot;: 490, &amp;quot;filename&amp;' +
+                          'quot;: &amp;quot;sIOFeedback.png&amp;' +
+                          'quot;}"></oppia-noninteractive-image></p>'
                   },
                   param_changes: [],
                   refresher_exploration_id: null,
@@ -283,8 +289,10 @@ describe('Image preloader service', function() {
             hints: [{
               hint_content: {
                 content_id: 'hint_1',
-                html: '<p><oppia-noninteractive-image filepath-with-value="' +
-                      '&amp;quot;s6Hint1.png&amp;quot;">' +
+                html: '<p><oppia-noninteractive-image filepath-with-value=' +
+                      '"{&amp;quot;width&amp;quot;: 120, &amp;quot;height' +
+                      '&amp;quot;: 490, &amp;quot;filename&amp;quot;: ' +
+                      '&amp;quot;s6Hint1.png&amp;quot;}">' +
                       '</oppia-noninteractive-image></p>'
               }
             }],
