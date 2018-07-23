@@ -74,11 +74,13 @@ describe('Responses Service', function() {
     it('should update answer group', function() {
       let updates = {
         rules: 'new rules',
-        feedback: 'new feedback',
-        dest: 'new dest',
-        refresherExplorationId: 2,
-        missingPrerequisiteSkillId: 3,
-        labelledAsCorrect: false,
+        outcome: {
+          feedback: 'new feedback',
+          dest: 'new dest',
+          refresherExplorationId: 2,
+          missingPrerequisiteSkillId: 3,
+          labelledAsCorrect: false
+        },
         trainingData: 'new data'
       };
       rs.updateAnswerGroup(0, updates);
@@ -88,13 +90,15 @@ describe('Responses Service', function() {
     it('should delete answer group', function() {
       let initialLength = rs.getAnswerGroupCount();
       let updates = {
-        rules: 'rules',
-        feedback: 'feedback',
-        dest: 'dest',
-        refresherExplorationId: 1,
-        missingPrerequisiteSkillId: 2,
-        labelledAsCorrect: true,
-        trainingData: 'data'
+        rules: 'new rules',
+        outcome: {
+          feedback: 'new feedback',
+          dest: 'new dest',
+          refresherExplorationId: 2,
+          missingPrerequisiteSkillId: 3,
+          labelledAsCorrect: false
+        },
+        trainingData: 'new data'
       };
       rs.updateAnswerGroup(initialLength, updates);
       rs.deleteAnswerGroup(initialLength);
