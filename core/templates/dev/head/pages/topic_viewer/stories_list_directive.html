@@ -1,21 +1,21 @@
-<div ng-if="canonicalStoryList.length === 0">
+<div ng-if="canonicalStories.length === 0">
   <em>There are no stories to display.</em>
 </div>
 
 
-<div ng-if="!libraryWindowIsNarrow">
-  <md-button class="md-no-ink oppia-library-carousel-scroller"
+<div ng-if="!topicViewerWindowIsNarrow">
+  <md-button class="md-no-ink oppia-topic-viewer-carousel-scroller"
              ng-click="scroll(true)"
              ng-hide="leftmostCardIndices == 0">
     <i class="material-icons">&#xE314;</i>
   </md-button>
-  <div class="oppia-library-carousel-scroller" ng-if="leftmostCardIndices == 0" aria-hidden="true">
+  <div class="oppia-topic-viewer-carousel-scroller" ng-if="leftmostCardIndices == 0" aria-hidden="true">
   </div>
 
-  <div class="oppia-library-carousel"
+  <div class="oppia-topic-viewer-carousel"
        ng-swipe-right="scroll(true)"
        ng-swipe-left="scroll(false)">
-    <div class="oppia-library-carousel-tiles">
+    <div class="oppia-topic-viewer-carousel-tiles">
       <md-card ng-repeat="canonicalStory in canonicalStories" class="oppia-story-summary-tile">
         <canonical-story-summary-tile story-id="canonicalStory.id"
                                       title="canonicalStory.title"
@@ -25,18 +25,18 @@
     </div>
   </div>
 
-  <md-button class="md-no-ink oppia-library-carousel-scroller"
+  <md-button class="md-no-ink oppia-topic-viewer-carousel-scroller"
              ng-click="scroll(false)"
              ng-hide="(canonicalStories.length - tileDisplayCount) <= leftmostCardIndices"
              aria-hidden="true">
     <i class="material-icons">&#xE315;</i>
   </md-button>
-  <div class="oppia-library-carousel-scroller"
+  <div class="oppia-topic-viewer-carousel-scroller"
        ng-if="(canonicalStories.length - tileDisplayCount) <= leftmostCardIndices">
   </div>
 </div>
 
-<div ng-if="libraryWindowIsNarrow">
+<div ng-if="topicViewerWindowIsNarrow" class="oppia-topic-viewer-low-width">
   <md-card ng-repeat="canonicalStory in canonicalStories" class="oppia-story-summary-tile">
     <canonical-story-summary-tile story-id="canonicalStory.id"
                                   title="canonicalStory.title"
@@ -46,6 +46,10 @@
 </div>
 
 <style>
+  .oppia-topic-viewer-low-width {
+    width: min-content;
+    margin: 0 auto;
+  }
   .oppia-story-tab .oppia-story-summary-tile {
     background-color: #fff;
     cursor: pointer;
@@ -61,7 +65,7 @@
     width: 308px;
     height: 400px;
   }
-  .oppia-library-carousel-scroller {
+  .oppia-topic-viewer-carousel-scroller {
     color: #2c4841;
     cursor: default;
     float: left;
@@ -72,19 +76,19 @@
     position: relative;
     width: 10vw;
   }
-  .md-button.oppia-library-carousel-scroller {
+  .md-button.oppia-topic-viewer-carousel-scroller {
     cursor: pointer;
   }
-  .oppia-library-carousel-scroller i {
+  .oppia-topic-viewer-carousel-scroller i {
     font-size: 36px;
     margin: 0;
     padding: 0;
     top: 50%;
   }
-  .oppia-library-carousel-tiles {
+  .oppia-topic-viewer-carousel-tiles {
     white-space: nowrap;
   }
-  .oppia-library-carousel {
+  .oppia-topic-viewer-carousel {
     float: left;
     max-width: 1070px;
     overflow: hidden;

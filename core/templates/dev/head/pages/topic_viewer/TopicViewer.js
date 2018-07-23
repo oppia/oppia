@@ -30,7 +30,7 @@ oppia.controller('TopicViewer', [
     $scope.checkMobileView = function() {
       return ($window.innerWidth < 500);
     };
-    $scope.topicId = UrlService.getPathname().split('/')[2];
+    $scope.topicId = UrlService.getTopicIdFromLearnerUrl();
 
     $rootScope.loadingMessage = 'Loading';
     TopicViewerBackendApiService.fetchTopicData($scope.topicId).then(

@@ -36,12 +36,12 @@ describe('Topic viewer backend API service', function() {
     // Sample topic object returnable from the backend
     sampleDataResults = {
       topic_name: 'topic_name',
-      canonical_story_ids: {
+      canonical_story_dicts: {
         id: '0',
         title: 'Story Title',
         description: 'Story Description',
       },
-      additional_story_ids: {
+      additional_story_dicts: {
         id: '0',
         title: 'Story Title',
         description: 'Story Description',

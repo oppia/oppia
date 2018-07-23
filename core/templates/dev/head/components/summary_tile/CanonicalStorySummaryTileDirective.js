@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Component for an canonical story tile.
+ * @fileoverview Component for a canonical story tile.
  */
 
 oppia.directive('canonicalStorySummaryTile', [
@@ -31,6 +31,14 @@ oppia.directive('canonicalStorySummaryTile', [
         function($scope) {
           $scope.getStoryLink = function() {
             return '/story/' + $scope.getStoryId();
+          };
+          $scope.normalisedStoryTitle = function (str) {
+            var splitStr = str.toLowerCase().split(' ');
+            for (var i = 0; i < splitStr.length; i++) {
+              splitStr[i] = (
+                splitStr[i].charAt(0).toUpperCase() + splitStr[i].substring(1));
+            }
+            return splitStr.join(' ');
           };
         }
       ]
