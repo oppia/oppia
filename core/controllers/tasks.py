@@ -22,6 +22,7 @@ from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.platform import models
+import feconf
 
 (job_models, email_models) = models.Registry.import_models(
     [models.NAMES.job, models.NAMES.email])
@@ -99,9 +100,12 @@ class InstantFeedbackMessageEmailHandler(base.BaseHandler):
         exploration = exp_services.get_exploration_by_id(
             reference_dict['entity_id'])
         thread = feedback_services.get_thread(reference_dict['thread_id'])
-
-        model = email_models.FeedbackEmailReplyToIdModel.get(
-            user_id, reference_dict['thread_id'])
+        if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+            model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
+                user_id, reference_dict['thread_id'])
+        else:
+            model = email_models.FeedbackEmailReplyToIdModel.get(
+                user_id, reference_dict['thread_id'])
         reply_to_id = model.reply_to_id
 
         subject = 'New Oppia message in "%s"' % thread.subject

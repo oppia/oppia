@@ -331,10 +331,11 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
             threads = feedback_services.get_all_threads(
                 'exploration', self.EXP_ID_1, False)
-        self.assertEqual(1, len(threads))
+            self.assertEqual(1, len(threads))
 
-        self.assertEqual(feedback_services.get_total_open_threads(
-            feedback_services.get_thread_analytics_multi([self.EXP_ID_1])), 0)
+            self.assertEqual(feedback_services.get_total_open_threads(
+                feedback_services.get_thread_analytics_multi(
+                    [self.EXP_ID_1])), 0)
 
     def test_get_total_open_threads_for_single_exploration(self):
 
@@ -346,11 +347,12 @@ class FeedbackThreadUnitTests(test_utils.GenericTestBase):
 
             threads = feedback_services.get_all_threads(
                 'exploration', self.EXP_ID_1, False)
-        self.assertEqual(1, len(threads))
+            self.assertEqual(1, len(threads))
 
-        self._run_computation()
-        self.assertEqual(feedback_services.get_total_open_threads(
-            feedback_services.get_thread_analytics_multi([self.EXP_ID_1])), 1)
+            self._run_computation()
+            self.assertEqual(feedback_services.get_total_open_threads(
+                feedback_services.get_thread_analytics_multi(
+                    [self.EXP_ID_1])), 1)
 
     def test_get_total_open_threads_for_multiple_explorations(self):
 
@@ -892,22 +894,22 @@ class FeedbackMessageEmailTests(test_utils.GenericTestBase):
                 feedback_services.create_message(
                     thread_id, self.user_id_b, None, None, 'user b message')
                 # Check that reply_to id is created for user A.
-                model = email_models.FeedbackEmailReplyToIdModel.get(
+                model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
                     self.user_id_a, thread_id)
                 cross_model = (
-                    email_models.FeedbackEmailReplyToIdModel.get_by_reply_to_id(
-                        model.reply_to_id))
+                    email_models.GeneralFeedbackEmailReplyToIdModel
+                    .get_by_reply_to_id(model.reply_to_id))
                 self.assertEqual(model, cross_model)
                 self.assertEqual(cross_model.user_id, self.user_id_a)
 
                 feedback_services.create_message(
                     thread_id, self.user_id_a, None, None, 'user a message')
                 # Check that reply_to id is created for user B.
-                model = email_models.FeedbackEmailReplyToIdModel.get(
+                model = email_models.GeneralFeedbackEmailReplyToIdModel.get(
                     self.user_id_b, thread_id)
                 cross_model = (
-                    email_models.FeedbackEmailReplyToIdModel.get_by_reply_to_id(
-                        model.reply_to_id))
+                    email_models.GeneralFeedbackEmailReplyToIdModel
+                    .get_by_reply_to_id(model.reply_to_id))
                 self.assertEqual(model, cross_model)
                 self.assertEqual(cross_model.user_id, self.user_id_b)
 

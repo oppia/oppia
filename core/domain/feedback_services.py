@@ -1131,16 +1131,26 @@ def _ensure_each_recipient_has_reply_to_id(user_ids, thread_id):
         thread_id: str. The id of thread used to obtain
             FeedbackEmailReplyToIdModel for given user.
     """
-    feedback_email_id_models = (
-        email_models.FeedbackEmailReplyToIdModel.get_multi_by_user_ids(
-            user_ids, thread_id))
+    if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+        feedback_email_id_models = (
+            email_models.GeneralFeedbackEmailReplyToIdModel
+            .get_multi_by_user_ids(user_ids, thread_id))
+    else:
+        feedback_email_id_models = (
+            email_models.FeedbackEmailReplyToIdModel.get_multi_by_user_ids(
+                user_ids, thread_id))
 
     # Users are added to thread incrementally. Therefore at a time there can be
     # at most one user who does not have FeedbackEmailReplyToIdModel instance.
     for user_id in user_ids:
         if feedback_email_id_models[user_id] is None:
-            new_model = email_models.FeedbackEmailReplyToIdModel.create(
-                user_id, thread_id)
+            if feconf.ENABLE_GENERALIZED_FEEDBACK_THREADS:
+                new_model = (
+                    email_models.GeneralFeedbackEmailReplyToIdModel.create(
+                        user_id, thread_id))
+            else:
+                new_model = email_models.FeedbackEmailReplyToIdModel.create(
+                    user_id, thread_id)
             new_model.put()
 
 

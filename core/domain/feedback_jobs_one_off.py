@@ -236,7 +236,7 @@ class FeedbackThreadIdMigrationOneOffJob(jobs.BaseMapReduceOneOffJobManager):
             new_id = '.'.join(
                 [old_id_parts[0], 'exploration', old_id_parts[1],
                  old_id_parts[2]])
-            email_models.FeedbackEmailReplyToIdModel(
+            email_models.GeneralFeedbackEmailReplyToIdModel(
                 id=new_id, reply_to_id=item.reply_to_id).put()
         elif isinstance(item, user_models.UserSubscriptionsModel):
             for thread_id in item.feedback_thread_ids:

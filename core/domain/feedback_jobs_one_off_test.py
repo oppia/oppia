@@ -30,8 +30,10 @@ from core.platform import models
 from core.tests import test_utils
 import feconf
 
-(suggestion_models, feedback_models) = models.Registry.import_models([
-    models.NAMES.suggestion, models.NAMES.feedback])
+(suggestion_models, feedback_models, email_models, user_models) = (
+    models.Registry.import_models([
+        models.NAMES.suggestion, models.NAMES.feedback, models.NAMES.email,
+        models.NAMES.user]))
 taskqueue_services = models.Registry.import_taskqueue_services()
 
 
@@ -412,6 +414,12 @@ class FeedbackThreadIdMigrationJobTest(test_utils.GenericTestBase):
             author_id='author', text='message text').put()
         feedback_models.FeedbackThreadUserModel(
             id='author.exp1.thread1', message_ids_read_by_user=[1]).put()
+        email_models.FeedbackEmailReplyToIdModel(
+            id='author.exp1.thread1', reply_to_id='1234').put()
+        user_models.UserSubscriptionsModel(
+            id='author', feedback_thread_ids=['exp1.thread1', 'exp2.thread2']
+        ).put()
+
 
     def _run_one_off_job(self):
         """Runs the one-off MapReduce job."""
@@ -459,3 +467,16 @@ class FeedbackThreadIdMigrationJobTest(test_utils.GenericTestBase):
             feedback_models.GeneralFeedbackThreadUserModel.get_by_id(
                 'author.exploration.exp1.thread1'))
         self.assertEqual(new_thread_user_model.message_ids_read_by_user, [1])
+
+        new_reply_to_id_model = (
+            email_models.GeneralFeedbackEmailReplyToIdModel.get_by_id(
+                'author.exploration.exp1.thread1'))
+        self.assertEqual(new_reply_to_id_model.reply_to_id, '1234')
+
+        new_user_subscription_model = (
+            user_models.UserSubscriptionsModel.get_by_id('author'))
+
+        self.assertEqual(
+            new_user_subscription_model.feedback_thread_ids,
+            ['exp1.thread1', 'exp2.thread2', 'exploration.exp1.thread1',
+             'exploration.exp2.thread2'])

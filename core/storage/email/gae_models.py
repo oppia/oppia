@@ -438,3 +438,169 @@ class FeedbackEmailReplyToIdModel(base_models.BaseModel):
             str. The thread id.
         """
         return self.id[self.id.find('.') + 1:]
+
+
+class GeneralFeedbackEmailReplyToIdModel(base_models.BaseModel):
+    """This model stores unique_id for each <user, thread>
+    combination.
+
+    This unique_id is used in reply-to email address in outgoing feedback and
+    suggestion emails. The id/key of instances of this model has form of
+    [USER_ID].[THREAD_ID]
+    """
+    # The reply-to ID that is used in the reply-to email address.
+    reply_to_id = ndb.StringProperty(indexed=True, required=True)
+
+    @classmethod
+    def _generate_id(cls, user_id, thread_id):
+        """Returns the unique id corresponding to the given user and thread ids.
+
+        Args:
+            user_id: str. The user id.
+            thread_id: str. The thread id.
+
+        Returns:
+            str. The unique id used in the reply-to email address in outgoing
+                feedback and suggestion emails.
+        """
+        return '.'.join([user_id, thread_id])
+
+    @classmethod
+    def _generate_unique_reply_to_id(cls):
+        """Generates the unique reply-to id.
+
+        Raises:
+            Exception. When unique id generator produces too many collisions.
+
+        Returns:
+            str. The unique reply-to id if there are no collisions.
+        """
+        for _ in range(base_models.MAX_RETRIES):
+            new_id = utils.convert_to_hash(
+                '%s' % (utils.get_random_int(base_models.RAND_RANGE)),
+                REPLY_TO_ID_LENGTH)
+            if not cls.get_by_reply_to_id(new_id):
+                return new_id
+
+        raise Exception('Unique id generator is producing too many collisions.')
+
+    @classmethod
+    def create(cls, user_id, thread_id):
+        """Creates a new FeedbackEmailReplyToIdModel instance.
+
+        Args:
+            user_id: str. ID of the corresponding user.
+            thread_id: str. ID of the corresponding thread.
+
+        Returns:
+            str. A unique ID that can be used in 'reply-to' email address.
+
+        Raises:
+            Exception: Model instance for given user_id and
+                thread_id already exists.
+        """
+
+        instance_id = cls._generate_id(user_id, thread_id)
+        if cls.get_by_id(instance_id):
+            raise Exception('Unique reply-to ID for given user and thread'
+                            ' already exists.')
+
+        reply_to_id = cls._generate_unique_reply_to_id()
+        return cls(id=instance_id, reply_to_id=reply_to_id)
+
+    @classmethod
+    def get_by_reply_to_id(cls, reply_to_id):
+        """Fetches the FeedbackEmailReplyToIdModel instance corresponding to the
+        given 'reply-to' id.
+
+        Args:
+            reply_to_id: str. The unique 'reply-to' id.
+
+        Returns:
+            str or None. The FeedbackEmailReplyToIdModel instance corresponding
+                to the given 'reply-to' id if it is fetched else None.
+        """
+        model = cls.query(cls.reply_to_id == reply_to_id).fetch()
+        if not model:
+            return None
+        return model[0]
+
+    @classmethod
+    def get(cls, user_id, thread_id, strict=True):
+        """Gets the FeedbackEmailReplyToIdModel instance corresponding to the
+        unique instance id.
+
+        Args:
+            user_id: str. The user id.
+            thread_id: str. The thread id.
+            strict: bool. Whether to fail noisily if no entry with the given
+                instance id exists in the datastore. Default is True.
+
+        Returns:
+            A FeedbackEmailReplyToIdModel instance that corresponds to the given
+                instance id if it is present in the datastore. Otherwise, None.
+        """
+        instance_id = cls._generate_id(user_id, thread_id)
+        return super(
+            GeneralFeedbackEmailReplyToIdModel, cls).get(
+            instance_id, strict=strict)
+
+    @classmethod
+    def get_multi_by_user_ids(cls, user_ids, thread_id):
+        """Returns the FeedbackEmailReplyToIdModel instances corresponding to
+        the given user ids in dict format.
+
+        Args:
+            user_ids: list(str). A list of user ids.
+            thread_id: str. The thread id.
+
+        Returns:
+            dict. The FeedbackEmailReplyToIdModel instances corresponding to the
+                given list of user ids in dict format. The key is the unique
+                user id, and the corresponding value is the list of
+                FeedbackEmailReplyToIdModel instances.
+        """
+        instance_ids = [cls._generate_id(user_id, thread_id)
+                        for user_id in user_ids]
+        user_models = cls.get_multi(instance_ids)
+        return {
+            user_id: model for user_id, model in zip(user_ids, user_models)}
+
+    @property
+    def user_id(self):
+        """Returns the user id corresponding to this FeedbackEmailReplyToIdModel
+        instance.
+
+        Returns:
+            str. The user id.
+        """
+        return self.id.split('.')[0]
+
+
+    @property
+    def entity_type(self):
+        """Returns the entity type extracted from the unique id.
+
+        Returns:
+            str. The entity type.
+        """
+        return self.id.split('.')[1]
+
+
+    @property
+    def entity_id(self):
+        """Returns the entity id extracted from the unique id.
+
+        Returns:
+            str. The entity id.
+        """
+        return self.id.split('.')[2]
+
+    @property
+    def thread_id(self):
+        """Returns the thread id extracted from the unique id.
+
+        Returns:
+            str. The thread id.
+        """
+        return self.id[self.id.find('.') + 1:]
