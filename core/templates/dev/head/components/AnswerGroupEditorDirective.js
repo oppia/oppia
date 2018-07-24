@@ -130,7 +130,7 @@ oppia.directive('answerGroupEditor', [
                   filename: getDefaultInputValue('UnicodeString'),
                   height: getDefaultInputValue('Int'),
                   width: getDefaultInputValue('Int')
-                }
+                };
               case 'Graph':
                 return {
                   edges: [],
