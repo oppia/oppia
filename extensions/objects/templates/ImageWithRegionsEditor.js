@@ -167,15 +167,9 @@ oppia.directive('imageWithRegionsEditor', [
           // width and height, especially for large images.
           $scope.$watch('value.imagePath', function(newVal) {
             if (newVal !== '') {
-              // Loads the image in hanging <img> tag so as to get the
-              // width and height.
-              $('<img/>').attr('src', $scope.getPreviewUrl(newVal.filename)).on(
-                'load', function() {
-                  $scope.originalImageWidth = this.width;
-                  $scope.originalImageHeight = this.height;
-                  $scope.$apply();
-                }
-              );
+              $scope.originalImageWidth = newVal.width;
+              $scope.originalImageHeight = newVal.height;
+              $scope.$apply();
             }
           });
 

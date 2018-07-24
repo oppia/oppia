@@ -836,11 +836,12 @@ def get_filepath_of_object_image(filename, exp_id):
     Returns:
         object. filepath object of the image.
     """
-    URL = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
+    url = ('https://storage.googleapis.com/%s/%s/assets/image/%s' % (
         app_identity_services.get_gcs_resource_bucket_name(), exp_id,
         filename)) if not feconf.DEV_MODE else (
             'http://localhost:8181/imagehandler/%s/%s' % (exp_id, filename))
-    imageFile = cStringIO.StringIO(urllib.urlopen(URL).read())
+    imageFile = cStringIO.StringIO(urllib.urlopen(url).read())
     img = Image.open(imageFile)
     width, height = img.size
+    img.close()
     return {'filename': filename, 'height': height, 'width': width}

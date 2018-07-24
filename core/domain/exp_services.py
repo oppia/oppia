@@ -80,7 +80,7 @@ def _migrate_states_schema(versioned_exploration_states, exploration_id):
                 exploration.
             states: the dict of states comprising the exploration. The keys in
                 this dict are state names.
-        exploration_id: str. id of the exploration.
+        exploration_id: str. ID of the exploration.
 
     Raises:
         Exception: The given states_schema_version is invalid.
