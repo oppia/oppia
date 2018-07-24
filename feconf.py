@@ -992,6 +992,8 @@ RTE_CONTENT_SPEC = {
     }
 }
 
+# Validation criteria for customization arguments of rich text components
+# along with their default values.
 RICH_TEXT_COMPONENTS = [{
     'name': 'oppia-noninteractive-link',
     'customization_args': [{
@@ -1059,6 +1061,8 @@ RICH_TEXT_COMPONENTS = [{
     'name': 'oppia-noninteractive-tabs',
     'customization_args': [{
         'name': 'tab_contents-with-value',
+        # This is given a special type custom because a separate test is needed
+        # to see that the arg type here is list of dictionaries.
         'type': 'custom',
         'title_type': "UnicodeString",
         'content_type': "Html",

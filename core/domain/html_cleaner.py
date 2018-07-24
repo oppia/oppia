@@ -19,6 +19,7 @@
 import HTMLParser
 import json
 import logging
+import re
 import urlparse
 
 import bleach
@@ -807,7 +808,7 @@ def validate_customization_args(html_list):
     from extensions.objects.models import objects # pylint: disable=relative-import
 
     rich_text_components = feconf.RICH_TEXT_COMPONENTS
-
+    # Mapping of type to classes defined in objects.py.
     class_dict = {
         'SanitizedUrl': objects.SanitizedUrl,
         'UnicodeString': objects.UnicodeString,
@@ -817,23 +818,29 @@ def validate_customization_args(html_list):
         'Boolean': objects.Boolean,
         'Html': objects.Html
     }
-
+    # Dictionary to hold html strings in which customization arguments
+    # are invalid.
     err_dict = {}
 
     for html_string in html_list:
         soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
 
         for component in rich_text_components:
+            # This flag is set to true if the html string is invalid.
             is_invalid = False
             tag_name = component['name']
             customization_args = component['customization_args']
             required_attrs_names = [arg['name'] for arg in customization_args]
+
             for tag in soup.findAll(name=tag_name):
                 attrs = tag.attrs
                 attrs_names = attrs.keys()
+                # Ensure that no tag attribute is missing and also check
+                # there is no extra attribute.
                 if set(attrs_names) != set(required_attrs_names):
                     is_invalid = True
                     break
+
                 for customization_arg in customization_args:
                     arg_name = customization_arg['name']
                     arg_value = json.loads(unescape_html(attrs[arg_name]))
@@ -841,14 +848,29 @@ def validate_customization_args(html_list):
                         arg_type = class_dict[customization_arg['type']]
                         try:
                             arg_type.normalize(arg_value)
+                            # To ensure filepath is in valid format.
+                            if arg_name == 'filepath-with-value':
+                                regex = r'^[A-Za-z0-9+/]*\.((png)|(jpeg)|(gif)|(jpg))$' # pylint: disable=line-too-long
+                                if not re.match(regex, arg_value):
+                                    is_invalid = True
+
+                            # To ensure video id has 11 chars.
+                            elif arg_name == 'video_id-with-value':
+                                if len(arg_value) != 11:
+                                    is_invalid = True
                         except Exception:
                             is_invalid = True
                     else:
+                        # This block is to check args for tab component.
+                        # Ensure that arg is a list and each element item in
+                        # the list is a dictionary.
                         if isinstance(arg_value, list) and (
                                 all(isinstance(item, dict) for item in (
                                     arg_value))):
                             for value in arg_value:
                                 value_keys = value.keys()
+                                # Each item has exactly two keys namely content
+                                # and title.
                                 if set(value_keys) != set(['content', 'title']):
                                     is_invalid = True
                                 else:
