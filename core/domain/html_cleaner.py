@@ -485,7 +485,7 @@ def convert_to_ckeditor(html_data, unused_exp_id=''):
 
     Args:
         html_data: str. HTML string to be converted.
-        unused_exp_id. str: Unused argument.
+        unused_exp_id: str. Unused argument.
 
     Returns:
         str. The converted HTML string.
