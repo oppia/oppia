@@ -89,7 +89,6 @@ oppia.directive('answerGroupEditor', [
               case 'MathLatexString':
               case 'Html':
               case 'SanitizedUrl':
-              case 'Filepath':
               case 'LogicErrorCategory':
                 return '';
               case 'CodeEvaluation':
@@ -123,6 +122,12 @@ oppia.directive('answerGroupEditor', [
                   top_kind_name: getDefaultInputValue('UnicodeString'),
                   top_operator_name: getDefaultInputValue('UnicodeString')
                 };
+              case 'Filepath':
+                return {
+                  filename: getDefaultInputValue('UnicodeString'),
+                  height: getDefaultInputValue('Int'),
+                  width: getDefaultInputValue('Int')
+                }
               case 'Graph':
                 return {
                   edges: [],

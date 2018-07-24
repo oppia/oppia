@@ -453,7 +453,6 @@ class ObjectDefinitionTests(test_utils.GenericTestBase):
                 self.assertEqual(
                     member.normalize(member.default_value),
                     member.default_value)
-
                 # Comparing types here is necessary because 0 == False in
                 # Python. We handle the string case separately since Python
                 # treats str and unicode as different types.
