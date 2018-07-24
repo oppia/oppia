@@ -795,6 +795,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'url-with-value="&amp;quot;http://google.com&amp'
             ';quot;"></oppia-noninteractive-link></p>'
         ), (
+            '<p><oppia-noninteractive-link text-with-value="&amp;quot;What is '
+            'a link?&amp;quot;" url-with-value="&amp;quot;https://link.com&amp'
+            ';quot;"></oppia-noninteractive-link></p>'
+        ), (
             '<oppia-noninteractive-image caption-with-value="&amp;quot;'
             'abc&amp;quot;" filepath-with-value="&amp;quot;'
             'random.png&amp;quot;"></oppia-noninteractive-image>'
@@ -845,8 +849,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             '</oppia-noninteractive-tabs>'
         ), (
             '<oppia-noninteractive-video autoplay-with-value="false" '
-            'end-with-value="0" start-with-value="0" '
-            'video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
+            'end-with-value="0" start-with-value="0">'
             '</oppia-noninteractive-video>'
         ), (
             '<oppia-noninteractive-video autoplay-with-value="&amp;quot;hello'
@@ -863,15 +866,66 @@ class ContentMigrationTests(test_utils.GenericTestBase):
             'end-with-value="0" start-with-value="0" '
             'video_id-with-value="&amp;quot;lorem&amp;quot;">'
             '</oppia-noninteractive-video>'
+        ), (
+            '<oppia-noninteractive-video autoplay-with-value="false" '
+            'end-with-value="0" start-with-value="0" '
+            'video_id-with-value="&amp;quot;12345678901&amp;quot;">'
+            '</oppia-noninteractive-video>'
+        ), (
+            '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" '
+            'caption-with-value="&amp;quot;&amp;quot;" '
+            'filepath-with-value="&amp;quot;xyz.png&amp;quot;">'
+            '</oppia-noninteractive-image>'
+        ), (
+            '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" '
+            'caption-with-value="&amp;quot;Hello&amp;quot;" '
+            'filepath-with-value="&amp;quot;xy.z.png&amp;quot;">'
+            '</oppia-noninteractive-image>'
+        ), (
+            '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" '
+            'caption-with-value="34454" '
+            'filepath-with-value="&amp;quot;xyz.png&amp;quot;">'
+            '</oppia-noninteractive-image>'
+        ), (
+            '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" '
+            'caption-with-value="&amp;quot;5454&amp;quot;" '
+            'filepath-with-value="&amp;quot;xyz.jpg&amp;quot;">'
+            '</oppia-noninteractive-image>'
+        ), (
+            '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+            'circle divided into equal fifths.&amp;quot;" '
+            'caption-with-value="&amp;quot;Hello&amp;quot;" '
+            'filepath-with-value="&amp;quot;46503*.jpg&amp;quot;">'
+            '</oppia-noninteractive-image>'
         )]
 
         actual_output = html_cleaner.validate_customization_args(test_cases)
 
         expected_output = {
             'oppia-noninteractive-image': [(
-                '<oppia-noninteractive-image caption-with-value="&amp;quot;abc'
-                '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;quot'
-                ';"></oppia-noninteractive-image>'
+                '<oppia-noninteractive-image caption-with-value="&amp;quot;'
+                'abc&amp;quot;" filepath-with-value="&amp;quot;random.png'
+                '&amp;quot;"></oppia-noninteractive-image>'
+            ), (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A '
+                'circle divided into equal fifths.&amp;quot;" '
+                'caption-with-value="&amp;quot;Hello&amp;quot;" '
+                'filepath-with-value="&amp;quot;'
+                'xy.z.png&amp;quot;"></oppia-noninteractive-image>'
+            ), (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A circle'
+                ' divided into equal fifths.&amp;quot;" caption-with-value='
+                '"34454" filepath-with-value="&amp;quot;xyz.png&amp;quot;">'
+                '</oppia-noninteractive-image>'
+            ), (
+                '<oppia-noninteractive-image alt-with-value="&amp;quot;A circle'
+                ' divided into equal fifths.&amp;quot;" caption-with-value='
+                '"&amp;quot;Hello&amp;quot;" filepath-with-value="&amp;quot;'
+                '46503*.jpg&amp;quot;"></oppia-noninteractive-image>'
             )],
             'oppia-noninteractive-link': [(
                 '<p><oppia-noninteractive-link text-with-value="&amp;quot;'
@@ -883,6 +937,10 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '</oppia-noninteractive-link></p>'
             )],
             'oppia-noninteractive-video': [(
+                '<oppia-noninteractive-video autoplay-with-value="false" '
+                'end-with-value="0" start-with-value="0">'
+                '</oppia-noninteractive-video>'
+            ), (
                 '<oppia-noninteractive-video autoplay-with-value="&amp;quot;'
                 'hello&amp;quot;" end-with-value="0" start-with-value="0" '
                 'video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
@@ -892,6 +950,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 'end-with-value="0" start-with-value="&amp;quot;Hello&'
                 'amp;quot;" video_id-with-value="&amp;quot;loremipsum'
                 '&amp;quot;"></oppia-noninteractive-video>'
+            ), (
+                '<oppia-noninteractive-video autoplay-with-value="false" '
+                'end-with-value="0" start-with-value="0" '
+                'video_id-with-value="&amp;quot;lorem&amp;quot;">'
+                '</oppia-noninteractive-video>'
             )],
             'oppia-noninteractive-collapsible': [(
                 '<oppia-noninteractive-collapsible content-with-value="34454" '
