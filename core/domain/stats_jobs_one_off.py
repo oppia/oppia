@@ -146,9 +146,6 @@ class RegenerateMissingStatsModelsOneOffJob(jobs.BaseMapReduceOneOffJobManager):
                                 state_name].useful_feedback_count_v1 = (
                                     pssm.useful_feedback_count_v1)
                             exp_stats_default.state_stats_mapping[
-                                state_name].num_times_solution_viewed_v1 = (
-                                    pssm.num_times_solution_viewed_v1)
-                            exp_stats_default.state_stats_mapping[
                                 state_name].total_answers_count_v1 = (
                                     pssm.total_answers_count_v1)
                             exp_stats_default.state_stats_mapping[
