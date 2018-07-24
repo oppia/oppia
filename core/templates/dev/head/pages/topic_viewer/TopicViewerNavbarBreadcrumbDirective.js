@@ -19,13 +19,16 @@ oppia.directive('topicsViewerNavbarBreadcrumb', [
   'UrlInterpolationService', function(UrlInterpolationService) {
     return {
       restrict: 'E',
-      scope: {
-        getTopicName: '@topicName',
-      },
+      scope: {},
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/topic_viewer/topic_viewer_navbar_breadcrumb_directive.html'),
-      controller: [
-        function() {}
+      controller: ['$scope', 'TopicViewerBackendApiService', 'UrlService',
+        function($scope, TopicViewerBackendApiService, UrlService) {
+          TopicViewerBackendApiService.fetchTopicData(
+            UrlService.getTopicIdFromLearnerUrl()).then(function(response) {
+            $scope.topicName = response.topic_name;
+          });
+        }
       ]
     };
   }]);
