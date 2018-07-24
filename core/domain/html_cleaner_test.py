@@ -784,3 +784,143 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 html_cleaner.add_caption_attr_to_image(
                     test_case['html_content']),
                 test_case['expected_output'])
+
+    def test_validate_customization_args(self):
+        test_cases = [(
+            '<p><oppia-noninteractive-link text-with-value="&amp;quot;What is '
+            'a link?&amp;quot;" url-with-value="&amp;quot;htt://link.com&amp'
+            ';quot;"></oppia-noninteractive-link></p>'
+        ), (
+            '<p><oppia-noninteractive-link text-with-value="3456" '
+            'url-with-value="&amp;quot;http://google.com&amp'
+            ';quot;"></oppia-noninteractive-link></p>'
+        ), (
+            '<oppia-noninteractive-image caption-with-value="&amp;quot;'
+            'abc&amp;quot;" filepath-with-value="&amp;quot;'
+            'random.png&amp;quot;"></oppia-noninteractive-image>'
+        ), (
+            '<p><oppia-noninteractive-math raw_latex-with-value="&amp;quot;'
+            'abc&amp;quot;"></oppia-noninteractive-math></p>'
+        ), (
+            '<p><oppia-noninteractive-math url-with-value="&amp;quot;'
+            'http://link.com&amp;quot;></oppia-noninteractive-math></p>'
+        ), (
+            '<oppia-noninteractive-collapsible content-with-value='
+            '"&amp;quot;&amp;lt;p&amp;gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;'
+            'quot;" heading-with-value="&amp;quot;lorem ipsum&amp;quot;">'
+            '</oppia-noninteractive-collapsible>'
+        ), (
+            '<oppia-noninteractive-collapsible content-with-value='
+            '"34454" heading-with-value="&amp;quot;lorem ipsum&amp;quot;">'
+            '</oppia-noninteractive-collapsible>'
+        ), (
+            '<oppia-noninteractive-tabs tab_contents-with-value="'
+            '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;lorem '
+            'ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title&amp;quot;: '
+            '&amp;quot;hello&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;'
+            'quot;&amp;lt;p&amp;gt;oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
+            'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
+            '</oppia-noninteractive-tabs>'
+        ), (
+            '<oppia-noninteractive-tabs tab_contents-with-value="'
+            '[{&amp;quot;content&amp;quot;: 1234, '
+            '&amp;quot;title&amp;quot;: &amp;quot;hello&amp;quot;}, '
+            '{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+            'oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
+            'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
+            '</oppia-noninteractive-tabs>'
+        ), (
+            '<oppia-noninteractive-tabs tab_contents-with-value="'
+            '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;lorem '
+            'ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;url&amp;quot;: '
+            '&amp;quot;hello&amp;quot;}, {&amp;quot;content&amp;quot;: &amp;'
+            'quot;&amp;lt;p&amp;gt;oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
+            'quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
+            '</oppia-noninteractive-tabs>'
+        ), (
+            '<oppia-noninteractive-tabs tab_contents-with-value="'
+            '[{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;lorem '
+            'ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;url&amp;quot;: '
+            '&amp;quot;hello&amp;quot;}, [1,2,3]]">'
+            '</oppia-noninteractive-tabs>'
+        ), (
+            '<oppia-noninteractive-video autoplay-with-value="false" '
+            'end-with-value="0" start-with-value="0" '
+            'video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
+            '</oppia-noninteractive-video>'
+        ), (
+            '<oppia-noninteractive-video autoplay-with-value="&amp;quot;hello'
+            '&amp;quot;" end-with-value="0" start-with-value="0" '
+            'video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
+            '</oppia-noninteractive-video>'
+        ), (
+            '<oppia-noninteractive-video autoplay-with-value="false" '
+            'end-with-value="0" start-with-value="&amp;quot;Hello&amp;quot;" '
+            'video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
+            '</oppia-noninteractive-video>'
+        ), (
+            '<oppia-noninteractive-video autoplay-with-value="false" '
+            'end-with-value="0" start-with-value="0" '
+            'video_id-with-value="&amp;quot;lorem&amp;quot;">'
+            '</oppia-noninteractive-video>'
+        )]
+
+        actual_output = html_cleaner.validate_customization_args(test_cases)
+
+        expected_output = {
+            'oppia-noninteractive-image': [(
+                '<oppia-noninteractive-image caption-with-value="&amp;quot;abc'
+                '&amp;quot;" filepath-with-value="&amp;quot;random.png&amp;quot'
+                ';"></oppia-noninteractive-image>'
+            )],
+            'oppia-noninteractive-link': [(
+                '<p><oppia-noninteractive-link text-with-value="&amp;quot;'
+                'What is a link?&amp;quot;" url-with-value="&amp;quot;'
+                'htt://link.com&amp;quot;"></oppia-noninteractive-link></p>'
+            ), (
+                '<p><oppia-noninteractive-link text-with-value="3456" '
+                'url-with-value="&amp;quot;http://google.com&amp;quot;">'
+                '</oppia-noninteractive-link></p>'
+            )],
+            'oppia-noninteractive-video': [(
+                '<oppia-noninteractive-video autoplay-with-value="&amp;quot;'
+                'hello&amp;quot;" end-with-value="0" start-with-value="0" '
+                'video_id-with-value="&amp;quot;loremipsum&amp;quot;">'
+                '</oppia-noninteractive-video>'
+            ), (
+                '<oppia-noninteractive-video autoplay-with-value="false" '
+                'end-with-value="0" start-with-value="&amp;quot;Hello&'
+                'amp;quot;" video_id-with-value="&amp;quot;loremipsum'
+                '&amp;quot;"></oppia-noninteractive-video>'
+            )],
+            'oppia-noninteractive-collapsible': [(
+                '<oppia-noninteractive-collapsible content-with-value="34454" '
+                'heading-with-value="&amp;quot;lorem ipsum&amp;quot;">'
+                '</oppia-noninteractive-collapsible>'
+            )],
+            'oppia-noninteractive-tabs': [(
+                '<oppia-noninteractive-tabs tab_contents-with-value="[{&amp;'
+                'quot;content&amp;quot;: 1234, &amp;quot;title&amp;quot;: '
+                '&amp;quot;hello&amp;quot;}, {&amp;quot;content&amp;quot;: '
+                '&amp;quot;&amp;lt;p&amp;gt;oppia&amp;lt;/p&amp;gt;&amp;quot;'
+                ', &amp;quot;title&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]"'
+                '></oppia-noninteractive-tabs>'
+            ), (
+                '<oppia-noninteractive-tabs tab_contents-with-value="[{'
+                '&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
+                'gt;lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;'
+                'quot;url&amp;quot;: &amp;quot;hello&amp;quot;}, '
+                '{&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;'
+                'gt;oppia&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;title'
+                '&amp;quot;: &amp;quot;Savjet 1&amp;quot;}]">'
+                '</oppia-noninteractive-tabs>'
+            ), (
+                '<oppia-noninteractive-tabs tab_contents-with-value="[{'
+                '&amp;quot;content&amp;quot;: &amp;quot;&amp;lt;p&amp;gt;'
+                'lorem ipsum&amp;lt;/p&amp;gt;&amp;quot;, &amp;quot;url'
+                '&amp;quot;: &amp;quot;hello&amp;quot;}, [1,2,3]]">'
+                '</oppia-noninteractive-tabs>'
+            )]
+        }
+
+        self.assertEqual(actual_output, expected_output)
