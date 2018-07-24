@@ -884,22 +884,23 @@ class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
                 value dict.
             value: dict. Its structure is as follows:
                 {
-                    'num_starts_v1': int. # of times exploration was
+                    'num_starts_v2': int. # of times exploration was
                         started.
-                    'num_completions_v1': int. # of times exploration was
+                    'num_completions_v2': int. # of times exploration was
                         completed.
-                    'num_actual_starts_v1': int. # of times exploration was
+                    'num_actual_starts_v2': int. # of times exploration was
                         actually started.
                     'state_stats_mapping': A dict containing the values of
                         stats for the states of the exploration. It is
                         formatted as follows:
                         {
                             state_name: {
-                                'total_answers_count_v1',
-                                'useful_feedback_count_v1',
-                                'total_hit_count_v1',
-                                'first_hit_count_v1',
-                                'num_completions_v1'
+                                'total_answers_count_v2',
+                                'useful_feedback_count_v2',
+                                'total_hit_count_v2',
+                                'first_hit_count_v2',
+                                'num_times_solution_viewed_v2',
+                                'num_completions_v2'
                             }
                         }
                 }
