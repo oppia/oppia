@@ -17,7 +17,6 @@
 """Tests for the HTML sanitizer."""
 
 import bs4
-import json
 from core.domain import html_cleaner
 from core.tests import test_utils
 import feconf
