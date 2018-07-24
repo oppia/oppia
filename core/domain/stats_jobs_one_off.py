@@ -861,6 +861,218 @@ class StatisticsAuditV1(jobs.BaseMapReduceOneOffJobManager):
                             num_completions_v1),)
 
 
+class StatisticsAuditV2(jobs.BaseMapReduceOneOffJobManager):
+    """A one-off statistics audit for the v2 stats.
+
+    Performs a brief audit of exploration stats values to ensure that they
+    maintain simple sanity checks like being non-negative and so on.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.ExplorationStatsModel]
+
+    @classmethod
+    def require_non_negative(
+            cls, exp_id, exp_version, property_name, value, state_name=None):
+        """Ensures that all the statistical data is non-negative.
+
+        Args:
+            exp_id: str. ID of the exploration.
+            exp_version: str. Version of the exploration.
+            property_name: str. The name used as the property's key in the
+                value dict.
+            value: dict. Its structure is as follows:
+                {
+                    'num_starts_v1': int. # of times exploration was
+                        started.
+                    'num_completions_v1': int. # of times exploration was
+                        completed.
+                    'num_actual_starts_v1': int. # of times exploration was
+                        actually started.
+                    'state_stats_mapping': A dict containing the values of
+                        stats for the states of the exploration. It is
+                        formatted as follows:
+                        {
+                            state_name: {
+                                'total_answers_count_v1',
+                                'useful_feedback_count_v1',
+                                'total_hit_count_v1',
+                                'first_hit_count_v1',
+                                'num_completions_v1'
+                            }
+                        }
+                }
+            state_name: str|None. The name of the state whose statistics should
+                be checked.
+
+        Yield:
+            str. "Negative count: exp_id:? version:? state:? ?:?",
+                where ? is the placeholder for exp_id, exp_version,
+                property_name, state_name and value.
+        """
+        state_name = state_name if state_name else ''
+        if value[property_name] < 0:
+            yield (
+                'Negative count: exp_id:%s version:%s state:%s %s:%s' % (
+                    exp_id, exp_version, property_name, state_name, value))
+
+    @staticmethod
+    def map(item):
+        """Implements the map function. Must be declared @staticmethod.
+
+        Args:
+            item. ExplorationStatsModel.
+
+        Yields:
+            tuple. For ExplorationStatsModel, a 2-tuple of the form
+                (exp_id, value) where value is of the form:
+                    {
+                        'version': int. Version of the exploration.
+                        'num_starts_v2': int. # of times exploration was
+                            started.
+                        'num_completions_v2': int. # of times exploration was
+                            completed.
+                        'num_actual_starts_v2': int. # of times exploration was
+                            actually started.
+                        'state_stats_mapping': A dict containing the values of
+                            stats for the states of the exploration. It is
+                            formatted as follows:
+                            {
+                                state_name: {
+                                    'total_answers_count_v2',
+                                    'useful_feedback_count_v2',
+                                    'total_hit_count_v2',
+                                    'first_hit_count_v2',
+                                    'num_times_solution_viewed_v2',
+                                    'num_completions_v2'
+                                }
+                            }
+                    }
+        """
+        reduced_state_stats_mapping = {
+            state_name: {
+                'total_answers_count_v2': item.state_stats_mapping[state_name][
+                    'total_answers_count_v2'],
+                'useful_feedback_count_v2': item.state_stats_mapping[
+                    state_name]['useful_feedback_count_v2'],
+                'total_hit_count_v2': item.state_stats_mapping[state_name][
+                    'total_hit_count_v2'],
+                'first_hit_count_v2': item.state_stats_mapping[state_name][
+                    'first_hit_count_v2'],
+                'num_times_solution_viewed_v2': item.state_stats_mapping[
+                    state_name]['num_times_solution_viewed_v2'],
+                'num_completions_v2': item.state_stats_mapping[state_name][
+                    'num_completions_v2']
+            } for state_name in item.state_stats_mapping
+        }
+
+        yield (
+            item.exp_id, {
+                'exp_version': item.exp_version,
+                'num_starts_v2': item.num_starts_v2,
+                'num_completions_v2': item.num_completions_v2,
+                'num_actual_starts_v2': item.num_actual_starts_v2,
+                'state_stats_mapping': reduced_state_stats_mapping
+            })
+
+    @staticmethod
+    def reduce(exp_id, stringified_values):
+        for exp_stats in stringified_values:
+            exp_stats = ast.literal_eval(exp_stats)
+            exp_version = exp_stats['exp_version']
+
+            num_starts_v2 = exp_stats['num_starts_v2']
+            num_completions_v2 = exp_stats['num_completions_v2']
+            num_actual_starts_v2 = exp_stats['num_actual_starts_v2']
+
+            StatisticsAuditV2.require_non_negative(
+                exp_id, exp_version, 'num_starts_v2', num_starts_v2)
+            StatisticsAuditV2.require_non_negative(
+                exp_id, exp_version, 'num_completions_v2', num_completions_v2)
+            StatisticsAuditV2.require_non_negative(
+                exp_id, exp_version, 'num_actual_starts_v2',
+                num_actual_starts_v2)
+
+            # Number of starts must never be less than the number of
+            # completions.
+            if num_starts_v2 < num_completions_v2:
+                yield ('Completions > starts: exp_id:%s version:%s %s > %s' % (
+                    exp_id, exp_version, num_completions_v2, num_starts_v2),)
+
+            # Number of actual starts must never be less than the number of
+            # completions.
+            if num_actual_starts_v2 < num_completions_v2:
+                yield (
+                    'Completions > actual starts: exp_id:%s '
+                    'version:%s %s > %s' % (
+                        exp_id, exp_version, num_completions_v2,
+                        num_actual_starts_v2),)
+
+            # Number of starts must never be less than the number of actual
+            # starts.
+            if num_starts_v2 < num_actual_starts_v2:
+                yield (
+                    'Actual starts > starts: exp_id:%s '
+                    'version:%s %s > %s' % (
+                        exp_id, exp_version, num_actual_starts_v2,
+                        num_starts_v2),)
+
+            for state_name in exp_stats['state_stats_mapping']:
+                state_stats = exp_stats['state_stats_mapping'][state_name]
+
+                total_answers_count_v2 = state_stats['total_answers_count_v2']
+                useful_feedback_count_v2 = state_stats[
+                    'useful_feedback_count_v2']
+                total_hit_count_v2 = state_stats['total_hit_count_v2']
+                first_hit_count_v2 = state_stats['first_hit_count_v2']
+                num_completions_v2 = state_stats['num_completions_v2']
+
+                StatisticsAuditV2.require_non_negative(
+                    exp_id, exp_version, 'total_answers_count_v2',
+                    total_answers_count_v2, state_name=state_name)
+                StatisticsAuditV2.require_non_negative(
+                    exp_id, exp_version, 'useful_feedback_count_v2',
+                    useful_feedback_count_v2, state_name=state_name)
+                StatisticsAuditV2.require_non_negative(
+                    exp_id, exp_version, 'total_hit_count_v2',
+                    total_hit_count_v2, state_name=state_name)
+                StatisticsAuditV2.require_non_negative(
+                    exp_id, exp_version, 'first_hit_count_v2',
+                    first_hit_count_v2, state_name=state_name)
+                StatisticsAuditV2.require_non_negative(
+                    exp_id, exp_version, 'num_completions_v2',
+                    num_completions_v2, state_name=state_name)
+
+                # The total number of answers submitted can never be less than
+                # the number of submitted answers for which useful feedback was
+                # given.
+                if total_answers_count_v2 < useful_feedback_count_v2:
+                    yield (
+                        'Total answers < Answers with useful feedback: '
+                        'exp_id:%s version:%s state:%s %s > %s' % (
+                            exp_id, exp_version, state_name,
+                            total_answers_count_v2, useful_feedback_count_v2),)
+
+                # The total hit count for a state can never be less than the
+                # number of times the state was hit for the first time.
+                if total_hit_count_v2 < first_hit_count_v2:
+                    yield (
+                        'Total state hits < First state hits: '
+                        'exp_id:%s version:%s state:%s %s > %s' % (
+                            exp_id, exp_version, state_name, total_hit_count_v2,
+                            first_hit_count_v2),)
+
+                # The total hit count for a state can never be less than the
+                # total number of times the state was completed.
+                if total_hit_count_v2 < num_completions_v2:
+                    yield (
+                        'Total state hits < Total state completions: '
+                        'exp_id:%s version:%s state:%s %s > %s' % (
+                            exp_id, exp_version, state_name, total_hit_count_v2,
+                            num_completions_v2),)
+
+
 class StatisticsAudit(jobs.BaseMapReduceOneOffJobManager):
     """A one-off statistics audit.
 
