@@ -104,6 +104,7 @@
 	"I18N_DASHBOARD_TABLE_HEADING_PLAYS": "Exécutions",
 	"I18N_DASHBOARD_TABLE_HEADING_RATING": "Note",
 	"I18N_DASHBOARD_TABLE_HEADING_UNRESOLVED_ANSWERS": "Réponses non résolues",
+	"I18N_DASHBOARD_TOPICS_AND_SKILLS_DASHBOARD": "Tableau de bord des sujets et compérences",
 	"I18N_DIRECTIVES_DRAG_IMAGE_HERE": "Faire glisser une image dans cette zone",
 	"I18N_DIRECTIVES_UPLOAD_A_FILE": "Téléverser un fichier",
 	"I18N_ERROR_DISABLED_EXPLORATION": "Exploration désactivée",
@@ -194,6 +195,7 @@
 	"I18N_INTERACTIONS_MUSIC_CLEAR": "Effacer",
 	"I18N_INTERACTIONS_MUSIC_PLAY": "Jouer",
 	"I18N_INTERACTIONS_MUSIC_PLAY_SEQUENCE": "Jouer la séquence cible",
+	"I18N_INTERACTIONS_NUMBER_WITH_UNITS_POSSIBLE_UNIT_FORMATS": "Formats possibles des unités",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_ARE_YOU_SURE_YOU_WANT_TO_RESET_YOUR_CODE": "Êtes-vous sûr de vouloir réinitialiser votre code ?",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CANCEL": "Annuler",
 	"I18N_INTERACTIONS_PENCILCODEEDITOR_CONFIRMATION_REQUIRED": "Confirmation demandée",
@@ -434,6 +436,7 @@
 	"I18N_SIDEBAR_FORUM": "Forum",
 	"I18N_SIDEBAR_GET_STARTED": "Démarrer",
 	"I18N_SIDEBAR_LIBRARY_LINK": "Bibliothèque",
+	"I18N_SIDEBAR_OPPIA_FOUNDATION": "La fondation Oppia",
 	"I18N_SIDEBAR_TEACH_WITH_OPPIA": "Enseigner avec Oppia",
 	"I18N_SIGNUP_AGREE_LICENSE_DESCRIPTION": "En cochant la case à gauche de ce texte, vous reconnaissez et acceptez d’être lié par les Conditions d’utilisation de <[sitename]>, trouvées <a href=\"/terms\" target=\"_blank\">ici</a>.",
 	"I18N_SIGNUP_BUTTON_SUBMIT": "Soumettre et commencer à contribuer",
@@ -520,5 +523,6 @@
 	"I18N_TOPNAV_SIGN_IN_WITH_GOOGLE": "Se connecter avec Google",
 	"I18N_TOPNAV_TEACH_WITH_OPPIA": "Enseigner avec Oppia",
 	"I18N_TOTAL_SUBSCRIBERS_TEXT": "Vous avez un total de <[totalSubscribers]> abonnés.",
-	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Se désabonner"
+	"I18N_UNSUBSCRIBE_BUTTON_TEXT": "Se désabonner",
+	"I18N_WORKED_EXAMPLE": "Exemple travaillé"
 }
