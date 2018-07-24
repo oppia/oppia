@@ -680,7 +680,8 @@ def validate_rte_format(html_list, rte_format, run_migration=False):
     for html_data in html_list:
         if run_migration:
             if rte_format == feconf.RTE_FORMAT_TEXTANGULAR:
-                soup_data = convert_to_textangular(html_data, 'unused')
+                soup_data = convert_to_textangular(
+                    html_data, unused_exp_id='unused')
             else:
                 soup_data = convert_to_ckeditor(html_data)
         else:
@@ -816,7 +817,7 @@ def add_dimensions_to_noninteractive_image_tag(html_string, exp_id):
     """
     soup = bs4.BeautifulSoup(html_string.encode('utf-8'), 'html.parser')
 
-    for image in soup.findAll('oppia-noninteractive-image'):
+    for image in soup.findAll(name='oppia-noninteractive-image'):
         filename = unescape_html(image['filepath-with-value'])
         filename = filename[1:-1]
         image['filepath-with-value'] = escape_html(json.dumps(

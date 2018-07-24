@@ -4807,8 +4807,7 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
             self.assertEqual(
                 exp_domain.State.convert_html_fields_in_state(
                     state_dict,
-                    html_cleaner.add_dimensions_to_noninteractive_image_tag,
-                    'unused'),
+                    html_cleaner.add_dimensions_to_noninteractive_image_tag),
                 state_dict_with_image_dimensions)
 
 

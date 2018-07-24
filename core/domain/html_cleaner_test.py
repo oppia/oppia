@@ -820,8 +820,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         }]
 
         def _mock_get_filepath_of_object_image(filename, unused_exp_id):
-            return html_cleaner.escape_html(json.dumps(
-                {'filename': filename, 'height': 490, 'width': 120}))
+            return {'filename': filename, 'height': 490, 'width': 120}
 
         with self.swap(
             html_cleaner, 'get_filepath_of_object_image',
