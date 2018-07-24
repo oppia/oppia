@@ -21,15 +21,17 @@
  */
 
 oppia.directive('oppiaInteractiveImageClickInput', [
-  '$sce', 'HtmlEscaperService', 'ExplorationContextService',
+  '$sce', 'HtmlEscaperService', 'ContextService',
   'imageClickInputRulesService', 'UrlInterpolationService',
-  'ImagePreloaderService', 'AssetsBackendApiService', 'EDITOR_TAB_CONTEXT',
-  'EVENT_NEW_CARD_AVAILABLE', 'LOADING_INDICATOR_URL',
+  'ImagePreloaderService', 'AssetsBackendApiService',
+  'EXPLORATION_EDITOR_TAB_CONTEXT', 'EVENT_NEW_CARD_AVAILABLE',
+  'LOADING_INDICATOR_URL',
   function(
-      $sce, HtmlEscaperService, ExplorationContextService,
+      $sce, HtmlEscaperService, ContextService,
       imageClickInputRulesService, UrlInterpolationService,
-      ImagePreloaderService, AssetsBackendApiService, EDITOR_TAB_CONTEXT,
-      EVENT_NEW_CARD_AVAILABLE, LOADING_INDICATOR_URL) {
+      ImagePreloaderService, AssetsBackendApiService,
+      EXPLORATION_EDITOR_TAB_CONTEXT, EVENT_NEW_CARD_AVAILABLE,
+      LOADING_INDICATOR_URL) {
     return {
       restrict: 'E',
       scope: {
@@ -81,19 +83,12 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             };
             $scope.loadImage();
           } else {
-            // This is the case when user is in exploration editor. We don't
-            // have loading indicator or try again for showing images in the
-            // exploration editor. So we directly fetch the images from the
-            // AssetsBackendApiService's cache.
-            AssetsBackendApiService.loadImage(
-              ExplorationContextService.getExplorationId(),
-              $scope.filepath.filename)
-              .then(function(loadedImageFile) {
-                $scope.isLoadingIndicatorShown = false;
-                $scope.isTryAgainShown = false;
-                var objectUrl = URL.createObjectURL(loadedImageFile.data);
-                $scope.imageUrl = objectUrl;
-              });
+            // This is the case when user is in exploration editor or in
+            // preview mode. We don't have loading indicator or try again for
+            // showing images in the exploration editor or in preview mode. So
+            // we directly assign the url to the imageUrl.
+            $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
+              ContextService.getExplorationId(), $scope.filepath);
           }
 
           $scope.mouseX = 0;
@@ -147,8 +142,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             }
           };
           $scope.getDotDisplay = function() {
-            if (ExplorationContextService.getEditorTabContext() ===
-                EDITOR_TAB_CONTEXT.EDITOR) {
+            if (ContextService.getEditorTabContext() ===
+                EXPLORATION_EDITOR_TAB_CONTEXT.EDITOR) {
               return 'none';
             }
             return 'inline';

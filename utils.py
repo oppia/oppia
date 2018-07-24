@@ -290,7 +290,7 @@ def get_random_int(upper_bound):
     assert upper_bound >= 0 and isinstance(upper_bound, int)
 
     generator = random.SystemRandom()
-    return generator.randrange(0, upper_bound)
+    return generator.randrange(0, stop=upper_bound)
 
 
 def get_random_choice(alist):
@@ -320,7 +320,7 @@ def convert_png_binary_to_data_url(content):
     Raises:
         Exception: If the given binary string is not of a PNG image.
     """
-    if imghdr.what(None, content) == 'png':
+    if imghdr.what(None, h=content) == 'png':
         return 'data:image/png;base64,%s' % urllib.quote(
             content.encode('base64'))
     else:
@@ -397,7 +397,8 @@ class JSONEncoderForHTML(json.JSONEncoder):
         return ''.join(chunks) if self.ensure_ascii else u''.join(chunks)
 
     def iterencode(self, o, _one_shot=False):
-        chunks = super(JSONEncoderForHTML, self).iterencode(o, _one_shot)
+        chunks = super(
+            JSONEncoderForHTML, self).iterencode(o, _one_shot=_one_shot)
         for chunk in chunks:
             yield chunk.replace('&', '\\u0026').replace(
                 '<', '\\u003c').replace('>', '\\u003e')
@@ -568,7 +569,7 @@ def require_valid_name(name, name_type, allow_empty=False):
         raise ValidationError(
             'Adjacent whitespace in %s should be collapsed.' % name_type)
 
-    for character in feconf.INVALID_NAME_CHARS:
+    for character in constants.INVALID_NAME_CHARS:
         if character in name:
             raise ValidationError(
                 'Invalid character %s in %s: %s' %

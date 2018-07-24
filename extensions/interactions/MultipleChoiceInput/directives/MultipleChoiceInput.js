@@ -39,6 +39,9 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
         $scope.answer = null;
 
         $scope.submitAnswer = function(answer) {
+          if (answer === null) {
+            return;
+          }
           answer = parseInt(answer, 10);
           $scope.onSubmit({
             answer: answer,

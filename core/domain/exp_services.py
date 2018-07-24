@@ -1263,11 +1263,11 @@ def compute_summary_of_exploration(exploration, contributor_id_to_add):
     # defined as humans who have made a positive (i.e. not just
     # a revert) change to an exploration's content).
     if (contributor_id_to_add is not None and
-            contributor_id_to_add not in feconf.SYSTEM_USER_IDS):
+            contributor_id_to_add not in constants.SYSTEM_USER_IDS):
         if contributor_id_to_add not in contributor_ids:
             contributor_ids.append(contributor_id_to_add)
 
-    if contributor_id_to_add not in feconf.SYSTEM_USER_IDS:
+    if contributor_id_to_add not in constants.SYSTEM_USER_IDS:
         if contributor_id_to_add is None:
             # Revert commit or other non-positive commit.
             contributors_summary = compute_exploration_contributors_summary(
@@ -1316,7 +1316,7 @@ def compute_exploration_contributors_summary(exploration_id):
         snapshot_metadata = snapshots_metadata[current_version - 1]
         committer_id = snapshot_metadata['committer_id']
         is_revert = (snapshot_metadata['commit_type'] == 'revert')
-        if not is_revert and committer_id not in feconf.SYSTEM_USER_IDS:
+        if not is_revert and committer_id not in constants.SYSTEM_USER_IDS:
             contributors_summary[committer_id] += 1
         if current_version == 1:
             break
@@ -2005,6 +2005,25 @@ def get_user_exploration_data(
     exploration_email_preferences = (
         user_services.get_email_preferences_for_exploration(
             user_id, exploration_id))
+
+    # Retrieve all classifiers for the exploration.
+    state_classifier_mapping = {}
+    classifier_training_jobs = (
+        classifier_services.get_classifier_training_jobs(
+            exploration_id, exploration.version, exploration.states))
+    for index, state_name in enumerate(exploration.states):
+        if classifier_training_jobs[index] is not None:
+            classifier_data = classifier_training_jobs[
+                index].classifier_data
+            algorithm_id = classifier_training_jobs[index].algorithm_id
+            data_schema_version = (
+                classifier_training_jobs[index].data_schema_version)
+            state_classifier_mapping[state_name] = {
+                'algorithm_id': algorithm_id,
+                'classifier_data': classifier_data,
+                'data_schema_version': data_schema_version
+            }
+
     editor_dict = {
         'auto_tts_enabled': exploration.auto_tts_enabled,
         'category': exploration.category,
@@ -2026,7 +2045,8 @@ def get_user_exploration_data(
         'version': exploration.version,
         'is_version_of_draft_valid': is_valid_draft_version,
         'draft_changes': draft_changes,
-        'email_preferences': exploration_email_preferences.to_dict()
+        'email_preferences': exploration_email_preferences.to_dict(),
+        'state_classifier_mapping': state_classifier_mapping
     }
 
     return editor_dict

@@ -54,6 +54,28 @@ describe('HTML to text', function() {
       expect(fn).toThrow();
     });
   }));
+
+  var validUnicodeStrings = [
+    '{{}}',
+    '{{abc}}',
+    '\\\\{{abc}}',
+    '\\{{{abc}}'
+  ];
+
+  it('should detect valid unicode strings', inject(function($filter) {
+    var results = [
+      '<oppia-parameter></oppia-parameter>',
+      '<oppia-parameter>abc</oppia-parameter>',
+      '\\<oppia-parameter>abc</oppia-parameter>',
+      '{<oppia-parameter>abc</oppia-parameter>',
+    ];
+    validUnicodeStrings.forEach(function(s, i) {
+      var fn = (function() {
+        return $filter('convertUnicodeWithParamsToHtml')(s);
+      })();
+      expect(fn).toEqual(results[i]);
+    });
+  }));
 });
 
 describe('Normalizer tests', function() {
@@ -103,6 +125,7 @@ describe('Normalizer tests', function() {
     expect(filter('2+3')).toBeUndefined();
     expect(filter('--1.23')).toBeUndefined();
     expect(filter('=1.23')).toBeUndefined();
+    expect(filter(undefined)).toBeUndefined();
   }));
 
   it('should impose minimum bounds', inject(function($filter) {
@@ -143,6 +166,277 @@ describe('Normalizer tests', function() {
     expect(filter('-3')).toBe(true);
     expect(filter('3.0')).toBe(true);
     expect(filter('3.5')).toBe(false);
+  }));
+});
+
+describe('Testing requireIsFloat directive', function() {
+  var $compile, scope, testInput;
+
+  beforeEach(module('oppia'));
+
+  beforeEach(inject(function($compile, $rootScope) {
+    scope = $rootScope.$new();
+    var element = '<form name="testForm">' +
+      '<input name="floatValue" type="number" ng-model="localValue" ' +
+      'require-is-float apply-validation>' +
+      '</form>';
+    $compile(element)(scope);
+    testInput = scope.testForm.floatValue;
+  }));
+
+  it('should validate if value is a float', function() {
+    testInput.$setViewValue('2');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('2.0');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('3.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+
+    testInput.$setViewValue('-3.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+  });
+
+  it('should invalidate if value is not a float', function() {
+    testInput.$setViewValue('-abc');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('3..5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('-2.abc');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue('0.3.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+
+    testInput.$setViewValue(undefined);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+  });
+});
+
+describe('Testing apply-validation directive', function() {
+  var $compile, element, scope, testInput;
+
+  beforeEach(module('oppia'));
+
+  beforeEach(inject(function($rootScope) {
+    scope = $rootScope.$new();
+    element = '<form name="testForm">' +
+      '<input name="inputValue" type="number" ng-model="localValue" ' +
+      'apply-validation>' +
+      '</form>';
+  }));
+
+  it('should apply isAtLeast validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'isAtLeast',
+        minValue: -2.5
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-1);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(-2.5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(-3);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+
+    testInput.$setViewValue('-3');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+  }));
+
+  it('should apply isAtMost validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'isAtMost',
+        maxValue: 5
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-1);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(6);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+
+    testInput.$setViewValue('10');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+  }));
+
+  it('should apply isNonempty validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'isNonempty'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-1);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+  }));
+
+  it('should apply isInteger validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'isInteger'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-3);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('1');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('3.0');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(3.5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).toEqual(1);
+
+    testInput.$setViewValue('O');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(false);
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+  }));
+
+  it('should apply isFloat validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'isFloat'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue(-3.5);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('0.5');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('1.0');
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(2);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(3);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue(4);
+    scope.$digest();
+    expect(testInput.$valid).toEqual(true);
+    expect(Object.keys(testInput.$error).length).toEqual(0);
+
+    testInput.$setViewValue('abc');
+    scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+
+    testInput.$setViewValue('1.2.3');
+    scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+
+    testInput.$setViewValue('-3..5');
+    scope.$digest();
+    expect(testInput.$valid).toBeUndefined();
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
+  }));
+
+  it('should not apply nonexistent validation', inject(function($compile) {
+    scope.validators = function() {
+      return [{
+        id: 'testFilterFilter'
+      }];
+    };
+    $compile(element)(scope);
+    testInput = scope.testForm.inputValue;
+
+    testInput.$setViewValue('-abc');
+    scope.$digest();
+    expect(Object.keys(testInput.$error).length).not.toEqual(0);
   }));
 });
 
@@ -197,242 +491,4 @@ describe('RTE helper service', function() {
         .toEqual(testData[i][0]);
     }
   });
-
-  it('should correctly sanitize HTML for the RTE', inject(function($filter) {
-    var RAW_TEXT = (
-      '<span style="color: rgb(85, 85, 85); ' +
-      'font-family: Roboto, Arial, sans-serif; ' +
-      'font-size: 16px; font-style: normal; ' +
-      'font-variant: normal; font-weight: normal; ' +
-      'letter-spacing: normal; line-height: 29.5360012054443px; ' +
-      'orphans: auto; text-align: left; text-indent: 0px; ' +
-      'text-transform: none; white-space: normal; widows: 1; ' +
-      'word-spacing: 0px; -webkit-text-stroke-width: 0px; ' +
-      'display: inline !important; float: none; ' +
-      'background-color: rgb(255, 255, 255);">' +
-      'plain text</span>');
-    var PROCESSED_TEXT = '<span>plain text</span>';
-    var RAW_BOLD_TEXT = (
-      '<b style="box-sizing: border-box; font-weight: bold; ' +
-      'color: rgb(85, 85, 85); font-family: Roboto, Arial, sans-serif; ' +
-      'font-size: 16px; font-style: normal; font-variant: normal; ' +
-      'letter-spacing: normal; line-height: 29.5360012054443px; ' +
-      'orphans: auto; text-align: left; text-indent: 0px; ' +
-      'text-transform: none; white-space: normal; widows: 1; ' +
-      'word-spacing: 0px; -webkit-text-stroke-width: 0px; ' +
-      'background-color: rgb(255, 255, 255);">bolded text</b>');
-    var PROCESSED_BOLD_TEXT = '<b>bolded text</b>';
-    var RAW_ITALIC_TEXT = (
-      '<i style="box-sizing: border-box; color: rgb(85, 85, 85); ' +
-      'font-family: Roboto, Arial, sans-serif; font-size: 16px; ' +
-      'font-variant: normal; font-weight: normal; letter-spacing: normal; ' +
-      'line-height: 29.5360012054443px; orphans: auto; text-align: left; ' +
-      'text-indent: 0px; text-transform: none; white-space: normal; ' +
-      'widows: 1; word-spacing: 0px; -webkit-text-stroke-width: 0px; ' +
-      'background-color: rgb(255, 255, 255);">italicized text</i>');
-    var PROCESSED_ITALIC_TEXT = '<i>italicized text</i>';
-
-    // Preserve allowed tags, but strip unwanted attributes.
-    expect($filter('sanitizeHtmlForRte')('')).toEqual('');
-    expect($filter('sanitizeHtmlForRte')('test')).toEqual('test');
-    expect($filter('sanitizeHtmlForRte')('<p>hello</p>')).toEqual(
-      '<p>hello</p>');
-    expect($filter('sanitizeHtmlForRte')(RAW_TEXT)).toEqual(PROCESSED_TEXT);
-    expect($filter('sanitizeHtmlForRte')(RAW_BOLD_TEXT)).toEqual(
-      PROCESSED_BOLD_TEXT);
-    expect($filter('sanitizeHtmlForRte')(RAW_ITALIC_TEXT))
-      .toEqual(PROCESSED_ITALIC_TEXT);
-    expect($filter('sanitizeHtmlForRte')(
-      RAW_TEXT + RAW_BOLD_TEXT + RAW_ITALIC_TEXT
-    )).toEqual(PROCESSED_TEXT + PROCESSED_BOLD_TEXT + PROCESSED_ITALIC_TEXT);
-
-    expect($filter('sanitizeHtmlForRte')('a<code>b</code>'))
-      .toEqual('a<code>b</code>');
-    expect($filter('sanitizeHtmlForRte')(
-      'hello <a href="http://www.abc.com">a link</a> goodbye'
-    )).toEqual('hello <a href="http://www.abc.com">a link</a> goodbye');
-    expect($filter('sanitizeHtmlForRte')(
-      '<table><tr><td>inside</td></tr></table>outside'
-    )).toEqual('<table><tbody><tr><td>inside</td></tr></tbody></table>outside');
-
-    // Remove non-allowed tags.
-    expect($filter('sanitizeHtmlForRte')('good <script>bad</script> good'))
-      .toEqual('good  good');
-    expect($filter('sanitizeHtmlForRte')('<iframe>inner</iframe>good'))
-      .toEqual('innergood');
-    expect($filter('sanitizeHtmlForRte')('<embed>inner</embed>good'))
-      .toEqual('innergood');
-
-    // Remove non-allowed attributes.
-    expect($filter('sanitizeHtmlForRte')(
-      'good <nonsense-tag onerror="abc" on-error="abc" evil-attr="evil">' +
-      'test</nonsense-tag> good'
-    )).toEqual('good test good');
-    expect($filter('sanitizeHtmlForRte')(
-      'good <code onerror="abc" on-error="abc" evil-attr="evil">' +
-      'test</code> good'
-    )).toEqual('good <code>test</code> good');
-
-    // Handle malformed tags.
-    expect($filter('sanitizeHtmlForRte')('<b>abc')).toEqual('<b>abc</b>');
-    expect($filter('sanitizeHtmlForRte')('<p')).toEqual('');
-    expect($filter('sanitizeHtmlForRte')('<evil')).toEqual('');
-    expect($filter('sanitizeHtmlForRte')('<evil>abc')).toEqual('abc');
-    expect($filter('sanitizeHtmlForRte')('</evil>abc')).toEqual('abc');
-  }));
-
-  it('should preserve RTE extensions while sanitizing HTML', inject(
-    function($filter) {
-      var STYLE_SUFFIX = (
-        'style="box-sizing: border-box; border: 0px; vertical-align: middle; ' +
-        'max-width: 100%; color: rgb(85, 85, 85); ' +
-        'font-family: Roboto, Arial, sans-serif; font-size: 16px; ' +
-        'font-style: normal; font-variant: normal; font-weight: normal; ' +
-        'letter-spacing: normal; line-height: 29.5360012054443px; ' +
-        'orphans: auto; text-align: left; text-indent: 0px; ' +
-        'text-transform: none; white-space: normal; widows: 1; ' +
-        'word-spacing: 0px; -webkit-text-stroke-width: 0px; ' +
-        'background-color: rgb(255, 255, 255);">');
-
-      var RAW_MATH = (
-        '<img src="data:image/png;base64,iVB" ' +
-        'class="oppia-noninteractive-math" ' +
-        'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;" ' +
-        STYLE_SUFFIX);
-      var RAW_LINK = (
-        '<img src="data:image/png;base64,iVB" ' +
-        'class="oppia-noninteractive-link" ' +
-        'url-with-value="&amp;quot;https://www.example.com/abc&amp;quot;" ' +
-        'text-with-value="&amp;quot;&amp;quot;" ' +
-        'open_link_in_same_window-with-value="false" ' +
-        STYLE_SUFFIX);
-      var RAW_VIDEO = (
-        '<img src="data:image/png;base64,iVB" ' +
-        'class="oppia-noninteractive-video" ' +
-        'video_id-with-value="&amp;quot;Ntcw0H0hwPU&amp;quot;" ' +
-        'start-with-value="10" ' +
-        'end-with-value="20" ' +
-        'autoplay-with-value="true" ' +
-        STYLE_SUFFIX);
-      var RAW_COLLAPSIBLE = (
-        '<img src="data:image/png;base64,iVB" ' +
-        'class="oppia-noninteractive-collapsible" ' +
-        'heading-with-value="&amp;quot;Test Collapsible&amp;quot;" ' +
-        'content-with-value="&amp;quot;&amp;lt;p&amp;gt;Collapsible content' +
-          '&amp;amp;nbsp;&amp;lt;oppia-noninteractive-math ' +
-          'raw_latex-with-value=\&amp;quot;&amp;amp;amp;quot;' +
-          '\\\\frac{x}{y}&amp;amp;amp;quot;\&amp;quot;&amp;gt;' +
-          '&amp;lt;/oppia-noninteractive-math&amp;gt;' +
-          '&amp;lt;/p&amp;gt;&amp;quot;" ' + STYLE_SUFFIX);
-      var RAW_TABS = (
-        '<img src="data:image/png;base64,iVB" ' +
-        'class="oppia-noninteractive-tabs" ' +
-        'tab_contents-with-value="[{&amp;quot;title&amp;quot;:&amp;quot;Tab 1' +
-        '&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;' +
-        'First Tabs Content&amp;amp;nbsp;&amp;lt;oppia-noninteractive-link ' +
-        'url-with-value=\&amp;quot;&amp;amp;amp;quot;' +
-        'https://www.example.com/abc&amp;amp;amp;quot;\&amp;quot; ' +
-        'text-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;' +
-        '\&amp;quot; open_link_in_same_window-with-value=\&amp;quot;' +
-        'false\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-link&amp;gt;' +
-        '&amp;lt;/p&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;:&amp;quot;' +
-        'Tab 2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p' +
-        '&amp;gt;Second Tabs Content&amp;amp;nbsp;&amp;' +
-        'lt;oppia-noninteractive-math ' +
-        'raw_latex-with-value=\&amp;quot;&amp;amp;amp;quot;' +
-        '\\\\frac{x}{y}&amp;amp;amp;quot;\&amp;quot;&amp;gt;' +
-        '&amp;lt;/oppia-noninteractive-math&amp;gt;' +
-        '&amp;lt;/p&amp;gt;&amp;quot;}]" ' + STYLE_SUFFIX);
-
-      var PROCESSED_MATH = (
-        '<img src="data:image/png;base64,iVB" ' +
-        'class="oppia-noninteractive-math" ' +
-        'raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;">');
-      var PROCESSED_LINK = (
-        '<img src="data:image/png;base64,iVB" ' +
-        'class="oppia-noninteractive-link" ' +
-        'url-with-value="&amp;quot;https://www.example.com/abc&amp;quot;" ' +
-        'text-with-value="&amp;quot;&amp;quot;" ' +
-        'open_link_in_same_window-with-value="false">');
-      var PROCESSED_VIDEO = (
-        '<img src="data:image/png;base64,iVB" ' +
-        'class="oppia-noninteractive-video" ' +
-        'video_id-with-value="&amp;quot;Ntcw0H0hwPU&amp;quot;" ' +
-        'start-with-value="10" ' +
-        'end-with-value="20" ' +
-        'autoplay-with-value="true">');
-      var PROCESSED_COLLAPSIBLE = (
-        '<img src="data:image/png;base64,iVB" ' +
-        'class="oppia-noninteractive-collapsible" ' +
-        'heading-with-value="&amp;quot;Test Collapsible&amp;quot;" ' +
-        'content-with-value="&amp;quot;&amp;lt;p&amp;gt;Collapsible content' +
-          '&amp;amp;nbsp;&amp;lt;oppia-noninteractive-math ' +
-          'raw_latex-with-value=\&amp;quot;&amp;amp;amp;quot;' +
-          '\\\\frac{x}{y}&amp;amp;amp;quot;\&amp;quot;&amp;gt;' +
-          '&amp;lt;/oppia-noninteractive-math&amp;gt;' +
-          '&amp;lt;/p&amp;gt;&amp;quot;">');
-      var PROCESSED_TABS = (
-        '<img src="data:image/png;base64,iVB" ' +
-        'class="oppia-noninteractive-tabs" ' +
-        'tab_contents-with-value="[{&amp;quot;title&amp;quot;:&amp;quot;Tab 1' +
-        '&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p&amp;gt;' +
-        'First Tabs Content&amp;amp;nbsp;&amp;lt;oppia-noninteractive-link ' +
-        'url-with-value=\&amp;quot;&amp;amp;amp;quot;' +
-        'https://www.example.com/abc&amp;amp;amp;quot;\&amp;quot; ' +
-        'text-with-value=\&amp;quot;&amp;amp;amp;quot;&amp;amp;amp;quot;' +
-        '\&amp;quot; open_link_in_same_window-with-value=\&amp;quot;' +
-        'false\&amp;quot;&amp;gt;&amp;lt;/oppia-noninteractive-link&amp;gt;' +
-        '&amp;lt;/p&amp;gt;&amp;quot;},{&amp;quot;title&amp;quot;:&amp;quot;' +
-        'Tab 2&amp;quot;,&amp;quot;content&amp;quot;:&amp;quot;&amp;lt;p' +
-        '&amp;gt;Second Tabs Content&amp;amp;nbsp;&amp;' +
-        'lt;oppia-noninteractive-math ' +
-        'raw_latex-with-value=\&amp;quot;&amp;amp;amp;quot;' +
-        '\\\\frac{x}{y}&amp;amp;amp;quot;\&amp;quot;&amp;gt;' +
-        '&amp;lt;/oppia-noninteractive-math&amp;gt;' +
-        '&amp;lt;/p&amp;gt;&amp;quot;}]">');
-
-      var RAW_TEXT = '<span style="color: rgb(85, 85, 85);">plain text</span>';
-      var PROCESSED_TEXT = '<span>plain text</span>';
-      var RAW_BOLD_TEXT = '<b style="box-sizing: border-box;">bolded text</b>';
-      var PROCESSED_BOLD_TEXT = '<b>bolded text</b>';
-      var RAW_ITALIC_TEXT = '<i style="font-size: 16px;">italicized text</i>';
-      var PROCESSED_ITALIC_TEXT = '<i>italicized text</i>';
-
-      // Individual extensions.
-      expect($filter('sanitizeHtmlForRte')(RAW_MATH)).toEqual(PROCESSED_MATH);
-      expect($filter('sanitizeHtmlForRte')(RAW_LINK)).toEqual(PROCESSED_LINK);
-      expect($filter('sanitizeHtmlForRte')(RAW_VIDEO)).toEqual(PROCESSED_VIDEO);
-      expect($filter('sanitizeHtmlForRte')(RAW_COLLAPSIBLE)).toEqual(
-        PROCESSED_COLLAPSIBLE);
-      expect($filter('sanitizeHtmlForRte')(RAW_TABS)).toEqual(PROCESSED_TABS);
-
-      // Combinations of extensions and text.
-      expect($filter('sanitizeHtmlForRte')(RAW_MATH + RAW_MATH))
-        .toEqual(PROCESSED_MATH + PROCESSED_MATH);
-      expect($filter('sanitizeHtmlForRte')(RAW_MATH + RAW_TABS + RAW_VIDEO))
-        .toEqual(PROCESSED_MATH + PROCESSED_TABS + PROCESSED_VIDEO);
-      expect($filter('sanitizeHtmlForRte')(
-        RAW_TEXT + RAW_BOLD_TEXT + RAW_MATH + RAW_TABS
-      )).toEqual(
-        PROCESSED_TEXT + PROCESSED_BOLD_TEXT + PROCESSED_MATH + PROCESSED_TABS);
-      expect($filter('sanitizeHtmlForRte')(RAW_TEXT + RAW_MATH + RAW_TEXT))
-        .toEqual(PROCESSED_TEXT + PROCESSED_MATH + PROCESSED_TEXT);
-      expect($filter('sanitizeHtmlForRte')(
-        RAW_TEXT + RAW_MATH + RAW_TEXT + RAW_LINK
-      )).toEqual(
-        PROCESSED_TEXT + PROCESSED_MATH + PROCESSED_TEXT + PROCESSED_LINK);
-      expect($filter('sanitizeHtmlForRte')(
-        RAW_MATH + RAW_TEXT + RAW_LINK + RAW_ITALIC_TEXT
-      )).toEqual(
-        PROCESSED_MATH + PROCESSED_TEXT + PROCESSED_LINK +
-        PROCESSED_ITALIC_TEXT);
-
-      // Invalid combinations.
-      expect($filter('sanitizeHtmlForRte')(RAW_MATH + '<span')).toEqual(
-        PROCESSED_MATH);
-      expect($filter('sanitizeHtmlForRte')(
-        '<img src="srcUrl" random-attr="blah-tabs">'
-      )).toEqual('<img src="srcUrl">');
-    }
-  ));
 });

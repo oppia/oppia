@@ -41,7 +41,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
     <!-- Tiles for Internet Explorer. -->
-    <meta name="application-name" content="{{SITE_NAME}}">
+    <meta name="application-name" content="<[siteName]>">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-square70x70logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-tiny.png')}}">
     <meta name="msapplication-square150x150logo" content="{{get_complete_static_resource_url(DOMAIN_URL, '/assets/images/logo/msapplication-square.png')}}">
@@ -77,10 +77,6 @@
 
     <script>
       var GLOBALS = {
-        ACTIVITY_STATUS_PRIVATE: JSON.parse(
-          '{{ACTIVITY_STATUS_PRIVATE|js_string}}'),
-        ACTIVITY_STATUS_PUBLIC: JSON.parse(
-          '{{ACTIVITY_STATUS_PUBLIC|js_string}}'),
         ADDITIONAL_ANGULAR_MODULES: JSON.parse(
           '{{additional_angular_modules|js_string}}'),
         ASSET_DIR_PREFIX: JSON.parse('{{ASSET_DIR_PREFIX|js_string}}'),
@@ -90,15 +86,10 @@
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
         status_code: JSON.parse('{{status_code}}'),
         GCS_RESOURCE_BUCKET_NAME: JSON.parse('{{GCS_RESOURCE_BUCKET_NAME|js_string}}'),
-        INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
         NAV_MODE: JSON.parse('{{nav_mode|js_string}}'),
-        /* A list of functions to be called when an exploration is completed */
-        POST_COMPLETION_HOOKS: [],
         preferredSiteLanguageCode: JSON.parse(
           '{{preferred_site_language_code|js_string}}'),
         SITE_FEEDBACK_FORM_URL: JSON.parse('{{SITE_FEEDBACK_FORM_URL|js_string}}'),
-        SITE_NAME: JSON.parse('{{SITE_NAME|js_string}}'),
-        SYSTEM_USERNAMES: JSON.parse('{{SYSTEM_USERNAMES|js_string}}'),
         TEMPLATE_DIR_PREFIX: JSON.parse('{{TEMPLATE_DIR_PREFIX|js_string}}'),
         iframed: JSON.parse('{{iframed|js_string}}'),
         isAdmin: JSON.parse('{{is_admin|js_string}}'),
@@ -106,7 +97,6 @@
         isSuperAdmin: JSON.parse('{{is_super_admin|js_string}}'),
         loginUrl: JSON.parse('{{login_url|js_string}}'),
         logoutUrl: JSON.parse('{{logout_url|js_string}}'),
-        profilePictureDataUrl: JSON.parse('{{profile_picture_data_url|js_string}}'),
         userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}'),
         username: JSON.parse('{{username|js_string}}'),
         allowYamlFileUpload: JSON.parse('{{allow_yaml_file_upload|js_string}}'),
@@ -201,7 +191,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/pages/Base.js"></script>
 
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/AlertsService.js"></script>
-    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ExplorationContextService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/ContextService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/UtilsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/DebouncerService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/DateTimeFormatService.js"></script>
@@ -212,6 +202,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/RteHelperService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/StateRulesStatsService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/ConstructTranslationIdsService.js"></script>
+    <script src="{{TEMPLATE_DIR_PREFIX}}/services/UserService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/DeviceInfoService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/UrlService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/services/contextual/WindowDimensionsService.js"></script>
@@ -233,6 +224,7 @@
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/SkillCreationService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/components/StoryCreationService.js"></script>
 
+    <script src="{{TEMPLATE_DIR_PREFIX}}/components/CkEditorRteDirective.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/sidebar/SidebarStatusService.js"></script>
     <script src="{{TEMPLATE_DIR_PREFIX}}/domain/utilities/UrlInterpolationService.js"></script>
 

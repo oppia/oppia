@@ -74,14 +74,20 @@
 
   <li ng-class="{'active': getTabStatuses().active === 'subtopics'}" class="icon">
     <a uib-tooltip="Subtopics Editor" tooltip-placement="bottom" ng-click="selectSubtopicsTab()">
-      <i class="fa fa-book material-icons"></i>
+      <i class="material-icons">library_books</i>
+    </a>
+  </li>
+
+  <li ng-class="{'active': getTabStatuses().active === 'questions'}" class="icon">
+    <a uib-tooltip="Questions Editor" tooltip-placement="bottom" ng-click="selectQuestionsTab()">
+      <i class="material-icons">question_answer</i>
     </a>
   </li>
 </ul>
 
 <style>
   topic-editor-navbar .icon {
-    width: 2.5vw;
+    width: 2.5em;
   }
   topic-editor-navbar .icon .material-icons {
     font-size: 1.4em;

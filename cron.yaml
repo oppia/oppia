@@ -14,3 +14,6 @@ cron:
 - description: weekly exploration search rank computation
   url: /cron/explorations/search_rank
   schedule: every wednesday 9:00
+- description: accept all stale suggestions every week
+  url: /cron/suggestions/accept_stale_suggestions
+  schedule: every thursday 9:00

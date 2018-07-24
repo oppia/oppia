@@ -38,10 +38,12 @@ oppia.directive('answerGroupEditor', [
         '$scope', 'stateInteractionIdService', 'ResponsesService',
         'EditorStateService', 'AlertsService', 'INTERACTION_SPECS',
         'RuleObjectFactory', 'TrainingDataEditorPanelService',
+        'ENABLE_ML_CLASSIFIERS',
         function(
             $scope, stateInteractionIdService, ResponsesService,
             EditorStateService, AlertsService, INTERACTION_SPECS,
-            RuleObjectFactory, TrainingDataEditorPanelService) {
+            RuleObjectFactory, TrainingDataEditorPanelService,
+            ENABLE_ML_CLASSIFIERS) {
           $scope.rulesMemento = null;
           $scope.activeRuleIndex = ResponsesService.getActiveRuleIndex();
           $scope.editAnswerGroupForm = {};
@@ -102,6 +104,7 @@ oppia.directive('answerGroupEditor', [
                 return [
                   getDefaultInputValue('Real'),
                   getDefaultInputValue('Real')];
+              case 'ListOfSetsOfHtmlStrings':
               case 'ListOfUnicodeString':
               case 'SetOfUnicodeString':
               case 'SetOfHtmlString':
@@ -247,6 +250,10 @@ oppia.directive('answerGroupEditor', [
 
           $scope.openTrainingDataEditor = function() {
             TrainingDataEditorPanelService.openTrainingDataEditor();
+          };
+
+          $scope.isMLEnabled = function() {
+            return ENABLE_ML_CLASSIFIERS;
           };
 
           $scope.$on('onInteractionIdChanged', function() {

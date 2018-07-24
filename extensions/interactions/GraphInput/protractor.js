@@ -18,7 +18,7 @@
 
 var forms = require('../../../core/tests/protractor_utils/forms.js');
 var objects = require('../../objects/protractor.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('../../../core/tests/protractor_utils/waitFor.js');
 
 var customizeInteraction = function(interactionEditor, graphDict) {
   var graphInputContainer = interactionEditor.element(by.css(
@@ -49,13 +49,9 @@ var submitAnswer = function(conversationInput, graphDict) {
   }
   var submitAnswerButton = element(by.css(
     '.protractor-test-submit-answer-button'));
-  browser.wait(until.elementToBeClickable(submitAnswerButton), 10000,
-    'Submit Answer button is not clickable')
-    .then(function(isClickable) {
-      if (isClickable) {
-        submitAnswerButton.click();
-      }
-    });
+  waitFor.elementToBeClickable(
+    submitAnswerButton, 'Submit Answer button is not clickable');
+  submitAnswerButton.click();
 };
 
 var answerObjectType = 'Graph';

@@ -20,7 +20,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var AdminPage = require('../protractor_utils/AdminPage.js');
@@ -64,7 +64,7 @@ describe('Learner dashboard functionality', function() {
   var createAboutOppiaExploration = function() {
     creatorDashboardPage.get();
     creatorDashboardPage.clickCreateActivityButton();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     explorationEditorMainTab.exitTutorial();
     explorationEditorMainTab.setStateName('First');
     explorationEditorMainTab.setContent(forms.toRichText(
@@ -129,13 +129,13 @@ describe('Learner dashboard functionality', function() {
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    // Refresh page to simulate user leaving and accept the alert.
-    general.safeAcceptAlert();
-    // Wait for exploration to re-load again.
-    general.waitForLoadingMessage();
+    // User clicks on Oppia logo to leave exploration.
+    var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
+    oppiaLogo.click();
+    general.acceptAlert();
+    // Wait for /learner_dashboard to load.
+    waitFor.pageToFullyLoad();
 
-    // Learner Dashboard should display 'About Oppia' as incomplete.
-    learnerDashboardPage.get();
     learnerDashboardPage.navigateToInCompleteSection();
     learnerDashboardPage.navigateToIncompleteExplorationsSection();
     learnerDashboardPage.expectTitleOfExplorationSummaryTileToMatch(
@@ -150,7 +150,7 @@ describe('Learner dashboard functionality', function() {
     libraryPage.get();
     libraryPage.findExploration('About Oppia');
     libraryPage.playExploration('About Oppia');
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     explorationPlayerPage.expectExplorationNameToBe('About Oppia');
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.submitAnswer(
@@ -173,7 +173,7 @@ describe('Learner dashboard functionality', function() {
     libraryPage.findExploration('About Oppia');
     libraryPage.playExploration('About Oppia');
     // Wait for player page to completely load
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
     general.getExplorationIdFromPlayer().then(function(explorationId) {
       general.openEditor(explorationId);
     });
@@ -221,53 +221,45 @@ describe('Learner dashboard functionality', function() {
     collectionEditorPage.setObjective('This is a test collection.');
     collectionEditorPage.setCategory('Algebra');
     collectionEditorPage.saveChanges();
-    general.waitForSystem();
     users.logout();
 
-    users.createAndLoginUser('learner4@learnerDashboard.com',
-      'learner4learnerDashboard');
+    users.createAndLoginUser(
+      'learner4@learnerDashboard.com', 'learner4learnerDashboard');
     // Go to 'Test Collection' and play it.
     libraryPage.get();
-    libraryPage.findExploration('Test Collection');
+    libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     var firstExploration = element.all(
       by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
-    browser.wait(until.elementToBeClickable(firstExploration), 10000,
-      'Could not click first exploration in collection')
-      .then(function(isClickable) {
-        if (isClickable) {
-          firstExploration.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      firstExploration, 'Could not click first exploration in collection');
+    firstExploration.click();
     explorationPlayerPage.submitAnswer('Continue', null);
     explorationPlayerPage.expectExplorationToNotBeOver();
 
-    // Refresh page to simulate user leaving and accept the alert.
-    general.safeAcceptAlert();
-    // Wait for exploration to re-load again.
-    general.waitForLoadingMessage();
+    // User clicks on Oppia logo to leave exploration.
+    var oppiaLogo = element(by.css('.protractor-test-oppia-main-logo'));
+    oppiaLogo.click();
+    general.acceptAlert();
+    // Wait for /learner_dashboard to load.
+    waitFor.pageToFullyLoad();
 
     // Learner Dashboard should display 'Test Collection' as incomplete.
-    learnerDashboardPage.get();
     learnerDashboardPage.navigateToInCompleteSection();
     learnerDashboardPage.navigateToIncompleteCollectionsSection();
     learnerDashboardPage.expectTitleOfCollectionSummaryTileToMatch(
       'Test Collection');
 
     libraryPage.get();
-    libraryPage.findExploration('Test Collection');
+    libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     var firstExploration = element.all(
       by.css('.protractor-test-collection-exploration')).first();
     // Click first exploration in collection.
-    browser.wait(until.elementToBeClickable(firstExploration), 10000,
-      'Could not click first exploration in collection')
-      .then(function(isClickable) {
-        if (isClickable) {
-          firstExploration.click();
-        }
-      });
+    waitFor.elementToBeClickable(
+      firstExploration, 'Could not click first exploration in collection');
+    firstExploration.click();
 
     // Complete the exploration and rate it 5 stars!
     explorationPlayerPage.expectExplorationNameToBe('About Oppia');

@@ -19,13 +19,15 @@
 oppia.controller('Signup', [
   '$scope', '$http', '$rootScope', '$uibModal', 'AlertsService', 'UrlService',
   'FocusManagerService', 'siteAnalyticsService', 'UrlInterpolationService',
+  'SITE_NAME',
   function(
       $scope, $http, $rootScope, $uibModal, AlertsService, UrlService,
-      FocusManagerService, siteAnalyticsService, UrlInterpolationService) {
+      FocusManagerService, siteAnalyticsService, UrlInterpolationService,
+      SITE_NAME) {
     var _SIGNUP_DATA_URL = '/signuphandler/data';
     $rootScope.loadingMessage = 'I18N_SIGNUP_LOADING';
     $scope.warningI18nCode = '';
-    $scope.siteName = GLOBALS.SITE_NAME;
+    $scope.siteName = SITE_NAME;
     $scope.showEmailPreferencesForm = GLOBALS.CAN_SEND_EMAILS;
     $scope.submissionInProcess = false;
 
@@ -56,8 +58,9 @@ oppia.controller('Signup', [
         backdrop: true,
         resolve: {},
         controller: [
-          '$scope', '$uibModalInstance', function($scope, $uibModalInstance) {
-            $scope.siteName = GLOBALS.SITE_NAME;
+          '$scope', '$uibModalInstance', 'SITE_NAME',
+          function($scope, $uibModalInstance, SITE_NAME) {
+            $scope.siteName = SITE_NAME;
             $scope.close = function() {
               $uibModalInstance.dismiss('cancel');
             };

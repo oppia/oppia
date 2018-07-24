@@ -16,8 +16,8 @@
  * @fileoverview Page object for the creator dashboard, for use in Protractor
  * tests.
  */
-var general = require('./general.js');
-var until = protractor.ExpectedConditions;
+
+var waitFor = require('./waitFor.js');
 
 var CreatorDashboardPage = function() {
   var CREATOR_DASHBOARD_URL = '/creator_dashboard';
@@ -51,7 +51,7 @@ var CreatorDashboardPage = function() {
 
   this.get = function() {
     browser.get(CREATOR_DASHBOARD_URL);
-    return general.waitForLoadingMessage();
+    return waitFor.pageToFullyLoad();
   };
 
   this.getNumberOfFeedbackMessages = function() {
@@ -62,67 +62,49 @@ var CreatorDashboardPage = function() {
 
   this.navigateToExplorationEditor = function() {
     explorationDashboardCard.click();
-    general.waitForLoadingMessage();
+    waitFor.pageToFullyLoad();
   };
 
   this.clickCreateActivityButton = function() {
-    browser.wait(until.elementToBeClickable(createActivityButton), 10000,
-      'Create Activity button takes too long to appear')
-      .then(function(isClickable) {
-        if (isClickable) {
-          createActivityButton.click();
-          general.waitForLoadingMessage();
-        }
-      });
+    waitFor.elementToBeClickable(
+      createActivityButton,
+      'Create Activity button takes too long to be clickable');
+    createActivityButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.clickCreateCollectionButton = function() {
-    browser.wait(until.visibilityOf(activityCreationModal), 5000,
-      'Activity Creation modal is not visible').then( function(isVisible) {
-      if (isVisible) {
-        browser.wait(until.elementToBeClickable(createCollectionButton), 10000,
-          'Create Collection button takes too long to appear')
-          .then(function(isClickable) {
-            if (isClickable) {
-              createCollectionButton.click();
-              general.waitForLoadingMessage();
-            }
-          });
-      }
-    });
+    waitFor.visibilityOf(
+      activityCreationModal, 'Activity Creation modal is not visible');
+    waitFor.elementToBeClickable(
+      createCollectionButton,
+      'Create Collection button takes too long to be clickable');
+    createCollectionButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.clickCreateExplorationButton = function() {
-    browser.wait(until.elementToBeClickable(createExplorationButton), 5000,
-      'Create Exploration button takes too long to appear')
-      .then(function(isClickable) {
-        if (isClickable) {
-          createExplorationButton.click();
-          general.waitForLoadingMessage();
-        }
-      });
+    waitFor.elementToBeClickable(
+      createExplorationButton,
+      'Create Exploration button takes too long to be clickable');
+    createExplorationButton.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.navigateToCollectionEditor = function() {
-    browser.wait(until.elementToBeClickable(collectionCard), 5000,
-      'Collection Card tab takes too long to appear')
-      .then(function(isClickable) {
-        if (isClickable) {
-          collectionCard.click();
-          general.waitForLoadingMessage();
-        }
-      });
+    waitFor.elementToBeClickable(
+      collectionCard,
+      'Collection Card tab takes too long to be clickable');
+    collectionCard.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.navigateToSubscriptionDashboard = function() {
-    browser.wait(until.elementToBeClickable(subscriptionTab), 5000,
-      'Subscription Dashboard tab takes too long to appear')
-      .then(function(isClickable) {
-        if (isClickable) {
-          subscriptionTab.click();
-          general.waitForLoadingMessage();
-        }
-      });
+    waitFor.elementToBeClickable(
+      subscriptionTab,
+      'Subscription Dashboard tab takes too long to be clickable');
+    subscriptionTab.click();
+    waitFor.pageToFullyLoad();
   };
 
   this.editExploration = function(explorationTitle) {
@@ -132,14 +114,11 @@ var CreatorDashboardPage = function() {
       }
       var explorationElement = elems[0].element(
         by.css('.protractor-test-title-mask'));
-      browser.wait(until.elementToBeClickable(explorationElement), 5000,
-        'Exploration tile takes too long to appear')
-        .then(function(isClickable) {
-          if (isClickable) {
-            explorationElement.click();
-            general.waitForLoadingMessage();
-          }
-        });
+      waitFor.elementToBeClickable(
+        explorationElement,
+        'Unable to click on exploration: ' + explorationTitle);
+      explorationElement.click();
+      waitFor.pageToFullyLoad();
     });
   };
 };

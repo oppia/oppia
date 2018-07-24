@@ -560,7 +560,7 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
 
         self.assertTrue(
             FailingAdditionJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_FAILED)
+            msg=jobs.STATUS_CODE_FAILED)
 
 
 class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):

@@ -18,7 +18,7 @@
  */
 
 var forms = require('./forms.js');
-var until = protractor.ExpectedConditions;
+var waitFor = require('./waitFor.js');
 
 var ExplorationEditorHistoryTab = function() {
   /*
@@ -76,15 +76,14 @@ var ExplorationEditorHistoryTab = function() {
         });
       },
       closeStateHistory: function() {
-        browser.wait(until.elementToBeClickable(closeStateHistoryButton), 5000,
-          'Close State History button is not clickable')
-          .then(function(isClickable) {
-            if (isClickable) {
-              expect(closeStateHistoryButton.isDisplayed()).toBe(true);
-              closeStateHistoryButton.click();
-              browser.wait(until.invisibilityOf(closeStateHistoryButton), 5000);
-            }
-          });
+        waitFor.elementToBeClickable(
+          closeStateHistoryButton,
+          'Close State History button is not clickable');
+        expect(closeStateHistoryButton.isDisplayed()).toBe(true);
+        closeStateHistoryButton.click();
+        waitFor.invisibilityOf(
+          closeStateHistoryButton,
+          'Close State History button takes too long to disappear.');
       },
       deselectTwoVersions: function(versionNumber1, versionNumber2) {
         // Array starts at 0.

@@ -1277,6 +1277,13 @@ class InteractionInstance(object):
                     rule_spec_html = rule_spec.inputs['x']
                     html_list = html_list + rule_spec_html
 
+        if self.id == 'DragAndDropSortInput':
+            for answer_group in self.answer_groups:
+                for rule_spec in answer_group.rule_specs:
+                    rule_spec_html_list = rule_spec.inputs['x']
+                    for rule_spec_html in rule_spec_html_list:
+                        html_list = html_list + rule_spec_html
+
         if self.default_outcome:
             default_outcome_html = self.default_outcome.feedback.html
             html_list = html_list + [default_outcome_html]
@@ -1289,7 +1296,9 @@ class InteractionInstance(object):
             solution_html = self.solution.explanation.html
             html_list = html_list + [solution_html]
 
-        if self.id in ('ItemSelectionInput', 'MultipleChoiceInput'):
+        if self.id in (
+                'ItemSelectionInput', 'MultipleChoiceInput',
+                'DragAndDropSortInput'):
             customization_args_html_list = (
                 self.customization_args['choices']['value'])
             html_list = html_list + customization_args_html_list
@@ -3558,8 +3567,26 @@ class Exploration(object):
         return states_dict
 
     @classmethod
-    def _convert_states_v23_dict_to_v24_dict(cls, states_dict, exp_id):
-        """Converts from version 23 to 24. Version 24 adds the dimensions of
+    def _convert_states_v23_dict_to_v24_dict(cls, states_dict):
+        """Converts from version 23 to 24. Version 24 converts all Rich Text
+        Editor content to be compatible with the CKEditor format.
+
+        Args:
+            states_dict: dict. A dict where each key-value pair represents,
+                respectively, a state name and a dict used to initialize a
+                State domain object.
+
+        Returns:
+            dict. The converted states_dict.
+        """
+        for key, state_dict in states_dict.iteritems():
+            states_dict[key] = State.convert_html_fields_in_state(
+                state_dict, html_cleaner.convert_to_ckeditor)
+        return states_dict
+
+    @classmethod
+    def _convert_states_v24_dict_to_v25_dict(cls, states_dict, exp_id):
+        """Converts from version 24 to 25. Version 25 adds the dimensions of
         images in the oppia-noninteractive-image tags.
 
         Args:
@@ -3614,14 +3641,14 @@ class Exploration(object):
             current_states_schema_version, current_states_schema_version + 1))
         versioned_exploration_states['states'] = conversion_fn(
             versioned_exploration_states['states'], exploration_id) if (
-                current_states_schema_version == 23) else (
+                current_states_schema_version == 24) else (
                     conversion_fn(versioned_exploration_states['states']))
 
     # The current version of the exploration YAML schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXP_SCHEMA_VERSION = 29
+    CURRENT_EXP_SCHEMA_VERSION = 30
     LAST_UNTITLED_SCHEMA_VERSION = 9
 
     @classmethod
@@ -4144,13 +4171,28 @@ class Exploration(object):
     def _convert_v28_dict_to_v29_dict(cls, exploration_dict):
         """Converts a v28 exploration dict into a v29 exploration dict.
 
-        Adds dimensions to all oppia-noninteractive-image tags.
+        Converts all Rich Text Editor content to be compatible with the
+        CKEditor format.
         """
         exploration_dict['schema_version'] = 29
 
         exploration_dict['states'] = cls._convert_states_v23_dict_to_v24_dict(
-            exploration_dict['states'], exploration_dict['id'])
+            exploration_dict['states'])
         exploration_dict['states_schema_version'] = 24
+
+        return exploration_dict
+
+    @classmethod
+    def _convert_v29_dict_to_v30_dict(cls, exploration_dict):
+        """Converts a v29 exploration dict into a v30 exploration dict.
+
+        Adds dimensions to all oppia-noninteractive-image tags.
+        """
+        exploration_dict['schema_version'] = 30
+
+        exploration_dict['states'] = cls._convert_states_v24_dict_to_v25_dict(
+            exploration_dict['states'], exploration_dict['id'])
+        exploration_dict['states_schema_version'] = 25
 
         return exploration_dict
 
@@ -4328,10 +4370,15 @@ class Exploration(object):
             exploration_schema_version = 28
 
         if exploration_schema_version == 28:
-            exploration_dict['id'] = exp_id
             exploration_dict = cls._convert_v28_dict_to_v29_dict(
                 exploration_dict)
             exploration_schema_version = 29
+
+        if exploration_schema_version == 29:
+            exploration_dict['id'] = exp_id
+            exploration_dict = cls._convert_v29_dict_to_v30_dict(
+                exploration_dict)
+            exploration_schema_version = 30
 
         return (exploration_dict, initial_schema_version)
 

@@ -19,53 +19,7 @@
 
 var ExplorationEditorPage = require(
   '../protractor_utils/ExplorationEditorPage.js');
-var until = protractor.ExpectedConditions;
-
-// Time (in ms) to wait when the system needs time for some computations.
-var WAIT_TIME = 4000;
-
-// Optionally accepts a waitTime integer in milliseconds.
-var waitForSystem = function() {
-  var waitTime;
-  if (arguments.length === 1) {
-    waitTime = arguments[0];
-  } else {
-    waitTime = WAIT_TIME;
-  }
-  browser.sleep(waitTime);
-};
-
-var waitForLoadingMessage = function() {
-  // Consider adding this method after each browser.get() call going to an
-  // Angular page destination. Completely wait for page to load to
-  // avoid XMLHTTPReq error on page refresh:
-  // https://github.com/angular/angular.js/issues/14219#issuecomment-251605766
-  // and browser.waitForAngular()'s flakiness
-  // https://github.com/angular/protractor/issues/2954.
-  var loadingMessage = element(by.css('[ng-show="loadingMessage"]'));
-  return browser.wait(until.invisibilityOf(loadingMessage), 15000,
-    'Page takes more than 15 secs to load');
-};
-
-/**
- * Leaving exp/collections mid-play causes an alert window which cannot
- * be handled unless waitForAngular() is disabled. Re-enable waitForAngular()
- * once alert is accepted.
- */
-var safeAcceptAlert = function() {
-  // Disable waiting for Angular to accept alert.
-  browser.waitForAngularEnabled(false);
-  // Refresh page to simulate user leaving.
-  browser.navigate().refresh().then(function() {
-    browser.wait(until.alertIsPresent(), 5000);
-    return browser.switchTo().alert().then(function (alert) {
-      alert.accept().then(function() {
-      // Re-enable waiting for Angular.
-        return browser.waitForAngularEnabled(true);
-      });
-    });
-  });
-};
+var waitFor = require('./waitFor.js');
 
 var scrollToTop = function() {
   browser.executeScript('window.scrollTo(0,0);');
@@ -136,7 +90,7 @@ var getExplorationIdFromPlayer = function() {
 // The explorationId here should be a string, not a promise.
 var openEditor = function(explorationId) {
   browser.get(EDITOR_URL_SLICE + explorationId);
-  waitForLoadingMessage();
+  waitFor.pageToFullyLoad();
   var explorationEditorPage = new ExplorationEditorPage.ExplorationEditorPage();
   var explorationEditorMainTab = explorationEditorPage.getMainTab();
   explorationEditorMainTab.exitTutorial();
@@ -144,7 +98,7 @@ var openEditor = function(explorationId) {
 
 var openPlayer = function(explorationId) {
   browser.get(PLAYER_URL_SLICE + explorationId);
-  waitForLoadingMessage();
+  waitFor.pageToFullyLoad();
 };
 
 // Takes the user from an exploration editor to its player.
@@ -182,18 +136,8 @@ var ensurePageHasNoTranslationIds = function() {
 };
 
 var acceptAlert = function() {
-  browser.wait(until.alertIsPresent(), 5000).then( function(activeAlert) {
-    if (activeAlert) {
-      return browser.switchTo().alert().accept().then(
-        function() {
-          return true;
-        },
-        function() {
-          return false;
-        }
-      );
-    }
-  });
+  waitFor.alertToBePresent();
+  browser.switchTo().alert().accept();
 };
 
 var _getUniqueLogMessages = function(logs) {
@@ -228,9 +172,6 @@ var checkConsoleErrorsExist = function(expectedErrors) {
 };
 
 exports.acceptAlert = acceptAlert;
-exports.safeAcceptAlert = safeAcceptAlert;
-exports.waitForSystem = waitForSystem;
-exports.waitForLoadingMessage = waitForLoadingMessage;
 exports.scrollToTop = scrollToTop;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 

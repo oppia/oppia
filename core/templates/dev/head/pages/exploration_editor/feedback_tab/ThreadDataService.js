@@ -18,11 +18,13 @@
  */
 
 oppia.factory('ThreadDataService', [
-  '$http', '$q', 'ExplorationDataService', 'AlertsService',
-  'ACTION_ACCEPT_SUGGESTION',
+  '$http', '$log', '$q', 'ExplorationDataService', 'AlertsService',
+  'FeedbackThreadObjectFactory', 'SuggestionObjectFactory',
+  'SuggestionThreadObjectFactory', 'ACTION_ACCEPT_SUGGESTION',
   function(
-      $http, $q, ExplorationDataService, AlertsService,
-      ACTION_ACCEPT_SUGGESTION) {
+      $http, $log, $q, ExplorationDataService, AlertsService,
+      FeedbackThreadObjectFactory, SuggestionObjectFactory,
+      SuggestionThreadObjectFactory, ACTION_ACCEPT_SUGGESTION) {
     var _expId = ExplorationDataService.explorationId;
     var _FEEDBACK_STATS_HANDLER_URL = '/feedbackstatshandler/' + _expId;
     var _THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + _expId;
@@ -51,7 +53,7 @@ oppia.factory('ThreadDataService', [
     var _openThreadsCount = 0;
 
     var _fetchThreads = function(successCallback) {
-      var fPromise = $http.get(_THREAD_LIST_HANDLER_URL);
+      var threadsPromise = $http.get(_THREAD_LIST_HANDLER_URL);
       var params = {
         list_type: 'all',
         has_suggestion: true
@@ -63,38 +65,38 @@ oppia.factory('ThreadDataService', [
           target_id: _expId
         };
       }
-      var sPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
+      var suggestionsPromise = $http.get(_SUGGESTION_LIST_HANDLER_URL, {
         params: params
       });
 
-      $q.all([fPromise, sPromise]).then(function(res) {
-        _data.feedbackThreads = res[0].data.threads;
+      $q.all([threadsPromise, suggestionsPromise]).then(function(res) {
+        _data.feedbackThreads = res[0].data.feedback_thread_dicts.map(
+          FeedbackThreadObjectFactory.createFromBackendDict);
+
         _data.suggestionThreads = [];
         if (constants.USE_NEW_SUGGESTION_FRAMEWORK) {
-          for (var i = 0; i < res[1].data.suggestions.length; i++) {
-            suggestion = res[1].data.suggestions[i];
-            suggestion.thread_id = suggestion.suggestion_id.slice(
-              suggestion.suggestion_id.indexOf('.') + 1);
-            _data.suggestionThreads.push(suggestion);
+          var suggestionThreads = res[0].data.suggestion_thread_dicts;
+          if (suggestionThreads.length !== res[1].data.suggestions.length) {
+            $log.error('Number of suggestion threads doesn\'t match number of' +
+                       'suggestion objects');
           }
-          for (var i = 0; i < _data.suggestionThreads.length; i++) {
-            for (var j = 0; j < _data.feedbackThreads.length; j++) {
-              if (_data.suggestionThreads[i].thread_id ===
-                  _data.feedbackThreads[j].thread_id) {
-                _data.suggestionThreads[i].subject = (
-                  _data.feedbackThreads[j].subject);
-                _data.suggestionThreads[i].description = (
-                  _data.feedbackThreads[j].description);
-                _data.feedbackThreads.splice(j, 1);
-                // As only one feedback thread can link to one suggestion thread
-                // We can stop the inner loop when we find a match and move on
-                // to the next suggestion thread.
+          for (var i = 0; i < res[1].data.suggestions.length; i++) {
+            var suggestion = SuggestionObjectFactory.createFromBackendDict(
+              res[1].data.suggestions[i]);
+            for (var j = 0; j < suggestionThreads.length; j++) {
+              if (suggestion.threadId() ===
+                  suggestionThreads[j].thread_id) {
+                var suggestionThread = (
+                  SuggestionThreadObjectFactory.createFromBackendDicts(
+                    suggestionThreads[j], res[1].data.suggestions[i]));
+                _data.suggestionThreads.push(suggestionThread);
                 break;
               }
             }
           }
         } else {
-          _data.suggestionThreads = res[1].data.threads;
+          _data.suggestionThreads = res[1].data.threads.map(
+            FeedbackThreadObjectFactory.createFromBackendDict);
         }
         if (successCallback) {
           successCallback();
@@ -106,9 +108,11 @@ oppia.factory('ThreadDataService', [
       $http.get(_THREAD_HANDLER_PREFIX + threadId).then(function(response) {
         var allThreads = _data.feedbackThreads.concat(_data.suggestionThreads);
         for (var i = 0; i < allThreads.length; i++) {
-          if (allThreads[i].thread_id === threadId) {
-            allThreads[i].messages = response.data.messages;
-            allThreads[i].suggestion = response.data.suggestion;
+          if (allThreads[i].threadId === threadId) {
+            allThreads[i].setMessages(response.data.messages);
+            if (!constants.USE_NEW_SUGGESTION_FRAMEWORK) {
+              allThreads[i].suggestion = response.data.suggestion;
+            }
             break;
           }
         }
@@ -160,7 +164,7 @@ oppia.factory('ThreadDataService', [
         var thread = null;
 
         for (var i = 0; i < allThreads.length; i++) {
-          if (allThreads[i].thread_id === threadId) {
+          if (allThreads[i].threadId === threadId) {
             thread = allThreads[i];
             break;
           }

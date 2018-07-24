@@ -165,11 +165,7 @@ skip_files:
 - third_party/static/angular-toastr-1.7.0
 - third_party/static/bower-material-0.6.0-rc1
 - third_party/static/font-awesome-4.7.0
-- third_party/static/guppy-b5055b/lib
 - third_party/static/guppy-b5055b/site
-- third_party/static/guppy-b5055b/src
-- third_party/static/guppy-b5055b/style
-- third_party/static/guppy-b5055b/sym
 - third_party/static/guppy-b5055b/test
 - third_party/static/MathJax-2.6.0/docs
 - third_party/static/MathJax-2.6.0/localization/ast
@@ -219,5 +215,4 @@ skip_files:
 - third_party/static/nginfinitescroll-1.0.0
 - third_party/static/perfectscrollbar-0.6.16
 - third_party/static/rangy-1.3.0
-- third_party/static/textAngular-1.4.5
 - third_party/static/widget

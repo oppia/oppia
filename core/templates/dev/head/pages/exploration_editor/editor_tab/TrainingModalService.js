@@ -38,14 +38,14 @@ oppia.factory('TrainingModalService', [
           controller: [
             '$scope', '$injector', '$uibModalInstance',
             'ExplorationStatesService', 'EditorStateService',
-            'AnswerClassificationService', 'ExplorationContextService',
+            'AnswerClassificationService', 'ContextService',
             'stateInteractionIdService', 'AngularNameService',
             'ResponsesService', 'TrainingDataService',
             'stateContentIdsToAudioTranslationsService',
             'AnswerGroupObjectFactory',
             function($scope, $injector, $uibModalInstance,
                 ExplorationStatesService, EditorStateService,
-                AnswerClassificationService, ExplorationContextService,
+                AnswerClassificationService, ContextService,
                 stateInteractionIdService, AngularNameService,
                 ResponsesService, TrainingDataService,
                 stateContentIdsToAudioTranslationsService,
@@ -100,7 +100,7 @@ oppia.factory('TrainingModalService', [
 
               $scope.init = function() {
                 var explorationId =
-                  ExplorationContextService.getExplorationId();
+                  ContextService.getExplorationId();
                 var currentStateName =
                   EditorStateService.getActiveStateName();
                 var state = ExplorationStatesService.getState(currentStateName);

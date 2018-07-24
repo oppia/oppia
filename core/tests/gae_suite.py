@@ -99,7 +99,7 @@ def main():
     dev_appserver.fix_sys_path()
 
     parsed_args = _PARSER.parse_args()
-    suites = create_test_suites(parsed_args.test_target)
+    suites = create_test_suites(test_target=parsed_args.test_target)
 
     results = [unittest.TextTestRunner(verbosity=2).run(suite)
                for suite in suites]

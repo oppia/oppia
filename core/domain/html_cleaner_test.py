@@ -51,7 +51,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
-                '\n\nOriginal text: %s' % datum[0])
+                msg='\n\nOriginal text: %s' % datum[0])
 
     def test_bad_tags_suppressed(self):
         test_data = [(
@@ -80,7 +80,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
-                '\n\nOriginal text: %s' % datum[0])
+                msg='\n\nOriginal text: %s' % datum[0])
 
     def test_oppia_custom_tags(self):
         test_data = [(
@@ -100,7 +100,7 @@ class HtmlCleanerUnitTests(test_utils.GenericTestBase):
         for datum in test_data:
             self.assertEqual(
                 html_cleaner.clean(datum[0]), datum[1],
-                '\n\nOriginal text: %s' % datum[0])
+                msg='\n\nOriginal text: %s' % datum[0])
 
 
 class HtmlStripperUnitTests(test_utils.GenericTestBase):
@@ -222,11 +222,11 @@ class ContentMigrationTests(test_utils.GenericTestBase):
         for index, test_case in enumerate(test_cases):
             soup = bs4.BeautifulSoup(test_case['html_content'], 'html.parser')
             if index == 0:
-                tag = soup.findAll('i')[1]
+                tag = soup.findAll(name='i')[1]
             elif index == 1:
-                tag = soup.find('br')
+                tag = soup.find(name='br')
             elif index == 2:
-                tag = soup.find('b')
+                tag = soup.find(name='b')
             html_cleaner.wrap_with_siblings(tag, soup.new_tag('p'))
             self.assertEqual(str(soup), test_case['expected_output'])
 
@@ -720,7 +720,7 @@ class ContentMigrationTests(test_utils.GenericTestBase):
                 '&amp;amp;amp;quot;\\&amp;quot; filepath-with-value=\\&amp;quot'
                 ';&amp;amp;amp;quot;loremipsum.png&amp;amp;amp;quot;\\&amp;quot'
                 ';&amp;gt;&amp;lt;/oppia-noninteractive-image&amp;gt;&amp;lt;'
-                'p&amp;gt;&amp;amp;amp;nbsp;&amp;lt;/p&amp;gt;&amp;lt;/li&amp;'
+                'p&amp;gt;\\u00a0&amp;lt;/p&amp;gt;&amp;lt;/li&amp;'
                 'gt;&amp;lt;/ul&amp;gt;&amp;quot;" heading-with-value="&amp;'
                 'quot;loremipusm&amp;quot;"></oppia-noninteractive-collapsible>'
             )

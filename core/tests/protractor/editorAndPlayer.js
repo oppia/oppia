@@ -19,6 +19,7 @@
 var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
+var waitFor = require('../protractor_utils/waitFor.js');
 var workflow = require('../protractor_utils/workflow.js');
 
 var CollectionEditorPage =
@@ -119,7 +120,7 @@ describe('Full exploration editor', function() {
 
           browser.get('/explore/' + refresherExplorationId + '?parent=' +
             parentId1 + '&parent=' + parentId2);
-          general.waitForLoadingMessage();
+          waitFor.pageToFullyLoad();
 
           explorationPlayerPage.clickOnReturnToParentButton();
 
@@ -257,7 +258,7 @@ describe('Full exploration editor', function() {
     explorationPlayerPage.submitAnswer('MultipleChoiceInput', 'Correct');
 
     libraryPage.get();
-    libraryPage.findExploration('Test Collection');
+    libraryPage.findCollection('Test Collection');
     libraryPage.playCollection('Test Collection');
     // Click first exploration in collection.
     element.all(by.css(
@@ -534,19 +535,11 @@ describe('Full exploration editor', function() {
       forms.toRichText('How are you feeling?'));
     explorationPlayerPage.expectInteractionToMatch('TextInput');
 
-    explorationPlayerPage.submitAnswer('TextInput', 'happy');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('You must be happy!'));
-
-    explorationPlayerPage.submitAnswer('TextInput', 'meh, I\'m okay');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('You must be happy!'));
-
-    explorationPlayerPage.submitAnswer('TextInput', 'NO I\'M SAD');
-    explorationPlayerPage.expectLatestFeedbackToMatch(
-      forms.toRichText('No being sad!'));
-
     explorationPlayerPage.submitAnswer('TextInput', 'Fine...I\'m doing okay');
+    explorationPlayerPage.expectLatestFeedbackToMatch(
+      forms.toRichText('You must be happy!'));
+
+    explorationPlayerPage.submitAnswer('TextInput', 'meh, I\'m so-so');
     explorationPlayerPage.expectLatestFeedbackToMatch(
       forms.toRichText('You must be happy!'));
 
@@ -568,6 +561,8 @@ describe('Full exploration editor', function() {
       'How are you feeling?'));
     explorationEditorMainTab.setInteraction('EndExploration');
     explorationEditorMainTab.deleteInteraction();
+    explorationEditorPage.navigateToPreviewTab();
+    explorationEditorPage.navigateToMainTab();
     explorationEditorMainTab.setInteraction('TextInput');
     explorationEditorMainTab.addResponse(
       'TextInput', forms.toRichText('Happy!'), null, false, 'Equals',

@@ -62,7 +62,7 @@ def create_suggestion(
     if target_type == suggestion_models.TARGET_TYPE_EXPLORATION:
         thread_id = feedback_services.create_thread(
             target_id, None, author_id, description,
-            DEFAULT_SUGGESTION_THREAD_SUBJECT)
+            DEFAULT_SUGGESTION_THREAD_SUBJECT, has_suggestion=True)
         # This line and the if..else will be removed after the feedback thread
         # migration is complete and the IDs for both models match.
         thread_id = suggestion_models.TARGET_TYPE_EXPLORATION + '.' + thread_id
@@ -119,78 +119,34 @@ def get_suggestion_by_id(suggestion_id):
     return get_suggestion_from_model(model) if model else None
 
 
-def get_suggestions_by_author(author_id):
-    """Gets a list of suggestions by the given author.
+def query_suggestions(query_fields_and_values):
+    """Queries for suggestions.
 
     Args:
-        author_id: str. The ID of the author of the suggestions.
+        query_fields_and_values: list(tuple(str, str)). A list of queries. The
+            first element in each tuple is the field to be queried, and the
+            second element is its value.
 
     Returns:
-        list(Suggestion). A list of suggestions by the given author.
-    """
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_suggestions_by_author(
-            author_id)]
-
-
-def get_suggestions_reviewed_by(reviewer_id):
-    """Gets a list of suggestions that have been reviewed by the given user.
-
-    Args:
-        reviewer_id: str. The ID of the reviewer of the suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions reviewed by the given user.
-    """
-    return [
-        get_suggestion_from_model(s)
-        for s in suggestion_models.GeneralSuggestionModel
-        .get_suggestions_reviewed_by(reviewer_id)]
-
-
-def get_suggestions_by_status(status):
-    """Gets a list of suggestions with the given status.
-
-    Args:
-        status: str. The status of the suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions with the given status.
+        list(Suggestion). A list of suggestions that match the given query
+        values, up to a maximum of feconf.DEFAULT_QUERY_LIMIT suggestions.
     """
     return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_by_status(status)]
+            for s in suggestion_models.GeneralSuggestionModel.query_suggestions(
+                query_fields_and_values)]
 
 
-def get_suggestion_by_type(suggestion_type):
-    """Gets a list of suggestions with the given type.
-
-    Args:
-        suggestion_type: str. The type of the suggestion.
-
-    Returns:
-        list(Suggestion). A list of suggestions of the given type.
-    """
-    return [get_suggestion_from_model(s)
-            for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_by_type(suggestion_type)]
-
-
-def get_suggestions_by_target_id(target_type, target_id):
-    """Gets a list of suggestions to the entity with the given ID.
-
-    Args:
-        target_type: str. The type of target entity the suggestion is linked to.
-        target_id: str. The ID of the target entity the suggestion is linked to.
+def get_all_stale_suggestions():
+    """Gets a list of suggestions without any activity on them for
+    THRESHOLD_TIME_BEFORE_ACCEPT time.
 
     Returns:
         list(Suggestion). A list of suggestions linked to the entity.
     """
+
     return [get_suggestion_from_model(s)
             for s in suggestion_models.GeneralSuggestionModel
-            .get_suggestions_by_target_id(target_type, target_id)]
+            .get_all_stale_suggestions()]
 
 
 def _update_suggestion(suggestion):

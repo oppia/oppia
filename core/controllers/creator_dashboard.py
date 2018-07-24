@@ -35,6 +35,7 @@ import utils
 
 EXPLORATION_ID_KEY = 'explorationId'
 COLLECTION_ID_KEY = 'collectionId'
+QUESTION_ID_KEY = 'questionId'
 
 DEFAULT_TWITTER_SHARE_MESSAGE_DASHBOARD = config_domain.ConfigProperty(
     'default_twitter_share_message_dashboard', {

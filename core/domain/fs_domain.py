@@ -457,7 +457,7 @@ class GcsFileSystem(object):
             filepath: str. The path to the relevant file within the exploration.
 
         Returns:
-            bool. Returns True if the file exists in GCS else False.
+            bool. Whether the file exists in GCS.
         """
         bucket_name = app_identity_services.get_gcs_resource_bucket_name()
 
@@ -501,7 +501,7 @@ class GcsFileSystem(object):
             '/%s/%s/assets/%s' % (
                 bucket_name, self._exploration_id, filepath))
         gcs_file = cloudstorage.open(
-            gcs_file_url, 'w', content_type=mimetype)
+            gcs_file_url, mode='w', content_type=mimetype)
         gcs_file.write(raw_bytes)
         gcs_file.close()
 

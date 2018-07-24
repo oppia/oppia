@@ -16,8 +16,8 @@
 
 """Models for topics and related constructs."""
 
+from constants import constants
 from core.platform import models
-import feconf
 
 from google.appengine.ext import ndb
 
@@ -97,7 +97,7 @@ class TopicModel(base_models.VersionedModel):
         topic_commit_log_entry = TopicCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            feconf.ACTIVITY_STATUS_PUBLIC, False
+            constants.ACTIVITY_STATUS_PUBLIC, False
         )
         topic_commit_log_entry.topic_id = self.id
         topic_commit_log_entry.put()
@@ -225,7 +225,7 @@ class SubtopicPageModel(base_models.VersionedModel):
         subtopic_page_commit_log_entry = SubtopicPageCommitLogEntryModel.create(
             self.id, self.version, committer_id, committer_username,
             commit_type, commit_message, commit_cmds,
-            feconf.ACTIVITY_STATUS_PUBLIC, False
+            constants.ACTIVITY_STATUS_PUBLIC, False
         )
         subtopic_page_commit_log_entry.subtopic_page_id = self.id
         subtopic_page_commit_log_entry.put()

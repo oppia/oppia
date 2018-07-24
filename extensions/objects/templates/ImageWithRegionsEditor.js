@@ -19,10 +19,10 @@
 // TODO(czx): Uniquify the labels of image regions
 oppia.directive('imageWithRegionsEditor', [
   '$sce', 'UrlInterpolationService', 'AlertsService', '$document',
-  'ExplorationContextService', 'AssetsBackendApiService',
+  'ContextService', 'AssetsBackendApiService',
   'OBJECT_EDITOR_URL_PREFIX',
   function($sce, UrlInterpolationService, AlertsService, $document,
-      ExplorationContextService, AssetsBackendApiService,
+      ContextService, AssetsBackendApiService,
       OBJECT_EDITOR_URL_PREFIX) {
     return {
       restrict: 'E',
@@ -159,7 +159,7 @@ oppia.directive('imageWithRegionsEditor', [
 
           $scope.getPreviewUrl = function(imageUrl) {
             return AssetsBackendApiService.getImageUrlForPreview(
-              ExplorationContextService.getExplorationId(),
+              ContextService.getExplorationId(),
               encodeURIComponent(imageUrl));
           };
 

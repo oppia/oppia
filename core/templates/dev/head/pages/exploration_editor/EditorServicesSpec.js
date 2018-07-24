@@ -220,6 +220,7 @@ describe('Exploration title service', function() {
       };
       module(function($provide) {
         $provide.value('ExplorationDataService', [mockExplorationData][0]);
+        $provide.constant('INVALID_NAME_CHARS', '#@&^%$');
       });
       spyOn(mockExplorationData, 'autosaveChangeList');
     });
@@ -227,8 +228,6 @@ describe('Exploration title service', function() {
     beforeEach(inject(function($injector) {
       ets = $injector.get('ExplorationTitleService');
       $httpBackend = $injector.get('$httpBackend');
-
-      GLOBALS.INVALID_NAME_CHARS = '#@&^%$';
     }));
 
     it('correctly initializes the service', function() {

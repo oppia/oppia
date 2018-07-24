@@ -17,9 +17,9 @@
  * tests.
  */
 
-var general = require('./general.js');
 var forms = require('./forms.js');
-var until = protractor.ExpectedConditions;
+var general = require('./general.js');
+var waitFor = require('./waitFor.js');
 
 var AdminPage = function(){
   var ADMIN_URL_SUFFIX = '/admin';
@@ -32,6 +32,7 @@ var AdminPage = function(){
   var updateFormName = element(by.css('.protractor-update-form-name'));
   var updateFormSubmit = element(by.css('.protractor-update-form-submit'));
   var roleSelect = element(by.css('.protractor-update-form-role-select'));
+  var statusMessage = element(by.css('[ng-if="statusMessage"]'));
 
   var saveConfigProperty = function(configProperty) {
     return configProperty.element(by.css('.protractor-test-config-title'))
@@ -41,8 +42,10 @@ var AdminPage = function(){
           editingInstructions(forms.getEditor(objectType)(configProperty));
           saveAllConfigs.click();
           general.acceptAlert();
-          // Time is needed for the saving to complete.
-          browser.waitForAngular();
+          // Waiting for success message.
+          waitFor.textToBePresentInElement(
+            statusMessage, 'saved successfully',
+            'New config could not be saved');
           return true;
         }
       });
@@ -50,12 +53,11 @@ var AdminPage = function(){
 
   this.get = function(){
     browser.get(ADMIN_URL_SUFFIX);
-    return general.waitForLoadingMessage();
+    return waitFor.pageToFullyLoad();
   };
 
   this.editConfigProperty = function(
       propertyName, objectType, editingInstructions) {
-    general.waitForSystem();
     this.get();
     configTab.click();
     configProperties.map(saveConfigProperty).then(function(results) {
@@ -70,23 +72,20 @@ var AdminPage = function(){
   };
 
   this.updateRole = function(name, newRole) {
-    browser.wait(until.elementToBeClickable(adminRolesTab), 5000,
-      'Admin Roles tab is not clickable').then(function(isClickable) {
-      if (isClickable) {
-        adminRolesTab.click();
-      }
-    });
+    waitFor.elementToBeClickable(
+      adminRolesTab, 'Admin Roles tab is not clickable');
+    adminRolesTab.click();
+
     // Change values for "update role" form, and submit it.
-    browser.wait(until.visibilityOf(updateFormName), 5000,
-      'Update Form Name is not visible');
+    waitFor.visibilityOf(updateFormName, 'Update Form Name is not visible');
     updateFormName.sendKeys(name);
     var roleOption = roleSelect.element(
       by.cssContainingText('option', newRole));
     roleOption.click();
     updateFormSubmit.click();
-    var statusMessage = element(by.css('[ng-if="statusMessage"]'));
-    browser.wait(until.textToBePresentInElement(statusMessage,
-      'successfully updated to'), 5000, 'Role was set unsuccessfully');
+    waitFor.textToBePresentInElement(
+      statusMessage, 'successfully updated to',
+      'Could not set role successfully');
     return true;
   };
 };

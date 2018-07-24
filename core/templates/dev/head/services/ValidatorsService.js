@@ -18,7 +18,8 @@
  */
 
 oppia.factory('ValidatorsService', [
-  '$filter', 'AlertsService', function($filter, AlertsService) {
+  '$filter', 'AlertsService', 'INVALID_NAME_CHARS',
+  function($filter, AlertsService, INVALID_NAME_CHARS) {
     return {
       /**
        * Checks whether an entity name is valid, and displays a warning message
@@ -37,8 +38,8 @@ oppia.factory('ValidatorsService', [
           return false;
         }
 
-        for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
-          if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
+        for (var i = 0; i < INVALID_NAME_CHARS.length; i++) {
+          if (input.indexOf(INVALID_NAME_CHARS[i]) !== -1) {
             if (showWarnings) {
               AlertsService.addWarning(
                 'Invalid input. Please use a non-empty description ' +

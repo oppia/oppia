@@ -51,7 +51,7 @@ describe('Image preloader service', function() {
     $httpBackend = $injector.get('$httpBackend');
     ips = $injector.get('ImagePreloaderService');
     eof = $injector.get('ExplorationObjectFactory');
-    ecs = $injector.get('ExplorationContextService');
+    ecs = $injector.get('ContextService');
     abas = $injector.get('AssetsBackendApiService');
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
     $rootScope = $injector.get('$rootScope');

@@ -30,11 +30,13 @@
 
 <style>
   .oppia-preview-bottom-right-container {
-    bottom: 5px;
+    /* Fixed at bottom right corner (before footer) and appear on top of other div*/
+    bottom: 10px;
     display: block;
-    position: absolute;
-    right: 5px;
+    position: fixed;
+    right: 0;
     padding-bottom: 2em;
+    z-index: 1060;
   }
 
   .oppia-preview-bottom-right-container .oppia-parameter-summary {

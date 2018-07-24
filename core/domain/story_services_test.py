@@ -181,6 +181,7 @@ class StoryServicesUnitTests(test_utils.GenericTestBase):
     def test_delete_story(self):
         story_services.delete_story(self.USER_ID, self.STORY_ID)
         self.assertEqual(story_services.get_story_by_id(
-            self.STORY_ID, False), None)
+            self.STORY_ID, strict=False), None)
         self.assertEqual(
-            story_services.get_story_summary_by_id(self.STORY_ID, False), None)
+            story_services.get_story_summary_by_id(
+                self.STORY_ID, strict=False), None)

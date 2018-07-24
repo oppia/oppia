@@ -48,7 +48,7 @@ describe('Extracting Image file names in the state service', function() {
   var ImageFilenamesInExploration;
   beforeEach(inject(function($injector) {
     eof = $injector.get('ExplorationObjectFactory');
-    ecs = $injector.get('ExplorationContextService');
+    ecs = $injector.get('ContextService');
     eifss = $injector.get('ExtractImageFilenamesFromStateService');
     spyOn(ecs, 'getExplorationId').and.returnValue('1');
     $rootScope = $injector.get('$rootScope');

@@ -22,9 +22,9 @@
 var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngAudio', 'ngSanitize', 'ngTouch', 'ngResource',
-    'ui.bootstrap', 'ui.sortable', 'infinite-scroll', 'ngJoyRide', 'ngImgCrop',
-    'ui.validate', 'textAngular', 'pascalprecht.translate', 'ngCookies',
-    'toastr', 'headroom', 'dndLists'
+    'ui.bootstrap', 'ui.sortable', 'ui.tree', 'infinite-scroll', 'ngJoyRide',
+    'ngImgCrop', 'ui.validate', 'pascalprecht.translate', 'ngCookies', 'toastr',
+    'headroom', 'dndLists'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || []) : []));
 
@@ -34,6 +34,8 @@ for (var constantName in constants) {
 
 oppia.constant(
   'EXPLORATION_SUMMARY_DATA_URL_TEMPLATE', '/explorationsummarieshandler/data');
+
+oppia.constant('EXPLORATION_AND_SKILL_ID_PATTERN', /^[a-zA-Z0-9_-]+$/);
 
 // We use a slash because this character is forbidden in a state name.
 oppia.constant('PLACEHOLDER_OUTCOME_DEST', '/');
@@ -72,6 +74,7 @@ oppia.constant('COMPONENT_NAME_CONTENT', 'content');
 oppia.constant('COMPONENT_NAME_HINT', 'hint');
 oppia.constant('COMPONENT_NAME_SOLUTION', 'solution');
 oppia.constant('COMPONENT_NAME_FEEDBACK', 'feedback');
+oppia.constant('COMPONENT_NAME_DEFAULT_OUTCOME', 'default_outcome');
 
 // Enables recording playthroughs from learner sessions.
 oppia.constant('ENABLE_PLAYTHROUGH_RECORDING', false);
@@ -93,136 +96,9 @@ oppia.constant('ISSUE_TYPE_EARLY_QUIT', 'EarlyQuit');
 oppia.constant(
   'ISSUE_TYPE_MULTIPLE_INCORRECT_SUBMISSIONS', 'MultipleIncorrectSubmissions');
 oppia.constant('ISSUE_TYPE_CYCLIC_STATE_TRANSITIONS', 'CyclicStateTransitions');
+oppia.constant('SITE_NAME', 'Oppia.org');
 
-// Add RTE extensions to textAngular toolbar options.
-oppia.config(['$provide', function($provide) {
-  $provide.decorator('taOptions', [
-    '$delegate', '$document', '$uibModal', '$timeout', 'FocusManagerService',
-    'taRegisterTool', 'RteHelperService', 'AlertsService',
-    'ExplorationContextService', 'PAGE_CONTEXT',
-    'UrlInterpolationService',
-    function(
-        taOptions, $document, $uibModal, $timeout, FocusManagerService,
-        taRegisterTool, RteHelperService, AlertsService,
-        ExplorationContextService, PAGE_CONTEXT,
-        UrlInterpolationService) {
-      taOptions.disableSanitizer = true;
-      taOptions.forceTextAngularSanitize = false;
-      taOptions.classes.textEditor = 'form-control oppia-rte-content';
-      taOptions.setup.textEditorSetup = function($element) {
-        $timeout(function() {
-          $element.trigger('focus');
-        });
-      };
-
-      RteHelperService.getRichTextComponents().forEach(function(componentDefn) {
-        var buttonDisplay = RteHelperService.createToolbarIcon(componentDefn);
-        var canUseFs = ExplorationContextService.getPageContext() ===
-          PAGE_CONTEXT.EDITOR;
-
-        taRegisterTool(componentDefn.id, {
-          display: buttonDisplay.outerHTML,
-          tooltiptext: componentDefn.tooltip,
-          disabled: function() {
-            // Disable components that affect fs for non-editors.
-            return !canUseFs && componentDefn.requiresFs;
-          },
-          onElementSelect: {
-            element: 'img',
-            filter: function(elt) {
-              return elt.hasClass('oppia-noninteractive-' + componentDefn.id);
-            },
-            action: function(event, $element) {
-              event.preventDefault();
-              var textAngular = this;
-
-              if (!canUseFs && componentDefn.requiresFs) {
-                var FS_UNAUTHORIZED_WARNING = 'Unfortunately, only ' +
-                  'exploration authors can make changes involving files.';
-                AlertsService.addWarning(FS_UNAUTHORIZED_WARNING);
-                // Without this, the view will not update to show the warning.
-                textAngular.$editor().$parent.$apply();
-                return;
-              }
-
-              // Move the cursor to be immediately after the clicked widget.
-              // This prevents users from overwriting the widget.
-              var elRange = rangy.createRange();
-              elRange.setStartAfter($element.get(0));
-              elRange.setEndAfter($element.get(0));
-              var elSelection = rangy.getSelection();
-              elSelection.removeAllRanges();
-              elSelection.addRange(elRange);
-              var savedSelection = rangy.saveSelection();
-
-              // Temporarily pauses sanitizer so rangy markers save position
-              textAngular.$editor().$parent.isCustomizationModalOpen = true;
-              RteHelperService._openCustomizationModal(
-                componentDefn.customizationArgSpecs,
-                RteHelperService.createCustomizationArgDictFromAttrs(
-                  $element[0].attributes),
-                function(customizationArgsDict) {
-                  var el = RteHelperService.createRteElement(
-                    componentDefn, customizationArgsDict);
-                  $element[0].parentNode.replaceChild(el, $element[0]);
-                  textAngular.$editor().updateTaBindtaTextElement();
-                },
-                function() {},
-                function() {
-                  // Re-enables the sanitizer now that the modal is closed.
-                  textAngular.$editor(
-                  ).$parent.isCustomizationModalOpen = false;
-                  textAngular.$editor().displayElements.text[0].focus();
-                  rangy.restoreSelection(savedSelection);
-                });
-              return false;
-            }
-          },
-          action: function() {
-            var textAngular = this;
-            var savedSelection = rangy.saveSelection();
-            textAngular.$editor().wrapSelection(
-              'insertHtml', '<span class="insertionPoint"></span>');
-
-            // Temporarily pauses sanitizer so rangy markers save position.
-            textAngular.$editor().$parent.isCustomizationModalOpen = true;
-            RteHelperService._openCustomizationModal(
-              componentDefn.customizationArgSpecs,
-              {},
-              function(customizationArgsDict) {
-                var el = RteHelperService.createRteElement(
-                  componentDefn, customizationArgsDict);
-                var insertionPoint = (
-                  textAngular.$editor().displayElements.text[0].querySelector(
-                    '.insertionPoint'));
-                var parent = insertionPoint.parentNode;
-                parent.replaceChild(el, insertionPoint);
-                textAngular.$editor().updateTaBindtaTextElement();
-              },
-              function() {
-                // Clean up the insertion point if no widget was inserted.
-                var insertionPoint = (
-                  textAngular.$editor().displayElements.text[0].querySelector(
-                    '.insertionPoint'));
-                if (insertionPoint !== null) {
-                  insertionPoint.remove();
-                }
-              },
-              function() {
-                // Re-enables the sanitizer now that the modal is closed.
-                textAngular.$editor().$parent.isCustomizationModalOpen = false;
-                textAngular.$editor().displayElements.text[0].focus();
-                rangy.restoreSelection(savedSelection);
-              }
-            );
-          }
-        });
-      });
-
-      return taOptions;
-    }
-  ]);
-}]);
+oppia.constant('DEFAULT_PROFILE_IMAGE_PATH', '/avatar/user_blue_72px.png');
 
 // Dynamically generate CKEditor widgets for the rich text components.
 oppia.run([
