@@ -20,6 +20,14 @@ from core.platform.memcache import gae_memcache_services
 from core.tests import test_utils
 
 
+def internet_on():
+    import urllib2
+    try:
+        urllib2.urlopen('http://www.google.com', timeout=1)
+        return True
+    except urllib2.URLError as err: 
+        return False
+
 class GaeMemcacheServicesUnitTests(test_utils.GenericTestBase):
     """Tests for gae_memcache_services."""
 
@@ -37,9 +45,18 @@ class GaeMemcacheServicesUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.exp_list, [])
 
     def test_delete(self):
-        return_code = gae_memcache_services.delete(self.keys[0])
-        self.assertTrue(return_code in xrange(3))
+        return_code_key_present = gae_memcache_services.delete('a')
+        return_code_key_not_present = gae_memcache_services.delete('d')
+        if internet_on():
+            self.assertEqual(return_code_key_present, 2)
+            self.assertEqual(return_code_key_not_present, 1)
+        else:
+            self.assertEqual(return_code_key_present, 0)
+            self.assertEqual(return_code_key_not_present, 0)
 
     def test_delete_multi(self):
         return_value = gae_memcache_services.delete_multi(self.keys)
-        self.assertTrue(isinstance(return_value, bool))
+        if internet_on():
+            self.assertEqual(return_value, True)
+        else:
+            self.assertEqual(return_value, False)
