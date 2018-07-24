@@ -56,6 +56,7 @@ ONE_OFF_JOB_MANAGERS = [
     recommendations_jobs_one_off.ExplorationRecommendationsOneOffJob,
     stats_jobs_one_off.ExplorationIssuesModelCreatorOneOffJob,
     stats_jobs_one_off.RecomputeStatisticsOneOffJob,
+    stats_jobs_one_off.RecomputeStatisticsValidationCopyOneOffJob,
     stats_jobs_one_off.StatisticsAuditV1,
     stats_jobs_one_off.StatisticsAudit,
     user_jobs_one_off.DashboardSubscriptionsOneOffJob,
