@@ -25,8 +25,9 @@ def internet_on():
     try:
         urllib2.urlopen('http://www.google.com', timeout=1)
         return True
-    except urllib2.URLError as err: 
+    except urllib2.URLError:
         return False
+
 
 class GaeMemcacheServicesUnitTests(test_utils.GenericTestBase):
     """Tests for gae_memcache_services."""
