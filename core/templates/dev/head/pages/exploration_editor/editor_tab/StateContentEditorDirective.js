@@ -28,20 +28,23 @@ oppia.directive('stateContentEditor', [
         };
       },
       scope: {
-        getOnSaveContentFn: '&onSaveContentFn'
+        getOnSaveContentFn: '&onSaveContentFn',
+        stateService: '=',
+        isQuestion: '&',
+        isInitialState: '&'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/exploration_editor/editor_tab/' +
         'state_content_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'stateContentService', 'EditabilityService',
-        'EditorFirstTimeEventsService', 'ExplorationInitStateNameService',
-        'EditorStateService', 'stateContentIdsToAudioTranslationsService',
+        'EditorFirstTimeEventsService',
+        'stateContentIdsToAudioTranslationsService',
         'COMPONENT_NAME_CONTENT',
         function(
             $scope, $uibModal, stateContentService, EditabilityService,
-            EditorFirstTimeEventsService, ExplorationInitStateNameService,
-            EditorStateService, stateContentIdsToAudioTranslationsService,
+            EditorFirstTimeEventsService,
+            stateContentIdsToAudioTranslationsService,
             COMPONENT_NAME_CONTENT) {
           $scope.HTML_SCHEMA = {
             type: 'html'
@@ -54,11 +57,22 @@ oppia.directive('stateContentEditor', [
           $scope.stateContentIdsToAudioTranslationsService =
             stateContentIdsToAudioTranslationsService;
           $scope.contentEditorIsOpen = false;
-          $scope.isEditable = EditabilityService.isEditable;
+          if ($scope.isQuestion()) {
+            $scope.isEditable = function() {
+              return true;
+            };
+          } else {
+            $scope.isEditable = EditabilityService.isEditable;
+          }
           $scope.COMPONENT_NAME_CONTENT = COMPONENT_NAME_CONTENT;
 
           var saveContent = function() {
             stateContentService.saveDisplayedValue();
+            if (!$scope.isQuestion()) {
+              $scope.stateService.saveStateContent(
+                stateContentService.stateName,
+                angular.copy(stateContentService.displayed));
+            }
             $scope.contentEditorIsOpen = false;
           };
 
@@ -75,6 +89,12 @@ oppia.directive('stateContentEditor', [
               stateContentIdsToAudioTranslationsService.displayed
                 .markAllAudioAsNeedingUpdate(contentId);
               stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+              if (!$scope.isQuestion()) {
+                $scope.stateService.saveContentIdsToAudioTranslations(
+                  stateContentIdsToAudioTranslationsService.stateName,
+                  angular.copy(
+                    stateContentIdsToAudioTranslationsService.displayed));
+              }
             });
           };
 
@@ -83,12 +103,6 @@ oppia.directive('stateContentEditor', [
               saveContent();
             }
           });
-
-          $scope.isCurrentStateInitialState = function() {
-            return (
-              EditorStateService.getActiveStateName() ===
-              ExplorationInitStateNameService.savedMemento);
-          };
 
           $scope.openStateContentEditor = function() {
             if ($scope.isEditable()) {
@@ -127,6 +141,12 @@ oppia.directive('stateContentEditor', [
 
           $scope.onAudioTranslationsEdited = function() {
             stateContentIdsToAudioTranslationsService.saveDisplayedValue();
+            if (!$scope.isQuestion()) {
+              $scope.stateService.saveContentIdsToAudioTranslations(
+                stateContentIdsToAudioTranslationsService.stateName,
+                angular.copy(
+                  stateContentIdsToAudioTranslationsService.displayed));
+            }
           };
         }
       ]

@@ -21,11 +21,14 @@ oppia.controller('StateEditor', [
   'INTERACTION_SPECS', 'ExplorationAdvancedFeaturesService',
   'UrlInterpolationService', 'stateContentService',
   'stateContentIdsToAudioTranslationsService',
+  'ExplorationInitStateNameService',
   function(
       $scope, $rootScope, EditorStateService, ExplorationStatesService,
       INTERACTION_SPECS, ExplorationAdvancedFeaturesService,
       UrlInterpolationService, stateContentService,
-      stateContentIdsToAudioTranslationsService) {
+      stateContentIdsToAudioTranslationsService,
+      ExplorationInitStateNameService) {
+    $scope.explorationStatesService = ExplorationStatesService;
     $scope.areParametersEnabled = (
       ExplorationAdvancedFeaturesService.areParametersEnabled);
 
@@ -39,6 +42,12 @@ oppia.controller('StateEditor', [
     $scope.$on('refreshStateEditor', function() {
       $scope.initStateEditor();
     });
+
+    $scope.isInitialState = function() {
+      return (
+        EditorStateService.getActiveStateName() ===
+        ExplorationInitStateNameService.savedMemento);
+    };
 
     $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
       $scope.interactionIdIsSet = Boolean(newInteractionId);

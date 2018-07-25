@@ -9,11 +9,11 @@
          ng-class="{'oppia-prevent-selection': isEditable()}"
          title="Card Content">
       <span ng-show="stateContentService.savedMemento.hasNoHtml()" class="oppia-placeholder">
-        <span ng-show="isCurrentStateInitialState()">
+        <span ng-show="isInitialState()">
           This is the first card of your exploration. Use this space to introduce
           your topic and engage the learner, then ask them a question.
         </span>
-        <span ng-show="!isCurrentStateInitialState()">
+        <span ng-show="!isInitialState()">
           You can speak to the learner here, then ask them a question.
         </span>
       </span>

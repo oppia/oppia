@@ -20,29 +20,22 @@ oppia.directive('questionEditor', [
     return {
       restrict: 'E',
       scope: {
-        getQuestionId: '&questionId'
+        getQuestionId: '&questionId',
+        getQuestionStateData: '&questionStateData'
       },
       templateUrl: UrlInterpolationService.getDirectiveTemplateUrl(
         '/pages/question_editor/question_editor_directive.html'),
       controller: [
         '$scope', 'AlertsService', 'QuestionCreationService',
         'EditableQuestionBackendApiService', 'QuestionObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'stateContentService',
         function(
             $scope, AlertsService, QuestionCreationService,
             EditableQuestionBackendApiService, QuestionObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED) {
-          $scope.question = null;
-          if ($scope.getQuestionId() === null) {
-            // TODO (aks681): Add the necessary steps to be done when creating
-            // question here.
-          } else {
-            EditableQuestionBackendApiService.fetchQuestion(
-              $scope.getQuestionId()).then(function(questionBackendDict) {
-              $scope.question = QuestionObjectFactory.createFromBackendDict(
-                questionBackendDict);
-            });
-          }
+            EVENT_QUESTION_SUMMARIES_INITIALIZED, stateContentService) {
+          $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
+            '/avatar/oppia_avatar_100px.svg');
+          stateContentService.init(null, $scope.getQuestionStateData().content);
         }
       ]
     };

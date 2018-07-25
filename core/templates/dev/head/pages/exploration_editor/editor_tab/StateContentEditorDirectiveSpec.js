@@ -195,9 +195,11 @@ describe('State content editor directive', function() {
     $rootScope.$digest();
 
     outerScope = $rootScope.$new();
+    outerScope.ess = ess;
     outerScope.onSaveContentFn = jasmine.createSpy('onSaveContentFn');
     var elem = angular.element(
-      '<state-content-editor on-save-content-fn="onSaveContentFn">' +
+      '<state-content-editor on-save-content-fn="onSaveContentFn" ' +
+      'is-question="false" state-service="ess">' +
       '</state-content-editor>');
     var compiledElem = $compile(elem)(outerScope);
     outerScope.$digest();

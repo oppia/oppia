@@ -17,8 +17,8 @@
  */
 
 oppia.factory('statePropertyService', [
-  '$log', 'ChangeListService', 'AlertsService', 'ExplorationStatesService',
-  function($log, ChangeListService, AlertsService, ExplorationStatesService) {
+  '$log', 'AlertsService', 'ExplorationStatesService',
+  function($log, AlertsService, ExplorationStatesService) {
     // Public base API for data services corresponding to state properties
     // (interaction id, content, etc.)
     // WARNING: This should be initialized only in the context of the state
