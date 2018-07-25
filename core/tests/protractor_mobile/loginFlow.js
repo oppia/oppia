@@ -22,7 +22,7 @@ var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
-describe('login flow for mobile', function() {
+describe('Login flow for mobile', function() {
   var libraryPage = null;
 
   beforeAll(function() {

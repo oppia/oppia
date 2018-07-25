@@ -22,7 +22,7 @@ var waitFor = require('../protractor_utils/waitFor.js');
 
 var LibraryPage = require('../protractor_utils/LibraryPage.js');
 
-describe('user accessibility features', function() {
+describe('User accessibility features', function() {
   var SEARCH_TERM = 'Mobile';
   var libraryPage = null;
 
