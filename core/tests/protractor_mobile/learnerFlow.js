@@ -130,7 +130,7 @@ describe('learner flow for mobile', function () {
       'Mobile device testing');
   });
 
-  fit('displays incomplete and completed collections', function () {
+  it('displays incomplete and completed collections', function () {
     users.login('learnerMobile@learnerFlow.com');
     learnerDashboardPage.get();
     // Go to the test collection.
