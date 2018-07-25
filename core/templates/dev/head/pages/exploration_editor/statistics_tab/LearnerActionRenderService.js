@@ -122,6 +122,27 @@ oppia.factory('LearnerActionRenderService', [
       return blockLength < 4;
     };
 
+    var displayBlocksGrouped = {
+      displayBlocks: [],
+      localBlock: [],
+      latestStateName: null,
+      handleChangeInState: function(action) {
+        stateName = action.actionCustomizationArgs.state_name.value;
+        if (withinBlockUpperBound(this.localBlock.length)) {
+          // Add action to block.
+          this.localBlock.unshift(action);
+          return;
+        }
+        // Push current block to list of blocks and and action into new
+        // block.
+        this.displayBlocks.push(this.localBlock);
+        this.localBlock = [action];
+      },
+      handleSameState: function(action) {
+        this.localBlock.unshift(action);
+      }
+    };
+
     return {
       renderFinalDisplayBlockForMISIssueHTML: function(block) {
         var index = block.length - 1;
@@ -146,33 +167,26 @@ oppia.factory('LearnerActionRenderService', [
         return htmlString;
       },
       getDisplayBlocks: function(learnerActions) {
-        var displayBlocks = [];
         var lastIndex = learnerActions.length - 1;
-        var localBlock = [learnerActions[lastIndex]];
-        var stateName =
+        displayBlocksGrouped.localBlock = [learnerActions[lastIndex]];
+        displayBlocksGrouped.latestStateName =
           learnerActions[lastIndex].actionCustomizationArgs.state_name.value;
         for (var i = lastIndex - 1; i >= 0; i--) {
           var action = learnerActions[i];
-          if (action.actionCustomizationArgs.state_name.value !== stateName) {
-            stateName = action.actionCustomizationArgs.state_name.value;
-            if (withinBlockUpperBound(localBlock.length)) {
-              // Add action to block.
-              localBlock.unshift(action);
-              continue;
-            }
-            // Push current block to list of blocks and and action into new
-            // block.
-            displayBlocks.push(localBlock);
-            localBlock = [action];
+          var currentStateName =
+            action.actionCustomizationArgs.state_name.value;
+          if (currentStateName !== displayBlocksGrouped.latestStateName) {
+            displayBlocksGrouped.handleChangeInState(action);
           } else {
-            localBlock.unshift(action);
+            displayBlocksGrouped.handleSameState(action);
           }
         }
         // If there is a local block with actions at the end, push it.
-        if (localBlock) {
-          displayBlocks.push(localBlock);
+        if (displayBlocksGrouped.localBlock) {
+          displayBlocksGrouped.displayBlocks.push(
+            displayBlocksGrouped.localBlock);
         }
-        return displayBlocks;
+        return displayBlocksGrouped.displayBlocks;
       }
     };
   }]);
