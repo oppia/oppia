@@ -77,7 +77,7 @@ oppia.directive('oppiaNoninteractiveImage', [
           // showing images in the exploration editor or in preview mode. So
           // we directly assign the url to the imageUrl.
           $scope.imageUrl = AssetsBackendApiService.getImageUrlForPreview(
-            ContextService.getExplorationId(), $scope.filepath);
+            ContextService.getExplorationId(), $scope.filepath.filename);
         }
 
         $scope.imageCaption = '';

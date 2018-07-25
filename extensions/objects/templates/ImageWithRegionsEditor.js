@@ -169,7 +169,6 @@ oppia.directive('imageWithRegionsEditor', [
             if (newVal !== '') {
               $scope.originalImageWidth = newVal.width;
               $scope.originalImageHeight = newVal.height;
-              $scope.$apply();
             }
           });
 
