@@ -3786,3 +3786,28 @@ md-card.preview-conversation-skin-supplemental-card {
   border-bottom: solid 2.8284px #009A8B;
   border-left: solid 2.8284px #009A8B;
 }
+
+.content {
+  width: 76%;
+  margin: 0 auto;
+}
+
+.border_gray {
+  border: 2px solid #b2b2bb;
+}
+
+.issueNav:hover {
+  cursor: pointer;
+}
+
+.bor-btm {
+  border-bottom: 2px solid #b2b2bb;
+}
+
+.clr-green {
+  color: #66A79D;
+}
+
+.bg-clr {
+  background: #469689;
+}
