@@ -47,7 +47,7 @@ var AdminPage = function(){
   ));
 
   var reloadCollectionButton = element.all(by.css(
-    '.protractor-test-reload-collection-button')).first();
+    '.protractor-test-reload-collection-button'));
 
   var explorationTitleElement = function(explorationElement) {
     return explorationElement.element(
@@ -61,8 +61,8 @@ var AdminPage = function(){
     );
   };
 
-  this.reloadCollection = function() {
-    reloadCollectionButton.click();
+  this.reloadCollection = function(collectionId) {
+    reloadCollectionButton.get(collectionId).click();
     general.acceptAlert();
     // Time is needed for the reloading to complete.
     waitFor.textToBePresentInElement(
