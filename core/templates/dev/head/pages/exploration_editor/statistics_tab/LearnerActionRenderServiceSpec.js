@@ -255,7 +255,7 @@ describe('Learner Action Render Service', function() {
               }
             }, 1
           )
-        ]])
+        ]]);
       });
 
     it('should render tables for MultipleIncorrectSubmissions issue block.',
