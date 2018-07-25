@@ -18,7 +18,6 @@
 
 var browserstack = require('browserstack-local');
 var dotenv = require('dotenv');
-var ScreenShotReporter = require('protractor-screenshot-reporter');
 
 // eslint-disable-next-line angular/di
 var result = dotenv.config({path: 'core/tests/.browserstack.env'});
@@ -81,50 +80,36 @@ exports.config = {
   // with --suite=smoke, only the patterns matched by that suite will run.
   suites: {
     full: [
-      'protractor/*.js'
+      'protractor_mobile/*.js'
     ],
 
-    // Unfortunately, adding more than one file to a test suite results in
-    // severe instability as of Chromedriver 2.38 (Chrome 66).
     accessibility: [
-      'protractor/accessibility.js'
+      'protractor_mobile/accessibility.js'
     ],
 
-    collections: [
-      'protractor/collections.js'
+    console: [
+      'protractor_mobile/consoleErrors.js'
     ],
 
-    editorAndPlayer: [
-      'protractor/editorAndPlayer.js',
-    ],
-
-    stateEditor: [
-      'protractor/stateEditor.js',
-    ],
-
-    editorFeatures: [
-      'protractor/editorFeatures.js'
-    ],
-
-    embedding: [
-      'protractor/embedding.js'
-    ],
-
-    extensions: [
-      'protractor/extensions.js'
-    ],
-
-    learnerDashboard: [
-      'protractor/learnerDashboard.js'
+    learner: [
+      'protractor_mobile/learnerFlow.js'
     ],
 
     library: [
-      'protractor/publicationAndLibrary.js'
+      'protractor_mobile/libraryFlow.js'
     ],
 
-    users: [
-      'protractor/userJourneys.js',
+    login: [
+      'protractor_mobile/loginFlow.js'
     ],
+
+    navigation: [
+      'protractor_mobile/navigation.js'
+    ],
+
+    subscriptions: [
+      'protractor/subscriptionsFlow.js'
+    ]
   },
 
   // ----- Capabilities to be passed to the webdriver instance ----
@@ -137,29 +122,20 @@ exports.config = {
     'browserstack.user': process.env.USERNAME,
     'browserstack.key': process.env.ACCESS_KEY,
     'browserstack.local': true,
-    'browserstack.localIdentifier': process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
-    browserName: 'chrome',
-    browserVersion: 67,
-    platform: 'WINDOWS',
-    chromeOptions: {
-      args: ['--lang=en-EN', '--window-size=1285x1000']
-    },
-    prefs: {
-      intl: {
-        accept_languages: 'en-EN'
-      }
-    },
-    loggingPrefs: {
-      driver: 'INFO',
-      browser: 'INFO'
-    }
+    'browserstack.debug': true,
+    'browserstack.networkLogs': true,
+    'browserstack.appium_version': '1.7.2',
+    device: process.env.DEVICE,
+    os_version: process.env.OS_VERSION,
+    real_mobile: 'true',
+    browserName: ''
   },
 
   // Code to start browserstack local before start of test
-  beforeLaunch: function(){
+  beforeLaunch: function() {
     // eslint-disable-next-line no-console
-    console.log('Connecting local');
-    return new Promise(function(resolve, reject){
+    console.log('Connecting browserstack local');
+    return new Promise(function(resolve, reject) {
       exports.bs_local = new browserstack.Local();
       exports.bs_local.start({
         key: exports.config.capabilities['browserstack.key']
@@ -176,11 +152,12 @@ exports.config = {
   },
 
   // Code to stop browserstack local after end of test
-  afterLaunch: function(){
-    return new Promise(function(resolve, reject){
+  afterLaunch: function() {
+    return new Promise(function(resolve, reject) {
       exports.bs_local.stop(resolve);
     });
   },
+
   // If you would like to run more than one instance of webdriver on the same
   // tests, use multiCapabilities, which takes an array of capabilities.
   // If this is specified, capabilities will be ignored.
@@ -196,58 +173,14 @@ exports.config = {
   // body, but is necessary if ng-app is on a descendant of <body>
   rootElement: 'body',
 
-  // A callback function called once protractor is ready and available, and
-  // before the specs are executed
-  // You can specify a file containing code to run by setting onPrepare to
-  // the filename string.
   onPrepare: function() {
-    // At this point, global 'protractor' object will be set up, and jasmine
-    // will be available. For example, you can add a Jasmine reporter with:
-    //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
-    //         'outputdir/', true, true));
-
-    // This is currently pulled out into a flag because it sometimes obscures
-    // the actual protractor error logs and does not close the browser after
-    // a failed run.
-    // TODO(sll): Switch this option on by default, once the above issues are
-    // fixed.
-    var _ADD_SCREENSHOT_REPORTER = false;
-
-    if (_ADD_SCREENSHOT_REPORTER) {
-      // This takes screenshots of failed tests. For more information see
-      // https://www.npmjs.com/package/protractor-screenshot-reporter
-      jasmine.getEnv().addReporter(new ScreenShotReporter({
-        // Directory for screenshots
-        baseDirectory: '../protractor-screenshots',
-        // Function to build filenames of screenshots
-        pathBuilder: function(spec, descriptions, results, capabilities) {
-          return descriptions[1] + ' ' + descriptions[0];
-        },
-        takeScreenShotsOnlyForFailedSpecs: true
-      }));
-    }
+    browser.isMobile = true;
 
     var SpecReporter = require('jasmine-spec-reporter').SpecReporter;
     jasmine.getEnv().addReporter(new SpecReporter({
       displayStacktrace: 'all',
       displaySpecDuration: true
     }));
-
-    // Set a wide enough window size for the navbar in the library pages to
-    // display fully.
-    browser.driver.manage().window().setSize(1285, 1000);
-  },
-
-  // The params object will be passed directly to the protractor instance,
-  // and can be accessed from your test. It is an arbitrary object and can
-  // contain anything you may need in your test.
-  // This can be changed via the command line as:
-  //   --params.login.user 'Joe'
-  params: {
-    login: {
-      user: 'Jane',
-      password: '1234'
-    }
   },
 
   // ----- The test framework -----
@@ -271,31 +204,5 @@ exports.config = {
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
     defaultTimeoutInterval: 1200000
-  },
-
-  // ----- Options to be passed to mocha -----
-  //
-  // See the full list at http://visionmedia.github.io/mocha/
-  mochaOpts: {
-    ui: 'bdd',
-    reporter: 'list'
-  },
-
-  // ----- Options to be passed to cucumber -----
-  cucumberOpts: {
-    // Require files before executing the features.
-    require: 'cucumber/stepDefinitions.js',
-    // Only execute the features or scenarios with tags matching @dev.
-    // This may be an array of strings to specify multiple tags to include.
-    tags: '@dev',
-    // How to format features (default: progress)
-    format: 'summary'
-  },
-
-  // ----- The cleanup step -----
-  //
-  // A callback function called once the tests have finished running and
-  // the webdriver instance has been shut down. It is passed the exit code
-  // (0 if the tests passed or 1 if not).
-  onCleanUp: function() {}
+  }
 };
