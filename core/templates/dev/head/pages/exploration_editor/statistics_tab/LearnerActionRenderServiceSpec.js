@@ -42,25 +42,27 @@ describe('Learner Action Render Service', function() {
         var learnerActions = this.ps.getPlaythrough().actions;
         var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
 
-        expect(displayBlocks.length).toEqual(1);
-        expect(displayBlocks[0].length).toEqual(4);
-        expect(displayBlocks[0][0]).toEqual(this.laof.createNew(
-          'ExplorationStart', {
-            state_name: {
-              value: 'stateName1'
-            }
-          }, 1
-        ));
-        expect(displayBlocks[0][3]).toEqual(this.laof.createNew(
-          'ExplorationQuit', {
-            state_name: {
-              value: 'stateName2'
-            },
-            time_spent_in_state_secs: {
-              value: 120
-            }
-          }, 1
-        ));
+        expect(displayBlocks).toEqual([[
+          this.laof.createNew(
+            'ExplorationStart', {
+              state_name: {
+                value: 'stateName1'
+              }
+            }, 1
+          ),
+          jasmine.any(Object),
+          jasmine.any(Object),
+          this.laof.createNew(
+            'ExplorationQuit', {
+              state_name: {
+                value: 'stateName2'
+              },
+              time_spent_in_state_secs: {
+                value: 120
+              }
+            }, 1
+          )
+        ]]);
       });
 
     it('should split up many learner actions into different display blocks.',
@@ -89,118 +91,124 @@ describe('Learner Action Render Service', function() {
         var learnerActions = this.ps.getPlaythrough().actions;
         var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
 
-        expect(displayBlocks.length).toEqual(3);
-        expect(displayBlocks[0].length).toEqual(4);
-        expect(displayBlocks[1].length).toEqual(4);
-        expect(displayBlocks[2].length).toEqual(3);
-
-        expect(displayBlocks[2][0]).toEqual(this.laof.createNew(
-          'ExplorationStart', {
-            state_name: {
-              value: 'stateName1'
-            }
-          }, 1
-        ));
-        expect(displayBlocks[2][2]).toEqual(this.laof.createNew(
-          'AnswerSubmit', {
-            state_name: {
-              value: 'stateName2'
-            },
-            dest_state_name: {
-              value: 'stateName3'
-            },
-            interaction_id: {
-              value: 'TextInput'
-            },
-            answer: {
-              value: 'Hello'
-            },
-            feedback: {
-              value: 'Try again'
-            },
-            time_spent_in_state_secs: {
-              value: 30
-            }
-          }, 1
-        ));
-
-        expect(displayBlocks[1][0]).toEqual(this.laof.createNew(
-          'AnswerSubmit', {
-            state_name: {
-              value: 'stateName3'
-            },
-            dest_state_name: {
-              value: 'stateName1'
-            },
-            interaction_id: {
-              value: 'TextInput'
-            },
-            answer: {
-              value: 'Hello'
-            },
-            feedback: {
-              value: 'Try again'
-            },
-            time_spent_in_state_secs: {
-              value: 30
-            }
-          }, 1
-        ));
-        expect(displayBlocks[1][3]).toEqual(this.laof.createNew(
-          'AnswerSubmit', {
-            state_name: {
-              value: 'stateName3'
-            },
-            dest_state_name: {
-              value: 'stateName1'
-            },
-            interaction_id: {
-              value: 'TextInput'
-            },
-            answer: {
-              value: 'Hello'
-            },
-            feedback: {
-              value: 'Try again'
-            },
-            time_spent_in_state_secs: {
-              value: 30
-            }
-          }, 1
-        ));
-
-        expect(displayBlocks[0][0]).toEqual(this.laof.createNew(
-          'AnswerSubmit', {
-            state_name: {
-              value: 'stateName1'
-            },
-            dest_state_name: {
-              value: 'stateName2'
-            },
-            interaction_id: {
-              value: 'TextInput'
-            },
-            answer: {
-              value: 'Hello'
-            },
-            feedback: {
-              value: 'Try again'
-            },
-            time_spent_in_state_secs: {
-              value: 30
-            }
-          }, 1
-        ));
-        expect(displayBlocks[0][3]).toEqual(this.laof.createNew(
-          'ExplorationQuit', {
-            state_name: {
-              value: 'stateName1'
-            },
-            time_spent_in_state_secs: {
-              value: 120
-            }
-          }, 1
-        ));
+        expect(displayBlocks).toEqual([
+          [
+            this.laof.createNew(
+              'AnswerSubmit', {
+                state_name: {
+                  value: 'stateName1'
+                },
+                dest_state_name: {
+                  value: 'stateName2'
+                },
+                interaction_id: {
+                  value: 'TextInput'
+                },
+                answer: {
+                  value: 'Hello'
+                },
+                feedback: {
+                  value: 'Try again'
+                },
+                time_spent_in_state_secs: {
+                  value: 30
+                }
+              }, 1
+            ),
+            jasmine.any(Object),
+            jasmine.any(Object),
+            this.laof.createNew(
+              'ExplorationQuit', {
+                state_name: {
+                  value: 'stateName1'
+                },
+                time_spent_in_state_secs: {
+                  value: 120
+                }
+              }, 1
+            )
+          ],
+          [
+            this.laof.createNew(
+              'AnswerSubmit', {
+                state_name: {
+                  value: 'stateName3'
+                },
+                dest_state_name: {
+                  value: 'stateName1'
+                },
+                interaction_id: {
+                  value: 'TextInput'
+                },
+                answer: {
+                  value: 'Hello'
+                },
+                feedback: {
+                  value: 'Try again'
+                },
+                time_spent_in_state_secs: {
+                  value: 30
+                }
+              }, 1
+            ),
+            jasmine.any(Object),
+            jasmine.any(Object),
+            this.laof.createNew(
+              'AnswerSubmit', {
+                state_name: {
+                  value: 'stateName3'
+                },
+                dest_state_name: {
+                  value: 'stateName1'
+                },
+                interaction_id: {
+                  value: 'TextInput'
+                },
+                answer: {
+                  value: 'Hello'
+                },
+                feedback: {
+                  value: 'Try again'
+                },
+                time_spent_in_state_secs: {
+                  value: 30
+                }
+              }, 1
+            )
+          ],
+          [
+            this.laof.createNew(
+              'ExplorationStart', {
+                state_name: {
+                  value: 'stateName1'
+                }
+              }, 1
+            ),
+            jasmine.any(Object),
+            this.laof.createNew(
+              'AnswerSubmit', {
+                state_name: {
+                  value: 'stateName2'
+                },
+                dest_state_name: {
+                  value: 'stateName3'
+                },
+                interaction_id: {
+                  value: 'TextInput'
+                },
+                answer: {
+                  value: 'Hello'
+                },
+                feedback: {
+                  value: 'Try again'
+                },
+                time_spent_in_state_secs: {
+                  value: 30
+                }
+              }, 1
+            )
+          ]
+        ]);
       });
 
     it('should assign multiple learner actions at same state to same block.',
@@ -223,25 +231,31 @@ describe('Learner Action Render Service', function() {
         var learnerActions = this.ps.getPlaythrough().actions;
         var displayBlocks = this.lars.getDisplayBlocks(learnerActions);
 
-        expect(displayBlocks.length).toEqual(1);
-        expect(displayBlocks[0].length).toEqual(8);
-        expect(displayBlocks[0][0]).toEqual(this.laof.createNew(
-          'ExplorationStart', {
-            state_name: {
-              value: 'stateName1'
-            }
-          }, 1
-        ));
-        expect(displayBlocks[0][7]).toEqual(this.laof.createNew(
-          'ExplorationQuit', {
-            state_name: {
-              value: 'stateName1'
-            },
-            time_spent_in_state_secs: {
-              value: 120
-            }
-          }, 1
-        ));
+        expect(displayBlocks).toEqual([[
+          this.laof.createNew(
+            'ExplorationStart', {
+              state_name: {
+                value: 'stateName1'
+              }
+            }, 1
+          ),
+          jasmine.any(Object),
+          jasmine.any(Object),
+          jasmine.any(Object),
+          jasmine.any(Object),
+          jasmine.any(Object),
+          jasmine.any(Object),
+          this.laof.createNew(
+            'ExplorationQuit', {
+              state_name: {
+                value: 'stateName1'
+              },
+              time_spent_in_state_secs: {
+                value: 120
+              }
+            }, 1
+          )
+        ]])
       });
 
     it('should render tables for MultipleIncorrectSubmissions issue block.',
