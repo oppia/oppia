@@ -27,15 +27,20 @@ oppia.directive('questionEditor', [
         '/pages/question_editor/question_editor_directive.html'),
       controller: [
         '$scope', 'AlertsService', 'QuestionCreationService',
-        'EditableQuestionBackendApiService', 'QuestionObjectFactory',
-        'EVENT_QUESTION_SUMMARIES_INITIALIZED', 'stateContentService',
+        'EditabilityService', 'EditableQuestionBackendApiService',
+        'QuestionObjectFactory', 'EVENT_QUESTION_SUMMARIES_INITIALIZED',
+        'stateContentService', 'stateContentIdsToAudioTranslationsService',
         function(
             $scope, AlertsService, QuestionCreationService,
-            EditableQuestionBackendApiService, QuestionObjectFactory,
-            EVENT_QUESTION_SUMMARIES_INITIALIZED, stateContentService) {
+            EditabilityService, EditableQuestionBackendApiService,
+            QuestionObjectFactory, EVENT_QUESTION_SUMMARIES_INITIALIZED,
+            stateContentService, stateContentIdsToAudioTranslationsService) {
+          EditabilityService.markEditable();
           $scope.oppiaBlackImgUrl = UrlInterpolationService.getStaticImageUrl(
             '/avatar/oppia_avatar_100px.svg');
           stateContentService.init(null, $scope.getQuestionStateData().content);
+          stateContentIdsToAudioTranslationsService.init(
+            null, $scope.getQuestionStateData().contentIdsToAudioTranslations);
         }
       ]
     };

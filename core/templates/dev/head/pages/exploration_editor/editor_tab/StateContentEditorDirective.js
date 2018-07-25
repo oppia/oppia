@@ -38,14 +38,12 @@ oppia.directive('stateContentEditor', [
         'state_content_editor_directive.html'),
       controller: [
         '$scope', '$uibModal', 'stateContentService', 'EditabilityService',
-        'EditorFirstTimeEventsService',
+        'EditorFirstTimeEventsService', 'COMPONENT_NAME_CONTENT',
         'stateContentIdsToAudioTranslationsService',
-        'COMPONENT_NAME_CONTENT',
         function(
             $scope, $uibModal, stateContentService, EditabilityService,
-            EditorFirstTimeEventsService,
-            stateContentIdsToAudioTranslationsService,
-            COMPONENT_NAME_CONTENT) {
+            EditorFirstTimeEventsService, COMPONENT_NAME_CONTENT,
+            stateContentIdsToAudioTranslationsService) {
           $scope.HTML_SCHEMA = {
             type: 'html'
           };
@@ -57,13 +55,7 @@ oppia.directive('stateContentEditor', [
           $scope.stateContentIdsToAudioTranslationsService =
             stateContentIdsToAudioTranslationsService;
           $scope.contentEditorIsOpen = false;
-          if ($scope.isQuestion()) {
-            $scope.isEditable = function() {
-              return true;
-            };
-          } else {
-            $scope.isEditable = EditabilityService.isEditable;
-          }
+          $scope.isEditable = EditabilityService.isEditable;
           $scope.COMPONENT_NAME_CONTENT = COMPONENT_NAME_CONTENT;
 
           var saveContent = function() {
