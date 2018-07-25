@@ -543,6 +543,7 @@ DEMO_EXPLORATIONS = {
     u'19': 'example_exploration_in_collection1.yaml',
     u'20': 'example_exploration_in_collection2.yaml',
     u'21': 'example_exploration_in_collection3.yaml',
+    u'22': 'protractor_mobile_test_exploration.yaml',
 }
 
 DEMO_COLLECTIONS = {
