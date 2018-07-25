@@ -14,6 +14,16 @@
 
 /**
  * @fileoverview Service for rendering learner action HTML strings.
+ *
+ * The service should be used in the following way:
+ *
+ * 1. All learner actions for the playthrough should be passed as an arg to the
+ *  function that splits them up into Display blocks. Display blocks are the
+ *  blocks in which learner actions will be displayed in their modal.
+ * 2. Now, to render one Display block's HTML equivalent, we would pass it to
+ *  the renderDisplayBlockHTML() function. This function converts each learner
+ *  action in the block to its corresponding HTML string and joins all such
+ * learner actions and then returns a giant HTML string.
  */
 
 oppia.factory('LearnerActionRenderService', [
@@ -94,14 +104,13 @@ oppia.factory('LearnerActionRenderService', [
         return renderExplorationQuitActionHTML(
           custArgs.state_name.value, custArgs.time_spent_in_state_secs.value);
       } else if (actionType === ACTION_TYPE_ANSWER_SUBMIT) {
-        interactionId =
-          custArgs.interaction_id.value;
+        interactionId = custArgs.interaction_id.value;
         if (interactionId === 'Continue') {
           return renderContinueButtonSubmitActionHTML(
             custArgs.dest_state_name.value,
             custArgs.time_spent_in_state_secs.value);
         }
-        if (custArgs.answer.value) {
+        else if (custArgs.answer.value) {
           return renderAnswerSubmitActionHTML(
             custArgs.answer.value, custArgs.dest_state_name.value,
             custArgs.time_spent_in_state_secs.value, custArgs.state_name.value
