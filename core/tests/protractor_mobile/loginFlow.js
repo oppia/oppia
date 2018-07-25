@@ -17,17 +17,17 @@
  * and then logout.
  */
 
-var LibraryPage = require('../protractor_utils/LibraryPage.js');
+var LearnerDashboardPage =
+  require('../protractor_utils/LearnerDashboardPage.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var waitFor = require('../protractor_utils/waitFor.js');
 
 describe('Login flow for mobile', function() {
-  var libraryPage = null;
+  var learnerDashboardPage = null;
 
   beforeAll(function() {
-    libraryPage = new LibraryPage.LibraryPage();
-    libraryPage.get();
+    learnerDashboardPage = new LearnerDashboardPage.LearnerDashboardPage();
     var VISITOR_USERNAME = 'mobileVisitor';
     users.createAndLoginUser('mobileVisitor@loginFlow.com', VISITOR_USERNAME);
   });
@@ -40,6 +40,8 @@ describe('Login flow for mobile', function() {
 
   describe('profile dropdown menu', function() {
     beforeEach(function() {
+      users.login('mobileVisitor@loginFlow.com');
+      learnerDashboardPage.get();
       var profileDropdown = element(by.css(
         '.protractor-test-profile-dropdown'));
       waitFor.elementToBeClickable(
@@ -108,14 +110,12 @@ describe('Login flow for mobile', function() {
 
     afterEach(function() {
       general.checkForConsoleErrors([]);
+      users.logout();
     });
   });
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
-  });
-
-  afterAll(function() {
     users.logout();
   });
 });
